@@ -1,7 +1,7 @@
 
 // 構文スロット型ランダマイズ（3段階制御）対応版
 
-import { grammarData } from './data/grammar_data.js';
+import { grammarData } from './grammar_data.js'
 import { updateSlot } from './common.js';
 
 // 全体ランダマイズ実行関数
