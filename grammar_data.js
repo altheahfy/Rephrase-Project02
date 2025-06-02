@@ -42,6 +42,19 @@ export const grammarData = {
         "slot-o1-o1": ["the project", "the meeting"],
         "slot-o1-m3": ["promptly", "together"]
       }
+
+    embedded_structure: {
+      m1: { imagePath: "slot_images/common/soon.png" },
+      s: { imagePath: "slot_images/common/you.png" },
+      aux: { text: "するつもりだった" },
+      m2: {},
+      v: { imagePath: "slot_images/common/want.png" },
+      c: {},
+      o1: { imagePath: "slot_images/common/to_go.png" },
+      o2: {},
+      c2: {},
+      m3: { imagePath: "slot_images/common/quickly.png" }
+    },
     }
   }
 };
