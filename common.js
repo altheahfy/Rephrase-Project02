@@ -1,23 +1,18 @@
-function getStructureId() {
-  const input = document.getElementById("structureId");
-  return input ? input.value : "INF-N-OBJ-010";
+// 共通ユーティリティ関数群
+
+// null/undefined安全に処理
+export function safe(value) {
+  return value ?? '';
 }
 
-async function loadStructureData(structureId) {
-  const dir = structureId.slice(-3);
-  try {
-    const response = await fetch(`slot_assignments/${dir}/slot_assignment.json`);
-    const json = await response.json();
-    return json[structureId];
-  } catch (error) {
-    console.error(`❌ 構文データの読み込みに失敗: ${structureId}`, error);
-    return null;
-  }
+// スロットにテキストを更新（例：slot-v）
+export function updateSlotDisplay(slotId, text) {
+  const el = document.getElementById(slotId);
+  if (el) el.textContent = text;
 }
 
-
-function safe(value) {
-  return value == null ? "" : value;
+// スロット名（V, S, O1など）から要素を更新（例：V -> slot-V）
+export function updateSlot(slot, word) {
+  const el = document.getElementById("slot-" + slot);
+  if (el) el.textContent = word;
 }
-
-
