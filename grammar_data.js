@@ -4,7 +4,7 @@ export const grammarData = {
     "B": {
       "want": {
         subject: ["I", "You", "They"],
-        object1: ["to go", "to eat", "to sleep"],
+        object1: ["to go", "to eat", "to sleep", "a coffee"],
         object2: [],
         complement: [],
         m1: ["tomorrow", "soon", "now"],
