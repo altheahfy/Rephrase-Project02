@@ -1,65 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>randomizer_all.js テスト（ランダム表示）</title>
+  <title>Global Randomizer Test</title>
   <script type="module">
-    import { randomizeAll } from './randomizer_all.js';
-    import { updateSlotDisplay, safe } from './common.js';
-    import { applyImages } from './image_handler.js';
-    import { applySlotText, applySubSlotText } from './structure_analyzer.js';
+    import { performGlobalRandomization } from './randomizer_all.js';
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const variants = [
-        {
-          image_v: "test_image.png",
-          chunk_s: "He", chunk_aux: "can", chunk_v: "run", chunk_o1: "fast", chunk_m1: "every day",
-          chunk_sub_v: "run", chunk_sub_o1: "fast", chunk_sub_m3: "every day"
-        },
-        {
-          image_v: "test_image.png",
-          chunk_s: "She", chunk_aux: "will", chunk_v: "sing", chunk_o1: "a song", chunk_m1: "tonight",
-          chunk_sub_v: "sing", chunk_sub_o1: "a song", chunk_sub_m3: "softly"
-        },
-        {
-          image_v: "test_image.png",
-          chunk_s: "They", chunk_aux: "must", chunk_v: "study", chunk_o1: "math", chunk_m1: "this weekend",
-          chunk_sub_v: "study", chunk_sub_o1: "math", chunk_sub_m3: "diligently"
-        }
-      ];
-
-      function doRandomize() {
-        const data = variants[Math.floor(Math.random() * variants.length)];
-        randomizeAll(data);
-      }
-
-      document.getElementById("randomize-all").addEventListener("click", doRandomize);
-      doRandomize(); // 初期表示
-    });
+    window.onload = () => {
+      document.getElementById('randomizeBtn').addEventListener('click', () => {
+        performGlobalRandomization();
+      });
+    };
   </script>
-  <style>
-    .slot-box {
-      border: 1px solid #aaa;
-      padding: 10px;
-      margin: 5px;
-      min-height: 30px;
-    }
-  </style>
+  <script type="module" src="./common.js"></script>
 </head>
 <body>
-  <h1>randomizer_all.js テストページ（ランダム表示）</h1>
-  <button id="randomize-all">🔁 ランダマイズ</button>
-
-  <h2>主スロット</h2>
-  <div id="slot-s" class="slot-box">slot-s</div>
-  <div id="slot-aux" class="slot-box">slot-aux</div>
-  <div id="slot-v" class="slot-box">slot-v</div>
-  <div id="slot-o1" class="slot-box">slot-o1</div>
-  <div id="slot-m1" class="slot-box">slot-m1</div>
-
-  <h2>subスロット</h2>
-  <div id="slot-o1-v" class="slot-box">slot-o1-v</div>
-  <div id="slot-o1-o1" class="slot-box">slot-o1-o1</div>
-  <div id="slot-o1-m3" class="slot-box">slot-o1-m3</div>
+  <h1>🌐 全体ランダマイズテスト</h1>
+  <button id="randomizeBtn">ランダマイズ実行</button>
+  <div>
+    <p>S: <span id="slot-S">---</span></p>
+    <p>V: <span id="slot-V">---</span></p>
+    <p>O1: <span id="slot-O1">---</span></p>
+    <p>O2: <span id="slot-O2">---</span></p>
+    <p>C: <span id="slot-C">---</span></p>
+    <p>M1: <span id="slot-M1">---</span></p>
+    <p>M2: <span id="slot-M2">---</span></p>
+    <p>M3: <span id="slot-M3">---</span></p>
+    <p>Aux: <span id="slot-Aux">---</span></p>
+  </div>
 </body>
 </html>
