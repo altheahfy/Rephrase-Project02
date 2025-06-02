@@ -12,6 +12,7 @@ export function initIndividualRandomizer(structureId, currentVerb) {
         const options = grammarData[structureId].B[currentVerb][slot];
         const selected = options[Math.floor(Math.random() * options.length)];
         updateSlot(slot, selected);
+        console.log(`[${slot}] →`, selected);
       });
     }
   });
