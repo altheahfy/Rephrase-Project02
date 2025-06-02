@@ -1,0 +1,13 @@
+{
+  "INF-N-OBJ-002": {
+    "subject": "he",
+    "verb": "try",
+    "infinitive": "to eat",
+    "object": "the cake",
+    "image_s": "he.png",
+    "image_v": "try.png",
+    "image_o": "to eat the cake.png",
+    "image_o_v": "to eat.png",
+    "image_o_o": "the cake.png"
+  }
+}

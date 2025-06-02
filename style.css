@@ -1,0 +1,15 @@
+
+/* スロット画像（複数対応）の共通スタイル */
+.slot-image {
+  display: inline-block;
+  margin-right: 4px;
+  max-height: 60px;
+  vertical-align: middle;
+}
+
+/* スロット全体の調整が必要な場合に備えた汎用クラス */
+.slot-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}

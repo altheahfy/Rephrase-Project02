@@ -1,0 +1,15 @@
+{
+  "INF-N-OBJ-009": {
+    "subject": "We",
+    "verb": "can’t afford",
+    "infinitive": "to pay so much",
+    "object": "to pay so much",
+    "adverbial": "for a new television",
+    "image_s": "we.png",
+    "image_v": "can’t afford.png",
+    "image_o": "to pay so much.png",
+    "image_o_v": "to pay.png",
+    "image_o_c": "so much.png",
+    "image_m": "for a new television.png"
+  }
+}

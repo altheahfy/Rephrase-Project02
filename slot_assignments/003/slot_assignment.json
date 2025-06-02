@@ -1,0 +1,13 @@
+{
+  "INF-N-OBJ-003": {
+    "subject": "my brother",
+    "verb": "intend",
+    "infinitive": "to interrupt",
+    "object": "the game",
+    "image_s": "my brother.png",
+    "image_v": "intend.png",
+    "image_o": "to interrupt the game.png",
+    "image_o_v": "to interrupt.png",
+    "image_o_o": "the game.png"
+  }
+}

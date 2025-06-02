@@ -1,0 +1,13 @@
+{
+  "INF-N-OBJ-001": {
+    "subject": "they",
+    "verb": "intend",
+    "infinitive": "to read",
+    "object": "a book",
+    "image_s": "they.png",
+    "image_v": "intend.png",
+    "image_o": "to read a book.png",
+    "image_o_v": "to read.png",
+    "image_o_o": "a book.png"
+  }
+}

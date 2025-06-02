@@ -1,0 +1,13 @@
+{
+  "INF-N-OBJ-005": {
+    "subject": "they",
+    "verb": "refused",
+    "infinitive": "to answer",
+    "object": "the question",
+    "image_s": "they.png",
+    "image_v": "refused.png",
+    "image_o": "to answer the question.png",
+    "image_o_v": "to answer.png",
+    "image_o_o": "the question.png"
+  }
+}

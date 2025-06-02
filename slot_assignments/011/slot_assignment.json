@@ -1,0 +1,16 @@
+{
+  "INF-N-OBJ-011": {
+    "subject": "Paul",
+    "verb": "agreed",
+    "infinitive": "to help me move",
+    "object": "to help me move",
+    "adverbial": "to my new apartment",
+    "image_s": "paul.png",
+    "image_v": "agreed.png",
+    "image_o": "to help me move.png",
+    "image_o_v": "to help.png",
+    "image_o_o": "me.png",
+    "image_o_c": "move.png",
+    "image_m": "to my new apartment.png"
+  }
+}

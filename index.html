@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>Rephrase Training UI</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="controls">文タイプ：
+        <select id="sentenceType">
+            <option value="肯定文">肯定文</option>
+            <option value="否定文">否定文</option>
+            <option value="疑問文">疑問文</option>
+        </select>
+        <button onclick="randomizeAll()">全体ランダマイズ</button>
+    </div>
+
+    <div class="answer-section">
+        <label for="structured">構文IDを入力（例: INF-N-OBJ-006）:</label>
+        <input id="structured" type="text" value="INF-N-OBJ-010" />
+    </div>
+
+    <div id="sentence-container" class="sentence">
+        <div class="slot" id="slot-s">
+            <details>
+                <summary>S</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-aux">
+            <details>
+                <summary>助動詞</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-v">
+            <details>
+                <summary>V</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-c">
+            <details>
+                <summary>C</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-o1">
+            <details>
+                <summary>O1</summary>
+                <span class="chunk-content"></span>
+                <img />
+                <!-- slot-o1 sub-slot 構造を script.js 側に移管のため削除 -->
+            </details>
+        </div>
+        <div class="slot" id="slot-o2">
+            <details>
+                <summary>O2</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-c2">
+            <details>
+                <summary>C2</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+        <div class="slot" id="slot-m">
+            <details>
+                <summary>M</summary>
+                <span class="chunk-content"></span>
+                <img />
+            </details>
+        </div>
+    </div>
+
+    <div class="answer-section">
+        <label for="spoken">ここに英語文を入力：</label>
+        <input id="spoken" type="text" />
+        <button onclick="speakInput()">録音</button>
+        <button onclick="parseInput()">文法解析</button>
+        <button onclick="clearInput()">解法</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

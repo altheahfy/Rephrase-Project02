@@ -1,0 +1,13 @@
+{
+  "INF-N-OBJ-007": {
+    "subject": "my sister",
+    "verb": "decided",
+    "infinitive": "to bake",
+    "object": "a cake",
+    "image_s": "my sister.png",
+    "image_v": "decided.png",
+    "image_o": "to bake a cake.png",
+    "image_o_v": "to bake.png",
+    "image_o_o": "a cake.png"
+  }
+}
