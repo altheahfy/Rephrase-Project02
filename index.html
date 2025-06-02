@@ -2,56 +2,38 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>structure_analyzer.js テスト</title>
+  <title>randomizer_all.js テスト</title>
   <script type="module">
-    import { applySlotText, applySubSlotText } from './structure_analyzer.js';
+    import { randomizeAll } from './randomizer_all.js';
     import { updateSlotDisplay, safe } from './common.js';
+    import { applyImages } from './image_handler.js';
+    import { applySlotText, applySubSlotText } from './structure_analyzer.js';
 
     document.addEventListener("DOMContentLoaded", () => {
       const dummyData = {
-        chunk_s: "I",
-        chunk_aux: "will",
-        chunk_v: "go",
-        chunk_c1: "",
-        chunk_o1: "to school",
-        chunk_o2: "",
-        chunk_c2: "",
-        chunk_m1: "tomorrow",
-        chunk_m2: "",
-        chunk_m3: "",
+        image_v: "test_image.png",
+        image_sub_o1: "test_image.png",
 
-        chunk_sub_m1: "",
-        chunk_sub_s: "",
-        chunk_sub_aux: "",
-        chunk_sub_m2: "",
-        chunk_sub_v: "go",
-        chunk_sub_c1: "",
-        chunk_sub_o1: "to school",
-        chunk_sub_o2: "",
-        chunk_sub_c2: "",
-        chunk_sub_m3: "quickly"
+        chunk_s: "He",
+        chunk_aux: "can",
+        chunk_v: "run",
+        chunk_o1: "fast",
+        chunk_m1: "every day",
+
+        chunk_sub_v: "run",
+        chunk_sub_o1: "fast",
+        chunk_sub_m3: "every day"
       };
 
-      applySlotText(dummyData);
-      applySubSlotText(dummyData);
+      const button = document.getElementById("randomize-all");
+      button.addEventListener("click", () => {
+        randomizeAll(dummyData);
+      });
+
+      // 初期表示として1回実行
+      randomizeAll(dummyData);
     });
   </script>
-</head>
-<body>
-  <h1>structure_analyzer.js テストページ</h1>
-
-  <h2>主スロット</h2>
-  <div id="slot-s" class="slot-box">slot-s</div>
-  <div id="slot-aux" class="slot-box">slot-aux</div>
-  <div id="slot-v" class="slot-box">slot-v</div>
-  <div id="slot-o1" class="slot-box">slot-o1</div>
-  <div id="slot-m1" class="slot-box">slot-m1</div>
-
-  <h2>subスロット（折り畳み内）</h2>
-  <div id="slot-o1-v" class="slot-box">slot-o1-v</div>
-  <div id="slot-o1-o1" class="slot-box">slot-o1-o1</div>
-  <div id="slot-o1-m3" class="slot-box">slot-o1-m3</div>
-
   <style>
     .slot-box {
       border: 1px solid #aaa;
@@ -60,5 +42,21 @@
       min-height: 30px;
     }
   </style>
+</head>
+<body>
+  <h1>randomizer_all.js テストページ</h1>
+  <button id="randomize-all">🔁 ランダマイズ（初期化）</button>
+
+  <h2>主スロット</h2>
+  <div id="slot-s" class="slot-box">slot-s</div>
+  <div id="slot-aux" class="slot-box">slot-aux</div>
+  <div id="slot-v" class="slot-box">slot-v</div>
+  <div id="slot-o1" class="slot-box">slot-o1</div>
+  <div id="slot-m1" class="slot-box">slot-m1</div>
+
+  <h2>subスロット</h2>
+  <div id="slot-o1-v" class="slot-box">slot-o1-v</div>
+  <div id="slot-o1-o1" class="slot-box">slot-o1-o1</div>
+  <div id="slot-o1-m3" class="slot-box">slot-o1-m3</div>
 </body>
 </html>
