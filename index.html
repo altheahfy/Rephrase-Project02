@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🌐 全体ランダマイズテスト</title>
-  <script type="module">
-    import { performGlobalRandomization } from './randomizer_all.js';
-
-    window.onload = () => {
-      document.getElementById('randomizeBtn').addEventListener('click', () => {
-        performGlobalRandomization();
-      });
-    };
-  </script>
-  <script type="module" src="./common.js"></script>
+  <title>Test Individual Randomizer</title>
 </head>
 <body>
-  <h1>🌐 全体ランダマイズテスト（構文010用）</h1>
-  <button id="randomizeBtn">ランダマイズ実行</button>
-  <div>
-    <p>M1: <span id="slot-M1">---</span></p>
-    <p>S: <span id="slot-S">---</span></p>
-    <p>Aux: <span id="slot-Aux">---</span></p>
-    <p>M2: <span id="slot-M2">---</span></p>
-    <p>V: <span id="slot-V">---</span></p>
-    <p>C: <span id="slot-C">---</span></p>
-    <p>O1: <span id="slot-O1">---</span></p>
-    <p>O2: <span id="slot-O2">---</span></p>
-    <p>C2: <span id="slot-C2">---</span></p>
-    <p>M3: <span id="slot-M3">---</span></p>
+  <h2>Individual Slot Randomizer Test</h2>
+  <div id="slots">
+    <div>
+      <span id="slot-S">---S---</span>
+      <button id="btn-S">🔁</button>
+    </div>
+    <div>
+      <span id="slot-V">---V---</span>
+      <button id="btn-V">🔁</button>
+    </div>
+    <div>
+      <span id="slot-O1">---O1---</span>
+      <button id="btn-O1">🔁</button>
+    </div>
+    <!-- 他のスロットを必要に応じて追加可能 -->
   </div>
+
+  <script type="module">
+    import { initIndividualRandomizer } from './randomizer_individual.js';
+    import { updateSlot } from './common.js';
+
+    // スロット初期化（ダミー値）
+    updateSlot("S", "I");
+    updateSlot("V", "want");
+    updateSlot("O1", "a coffee");
+
+    // 初期化（構文ID, 動詞）
+    initIndividualRandomizer("010", "want");
+  </script>
 </body>
 </html>
