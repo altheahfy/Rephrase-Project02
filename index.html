@@ -34,5 +34,15 @@
     // ランダマイザー初期化
     initIndividualRandomizer("010", "want", grammarData);
   </script>
+<script type="module">
+  import { renderSubSlots } from './subslot_renderer.js';
+  import { grammar_data } from './grammar_data.js';
+
+  const testId = "INF-N-OBJ-010";
+
+  if (grammar_data[testId] && grammar_data[testId].embedded_structure) {
+    renderSubSlots(grammar_data[testId].embedded_structure, "slot-o1-sub");
+  }
+</script>
 </body>
 </html>
