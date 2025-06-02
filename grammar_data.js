@@ -11,9 +11,9 @@ export const grammarData = {
         m2: [],
         m3: [],
         aux: ["would", "might", "can"],
-        slot-o1-v: ["eat", "go", "sleep"],
-        slot-o1-o1: ["lunch", "home", "well"],
-        slot-o1-m3: ["quickly", "happily", "early"]
+        "slot-o1-v": ["eat", "go", "sleep"],
+        "slot-o1-o1": ["lunch", "home", "well"],
+        "slot-o1-m3": ["quickly", "happily", "early"]
       },
       "hope": {
         subject: ["She", "We"],
@@ -24,9 +24,9 @@ export const grammarData = {
         m2: [],
         m3: [],
         aux: ["can", "will"],
-        slot-o1-v: ["find", "win"],
-        slot-o1-o1: ["the prize", "the answer"],
-        slot-o1-m3: ["immediately", "eventually"]
+        "slot-o1-v": ["find", "win"],
+        "slot-o1-o1": ["the prize", "the answer"],
+        "slot-o1-m3": ["immediately", "eventually"]
       },
       "plan": {
         subject: ["They", "My team"],
@@ -37,9 +37,9 @@ export const grammarData = {
         m2: [],
         m3: [],
         aux: ["must", "may"],
-        slot-o1-v: ["leave", "start"],
-        slot-o1-o1: ["the project", "the meeting"],
-        slot-o1-m3: ["promptly", "together"]
+        "slot-o1-v": ["leave", "start"],
+        "slot-o1-o1": ["the project", "the meeting"],
+        "slot-o1-m3": ["promptly", "together"]
       }
     },
     embedded_structure: {
