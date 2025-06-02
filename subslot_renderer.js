@@ -1,26 +1,24 @@
 // subslot_renderer.js
 
-// MSauxMVCOOCM順の10スロット
 const slotOrder = ["m1", "s", "aux", "m2", "v", "c", "o1", "o2", "c2", "m3"];
 
 /**
- * サブスロット（slot-o1-sub）に対し、embedded_structure に基づき描画する
- * @param {Object} embeddedStructure - grammar_dataからの構造情報
- * @param {string} targetElementId - 描画対象（通常 "slot-o1-sub"）
+ * サブスロット描画（例：slot-o1-sub）に対し、embedded_structure に基づいて描画
+ * @param {Object} embeddedStructure - grammar_dataの構造情報
+ * @param {string} targetElementId - 描画対象のDOM ID（例："slot-o1-sub"）
  */
 export function renderSubSlots(embeddedStructure, targetElementId) {
     clearSubSlots(targetElementId);
 
     slotOrder.forEach(slotKey => {
         const slotData = embeddedStructure[slotKey] || {};
-        const slotHtml = generateSlotHtml(slotKey, slotData);
-        appendSlotToTarget(targetElementId, slotHtml);
+        const slotElement = generateSlotHtml(slotKey, slotData);
+        appendSlotToTarget(targetElementId, slotElement);
     });
 }
 
 /**
- * 各スロットごとのHTML要素を生成
- * slot-auxは文字列、その他は画像表示
+ * スロット要素の生成（slot-auxは文字列、それ以外は画像表示）
  */
 function generateSlotHtml(slotKey, slotData) {
     const wrapper = document.createElement("div");
@@ -43,7 +41,7 @@ function generateSlotHtml(slotKey, slotData) {
 }
 
 /**
- * 指定DOMにスロット要素を追加
+ * 対象DOMにスロット要素を追加
  */
 function appendSlotToTarget(targetId, element) {
     const target = document.getElementById(targetId);
@@ -53,7 +51,7 @@ function appendSlotToTarget(targetId, element) {
 }
 
 /**
- * 既存スロット内容をクリア
+ * 対象DOMの内容をクリア
  */
 function clearSubSlots(targetId) {
     const target = document.getElementById(targetId);
