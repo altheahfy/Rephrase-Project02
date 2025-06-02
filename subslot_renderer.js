@@ -58,4 +58,4 @@ function clearSubSlots(targetId) {
     if (target) {
         target.innerHTML = '';
     }
-}
+} 
