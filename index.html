@@ -19,18 +19,19 @@
       <span id="slot-O1">---O1---</span>
       <button id="btn-O1">🔁</button>
     </div>
-    <!-- 他のスロットを必要に応じて追加可能 -->
   </div>
 
   <script type="module">
-    import { initIndividualRandomizer } from './randomizer_individual_mapped.js'; <!-- ←ここだけ変更 -->
+    import { initIndividualRandomizer } from './randomizer_individual_mapped.js';
     import { updateSlot } from './common.js';
 
+    // 初期表示（grammarData["010"].B["want"] に存在する語）
     updateSlot("S", "I");
     updateSlot("V", "want");
     updateSlot("O1", "to eat");
 
+    // ランダマイザー初期化
     initIndividualRandomizer("010", "want");
-</script>
+  </script>
 </body>
 </html>
