@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>randomizer_all.js テスト</title>
+  <title>randomizer_all.js テスト（ランダム表示）</title>
   <script type="module">
     import { randomizeAll } from './randomizer_all.js';
     import { updateSlotDisplay, safe } from './common.js';
@@ -10,28 +10,31 @@
     import { applySlotText, applySubSlotText } from './structure_analyzer.js';
 
     document.addEventListener("DOMContentLoaded", () => {
-      const dummyData = {
-        image_v: "test_image.png",
-        image_sub_o1: "test_image.png",
+      const variants = [
+        {
+          image_v: "test_image.png",
+          chunk_s: "He", chunk_aux: "can", chunk_v: "run", chunk_o1: "fast", chunk_m1: "every day",
+          chunk_sub_v: "run", chunk_sub_o1: "fast", chunk_sub_m3: "every day"
+        },
+        {
+          image_v: "test_image.png",
+          chunk_s: "She", chunk_aux: "will", chunk_v: "sing", chunk_o1: "a song", chunk_m1: "tonight",
+          chunk_sub_v: "sing", chunk_sub_o1: "a song", chunk_sub_m3: "softly"
+        },
+        {
+          image_v: "test_image.png",
+          chunk_s: "They", chunk_aux: "must", chunk_v: "study", chunk_o1: "math", chunk_m1: "this weekend",
+          chunk_sub_v: "study", chunk_sub_o1: "math", chunk_sub_m3: "diligently"
+        }
+      ];
 
-        chunk_s: "He",
-        chunk_aux: "can",
-        chunk_v: "run",
-        chunk_o1: "fast",
-        chunk_m1: "every day",
+      function doRandomize() {
+        const data = variants[Math.floor(Math.random() * variants.length)];
+        randomizeAll(data);
+      }
 
-        chunk_sub_v: "run",
-        chunk_sub_o1: "fast",
-        chunk_sub_m3: "every day"
-      };
-
-      const button = document.getElementById("randomize-all");
-      button.addEventListener("click", () => {
-        randomizeAll(dummyData);
-      });
-
-      // 初期表示として1回実行
-      randomizeAll(dummyData);
+      document.getElementById("randomize-all").addEventListener("click", doRandomize);
+      doRandomize(); // 初期表示
     });
   </script>
   <style>
@@ -44,8 +47,8 @@
   </style>
 </head>
 <body>
-  <h1>randomizer_all.js テストページ</h1>
-  <button id="randomize-all">🔁 ランダマイズ（初期化）</button>
+  <h1>randomizer_all.js テストページ（ランダム表示）</h1>
+  <button id="randomize-all">🔁 ランダマイズ</button>
 
   <h2>主スロット</h2>
   <div id="slot-s" class="slot-box">slot-s</div>
