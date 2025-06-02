@@ -23,16 +23,14 @@
   </div>
 
   <script type="module">
-    import { initIndividualRandomizer } from './randomizer_individual.js';
+    import { initIndividualRandomizer } from './randomizer_individual_mapped.js'; <!-- ←ここだけ変更 -->
     import { updateSlot } from './common.js';
 
-    // スロット初期化（ダミー値）
     updateSlot("S", "I");
     updateSlot("V", "want");
     updateSlot("O1", "to eat");
 
-    // 初期化（構文ID, 動詞）
     initIndividualRandomizer("010", "want");
-  </script>
+</script>
 </body>
 </html>
