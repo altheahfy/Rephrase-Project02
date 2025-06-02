@@ -2,49 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Test Individual Randomizer</title>
+  <title>Subslot Renderer Test</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h2>Subslot Display Area</h2>
   <div id="slot-o1-sub"></div>
+
   <h2>Individual Slot Randomizer Test</h2>
-  <div id="slots">
-    <div>
-      <span id="slot-S">---S---</span>
-      <button id="btn-S">🔁</button>
-    </div>
-    <div>
-      <span id="slot-V">---V---</span>
-      <button id="btn-V">🔁</button>
-    </div>
-    <div>
-      <span id="slot-O1">---O1---</span>
-      <button id="btn-O1">🔁</button>
-    </div>
-  </div>
+  <div id="S"></div>
+  <div id="V"></div>
+  <div id="O1"></div>
 
   <script type="module">
+    import { renderSubSlots } from './subslot_renderer.js';
     import { grammarData } from './grammar_data.js';
-    import { initIndividualRandomizer } from './randomizer_individual.js';
-    import { updateSlot } from './common.js';
 
-    // 初期表示（grammarData["010"].B["want"] に存在する語）
-    updateSlot("S", "I");
-    updateSlot("V", "want");
-    updateSlot("O1", "to eat");
-
-    // ランダマイザー初期化
-    initIndividualRandomizer("010", "want", grammarData);
+    const testId = "010";
+    if (grammarData[testId]?.embedded_structure) {
+      renderSubSlots(grammarData[testId].embedded_structure, "slot-o1-sub");
+    }
   </script>
-<script type="module">
-  import { renderSubSlots } from './subslot_renderer.js';
-  import { grammar_data } from './grammar_data.js';
-
-  const testId = "INF-N-OBJ-010";
-
-  if (grammar_data[testId] && grammar_data[testId].embedded_structure) {
-    renderSubSlots(grammar_data[testId].embedded_structure, "slot-o1-sub");
-  }
-</script>
 </body>
 </html>
