@@ -113,3 +113,4 @@ function generateEmptyStructure() {
         o1: {}, o2: {}, c2: {}, m3: {}
     };
 }
+ 
