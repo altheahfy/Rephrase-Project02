@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Subslot Renderer Test</title>
@@ -10,17 +10,17 @@
   <div id="slot-o1-sub"></div>
 
   <h2>Individual Slot Randomizer Test</h2>
+  <div id="S"></div>
+  <div id="V"></div>
+  <div id="O1"></div>
 
-  <!-- グローバル方式でJS読み込み -->
-  <script src="grammar_data.js"></script>
-  <script src="subslot_renderer.js"></script>
-  <script>
-    // テスト用：ID「010」の embedded_structure を使って描画
+  <script type="module">
+    import { renderSubSlots } from './subslot_renderer.js';
+    import { grammarData } from './grammar_data.js';
+
     const testId = "010";
-    if (window.grammarData && window.grammarData[testId]?.embedded_structure) {
-      window.renderSubSlots(window.grammarData[testId].embedded_structure, "slot-o1-sub");
-    } else {
-      document.getElementById("slot-o1-sub").innerText = "grammarDataが見つかりません";
+    if (grammarData[testId]?.embedded_structure) {
+      renderSubSlots(grammarData[testId].embedded_structure, "slot-o1-sub");
     }
   </script>
 </body>
