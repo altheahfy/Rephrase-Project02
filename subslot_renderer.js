@@ -21,6 +21,8 @@ export function renderSubSlots(embeddedStructure, targetElementId) {
  * スロット要素の生成（slot-auxは文字列、それ以外は画像表示）
  */
 function generateSlotHtml(slotKey, slotData) {
+    const randomizableSlots = ["m1", "s", "m2", "c", "o1", "o2", "c2", "m3"];
+
     const wrapper = document.createElement("div");
     wrapper.className = `slot slot-${slotKey}-sub`;
 
@@ -35,6 +37,15 @@ function generateSlotHtml(slotKey, slotData) {
         imgEl.alt = slotKey;
         imgEl.onerror = () => imgEl.style.display = "none";
         wrapper.appendChild(imgEl);
+    }
+
+        // ✅ 個別ランダマイズボタン（aux, v は除外）
+    if (randomizableSlots.includes(slotKey)) {
+        const button = document.createElement("button");
+        button.className = "subslot-randomize-btn";
+        button.innerText = "🎲";
+        button.onclick = () => randomizeSubSlot(slotKey);
+        wrapper.appendChild(button);
     }
 
     return wrapper;
