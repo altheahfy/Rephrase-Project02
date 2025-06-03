@@ -21,15 +21,7 @@ export function renderSubSlots(embeddedStructure, targetElementId) {
  * スロット要素の生成（slot-auxは文字列、それ以外は画像表示）
  */
 function generateSlotHtml(slotKey, slotData) {
-    const randomizableSlots = ["m1", "s", "m2", "c", "o1", "o2", "c2", "m3"];
-    const collapsibleSlots = ["m1", "s", "m2", "c", "o1", "o2", "c2", "m3"];
-
-
     const wrapper = document.createElement("div");
-    const label = document.createElement("div");
-    label.className = "slot-label";
-    label.innerText = slotKey;
-    wrapper.insertBefore(label, wrapper.firstChild);
     wrapper.className = `slot slot-${slotKey}-sub`;
 
     if (slotKey === "aux" && slotData.text) {
@@ -43,40 +35,6 @@ function generateSlotHtml(slotKey, slotData) {
         imgEl.alt = slotKey;
         imgEl.onerror = () => imgEl.style.display = "none";
         wrapper.appendChild(imgEl);
-    }
-
-        // ✅ 個別ランダマイズボタン（aux, v は除外）
-    if (randomizableSlots.includes(slotKey)) {
-        const button = document.createElement("button");
-        button.className = "subslot-randomize-btn";
-        button.innerText = "🎲";
-        button.onclick = () => randomizeSubSlot(slotKey);
-        wrapper.appendChild(button);
-    }
-
-
-    // ✅ 折り畳みボタンと subslotContainer の追加（aux, v は除外）
-    if (collapsibleSlots.includes(slotKey)) {
-        const toggleButton = document.createElement("button");
-        toggleButton.className = "subslot-toggle-btn";
-        toggleButton.innerText = "▼";
-        toggleButton.onclick = () => {
-            const subslotId = `slot-${slotKey}-sub`;
-            const subslotContainer = document.getElementById(subslotId);
-            if (subslotContainer.style.display === "none") {
-                subslotContainer.style.display = "block";
-                renderSubSlots(slotData.subslots ?? generateEmptyStructure(), subslotId); // サブ構造を描画
-            } else {
-                subslotContainer.style.display = "none";
-            }
-        };
-        wrapper.appendChild(toggleButton);
-
-        const subslotContainer = document.createElement("div");
-        subslotContainer.id = `slot-${slotKey}-sub`;
-        subslotContainer.className = "subslot-container";
-        subslotContainer.style.display = "none";
-        wrapper.appendChild(subslotContainer);
     }
 
     return wrapper;
@@ -101,14 +59,3 @@ function clearSubSlots(targetId) {
         target.innerHTML = '';
     }
 } 
-
-
-/**
- * 空のsubslot構造を生成する（全10スロットに空の要素を用意）
- */
-function generateEmptyStructure() {
-    return {
-        m1: {}, s: {}, aux: {}, m2: {}, v: {}, c: {},
-        o1: {}, o2: {}, c2: {}, m3: {}
-    };
-}
