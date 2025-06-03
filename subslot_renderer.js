@@ -109,7 +109,3 @@ function generateEmptyStructure() {
 function randomizeSubSlot(slotKey) {
     console.log(`Randomize requested for: ${slotKey}`);
 }
-
-
-// グローバルスコープに登録
-window.renderSubSlots = renderSubSlots;
