@@ -1,4 +1,4 @@
-window.grammarData = {
+export const grammarData = {
   "010": {
     A: ["want", "hope", "plan"],
     B: {
