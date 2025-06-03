@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Subslot Renderer Test</title>
+  <title>Rephrase Training UI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,15 +15,8 @@
   <div id="O1"></div>
 
   <script type="module">
-    import { renderSubSlotsOnce } from './subslot_renderer.js';
-    import { grammarData } from './grammar_data.js';
-    import { randomizeAll } from './randomizer_all.js';
-
-    const testId = "010";
-    if (grammarData[testId]?.embedded_structure) {
-      renderSubSlotsOnce(grammarData[testId].embedded_structure, "slot-o1-sub");
-      randomizeAll(grammarData[testId]);
-    }
+    import { setup } from './setup.js';
+    setup("010");
   </script>
 </body>
 </html>
