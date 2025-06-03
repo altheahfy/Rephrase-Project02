@@ -2,20 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rephrase Training UI</title>
+  <title>Rephrase Training UI - TEST</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Subslot Display Area</h2>
-  <div id="slot-o1-sub"></div>
+  <h1>🧪 Subslot Toggle & Randomizer Test</h1>
 
-  <h2>Individual Slot Randomizer Test</h2>
-  <div id="S"></div>
-  <div id="V"></div>
-  <div id="O1"></div>
+  <section>
+    <h2>Subslot Display Area</h2>
+    <div id="slot-o1-sub"></div>
+  </section>
+
+  <section>
+    <h2>Individual Slot Randomizer Test</h2>
+    <div>
+      <button class="randomize-btn" data-slot="s">🔄 S</button>
+      <div id="slot-s"></div>
+    </div>
+    <div>
+      <button class="randomize-btn" data-slot="v">🔄 V</button>
+      <div id="slot-v"></div>
+    </div>
+    <div>
+      <button class="randomize-btn" data-slot="o1">🔄 O1</button>
+      <div id="slot-o1"></div>
+    </div>
+  </section>
 
   <script type="module">
-    import { setup } from './setup.js';
+    import { setup } from './setup_with_toggle.js';
     setup("010");
   </script>
 </body>
