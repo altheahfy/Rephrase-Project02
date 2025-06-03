@@ -11,7 +11,7 @@ const renderedSubslotMap = {};
 /**
  * 指定したスロットのサブスロットを描画（初回のみ）
  */
-export function renderSubSlotsV2(embeddedStructure, targetElementId) {
+export function renderSubSlots(embeddedStructure, targetElementId) {
     clearSubSlots(targetElementId);
 
     slotOrder.forEach(slotKey => {
