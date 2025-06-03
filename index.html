@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Subslot Renderer Test</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subslot Renderer Test</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Subslot Display Area</h2>
-    <div id="slot-o1-sub"></div>
+  <h2>Subslot Display Area</h2>
+  <div id="slot-o1-sub"></div>
 
-    <h2>Individual Slot Randomizer Test</h2>
-    <!-- 他の表示エリアがあればここに追記 -->
+  <h2>Individual Slot Randomizer Test</h2>
+  <!-- 他のスロット描画エリアも今後ここに追加可能 -->
 
-    <!-- ✅ 非モジュール形式のJSを読み込む -->
-    <script src="subslot_renderer.js"></script>
+  <!-- 非モジュール形式の JS 読み込み -->
+  <script src="subslot_renderer.js"></script>
+
+  <!-- 初期描画スクリプト -->
+  <script>
+    const dummyData = {
+      m1: { imagePath: "slot_images/common/m1_sub.png" },
+      s:  { imagePath: "slot_images/common/s_sub.png" },
+      m2: { imagePath: "slot_images/common/m2_sub.png" },
+      c:  { imagePath: "slot_images/common/c_sub.png" },
+      o1: { imagePath: "slot_images/common/o1_sub.png" },
+      o2: { imagePath: "slot_images/common/o2_sub.png" },
+      c2: { imagePath: "slot_images/common/c2_sub.png" },
+      m3: { imagePath: "slot_images/common/m3_sub.png" },
+      aux: { text: "するつもりだった" },
+      v:   { imagePath: "slot_images/common/v_sub.png" }
+    };
+
+    renderSubSlot(dummyData, "o1", "slot-o1-sub");
+  </script>
 </body>
 </html>
