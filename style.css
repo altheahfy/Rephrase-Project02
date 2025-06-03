@@ -13,3 +13,12 @@
   gap: 4px;
   align-items: center;
 }
+
+
+/* Slot label for identifying slotKey (e.g., m1, s, o1) */
+.slot-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 4px;
+}
