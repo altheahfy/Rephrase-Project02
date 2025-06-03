@@ -17,10 +17,12 @@
   <script type="module">
     import { renderSubSlotsOnce } from './subslot_renderer.js';
     import { grammarData } from './grammar_data.js';
+    import { randomizeAll } from './randomizer_all.js';
 
     const testId = "010";
     if (grammarData[testId]?.embedded_structure) {
       renderSubSlotsOnce(grammarData[testId].embedded_structure, "slot-o1-sub");
+      randomizeAll(grammarData[testId]);
     }
   </script>
 </body>
