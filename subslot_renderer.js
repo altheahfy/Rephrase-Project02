@@ -22,6 +22,8 @@ export function renderSubSlots(embeddedStructure, targetElementId) {
  */
 function generateSlotHtml(slotKey, slotData) {
     const randomizableSlots = ["m1", "s", "m2", "c", "o1", "o2", "c2", "m3"];
+    const collapsibleSlots = ["m1", "s", "m2", "c", "o1", "o2", "c2", "m3"];
+
 
     const wrapper = document.createElement("div");
     wrapper.className = `slot slot-${slotKey}-sub`;
@@ -46,6 +48,31 @@ function generateSlotHtml(slotKey, slotData) {
         button.innerText = "🎲";
         button.onclick = () => randomizeSubSlot(slotKey);
         wrapper.appendChild(button);
+    }
+
+
+    // ✅ 折り畳みボタンと subslotContainer の追加（aux, v は除外）
+    if (collapsibleSlots.includes(slotKey)) {
+        const toggleButton = document.createElement("button");
+        toggleButton.className = "subslot-toggle-btn";
+        toggleButton.innerText = "▼";
+        toggleButton.onclick = () => {
+            const subslotId = `slot-${slotKey}-sub`;
+            const subslotContainer = document.getElementById(subslotId);
+            if (subslotContainer.style.display === "none") {
+                subslotContainer.style.display = "block";
+                renderSubSlots(slotData.subslots || {}, subslotId); // サブ構造を描画
+            } else {
+                subslotContainer.style.display = "none";
+            }
+        };
+        wrapper.appendChild(toggleButton);
+
+        const subslotContainer = document.createElement("div");
+        subslotContainer.id = `slot-${slotKey}-sub`;
+        subslotContainer.className = "subslot-container";
+        subslotContainer.style.display = "none";
+        wrapper.appendChild(subslotContainer);
     }
 
     return wrapper;
