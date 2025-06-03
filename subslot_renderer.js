@@ -65,7 +65,7 @@ function generateSlotHtml(slotKey, slotData) {
             const subslotContainer = document.getElementById(subslotId);
             if (subslotContainer.style.display === "none") {
                 subslotContainer.style.display = "block";
-                renderSubSlots(slotData.subslots || {}, subslotId); // サブ構造を描画
+                renderSubSlots(slotData.subslots ?? generateEmptyStructure(), subslotId); // サブ構造を描画
             } else {
                 subslotContainer.style.display = "none";
             }
@@ -101,3 +101,14 @@ function clearSubSlots(targetId) {
         target.innerHTML = '';
     }
 } 
+
+
+/**
+ * 空のsubslot構造を生成する（全10スロットに空の要素を用意）
+ */
+function generateEmptyStructure() {
+    return {
+        m1: {}, s: {}, aux: {}, m2: {}, v: {}, c: {},
+        o1: {}, o2: {}, c2: {}, m3: {}
+    };
+}
