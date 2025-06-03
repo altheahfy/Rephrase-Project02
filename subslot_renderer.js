@@ -57,6 +57,7 @@ function generateSlotHtml(slotKey, slotData) {
 
     // ✅ 折り畳みボタンと subslotContainer の追加（aux, v は除外）
     if (collapsibleSlots.includes(slotKey)) {
+        // 常に折り畳み構造を描画（slotData.subslots の有無に関係なく）
         const toggleButton = document.createElement("button");
         toggleButton.className = "subslot-toggle-btn";
         toggleButton.innerText = "▼";
