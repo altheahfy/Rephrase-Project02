@@ -64,12 +64,16 @@ function generateSlotHtml(slotKey, slotData) {
         toggleButton.onclick = () => {
             const subslotId = `slot-${slotKey}-sub`;
             const subslotContainer = document.getElementById(subslotId);
-            if (subslotContainer.style.display === "none") {
-                subslotContainer.style.display = "block";
-                renderSubSlots(slotData.subslots ?? generateEmptyStructure(), subslotId); // サブ構造を描画
-            } else {
-                subslotContainer.style.display = "none";
+
+            // 初回描画済みでない場合のみ描画（再生成による上書きを防ぐ）
+            if (!subslotContainer.dataset.rendered) {
+                renderSubSlots(slotData.subslots ?? generateEmptyStructure(), subslotId);
+                subslotContainer.dataset.rendered = "true";  // ✅ フラグ設定
             }
+
+            // 表示・非表示の切り替えだけ行う（DOMは保持されたまま）
+            const isCurrentlyHidden = subslotContainer.style.display === "none";
+            subslotContainer.style.display = isCurrentlyHidden ? "block" : "none";
         };
         wrapper.appendChild(toggleButton);
 
