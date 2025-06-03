@@ -29,7 +29,7 @@ function generateSlotHtml(slotKey, slotData) {
     const label = document.createElement("div");
     label.className = "slot-label";
     label.innerText = slotKey;
-    wrapper.appendChild(label);
+    wrapper.insertBefore(label, wrapper.firstChild);
     wrapper.className = `slot slot-${slotKey}-sub`;
 
     if (slotKey === "aux" && slotData.text) {
