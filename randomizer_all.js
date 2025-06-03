@@ -1,45 +1,62 @@
+import { updateSlotDisplay, updateSlotImage } from './image_handler.js';
 
-// 構文スロット型ランダマイズ（3段階制御）対応版
-
-import { grammarData } from './grammar_data.js'
-import { updateSlot } from './common.js';
-
-// 全体ランダマイズ実行関数
-export function performGlobalRandomization() {
-  // 第1段階：構文IDのランダム選定
-  const grammarIDs = Object.keys(grammarData);
-  const randomGrammarID = grammarIDs[Math.floor(Math.random() * grammarIDs.length)];
-  const grammar = grammarData[randomGrammarID];
-
-  // 第2段階：A群（動詞）のランダム選定
-  const verbList = grammar.A;
-  const randomVerb = verbList[Math.floor(Math.random() * verbList.length)];
-
-  // 第3段階：B群（スロットごとの語句）のランダム選定
-  const slotWords = grammar.B[randomVerb];
-
-  const result = {
-    V: randomVerb,
-    S: getRandomFromList(slotWords.subject),
-    O1: getRandomFromList(slotWords.object1),
-    O2: getRandomFromList(slotWords.object2),
-    C: getRandomFromList(slotWords.complement),
-    M1: getRandomFromList(slotWords.m1),
-    M2: getRandomFromList(slotWords.m2),
-    M3: getRandomFromList(slotWords.m3),
-    Aux: getRandomFromList(slotWords.aux)
+/**
+ * 全slot（上位 + slot-o1配下）に対して、テキストと画像を一括で反映
+ */
+export function randomizeAll(data) {
+  const slotMap = {
+    "slot-s": data.subject,
+    "slot-aux": data.auxiliary,
+    "slot-v": data.verb,
+    "slot-o1": data.object,
+    "slot-o_v": data.object_verb,
+    "slot-c1": data.complement,
+    "slot-o2": data.object2,
+    "slot-c2": data.complement2,
+    "slot-m1": data.adverbial,
+    "slot-m2": data.adverbial2,
+    "slot-m3": data.adverbial3,
+    "slot-o1-m1": data.sub_m1,
+    "slot-o1-s": data.sub_s,
+    "slot-o1-aux": data.sub_aux,
+    "slot-o1-m2": data.sub_m2,
+    "slot-o1-v": data.sub_v,
+    "slot-o1-c1": data.sub_c1,
+    "slot-o1-o1": data.sub_o1,
+    "slot-o1-o2": data.sub_o2,
+    "slot-o1-c2": data.sub_c2,
+    "slot-o1-m3": data.sub_m3
   };
 
-  // 表示更新
-  for (const [slot, word] of Object.entries(result)) {
-    updateSlot(slot, word);
+  for (const [slotId, text] of Object.entries(slotMap)) {
+    if (text) updateSlotDisplay(slotId, text);
   }
 
-  console.log(`[構文ID: ${randomGrammarID}] A群: ${randomVerb}`, result);
-}
+  const imageMap = {
+    "slot-s": data.image_s,
+    "slot-aux": data.image_aux,
+    "slot-v": data.image_v,
+    "slot-o1": data.image_o1,
+    "slot-o_v": data.image_o_v,
+    "slot-c1": data.image_c1,
+    "slot-o2": data.image_o2,
+    "slot-c2": data.image_c2,
+    "slot-m1": data.image_m1,
+    "slot-m2": data.image_m2,
+    "slot-m3": data.image_m3,
+    "slot-o1-m1": data.image_sub_m1,
+    "slot-o1-s": data.image_sub_s,
+    "slot-o1-aux": data.image_sub_aux,
+    "slot-o1-m2": data.image_sub_m2,
+    "slot-o1-v": data.image_sub_v,
+    "slot-o1-c1": data.image_sub_c1,
+    "slot-o1-o1": data.image_sub_o1,
+    "slot-o1-o2": data.image_sub_o2,
+    "slot-o1-c2": data.image_sub_c2,
+    "slot-o1-m3": data.image_sub_m3
+  };
 
-// ヘルパー関数
-function getRandomFromList(list) {
-  if (!Array.isArray(list) || list.length === 0) return '';
-  return list[Math.floor(Math.random() * list.length)];
+  for (const [slotId, imgFile] of Object.entries(imageMap)) {
+    if (imgFile) updateSlotImage(slotId, imgFile);
+  }
 }
