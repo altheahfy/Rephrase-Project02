@@ -62,7 +62,7 @@ function generateSlotHtml(slotKey, slotData) {
         toggleButton.className = "subslot-toggle-btn";
         toggleButton.innerText = "▼";
         toggleButton.onclick = () => {
-            const subslotId = `${targetElementId}-${slotKey}-sub`;
+            const subslotId = `slot-${slotKey}-sub`;
             const subslotContainer = document.getElementById(subslotId);
             if (subslotContainer.style.display === "none") {
                 subslotContainer.style.display = "block";
@@ -74,7 +74,7 @@ function generateSlotHtml(slotKey, slotData) {
         wrapper.appendChild(toggleButton);
 
         const subslotContainer = document.createElement("div");
-        subslotContainer.id = `${targetElementId}-${slotKey}-sub`;
+        subslotContainer.id = `slot-${slotKey}-sub`;
         subslotContainer.className = "subslot-container";
         subslotContainer.style.display = "none";
         wrapper.appendChild(subslotContainer);
