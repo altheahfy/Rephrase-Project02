@@ -1,4 +1,4 @@
-export function toggleSubslot(slotKey) {
+function toggleSubslot(slotKey) {
   const subslotId = `slot-${slotKey}-sub`;
   const container = document.getElementById(subslotId);
   if (!container) return;
