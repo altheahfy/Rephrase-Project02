@@ -9,8 +9,9 @@
 /* スロット全体の調整が必要な場合に備えた汎用クラス */
 .slot-container {
   display: flex;
-  gap: 4px;
+  flex-direction: column;
   align-items: center;
+  gap: 4px;
 }
 
 
