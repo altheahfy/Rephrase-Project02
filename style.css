@@ -1,4 +1,3 @@
-
 /* スロット画像（複数対応）の共通スタイル */
 .slot-image {
   display: inline-block;
@@ -27,4 +26,11 @@
 /* 非表示制御用クラス */
 .hidden {
   display: none;
+}
+
+.slot-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
 }
