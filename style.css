@@ -22,3 +22,9 @@
   color: #444;
   margin-bottom: 4px;
 }
+
+
+/* 非表示制御用クラス */
+.hidden {
+  display: none;
+}
