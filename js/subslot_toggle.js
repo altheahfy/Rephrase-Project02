@@ -4,5 +4,5 @@ function toggleSubslot(slotKey) {
   if (!container) return;
 
   const isHidden = window.getComputedStyle(container).display === "none";
-  container.style.display = isHidden ? "block" : "none";
+  container.style.display = isHidden ? "flex" : "none";
 }
