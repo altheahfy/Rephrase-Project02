@@ -13,14 +13,27 @@ export async function loadSlotImageAndTextMap(structureId) {
   const slotKeys = ["m1", "s", "aux", "m2", "v", "c", "o1", "o2", "c2", "m3"];
 
   slotKeys.forEach(key => {
-    const slotData = data[`slot-${key}`];
-    const domId = `slot-o1-sub-${key}`;
-    if (slotData) {
-      if (slotData.image) {
-        slotImageMap[domId] = slotData.image;
+    // 上位スロットID
+    const upperId = `slot-${key}`;
+    const upperData = data[upperId];
+    if (upperData) {
+      if (upperData.image) {
+        slotImageMap[upperId] = upperData.image;
       }
-      if (slotData.text) {
-        slotTextMap[domId] = slotData.text;
+      if (upperData.text) {
+        slotTextMap[upperId] = upperData.text;
+      }
+    }
+
+    // subslot ID
+    const subId = `slot-o1-sub-${key}`;
+    const subData = data[subId];
+    if (subData) {
+      if (subData.image) {
+        slotImageMap[subId] = subData.image;
+      }
+      if (subData.text) {
+        slotTextMap[subId] = subData.text;
       }
     }
   });
