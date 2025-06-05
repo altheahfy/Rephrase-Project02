@@ -1,7 +1,7 @@
 // subslot_toggle_v4.js
 
 function toggleExclusiveSubslot(slotId) {
-  const subslotIds = ["o1", "c"];
+  const subslotIds = ["o1", "c", "o2"];
   const target = document.getElementById(`slot-${slotId}-sub`);
   const isOpen = target && target.style.display !== "none";
 
