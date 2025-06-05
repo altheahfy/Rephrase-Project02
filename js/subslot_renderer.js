@@ -5,7 +5,7 @@ window.addEventListener("DOMContentLoaded", () => {
     "slot-o1-sub-m1", "slot-o1-sub-s", "slot-o1-sub-aux", "slot-o1-sub-m2",
     "slot-o1-sub-v", "slot-o1-sub-c", "slot-o1-sub-o1", "slot-o1-sub-o2",
     "slot-o1-sub-c2", "slot-o1-sub-m3"
-  ];
+  , "slot-o2-sub-m1", "slot-o2-sub-s", "slot-o2-sub-aux", "slot-o2-sub-m2", "slot-o2-sub-v", "slot-o2-sub-c", "slot-o2-sub-o1", "slot-o2-sub-o2", "slot-o2-sub-c2", "slot-o2-sub-m3"];
 
   slotIds.forEach(id => {
     const img = document.querySelector(`#${id} img`);
