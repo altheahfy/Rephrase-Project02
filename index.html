@@ -31,7 +31,7 @@
 <div class="slot-container" id="slot-v">
 <label>V</label>
 <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
+<div class="slot-text"></div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleSubslot('v')">▼ 詳細</button></div></div>
 <div class="slot-container" id="slot-c">
 <label>C</label>
 <img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/>
@@ -97,9 +97,8 @@
 <label>M3</label>
 <img alt="image for M3" class="slot-image"/>
 </div>
-</div>
+</div><div class="slot-wrapper" id="slot-v-sub" style="display: none;"><div class="subslot" id="slot-v-sub-m1" style="display: flex; flex-direction: column; align-items: center;"><label>M1</label><img alt="image for M1" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-s" style="display: flex; flex-direction: column; align-items: center;"><label>S</label><img alt="image for S" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-aux" style="display: flex; flex-direction: column; align-items: center;"><label>AUX</label><img alt="image for AUX" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-m2" style="display: flex; flex-direction: column; align-items: center;"><label>M2</label><img alt="image for M2" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-v" style="display: flex; flex-direction: column; align-items: center;"><label>V</label><img alt="image for V" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-c" style="display: flex; flex-direction: column; align-items: center;"><label>C</label><img alt="image for C" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-o1" style="display: flex; flex-direction: column; align-items: center;"><label>O1</label><img alt="image for O1" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-o2" style="display: flex; flex-direction: column; align-items: center;"><label>O2</label><img alt="image for O2" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-c2" style="display: flex; flex-direction: column; align-items: center;"><label>C2</label><img alt="image for C2" class="slot-image"/><div class="slot-text"></div></div><div class="subslot" id="slot-v-sub-m3" style="display: flex; flex-direction: column; align-items: center;"><label>M3</label><img alt="image for M3" class="slot-image"/><div class="slot-text"></div></div></div>
 </section>
-
 <script src="js/subslot_renderer_static.js"></script>
 <script src="./js/test_controller.js" type="module"></script>
 </body>
