@@ -7,7 +7,7 @@ const structureId = "INF-N-OBJ-010";
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     const { slotImageMap, slotTextMap } = await loadSlotImageAndTextMap(structureId);
-    renderAllSlots(slotImageMap);
+    renderAllSlots();
     renderAllTexts(slotTextMap);
   } catch (error) {
     console.error("描画エラー:", error);
