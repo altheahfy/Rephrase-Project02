@@ -1,4 +1,3 @@
-// subslot_toggle_v4.js
 
 function toggleExclusiveSubslot(slotId) {
   const subslotIds = ["o1", "c", "o2", "m1", "s", "m2", "c2", "m3"];
@@ -19,3 +18,12 @@ function toggleExclusiveSubslot(slotId) {
   // ラベル更新呼び出し
   updateSubslotLabel(slotId);
 }
+
+// ↓ DOM 構築後にイベント登録
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll("[data-subslot-toggle]");
+  buttons.forEach(button => {
+    const slotId = button.getAttribute("data-subslot-toggle");
+    button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
+  });
+});
