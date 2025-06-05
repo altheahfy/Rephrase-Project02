@@ -1,5 +1,5 @@
 // test_controller.js
-import { renderAllSlots, renderAllTexts } from './renderer_core.js';
+import { renderAllSlots, renderAllTexts } from './renderer_core_v2.js';
 import { loadSlotImageAndTextMap } from './slot_data_loader.js';
 
 const structureId = "INF-N-OBJ-010";
