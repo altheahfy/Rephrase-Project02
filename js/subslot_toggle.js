@@ -27,3 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
   });
 });
+
+
+window.toggleExclusiveSubslot = toggleExclusiveSubslot;
