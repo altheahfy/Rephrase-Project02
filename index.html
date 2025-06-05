@@ -7,7 +7,7 @@
 <link href="style.css" rel="stylesheet"/>
 <script src="js/subslot_toggle.js"></script>
 </head>
-<body>
+<body><div id="subslot-label" style="font-weight: bold; margin-top: 1rem; display: none;">現在展開中：◯◯ の subslot</div>
 <h1>🧪 Subslot Structured Test with Upper Slots</h1>
 <section>
 <h2>Full Structure</h2>
@@ -101,5 +101,20 @@
 </section>
 <script src="js/subslot_renderer_static.js"></script>
 <script src="./js/test_controller.js" type="module"></script>
-</body>
+<script>
+function updateSubslotLabel(slotId) {
+  const labelMap = {
+    o1: "O1",
+    c: "C"
+  };
+  const labelText = labelMap[slotId] ? `現在展開中：${labelMap[slotId]} の subslot` : "";
+  const labelDiv = document.getElementById("subslot-label");
+  if (labelText) {
+    labelDiv.textContent = labelText;
+    labelDiv.style.display = "block";
+  } else {
+    labelDiv.style.display = "none";
+  }
+}
+</script></body>
 </html>
