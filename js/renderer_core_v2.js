@@ -1,8 +1,6 @@
-console.log("✅ renderer_core_v2.js loaded. Checking export status...");
 
 // renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正）
 export function renderAllSlots() {
-  console.log("✅ renderAllSlots called");
   const slotIds = [
     // 上位スロット
     "slot-m1", "slot-s", "slot-aux", "slot-m2", "slot-v",
