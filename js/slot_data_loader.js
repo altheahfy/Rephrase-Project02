@@ -1,7 +1,12 @@
 // slot_data_loader.js
 
 export async function loadSlotImageMap(structureId) {
-  const response = await fetch(`slot_assignment/${structureId}.json`);
+  // 末尾の構文番号（例: 010）から数値フォルダ名を導出（例: 10）
+  const idPart = structureId.split("-").pop(); // "010"
+  const folderNumber = parseInt(idPart, 10);   // 10
+  const jsonPath = `slot_assignment/${folderNumber}/slot_assignment.json`;
+
+  const response = await fetch(jsonPath);
   const data = await response.json();
 
   const slotImageMap = {};
