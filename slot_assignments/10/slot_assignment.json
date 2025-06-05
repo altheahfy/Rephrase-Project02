@@ -1,7 +1,7 @@
 {
   "slot-m1": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010M1\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【M1】の文法ガイド"
   },
   "slot-o1-sub-m1": {
     "image": "slot_images/common/placeholder.png",
@@ -9,7 +9,7 @@
   },
   "slot-s": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010S\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【S】の文法ガイド"
   },
   "slot-o1-sub-s": {
     "image": "slot_images/common/placeholder.png",
@@ -17,7 +17,7 @@
   },
   "slot-aux": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010AUX\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【AUX】の文法ガイド"
   },
   "slot-o1-sub-aux": {
     "image": "slot_images/common/placeholder.png",
@@ -25,7 +25,7 @@
   },
   "slot-m2": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010M2\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【M2】の文法ガイド"
   },
   "slot-o1-sub-m2": {
     "image": "slot_images/common/placeholder.png",
@@ -33,7 +33,7 @@
   },
   "slot-v": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010V\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【V】の文法ガイド"
   },
   "slot-o1-sub-v": {
     "image": "slot_images/common/placeholder.png",
@@ -41,7 +41,7 @@
   },
   "slot-c": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010C\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【C】の文法ガイド"
   },
   "slot-o1-sub-c": {
     "image": "slot_images/common/placeholder.png",
@@ -49,7 +49,7 @@
   },
   "slot-o1": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010O1\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【O1】の文法ガイド"
   },
   "slot-o1-sub-o1": {
     "image": "slot_images/common/placeholder.png",
@@ -57,7 +57,7 @@
   },
   "slot-o2": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010O2\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【O2】の文法ガイド"
   },
   "slot-o1-sub-o2": {
     "image": "slot_images/common/placeholder.png",
@@ -65,7 +65,7 @@
   },
   "slot-c2": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010C2\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【C2】の文法ガイド"
   },
   "slot-o1-sub-c2": {
     "image": "slot_images/common/placeholder.png",
@@ -73,7 +73,7 @@
   },
   "slot-m3": {
     "image": "slot_images/common/placeholder.png",
-    "text": "\u3010M3\u3011\u306e\u6587\u6cd5\u30ac\u30a4\u30c9"
+    "text": "【M3】の文法ガイド"
   },
   "slot-o1-sub-m3": {
     "image": "slot_images/common/placeholder.png",
@@ -116,6 +116,46 @@
     "text": "text_c2"
   },
   "slot-c-sub-m3": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m3"
+  },
+  "slot-m1-sub-m1": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m1"
+  },
+  "slot-m1-sub-s": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_s"
+  },
+  "slot-m1-sub-aux": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_aux"
+  },
+  "slot-m1-sub-m2": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m2"
+  },
+  "slot-m1-sub-v": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_v"
+  },
+  "slot-m1-sub-c": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_c"
+  },
+  "slot-m1-sub-o1": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_o1"
+  },
+  "slot-m1-sub-o2": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_o2"
+  },
+  "slot-m1-sub-c2": {
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_c2"
+  },
+  "slot-m1-sub-m3": {
     "image": "slot_images/common/placeholder.png",
     "text": "text_m3"
   }
