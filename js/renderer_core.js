@@ -1,3 +1,4 @@
+console.log("✅ renderer_core.js loaded. renderAllSlots defined");
 
 // renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正）
 export function renderAllSlots() {
