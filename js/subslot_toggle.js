@@ -1,14 +1,12 @@
-// subslot_toggle_v2.js
+// subslot_toggle_v3.js
 
 function toggleExclusiveSubslot(slotId) {
+  // 明示的に対象スロットID列挙
   const subslotIds = ["o1", "c"];
-  let isCurrentlyVisible = false;
 
-  // チェック：既に開かれているか確認
-  const current = document.getElementById(`slot-${slotId}-sub`);
-  if (current && current.style.display !== "none") {
-    isCurrentlyVisible = true;
-  }
+  // すでに開かれているスロットを確認
+  const target = document.getElementById(`slot-${slotId}-sub`);
+  const isOpen = target && target.style.display !== "none";
 
   // 全て閉じる
   subslotIds.forEach(id => {
@@ -16,8 +14,8 @@ function toggleExclusiveSubslot(slotId) {
     if (el) el.style.display = "none";
   });
 
-  // 対象だけ開く（現在開かれていた場合はそのまま閉じる）
-  if (!isCurrentlyVisible && current) {
-    current.style.display = "flex";
+  // 再度開く必要があるなら開く
+  if (!isOpen && target) {
+    target.style.display = "flex";
   }
 }
