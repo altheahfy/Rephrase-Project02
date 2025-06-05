@@ -20,7 +20,17 @@ export function renderAllSlots() {
     "slot-o2-sub-m1", "slot-o2-sub-s", "slot-o2-sub-aux", "slot-o2-sub-m2",
     "slot-o2-sub-v", "slot-o2-sub-c", "slot-o2-sub-o1", "slot-o2-sub-o2",
     "slot-o2-sub-c2", "slot-o2-sub-m3"
-  ];
+  ,
+  "slot-m1-sub-m1",
+  "slot-m1-sub-s",
+  "slot-m1-sub-aux",
+  "slot-m1-sub-m2",
+  "slot-m1-sub-v",
+  "slot-m1-sub-c",
+  "slot-m1-sub-o1",
+  "slot-m1-sub-o2",
+  "slot-m1-sub-c2",
+  "slot-m1-sub-m3"];
 
   slotIds.forEach(slotId => {
     const img = document.querySelector(`#${slotId} img`);
