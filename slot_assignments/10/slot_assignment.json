@@ -1,32 +1,42 @@
 {
   "slot-m1": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m1"
   },
   "slot-s": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_s"
   },
   "slot-aux": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_aux"
   },
   "slot-m2": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m2"
   },
   "slot-v": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_v"
   },
   "slot-c": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_c"
   },
   "slot-o1": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_o1"
   },
   "slot-o2": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_o2"
   },
   "slot-c2": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_c2"
   },
   "slot-m3": {
-    "image": "slot_images/common/placeholder.png"
+    "image": "slot_images/common/placeholder.png",
+    "text": "text_m3"
   }
 }
