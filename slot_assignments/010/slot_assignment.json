@@ -1,50 +1,32 @@
 {
-  "INF-N-OBJ-010": {
-    "subject": "Jane and her husband",
-    "verb": "intend",
-    "infinitive": "to go to Hawaii",
-    "object": "to go to Hawaii",
-    "adverbial": "this summer",
-    "object_verb": "to go",
-    "object2": "",
-    "complement": "",
-    "complement2": "",
-    "auxiliary": "",
-    "chunk_s": "Jane and her husband",
-    "chunk_aux": "",
-    "chunk_v": "intend",
-    "chunk_o1": "to go to Hawaii",
-    "chunk_o_v": "to go",
-    "chunk_o2": "",
-    "chunk_c1": "",
-    "chunk_c2": "",
-    "chunk_m1": "this summer",
-    "chunk_m2": "",
-    "chunk_m3": "",
-    "image_s": "jane_and_her_husband.png",
-    "image_aux": "",
-    "image_v": "intend.png",
-    "image_o1": "to_go_to_hawaii.png",
-    "image_o_v": "to_go.png",
-    "image_o2": "",
-    "image_c1": "",
-    "image_c2": "",
-    "image_m1": "this_summer.png",
-    "image_m2": "",
-    "image_m3": "",
-    "slot_o1_internal_keys": [
-      "v",
-      "o1"
-    ],
-    "image_o1_sub": "to_hawaii.png",
-    "image_m1_sub": "",
-    "image_s_sub": "",
-    "image_aux_sub": "",
-    "image_m2_sub": "",
-    "image_v_sub": "",
-    "image_c_sub": "",
-    "image_o2_sub": "",
-    "image_c2_sub": "",
-    "image_m3_sub": ""
+  "slot-m1": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-s": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-aux": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-m2": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-v": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-c": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-o1": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-o2": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-c2": {
+    "image": "slot_images/common/placeholder.png"
+  },
+  "slot-m3": {
+    "image": "slot_images/common/placeholder.png"
   }
 }
