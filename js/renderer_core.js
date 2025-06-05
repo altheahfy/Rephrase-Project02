@@ -1,6 +1,6 @@
 
-// renderer_core.js（subslotも含む描画統合版）
-window.addEventListener("DOMContentLoaded", () => {
+// renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正）
+export function renderAllSlots() {
   const slotIds = [
     // 上位スロット
     "slot-m1", "slot-s", "slot-aux", "slot-m2", "slot-v",
@@ -16,7 +16,7 @@ window.addEventListener("DOMContentLoaded", () => {
     "slot-c-sub-v", "slot-c-sub-c", "slot-c-sub-o1", "slot-c-sub-o2",
     "slot-c-sub-c2", "slot-c-sub-m3",
 
-    // subslot - O2 ←★ 今回追加
+    // subslot - O2
     "slot-o2-sub-m1", "slot-o2-sub-s", "slot-o2-sub-aux", "slot-o2-sub-m2",
     "slot-o2-sub-v", "slot-o2-sub-c", "slot-o2-sub-o1", "slot-o2-sub-o2",
     "slot-o2-sub-c2", "slot-o2-sub-m3"
@@ -32,8 +32,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const text = document.querySelector(`#${slotId} .slot-text`);
     if (text) {
-      text.textContent = `【${slotId.replace(/^slot-|-sub/g, "").toUpperCase()}】の文法ガイド`;
+      // スロットID末尾の名称だけを抽出して使用
+      const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
+      text.textContent = `【${slotKey}】の文法ガイド`;
       console.log(`テキスト描画: ${slotId} → ${text.textContent}`);
     }
   });
-});
+}
+
+// 自動実行：必要ならコメントアウト可
+window.addEventListener("DOMContentLoaded", renderAllSlots);
