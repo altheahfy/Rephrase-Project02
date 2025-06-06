@@ -653,22 +653,6 @@
     </div>
    </div>
   </section>
-  <script src="./js/test_controller.js" type="module">
-  </script>
-  <script>
-   function updateSubslotLabel(slotId) {
-  const ids = ["o1", "c", "m1", "s"];
-  ids.forEach(id => {
-    const container = document.getElementById(`slot-${id}-sub`);
-    if (container) {
-      const label = container.querySelector(".subslot-label");
-      if (label) label.style.display = (id === slotId) ? "block" : "none";
-    }
-  });
-}
-  </script>
-  <script src="js/renderer_core.js" type="module">
-  </script>
   <div class="slot-wrapper" id="slot-s-sub" style="display: none;">
    <div class="subslot-label">
     現在展開中：S の subslot
@@ -724,5 +708,21 @@
     </div>
    </div>
   </div>
+  <script src="./js/test_controller.js" type="module">
+  </script>
+  <script>
+   function updateSubslotLabel(slotId) {
+  const ids = ["o1", "c", "m1", "s"];
+  ids.forEach(id => {
+    const container = document.getElementById(`slot-${id}-sub`);
+    if (container) {
+      const label = container.querySelector(".subslot-label");
+      if (label) label.style.display = (id === slotId) ? "block" : "none";
+    }
+  });
+}
+  </script>
+  <script src="js/renderer_core.js" type="module">
+  </script>
  </body>
 </html>
