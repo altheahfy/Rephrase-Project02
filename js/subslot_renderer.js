@@ -13,7 +13,17 @@ window.addEventListener("DOMContentLoaded", () => {
     "slot-c-sub-m1", "slot-c-sub-s", "slot-c-sub-aux", "slot-c-sub-m2",
     "slot-c-sub-v", "slot-c-sub-c", "slot-c-sub-o1", "slot-c-sub-o2",
     "slot-c-sub-c2", "slot-c-sub-m3"
-  ];
+    "slot-s-sub-m1",
+  "slot-s-sub-s",
+  "slot-s-sub-aux",
+  "slot-s-sub-m2",
+  "slot-s-sub-v",
+  "slot-s-sub-c",
+  "slot-s-sub-o1",
+  "slot-s-sub-o2",
+  "slot-s-sub-c2",
+  "slot-s-sub-m3",
+];
 
   slotIds.forEach(id => {
     const img = document.querySelector(`#${id} img`);

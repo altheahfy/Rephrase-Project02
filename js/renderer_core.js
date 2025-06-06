@@ -45,6 +45,11 @@ export function renderAllSlots() {
       // スロットID末尾の名称だけを抽出して使用
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = `【${slotKey}】の文法ガイド`;
+  const img = document.querySelector(`#${slotId} img`);
+  if (img) {
+    img.src = "/slot_images/common/placeholder.png";
+    img.alt = `image for ${slotId}`;
+  }
       console.log(`テキスト描画: ${slotId} → ${text.textContent}`);
     }
   });
