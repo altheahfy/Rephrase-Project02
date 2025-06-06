@@ -56,3 +56,12 @@
   flex-wrap: wrap;
   align-items: flex-start;
 }
+/* subslot 内のラベル表示用スタイル */
+.subslot label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
+  text-align: center;
+}
