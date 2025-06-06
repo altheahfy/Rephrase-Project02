@@ -45,6 +45,56 @@ export function renderAllSlots() {
       // スロットID末尾の名称だけを抽出して使用
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = `【${slotKey}】の文法ガイド`;
+  const text_slot-s-sub-m1 = document.querySelector("#slot-s-sub-m1 .slot-text");
+  if (text_slot-s-sub-m1) {
+    text_slot-s-sub-m1.textContent = "【M1】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-m1 →", text_slot-s-sub-m1.textContent);
+  }
+  const text_slot-s-sub-s = document.querySelector("#slot-s-sub-s .slot-text");
+  if (text_slot-s-sub-s) {
+    text_slot-s-sub-s.textContent = "【S】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-s →", text_slot-s-sub-s.textContent);
+  }
+  const text_slot-s-sub-aux = document.querySelector("#slot-s-sub-aux .slot-text");
+  if (text_slot-s-sub-aux) {
+    text_slot-s-sub-aux.textContent = "【AUX】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-aux →", text_slot-s-sub-aux.textContent);
+  }
+  const text_slot-s-sub-m2 = document.querySelector("#slot-s-sub-m2 .slot-text");
+  if (text_slot-s-sub-m2) {
+    text_slot-s-sub-m2.textContent = "【M2】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-m2 →", text_slot-s-sub-m2.textContent);
+  }
+  const text_slot-s-sub-v = document.querySelector("#slot-s-sub-v .slot-text");
+  if (text_slot-s-sub-v) {
+    text_slot-s-sub-v.textContent = "【V】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-v →", text_slot-s-sub-v.textContent);
+  }
+  const text_slot-s-sub-c = document.querySelector("#slot-s-sub-c .slot-text");
+  if (text_slot-s-sub-c) {
+    text_slot-s-sub-c.textContent = "【C】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-c →", text_slot-s-sub-c.textContent);
+  }
+  const text_slot-s-sub-o1 = document.querySelector("#slot-s-sub-o1 .slot-text");
+  if (text_slot-s-sub-o1) {
+    text_slot-s-sub-o1.textContent = "【O1】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-o1 →", text_slot-s-sub-o1.textContent);
+  }
+  const text_slot-s-sub-o2 = document.querySelector("#slot-s-sub-o2 .slot-text");
+  if (text_slot-s-sub-o2) {
+    text_slot-s-sub-o2.textContent = "【O2】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-o2 →", text_slot-s-sub-o2.textContent);
+  }
+  const text_slot-s-sub-c2 = document.querySelector("#slot-s-sub-c2 .slot-text");
+  if (text_slot-s-sub-c2) {
+    text_slot-s-sub-c2.textContent = "【C2】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-c2 →", text_slot-s-sub-c2.textContent);
+  }
+  const text_slot-s-sub-m3 = document.querySelector("#slot-s-sub-m3 .slot-text");
+  if (text_slot-s-sub-m3) {
+    text_slot-s-sub-m3.textContent = "【M3】の文法ガイド";
+    console.log("テキスト描画: slot-s-sub-m3 →", text_slot-s-sub-m3.textContent);
+  }
       console.log(`テキスト描画: ${slotId} → ${text.textContent}`);
     }
   });
