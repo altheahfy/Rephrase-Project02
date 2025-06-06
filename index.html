@@ -1,407 +1,662 @@
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<title>Rephrase Structured UI</title>
-<link href="style.css" rel="stylesheet"/>
-<script src="js/subslot_toggle.js"></script>
-</head>
-<body>
-<h1>🧪 Subslot Structured Test with Upper Slots</h1>
-<section>
-<h2>Full Structure</h2>
-<div class="slot-wrapper">
-<div class="slot-container" id="slot-m1">
-<div class="subslot-toggle-button" style="margin-top: 4px;">
-<button onclick="toggleExclusiveSubslot('m1')">▼ 詳細</button>
-</div>
-<label>M1</label>
-<img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-s">
-<div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('s')">▼ 詳細</button></div>
-<label>S</label>
-<img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-aux">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-m2">
-<label>M2</label>
-<img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-v">
-<label>V</label>
-<img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-c">
-<label>C</label>
-<img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('c')">▼ 詳細</button></div></div>
-<div class="slot-container" id="slot-o1">
-<label>O1</label>
-<img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="subslot-toggle-button" style="margin-top: 4px;">
-<button onclick="toggleExclusiveSubslot('o1')">▼ 詳細</button>
-</div>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-o2">
-<label>O2</label><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick='toggleExclusiveSubslot("o2")'>▼ 詳細</button></div>
-<img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-c2">
-<label>C2</label>
-<img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-<div class="slot-container" id="slot-m3">
-<label>M3</label>
-<img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
-<div class="slot-text"></div></div>
-</div>
-<div class="slot-wrapper" id="slot-o1-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：O1 の subslot</div>
-<div class="subslot" id="slot-o1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-m1-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：M1 の subslot</div>
-<div class="subslot" id="slot-m1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-o2-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：O2 の subslot</div>
-<div class="subslot" id="slot-o2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-o2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-c-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：C の subslot</div>
-<div class="subslot-container" id="slot-o2-sub" style="display: none;">
-<div class="subslot-wrapper">
-<div class="subslot" id="slot-m1-sub-o2"></div>
-<div class="subslot" id="slot-s-sub-o2"></div>
-<div class="subslot" id="slot-aux-sub-o2"></div>
-<div class="subslot" id="slot-m2-sub-o2"></div>
-<div class="subslot" id="slot-v-sub-o2"></div>
-<div class="subslot" id="slot-c-sub-o2"></div>
-<div class="subslot" id="slot-o1-sub-o2"></div>
-<div class="subslot" id="slot-o2-sub-o2"></div>
-<div class="subslot" id="slot-c2-sub-o2"></div>
-<div class="subslot" id="slot-m3-sub-o2"></div>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-m1-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：M1 の subslot</div>
-<div class="subslot" id="slot-m1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-s-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：S の subslot</div>
-<div class="subslot" id="slot-s-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-<div class="slot-text"></div></div>
-<div class="subslot" id="slot-s-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-<div class="slot-text"></div></div>
-</div>
-<div class="slot-wrapper" id="slot-m2-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：M2 の subslot</div>
-<div class="subslot" id="slot-m2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-m2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="slot-wrapper" id="slot-c2-sub" style="display: none;"><div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">現在展開中：C2 の subslot</div>
-<div class="subslot" id="slot-c2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
-<label>M1</label>
-<img alt="image for M1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
-<label>S</label>
-<img alt="image for S" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
-<label>AUX</label>
-<img alt="image for AUX" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
-<label>M2</label>
-<img alt="image for M2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
-<label>V</label>
-<img alt="image for V" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
-<label>C</label>
-<img alt="image for C" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
-<label>O1</label>
-<img alt="image for O1" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
-<label>O2</label>
-<img alt="image for O2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
-<label>C2</label>
-<img alt="image for C2" class="slot-image"/>
-</div>
-<div class="subslot" id="slot-c2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
-<label>M3</label>
-<img alt="image for M3" class="slot-image"/>
-</div>
-</div>
-<div class="subslot-container" id="slot-o2-sub" style="display: none;">
-<div class="subslot-wrapper">
-<div class="subslot" id="slot-m1-sub-o2"></div>
-<div class="subslot" id="slot-s-sub-o2"></div>
-<div class="subslot" id="slot-aux-sub-o2"></div>
-<div class="subslot" id="slot-m2-sub-o2"></div>
-<div class="subslot" id="slot-v-sub-o2"></div>
-<div class="subslot" id="slot-c-sub-o2"></div>
-<div class="subslot" id="slot-o1-sub-o2"></div>
-<div class="subslot" id="slot-o2-sub-o2"></div>
-<div class="subslot" id="slot-c2-sub-o2"></div>
-<div class="subslot" id="slot-m3-sub-o2"></div>
-</div>
-</div>
-<!-- subslot for slot-m3-sub -->
-<div class="subslot-container" id="slot-m3-sub" style="display: none;">
-<div class="subslot-wrapper">
-<div class="subslot" id="slot-m1-sub-m3"></div>
-<div class="subslot" id="slot-s-sub-m3"></div>
-<div class="subslot" id="slot-aux-sub-m3"></div>
-<div class="subslot" id="slot-m2-sub-m3"></div>
-<div class="subslot" id="slot-v-sub-m3"></div>
-<div class="subslot" id="slot-c-sub-m3"></div>
-<div class="subslot" id="slot-o1-sub-m3"></div>
-<div class="subslot" id="slot-o2-sub-m3"></div>
-<div class="subslot" id="slot-c2-sub-m3"></div>
-<div class="subslot" id="slot-m3-sub-m3"></div>
-</div>
-</div><div class="subslot" id="slot-c-sub-m1" style="display: flex; flex-direction: column; align-items: center;"><label>M1</label><img alt="image for M1" class="slot-image"/></div><div class="subslot" id="slot-c-sub-s" style="display: flex; flex-direction: column; align-items: center;"><label>S</label><img alt="image for S" class="slot-image"/></div><div class="subslot" id="slot-c-sub-aux" style="display: flex; flex-direction: column; align-items: center;"><label>AUX</label><img alt="image for AUX" class="slot-image"/></div><div class="subslot" id="slot-c-sub-m2" style="display: flex; flex-direction: column; align-items: center;"><label>M2</label><img alt="image for M2" class="slot-image"/></div><div class="subslot" id="slot-c-sub-v" style="display: flex; flex-direction: column; align-items: center;"><label>V</label><img alt="image for V" class="slot-image"/></div><div class="subslot" id="slot-c-sub-c" style="display: flex; flex-direction: column; align-items: center;"><label>C</label><img alt="image for C" class="slot-image"/></div><div class="subslot" id="slot-c-sub-o1" style="display: flex; flex-direction: column; align-items: center;"><label>O1</label><img alt="image for O1" class="slot-image"/></div><div class="subslot" id="slot-c-sub-o2" style="display: flex; flex-direction: column; align-items: center;"><label>O2</label><img alt="image for O2" class="slot-image"/></div><div class="subslot" id="slot-c-sub-c2" style="display: flex; flex-direction: column; align-items: center;"><label>C2</label><img alt="image for C2" class="slot-image"/></div><div class="subslot" id="slot-c-sub-m3" style="display: flex; flex-direction: column; align-items: center;"><label>M3</label><img alt="image for M3" class="slot-image"/></div></div>
-</section>
-<script src="./js/test_controller.js" type="module"></script>
-<script>
-function updateSubslotLabel(slotId) {
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Rephrase Structured UI
+  </title>
+  <link href="style.css" rel="stylesheet"/>
+  <script src="js/subslot_toggle.js">
+  </script>
+ </head>
+ <body>
+  <h1>
+   🧪 Subslot Structured Test with Upper Slots
+  </h1>
+  <section>
+   <h2>
+    Full Structure
+   </h2>
+   <div class="slot-wrapper">
+    <div class="slot-container" id="slot-m1">
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('m1')">
+       ▼ 詳細
+      </button>
+     </div>
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-s">
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('s')">
+       ▼ 詳細
+      </button>
+     </div>
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-aux">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m2">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-v">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c">
+     <label>
+      C
+     </label>
+     <img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('c')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o1">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('o1')">
+       ▼ 詳細
+      </button>
+     </div>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o2">
+     <label>
+      O2
+     </label>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick='toggleExclusiveSubslot("o2")'>
+       ▼ 詳細
+      </button>
+     </div>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c2">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m3">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O1 の subslot
+    </div>
+    <div class="subslot" id="slot-o1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C
+     </label>
+     <img alt="image for C" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：M1 の subslot
+    </div>
+    <div class="subslot" id="slot-m1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C
+     </label>
+     <img alt="image for C" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o2-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O2 の subslot
+    </div>
+    <div class="subslot" id="slot-o2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C
+     </label>
+     <img alt="image for C" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-o2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-c-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：C の subslot
+    </div>
+    <div class="subslot-container" id="slot-o2-sub" style="display: none;">
+     <div class="subslot-wrapper">
+      <div class="subslot" id="slot-m1-sub-o2">
+      </div>
+      <div class="subslot" id="slot-s-sub-o2">
+      </div>
+      <div class="subslot" id="slot-aux-sub-o2">
+      </div>
+      <div class="subslot" id="slot-m2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-v-sub-o2">
+      </div>
+      <div class="subslot" id="slot-c-sub-o2">
+      </div>
+      <div class="subslot" id="slot-o1-sub-o2">
+      </div>
+      <div class="subslot" id="slot-o2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-c2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-m3-sub-o2">
+      </div>
+     </div>
+    </div>
+    <div class="slot-wrapper" id="slot-m1-sub" style="display: none;">
+     <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+      現在展開中：M1 の subslot
+     </div>
+     <div class="subslot" id="slot-m1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M1
+      </label>
+      <img alt="image for M1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       S
+      </label>
+      <img alt="image for S" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       AUX
+      </label>
+      <img alt="image for AUX" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M2
+      </label>
+      <img alt="image for M2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       V
+      </label>
+      <img alt="image for V" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C
+      </label>
+      <img alt="image for C" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M1
+      </label>
+      <img alt="image for M1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       O2
+      </label>
+      <img alt="image for O2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C2
+      </label>
+      <img alt="image for C2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M3
+      </label>
+      <img alt="image for M3" class="slot-image"/>
+     </div>
+    </div>
+    <div class="slot-wrapper" id="slot-m2-sub" style="display: none;">
+     <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+      現在展開中：M2 の subslot
+     </div>
+     <div class="subslot" id="slot-m2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M1
+      </label>
+      <img alt="image for M1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       S
+      </label>
+      <img alt="image for S" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       AUX
+      </label>
+      <img alt="image for AUX" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M2
+      </label>
+      <img alt="image for M2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       V
+      </label>
+      <img alt="image for V" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C
+      </label>
+      <img alt="image for C" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       O1
+      </label>
+      <img alt="image for O1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       O2
+      </label>
+      <img alt="image for O2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C2
+      </label>
+      <img alt="image for C2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-m2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M3
+      </label>
+      <img alt="image for M3" class="slot-image"/>
+     </div>
+    </div>
+    <div class="slot-wrapper" id="slot-c2-sub" style="display: none;">
+     <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+      現在展開中：C2 の subslot
+     </div>
+     <div class="subslot" id="slot-c2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M1
+      </label>
+      <img alt="image for M1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       S
+      </label>
+      <img alt="image for S" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       AUX
+      </label>
+      <img alt="image for AUX" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M2
+      </label>
+      <img alt="image for M2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       V
+      </label>
+      <img alt="image for V" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C
+      </label>
+      <img alt="image for C" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       O1
+      </label>
+      <img alt="image for O1" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       O2
+      </label>
+      <img alt="image for O2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       C2
+      </label>
+      <img alt="image for C2" class="slot-image"/>
+     </div>
+     <div class="subslot" id="slot-c2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+      <label>
+       M3
+      </label>
+      <img alt="image for M3" class="slot-image"/>
+     </div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub" style="display: none;">
+     <div class="subslot-wrapper">
+      <div class="subslot" id="slot-m1-sub-o2">
+      </div>
+      <div class="subslot" id="slot-s-sub-o2">
+      </div>
+      <div class="subslot" id="slot-aux-sub-o2">
+      </div>
+      <div class="subslot" id="slot-m2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-v-sub-o2">
+      </div>
+      <div class="subslot" id="slot-c-sub-o2">
+      </div>
+      <div class="subslot" id="slot-o1-sub-o2">
+      </div>
+      <div class="subslot" id="slot-o2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-c2-sub-o2">
+      </div>
+      <div class="subslot" id="slot-m3-sub-o2">
+      </div>
+     </div>
+    </div>
+    <!-- subslot for slot-m3-sub -->
+    <div class="subslot-container" id="slot-m3-sub" style="display: none;">
+     <div class="subslot-wrapper">
+      <div class="subslot" id="slot-m1-sub-m3">
+      </div>
+      <div class="subslot" id="slot-s-sub-m3">
+      </div>
+      <div class="subslot" id="slot-aux-sub-m3">
+      </div>
+      <div class="subslot" id="slot-m2-sub-m3">
+      </div>
+      <div class="subslot" id="slot-v-sub-m3">
+      </div>
+      <div class="subslot" id="slot-c-sub-m3">
+      </div>
+      <div class="subslot" id="slot-o1-sub-m3">
+      </div>
+      <div class="subslot" id="slot-o2-sub-m3">
+      </div>
+      <div class="subslot" id="slot-c2-sub-m3">
+      </div>
+      <div class="subslot" id="slot-m3-sub-m3">
+      </div>
+     </div>
+    </div>
+    <div class="subslot" id="slot-c-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-c" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C
+     </label>
+     <img alt="image for C" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+    </div>
+    <div class="subslot" id="slot-c-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+    </div>
+   </div>
+  </section>
+  <script src="./js/test_controller.js" type="module">
+  </script>
+  <script>
+   function updateSubslotLabel(slotId) {
   const ids = ["o1", "c", "m1", "s"];
   ids.forEach(id => {
     const container = document.getElementById(`slot-${id}-sub`);
@@ -411,7 +666,63 @@ function updateSubslotLabel(slotId) {
     }
   });
 }
-</script>
-<script src="js/renderer_core.js" type="module"></script>
-</body>
+  </script>
+  <script src="js/renderer_core.js" type="module">
+  </script>
+  <div class="slot-wrapper" id="slot-s-sub" style="display: none;">
+   <div class="subslot-label">
+    現在展開中：S の subslot
+   </div>
+   <div class="subslot" id="slot-s-sub-m1">
+    <img alt="image for M1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-s">
+    <img alt="image for S" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-aux">
+    <img alt="image for AUX" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-m2">
+    <img alt="image for M2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-v">
+    <img alt="image for V" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-c">
+    <img alt="image for C" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-o1">
+    <img alt="image for O1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-o2">
+    <img alt="image for O2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-c2">
+    <img alt="image for C2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-m3">
+    <img alt="image for M3" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+  </div>
+ </body>
 </html>
