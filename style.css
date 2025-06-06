@@ -35,3 +35,17 @@
   gap: 16px;
   margin-bottom: 16px;
 }
+
+/* subslot 表示安定化のための共通構造 */
+.subslot {
+  min-width: 80px;
+  min-height: 100px;
+  padding: 4px;
+  margin: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
