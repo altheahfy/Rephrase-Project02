@@ -49,8 +49,32 @@
   align-items: center;
   justify-content: center;
 }
-/* Step13-A: slot-s-sub 視認確認用の一時スタイル */
+
+/* Step13-B-1: slot-s-sub 直接可視化 */
 #slot-s-sub {
-  background-color: rgba(255, 0, 0, 0.1); /* 領域が画面に出ればDOM確定 */
-  border: 1px solid red; /* 境界線強調 */
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 2px dashed red;
+  position: relative;
+}
+
+#slot-s-sub::after {
+  content: "🟥 slot-s-sub here";
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: yellow;
+  color: black;
+  font-size: 12px;
+  padding: 2px;
+  z-index: 10000;
+}
+
+/* Step13-B-2: 親要素の階層確認用可視化 */
+section {
+  border: 2px solid blue;
+  min-height: 50px;
+}
+
+body {
+  border: 2px solid purple;
 }
