@@ -13,6 +13,9 @@ function toggleExclusiveSubslot(slotId) {
   // 必要なら開く
   if (!isOpen && target) {
     target.style.display = "flex";
+    console.log("🔍 target.style.display set to:", target.style.display);
+    const forceRedraw = target.offsetHeight; // force reflow
+    console.log("📐 target.offsetHeight (for reflow):", forceRedraw);
   }
 
   // ラベル更新呼び出し

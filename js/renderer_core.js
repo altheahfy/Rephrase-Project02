@@ -65,3 +65,11 @@ export function renderAllTexts(slotTextMap) {
     }
   });
 }
+
+
+export function updateSubslotLabel(slotId) {
+  const label = document.getElementById("subslot-label");
+  if (label) {
+    label.textContent = `【${slotId.toUpperCase()}】の展開中サブスロット`;
+  }
+}
