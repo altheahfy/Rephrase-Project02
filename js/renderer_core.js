@@ -97,3 +97,17 @@ export function injectSlotText(slotId) {
 
 
 window.injectSlotText = injectSlotText;
+
+
+export function injectAllSubslotTexts(containerId) {
+  const subslots = document.querySelectorAll(`#${containerId} .subslot`);
+  subslots.forEach(subslot => {
+    const slotId = subslot.id;
+    const text = subslot.querySelector(".slot-text");
+    if (text) {
+      const key = slotId.split("-").pop().toUpperCase();
+      text.textContent = `【${key}】の文法ガイド`;
+    }
+  });
+}
+window.injectAllSubslotTexts = injectAllSubslotTexts;
