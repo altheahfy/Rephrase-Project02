@@ -8,6 +8,16 @@ export function renderAllSlots() {
 
     // subslot - O1
     "slot-o1-sub-m1", "slot-o1-sub-s", "slot-o1-sub-aux", "slot-o1-sub-m2",
+  "slot-m2-sub-m1",
+  "slot-m2-sub-s",
+  "slot-m2-sub-aux",
+  "slot-m2-sub-m2",
+  "slot-m2-sub-v",
+  "slot-m2-sub-c",
+  "slot-m2-sub-o1",
+  "slot-m2-sub-o2",
+  "slot-m2-sub-c2",
+  "slot-m2-sub-m3",
     "slot-o1-sub-v", "slot-o1-sub-c", "slot-o1-sub-o1", "slot-o1-sub-o2",
     "slot-o1-sub-c2", "slot-o1-sub-m3",
 
