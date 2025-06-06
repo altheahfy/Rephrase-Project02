@@ -1,5 +1,5 @@
 
-// renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正）
+// renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正 + ログ強化）
 export function renderAllSlots() {
   const slotIds = [
     // 上位スロット
@@ -19,41 +19,44 @@ export function renderAllSlots() {
     // subslot - O2
     "slot-o2-sub-m1", "slot-o2-sub-s", "slot-o2-sub-aux", "slot-o2-sub-m2",
     "slot-o2-sub-v", "slot-o2-sub-c", "slot-o2-sub-o1", "slot-o2-sub-o2",
-    "slot-o2-sub-c2", "slot-o2-sub-m3"
-  ,
-  "slot-m1-sub-m1",
-  "slot-m1-sub-s",
-  "slot-m1-sub-aux",
-  "slot-m1-sub-m2",
-  "slot-m1-sub-v",
-  "slot-m1-sub-c",
-  "slot-m1-sub-o1",
-  "slot-m1-sub-o2",
-  "slot-m1-sub-c2",
-  "slot-m1-sub-m3",
-  "slot-s-sub-m1", "slot-s-sub-s", "slot-s-sub-aux", "slot-s-sub-m2", "slot-s-sub-v", "slot-s-sub-c", "slot-s-sub-o1", "slot-s-sub-o2", "slot-s-sub-c2", "slot-s-sub-m3"];
+    "slot-o2-sub-c2", "slot-o2-sub-m3",
+
+    // subslot - M1
+    "slot-m1-sub-m1", "slot-m1-sub-s", "slot-m1-sub-aux", "slot-m1-sub-m2",
+    "slot-m1-sub-v", "slot-m1-sub-c", "slot-m1-sub-o1", "slot-m1-sub-o2",
+    "slot-m1-sub-c2", "slot-m1-sub-m3",
+
+    // subslot - S（検証対象）
+    "slot-s-sub-m1", "slot-s-sub-s", "slot-s-sub-aux", "slot-s-sub-m2",
+    "slot-s-sub-v", "slot-s-sub-c", "slot-s-sub-o1", "slot-s-sub-o2",
+    "slot-s-sub-c2", "slot-s-sub-m3"
+  ];
 
   slotIds.forEach(slotId => {
+    console.log(`🧪 Rendering slot: ${slotId}`);
+
     const img = document.querySelector(`#${slotId} img`);
     if (img) {
       img.src = "slot_images/common/placeholder.png";
       img.alt = `Placeholder for ${slotId}`;
-      console.log(`描画中: ${slotId} → ${img.src}`);
+      console.log(`🖼️ 画像描画: ${slotId} → ${img.src}`);
+    } else {
+      console.warn(`⚠️ 画像描画スキップ: ${slotId} に img が見つかりません`);
     }
 
     const text = document.querySelector(`#${slotId} .slot-text`);
     if (text) {
-      // スロットID末尾の名称だけを抽出して使用
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = `【${slotKey}】の文法ガイド`;
-      console.log(`テキスト描画: ${slotId} → ${text.textContent}`);
+      console.log(`📘 テキスト描画: ${slotId} → ${text.textContent}`);
+    } else {
+      console.warn(`⚠️ テキスト描画スキップ: ${slotId} に .slot-text が見つかりません`);
     }
   });
 }
 
 // 自動実行：必要ならコメントアウト可
 window.addEventListener("DOMContentLoaded", renderAllSlots);
-
 
 export function renderAllTexts(slotTextMap) {
   console.log("✅ renderAllTexts called");
@@ -66,7 +69,6 @@ export function renderAllTexts(slotTextMap) {
     }
   });
 }
-
 
 export function updateSubslotLabel(slotId) {
   const label = document.getElementById("subslot-label");
