@@ -1,0 +1,56 @@
+/* スロット画像（複数対応）の共通スタイル */
+.slot-image {
+  display: inline-block;
+  margin-right: 4px;
+  max-height: 60px;
+  vertical-align: middle;
+}
+
+/* スロット全体の調整が必要な場合に備えた汎用クラス */
+.slot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+
+/* Slot label for identifying slotKey (e.g., m1, s, o1) */
+.slot-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+
+/* 非表示制御用クラス */
+.hidden {
+  display: none;
+}
+
+.slot-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* subslot 表示安定化のための共通構造 */
+.subslot {
+  min-width: 80px;
+  min-height: 100px;
+  padding: 4px;
+  margin: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+/* Step13-A: slot-s-sub 視認確認用の一時スタイル */
+#slot-s-sub {
+  background-color: rgba(255, 0, 0, 0.1); /* 領域が画面に出ればDOM確定 */
+  border: 1px solid red; /* 境界線強調 */
+}
