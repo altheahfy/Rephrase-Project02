@@ -86,3 +86,11 @@ export function updateSubslotLabel(slotId) {
     label.textContent = `【${slotId.toUpperCase()}】の展開中サブスロット`;
   }
 }
+
+export function injectSlotText(slotId) {
+  const text = document.querySelector(`#${slotId} .slot-text`);
+  if (text) {
+    const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
+    text.textContent = `【${slotKey}】の文法ガイド`;
+  }
+}
