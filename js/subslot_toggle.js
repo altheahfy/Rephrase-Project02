@@ -1,3 +1,4 @@
+import { injectSlotText } from './renderer_core.js';
 
 function toggleExclusiveSubslot(slotId) {
   if (slotId === "s") console.log("✅ slot-s-sub toggle triggered");
@@ -17,6 +18,7 @@ function toggleExclusiveSubslot(slotId) {
     target.style.display = "flex";
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
+    injectSlotText(`slot-${slotId}-sub`);  // PH-07-8-h-9 inject
     console.log("✅ 強制表示style適用: ", target.id);
     console.log("🔍 target.style.display set to:", target.style.display);
     const forceRedraw = target.offsetHeight; // force reflow
