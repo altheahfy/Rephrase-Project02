@@ -49,3 +49,10 @@
   align-items: center;
   justify-content: center;
 }
+/* 高さ潰れ・透明化・折り返し不備の対処 */
+.slot-wrapper {
+  min-height: 100px;
+  visibility: visible;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
