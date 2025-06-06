@@ -30,7 +30,17 @@ export function renderAllSlots() {
   "slot-m1-sub-o1",
   "slot-m1-sub-o2",
   "slot-m1-sub-c2",
-  "slot-m1-sub-m3"];
+  "slot-m1-sub-m3"  "slot-s-sub-m1",
+  "slot-s-sub-s",
+  "slot-s-sub-aux",
+  "slot-s-sub-m2",
+  "slot-s-sub-v",
+  "slot-s-sub-c",
+  "slot-s-sub-o1",
+  "slot-s-sub-o2",
+  "slot-s-sub-c2",
+  "slot-s-sub-m3",
+];
 
   slotIds.forEach(slotId => {
     const img = document.querySelector(`#${slotId} img`);
