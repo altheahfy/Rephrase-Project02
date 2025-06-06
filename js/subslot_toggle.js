@@ -17,6 +17,7 @@ function toggleExclusiveSubslot(slotId) {
     target.style.display = "flex";
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
+    window.injectSlotText(`slot-${slotId}-sub`);  // inject added
     console.log("✅ 強制表示style適用: ", target.id);
     console.log("🔍 target.style.display set to:", target.style.display);
     const forceRedraw = target.offsetHeight; // force reflow

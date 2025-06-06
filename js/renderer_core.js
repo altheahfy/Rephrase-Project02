@@ -94,3 +94,6 @@ export function injectSlotText(slotId) {
     text.textContent = `【${slotKey}】の文法ガイド`;
   }
 }
+
+
+window.injectSlotText = injectSlotText;
