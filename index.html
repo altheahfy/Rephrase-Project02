@@ -2,6 +2,8 @@
 
 <html lang="en">
 <head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script type="module" src="js/randomizer_controller.js"></script>
 <meta charset="utf-8"/>
 <title>
    Rephrase Structured UI
@@ -11,6 +13,11 @@
 </script>
 </head>
 <body>
+<section>
+  <label for="fileInput">grammar_data0001.xlsx を選択：</label>
+  <input type="file" id="fileInput" accept=".xlsx" />
+  <button id="loadButton">📘 増殖①からランダム出題</button>
+</section>
 <h1>
    🧪 Subslot Structured Test with Upper Slots
   </h1>
@@ -700,4 +707,19 @@ function hideEmptySlots() {
 }
 </script>
 </body>
+<script type="module">
+let currentFile = null;
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  currentFile = e.target.files[0];
+});
+document.getElementById("loadButton").addEventListener("click", () => {
+  if (!currentFile) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    module.handleExcelFileUpload(currentFile);
+  });
+});
+</script>
 </html>
