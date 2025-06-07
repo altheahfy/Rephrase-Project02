@@ -1,13 +1,7 @@
-// randomizer_controller.js
-// 必要ライブラリ: SheetJS (XLSX) を事前に読み込んでおくこと
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+// randomizer_controller.js（修正版：構文スロットUI完全対応）
+// 必要ライブラリ: SheetJS (XLSX)
 import { randomizeAll } from './randomizer_all.js';
 
-/**
- * ユーザーがアップロードした grammar_data0001.xlsx ファイルを読み込んで、
- * 増殖①シートの中からランダムに1文を選び、構文スロットにマッピングして反映する
- */
 export function handleExcelFileUpload(file) {
   const reader = new FileReader();
   reader.onload = function (e) {
@@ -20,36 +14,42 @@ export function handleExcelFileUpload(file) {
     }
     const json = XLSX.utils.sheet_to_json(sheet);
 
-    // ランダムに1行選ぶ
-    const randomRow = json[Math.floor(Math.random() * json.length)];
+    // 文法項目番号のランダム抽出
+    const allIds = [...new Set(json.map(row => row['文法項目番号']))];
+    const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
 
-    // スロットへのマッピング（列名は実際のExcelに応じて調整）
-    const slotData = {
-      subject: randomRow['subject'] || '',
-      auxiliary: randomRow['auxiliary'] || '',
-      verb: randomRow['verb'] || '',
-      object: randomRow['object'] || '',
-      object_verb: randomRow['object_verb'] || '',
-      complement: randomRow['complement'] || '',
-      object2: randomRow['object2'] || '',
-      complement2: randomRow['complement2'] || '',
-      adverbial: randomRow['adverbial'] || '',
-      adverbial2: randomRow['adverbial2'] || '',
-      adverbial3: randomRow['adverbial3'] || '',
+    // 対象行を抽出
+    const targetRows = json.filter(row => row['文法項目番号'] === chosenId);
 
-      sub_s: randomRow['sub_s'] || '',
-      sub_aux: randomRow['sub_aux'] || '',
-      sub_v: randomRow['sub_v'] || '',
-      sub_o1: randomRow['sub_o1'] || '',
-      sub_o2: randomRow['sub_o2'] || '',
-      sub_c1: randomRow['sub_c1'] || '',
-      sub_c2: randomRow['sub_c2'] || '',
-      sub_m1: randomRow['sub_m1'] || '',
-      sub_m2: randomRow['sub_m2'] || '',
-      sub_m3: randomRow['sub_m3'] || '',
-    };
+    // slotId生成マッピング関数
+    function determineSlotId(row) {
+      const slot = row['Slot'];
+      const internal = row['内部スロット'];
+      if (internal) {
+        return {
+          sub_s: 'slot-o1-s', sub_aux: 'slot-o1-aux', sub_v: 'slot-o1-v',
+          sub_o1: 'slot-o1-o1', sub_o2: 'slot-o1-o2', sub_c1: 'slot-o1-c1',
+          sub_c2: 'slot-o1-c2', sub_m1: 'slot-o1-m1', sub_m2: 'slot-o1-m2', sub_m3: 'slot-o1-m3'
+        }[internal] || null;
+      } else if (slot) {
+        return {
+          S: 'slot-s', V: 'slot-v', AUX: 'slot-aux', C: 'slot-c', 'O-V': 'slot-o_v',
+          O1: 'slot-o1', O2: 'slot-o2', C1: 'slot-c1', C2: 'slot-c2',
+          M1: 'slot-m1', M2: 'slot-m2', M3: 'slot-m3'
+        }[slot] || null;
+      }
+      return null;
+    }
 
-    // 表示に反映
+    const slotData = {};
+    for (const row of targetRows) {
+      const slotId = determineSlotId(row);
+      if (!slotId) continue;
+      const value = row['Phrase'] || row['内部要素'];
+      if (value) slotData[slotId] = value;
+    }
+
+    console.log("📘 構文スロットデータ:", slotData);
     randomizeAll(slotData);
   };
   reader.readAsArrayBuffer(file);
