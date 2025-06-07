@@ -11,6 +11,24 @@
 <link href="style.css" rel="stylesheet"/>
 <script src="js/subslot_toggle.js">
 </script>
+
+<!-- PH-35対策: randomizer_controller をモジュールとして読み込み -->
+<script type="module" src="js/randomizer_controller.js"></script>
+
+<!-- PH-35対策: loadButton 押下でグローバル関数 handleExcelFileUpload を実行 -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const loadButton = document.getElementById("loadButton");
+    if (loadButton) {
+      loadButton.addEventListener("click", () => {
+        if (window.handleExcelFileUpload && window.currentFile) {
+          window.handleExcelFileUpload(window.currentFile);
+        }
+      });
+    }
+  });
+</script>
+
 </head>
 <body>
 <section>
