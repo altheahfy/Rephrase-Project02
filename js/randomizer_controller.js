@@ -1,56 +1,55 @@
-// randomizer_controller.js（修正版：構文スロットUI完全対応）
-// 必要ライブラリ: SheetJS (XLSX)
-import { randomizeAll } from './randomizer_all.js';
+import { loadXlsxSheet } from './utils/xlsx_loader.js';
 
-export function handleExcelFileUpload(file) {
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheet = workbook.Sheets['増殖①'];
-    if (!sheet) {
-      alert('シート「増殖①」が見つかりません');
-      return;
-    }
-    const json = XLSX.utils.sheet_to_json(sheet);
+document.addEventListener('DOMContentLoaded', () => {
+  const randomizeButton = document.getElementById('randomize-all');
+  if (randomizeButton) {
+    randomizeButton.addEventListener('click', async () => {
+      const json = await loadXlsxSheet('data/grammar_data0001.xlsx', '増殖①');
 
-    // 文法項目番号のランダム抽出
-    const allIds = [...new Set(json.map(row => row['文法項目番号']))];
-    const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
+      // 文法項目番号の一覧を取得（重複排除）
+      const allIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
 
-    // 対象行を抽出
-    const targetRows = json.filter(row => row['文法項目番号'] === chosenId);
+      // ランダムに1つ選ぶ
+      const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
 
-    // slotId生成マッピング関数
-    function determineSlotId(row) {
-      const slot = row['Slot'];
-      const internal = row['内部スロット'];
-      if (internal) {
-        return {
-          sub_s: 'slot-o1-s', sub_aux: 'slot-o1-aux', sub_v: 'slot-o1-v',
-          sub_o1: 'slot-o1-o1', sub_o2: 'slot-o1-o2', sub_c1: 'slot-o1-c1',
-          sub_c2: 'slot-o1-c2', sub_m1: 'slot-o1-m1', sub_m2: 'slot-o1-m2', sub_m3: 'slot-o1-m3'
-        }[internal] || null;
-      } else if (slot) {
-        return {
-          S: 'slot-s', V: 'slot-v', AUX: 'slot-aux', C: 'slot-c', 'O-V': 'slot-o_v',
-          O1: 'slot-o1', O2: 'slot-o2', C1: 'slot-c1', C2: 'slot-c2',
-          M1: 'slot-m1', M2: 'slot-m2', M3: 'slot-m3'
-        }[slot] || null;
+      // 対象行を抽出
+      const targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
+      if (targetRows.length === 0) {
+        console.error("❌ 対象文法項目が見つかりませんでした:", chosenId);
+        return;
       }
-      return null;
-    }
 
-    const slotData = {};
-    for (const row of targetRows) {
-      const slotId = determineSlotId(row);
-      if (!slotId) continue;
-      const value = row['Phrase'] || row['内部要素'];
-      if (value) slotData[slotId] = value;
-    }
+      const slotData = {};
 
-    console.log("📘 構文スロットデータ:", slotData);
-    randomizeAll(slotData);
-  };
-  reader.readAsArrayBuffer(file);
-}
+      for (const row of targetRows) {
+        const internal = row['構文要素ID']; // sub_s など
+        const value = row['表示テキスト'];  // 表示内容
+
+        if (!internal || !value) continue;
+
+        let slotId = '';
+        if (internal.startsWith('sub_')) {
+          // サブスロットの場合
+          const slotSuffix = internal.replace('sub_', '');
+          slotId = `slot-o1-sub-${slotSuffix}`;
+        } else {
+          // 上位スロットの場合
+          slotId = `slot-${internal}`;
+        }
+
+        slotData[slotId] = value;
+      }
+
+      console.log("📘 構文スロットデータ:", slotData);
+
+      for (const [slotId, value] of Object.entries(slotData)) {
+        const textEl = document.querySelector(`#${slotId} .slot-text`);
+        if (textEl) {
+          textEl.textContent = value;
+        } else {
+          console.warn(`⚠️ テキスト要素が見つかりませんでした: ${slotId}`);
+        }
+      }
+    });
+  }
+});
