@@ -23,8 +23,8 @@ export function handleExcelFileUpload(file) {
 
     const slotData = {};
     for (const row of targetRows) {
-      const internal = row['構文要素ID'];
-      const value = row['表示テキスト'];
+      const internal = row['Slot'];
+      const value = row['Phrase'];
       if (!internal || !value) continue;
 
       let slotId = '';
