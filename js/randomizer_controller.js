@@ -1,55 +1,46 @@
-import { loadXlsxSheet } from './utils/xlsx_loader.js';
+// randomizer_controller.js（グローバル関数対応）
+import { randomizeAll } from './randomizer_all.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const randomizeButton = document.getElementById('randomize-all');
-  if (randomizeButton) {
-    randomizeButton.addEventListener('click', async () => {
-      const json = await loadXlsxSheet('data/grammar_data0001.xlsx', '増殖①');
+export function handleExcelFileUpload(file) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheet = workbook.Sheets['増殖①'];
+    if (!sheet) {
+      alert('シート「増殖①」が見つかりません');
+      return;
+    }
+    const json = XLSX.utils.sheet_to_json(sheet);
 
-      // 文法項目番号の一覧を取得（重複排除）
-      const allIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
+    const allIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
+    const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
+    const targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
+    if (targetRows.length === 0) {
+      console.warn('⚠️ 対象文法項目が見つかりません:', chosenId);
+      return;
+    }
 
-      // ランダムに1つ選ぶ
-      const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
+    const slotData = {};
+    for (const row of targetRows) {
+      const internal = row['構文要素ID'];
+      const value = row['表示テキスト'];
+      if (!internal || !value) continue;
 
-      // 対象行を抽出
-      const targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
-      if (targetRows.length === 0) {
-        console.error("❌ 対象文法項目が見つかりませんでした:", chosenId);
-        return;
+      let slotId = '';
+      if (internal.startsWith('sub_')) {
+        slotId = `slot-o1-sub-${internal.replace('sub_', '')}`;
+      } else {
+        slotId = `slot-${internal}`;
       }
+      slotData[slotId] = value;
+    }
 
-      const slotData = {};
+    console.log('📘 構文スロットデータ:', slotData);
+    randomizeAll(slotData);
+  };
+  reader.readAsArrayBuffer(file);
+}
 
-      for (const row of targetRows) {
-        const internal = row['構文要素ID']; // sub_s など
-        const value = row['表示テキスト'];  // 表示内容
-
-        if (!internal || !value) continue;
-
-        let slotId = '';
-        if (internal.startsWith('sub_')) {
-          // サブスロットの場合
-          const slotSuffix = internal.replace('sub_', '');
-          slotId = `slot-o1-sub-${slotSuffix}`;
-        } else {
-          // 上位スロットの場合
-          slotId = `slot-${internal}`;
-        }
-
-        slotData[slotId] = value;
-      }
-
-      console.log("📘 構文スロットデータ:", slotData);
-
-      for (const [slotId, value] of Object.entries(slotData)) {
-        const textEl = document.querySelector(`#${slotId} .slot-text`);
-        if (textEl) {
-          textEl.textContent = value;
-        } else {
-          console.warn(`⚠️ テキスト要素が見つかりませんでした: ${slotId}`);
-        }
-      }
-    });
-  }
-});
+// グローバル登録
+window.handleExcelFileUpload = handleExcelFileUpload;
