@@ -14,7 +14,69 @@
 <h1>
    🧪 Subslot Structured Test with Upper Slots
   </h1>
-<section>
+<section><button id="randomize-all">全体ランダマイズ</button>
+<div class="slot-wrapper">
+<div class="slot-container" id="subject">
+<label>主語</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="verb">
+<label>動詞</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="object">
+<label>目的語</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="m1">
+<label>M1</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="s">
+<label>S</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="v">
+<label>V</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="o1">
+<label>O1</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="o2">
+<label>O2</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="c2">
+<label>C2</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="m2">
+<label>M2</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="m3">
+<label>M3</label>
+<div class="slot-text"></div>
+</div>
+</div>
+
+<div class="slot-wrapper">
+<div class="slot-container" id="subject">
+<label>主語</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="verb">
+<label>動詞</label>
+<div class="slot-text"></div>
+</div>
+<div class="slot-container" id="object">
+<label>目的語</label>
+<div class="slot-text"></div>
+</div>
+</div>
+
 <h2>
     Full Structure
    </h2>
@@ -91,7 +153,7 @@
 </div>
 <!-- M3スロット用ボタン -->
 <div class="subslot-toggle-button" style="margin-top: 4px;">
-  <button data-subslot-toggle="m3">▼ 詳細</button>
+<button data-subslot-toggle="m3">▼ 詳細</button>
 </div></div>
 </div>
 <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
@@ -550,6 +612,92 @@
 }
   </script>
 <script src="js/renderer_core.js" type="module">
+</script>
+
+<script>
+document.getElementById("randomize-all").addEventListener("click", function() {
+    randomizeAllSlots();  // 全体ランダマイズ処理を実行
+});
+
+function randomizeAllSlots() {
+    let slots = {
+        subject: ["I", "You", "He", "She", "They"],
+        verb: ["am", "are", "is", "was", "were"],
+        object: ["happy", "sad", "excited", "tired", "bored"],
+    };
+
+    document.getElementById("subject").querySelector(".slot-text").innerText = getRandomElement(slots.subject);
+    document.getElementById("verb").querySelector(".slot-text").innerText = getRandomElement(slots.verb);
+    document.getElementById("object").querySelector(".slot-text").innerText = getRandomElement(slots.object);
+
+    hideEmptySlots();  // 空のスロットを非表示にする処理
+}
+
+function getRandomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function hideEmptySlots() {
+    let slots = document.querySelectorAll('.slot-container');
+    slots.forEach(function(slot) {
+        if (slot.querySelector(".slot-text").innerText.trim() === '') {
+            slot.style.display = 'none';  // 空のスロットを非表示
+        } else {
+            slot.style.display = 'block';  // 内容があれば表示
+        }
+    });
+}
+</script>
+
+<script>
+document.getElementById("randomize-all").addEventListener("click", function() {
+    randomizeAllSlots();  // 全体ランダマイズ処理を実行
+});
+
+function randomizeAllSlots() {
+    let slots = {
+        subject: ["I", "You", "He", "She", "They"],
+        verb: ["am", "are", "is", "was", "were"],
+        object: ["happy", "sad", "excited", "tired", "bored"],
+        m1: ["item1", "item2", "item3"],
+        s: ["subject1", "subject2", "subject3"],
+        v: ["verb1", "verb2", "verb3"],
+        o1: ["object1", "object2", "object3"],
+        o2: ["object1", "object2", "object3"],
+        c2: ["complement1", "complement2", "complement3"],
+        m2: ["modifier1", "modifier2", "modifier3"],
+        m3: ["modifier1", "modifier2", "modifier3"],
+    };
+
+    document.getElementById("subject").querySelector(".slot-text").innerText = getRandomElement(slots.subject);
+    document.getElementById("verb").querySelector(".slot-text").innerText = getRandomElement(slots.verb);
+    document.getElementById("object").querySelector(".slot-text").innerText = getRandomElement(slots.object);
+    document.getElementById("m1").querySelector(".slot-text").innerText = getRandomElement(slots.m1);
+    document.getElementById("s").querySelector(".slot-text").innerText = getRandomElement(slots.s);
+    document.getElementById("v").querySelector(".slot-text").innerText = getRandomElement(slots.v);
+    document.getElementById("o1").querySelector(".slot-text").innerText = getRandomElement(slots.o1);
+    document.getElementById("o2").querySelector(".slot-text").innerText = getRandomElement(slots.o2);
+    document.getElementById("c2").querySelector(".slot-text").innerText = getRandomElement(slots.c2);
+    document.getElementById("m2").querySelector(".slot-text").innerText = getRandomElement(slots.m2);
+    document.getElementById("m3").querySelector(".slot-text").innerText = getRandomElement(slots.m3);
+
+    hideEmptySlots();  // 空のスロットを非表示にする処理
+}
+
+function getRandomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function hideEmptySlots() {
+    let slots = document.querySelectorAll('.slot-container');
+    slots.forEach(function(slot) {
+        if (slot.querySelector(".slot-text").innerText.trim() === '') {
+            slot.style.display = 'none';  // 空のスロットを非表示
+        } else {
+            slot.style.display = 'block';  // 内容があれば表示
+        }
+    });
+}
 </script>
 </body>
 </html>
