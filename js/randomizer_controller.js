@@ -27,99 +27,30 @@ export function handleExcelFileUpload(file) {
     console.log("🧪 選出構文ID:", chosenId);
     console.log("📑 targetRows:", targetRows);
     for (const row of targetRows) {
-      console.log("🔍 rowデータ:", row);
+  const rawSlot = (row['Slot'] || '').trim();
+  const internalSub = (row['内部スロット'] || '').trim();
+  const value = (row['Phrase'] || '').trim();
+  if (!value) continue;
+
+  let slotId = '';
+
+  if (internalSub.startsWith('sub-')) {
+    if (!parentSlot) {
+      console.warn(`⚠️ 親スロット未設定で subslot 検出: ${internalSub}`);
+      continue;
     }
+    const child = internalSub.replace('sub-', '');
+    slotId = `slot-${parentSlot}-sub-${child}`;
+  } else if (rawSlot) {
+    slotId = `slot-${rawSlot}`;
+    parentSlot = rawSlot; // 親スロット更新
+  } else {
+    console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
+    continue;
+  }
 
-    if (targetRows.length === 0) {
-      console.warn("📛 有効なデータ行が見つかりませんでした。");
-      return;
-    }
-
-    const slotData = {};
-    let parentSlot = null;
-
-    for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim();
-      if (rawSlot && !rawSlot.startsWith('sub_')) {
-        parentSlot = rawSlot;
-      }
-    }
-
-    for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim();
-      const internalSub = (row['内部スロット'] || '').trim();
-      const value = (row['Phrase'] || '').trim();
-      if (!value) continue;
-
-      let slotId = '';
-
-if (internalSub.startsWith('sub-')) {
-        if (parentSlot === 'v' || parentSlot === 'aux') {
-          console.warn(`除外: ${internalSub} from ${parentSlot}`);if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}`);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot;
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      
-        if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}`);
-
-      `);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot;
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      
-        if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}`);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot;
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      
-        if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}`);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      }`);
-          continue;
-        }
-        if (!parentSlot) {
-          console.warn('⚠️ 親スロット未設定で subslot 検出:', internalSub);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot; // 更新
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      }
-
-      slotData[slotId] = value;
+  slotData[slotId] = value;
+}
     }
 
     console.log('📘 構文スロットデータ:', slotData);
