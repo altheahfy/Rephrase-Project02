@@ -1,3 +1,4 @@
+
 // randomizer_controller.js（グローバル関数対応）
 import { randomizeAll } from './randomizer_all.js';
 
@@ -22,6 +23,16 @@ export function handleExcelFileUpload(file) {
     }
 
     const slotData = {};
+    let parentSlot = null;
+
+    for (const row of targetRows) {
+      const internal = row['Slot'];
+      if (!internal || !internal.trim()) continue;
+      if (!internal.startsWith('sub_')) {
+        parentSlot = internal;
+      }
+    }
+
     for (const row of targetRows) {
       const internal = row['Slot'];
       const value = row['Phrase'];
@@ -29,7 +40,12 @@ export function handleExcelFileUpload(file) {
 
       let slotId = '';
       if (internal.startsWith('sub_')) {
-        slotId = `slot-o1-sub-${internal.replace('sub_', '')}`;
+        if (!parentSlot) {
+          console.warn('⚠️ 親スロットが未定義のまま sub_ スロットが検出されました:', internal);
+          continue;
+        }
+        const child = internal.replace('sub_', '');
+        slotId = `slot-${parentSlot}-sub-${child}`;
       } else {
         slotId = `slot-${internal}`;
       }
