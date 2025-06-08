@@ -53,11 +53,9 @@ export function handleExcelFileUpload(file) {
 
       let slotId = '';
 
-      if (internalSub.startsWith('sub-')) {
+if (internalSub.startsWith('sub-')) {
         if (parentSlot === 'v' || parentSlot === 'aux') {
-          console.warn(`除外: ${internalSub} from ${parentSlot}`);
-          continue;
-        }
+          console.warn(`除外: ${internalSub
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
@@ -70,9 +68,22 @@ export function handleExcelFileUpload(file) {
       } else {
         console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
         continue;
-      } from ${parentSlot}`);
+      
+        if (!parentSlot) {
+          console.warn(`parentSlot未定義: ${internalSub}
+
+      `);
           continue;
         }
+        const child = internalSub.replace('sub-', '');
+        slotId = `slot-${parentSlot}-sub-${child}`;
+      } else if (rawSlot) {
+        slotId = `slot-${rawSlot}`;
+        parentSlot = rawSlot;
+      } else {
+        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
+        continue;
+      
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
@@ -85,24 +96,7 @@ export function handleExcelFileUpload(file) {
       } else {
         console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
         continue;
-      } from ${parentSlot}`);
-          continue;
-        }
-        if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}`);
-          continue;
-        }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot;
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      } from ${parentSlot}`);
-          continue;
-        }
+      
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
