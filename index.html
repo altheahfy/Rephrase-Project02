@@ -505,4 +505,15 @@ document.getElementById("loadButton").addEventListener("click", () => {
   });
 });
 </script>
+<script type="module">
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.currentFile) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    module.handleExcelFileUpload(window.currentFile);
+  });
+});
+</script>
 </html>
