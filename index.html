@@ -482,14 +482,22 @@
 <script src="js/renderer_core.js" type="module">
 </script>
 <script type="module">
-document.getElementById("randomize-all").addEventListener("click", async () => {
-  if (typeof randomizeAll === "function") {
-    await randomizeAll();
-  } else {
-    console.warn("randomizeAll is not defined");
+
+<script type="module">
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
   }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
 });
-</script></body>
+</script>
 <script type="module">
 window.currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
@@ -506,13 +514,19 @@ document.getElementById("loadButton").addEventListener("click", () => {
 });
 </script>
 <script type="module">
+
+<script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
-  if (!window.currentFile) {
+  if (!window.lastWorkbook) {
     alert("先に grammar_data0001.xlsx を選んでください。");
     return;
   }
   import("./js/randomizer_controller.js").then(module => {
-    module.handleExcelFileUpload(window.currentFile);
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
   });
 });
 </script>
