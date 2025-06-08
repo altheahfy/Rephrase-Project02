@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <meta charset="utf-8"/>
 <title>
    Rephrase Structured UI
@@ -11,10 +10,7 @@
 <link href="style.css" rel="stylesheet"/>
 <script src="js/subslot_toggle.js">
 </script>
-
 <!-- PH-35対策: randomizer_controller をモジュールとして読み込み -->
-
-
 <!-- PH-35対策: loadButton 押下でグローバル関数 handleExcelFileUpload を実行 -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -28,42 +24,36 @@
     }
   });
 </script>
-
-<script type="module" src="js/randomizer_controller.js"></script>
+<script src="js/randomizer_controller.js" type="module"></script>
 </head>
 <body>
 <section>
-  <label for="fileInput">grammar_data0001.xlsx を選択：</label>
-  <input type="file" id="fileInput" accept=".xlsx" />
-  <button id="loadButton">📘 増殖①からランダム出題</button>
+<label for="fileInput">grammar_data0001.xlsx を選択：</label>
+<input accept=".xlsx" id="fileInput" type="file"/>
+<button id="loadButton">📘 増殖①からランダム出題</button>
 </section>
 <h1>
    🧪 Subslot Structured Test with Upper Slots
   </h1>
 <section><button id="randomize-all">全体ランダマイズ</button>
 
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
 
 
-</div>
-</div>
-</div>
+
+
+
+
+
+
+
+
+
+
 
 <h2>
     Full Structure
    </h2>
-<div class="slot-wrapper">
-<div class="slot-container" id="slot-m1">
+<div class="slot-wrapper"><div class="slot-container" id="slot-m1">
 <label>
       M1
      </label><img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -71,8 +61,7 @@
 <button onclick="toggleExclusiveSubslot('m1')">
        ▼ 詳細
       </button>
-</div></div>
-<div class="slot-container" id="slot-s">
+</div></div><div class="slot-container" id="slot-s">
 <label>
       S
      </label><img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -80,23 +69,19 @@
 <button onclick="toggleExclusiveSubslot('s')">
        ▼ 詳細
       </button>
-</div></div>
-<div class="slot-container" id="slot-aux">
+</div></div><div class="slot-container" id="slot-aux">
 <label>
       AUX
      </label><img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
-</div></div>
-<div class="slot-container" id="slot-m2">
+</div></div><div class="slot-container" id="slot-m2">
 <label>
       M2
      </label><img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
-</div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('m2')">▼ 詳細</button></div></div>
-<div class="slot-container" id="slot-v">
+</div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('m2')">▼ 詳細</button></div></div><div class="slot-container" id="slot-v">
 <label>
       V
      </label><img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
-</div></div>
-<div class="slot-container" id="slot-c">
+</div></div><div class="slot-container" id="slot-c">
 <label>
       C
      </label><img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -104,8 +89,7 @@
 <button onclick="toggleExclusiveSubslot('c')">
        ▼ 詳細
       </button>
-</div></div>
-<div class="slot-container" id="slot-o1">
+</div></div><div class="slot-container" id="slot-o1">
 <label>
       O1
      </label><img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -113,8 +97,7 @@
 <button onclick="toggleExclusiveSubslot('o1')">
        ▼ 詳細
       </button>
-</div></div>
-<div class="slot-container" id="slot-o2">
+</div></div><div class="slot-container" id="slot-o2">
 <label>
       O2
      </label><img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -122,13 +105,11 @@
 <button onclick='toggleExclusiveSubslot("o2")'>
        ▼ 詳細
       </button>
-</div></div>
-<div class="slot-container" id="slot-c2">
+</div></div><div class="slot-container" id="slot-c2">
 <label>
       C2
      </label><img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
-</div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('c2')">▼ 詳細</button></div></div>
-<div class="slot-container" id="slot-m3">
+</div><div class="subslot-toggle-button" style="margin-top: 4px;"><button onclick="toggleExclusiveSubslot('c2')">▼ 詳細</button></div></div><div class="slot-container" id="slot-m3">
 <label>
       M3
      </label><img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/><div class="slot-text">
@@ -136,8 +117,7 @@
 <!-- M3スロット用ボタン -->
 <div class="subslot-toggle-button" style="margin-top: 4px;">
 <button data-subslot-toggle="m3">▼ 詳細</button>
-</div></div>
-</div>
+</div></div></div>
 <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
 <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
      現在展開中：O1 の subslot
@@ -595,7 +575,6 @@
   </script>
 <script src="js/renderer_core.js" type="module">
 </script>
-
 <script>
 document.getElementById("randomize-all").addEventListener("click", function() {
     randomizeAllSlots();  // 全体ランダマイズ処理を実行
@@ -630,7 +609,6 @@ function hideEmptySlots() {
     });
 }
 </script>
-
 <script>
 document.getElementById("randomize-all").addEventListener("click", function() {
     randomizeAllSlots();  // 全体ランダマイズ処理を実行
