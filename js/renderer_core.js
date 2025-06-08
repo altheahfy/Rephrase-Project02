@@ -99,11 +99,24 @@ window.injectAllSubslotTexts = injectAllSubslotTexts;
 export function renderAllSubslots(slotData) {
   for (const slotId in slotData) {
     if (slotId.includes("-sub-")) {
+      console.log("🔍 render対象:", slotId);  // デバッグログ追加
       const elem = document.getElementById(slotId);
       if (!elem) {
         console.warn("❗ subslot DOM not found:", slotId);
         continue;
       }
+
+      const textElem = elem.querySelector(".slot-text");
+      if (!textElem) {
+        console.warn("❗ .slot-text missing in subslot:", slotId);
+        continue;
+      }
+
+      textElem.textContent = slotData[slotId];
+    }
+  }
+}
+
 
       const textElem = elem.querySelector(".slot-text");
       if (!textElem) {
