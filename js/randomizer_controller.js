@@ -55,7 +55,16 @@ export function handleExcelFileUpload(file) {
 
       if (internalSub.startsWith('sub-')) {
         if (parentSlot === 'v' || parentSlot === 'aux') {
-          console.warn(`⛔ V/AUXスロットに対するsubslotは描画対象外のため除外: ${internalSub}`);
+          console.warn(`除外: ${internalSub} from ${parentSlot}`);
+          continue;
+        }
+        if (!parentSlot) {
+          console.warn(`parentSlot未定義: ${internalSub}`);
+          continue;
+        }
+        const child = internalSub.replace('sub-', '');
+        slotId = `slot-${parentSlot}-sub-${child}`;
+      }`);
           continue;
         }
         if (!parentSlot) {
