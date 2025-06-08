@@ -23,6 +23,13 @@ export function handleExcelFileUpload(file) {
       targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
     }
 
+    
+    console.log("🧪 選出構文ID:", chosenId);
+    console.log("📑 targetRows:", targetRows);
+    for (const row of targetRows) {
+      console.log("🔍 rowデータ:", row);
+    }
+
     if (targetRows.length === 0) {
       console.warn("📛 有効なデータ行が見つかりませんでした。");
       return;
