@@ -44,6 +44,13 @@ export function handleExcelFileUpload(file) {
       const rawSlot = (row['Slot'] || '').trim().toLowerCase();
       const internalSub = (row['内部スロット'] || '').trim();
       const value = (row['Phrase'] || '').trim();
+      const verb = (row['A_group_V'] || '').trim();
+
+      // ✅ slot-v 特別扱い（構文代表動詞）
+      if (verb && !slotData['slot-v']) {
+        slotData['slot-v'] = verb;
+      }
+
       if (!value || internalSub.startsWith('sub-')) continue;
       const slotId = `slot-${rawSlot}`;
       slotData[slotId] = value;
@@ -72,3 +79,4 @@ export function handleExcelFileUpload(file) {
 // グローバル登録
 window.handleExcelFileUpload = handleExcelFileUpload;
 window.randomizeAll = randomizeAll;
+
