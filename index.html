@@ -481,9 +481,15 @@
   </script>
 <script src="js/renderer_core.js" type="module">
 </script>
-
-
-</body>
+<script type="module">
+document.getElementById("randomize-all").addEventListener("click", async () => {
+  if (typeof randomizeAll === "function") {
+    await randomizeAll();
+  } else {
+    console.warn("randomizeAll is not defined");
+  }
+});
+</script></body>
 <script type="module">
 let currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
