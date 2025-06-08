@@ -70,18 +70,9 @@ export function handleExcelFileUpload(file) {
       } else {
         console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
         continue;
-      }`);
+      } from ${parentSlot}`);
           continue;
         }
-        const child = internalSub.replace('sub-', '');
-        slotId = `slot-${parentSlot}-sub-${child}`;
-      } else if (rawSlot) {
-        slotId = `slot-${rawSlot}`;
-        parentSlot = rawSlot;
-      } else {
-        console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
-        continue;
-      
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
@@ -94,7 +85,9 @@ export function handleExcelFileUpload(file) {
       } else {
         console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
         continue;
-      
+      } from ${parentSlot}`);
+          continue;
+        }
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
@@ -107,7 +100,9 @@ export function handleExcelFileUpload(file) {
       } else {
         console.warn('⚠️ Slot情報が欠落しています（valueは存在）:', value);
         continue;
-      
+      } from ${parentSlot}`);
+          continue;
+        }
         if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
