@@ -96,6 +96,9 @@ export function injectAllSubslotTexts(containerId) {
 window.injectAllSubslotTexts = injectAllSubslotTexts;
 
 // ✅ 差分追加：subslot描画関数
+
+
+
 export function renderAllSubslots(slotData) {
   for (const slotId in slotData) {
     if (slotId.includes("-sub-")) {
@@ -105,18 +108,6 @@ export function renderAllSubslots(slotData) {
         console.warn("❗ subslot DOM not found:", slotId);
         continue;
       }
-
-      const textElem = elem.querySelector(".slot-text");
-      if (!textElem) {
-        console.warn("❗ .slot-text missing in subslot:", slotId);
-        continue;
-      }
-
-      textElem.textContent = slotData[slotId];
-    }
-  }
-}
-
 
       const textElem = elem.querySelector(".slot-text");
       if (!textElem) {
