@@ -26,6 +26,9 @@ export function handleExcelFileUpload(file) {
     
     console.log("🧪 選出構文ID:", chosenId);
     console.log("📑 targetRows:", targetRows);
+
+    let slotData = {};
+    let parentSlot = null;
     for (const row of targetRows) {
   const rawSlot = (row['Slot'] || '').trim();
   const internalSub = (row['内部スロット'] || '').trim();
