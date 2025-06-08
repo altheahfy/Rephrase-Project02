@@ -14,11 +14,17 @@ export function handleExcelFileUpload(file) {
     }
     const json = XLSX.utils.sheet_to_json(sheet);
 
-    const allIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
-    const chosenId = allIds[Math.floor(Math.random() * allIds.length)];
-    const targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
+    let chosenId, targetRows = [];
+    const availableIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
+
+    while (targetRows.length === 0 && availableIds.length > 0) {
+      const index = Math.floor(Math.random() * availableIds.length);
+      chosenId = availableIds.splice(index, 1)[0]; // 選んだIDは一度使ったら除外
+      targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
+    }
+
     if (targetRows.length === 0) {
-      console.warn('⚠️ 対象文法項目が見つかりません:', chosenId);
+      console.warn("📛 有効なデータ行が見つかりませんでした。");
       return;
     }
 
