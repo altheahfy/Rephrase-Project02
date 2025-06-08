@@ -58,6 +58,7 @@ export function handleExcelFileUpload(file) {
     console.log('📘 構文スロットデータ:', slotData);
     window.lastSlotData = slotData;
     randomizeAll(slotData);
+    console.log("🔍 slotData 内容:", slotData);
     renderAllSlots();
   };
   reader.readAsArrayBuffer(file);
