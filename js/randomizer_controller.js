@@ -54,6 +54,10 @@ export function handleExcelFileUpload(file) {
       let slotId = '';
 
       if (internalSub.startsWith('sub-')) {
+        if (parentSlot === 'v' || parentSlot === 'aux') {
+          console.warn(`⛔ V/AUXスロットに対するsubslotは描画対象外のため除外: ${internalSub}`);
+          continue;
+        }
         if (!parentSlot) {
           console.warn('⚠️ 親スロット未設定で subslot 検出:', internalSub);
           continue;
