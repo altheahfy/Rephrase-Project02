@@ -55,8 +55,7 @@ export function handleExcelFileUpload(file) {
 
 if (internalSub.startsWith('sub-')) {
         if (parentSlot === 'v' || parentSlot === 'aux') {
-          console.warn(`除外: ${internalSub
-        if (!parentSlot) {
+          console.warn(`除外: ${internalSub} from ${parentSlot}`);if (!parentSlot) {
           console.warn(`parentSlot未定義: ${internalSub}`);
           continue;
         }
@@ -70,7 +69,7 @@ if (internalSub.startsWith('sub-')) {
         continue;
       
         if (!parentSlot) {
-          console.warn(`parentSlot未定義: ${internalSub}
+          console.warn(`parentSlot未定義: ${internalSub}`);
 
       `);
           continue;
