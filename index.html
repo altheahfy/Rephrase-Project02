@@ -491,9 +491,9 @@ document.getElementById("randomize-all").addEventListener("click", async () => {
 });
 </script></body>
 <script type="module">
-let currentFile = null;
+window.currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
-  currentFile = e.target.files[0];
+  window.currentFile = e.target.files[0];
 });
 document.getElementById("loadButton").addEventListener("click", () => {
   if (!currentFile) {
