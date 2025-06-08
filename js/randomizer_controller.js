@@ -18,12 +18,12 @@ export function handleExcelFileUpload(file) {
     const json = XLSX.utils.sheet_to_json(sheet);
 
     let chosenId, targetRows = [];
-    const availableIds = [...new Set(json.map(row => String(row['文法項目番号']).trim()))];
+    const availableIds = [...new Set(json.map(row => String(parseInt(row['文法項目番号']))))];
 
     while (targetRows.length === 0 && availableIds.length > 0) {
       const index = Math.floor(Math.random() * availableIds.length);
       chosenId = availableIds.splice(index, 1)[0]; // 選んだIDは一度使ったら除外
-      targetRows = json.filter(row => String(row['文法項目番号']).trim() === chosenId);
+      targetRows = json.filter(row => String(parseInt(row['文法項目番号'])) === chosenId);
     }
 
     
