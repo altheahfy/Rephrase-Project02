@@ -1,93 +1,93 @@
-// randomizer_controller.js（PH-35-R-FIX-2 完全対応版）
-import { randomizeAll } from './randomizer_all.js';
-import { renderAllSlots, renderAllSubslots } from './renderer_core.js';
+// renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正 + ログ強化）
+export function renderAllSlots(slotData) {
+  const slotIds = [
+    // 上位スロット
+    "slot-m1", "slot-s", "slot-aux", "slot-m2", "slot-v",
+    "slot-c", "slot-o1", "slot-o2", "slot-c2", "slot-m3",
 
-export function handleExcelFileUpload(file) {
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    let slotData = {};
-    let parentSlot = null;
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheet = workbook.Sheets['増殖①'];
-    if (!sheet) {
-      alert('シート「増殖①」が見つかりません');
-      return;
-    }
-    let chosenId, targetRows = [];
-    const json = XLSX.utils.sheet_to_json(sheet);
+    // subslot - O1
+    "slot-o1-sub-m1", "slot-o1-sub-s", "slot-o1-sub-aux", "slot-o1-sub-m2",
+    "slot-o1-sub-v", "slot-o1-sub-c", "slot-o1-sub-o1", "slot-o1-sub-o2",
+    "slot-o1-sub-c2", "slot-o1-sub-m3",
 
-    // 🔧 修正: NaN除外 + 空白除外
-    const availableIds = [...new Set(
-      json
-        .map(row => String(parseInt(row['文法項目番号'])))
-        .filter(id => id && id !== "NaN")
-    )];
+    // subslot - M2
+    "slot-m2-sub-m1", "slot-m2-sub-s", "slot-m2-sub-aux", "slot-m2-sub-m2",
+    "slot-m2-sub-v", "slot-m2-sub-c", "slot-m2-sub-o1", "slot-m2-sub-o2",
+    "slot-m2-sub-c2", "slot-m2-sub-m3",
 
-    while (targetRows.length === 0 && availableIds.length > 0) {
-      const index = Math.floor(Math.random() * availableIds.length);
-      chosenId = availableIds.splice(index, 1)[0];
+    // subslot - C
+    "slot-c-sub-m1", "slot-c-sub-s", "slot-c-sub-aux", "slot-c-sub-m2",
+    "slot-c-sub-v", "slot-c-sub-c", "slot-c-sub-o1", "slot-c-sub-o2",
+    "slot-c-sub-c2", "slot-c-sub-m3",
 
-      // 🔧 修正: Slotが空の行を除外して targetRows 抽出
-      targetRows = json.filter(row => {
-        const idMatch = String(parseInt(row['文法項目番号'])) === chosenId;
-        const hasSlot = !!(row['Slot'] || '').trim();
-        return idMatch && hasSlot;
-      });
-    }
+    // subslot - O2
+    "slot-o2-sub-m1", "slot-o2-sub-s", "slot-o2-sub-aux", "slot-o2-sub-m2",
+    "slot-o2-sub-v", "slot-o2-sub-c", "slot-o2-sub-o1", "slot-o2-sub-o2",
+    "slot-o2-sub-c2", "slot-o2-sub-m3",
 
-    console.log("🧪 選出構文ID:", chosenId);
-    console.log("📑 targetRows:", targetRows);
+    // subslot - M1
+    "slot-m1-sub-m1", "slot-m1-sub-s", "slot-m1-sub-aux", "slot-m1-sub-m2",
+    "slot-m1-sub-v", "slot-m1-sub-c", "slot-m1-sub-o1", "slot-m1-sub-o2",
+    "slot-m1-sub-c2", "slot-m1-sub-m3",
 
-    // PH-36-R-BUILD-2: 親スロット先処理
-    for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim().toLowerCase();
-      const internalSub = (row['内部スロット'] || '').trim();
-      const value = (row['Phrase'] || '').trim();
-      const verb = (row['A_group_V'] || '').trim();
+    // subslot - S（検証対象）
+    "slot-s-sub-m1", "slot-s-sub-s", "slot-s-sub-aux", "slot-s-sub-m2",
+    "slot-s-sub-v", "slot-s-sub-c", "slot-s-sub-o1", "slot-s-sub-o2",
+    "slot-s-sub-c2", "slot-s-sub-m3"
+  ];
 
-      // ✅ slot-v 特別扱い（構文代表動詞）
-      if (verb && !slotData['slot-v']) {
-        slotData['slot-v'] = verb;
-      }
-
-      if (!value || internalSub.startsWith('sub-')) continue;
-      const slotId = `slot-${rawSlot}`;
-      slotData[slotId] = value;
+  slotIds.forEach(slotId => {
+    const container = document.getElementById(slotId);
+    if (container) {
+      const slotTextCheck = container.querySelector(".slot-text");
     }
 
-    // subslot 後処理（parentSlot 使用）
-    for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim().toLowerCase();
-      const internalSub = (row['内部スロット'] || '').trim().toLowerCase();
-      const value = (row['Phrase'] || '').trim();
-      if (!value || !internalSub.startsWith('sub-')) continue;
-      const slotId = `slot-${rawSlot}-sub-${internalSub.replace('sub-', '')}`;
-      slotData[slotId] = value;
+    const img = document.querySelector(`#${slotId} img`);
+    if (img) {
+      img.src = "slot_images/common/placeholder.png";
+      img.alt = `Placeholder for ${slotId}`;
     }
 
-    console.log('📘 構文スロットデータ:', slotData);
-    window.lastSlotData = slotData;
-    randomizeAll(slotData);
-    console.log("🔍 slotData 内容:", slotData);
-    renderAllSlots(slotData);
-    renderAllSubslots(slotData); // ✅ 差分追加：subslot描画を即時実行
-  }; // ← 正しく閉じる
-
-  reader.readAsArrayBuffer(file); // ← 関数外に移動
+    const text = document.querySelector(`#${slotId} .slot-text`);
+    if (text) {
+      const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
+      text.textContent = slotData[slotId] || `【${slotKey}】の文法ガイド`;
+    }
+  });
 }
 
-// グローバル登録
-window.handleExcelFileUpload = handleExcelFileUpload;
-window.randomizeAll = randomizeAll;
+// 自動実行：コメントアウト済
+// window.addEventListener("DOMContentLoaded", renderAllSlots);
 
+export function renderAllTexts(slotTextMap) {
+  Object.entries(slotTextMap).forEach(([slotId, text]) => {
+    const textElement = document.querySelector(`#${slotId} .slot-text`);
+    if (textElement) {
+      if (text === undefined || text === null) return;
+      textElement.textContent = text;
+    }
+  });
+}
 
+export function updateSubslotLabel(slotId) {
+  const label = document.getElementById("subslot-label");
+  if (label) {
+    label.textContent = `【${slotId.toUpperCase()}】の展開中サブスロット`;
+  }
+}
 
-export function extractSlotDataFromWorkbook(workbook) {
-  const sheet = workbook.Sheets['増殖①'];
-  if (!sheet) {
-    alert('シート「増殖①」が見つかりません');
-    return null;
+export function injectSlotText(slotId) {
+  const text = document.querySelector(`#${slotId} .slot-text`);
+  if (text) {
+    const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
+    text.textContent = slotData[slotId] || `【${slotKey}】の文法ガイド`;
+  }
+}
+window.injectSlotText = injectSlotText;
+
+export function injectAllSubslotTexts(containerId) {
+  const subslots = document.querySelectorAll(`#${containerId} .subslot`);
+  subslots.forEach(subslot => {
   }
 
   let chosenId, targetRows = [];
