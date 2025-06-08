@@ -484,6 +484,20 @@
 <script type="module">
 
 <script type="module">
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
+});
+</script>
 <script type="module">
 window.currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
@@ -502,10 +516,6 @@ document.getElementById("loadButton").addEventListener("click", () => {
 <script type="module">
 
 <script type="module">
-</html>
-
-
-<script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!window.lastWorkbook) {
     alert("先に grammar_data0001.xlsx を選んでください。");
@@ -520,4 +530,4 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   });
 });
 </script>
-
+</html>
