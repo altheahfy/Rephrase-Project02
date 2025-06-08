@@ -1,6 +1,6 @@
 
 // renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正 + ログ強化）
-export function renderAllSlots() {
+export function renderAllSlots(slotData) {
   const slotIds = [
     // 上位スロット
     "slot-m1", "slot-s", "slot-aux", "slot-m2", "slot-v",
@@ -64,7 +64,7 @@ export function renderAllSlots() {
 
     } else {
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
-      text.textContent = `【${slotKey}】の文法ガイド`;
+      text.textContent = slotData[slotId] || `【${slotKey}】の文法ガイド`;
 
 
 
@@ -101,7 +101,7 @@ export function injectSlotText(slotId) {
   const text = document.querySelector(`#${slotId} .slot-text`);
   if (text) {
     const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
-    text.textContent = `【${slotKey}】の文法ガイド`;
+    text.textContent = slotData[slotId] || `【${slotKey}】の文法ガイド`;
   }
 }
 window.injectSlotText = injectSlotText;
