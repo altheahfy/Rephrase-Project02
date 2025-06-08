@@ -80,3 +80,57 @@ export function handleExcelFileUpload(file) {
 window.handleExcelFileUpload = handleExcelFileUpload;
 window.randomizeAll = randomizeAll;
 
+
+
+export function extractSlotDataFromWorkbook(workbook) {
+  const sheet = workbook.Sheets['増殖①'];
+  if (!sheet) {
+    alert('シート「増殖①」が見つかりません');
+    return null;
+  }
+
+  let chosenId, targetRows = [];
+  const json = XLSX.utils.sheet_to_json(sheet);
+
+  const availableIds = [...new Set(
+    json.map(row => String(parseInt(row['文法項目番号'])))
+        .filter(id => id && id !== "NaN")
+  )];
+
+  while (targetRows.length === 0 && availableIds.length > 0) {
+    const index = Math.floor(Math.random() * availableIds.length);
+    chosenId = availableIds.splice(index, 1)[0];
+
+    targetRows = json.filter(row => {
+      const idMatch = String(parseInt(row['文法項目番号'])) === chosenId;
+      const hasSlot = !!(row['Slot'] || '').trim();
+      return idMatch && hasSlot;
+    });
+  }
+
+  const slotData = {};
+
+  for (const row of targetRows) {
+    const rawSlot = (row['Slot'] || '').trim().toLowerCase();
+    const internalSub = (row['内部スロット'] || '').trim();
+    const value = (row['Phrase'] || '').trim();
+    const verb = (row['A_group_V'] || '').trim();
+
+    if (verb && !slotData['slot-v']) slotData['slot-v'] = verb;
+    if (!value || internalSub.startsWith('sub-')) continue;
+    slotData[`slot-${rawSlot}`] = value;
+  }
+
+  for (const row of targetRows) {
+    const rawSlot = (row['Slot'] || '').trim().toLowerCase();
+    const internalSub = (row['内部スロット'] || '').trim().toLowerCase();
+    const value = (row['Phrase'] || '').trim();
+    if (!value || !internalSub.startsWith('sub-')) continue;
+    slotData[`slot-${rawSlot}-sub-${internalSub.replace('sub-', '')}`] = value;
+  }
+
+  console.log("🧪 再抽選 chosenId:", chosenId);
+  console.log("📘 slotData (再抽選):", slotData);
+  return slotData;
+}
+
