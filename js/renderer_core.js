@@ -38,54 +38,34 @@ export function renderAllSlots(slotData) {
   ];
 
   slotIds.forEach(slotId => {
-    // PH-35-R-DIAG-4: 描画前にDOM状態を観察
     const container = document.getElementById(slotId);
     if (container) {
-
-
-
       const slotTextCheck = container.querySelector(".slot-text");
-
-    } else {
-
     }
 
     const img = document.querySelector(`#${slotId} img`);
     if (img) {
       img.src = "slot_images/common/placeholder.png";
       img.alt = `Placeholder for ${slotId}`;
-
-    } else {
-
     }
 
     const text = document.querySelector(`#${slotId} .slot-text`);
-    if (!text) {
-
-    } else {
+    if (text) {
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = slotData[slotId] || `【${slotKey}】の文法ガイド`;
-
-
-
-
     }
   });
 }
 
-// 自動実行：必要ならコメントアウト可
-window.addEventListener("DOMContentLoaded", renderAllSlots);
+// 自動実行：コメントアウト済
+// window.addEventListener("DOMContentLoaded", renderAllSlots);
 
 export function renderAllTexts(slotTextMap) {
-
   Object.entries(slotTextMap).forEach(([slotId, text]) => {
     const textElement = document.querySelector(`#${slotId} .slot-text`);
     if (textElement) {
-      if (text === undefined || text === null) {
-
-      }
+      if (text === undefined || text === null) return;
       textElement.textContent = text;
-
     }
   });
 }
