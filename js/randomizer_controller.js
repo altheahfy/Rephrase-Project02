@@ -9,7 +9,6 @@ export function handleExcelFileUpload(file) {
     let parentSlot = null;
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array' });
-      window.lastWorkbook = workbook;
     const sheet = workbook.Sheets['増殖①'];
     if (!sheet) {
       alert('シート「増殖①」が見つかりません');
