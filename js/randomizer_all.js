@@ -8,9 +8,9 @@ export function randomizeAll(data) {
     const el = document.querySelector(`#${slotId} .slot-text`);
     if (el) {
       el.textContent = text;
-      console.log(`🟢 テキスト反映: \${slotId} → \${text}`);
+      console.log(`🟢 テキスト反映: ${slotId} → ${text}`);
     } else {
-      console.warn(`🟥 slot-text DOMが見つかりません: \${slotId}`);
+      console.warn(`🟥 slot-text DOMが見つかりません: ${slotId}`);
     }
   }
 }
