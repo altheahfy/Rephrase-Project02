@@ -5,6 +5,8 @@ import { randomizeAll } from './randomizer_all.js';
 export function handleExcelFileUpload(file) {
   const reader = new FileReader();
   reader.onload = function (e) {
+    let slotData = {};
+    let parentSlot = null;
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array' });
     const sheet = workbook.Sheets['増殖①'];
@@ -26,9 +28,6 @@ export function handleExcelFileUpload(file) {
     
     console.log("🧪 選出構文ID:", chosenId);
     console.log("📑 targetRows:", targetRows);
-
-    let slotData = {};
-    let parentSlot = null;
     for (const row of targetRows) {
   const rawSlot = (row['Slot'] || '').trim();
   const internalSub = (row['内部スロット'] || '').trim();
