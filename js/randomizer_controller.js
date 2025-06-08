@@ -51,7 +51,6 @@ export function handleExcelFileUpload(file) {
 
   slotData[slotId] = value;
 }
-    }
 
     console.log('📘 構文スロットデータ:', slotData);
     window.lastSlotData = slotData;
