@@ -41,11 +41,7 @@
    🧪 Subslot Structured Test with Upper Slots
   </h1>
 <section><button id="randomize-all">全体ランダマイズ</button>
-<div class="slot-wrapper">
-<div class="slot-container" id="subject">
-<label>主語</label>
-<div class="slot-text"></div>
-</div>
+
 <div class="slot-container" id="verb">
 <label>動詞</label>
 <div class="slot-text"></div>
@@ -88,11 +84,7 @@
 </div>
 </div>
 
-<div class="slot-wrapper">
-<div class="slot-container" id="subject">
-<label>主語</label>
-<div class="slot-text"></div>
-</div>
+
 <div class="slot-container" id="verb">
 <label>動詞</label>
 <div class="slot-text"></div>
@@ -725,22 +717,6 @@ function hideEmptySlots() {
     });
 }
 </script>
-
-<script type="module">
-  import { randomizeAll } from './js/randomizer_all.js';
-
-  window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      if (window.lastSlotData) {
-        console.log("🚀 描画タイミング調整：randomizeAll 再実行");
-        randomizeAll(window.lastSlotData);
-      } else {
-        console.warn("⚠️ lastSlotData が未定義のため描画できず");
-      }
-    }, 100);
-  });
-</script>
-
 </body>
 <script type="module">
 let currentFile = null;
