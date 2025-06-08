@@ -1,4 +1,3 @@
-
 // renderer_core.js（subslotも含む描画統合版 + export + テキスト描画修正 + ログ強化）
 export function renderAllSlots(slotData) {
   const slotIds = [
@@ -57,9 +56,6 @@ export function renderAllSlots(slotData) {
   });
 }
 
-// 自動実行：コメントアウト済
-// window.addEventListener("DOMContentLoaded", renderAllSlots);
-
 export function renderAllTexts(slotTextMap) {
   Object.entries(slotTextMap).forEach(([slotId, text]) => {
     const textElement = document.querySelector(`#${slotId} .slot-text`);
@@ -98,3 +94,24 @@ export function injectAllSubslotTexts(containerId) {
   });
 }
 window.injectAllSubslotTexts = injectAllSubslotTexts;
+
+// ✅ 差分追加：subslot描画関数
+export function renderAllSubslots(slotData) {
+  for (const slotId in slotData) {
+    if (slotId.includes("-sub-")) {
+      const elem = document.getElementById(slotId);
+      if (!elem) {
+        console.warn("❗ subslot DOM not found:", slotId);
+        continue;
+      }
+
+      const textElem = elem.querySelector(".slot-text");
+      if (!textElem) {
+        console.warn("❗ .slot-text missing in subslot:", slotId);
+        continue;
+      }
+
+      textElem.textContent = slotData[slotId];
+    }
+  }
+}
