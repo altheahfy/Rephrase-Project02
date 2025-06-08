@@ -8,18 +8,13 @@ export function renderAllSlots() {
 
     // subslot - O1
     "slot-o1-sub-m1", "slot-o1-sub-s", "slot-o1-sub-aux", "slot-o1-sub-m2",
-  "slot-m2-sub-m1",
-  "slot-m2-sub-s",
-  "slot-m2-sub-aux",
-  "slot-m2-sub-m2",
-  "slot-m2-sub-v",
-  "slot-m2-sub-c",
-  "slot-m2-sub-o1",
-  "slot-m2-sub-o2",
-  "slot-m2-sub-c2",
-  "slot-m2-sub-m3",
     "slot-o1-sub-v", "slot-o1-sub-c", "slot-o1-sub-o1", "slot-o1-sub-o2",
     "slot-o1-sub-c2", "slot-o1-sub-m3",
+
+    // subslot - M2
+    "slot-m2-sub-m1", "slot-m2-sub-s", "slot-m2-sub-aux", "slot-m2-sub-m2",
+    "slot-m2-sub-v", "slot-m2-sub-c", "slot-m2-sub-o1", "slot-m2-sub-o2",
+    "slot-m2-sub-c2", "slot-m2-sub-m3",
 
     // subslot - C
     "slot-c-sub-m1", "slot-c-sub-s", "slot-c-sub-aux", "slot-c-sub-m2",
@@ -55,12 +50,15 @@ export function renderAllSlots() {
     }
 
     const text = document.querySelector(`#${slotId} .slot-text`);
-    if (text) {
+    if (!text) {
+      console.warn(`🟥 slot-text DOMが見つかりません: ${slotId}`);
+    } else {
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = `【${slotKey}】の文法ガイド`;
-      console.log(`📘 テキスト描画: ${slotId} → ${text.textContent}`);
-    } else {
-      console.warn(`⚠️ テキスト描画スキップ: ${slotId} に .slot-text が見つかりません`);
+      console.log(`🟢 slot-text DOM発見: ${slotId} → text: ${text.textContent}`);
+      console.log("Computed styles:", getComputedStyle(text));
+      console.log("textContent:", text.textContent);
+      console.log("innerHTML:", text.innerHTML);
     }
   });
 }
@@ -74,6 +72,9 @@ export function renderAllTexts(slotTextMap) {
   Object.entries(slotTextMap).forEach(([slotId, text]) => {
     const textElement = document.querySelector(`#${slotId} .slot-text`);
     if (textElement) {
+      if (text === undefined || text === null) {
+        console.warn(`❗ textが未定義: ${slotId}`);
+      }
       textElement.textContent = text;
       console.log(`テキスト設定: ${slotId} → ${text}`);
     }
@@ -94,10 +95,7 @@ export function injectSlotText(slotId) {
     text.textContent = `【${slotKey}】の文法ガイド`;
   }
 }
-
-
 window.injectSlotText = injectSlotText;
-
 
 export function injectAllSubslotTexts(containerId) {
   const subslots = document.querySelectorAll(`#${containerId} .subslot`);
