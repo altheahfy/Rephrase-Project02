@@ -29,17 +29,34 @@ export function handleExcelFileUpload(file) {
     
     console.log("🧪 選出構文ID:", chosenId);
     console.log("📑 targetRows:", targetRows);
+    // PH-36-R-BUILD-2: 親スロット先処理
     for (const row of targetRows) {
-  const rawSlot = (row['Slot'] || '').trim();
-  const internalSub = (row['内部スロット'] || '').trim();
-  const value = (row['Phrase'] || '').trim();
-  if (!value) continue;
+      const rawSlot = (row['Slot'] || '').trim();
+      const internalSub = (row['内部スロット'] || '').trim();
+      const value = (row['Phrase'] || '').trim();
+      if (!value || internalSub.startsWith('sub-')) continue;
+      const slotId = `slot-${rawSlot}`;
+      parentSlot = rawSlot;
+      slotData[slotId] = value;
+    }
 
-  let slotId = '';
+    // subslot 後処理（parentSlot 使用）
+    for (const row of targetRows) {
+      const rawSlot = (row['Slot'] || '').trim();
+      const internalSub = (row['内部スロット'] || '').trim();
+      const value = (row['Phrase'] || '').trim();
+      if (!value || !internalSub.startsWith('sub-')) continue;
+      if (!parentSlot) {
+        console.warn(`⚠️ parentSlot 未設定で subslot 無視: ${internalSub}`);
+        continue;
+      }
+      const child = internalSub.replace('sub-', '');
+      const slotId = `slot-${parentSlot}-sub-${child}`;
+      slotData[slotId] = value;
+    }
 
-  if (internalSub.startsWith('sub-')) {
+
     if (!parentSlot) {
-      console.warn(`⚠️ 親スロット未設定で subslot 検出: ${internalSub}`);
       continue;
     }
     const child = internalSub.replace('sub-', '');
