@@ -29,7 +29,7 @@ export function handleExcelFileUpload(file) {
 
     // PH-36-R-BUILD-2: 親スロット先処理
     for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim();
+      const rawSlot = (row['Slot'] || '').trim().toLowerCase();
       const internalSub = (row['内部スロット'] || '').trim();
       const value = (row['Phrase'] || '').trim();
       if (!value || internalSub.startsWith('sub-')) continue;
@@ -39,8 +39,8 @@ export function handleExcelFileUpload(file) {
 
     // subslot 後処理（parentSlot 使用）
     for (const row of targetRows) {
-      const rawSlot = (row['Slot'] || '').trim();
-      const internalSub = (row['内部スロット'] || '').trim();
+      const rawSlot = (row['Slot'] || '').trim().toLowerCase();
+      const internalSub = (row['内部スロット'] || '').trim().toLowerCase();
       const value = (row['Phrase'] || '').trim();
       if (!value || !internalSub.startsWith('sub-')) continue;
       const slotId = `slot-${rawSlot}-sub-${internalSub.replace('sub-', '')}`;
@@ -60,4 +60,5 @@ export function handleExcelFileUpload(file) {
 // グローバル登録
 window.handleExcelFileUpload = handleExcelFileUpload;
 window.randomizeAll = randomizeAll;
+
 
