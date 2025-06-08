@@ -1,5 +1,5 @@
 
-// randomizer_controller.js（グローバル関数対応）
+// randomizer_controller.js（PH-35-R-FIX-2 対応版）
 import { randomizeAll } from './randomizer_all.js';
 
 export function handleExcelFileUpload(file) {
@@ -27,28 +27,33 @@ export function handleExcelFileUpload(file) {
 
     for (const row of targetRows) {
       const internal = row['Slot'];
-      if (!internal || !internal.trim()) continue;
-      if (!internal.startsWith('sub_')) {
+      if (internal && !internal.startsWith('sub_')) {
         parentSlot = internal;
       }
     }
 
     for (const row of targetRows) {
-      const internal = row['Slot'];
+      const rawSlot = row['Slot'];
+      const internalSub = row['内部スロット'];
       const value = row['Phrase'];
-      if (!internal || !value) continue;
+      if (!value) continue;
 
       let slotId = '';
-      if (internal.startsWith('sub_')) {
+
+      if (internalSub && internalSub.startsWith('sub-')) {
         if (!parentSlot) {
-          console.warn('⚠️ 親スロットが未定義のまま sub_ スロットが検出されました:', internal);
+          console.warn('⚠️ 親スロット未設定で subslot 検出:', internalSub);
           continue;
         }
-        const child = internal.replace('sub_', '');
+        const child = internalSub.replace('sub-', '');
         slotId = `slot-${parentSlot}-sub-${child}`;
+      } else if (rawSlot) {
+        slotId = `slot-${rawSlot}`;
+        parentSlot = rawSlot; // 更新
       } else {
-        slotId = `slot-${internal}`;
+        continue; // Slot も subslot も無ければ無視
       }
+
       slotData[slotId] = value;
     }
 
