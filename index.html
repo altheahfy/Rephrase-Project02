@@ -725,6 +725,22 @@ function hideEmptySlots() {
     });
 }
 </script>
+
+<script type="module">
+  import { randomizeAll } from './js/randomizer_all.js';
+
+  window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      if (window.lastSlotData) {
+        console.log("🚀 描画タイミング調整：randomizeAll 再実行");
+        randomizeAll(window.lastSlotData);
+      } else {
+        console.warn("⚠️ lastSlotData が未定義のため描画できず");
+      }
+    }, 100);
+  });
+</script>
+
 </body>
 <script type="module">
 let currentFile = null;
