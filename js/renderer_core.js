@@ -41,35 +41,34 @@ export function renderAllSlots() {
     // PH-35-R-DIAG-4: 描画前にDOM状態を観察
     const container = document.getElementById(slotId);
     if (container) {
-      console.log("📦 innerHTML:", container.innerHTML);
-      console.log("📐 style.display:", container.style.display);
-      console.log("🔍 offsetParent:", container.offsetParent);
+
+
+
       const slotTextCheck = container.querySelector(".slot-text");
-      console.log("🧭 .slot-text DOM取得結果:", slotTextCheck);
+
     } else {
-      console.warn(`❌ container DOMが存在しません: ${slotId}`);
+
     }
-    console.log(`🧪 Rendering slot: ${slotId}`);
 
     const img = document.querySelector(`#${slotId} img`);
     if (img) {
       img.src = "slot_images/common/placeholder.png";
       img.alt = `Placeholder for ${slotId}`;
-      console.log(`🖼️ 画像描画: ${slotId} → ${img.src}`);
+
     } else {
-      console.warn(`⚠️ 画像描画スキップ: ${slotId} に img が見つかりません`);
+
     }
 
     const text = document.querySelector(`#${slotId} .slot-text`);
     if (!text) {
-      console.warn(`🟥 slot-text DOMが見つかりません: ${slotId}`);
+
     } else {
       const slotKey = slotId.split("-").slice(-1)[0].toUpperCase();
       text.textContent = `【${slotKey}】の文法ガイド`;
-      console.log(`🟢 slot-text DOM発見: ${slotId} → text: ${text.textContent}`);
-      console.log("Computed styles:", getComputedStyle(text));
-      console.log("textContent:", text.textContent);
-      console.log("innerHTML:", text.innerHTML);
+
+
+
+
     }
   });
 }
@@ -78,16 +77,15 @@ export function renderAllSlots() {
 window.addEventListener("DOMContentLoaded", renderAllSlots);
 
 export function renderAllTexts(slotTextMap) {
-  console.log("✅ renderAllTexts called");
 
   Object.entries(slotTextMap).forEach(([slotId, text]) => {
     const textElement = document.querySelector(`#${slotId} .slot-text`);
     if (textElement) {
       if (text === undefined || text === null) {
-        console.warn(`❗ textが未定義: ${slotId}`);
+
       }
       textElement.textContent = text;
-      console.log(`テキスト設定: ${slotId} → ${text}`);
+
     }
   });
 }
