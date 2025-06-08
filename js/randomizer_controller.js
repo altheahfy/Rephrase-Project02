@@ -1,6 +1,7 @@
 
 // randomizer_controller.js（PH-35-R-FIX-2 完全対応版）
 import { randomizeAll } from './randomizer_all.js';
+import { renderAllSlots } from './renderer_core.js';
 
 export function handleExcelFileUpload(file) {
   const reader = new FileReader();
@@ -57,6 +58,7 @@ export function handleExcelFileUpload(file) {
     console.log('📘 構文スロットデータ:', slotData);
     window.lastSlotData = slotData;
     randomizeAll(slotData);
+    renderAllSlots();
   };
   reader.readAsArrayBuffer(file);
 }
