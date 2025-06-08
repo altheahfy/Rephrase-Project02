@@ -38,6 +38,17 @@ export function renderAllSlots() {
   ];
 
   slotIds.forEach(slotId => {
+    // PH-35-R-DIAG-4: 描画前にDOM状態を観察
+    const container = document.getElementById(slotId);
+    if (container) {
+      console.log("📦 innerHTML:", container.innerHTML);
+      console.log("📐 style.display:", container.style.display);
+      console.log("🔍 offsetParent:", container.offsetParent);
+      const slotTextCheck = container.querySelector(".slot-text");
+      console.log("🧭 .slot-text DOM取得結果:", slotTextCheck);
+    } else {
+      console.warn(`❌ container DOMが存在しません: ${slotId}`);
+    }
     console.log(`🧪 Rendering slot: ${slotId}`);
 
     const img = document.querySelector(`#${slotId} img`);
