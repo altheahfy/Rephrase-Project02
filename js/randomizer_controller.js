@@ -45,3 +45,4 @@ export function handleExcelFileUpload(file) {
 
 // グローバル登録
 window.handleExcelFileUpload = handleExcelFileUpload;
+window.randomizeAll = randomizeAll;
