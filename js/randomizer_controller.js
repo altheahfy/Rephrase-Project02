@@ -16,12 +16,24 @@ export function handleExcelFileUpload(file) {
     }
     let chosenId, targetRows = [];
     const json = XLSX.utils.sheet_to_json(sheet);
-    const availableIds = [...new Set(json.map(row => String(parseInt(row['文法項目番号']))))];
+
+    // 🔧 修正: NaN除外 + 空白除外
+    const availableIds = [...new Set(
+      json
+        .map(row => String(parseInt(row['文法項目番号'])))
+        .filter(id => id && id !== "NaN")
+    )];
 
     while (targetRows.length === 0 && availableIds.length > 0) {
       const index = Math.floor(Math.random() * availableIds.length);
       chosenId = availableIds.splice(index, 1)[0];
-      targetRows = json.filter(row => String(parseInt(row['文法項目番号'])) === chosenId);
+
+      // 🔧 修正: Slotが空の行を除外して targetRows 抽出
+      targetRows = json.filter(row => {
+        const idMatch = String(parseInt(row['文法項目番号'])) === chosenId;
+        const hasSlot = !!(row['Slot'] || '').trim();
+        return idMatch && hasSlot;
+      });
     }
 
     console.log("🧪 選出構文ID:", chosenId);
@@ -60,5 +72,3 @@ export function handleExcelFileUpload(file) {
 // グローバル登録
 window.handleExcelFileUpload = handleExcelFileUpload;
 window.randomizeAll = randomizeAll;
-
-
