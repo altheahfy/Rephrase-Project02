@@ -7,9 +7,10 @@ const structureId = "INF-N-OBJ-010";
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     const { slotImageMap, slotTextMap } = await loadSlotImageAndTextMap(structureId);
-    renderAllSlots();
+    window.lastSlotData = window.lastSlotData || {};
+    renderAllSlots(window.lastSlotData);
     renderAllTexts(slotTextMap);
-    renderAllSubslots(window.lastSlotData || {});
+    renderAllSubslots(window.lastSlotData);
   } catch (error) {
     console.error("描画エラー:", error);
   }
