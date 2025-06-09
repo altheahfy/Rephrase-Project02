@@ -1,4 +1,4 @@
-// randomizer_controller.js（構文修復済み + subslot描画対応）
+// randomizer_controller.js（構文修復済み + subslot描画対応 + PH-37-5-EXT対応）
 import { randomizeAll } from './randomizer_all.js';
 import { renderAllSlots, renderAllSubslots } from './renderer_core.js';
 
@@ -122,7 +122,6 @@ export function extractSlotDataFromWorkbook(workbook) {
   return slotData;
 }
 
-// ✅ 正常定義化
 export function injectAllSubslotTexts(containerId) {
   const subslots = document.querySelectorAll(`#${containerId} .subslot`);
   subslots.forEach(subslot => {
