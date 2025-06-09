@@ -868,7 +868,6 @@
   <script src="js/renderer_core.js" type="module">
   </script>
   <script type="module">
-   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!window.lastWorkbook) {
     alert("先に grammar_data0001.xlsx を選んでください。");
@@ -899,7 +898,6 @@ document.getElementById("loadButton").addEventListener("click", () => {
 });
   </script>
   <script type="module">
-   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!window.lastWorkbook) {
     alert("先に grammar_data0001.xlsx を選んでください。");
@@ -914,5 +912,33 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   });
 });
   </script>
- </body>
+ <script type="module">
+window.currentFile = null;
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  window.currentFile = e.target.files[0];
+});
+document.getElementById("loadButton").addEventListener("click", () => {
+  if (!currentFile) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    module.handleExcelFileUpload(currentFile);
+  });
+});
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
+});
+</script>
+</body>
 </html>
