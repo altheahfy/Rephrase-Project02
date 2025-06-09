@@ -49,7 +49,10 @@ export function handleExcelFileUpload(file) {
       const internalSub = (row['内部スロット'] || '').trim().toLowerCase();
       const value = (row['Phrase'] || '').trim();
       if (!value || !internalSub.startsWith('sub-')) continue;
-      slotData[`slot-${rawSlot}-sub-${internalSub.replace('sub-', '')}`] = value;
+      let subKey = internalSub.replace('sub-', '').toLowerCase();
+      if (subKey === '2') subKey = 'o2';
+      if (subKey === 'c') subKey = 'c1';
+      slotData[`slot-${rawSlot}-sub-${subKey}`] = value;
     }
 
     console.log("🧪 選出構文ID:", chosenId);
@@ -108,7 +111,10 @@ export function extractSlotDataFromWorkbook(workbook) {
     const internalSub = (row['内部スロット'] || '').trim().toLowerCase();
     const value = (row['Phrase'] || '').trim();
     if (!value || !internalSub.startsWith('sub-')) continue;
-    slotData[`slot-${rawSlot}-sub-${internalSub.replace('sub-', '')}`] = value;
+    let subKey = internalSub.replace('sub-', '').toLowerCase();
+    if (subKey === '2') subKey = 'o2';
+    if (subKey === 'c') subKey = 'c1';
+    slotData[`slot-${rawSlot}-sub-${subKey}`] = value;
   }
 
   console.log("🧪 再抽選 chosenId:", chosenId);
