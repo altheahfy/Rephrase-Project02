@@ -19,7 +19,6 @@
         const fileInput = document.getElementById("fileInput");
         if (!fileInput.files[0]) {
           alert("先に data.json を選んでください。");
-          return;
         }
         const file = fileInput.files[0];
         const reader = new FileReader();
@@ -877,7 +876,6 @@
   </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
-    return;
   }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
@@ -894,7 +892,6 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
 });
 document.getElementById("loadButton").addEventListener("click", () => {
   if (!currentFile) {
-    return;
   }
   import("./js/randomizer_controller.js").then(module => {
   });
@@ -902,7 +899,6 @@ document.getElementById("loadButton").addEventListener("click", () => {
   </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
-    return;
   }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
@@ -919,13 +915,11 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
 });
 document.getElementById("loadButton").addEventListener("click", () => {
   if (!currentFile) {
-    return;
   }
   import("./js/randomizer_controller.js").then(module => {
   });
 });
 document.getElementById("randomize-all").addEventListener("click", () => {
-    return;
   }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
