@@ -20,6 +20,26 @@
         if (window.handleExcelFileUpload && window.currentFile) {
           window.handleExcelFileUpload(window.currentFile);
         }
+        const fileInput = document.getElementById("fileInput");
+        if (!fileInput.files[0]) {
+          alert("先に data.json を選んでください。");
+          return;
+        }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const jsonData = JSON.parse(e.target.result);
+          window.lastSlotData = jsonData;
+          import("./js/structure_builder.js").then(builderModule => {
+            if (window.lastSlotData) {
+              builderModule.buildStructureFromJson(window.lastSlotData);
+            } else {
+              console.warn("lastSlotData がセットされていません");
+            }
+          });
+          // 次の小ロットで structure_builder の呼び出しを入れる予定
+        };
+        reader.readAsText(file);
       });
     }
   });
