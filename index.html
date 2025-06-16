@@ -2,54 +2,14 @@
 <html lang="en">
  <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <meta charset="utf-8"/>
   <title>
    Rephrase Structured UI
   </title>
   <link href="style.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <!-- PH-35対策: randomizer_controller をモジュールとして読み込み -->
   <!-- PH-35対策: loadButton 押下でグローバル関数 handleExcelFileUpload を実行 -->
   <script>
@@ -63,49 +23,9 @@ document.getElementById("loadButton").addEventListener("click", () => {
       });
     }
   });
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script src="js/randomizer_controller.js" type="module">
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
  </head>
  <body>
   <section>
@@ -932,27 +852,7 @@ document.getElementById("loadButton").addEventListener("click", () => {
    </div>
   </div>
   <script src="./js/test_controller.js" type="module">
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script>
    function updateSubslotLabel(slotId) {
   const ids = ["o1", "c", "m1", "s"];
@@ -964,49 +864,9 @@ document.getElementById("loadButton").addEventListener("click", () => {
     }
   });
 }
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script src="js/renderer_core.js" type="module">
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!window.lastWorkbook) {
@@ -1021,27 +881,7 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     }
   });
 });
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script type="module">
    window.currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
@@ -1053,38 +893,10 @@ document.getElementById("loadButton").addEventListener("click", () => {
     return;
   }
   import("./js/randomizer_controller.js").then(module => {
-    module.handleExcelFileUpload(currentFile).then(() => {
-      import("./js/structure_builder.js").then(builderModule => {
-        if (window.lastSlotData) {
-          builderModule.buildStructureFromJson(window.lastSlotData);
-        } else {
-          console.warn("順序制御のデータが未セットです");
-        }
-      });
-    });
+    module.handleExcelFileUpload(currentFile);
   });
 });
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!window.lastWorkbook) {
@@ -1099,27 +911,7 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     }
   });
 });
-  
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
-</script>
+  </script>
  <script type="module">
 window.currentFile = null;
 document.getElementById("fileInput").addEventListener("change", (e) => {
@@ -1131,15 +923,7 @@ document.getElementById("loadButton").addEventListener("click", () => {
     return;
   }
   import("./js/randomizer_controller.js").then(module => {
-    module.handleExcelFileUpload(currentFile).then(() => {
-      import("./js/structure_builder.js").then(builderModule => {
-        if (window.lastSlotData) {
-          builderModule.buildStructureFromJson(window.lastSlotData);
-        } else {
-          console.warn("順序制御のデータが未セットです");
-        }
-      });
-    });
+    module.handleExcelFileUpload(currentFile);
   });
 });
 document.getElementById("randomize-all").addEventListener("click", () => {
@@ -1155,26 +939,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     }
   });
 });
-
-document.getElementById("loadButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (file && file.name.endsWith(".json")) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        import("./js/structure_builder.js").then(builderModule => {
-          builderModule.buildStructureFromJson(jsonData);
-        });
-      } catch (e) {
-        console.error("JSONの読み込みに失敗しました", e);
-      }
-    };
-    reader.readAsText(file);
-  }
-});
-
 </script>
 </body>
 </html>
