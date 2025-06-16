@@ -1,39 +1,944 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <title>Rephrase Structured UI</title>
-  <link href="style.css" rel="stylesheet"/>
-</head>
-<body>
-  <section>
-    <label for="fileInput">grammar_data0001.xlsx を選択：</label>
-    <input accept=".xlsx" id="fileInput" type="file"/>
-    <button id="loadButton">📘 Load</button>
-  </section>
-  <script type="module">
-    let currentFile = null;
-    document.getElementById("fileInput").addEventListener("change", (event) => {
-      currentFile = event.target.files[0];
-    });
-    document.getElementById("loadButton").addEventListener("click", () => {
-      if (!currentFile) {
-        alert("先に grammar_data0001.xlsx を選んでください。");
-        return;
-      }
-      import("./js/randomizer_controller.js").then(module => {
-        module.handleExcelFileUpload(currentFile).then(() => {
-          import("./js/structure_builder.js").then(builderModule => {
-            if (window.lastSlotData) {
-              builderModule.buildStructureFromJson(window.lastSlotData);
-            } else {
-              console.warn("順序制御のデータが未セットです");
-            }
-          });
-        });
-      });
-    });
+ <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
   </script>
+  <meta charset="utf-8"/>
+  <title>
+   Rephrase Structured UI
+  </title>
+  <link href="style.css" rel="stylesheet"/>
+  <script src="js/subslot_toggle.js">
+  </script>
+  <!-- PH-35対策: randomizer_controller をモジュールとして読み込み -->
+  <!-- PH-35対策: loadButton 押下でグローバル関数 handleExcelFileUpload を実行 -->
+  <script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const loadButton = document.getElementById("loadButton");
+    if (loadButton) {
+      loadButton.addEventListener("click", () => {
+        if (window.handleExcelFileUpload && window.currentFile) {
+          window.handleExcelFileUpload(window.currentFile);
+        }
+      });
+    }
+  });
+  </script>
+  <script src="js/randomizer_controller.js" type="module">
+  </script>
+ </head>
+ <body>
+  <section>
+   <label for="fileInput">
+    grammar_data0001.xlsx を選択：
+   </label>
+   <input accept=".xlsx" id="fileInput" type="file"/>
+   <button id="loadButton">
+    📘 増殖①からランダム出題
+   </button>
+  </section>
+  <h1>
+   🧪 Subslot Structured Test with Upper Slots
+  </h1>
+  <section>
+   <button id="randomize-all">
+    全体ランダマイズ
+   </button>
+   <h2>
+    Full Structure
+   </h2>
+   <div class="slot-wrapper">
+    <div class="slot-container" id="slot-m1">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('m1')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-s">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('s')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-aux">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m2">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('m2')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-v">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('c')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o1">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('o1')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o2">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick='toggleExclusiveSubslot("o2")'>
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c2">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button onclick="toggleExclusiveSubslot('c2')">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m3">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+     <!-- M3スロット用ボタン -->
+     <div class="subslot-toggle-button" style="margin-top: 4px;">
+      <button data-subslot-toggle="m3">
+       ▼ 詳細
+      </button>
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O1 の subslot
+    </div>
+    <div class="subslot" id="slot-o1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：M1 の subslot
+    </div>
+    <div class="subslot" id="slot-m1-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o2-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O2 の subslot
+    </div>
+    <div class="subslot" id="slot-o2-sub-m1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-o2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m2-sub" style="display: none;">
+    <div class="subslot-label">
+     現在展開中：M2 の subslot
+    </div>
+    <div class="subslot" id="slot-m2-sub-m1">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-s">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-aux">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-m2">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-v">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-o1">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-o2">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-c2">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m2-sub-m3">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-c2-sub" style="display: none;">
+    <div class="subslot-label">
+     現在展開中：C2 の subslot
+    </div>
+    <div class="subslot" id="slot-c2-sub-m1">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-s">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-aux">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-m2">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-v">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-o1">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-o2">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-c2">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-c2-sub-m3">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m3-sub" style="display: none;">
+    <div class="subslot-label">
+     現在展開中：M3 の subslot
+    </div>
+    <div class="subslot" id="slot-m3-sub-m1">
+     <label>
+      M1
+     </label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-s">
+     <label>
+      S
+     </label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-aux">
+     <label>
+      AUX
+     </label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-m2">
+     <label>
+      M2
+     </label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-v">
+     <label>
+      V
+     </label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-c1">
+     <label>
+      C1
+     </label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-o1">
+     <label>
+      O1
+     </label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-o2">
+     <label>
+      O2
+     </label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-c2">
+     <label>
+      C2
+     </label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+    <div class="subslot" id="slot-m3-sub-m3">
+     <label>
+      M3
+     </label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text">
+     </div>
+    </div>
+   </div>
+  </section>
+  <div class="slot-wrapper" id="slot-s-sub" style="display: none;">
+   <div class="subslot-label">
+    現在展開中：S の subslot
+   </div>
+   <div class="subslot" id="slot-s-sub-m1">
+    <label>
+     M1
+    </label>
+    <img alt="image for M1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-s">
+    <label>
+     S
+    </label>
+    <img alt="image for S" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-aux">
+    <label>
+     AUX
+    </label>
+    <img alt="image for AUX" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-m2">
+    <label>
+     M2
+    </label>
+    <img alt="image for M2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-v">
+    <label>
+     V
+    </label>
+    <img alt="image for V" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-c1">
+    <label>
+     C1
+    </label>
+    <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-o1">
+    <label>
+     O1
+    </label>
+    <img alt="image for O1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-o2">
+    <label>
+     O2
+    </label>
+    <img alt="image for O2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-c2">
+    <label>
+     C2
+    </label>
+    <img alt="image for C2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-s-sub-m3">
+    <label>
+     M3
+    </label>
+    <img alt="image for M3" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+  </div>
+  <div class="slot-wrapper" id="slot-c-sub" style="display: none;">
+   <div class="subslot-label">
+    現在展開中：C の subslot
+   </div>
+   <div class="subslot" id="slot-c-sub-m1">
+    <label>
+     M1
+    </label>
+    <img alt="image for M1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-s">
+    <label>
+     S
+    </label>
+    <img alt="image for S" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-aux">
+    <label>
+     AUX
+    </label>
+    <img alt="image for AUX" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-m2">
+    <label>
+     M2
+    </label>
+    <img alt="image for M2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-v">
+    <label>
+     V
+    </label>
+    <img alt="image for V" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-c1">
+    <label>
+     C1
+    </label>
+    <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-o1">
+    <label>
+     O1
+    </label>
+    <img alt="image for O1" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-o2">
+    <label>
+     O2
+    </label>
+    <img alt="image for O2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-c2">
+    <label>
+     C2
+    </label>
+    <img alt="image for C2" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+   <div class="subslot" id="slot-c-sub-m3">
+    <label>
+     M3
+    </label>
+    <img alt="image for M3" class="slot-image"/>
+    <div class="slot-text">
+    </div>
+   </div>
+  </div>
+  <script src="./js/test_controller.js" type="module">
+  </script>
+  <script>
+   function updateSubslotLabel(slotId) {
+  const ids = ["o1", "c", "m1", "s"];
+  ids.forEach(id => {
+    const container = document.getElementById(`slot-${id}-sub`);
+    if (container) {
+      const label = container.querySelector(".subslot-label");
+      if (label) label.style.display = (id === slotId) ? "block" : "none";
+    }
+  });
+}
+  </script>
+  <script src="js/renderer_core.js" type="module">
+  </script>
+  <script type="module">
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
+});
+  </script>
+  <script type="module">
+   window.currentFile = null;
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  window.currentFile = e.target.files[0];
+});
+document.getElementById("loadButton").addEventListener("click", () => {
+  if (!currentFile) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    module.handleExcelFileUpload(currentFile);
+  });
+});
+  </script>
+  <script type="module">
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
+});
+  </script>
+ <script type="module">
+window.currentFile = null;
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  window.currentFile = e.target.files[0];
+});
+document.getElementById("loadButton").addEventListener("click", () => {
+  if (!currentFile) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    module.handleExcelFileUpload(currentFile);
+  });
+});
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!window.lastWorkbook) {
+    alert("先に grammar_data0001.xlsx を選んでください。");
+    return;
+  }
+  import("./js/randomizer_controller.js").then(module => {
+    const slotData = module.extractSlotDataFromWorkbook(window.lastWorkbook);
+    if (slotData) {
+      window.lastSlotData = slotData;
+      module.renderAllSlots(slotData);
+    }
+  });
+});
+</script>
 </body>
 </html>
