@@ -1,0 +1,1208 @@
+[
+  {
+    "Slot": "S",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the woman who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "seemed",
+    "SlotText": NaN,
+    "SubslotText": "～のように見える"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-c1",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "indecisive",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "although",
+    "SlotText": NaN,
+    "SubslotText": "～だが"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "it",
+    "SlotText": NaN,
+    "SubslotText": "指示語「それ」"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "was",
+    "SlotText": NaN,
+    "SubslotText": "be動詞"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "emotionally",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-c1",
+    "Slot_display_order": 5,
+    "display_order": 5,
+    "SubslotElement": "hard",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "that he",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 1,
+    "display_order": 2,
+    "SubslotElement": "had",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 1,
+    "display_order": 3,
+    "SubslotElement": "been trying",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "進行形"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 1,
+    "display_order": 4,
+    "SubslotElement": "to avoid Tom",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "he",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "was afraid of",
+    "SlotText": NaN,
+    "SubslotText": "句動詞"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "hurting her feelings",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "that he",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 1,
+    "display_order": 2,
+    "SubslotElement": "wanted",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 1,
+    "display_order": 3,
+    "SubslotElement": "to avoid confrontation",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "he",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "feared",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "upsetting her",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "This morning when",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": "この、～のとき"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "the request",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "became",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-c1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "urgent",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the teacher who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "had just returned",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "from a long absence",
+    "SlotText": NaN,
+    "SubslotText": "～から"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "while",
+    "SlotText": NaN,
+    "SubslotText": "～の間"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "the principal",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "was still explaining",
+    "SlotText": NaN,
+    "SubslotText": "過去進行形"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "the policy",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "the student who",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 1,
+    "display_order": 2,
+    "SubslotElement": "had been absent",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 1,
+    "display_order": 3,
+    "SubslotElement": "for several days",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "数日間"
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "a summary of the content",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "she",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "had missed",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "he",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "believed",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "it would help her catch up",
+    "SlotText": NaN,
+    "SubslotText": "それが彼女のキャッチアップする助けになるであろうこと"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the manager who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "often",
+    "SlotText": NaN,
+    "SubslotText": "しばしば"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "avoided",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "direct suggestions",
+    "SlotText": NaN,
+    "SubslotText": "直接の"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "the new employee who",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 1,
+    "display_order": 2,
+    "SubslotElement": "had recently joined",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "最近、過去完了"
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "a detailed plan she",
+    "SlotText": NaN,
+    "SubslotText": "詳細な"
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "had prepared",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "O2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "the previous day",
+    "SlotText": NaN,
+    "SubslotText": "直前の"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "the team",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "was facing",
+    "SlotText": NaN,
+    "SubslotText": "過去進行形"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "unexpected challenges",
+    "SlotText": NaN,
+    "SubslotText": "予期せぬ"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "During the critical moment when",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": "～の間に"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "the silence",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "filled",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "the room",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the student who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "lacked",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "once",
+    "SlotText": NaN,
+    "SubslotText": "かつて"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 5,
+    "SubslotElement": "all confidence",
+    "SlotText": NaN,
+    "SubslotText": "全ての"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "although",
+    "SlotText": NaN,
+    "SubslotText": "～だが"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "doubt",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "still",
+    "SlotText": NaN,
+    "SubslotText": "まだ"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "lingered",
+    "SlotText": NaN,
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m3",
+    "Slot_display_order": 5,
+    "display_order": 5,
+    "SubslotElement": "in her mind",
+    "SlotText": NaN,
+    "SubslotText": "～の中に、～の中で"
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 6,
+    "display_order": 1,
+    "SubslotElement": "the dependable voice",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 6,
+    "display_order": 2,
+    "SubslotElement": "everyone",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 6,
+    "display_order": 3,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 6,
+    "display_order": 4,
+    "SubslotElement": "been waiting for",
+    "SlotText": NaN,
+    "SubslotText": "進行形、過去完了"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "she",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "spoke",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "with unexpected clarity",
+    "SlotText": NaN,
+    "SubslotText": "予期せぬ、～の状態で"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "Amid the fierce storm when",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": "～の真ん中で"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "waves",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "battered",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "the vessel",
+    "SlotText": "疑問文のdo, does",
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the captain who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "doubted",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "once",
+    "SlotText": NaN,
+    "SubslotText": "かつて"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 5,
+    "SubslotElement": "his own judgment",
+    "SlotText": NaN,
+    "SubslotText": "彼の、自身の"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "even though",
+    "SlotText": NaN,
+    "SubslotText": "たとえ～でも"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "fear",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "still",
+    "SlotText": NaN,
+    "SubslotText": "まだ"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "gripped",
+    "SlotText": NaN,
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m3",
+    "Slot_display_order": 5,
+    "display_order": 5,
+    "SubslotElement": "their hearts",
+    "SlotText": NaN,
+    "SubslotText": "彼らの"
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 6,
+    "display_order": 1,
+    "SubslotElement": "the steady hand",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 6,
+    "display_order": 2,
+    "SubslotElement": "the crew",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 6,
+    "display_order": 3,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "C1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 6,
+    "display_order": 4,
+    "SubslotElement": "been praying for",
+    "SlotText": NaN,
+    "SubslotText": "過去完了、～のために"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "because",
+    "SlotText": NaN,
+    "SubslotText": "～だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "he",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "navigated",
+    "SlotText": NaN,
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "with exceptional skill",
+    "SlotText": NaN,
+    "SubslotText": "～を保持して"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-w",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the manager who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "recently",
+    "SlotText": NaN,
+    "SubslotText": "最近、過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "taken",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 5,
+    "SubslotElement": "charge of the project",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "even though",
+    "SlotText": NaN,
+    "SubslotText": "たとえ～でも"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "he",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "was",
+    "SlotText": NaN,
+    "SubslotText": "be動詞過去"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "under intense pressure",
+    "SlotText": NaN,
+    "SubslotText": "～の下・元で"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "so",
+    "SlotText": NaN,
+    "SubslotText": "だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "the outcome",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "would",
+    "SlotText": NaN,
+    "SubslotText": "過去から未来を推量"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "reflect",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 8,
+    "display_order": 5,
+    "SubslotElement": "their full potential",
+    "SlotText": NaN,
+    "SubslotText": "彼らの"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-w",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "SubslotElement": "the young explorer who",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "SubslotElement": "had",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "SubslotElement": "recently",
+    "SlotText": NaN,
+    "SubslotText": "最近"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "SubslotElement": "discovered",
+    "SlotText": NaN,
+    "SubslotText": "過去完了"
+  },
+  {
+    "Slot": "S",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 2,
+    "display_order": 5,
+    "SubslotElement": "hidden paths",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "SubslotElement": "even though",
+    "SlotText": NaN,
+    "SubslotText": "たとえ～でも"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "SubslotElement": "uncertainty",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m2",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "SubslotElement": "still",
+    "SlotText": NaN,
+    "SubslotText": "まだ"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "SubslotElement": "clouded",
+    "SlotText": NaN,
+    "SubslotText": "過去形"
+  },
+  {
+    "Slot": "M2",
+    "SubslotID": "sub-m3",
+    "Slot_display_order": 5,
+    "display_order": 5,
+    "SubslotElement": "his thoughts",
+    "SlotText": NaN,
+    "SubslotText": "彼の"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m1",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "SubslotElement": "so",
+    "SlotText": NaN,
+    "SubslotText": "だから"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "SubslotElement": "the journey",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-aux",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "SubslotElement": "would",
+    "SlotText": NaN,
+    "SubslotText": "過去から未来を推量"
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "SubslotElement": "reach",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-o1",
+    "Slot_display_order": 8,
+    "display_order": 5,
+    "SubslotElement": "the hidden temple",
+    "SlotText": NaN,
+    "SubslotText": NaN
+  },
+  {
+    "Slot": "M3",
+    "SubslotID": "sub-m3",
+    "Slot_display_order": 8,
+    "display_order": 6,
+    "SubslotElement": "without incident",
+    "SlotText": NaN,
+    "SubslotText": "～なしに"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-c1",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "What",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "疑問詞【何？】"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-s",
+    "Slot_display_order": 1,
+    "display_order": 1,
+    "SubslotElement": "it",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "指示語「それ」"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "sub-v",
+    "Slot_display_order": 1,
+    "display_order": 2,
+    "SubslotElement": "is",
+    "SlotText": "疑問詞【何？】",
+    "SubslotText": "be動詞"
+  }
+]
