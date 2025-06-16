@@ -15,7 +15,6 @@
     const loadButton = document.getElementById("loadButton");
     if (loadButton) {
       loadButton.addEventListener("click", () => {
-        }
         const fileInput = document.getElementById("fileInput");
         if (!fileInput.files[0]) {
           alert("先に data.json を選んでください。");
@@ -868,7 +867,6 @@
     if (container) {
       const label = container.querySelector(".subslot-label");
       if (label) label.style.display = (id === slotId) ? "block" : "none";
-    }
   });
 }
   </script>
@@ -876,7 +874,6 @@
   </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
-  }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
       window.lastSlotData = slotData;
@@ -892,14 +889,12 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
 });
 document.getElementById("loadButton").addEventListener("click", () => {
   if (!currentFile) {
-  }
   import("./js/randomizer_controller.js").then(module => {
   });
 });
   </script>
   <script type="module">
 document.getElementById("randomize-all").addEventListener("click", () => {
-  }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
       window.lastSlotData = slotData;
@@ -915,12 +910,10 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
 });
 document.getElementById("loadButton").addEventListener("click", () => {
   if (!currentFile) {
-  }
   import("./js/randomizer_controller.js").then(module => {
   });
 });
 document.getElementById("randomize-all").addEventListener("click", () => {
-  }
   import("./js/randomizer_controller.js").then(module => {
     if (slotData) {
       window.lastSlotData = slotData;
