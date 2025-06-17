@@ -852,31 +852,7 @@
 
 
 <!-- 元のロード処理スクリプトをコメントアウト
-<script type="module">
-import { buildStructureFromJson } from './js/structure_builder.js';
 
-document.getElementById("loadJsonButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("jsonFileInput");
-  if (fileInput.files.length === 0) {
-    alert("ファイルを選択してください");
-    return;
-  }
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      console.log("読み込んだJSONテキスト:", e.target.result);
-      const jsonData = JSON.parse(e.target.result);
-      console.log("パース結果:", jsonData);
-      buildStructureFromJson(jsonData);
-    } catch (err) {
-      console.error("JSON パースエラーまたは処理例外", err);
-      alert("無効な JSON ファイルです");
-    }
-  };
-  reader.readAsText(file);
-});
-</script>
 -->
 
 </body>
@@ -886,38 +862,8 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
 import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
 
-document.getElementById("loadJsonButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("jsonFileInput");
-  if (fileInput.files.length === 0) {
-    alert("ファイルを選択してください");
-    return;
-  }
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      console.log("読み込んだJSONテキスト:", e.target.result);
-      const jsonData = JSON.parse(e.target.result);
-      console.log("パース結果:", jsonData);
-      const data = randomizeAll(jsonData);
-      console.log("ランダマイズ結果:", data);
-      buildStructure(data);
-    } catch (err) {
-      console.error("JSON パースエラーまたは処理例外", err);
-      alert("無効な JSON ファイルです");
-    }
-  };
-  reader.readAsText(file);
-});
-</script>
-
-<script type="module">
-import { randomizeAll } from './js/randomizer_all.js';
-import { buildStructure } from './js/structure_builder.js';
-
 let loadedJsonData = null;
 
-// ロードボタンでデータ保持しランダマイズ即描画
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
   if (fileInput.files.length === 0) {
@@ -929,65 +875,24 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   reader.onload = (e) => {
     try {
       loadedJsonData = JSON.parse(e.target.result);
-      console.log("パース結果:", loadedJsonData);
-      const data = randomizeAll(loadedJsonData);
-      console.log("ランダマイズ結果:", data);
-      buildStructure(data);
-    } catch (err) {
-      console.error("JSON パースエラーまたは処理例外", err);
-      alert("無効な JSON ファイルです");
-    }
-  };
-  reader.readAsText(file);
-});
-
-// 全体ランダマイズボタンでロード済データを利用
-document.getElementById("randomize-all").addEventListener("click", () => {
-  if (!loadedJsonData) {
-    alert("先にJSONデータをロードしてください");
-    return;
-  }
-  const data = randomizeAll(loadedJsonData);
-  console.log("ランダマイズ結果（全体ボタン）:", data);
-  buildStructure(data);
-});
-</script>
-
-<script type="module">
-import { randomizeAll } from './js/randomizer_all.js';
-import { buildStructure } from './js/structure_builder.js';
-
-let loadedJsonData = null;
-
-// ロードボタンでデータ保持しランダマイズ即描画
-document.getElementById("loadJsonButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("jsonFileInput");
-  if (fileInput.files.length === 0) {
-    alert("ファイルを選択してください");
-    return;
-  }
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      loadedJsonData = JSON.parse(e.target.result);
-      console.log("パース結果:", loadedJsonData);
+      window.loadedJsonData = loadedJsonData;  // コンソール確認用
+      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlots(data);
       buildStructure(data);
     } catch (err) {
-      console.error("JSON パースエラーまたは処理例外", err);
+      console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
     }
   };
   reader.readAsText(file);
 });
 
-// 全体ランダマイズボタンでロード済データを利用
 document.getElementById("randomize-all").addEventListener("click", () => {
-  if (!loadedJsonData) {
-    alert("先にJSONデータをロードしてください");
+  if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
+    alert("先に正しいJSONデータをロードしてください");
+    console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
     return;
   }
   const data = randomizeAll(loadedJsonData);
@@ -996,7 +901,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   buildStructure(data);
 });
 
-// 必須スロット確認用関数
 function validateSlots(data) {
   const requiredSlots = ["M1", "S", "V"];
   const presentSlots = data.map(d => d.Slot);
