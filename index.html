@@ -19,6 +19,8 @@
    <button id="randomize-all">
     全体ランダマイズ
    </button>
+<input type="file" id="jsonFileInput" accept=".json">
+<button id="loadJsonButton">ロード</button>
    <h2>
     Full Structure
    </h2>
@@ -842,5 +844,28 @@
   </script>
   <script src="js/renderer_core.js" type="module">
   </script>
+
+<script>
+document.getElementById("loadJsonButton").addEventListener("click", () => {
+  const fileInput = document.getElementById("jsonFileInput");
+  if (fileInput.files.length === 0) {
+    alert("ファイルを選択してください");
+    return;
+  }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const jsonData = JSON.parse(e.target.result);
+      buildStructureFromJson(jsonData);
+    } catch (err) {
+      console.error("JSON パースエラー", err);
+      alert("無効な JSON ファイルです");
+    }
+  };
+  reader.readAsText(file);
+});
+</script>
+
 </body>
 </html>
