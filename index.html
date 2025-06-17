@@ -847,7 +847,13 @@
 <script src="js/structure_builder.js" type="module"></script>
 
 
-<script>
+
+
+
+
+<script type="module">
+import { buildStructureFromJson } from './js/structure_builder.js';
+
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
   if (fileInput.files.length === 0) {
@@ -870,7 +876,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   reader.readAsText(file);
 });
 </script>
-
 
 </body>
 </html>
