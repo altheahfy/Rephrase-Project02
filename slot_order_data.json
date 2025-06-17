@@ -1,7 +1,7 @@
 [
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "This morning",
     "SlotText": "この",
@@ -9,17 +9,17 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the woman who seemed indecisive",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "known",
     "SlotText": "知っていた",
@@ -27,53 +27,53 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "although it was emotionally hard",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O",
     "SlotPhrase": "that he had been trying to avoid Tom",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "because he was afraid of hurting her feelings",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "At the very last second",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 1,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the thoughtful woman",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "must have",
     "SlotText": "～したに違いない",
@@ -81,62 +81,62 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "figured out",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "that he wanted to avoid confrontation",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "because he feared upsetting her",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "This morning when the request became urgent",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 1,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the teacher who had just returned from a long absence",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "while the principal was still explaining the policy",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 3,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "might have",
     "SlotText": "～したかもしれない",
@@ -144,44 +144,44 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "given",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "the student who had been absent for several days",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SlotPhrase": "a summary of the content she had missed",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 7,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "because he believed it would help her catch up",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 8,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "During the intense morning meeting",
     "SlotText": "～の間に",
@@ -189,53 +189,53 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the manager who often avoided direct suggestions",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "offered",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 3,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "the new employee who had recently joined",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SlotPhrase": "a detailed plan she had prepared the previous day",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "because the team was facing unexpected challenges",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "without prior notice",
     "SlotText": "～なしに",
@@ -243,26 +243,26 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "During the critical moment when silence filled the room",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 1,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the student who had once lacked all confidence",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "might",
     "SlotText": "かもしれない",
@@ -270,62 +270,62 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "become",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "although doubt still lingered in her mind",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SlotPhrase": "the dependable voice everyone had been waiting for",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "because she spoke with unexpected clarity",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 7,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "Amid the fierce storm when waves battered the vessel",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 1,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the captain who had once doubted his own judgment",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "might",
     "SlotText": "かもしれない",
@@ -333,44 +333,44 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "become",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "even though fear still gripped their hearts",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SlotPhrase": "the steady hand the crew had been praying for",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "because he navigated with exceptional skill",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 7,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "That afternoon at the crucial point in the presentation",
     "SlotText": "あの、～の時点・地点で、～の中に、～の中で",
@@ -378,17 +378,17 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the manager who had recently taken charge of the project",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "had to",
     "SlotText": "～しなければならなかった",
@@ -396,26 +396,26 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "make",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "even though he was under intense pressure",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "the committee responsible for implementation",
     "SlotText": "～のために",
@@ -423,26 +423,26 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C2",
     "SlotPhrase": "deliver the final proposal flawlessly",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 7,
     "PhraseType": "phrase"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "so the outcome would reflect their full potential",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 8,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "That morning at the edge of the ancient forest",
     "SlotText": "あの、～の時点・地点で",
@@ -450,17 +450,17 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "the young explorer who had recently discovered hidden paths",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "Aux",
     "SlotPhrase": "had to",
     "SlotText": "～しなければならなかった",
@@ -468,62 +468,62 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "make",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SlotPhrase": "even though uncertainty still clouded his thoughts",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "the guide dog",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 6,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C2",
     "SlotPhrase": "find the safest route quickly",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 7,
     "PhraseType": "phrase"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SlotPhrase": "so the journey would reach the hidden temple without incident",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 8,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "What",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 1,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SlotPhrase": "do",
     "SlotText": "疑問文のdo, does",
@@ -531,35 +531,35 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "you",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 3,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "think",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 4,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "it is",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 5,
     "PhraseType": "clause"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SlotPhrase": "What cruelty",
     "SlotText": "疑問詞【何？】",
@@ -567,17 +567,17 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SlotPhrase": "people",
-    "SlotText": NaN,
+    "SlotText": "",
     "Slot_display_order": 2,
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "unknown",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "V",
     "SlotPhrase": "are capable of",
     "SlotText": "句動詞",
@@ -585,17 +585,17 @@
     "PhraseType": "word"
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the woman who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "seemed",
@@ -603,17 +603,17 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-c1",
     "SubslotElement": "indecisive",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "although",
@@ -621,8 +621,8 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "it",
@@ -630,8 +630,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was",
@@ -639,35 +639,35 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "emotionally",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-c1",
     "SubslotElement": "hard",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "that he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -675,8 +675,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "been trying",
@@ -684,17 +684,17 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-o1",
     "SubslotElement": "to avoid Tom",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -702,17 +702,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "was afraid of",
@@ -720,44 +720,44 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "know",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "hurting her feelings",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "that he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "wanted",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-o1",
     "SubslotElement": "to avoid confrontation",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -765,35 +765,35 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "feared",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "figure out",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "upsetting her",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "This morning when",
@@ -801,44 +801,44 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "the request",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "became",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-c1",
     "SubslotElement": "urgent",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the teacher who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "had just returned",
@@ -846,8 +846,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "from a long absence",
@@ -855,8 +855,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "while",
@@ -864,17 +864,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "the principal",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was still explaining",
@@ -882,35 +882,35 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-o1",
     "SubslotElement": "the policy",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "the student who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "had been absent",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-m1",
     "SubslotElement": "for several days",
@@ -918,26 +918,26 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-o1",
     "SubslotElement": "a summary of the content",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-s",
     "SubslotElement": "she",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-v",
     "SubslotElement": "had missed",
@@ -945,8 +945,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -954,26 +954,26 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "believed",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "give",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "it would help her catch up",
@@ -981,17 +981,17 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the manager who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "often",
@@ -999,17 +999,17 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "avoided",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "direct suggestions",
@@ -1017,17 +1017,17 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "the new employee who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "had recently joined",
@@ -1035,8 +1035,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-s",
     "SubslotElement": "a detailed plan she",
@@ -1044,8 +1044,8 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-v",
     "SubslotElement": "had prepared",
@@ -1053,8 +1053,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O2",
     "SubslotID": "sub-m1",
     "SubslotElement": "the previous day",
@@ -1062,8 +1062,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -1071,17 +1071,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "the team",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was facing",
@@ -1089,8 +1089,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "offer",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-o1",
     "SubslotElement": "unexpected challenges",
@@ -1098,8 +1098,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "During the critical moment when",
@@ -1107,17 +1107,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "the silence",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "filled",
@@ -1125,26 +1125,26 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the room",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the student who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1152,8 +1152,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "lacked",
@@ -1161,8 +1161,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "once",
@@ -1170,8 +1170,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "all confidence",
@@ -1179,8 +1179,8 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "although",
@@ -1188,17 +1188,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "doubt",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
@@ -1206,8 +1206,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "lingered",
@@ -1215,8 +1215,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "in her mind",
@@ -1224,26 +1224,26 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the dependable voice",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-s",
     "SubslotElement": "everyone",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1251,8 +1251,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-v",
     "SubslotElement": "been waiting for",
@@ -1260,8 +1260,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -1269,26 +1269,26 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "she",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "spoke",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m2",
     "SubslotElement": "with unexpected clarity",
@@ -1296,8 +1296,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "Amid the fierce storm when",
@@ -1305,17 +1305,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "waves",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "battered",
@@ -1323,26 +1323,26 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the vessel",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the captain who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1350,8 +1350,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "doubted",
@@ -1359,8 +1359,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "once",
@@ -1368,8 +1368,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "his own judgment",
@@ -1377,8 +1377,8 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
@@ -1386,17 +1386,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "fear",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
@@ -1404,8 +1404,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "gripped",
@@ -1413,8 +1413,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "their hearts",
@@ -1422,26 +1422,26 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the steady hand",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-s",
     "SubslotElement": "the crew",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1449,8 +1449,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "C1",
     "SubslotID": "sub-v",
     "SubslotElement": "been praying for",
@@ -1458,8 +1458,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
@@ -1467,17 +1467,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "navigated",
@@ -1485,8 +1485,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "become",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m2",
     "SubslotElement": "with exceptional skill",
@@ -1494,17 +1494,17 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-w",
     "SubslotElement": "the manager who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1512,8 +1512,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m2",
     "SubslotElement": "recently",
@@ -1521,26 +1521,26 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "taken",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "charge of the project",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
@@ -1548,17 +1548,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was",
@@ -1566,8 +1566,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "under intense pressure",
@@ -1575,8 +1575,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "so",
@@ -1584,17 +1584,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "the outcome",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-aux",
     "SubslotElement": "would",
@@ -1602,17 +1602,17 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "reflect",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "their full potential",
@@ -1620,17 +1620,17 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-w",
     "SubslotElement": "the young explorer who",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
@@ -1638,8 +1638,8 @@
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-m2",
     "SubslotElement": "recently",
@@ -1647,8 +1647,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "discovered",
@@ -1656,17 +1656,17 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "hidden paths",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
@@ -1674,17 +1674,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "uncertainty",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
@@ -1692,8 +1692,8 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "clouded",
@@ -1701,8 +1701,8 @@
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "his thoughts",
@@ -1710,8 +1710,8 @@
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "so",
@@ -1719,17 +1719,17 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "the journey",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 2
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-aux",
     "SubslotElement": "would",
@@ -1737,26 +1737,26 @@
     "display_order": 3
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "reach",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 4
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "the hidden temple",
-    "SubslotText": NaN,
+    "SubslotText": "",
     "display_order": 5
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "make",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "M3",
     "SubslotID": "sub-m3",
     "SubslotElement": "without incident",
@@ -1764,8 +1764,8 @@
     "display_order": 6
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "think",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-c1",
     "SubslotElement": "What",
@@ -1773,8 +1773,8 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "think",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "it",
@@ -1782,8 +1782,8 @@
     "display_order": 1
   },
   {
-    "ExampleID": "unknown",
-    "V_group_key": "think",
+    "ExampleID": "",
+    "V_group_key": "",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "is",
