@@ -57,4 +57,4 @@ function buildStructure(selectedSlots) {
   });
 }
 
-export { buildStructure };
+export { buildStructure, buildStructure as buildStructureFromJson };
