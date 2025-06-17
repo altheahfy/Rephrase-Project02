@@ -910,3 +910,14 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   reader.readAsText(file);
 });
 </script>
+
+<script type="module">
+import { randomizeAll } from './js/randomizer_all.js';
+import { buildStructure } from './js/structure_builder.js';
+
+document.getElementById("randomize-all").addEventListener("click", () => {
+  const data = randomizeAll();
+  console.log("ランダマイズ結果（全体ボタン）:", data);
+  buildStructure(data);
+});
+</script>
