@@ -1,17 +1,12 @@
 
-/**
- * 選択済スロット群データを受け取り、UIに描画。
- * @param {Array} selectedSlots - ランダマイズ済みスロットデータ配列
- */
-export function buildStructure(selectedSlots) {
+function buildStructure(selectedSlots) {
   const wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
     console.warn('slot-wrapper not found');
     return;
   }
-  wrapper.innerHTML = ''; // クリーン化
+  wrapper.innerHTML = '';
 
-  // 上位スロットを抽出し順序でソート
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
@@ -39,7 +34,6 @@ export function buildStructure(selectedSlots) {
 
     wrapper.appendChild(slotDiv);
 
-    // 該当するサブスロットを追加
     const subslots = selectedSlots.filter(s => s.Slot === item.Slot && s.SubslotID);
     subslots.sort((a, b) => a.display_order - b.display_order);
 
@@ -62,3 +56,5 @@ export function buildStructure(selectedSlots) {
     });
   });
 }
+
+export { buildStructure };
