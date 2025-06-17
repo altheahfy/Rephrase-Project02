@@ -5,8 +5,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the woman who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -14,7 +14,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "seemed",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～のように見える"
   },
   {
@@ -23,8 +23,8 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "indecisive",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -32,7 +32,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "although",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だが"
   },
   {
@@ -41,7 +41,7 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "it",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "指示語「それ」"
   },
   {
@@ -50,7 +50,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "was",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "be動詞"
   },
   {
@@ -59,8 +59,8 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "emotionally",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -68,8 +68,8 @@
     "Slot_display_order": 5,
     "display_order": 5,
     "SubslotElement": "hard",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -78,7 +78,7 @@
     "display_order": 1,
     "SubslotElement": "that he",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -105,7 +105,7 @@
     "display_order": 4,
     "SubslotElement": "to avoid Tom",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -113,7 +113,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -122,8 +122,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "he",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -131,7 +131,7 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "was afraid of",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "句動詞"
   },
   {
@@ -140,8 +140,8 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "hurting her feelings",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -150,7 +150,7 @@
     "display_order": 1,
     "SubslotElement": "that he",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -159,7 +159,7 @@
     "display_order": 2,
     "SubslotElement": "wanted",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -168,7 +168,7 @@
     "display_order": 3,
     "SubslotElement": "to avoid confrontation",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -176,7 +176,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -185,8 +185,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "he",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -194,8 +194,8 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "feared",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -203,8 +203,8 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "upsetting her",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M1",
@@ -222,7 +222,7 @@
     "display_order": 2,
     "SubslotElement": "the request",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M1",
@@ -231,7 +231,7 @@
     "display_order": 3,
     "SubslotElement": "became",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M1",
@@ -240,7 +240,7 @@
     "display_order": 4,
     "SubslotElement": "urgent",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -248,8 +248,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the teacher who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -257,7 +257,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "had just returned",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -266,7 +266,7 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "from a long absence",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～から"
   },
   {
@@ -275,7 +275,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "while",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～の間"
   },
   {
@@ -284,8 +284,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "the principal",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -293,7 +293,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "was still explaining",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去進行形"
   },
   {
@@ -302,8 +302,8 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "the policy",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -312,7 +312,7 @@
     "display_order": 1,
     "SubslotElement": "the student who",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -321,7 +321,7 @@
     "display_order": 2,
     "SubslotElement": "had been absent",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -338,8 +338,8 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "a summary of the content",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "O2",
@@ -347,8 +347,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "she",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "O2",
@@ -356,7 +356,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "had missed",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -365,7 +365,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -374,8 +374,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "he",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -383,8 +383,8 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "believed",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -392,7 +392,7 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "it would help her catch up",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "それが彼女のキャッチアップする助けになるであろうこと"
   },
   {
@@ -401,8 +401,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the manager who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -410,7 +410,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "often",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "しばしば"
   },
   {
@@ -419,8 +419,8 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "avoided",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -428,7 +428,7 @@
     "Slot_display_order": 2,
     "display_order": 4,
     "SubslotElement": "direct suggestions",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "直接の"
   },
   {
@@ -438,7 +438,7 @@
     "display_order": 1,
     "SubslotElement": "the new employee who",
     "SlotText": "疑問詞【何？】",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "O1",
@@ -455,7 +455,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "a detailed plan she",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "詳細な"
   },
   {
@@ -464,7 +464,7 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "had prepared",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -473,7 +473,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "the previous day",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "直前の"
   },
   {
@@ -482,7 +482,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -491,8 +491,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "the team",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -500,7 +500,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "was facing",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去進行形"
   },
   {
@@ -509,7 +509,7 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "unexpected challenges",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "予期せぬ"
   },
   {
@@ -528,7 +528,7 @@
     "display_order": 2,
     "SubslotElement": "the silence",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M1",
@@ -546,7 +546,7 @@
     "display_order": 4,
     "SubslotElement": "the room",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -554,8 +554,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the student who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -563,7 +563,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -572,7 +572,7 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "lacked",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -581,7 +581,7 @@
     "Slot_display_order": 2,
     "display_order": 4,
     "SubslotElement": "once",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "かつて"
   },
   {
@@ -590,7 +590,7 @@
     "Slot_display_order": 2,
     "display_order": 5,
     "SubslotElement": "all confidence",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "全ての"
   },
   {
@@ -599,7 +599,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "although",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だが"
   },
   {
@@ -608,8 +608,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "doubt",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -617,7 +617,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "まだ"
   },
   {
@@ -626,7 +626,7 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "lingered",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去形"
   },
   {
@@ -635,7 +635,7 @@
     "Slot_display_order": 5,
     "display_order": 5,
     "SubslotElement": "in her mind",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～の中に、～の中で"
   },
   {
@@ -644,8 +644,8 @@
     "Slot_display_order": 6,
     "display_order": 1,
     "SubslotElement": "the dependable voice",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "C1",
@@ -653,8 +653,8 @@
     "Slot_display_order": 6,
     "display_order": 2,
     "SubslotElement": "everyone",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "C1",
@@ -662,7 +662,7 @@
     "Slot_display_order": 6,
     "display_order": 3,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -671,7 +671,7 @@
     "Slot_display_order": 6,
     "display_order": 4,
     "SubslotElement": "been waiting for",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "進行形、過去完了"
   },
   {
@@ -680,7 +680,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -689,8 +689,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "she",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -698,8 +698,8 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "spoke",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -707,7 +707,7 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "with unexpected clarity",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "予期せぬ、～の状態で"
   },
   {
@@ -726,7 +726,7 @@
     "display_order": 2,
     "SubslotElement": "waves",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "M1",
@@ -744,7 +744,7 @@
     "display_order": 4,
     "SubslotElement": "the vessel",
     "SlotText": "疑問文のdo, does",
-    "SubslotText": NaN
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -752,8 +752,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the captain who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -761,7 +761,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -770,7 +770,7 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "doubted",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -779,7 +779,7 @@
     "Slot_display_order": 2,
     "display_order": 4,
     "SubslotElement": "once",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "かつて"
   },
   {
@@ -788,7 +788,7 @@
     "Slot_display_order": 2,
     "display_order": 5,
     "SubslotElement": "his own judgment",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "彼の、自身の"
   },
   {
@@ -797,7 +797,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "たとえ～でも"
   },
   {
@@ -806,8 +806,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "fear",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -815,7 +815,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "まだ"
   },
   {
@@ -824,7 +824,7 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "gripped",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去形"
   },
   {
@@ -833,7 +833,7 @@
     "Slot_display_order": 5,
     "display_order": 5,
     "SubslotElement": "their hearts",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "彼らの"
   },
   {
@@ -842,8 +842,8 @@
     "Slot_display_order": 6,
     "display_order": 1,
     "SubslotElement": "the steady hand",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "C1",
@@ -851,8 +851,8 @@
     "Slot_display_order": 6,
     "display_order": 2,
     "SubslotElement": "the crew",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "C1",
@@ -860,7 +860,7 @@
     "Slot_display_order": 6,
     "display_order": 3,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -869,7 +869,7 @@
     "Slot_display_order": 6,
     "display_order": 4,
     "SubslotElement": "been praying for",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了、～のために"
   },
   {
@@ -878,7 +878,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～だから"
   },
   {
@@ -887,8 +887,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "he",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -896,7 +896,7 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "navigated",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去形"
   },
   {
@@ -905,7 +905,7 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "with exceptional skill",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～を保持して"
   },
   {
@@ -914,8 +914,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the manager who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -923,7 +923,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -932,7 +932,7 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "recently",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "最近、過去完了"
   },
   {
@@ -941,8 +941,8 @@
     "Slot_display_order": 2,
     "display_order": 4,
     "SubslotElement": "taken",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -950,8 +950,8 @@
     "Slot_display_order": 2,
     "display_order": 5,
     "SubslotElement": "charge of the project",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -959,7 +959,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "たとえ～でも"
   },
   {
@@ -968,8 +968,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "he",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -977,7 +977,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "was",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "be動詞過去"
   },
   {
@@ -986,7 +986,7 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "under intense pressure",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～の下・元で"
   },
   {
@@ -995,7 +995,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "so",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "だから"
   },
   {
@@ -1004,8 +1004,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "the outcome",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -1013,7 +1013,7 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "would",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去から未来を推量"
   },
   {
@@ -1022,8 +1022,8 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "reflect",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -1031,7 +1031,7 @@
     "Slot_display_order": 8,
     "display_order": 5,
     "SubslotElement": "their full potential",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "彼らの"
   },
   {
@@ -1040,8 +1040,8 @@
     "Slot_display_order": 2,
     "display_order": 1,
     "SubslotElement": "the young explorer who",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "S",
@@ -1049,7 +1049,7 @@
     "Slot_display_order": 2,
     "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -1058,7 +1058,7 @@
     "Slot_display_order": 2,
     "display_order": 3,
     "SubslotElement": "recently",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "最近"
   },
   {
@@ -1067,7 +1067,7 @@
     "Slot_display_order": 2,
     "display_order": 4,
     "SubslotElement": "discovered",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去完了"
   },
   {
@@ -1076,8 +1076,8 @@
     "Slot_display_order": 2,
     "display_order": 5,
     "SubslotElement": "hidden paths",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -1085,7 +1085,7 @@
     "Slot_display_order": 5,
     "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "たとえ～でも"
   },
   {
@@ -1094,8 +1094,8 @@
     "Slot_display_order": 5,
     "display_order": 2,
     "SubslotElement": "uncertainty",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M2",
@@ -1103,7 +1103,7 @@
     "Slot_display_order": 5,
     "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "まだ"
   },
   {
@@ -1112,7 +1112,7 @@
     "Slot_display_order": 5,
     "display_order": 4,
     "SubslotElement": "clouded",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去形"
   },
   {
@@ -1121,7 +1121,7 @@
     "Slot_display_order": 5,
     "display_order": 5,
     "SubslotElement": "his thoughts",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "彼の"
   },
   {
@@ -1130,7 +1130,7 @@
     "Slot_display_order": 8,
     "display_order": 1,
     "SubslotElement": "so",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "だから"
   },
   {
@@ -1139,8 +1139,8 @@
     "Slot_display_order": 8,
     "display_order": 2,
     "SubslotElement": "the journey",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -1148,7 +1148,7 @@
     "Slot_display_order": 8,
     "display_order": 3,
     "SubslotElement": "would",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "過去から未来を推量"
   },
   {
@@ -1157,8 +1157,8 @@
     "Slot_display_order": 8,
     "display_order": 4,
     "SubslotElement": "reach",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -1166,8 +1166,8 @@
     "Slot_display_order": 8,
     "display_order": 5,
     "SubslotElement": "the hidden temple",
-    "SlotText": NaN,
-    "SubslotText": NaN
+    "SlotText": null,
+    "SubslotText": null
   },
   {
     "Slot": "M3",
@@ -1175,7 +1175,7 @@
     "Slot_display_order": 8,
     "display_order": 6,
     "SubslotElement": "without incident",
-    "SlotText": NaN,
+    "SlotText": null,
     "SubslotText": "～なしに"
   },
   {
