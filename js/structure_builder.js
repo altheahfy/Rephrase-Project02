@@ -27,6 +27,8 @@ export function buildStructureFromJson(jsonData) {
     const subWrapperId = `slot-${item.Slot.toLowerCase()}-sub`;
     const subWrapper = document.getElementById(subWrapperId);
     if (subWrapper) {
+      subWrapper.style.display = 'flex'; // サブスロット表示切り替え
+    
       const subId = `${subWrapperId}-${item.SubslotID.toLowerCase()}`;
       const el = document.getElementById(subId);
       if (el) {
