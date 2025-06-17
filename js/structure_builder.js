@@ -1,5 +1,9 @@
 
-export function buildStructureFromJson(jsonData) {
+/**
+ * 選択済スロット群データを受け取り、UIに描画。
+ * @param {Array} selectedSlots - ランダマイズ済みスロットデータ配列
+ */
+export function buildStructure(selectedSlots) {
   const wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
     console.warn('slot-wrapper not found');
@@ -7,21 +11,8 @@ export function buildStructureFromJson(jsonData) {
   }
   wrapper.innerHTML = ''; // クリーン化
 
-  // ExampleID 単位でグループ化
-  const examples = {};
-  jsonData.forEach(item => {
-    if (!examples[item.ExampleID]) {
-      examples[item.ExampleID] = [];
-    }
-    examples[item.ExampleID].push(item);
-  });
-
-  // 仮に最初の ExampleID のデータだけ表示
-  const exampleID = Object.keys(examples)[0];
-  const slots = examples[exampleID];
-
-  // 上位スロットの描画
-  const upperSlots = slots.filter(e => !e.SubslotID);
+  // 上位スロットを抽出し順序でソート
+  const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
@@ -48,7 +39,8 @@ export function buildStructureFromJson(jsonData) {
 
     wrapper.appendChild(slotDiv);
 
-    const subslots = slots.filter(s => s.Slot === item.Slot && s.SubslotID);
+    // 該当するサブスロットを追加
+    const subslots = selectedSlots.filter(s => s.Slot === item.Slot && s.SubslotID);
     subslots.sort((a, b) => a.display_order - b.display_order);
 
     subslots.forEach(sub => {
