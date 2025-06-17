@@ -1,1793 +1,1793 @@
 [
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M1",
     "SlotPhrase": "This morning",
     "SlotText": "この",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "S",
     "SlotPhrase": "the woman who seemed indecisive",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "V",
     "SlotPhrase": "known",
     "SlotText": "知っていた",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M2",
     "SlotPhrase": "although it was emotionally hard",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "O",
     "SlotPhrase": "that he had been trying to avoid Tom",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M3",
     "SlotPhrase": "because he was afraid of hurting her feelings",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex001"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "M1",
     "SlotPhrase": "At the very last second",
     "SlotText": "",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "S",
     "SlotPhrase": "the thoughtful woman",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "Aux",
     "SlotPhrase": "must have",
     "SlotText": "～したに違いない",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "V",
     "SlotPhrase": "figured out",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "O1",
     "SlotPhrase": "that he wanted to avoid confrontation",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "M3",
     "SlotPhrase": "because he feared upsetting her",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex002"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M1",
     "SlotPhrase": "This morning when the request became urgent",
     "SlotText": "",
     "Slot_display_order": 1,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "S",
     "SlotPhrase": "the teacher who had just returned from a long absence",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M2",
     "SlotPhrase": "while the principal was still explaining the policy",
     "SlotText": "",
     "Slot_display_order": 3,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "Aux",
     "SlotPhrase": "might have",
     "SlotText": "～したかもしれない",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "V",
     "SlotPhrase": "given",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O1",
     "SlotPhrase": "the student who had been absent for several days",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O2",
     "SlotPhrase": "a summary of the content she had missed",
     "SlotText": "",
     "Slot_display_order": 7,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M3",
     "SlotPhrase": "because he believed it would help her catch up",
     "SlotText": "",
     "Slot_display_order": 8,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M1",
     "SlotPhrase": "During the intense morning meeting",
     "SlotText": "～の間に",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "S",
     "SlotPhrase": "the manager who often avoided direct suggestions",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "V",
     "SlotPhrase": "offered",
     "SlotText": "",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O1",
     "SlotPhrase": "the new employee who had recently joined",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O2",
     "SlotPhrase": "a detailed plan she had prepared the previous day",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M2",
     "SlotPhrase": "because the team was facing unexpected challenges",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M3",
     "SlotPhrase": "without prior notice",
     "SlotText": "～なしに",
     "Slot_display_order": 7,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex004"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SlotPhrase": "During the critical moment when silence filled the room",
     "SlotText": "",
     "Slot_display_order": 1,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SlotPhrase": "the student who had once lacked all confidence",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "Aux",
     "SlotPhrase": "might",
     "SlotText": "かもしれない",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "V",
     "SlotPhrase": "become",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SlotPhrase": "although doubt still lingered in her mind",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SlotPhrase": "the dependable voice everyone had been waiting for",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SlotPhrase": "because she spoke with unexpected clarity",
     "SlotText": "",
     "Slot_display_order": 7,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SlotPhrase": "Amid the fierce storm when waves battered the vessel",
     "SlotText": "",
     "Slot_display_order": 1,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex006"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SlotPhrase": "the captain who had once doubted his own judgment",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex006"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "Aux",
     "SlotPhrase": "might",
     "SlotText": "かもしれない",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex003"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "V",
     "SlotPhrase": "become",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SlotPhrase": "even though fear still gripped their hearts",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex006"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SlotPhrase": "the steady hand the crew had been praying for",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex006"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SlotPhrase": "because he navigated with exceptional skill",
     "SlotText": "",
     "Slot_display_order": 7,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex006"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M1",
     "SlotPhrase": "That afternoon at the crucial point in the presentation",
     "SlotText": "あの、～の時点・地点で、～の中に、～の中で",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SlotPhrase": "the manager who had recently taken charge of the project",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "Aux",
     "SlotPhrase": "had to",
     "SlotText": "～しなければならなかった",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "V",
     "SlotPhrase": "make",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SlotPhrase": "even though he was under intense pressure",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "O1",
     "SlotPhrase": "the committee responsible for implementation",
     "SlotText": "～のために",
     "Slot_display_order": 6,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "C2",
     "SlotPhrase": "deliver the final proposal flawlessly",
     "SlotText": "",
     "Slot_display_order": 7,
-    "PhraseType": "phrase"
+    "PhraseType": "phrase",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SlotPhrase": "so the outcome would reflect their full potential",
     "SlotText": "",
     "Slot_display_order": 8,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M1",
     "SlotPhrase": "That morning at the edge of the ancient forest",
     "SlotText": "あの、～の時点・地点で",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SlotPhrase": "the young explorer who had recently discovered hidden paths",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "Aux",
     "SlotPhrase": "had to",
     "SlotText": "～しなければならなかった",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "V",
     "SlotPhrase": "make",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex007"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SlotPhrase": "even though uncertainty still clouded his thoughts",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "O1",
     "SlotPhrase": "the guide dog",
     "SlotText": "",
     "Slot_display_order": 6,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "C2",
     "SlotPhrase": "find the safest route quickly",
     "SlotText": "",
     "Slot_display_order": 7,
-    "PhraseType": "phrase"
+    "PhraseType": "phrase",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SlotPhrase": "so the journey would reach the hidden temple without incident",
     "SlotText": "",
     "Slot_display_order": 8,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "O1",
     "SlotPhrase": "What",
     "SlotText": "",
     "Slot_display_order": 1,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex009"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "M1",
     "SlotPhrase": "do",
     "SlotText": "疑問文のdo, does",
     "Slot_display_order": 2,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex005"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "S",
     "SlotPhrase": "you",
     "SlotText": "",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex008"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "V",
     "SlotPhrase": "think",
     "SlotText": "",
     "Slot_display_order": 4,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex009"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "O1",
     "SlotPhrase": "it is",
     "SlotText": "",
     "Slot_display_order": 5,
-    "PhraseType": "clause"
+    "PhraseType": "clause",
+    "例文ID": "ex009"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "be capable of",
     "Slot": "O1",
     "SlotPhrase": "What cruelty",
     "SlotText": "疑問詞【何？】",
     "Slot_display_order": 1,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex010"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "be capable of",
     "Slot": "S",
     "SlotPhrase": "people",
     "SlotText": "",
     "Slot_display_order": 2,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex010"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "be capable of",
     "Slot": "V",
     "SlotPhrase": "are capable of",
     "SlotText": "句動詞",
     "Slot_display_order": 3,
-    "PhraseType": "word"
+    "PhraseType": "word",
+    "例文ID": "ex010"
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the woman who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "seemed",
     "SubslotText": "～のように見える",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "S",
     "SubslotID": "sub-c1",
     "SubslotElement": "indecisive",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "although",
     "SubslotText": "～だが",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "it",
     "SubslotText": "指示語「それ」",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was",
     "SubslotText": "be動詞",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "emotionally",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M2",
     "SubslotID": "sub-c1",
     "SubslotElement": "hard",
     "SubslotText": "",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "that he",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "O1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "been trying",
     "SubslotText": "進行形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "O1",
     "SubslotID": "sub-o1",
     "SubslotElement": "to avoid Tom",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "was afraid of",
     "SubslotText": "句動詞",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "know",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "hurting her feelings",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "that he",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "wanted",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "O1",
     "SubslotID": "sub-o1",
     "SubslotElement": "to avoid confrontation",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "feared",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "figure out",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "upsetting her",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "This morning when",
     "SubslotText": "この、～のとき",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "the request",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "became",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M1",
     "SubslotID": "sub-c1",
     "SubslotElement": "urgent",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the teacher who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "had just returned",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "from a long absence",
     "SubslotText": "～から",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "while",
     "SubslotText": "～の間",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "the principal",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was still explaining",
     "SubslotText": "過去進行形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M2",
     "SubslotID": "sub-o1",
     "SubslotElement": "the policy",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "the student who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "had been absent",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O1",
     "SubslotID": "sub-m1",
     "SubslotElement": "for several days",
     "SubslotText": "数日間",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O2",
     "SubslotID": "sub-o1",
     "SubslotElement": "a summary of the content",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "O2",
     "SubslotID": "sub-s",
     "SubslotElement": "she",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "O2",
     "SubslotID": "sub-v",
     "SubslotElement": "had missed",
     "SubslotText": "過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "believed",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "give",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "it would help her catch up",
     "SubslotText": "それが彼女のキャッチアップする助けになるであろうこと",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the manager who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "often",
     "SubslotText": "しばしば",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "avoided",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "direct suggestions",
     "SubslotText": "直接の",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "the new employee who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "had recently joined",
     "SubslotText": "最近、過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O2",
     "SubslotID": "sub-s",
     "SubslotElement": "a detailed plan she",
     "SubslotText": "詳細な",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O2",
     "SubslotID": "sub-v",
     "SubslotElement": "had prepared",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "O2",
     "SubslotID": "sub-m1",
     "SubslotElement": "the previous day",
     "SubslotText": "直前の",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "the team",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was facing",
     "SubslotText": "過去進行形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "offer",
     "Slot": "M2",
     "SubslotID": "sub-o1",
     "SubslotElement": "unexpected challenges",
     "SubslotText": "予期せぬ",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "During the critical moment when",
     "SubslotText": "～の間に",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "the silence",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "filled",
     "SubslotText": "過去形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the room",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the student who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "lacked",
     "SubslotText": "過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "once",
     "SubslotText": "かつて",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "all confidence",
     "SubslotText": "全ての",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "although",
     "SubslotText": "～だが",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "doubt",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
     "SubslotText": "まだ",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "lingered",
     "SubslotText": "過去形",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "in her mind",
     "SubslotText": "～の中に、～の中で",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the dependable voice",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-s",
     "SubslotElement": "everyone",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "C1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-v",
     "SubslotElement": "been waiting for",
     "SubslotText": "進行形、過去完了",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "she",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "spoke",
     "SubslotText": "",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m2",
     "SubslotElement": "with unexpected clarity",
     "SubslotText": "予期せぬ、～の状態で",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-m1",
     "SubslotElement": "Amid the fierce storm when",
     "SubslotText": "～の真ん中で",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-s",
     "SubslotElement": "waves",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-v",
     "SubslotElement": "battered",
     "SubslotText": "過去形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the vessel",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-s",
     "SubslotElement": "the captain who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "doubted",
     "SubslotText": "過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-m1",
     "SubslotElement": "once",
     "SubslotText": "かつて",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "his own judgment",
     "SubslotText": "彼の、自身の",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
     "SubslotText": "たとえ～でも",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "fear",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
     "SubslotText": "まだ",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "gripped",
     "SubslotText": "過去形",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "their hearts",
     "SubslotText": "彼らの",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-o1",
     "SubslotElement": "the steady hand",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-s",
     "SubslotElement": "the crew",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "C1",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "C1",
     "SubslotID": "sub-v",
     "SubslotElement": "been praying for",
     "SubslotText": "過去完了、～のために",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "navigated",
     "SubslotText": "過去形",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "become",
     "Slot": "M3",
     "SubslotID": "sub-m2",
     "SubslotElement": "with exceptional skill",
     "SubslotText": "～を保持して",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-w",
     "SubslotElement": "the manager who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-m2",
     "SubslotElement": "recently",
     "SubslotText": "最近、過去完了",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "taken",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "charge of the project",
     "SubslotText": "",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
     "SubslotText": "たとえ～でも",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "was",
     "SubslotText": "be動詞過去",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "under intense pressure",
     "SubslotText": "～の下・元で",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "so",
     "SubslotText": "だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "the outcome",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-aux",
     "SubslotElement": "would",
     "SubslotText": "過去から未来を推量",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "reflect",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "their full potential",
     "SubslotText": "彼らの",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-w",
     "SubslotElement": "the young explorer who",
     "SubslotText": "",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-aux",
     "SubslotElement": "had",
     "SubslotText": "過去完了",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-m2",
     "SubslotElement": "recently",
     "SubslotText": "最近",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-v",
     "SubslotElement": "discovered",
     "SubslotText": "過去完了",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "S",
     "SubslotID": "sub-o1",
     "SubslotElement": "hidden paths",
     "SubslotText": "",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m1",
     "SubslotElement": "even though",
     "SubslotText": "たとえ～でも",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-s",
     "SubslotElement": "uncertainty",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
     "SubslotText": "まだ",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-v",
     "SubslotElement": "clouded",
     "SubslotText": "過去形",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M2",
     "SubslotID": "sub-m3",
     "SubslotElement": "his thoughts",
     "SubslotText": "彼の",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-m1",
     "SubslotElement": "so",
     "SubslotText": "だから",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-s",
     "SubslotElement": "the journey",
     "SubslotText": "",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-aux",
     "SubslotElement": "would",
     "SubslotText": "過去から未来を推量",
-    "display_order": 3
+    "display_order": 3,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-v",
     "SubslotElement": "reach",
     "SubslotText": "",
-    "display_order": 4
+    "display_order": 4,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-o1",
     "SubslotElement": "the hidden temple",
     "SubslotText": "",
-    "display_order": 5
+    "display_order": 5,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "make",
     "Slot": "M3",
     "SubslotID": "sub-m3",
     "SubslotElement": "without incident",
     "SubslotText": "～なしに",
-    "display_order": 6
+    "display_order": 6,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "O1",
     "SubslotID": "sub-c1",
     "SubslotElement": "What",
     "SubslotText": "疑問詞【何？】",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "O1",
     "SubslotID": "sub-s",
     "SubslotElement": "it",
     "SubslotText": "指示語「それ」",
-    "display_order": 1
+    "display_order": 1,
+    "例文ID": ""
   },
   {
-    "ExampleID": "",
-    "V_group_key": "",
+    "V_group_key": "think",
     "Slot": "O1",
     "SubslotID": "sub-v",
     "SubslotElement": "is",
     "SubslotText": "be動詞",
-    "display_order": 2
+    "display_order": 2,
+    "例文ID": ""
   }
 ]
