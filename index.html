@@ -845,6 +845,7 @@
   <script src="js/renderer_core.js" type="module">
   </script>
 
+
 <script>
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
@@ -856,16 +857,19 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
+      console.log("読み込んだJSONテキスト:", e.target.result);
       const jsonData = JSON.parse(e.target.result);
+      console.log("パース結果:", jsonData);
       buildStructureFromJson(jsonData);
     } catch (err) {
-      console.error("JSON パースエラー", err);
+      console.error("JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
     }
   };
   reader.readAsText(file);
 });
 </script>
+
 
 </body>
 </html>
