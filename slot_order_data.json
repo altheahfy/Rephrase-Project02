@@ -1,6 +1,5 @@
 [
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
     "Slot": "M1",
@@ -588,2104 +587,1207 @@
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the woman who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "seemed",
-    "SlotText": null,
-    "SubslotText": "～のように見える"
+    "SubslotText": "～のように見える",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-c1",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "indecisive",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "although",
-    "SlotText": null,
-    "SubslotText": "～だが"
+    "SubslotText": "～だが",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "it",
-    "SlotText": null,
-    "SubslotText": "指示語「それ」"
+    "SubslotText": "指示語「それ」",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "was",
-    "SlotText": null,
-    "SubslotText": "be動詞"
+    "SubslotText": "be動詞",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "emotionally",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-c1",
-    "Slot_display_order": 5,
-    "display_order": 5,
     "SubslotElement": "hard",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 5
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "that he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 1,
-    "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 1,
-    "display_order": 3,
     "SubslotElement": "been trying",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "進行形"
+    "SubslotText": "進行形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 1,
-    "display_order": 4,
     "SubslotElement": "to avoid Tom",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "was afraid of",
-    "SlotText": null,
-    "SubslotText": "句動詞"
+    "SubslotText": "句動詞",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "hurting her feelings",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "that he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 1,
-    "display_order": 2,
     "SubslotElement": "wanted",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 1,
-    "display_order": 3,
     "SubslotElement": "to avoid confrontation",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "feared",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "upsetting her",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "This morning when",
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": "この、～のとき"
+    "SubslotText": "この、～のとき",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "the request",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "became",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-c1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "urgent",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the teacher who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "had just returned",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "from a long absence",
-    "SlotText": null,
-    "SubslotText": "～から"
+    "SubslotText": "～から",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "while",
-    "SlotText": null,
-    "SubslotText": "～の間"
+    "SubslotText": "～の間",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "the principal",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "was still explaining",
-    "SlotText": null,
-    "SubslotText": "過去進行形"
+    "SubslotText": "過去進行形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "the policy",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "the student who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 1,
-    "display_order": 2,
     "SubslotElement": "had been absent",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 1,
-    "display_order": 3,
     "SubslotElement": "for several days",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "数日間"
+    "SubslotText": "数日間",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "a summary of the content",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "she",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "had missed",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "believed",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "it would help her catch up",
-    "SlotText": null,
-    "SubslotText": "それが彼女のキャッチアップする助けになるであろうこと"
+    "SubslotText": "それが彼女のキャッチアップする助けになるであろうこと",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the manager who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "often",
-    "SlotText": null,
-    "SubslotText": "しばしば"
+    "SubslotText": "しばしば",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "avoided",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "direct suggestions",
-    "SlotText": null,
-    "SubslotText": "直接の"
+    "SubslotText": "直接の",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "the new employee who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 1,
-    "display_order": 2,
     "SubslotElement": "had recently joined",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "最近、過去完了"
+    "SubslotText": "最近、過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "a detailed plan she",
-    "SlotText": null,
-    "SubslotText": "詳細な"
+    "SubslotText": "詳細な",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "had prepared",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "the previous day",
-    "SlotText": null,
-    "SubslotText": "直前の"
+    "SubslotText": "直前の",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "the team",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "was facing",
-    "SlotText": null,
-    "SubslotText": "過去進行形"
+    "SubslotText": "過去進行形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "unexpected challenges",
-    "SlotText": null,
-    "SubslotText": "予期せぬ"
+    "SubslotText": "予期せぬ",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "During the critical moment when",
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": "～の間に"
+    "SubslotText": "～の間に",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "the silence",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "filled",
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "the room",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the student who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "lacked",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "once",
-    "SlotText": null,
-    "SubslotText": "かつて"
+    "SubslotText": "かつて",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 5,
     "SubslotElement": "all confidence",
-    "SlotText": null,
-    "SubslotText": "全ての"
+    "SubslotText": "全ての",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "although",
-    "SlotText": null,
-    "SubslotText": "～だが"
+    "SubslotText": "～だが",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "doubt",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": null,
-    "SubslotText": "まだ"
+    "SubslotText": "まだ",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "lingered",
-    "SlotText": null,
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m3",
-    "Slot_display_order": 5,
-    "display_order": 5,
     "SubslotElement": "in her mind",
-    "SlotText": null,
-    "SubslotText": "～の中に、～の中で"
+    "SubslotText": "～の中に、～の中で",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 6,
-    "display_order": 1,
     "SubslotElement": "the dependable voice",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 6,
-    "display_order": 2,
     "SubslotElement": "everyone",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 6,
-    "display_order": 3,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 6,
-    "display_order": 4,
     "SubslotElement": "been waiting for",
-    "SlotText": null,
-    "SubslotText": "進行形、過去完了"
+    "SubslotText": "進行形、過去完了",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "she",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "spoke",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 3
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "with unexpected clarity",
-    "SlotText": null,
-    "SubslotText": "予期せぬ、～の状態で"
+    "SubslotText": "予期せぬ、～の状態で",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "Amid the fierce storm when",
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": "～の真ん中で"
+    "SubslotText": "～の真ん中で",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "waves",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "battered",
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "the vessel",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": "疑問文のdo, does",
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-s",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the captain who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "doubted",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "once",
-    "SlotText": null,
-    "SubslotText": "かつて"
+    "SubslotText": "かつて",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 5,
     "SubslotElement": "his own judgment",
-    "SlotText": null,
-    "SubslotText": "彼の、自身の"
+    "SubslotText": "彼の、自身の",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": null,
-    "SubslotText": "たとえ～でも"
+    "SubslotText": "たとえ～でも",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "fear",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": null,
-    "SubslotText": "まだ"
+    "SubslotText": "まだ",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "gripped",
-    "SlotText": null,
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m3",
-    "Slot_display_order": 5,
-    "display_order": 5,
     "SubslotElement": "their hearts",
-    "SlotText": null,
-    "SubslotText": "彼らの"
+    "SubslotText": "彼らの",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 6,
-    "display_order": 1,
     "SubslotElement": "the steady hand",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 6,
-    "display_order": 2,
     "SubslotElement": "the crew",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 6,
-    "display_order": 3,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "C1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 6,
-    "display_order": 4,
     "SubslotElement": "been praying for",
-    "SlotText": null,
-    "SubslotText": "過去完了、～のために"
+    "SubslotText": "過去完了、～のために",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "because",
-    "SlotText": null,
-    "SubslotText": "～だから"
+    "SubslotText": "～だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "navigated",
-    "SlotText": null,
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "with exceptional skill",
-    "SlotText": null,
-    "SubslotText": "～を保持して"
+    "SubslotText": "～を保持して",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-w",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the manager who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "recently",
-    "SlotText": null,
-    "SubslotText": "最近、過去完了"
+    "SubslotText": "最近、過去完了",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "taken",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 5,
     "SubslotElement": "charge of the project",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 5
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": null,
-    "SubslotText": "たとえ～でも"
+    "SubslotText": "たとえ～でも",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "he",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "was",
-    "SlotText": null,
-    "SubslotText": "be動詞過去"
+    "SubslotText": "be動詞過去",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "under intense pressure",
-    "SlotText": null,
-    "SubslotText": "～の下・元で"
+    "SubslotText": "～の下・元で",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "so",
-    "SlotText": null,
-    "SubslotText": "だから"
+    "SubslotText": "だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "the outcome",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "would",
-    "SlotText": null,
-    "SubslotText": "過去から未来を推量"
+    "SubslotText": "過去から未来を推量",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "reflect",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 8,
-    "display_order": 5,
     "SubslotElement": "their full potential",
-    "SlotText": null,
-    "SubslotText": "彼らの"
+    "SubslotText": "彼らの",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-w",
-    "Slot_display_order": 2,
-    "display_order": 1,
     "SubslotElement": "the young explorer who",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 1
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 2,
-    "display_order": 2,
     "SubslotElement": "had",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 2
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 2,
-    "display_order": 3,
     "SubslotElement": "recently",
-    "SlotText": null,
-    "SubslotText": "最近"
+    "SubslotText": "最近",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-v",
-    "Slot_display_order": 2,
-    "display_order": 4,
     "SubslotElement": "discovered",
-    "SlotText": null,
-    "SubslotText": "過去完了"
+    "SubslotText": "過去完了",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "S",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 2,
-    "display_order": 5,
     "SubslotElement": "hidden paths",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 5
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 5,
-    "display_order": 1,
     "SubslotElement": "even though",
-    "SlotText": null,
-    "SubslotText": "たとえ～でも"
+    "SubslotText": "たとえ～でも",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-s",
-    "Slot_display_order": 5,
-    "display_order": 2,
     "SubslotElement": "uncertainty",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m2",
-    "Slot_display_order": 5,
-    "display_order": 3,
     "SubslotElement": "still",
-    "SlotText": null,
-    "SubslotText": "まだ"
+    "SubslotText": "まだ",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-v",
-    "Slot_display_order": 5,
-    "display_order": 4,
     "SubslotElement": "clouded",
-    "SlotText": null,
-    "SubslotText": "過去形"
+    "SubslotText": "過去形",
+    "display_order": 4
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M2",
     "SubslotID": "sub-m3",
-    "Slot_display_order": 5,
-    "display_order": 5,
     "SubslotElement": "his thoughts",
-    "SlotText": null,
-    "SubslotText": "彼の"
+    "SubslotText": "彼の",
+    "display_order": 5
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m1",
-    "Slot_display_order": 8,
-    "display_order": 1,
     "SubslotElement": "so",
-    "SlotText": null,
-    "SubslotText": "だから"
+    "SubslotText": "だから",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-s",
-    "Slot_display_order": 8,
-    "display_order": 2,
     "SubslotElement": "the journey",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 2
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-aux",
-    "Slot_display_order": 8,
-    "display_order": 3,
     "SubslotElement": "would",
-    "SlotText": null,
-    "SubslotText": "過去から未来を推量"
+    "SubslotText": "過去から未来を推量",
+    "display_order": 3
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-v",
-    "Slot_display_order": 8,
-    "display_order": 4,
     "SubslotElement": "reach",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 4
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-o1",
-    "Slot_display_order": 8,
-    "display_order": 5,
     "SubslotElement": "the hidden temple",
-<<<<<<< HEAD
     "SubslotText": "",
     "display_order": 5
   },
   {
     "ExampleID": "",
     "V_group_key": "",
-=======
-    "SlotText": null,
-    "SubslotText": null
-  },
-  {
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "M3",
     "SubslotID": "sub-m3",
-    "Slot_display_order": 8,
-    "display_order": 6,
     "SubslotElement": "without incident",
-    "SlotText": null,
-    "SubslotText": "～なしに"
+    "SubslotText": "～なしに",
+    "display_order": 6
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-c1",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "What",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "疑問詞【何？】"
+    "SubslotText": "疑問詞【何？】",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-s",
-    "Slot_display_order": 1,
-    "display_order": 1,
     "SubslotElement": "it",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "指示語「それ」"
+    "SubslotText": "指示語「それ」",
+    "display_order": 1
   },
   {
-<<<<<<< HEAD
     "ExampleID": "",
     "V_group_key": "",
-=======
->>>>>>> parent of ef97cbf (json設計しなおし)
     "Slot": "O1",
     "SubslotID": "sub-v",
-    "Slot_display_order": 1,
-    "display_order": 2,
     "SubslotElement": "is",
-    "SlotText": "疑問詞【何？】",
-    "SubslotText": "be動詞"
+    "SubslotText": "be動詞",
+    "display_order": 2
   }
 ]
