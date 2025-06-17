@@ -851,6 +851,7 @@
 
 
 
+<!-- 元のロード処理スクリプトをコメントアウト
 <script type="module">
 import { buildStructureFromJson } from './js/structure_builder.js';
 
@@ -876,6 +877,36 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   reader.readAsText(file);
 });
 </script>
+-->
 
 </body>
 </html>
+
+<script type="module">
+import { randomizeAll } from './js/randomizer_all.js';
+import { buildStructure } from './js/structure_builder.js';
+
+document.getElementById("loadJsonButton").addEventListener("click", () => {
+  const fileInput = document.getElementById("jsonFileInput");
+  if (fileInput.files.length === 0) {
+    alert("ファイルを選択してください");
+    return;
+  }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      console.log("読み込んだJSONテキスト:", e.target.result);
+      const jsonData = JSON.parse(e.target.result);
+      console.log("パース結果:", jsonData);
+      const data = randomizeAll(jsonData);
+      console.log("ランダマイズ結果:", data);
+      buildStructure(data);
+    } catch (err) {
+      console.error("JSON パースエラーまたは処理例外", err);
+      alert("無効な JSON ファイルです");
+    }
+  };
+  reader.readAsText(file);
+});
+</script>
