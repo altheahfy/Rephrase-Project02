@@ -1,7 +1,7 @@
 
 /**
  * V_group_key 母集団から1つ選び、スロット種別ごとに1候補のみランダム選択し返す。
- * structure_builder.js に渡すデータを生成。
+ * 上位スロットに対応するサブスロットのみ付随。
  * @param {Array} slotData - slot_order_data.json のデータ配列
  * @returns {Array} 選択されたスロット群（上位スロット＋サブスロット含む）のデータ配列
  */
@@ -24,8 +24,12 @@ export function randomizeAll(slotData) {
     if (candidates.length > 0) {
       const selected = candidates[Math.floor(Math.random() * candidates.length)];
       result.push(selected);
-      // サブスロットも同じ Slot のものを追加
-      const subslots = groupSlots.filter(entry => entry.Slot === slotType && entry.SubslotID);
+      // 対応するサブスロットのみを追加（同じ上位スロットに属するもの）
+      const subslots = groupSlots.filter(entry =>
+        entry.Slot === slotType &&
+        entry.SubslotID &&
+        entry.SlotPhrase === selected.SlotPhrase
+      );
       result.push(...subslots);
     }
   });
