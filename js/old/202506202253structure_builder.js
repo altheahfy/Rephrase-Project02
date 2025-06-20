@@ -7,15 +7,10 @@ function buildStructure(selectedSlots) {
   }
   wrapper.innerHTML = '';
 
-  console.log('📝 buildStructure received selectedSlots:', selectedSlots);
-
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
-  console.log('📝 upperSlots after sort:', upperSlots);
 
   upperSlots.forEach(item => {
-    console.log(`📝 Rendering upperSlot: ${item.Slot}, PhraseType: ${item.PhraseType}, SlotPhrase: ${item.SlotPhrase}, SlotText: ${item.SlotText}`);
-
     const slotDiv = document.createElement('div');
     slotDiv.className = 'slot';
 
@@ -41,11 +36,8 @@ function buildStructure(selectedSlots) {
 
     const subslots = selectedSlots.filter(s => s.Slot === item.Slot && s.SubslotID);
     subslots.sort((a, b) => a.display_order - b.display_order);
-    console.log(`📝 Subslots for ${item.Slot}:`, subslots);
 
     subslots.forEach(sub => {
-      console.log(`📝 Rendering subSlot: ${sub.SubslotID}, SubslotElement: ${sub.SubslotElement}, SubslotText: ${sub.SubslotText}`);
-
       const subDiv = document.createElement('div');
       subDiv.className = 'subslot';
 
