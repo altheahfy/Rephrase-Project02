@@ -20,19 +20,10 @@ export function randomizeAll(slotData) {
   let slotSets = [];
   exampleIDs.forEach((id, index) => {
     const setNumber = index + 1;
-    const slots = groupSlots.filter(entry => entry.例文ID === id && !entry.SubslotID).map(entry => {
-      let o1Siblings = groupSlots.filter(e => e.例文ID === id && e.Slot === "O1");
-      let o1Orders = [...new Set(o1Siblings.map(e => e.Slot_display_order))];
-      let o1Index = o1Orders.indexOf(entry.Slot_display_order) + 1;
-      let idSuffix = "";
-      if (entry.Slot === "O1" && o1Orders.length > 1) {
-        idSuffix = `-${o1Index}`;
-      }
-      return {
-        ...entry,
-        識別番号: `${entry.Slot}-${setNumber}${idSuffix}`
-      };
-    });
+    const slots = groupSlots.filter(entry => entry.例文ID === id && !entry.SubslotID).map(entry => ({
+      ...entry,
+      識別番号: `${entry.Slot}-${setNumber}`
+    }));
     slotSets.push(slots);
   });
 
@@ -49,18 +40,50 @@ export function randomizeAll(slotData) {
         e.Slot === chosen.Slot &&
         e.SubslotID
       );
-      relatedSubslots.forEach(sub => selectedSlots.push({ ...sub }));
+      relatedSubslots.forEach(sub => {
+        selectedSlots.push({ ...sub });
+      });
     }
   });
 
-  const o1Candidates = slotSets.flat().filter(e => e.Slot === "O1");
-  const doubleO1 = o1Candidates.filter(e => /O1-\d+-\d+/.test(e.識別番号));
-  if (doubleO1.length > 0) {
-    doubleO1.forEach(e => selectedSlots.push({ ...e }));
-  } else {
-    if (o1Candidates.length > 0) {
-      const chosen = o1Candidates[Math.floor(Math.random() * o1Candidates.length)];
+  const o1Entries = groupSlots.filter(e => e.Slot === "O1");
+  const addedSubKeys = new Set();
+
+  if (o1Entries.length > 0) {
+    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
+    if (clauseO1.length > 0) {
+      // PhraseType: clause の O1 は必ず1件選出
+      const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
       selectedSlots.push({ ...chosen });
+      groupSlots.filter(e =>
+        e.例文ID === chosen.例文ID &&
+        e.Slot === chosen.Slot &&
+        e.SubslotID
+      ).forEach(sub => {
+        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
+        if (!addedSubKeys.has(key)) {
+          selectedSlots.push({ ...sub });
+          addedSubKeys.add(key);
+        }
+      });
+    } else {
+      // PhraseType: word の O1 を選出
+      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
+      if (wordO1.length > 0) {
+        const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
+        selectedSlots.push({ ...chosen });
+        groupSlots.filter(e =>
+          e.例文ID === chosen.例文ID &&
+          e.Slot === chosen.Slot &&
+          e.SubslotID
+        ).forEach(sub => {
+          const key = `${sub.SubslotID}-${sub.SubslotElement}`;
+          if (!addedSubKeys.has(key)) {
+            selectedSlots.push({ ...sub });
+            addedSubKeys.add(key);
+          }
+        });
+      }
     }
   }
 
