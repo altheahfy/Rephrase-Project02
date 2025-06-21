@@ -47,16 +47,44 @@ export function randomizeAll(slotData) {
   });
 
   const o1Entries = groupSlots.filter(e => e.Slot === "O1");
-  const uniqueOrders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
+  const addedSubKeys = new Set();
 
-  if (uniqueOrders.length > 1) {
-    uniqueOrders.forEach(order => {
-      const target = o1Entries.find(e => e.Slot_display_order === order);
-      if (target) selectedSlots.push({ ...target });
-    });
-  } else if (o1Entries.length > 0) {
-    const chosen = o1Entries[Math.floor(Math.random() * o1Entries.length)];
-    selectedSlots.push({ ...chosen });
+  if (o1Entries.length > 0) {
+    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
+    if (clauseO1.length > 0) {
+      // PhraseType: clause の O1 は必ず1件選出
+      const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
+      selectedSlots.push({ ...chosen });
+      groupSlots.filter(e =>
+        e.例文ID === chosen.例文ID &&
+        e.Slot === chosen.Slot &&
+        e.SubslotID
+      ).forEach(sub => {
+        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
+        if (!addedSubKeys.has(key)) {
+          selectedSlots.push({ ...sub });
+          addedSubKeys.add(key);
+        }
+      });
+    } else {
+      // PhraseType: word の O1 を選出
+      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
+      if (wordO1.length > 0) {
+        const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
+        selectedSlots.push({ ...chosen });
+        groupSlots.filter(e =>
+          e.例文ID === chosen.例文ID &&
+          e.Slot === chosen.Slot &&
+          e.SubslotID
+        ).forEach(sub => {
+          const key = `${sub.SubslotID}-${sub.SubslotElement}`;
+          if (!addedSubKeys.has(key)) {
+            selectedSlots.push({ ...sub });
+            addedSubKeys.add(key);
+          }
+        });
+      }
+    }
   }
 
   window.slotSets = slotSets;
