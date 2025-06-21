@@ -36,6 +36,17 @@ export function randomizeAll(slotData) {
       selectedSlots.push({
         ...chosen
       });
+      // 関連するサブスロットも含める
+      const relatedSubslots = groupSlots.filter(e =>
+        e.例文ID === chosen.例文ID &&
+        e.Slot === chosen.Slot &&
+        e.SubslotID
+      );
+      relatedSubslots.forEach(sub => {
+        selectedSlots.push({
+          ...sub
+        });
+      });
     }
   });
 
