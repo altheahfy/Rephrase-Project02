@@ -52,7 +52,6 @@ export function randomizeAll(slotData) {
   if (o1Entries.length > 0) {
     const o1 = o1Entries[Math.floor(Math.random() * o1Entries.length)];
     selectedSlots.push({ ...o1 });
-
     groupSlots.filter(e =>
       e.例文ID === o1.例文ID &&
       e.Slot === o1.Slot &&
@@ -63,14 +62,6 @@ export function randomizeAll(slotData) {
         selectedSlots.push({ ...sub });
         addedSubKeys.add(key);
       }
-    });
-
-    // 文頭分離用フラグ付与（必要な場合の分離処理用）
-    selectedSlots = selectedSlots.map(slot => {
-      if (slot.Slot === "O1" && slot.PhraseType === "clause") {
-        return { ...slot, isHeadSeparation: true };
-      }
-      return slot;
     });
   }
 
@@ -88,7 +79,6 @@ export function randomizeAll(slotData) {
     SubslotElement: slot.SubslotElement || "",
     SubslotText: slot.SubslotText || "",
     display_order: slot.display_order || 0,
-    識別番号: slot.識別番号 || "",
-    isHeadSeparation: slot.isHeadSeparation || false
+    識別番号: slot.識別番号 || ""
   }));
 }
