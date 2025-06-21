@@ -48,55 +48,36 @@ export function randomizeAll(slotData) {
 
   const o1Entries = groupSlots.filter(e => e.Slot === "O1");
   const o1Orders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
-  const addedSubKeys = new Set();
-
   if (o1Orders.length > 1) {
     const o1Head = o1Entries.find(e => e.Slot_display_order === Math.min(...o1Orders));
     const o1Tail = o1Entries.find(e => e.Slot_display_order === Math.max(...o1Orders));
-
     if (o1Head) {
       selectedSlots.push({ ...o1Head });
-      groupSlots.filter(e =>
+      const subHead = groupSlots.filter(e =>
         e.例文ID === o1Head.例文ID &&
         e.Slot === o1Head.Slot &&
         e.SubslotID
-      ).forEach(sub => {
-        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-        if (!addedSubKeys.has(key)) {
-          selectedSlots.push({ ...sub });
-          addedSubKeys.add(key);
-        }
-      });
+      );
+      subHead.forEach(sub => selectedSlots.push({ ...sub }));
     }
-
     if (o1Tail) {
       selectedSlots.push({ ...o1Tail });
-      groupSlots.filter(e =>
+      const subTail = groupSlots.filter(e =>
         e.例文ID === o1Tail.例文ID &&
         e.Slot === o1Tail.Slot &&
         e.SubslotID
-      ).forEach(sub => {
-        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-        if (!addedSubKeys.has(key)) {
-          selectedSlots.push({ ...sub });
-          addedSubKeys.add(key);
-        }
-      });
+      );
+      subTail.forEach(sub => selectedSlots.push({ ...sub }));
     }
   } else if (o1Entries.length > 0) {
     const o1 = o1Entries[0];
     selectedSlots.push({ ...o1 });
-    groupSlots.filter(e =>
+    const sub = groupSlots.filter(e =>
       e.例文ID === o1.例文ID &&
       e.Slot === o1.Slot &&
       e.SubslotID
-    ).forEach(sub => {
-      const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-      if (!addedSubKeys.has(key)) {
-        selectedSlots.push({ ...sub });
-        addedSubKeys.add(key);
-      }
-    });
+    );
+    sub.forEach(s => selectedSlots.push({ ...s }));
   }
 
   window.slotSets = slotSets;
