@@ -20,7 +20,7 @@ export function randomizeAll(slotData) {
   let slotSets = [];
   exampleIDs.forEach((id, index) => {
     const setNumber = index + 1;
-    const slots = groupSlots.filter(entry => entry.例文ID === id).map(entry => ({
+    const slots = groupSlots.filter(entry => entry.例文ID === id && !entry.SubslotID).map(entry => ({
       ...entry,
       識別番号: `${entry.Slot}-${setNumber}`
     }));
@@ -39,10 +39,8 @@ export function randomizeAll(slotData) {
     }
   });
 
-  // デバッグ用に slotSets と slotTypes を window にセット
   window.slotSets = slotSets;
   window.slotTypes = slotTypes;
-
   window.lastSelectedSlots = selectedSlots;
 
   return selectedSlots.map(slot => ({
