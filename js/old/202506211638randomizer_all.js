@@ -33,7 +33,9 @@ export function randomizeAll(slotData) {
     const candidates = slotSets.flat().filter(entry => entry.Slot === type);
     if (candidates.length > 0) {
       const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-      selectedSlots.push({ ...chosen });
+      selectedSlots.push({
+        ...chosen
+      });
       // 関連するサブスロットも含める
       const relatedSubslots = groupSlots.filter(e =>
         e.例文ID === chosen.例文ID &&
@@ -41,16 +43,12 @@ export function randomizeAll(slotData) {
         e.SubslotID
       );
       relatedSubslots.forEach(sub => {
-        selectedSlots.push({ ...sub });
+        selectedSlots.push({
+          ...sub
+        });
       });
     }
   });
-
-  // O1 分離表示用に文頭・文末を個別に選出
-  const o1Head = groupSlots.find(e => e.Slot === "O1" && e.display_order === 1);
-  const o1Tail = groupSlots.find(e => e.Slot === "O1" && e.display_order !== 1);
-  if (o1Head) selectedSlots.push({ ...o1Head });
-  if (o1Tail) selectedSlots.push({ ...o1Tail });
 
   window.slotSets = slotSets;
   window.slotTypes = slotTypes;
