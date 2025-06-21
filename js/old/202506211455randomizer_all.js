@@ -1,4 +1,10 @@
 
+/**
+ * V_group_key 母集団から1つ選び、例文ID単位で母集団を形成し、1例文を選択。
+ * structure_builder.js に渡すデータを生成。
+ * @param {Array} slotData - slot_order_data.json のデータ配列
+ * @returns {Array} 選択されたスロット群
+ */
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -20,17 +26,7 @@ export function randomizeAll(slotData) {
   const selectedExampleID = exampleIDs[Math.floor(Math.random() * exampleIDs.length)];
   console.log(`🟢 選択 例文ID: ${selectedExampleID}`);
 
-  const baseSlots = groupSlots.filter(entry => entry.例文ID === selectedExampleID);
-
-  const selectedSlots = baseSlots.map(baseSlot => {
-    const candidates = groupSlots.filter(entry => entry.Slot === baseSlot.Slot);
-    const randomPick = candidates[Math.floor(Math.random() * candidates.length)];
-    return {
-      ...baseSlot,
-      SlotPhrase: randomPick.SlotPhrase || baseSlot.SlotPhrase,
-      SlotText: randomPick.SlotText || baseSlot.SlotText
-    };
-  });
+  const selectedSlots = groupSlots.filter(entry => entry.例文ID === selectedExampleID);
 
   window.lastSelectedSlots = selectedSlots;
 
