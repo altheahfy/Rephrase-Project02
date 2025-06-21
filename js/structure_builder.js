@@ -41,15 +41,14 @@ function buildStructure(selectedSlots) {
 
     wrapper.appendChild(slotDiv);
 
-    // サブスロットは Slot + SlotPhrase + Slot_display_order に基づき付随
+    // サブスロットは Slot + Slot_display_order に基づき付随 (SlotPhrase依存を緩和)
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
       s.SubslotID &&
-      s.SlotPhrase === item.SlotPhrase &&
       s.Slot_display_order === item.Slot_display_order
     );
     subslots.sort((a, b) => a.display_order - b.display_order);
-    console.log(`📝 Subslots for ${item.Slot} (${item.SlotPhrase}):`, subslots);
+    console.log(`📝 Subslots for ${item.Slot}:`, subslots);
 
     subslots.forEach(sub => {
       console.log(`📝 Rendering subSlot: ${sub.SubslotID}, SubslotElement: ${sub.SubslotElement}`);
