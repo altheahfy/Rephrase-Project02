@@ -9,13 +9,13 @@ function buildStructure(selectedSlots) {
 
   console.log('📝 buildStructure received selectedSlots:', selectedSlots);
 
-  // 上位スロットを display_order 順に厳密ソート
+  // 上位スロットを display_order 順に絶対ソート
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
   console.log('📝 upperSlots after sort:', upperSlots);
 
   upperSlots.forEach(item => {
-    console.log(`📝 Rendering upperSlot: ${item.Slot}, SlotPhrase: ${item.SlotPhrase}, Slot_display_order: ${item.Slot_display_order}`);
+    console.log(`📝 Rendering upperSlot: ${item.Slot}, PhraseType: ${item.PhraseType}, SlotPhrase: ${item.SlotPhrase}, SlotText: ${item.SlotText}`);
 
     const slotDiv = document.createElement('div');
     slotDiv.className = 'slot';
@@ -41,18 +41,13 @@ function buildStructure(selectedSlots) {
 
     wrapper.appendChild(slotDiv);
 
-    // サブスロットは Slot + SlotPhrase + Slot_display_order に基づき付随
-    const subslots = selectedSlots.filter(s =>
-      s.Slot === item.Slot &&
-      s.SubslotID &&
-      s.SlotPhrase === item.SlotPhrase &&
-      s.Slot_display_order === item.Slot_display_order
-    );
+    // サブスロットも display_order 絶対ソート
+    const subslots = selectedSlots.filter(s => s.Slot === item.Slot && s.SubslotID);
     subslots.sort((a, b) => a.display_order - b.display_order);
-    console.log(`📝 Subslots for ${item.Slot} (${item.SlotPhrase}):`, subslots);
+    console.log(`📝 Subslots for ${item.Slot}:`, subslots);
 
     subslots.forEach(sub => {
-      console.log(`📝 Rendering subSlot: ${sub.SubslotID}, SubslotElement: ${sub.SubslotElement}`);
+      console.log(`📝 Rendering subSlot: ${sub.SubslotID}, SubslotElement: ${sub.SubslotElement}, SubslotText: ${sub.SubslotText}`);
 
       const subDiv = document.createElement('div');
       subDiv.className = 'subslot';
