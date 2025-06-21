@@ -39,6 +39,10 @@ export function randomizeAll(slotData) {
     }
   });
 
+  // デバッグ用に slotSets と slotTypes を window にセット
+  window.slotSets = slotSets;
+  window.slotTypes = slotTypes;
+
   window.lastSelectedSlots = selectedSlots;
 
   return selectedSlots.map(slot => ({
