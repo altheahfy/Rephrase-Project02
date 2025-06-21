@@ -30,11 +30,11 @@ export function randomizeAll(slotData) {
   let selectedSlots = [];
   const slotTypes = [...new Set(groupSlots.map(entry => entry.Slot).filter(s => s))];
   slotTypes.forEach(type => {
-    if (type === "O1") return; // O1 は後で個別処理
     const candidates = slotSets.flat().filter(entry => entry.Slot === type);
     if (candidates.length > 0) {
       const chosen = candidates[Math.floor(Math.random() * candidates.length)];
       selectedSlots.push({ ...chosen });
+      // 関連するサブスロットも含める
       const relatedSubslots = groupSlots.filter(e =>
         e.例文ID === chosen.例文ID &&
         e.Slot === chosen.Slot &&
@@ -46,19 +46,11 @@ export function randomizeAll(slotData) {
     }
   });
 
-  // O1 の分離表示が必要な場合のみ分けて選出
-  const o1Entries = groupSlots.filter(e => e.Slot === "O1");
-  const o1Orders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
-  if (o1Orders.length > 1) {
-    // 分離必要ケース
-    const o1Head = o1Entries.find(e => e.Slot_display_order === Math.min(...o1Orders));
-    const o1Tail = o1Entries.find(e => e.Slot_display_order === Math.max(...o1Orders));
-    if (o1Head) selectedSlots.push({ ...o1Head });
-    if (o1Tail) selectedSlots.push({ ...o1Tail });
-  } else if (o1Entries.length > 0) {
-    // 通常の1回のみ必要ケース
-    selectedSlots.push({ ...o1Entries[0] });
-  }
+  // O1 分離表示用に文頭・文末を個別に選出
+  const o1Head = groupSlots.find(e => e.Slot === "O1" && e.display_order === 1);
+  const o1Tail = groupSlots.find(e => e.Slot === "O1" && e.display_order !== 1);
+  if (o1Head) selectedSlots.push({ ...o1Head });
+  if (o1Tail) selectedSlots.push({ ...o1Tail });
 
   window.slotSets = slotSets;
   window.slotTypes = slotTypes;
