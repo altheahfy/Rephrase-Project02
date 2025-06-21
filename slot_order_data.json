@@ -808,7 +808,7 @@
     "SubslotID": "sub-m1",
     "SubslotElement": "because",
     "SubslotText": "～だから",
-    "Slot_display_order": 0,
+    "Slot_display_order": 6,
     "display_order": 1
   },
   {
@@ -822,7 +822,7 @@
     "SubslotID": "sub-s",
     "SubslotElement": "he",
     "SubslotText": "",
-    "Slot_display_order": 0,
+    "Slot_display_order": 6,
     "display_order": 2
   },
   {
@@ -836,7 +836,7 @@
     "SubslotID": "sub-v",
     "SubslotElement": "feared",
     "SubslotText": "過去形",
-    "Slot_display_order": 0,
+    "Slot_display_order": 6,
     "display_order": 3
   },
   {
@@ -850,7 +850,7 @@
     "SubslotID": "sub-o1",
     "SubslotElement": "upsetting her",
     "SubslotText": "",
-    "Slot_display_order": 0,
+    "Slot_display_order": 6,
     "display_order": 4
   },
   {
@@ -1018,7 +1018,7 @@
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
-    "Slot_display_order": 2,
+    "Slot_display_order": 3,
     "display_order": 0
   },
   {
@@ -1046,7 +1046,7 @@
     "SubslotID": "sub-s",
     "SubslotElement": "the principal",
     "SubslotText": "",
-    "Slot_display_order": 4,
+    "Slot_display_order": 3,
     "display_order": 2
   },
   {
@@ -1060,7 +1060,7 @@
     "SubslotID": "sub-aux",
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
-    "Slot_display_order": 5,
+    "Slot_display_order": 3,
     "display_order": 3
   },
   {
@@ -1074,7 +1074,7 @@
     "SubslotID": "sub-m2",
     "SubslotElement": "still",
     "SubslotText": "まだ",
-    "Slot_display_order": 5,
+    "Slot_display_order": 3,
     "display_order": 4
   },
   {
@@ -1088,7 +1088,7 @@
     "SubslotID": "sub-v",
     "SubslotElement": "explaining",
     "SubslotText": "進行形",
-    "Slot_display_order": 5,
+    "Slot_display_order": 3,
     "display_order": 5
   },
   {
@@ -1102,7 +1102,7 @@
     "SubslotID": "sub-o1",
     "SubslotElement": "the policy",
     "SubslotText": "",
-    "Slot_display_order": 5,
+    "Slot_display_order": 3,
     "display_order": 6
   },
   {
@@ -1116,7 +1116,7 @@
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
-    "Slot_display_order": 5,
+    "Slot_display_order": 4,
     "display_order": 0
   },
   {
