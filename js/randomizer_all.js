@@ -50,31 +50,25 @@ export function randomizeAll(slotData) {
   const addedSubKeys = new Set();
 
   if (o1Entries.length > 0) {
-    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause" && !e.SubslotID);
+    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
     if (clauseO1.length > 0) {
-      const orders = clauseO1.map(e => e.Slot_display_order);
-      const min = Math.min(...orders);
-      const max = Math.max(...orders);
-      const o1Head = clauseO1.find(e => e.Slot_display_order === min);
-      const o1Tail = clauseO1.find(e => e.Slot_display_order === max);
-      [o1Head, o1Tail].forEach(chosen => {
-        if (chosen) {
-          selectedSlots.push({ ...chosen });
-          groupSlots.filter(e =>
-            e.例文ID === chosen.例文ID &&
-            e.Slot === chosen.Slot &&
-            e.SubslotID
-          ).forEach(sub => {
-            const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-            if (!addedSubKeys.has(key)) {
-              selectedSlots.push({ ...sub });
-              addedSubKeys.add(key);
-            }
-          });
+      // PhraseType: clause の O1 は必ず1件選出
+      const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
+      selectedSlots.push({ ...chosen });
+      groupSlots.filter(e =>
+        e.例文ID === chosen.例文ID &&
+        e.Slot === chosen.Slot &&
+        e.SubslotID
+      ).forEach(sub => {
+        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
+        if (!addedSubKeys.has(key)) {
+          selectedSlots.push({ ...sub });
+          addedSubKeys.add(key);
         }
       });
     } else {
-      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause" && !e.SubslotID);
+      // PhraseType: word の O1 を選出
+      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
       if (wordO1.length > 0) {
         const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
         selectedSlots.push({ ...chosen });
@@ -92,8 +86,6 @@ export function randomizeAll(slotData) {
       }
     }
   }
-
-  selectedSlots.sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
 
   window.slotSets = slotSets;
   window.slotTypes = slotTypes;
