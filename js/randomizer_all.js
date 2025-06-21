@@ -47,44 +47,18 @@ export function randomizeAll(slotData) {
   });
 
   const o1Entries = groupSlots.filter(e => e.Slot === "O1");
-  const addedSubKeys = new Set();
+  const uniqueOrders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
 
-  if (o1Entries.length > 0) {
-    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
-    if (clauseO1.length > 0) {
-      // PhraseType: clause の O1 は必ず1件選出
-      const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
-      selectedSlots.push({ ...chosen });
-      groupSlots.filter(e =>
-        e.例文ID === chosen.例文ID &&
-        e.Slot === chosen.Slot &&
-        e.SubslotID
-      ).forEach(sub => {
-        const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-        if (!addedSubKeys.has(key)) {
-          selectedSlots.push({ ...sub });
-          addedSubKeys.add(key);
-        }
-      });
-    } else {
-      // PhraseType: word の O1 を選出
-      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
-      if (wordO1.length > 0) {
-        const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
-        selectedSlots.push({ ...chosen });
-        groupSlots.filter(e =>
-          e.例文ID === chosen.例文ID &&
-          e.Slot === chosen.Slot &&
-          e.SubslotID
-        ).forEach(sub => {
-          const key = `${sub.SubslotID}-${sub.SubslotElement}`;
-          if (!addedSubKeys.has(key)) {
-            selectedSlots.push({ ...sub });
-            addedSubKeys.add(key);
-          }
-        });
-      }
-    }
+  if (uniqueOrders.length > 1) {
+    // 分離構造 O1 の場合、全 Slot_display_order の O1 を選出
+    uniqueOrders.forEach(order => {
+      const targets = o1Entries.filter(e => e.Slot_display_order === order);
+      targets.forEach(t => selectedSlots.push({ ...t }));
+    });
+  } else if (o1Entries.length > 0) {
+    // 通常 O1 は1件ランダム選出
+    const chosen = o1Entries[Math.floor(Math.random() * o1Entries.length)];
+    selectedSlots.push({ ...chosen });
   }
 
   window.slotSets = slotSets;
