@@ -1,21 +1,75 @@
 
-// 差分案: O1 の場合は PhraseType にかかわらず SlotPhrase を表示する処理を追加
+function buildStructure(selectedSlots) {
+  const wrapper = document.querySelector('.slot-wrapper');
+  if (!wrapper) {
+    console.warn('slot-wrapper not found');
+    return;
+  }
+  wrapper.innerHTML = '';
 
-if (item.Slot === 'O1' || item.PhraseType === 'word') {
-  // O1 または word の場合は SlotPhrase と SlotText を表示
-  const slotPhraseElement = document.createElement('div');
-  slotPhraseElement.className = 'slot-phrase';
-  slotPhraseElement.textContent = item.SlotPhrase;
-  wrapper.appendChild(slotPhraseElement);
+  console.log('📝 buildStructure received selectedSlots:', selectedSlots);
 
-  const slotTextElement = document.createElement('div');
-  slotTextElement.className = 'slot-text';
-  slotTextElement.textContent = item.SlotText;
-  wrapper.appendChild(slotTextElement);
-} else {
-  // その他の場合は slot-mark のみ表示
-  const markElement = document.createElement('div');
-  markElement.className = 'slot-mark';
-  markElement.textContent = '▶';
-  wrapper.appendChild(markElement);
+  // 上位スロットを display_order 順に厳密ソート
+  const upperSlots = selectedSlots.filter(e => !e.SubslotID);
+  upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
+  console.log('📝 upperSlots after sort:', upperSlots);
+
+  upperSlots.forEach(item => {
+    console.log(`📝 Rendering upperSlot: ${item.Slot}, SlotPhrase: ${item.SlotPhrase}, Slot_display_order: ${item.Slot_display_order}`);
+
+    const slotDiv = document.createElement('div');
+    slotDiv.className = 'slot';
+    slotDiv.dataset.displayOrder = item.Slot_display_order;
+
+    if (item.PhraseType === 'word') {
+      const phraseDiv = document.createElement('div');
+      phraseDiv.className = 'slot-phrase';
+      phraseDiv.innerText = item.SlotPhrase || '';
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'slot-text';
+      textDiv.innerText = item.SlotText || '';
+
+      slotDiv.appendChild(phraseDiv);
+      slotDiv.appendChild(textDiv);
+    } else {
+      const markDiv = document.createElement('div');
+      markDiv.className = 'slot-mark';
+      markDiv.innerText = '▶';
+      slotDiv.appendChild(markDiv);
+    }
+
+    wrapper.appendChild(slotDiv);
+
+    // サブスロットは Slot + Slot_display_order に基づき付随 (SlotPhrase依存を緩和)
+    const subslots = selectedSlots.filter(s =>
+      s.Slot === item.Slot &&
+      s.SubslotID &&
+      s.Slot_display_order === item.Slot_display_order
+    );
+    subslots.sort((a, b) => a.display_order - b.display_order);
+    console.log(`📝 Subslots for ${item.Slot}:`, subslots);
+
+    subslots.forEach(sub => {
+      console.log(`📝 Rendering subSlot: ${sub.SubslotID}, SubslotElement: ${sub.SubslotElement}`);
+
+      const subDiv = document.createElement('div');
+      subDiv.className = 'subslot';
+
+      const subElDiv = document.createElement('div');
+      subElDiv.className = 'subslot-element';
+      subElDiv.innerText = sub.SubslotElement || '';
+
+      const subTextDiv = document.createElement('div');
+      subTextDiv.className = 'subslot-text';
+      subTextDiv.innerText = sub.SubslotText || '';
+
+      subDiv.appendChild(subElDiv);
+      subDiv.appendChild(subTextDiv);
+
+      slotDiv.appendChild(subDiv);
+    });
+  });
 }
+
+export { buildStructure, buildStructure as buildStructureFromJson };
