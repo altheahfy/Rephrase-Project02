@@ -9,7 +9,6 @@ function buildStructure(selectedSlots) {
 
   console.log('📝 buildStructure received selectedSlots:', selectedSlots);
 
-  // 上位スロットを display_order 順に厳密ソート
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
   console.log('📝 upperSlots after sort:', upperSlots);
@@ -21,7 +20,7 @@ function buildStructure(selectedSlots) {
     slotDiv.className = 'slot';
     slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-    if (item.PhraseType === 'word') {
+    if (item.PhraseType === 'word' || item.Slot === 'O1') {
       const phraseDiv = document.createElement('div');
       phraseDiv.className = 'slot-phrase';
       phraseDiv.innerText = item.SlotPhrase || '';
@@ -41,7 +40,6 @@ function buildStructure(selectedSlots) {
 
     wrapper.appendChild(slotDiv);
 
-    // サブスロットは Slot + Slot_display_order に基づき付随 (SlotPhrase依存を緩和)
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
       s.SubslotID &&
