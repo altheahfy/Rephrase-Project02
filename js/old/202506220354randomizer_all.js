@@ -56,18 +56,9 @@ export function randomizeAll(slotData) {
       targets.forEach(t => selectedSlots.push({ ...t }));
     });
   } else if (o1Entries.length > 0) {
-    // 分離構造でない場合、clause O1 優先で1件選出、なければ word O1 を1件選出
-    const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
-    if (clauseO1.length > 0) {
-      const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
-      selectedSlots.push({ ...chosen });
-    } else {
-      const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
-      if (wordO1.length > 0) {
-        const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
-        selectedSlots.push({ ...chosen });
-      }
-    }
+    // 分離構造でない場合、clause, word 問わず全候補から1件選出
+    const chosen = o1Entries[Math.floor(Math.random() * o1Entries.length)];
+    selectedSlots.push({ ...chosen });
   }
 
   window.slotSets = slotSets;
