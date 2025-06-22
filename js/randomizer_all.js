@@ -50,22 +50,24 @@ export function randomizeAll(slotData) {
   const uniqueOrders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
 
   if (uniqueOrders.length > 1) {
-    // 分離構造 O1 の場合、全 Slot_display_order の O1 を選出
     uniqueOrders.forEach(order => {
       const targets = o1Entries.filter(e => e.Slot_display_order === order);
       targets.forEach(t => selectedSlots.push({ ...t }));
     });
   } else if (o1Entries.length > 0) {
-    // 分離構造でない場合、clause O1 優先で1件選出、なければ word O1 を1件選出
     const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
     if (clauseO1.length > 0) {
       const chosen = clauseO1[Math.floor(Math.random() * clauseO1.length)];
       selectedSlots.push({ ...chosen });
+      const subslots = groupSlots.filter(e => e.例文ID === chosen.例文ID && e.Slot === chosen.Slot && e.SubslotID);
+      subslots.forEach(sub => selectedSlots.push({ ...sub }));
     } else {
       const wordO1 = o1Entries.filter(e => e.PhraseType !== "clause");
       if (wordO1.length > 0) {
         const chosen = wordO1[Math.floor(Math.random() * wordO1.length)];
         selectedSlots.push({ ...chosen });
+        const subslots = groupSlots.filter(e => e.例文ID === chosen.例文ID && e.Slot === chosen.Slot && e.SubslotID);
+        subslots.forEach(sub => selectedSlots.push({ ...sub }));
       }
     }
   }
