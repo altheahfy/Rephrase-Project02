@@ -20,7 +20,7 @@ function buildStructure(selectedSlots) {
     slotDiv.className = 'slot';
     slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-    if (item.PhraseType === 'word') {
+    if (item.PhraseType === 'word' || item.Slot === 'O1') {
       const phraseDiv = document.createElement('div');
       phraseDiv.className = 'slot-phrase';
       phraseDiv.innerText = item.SlotPhrase || '';
