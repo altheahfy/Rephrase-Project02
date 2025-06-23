@@ -74,15 +74,15 @@ export function randomizeAll(slotData) {
 
   // Ensure M1 is selected once and only once using the same logic as other slots
   const m1Entries = groupSlots.filter(e => e.Slot === "M1");
-  const m1Set = new Set();  // Track which M1 slots have been selected
+  const selectedM1Set = new Set();  // Set to track selected M1s
 
   exampleIDs.forEach(id => {
     const m1InSet = m1Entries.filter(e => e.例文ID === id);
     if (m1InSet.length > 0) {
       const chosenM1 = m1InSet[Math.floor(Math.random() * m1InSet.length)];
-      if (!m1Set.has(chosenM1.識別番号)) {  // Check if this M1 has already been selected
+      if (!selectedM1Set.has(chosenM1.識別番号)) {  // Check if this M1 has already been selected
         selectedSlots.push({ ...chosenM1 });
-        m1Set.add(chosenM1.識別番号);  // Mark this M1 as selected
+        selectedM1Set.add(chosenM1.識別番号);  // Mark this M1 as selected
         const m1Subslots = groupSlots.filter(e => e.例文ID === chosenM1.例文ID && e.Slot === chosenM1.Slot && e.SubslotID);
         m1Subslots.forEach(sub => selectedSlots.push({ ...sub }));
       }
