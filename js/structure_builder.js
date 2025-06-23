@@ -1,31 +1,30 @@
 
 function renderSlot(item) {
+  // Log the rendering of each slot
+  console.log('Rendering slot:', item);
+
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-  if (item.PhraseType === 'word') {
-    const phraseDiv = document.createElement('div');
-    phraseDiv.className = 'slot-phrase';
-    phraseDiv.innerText = item.SlotPhrase || '';
+  const phraseDiv = document.createElement('div');
+  phraseDiv.className = 'slot-phrase';
+  phraseDiv.innerText = item.SlotPhrase || '';
 
-    const textDiv = document.createElement('div');
-    textDiv.className = 'slot-text';
-    textDiv.innerText = item.SlotText || '';
+  const textDiv = document.createElement('div');
+  textDiv.className = 'slot-text';
+  textDiv.innerText = item.SlotText || '';
 
-    slotDiv.appendChild(phraseDiv);
-    slotDiv.appendChild(textDiv);
-  } else {
-    const markDiv = document.createElement('div');
-    markDiv.className = 'slot-mark';
-    markDiv.innerText = '▶';
-    slotDiv.appendChild(markDiv);
-  }
+  slotDiv.appendChild(phraseDiv);
+  slotDiv.appendChild(textDiv);
 
   return slotDiv;
 }
 
 function renderSubslot(sub) {
+  // Log the rendering of each subslot
+  console.log('Rendering subslot:', sub);
+
   const subDiv = document.createElement('div');
   subDiv.className = 'subslot';
 
@@ -53,25 +52,31 @@ function buildStructure(selectedSlots) {
   // Clear the previous content before adding new content
   wrapper.innerHTML = '';
 
-  const upperSlots = selectedSlots.filter(e => !e.SubslotID);
+  const fragment = document.createDocumentFragment();
+
+  // Only render 'word' type slots as upper slots
+  const upperSlots = selectedSlots.filter(e => !e.SubslotID && e.PhraseType === 'word');
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
     const slotDiv = renderSlot(item);
-    wrapper.appendChild(slotDiv);
+    if (slotDiv) {  // Only append if it's a valid 'word' slot
+      fragment.appendChild(slotDiv);
 
-    const subslots = selectedSlots.filter(s =>
-      s.Slot === item.Slot &&
-      s.SubslotID &&
-      s.Slot_display_order === item.Slot_display_order
-    );
-    subslots.sort((a, b) => a.display_order - b.display_order);
+      const subslots = selectedSlots.filter(s => s.Slot === item.Slot && s.SubslotID);
+      subslots.sort((a, b) => a.display_order - b.display_order);
 
-    subslots.forEach(sub => {
-      const subDiv = renderSubslot(sub);
-      slotDiv.appendChild(subDiv);
-    });
+      subslots.forEach(sub => {
+        const subDiv = renderSubslot(sub);
+        if (subDiv) {  // Only append valid subslots
+          slotDiv.appendChild(subDiv);
+        }
+      });
+    }
   });
+
+  // Append the new content
+  wrapper.appendChild(fragment);
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
