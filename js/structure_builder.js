@@ -50,14 +50,15 @@ function buildStructure(selectedSlots) {
     return;
   }
 
-  const fragment = document.createDocumentFragment();
+  // Clear the previous content before adding new content
+  wrapper.innerHTML = '';
 
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
     const slotDiv = renderSlot(item);
-    fragment.appendChild(slotDiv);
+    wrapper.appendChild(slotDiv);
 
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
@@ -71,8 +72,6 @@ function buildStructure(selectedSlots) {
       slotDiv.appendChild(subDiv);
     });
   });
-
-  wrapper.appendChild(fragment);
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
