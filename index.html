@@ -879,7 +879,7 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
-      validateSlots(data);
+      validateSlotsModified(data);
       buildStructure(data);
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
@@ -897,11 +897,11 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   }
   const data = randomizeAll(loadedJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
-  validateSlots(data);
+  validateSlotsModified(data);
   buildStructure(data);
 });
 
-function validateSlots(data) {
+function validateSlotsModified(data) {
   const requiredSlots = ["M1", "S", "V"];
   const presentSlots = data.map(d => d.Slot);
   requiredSlots.forEach(slot => {
