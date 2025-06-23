@@ -1,5 +1,6 @@
 
 function renderSlot(item) {
+  console.log("renderSlot item:", item); // Add log to check the item data
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
@@ -28,6 +29,7 @@ function renderSlot(item) {
 }
 
 function renderSubslot(sub) {
+  console.log("renderSubslot sub:", sub); // Add log to check the sub data
   const subDiv = document.createElement('div');
   subDiv.className = 'subslot';
 
