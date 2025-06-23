@@ -72,15 +72,6 @@ export function randomizeAll(slotData) {
     }
   }
 
-  // Ensure M1 is always selected
-  const m1Entries = groupSlots.filter(e => e.Slot === "M1");
-  if (m1Entries.length > 0) {
-    const chosenM1 = m1Entries[Math.floor(Math.random() * m1Entries.length)];
-    selectedSlots.push({ ...chosenM1 });
-    const m1Subslots = groupSlots.filter(e => e.例文ID === chosenM1.例文ID && e.Slot === chosenM1.Slot && e.SubslotID);
-    m1Subslots.forEach(sub => selectedSlots.push({ ...sub }));
-  }
-
   window.slotSets = slotSets;
   window.slotTypes = slotTypes;
   window.lastSelectedSlots = selectedSlots;
