@@ -1,26 +1,34 @@
 
-function renderSlot(item) {
+function validateData(selectedSlots) {
+  selectedSlots.forEach(item => {
+    if (!item.Slot || !item.SlotPhrase || !item.SlotText) {
+      console.warn(`Missing required data for Slot: ${item.Slot}`);
+    }
+  });
+}
+
+function renderSlot(item, options = {}) {
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-  if (item.PhraseType === 'word') {
-    const phraseDiv = document.createElement('div');
-    phraseDiv.className = 'slot-phrase';
-    phraseDiv.innerText = item.SlotPhrase || '';
-
-    const textDiv = document.createElement('div');
-    textDiv.className = 'slot-text';
-    textDiv.innerText = item.SlotText || '';
-
-    slotDiv.appendChild(phraseDiv);
-    slotDiv.appendChild(textDiv);
-  } else {
-    const markDiv = document.createElement('div');
-    markDiv.className = 'slot-mark';
-    markDiv.innerText = '▶';
-    slotDiv.appendChild(markDiv);
+  if (options.className) {
+    slotDiv.classList.add(options.className);  // Optional class addition
   }
+
+  const phraseDiv = document.createElement('div');
+  phraseDiv.className = 'slot-phrase';
+  phraseDiv.innerText = item.SlotPhrase || '';
+
+  if (options.textColor) {
+    phraseDiv.style.color = options.textColor;  // Optional text color change
+  }
+
+  slotDiv.appendChild(phraseDiv);
+  const textDiv = document.createElement('div');
+  textDiv.className = 'slot-text';
+  textDiv.innerText = item.SlotText || '';
+  slotDiv.appendChild(textDiv);
 
   return slotDiv;
 }
@@ -43,6 +51,15 @@ function renderSubslot(sub) {
   return subDiv;
 }
 
+function safeRender(callback) {
+  try {
+    callback();
+  } catch (error) {
+    console.error('Rendering error:', error);
+    alert('表示中にエラーが発生しました。コンソールを確認してください。');
+  }
+}
+
 function buildStructure(selectedSlots) {
   const wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
@@ -50,15 +67,20 @@ function buildStructure(selectedSlots) {
     return;
   }
 
-  // Clear the previous content before adding new content
+  // Clear previous content
   wrapper.innerHTML = '';
+
+  // Validate the data
+  validateData(selectedSlots);
+
+  const fragment = document.createDocumentFragment();
 
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
     const slotDiv = renderSlot(item);
-    wrapper.appendChild(slotDiv);
+    fragment.appendChild(slotDiv);
 
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
@@ -72,6 +94,9 @@ function buildStructure(selectedSlots) {
       slotDiv.appendChild(subDiv);
     });
   });
+
+  // Append the new content
+  wrapper.appendChild(fragment);
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
