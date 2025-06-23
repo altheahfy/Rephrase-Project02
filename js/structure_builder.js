@@ -8,6 +8,11 @@ function validateData(selectedSlots) {
 }
 
 function renderSlot(item, options = {}) {
+  // Only render 'word' type slots as upper slots
+  if (item.PhraseType !== 'word') {
+    return null;  // Return nothing if it's not a 'word' type slot
+  }
+
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
@@ -75,24 +80,27 @@ function buildStructure(selectedSlots) {
 
   const fragment = document.createDocumentFragment();
 
-  const upperSlots = selectedSlots.filter(e => !e.SubslotID);
+  // Only filter and render 'word' type slots as upper slots
+  const upperSlots = selectedSlots.filter(e => !e.SubslotID && e.PhraseType === 'word');
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
     const slotDiv = renderSlot(item);
-    fragment.appendChild(slotDiv);
+    if (slotDiv) {  // Only append if it's a valid 'word' slot
+      fragment.appendChild(slotDiv);
 
-    const subslots = selectedSlots.filter(s =>
-      s.Slot === item.Slot &&
-      s.SubslotID &&
-      s.Slot_display_order === item.Slot_display_order
-    );
-    subslots.sort((a, b) => a.display_order - b.display_order);
+      const subslots = selectedSlots.filter(s =>
+        s.Slot === item.Slot &&
+        s.SubslotID &&
+        s.Slot_display_order === item.Slot_display_order
+      );
+      subslots.sort((a, b) => a.display_order - b.display_order);
 
-    subslots.forEach(sub => {
-      const subDiv = renderSubslot(sub);
-      slotDiv.appendChild(subDiv);
-    });
+      subslots.forEach(sub => {
+        const subDiv = renderSubslot(sub);
+        slotDiv.appendChild(subDiv);
+      });
+    }
   });
 
   // Append the new content
