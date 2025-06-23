@@ -72,14 +72,16 @@ export function randomizeAll(slotData) {
     }
   }
 
-  // Ensure M1 is selected using the same logic as other slots (randomly from each example set)
+  // Ensure M1 is selected in the same way as other slots (randomly from each example set, avoiding duplicates)
   const m1Entries = groupSlots.filter(e => e.Slot === "M1");
+  let selectedM1 = null;
+
   exampleIDs.forEach(id => {
     const m1InSet = m1Entries.filter(e => e.例文ID === id);
-    if (m1InSet.length > 0) {
-      const chosenM1 = m1InSet[Math.floor(Math.random() * m1InSet.length)];
-      selectedSlots.push({ ...chosenM1 });
-      const m1Subslots = groupSlots.filter(e => e.例文ID === chosenM1.例文ID && e.Slot === chosenM1.Slot && e.SubslotID);
+    if (m1InSet.length > 0 && !selectedM1) {
+      selectedM1 = m1InSet[Math.floor(Math.random() * m1InSet.length)];
+      selectedSlots.push({ ...selectedM1 });
+      const m1Subslots = groupSlots.filter(e => e.例文ID === selectedM1.例文ID && e.Slot === selectedM1.Slot && e.SubslotID);
       m1Subslots.forEach(sub => selectedSlots.push({ ...sub }));
     }
   });
