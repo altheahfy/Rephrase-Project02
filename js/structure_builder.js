@@ -4,6 +4,7 @@ function renderSlot(item) {
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
 
+  // Only add word-type Slot data
   if (item.PhraseType === 'word') {
     const phraseDiv = document.createElement('div');
     phraseDiv.className = 'slot-phrase';
@@ -16,6 +17,7 @@ function renderSlot(item) {
     slotDiv.appendChild(phraseDiv);
     slotDiv.appendChild(textDiv);
   } else {
+    // For other types (e.g. clause), show a placeholder or mark
     const markDiv = document.createElement('div');
     markDiv.className = 'slot-mark';
     markDiv.innerText = '▶';
