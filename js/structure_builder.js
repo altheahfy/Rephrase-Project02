@@ -20,11 +20,6 @@ function buildStructure(selectedSlots) {
     slotDiv.className = 'slot';
     slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-    // O1に対して流し込み処理を追加
-    if (item.Slot === 'O1') {
-      flowIntoO1StaticSlot(selectedSlots);
-    }
-
     if (item.PhraseType === 'word') {
       const phraseDiv = document.createElement('div');
       phraseDiv.className = 'slot-phrase';
