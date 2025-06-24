@@ -830,18 +830,7 @@
   </div>
   <script src="./js/test_controller.js" type="module">
   </script>
-  <script>
-   function updateSubslotLabel(slotId) {
-  const ids = ["o1", "c", "m1", "s"];
-  ids.forEach(id => {
-    const container = document.getElementById(`slot-${id}-sub`);
-    if (container) {
-      const label = container.querySelector(".subslot-label");
-      if (label) label.style.display = (id === slotId) ? "block" : "none";
-    }
-  });
-}
-  </script>
+  
   <script src="js/renderer_core.js" type="module">
   </script>
 <script src="js/structure_builder.js" type="module"></script>
@@ -856,74 +845,11 @@
 -->
 
 
-<script>
-const testData = [
-    {
-        "Slot": "M1",
-        "SlotPhrase": "That afternoon at the crucial point in the presentation",
-        "SlotText": "あの、～の時点・地点で、～の中に、～の中で",
-        "PhraseType": "word"
-    },
-    {
-        "Slot": "S",
-        "SlotPhrase": "the manager who had recently taken charge of the project",
-        "SlotText": "最近",
-        "PhraseType": "clause"
-    },
-    {
-        "Slot": "Aux",
-        "SlotPhrase": "had to",
-        "SlotText": "～しなければならなかった",
-        "PhraseType": "word"
-    },
-    {
-        "Slot": "V",
-        "SlotPhrase": "make",
-        "SlotText": "",
-        "PhraseType": "word"
-    }
-];
 
-// Inserting the test data into the corresponding slots in the HTML
-testData.forEach(data => {
-    const slotElement = document.getElementById('slot-' + data.Slot.toLowerCase());
-    if (slotElement) {
-        // Insert SlotPhrase and SlotText into the slot's text container
-        const slotTextElement = slotElement.querySelector('.slot-text');
-        if (slotTextElement) {
-            slotTextElement.textContent = data.SlotPhrase + " " + data.SlotText;
-        }
-    }
-});
-</script>
 
-<script>
-window.onload = function() {
-    const testData = [
-        { Slot: "M1", SlotPhrase: "That afternoon at the crucial point in the presentation", SlotText: "あの、～の時点・地点で、～の中に、～の中で", PhraseType: "word" },
-        { Slot: "S", SlotPhrase: "the manager who had recently taken charge of the project", SlotText: "最近", PhraseType: "clause" },
-        { Slot: "Aux", SlotPhrase: "had to", SlotText: "～しなければならなかった", PhraseType: "word" },
-        { Slot: "V", SlotPhrase: "make", SlotText: "", PhraseType: "word" }
-    ];
 
-    testData.forEach(data => {
-        const slotId = 'slot-' + data.Slot.toLowerCase();
-        const slotElement = document.getElementById(slotId);
-        console.log(`探している: ${slotId}`, slotElement);
-        if (slotElement) {
-            const slotTextElement = slotElement.querySelector('.slot-text');
-            if (slotTextElement) {
-                slotTextElement.textContent = data.SlotPhrase + " " + data.SlotText;
-            } else {
-                console.warn(`slot-text が見つからない: ${slotId}`);
-            }
-        } else {
-            console.warn(`${slotId} が見つからない`);
-        }
-    });
-};
-</script>
 
+<script src="js/insert_test_data.js"></script>
 </body>
 </html>
 
