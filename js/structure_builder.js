@@ -52,7 +52,6 @@ function buildStructure(selectedSlots) {
     return;
   }
 
-  // 動的描画専用エリアを確保
   let dynamicArea = document.getElementById('dynamic-slot-area');
   if (!dynamicArea) {
     dynamicArea = document.createElement('div');
@@ -60,7 +59,6 @@ function buildStructure(selectedSlots) {
     wrapper.appendChild(dynamicArea);
   }
 
-  // 前回の動的内容を削除
   dynamicArea.innerHTML = '';
 
   console.log("buildStructure called with selectedSlots:", selectedSlots);
@@ -85,6 +83,18 @@ function buildStructure(selectedSlots) {
       const subDiv = renderSubslot(sub);
       slotDiv.appendChild(subDiv);
     });
+
+    // M1 スロット静的エリアへの流し込み
+    if (item.Slot === "M1") {
+      const m1Container = document.getElementById("slot-m1");
+      if (m1Container) {
+        const phraseDiv = m1Container.querySelector(".slot-phrase");
+        if (phraseDiv) phraseDiv.innerText = item.SlotPhrase || '';
+
+        const textDiv = m1Container.querySelector(".slot-text");
+        if (textDiv) textDiv.innerText = item.SlotText || '';
+      }
+    }
   });
 }
 
