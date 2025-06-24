@@ -67,9 +67,25 @@ function buildStructure(selectedSlots) {
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
-    console.log(`Adding upper slot: ${item.Slot} (display_order: ${item.Slot_display_order})`);
-    const slotDiv = renderSlot(item);
-    dynamicArea.appendChild(slotDiv);
+    console.log(`Processing upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
+
+    if (item.PhraseType === 'word') {
+      const slotDiv = renderSlot(item);
+      dynamicArea.appendChild(slotDiv);
+
+      if (item.Slot === "M1") {
+        const m1Container = document.getElementById("slot-m1");
+        if (m1Container) {
+          const phraseDiv = m1Container.querySelector(".slot-phrase");
+          if (phraseDiv) phraseDiv.innerText = item.SlotPhrase || '';
+
+          const textDiv = m1Container.querySelector(".slot-text");
+          if (textDiv) textDiv.innerText = item.SlotText || '';
+        }
+      }
+    } else {
+      console.log(`Skipped upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
+    }
 
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
@@ -81,20 +97,8 @@ function buildStructure(selectedSlots) {
     subslots.forEach(sub => {
       console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
       const subDiv = renderSubslot(sub);
-      slotDiv.appendChild(subDiv);
+      dynamicArea.appendChild(subDiv);
     });
-
-    // M1 スロット静的エリアへの流し込み
-    if (item.Slot === "M1") {
-      const m1Container = document.getElementById("slot-m1");
-      if (m1Container) {
-        const phraseDiv = m1Container.querySelector(".slot-phrase");
-        if (phraseDiv) phraseDiv.innerText = item.SlotPhrase || '';
-
-        const textDiv = m1Container.querySelector(".slot-text");
-        if (textDiv) textDiv.innerText = item.SlotText || '';
-      }
-    }
   });
 }
 
