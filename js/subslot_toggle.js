@@ -9,17 +9,17 @@ function toggleExclusiveSubslot(slotId) {
     return;
   }
 
-  const isOpen = target.style.display !== "none";
+  const isOpen = getComputedStyle(target).display !== "none";
 
   // 全 subslot を閉じる
   subslotIds.forEach(id => {
     const el = document.getElementById(`slot-${id}-sub`);
-    if (el) el.style.display = "none";
+    if (el) el.style.setProperty("display", "none", "important");
   });
 
   // 対象のみ開く
   if (!isOpen) {
-    target.style.display = "flex";
+    target.style.setProperty("display", "flex", "important");
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
     console.log(`✅ slot-${slotId}-sub opened`);
@@ -28,7 +28,6 @@ function toggleExclusiveSubslot(slotId) {
   }
 }
 
-// DOM 構築後にイベント登録（詳細ログ付き）
 document.addEventListener("DOMContentLoaded", () => {
   const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
   console.log(`🔍 Found ${buttons.length} toggle candidate buttons`);
