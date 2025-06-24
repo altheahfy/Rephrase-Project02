@@ -17,15 +17,13 @@ function toggleExclusiveSubslot(slotId) {
     target.style.display = "flex";
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
-    // window.injectAllSubslotTexts(`slot-${slotId}-sub`); // 不要な呼び出し削除
     console.log("✅ 強制表示style適用: ", target.id);
     console.log("🔍 target.style.display set to:", target.style.display);
     const forceRedraw = target.offsetHeight; // force reflow
     console.log("📐 target.offsetHeight (for reflow):", forceRedraw);
   }
 
-  // ラベル更新呼び出し
-  updateSubslotLabel(slotId);
+  // updateSubslotLabel(slotId); 呼び出し削除
 }
 
 // ↓ DOM 構築後にイベント登録
