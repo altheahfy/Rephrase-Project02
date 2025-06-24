@@ -14,7 +14,10 @@ function toggleExclusiveSubslot(slotId) {
   // 全 subslot を閉じる
   subslotIds.forEach(id => {
     const el = document.getElementById(`slot-${id}-sub`);
-    if (el) el.style.setProperty("display", "none", "important");
+    if (el) {
+      el.style.setProperty("display", "none", "important");
+      console.log(`❌ slot-${id}-sub display set to none`);
+    }
   });
 
   // 対象のみ開く
@@ -22,7 +25,7 @@ function toggleExclusiveSubslot(slotId) {
     target.style.setProperty("display", "flex", "important");
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
-    console.log(`✅ slot-${slotId}-sub opened`);
+    console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
   } else {
     console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
   }
