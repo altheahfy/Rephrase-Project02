@@ -1,10 +1,15 @@
 
 function toggleExclusiveSubslot(slotId) {
-  if (slotId === "s") console.log("✅ slot-s-sub toggle triggered");
+  console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
 
   const subslotIds = ["o1", "c", "o2", "m1", "s", "m2", "c2", "m3"];
   const target = document.getElementById(`slot-${slotId}-sub`);
-  const isOpen = target && target.style.display !== "none";
+  if (!target) {
+    console.warn(`⚠ toggleExclusiveSubslot: target slot-${slotId}-sub not found`);
+    return;
+  }
+
+  const isOpen = target.style.display !== "none";
 
   // 全 subslot を閉じる
   subslotIds.forEach(id => {
@@ -12,26 +17,31 @@ function toggleExclusiveSubslot(slotId) {
     if (el) el.style.display = "none";
   });
 
-  // 必要なら開く
-  if (!isOpen && target) {
+  // 対象のみ開く
+  if (!isOpen) {
     target.style.display = "flex";
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
-    console.log("✅ 強制表示style適用: ", target.id);
-    console.log("🔍 target.style.display set to:", target.style.display);
-    const forceRedraw = target.offsetHeight; // force reflow
-    console.log("📐 target.offsetHeight (for reflow):", forceRedraw);
+    console.log(`✅ slot-${slotId}-sub opened`);
+  } else {
+    console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
   }
-
-  // updateSubslotLabel(slotId); 呼び出し削除
 }
 
-// ↓ DOM 構築後にイベント登録
+// DOM 構築後にイベント登録（既存ボタンに対応）
 document.addEventListener("DOMContentLoaded", () => {
-  const buttons = document.querySelectorAll("[data-subslot-toggle]");
+  const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
   buttons.forEach(button => {
-    const slotId = button.getAttribute("data-subslot-toggle");
-    button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
+    let slotId = button.getAttribute("data-subslot-toggle");
+    if (!slotId) {
+      // fallback: onclick で直接呼ばれるボタンは解析
+      const onclickAttr = button.getAttribute("onclick");
+      const match = onclickAttr && onclickAttr.match(/toggleExclusiveSubslot\(['"](.+?)['"]\)/);
+      if (match) slotId = match[1];
+    }
+    if (slotId) {
+      button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
+    }
   });
 });
 
