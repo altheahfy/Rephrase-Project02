@@ -23,6 +23,8 @@ function toggleExclusiveSubslot(slotId) {
   // 対象のみ開く
   if (!isOpen) {
     target.style.setProperty("display", "flex", "important");
+    target.style.setProperty("visibility", "visible", "important");
+    target.style.setProperty("min-height", "100px", "important");
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
