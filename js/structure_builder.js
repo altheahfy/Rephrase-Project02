@@ -1,11 +1,10 @@
 
 function renderSlot(item) {
-  console.log("renderSlot item:", item); // Add log to check the item data
+  console.log("renderSlot item:", item); 
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
 
-  // Only add word-type Slot data
   if (item.PhraseType === 'word') {
     const phraseDiv = document.createElement('div');
     phraseDiv.className = 'slot-phrase';
@@ -18,7 +17,6 @@ function renderSlot(item) {
     slotDiv.appendChild(phraseDiv);
     slotDiv.appendChild(textDiv);
   } else {
-    // For other types (e.g. clause), show a placeholder or mark
     const markDiv = document.createElement('div');
     markDiv.className = 'slot-mark';
     markDiv.innerText = '▶';
@@ -29,7 +27,7 @@ function renderSlot(item) {
 }
 
 function renderSubslot(sub) {
-  console.log("renderSubslot sub:", sub); // Add log to check the sub data
+  console.log("renderSubslot sub:", sub);
   const subDiv = document.createElement('div');
   subDiv.className = 'subslot';
 
@@ -54,13 +52,13 @@ function buildStructure(selectedSlots) {
     return;
   }
 
-  // Clear the previous content before adding new content
-  wrapper.innerHTML = '';
+  console.log("buildStructure called with selectedSlots:", selectedSlots);
 
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
+    console.log(`Adding upper slot: ${item.Slot} (display_order: ${item.Slot_display_order})`);
     const slotDiv = renderSlot(item);
     wrapper.appendChild(slotDiv);
 
@@ -72,6 +70,7 @@ function buildStructure(selectedSlots) {
     subslots.sort((a, b) => a.display_order - b.display_order);
 
     subslots.forEach(sub => {
+      console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
       const subDiv = renderSubslot(sub);
       slotDiv.appendChild(subDiv);
     });
