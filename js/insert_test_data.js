@@ -98,7 +98,15 @@ window.onload = function() {
         if (slotElement) {
             const slotTextElement = slotElement.querySelector('.slot-text');
             if (slotTextElement) {
-                slotTextElement.textContent = data.SlotPhrase + " " + data.SlotText;
+                
+                const phraseElement = slotElement.querySelector('.slot-phrase');
+                if (phraseElement) {
+                    phraseElement.textContent = data.SlotPhrase;
+                    console.log(`✅ phrase書き込み成功: ${data.Slot}`);
+                }
+                slotTextElement.textContent = data.SlotText;
+                console.log(`✅ text書き込み成功: ${data.Slot}`);
+    
                 console.log(`✅ 書き込み成功: ${data.Slot} → ${slotTextElement.textContent}`);
             } else {
                 console.warn(`⚠ slot-text が見つからない: ${data.Slot}`);
