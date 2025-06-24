@@ -57,3 +57,26 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.toggleExclusiveSubslot = toggleExclusiveSubslot;
+
+
+function bindSubslotToggleButtons() {
+  const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
+  console.log(`🔍 Rebinding: Found ${buttons.length} toggle candidate buttons`);
+  buttons.forEach(button => {
+    let slotId = button.getAttribute("data-subslot-toggle");
+    if (!slotId) {
+      const onclickAttr = button.getAttribute("onclick");
+      const match = onclickAttr && onclickAttr.match(/toggleExclusiveSubslot\(['"](.+?)['"]\)/);
+      if (match) slotId = match[1];
+    }
+
+    if (slotId) {
+      button.onclick = null; // 既存の onclick をクリア
+      button.addEventListener("click", () => {
+        console.log(`🚀 Event listener triggered for slotId: ${slotId}`);
+        toggleExclusiveSubslot(slotId);
+      });
+      console.log(`✅ Event listener rebound for slotId: ${slotId}`);
+    }
+  });
+}

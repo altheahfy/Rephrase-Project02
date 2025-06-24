@@ -21,9 +21,11 @@ function renderSlot(item) {
     markDiv.className = 'slot-mark';
     markDiv.innerText = '▶';
     slotDiv.appendChild(markDiv);
-  }
+    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
 
   return slotDiv;
+  if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
 }
 
 function renderSubslot(sub) {
@@ -43,6 +45,7 @@ function renderSubslot(sub) {
   subDiv.appendChild(subTextDiv);
 
   return subDiv;
+  if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
 }
 
 function buildStructure(selectedSlots) {
@@ -50,14 +53,16 @@ function buildStructure(selectedSlots) {
   if (!wrapper) {
     console.error('slot-wrapper not found, skipping structure generation');
     return;
-  }
+    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
 
   let dynamicArea = document.getElementById('dynamic-slot-area');
   if (!dynamicArea) {
     dynamicArea = document.createElement('div');
     dynamicArea.id = 'dynamic-slot-area';
     wrapper.appendChild(dynamicArea);
-  }
+    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
 
   dynamicArea.innerHTML = '';
 
@@ -90,11 +95,14 @@ function buildStructure(selectedSlots) {
 
           const textDiv = m1Container.querySelector(".slot-text");
           if (textDiv) textDiv.innerText = item.SlotText || '';
-        }
-      }
+          if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
+        if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
     } else {
       console.log(`Skipped upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
-    }
+      if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
 
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
@@ -109,6 +117,7 @@ function buildStructure(selectedSlots) {
       dynamicArea.appendChild(subDiv);
     });
   });
+  if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
