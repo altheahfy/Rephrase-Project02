@@ -28,19 +28,28 @@ function toggleExclusiveSubslot(slotId) {
   }
 }
 
-// DOM 構築後にイベント登録（既存ボタンに対応）
+// DOM 構築後にイベント登録（詳細ログ付き）
 document.addEventListener("DOMContentLoaded", () => {
   const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
+  console.log(`🔍 Found ${buttons.length} toggle candidate buttons`);
   buttons.forEach(button => {
     let slotId = button.getAttribute("data-subslot-toggle");
     if (!slotId) {
-      // fallback: onclick で直接呼ばれるボタンは解析
       const onclickAttr = button.getAttribute("onclick");
       const match = onclickAttr && onclickAttr.match(/toggleExclusiveSubslot\(['"](.+?)['"]\)/);
       if (match) slotId = match[1];
     }
+    console.log(`📝 Button: ${button.outerHTML}`);
+    console.log(`➡ slotId resolved: ${slotId}`);
+
     if (slotId) {
-      button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
+      button.addEventListener("click", () => {
+        console.log(`🚀 Event listener triggered for slotId: ${slotId}`);
+        toggleExclusiveSubslot(slotId);
+      });
+      console.log(`✅ Event listener attached for slotId: ${slotId}`);
+    } else {
+      console.warn(`⚠ No slotId resolved for button`);
     }
   });
 });
