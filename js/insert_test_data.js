@@ -1,6 +1,5 @@
 
-// const testData is already declared earlier
-const testData = [
+let testData = [
     {
         "Slot": "M1",
         "SlotPhrase": "That afternoon at the crucial point in the presentation",
