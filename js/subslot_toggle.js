@@ -17,7 +17,7 @@ function toggleExclusiveSubslot(slotId) {
     target.style.display = "flex";
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
-    window.injectAllSubslotTexts(`slot-${slotId}-sub`);  // inject added
+    // window.injectAllSubslotTexts(`slot-${slotId}-sub`); // 不要な呼び出し削除
     console.log("✅ 強制表示style適用: ", target.id);
     console.log("🔍 target.style.display set to:", target.style.display);
     const forceRedraw = target.offsetHeight; // force reflow
@@ -36,6 +36,5 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => toggleExclusiveSubslot(slotId));
   });
 });
-
 
 window.toggleExclusiveSubslot = toggleExclusiveSubslot;
