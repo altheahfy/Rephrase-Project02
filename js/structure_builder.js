@@ -52,6 +52,9 @@ function buildStructure(selectedSlots) {
     return;
   }
 
+  // 🔑 既存の例文のみをクリア（静的DOMはそのまま）
+  wrapper.innerHTML = '';
+
   console.log("buildStructure called with selectedSlots:", selectedSlots);
 
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
