@@ -46,14 +46,22 @@ function renderSubslot(sub) {
 }
 
 function buildStructure(selectedSlots) {
-  const wrapper = document.querySelector('.slot-wrapper');
+  let wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
     console.error('slot-wrapper not found, skipping structure generation');
     return;
   }
 
-  // 🔑 既存の例文のみをクリア（静的DOMはそのまま）
-  wrapper.innerHTML = '';
+  // 動的描画専用エリアを確保
+  let dynamicArea = document.getElementById('dynamic-slot-area');
+  if (!dynamicArea) {
+    dynamicArea = document.createElement('div');
+    dynamicArea.id = 'dynamic-slot-area';
+    wrapper.appendChild(dynamicArea);
+  }
+
+  // 前回の動的内容を削除
+  dynamicArea.innerHTML = '';
 
   console.log("buildStructure called with selectedSlots:", selectedSlots);
 
@@ -63,7 +71,7 @@ function buildStructure(selectedSlots) {
   upperSlots.forEach(item => {
     console.log(`Adding upper slot: ${item.Slot} (display_order: ${item.Slot_display_order})`);
     const slotDiv = renderSlot(item);
-    wrapper.appendChild(slotDiv);
+    dynamicArea.appendChild(slotDiv);
 
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
