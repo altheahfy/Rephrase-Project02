@@ -115,6 +115,18 @@ function buildStructure(selectedSlots) {
       console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
       const subDiv = renderSubslot(sub);
       dynamicArea.appendChild(subDiv);
+    // 差分追加: 安全なM1サブスロット書き込み
+    if (sub.Slot === "M1") {
+      const target = document.getElementById(`slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      if (target) {
+        const phrase = target.querySelector(".slot-phrase");
+        if (phrase) { phrase.textContent = sub.SubslotElement || ""; console.log(`✅ phrase書き込み: ${target.id}`); }
+        const text = target.querySelector(".slot-text");
+        if (text) { text.textContent = sub.SubslotText || ""; console.log(`✅ text書き込み: ${target.id}`); }
+      } else {
+        console.warn(`⚠ サブスロットが見つからない: slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      }
+    }
     });
   });
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
