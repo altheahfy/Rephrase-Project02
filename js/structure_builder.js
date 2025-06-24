@@ -32,6 +32,13 @@ function renderSubslot(sub) {
   console.log("renderSubslot sub:", sub);
   const subDiv = document.createElement('div');
   subDiv.className = 'subslot';
+  if (sub.SubslotID) {
+    subDiv.id = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
+  }
+  if (typeof sub.display_order !== 'undefined') {
+    subDiv.dataset.displayOrder = sub.display_order;
+  }
+
 
   const subElDiv = document.createElement('div');
   subElDiv.className = 'subslot-element';
