@@ -115,6 +115,19 @@ function buildStructure(selectedSlots) {
       console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
       const subDiv = renderSubslot(sub);
       dynamicArea.appendChild(subDiv);
+    // 差分追加: M1 のサブスロットへの書き込み
+    if (sub.Slot === "M1") {
+      const target = document.getElementById(`slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      if (target) {
+        const phrase = target.querySelector(".slot-phrase");
+        if (phrase) phrase.textContent = sub.SubslotElement || "";
+        const text = target.querySelector(".slot-text");
+        if (text) text.textContent = sub.SubslotText || "";
+        console.log(`✅ M1 サブスロット書き込み: slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      } else {
+        console.warn(`⚠ M1 サブスロットが見つからない: slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      }
+    }
     });
   });
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
