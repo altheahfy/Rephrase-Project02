@@ -86,19 +86,6 @@ function buildStructure(selectedSlots) {
     if (item.PhraseType === 'word') {
       const slotDiv = renderSlot(item);
       dynamicArea.appendChild(slotDiv);
-
-      if (item.Slot === "M1") {
-        const m1Container = document.getElementById("slot-m1");
-        if (m1Container) {
-          const phraseDiv = m1Container.querySelector(".slot-phrase");
-          if (phraseDiv) phraseDiv.innerText = item.SlotPhrase || '';
-
-          const textDiv = m1Container.querySelector(".slot-text");
-          if (textDiv) textDiv.innerText = item.SlotText || '';
-          if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
-}
-        if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
-}
     } else {
       console.log(`Skipped upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
       if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
