@@ -63,6 +63,15 @@ function buildStructure(selectedSlots) {
 
   console.log("buildStructure called with selectedSlots:", selectedSlots);
 
+  // 上位スロットのリセット
+  const slotContainers = wrapper.querySelectorAll('.slot-container');
+  slotContainers.forEach(container => {
+    const phraseDiv = container.querySelector('.slot-phrase');
+    if (phraseDiv) phraseDiv.innerText = '';
+    const textDiv = container.querySelector('.slot-text');
+    if (textDiv) textDiv.innerText = '';
+  });
+
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
