@@ -177,4 +177,5 @@ function buildStructure(selectedSlots) {
 
 export { buildStructure, buildStructure as buildStructureFromJson };
 
+window.loadedJsonData = selectedSlots;
 window.buildStructure = buildStructure;
