@@ -94,7 +94,7 @@ allSubslots.forEach(slot => {
       // 上位スロットへの書き込み
       
     console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
-    const container = document.getElementById(normalizeSlotId(item.Slot));
+    const container = document.getElementById("slot-" + item.Slot.toLowerCase());
       if (container) {
       console.log("container found for ID:", container.id);
         const phraseDiv = container.querySelector(".slot-phrase");
