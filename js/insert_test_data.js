@@ -47,10 +47,15 @@ function syncDynamicToStatic() {
   data.forEach(item => {
     if (item.SubslotID === "" && (item.PhraseType === "word" || item.PhraseType === "")) {
       // 上位スロットへの書き込み
-      const container = document.getElementById(normalizeSlotId(item.Slot));
+      
+    console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
+    const container = document.getElementById(normalizeSlotId(item.Slot));
       if (container) {
+      console.log("container found for ID:", container.id);
         const phraseDiv = container.querySelector(".slot-phrase");
+      console.log("phraseDiv:", phraseDiv);
         const textDiv = container.querySelector(".slot-text");
+      console.log("textDiv:", textDiv);
         if (phraseDiv) {
           phraseDiv.textContent = item.SlotPhrase || "";
           console.log(`✅ phrase書き込み成功: ${item.Slot} (parent)`);
@@ -63,13 +68,17 @@ function syncDynamicToStatic() {
       return;
     }
     // 元のサブスロット書き込み処理（以下は既存処理をそのまま残す）
+    console.log("サブスロット検索ID(normalized):", normalizeSlotId(item.Slot));
     const slotElement = document.getElementById(normalizeSlotId(item.Slot));
     if (!slotElement) {
+      console.log("サブスロット要素が見つかりません:", normalizeSlotId(item.Slot));
       console.warn(`⚠ スロットが見つかりません: ${item.Slot}`);
       return;
     }
     const phraseElement = slotElement.querySelector(".slot-phrase");
+    console.log("サブスロット phraseElement:", phraseElement);
     const slotTextElement = slotElement.querySelector(".slot-text");
+    console.log("サブスロット textElement:", slotTextElement);
 
     if (phraseElement) {
       phraseElement.textContent = item.SlotPhrase;
