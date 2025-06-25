@@ -30,32 +30,34 @@ function extractDataFromDynamicArea() {
   return data;
 }
 
-
 function normalizeSlotId(slotId) {
   return slotId.replace(/-sub-sub/g, '-sub');
 }
 
-
 function syncDynamicToStatic() {
+  // ▼ 静的サブスロットのみ初期化
+  const allSubslotPhrases = document.querySelectorAll('[id^="slot-"][id*="-sub-sub-"] .slot-phrase');
+  const allSubslotTexts = document.querySelectorAll('[id^="slot-"][id*="-sub-sub-"] .slot-text');
+  allSubslotPhrases.forEach(el => el.textContent = "");
+  allSubslotTexts.forEach(el => el.textContent = "");
+
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
     return;
   }
 
-  
   data.forEach(item => {
     if (item.SubslotID === "" && item.PhraseType === "word") {
       // 上位スロットへの書き込み
-      
-    console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
-    const container = document.getElementById(normalizeSlotId(item.Slot));
+      console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
+      const container = document.getElementById(normalizeSlotId(item.Slot));
       if (container) {
-      console.log("container found for ID:", container.id);
+        console.log("container found for ID:", container.id);
         const phraseDiv = container.querySelector(".slot-phrase");
-      console.log("phraseDiv:", phraseDiv);
+        console.log("phraseDiv:", phraseDiv);
         const textDiv = container.querySelector(".slot-text");
-      console.log("textDiv:", textDiv);
+        console.log("textDiv:", textDiv);
         if (phraseDiv) {
           phraseDiv.textContent = item.SlotPhrase || "";
           console.log(`✅ phrase書き込み成功: ${item.Slot} (parent)`);
@@ -67,7 +69,8 @@ function syncDynamicToStatic() {
       }
       return;
     }
-    // 元のサブスロット書き込み処理（以下は既存処理をそのまま残す）
+
+    // サブスロット書き込み処理
     console.log("サブスロット検索ID(normalized):", normalizeSlotId(item.Slot));
     const slotElement = document.getElementById(normalizeSlotId(item.Slot));
     if (!slotElement) {
@@ -89,10 +92,9 @@ function syncDynamicToStatic() {
       console.log(`✅ text書き込み成功: ${item.Slot}`);
     }
   });
-
 }
 
-// 例：ページロード後やJSONロード後に呼ぶ
+// ページロード時に実行
 window.onload = function() {
   syncDynamicToStatic();
 };
