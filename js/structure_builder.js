@@ -99,15 +99,14 @@ function buildStructure(selectedSlots) {
   });
 
   
+  // 🔍 分離疑問詞構文判定と DisplayAtTop 付加（clause 限定）
   selectedSlots.forEach(entry => {
-    if (
-      !entry.SubslotID &&
-      slotOrderMap[entry.Slot] &&
-      slotOrderMap[entry.Slot].size >= 2 &&
-      entry.Slot_display_order === Math.min(...slotOrderMap[entry.Slot]) &&
-      entry.PhraseType === "clause" &&
-      /^what|who|where|when|why|how/i.test(entry.SlotPhrase || entry.Text || "")
-    ) {
+    const slotOrders = slotOrderMap[entry.Slot];
+    const isSplit = slotOrders && slotOrders.size >= 2;
+    const isFirst = isSplit && entry.Slot_display_order === Math.min(...slotOrders);
+    const isClause = entry.PhraseType === "clause";
+    const isQuestionWord = /^what|who|where|when|why|how/i.test(entry.SlotPhrase || entry.Text || "");
+    if (!entry.SubslotID && isSplit && isFirst && isClause && isQuestionWord) {
       entry.DisplayAtTop = true;
       entry.DisplayText = entry.SlotPhrase || entry.Text || "";
       console.log("🔼 DisplayAtTop（clause）付加:", entry.DisplayText);
