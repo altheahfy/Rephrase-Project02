@@ -98,16 +98,22 @@ function buildStructure(selectedSlots) {
     }
   });
 
+  
   selectedSlots.forEach(entry => {
-    if (!entry.SubslotID && slotOrderMap[entry.Slot] && slotOrderMap[entry.Slot].size >= 2) {
-      const minOrder = Math.min(...slotOrderMap[entry.Slot]);
-      if (entry.Slot_display_order === minOrder && entry.Role === "c1") {
-        entry.DisplayAtTop = true;
-        entry.DisplayText = entry.Text;
-        console.log("🔼 DisplayAtTop 付加:", entry.Text);
-      }
+    if (
+      !entry.SubslotID &&
+      slotOrderMap[entry.Slot] &&
+      slotOrderMap[entry.Slot].size >= 2 &&
+      entry.Slot_display_order === Math.min(...slotOrderMap[entry.Slot]) &&
+      entry.PhraseType === "clause" &&
+      /^what|who|where|when|why|how/i.test(entry.SlotPhrase || entry.Text || "")
+    ) {
+      entry.DisplayAtTop = true;
+      entry.DisplayText = entry.SlotPhrase || entry.Text || "";
+      console.log("🔼 DisplayAtTop（clause）付加:", entry.DisplayText);
     }
   });
+);
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
