@@ -2752,15 +2752,15 @@
     "SlotText": "たとえ～でも",
     "PhraseType": "",
     "SubslotID": "sub-s",
-    "SubslotElement": "he",
+    "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 5,
     "display_order": 2
   },
   {
-    "構文ID": "",
-    "V_group_key": "",
-    "例文ID": "",
+    "構文ID": "5001",
+    "V_group_key": "make",
+    "例文ID": "ex008",
     "Slot": "M2",
     "SlotPhrase": "even though she was facing severe fatigue",
     "SlotText": "たとえ～でも",
@@ -3178,9 +3178,9 @@
     "display_order": 2
   },
   {
-    "構文ID": "",
-    "V_group_key": "",
-    "例文ID": "",
+    "構文ID": "5001",
+    "V_group_key": "know",
+    "例文ID": "ex011",
     "Slot": "M3",
     "SlotPhrase": "because she was determined to encourage their growth",
     "SlotText": "～だから、過去形、彼らの",
