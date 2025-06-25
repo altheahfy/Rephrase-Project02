@@ -128,7 +128,14 @@ function buildStructure(selectedSlots) {
     );
     subslots.sort((a, b) => a.display_order - b.display_order);
 
-    subslots.forEach(sub => {
+    
+    // 🔽 DisplayAtTop が付加された上位スロットは動的記載エリアに出力しない
+    if (item.DisplayAtTop === true) {
+      console.log(`🚫 DisplayAtTop により ${item.Slot} の表示をスキップ`);
+      return;
+    }
+
+  subslots.forEach(sub => {
       console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
       const subDiv = renderSubslot(sub);
       dynamicArea.appendChild(subDiv);
