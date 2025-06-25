@@ -37,6 +37,15 @@ function normalizeSlotId(slotId) {
 
 
 function syncDynamicToStatic() {
+  // 🧹 slot-*-sub の中にあるサブスロット phrase/text を初期化
+  const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
+  allSubContainers.forEach(container => {
+    const phraseBlocks = container.querySelectorAll('.slot-phrase');
+    const textBlocks = container.querySelectorAll('.slot-text');
+    phraseBlocks.forEach(p => p.textContent = "");
+    textBlocks.forEach(t => t.textContent = "");
+  });
+
 // 🧹 全サブスロット初期化（静的DOM）
 const allSubslots = document.querySelectorAll('[id*="-sub-sub-"]');
 allSubslots.forEach(slot => {
