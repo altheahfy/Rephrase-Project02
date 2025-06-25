@@ -56,6 +56,7 @@ function renderSubslot(sub) {
 }
 
 function buildStructure(selectedSlots) {
+  console.log("buildStructure called with selectedSlots:", selectedSlots);
   let wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
     console.error('slot-wrapper not found, skipping structure generation');
@@ -127,3 +128,5 @@ function buildStructure(selectedSlots) {
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
+
+window.buildStructure = buildStructure;
