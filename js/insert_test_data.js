@@ -36,7 +36,7 @@ function normalizeSlotId(slotId) {
 }
 
 
-function syncDynamicToStatic() {
+function syncDynamicToStatic(data = null) {
 // 🔼 DisplayAtTop 対応（分離疑問詞表示）ここから追加
 if (window.loadedJsonData) {
   const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);
