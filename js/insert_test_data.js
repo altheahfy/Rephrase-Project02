@@ -43,7 +43,26 @@ function syncDynamicToStatic() {
     return;
   }
 
+  
   data.forEach(item => {
+    if (item.SubslotID === "" && (item.PhraseType === "word" || item.PhraseType === "")) {
+      // 上位スロットへの書き込み
+      const container = document.getElementById(normalizeSlotId(item.Slot));
+      if (container) {
+        const phraseDiv = container.querySelector(".slot-phrase");
+        const textDiv = container.querySelector(".slot-text");
+        if (phraseDiv) {
+          phraseDiv.textContent = item.SlotPhrase || "";
+          console.log(`✅ phrase書き込み成功: ${item.Slot} (parent)`);
+        }
+        if (textDiv) {
+          textDiv.textContent = item.SlotText || "";
+          console.log(`✅ text書き込み成功: ${item.Slot} (parent)`);
+        }
+      }
+      return;
+    }
+    // 元のサブスロット書き込み処理（以下は既存処理をそのまま残す）
     const slotElement = document.getElementById(normalizeSlotId(item.Slot));
     if (!slotElement) {
       console.warn(`⚠ スロットが見つかりません: ${item.Slot}`);
@@ -61,6 +80,7 @@ function syncDynamicToStatic() {
       console.log(`✅ text書き込み成功: ${item.Slot}`);
     }
   });
+
 }
 
 // 例：ページロード後やJSONロード後に呼ぶ
