@@ -1037,6 +1037,7 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
       buildStructure(data);
+    syncDynamicToStatic();
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
@@ -1055,6 +1056,7 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
   buildStructure(data);
+  syncDynamicToStatic();
 });
 
 function validateSlotsModified(data) {
