@@ -45,7 +45,7 @@ function syncDynamicToStatic() {
 
   
   data.forEach(item => {
-    if (item.SubslotID === "" && (item.PhraseType === "word" || item.PhraseType === "")) {
+    if (item.SubslotID === "" && item.PhraseType === "word") {
       // 上位スロットへの書き込み
       
     console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
