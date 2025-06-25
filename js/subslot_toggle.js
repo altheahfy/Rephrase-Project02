@@ -5,7 +5,7 @@ function toggleExclusiveSubslot(slotId) {
   setTimeout(() => { toggleExclusiveSubslot.lock = false; }, 100);
   console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
 
-  const subslotIds = ["o1", "c", "o2", "m1", "s", "m2", "c2", "m3"];
+  const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
   const target = document.getElementById(`slot-${slotId}-sub`);
   if (!target) {
     console.warn(`⚠ toggleExclusiveSubslot: target slot-${slotId}-sub not found`);
