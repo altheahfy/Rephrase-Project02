@@ -57,6 +57,18 @@ allSubslots.forEach(slot => {
 
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
+
+  // 🔼 分離疑問詞 (DisplayAtTop) 書き込み処理
+  const topDisplay = data.find(d => d.DisplayAtTop);
+  if (topDisplay && topDisplay.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplay.DisplayText;
+      console.log(`🔼 DisplayAtTop 表示: ${topDisplay.DisplayText}`);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
     return;
   }
@@ -113,16 +125,16 @@ allSubslots.forEach(slot => {
 // 例：ページロード後やJSONロード後に呼ぶ
 window.onload = function() {
   syncDynamicToStatic();
-
-  // ✅ DisplayAtTop 表示対応
-  const topDisplayItem = data.find(d => d.DisplayAtTop);
-  if (topDisplayItem && topDisplayItem.DisplayText) {
-    const topDiv = document.getElementById("display-top-question-word");
-    if (topDiv) {
-      topDiv.textContent = topDisplayItem.DisplayText;
-      console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
-    } else {
-      console.warn("⚠ display-top-question-word が見つかりません");
-    }
-  }
 };
+
+// DisplayAtTop に対応する疑問詞をページ上部に表示
+const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
+if (topDisplayItem && topDisplayItem.DisplayText) {
+  const topDiv = document.getElementById("display-top-question-word");
+  if (topDiv) {
+    topDiv.textContent = topDisplayItem.DisplayText;
+    console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+  } else {
+    console.warn("⚠ display-top-question-word が見つかりません");
+  }
+}
