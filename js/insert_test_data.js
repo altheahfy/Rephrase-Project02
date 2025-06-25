@@ -37,6 +37,21 @@ function normalizeSlotId(slotId) {
 
 
 function syncDynamicToStatic() {
+// 🔼 DisplayAtTop 対応（分離疑問詞表示）ここから追加
+if (window.loadedJsonData) {
+  const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);
+  if (topDisplayItem && topDisplayItem.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplayItem.DisplayText;
+      console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
+}
+// 🔼 DisplayAtTop 対応ここまで
+
   // 🧹 slot-*-sub の中にあるサブスロット phrase/text を初期化
   const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
   allSubContainers.forEach(container => {
