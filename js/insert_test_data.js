@@ -64,21 +64,6 @@ allSubslots.forEach(slot => {
   
   data.forEach(item => {
     if (item.SubslotID === "" && item.PhraseType === "word") {
-    const container = document.getElementById(normalizeSlotId(item.Slot));
-    if (container) {
-      const phraseDiv = container.querySelector(".slot-phrase");
-      const textDiv = container.querySelector(".slot-text");
-      if (phraseDiv) {
-        phraseDiv.textContent = item.SlotPhrase || "";
-        console.log(`✅ phrase書き込み成功: ${item.Slot} (parent)`);
-      }
-      if (textDiv) {
-        textDiv.textContent = item.SlotText || "";
-        console.log(`✅ text書き込み成功: ${item.Slot} (parent)`);
-      }
-    }
-    return;
-
       // 上位スロットへの書き込み
       
     console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
