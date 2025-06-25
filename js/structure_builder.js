@@ -86,6 +86,28 @@ function buildStructure(selectedSlots) {
   });
 
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
+
+  // 🔍 分離疑問詞判定とDisplayAtTop付加
+  const slotOrderMap = {};
+  selectedSlots.forEach(entry => {
+    if (!entry.SubslotID) {
+      const slot = entry.Slot;
+      const order = entry.Slot_display_order;
+      if (!slotOrderMap[slot]) slotOrderMap[slot] = new Set();
+      slotOrderMap[slot].add(order);
+    }
+  });
+
+  selectedSlots.forEach(entry => {
+    if (!entry.SubslotID && slotOrderMap[entry.Slot] && slotOrderMap[entry.Slot].size >= 2) {
+      const minOrder = Math.min(...slotOrderMap[entry.Slot]);
+      if (entry.Slot_display_order === minOrder && entry.Role === "c1") {
+        entry.DisplayAtTop = true;
+        entry.DisplayText = entry.Text;
+        console.log("🔼 DisplayAtTop 付加:", entry.Text);
+      }
+    }
+  });
   upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
 
   upperSlots.forEach(item => {
