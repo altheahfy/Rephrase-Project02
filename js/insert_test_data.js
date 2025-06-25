@@ -120,11 +120,10 @@ allSubslots.forEach(slot => {
       const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);
       if (
         topDisplayItem &&
-        topDisplayItem.SubslotID &&
-        item.SubslotID === topDisplayItem.SubslotID &&
-        item.Slot === topDisplayItem.Slot
+        topDisplayItem.DisplayText &&
+        item.SubslotElement === topDisplayItem.DisplayText
       ) {
-        console.log(`🚫 subslot ${item.Slot}-${item.SubslotID} は DisplayAtTop で表示済のためスキップ`);
+        console.log(`🚫 subslot "${item.SubslotElement}" は DisplayAtTop で表示済のためスキップ`);
         return;
       }
     }
