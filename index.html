@@ -1016,6 +1016,21 @@
   
   
 <script src="js/insert_test_data.js"></script>
+
+<script>
+  // syncDynamicToStatic() をDOM描画完了後に遅延実行
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      console.log("🚀 syncDynamicToStatic() 遅延呼び出し");
+      if (typeof syncDynamicToStatic === "function") {
+        syncDynamicToStatic();
+      } else {
+        console.warn("⚠ syncDynamicToStatic 関数が未定義です");
+      }
+    }, 200);
+  });
+</script>
+
 </body>
 </html>
 
