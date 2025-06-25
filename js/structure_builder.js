@@ -89,14 +89,33 @@ function buildStructure(selectedSlots) {
 
   // 🔍 分離疑問詞判定とDisplayAtTop付加
   const slotOrderMap = {};
+  
+  // 🔍 分離疑問詞構文の疑問詞表示（DisplayAtTop）を上位スロットに付与
+  const questionWords = ["what", "where", "who", "when", "why", "how"];
+  const displayTopMap = new Map();
+
   selectedSlots.forEach(entry => {
-    if (!entry.SubslotID) {
-      const slot = entry.Slot;
-      const order = entry.Slot_display_order;
-      if (!slotOrderMap[slot]) slotOrderMap[slot] = new Set();
-      slotOrderMap[slot].add(order);
+    if (
+      entry.SubslotID &&
+      entry.SubslotElement &&
+      questionWords.includes(entry.SubslotElement.trim().toLowerCase())
+    ) {
+      const key = entry.Slot + "-" + entry.Slot_display_order;
+      displayTopMap.set(key, entry.SubslotElement.trim());
     }
   });
+
+  selectedSlots.forEach(entry => {
+    if (!entry.SubslotID) {
+      const key = entry.Slot + "-" + entry.Slot_display_order;
+      if (displayTopMap.has(key)) {
+        entry.DisplayAtTop = true;
+        entry.DisplayText = displayTopMap.get(key);
+        console.log("🔼 DisplayAtTop 自動付加:", entry.DisplayText, "(slot:", entry.Slot, ")");
+      }
+    }
+  });
+
 
   selectedSlots.forEach(entry => {
     if (!entry.SubslotID && slotOrderMap[entry.Slot] && slotOrderMap[entry.Slot].size >= 2) {
