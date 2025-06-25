@@ -113,4 +113,16 @@ allSubslots.forEach(slot => {
 // 例：ページロード後やJSONロード後に呼ぶ
 window.onload = function() {
   syncDynamicToStatic();
+
+  // ✅ DisplayAtTop 表示対応
+  const topDisplayItem = data.find(d => d.DisplayAtTop);
+  if (topDisplayItem && topDisplayItem.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplayItem.DisplayText;
+      console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
 };
