@@ -57,18 +57,6 @@ allSubslots.forEach(slot => {
 
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
-
-  // 🔼 分離疑問詞 (DisplayAtTop) 書き込み処理
-  const topDisplay = data.find(d => d.DisplayAtTop);
-  if (topDisplay && topDisplay.DisplayText) {
-    const topDiv = document.getElementById("display-top-question-word");
-    if (topDiv) {
-      topDiv.textContent = topDisplay.DisplayText;
-      console.log(`🔼 DisplayAtTop 表示: ${topDisplay.DisplayText}`);
-    } else {
-      console.warn("⚠ display-top-question-word が見つかりません");
-    }
-  }
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
     return;
   }
