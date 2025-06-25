@@ -155,14 +155,5 @@ function buildStructure(selectedSlots) {
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
-// ✅ モジュール環境でもグローバル公開を保証（type="module" 対応）
-try {
-  if (typeof window !== 'undefined') {
-    window.buildStructure = buildStructure;
-  }
-} catch (e) {
-  console.warn("🌐 グローバル公開失敗:", e);
-}
-
 
 window.buildStructure = buildStructure;
