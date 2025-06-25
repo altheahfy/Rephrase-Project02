@@ -30,6 +30,12 @@ function extractDataFromDynamicArea() {
   return data;
 }
 
+
+function normalizeSlotId(slotId) {
+  return slotId.replace(/-sub-sub/g, '-sub');
+}
+
+
 function syncDynamicToStatic() {
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
@@ -38,7 +44,7 @@ function syncDynamicToStatic() {
   }
 
   data.forEach(item => {
-    const slotElement = document.getElementById(item.Slot);
+    const slotElement = document.getElementById(normalizeSlotId(item.Slot));
     if (!slotElement) {
       console.warn(`⚠ スロットが見つかりません: ${item.Slot}`);
       return;
