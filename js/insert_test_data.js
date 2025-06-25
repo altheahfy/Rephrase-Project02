@@ -137,4 +137,19 @@ if (topDisplayItem && topDisplayItem.DisplayText) {
   } else {
     console.warn("⚠ display-top-question-word が見つかりません");
   }
+
+// 🔼 DisplayAtTop スロット表示（遅延でDOM書き込み）
+setTimeout(() => {
+  const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
+  if (topDisplayItem && topDisplayItem.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplayItem.DisplayText;
+      console.log("✅ DisplayAtTop 表示（遅延）:", topDisplayItem.DisplayText);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
+}, 0);
+
 }
