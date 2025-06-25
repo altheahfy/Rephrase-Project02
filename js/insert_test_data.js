@@ -37,12 +37,6 @@ function normalizeSlotId(slotId) {
 
 
 function syncDynamicToStatic() {
-  // 👇 事前に静的スロットの中身をクリア
-  const allPhrases = document.querySelectorAll(".slot-phrase");
-  const allTexts = document.querySelectorAll(".slot-text");
-  allPhrases.forEach(el => el.textContent = "");
-  allTexts.forEach(el => el.textContent = "");
-
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
