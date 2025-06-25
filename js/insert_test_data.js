@@ -24,8 +24,8 @@ function extractDataFromDynamicArea() {
       Slot: slotId,
       SlotPhrase: phraseText,
       SlotText: slotText
-    });
-  });
+    }});
+  }});
 
   return data;
 }
@@ -59,7 +59,7 @@ if (window.loadedJsonData) {
     const textBlocks = container.querySelectorAll('.slot-text');
     phraseBlocks.forEach(p => p.textContent = "");
     textBlocks.forEach(t => t.textContent = "");
-  });
+  }});
 
 // 🧹 全サブスロット初期化（静的DOM）
 const allSubslots = document.querySelectorAll('[id*="-sub-sub-"]');
@@ -110,8 +110,7 @@ allSubslots.forEach(slot => {
           console.log(`✅ text書き込み成功: ${item.Slot} (parent)`);
         }
       }
-      return;
-    }
+    } else {
     // 元のサブスロット書き込み処理（以下は既存処理をそのまま残す）
     console.log("サブスロット検索ID(normalized):", normalizeSlotId(item.Slot));
     
@@ -146,7 +145,7 @@ const slotElement = document.getElementById(normalizeSlotId(item.Slot));
       slotTextElement.textContent = item.SlotText;
       console.log(`✅ text書き込み成功: ${item.Slot}`);
     }
-  });
+  }});
 
 }
 
