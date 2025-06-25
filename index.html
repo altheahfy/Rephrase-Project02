@@ -1041,7 +1041,8 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
-      buildStructure(data);
+      window.loadedJsonData = data;
+  buildStructure(data);
     syncDynamicToStatic();
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
@@ -1060,6 +1061,7 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   const data = randomizeAll(loadedJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
+  window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();
 });
