@@ -341,3 +341,89 @@ function debugM1Slot() {
 window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
 window.syncSubslotsFromJson = syncSubslotsFromJson;
 window.debugM1Slot = debugM1Slot;
+
+// JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
+window.safeJsonSync = function(data) {
+  try {
+    console.log("🔄 安全な同期処理を開始します");
+    if (!data || !Array.isArray(data)) {
+      console.warn("⚠ 同期処理に渡されたデータが無効です:", typeof data);
+      if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+        console.log("✅ window.loadedJsonDataを代わりに使用します");
+        data = window.loadedJsonData;
+      } else {
+        console.error("❌ 有効なJSONデータがありません");
+        return;
+      }
+    }
+    
+    syncUpperSlotsFromJson(data);
+    console.log("✅ 上位スロットの同期が完了しました");
+    
+    // サブスロット同期関数があれば実行
+    if (typeof window.syncSubslotsFromJson === 'function') {
+      window.syncSubslotsFromJson(data);
+      console.log("✅ サブスロットの同期が完了しました");
+    }
+  } catch (err) {
+    console.error("❌ 同期処理中にエラーが発生しました:", err.message);
+    console.error("エラーの詳細:", err.stack);
+  }
+};
+
+// ランダマイズ後の同期を確保するためのMutationObserverを設定
+window.setupSyncObserver = function() {
+  try {
+    // 動的記載エリアの変更を監視
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    if (!dynamicArea) {
+      console.warn("⚠ 監視対象の動的記載エリアが見つかりません");
+      return;
+    }
+    
+    console.log("👁 動的記載エリアの監視を開始します");
+    
+    // 変更の監視設定
+    const observer = new MutationObserver(function(mutations) {
+      console.log("👀 動的記載エリアに変更を検出しました");
+      
+      // 処理が重複しないよう、タイマーでデバウンス
+      if (window.syncDebounceTimer) {
+        clearTimeout(window.syncDebounceTimer);
+      }
+      
+      window.syncDebounceTimer = setTimeout(() => {
+        console.log("🔄 変更検出による同期処理を実行します");
+        if (window.loadedJsonData) {
+          window.safeJsonSync(window.loadedJsonData);
+        }
+      }, 300); // 300ミリ秒の遅延で実行
+    });
+    
+    // 設定を適用して監視開始
+    observer.observe(dynamicArea, { 
+      childList: true, 
+      subtree: true, 
+      characterData: true,
+      attributes: true
+    });
+    
+    console.log("✅ MutationObserverの設定が完了しました");
+    return observer;
+  } catch (err) {
+    console.error("❌ 監視設定中にエラーが発生しました:", err.message);
+  }
+};
+
+// ページ読み込み完了時に監視を開始
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("🌐 DOMContentLoaded イベント発生");
+  setTimeout(() => {
+    window.setupSyncObserver();
+    
+    // 初期同期も実行
+    if (window.loadedJsonData) {
+      window.safeJsonSync(window.loadedJsonData);
+    }
+  }, 500); // DOMが完全に構築されるのを待つ
+});
