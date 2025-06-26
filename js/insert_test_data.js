@@ -273,6 +273,53 @@ function syncUpperSlotsFromJson(data) {
   });
 }
 
+// ✅ サブスロット同期機能の実装 (エクスポート済みだが未定義だった関数)
+function syncSubslotsFromJson(data) {
+  console.log("🔄 サブスロット同期（from window.loadedJsonData）開始");
+  if (!data || !Array.isArray(data)) {
+    console.warn("⚠ サブスロット同期: データが無効です");
+    return;
+  }
+  
+  // サブスロット用のデータをフィルタリング
+  const subslotData = data.filter(item => item.SubslotID && item.SubslotID !== "");
+  console.log(`📊 サブスロット対象件数: ${subslotData.length}`);
+  
+  subslotData.forEach(item => {
+    try {
+      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
+      const parentSlot = item.Slot.toLowerCase();
+      const subslotId = item.SubslotID.toLowerCase();
+      const fullSlotId = `slot-${parentSlot}-${subslotId}`;
+      console.log(`🔍 サブスロット処理: ${fullSlotId}`);
+      
+      const slotElement = document.getElementById(fullSlotId);
+      if (!slotElement) {
+        console.warn(`⚠ サブスロット要素が見つかりません: ${fullSlotId}`);
+        return;
+      }
+      
+      // phraseとtextを更新
+      const phraseElement = slotElement.querySelector(".slot-phrase");
+      const textElement = slotElement.querySelector(".slot-text");
+      
+      if (phraseElement && item.SubslotElement) {
+        phraseElement.textContent = item.SubslotElement;
+        console.log(`✅ サブスロット phrase書き込み: ${fullSlotId} | "${item.SubslotElement}"`);
+      }
+      
+      if (textElement && item.SubslotText) {
+        textElement.textContent = item.SubslotText;
+        console.log(`✅ サブスロット text書き込み: ${fullSlotId} | "${item.SubslotText}"`);
+      }
+    } catch (err) {
+      console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
+    }
+  });
+  
+  console.log("✅ サブスロット同期完了");
+}
+
 // 特定のM1スロットをテスト（デバッグ用）
 function debugM1Slot() {
   if (!window.loadedJsonData) {
@@ -361,8 +408,8 @@ window.safeJsonSync = function(data) {
     console.log("✅ 上位スロットの同期が完了しました");
     
     // サブスロット同期関数があれば実行
-    if (typeof window.syncSubslotsFromJson === 'function') {
-      window.syncSubslotsFromJson(data);
+    if (typeof syncSubslotsFromJson === 'function') {
+      syncSubslotsFromJson(data);
       console.log("✅ サブスロットの同期が完了しました");
     }
   } catch (err) {
@@ -415,15 +462,90 @@ window.setupSyncObserver = function() {
   }
 };
 
+// ランダマイザーの監視と同期（ランダマイザー用の特別対応）
+window.setupRandomizerSync = function() {
+  try {
+    // ランダマイズボタンを探す
+    const randomizerButtons = document.querySelectorAll('button[data-action="randomize"], button.randomize-button');
+    if (randomizerButtons.length === 0) {
+      console.warn("⚠ ランダマイズボタンが見つかりません");
+      return;
+    }
+    
+    console.log(`🎲 ランダマイズボタンを ${randomizerButtons.length}個 検出しました`);
+    
+    // 各ボタンにイベントリスナーを追加
+    randomizerButtons.forEach((button, index) => {
+      // 既存のイベントハンドラを保持するための対応
+      const originalClickHandler = button.onclick;
+      
+      button.addEventListener('click', function(event) {
+        console.log(`🎲 ランダマイズボタンがクリックされました (${index + 1})`);
+        
+        // ランダマイズ処理完了後に確実に同期処理を行う
+        setTimeout(() => {
+          console.log("🔄 ランダマイズ後の同期処理を実行します");
+          if (window.loadedJsonData) {
+            window.safeJsonSync(window.loadedJsonData);
+          }
+        }, 500); // ランダマイズ処理の完了を待つため少し長めの遅延
+      }, true); // キャプチャフェーズでイベントをキャッチ
+      
+      console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
+    });
+    
+    // window.randomizeAllSlots関数をオーバーライド（存在する場合）
+    if (typeof window.randomizeAllSlots === 'function') {
+      const originalRandomizeFunc = window.randomizeAllSlots;
+      window.randomizeAllSlots = function(...args) {
+        console.log("🎲 randomizeAllSlots関数が呼び出されました");
+        const result = originalRandomizeFunc.apply(this, args);
+        
+        // ランダマイズ処理完了後に同期処理を行う
+        setTimeout(() => {
+          console.log("🔄 randomizeAllSlots後の同期処理を実行します");
+          if (window.loadedJsonData) {
+            window.safeJsonSync(window.loadedJsonData);
+          }
+        }, 500);
+        
+        return result;
+      };
+      console.log("✅ randomizeAllSlots関数をオーバーライドしました");
+    }
+    
+    return true;
+  } catch (err) {
+    console.error("❌ ランダマイザー監視設定中にエラーが発生しました:", err.message);
+    return false;
+  }
+};
+
 // ページ読み込み完了時に監視を開始
 document.addEventListener("DOMContentLoaded", function() {
   console.log("🌐 DOMContentLoaded イベント発生");
   setTimeout(() => {
     window.setupSyncObserver();
+    window.setupRandomizerSync();
     
     // 初期同期も実行
     if (window.loadedJsonData) {
       window.safeJsonSync(window.loadedJsonData);
     }
+    
+    // JSONデータ変更を監視（loadedJsonDataの監視）
+    let lastJsonDataState = "";
+    setInterval(() => {
+      if (window.loadedJsonData) {
+        // 簡易的なデータ変更検出（データの長さをチェック）
+        const currentState = `${window.loadedJsonData.length}-${Date.now()}`;
+        if (currentState !== lastJsonDataState) {
+          console.log("🔄 window.loadedJsonData の変更を検出しました");
+          window.safeJsonSync(window.loadedJsonData);
+          lastJsonDataState = currentState;
+        }
+      }
+    }, 1000); // 1秒ごとに変更をチェック
+    
   }, 500); // DOMが完全に構築されるのを待つ
 });
