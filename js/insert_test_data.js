@@ -10,6 +10,7 @@ function clearAllUpperSlots() {
   });
 }
 
+
 function clearAllSubslots() {
   const subslotIDs = [
     "slot-m1-sub", "slot-s-sub", "slot-aux-sub", "slot-m2-sub",
@@ -20,13 +21,14 @@ function clearAllSubslots() {
   subslotIDs.forEach(id => {
     const slot = document.getElementById(id);
     if (slot) {
-      const phrase = slot.querySelector('.subslot-element');
-      const text = slot.querySelector('.subslot-text');
+      const phrase = slot.querySelector('.slot-phrase');
+      const text = slot.querySelector('.slot-text');
       if (phrase) phrase.textContent = "";
       if (text) text.textContent = "";
     }
   });
 }
+
 
 function extractDataFromDynamicArea() {
   const dynamicArea = document.getElementById("dynamic-slot-area");
