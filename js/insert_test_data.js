@@ -1,11 +1,18 @@
 // insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
 
 function extractDataFromDynamicArea() {
-  const data = [];
-  const slotElements = document.querySelectorAll(".slot, .subslot");
+  const dynamicArea = document.getElementById("dynamic-slot-area");
+  if (!dynamicArea) {
+    console.warn("⚠ dynamic-slot-area が見つかりません");
+    return [];
+  }
 
-  slotElements.forEach((el) => {
-    const slotId = el.id.replace(/^slot-/, "").toUpperCase();
+  const slotElements = dynamicArea.querySelectorAll(".slot, .subslot");
+  const data = [];
+
+  slotElements.forEach(el => {
+    const slotId = el.id || el.getAttribute("id");
+    if (!slotId) return;
 
     const phraseEl = el.querySelector(".slot-phrase, .subslot-element");
     const textEl = el.querySelector(".slot-text, .subslot-text");
@@ -23,72 +30,154 @@ function extractDataFromDynamicArea() {
   return data;
 }
 
-function syncDynamicToStatic() {
-  let data = extractDataFromDynamicArea();
 
-  // ❗補完：DOMから構文情報が取れない場合、window.loadedJsonDataを使用
-  if (!data || !data.some(d => d.PhraseType || d.SubslotID)) {
-    console.warn("⚠ DOMから構文情報が取得できませんでした。window.loadedJsonDataから読み込みます。");
-    if (Array.isArray(window.loadedJsonData)) {
-      data = window.loadedJsonData;
+function normalizeSlotId(slotId) {
+  return slotId.replace(/-sub-sub/g, '-sub');
+}
+
+
+function syncDynamicToStatic() {
+// 🔼 DisplayAtTop 対応（分離疑問詞表示）ここから追加
+if (window.loadedJsonData) {
+  const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);
+  if (topDisplayItem && topDisplayItem.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplayItem.DisplayText;
+      console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
     } else {
-      console.error("❌ window.loadedJsonDataが存在しません。同期できません。");
-      return;
+      console.warn("⚠ display-top-question-word が見つかりません");
     }
   }
+}
+// 🔼 DisplayAtTop 対応ここまで
 
-  // 上位スロット表示（PhraseType === word, SubslotID === ""）
-  data
-    .filter((item) => item.SubslotID === "" && item.PhraseType === "word")
-    .forEach((item) => {
-      const slotId = item.Slot.toLowerCase();
-      const container = document.getElementById("slot-" + slotId);
-      if (!container) return;
-      const phraseEl = container.querySelector(".slot-phrase");
-      const textEl = container.querySelector(".slot-text");
+  // 🧹 slot-*-sub の中にあるサブスロット phrase/text を初期化
+  const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
+  allSubContainers.forEach(container => {
+    const phraseBlocks = container.querySelectorAll('.slot-phrase');
+    const textBlocks = container.querySelectorAll('.slot-text');
+    phraseBlocks.forEach(p => p.textContent = "");
+    textBlocks.forEach(t => t.textContent = "");
+  });
 
-      if (item.SlotPhrase && phraseEl) {
-        phraseEl.textContent = item.SlotPhrase;
-        console.log(`✅ 上位スロット phrase書き込み成功: slot-${slotId}`);
-      }
-      if (item.SlotText && textEl) {
-        textEl.textContent = item.SlotText;
-        console.log(`✅ 上位スロット text書き込み成功: slot-${slotId}`);
-      }
-    });
+// 🧹 全サブスロット初期化（静的DOM）
+const allSubslots = document.querySelectorAll('[id*="-sub-sub-"]');
+allSubslots.forEach(slot => {
+  const phrase = slot.querySelector('.slot-phrase');
+  const text = slot.querySelector('.slot-text');
+  if (phrase) phrase.textContent = "";
+  if (text) text.textContent = "";
+});
 
-  // サブスロット表示
-  data
-    .filter((item) => item.SubslotID && item.PhraseType !== "clause")
-    .forEach((sub) => {
-      const subslotId = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
-      const container = document.getElementById(subslotId);
-      console.log("サブスロット検索ID(normalized):", subslotId);
+  const data = extractDataFromDynamicArea();
+  if (data.length === 0) {
 
+  // 🔼 分離疑問詞 (DisplayAtTop) 書き込み処理
+  const topDisplay = data.find(d => d.DisplayAtTop);
+  if (topDisplay && topDisplay.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplay.DisplayText;
+      console.log(`🔼 DisplayAtTop 表示: ${topDisplay.DisplayText}`);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
+    console.warn("⚠ 動的エリアからデータ抽出できませんでした");
+    return;
+  }
+
+  
+  data.forEach(item => {
+    if (item.SubslotID === "" && item.PhraseType === "word") {
+      // 上位スロットへの書き込み
+      
+    console.log("検索ID(normalized):", normalizeSlotId(item.Slot));
+    const container = document.getElementById("slot-" + item.Slot.toLowerCase());
       if (container) {
-        const phraseEl = container.querySelector(".slot-phrase, .subslot-element");
-        const textEl = container.querySelector(".slot-text, .subslot-text");
-        console.log("サブスロット phraseElement:", phraseEl);
-        console.log("サブスロット textElement:", textEl);
-
-        if (phraseEl && sub.SubslotElement) {
-          phraseEl.textContent = sub.SubslotElement;
-          console.log(`✅ phrase書き込み成功: ${subslotId}`);
+      console.log("container found for ID:", container.id);
+        const phraseDiv = container.querySelector(".slot-phrase");
+      console.log("phraseDiv:", phraseDiv);
+        const textDiv = container.querySelector(".slot-text");
+      console.log("textDiv:", textDiv);
+        if (phraseDiv) {
+          phraseDiv.textContent = item.SlotPhrase || "";
+          console.log(`✅ phrase書き込み成功: ${item.Slot} (parent)`);
         }
-
-        if (textEl && sub.SubslotText) {
-          textEl.textContent = sub.SubslotText;
-          console.log(`✅ text書き込み成功: ${subslotId}`);
+        if (textDiv) {
+          textDiv.textContent = item.SlotText || "";
+          console.log(`✅ text書き込み成功: ${item.Slot} (parent)`);
         }
-      } else {
-        console.warn(`⚠ サブスロット DOM未検出: ${subslotId}`);
       }
-    });
+      return;
+    }
+    // 元のサブスロット書き込み処理（以下は既存処理をそのまま残す）
+    console.log("サブスロット検索ID(normalized):", normalizeSlotId(item.Slot));
+    
+    // 🔽 DisplayAtTop 対象の subslot 要素はスキップ
+    if (window.loadedJsonData) {
+      const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);
+      if (
+        topDisplayItem &&
+        topDisplayItem.DisplayText &&
+        item.SubslotElement === topDisplayItem.DisplayText
+      ) {
+        console.log(`🚫 subslot "${item.SubslotElement}" は DisplayAtTop で表示済のためスキップ`);
+        return;
+      }
+    }
+const slotElement = document.getElementById(normalizeSlotId(item.Slot));
+    if (!slotElement) {
+      console.log("サブスロット要素が見つかりません:", normalizeSlotId(item.Slot));
+      console.warn(`⚠ スロットが見つかりません: ${item.Slot}`);
+      return;
+    }
+    const phraseElement = slotElement.querySelector(".slot-phrase");
+    console.log("サブスロット phraseElement:", phraseElement);
+    const slotTextElement = slotElement.querySelector(".slot-text");
+    console.log("サブスロット textElement:", slotTextElement);
 
-  // 補助表示（DisplayAtTop）
-  data
-    .filter((item) => item.DisplayAtTop && item.DisplayText)
-    .forEach((item) => {
-      console.log(`✅ DisplayAtTop 表示: ${item.DisplayText}`);
-    });
+    if (phraseElement) {
+      phraseElement.textContent = item.SlotPhrase;
+      console.log(`✅ phrase書き込み成功: ${item.Slot}`);
+    }
+    if (slotTextElement) {
+      slotTextElement.textContent = item.SlotText;
+      console.log(`✅ text書き込み成功: ${item.Slot}`);
+    }
+  });
+
+}
+
+// 例：ページロード後やJSONロード後に呼ぶ
+window.onload = function() {
+  syncDynamicToStatic();
+};
+
+// DisplayAtTop に対応する疑問詞をページ上部に表示
+const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
+if (topDisplayItem && topDisplayItem.DisplayText) {
+  const topDiv = document.getElementById("display-top-question-word");
+  if (topDiv) {
+    topDiv.textContent = topDisplayItem.DisplayText;
+    console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+  } else {
+    console.warn("⚠ display-top-question-word が見つかりません");
+  }
+
+// 🔼 DisplayAtTop スロット表示（遅延でDOM書き込み）
+setTimeout(() => {
+  const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
+  if (topDisplayItem && topDisplayItem.DisplayText) {
+    const topDiv = document.getElementById("display-top-question-word");
+    if (topDiv) {
+      topDiv.textContent = topDisplayItem.DisplayText;
+      console.log("✅ DisplayAtTop 表示（遅延）:", topDisplayItem.DisplayText);
+    } else {
+      console.warn("⚠ display-top-question-word が見つかりません");
+    }
+  }
+}, 0);
+
 }
