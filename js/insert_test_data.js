@@ -151,9 +151,10 @@ const slotElement = document.getElementById(normalizeSlotId(item.Slot));
 }
 
 // 例：ページロード後やJSONロード後に呼ぶ
-window.onload = function() {
-  syncDynamicToStatic();
-};
+// window.onload = function() {
+//   syncDynamicToStatic();
+// };
+
 
 // DisplayAtTop に対応する疑問詞をページ上部に表示
 const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
@@ -234,6 +235,7 @@ function syncSubslotsFromJson(data) {
 
 // ✅ 差分追加：window.loadedJsonData を使った同期を起動
 window.onload = function() {
+  syncDynamicToStatic();
   if (window.loadedJsonData) {
     syncUpperSlotsFromJson(window.loadedJsonData);
     syncSubslotsFromJson(window.loadedJsonData);
