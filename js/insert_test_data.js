@@ -11,12 +11,20 @@ function clearAllUpperSlots() {
 }
 
 function clearAllSubslots() {
-  const staticSubslots = document.querySelectorAll('#static-slot-area [id*="-sub-"]');
-  staticSubslots.forEach(slot => {
-    const phrase = slot.querySelector('.slot-phrase, .subslot-element');
-    const text = slot.querySelector('.slot-text, .subslot-text');
-    if (phrase) phrase.textContent = "";
-    if (text) text.textContent = "";
+  const subslotIDs = [
+    "slot-m1-sub", "slot-s-sub", "slot-aux-sub", "slot-m2-sub",
+    "slot-v-sub", "slot-c1-sub", "slot-o1-sub", "slot-o2-sub",
+    "slot-c2-sub", "slot-m3-sub"
+  ];
+
+  subslotIDs.forEach(id => {
+    const slot = document.getElementById(id);
+    if (slot) {
+      const phrase = slot.querySelector('.slot-phrase, .subslot-element');
+      const text = slot.querySelector('.slot-text, .subslot-text');
+      if (phrase) phrase.textContent = "";
+      if (text) text.textContent = "";
+    }
   });
 }
 
