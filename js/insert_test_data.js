@@ -20,8 +20,8 @@ function clearAllSubslots() {
   subslotIDs.forEach(id => {
     const slot = document.getElementById(id);
     if (slot) {
-      const phrase = slot.querySelector('.slot-phrase, .subslot-element');
-      const text = slot.querySelector('.slot-text, .subslot-text');
+      const phrase = slot.querySelector('.subslot-element');
+      const text = slot.querySelector('.subslot-text');
       if (phrase) phrase.textContent = "";
       if (text) text.textContent = "";
     }
