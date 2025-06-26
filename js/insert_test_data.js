@@ -225,12 +225,22 @@ setTimeout(() => {
 
 // ✅ 修正版：window.loadedJsonData を直接参照してスロット書き込み
 function syncUpperSlotsFromJson(data) {
+  if (!data || !Array.isArray(data)) {
+    console.error("❌ 上位スロット同期: 無効なデータが渡されました", data);
+    return;
+  }
+  
   const upperSlotCount = data.filter(item => item.SubslotID === "" && item.PhraseType === "word").length;
   console.log(`🔄 上位スロット同期: ${upperSlotCount}件の対象を処理`);
   
   // 詳細ログはデバッグが必要な時だけ出す
   if (window.DEBUG_SYNC) {
     console.log("📊 データサンプル:", JSON.stringify(data.slice(0, 3))); // 最初の3件だけ表示
+  }
+  
+  // グローバル変数がなければ初期化
+  if (typeof window.DEBUG_SYNC === 'undefined') {
+    window.DEBUG_SYNC = false;
   }
   
   data.forEach(item => {
@@ -264,8 +274,14 @@ function syncUpperSlotsFromJson(data) {
             nestedPhraseDiv.textContent = "";
           }
           
-          // テキストを直接設定
-          textDiv.firstChild.textContent = item.SlotText || "";
+          // テキストノードを安全に設定（firstChildが存在しない場合の対策）
+          if (textDiv.firstChild && textDiv.firstChild.nodeType === Node.TEXT_NODE) {
+            textDiv.firstChild.textContent = item.SlotText || "";
+          } else {
+            // firstChildがない場合は新しいテキストノードを作成
+            textDiv.textContent = ""; // 既存のコンテンツをクリア
+            textDiv.append(document.createTextNode(item.SlotText || ""));
+          }
           console.log(`✅ 上位 text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
         } else {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
@@ -376,11 +392,13 @@ function debugM1Slot() {
       nestedPhraseDiv.textContent = "";
     }
     
-    // テキストノードを適切に設定
+    // テキストノードを適切に設定 - 安全に処理
     if (textDiv.firstChild && textDiv.firstChild.nodeType === Node.TEXT_NODE) {
       textDiv.firstChild.textContent = m1Data.SlotText || "";
     } else {
-      textDiv.prepend(document.createTextNode(m1Data.SlotText || ""));
+      // firstChildがない場合や適切なノードでない場合は新しくテキストノードを作成
+      textDiv.textContent = ""; // 既存のコンテンツをクリア
+      textDiv.append(document.createTextNode(m1Data.SlotText || ""));
     }
     console.log("✅ M1 text値設定:", m1Data.SlotText);
   } else {
@@ -398,6 +416,7 @@ window.safeJsonSync = function(data) {
   try {
     // 重複実行防止のためのフラグ
     if (window.isSyncInProgress) {
+      console.log("⏳ 同期処理が既に実行中のため、このリクエストはスキップします");
       return;
     }
     window.isSyncInProgress = true;
@@ -411,17 +430,34 @@ window.safeJsonSync = function(data) {
       } else {
         console.error("❌ 有効なJSONデータがありません");
         window.isSyncInProgress = false;
+        
+        // 1秒後に再試行
+        setTimeout(() => {
+          console.log("🔄 JSONデータが無効だったため再試行します");
+          if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+            window.safeJsonSync(window.loadedJsonData);
+          }
+        }, 1000);
         return;
       }
     }
     
-    syncUpperSlotsFromJson(data);
-    console.log("✅ 上位スロットの同期が完了");
+    // 上位スロット同期を実行
+    try {
+      syncUpperSlotsFromJson(data);
+      console.log("✅ 上位スロットの同期が完了");
+    } catch (upperSlotError) {
+      console.error("❌ 上位スロット同期中にエラーが発生:", upperSlotError.message);
+    }
     
     // サブスロット同期関数があれば実行
     if (typeof syncSubslotsFromJson === 'function') {
-      syncSubslotsFromJson(data);
-      console.log("✅ サブスロットの同期が完了");
+      try {
+        syncSubslotsFromJson(data);
+        console.log("✅ サブスロットの同期が完了");
+      } catch (subslotError) {
+        console.error("❌ サブスロット同期中にエラーが発生:", subslotError.message);
+      }
     }
     
     // 同期完了
@@ -429,6 +465,7 @@ window.safeJsonSync = function(data) {
   } catch (err) {
     console.error("❌ 同期処理中にエラーが発生しました:", err.message);
     console.error("エラーの詳細:", err.stack);
+    window.isSyncInProgress = false; // エラーが発生してもフラグはリセット
   }
 };
 
@@ -498,11 +535,16 @@ window.setupRandomizerSync = function() {
         
         // ランダマイズ処理完了後に確実に同期処理を行う
         setTimeout(() => {
-          console.log("🔄 ランダマイズ後の同期処理を実行します");
+          console.log("🔄 ランダマイズ後の同期処理を実行します (遅延: 1000ms)");
           if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
             window.safeJsonSync(window.loadedJsonData);
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
           }
-        }, 500); // ランダマイズ処理の完了を待つため少し長めの遅延
+        }, 1000); // 1000ms（1秒）に延長 - ランダマイズ処理が確実に完了するのを待つ
       }, true); // キャプチャフェーズでイベントをキャッチ
       
       console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
@@ -517,11 +559,16 @@ window.setupRandomizerSync = function() {
         
         // ランダマイズ処理完了後に同期処理を行う
         setTimeout(() => {
-          console.log("🔄 randomizeAllSlots後の同期処理を実行します");
+          console.log("🔄 randomizeAllSlots後の同期処理を実行します (遅延: 1000ms)");
           if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
             window.safeJsonSync(window.loadedJsonData);
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
           }
-        }, 500);
+        }, 1000); // 1000ms（1秒）に延長
         
         return result;
       };
