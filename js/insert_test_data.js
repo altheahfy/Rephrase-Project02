@@ -225,9 +225,13 @@ setTimeout(() => {
 
 // ✅ 修正版：window.loadedJsonData を直接参照してスロット書き込み
 function syncUpperSlotsFromJson(data) {
-  console.log("🔄 上位スロット同期（from window.loadedJsonData）開始");
-  console.log("📊 データ全体:", JSON.stringify(data.slice(0, 3))); // 最初の3件だけ表示
-  console.log("📝 上位スロット対象件数:", data.filter(item => item.SubslotID === "" && item.PhraseType === "word").length);
+  const upperSlotCount = data.filter(item => item.SubslotID === "" && item.PhraseType === "word").length;
+  console.log(`🔄 上位スロット同期: ${upperSlotCount}件の対象を処理`);
+  
+  // 詳細ログはデバッグが必要な時だけ出す
+  if (window.DEBUG_SYNC) {
+    console.log("📊 データサンプル:", JSON.stringify(data.slice(0, 3))); // 最初の3件だけ表示
+  }
   
   data.forEach(item => {
     if (item.SubslotID === "" && item.PhraseType === "word") {
@@ -392,7 +396,13 @@ window.debugM1Slot = debugM1Slot;
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
   try {
-    console.log("🔄 安全な同期処理を開始します");
+    // 重複実行防止のためのフラグ
+    if (window.isSyncInProgress) {
+      return;
+    }
+    window.isSyncInProgress = true;
+    
+    console.log("🔄 同期処理を開始します");
     if (!data || !Array.isArray(data)) {
       console.warn("⚠ 同期処理に渡されたデータが無効です:", typeof data);
       if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
@@ -400,18 +410,22 @@ window.safeJsonSync = function(data) {
         data = window.loadedJsonData;
       } else {
         console.error("❌ 有効なJSONデータがありません");
+        window.isSyncInProgress = false;
         return;
       }
     }
     
     syncUpperSlotsFromJson(data);
-    console.log("✅ 上位スロットの同期が完了しました");
+    console.log("✅ 上位スロットの同期が完了");
     
     // サブスロット同期関数があれば実行
     if (typeof syncSubslotsFromJson === 'function') {
       syncSubslotsFromJson(data);
-      console.log("✅ サブスロットの同期が完了しました");
+      console.log("✅ サブスロットの同期が完了");
     }
+    
+    // 同期完了
+    window.isSyncInProgress = false;
   } catch (err) {
     console.error("❌ 同期処理中にエラーが発生しました:", err.message);
     console.error("エラーの詳細:", err.stack);
@@ -533,19 +547,35 @@ document.addEventListener("DOMContentLoaded", function() {
       window.safeJsonSync(window.loadedJsonData);
     }
     
-    // JSONデータ変更を監視（loadedJsonDataの監視）
-    let lastJsonDataState = "";
+    // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
+    let lastJsonDataSignature = "";
+    
+    // データの特徴的な部分から署名を生成する関数
+    function getDataSignature(data) {
+      if (!data || !Array.isArray(data) || data.length === 0) return "";
+      try {
+        // スロットの内容からチェックサムを生成
+        const sampleItems = data.slice(0, 3); // 最初の3件のみ使用
+        const signature = sampleItems.map(item => 
+          `${item.Slot}:${item.SlotPhrase && item.SlotPhrase.substring(0, 10)}`
+        ).join('|');
+        return signature;
+      } catch (e) {
+        return "";
+      }
+    }
+    
+    // 低頻度で定期チェック (3秒ごと)
     setInterval(() => {
       if (window.loadedJsonData) {
-        // 簡易的なデータ変更検出（データの長さをチェック）
-        const currentState = `${window.loadedJsonData.length}-${Date.now()}`;
-        if (currentState !== lastJsonDataState) {
-          console.log("🔄 window.loadedJsonData の変更を検出しました");
+        const newSignature = getDataSignature(window.loadedJsonData);
+        if (newSignature && newSignature !== lastJsonDataSignature) {
+          console.log("🔄 window.loadedJsonData の実質的な変更を検出");
           window.safeJsonSync(window.loadedJsonData);
-          lastJsonDataState = currentState;
+          lastJsonDataSignature = newSignature;
         }
       }
-    }, 1000); // 1秒ごとに変更をチェック
+    }, 3000); // 3秒ごとに変更をチェック
     
   }, 500); // DOMが完全に構築されるのを待つ
 });
