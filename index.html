@@ -1057,8 +1057,21 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
       window.loadedJsonData = data;
-  buildStructure(data);
-    syncDynamicToStatic();
+      buildStructure(data);
+      syncDynamicToStatic();
+      
+      // 明示的に上位スロットとサブスロットの同期を呼び出す
+      if (typeof syncUpperSlotsFromJson === 'function') {
+        console.log("🔄 JSONロード後の明示的同期呼び出し");
+        syncUpperSlotsFromJson(data);
+        if (typeof syncSubslotsFromJson === 'function') {
+          syncSubslotsFromJson(data);
+        }
+        if (typeof debugM1Slot === 'function') {
+          console.log("🔍 M1スロットのデバッグ実行");
+          debugM1Slot();
+        }
+      }
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");

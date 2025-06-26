@@ -237,131 +237,107 @@ function syncUpperSlotsFromJson(data) {
       
       const container = document.getElementById(slotId);
       if (container) {
-        console.log("✅ スロットコンテナ発見:", container.id, "| HTML:", container.outerHTML.substring(0, 100) + "...");
+        console.log("✅ スロットコンテナ発見:", container.id);
         
-        // すべての .slot-phrase 要素を取得（入れ子構造も考慮）
-        const allPhraseDivs = container.querySelectorAll(".slot-phrase");
-        console.log("🔢 slot-phrase要素数:", allPhraseDivs.length);
+        // 重要: slot-containerの直下のslot-phraseを選択（:scope > を使用）
+        const phraseDiv = container.querySelector(":scope > .slot-phrase");
+        console.log("📌 上位スロットのphraseDiv:", phraseDiv ? phraseDiv.outerHTML : "未検出");
         
-        // 最初の .slot-phrase を使用
-        const phraseDiv = allPhraseDivs[0];
-        console.log("📌 使用するphraseDiv:", phraseDiv ? phraseDiv.outerHTML : "未検出");
-        
-        // .slot-text直下の.slot-phraseを除外した本来のtextDivを取得
-        const textDiv = container.querySelector(".slot-text");
-        console.log("📌 使用するtextDiv:", textDiv ? textDiv.outerHTML : "未検出");
+        const textDiv = container.querySelector(":scope > .slot-text");
+        console.log("📌 上位スロットのtextDiv:", textDiv ? textDiv.outerHTML : "未検出");
         
         if (phraseDiv) {
           phraseDiv.textContent = item.SlotPhrase || "";
           console.log(`✅ 上位 phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
         } else {
-          console.warn(`❌ 上位phraseDiv取得失敗: ${slotId}`);
+          console.warn(`❌ 上位phraseDiv取得失敗: ${slotId} - 要素が見つかりません`);
         }
         
         if (textDiv) {
-          textDiv.textContent = item.SlotText || "";
-          console.log(`✅ 上位 text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
-          
-          // textDiv内のslot-phraseも確認
+          // textDiv内のslot-phraseがあれば、それも合わせてクリア
           const nestedPhraseDiv = textDiv.querySelector(".slot-phrase");
           if (nestedPhraseDiv) {
-            console.warn(`⚠️ textDiv内にslot-phraseが入れ子になっています: ${slotId}`);
+            nestedPhraseDiv.textContent = "";
           }
+          
+          // テキストを直接設定
+          textDiv.firstChild.textContent = item.SlotText || "";
+          console.log(`✅ 上位 text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
         } else {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
       } else {
         console.warn(`❌ 上位スロットが見つかりません: ${slotId}`);
-        // 念のため存在するスロットIDを確認
-        const allSlots = document.querySelectorAll('[id^="slot-"]');
-        console.log("📋 存在するスロットID一覧:", Array.from(allSlots).map(el => el.id).join(", "));
       }
     }
   });
 }
 
-function syncSubslotsFromJson(data) {
-  console.log("🔄 サブスロット同期（from window.loadedJsonData）開始");
-  console.log("📊 サブスロット対象件数:", data.filter(item => item.SubslotID !== "").length);
-  
-  data.forEach(item => {
-    if (item.SubslotID !== "") {
-      console.log("🔍 サブスロット処理開始:", JSON.stringify(item));
-      const slotId = "slot-" + item.Slot.toLowerCase() + "-sub-" + item.SubslotID;
-      console.log("👉 探索するサブスロットID:", slotId);
-      
-      const slotElement = document.getElementById(slotId);
-      if (!slotElement) {
-        console.warn(`❌ サブスロットが見つかりません: ${slotId}`);
-        // 近いIDを検索
-        const similarElements = document.querySelectorAll(`[id^="slot-${item.Slot.toLowerCase()}-"]`);
-        if (similarElements.length > 0) {
-          console.log(`📋 類似IDの要素一覧:`, Array.from(similarElements).map(el => el.id).join(", "));
-        }
-        return;
-      }
-      
-      console.log("✅ サブスロット要素発見:", slotElement.id, "| HTML:", slotElement.outerHTML.substring(0, 100) + "...");
-      
-      const phraseElement = slotElement.querySelector(".slot-phrase");
-      console.log("📌 サブスロットphraseElement:", phraseElement ? phraseElement.outerHTML : "未検出");
-      
-      const textElement = slotElement.querySelector(".slot-text");
-      console.log("📌 サブスロットtextElement:", textElement ? textElement.outerHTML : "未検出");
-      
-      if (phraseElement) {
-        phraseElement.textContent = item.SlotPhrase || "";
-        console.log(`✅ サブ phrase書き込み成功: ${slotId} | 値: "${item.SlotPhrase}"`);
-      } else {
-        console.warn(`❌ サブphrase要素取得失敗: ${slotId}`);
-      }
-      
-      if (textElement) {
-        textElement.textContent = item.SlotText || "";
-        console.log(`✅ サブ text書き込み成功: ${slotId} | 値: "${item.SlotText}"`);
-        
-        // textElement内のslot-phraseも確認
-        const nestedPhraseDiv = textElement.querySelector(".slot-phrase");
-        if (nestedPhraseDiv) {
-          console.warn(`⚠️ textElement内にslot-phraseが入れ子になっています: ${slotId}`);
-        }
-      } else {
-        console.warn(`❌ サブtext要素取得失敗: ${slotId}`);
-      }
-    }
-  });
-}
-
-// ✅ 差分追加：window.loadedJsonData を使った同期を起動
-window.onload = function() {
-  console.log("🚀 window.onload 発火");
-  console.log("📊 window.loadedJsonData存在確認:", !!window.loadedJsonData);
-  
-  if (window.loadedJsonData) {
-    console.log("📦 loadedJsonData件数:", window.loadedJsonData.length);
-    console.log("📝 最初のデータサンプル:", JSON.stringify(window.loadedJsonData[0]));
+// 特定のM1スロットをテスト（デバッグ用）
+function debugM1Slot() {
+  if (!window.loadedJsonData) {
+    console.warn("⚠ window.loadedJsonData が存在しないためM1デバッグできません");
+    return;
   }
   
-  // DOM構造の検証
-  console.log("🔍 slot-containerの数:", document.querySelectorAll(".slot-container").length);
-  console.log("🔍 slot-phraseの数:", document.querySelectorAll(".slot-phrase").length);
-  console.log("🔍 slot-textの数:", document.querySelectorAll(".slot-text").length);
-  
-  // 重要: テキストエリア内のslot-phraseを確認
-  const textDivsWithPhrase = Array.from(document.querySelectorAll(".slot-text")).filter(
-    div => div.querySelector(".slot-phrase")
+  const m1Data = window.loadedJsonData.find(item => 
+    item.Slot.toLowerCase() === "m1" && item.SubslotID === "" && item.PhraseType === "word"
   );
-  console.log("⚠️ slot-text内にslot-phraseを持つ要素数:", textDivsWithPhrase.length);
-  if (textDivsWithPhrase.length > 0) {
-    console.log("⚠️ 例:", textDivsWithPhrase[0].outerHTML);
+  
+  if (!m1Data) {
+    console.warn("⚠ M1の上位スロットデータが見つかりません");
+    return;
   }
   
-  syncDynamicToStatic();
+  console.log("🔍 M1スロットデバッグ - データ:", m1Data);
   
-  if (window.loadedJsonData) {
-    syncUpperSlotsFromJson(window.loadedJsonData);
-    syncSubslotsFromJson(window.loadedJsonData);
+  // M1スロットを直接取得
+  const m1Container = document.getElementById("slot-m1");
+  if (!m1Container) {
+    console.warn("⚠ slot-m1要素が見つかりません");
+    return;
+  }
+  
+  // M1の構造を確認
+  console.log("📋 M1スロット構造:", m1Container.outerHTML.substring(0, 200));
+  
+  // 直接の子要素としてのslot-phrase
+  const phraseDiv = m1Container.querySelector(":scope > .slot-phrase");
+  console.log("📌 M1の直接子としてのslot-phrase:", phraseDiv ? phraseDiv.outerHTML : "未検出");
+  
+  if (phraseDiv) {
+    // 値を設定
+    phraseDiv.textContent = m1Data.SlotPhrase || "";
+    console.log("✅ M1 phrase値設定:", m1Data.SlotPhrase);
   } else {
-    console.warn("⚠ window.loadedJsonData が存在しません");
+    console.warn("⚠ M1にslot-phrase要素がないか、直接の子要素ではありません");
   }
-};
+  
+  // slot-textの処理
+  const textDiv = m1Container.querySelector(":scope > .slot-text");
+  if (textDiv) {
+    // 入れ子のslot-phraseを確認
+    const nestedPhraseDiv = textDiv.querySelector(".slot-phrase");
+    console.log("📌 M1のslot-text内のslot-phrase:", nestedPhraseDiv ? nestedPhraseDiv.outerHTML : "未検出");
+    
+    if (nestedPhraseDiv) {
+      // 入れ子のslot-phraseも念のためクリア
+      nestedPhraseDiv.textContent = "";
+    }
+    
+    // テキストノードを適切に設定
+    if (textDiv.firstChild && textDiv.firstChild.nodeType === Node.TEXT_NODE) {
+      textDiv.firstChild.textContent = m1Data.SlotText || "";
+    } else {
+      textDiv.prepend(document.createTextNode(m1Data.SlotText || ""));
+    }
+    console.log("✅ M1 text値設定:", m1Data.SlotText);
+  } else {
+    console.warn("⚠ M1にslot-text要素が見つかりません");
+  }
+}
+
+// グローバルにエクスポートする（index.htmlから呼び出せるように）
+window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
+window.syncSubslotsFromJson = syncSubslotsFromJson;
+window.debugM1Slot = debugM1Slot;
