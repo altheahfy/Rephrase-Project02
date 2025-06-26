@@ -181,3 +181,63 @@ setTimeout(() => {
 }, 0);
 
 }
+
+
+
+// ✅ 修正版：window.loadedJsonData を直接参照してスロット書き込み
+function syncUpperSlotsFromJson(data) {
+  console.log("🔄 上位スロット同期（from window.loadedJsonData）開始");
+  data.forEach(item => {
+    if (item.SubslotID === "" && item.PhraseType === "word") {
+      const container = document.getElementById("slot-" + item.Slot.toLowerCase());
+      if (container) {
+        const phraseDiv = container.querySelector(".slot-phrase");
+        const textDiv = container.querySelector(".slot-text");
+        if (phraseDiv) {
+          phraseDiv.textContent = item.SlotPhrase || "";
+          console.log(`✅ 上位 phrase書き込み成功: ${item.Slot}`);
+        }
+        if (textDiv) {
+          textDiv.textContent = item.SlotText || "";
+          console.log(`✅ 上位 text書き込み成功: ${item.Slot}`);
+        }
+      } else {
+        console.warn(`⚠ 上位スロットが見つかりません: ${item.Slot}`);
+      }
+    }
+  });
+}
+
+function syncSubslotsFromJson(data) {
+  console.log("🔄 サブスロット同期（from window.loadedJsonData）開始");
+  data.forEach(item => {
+    if (item.SubslotID !== "") {
+      const slotId = "slot-" + item.Slot.toLowerCase() + "-sub-" + item.SubslotID;
+      const slotElement = document.getElementById(slotId);
+      if (!slotElement) {
+        console.warn(`⚠ サブスロットが見つかりません: ${slotId}`);
+        return;
+      }
+      const phraseElement = slotElement.querySelector(".slot-phrase");
+      const textElement = slotElement.querySelector(".slot-text");
+      if (phraseElement) {
+        phraseElement.textContent = item.SlotPhrase || "";
+        console.log(`✅ サブ phrase書き込み成功: ${slotId}`);
+      }
+      if (textElement) {
+        textElement.textContent = item.SlotText || "";
+        console.log(`✅ サブ text書き込み成功: ${slotId}`);
+      }
+    }
+  });
+}
+
+// ✅ 差分追加：window.loadedJsonData を使った同期を起動
+window.onload = function() {
+  if (window.loadedJsonData) {
+    syncUpperSlotsFromJson(window.loadedJsonData);
+    syncSubslotsFromJson(window.loadedJsonData);
+  } else {
+    console.warn("⚠ window.loadedJsonData が存在しません");
+  }
+};
