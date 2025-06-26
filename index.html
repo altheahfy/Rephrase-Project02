@@ -8,13 +8,10 @@
   <link href="style.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
   </script>
+  <script src="js/fix_html_structure.js">
+  </script>
  </head>
  <body>
-
-<!-- 🔹 分離疑問詞用表示領域 -->
-<div id="display-top-question-word" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; color: #2a2a2a;">
-</div>
-
   <section>
   </section>
   <h1>
@@ -35,12 +32,10 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
-     <div class="slot-text">
-        <div class="slot-phrase"></div>
-     </div>
+     <div class="slot-phrase"></div>
+     <div class="slot-text"></div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="m1">
+      <button onclick="toggleExclusiveSubslot('m1')">
        ▼ 詳細
       </button>
      </div>
@@ -50,12 +45,10 @@
       S
      </label>
      <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
-     <div class="slot-text">
-        <div class="slot-phrase"></div>
-     </div>
+     <div class="slot-phrase"></div>
+     <div class="slot-text"></div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="s">
+      <button onclick="toggleExclusiveSubslot('s')">
        ▼ 詳細
       </button>
      </div>
@@ -65,9 +58,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="slot-container" id="slot-m2">
@@ -75,12 +66,10 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="m2">
+      <button onclick="toggleExclusiveSubslot('m2')">
        ▼ 詳細
       </button>
      </div>
@@ -90,9 +79,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="slot-container" id="slot-c1">
@@ -100,12 +87,10 @@
       C1
      </label>
      <img alt="image for C" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="c1">
+      <button onclick="toggleExclusiveSubslot('c')">
        ▼ 詳細
       </button>
      </div>
@@ -115,12 +100,10 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="o1">
+      <button onclick="toggleExclusiveSubslot('o1')">
        ▼ 詳細
       </button>
      </div>
@@ -130,12 +113,10 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="o2">
+      <button onclick='toggleExclusiveSubslot("o2")'>
        ▼ 詳細
       </button>
      </div>
@@ -145,12 +126,10 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <div class="subslot-toggle-button" style="margin-top: 4px;">
-      <button data-subslot-toggle="c2">
+      <button onclick="toggleExclusiveSubslot('c2')">
        ▼ 詳細
       </button>
      </div>
@@ -160,9 +139,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
      <!-- M3スロット用ボタン -->
      <div class="subslot-toggle-button" style="margin-top: 4px;">
@@ -181,9 +158,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
@@ -191,9 +166,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
@@ -201,9 +174,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
@@ -211,9 +182,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
@@ -221,9 +190,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-c1">
@@ -231,9 +198,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
@@ -241,9 +206,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
@@ -251,9 +214,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
@@ -261,9 +222,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
@@ -271,9 +230,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -286,9 +243,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-s" style="display: flex; flex-direction: column; align-items: center;">
@@ -296,9 +251,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
@@ -306,9 +259,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
@@ -316,9 +267,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-v" style="display: flex; flex-direction: column; align-items: center;">
@@ -326,9 +275,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-c1">
@@ -336,9 +283,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
@@ -346,9 +291,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
@@ -356,9 +299,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
@@ -366,9 +307,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m1-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
@@ -376,9 +315,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -391,9 +328,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-s" style="display: flex; flex-direction: column; align-items: center;">
@@ -401,9 +336,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-aux" style="display: flex; flex-direction: column; align-items: center;">
@@ -411,9 +344,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-m2" style="display: flex; flex-direction: column; align-items: center;">
@@ -421,9 +352,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-v" style="display: flex; flex-direction: column; align-items: center;">
@@ -431,9 +360,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-c1">
@@ -441,9 +368,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
@@ -451,9 +376,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
@@ -461,9 +384,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
@@ -471,9 +392,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-o2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
@@ -481,9 +400,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -496,9 +413,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-s">
@@ -506,9 +421,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-aux">
@@ -516,9 +429,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-m2">
@@ -526,9 +437,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-v">
@@ -536,9 +445,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-c1">
@@ -546,9 +453,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-o1">
@@ -556,9 +461,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-o2">
@@ -566,9 +469,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-c2">
@@ -576,9 +477,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m2-sub-m3">
@@ -586,9 +485,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -601,9 +498,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-s">
@@ -611,9 +506,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-aux">
@@ -621,9 +514,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-m2">
@@ -631,9 +522,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-v">
@@ -641,9 +530,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-c1">
@@ -651,9 +538,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-o1">
@@ -661,9 +546,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-o2">
@@ -671,9 +554,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-c2">
@@ -681,9 +562,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-c2-sub-m3">
@@ -691,9 +570,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -706,9 +583,7 @@
       M1
      </label>
      <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-s">
@@ -716,9 +591,7 @@
       S
      </label>
      <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-aux">
@@ -726,9 +599,7 @@
       AUX
      </label>
      <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-m2">
@@ -736,9 +607,7 @@
       M2
      </label>
      <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-v">
@@ -746,9 +615,7 @@
       V
      </label>
      <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-c1">
@@ -756,9 +623,7 @@
       C1
      </label>
      <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-o1">
@@ -766,9 +631,7 @@
       O1
      </label>
      <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-o2">
@@ -776,9 +639,7 @@
       O2
      </label>
      <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-c2">
@@ -786,9 +647,7 @@
       C2
      </label>
      <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
     <div class="subslot" id="slot-m3-sub-m3">
@@ -796,9 +655,7 @@
       M3
      </label>
      <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
      <div class="slot-text">
-        <div class="slot-phrase"></div>
      </div>
     </div>
    </div>
@@ -812,9 +669,7 @@
      M1
     </label>
     <img alt="image for M1" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-s">
@@ -822,9 +677,7 @@
      S
     </label>
     <img alt="image for S" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-aux">
@@ -832,9 +685,7 @@
      AUX
     </label>
     <img alt="image for AUX" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-m2">
@@ -842,9 +693,7 @@
      M2
     </label>
     <img alt="image for M2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-v">
@@ -852,9 +701,7 @@
      V
     </label>
     <img alt="image for V" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-c1">
@@ -862,9 +709,7 @@
      C1
     </label>
     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-o1">
@@ -872,9 +717,7 @@
      O1
     </label>
     <img alt="image for O1" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-o2">
@@ -882,9 +725,7 @@
      O2
     </label>
     <img alt="image for O2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-c2">
@@ -892,9 +733,7 @@
      C2
     </label>
     <img alt="image for C2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
    <div class="subslot" id="slot-s-sub-m3">
@@ -902,134 +741,121 @@
      M3
     </label>
     <img alt="image for M3" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
   </div>
-  <div class="slot-wrapper" id="slot-c1-sub" style="display: none;">
+  <div class="slot-wrapper" id="slot-c-sub" style="display: none;">
    <div class="subslot-label">
-    現在展開中：C1 の subslot
+    現在展開中：C の subslot
    </div>
-   <div class="subslot" id="slot-c1-sub-m1">
+   <div class="subslot" id="slot-c-sub-m1">
     <label>
      M1
     </label>
     <img alt="image for M1" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-s">
+   <div class="subslot" id="slot-c-sub-s">
     <label>
      S
     </label>
     <img alt="image for S" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-aux">
+   <div class="subslot" id="slot-c-sub-aux">
     <label>
      AUX
     </label>
     <img alt="image for AUX" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-m2">
+   <div class="subslot" id="slot-c-sub-m2">
     <label>
      M2
     </label>
     <img alt="image for M2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-v">
+   <div class="subslot" id="slot-c-sub-v">
     <label>
      V
     </label>
     <img alt="image for V" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-c1">
+   <div class="subslot" id="slot-c-sub-c1">
     <label>
      C1
     </label>
     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-o1">
+   <div class="subslot" id="slot-c-sub-o1">
     <label>
      O1
     </label>
     <img alt="image for O1" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-o2">
+   <div class="subslot" id="slot-c-sub-o2">
     <label>
      O2
     </label>
     <img alt="image for O2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-c2">
+   <div class="subslot" id="slot-c-sub-c2">
     <label>
      C2
     </label>
     <img alt="image for C2" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
-   <div class="subslot" id="slot-c1-sub-m3">
+   <div class="subslot" id="slot-c-sub-m3">
     <label>
      M3
     </label>
     <img alt="image for M3" class="slot-image"/>
-        <div class="slot-phrase"></div>
     <div class="slot-text">
-        <div class="slot-phrase"></div>
     </div>
    </div>
   </div>
-  
-  
-<script src="js/insert_test_data.js"></script>
-
-<script>
-  // syncDynamicToStatic() をDOM描画完了後に遅延実行
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      console.log("🚀 syncDynamicToStatic() 遅延呼び出し");
-      if (typeof syncDynamicToStatic === "function") {
-        syncDynamicToStatic();
-      } else {
-        console.warn("⚠ syncDynamicToStatic 関数が未定義です");
-      }
-    }, 200);
+  <script src="./js/test_controller.js" type="module">
+  </script>
+  <script>
+   function updateSubslotLabel(slotId) {
+  const ids = ["o1", "c", "m1", "s"];
+  ids.forEach(id => {
+    const container = document.getElementById(`slot-${id}-sub`);
+    if (container) {
+      const label = container.querySelector(".subslot-label");
+      if (label) label.style.display = (id === slotId) ? "block" : "none";
+    }
   });
-</script>
+}
+  </script>
+  <script src="js/renderer_core.js" type="module">
+  </script>
+<script src="js/structure_builder.js" type="module"></script>
+
+
+
+
+
+
+<!-- 元のロード処理スクリプトをコメントアウト
+
+-->
 
 </body>
 </html>
@@ -1055,10 +881,8 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
-      validateSlotsModified(data);
-      window.loadedJsonData = data;
-  buildStructure(data);
-    syncDynamicToStatic();
+      validateSlots(data);
+      buildStructure(data);
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
@@ -1075,13 +899,11 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   }
   const data = randomizeAll(loadedJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
-  validateSlotsModified(data);
-  window.loadedJsonData = data;
+  validateSlots(data);
   buildStructure(data);
-  syncDynamicToStatic();
 });
 
-function validateSlotsModified(data) {
+function validateSlots(data) {
   const requiredSlots = ["M1", "S", "V"];
   const presentSlots = data.map(d => d.Slot);
   requiredSlots.forEach(slot => {
