@@ -1,24 +1,5 @@
 
 // insert_test_data.js クリーン版：動的DOMスキャン + DisplayAtTop 表示対応
-function clearAllUpperSlots() {
-  const staticUpper = document.querySelectorAll('#static-slot-area [id^="slot-"]:not([id*="-sub-"])');
-  staticUpper.forEach(slot => {
-    const phrase = slot.querySelector('.slot-phrase');
-    const text = slot.querySelector('.slot-text');
-    if (phrase) phrase.textContent = "";
-    if (text) text.textContent = "";
-  });
-}
-
-function clearAllSubslots() {
-  const staticSubslots = document.querySelectorAll('#static-slot-area [id*="-sub-"]');
-  staticSubslots.forEach(slot => {
-    const phrase = slot.querySelector('.slot-phrase, .subslot-element');
-    const text = slot.querySelector('.slot-text, .subslot-text');
-    if (phrase) phrase.textContent = "";
-    if (text) text.textContent = "";
-  });
-}
 
 function extractDataFromDynamicArea() {
   const dynamicArea = document.getElementById("dynamic-slot-area");
@@ -46,7 +27,6 @@ function normalizeSlotId(slotId) {
 }
 
 function syncDynamicToStatic() {
-  clearAllSubslots();
   const data = extractDataFromDynamicArea();
   if (data.length === 0) {
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
