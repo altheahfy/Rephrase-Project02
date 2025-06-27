@@ -1,3 +1,4 @@
+
 function renderSlot(item) {
   console.log("renderSlot item:", item); 
   const slotDiv = document.createElement('div');
@@ -56,35 +57,20 @@ function renderSubslot(sub) {
 
 function buildStructure(selectedSlots) {
   console.log("buildStructure called with selectedSlots:", selectedSlots);
-  
-  // 動的記載エリアの配置場所を変更 - 専用のラッパー内に配置
-  let dynamicWrapper = document.getElementById('dynamic-slot-area-wrapper');
-  if (!dynamicWrapper) {
-    console.warn('dynamic-slot-area-wrapper not found, falling back to default location');
-    let wrapper = document.querySelector('.slot-wrapper');
-    if (!wrapper) {
-      console.error('slot-wrapper not found, skipping structure generation');
-      return;
-    }
-    dynamicWrapper = wrapper;
-  }
-  
-  // 動的記載エリアを作成または取得
+  let wrapper = document.querySelector('.slot-wrapper');
+  if (!wrapper) {
+    console.error('slot-wrapper not found, skipping structure generation');
+    return;
+    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
+
   let dynamicArea = document.getElementById('dynamic-slot-area');
   if (!dynamicArea) {
     dynamicArea = document.createElement('div');
     dynamicArea.id = 'dynamic-slot-area';
-    dynamicWrapper.appendChild(dynamicArea);
-    console.log("✅ 動的記載エリアを新規作成しました (ID: dynamic-slot-area)");
-  } else {
-    // 既存エリアを一旦ラッパーから削除
-    if (dynamicArea.parentElement) {
-      dynamicArea.parentElement.removeChild(dynamicArea);
-    }
-    // 新しい場所（ラッパー）に追加
-    dynamicWrapper.appendChild(dynamicArea);
-    console.log("✅ 既存の動的記載エリアを指定位置に移動しました");
-  }
+    wrapper.appendChild(dynamicArea);
+    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
 
   dynamicArea.innerHTML = '';
 
