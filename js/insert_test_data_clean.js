@@ -564,22 +564,27 @@ function reorderSubslotsInContainer(container, jsonData) {
 
   console.log(`🔢 DOM並べ替え実行: ${container.id} (${subslots.length}個の要素)`);
 
-  const parentSlotId = container.id.replace("slot-", "").replace("-sub", "");
+  // container.id = "slot-m1-sub" -> parentSlotId = "m1"
+  const parentSlotId = container.id.replace("slot-", "").replace("-sub", "").toUpperCase();
   console.log(`親スロットID: ${parentSlotId}`);
 
   const elementsWithOrder = Array.from(subslots).map(el => {
-    // 'slot-c1-sub-s' から 's' を取り出すロジックを堅牢化
+    // 'slot-m1-sub-s' から 's' を取り出し、'sub-s' 形式にする
     const subId = el.id.substring(el.id.lastIndexOf('-') + 1);
-    console.log(`  - 処理中のサブスロット要素: ${el.id} (抽出ID: ${subId})`);
+    const fullSubslotId = `sub-${subId}`;
+    console.log(`  - 処理中のサブスロット要素: ${el.id} (検索ID: ${fullSubslotId})`);
     
-    // ★★★ 検索ロジック修正: 親の縛りをなくし、SubslotIDだけでデータを探す ★★★
-    const data = jsonData.find(d => d.SubslotID?.toLowerCase() === subId);
+    // 親スロットと SubslotID の両方でマッチング
+    const data = jsonData.find(d => 
+      d.Slot?.toUpperCase() === parentSlotId && 
+      d.SubslotID?.toLowerCase() === fullSubslotId.toLowerCase()
+    );
     const order = data ? data.display_order : 999;
     
     if(data){
-        console.log(`    ✅ データ発見 (親: ${data.Slot}), order=${order}`);
+        console.log(`    ✅ データ発見 (Slot: ${data.Slot}, SubslotID: ${data.SubslotID}), order=${order}`);
     } else {
-        console.log(`    ❌ データ未発見 (ID: ${subId})`);
+        console.log(`    ❌ データ未発見 (親: ${parentSlotId}, SubslotID: ${fullSubslotId})`);
     }
     
     return { el, order };
