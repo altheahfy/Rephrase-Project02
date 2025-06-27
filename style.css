@@ -194,3 +194,30 @@
   margin-bottom: 20px;
   width: 100%;
 }
+
+/* 空のスロット非表示機構用のスタイル */
+.empty-slot-hidden {
+  display: none !important;
+  visibility: hidden;
+}
+
+.display-at-top-hidden {
+  display: none !important;
+  visibility: hidden;
+}
+
+.empty-container-hidden {
+  display: none !important;
+  visibility: hidden;
+}
+
+/* アニメーション効果（オプション - 将来の拡張用） */
+.slot-container.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.slot-container.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
