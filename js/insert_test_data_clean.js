@@ -131,7 +131,7 @@ function reorderSubslots(parentSlotId, jsonData) {
     container.appendChild(item.el);
   });
   
-  console.log(`✅ ${parentSlotId}内のサブスロットを順序通りに再配置しました`);
+  console.log(`✅ ${parentId}内のサブスロットを順序通りに再配置しました`);
 }
 
 // すべての上位スロットを順序付けする関数 - CSSのorder属性を使用する安全版
@@ -568,14 +568,16 @@ function reorderSubslotsInContainer(container, jsonData) {
   console.log(`親スロットID: ${parentSlotId}`);
 
   const elementsWithOrder = Array.from(subslots).map(el => {
-    const subId = el.id.replace(`slot-${parentSlotId}-sub-`, "");
+    // 'slot-c1-sub-s' から 's' を取り出すロジックを堅牢化
+    const subId = el.id.substring(el.id.lastIndexOf('-') + 1);
     console.log(`  - 処理中のサブスロット要素: ${el.id} (抽出ID: ${subId})`);
     
-    const data = jsonData.find(d => d.Slot?.toLowerCase() === parentSlotId && d.SubslotID?.toLowerCase() === subId);
+    // ★★★ 検索ロジック修正: 親の縛りをなくし、SubslotIDだけでデータを探す ★★★
+    const data = jsonData.find(d => d.SubslotID?.toLowerCase() === subId);
     const order = data ? data.display_order : 999;
     
     if(data){
-        console.log(`    ✅ データ発見: order=${order}`);
+        console.log(`    ✅ データ発見 (親: ${data.Slot}), order=${order}`);
     } else {
         console.log(`    ❌ データ未発見 (ID: ${subId})`);
     }
