@@ -94,7 +94,7 @@ function reorderSubslots(parentSlotId, jsonData) {
   );
   
   if (subslotData.length <= 1) {
-    console.log(`ℹ️ ${parentSlotId}には並べ替えが必要なサブスロットがありません`);
+    console.log(`ℹ️ ${parentSlotId}には並べ替えが必要なサブスロットが1つ以下です`);
     return;
   }
   
@@ -557,21 +557,37 @@ function reorderSubslotsInContainer(container, jsonData) {
     return;
   }
   const subslots = container.querySelectorAll(".subslot");
-  if (subslots.length <= 1) return; // 並べ替える必要なし
+  if (subslots.length <= 1) {
+    console.log(`ℹ️ ${container.id} には並べ替えが必要なサブスロットが1つ以下です`);
+    return; // 並べ替える必要なし
+  }
 
-  console.log(`🔢 DOM並べ替え実行: ${container.id}`);
+  console.log(`🔢 DOM並べ替え実行: ${container.id} (${subslots.length}個の要素)`);
 
   const parentSlotId = container.id.replace("slot-", "").replace("-sub", "");
+  console.log(`親スロットID: ${parentSlotId}`);
 
   const elementsWithOrder = Array.from(subslots).map(el => {
     const subId = el.id.replace(`slot-${parentSlotId}-sub-`, "");
+    console.log(`  - 処理中のサブスロット要素: ${el.id} (抽出ID: ${subId})`);
+    
     const data = jsonData.find(d => d.Slot?.toLowerCase() === parentSlotId && d.SubslotID?.toLowerCase() === subId);
     const order = data ? data.display_order : 999;
+    
+    if(data){
+        console.log(`    ✅ データ発見: order=${order}`);
+    } else {
+        console.log(`    ❌ データ未発見 (ID: ${subId})`);
+    }
+    
     return { el, order };
   });
 
   elementsWithOrder.sort((a, b) => a.order - b.order);
 
+  console.log("📊 ソート後の順序:", elementsWithOrder.map(item => ({id: item.el.id, order: item.order})));
+  
+  console.log("🔄 DOM要素の再配置を開始");
   elementsWithOrder.forEach(item => {
     container.appendChild(item.el);
   });
