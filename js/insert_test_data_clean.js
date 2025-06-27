@@ -466,6 +466,7 @@ window.reorderSubslotsInContainer = (container, jsonData) => {
     console.error("reorderSubslotsInContainer: container is null");
     return;
   }
+  console.log(`🔄 Executing reorder for: ${container.id}`);
   
   const upperSlotId = container.id.replace('slot-', '').replace('-sub', '');
 
@@ -473,32 +474,37 @@ window.reorderSubslotsInContainer = (container, jsonData) => {
     .filter(item => item.Slot.toLowerCase() === upperSlotId.toLowerCase() && item.SubslotID)
     .sort((a, b) => a.display_order - b.display_order);
 
-  // Find all subslot elements currently in the container BEFORE clearing it.
+  if (relevantSubslotsData.length === 0) {
+    console.warn(`_WARN: No relevant subslot data found in jsonData for container ${container.id}`);
+    return;
+  }
+
+  console.log(`📊 Expected order for ${container.id} from JSON:`, relevantSubslotsData.map(d => `${d.SubslotID} (order: ${d.display_order})`));
+
   const subslotElementsInDom = Array.from(container.querySelectorAll('.subslot'));
+  console.log('📦 Current DOM elements:', subslotElementsInDom.map(el => el.id));
 
   const sortedElementsToAppend = relevantSubslotsData.map(subslotData => {
     const subslotIdSuffix = subslotData.SubslotID.replace('sub-', '');
     const fullSubslotId = `slot-${upperSlotId}-sub-${subslotIdSuffix}`;
-    // Find the element in the array we captured before modification.
-    const element = subslotElementsInDom.find(el => el.id === fullSubslotId);
+    const element = container.querySelector(`#${fullSubslotId}`);
+    if (!element) {
+      console.warn(`_WARN: Element with ID #${fullSubslotId} not found in container.`);
+    }
     return element;
   }).filter(el => el); // Filter out any nulls if elements weren't found
 
-  // Clear the container of all its current children.
-  while (container.firstChild) {
-    container.removeChild(container.firstChild);
-  }
+  console.log('🔩 Sorted elements to append:', sortedElementsToAppend.map(el => el.id));
 
-  // Append the sorted elements back to the now-empty container.
+  // Append elements in the sorted order. This moves them to the end of the container.
   sortedElementsToAppend.forEach(element => {
     container.appendChild(element);
   });
+
+  const finalDomOrder = Array.from(container.querySelectorAll('.subslot'));
+  console.log(`✅ Reordering complete for ${container.id}. Final DOM order:`, finalDomOrder.map(el => el.id));
 };
 
-
-/**
-// ...existing code...
-*/
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
@@ -560,4 +566,196 @@ window.safeJsonSync = function(data) {
   }
 };
 
-```
+// ランダマイズ後の同期を確保するためのMutationObserverを設定
+window.setupSyncObserver = function() {
+  try {
+    // 動的記載エリアの変更を監視
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    if (!dynamicArea) {
+      console.warn("⚠ 監視対象の動的記載エリアが見つかりません");
+      return;
+    }
+    
+    console.log("👁 動的記載エリアの監視を開始します");
+    
+    // 変更の監視設定
+    const observer = new MutationObserver(function(mutations) {
+      console.log("👀 動的記載エリアに変更を検出しました");
+      
+      // 処理が重複しないよう、タイマーでデバウンス
+      if (window.syncDebounceTimer) {
+        clearTimeout(window.syncDebounceTimer);
+      }
+      
+      window.syncDebounceTimer = setTimeout(() => {
+        console.log("🔄 変更検出による同期処理を実行します");
+        if (window.loadedJsonData) {
+          window.safeJsonSync(window.loadedJsonData);
+        }
+      }, 300); // 300ミリ秒の遅延で実行
+    });
+    
+    // 設定を適用して監視開始
+    observer.observe(dynamicArea, { 
+      childList: true, 
+      subtree: true, 
+      characterData: true,
+      attributes: true
+    });
+    
+    console.log("✅ MutationObserverの設定が完了しました");
+    return observer;
+  } catch (err) {
+    console.error("❌ 監視設定中にエラーが発生しました:", err.message);
+  }
+};
+
+// ランダマイザーの監視と同期（ランダマイザー用の特別対応）
+window.setupRandomizerSync = function() {
+  try {
+    // ランダマイズボタンを探す
+    const randomizerButtons = document.querySelectorAll('button[data-action="randomize"], button.randomize-button, #randomize-all');
+    if (randomizerButtons.length === 0) {
+      console.warn("⚠ ランダマイズボタンが見つかりません");
+      return;
+    }
+    
+    console.log(`🎲 ランダマイズボタンを ${randomizerButtons.length}個 検出しました`);
+    
+    // 各ボタンにイベントリスナーを追加
+    randomizerButtons.forEach((button, index) => {
+      // 既存のイベントハンドラを保持するための対応
+      const originalClickHandler = button.onclick;
+      
+      button.addEventListener('click', function(event) {
+        console.log(`🎲 ランダマイズボタンがクリックされました (${index + 1})`);
+        
+        // ランダマイズ処理完了後に確実に同期処理を行う
+        setTimeout(() => {
+          console.log("🔄 ランダマイズ後の同期処理を実行します (遅延: 1000ms)");
+          if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
+            
+            // 全体の再同期
+            window.safeJsonSync(window.loadedJsonData);
+            
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
+          }
+        }, 1000); // 1000ms（1秒）に延長 - ランダマイズ処理が確実に完了するのを待つ
+      }, true); // キャプチャフェーズでイベントをキャッチ
+      
+      console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
+    });
+    
+    // window.randomizeAllSlots関数をオーバーライド（存在する場合）
+    if (typeof window.randomizeAllSlots === 'function') {
+      const originalRandomizeFunc = window.randomizeAllSlots;
+      window.randomizeAllSlots = function(...args) {
+        console.log("🎲 randomizeAllSlots関数が呼び出されました");
+        const result = originalRandomizeFunc.apply(this, args);
+        
+        // ランダマイズ処理完了後に同期処理を行う
+        setTimeout(() => {
+          console.log("🔄 randomizeAllSlots後の同期処理を実行します (遅延: 1000ms)");
+          if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
+            
+            window.safeJsonSync(window.loadedJsonData);
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
+          }
+        }, 1000); // 1000ms（1秒）に延長
+        
+        return result;
+      };
+      console.log("✅ randomizeAllSlots関数をオーバーライドしました");
+    }
+    
+    return true;
+  } catch (err) {
+    console.error("❌ ランダマイザー監視設定中にエラーが発生しました:", err.message);
+    return false;
+  }
+};
+
+// ページ読み込み完了時に監視を開始
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("🌐 DOMContentLoaded イベント発生");
+  
+  // 動的エリアの位置調整
+  ensureDynamicAreaPosition();
+  
+  setTimeout(() => {
+    window.setupSyncObserver();
+    window.setupRandomizerSync();
+    
+    // 初期同期も実行
+    if (window.loadedJsonData) {
+      window.safeJsonSync(window.loadedJsonData);
+    }
+    
+    // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
+    let lastJsonDataSignature = "";
+    
+    // データの特徴的な部分から署名を生成する関数
+    function getDataSignature(data) {
+      if (!data || !Array.isArray(data) || data.length === 0) return "";
+      try {
+        // スロットの内容からチェックサムを生成
+        const sampleItems = data.slice(0, 3); // 最初の3件のみ使用
+        const signature = sampleItems.map(item => 
+          `${item.Slot}:${item.SlotPhrase && item.SlotPhrase.substring(0, 10)}`
+        ).join('|');
+        return signature;
+      } catch (e) {
+        return "";
+      }
+    }
+    
+    // 低頻度で定期チェック (3秒ごと)
+    setInterval(() => {
+      if (window.loadedJsonData) {
+        const newSignature = getDataSignature(window.loadedJsonData);
+        if (newSignature && newSignature !== lastJsonDataSignature) {
+          console.log("🔄 window.loadedJsonData の実質的な変更を検出");
+          window.safeJsonSync(window.loadedJsonData);
+          lastJsonDataSignature = newSignature;
+        }
+      }
+      
+      // 定期的に動的エリアの位置も確認
+      ensureDynamicAreaPosition();
+    }, 3000); // 3秒ごとに変更をチェック
+    
+  }, 500); // DOMが完全に構築されるのを待つ
+});
+
+// 動的エリアの位置を調整する関数
+function ensureDynamicAreaPosition() {
+  // 動的エリアコンテナを取得
+  const container = document.getElementById("dynamic-area-container");
+  
+  // コンテナが存在する場合
+  if (container) {
+    // コンテナが最後の要素でない場合は移動
+    if (container !== document.body.lastElementChild) {
+      // すべてのスロット関連要素とサブスロット要素の後に配置する
+      document.body.appendChild(container);
+      console.log("🔄 動的エリアコンテナを再配置しました");
+    }
+    
+    // 動的エリア内部の調整
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    
+    if (dynamicArea && wrapper && !wrapper.contains(dynamicArea)) {
+      wrapper.appendChild(dynamicArea);
+      console.log("🔄 動的エリアをラッパー内に再配置しました");
+    }
+  }
+}
