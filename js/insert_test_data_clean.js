@@ -77,8 +77,10 @@ function reorderDomElements(container, selector, getOrderFunc) {
   console.log(`✅ ${container.id}内の要素を順序通りに再配置しました`);
 }
 
-// 特定のスロットコンテナ内のサブスロットを順序付けする関数
+// 特定のスロットコンテナ内のサブスロットを順序付けする関数（改良版）
 function reorderSubslots(parentSlotId, jsonData) {
+  console.log(`🔄 サブスロット順序処理開始: ${parentSlotId}`);
+  
   const container = document.getElementById(parentSlotId);
   if (!container) {
     console.warn(`⚠ 並べ替え対象のコンテナが見つかりません: ${parentSlotId}`);
@@ -100,41 +102,82 @@ function reorderSubslots(parentSlotId, jsonData) {
   
   console.log(`🔢 ${parentSlotId}のサブスロットを並べ替えます (${subslotData.length}個)`);
   
+  // サブスロットのデータをオーダー順にソート
+  const sortedSubslotData = sortJsonDataByOrder(subslotData);
+  console.log(`🔄 サブスロットの順序情報:`, sortedSubslotData.map(item => 
+    `${item.SubslotID}:${item.display_order || item.order || 0}`
+  ).join(', '));
+  
   // SubSlotIDからorderを取得するマップを作成
   const orderMap = new Map();
+  
+  // 内容があるサブスロットを追跡
+  const usedSubslots = new Set();
+  
   subslotData.forEach(item => {
-    orderMap.set(item.SubslotID.toLowerCase(), item.order || 0);
+    // 順序値の取得
+    const orderValue = item.display_order || item.order || 0;
+    orderMap.set(item.SubslotID.toLowerCase(), orderValue);
+    
+    // 内容のあるサブスロットを記録
+    if ((item.SubslotElement && item.SubslotElement.trim() !== "") || 
+        (item.SubslotText && item.SubslotText.trim() !== "")) {
+      usedSubslots.add(item.SubslotID.toLowerCase());
+    }
   });
   
-  // サブスロット要素を取得して順序付け
-  const subslotSelector = '[id^="slot-' + parentId.toLowerCase() + '-"]';
-  const subslots = container.querySelectorAll(subslotSelector);
+  console.log(`📋 ${parentSlotId}の使用中サブスロット:`, Array.from(usedSubslots).join(', '));
+  
+  // サブスロットのコンテナ（通常はslot-*-subの要素）
+  const subslotContainer = container.querySelector(`#${parentSlotId}-sub`) || container;
+  
+  // サブスロット要素を取得して順序付けとフィルタリング
+  const subslotSelector = '.subslot';
+  const subslots = subslotContainer.querySelectorAll(subslotSelector);
   
   if (subslots.length === 0) {
     console.warn(`⚠ ${parentSlotId}内にサブスロット要素が見つかりません`);
     return;
   }
   
-  // サブスロット要素とその順序値の配列を作成
-  const subslotElements = Array.from(subslots).map(el => {
-    // IDからサブスロットIDを抽出（例：slot-m1-sub-o1 → sub-o1）
-    const subslotId = el.id.replace(`slot-${parentId.toLowerCase()}-`, '');
-    const order = orderMap.get(subslotId) || 0;
-    return { el, order };
+  // コンテナにFlex表示を明示的に設定して順序制御を有効化
+  subslotContainer.style.display = 'flex';
+  subslotContainer.style.flexDirection = 'column';  // サブスロットは縦並びが基本
+  
+  console.log(`🔎 ${parentSlotId}のサブスロット要素数: ${subslots.length}`);
+  
+  // CSSのorder属性を使用して順序を設定し、未使用のサブスロットを非表示にする
+  Array.from(subslots).forEach(el => {
+    // IDからサブスロットIDを抽出（例：slot-m1-sub-o1 → o1）
+    const idParts = el.id.split('-');
+    const subslotId = idParts[idParts.length - 1].toLowerCase();
+    
+    // 順序を設定
+    const orderValue = orderMap.get(subslotId);
+    if (orderValue !== undefined) {
+      el.style.order = orderValue;
+      // データ属性としても設定（デバッグ用）
+      el.setAttribute('data-order', orderValue);
+      console.log(`🔢 サブスロット "${el.id}" に順序 ${orderValue} を適用`);
+    } else {
+      console.warn(`⚠ サブスロット "${el.id}" の順序情報が見つかりません`);
+      el.style.order = '999'; // 順序不明の場合は末尾に
+    }
+    
+    // 使用状況に応じた表示/非表示を設定
+    if (usedSubslots.has(subslotId)) {
+      el.style.display = 'flex';  // 表示するときはflex（子要素の配置制御のため）
+      console.log(`✅ サブスロット "${el.id}" を表示、順序 ${el.style.order} を適用`);
+    } else {
+      el.style.display = 'none';
+      console.log(`🚫 サブスロット "${el.id}" は未使用のため非表示`);
+    }
   });
   
-  // 順序でソート
-  subslotElements.sort((a, b) => a.order - b.order);
-  
-  // 親要素に順序通りに追加し直す
-  subslotElements.forEach(item => {
-    container.appendChild(item.el);
-  });
-  
-  console.log(`✅ ${parentSlotId}内のサブスロットを順序通りに再配置しました`);
+  console.log(`✅ ${parentSlotId}内のサブスロットの表示順と表示状態を適用しました`);
 }
 
-// すべての上位スロットを順序付けする関数 - CSSのorder属性を使用する安全版
+// すべての上位スロットを順序付けする関数 - 表示順制御と未使用スロットの非表示
 function applyOrderToAllSlots(jsonData) {
   if (!jsonData || !Array.isArray(jsonData)) {
     console.warn("⚠ 順序付けに使用するデータが無効です");
@@ -147,34 +190,108 @@ function applyOrderToAllSlots(jsonData) {
   const upperSlots = jsonData.filter(item => item.SubslotID === "" && item.PhraseType === "word");
   const slotOrderMap = new Map();
   
+  // 使用されているスロットのセット（例文に登場する要素のみ表示するため）
+//   const usedSlots = new Set();
+  
+  // DisplayAtTopフラグを持つスロットのIDを追跡
+  const displayAtTopSlots = new Set();
+  
   upperSlots.forEach(item => {
+    // DisplayAtTopフラグを持つスロットを記録（上部に別途表示されるため通常表示から除外）
+    if (item.DisplayAtTop === true) {
+      displayAtTopSlots.add(item.Slot.toLowerCase());
+      console.log(`🔼 DisplayAtTop対象: ${item.Slot} (${item.DisplayText || ''})`);
+      return; // このスロットはorder処理や使用済みセットへの追加をスキップ
+    }
+    
+    // 使用されている（内容がある）スロットを記録
+    if (item.SlotPhrase && item.SlotPhrase.trim() !== "") {
+      usedSlots.add(item.Slot.toLowerCase());
+    }
+    
     // order値を取得（display_order、Slot_display_orderまたはorderフィールド）
     const orderValue = item.display_order || item.Slot_display_order || item.order || 0;
     slotOrderMap.set(item.Slot.toLowerCase(), orderValue);
+    console.log(`📊 順序マッピング: ${item.Slot.toLowerCase()} => ${orderValue}`);
   });
   
-  // マップのエントリを確認
-  console.log("📊 スロット順序マップ:", [...slotOrderMap.entries()]);
+  // 使用中とDisplayAtTopスロットのリストを表示（デバッグ用）
+  console.log("📋 使用中スロット:", Array.from(usedSlots).join(', '));
+  console.log("🔼 DisplayAtTopスロット:", Array.from(displayAtTopSlots).join(', '));
   
-  // 順序をCSSのorder属性として適用（DOM構造自体は変更しない安全な方法）
-  slotOrderMap.forEach((orderValue, slotId) => {
-    const slotElement = document.getElementById(`slot-${slotId}`);
-    if (slotElement) {
-      // CSSのorder属性を設定
-      slotElement.style.order = orderValue;
-      console.log(`✅ スロット "${slotId}" に表示順 ${orderValue} を適用 (CSS order)`);
+  // マップのエントリを確認
+  console.log("📊 スロット順序マップ:", [...slotOrderMap.entries()].map(([id, order]) => `${id}:${order}`).join(', '));
+  
+  // 親コンテナを取得
+  const slotWrapper = document.querySelector('.slot-wrapper');
+  if (!slotWrapper) {
+    console.warn("⚠ スロットラッパーが見つかりません");
+    return;
+  }
+  
+  // すでにflex設定がされている場合は尊重し、されていない場合のみ設定
+  const wrapperStyle = window.getComputedStyle(slotWrapper);
+  const currentDisplay = wrapperStyle.display;
+  
+  // flex表示を明示的に設定して順序制御を有効化
+  if (currentDisplay === 'none' || currentDisplay === '') {
+    slotWrapper.style.display = 'flex';
+  }
+  
+  // 既存の方向設定を優先（CSSで設定されている可能性がある）
+  // フレキシブルディレクション - 既存の方向を尊重
+  if (!slotWrapper.style.flexDirection) {
+    slotWrapper.style.flexDirection = 'row';
+  }
+  
+  if (!slotWrapper.style.flexWrap) {
+    slotWrapper.style.flexWrap = 'wrap';
+  }
+  
+  if (!slotWrapper.style.alignItems) {
+    slotWrapper.style.alignItems = 'flex-start';
+  }
+  
+  console.log(`📐 スロットラッパースタイル適用: display=${slotWrapper.style.display}, direction=${slotWrapper.style.flexDirection}`);
+  
+  // すべての上位スロットコンテナを取得して処理
+  const slotContainers = Array.from(slotWrapper.querySelectorAll('.slot-container'));
+  console.log(`🔎 検出したスロットコンテナ数: ${slotContainers.length}`);
+  
+  slotContainers.forEach(container => {
+    const slotId = container.id.replace('slot-', '').toLowerCase();
+    console.log(`🔍 スロット処理: ${slotId}`);
+    
+    // 1. DisplayAtTopフラグを持つスロットは非表示（別の場所に表示されるため）
+//     if (displayAtTopSlots.has(slotId)) {
+//       container.style.display = 'none';
+//       console.log(`🚫 スロット "${slotId}" はDisplayAtTopのため非表示`);
+//       return;
+//     }
+    
+    // 2. 表示順の適用
+    const orderValue = slotOrderMap.get(slotId);
+    if (orderValue !== undefined) {
+      container.style.order = orderValue;
+      // データ属性としても設定（CSSセレクタで使用可能）
+      container.setAttribute('data-order', orderValue);
+      console.log(`🔢 スロット "${slotId}" に順序 ${orderValue} を適用`);
+    } else {
+      console.warn(`⚠ スロット "${slotId}" の順序情報が見つかりません`);
+      container.style.order = '999'; // 末尾に配置
+    }
+    
+    // 3. 使用状況に応じた表示/非表示の設定
+    if (usedSlots.has(slotId)) {
+      container.style.display = 'flex';
+      console.log(`✅ スロット "${slotId}" を表示、順序 ${container.style.order} を適用`);
+    } else {
+      container.style.display = 'none';
+      console.log(`🚫 スロット "${slotId}" は未使用のため非表示`);
     }
   });
   
-  // 親コンテナにflexboxレイアウトを適用（必要な場合）
-  const slotWrapper = document.querySelector('.slot-wrapper');
-  if (slotWrapper) {
-    slotWrapper.style.display = 'flex';
-    slotWrapper.style.flexDirection = 'column';
-    console.log("✅ スロットラッパーにflex表示を適用");
-  }
-  
-  console.log("✅ 上位スロットの表示順適用完了");
+  console.log("✅ 上位スロットの表示順と表示状態の適用完了");
 }
 
 // 動的エリアから静的DOMへの同期関数
@@ -249,10 +366,14 @@ function syncDynamicToStatic() {
       if (container) {
         console.log("container found for ID:", container.id);
         console.log("container HTML:", container.outerHTML.substring(0, 150) + "...");
-        const phraseDiv = container.querySelector(".slot-phrase");
-        console.log("phraseDiv:", phraseDiv ? phraseDiv.outerHTML : "未検出");
+
+        // 直接の子要素としてのslot-phrase
+        const phraseDiv = container.querySelector(":scope > .slot-phrase");
+        console.log("上位スロットのphraseDiv:", phraseDiv ? phraseDiv.outerHTML : "未検出");
+        
         const textDiv = container.querySelector(".slot-text");
-        console.log("textDiv:", textDiv ? textDiv.outerHTML : "未検出");
+        console.log("上位スロットのtextDiv:", textDiv ? textDiv.outerHTML : "未検出");
+        
         if (phraseDiv) {
           phraseDiv.textContent = item.SlotPhrase || "";
           console.log(`✅ phrase書き込み成功: ${item.Slot} (parent) | 値: "${item.SlotPhrase}"`);
@@ -303,10 +424,10 @@ function syncDynamicToStatic() {
     }
     
     console.log("🔍 サブスロット要素発見:", slotElement.id, "| HTML:", slotElement.outerHTML.substring(0, 100) + "...");
+
+    // phraseとtextを更新
     const phraseElement = slotElement.querySelector(".slot-phrase");
-    console.log("サブスロット phraseElement:", phraseElement ? phraseElement.outerHTML : "未検出");
     const slotTextElement = slotElement.querySelector(".slot-text");
-    console.log("サブスロット textElement:", slotTextElement ? slotTextElement.outerHTML : "未検出");
 
     if (phraseElement) {
       phraseElement.textContent = item.SlotPhrase;
@@ -368,11 +489,11 @@ function syncUpperSlotsFromJson(data) {
   
   const upperSlotCount = data.filter(item => item.SubslotID === "" && item.PhraseType === "word").length;
   console.log(`🔄 上位スロット同期: ${upperSlotCount}件の対象を処理`);
-  
-  // 詳細ログはデバッグが必要な時だけ出す
-  if (window.DEBUG_SYNC) {
-    console.log("📊 データサンプル:", JSON.stringify(data.slice(0, 3))); // 最初の3件だけ表示
-  }
+
+//   // 詳細ログはデバッグが必要な時だけ出す
+//   if (window.DEBUG_SYNC) {
+//     console.log("📊 データサンプル:", JSON.stringify(data.slice(0, 3))); // 最初の3件だけ表示
+//   }
   
   // グローバル変数がなければ初期化
   if (typeof window.DEBUG_SYNC === 'undefined') {
@@ -543,12 +664,12 @@ function debugM1Slot() {
 }
 
 // グローバルにエクスポートする（index.htmlから呼び出せるように）
-window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
-window.syncSubslotsFromJson = syncSubslotsFromJson;
-window.debugM1Slot = debugM1Slot;
-window.displayTopQuestionWord = displayTopQuestionWord;
-window.applyOrderToAllSlots = applyOrderToAllSlots;
-window.reorderSubslots = reorderSubslots;
+// window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
+// window.syncSubslotsFromJson = syncSubslotsFromJson;
+// window.debugM1Slot = debugM1Slot;
+// window.displayTopQuestionWord = displayTopQuestionWord;
+// window.applyOrderToAllSlots = applyOrderToAllSlots;
+// window.reorderSubslots = reorderSubslots;
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
@@ -768,13 +889,48 @@ document.addEventListener("DOMContentLoaded", function() {
   ensureDynamicAreaPosition();
   
   setTimeout(() => {
+    // ①監視を設定
     window.setupSyncObserver();
     window.setupRandomizerSync();
     
-    // 初期同期も実行
+    // ②強制的に順序制御を実行（最初の表示時）
+    console.log("🔄 初期表示時の順序制御を強制実行します");
     if (window.loadedJsonData) {
+      // 表示順制御を優先的に適用
+      if (typeof applyOrderToAllSlots === 'function') {
+        applyOrderToAllSlots(window.loadedJsonData);
+      }
+      
+      // 最重要な構文スロットのサブスロット順序を優先的に適用
+      if (typeof reorderSubslots === 'function') {
+        ['slot-m1', 'slot-s', 'slot-v', 'slot-c', 'slot-o'].forEach(slotId => {
+          reorderSubslots(slotId, window.loadedJsonData);
+        });
+      }
+      
+      // その後で全体同期を実行
       window.safeJsonSync(window.loadedJsonData);
     }
+    
+    // ③追加の保険：1秒後にもう一度順序制御を実行（全てのDOM要素が確実にロードされた後）
+    setTimeout(() => {
+      console.log("🔄 遅延実行の順序制御をトリガー（DOM完全ロード後）");
+      if (window.loadedJsonData) {
+        if (typeof applyOrderToAllSlots === 'function') {
+          applyOrderToAllSlots(window.loadedJsonData);
+        }
+        
+        // 全てのスロットに対してサブスロット順序も適用
+        const allSlotContainers = document.querySelectorAll('.slot-container');
+        if (typeof reorderSubslots === 'function' && allSlotContainers.length > 0) {
+          Array.from(allSlotContainers).forEach(container => {
+            if (container.id.startsWith('slot-')) {
+              reorderSubslots(container.id, window.loadedJsonData);
+            }
+          });
+        }
+      }
+    }, 1000);
     
     // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
     let lastJsonDataSignature = "";
@@ -800,6 +956,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const newSignature = getDataSignature(window.loadedJsonData);
         if (newSignature && newSignature !== lastJsonDataSignature) {
           console.log("🔄 window.loadedJsonData の実質的な変更を検出");
+          
+          // 順序制御も優先的に実行
+          if (typeof applyOrderToAllSlots === 'function') {
+            applyOrderToAllSlots(window.loadedJsonData);
+            console.log("✅ 定期チェックによる順序制御を実行しました");
+          }
+          
           window.safeJsonSync(window.loadedJsonData);
           lastJsonDataSignature = newSignature;
         }

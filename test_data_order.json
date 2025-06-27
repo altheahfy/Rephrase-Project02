@@ -1,0 +1,80 @@
+[
+  {
+    "Slot": "M1",
+    "SlotPhrase": "They",
+    "SlotText": "主語として機能する「彼ら」",
+    "PhraseType": "word",
+    "order": 1
+  },
+  {
+    "Slot": "AUX",
+    "SlotPhrase": "have",
+    "SlotText": "助動詞として現在完了形を形成",
+    "PhraseType": "word",
+    "order": 2
+  },
+  {
+    "Slot": "V",
+    "SlotPhrase": "studied",
+    "SlotText": "「勉強する」の過去分詞形",
+    "PhraseType": "word",
+    "order": 3
+  },
+  {
+    "Slot": "O1",
+    "SlotPhrase": "English",
+    "SlotText": "「英語」- 勉強の対象",
+    "PhraseType": "word",
+    "order": 4
+  },
+  {
+    "Slot": "C1",
+    "SlotPhrase": "for three years",
+    "SlotText": "「3年間」- 期間を表す",
+    "PhraseType": "word",
+    "order": 5
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "subject",
+    "SubslotElement": "主語",
+    "SubslotText": "文の主題となる部分",
+    "display_order": 1
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "noun",
+    "SubslotElement": "名詞",
+    "SubslotText": "人・物・概念を表す品詞",
+    "display_order": 2
+  },
+  {
+    "Slot": "M1",
+    "SubslotID": "pronoun", 
+    "SubslotElement": "代名詞",
+    "SubslotText": "名詞の代わりとなる語",
+    "display_order": 3
+  },
+  {
+    "Slot": "O1",
+    "DisplayAtTop": true,
+    "DisplayText": "What",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "word"
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "is",
+    "SubslotElement": "is",
+    "SubslotText": "be動詞の三人称単数現在形",
+    "display_order": 1
+  },
+  {
+    "Slot": "O1",
+    "SubslotID": "it",
+    "SubslotElement": "it",
+    "SubslotText": "それは（指示代名詞）",
+    "display_order": 2
+  }
+]
