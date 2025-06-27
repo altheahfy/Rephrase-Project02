@@ -147,31 +147,31 @@ function applyOrderToAllSlots(jsonData) {
   const upperSlots = jsonData.filter(item => item.SubslotID === "" && item.PhraseType === "word");
   const slotOrderMap = new Map();
   
+  // 使用されているスロットのセット（例文に登場する要素のみ表示するため）
+  const usedSlots = new Set();
+  
+  // DisplayAtTopフラグを持つスロットのIDを追跡
+  const displayAtTopSlots = new Set();
+  
   upperSlots.forEach(item => {
+    // DisplayAtTopフラグを持つスロットを記録（上部に別途表示されるため通常表示から除外）
+    if (item.DisplayAtTop === true) {
+      displayAtTopSlots.add(item.Slot.toLowerCase());
+      console.log(`🔼 DisplayAtTop対象: ${item.Slot} (${item.DisplayText || ''})`);
+      return; // このスロットはorder処理や使用済みセットへの追加をスキップ
+    }
+    
+    // 使用されている（内容がある）スロットを記録
+    if (item.SlotPhrase && item.SlotPhrase.trim() !== "") {
+      usedSlots.add(item.Slot.toLowerCase());
+    }
+    
     // order値を取得（display_order、Slot_display_orderまたはorderフィールド）
     const orderValue = item.display_order || item.Slot_display_order || item.order || 0;
     slotOrderMap.set(item.Slot.toLowerCase(), orderValue);
   });
   
-  // マップのエントリを確認
-  console.log("📊 スロット順序マップ:", [...slotOrderMap.entries()]);
-  
-  // 順序をCSSのorder属性として適用（DOM構造自体は変更しない安全な方法）
-  slotOrderMap.forEach((orderValue, slotId) => {
-    const slotElement = document.getElementById(`slot-${slotId}`);
-    if (slotElement) {
-      // CSSのorder属性を設定
-      slotElement.style.order = orderValue;
-      console.log(`✅ スロット "${slotId}" に表示順 ${orderValue} を適用 (CSS order)`);
-    }
-  });
-  
-  // 親コンテナにflexboxレイアウトを適用（必要な場合）
-  const slotWrapper = document.querySelector('.slot-wrapper');
-  if (slotWrapper) {
-    slotWrapper.style.display = 'flex';
-    slotWrapper.style.flexDirection = 'column';
-    console.log("✅ スロットラッパーにflex表示を適用");
+  // 使用中とDisplayAtTopスロットのリストを表示（デバッグ用）
   }
   
   console.log("✅ 上位スロットの表示順適用完了");

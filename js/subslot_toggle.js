@@ -1,3 +1,4 @@
+
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
   toggleExclusiveSubslot.lock = true;
@@ -35,34 +36,7 @@ function toggleExclusiveSubslot(slotId) {
   }
 }
 
-// ページ読み込み時に全サブスロットを初期化（閉じる）する関数
-function initializeSubslots() {
-  console.log("🔄 サブスロットの初期化を実行します");
-  const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
-  
-  // 全てのサブスロットコンテナを取得して閉じる
-  subslotIds.forEach(id => {
-    const el = document.getElementById(`slot-${id}-sub`);
-    if (el) {
-      el.style.setProperty("display", "none", "important");
-      console.log(`🔒 初期化: slot-${id}-sub を閉じました`);
-    }
-  });
-  
-  // 他のIDパターンのサブスロットも閉じる
-  const allSubslotElements = document.querySelectorAll('[id$="-sub"]');
-  allSubslotElements.forEach(el => {
-    if (el && !el.id.includes('wrapper')) { // wrapper要素は除外
-      el.style.setProperty("display", "none", "important");
-      console.log(`🔒 初期化: ${el.id} を閉じました`);
-    }
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  // 初期化：全サブスロットを閉じる
-  initializeSubslots();
-  
   const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
   console.log(`🔍 Found ${buttons.length} toggle candidate buttons`);
   buttons.forEach(button => {
