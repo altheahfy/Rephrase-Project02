@@ -656,41 +656,41 @@
         <div class="slot-phrase"></div>
      </div>
     </div>
-    <div class="subslot" id="slot-c2-sub-o1">
+    <div class="subslot" id="slot-c2-sub-o1" style="display: flex; flex-direction: column; align-items: center;">
      <label>
       O1
      </label>
-     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <img alt="image for O1" class="slot-image"/>
         <div class="slot-phrase"></div>
      <div class="slot-text">
         <div class="slot-phrase"></div>
      </div>
     </div>
-    <div class="subslot" id="slot-c2-sub-o2">
+    <div class="subslot" id="slot-c2-sub-o2" style="display: flex; flex-direction: column; align-items: center;">
      <label>
       O2
      </label>
-     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <img alt="image for O2" class="slot-image"/>
         <div class="slot-phrase"></div>
      <div class="slot-text">
         <div class="slot-phrase"></div>
      </div>
     </div>
-    <div class="subslot" id="slot-c2-sub-c2">
+    <div class="subslot" id="slot-c2-sub-c2" style="display: flex; flex-direction: column; align-items: center;">
      <label>
       C2
      </label>
-     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <img alt="image for C2" class="slot-image"/>
         <div class="slot-phrase"></div>
      <div class="slot-text">
         <div class="slot-phrase"></div>
      </div>
     </div>
-    <div class="subslot" id="slot-c2-sub-m3">
+    <div class="subslot" id="slot-c2-sub-m3" style="display: flex; flex-direction: column; align-items: center;">
      <label>
       M3
      </label>
-     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <img alt="image for M3" class="slot-image"/>
         <div class="slot-phrase"></div>
      <div class="slot-text">
         <div class="slot-phrase"></div>
@@ -1015,7 +1015,7 @@
   </div>
   
   
-<script src="js/insert_test_data.js"></script>
+<script src="js/insert_test_data_clean.js"></script>
 
 <script>
   // syncDynamicToStatic() をDOM描画完了後に遅延実行
@@ -1067,6 +1067,13 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
         if (typeof syncSubslotsFromJson === 'function') {
           syncSubslotsFromJson(data);
         }
+        
+        // 表示順制御機能の呼び出し
+        if (typeof applyOrderToAllSlots === 'function') {
+          console.log("🔢 JSONロード後にスロット表示順適用");
+          applyOrderToAllSlots(data);
+        }
+        
         if (typeof debugM1Slot === 'function') {
           console.log("🔍 M1スロットのデバッグ実行");
           debugM1Slot();
@@ -1092,6 +1099,12 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();
+  
+  // ランダマイズ後も表示順制御を適用
+  if (typeof applyOrderToAllSlots === 'function') {
+    console.log("🔢 ランダマイズ後のスロット表示順適用");
+    applyOrderToAllSlots(data);
+  }
 });
 
 function validateSlotsModified(data) {

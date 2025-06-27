@@ -12,6 +12,13 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  /* order属性への対応を追加 */
+  order: 0; /* デフォルト値 */
+}
+
+/* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
+[data-order] {
+  order: attr(data-order number, 0);
 }
 
 
@@ -34,6 +41,7 @@
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 16px;
+  flex-direction: column; /* 上から下への流れを確保 */
 }
 
 /* subslot 表示安定化のための共通構造 */
