@@ -195,6 +195,22 @@ function syncDynamicToStatic() {
   }
 
   console.log("🧹 サブスロット初期化開始");
+  // 🧹 DisplayAtTop対象となりうるサブスロットを明示的にクリア
+  const displayAtTopItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
+  if (displayAtTopItem && displayAtTopItem.DisplayText) {
+    console.log(`🧹 DisplayAtTop対象のサブスロットを検索: "${displayAtTopItem.DisplayText}"`);
+    
+    // 全てのサブスロットから DisplayAtTop.DisplayText と一致するものを探してクリア
+    const allSubslots = document.querySelectorAll('[id*="-sub-"]');
+    allSubslots.forEach(subslot => {
+      const phraseEl = subslot.querySelector('.slot-phrase');
+      if (phraseEl && phraseEl.textContent.trim() === displayAtTopItem.DisplayText.trim()) {
+        phraseEl.textContent = "";
+        console.log(`🧹 DisplayAtTop対象サブスロットをクリア: ${subslot.id}`);
+      }
+    });
+  }
+  
   // 🧹 slot-*-sub の中にあるサブスロット phrase/text を初期化
   const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
   console.log(`📊 初期化対象サブコンテナ: ${allSubContainers.length}件`);
@@ -333,15 +349,20 @@ function syncDynamicToStatic() {
 
 // DisplayAtTop に対応する疑問詞をページ上部に表示する処理
 function displayTopQuestionWord() {
+  const topDiv = document.getElementById("display-top-question-word");
+  if (!topDiv) {
+    console.warn("⚠ display-top-question-word が見つかりません");
+    return;
+  }
+
   const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
   if (topDisplayItem && topDisplayItem.DisplayText) {
-    const topDiv = document.getElementById("display-top-question-word");
-    if (topDiv) {
-      topDiv.textContent = topDisplayItem.DisplayText;
-      console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
-    } else {
-      console.warn("⚠ display-top-question-word が見つかりません");
-    }
+    topDiv.textContent = topDisplayItem.DisplayText;
+    console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+  } else {
+    // DisplayAtTopがない場合は表示をクリア
+    topDiv.textContent = "";
+    console.log("🧹 DisplayAtTop 表示をクリア（該当データなし）");
   }
   
   // 遅延表示（DOM操作タイミングの保険）
@@ -352,8 +373,13 @@ function displayTopQuestionWord() {
       if (topDiv) {
         topDiv.textContent = topDisplayItem.DisplayText;
         console.log("✅ DisplayAtTop 表示（遅延）:", topDisplayItem.DisplayText);
-      } else {
-        console.warn("⚠ display-top-question-word が見つかりません");
+      }
+    } else {
+      // 遅延処理でもクリア
+      const topDiv = document.getElementById("display-top-question-word");
+      if (topDiv) {
+        topDiv.textContent = "";
+        console.log("🧹 DisplayAtTop 表示をクリア（遅延・該当データなし）");
       }
     }
   }, 0);
@@ -437,12 +463,23 @@ function syncSubslotsFromJson(data) {
     return;
   }
   
+  // DisplayAtTopの要素を特定（サブスロットから除外するため）
+  const displayAtTopItem = data.find(d => d.DisplayAtTop);
+  
   // サブスロット用のデータをフィルタリング
   const subslotData = data.filter(item => item.SubslotID && item.SubslotID !== "");
   console.log(`📊 サブスロット対象件数: ${subslotData.length}`);
   
   subslotData.forEach(item => {
     try {
+      // DisplayAtTopの要素をサブスロットから除外
+      if (displayAtTopItem && 
+          displayAtTopItem.DisplayText && 
+          item.SubslotElement === displayAtTopItem.DisplayText) {
+        console.log(`🚫 DisplayAtTop対象のため除外: ${item.SubslotElement} (${item.Slot}-${item.SubslotID})`);
+        return;
+      }
+
       // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
       const parentSlot = item.Slot.toLowerCase();
       const subslotId = item.SubslotID.toLowerCase();
@@ -707,6 +744,16 @@ window.safeJsonSync = function(data) {
       } catch (subslotError) {
         console.error("❌ サブスロット同期中にエラーが発生:", subslotError.message);
       }
+    }
+    
+    // 分離疑問詞表示の更新
+    try {
+      if (typeof displayTopQuestionWord === 'function') {
+        displayTopQuestionWord();
+        console.log("✅ 分離疑問詞表示の更新が完了");
+      }
+    } catch (displayError) {
+      console.error("❌ 分離疑問詞表示更新中にエラーが発生:", displayError.message);
     }
     
     // 新機能：表示順の適用処理
