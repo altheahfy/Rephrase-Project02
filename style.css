@@ -9,12 +9,16 @@
 /* スロット全体の調整が必要な場合に備えた汎用クラス */
 .slot-container {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-direction: column; /* 各スロット内の要素は縦並び */
+  align-items: center; /* スロット内の要素は中央揃え */
   gap: 8px;
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
-  flex-wrap: wrap; /* 画面幅が足りない場合に折り返す */
+  border: 1px solid #eee; /* 境界線を追加して区別しやすく */
+  padding: 8px;
+  margin: 4px;
+  min-width: 120px; /* 最小幅を設定 */
+  max-width: 200px; /* 最大幅を設定 */
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -63,8 +67,11 @@
   min-height: 100px;
   visibility: visible;
   flex-wrap: wrap;
-  flex-direction: row; /* columnからrowに変更 */
+  flex-direction: row !important; /* 強制的に横並びに */
+  display: flex !important; /* flex表示を強制 */
   align-items: flex-start;
+  justify-content: flex-start; /* 左揃え */
+  gap: 12px; /* スロット間の間隔 */
 }
 /* subslot 内のラベル表示用スタイル */
 .subslot label {
