@@ -512,32 +512,7 @@ window.safeJsonSync = function(data) {
       }
     }
     
-    // 新機能：表示順の適用処理
-    try {
-      // スロットの表示順を適用
-      if (typeof applyOrderToAllSlots === 'function') {
-        applyOrderToAllSlots(data);
-        console.log("✅ スロット表示順の適用が完了");
-      }
-      
-      // 必要に応じて個別のサブスロット順序を適用（特定の上位スロットのみ）
-      // M1スロットのサブスロット順序設定例
-      if (typeof reorderSubslots === 'function') {
-        // もっとも重要な構文スロットのサブスロット順序を整理
-        reorderSubslots('slot-m1', data);
-        reorderSubslots('slot-s', data);
-        reorderSubslots('slot-v', data);
-        reorderSubslots('slot-c', data);
-        reorderSubslots('slot-o', data);
-        console.log("✅ 主要スロットのサブスロット順序適用が完了");
-      }
-
-      // ★新しい順序付け関数を呼び出す
-      applyDisplayOrder(data);
-
-    } catch (orderError) {
-      console.error("❌ 表示順適用中にエラーが発生しました:", orderError.message);
-    }
+    // 不要になった表示順の適用処理を削除
     
     // 同期完了
     window.isSyncInProgress = false;
@@ -713,21 +688,6 @@ document.addEventListener("DOMContentLoaded", function() {
       // 定期的に動的エリアの位置も確認
       ensureDynamicAreaPosition();
     }, 3000); // 3秒ごとに変更をチェック
-    
-    // 「詳細」ボタンクリック時に順序を再適用する
-    document.body.addEventListener('click', (event) => {
-        // クリックされたのが「.slot-container」内の要素かチェック
-        const slotContainer = event.target.closest('.slot-container');
-        if (slotContainer) {
-            console.log('スロットコンテナ内の要素がクリックされました。100ms後に順序を再適用します。');
-            // 元のスクリプトがコンテナを表示するのを待つために少し遅延させる
-            setTimeout(() => {
-                if (window.loadedJsonData) {
-                    applyDisplayOrder(window.loadedJsonData);
-                }
-            }, 100); // 100ミリ秒の遅延
-        }
-    });
     
   }, 500); // DOMが完全に構築されるのを待つ
 });
