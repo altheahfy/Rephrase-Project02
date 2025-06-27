@@ -19,7 +19,6 @@
   margin: 4px;
   min-width: 120px; /* 最小幅を設定 */
   max-width: 200px; /* 最大幅を設定 */
-  position: relative; /* 位置制御のため */
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -47,10 +46,7 @@
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 16px;
-  flex-direction: row; /* 横並びに変更（順序制御のため） */
-  width: 100%;
-  justify-content: flex-start;
-  align-items: flex-start;
+  flex-direction: column; /* 上から下への流れを確保 */
 }
 
 /* subslot 表示安定化のための共通構造 */
@@ -65,35 +61,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-/* サブスロットコンテナ用スタイル強化 */
-[id$="-sub"] {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-  margin-top: 8px;
-}
-
-/* サブスロット要素 */
-.subslot {
-  display: flex;
-  flex-direction: column;
-  width: 95%;
-  margin: 4px 0;
-  padding: 4px 8px;
-  border: 1px dashed #ccc;
-  background-color: #f9f9f9;
-  order: 0; /* デフォルト順序 */
-  position: relative;
-}
-
-/* サブスロット展開表示エリアの強化 */
-.subslot-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 }
 
 /* サブスロット展開エリアは初期状態では非表示に */
