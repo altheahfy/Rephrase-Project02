@@ -1050,6 +1050,12 @@
 
   // syncDynamicToStatic() をDOM描画完了後に遅延実行
   window.addEventListener("load", () => {
+    // サブスロットを明示的に初期化（再度実行して確実に閉じる）
+    if (typeof initializeSubslots === 'function') {
+      console.log("🔒 ページ読み込み完了時にサブスロットを初期化");
+      initializeSubslots();
+    }
+    
     setTimeout(() => {
       console.log("🚀 syncDynamicToStatic() 遅延呼び出し");
       if (typeof syncDynamicToStatic === "function") {
@@ -1090,6 +1096,12 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       buildStructure(data);
       syncDynamicToStatic();
       
+      // サブスロットの初期化も実行
+      if (typeof initializeSubslots === 'function') {
+        console.log("🔒 JSONロード後にサブスロットを初期化");
+        initializeSubslots();
+      }
+      
       // 明示的に上位スロットとサブスロットの同期を呼び出す
       if (typeof syncUpperSlotsFromJson === 'function') {
         console.log("🔄 JSONロード後の明示的同期呼び出し");
@@ -1129,6 +1141,12 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();
+  
+  // サブスロットの初期化も実行
+  if (typeof initializeSubslots === 'function') {
+    console.log("🔒 ランダマイズ後にサブスロットを初期化");
+    initializeSubslots();
+  }
   
   // ランダマイズ後も表示順制御を適用
   if (typeof applyOrderToAllSlots === 'function') {

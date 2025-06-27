@@ -62,6 +62,19 @@
   align-items: center;
   justify-content: center;
 }
+
+/* サブスロット展開エリアは初期状態では非表示に */
+[id^="slot-"][id$="-sub"] {
+  display: none !important; /* 初期状態では必ず非表示 */
+  visibility: hidden; /* 視覚的にも隠す */
+}
+
+/* JavaScriptで表示された場合のみ有効になるスタイル */
+[id^="slot-"][id$="-sub"].visible {
+  display: flex !important;
+  visibility: visible !important;
+}
+
 /* 高さ潰れ・透明化・折り返し不備の対処 */
 .slot-wrapper {
   min-height: 100px;
