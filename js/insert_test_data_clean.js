@@ -622,7 +622,7 @@ function hideEmptySlots(jsonData) {
 }
 
 /**
- * 空の上位スロットを非表示にする
+ * 空の上位スロットを非表示にする（改良版：サブスロットの存在も考慮）
  * @param {Array} jsonData - JSONデータ
  */
 function hideEmptyUpperSlots(jsonData) {
@@ -642,18 +642,43 @@ function hideEmptyUpperSlots(jsonData) {
       return;
     }
 
-    // 空かどうかを判定（SlotPhraseとSlotTextが両方とも空）
-    const isEmpty = (!item.SlotPhrase || item.SlotPhrase.trim() === "") && 
-                   (!item.SlotText || item.SlotText.trim() === "");
+    // 上位スロット自体が空かどうかを判定
+    const upperSlotIsEmpty = (!item.SlotPhrase || item.SlotPhrase.trim() === "") && 
+                           (!item.SlotText || item.SlotText.trim() === "");
 
-    if (isEmpty) {
+    // この上位スロットに関連するサブスロットを確認
+    const relatedSubslots = jsonData.filter(subItem => 
+      subItem.Slot.toLowerCase() === item.Slot.toLowerCase() && 
+      subItem.SubslotID && 
+      subItem.SubslotID !== ""
+    );
+
+    // 関連サブスロットのうち、空でないものがあるかチェック
+    const hasNonEmptySubslots = relatedSubslots.some(subItem => 
+      (subItem.SubslotElement && subItem.SubslotElement.trim() !== "") ||
+      (subItem.SubslotText && subItem.SubslotText.trim() !== "")
+    );
+
+    console.log(`🔍 上位スロット [${item.Slot}]:`);
+    console.log(`  - 上位スロット自体が空: ${upperSlotIsEmpty}`);
+    console.log(`  - 関連サブスロット数: ${relatedSubslots.length}`);
+    console.log(`  - 空でないサブスロットあり: ${hasNonEmptySubslots}`);
+
+    // 判定：上位スロット自体が空 かつ 空でないサブスロットがない場合のみ非表示
+    const shouldHide = upperSlotIsEmpty && !hasNonEmptySubslots;
+
+    if (shouldHide) {
       slotElement.style.display = "none";
       slotElement.classList.add("empty-slot-hidden", "hidden");
-      console.log(`🙈 上位スロットを非表示: ${slotId}`);
+      console.log(`🙈 上位スロットを非表示: ${slotId} (理由: 上位・サブスロット共に空)`);
     } else {
       slotElement.style.display = "";
       slotElement.classList.remove("empty-slot-hidden", "hidden");
-      console.log(`👁 上位スロットを表示: ${slotId}`);
+      if (upperSlotIsEmpty && hasNonEmptySubslots) {
+        console.log(`👁 上位スロットを表示: ${slotId} (理由: サブスロットに内容あり)`);
+      } else if (!upperSlotIsEmpty) {
+        console.log(`👁 上位スロットを表示: ${slotId} (理由: 上位スロットに内容あり)`);
+      }
     }
   });
 }
@@ -1248,10 +1273,10 @@ function debugEmptySlots() {
 }
 
 /**
- * 強制的に空のスロットを非表示にするテスト関数（デバッグ用）
+ * 強制的に空のスロットを非表示にするテスト関数（デバッグ用・改良版）
  */
 function forceHideEmptySlots() {
-  console.log("🚀 強制的な空のスロット非表示テストを実行");
+  console.log("🚀 強制的な空のスロット非表示テスト（改良版）を実行");
   
   // 全ての上位スロットを確認
   const allUpperSlots = document.querySelectorAll('[id^="slot-"]:not([id*="-sub"])');
@@ -1264,22 +1289,45 @@ function forceHideEmptySlots() {
     const phraseText = phraseEl ? phraseEl.textContent.trim() : '';
     const textText = textEl ? textEl.textContent.trim() : '';
     
+    // この上位スロットに関連するサブスロットを確認
+    const slotName = slot.id.replace('slot-', '');
+    const relatedSubSlots = document.querySelectorAll(`[id^="slot-${slotName}-sub-"]`);
+    
+    // 関連サブスロットに内容があるかチェック
+    let hasNonEmptySubslots = false;
+    relatedSubSlots.forEach(subSlot => {
+      const subPhraseEl = subSlot.querySelector('.slot-phrase');
+      const subTextEl = subSlot.querySelector('.slot-text');
+      const subPhraseText = subPhraseEl ? subPhraseEl.textContent.trim() : '';
+      const subTextText = subTextEl ? subTextEl.textContent.trim() : '';
+      
+      if (subPhraseText !== '' || subTextText !== '') {
+        hasNonEmptySubslots = true;
+      }
+    });
+    
     console.log(`🔍 ${slot.id}:`);
     console.log(`  - phrase: "${phraseText}"`);
     console.log(`  - text: "${textText}"`);
+    console.log(`  - 関連サブスロット数: ${relatedSubSlots.length}`);
+    console.log(`  - 空でないサブスロットあり: ${hasNonEmptySubslots}`);
     
-    if (phraseText === '' && textText === '') {
+    // 判定：上位スロット自体が空 かつ 空でないサブスロットがない場合のみ非表示
+    const upperSlotIsEmpty = phraseText === '' && textText === '';
+    const shouldHide = upperSlotIsEmpty && !hasNonEmptySubslots;
+    
+    if (shouldHide) {
       console.log(`  🙈 空のため非表示に設定: ${slot.id}`);
       slot.style.display = 'none';
       slot.classList.add('empty-slot-hidden', 'hidden');
     } else {
-      console.log(`  👁 内容があるため表示: ${slot.id}`);
+      console.log(`  👁 表示維持: ${slot.id} (理由: ${!upperSlotIsEmpty ? '上位スロットに内容' : 'サブスロットに内容'})`);
       slot.style.display = '';
       slot.classList.remove('empty-slot-hidden', 'hidden');
     }
   });
   
-  // 全てのサブスロットを確認
+  // サブスロットの処理は従来通り
   const allSubSlots = document.querySelectorAll('[id*="-sub-"]');
   console.log(`📊 検出されたサブスロット: ${allSubSlots.length}件`);
   
