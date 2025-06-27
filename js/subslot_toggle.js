@@ -30,6 +30,15 @@ function toggleExclusiveSubslot(slotId) {
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
+
+    // ★★★ 並べ替え処理を呼び出す ★★★
+    if (window.reorderSubslotsInContainer && window.loadedJsonData) {
+      console.log(`🔄 ${target.id} のサブスロットを並べ替えます`);
+      window.reorderSubslotsInContainer(target, window.loadedJsonData);
+    } else {
+      console.warn("⚠ reorderSubslotsInContainer または window.loadedJsonData が見つかりません");
+    }
+
   } else {
     console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
   }

@@ -111,7 +111,7 @@ function reorderSubslots(parentSlotId, jsonData) {
   const subslots = container.querySelectorAll(subslotSelector);
   
   if (subslots.length === 0) {
-    console.warn(`⚠ ${parentSlotId}内にサブスロット要素が見つかりません`);
+    console.warn(`⚠ ${parentId}内にサブスロット要素が見つかりません`);
     return;
   }
   
@@ -549,6 +549,37 @@ window.debugM1Slot = debugM1Slot;
 window.displayTopQuestionWord = displayTopQuestionWord;
 window.applyOrderToAllSlots = applyOrderToAllSlots;
 window.reorderSubslots = reorderSubslots;
+
+// 指定されたコンテナ内のサブスロットを order に従ってDOMを直接並べ替える関数
+function reorderSubslotsInContainer(container, jsonData) {
+  if (!container || !jsonData) {
+    console.warn("⚠ reorderSubslotsInContainer: コンテナまたはデータがありません");
+    return;
+  }
+  const subslots = container.querySelectorAll(".subslot");
+  if (subslots.length <= 1) return; // 並べ替える必要なし
+
+  console.log(`🔢 DOM並べ替え実行: ${container.id}`);
+
+  const parentSlotId = container.id.replace("slot-", "").replace("-sub", "");
+
+  const elementsWithOrder = Array.from(subslots).map(el => {
+    const subId = el.id.replace(`slot-${parentSlotId}-sub-`, "");
+    const data = jsonData.find(d => d.Slot?.toLowerCase() === parentSlotId && d.SubslotID?.toLowerCase() === subId);
+    const order = data ? data.display_order : 999;
+    return { el, order };
+  });
+
+  elementsWithOrder.sort((a, b) => a.order - b.order);
+
+  elementsWithOrder.forEach(item => {
+    container.appendChild(item.el);
+  });
+
+  console.log(`✅ DOM並べ替え完了: ${container.id}`);
+}
+// グローバルスコープに登録
+window.reorderSubslotsInContainer = reorderSubslotsInContainer;
 
 // 新しい順序付け関数
 function applyDisplayOrder(data) {
