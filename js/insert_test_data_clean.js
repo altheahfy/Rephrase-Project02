@@ -505,41 +505,6 @@ window.reorderSubslotsInContainer = (container, jsonData) => {
   console.log(`✅ Reordering complete for ${container.id}. Final DOM order:`, finalDomOrder.map(el => el.id));
 };
 
-/**
- * 上位スロットのDOMを、JSONデータのSlot_display_orderに基づいて並べ替える
- * @param {Array} jsonData - window.loadedJsonData
- */
-function reorderUpperSlots(jsonData) {
-  const container = document.getElementById('slot-container');
-  if (!container) {
-    console.warn('上位スロットのコンテナ #slot-container が見つかりません。');
-    return;
-  }
-
-  // SubslotIDがなく、Slot_display_orderを持つ要素を上位スロットデータとみなす
-  const upperSlotData = jsonData
-    .filter(item => !item.SubslotID && typeof item.Slot_display_order !== 'undefined')
-    // Slot名でユニークにする（同じSlotが複数行ある場合のため）
-    .filter((item, index, self) => 
-        index === self.findIndex(t => t.Slot === item.Slot)
-    )
-    .sort((a, b) => a.Slot_display_order - b.Slot_display_order);
-
-  if (upperSlotData.length === 0) {
-    // 並べ替え対象がない場合は何もしない
-    return;
-  }
-
-  const elementsToReorder = upperSlotData.map(item => {
-    const slotId = `slot-${item.Slot.toLowerCase()}`;
-    return document.getElementById(slotId);
-  }).filter(el => el); // 見つからない要素は除外
-
-  // ソートされた順序で要素をコンテナに再追加（appendChildは要素を末尾に移動させる）
-  elementsToReorder.forEach(element => {
-    container.appendChild(element);
-  });
-}
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
@@ -576,7 +541,6 @@ window.safeJsonSync = function(data) {
     try {
       syncUpperSlotsFromJson(data);
       console.log("✅ 上位スロットの同期が完了");
-      reorderUpperSlots(data); // ★★★ 上位スロットの並べ替えを実行
     } catch (upperSlotError) {
       console.error("❌ 上位スロット同期中にエラーが発生:", upperSlotError.message);
     }
@@ -668,9 +632,17 @@ window.setupRandomizerSync = function() {
         
         // ランダマイズ処理完了後に確実に同期処理を行う
         setTimeout(() => {
-          console.log("🔄 ランダマイズ後の同期処理を実行");
+          console.log("🔄 ランダマイズ後の同期処理を実行します (遅延: 1000ms)");
           if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
+            
+            // 全体の再同期
             window.safeJsonSync(window.loadedJsonData);
+            
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
           }
         }, 1000); // 1000ms（1秒）に延長 - ランダマイズ処理が確実に完了するのを待つ
       }, true); // キャプチャフェーズでイベントをキャッチ
@@ -678,9 +650,112 @@ window.setupRandomizerSync = function() {
       console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
     });
     
+    // window.randomizeAllSlots関数をオーバーライド（存在する場合）
+    if (typeof window.randomizeAllSlots === 'function') {
+      const originalRandomizeFunc = window.randomizeAllSlots;
+      window.randomizeAllSlots = function(...args) {
+        console.log("🎲 randomizeAllSlots関数が呼び出されました");
+        const result = originalRandomizeFunc.apply(this, args);
+        
+        // ランダマイズ処理完了後に同期処理を行う
+        setTimeout(() => {
+          console.log("🔄 randomizeAllSlots後の同期処理を実行します (遅延: 1000ms)");
+          if (window.loadedJsonData) {
+            // ランダマイズ後は強制的に上位スロットを再同期
+            window.DEBUG_SYNC = true; // 詳細ログを有効化
+            
+            window.safeJsonSync(window.loadedJsonData);
+            setTimeout(() => {
+              window.DEBUG_SYNC = false; // ログ量を元に戻す
+            }, 500);
+          }
+        }, 1000); // 1000ms（1秒）に延長
+        
+        return result;
+      };
+      console.log("✅ randomizeAllSlots関数をオーバーライドしました");
+    }
+    
     return true;
   } catch (err) {
     console.error("❌ ランダマイザー監視設定中にエラーが発生しました:", err.message);
     return false;
   }
 };
+
+// ページ読み込み完了時に監視を開始
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("🌐 DOMContentLoaded イベント発生");
+  
+  // 動的エリアの位置調整
+  ensureDynamicAreaPosition();
+  
+  setTimeout(() => {
+    window.setupSyncObserver();
+    window.setupRandomizerSync();
+    
+    // 初期同期も実行
+    if (window.loadedJsonData) {
+      window.safeJsonSync(window.loadedJsonData);
+    }
+    
+    // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
+    let lastJsonDataSignature = "";
+    
+    // データの特徴的な部分から署名を生成する関数
+    function getDataSignature(data) {
+      if (!data || !Array.isArray(data) || data.length === 0) return "";
+      try {
+        // スロットの内容からチェックサムを生成
+        const sampleItems = data.slice(0, 3); // 最初の3件のみ使用
+        const signature = sampleItems.map(item => 
+          `${item.Slot}:${item.SlotPhrase && item.SlotPhrase.substring(0, 10)}`
+        ).join('|');
+        return signature;
+      } catch (e) {
+        return "";
+      }
+    }
+    
+    // 低頻度で定期チェック (3秒ごと)
+    setInterval(() => {
+      if (window.loadedJsonData) {
+        const newSignature = getDataSignature(window.loadedJsonData);
+        if (newSignature && newSignature !== lastJsonDataSignature) {
+          console.log("🔄 window.loadedJsonData の実質的な変更を検出");
+          window.safeJsonSync(window.loadedJsonData);
+          lastJsonDataSignature = newSignature;
+        }
+      }
+      
+      // 定期的に動的エリアの位置も確認
+      ensureDynamicAreaPosition();
+    }, 3000); // 3秒ごとに変更をチェック
+    
+  }, 500); // DOMが完全に構築されるのを待つ
+});
+
+// 動的エリアの位置を調整する関数
+function ensureDynamicAreaPosition() {
+  // 動的エリアコンテナを取得
+  const container = document.getElementById("dynamic-area-container");
+  
+  // コンテナが存在する場合
+  if (container) {
+    // コンテナが最後の要素でない場合は移動
+    if (container !== document.body.lastElementChild) {
+      // すべてのスロット関連要素とサブスロット要素の後に配置する
+      document.body.appendChild(container);
+      console.log("🔄 動的エリアコンテナを再配置しました");
+    }
+    
+    // 動的エリア内部の調整
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    
+    if (dynamicArea && wrapper && !wrapper.contains(dynamicArea)) {
+      wrapper.appendChild(dynamicArea);
+      console.log("🔄 動的エリアをラッパー内に再配置しました");
+    }
+  }
+}
