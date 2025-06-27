@@ -1017,23 +1017,23 @@
   
 <script src="js/insert_test_data_clean.js"></script>
 
-<!-- 動的記載エリア用のセクション要素を追加 -->
-<section id="dynamic-area-container" style="margin-top: 60px;">
-  <h2>ランダマイズ後の文例表示エリア</h2>
-  <!-- 動的記載エリアがここに生成されます -->
-  <div id="dynamic-slot-area-wrapper"></div>
-</section>
+<!-- 動的記載エリアのプレースホルダー - スクリプト実行時にここに挿入されます -->
+<!-- 実際のセクションは文書の最後に移動しました -->
 
 <script>
-  // 動的エリアの生成位置を指定
+  // 動的エリアの生成位置を指定（文書の最下部に移動）
   window.addEventListener("DOMContentLoaded", () => {
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
     
-    // 既存のdynamic-slot-areaがあれば移動
+    // 既存のdynamic-slot-areaがあれば移動（最下部のラッパーに）
     if (dynamicArea && wrapper) {
+      // 親要素から削除してから追加することで、確実に移動
+      if (dynamicArea.parentElement) {
+        dynamicArea.parentElement.removeChild(dynamicArea);
+      }
       wrapper.appendChild(dynamicArea);
-      console.log("✅ 動的記載エリアを適切な位置に移動しました");
+      console.log("✅ 動的記載エリアを文書最下部に移動しました");
     } else {
       console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
     }
@@ -1051,6 +1051,13 @@
     }, 200);
   });
 </script>
+
+<!-- 動的記載エリア用のセクションをHTMLの最後に配置 -->
+<section id="dynamic-area-container" style="margin-top: 100px; padding: 24px 0; border-top: 4px double #999;">
+  <h2 style="margin-bottom: 20px; text-align: center; color: #444;">ランダマイズ後の文例表示エリア（最下部）</h2>
+  <!-- 動的記載エリアがここに生成されます -->
+  <div id="dynamic-slot-area-wrapper"></div>
+</section>
 
 </body>
 </html>
