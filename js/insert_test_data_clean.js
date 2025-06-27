@@ -558,15 +558,22 @@ function applyDisplayOrder(data) {
   }
 
   console.log("🔢 表示順序の適用を開始します");
+  const dynamicArea = document.getElementById('dynamic-slot-area');
+  // dynamicAreaが存在しない場合は処理を中断
+  if (!dynamicArea) {
+      console.error("❌ 動的記載エリア #dynamic-slot-area が見つかりません。順序付けを中止します。");
+      return;
+  }
 
   // 上位スロットの順序を適用
   const upperSlots = data.filter(item => !item.SubslotID || item.SubslotID === "");
   upperSlots.forEach(item => {
     if (item.Slot && typeof item.Slot_display_order !== 'undefined') {
       const slotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}`);
-      if (slotElement) {
+      // 要素が存在し、かつ動的エリアの子要素ではない場合にのみ処理
+      if (slotElement && !dynamicArea.contains(slotElement)) {
         slotElement.style.order = item.Slot_display_order;
-        console.log(`✅ 上位スロット[${slotElement.id}]に order: ${item.Slot_display_order} を適用`);
+        console.log(`✅ 静的上位スロット[${slotElement.id}]に order: ${item.Slot_display_order} を適用`);
       }
     }
   });
@@ -576,9 +583,10 @@ function applyDisplayOrder(data) {
   subSlots.forEach(item => {
     if (item.Slot && item.SubslotID && typeof item.display_order !== 'undefined') {
       const subSlotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}-sub-${item.SubslotID.toLowerCase()}`);
-      if (subSlotElement) {
+      // 要素が存在し、かつ動的エリアの子要素ではない場合にのみ処理
+      if (subSlotElement && !dynamicArea.contains(subSlotElement)) {
         subSlotElement.style.order = item.display_order;
-        console.log(`✅ サブスロット[${subSlotElement.id}]に order: ${item.display_order} を適用`);
+        console.log(`✅ 静的サブスロット[${subSlotElement.id}]に order: ${item.display_order} を適用`);
       }
     }
   });
