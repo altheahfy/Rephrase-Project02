@@ -574,9 +574,9 @@ window.safeJsonSync = function(data) {
     
     // 上位スロット同期を実行
     try {
-      reorderUpperSlots(data); // ★★★ 先に並べ替えを実行
-      syncUpperSlotsFromJson(data); // 後でテキストを書き込み
+      syncUpperSlotsFromJson(data);
       console.log("✅ 上位スロットの同期が完了");
+      reorderUpperSlots(data); // ★★★ 上位スロットの並べ替えを実行
     } catch (upperSlotError) {
       console.error("❌ 上位スロット同期中にエラーが発生:", upperSlotError.message);
     }
@@ -684,47 +684,3 @@ window.setupRandomizerSync = function() {
     return false;
   }
 };
-
-// ページ読み込み完了時に監視を開始
-document.addEventListener("DOMContentLoaded", function() {
-  console.log("🌐 DOMContentLoaded イベント発生");
-  
-  // 動的エリアの位置調整
-  ensureDynamicAreaPosition();
-  
-  setTimeout(() => {
-    window.setupSyncObserver();
-    window.setupRandomizerSync();
-    
-    // 初期同期も実行
-    if (window.loadedJsonData) {
-      window.safeJsonSync(window.loadedJsonData);
-    }
-    
-  }, 500); // DOMが完全に構築されるのを待つ
-});
-
-// 動的エリアの位置を調整する関数
-function ensureDynamicAreaPosition() {
-  try {
-    const dynamicArea = document.getElementById("dynamic-slot-area");
-    const wrapper = document.querySelector(".slot-wrapper");
-    
-    if (dynamicArea && wrapper) {
-      // 動的エリアがwrapper内に正しく配置されているか確認
-      if (!wrapper.contains(dynamicArea)) {
-        wrapper.appendChild(dynamicArea);
-        console.log("🔄 動的エリアコンテナを再配置しました");
-      }
-      
-      // サブスロットが動的エリアより下に表示されないよう、z-indexを調整
-      dynamicArea.style.position = "relative";
-      dynamicArea.style.zIndex = "1000";
-      
-    } else {
-      console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
-    }
-  } catch (err) {
-    console.error("❌ 動的エリア位置調整中にエラー:", err.message);
-  }
-}
