@@ -1032,7 +1032,16 @@
     
     // 既存のdynamic-slot-areaがあれば移動
     if (dynamicArea && wrapper) {
+      // 動的エリアをラッパーに移動
       wrapper.appendChild(dynamicArea);
+      
+      // さらに、動的エリアのコンテナを文書の末尾に移動
+      const container = document.getElementById("dynamic-area-container");
+      if (container) {
+        document.body.appendChild(container);
+        console.log("✅ 動的記載エリアコンテナを文書の最後に移動しました");
+      }
+      
       console.log("✅ 動的記載エリアを適切な位置に移動しました");
     } else {
       console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");

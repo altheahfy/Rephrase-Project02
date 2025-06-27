@@ -100,13 +100,13 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 80px; /* サブスロット展開エリアとの距離を大幅に確保 */
+  margin-top: 120px; /* サブスロット展開エリアとの距離をさらに広げる */
   padding-top: 24px;
   padding-bottom: 24px;
   border-top: 3px dashed #999; /* より目立つ区切り線 */
   position: relative; /* 位置関係の制御のため */
   clear: both; /* 他の要素の影響を受けないように */
-  order: 999; /* 最後に表示されるように（フレックスボックス内で） */
+  order: 9999; /* 表示優先度を最低に設定（一番最後に表示） */
 }
 
 /* 動的記載エリア内のスロット要素のスタイル */
@@ -153,4 +153,29 @@
   margin-bottom: 24px; /* 展開エリア間の間隔を確保 */
   border-bottom: 1px solid #eee;
   padding-bottom: 16px;
+}
+
+/* 動的記載エリアのコンテナ要素のスタイル強化 */
+#dynamic-area-container {
+  margin-top: 120px; /* 上部の余白を大きく取る */
+  padding-top: 40px;
+  border-top: 4px double #666; /* より明確な区切り */
+  position: relative;
+  clear: both;
+  display: block;
+  order: 9999; /* フレックスコンテナ内で確実に最後に配置 */
+  z-index: 1; /* z-indexを低めに設定 */
+  
+  /* ビジュアルマーカーの追加（デバッグ用） */
+  position: relative;
+}
+
+/* 動的エリアの前に視覚的な区切りを追加 */
+#dynamic-area-container::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(to right, transparent, #999, transparent);
+  margin-bottom: 20px;
+  width: 100%;
 }

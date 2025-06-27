@@ -763,6 +763,10 @@ window.setupRandomizerSync = function() {
 // ページ読み込み完了時に監視を開始
 document.addEventListener("DOMContentLoaded", function() {
   console.log("🌐 DOMContentLoaded イベント発生");
+  
+  // 動的エリアの位置調整
+  ensureDynamicAreaPosition();
+  
   setTimeout(() => {
     window.setupSyncObserver();
     window.setupRandomizerSync();
@@ -800,7 +804,35 @@ document.addEventListener("DOMContentLoaded", function() {
           lastJsonDataSignature = newSignature;
         }
       }
+      
+      // 定期的に動的エリアの位置も確認
+      ensureDynamicAreaPosition();
     }, 3000); // 3秒ごとに変更をチェック
     
   }, 500); // DOMが完全に構築されるのを待つ
 });
+
+// 動的エリアの位置を調整する関数
+function ensureDynamicAreaPosition() {
+  // 動的エリアコンテナを取得
+  const container = document.getElementById("dynamic-area-container");
+  
+  // コンテナが存在する場合
+  if (container) {
+    // コンテナが最後の要素でない場合は移動
+    if (container !== document.body.lastElementChild) {
+      // すべてのスロット関連要素とサブスロット要素の後に配置する
+      document.body.appendChild(container);
+      console.log("🔄 動的エリアコンテナを再配置しました");
+    }
+    
+    // 動的エリア内部の調整
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    
+    if (dynamicArea && wrapper && !wrapper.contains(dynamicArea)) {
+      wrapper.appendChild(dynamicArea);
+      console.log("🔄 動的エリアをラッパー内に再配置しました");
+    }
+  }
+}
