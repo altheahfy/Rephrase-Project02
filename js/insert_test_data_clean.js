@@ -461,7 +461,50 @@ window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
 window.syncSubslotsFromJson = syncSubslotsFromJson;
 window.debugM1Slot = debugM1Slot;
 window.displayTopQuestionWord = displayTopQuestionWord;
-window.reorderSubslotsInContainer = reorderSubslotsInContainer;
+window.reorderSubslotsInContainer = (container, jsonData) => {
+  if (!container) {
+    console.error("reorderSubslotsInContainer: container is null");
+    return;
+  }
+  console.log(`🔄 Executing reorder for: ${container.id}`);
+  
+  const upperSlotId = container.id.replace('slot-', '').replace('-sub', '');
+
+  const relevantSubslotsData = jsonData
+    .filter(item => item.Slot.toLowerCase() === upperSlotId.toLowerCase() && item.SubslotID)
+    .sort((a, b) => a.display_order - b.display_order);
+
+  if (relevantSubslotsData.length === 0) {
+    console.warn(`_WARN: No relevant subslot data found in jsonData for container ${container.id}`);
+    return;
+  }
+
+  console.log(`📊 Expected order for ${container.id} from JSON:`, relevantSubslotsData.map(d => `${d.SubslotID} (order: ${d.display_order})`));
+
+  const subslotElementsInDom = Array.from(container.querySelectorAll('.subslot'));
+  console.log('📦 Current DOM elements:', subslotElementsInDom.map(el => el.id));
+
+  const sortedElementsToAppend = relevantSubslotsData.map(subslotData => {
+    const subslotIdSuffix = subslotData.SubslotID.replace('sub-', '');
+    const fullSubslotId = `slot-${upperSlotId}-sub-${subslotIdSuffix}`;
+    const element = container.querySelector(`#${fullSubslotId}`);
+    if (!element) {
+      console.warn(`_WARN: Element with ID #${fullSubslotId} not found in container.`);
+    }
+    return element;
+  }).filter(el => el); // Filter out any nulls if elements weren't found
+
+  console.log('🔩 Sorted elements to append:', sortedElementsToAppend.map(el => el.id));
+
+  // Append elements in the sorted order. This moves them to the end of the container.
+  sortedElementsToAppend.forEach(element => {
+    container.appendChild(element);
+  });
+
+  const finalDomOrder = Array.from(container.querySelectorAll('.subslot'));
+  console.log(`✅ Reordering complete for ${container.id}. Final DOM order:`, finalDomOrder.map(el => el.id));
+};
+
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
