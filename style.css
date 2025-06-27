@@ -94,15 +94,19 @@
   min-height: 1em;
 }
 
-/* 動的記載エリアを横並びに設定 */
+/* 動的記載エリアを横並びに設定 - 位置の修正 */
 #dynamic-slot-area {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 32px; /* サブスロット展開エリアとの距離を確保 */
-  padding-top: 16px;
-  border-top: 2px dashed #ccc; /* 視覚的な区切り */
+  margin-top: 80px; /* サブスロット展開エリアとの距離を大幅に確保 */
+  padding-top: 24px;
+  padding-bottom: 24px;
+  border-top: 3px dashed #999; /* より目立つ区切り線 */
+  position: relative; /* 位置関係の制御のため */
+  clear: both; /* 他の要素の影響を受けないように */
+  order: 999; /* 最後に表示されるように（フレックスボックス内で） */
 }
 
 /* 動的記載エリア内のスロット要素のスタイル */
@@ -127,4 +131,26 @@
   border: 1px solid #eee;
   padding: 8px;
   margin: 4px;
+}
+
+/* 動的記載エリアのタイトルと区切り線 */
+#dynamic-slot-area::before {
+  content: "動的記載エリア（ランダマイズ後の文例）";
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  width: 100%;
+  color: #333;
+  text-align: center;
+  padding: 8px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+}
+
+/* 全サブスロット展開エリアのコンテナスタイル */
+[id$="-sub"] {
+  margin-bottom: 24px; /* 展開エリア間の間隔を確保 */
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
 }

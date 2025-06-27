@@ -1017,7 +1017,28 @@
   
 <script src="js/insert_test_data_clean.js"></script>
 
+<!-- 動的記載エリア用のセクション要素を追加 -->
+<section id="dynamic-area-container" style="margin-top: 60px;">
+  <h2>ランダマイズ後の文例表示エリア</h2>
+  <!-- 動的記載エリアがここに生成されます -->
+  <div id="dynamic-slot-area-wrapper"></div>
+</section>
+
 <script>
+  // 動的エリアの生成位置を指定
+  window.addEventListener("DOMContentLoaded", () => {
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    
+    // 既存のdynamic-slot-areaがあれば移動
+    if (dynamicArea && wrapper) {
+      wrapper.appendChild(dynamicArea);
+      console.log("✅ 動的記載エリアを適切な位置に移動しました");
+    } else {
+      console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
+    }
+  });
+
   // syncDynamicToStatic() をDOM描画完了後に遅延実行
   window.addEventListener("load", () => {
     setTimeout(() => {
