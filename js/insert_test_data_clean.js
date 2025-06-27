@@ -591,6 +591,18 @@ function applyDisplayOrder(data) {
     }
   });
 
+  // すべてのサブスロットコンテナに flexbox を適用して order を有効化
+  const subSlotContainers = document.querySelectorAll('[id$="-sub"]');
+  subSlotContainers.forEach(container => {
+      // .visible クラスを持つ（＝表示されている）コンテナのみを対象
+      if (container.classList.contains('visible')) {
+          container.style.display = 'flex';
+          container.style.flexWrap = 'wrap';
+          container.style.gap = '8px';
+          console.log(`✅ サブスロットコンテナ [${container.id}] にflexboxを適用`);
+      }
+  });
+
   console.log("✅ 表示順序の適用が完了しました");
 }
 
