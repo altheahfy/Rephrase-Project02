@@ -72,6 +72,8 @@
 /* JavaScriptで表示された場合のみ有効になるスタイル */
 [id^="slot-"][id$="-sub"].visible {
   display: flex !important;
+  flex-wrap: wrap; /* サブスロットが多すぎる場合に折り返す */
+  gap: 8px; /* サブスロット間の隙間 */
   visibility: visible !important;
 }
 

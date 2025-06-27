@@ -550,6 +550,42 @@ window.displayTopQuestionWord = displayTopQuestionWord;
 window.applyOrderToAllSlots = applyOrderToAllSlots;
 window.reorderSubslots = reorderSubslots;
 
+// 新しい順序付け関数
+function applyDisplayOrder(data) {
+  if (!data || !Array.isArray(data)) {
+    console.warn("⚠ applyDisplayOrder: 無効なデータです");
+    return;
+  }
+
+  console.log("🔢 表示順序の適用を開始します");
+
+  // 上位スロットの順序を適用
+  const upperSlots = data.filter(item => !item.SubslotID || item.SubslotID === "");
+  upperSlots.forEach(item => {
+    if (item.Slot && typeof item.Slot_display_order !== 'undefined') {
+      const slotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}`);
+      if (slotElement) {
+        slotElement.style.order = item.Slot_display_order;
+        console.log(`✅ 上位スロット[${slotElement.id}]に order: ${item.Slot_display_order} を適用`);
+      }
+    }
+  });
+
+  // サブスロットの順序を適用
+  const subSlots = data.filter(item => item.SubslotID && item.SubslotID !== "");
+  subSlots.forEach(item => {
+    if (item.Slot && item.SubslotID && typeof item.display_order !== 'undefined') {
+      const subSlotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}-sub-${item.SubslotID.toLowerCase()}`);
+      if (subSlotElement) {
+        subSlotElement.style.order = item.display_order;
+        console.log(`✅ サブスロット[${subSlotElement.id}]に order: ${item.display_order} を適用`);
+      }
+    }
+  });
+
+  console.log("✅ 表示順序の適用が完了しました");
+}
+
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
   try {
@@ -618,8 +654,12 @@ window.safeJsonSync = function(data) {
         reorderSubslots('slot-o', data);
         console.log("✅ 主要スロットのサブスロット順序適用が完了");
       }
+
+      // ★新しい順序付け関数を呼び出す
+      applyDisplayOrder(data);
+
     } catch (orderError) {
-      console.error("❌ 表示順適用中にエラーが発生:", orderError.message);
+      console.error("❌ 表示順適用中にエラーが発生しました:", orderError.message);
     }
     
     // 同期完了
