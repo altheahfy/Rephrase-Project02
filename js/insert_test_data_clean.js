@@ -869,6 +869,21 @@ document.addEventListener("DOMContentLoaded", function() {
       ensureDynamicAreaPosition();
     }, 3000); // 3秒ごとに変更をチェック
     
+    // 「詳細」ボタンクリック時に順序を再適用する
+    document.body.addEventListener('click', (event) => {
+        // クリックされたのが「.slot-container」内の要素かチェック
+        const slotContainer = event.target.closest('.slot-container');
+        if (slotContainer) {
+            console.log('スロットコンテナ内の要素がクリックされました。100ms後に順序を再適用します。');
+            // 元のスクリプトがコンテナを表示するのを待つために少し遅延させる
+            setTimeout(() => {
+                if (window.loadedJsonData) {
+                    applyDisplayOrder(window.loadedJsonData);
+                }
+            }, 100); // 100ミリ秒の遅延
+        }
+    });
+    
   }, 500); // DOMが完全に構築されるのを待つ
 });
 
