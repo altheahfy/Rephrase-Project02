@@ -1,18 +1,4 @@
-// --- フィールド名ゆれ吸収ヘルパー ---
-function normalizeGroupKey(obj) {
-  if (obj.V_group_key) return obj.V_group_key;
-  if (obj.V_groupe_key) return obj.V_groupe_key;
-  if (obj.V_grope_key) return obj.V_grope_key;
-  return undefined;
-}
-
 export function randomizeAll(slotData) {
-  // --- すべてのデータでV_group_keyを正規化 ---
-  slotData.forEach(entry => {
-    if (!entry.V_group_key) {
-      entry.V_group_key = normalizeGroupKey(entry);
-    }
-  });
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
     console.warn("V_group_key 母集団が見つかりません。");
@@ -115,22 +101,16 @@ function randomizeIndividualSlot(slotName) {
   }
   const targetSlot = slotName.toUpperCase();
   const currentSlot = window.lastSelectedSlots.find(item => item.Slot === targetSlot && (!item.SubslotID || item.SubslotID === ""));
-  if (!currentSlot) {
+  if (!currentSlot || !currentSlot.V_group_key) {
     alert("グループ情報が取得できません。全体ランダマイズをやり直してください。");
     return;
   }
-  // --- V_group_keyを正規化して取得 ---
-  const vGroupKey = normalizeGroupKey(currentSlot);
-  if (!vGroupKey) {
-    alert("グループ情報が取得できません。全体ランダマイズをやり直してください。");
-    return;
-  }
+  const vGroupKey = currentSlot.V_group_key;
   // 2. window.loadedJsonDataから該当グループ・スロットの全例文セットを抽出
   const all = window.loadedJsonData || [];
   const exampleIdSetMap = {};
   all.forEach(item => {
-    // --- V_group_keyを正規化して比較 ---
-    if (normalizeGroupKey(item) === vGroupKey && item.Slot === targetSlot) {
+    if (item.V_group_key === vGroupKey && item.Slot === targetSlot) {
       const exid = item.例文ID;
       if (!exampleIdSetMap[exid]) exampleIdSetMap[exid] = [];
       exampleIdSetMap[exid].push(item);
