@@ -90,6 +90,80 @@ export function randomizeAll(slotData) {
 }
 
 // ===========================================
+// 個別ランダマイズ専用の軽量描画更新関数
+// ===========================================
+
+/**
+ * 指定されたスロットのDOM内容のみを更新（ボタンやイベントハンドラを保持）
+ * @param {string} slotId - 対象スロットのID（例: "slot-s", "slot-m1"）
+ * @param {Array} selectedSlots - 更新するスロットデータ
+ */
+function updateSlotContentsOnly(slotId, selectedSlots) {
+  console.log(`🎯 軽量描画更新開始: ${slotId}`);
+  
+  if (!selectedSlots || selectedSlots.length === 0) {
+    console.warn("selectedSlotsが空です");
+    return;
+  }
+  
+  // slotIdから対象スロットを特定（slot-s → S）
+  const targetSlot = slotId.replace('slot-', '').toUpperCase();
+  
+  // 該当スロットのデータのみを抽出
+  const relevantSlots = selectedSlots.filter(slot => 
+    slot.Slot === targetSlot
+  );
+  
+  if (relevantSlots.length === 0) {
+    console.warn(`${targetSlot}に該当するスロットデータが見つかりません`);
+    return;
+  }
+  
+  console.log(`🎯 更新対象スロット: ${targetSlot}, 件数: ${relevantSlots.length}`);
+  
+  // 静的DOMの該当スロットコンテナを更新
+  relevantSlots.forEach(slot => {
+    let targetElement = null;
+    
+    if (slot.SubslotID) {
+      // サブスロットの場合
+      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}-sub-${slot.SubslotID.toLowerCase()}`);
+    } else {
+      // 上位スロットの場合
+      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}`);
+    }
+    
+    if (targetElement) {
+      // slot-phraseを更新
+      const phraseDiv = targetElement.querySelector('.slot-phrase');
+      if (phraseDiv) {
+        if (slot.SubslotID) {
+          phraseDiv.textContent = slot.SubslotElement || '';
+        } else {
+          phraseDiv.textContent = slot.SlotPhrase || '';
+        }
+      }
+      
+      // slot-textを更新
+      const textDiv = targetElement.querySelector('.slot-text');
+      if (textDiv) {
+        if (slot.SubslotID) {
+          textDiv.textContent = slot.SubslotText || '';
+        } else {
+          textDiv.textContent = slot.SlotText || '';
+        }
+      }
+      
+      console.log(`✅ 更新完了: ${targetElement.id}`);
+    } else {
+      console.warn(`⚠ DOM要素が見つかりません: ${slot.Slot}${slot.SubslotID ? `-sub-${slot.SubslotID}` : ''}`);
+    }
+  });
+  
+  console.log(`🎯 軽量描画更新完了: ${slotId}`);
+}
+
+// ===========================================
 // 個別ランダマイズ機能
 // ===========================================
 
@@ -257,80 +331,4 @@ function randomizeIndividual(slotId) {
 
 // グローバルに公開
 window.randomizeIndividual = randomizeIndividual;
-
-// ===========================================
-// 個別ランダマイズ専用の軽量描画更新関数
-// ===========================================
-
-/**
- * 指定されたスロットのDOM内容のみを更新（ボタンやイベントハンドラを保持)
- * @param {string} slotId - 対象スロットのID（例: "slot-s", "slot-m1"）
- * @param {Array} selectedSlots - 更新するスロットデータ
- */
-function updateSlotContentsOnly(slotId, selectedSlots) {
-  console.log(`🎯 軽量描画更新開始: ${slotId}`);
-  
-  if (!selectedSlots || selectedSlots.length === 0) {
-    console.warn("selectedSlotsが空です");
-    return;
-  }
-  
-  // slotIdから対象スロットを特定（slot-s → S）
-  const targetSlot = slotId.replace('slot-', '').toUpperCase();
-  
-  // 該当スロットのデータのみを抽出
-  const relevantSlots = selectedSlots.filter(slot => 
-    slot.Slot === targetSlot
-  );
-  
-  if (relevantSlots.length === 0) {
-    console.warn(`${targetSlot}に該当するスロットデータが見つかりません`);
-    return;
-  }
-  
-  console.log(`🎯 更新対象スロット: ${targetSlot}, 件数: ${relevantSlots.length}`);
-  
-  // 静的DOMの該当スロットコンテナを更新
-  relevantSlots.forEach(slot => {
-    let targetElement = null;
-    
-    if (slot.SubslotID) {
-      // サブスロットの場合
-      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}-sub-${slot.SubslotID.toLowerCase()}`);
-    } else {
-      // 上位スロットの場合
-      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}`);
-    }
-    
-    if (targetElement) {
-      // slot-phraseを更新
-      const phraseDiv = targetElement.querySelector('.slot-phrase');
-      if (phraseDiv) {
-        if (slot.SubslotID) {
-          phraseDiv.textContent = slot.SubslotElement || '';
-        } else {
-          phraseDiv.textContent = slot.SlotPhrase || '';
-        }
-      }
-      
-      // slot-textを更新
-      const textDiv = targetElement.querySelector('.slot-text');
-      if (textDiv) {
-        if (slot.SubslotID) {
-          textDiv.textContent = slot.SubslotText || '';
-        } else {
-          textDiv.textContent = slot.SlotText || '';
-        }
-      }
-      
-      console.log(`✅ 更新完了: ${targetElement.id}`);
-    } else {
-      console.warn(`⚠ DOM要素が見つかりません: ${slot.Slot}${slot.SubslotID ? `-sub-${slot.SubslotID}` : ''}`);
-    }
-  });
-  
-  console.log(`🎯 軽量描画更新完了: ${slotId}`);
-}
-
-// グローバルに新しい軽量更新関数も公開
 window.updateSlotContentsOnly = updateSlotContentsOnly;
