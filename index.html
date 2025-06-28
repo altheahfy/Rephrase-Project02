@@ -1106,19 +1106,23 @@ import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
 let currentRandomizedData = null; // 現在表示中のランダマイズ済みデータ
+let originalJsonData = null; // 元の全データ（個別ランダマイズの母集団用）
 
 // 個別ランダマイズボタンのイベントリスナー
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("individual-randomize")) {
     const targetSlot = e.target.getAttribute("data-slot");
     
-    if (!loadedJsonData || !currentRandomizedData) {
+    if (!originalJsonData || !currentRandomizedData) {
       alert("先にJSONデータをロードしてください");
       return;
     }
     
     console.log(`🎲 個別ランダマイズ実行: ${targetSlot}`);
-    const newData = randomizeIndividualSlot(loadedJsonData, targetSlot, currentRandomizedData);
+    console.log("母集団データ:", originalJsonData);
+    console.log("現在のデータ:", currentRandomizedData);
+    
+    const newData = randomizeIndividualSlot(originalJsonData, targetSlot, currentRandomizedData);
     currentRandomizedData = newData;
     window.loadedJsonData = newData; // グローバル変数も更新
     
@@ -1149,7 +1153,9 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   reader.onload = (e) => {
     try {
       loadedJsonData = JSON.parse(e.target.result);
+      originalJsonData = JSON.parse(e.target.result); // 元データを保存
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
+      console.log("🟢 originalJsonData セット完了:", originalJsonData);
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
@@ -1193,12 +1199,12 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
 });
 
 document.getElementById("randomize-all").addEventListener("click", () => {
-  if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
+  if (!originalJsonData || !Array.isArray(originalJsonData)) {
     alert("先に正しいJSONデータをロードしてください");
     console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
     return;
   }
-  const data = randomizeAll(loadedJsonData);
+  const data = randomizeAll(originalJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
   currentRandomizedData = data; // 現在のデータを記録
