@@ -109,44 +109,57 @@ function updateSlotContentsOnly(slotId, selectedSlots) {
   // slotIdから対象スロットを特定（slot-s → S）
   const targetSlot = slotId.replace('slot-', '').toUpperCase();
   
-  // 上位スロットとサブスロットで明確に分岐して更新
-  // 1. 上位スロット（SubslotIDなし）
-  const parentSlot = selectedSlots.find(slot => slot.Slot === targetSlot && (!slot.SubslotID || slot.SubslotID === ""));
-  if (parentSlot) {
-    const parentElement = document.getElementById(`slot-${targetSlot.toLowerCase()}`);
-    if (parentElement) {
-      // slot-phrase
-      const phraseDiv = parentElement.querySelector('.slot-phrase');
-      if (phraseDiv) phraseDiv.textContent = parentSlot.SlotPhrase || '';
-      // slot-text
-      const textDiv = parentElement.querySelector('.slot-text');
-      if (textDiv) textDiv.textContent = parentSlot.SlotText || '';
-      // subslot-toggle-buttonの表示リセット
-      const toggleBtn = parentElement.querySelector('.subslot-toggle-button');
-      if (toggleBtn) toggleBtn.style.display = '';
-      console.log(`✅ 上位スロット更新完了: ${parentElement.id}`);
-    } else {
-      console.warn(`⚠ DOM要素が見つかりません: ${targetSlot}`);
-    }
+  // 該当スロットのデータのみを抽出
+  const relevantSlots = selectedSlots.filter(slot => 
+    slot.Slot === targetSlot
+  );
+  
+  if (relevantSlots.length === 0) {
+    console.warn(`${targetSlot}に該当するスロットデータが見つかりません`);
+    return;
   }
-
-  // 2. サブスロット（SubslotIDあり）
-  const subslots = selectedSlots.filter(slot => slot.Slot === targetSlot && slot.SubslotID && slot.SubslotID !== "");
-  subslots.forEach(slot => {
-    const subElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}-sub-${slot.SubslotID.toLowerCase()}`);
-    if (subElement) {
-      // slot-phrase
-      const phraseDiv = subElement.querySelector('.slot-phrase');
-      if (phraseDiv) phraseDiv.textContent = slot.SubslotElement || '';
-      // slot-text
-      const textDiv = subElement.querySelector('.slot-text');
-      if (textDiv) textDiv.textContent = slot.SubslotText || '';
-      console.log(`✅ サブスロット更新完了: ${subElement.id}`);
+  
+  console.log(`🎯 更新対象スロット: ${targetSlot}, 件数: ${relevantSlots.length}`);
+  
+  // 静的DOMの該当スロットコンテナを更新
+  relevantSlots.forEach(slot => {
+    let targetElement = null;
+    
+    if (slot.SubslotID) {
+      // サブスロットの場合
+      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}-sub-${slot.SubslotID.toLowerCase()}`);
     } else {
-      console.warn(`⚠ サブスロットDOM要素が見つかりません: ${slot.Slot}-sub-${slot.SubslotID}`);
+      // 上位スロットの場合
+      targetElement = document.getElementById(`slot-${slot.Slot.toLowerCase()}`);
+    }
+    
+    if (targetElement) {
+      // slot-phraseを更新
+      const phraseDiv = targetElement.querySelector('.slot-phrase');
+      if (phraseDiv) {
+        if (slot.SubslotID) {
+          phraseDiv.textContent = slot.SubslotElement || '';
+        } else {
+          phraseDiv.textContent = slot.SlotPhrase || '';
+        }
+      }
+      
+      // slot-textを更新
+      const textDiv = targetElement.querySelector('.slot-text');
+      if (textDiv) {
+        if (slot.SubslotID) {
+          textDiv.textContent = slot.SubslotText || '';
+        } else {
+          textDiv.textContent = slot.SlotText || '';
+        }
+      }
+      
+      console.log(`✅ 更新完了: ${targetElement.id}`);
+    } else {
+      console.warn(`⚠ DOM要素が見つかりません: ${slot.Slot}${slot.SubslotID ? `-sub-${slot.SubslotID}` : ''}`);
     }
   });
-
+  
   console.log(`🎯 軽量描画更新完了: ${slotId}`);
 }
 
