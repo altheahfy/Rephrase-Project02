@@ -522,6 +522,15 @@ function syncUpperSlotsFromJson(data) {
     } else {
       detailButton.style.display = '';
       console.log(`👁 ${slotName}: サブスロットデータ${relatedSubslotData.length}件のため展開ボタンを表示`);
+      
+      // 🖼 サブスロット要素がある上位スロットの画像をbutton.pngに変更
+      const slotImage = container.querySelector('.slot-image');
+      if (slotImage) {
+        slotImage.src = 'slot_images/common/button.png';
+        console.log(`🖼 ${slotName}: 画像をbutton.pngに変更しました`);
+      } else {
+        console.warn(`⚠ ${slotName}: slot-imageが見つかりません`);
+      }
     }
   });
   const targetSlots = ['c1', 'm1', 's', 'v', 'o1', 'o2', 'm2', 'c2', 'm3', 'aux'];
