@@ -15,6 +15,12 @@
 <div id="display-top-question-word" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; color: #2a2a2a;">
 </div>
 
+<!-- 右上のファイル選択・ロードエリア -->
+<div id="file-load-area" style="position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(255, 255, 255, 0.9); padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+  <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 5px; font-size: 12px;">
+  <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 5px 10px; font-size: 12px; cursor: pointer; border-radius: 3px;">ロード</button>
+</div>
+
   <section>
   </section>
   <h1 style="margin-bottom: 15px;">
@@ -24,8 +30,6 @@
    <button id="randomize-all">
     全体ランダマイズ
    </button>
-<input type="file" id="jsonFileInput" accept=".json">
-<button id="loadJsonButton">ロード</button>
    <h2 style="margin-bottom: 15px; margin-top: 20px;">
     Full Structure
    </h2>
