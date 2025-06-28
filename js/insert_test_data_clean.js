@@ -1,7 +1,17 @@
 // insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
+// 
+// ⚠️⚠️⚠️【重要警告】⚠️⚠️⚠️
+// 動的記載エリア(dynamic-slot-area)は絶対に変更禁止！
+// - DOM構造の変更厳禁
+// - 位置の移動厳禁  
+// - ラッパーへの移動厳禁
+// - 読み取り専用でのみ使用可能
+// ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
 // 動的エリアからデータを抽出する関数
+// ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
 function extractDataFromDynamicArea() {
+  // ⚠️【編集禁止】この関数は動的記載エリアからの読み取りのみ行います
   const dynamicArea = document.getElementById("dynamic-slot-area");
   if (!dynamicArea) {
     console.warn("⚠ dynamic-slot-area が見つかりません");
@@ -854,6 +864,7 @@ function applyDisplayOrder(data) {
   }
 
   console.log("🔢 表示順序の適用を開始します");
+  // ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
   const dynamicArea = document.getElementById('dynamic-slot-area');
   // dynamicAreaが存在しない場合は処理を中断
   if (!dynamicArea) {
@@ -1008,9 +1019,10 @@ window.safeJsonSync = function(data) {
 };
 
 // ランダマイズ後の同期を確保するためのMutationObserverを設定
+// ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
 window.setupSyncObserver = function() {
   try {
-    // 動的記載エリアの変更を監視
+    // ⚠️【編集禁止】動的記載エリアの変更を監視（読み取り専用）
     const dynamicArea = document.getElementById("dynamic-slot-area");
     if (!dynamicArea) {
       console.warn("⚠ 監視対象の動的記載エリアが見つかりません");
@@ -1203,9 +1215,9 @@ document.addEventListener("DOMContentLoaded", function() {
   }, 500); // DOMが完全に構築されるのを待つ
 });
 
-// 動的エリアの位置を調整する関数
+// ⚠️【編集禁止】動的エリアの位置を調整する関数 - 動的記載エリアは変更厳禁
 function ensureDynamicAreaPosition() {
-  // 動的エリアコンテナを取得
+  // ⚠️【編集禁止】動的エリアコンテナを取得（読み取り専用）
   const container = document.getElementById("dynamic-area-container");
   
   // コンテナが存在する場合
@@ -1217,7 +1229,7 @@ function ensureDynamicAreaPosition() {
       console.log("🔄 動的エリアコンテナを再配置しました");
     }
     
-    // 動的エリア内部の調整
+    // ⚠️【編集禁止】動的エリア内部の調整 - DOM構造変更厳禁
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
     
