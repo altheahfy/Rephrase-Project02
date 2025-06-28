@@ -516,9 +516,23 @@ function syncUpperSlotsFromJson(data) {
     if (slotData && slotData.PhraseType === "word") {
       detailButton.style.display = 'none';
       console.log(`🚫 ${slotName}: PhraseType=wordのため展開ボタンを非表示`);
+      
+      // 🖼 展開ボタン非表示の場合は画像を元に戻す
+      const slotImage = container.querySelector('.slot-image');
+      if (slotImage) {
+        slotImage.src = 'slot_images/common/placeholder.png';
+        console.log(`🖼 ${slotName}: 画像をplaceholder.pngに戻しました`);
+      }
     } else if (relatedSubslotData.length === 0) {
       detailButton.style.display = 'none';
       console.log(`🚫 ${slotName}: サブスロットデータ0件のため展開ボタンを非表示`);
+      
+      // 🖼 展開ボタン非表示の場合は画像を元に戻す
+      const slotImage = container.querySelector('.slot-image');
+      if (slotImage) {
+        slotImage.src = 'slot_images/common/placeholder.png';
+        console.log(`🖼 ${slotName}: 画像をplaceholder.pngに戻しました`);
+      }
     } else {
       detailButton.style.display = '';
       console.log(`👁 ${slotName}: サブスロットデータ${relatedSubslotData.length}件のため展開ボタンを表示`);
