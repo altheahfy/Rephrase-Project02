@@ -377,9 +377,40 @@ function displayTopQuestionWord() {
       slotWrapper.insertBefore(topDiv, slotWrapper.firstChild);
       console.log("✅ 疑問詞を文頭に移動しました");
     }
+
+    // 🔹 動的記載エリアにも同じ疑問詞を表示
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    if (dynamicArea) {
+      // 既存の動的エリア用疑問詞要素があるかチェック
+      let dynamicQuestionDiv = document.getElementById("dynamic-question-word");
+      
+      if (!dynamicQuestionDiv) {
+        // 初回作成：元の要素をクローン
+        dynamicQuestionDiv = topDiv.cloneNode(true);
+        dynamicQuestionDiv.id = "dynamic-question-word"; // 異なるIDを設定
+        console.log("✅ 動的エリア用疑問詞要素を作成しました");
+      }
+      
+      // テキストを更新
+      dynamicQuestionDiv.textContent = topDisplayItem.DisplayText;
+      
+      // 動的エリアの最初に配置
+      if (!dynamicArea.contains(dynamicQuestionDiv)) {
+        dynamicArea.insertBefore(dynamicQuestionDiv, dynamicArea.firstChild);
+        console.log("✅ 動的エリアに疑問詞を配置しました");
+      }
+    }
   } else {
     // DisplayAtTopがない場合は表示をクリア
     topDiv.textContent = "";
+    
+    // 動的エリアの疑問詞もクリア
+    const dynamicQuestionDiv = document.getElementById("dynamic-question-word");
+    if (dynamicQuestionDiv) {
+      dynamicQuestionDiv.remove();
+      console.log("🧹 動的エリアの疑問詞を削除しました");
+    }
+    
     console.log("🧹 DisplayAtTop 表示をクリア（該当データなし）");
   }
   
