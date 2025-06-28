@@ -449,17 +449,17 @@ function syncUpperSlotsFromJson(data) {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
 
-        // 🔍 ステップ1: Auxスロットのみで空スロット非表示テスト
-        if (item.Slot.toLowerCase() === 'aux') {
+        // 🔍 ステップ1: O1スロットのみで空スロット非表示テスト
+        if (item.Slot.toLowerCase() === 'o1') {
           const isEmpty = !item.SlotPhrase || item.SlotPhrase.trim() === '';
-          console.log(`🔍 Auxスロット空判定: SlotPhrase="${item.SlotPhrase}" → isEmpty=${isEmpty}`);
+          console.log(`🔍 O1スロット空判定: SlotPhrase="${item.SlotPhrase}" → isEmpty=${isEmpty}`);
           
           if (isEmpty) {
             container.style.display = 'none';
-            console.log(`👻 Auxスロットを非表示にしました`);
+            console.log(`👻 O1スロットを非表示にしました`);
           } else {
             container.style.display = '';
-            console.log(`👁 Auxスロットを表示状態にしました`);
+            console.log(`👁 O1スロットを表示状態にしました`);
           }
         }
       } else {
@@ -467,6 +467,24 @@ function syncUpperSlotsFromJson(data) {
       }
     }
   });
+
+  // 🔍 全ての上位スロットをチェックして空のものを非表示（ステップ1：Auxのみ）
+  const auxSlot = document.getElementById('slot-aux');
+  if (auxSlot) {
+    const phraseDiv = auxSlot.querySelector('.slot-phrase');
+    const isEmpty = !phraseDiv || !phraseDiv.textContent || phraseDiv.textContent.trim() === '';
+    console.log(`🔍 Auxスロット空判定: textContent="${phraseDiv?.textContent}" → isEmpty=${isEmpty}`);
+    
+    if (isEmpty) {
+      auxSlot.style.display = 'none';
+      console.log(`👻 Auxスロットを非表示にしました`);
+    } else {
+      auxSlot.style.display = '';
+      console.log(`👁 Auxスロットを表示状態にしました`);
+    }
+  } else {
+    console.log(`⚠ slot-auxが見つかりません`);
+  }
 }
 
 // ✅ サブスロット同期機能の実装
