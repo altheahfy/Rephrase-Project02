@@ -448,20 +448,6 @@ function syncUpperSlotsFromJson(data) {
         } else {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
-
-        // 🔍 ステップ1: O1スロットのみで空スロット非表示テスト
-        if (item.Slot.toLowerCase() === 'o1') {
-          const isEmpty = !item.SlotPhrase || item.SlotPhrase.trim() === '';
-          console.log(`🔍 O1スロット空判定: SlotPhrase="${item.SlotPhrase}" → isEmpty=${isEmpty}`);
-          
-          if (isEmpty) {
-            container.style.display = 'none';
-            console.log(`👻 O1スロットを非表示にしました`);
-          } else {
-            container.style.display = '';
-            console.log(`👁 O1スロットを表示状態にしました`);
-          }
-        }
       } else {
         console.warn(`❌ 上位スロットが見つかりません: ${slotId}`);
       }
