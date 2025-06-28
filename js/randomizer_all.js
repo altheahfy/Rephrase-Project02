@@ -92,11 +92,33 @@ export function randomizeAll(slotData) {
 // 個別スロットランダマイズ関数
 export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
   console.log(`🎲 個別ランダマイズ開始: ${targetSlot}`);
+  console.log("現在のデータ:", currentData);
+  console.log("元データ:", slotData);
   
-  // 現在のV_group_keyを維持
-  const currentVGroup = currentData.find(entry => entry.V_group_key)?.V_group_key;
+  // 現在のV_group_keyを維持 - より確実な方法で取得
+  let currentVGroup = null;
+  
+  // 方法1: currentDataから取得を試行
+  if (currentData && Array.isArray(currentData)) {
+    const entryWithVGroup = currentData.find(entry => entry.V_group_key);
+    if (entryWithVGroup) {
+      currentVGroup = entryWithVGroup.V_group_key;
+    }
+  }
+  
+  // 方法2: window.loadedJsonDataから取得を試行
+  if (!currentVGroup && window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+    const entryWithVGroup = window.loadedJsonData.find(entry => entry.V_group_key);
+    if (entryWithVGroup) {
+      currentVGroup = entryWithVGroup.V_group_key;
+    }
+  }
+  
+  console.log(`🔍 検出されたV_group_key: ${currentVGroup}`);
+  
   if (!currentVGroup) {
     console.warn("現在のV_group_keyが見つかりません");
+    alert("V_group_keyが見つかりません。先にJSONデータをロードしてください。");
     return currentData;
   }
   
@@ -107,8 +129,11 @@ export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
     !entry.SubslotID
   );
   
+  console.log(`🎯 ${targetSlot}スロット候補数: ${candidates.length}`);
+  
   if (candidates.length === 0) {
     console.warn(`${targetSlot}スロットの候補が見つかりません`);
+    alert(`${targetSlot}スロットの候補が見つかりません`);
     return currentData;
   }
   
@@ -116,8 +141,10 @@ export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
   const selectedCandidate = candidates[Math.floor(Math.random() * candidates.length)];
   console.log(`🎯 選択された${targetSlot}:`, selectedCandidate);
   
-  // 新しいデータセットを作成（該当スロットのみ更新）
-  let newData = currentData.filter(entry => entry.Slot !== targetSlot);
+  // 新しいデータセットを作成（該当スロットとそのサブスロットを除外）
+  let newData = currentData.filter(entry => 
+    entry.Slot !== targetSlot || entry.SubslotID
+  );
   
   // 選択されたスロットを追加
   newData.push({ ...selectedCandidate });
@@ -134,5 +161,6 @@ export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
   });
   
   console.log(`✅ ${targetSlot}の個別ランダマイズ完了`);
+  console.log("新しいデータ:", newData);
   return newData;
 }
