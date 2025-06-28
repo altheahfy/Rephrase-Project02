@@ -1,4 +1,3 @@
-
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -89,3 +88,69 @@ export function randomizeAll(slotData) {
     識別番号: slot.識別番号 || ""
   }));
 }
+
+/**
+ * 指定スロット（例：S）のみ個別ランダマイズする（親＋サブスロットセットごと）
+ * @param {string} slotName - 例: "S"（大文字）
+ */
+function randomizeIndividualSlot(slotName) {
+  // 1. 現在のv_group_keyを取得
+  if (!window.lastSelectedSlots || window.lastSelectedSlots.length === 0) {
+    alert("先に全体ランダマイズを実行してください");
+    return;
+  }
+  // 例: S, M1 など
+  const targetSlot = slotName.toUpperCase();
+  // どのグループか
+  const currentSlot = window.lastSelectedSlots.find(item => item.Slot === targetSlot && (!item.SubslotID || item.SubslotID === ""));
+  if (!currentSlot || !currentSlot.V_group_key) {
+    alert("グループ情報が取得できません。全体ランダマイズをやり直してください。");
+    return;
+  }
+  const vGroupKey = currentSlot.V_group_key;
+  // 2. window.allDataから該当グループ・スロットの全例文セットを抽出
+  const all = window.allData || [];
+  // 例文IDごとに親＋サブスロットをまとめる
+  const exampleIdSetMap = {};
+  all.forEach(item => {
+    if (item.V_group_key === vGroupKey && item.Slot === targetSlot) {
+      const exid = item.例文ID;
+      if (!exampleIdSetMap[exid]) exampleIdSetMap[exid] = [];
+      exampleIdSetMap[exid].push(item);
+    }
+  });
+  const exampleIds = Object.keys(exampleIdSetMap);
+  if (exampleIds.length === 0) {
+    alert("該当スロットの候補がありません");
+    return;
+  }
+  // 3. ランダムに1セット選ぶ
+  const randomId = exampleIds[Math.floor(Math.random() * exampleIds.length)];
+  const selectedSet = exampleIdSetMap[randomId];
+  // 4. window.lastSelectedSlotsから該当スロット（親＋サブ）を除去
+  window.lastSelectedSlots = window.lastSelectedSlots.filter(item => item.Slot !== targetSlot);
+  // 5. 新しいセットを追加
+  window.lastSelectedSlots.push(...selectedSet);
+  // 6. 必要ならDOM更新関数を呼ぶ（例: buildDynamicSlots, updateSlotContentsOnly など）
+  if (window.buildDynamicSlots) {
+    window.buildDynamicSlots(window.lastSelectedSlots);
+  }
+  // 7. 必要ならwindow.loadedJsonDataも同期
+  if (window.loadedJsonData) {
+    window.loadedJsonData = window.loadedJsonData.filter(item => item.Slot !== targetSlot);
+    window.loadedJsonData.push(...selectedSet.map(slot => ({
+      Slot: slot.Slot || "",
+      SlotPhrase: slot.SlotPhrase || "",
+      SlotText: slot.SlotText || "",
+      Slot_display_order: slot.Slot_display_order || 0,
+      PhraseType: slot.PhraseType || "",
+      SubslotID: slot.SubslotID || "",
+      SubslotElement: slot.SubslotElement || "",
+      SubslotText: slot.SubslotText || "",
+      display_order: slot.display_order || 0
+    })));
+  }
+}
+
+// グローバル公開
+window.randomizeIndividualSlot = randomizeIndividualSlot;
