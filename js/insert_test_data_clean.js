@@ -449,17 +449,17 @@ function syncUpperSlotsFromJson(data) {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
 
-        // 🔍 ステップ1: Sスロットのみで空スロット非表示テスト
-        if (item.Slot.toLowerCase() === 's') {
+        // 🔍 ステップ1: Auxスロットのみで空スロット非表示テスト
+        if (item.Slot.toLowerCase() === 'aux') {
           const isEmpty = !item.SlotPhrase || item.SlotPhrase.trim() === '';
-          console.log(`🔍 Sスロット空判定: SlotPhrase="${item.SlotPhrase}" → isEmpty=${isEmpty}`);
+          console.log(`🔍 Auxスロット空判定: SlotPhrase="${item.SlotPhrase}" → isEmpty=${isEmpty}`);
           
           if (isEmpty) {
             container.style.display = 'none';
-            console.log(`👻 Sスロットを非表示にしました`);
+            console.log(`👻 Auxスロットを非表示にしました`);
           } else {
             container.style.display = '';
-            console.log(`👁 Sスロットを表示状態にしました`);
+            console.log(`👁 Auxスロットを表示状態にしました`);
           }
         }
       } else {
