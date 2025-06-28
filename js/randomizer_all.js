@@ -99,18 +99,15 @@ function randomizeIndividualSlot(slotName) {
     alert("先に全体ランダマイズを実行してください");
     return;
   }
-  // 例: S, M1 など
   const targetSlot = slotName.toUpperCase();
-  // どのグループか
   const currentSlot = window.lastSelectedSlots.find(item => item.Slot === targetSlot && (!item.SubslotID || item.SubslotID === ""));
   if (!currentSlot || !currentSlot.V_group_key) {
     alert("グループ情報が取得できません。全体ランダマイズをやり直してください。");
     return;
   }
   const vGroupKey = currentSlot.V_group_key;
-  // 2. window.allDataから該当グループ・スロットの全例文セットを抽出
-  const all = window.allData || [];
-  // 例文IDごとに親＋サブスロットをまとめる
+  // 2. window.loadedJsonDataから該当グループ・スロットの全例文セットを抽出
+  const all = window.loadedJsonData || [];
   const exampleIdSetMap = {};
   all.forEach(item => {
     if (item.V_group_key === vGroupKey && item.Slot === targetSlot) {
@@ -131,26 +128,24 @@ function randomizeIndividualSlot(slotName) {
   window.lastSelectedSlots = window.lastSelectedSlots.filter(item => item.Slot !== targetSlot);
   // 5. 新しいセットを追加
   window.lastSelectedSlots.push(...selectedSet);
-  // 6. 必要ならDOM更新関数を呼ぶ（例: buildDynamicSlots, updateSlotContentsOnly など）
+  // 6. 必要ならDOM更新関数を呼ぶ
   if (window.buildDynamicSlots) {
     window.buildDynamicSlots(window.lastSelectedSlots);
   }
-  // 7. 必要ならwindow.loadedJsonDataも同期
-  if (window.loadedJsonData) {
-    window.loadedJsonData = window.loadedJsonData.filter(item => item.Slot !== targetSlot);
-    window.loadedJsonData.push(...selectedSet.map(slot => ({
-      Slot: slot.Slot || "",
-      SlotPhrase: slot.SlotPhrase || "",
-      SlotText: slot.SlotText || "",
-      Slot_display_order: slot.Slot_display_order || 0,
-      PhraseType: slot.PhraseType || "",
-      SubslotID: slot.SubslotID || "",
-      SubslotElement: slot.SubslotElement || "",
-      SubslotText: slot.SubslotText || "",
-      display_order: slot.display_order || 0
-    })));
-  }
+  // 7. window.loadedJsonDataも同期
+  window.loadedJsonData = window.loadedJsonData.filter(item => item.Slot !== targetSlot);
+  window.loadedJsonData.push(...selectedSet.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    V_group_key: slot.V_group_key || "",
+    例文ID: slot.例文ID || ""
+  })));
 }
-
-// グローバル公開
 window.randomizeIndividualSlot = randomizeIndividualSlot;
