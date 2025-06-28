@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // --- フィールド名ゆれ吸収ヘルパー ---
 function normalizeGroupKey(obj) {
   if (obj.V_group_key) return obj.V_group_key;
@@ -5,6 +6,8 @@ function normalizeGroupKey(obj) {
   if (obj.V_grope_key) return obj.V_grope_key;
   return undefined;
 }
+=======
+>>>>>>> parent of 39421a1 (やり直しSのみの個別ランダマイズ)
 
 export function randomizeAll(slotData) {
   // --- すべてのデータでV_group_keyを正規化 ---
@@ -102,6 +105,7 @@ export function randomizeAll(slotData) {
     識別番号: slot.識別番号 || ""
   }));
 }
+<<<<<<< HEAD
 
 /**
  * 指定スロット（例：S）のみ個別ランダマイズする（親＋サブスロットセットごと）
@@ -169,3 +173,5 @@ function randomizeIndividualSlot(slotName) {
   })));
 }
 window.randomizeIndividualSlot = randomizeIndividualSlot;
+=======
+>>>>>>> parent of 39421a1 (やり直しSのみの個別ランダマイズ)
