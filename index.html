@@ -1111,7 +1111,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
     try {
       loadedJsonData = JSON.parse(e.target.result);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
-      window.allData = loadedJsonData;  // 🔧 個別ランダマイズの元データ保持
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
