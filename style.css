@@ -126,8 +126,8 @@ h2 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 120px; /* サブスロット展開エリアとの距離をさらに広げる */
-  padding-top: 24px;
+  margin-top: 5px; /* タイトルと例文の距離を大幅に縮める */
+  padding-top: 10px;
   padding-bottom: 24px;
   /* 点線を削除 */
   position: relative; /* 位置関係の制御のため */
