@@ -458,29 +458,72 @@ function syncUpperSlotsFromJson(data) {
         } else {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
-        
-        // 🚫 PhraseType: "word"の場合は展開ボタンを非表示（分解要素なし）
-        if (item.PhraseType === "word") {
-          const detailButton = container.querySelector('.subslot-toggle-button');
-          if (detailButton) {
-            detailButton.style.display = 'none';
-            console.log(`🚫 ${item.Slot}: PhraseType=wordのため展開ボタンを非表示にしました`);
-          }
-        } else {
-          // PhraseType が "word" 以外の場合は展開ボタンを表示
-          const detailButton = container.querySelector('.subslot-toggle-button');
-          if (detailButton) {
-            detailButton.style.display = '';
-            console.log(`👁 ${item.Slot}: PhraseType=${item.PhraseType}のため展開ボタンを表示しました`);
-          }
-        }
       } else {
         console.warn(`❌ 上位スロットが見つかりません: ${slotId}`);
       }
     }
   });
 
-  // 🔍 全ての上位スロットをチェックして空のものを非表示（全スロット対応版）
+  // � 全上位スロットの展開ボタン制御（データ存在チェック + PhraseType判定）
+  const allTargetSlots = ['c1', 'm1', 's', 'v', 'o1', 'o2', 'm2', 'c2', 'm3', 'aux'];
+  console.log(`🎯 展開ボタン制御対象: ${allTargetSlots.join(', ')}`);
+  
+  allTargetSlots.forEach(slotName => {
+    const slotId = `slot-${slotName}`;
+    const container = document.getElementById(slotId);
+    
+    if (!container) {
+      console.warn(`⚠ ${slotId}が見つかりません`);
+      return;
+    }
+    
+    // このスロットのデータを検索
+    const slotData = data.find(item => 
+      item.Slot.toLowerCase() === slotName && 
+      (!item.SubslotID || item.SubslotID === "")
+    );
+    
+    // このスロットに関連するサブスロットデータをチェック
+    const relatedSubslotData = data.filter(item => 
+      item.Slot.toLowerCase() === slotName && 
+      item.SubslotID && 
+      item.SubslotID !== ""
+    );
+    
+    const detailButton = container.querySelector('.subslot-toggle-button');
+    if (!detailButton) {
+      console.log(`ℹ ${slotName}: 展開ボタンが存在しません`);
+      return;
+    }
+    
+    console.log(`🔍 ${slotName}:`);
+    console.log(`  - 上位データ: ${slotData ? `PhraseType=${slotData.PhraseType}` : '未存在'}`);
+    console.log(`  - 関連サブスロット: ${relatedSubslotData.length}件`);
+    
+    // サブスロットデータの詳細を出力
+    if (relatedSubslotData.length > 0) {
+      console.log(`  - サブスロット詳細:`);
+      relatedSubslotData.forEach((sub, index) => {
+        console.log(`    ${index + 1}. SubslotID=${sub.SubslotID}, PhraseType=${sub.PhraseType}, Element="${sub.SubslotElement}"`);
+      });
+    }
+    
+    // 判定ロジック：
+    // 1. 上位データが存在し、PhraseType="word" → 展開ボタン非表示
+    // 2. 関連サブスロットデータが0件 → 展開ボタン非表示
+    // 3. それ以外 → 展開ボタン表示
+    
+    if (slotData && slotData.PhraseType === "word") {
+      detailButton.style.display = 'none';
+      console.log(`🚫 ${slotName}: PhraseType=wordのため展開ボタンを非表示`);
+    } else if (relatedSubslotData.length === 0) {
+      detailButton.style.display = 'none';
+      console.log(`🚫 ${slotName}: サブスロットデータ0件のため展開ボタンを非表示`);
+    } else {
+      detailButton.style.display = '';
+      console.log(`👁 ${slotName}: サブスロットデータ${relatedSubslotData.length}件のため展開ボタンを表示`);
+    }
+  });
   const targetSlots = ['c1', 'm1', 's', 'v', 'o1', 'o2', 'm2', 'c2', 'm3', 'aux'];
   console.log(`🎯 空スロット非表示対象: ${targetSlots.join(', ')}`);
   
