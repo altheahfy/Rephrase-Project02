@@ -1,3 +1,16 @@
+/* 解答全文トグルボタンのスタイル */
+#toggle-dynamic-area {
+  transition: background-color 0.3s ease;
+}
+
+#toggle-dynamic-area:hover {
+  opacity: 0.8;
+}
+
+#toggle-dynamic-area:active {
+  transform: scale(0.95);
+}
+
 /* 基本的なタイトル要素の余白調整 */
 h1 {
   margin-top: 20px;

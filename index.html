@@ -1019,9 +1019,11 @@
 
 <!-- 動的記載エリア用のセクション要素を追加 -->
 <section id="dynamic-area-container" style="margin-top: 30px;">
-  <h2 style="margin-bottom: 5px;">解答全文</h2>
+  <button id="toggle-dynamic-area" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; font-size: 16px; cursor: pointer; border-radius: 4px; margin-bottom: 5px;">
+    ▼ 解答全文
+  </button>
   <!-- 動的記載エリアがここに生成されます -->
-  <div id="dynamic-slot-area-wrapper"></div>
+  <div id="dynamic-slot-area-wrapper" style="display: none;"></div>
 </section>
 
 <script>
@@ -1045,6 +1047,24 @@
       console.log("✅ 動的記載エリアを適切な位置に移動しました");
     } else {
       console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
+    }
+  });
+
+  // 解答全文の表示・非表示切り替え機能
+  document.getElementById("toggle-dynamic-area").addEventListener("click", () => {
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    const button = document.getElementById("toggle-dynamic-area");
+    
+    if (wrapper.style.display === "none") {
+      wrapper.style.display = "block";
+      button.textContent = "▲ 解答全文";
+      button.style.backgroundColor = "#f44336"; // 赤色（閉じる状態）
+      console.log("✅ 解答全文エリアを表示しました");
+    } else {
+      wrapper.style.display = "none";
+      button.textContent = "▼ 解答全文";
+      button.style.backgroundColor = "#4CAF50"; // 緑色（開く状態）
+      console.log("✅ 解答全文エリアを非表示にしました");
     }
   });
 
