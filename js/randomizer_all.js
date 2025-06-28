@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -253,5 +252,3 @@ function randomizeIndividual(slotId) {
 
 // グローバルに公開
 window.randomizeIndividual = randomizeIndividual;
-=======
->>>>>>> parent of f7ddc8a (Add randomizer functions for slot data selection)
