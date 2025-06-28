@@ -134,6 +134,17 @@ function randomizeIndividualSlot(slotName) {
   // 6. 必要ならDOM更新関数を呼ぶ（例: buildDynamicSlots, updateSlotContentsOnly など）
   if (window.buildDynamicSlots) {
     window.buildDynamicSlots(window.lastSelectedSlots);
+<<<<<<< HEAD
+=======
+  // 🔧 強制的にUIを再構築（slotが反映されないケース対策）
+  if (window.buildStructure && window.lastSelectedSlots) {
+    buildStructure(window.lastSelectedSlots);
+    if (window.syncDynamicToStatic) {
+      syncDynamicToStatic();
+    }
+  }
+
+>>>>>>> parent of 51da046 (Update randomizer_all.js)
   }
   // 7. 必要ならwindow.loadedJsonDataも同期
   if (window.loadedJsonData) {
