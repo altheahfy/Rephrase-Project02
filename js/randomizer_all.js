@@ -134,15 +134,11 @@ function randomizeIndividualSlot(slotName) {
   // 6. 必要ならDOM更新関数を呼ぶ（例: buildDynamicSlots, updateSlotContentsOnly など）
   if (window.buildDynamicSlots) {
     window.buildDynamicSlots(window.lastSelectedSlots);
-  // 🔧 強制的にUIを再構築（innerHTMLでDOM差し替え）
+  // 🔧 強制的にUIを再構築（slotが反映されないケース対策）
   if (window.buildStructure && window.lastSelectedSlots) {
-    const html = buildStructure(window.lastSelectedSlots);
-    const target = document.getElementById("dynamic-slots-container");
-    if (target && html) {
-      target.innerHTML = html;
-      if (window.syncDynamicToStatic) {
-        syncDynamicToStatic();
-      }
+    buildStructure(window.lastSelectedSlots);
+    if (window.syncDynamicToStatic) {
+      syncDynamicToStatic();
     }
   }
 
