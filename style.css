@@ -1,3 +1,14 @@
+/* 基本的なタイトル要素の余白調整 */
+h1 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+h2 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
 /* スロット画像（複数対応）の共通スタイル */
 .slot-image {
   display: inline-block;
@@ -148,18 +159,9 @@
   margin: 4px;
 }
 
-/* 動的記載エリアのタイトル */
+/* 動的記載エリアのタイトルを削除 */
 #dynamic-slot-area::before {
-  content: "解答全文";
-  display: block;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 16px;
-  width: 100%;
-  color: #333;
-  text-align: center;
-  padding: 8px;
-  /* 背景色を削除してシンプルに */
+  display: none;
 }
 
 /* 全サブスロット展開エリアのコンテナスタイル */
@@ -171,9 +173,9 @@
 
 /* 動的記載エリアのコンテナ要素のスタイル強化 */
 #dynamic-area-container {
-  margin-top: 120px; /* 上部の余白を大きく取る */
-  padding-top: 40px;
-  border-top: 4px double #666; /* より明確な区切り */
+  margin-top: 40px; /* 上部の余白を縮める */
+  padding-top: 20px;
+  border-top: 2px solid #666; /* 区切り線を簡素化 */
   position: relative;
   clear: both;
   display: block;
