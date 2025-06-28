@@ -118,7 +118,7 @@
   margin-top: 120px; /* サブスロット展開エリアとの距離をさらに広げる */
   padding-top: 24px;
   padding-bottom: 24px;
-  border-top: 3px dashed #999; /* より目立つ区切り線 */
+  /* 点線を削除 */
   position: relative; /* 位置関係の制御のため */
   clear: both; /* 他の要素の影響を受けないように */
   order: 9999; /* 表示優先度を最低に設定（一番最後に表示） */
@@ -148,9 +148,9 @@
   margin: 4px;
 }
 
-/* 動的記載エリアのタイトルと区切り線 */
+/* 動的記載エリアのタイトル */
 #dynamic-slot-area::before {
-  content: "動的記載エリア（ランダマイズ後の文例）";
+  content: "解答全文";
   display: block;
   font-size: 18px;
   font-weight: bold;
@@ -159,8 +159,7 @@
   color: #333;
   text-align: center;
   padding: 8px;
-  background-color: #f8f8f8;
-  border-radius: 4px;
+  /* 背景色を削除してシンプルに */
 }
 
 /* 全サブスロット展開エリアのコンテナスタイル */
@@ -185,14 +184,10 @@
   position: relative;
 }
 
-/* 動的エリアの前に視覚的な区切りを追加 */
+/* 動的エリアの前の区切り線を削除 */
 #dynamic-area-container::before {
-  content: '';
-  display: block;
-  height: 4px;
-  background: linear-gradient(to right, transparent, #999, transparent);
-  margin-bottom: 20px;
-  width: 100%;
+  /* グレーの実線を削除 */
+  display: none;
 }
 
 /* 空のスロット非表示機構用のスタイル */
