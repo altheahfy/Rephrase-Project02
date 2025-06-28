@@ -47,9 +47,6 @@
       <button data-subslot-toggle="m1">
        ▼ 詳細
       </button>
-      <button class="individual-randomize" data-slot="M1" style="margin-left: 5px; background-color: #FF9800; color: white; border: none; padding: 3px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">
-       🎲 個別
-      </button>
      </div>
     </div>
     <div class="slot-container" id="slot-s">
@@ -64,9 +61,6 @@
      <div class="subslot-toggle-button" style="margin-top: 4px;">
       <button data-subslot-toggle="s">
        ▼ 詳細
-      </button>
-      <button class="individual-randomize" data-slot="S" style="margin-left: 5px; background-color: #FF9800; color: white; border: none; padding: 3px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">
-       🎲 個別
       </button>
      </div>
     </div>
@@ -1101,42 +1095,10 @@
 </html>
 
 <script type="module">
-import { randomizeAll, randomizeIndividualSlot } from './js/randomizer_all.js';
+import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
-let currentRandomizedData = null; // 現在表示中のランダマイズ済みデータ
-
-// 個別ランダマイズボタンのイベントリスナー
-document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("individual-randomize")) {
-    const targetSlot = e.target.getAttribute("data-slot");
-    
-    if (!loadedJsonData || !currentRandomizedData) {
-      alert("先にJSONデータをロードしてください");
-      return;
-    }
-    
-    console.log(`🎲 個別ランダマイズ実行: ${targetSlot}`);
-    const newData = randomizeIndividualSlot(loadedJsonData, targetSlot, currentRandomizedData);
-    currentRandomizedData = newData;
-    window.loadedJsonData = newData; // グローバル変数も更新
-    
-    buildStructure(newData);
-    syncDynamicToStatic();
-    
-    // 各種同期処理
-    if (typeof syncUpperSlotsFromJson === 'function') {
-      syncUpperSlotsFromJson(newData);
-      if (typeof syncSubslotsFromJson === 'function') {
-        syncSubslotsFromJson(newData);
-      }
-      if (typeof applyOrderToAllSlots === 'function') {
-        applyOrderToAllSlots(newData);
-      }
-    }
-  }
-});
 
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
@@ -1154,7 +1116,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
-      currentRandomizedData = data; // 現在のデータを記録
       window.loadedJsonData = data;
       buildStructure(data);
       syncDynamicToStatic();
@@ -1201,7 +1162,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   const data = randomizeAll(loadedJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
-  currentRandomizedData = data; // 現在のデータを記録
   window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();

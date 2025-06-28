@@ -1,3 +1,4 @@
+
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -87,52 +88,4 @@ export function randomizeAll(slotData) {
     display_order: slot.display_order || 0,
     識別番号: slot.識別番号 || ""
   }));
-}
-
-// 個別スロットランダマイズ関数
-export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
-  console.log(`🎲 個別ランダマイズ開始: ${targetSlot}`);
-  
-  // 現在のV_group_keyを維持
-  const currentVGroup = currentData.find(entry => entry.V_group_key)?.V_group_key;
-  if (!currentVGroup) {
-    console.warn("現在のV_group_keyが見つかりません");
-    return currentData;
-  }
-  
-  // 同じV_group_key内の該当スロットの候補を取得
-  const candidates = slotData.filter(entry => 
-    entry.V_group_key === currentVGroup && 
-    entry.Slot === targetSlot &&
-    !entry.SubslotID
-  );
-  
-  if (candidates.length === 0) {
-    console.warn(`${targetSlot}スロットの候補が見つかりません`);
-    return currentData;
-  }
-  
-  // ランダムに選択
-  const selectedCandidate = candidates[Math.floor(Math.random() * candidates.length)];
-  console.log(`🎯 選択された${targetSlot}:`, selectedCandidate);
-  
-  // 新しいデータセットを作成（該当スロットのみ更新）
-  let newData = currentData.filter(entry => entry.Slot !== targetSlot);
-  
-  // 選択されたスロットを追加
-  newData.push({ ...selectedCandidate });
-  
-  // 関連するサブスロットも追加
-  const relatedSubslots = slotData.filter(entry =>
-    entry.例文ID === selectedCandidate.例文ID &&
-    entry.Slot === selectedCandidate.Slot &&
-    entry.SubslotID
-  );
-  
-  relatedSubslots.forEach(sub => {
-    newData.push({ ...sub });
-  });
-  
-  console.log(`✅ ${targetSlot}の個別ランダマイズ完了`);
-  return newData;
 }
