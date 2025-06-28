@@ -369,6 +369,14 @@ function displayTopQuestionWord() {
   if (topDisplayItem && topDisplayItem.DisplayText) {
     topDiv.textContent = topDisplayItem.DisplayText;
     console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+    
+    // 🔹 疑問詞を文頭（slot-wrapper内の最初）に移動
+    const slotWrapper = document.querySelector('.slot-wrapper');
+    if (slotWrapper && !slotWrapper.contains(topDiv)) {
+      // slot-wrapperの最初に移動
+      slotWrapper.insertBefore(topDiv, slotWrapper.firstChild);
+      console.log("✅ 疑問詞を文頭に移動しました");
+    }
   } else {
     // DisplayAtTopがない場合は表示をクリア
     topDiv.textContent = "";
