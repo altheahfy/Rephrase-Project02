@@ -415,6 +415,15 @@ function syncUpperSlotsFromJson(data) {
             textDiv.append(document.createTextNode(item.SlotText || ""));
           }
         }
+
+        // 空スロット判定と非表示処理
+        const isEmpty = (!item.SlotPhrase || item.SlotPhrase.trim() === '') && 
+                        (!item.SlotText || item.SlotText.trim() === '');
+        if (isEmpty) {
+          container.style.display = 'none';
+        } else {
+          container.style.display = '';
+        }
       } else {
         console.warn(`❌ 上位スロットが見つかりません: ${slotId}`);
       }
