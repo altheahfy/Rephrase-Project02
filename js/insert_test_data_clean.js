@@ -1200,8 +1200,13 @@ document.addEventListener("DOMContentLoaded", function() {
   }, 500); // DOMが完全に構築されるのを待つ
 });
 
-// 動的エリアの位置を調整する関数
+// 動的エリアの位置を調整する関数（無効化 - 動的記載エリアは触ってはいけない）
 function ensureDynamicAreaPosition() {
+  // 【重要】動的記載エリアは触ってはいけないため、この関数を無効化
+  console.log("⚠ ensureDynamicAreaPosition: 動的記載エリアは変更禁止のため処理をスキップ");
+  return;
+  
+  /* 以下の処理は無効化
   // 動的エリアコンテナを取得
   const container = document.getElementById("dynamic-area-container");
   
@@ -1223,6 +1228,7 @@ function ensureDynamicAreaPosition() {
       console.log("🔄 動的エリアをラッパー内に再配置しました");
     }
   }
+  */
 }
 
 /**
