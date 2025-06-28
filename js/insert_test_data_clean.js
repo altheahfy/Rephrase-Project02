@@ -458,6 +458,22 @@ function syncUpperSlotsFromJson(data) {
         } else {
           console.warn(`❌ 上位textDiv取得失敗: ${slotId}`);
         }
+        
+        // 🚫 PhraseType: "word"の場合は展開ボタンを非表示（分解要素なし）
+        if (item.PhraseType === "word") {
+          const detailButton = container.querySelector('.subslot-toggle-button');
+          if (detailButton) {
+            detailButton.style.display = 'none';
+            console.log(`🚫 ${item.Slot}: PhraseType=wordのため展開ボタンを非表示にしました`);
+          }
+        } else {
+          // PhraseType が "word" 以外の場合は展開ボタンを表示
+          const detailButton = container.querySelector('.subslot-toggle-button');
+          if (detailButton) {
+            detailButton.style.display = '';
+            console.log(`👁 ${item.Slot}: PhraseType=${item.PhraseType}のため展開ボタンを表示しました`);
+          }
+        }
       } else {
         console.warn(`❌ 上位スロットが見つかりません: ${slotId}`);
       }
