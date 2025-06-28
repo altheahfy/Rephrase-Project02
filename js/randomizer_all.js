@@ -90,16 +90,25 @@ export function randomizeAll(slotData) {
 }
 
 // 個別スロットランダマイズ関数
-export function randomizeIndividualSlot(originalData, targetSlot, currentData) {
+export function randomizeIndividualSlot(slotData, targetSlot, currentData) {
   console.log(`🎲 個別ランダマイズ開始: ${targetSlot}`);
   console.log("現在のデータ:", currentData);
-  console.log("元データ（母集団）:", originalData);
+  console.log("元データ:", slotData);
   
-  // 現在のV_group_keyを現在表示中のデータから取得
+  // 現在のV_group_keyを維持 - より確実な方法で取得
   let currentVGroup = null;
   
+  // 方法1: currentDataから取得を試行
   if (currentData && Array.isArray(currentData)) {
     const entryWithVGroup = currentData.find(entry => entry.V_group_key);
+    if (entryWithVGroup) {
+      currentVGroup = entryWithVGroup.V_group_key;
+    }
+  }
+  
+  // 方法2: window.loadedJsonDataから取得を試行
+  if (!currentVGroup && window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+    const entryWithVGroup = window.loadedJsonData.find(entry => entry.V_group_key);
     if (entryWithVGroup) {
       currentVGroup = entryWithVGroup.V_group_key;
     }
@@ -113,8 +122,8 @@ export function randomizeIndividualSlot(originalData, targetSlot, currentData) {
     return currentData;
   }
   
-  // 元データ（母集団）から同じV_group_key内の該当スロットの候補を取得
-  const candidates = originalData.filter(entry => 
+  // 同じV_group_key内の該当スロットの候補を取得
+  const candidates = slotData.filter(entry => 
     entry.V_group_key === currentVGroup && 
     entry.Slot === targetSlot &&
     !entry.SubslotID
@@ -134,14 +143,14 @@ export function randomizeIndividualSlot(originalData, targetSlot, currentData) {
   
   // 新しいデータセットを作成（該当スロットとそのサブスロットを除外）
   let newData = currentData.filter(entry => 
-    entry.Slot !== targetSlot
+    entry.Slot !== targetSlot || entry.SubslotID
   );
   
   // 選択されたスロットを追加
   newData.push({ ...selectedCandidate });
   
-  // 元データから関連するサブスロットも追加
-  const relatedSubslots = originalData.filter(entry =>
+  // 関連するサブスロットも追加
+  const relatedSubslots = slotData.filter(entry =>
     entry.例文ID === selectedCandidate.例文ID &&
     entry.Slot === selectedCandidate.Slot &&
     entry.SubslotID
