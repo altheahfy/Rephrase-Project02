@@ -37,12 +37,19 @@ function randomizeSlotSIndividual() {
   // 全スロットデータを平坦化
   const allSlots = window.slotSets.flat();
   
+  // デバッグ：全Sスロットの内容を確認
+  const allSSlots = allSlots.filter(entry => entry.Slot === "S");
+  console.log("📋 利用可能な全Sスロット:", allSSlots.map(s => s.Content));
+  console.log(`📄 現在の動的エリアSスロット: "${currentSContent}"`);
+  
   // Sスロット候補を抽出（現在表示中以外）
   const candidates = allSlots.filter(entry => 
     entry.Slot === "S" && 
     entry.Content !== currentSContent && // 内容が異なるもの
     entry.Content && entry.Content.trim() !== "" // 空でないもの
   );
+  
+  console.log("🔍 フィルタ結果:", candidates.map(c => c.Content));
   
   if (candidates.length === 0) {
     console.warn("⚠️ 現在表示中以外のSスロット候補が見つかりません");
