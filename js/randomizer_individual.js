@@ -124,25 +124,28 @@ function updateSSlotDisplay(data, isSubslot = false) {
   
   if (isSubslot) {
     // サブスロットの場合：対応するサブスロット要素を更新
-    const subslotSelector = `[data-subslot-id="${data.SubslotID}"]`;
-    const subslotElement = container.querySelector(subslotSelector);
+    // SubslotID "sub-aux" → slot-s-sub-aux
+    const subslotId = `slot-s-${data.SubslotID}`;
+    const subslotElement = document.getElementById(subslotId);
+    
+    console.log(`🔧 サブスロット要素検索: ${subslotId}`);
+    console.log(`🔧 見つかったサブスロット要素:`, subslotElement);
     
     if (subslotElement) {
       // サブスロット要素内のテキスト部分を更新
-      const textDiv = subslotElement.querySelector('.subslot-text');
+      const textDiv = subslotElement.querySelector('.slot-text');
       if (textDiv) {
         const oldText = textDiv.textContent;
         textDiv.textContent = data.SubslotText || "SUBSLOT UPDATED";
         console.log(`✅ サブスロット ${data.SubslotID} text更新: "${oldText}" → "${textDiv.textContent}"`);
+      } else {
+        console.warn(`⚠️ サブスロット内の.slot-textが見つかりません: ${subslotId}`);
       }
     } else {
-      console.warn(`⚠️ サブスロット要素が見つかりません: ${data.SubslotID}`);
-      // フォールバック：コンテナ全体に表示
-      const fallbackDiv = container.querySelector('.slot-text') || container;
-      if (fallbackDiv) {
-        fallbackDiv.textContent = `${data.SubslotID}: ${data.SubslotText}`;
-        console.log(`✅ フォールバック更新: ${data.SubslotID}`);
-      }
+      console.warn(`⚠️ サブスロット要素が見つかりません: ${subslotId}`);
+      console.log(`🔧 利用可能なサブスロット要素:`);
+      const allSubslots = document.querySelectorAll('[id^="slot-s-sub-"]');
+      allSubslots.forEach(sub => console.log(`🔧 - ${sub.id}`));
     }
   } else {
     // メインスロットの場合：従来通りの更新
@@ -215,16 +218,7 @@ function setupSSlotRandomizeButton() {
     // デバッグ用：JSONデータの確認
     console.log("🔧 window.loadedJsonData:", window.loadedJsonData);
     
-    // 強制的にテスト用のデータでスロットを更新
-    const testData = {
-      SlotPhrase: "TEST PHRASE " + Math.random().toString(36).substring(7),
-      SlotText: "TEST TEXT " + Math.random().toString(36).substring(7)
-    };
-    
-    console.log("🔧 テスト用データでスロット更新:", testData);
-    updateSSlotDisplay(testData);
-    
-    // 元の処理も実行
+    // メイン処理を実行
     randomizeSlotS();
   }, true); // キャプチャフェーズでイベントを捕捉
   
