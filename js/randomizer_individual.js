@@ -6,95 +6,36 @@
 
 // 🟢 現在のV_group_keyを取得する関数
 function getCurrentVGroupKey() {
-  console.log("🔍 getCurrentVGroupKey() 開始");
-  
   // 動的記載エリアから現在表示中のスロットを取得
   const dynamicArea = document.getElementById('dynamic-slot-area');
-  console.log("動的記載エリア:", dynamicArea);
-  
-  if (!dynamicArea) {
-    console.log("❌ 動的記載エリアが見つかりません");
-    return null;
-  }
+  if (!dynamicArea) return null;
 
   const slots = dynamicArea.querySelectorAll('[data-v-group-key]');
-  console.log(`data-v-group-key属性を持つ要素: ${slots.length}個`, slots);
-  
   if (slots.length > 0) {
     const vGroupKey = slots[0].dataset.vGroupKey;
-    console.log(`data-v-group-key から取得: ${vGroupKey}`);
     if (vGroupKey) return vGroupKey;
   }
 
   // データ属性がない場合、window.slotSetsから推測
   const allSlots = dynamicArea.querySelectorAll('[data-display-order]');
-  console.log(`data-display-order属性を持つ要素: ${allSlots.length}個`, allSlots);
-  
   if (allSlots.length > 0 && window.slotSets) {
     const displayOrder = allSlots[0].dataset.displayOrder;
-    console.log(`最初の要素のdisplay-order: ${displayOrder}`);
-    
-    // 平坦化してから検索
     const allEntries = window.slotSets.flat();
     const matchingEntry = allEntries.find(entry => 
       entry.Slot_display_order == displayOrder
     );
-    console.log(`マッチするエントリ:`, matchingEntry);
-    
     if (matchingEntry && matchingEntry.V_group_key) {
-      console.log(`display-orderから取得したV_group_key: ${matchingEntry.V_group_key}`);
       return matchingEntry.V_group_key;
     }
   }
 
-  // 動的記載エリア内のすべての要素をチェック
-  console.log("動的記載エリア内のすべての要素:", dynamicArea.children);
-  Array.from(dynamicArea.children).forEach((el, index) => {
-    console.log(`要素 ${index}:`, el, `クラス: ${el.className}`, `データ属性:`, el.dataset);
-  });
-
   // フォールバック：window.slotSetsから最初のV_group_keyを取得
-  console.log("window.slotSets:", window.slotSets);
   if (window.slotSets && window.slotSets.length > 0) {
-    // 第1例文セットの詳細構造を確認
-    console.log("第1例文セット:", window.slotSets[0]);
-    console.log("第1例文セットの最初の要素:", window.slotSets[0][0]);
-    
-    // 平坦化してすべてのエントリを確認
     const allEntries = window.slotSets.flat();
-    console.log("全エントリ数:", allEntries.length);
-    console.log("最初の5エントリ:", allEntries.slice(0, 5));
-    
-    // V_group_keyフィールドの存在確認
-    const entryWithVGroupKey = allEntries.find(entry => {
-      const keys = Object.keys(entry);
-      console.log("エントリのキー:", keys);
-      return keys.some(key => key.toLowerCase().includes('group') || key.toLowerCase().includes('v_group'));
-    });
-    
-    if (entryWithVGroupKey) {
-      console.log("V_group_keyを含む可能性のあるエントリ:", entryWithVGroupKey);
-      
-      // 正しいフィールド名を特定
-      const possibleVGroupKeys = Object.keys(entryWithVGroupKey).filter(key => 
-        key.toLowerCase().includes('group') || key.toLowerCase().includes('v_group')
-      );
-      console.log("可能性のあるV_group_keyフィールド:", possibleVGroupKeys);
-      
-      if (possibleVGroupKeys.length > 0) {
-        const vGroupValue = entryWithVGroupKey[possibleVGroupKeys[0]];
-        console.log(`フォールバック - V_group_key (${possibleVGroupKeys[0]}): ${vGroupValue}`);
-        return vGroupValue;
-      }
-    }
-    
-    // 従来の方法でも試行
-    const firstEntry = window.slotSets.find(entry => entry.V_group_key);
-    console.log(`フォールバック - 最初のV_group_key: ${firstEntry ? firstEntry.V_group_key : 'なし'}`);
-    return firstEntry ? firstEntry.V_group_key : null;
+    const entryWithVGroupKey = allEntries.find(entry => entry.V_group_key);
+    return entryWithVGroupKey ? entryWithVGroupKey.V_group_key : null;
   }
 
-  console.log("❌ V_group_keyが見つかりませんでした");
   return null;
 }
 
@@ -204,6 +145,9 @@ function randomizeSlotSIndividual() {
   // Sスロットのみを含む配列を作成してbuildStructureを呼び出し
   const sSlotData = [chosen, ...chosenSubslots];
   updateSSlotOnly(sSlotData);
+  
+  // 手動で静的スロットも更新
+  updateStaticSSlot(chosen);
   
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
@@ -323,6 +267,41 @@ function updateSSlotOnly(sSlotData) {
   });
   
   console.log("✅ Sスロット更新完了");
+}
+
+/**
+ * 静的Sスロットを直接更新
+ * @param {Object} sSlotData - 選択されたSスロットデータ
+ */
+function updateStaticSSlot(sSlotData) {
+  console.log("🔄 静的Sスロット更新開始", sSlotData);
+  
+  const staticSSlot = document.getElementById('slot-s');
+  if (!staticSSlot) {
+    console.warn("⚠️ 静的Sスロットが見つかりません");
+    return;
+  }
+  
+  // 既存の内容をクリア
+  const phraseDiv = staticSSlot.querySelector('.slot-phrase');
+  const textDiv = staticSSlot.querySelector('.slot-text');
+  
+  if (phraseDiv) phraseDiv.textContent = '';
+  if (textDiv) textDiv.textContent = '';
+  
+  // 新しいデータを設定
+  if (sSlotData.PhraseType === 'word') {
+    if (phraseDiv) phraseDiv.textContent = sSlotData.SlotPhrase || '';
+    if (textDiv) textDiv.textContent = sSlotData.SlotText || '';
+    console.log(`📝 静的Sスロット更新: "${sSlotData.SlotPhrase}" / "${sSlotData.SlotText}"`);
+  } else {
+    // マーク表示の場合
+    if (phraseDiv) phraseDiv.textContent = '▶';
+    if (textDiv) textDiv.textContent = '';
+    console.log(`📝 静的Sスロットをマーク表示に更新`);
+  }
+  
+  console.log("✅ 静的Sスロット更新完了");
 }
 
 // グローバル関数として公開（静的HTMLボタンから呼び出し用）
