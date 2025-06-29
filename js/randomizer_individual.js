@@ -1,29 +1,21 @@
 /**
- * Sスロット個別ランダマイズ
- * 全体ランダマイザーの仕組みをSスロット専用にコピー
+ * Sスロット個別ランダマイザー
+ * randomizer_all.js と structure_builder.js を完全コピーしてSスロット専用に改造
  */
 
 /**
- * null や undefined に対してフォールバック値を返す
- */
-function safe(value, fallback = "") {
-  return value === null || value === undefined ? fallback : value;
-}
-
-/**
- * Sスロット個別ランダマイズ
- * 全体ランダマイザーの仕組みをSスロット専用にコピー
+ * Sスロット個別ランダマイズ（全体ランダマイザーの完全コピー版）
  */
 function randomizeSlotSIndividual() {
-  console.log("🎲 Sスロット個別ランダマイズ開始");
+  console.log("🎲🎯 Sスロット個別ランダマイズ開始（完全コピー版）");
   
-  // window.slotSetsの存在確認（全体ランダマイザーから継承）
-  if (!window.slotSets || !Array.isArray(window.slotSets)) {
-    console.warn("⚠️ window.slotSetsが見つかりません。先に全体ランダマイズを実行してください。");
+  // 現在のwindow.lastSelectedSlotsから既存データを取得
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。先に全体ランダマイズを実行してください。");
     return;
   }
   
-  // 現在のV_group_keyを取得（全体ランダマイザーと同じ方法）
+  // 現在のV_group_keyを取得
   const currentVGroupKey = getCurrentVGroupKey();
   if (!currentVGroupKey) {
     console.warn("⚠️ 現在のV_group_keyが特定できませんでした");
@@ -32,11 +24,16 @@ function randomizeSlotSIndividual() {
   
   console.log(`🔑 現在のV_group_key: ${currentVGroupKey}`);
   
-  // window.slotSetsを平坦化してSスロット候補を抽出（randomizer_all.jsと同じ方法）
+  // window.slotSetsから候補を取得（randomizer_all.jsと同じ）
+  if (!window.slotSets || !Array.isArray(window.slotSets)) {
+    console.warn("⚠️ window.slotSetsが見つかりません");
+    return;
+  }
+  
   const allEntries = window.slotSets.flat();
   const groupSlots = allEntries.filter(entry => entry.V_group_key === currentVGroupKey);
   
-  // Sスロットのメイン候補を抽出（SubslotIDなし）
+  // Sスロットのメイン候補を抽出
   const sSlotCandidates = groupSlots.filter(entry => 
     entry.Slot === "S" && !entry.SubslotID
   );
@@ -52,7 +49,7 @@ function randomizeSlotSIndividual() {
   const chosenSSlot = sSlotCandidates[Math.floor(Math.random() * sSlotCandidates.length)];
   console.log(`🎯 選択されたSスロット:`, chosenSSlot);
   
-  // 選択されたSスロットに関連するサブスロットを取得（randomizer_all.jsと同じ方法）
+  // 関連サブスロットを取得（randomizer_all.jsと同じ方法）
   const relatedSubslots = groupSlots.filter(e =>
     e.例文ID === chosenSSlot.例文ID &&
     e.Slot === chosenSSlot.Slot &&
@@ -61,17 +58,49 @@ function randomizeSlotSIndividual() {
   
   console.log(`🎯 関連サブスロット: ${relatedSubslots.length}個`, relatedSubslots);
   
-  // 選択されたスロットセットを作成（structure_builder.jsに渡す形式）
-  const selectedSlots = [chosenSSlot, ...relatedSubslots];
+  // 新しいSスロットデータセットを作成
+  const newSSlots = [chosenSSlot, ...relatedSubslots].map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || "",
+    V_group_key: slot.V_group_key || "",
+    例文ID: slot.例文ID || ""
+  }));
   
-  // structure_builder.jsの仕組みを使って動的記載エリアを更新
-  updateSSlotOnly(selectedSlots);
+  console.log(`🔄 新しいSスロットデータセット:`, newSSlots);
   
-  console.log("✅ Sスロット個別ランダマイズ完了");
+  // 既存のwindow.lastSelectedSlotsからSスロット関連を削除
+  const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
+  
+  // 新しいSスロットデータを追加
+  const updatedSlots = [...filteredSlots, ...newSSlots];
+  
+  // window.lastSelectedSlotsを更新
+  window.lastSelectedSlots = updatedSlots;
+  
+  console.log(`✅ 更新されたwindow.lastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // structure_builder.jsの仕組みを完全に使用して再構築
+  buildStructureForSIndividual(updatedSlots);
+  
+  // 静的エリアとの同期（全体ランダマイザーと同じ）
+  if (typeof syncDynamicToStatic === "function") {
+    syncDynamicToStatic();
+    console.log("🔄 静的エリアとの同期完了");
+  }
+  
+  console.log("✅ Sスロット個別ランダマイズ完了（完全コピー版）");
 }
 
 /**
- * 現在のV_group_keyを取得（全体ランダマイザーと同じ方法）
+ * 現在のV_group_keyを取得（randomizer_all.jsと同じ）
  */
 function getCurrentVGroupKey() {
   if (window.lastSelectedSlots && window.lastSelectedSlots.length > 0) {
@@ -82,15 +111,14 @@ function getCurrentVGroupKey() {
 }
 
 /**
- * Sスロットのみを更新（structure_builder.jsの仕組みを完全コピー）
+ * Sスロット個別用のstructure_builder（完全コピー版）
  */
-function updateSSlotOnly(selectedSlots) {
-  console.log("🔄 Sスロット更新開始 (structure_builder.jsの仕組みを使用)", selectedSlots);
+function buildStructureForSIndividual(selectedSlots) {
+  console.log("🏗️ buildStructureForSIndividual called with selectedSlots:", selectedSlots);
   
-  // structure_builder.jsと同じDOM操作
   let wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
-    console.error('slot-wrapper not found, skipping update');
+    console.error('slot-wrapper not found, skipping structure generation');
     return;
   }
 
@@ -101,31 +129,64 @@ function updateSSlotOnly(selectedSlots) {
     wrapper.appendChild(dynamicArea);
   }
 
-  // 既存のSスロット関連要素を削除
-  const existingSSlots = Array.from(dynamicArea.children).filter(el => {
-    return (el.classList.contains('slot') && el.dataset.displayOrder === "2") ||
-           (el.classList.contains('subslot') && el.id && el.id.includes('slot-s-sub'));
-  });
-  
-  existingSSlots.forEach(el => el.remove());
-  console.log(`🗑️ 既存のSスロット要素を削除: ${existingSSlots.length}個`);
+  // 動的記載エリアを完全にクリア
+  dynamicArea.innerHTML = '';
 
-  // structure_builder.jsの処理を完全再現
+  // 上位スロットのリセット（structure_builder.jsと同じ）
+  const slotContainers = wrapper.querySelectorAll('.slot-container');
+  slotContainers.forEach(container => {
+    const phraseDiv = container.querySelector('.slot-phrase');
+    if (phraseDiv) phraseDiv.innerText = '';
+    const textDiv = container.querySelector('.slot-text');
+    if (textDiv) textDiv.innerText = '';
+  });
+
   const upperSlots = selectedSlots.filter(e => !e.SubslotID);
-  
+
+  // 🔍 分離疑問詞判定とDisplayAtTop付加（structure_builder.jsと同じ）
+  const questionWords = ["what", "where", "who", "when", "why", "how"];
+  const displayTopMap = new Map();
+
+  selectedSlots.forEach(entry => {
+    if (
+      entry.SubslotID &&
+      entry.SubslotElement &&
+      questionWords.includes(entry.SubslotElement.trim().toLowerCase())
+    ) {
+      const key = entry.Slot + "-" + entry.Slot_display_order;
+      displayTopMap.set(key, entry.SubslotElement.trim());
+    }
+  });
+
+  selectedSlots.forEach(entry => {
+    if (!entry.SubslotID) {
+      const key = entry.Slot + "-" + entry.Slot_display_order;
+      if (displayTopMap.has(key)) {
+        entry.DisplayAtTop = true;
+        entry.DisplayText = displayTopMap.get(key);
+        console.log("🔼 DisplayAtTop 自動付加:", entry.DisplayText, "(slot:", entry.Slot, ")");
+      }
+    }
+  });
+
+  upperSlots.sort((a, b) => a.Slot_display_order - b.Slot_display_order);
+
   upperSlots.forEach(item => {
     console.log(`Processing upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
 
-    // structure_builder.jsと同じ条件分岐
-    if (item.PhraseType === 'word') {
-      const slotDiv = window.renderSlot(item);
-      dynamicArea.appendChild(slotDiv);
-      console.log(`✅ 上位スロット追加: ${item.Slot} (PhraseType: word)`);
-    } else {
-      console.log(`🚫 上位スロットスキップ: ${item.Slot} (PhraseType: ${item.PhraseType})`);
+    // 🔽 DisplayAtTop が付加された上位スロットは動的記載エリアに出力しない
+    if (item.DisplayAtTop === true) {
+      console.log(`🚫 DisplayAtTop により ${item.Slot} の表示をスキップ`);
+      return;
     }
 
-    // サブスロットの処理（structure_builder.jsと同じ）
+    if (item.PhraseType === 'word') {
+      const slotDiv = renderSlotForSIndividual(item);
+      dynamicArea.appendChild(slotDiv);
+    } else {
+      console.log(`Skipped upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
+    }
+
     const subslots = selectedSlots.filter(s =>
       s.Slot === item.Slot &&
       s.SubslotID &&
@@ -135,21 +196,76 @@ function updateSSlotOnly(selectedSlots) {
 
     subslots.forEach(sub => {
       console.log(`Adding subslot to ${item.Slot}: ${sub.SubslotID} (display_order: ${sub.display_order})`);
-      const subDiv = window.renderSubslot(sub);
+      const subDiv = renderSubslotForSIndividual(sub);
       dynamicArea.appendChild(subDiv);
     });
   });
-  
-  console.log("✅ Sスロット更新完了 (structure_builder.jsの仕組みを使用)");
+}
+
+/**
+ * Sスロット個別用のrenderSlot（structure_builder.jsの完全コピー）
+ */
+function renderSlotForSIndividual(item) {
+  console.log("renderSlotForSIndividual item:", item); 
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'slot';
+  slotDiv.dataset.displayOrder = item.Slot_display_order;
+
+  if (item.PhraseType === 'word') {
+    const phraseDiv = document.createElement('div');
+    phraseDiv.className = 'slot-phrase';
+    phraseDiv.innerText = item.SlotPhrase || '';
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'slot-text';
+    textDiv.innerText = item.SlotText || '';
+
+    slotDiv.appendChild(phraseDiv);
+    slotDiv.appendChild(textDiv);
+  } else {
+    const markDiv = document.createElement('div');
+    markDiv.className = 'slot-mark';
+    markDiv.innerText = '▶';
+    slotDiv.appendChild(markDiv);
+  }
+
+  return slotDiv;
+}
+
+/**
+ * Sスロット個別用のrenderSubslot（structure_builder.jsの完全コピー）
+ */
+function renderSubslotForSIndividual(sub) {
+  console.log("renderSubslotForSIndividual sub:", sub);
+  const subDiv = document.createElement('div');
+  subDiv.className = 'subslot';
+  if (sub.SubslotID) {
+    subDiv.id = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
+  }
+  if (typeof sub.display_order !== 'undefined') {
+    subDiv.dataset.displayOrder = sub.display_order;
+  }
+
+  const subElDiv = document.createElement('div');
+  subElDiv.className = 'subslot-element';
+  subElDiv.innerText = sub.SubslotElement || '';
+
+  const subTextDiv = document.createElement('div');
+  subTextDiv.className = 'subslot-text';
+  subTextDiv.innerText = sub.SubslotText || '';
+
+  subDiv.appendChild(subElDiv);
+  subDiv.appendChild(subTextDiv);
+
+  return subDiv;
 }
 
 // グローバル関数として公開
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 
 // デバッグ: 関数が正しく設定されたか確認
-console.log("✅ Sスロット個別ランダマイザー読み込み完了");
+console.log("✅ Sスロット個別ランダマイザー読み込み完了（完全コピー版）");
 console.log("🔍 window.randomizeSlotSIndividual:", typeof window.randomizeSlotSIndividual);
-console.log("🔍 function definition:", window.randomizeSlotSIndividual);
 
 // グローバルスコープテスト関数を追加
 window.testSRandomizer = function() {
