@@ -1,4 +1,4 @@
-import { updateSlotDisplay } from './image_handler.js';
+// import { updateSlotDisplay } from './image_handler.js';
 
 /**
  * null や undefined に対してフォールバック値を返す
@@ -10,7 +10,7 @@ function safe(value, fallback = "") {
 /**
  * 指定された key に対応する slot 内容だけを更新
  */
-export function randomizeSlot(data, key) {
+function randomizeSlot(data, key) {
   const contentMap = {
     s: data.subject,
     aux: data.auxiliary,
@@ -36,7 +36,8 @@ export function randomizeSlot(data, key) {
     "o1-m3": data.sub_m3
   };
 
-  updateSlotDisplay(`slot-${key}`, safe(contentMap[key]));
+  // updateSlotDisplay(`slot-${key}`, safe(contentMap[key]));
+  console.log(`🔄 randomizeSlot called for ${key}:`, safe(contentMap[key]));
 }
 
 // === 新しい個別ランダマイズ機能（Sスロット専用テスト） ===
@@ -181,10 +182,21 @@ function initializeSSlotRandomizer() {
   console.log("🚀 Sスロット個別ランダマイザー初期化開始");
   
   // DOMが準備できるまで待機
+  function setupWhenReady() {
+    const sContainer = document.getElementById('slot-s');
+    if (sContainer) {
+      setupSSlotRandomizeButton();
+      console.log("✅ Sスロットが見つかったのでボタンを設置しました");
+    } else {
+      console.log("⏳ Sスロットがまだ見つからないため、1秒後に再試行...");
+      setTimeout(setupWhenReady, 1000);
+    }
+  }
+  
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupSSlotRandomizeButton);
+    document.addEventListener('DOMContentLoaded', setupWhenReady);
   } else {
-    setupSSlotRandomizeButton();
+    setupWhenReady();
   }
   
   // JSONデータの読み込み完了を待機
@@ -202,7 +214,29 @@ function initializeSSlotRandomizer() {
 window.randomizeSlotS = randomizeSlotS;
 window.setupSSlotRandomizeButton = setupSSlotRandomizeButton;
 
+// デバッグ用：強制的にボタンを設置するテスト関数
+window.debugSetupButton = function() {
+  console.log("🔧 デバッグ: 強制的にSスロットボタン設置を試行");
+  const sContainer = document.getElementById('slot-s');
+  console.log("🔧 Sスロットコンテナ:", sContainer);
+  
+  if (sContainer) {
+    console.log("🔧 Sスロットが見つかりました");
+    setupSSlotRandomizeButton();
+  } else {
+    console.log("🔧 Sスロットが見つかりません - 利用可能なスロット:");
+    const allSlots = document.querySelectorAll('[id^="slot-"]');
+    allSlots.forEach(slot => console.log("🔧 発見されたスロット:", slot.id));
+  }
+};
+
 // 自動初期化
 initializeSSlotRandomizer();
+
+// 追加の初期化タイミング（保険）
+setTimeout(() => {
+  console.log("🔧 追加初期化タイミング - 3秒後");
+  window.debugSetupButton();
+}, 3000);
 
 console.log("✅ Sスロット個別ランダマイザー読み込み完了");
