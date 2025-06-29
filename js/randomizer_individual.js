@@ -56,28 +56,48 @@ function randomizeSlotS() {
   }
   
   try {
-    // Sスロット用のデータを取得
-    const sSlotData = window.loadedJsonData.filter(item => 
-      item.Slot && item.Slot.toLowerCase() === 's' && 
-      item.SubslotID === "" && 
-      item.PhraseType === "word"
+    // Sスロットのデータを抽出
+    // 1. メインスロット（SubslotID: ""）：PhraseTypeが"word", "phrase", "clause"のもの
+    // 2. サブスロット（SubslotID: "sub-..."）：SubslotTextにテキストがあるもの
+    const allSSlotData = window.loadedJsonData.filter(item => 
+      item.Slot && item.Slot.toLowerCase() === 's'
     );
     
-    if (sSlotData.length === 0) {
-      console.warn("⚠️ Sスロットのデータが見つかりません");
+    console.log(`📊 Sスロット全データ: ${allSSlotData.length}件`);
+    
+    // メインスロットとサブスロットを分けて取得
+    const mainSlotData = allSSlotData.filter(item => 
+      item.SubslotID === "" && 
+      (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
+    );
+    
+    const subSlotData = allSSlotData.filter(item => 
+      item.SubslotID !== "" && 
+      item.SubslotText && 
+      item.SubslotText.trim() !== ""
+    );
+    
+    console.log(`📊 Sメインスロットデータ: ${mainSlotData.length}件`);
+    console.log(`📊 Sサブスロットデータ: ${subSlotData.length}件`);
+    
+    // ランダマイズ対象の選択
+    const totalData = [...mainSlotData, ...subSlotData];
+    if (totalData.length === 0) {
+      console.warn("⚠️ Sスロットのランダマイズ対象データが見つかりません");
       return;
     }
     
-    console.log(`📊 Sスロット候補データ: ${sSlotData.length}件`);
+    console.log(`📊 Sスロット候補データ: ${totalData.length}件`);
     
     // ランダムに1つ選択
-    const randomIndex = Math.floor(Math.random() * sSlotData.length);
-    const selectedData = sSlotData[randomIndex];
+    const randomIndex = Math.floor(Math.random() * totalData.length);
+    const selectedData = totalData[randomIndex];
+    const isSubslot = selectedData.SubslotID !== "";
     
-    console.log(`🎯 選択されたSスロットデータ:`, selectedData);
+    console.log(`🎯 選択されたSスロットデータ (${isSubslot ? 'サブスロット' : 'メインスロット'}):`, selectedData);
     
-    // Sスロットの表示を更新（DOM操作は最小限に）
-    updateSSlotDisplay(selectedData);
+    // Sスロットの表示を更新
+    updateSSlotDisplay(selectedData, isSubslot);
     
     console.log("✅ Sスロット個別ランダマイズ完了");
     
@@ -88,8 +108,10 @@ function randomizeSlotS() {
 
 /**
  * Sスロットの表示のみを更新（既存システムに影響しない）
+ * @param {Object} data - 選択されたデータ
+ * @param {boolean} isSubslot - サブスロットかどうか
  */
-function updateSSlotDisplay(data) {
+function updateSSlotDisplay(data, isSubslot = false) {
   const container = document.getElementById('slot-s');
   
   if (!container) {
@@ -97,27 +119,55 @@ function updateSSlotDisplay(data) {
     return;
   }
   
-  console.log(`🔄 slot-s の表示更新開始`);
+  console.log(`🔄 slot-s の表示更新開始 (${isSubslot ? 'サブスロット' : 'メインスロット'})`);
+  console.log(`🔧 更新データ:`, data);
   
-  // phrase部分の更新
-  const phraseDiv = container.querySelector(":scope > .slot-phrase");
-  if (phraseDiv && data.SlotPhrase) {
-    phraseDiv.textContent = data.SlotPhrase;
-    console.log(`✅ slot-s phrase更新: "${data.SlotPhrase}"`);
-  }
-  
-  // text部分の更新
-  const textDiv = container.querySelector(":scope > .slot-text");
-  if (textDiv && data.SlotText) {
-    // 既存の実装に合わせてテキストノードを安全に更新
-    if (textDiv.firstChild && textDiv.firstChild.nodeType === Node.TEXT_NODE) {
-      textDiv.firstChild.textContent = data.SlotText;
+  if (isSubslot) {
+    // サブスロットの場合：対応するサブスロット要素を更新
+    const subslotSelector = `[data-subslot-id="${data.SubslotID}"]`;
+    const subslotElement = container.querySelector(subslotSelector);
+    
+    if (subslotElement) {
+      // サブスロット要素内のテキスト部分を更新
+      const textDiv = subslotElement.querySelector('.subslot-text');
+      if (textDiv) {
+        const oldText = textDiv.textContent;
+        textDiv.textContent = data.SubslotText || "SUBSLOT UPDATED";
+        console.log(`✅ サブスロット ${data.SubslotID} text更新: "${oldText}" → "${textDiv.textContent}"`);
+      }
     } else {
-      textDiv.textContent = "";
-      textDiv.append(document.createTextNode(data.SlotText));
+      console.warn(`⚠️ サブスロット要素が見つかりません: ${data.SubslotID}`);
+      // フォールバック：コンテナ全体に表示
+      const fallbackDiv = container.querySelector('.slot-text') || container;
+      if (fallbackDiv) {
+        fallbackDiv.textContent = `${data.SubslotID}: ${data.SubslotText}`;
+        console.log(`✅ フォールバック更新: ${data.SubslotID}`);
+      }
     }
-    console.log(`✅ slot-s text更新: "${data.SlotText}"`);
+  } else {
+    // メインスロットの場合：従来通りの更新
+    // phrase部分の更新
+    const phraseDiv = container.querySelector(":scope > .slot-phrase");
+    if (phraseDiv) {
+      const oldPhrase = phraseDiv.textContent;
+      phraseDiv.textContent = data.SlotPhrase || "PHRASE UPDATED";
+      console.log(`✅ slot-s phrase更新: "${oldPhrase}" → "${phraseDiv.textContent}"`);
+    }
+    
+    // text部分の更新
+    const textDiv = container.querySelector(":scope > .slot-text");
+    if (textDiv) {
+      const oldText = textDiv.textContent;
+      textDiv.textContent = data.SlotText || "TEXT UPDATED";
+      console.log(`✅ slot-s text更新: "${oldText}" → "${textDiv.textContent}"`);
+    }
   }
+  
+  // 視覚的な確認のため、一時的にボーダーを変更
+  container.style.border = "3px solid red";
+  setTimeout(() => {
+    container.style.border = "";
+  }, 1000);
 }
 
 /**
@@ -161,8 +211,22 @@ function setupSSlotRandomizeButton() {
     event.preventDefault();
     
     console.log("🎲 Sスロット個別ランダマイズボタンがクリックされました");
+    
+    // デバッグ用：JSONデータの確認
+    console.log("🔧 window.loadedJsonData:", window.loadedJsonData);
+    
+    // 強制的にテスト用のデータでスロットを更新
+    const testData = {
+      SlotPhrase: "TEST PHRASE " + Math.random().toString(36).substring(7),
+      SlotText: "TEST TEXT " + Math.random().toString(36).substring(7)
+    };
+    
+    console.log("🔧 テスト用データでスロット更新:", testData);
+    updateSSlotDisplay(testData);
+    
+    // 元の処理も実行
     randomizeSlotS();
-  });
+  }, true); // キャプチャフェーズでイベントを捕捉
   
   // スロットコンテナに相対位置を設定
   if (sContainer.style.position !== 'relative') {
