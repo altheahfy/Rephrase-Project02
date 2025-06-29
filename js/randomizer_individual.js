@@ -34,7 +34,9 @@ function getCurrentVGroupKey() {
     const displayOrder = allSlots[0].dataset.displayOrder;
     console.log(`最初の要素のdisplay-order: ${displayOrder}`);
     
-    const matchingEntry = window.slotSets.find(entry => 
+    // 平坦化してから検索
+    const allEntries = window.slotSets.flat();
+    const matchingEntry = allEntries.find(entry => 
       entry.Slot_display_order == displayOrder
     );
     console.log(`マッチするエントリ:`, matchingEntry);
@@ -54,6 +56,39 @@ function getCurrentVGroupKey() {
   // フォールバック：window.slotSetsから最初のV_group_keyを取得
   console.log("window.slotSets:", window.slotSets);
   if (window.slotSets && window.slotSets.length > 0) {
+    // 第1例文セットの詳細構造を確認
+    console.log("第1例文セット:", window.slotSets[0]);
+    console.log("第1例文セットの最初の要素:", window.slotSets[0][0]);
+    
+    // 平坦化してすべてのエントリを確認
+    const allEntries = window.slotSets.flat();
+    console.log("全エントリ数:", allEntries.length);
+    console.log("最初の5エントリ:", allEntries.slice(0, 5));
+    
+    // V_group_keyフィールドの存在確認
+    const entryWithVGroupKey = allEntries.find(entry => {
+      const keys = Object.keys(entry);
+      console.log("エントリのキー:", keys);
+      return keys.some(key => key.toLowerCase().includes('group') || key.toLowerCase().includes('v_group'));
+    });
+    
+    if (entryWithVGroupKey) {
+      console.log("V_group_keyを含む可能性のあるエントリ:", entryWithVGroupKey);
+      
+      // 正しいフィールド名を特定
+      const possibleVGroupKeys = Object.keys(entryWithVGroupKey).filter(key => 
+        key.toLowerCase().includes('group') || key.toLowerCase().includes('v_group')
+      );
+      console.log("可能性のあるV_group_keyフィールド:", possibleVGroupKeys);
+      
+      if (possibleVGroupKeys.length > 0) {
+        const vGroupValue = entryWithVGroupKey[possibleVGroupKeys[0]];
+        console.log(`フォールバック - V_group_key (${possibleVGroupKeys[0]}): ${vGroupValue}`);
+        return vGroupValue;
+      }
+    }
+    
+    // 従来の方法でも試行
     const firstEntry = window.slotSets.find(entry => entry.V_group_key);
     console.log(`フォールバック - 最初のV_group_key: ${firstEntry ? firstEntry.V_group_key : 'なし'}`);
     return firstEntry ? firstEntry.V_group_key : null;
