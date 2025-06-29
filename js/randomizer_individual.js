@@ -259,32 +259,7 @@ function setupSSlotRandomizeButton() {
 }
 
 /**
- * 初期化処理（エクスポート版）
- */
-export function initializeIndividualRandomizers() {
-  console.log("🚀 個別ランダマイザー初期化開始");
-  
-  // DOMが準備できてからボタンを設置
-  function setupWhenReady() {
-    const sContainer = document.getElementById('slot-s');
-    if (sContainer) {
-      setupSSlotRandomizeButton();
-      console.log("✅ Sスロット個別ランダマイズボタン設置完了");
-    } else {
-      console.log("⏳ Sスロットが見つからないため、1秒後に再試行...");
-      setTimeout(setupWhenReady, 1000);
-    }
-  }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupWhenReady);
-  } else {
-    setupWhenReady();
-  }
-}
-
-/**
- * 内部使用の初期化処理
+ * 初期化処理
  */
 function initializeIndividualRandomizer() {
   console.log("🚀 個別ランダマイザー初期化開始");
@@ -308,8 +283,11 @@ function initializeIndividualRandomizer() {
   }
 }
 
-// グローバル関数としてもエクスポート
+// グローバル関数としてエクスポート
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 window.setupSSlotRandomizeButton = setupSSlotRandomizeButton;
+
+// 自動初期化
+initializeIndividualRandomizer();
 
 console.log("✅ 個別ランダマイザー読み込み完了");

@@ -1097,7 +1097,6 @@
 <script type="module">
 import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
-import { initializeIndividualRandomizers } from './js/randomizer_individual.js';
 
 let loadedJsonData = null;
 
@@ -1146,12 +1145,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
           debugM1Slot();
         }
       }
-      
-      // 個別ランダマイザーの初期化
-      if (typeof initializeIndividualRandomizers === 'function') {
-        console.log("🎲 個別ランダマイザーボタンを初期化");
-        initializeIndividualRandomizers();
-      }
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
@@ -1183,12 +1176,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   if (typeof applyOrderToAllSlots === 'function') {
     console.log("🔢 ランダマイズ後のスロット表示順適用");
     applyOrderToAllSlots(data);
-  }
-  
-  // 個別ランダマイザーの初期化
-  if (typeof initializeIndividualRandomizers === 'function') {
-    console.log("🎲 ランダマイズ後に個別ランダマイザーボタンを初期化");
-    initializeIndividualRandomizers();
   }
 });
 
