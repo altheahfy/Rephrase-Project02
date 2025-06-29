@@ -1,41 +1,6 @@
 /**
  * 個別ランダマイズ機能
-   // 全スロットデータを平坦化
-  const allSlots = window.slotSets.flat();
-  
-  // 現在のV_group_keyを取得（動的記載エリアから）
-  const dynamicArea = document.getElementById('dynamic-slot-area');
-  let currentVGroupKey = null;
-  if (dynamicArea) {
-    const firstSlot = dynamicArea.querySelector('[data-v-group-key]');
-    currentVGroupKey = firstSlot?.getAttribute('data-v-group-key');
-  }
-  
-  if (!currentVGroupKey) {
-    console.warn("⚠️ 現在のV_group_keyが見つかりません");
-    return;
-  }
-  
-  console.log(`🔑 現在のV_group_key: ${currentVGroupKey}`);
-  
-  // 現在のSスロットを取得（静的DOMから）
-  const currentSContainer = document.getElementById('slot-s');
-  let currentSContent = '';
-  if (currentSContainer) {
-    const phraseDiv = currentSContainer.querySelector('.slot-phrase');
-    const textDiv = currentSContainer.querySelector('.slot-text');
-    currentSContent = (phraseDiv?.textContent || '') + (textDiv?.textContent || '');
-  }
-  
-  console.log(`📄 現在のSスロット内容: "${currentSContent}"`);
-  
-  // 同じV_group_key内のSスロット候補を抽出（現在表示中以外）
-  const candidates = allSlots.filter(entry => {
-    if (entry.Slot !== "S") return false;
-    if (entry.V_group_key !== currentVGroupKey) return false; // 同じV_group_keyのみ
-    const entryContent = (entry.SlotPhrase || '') + (entry.SlotText || '');
-    return entryContent !== currentSContent && entryContent.trim() !== '';
-  });スロットのみをランダム置換
+ * 仕様: 各スロット専用ボタンで、そのスロットのみをランダム置換
  * 方針: structure_builder.jsと同じ方法で動的記載エリアに書き込み、MutationObserver同期に任せる
  */
 
@@ -86,27 +51,17 @@ function randomizeSlotSIndividual() {
   const chosen = candidates[Math.floor(Math.random() * candidates.length)];
   console.log(`🎯 選択されたSスロット:`, chosen);
   
-  // 同じV_group_key内のSサブスロットもランダム選択
-  const allSSubslots = allSlots.filter(e =>
-    e.Slot === "S" &&
-    e.V_group_key === currentVGroupKey && // 同じV_group_keyのみ
-    e.SubslotID &&
-    e.SubslotElement &&
-    e.SubslotElement.trim() !== ""
+  // 関連するサブスロットも取得
+  const relatedSubslots = allSlots.filter(e =>
+    e.例文ID === chosen.例文ID &&
+    e.Slot === chosen.Slot &&
+    e.SubslotID
   );
   
-  // ランダムでSサブスロットを選択（必要に応じて複数選択も可能）
-  const chosenSubslots = [];
-  if (allSSubslots.length > 0) {
-    // 簡単のため1つだけ選択（後で拡張可能）
-    const randomSubslot = allSSubslots[Math.floor(Math.random() * allSSubslots.length)];
-    chosenSubslots.push(randomSubslot);
-  }
-  
-  console.log(`📊 選択されたSサブスロット数: ${chosenSubslots.length}個`);
+  console.log(`📊 関連サブスロット数: ${relatedSubslots.length}個`);
   
   // Sスロットのみを含む配列を作成してbuildStructureを呼び出し
-  const sSlotData = [chosen, ...chosenSubslots];
+  const sSlotData = [chosen, ...relatedSubslots];
   updateSSlotOnly(sSlotData);
   
   console.log("✅ Sスロット個別ランダマイズ完了");
