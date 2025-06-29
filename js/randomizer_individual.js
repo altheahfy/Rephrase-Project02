@@ -135,37 +135,12 @@ function randomizeSlotSIndividual() {
   console.log(`📄 現在のSスロット内容: "${currentSContent}"`);
   
   // 同じV_group_key内のSスロット候補を抽出（現在表示中以外）
-  console.log("🔍 Sスロット候補の検索開始");
-  
-  // window.slotSetsを平坦化
-  const allEntries = window.slotSets.flat();
-  console.log(`全エントリ数: ${allEntries.length}`);
-  
-  // V_group_keyでフィルタ
-  const sameVGroupEntries = allEntries.filter(entry => entry.V_group_key === currentVGroupKey);
-  console.log(`同じV_group_key (${currentVGroupKey}) のエントリ数: ${sameVGroupEntries.length}`, sameVGroupEntries);
-  
-  // Sスロットのみでフィルタ
-  const sSlotEntries = sameVGroupEntries.filter(entry => entry.Slot === "S");
-  console.log(`Sスロットエントリ数: ${sSlotEntries.length}`, sSlotEntries);
-  
-  // メインSスロット（SubslotIDなし）のみでフィルタ
-  const mainSSlotEntries = sSlotEntries.filter(entry => !entry.SubslotID);
-  console.log(`メインSスロットエントリ数: ${mainSSlotEntries.length}`, mainSSlotEntries);
-  
-  // 現在のSスロット内容と比較
-  console.log(`現在のSスロット内容: "${currentSContent}"`);
-  
-  const candidates = mainSSlotEntries.filter(entry => {
+  const candidates = window.slotSets.filter(entry => {
+    if (entry.Slot !== "S" || entry.SubslotID) return false; // メインSスロットのみ
+    if (entry.V_group_key !== currentVGroupKey) return false; // 同じV_group_keyのみ
     const entryContent = (entry.SlotPhrase || '') + (entry.SlotText || '');
-    console.log(`エントリ内容: "${entryContent}" vs 現在: "${currentSContent}"`);
-    const isDifferent = entryContent !== currentSContent;
-    const isNotEmpty = entryContent.trim() !== '';
-    console.log(`異なる: ${isDifferent}, 空でない: ${isNotEmpty}`);
-    return isDifferent && isNotEmpty;
+    return entryContent !== currentSContent && entryContent.trim() !== '';
   });
-  
-  console.log(`最終的なSスロット候補数: ${candidates.length}`, candidates);
   
   if (candidates.length === 0) {
     console.warn("⚠️ 現在表示中以外のSスロット候補が見つかりません");
@@ -179,16 +154,13 @@ function randomizeSlotSIndividual() {
   console.log(`🎯 選択されたSスロット:`, chosen);
   
   // 同じV_group_key内のSサブスロットもランダム選択
-  console.log("🔍 Sサブスロット候補の検索開始");
-  
-  const allSSubslots = allEntries.filter(e => {
-    console.log(`エントリチェック: Slot=${e.Slot}, V_group_key=${e.V_group_key}, SubslotID=${e.SubslotID}, SubslotElement="${e.SubslotElement}"`);
-    return e.Slot === "S" &&
-           e.V_group_key === currentVGroupKey && // 同じV_group_keyのみ
-           e.SubslotID &&
-           e.SubslotElement &&
-           e.SubslotElement.trim() !== "";
-  });
+  const allSSubslots = window.slotSets.filter(e =>
+    e.Slot === "S" &&
+    e.V_group_key === currentVGroupKey && // 同じV_group_keyのみ
+    e.SubslotID &&
+    e.SubslotElement &&
+    e.SubslotElement.trim() !== ""
+  );
   
   console.log(`📊 利用可能なSサブスロット候補: ${allSSubslots.length}個`, allSSubslots);
   
