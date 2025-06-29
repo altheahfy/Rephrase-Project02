@@ -6,34 +6,60 @@
 
 // 🟢 現在のV_group_keyを取得する関数
 function getCurrentVGroupKey() {
+  console.log("🔍 getCurrentVGroupKey() 開始");
+  
   // 動的記載エリアから現在表示中のスロットを取得
   const dynamicArea = document.getElementById('dynamic-slot-area');
-  if (!dynamicArea) return null;
+  console.log("動的記載エリア:", dynamicArea);
+  
+  if (!dynamicArea) {
+    console.log("❌ 動的記載エリアが見つかりません");
+    return null;
+  }
 
   const slots = dynamicArea.querySelectorAll('[data-v-group-key]');
+  console.log(`data-v-group-key属性を持つ要素: ${slots.length}個`, slots);
+  
   if (slots.length > 0) {
     const vGroupKey = slots[0].dataset.vGroupKey;
+    console.log(`data-v-group-key から取得: ${vGroupKey}`);
     if (vGroupKey) return vGroupKey;
   }
 
   // データ属性がない場合、window.slotSetsから推測
   const allSlots = dynamicArea.querySelectorAll('[data-display-order]');
+  console.log(`data-display-order属性を持つ要素: ${allSlots.length}個`, allSlots);
+  
   if (allSlots.length > 0 && window.slotSets) {
     const displayOrder = allSlots[0].dataset.displayOrder;
+    console.log(`最初の要素のdisplay-order: ${displayOrder}`);
+    
     const matchingEntry = window.slotSets.find(entry => 
       entry.Slot_display_order == displayOrder
     );
+    console.log(`マッチするエントリ:`, matchingEntry);
+    
     if (matchingEntry && matchingEntry.V_group_key) {
+      console.log(`display-orderから取得したV_group_key: ${matchingEntry.V_group_key}`);
       return matchingEntry.V_group_key;
     }
   }
 
+  // 動的記載エリア内のすべての要素をチェック
+  console.log("動的記載エリア内のすべての要素:", dynamicArea.children);
+  Array.from(dynamicArea.children).forEach((el, index) => {
+    console.log(`要素 ${index}:`, el, `クラス: ${el.className}`, `データ属性:`, el.dataset);
+  });
+
   // フォールバック：window.slotSetsから最初のV_group_keyを取得
+  console.log("window.slotSets:", window.slotSets);
   if (window.slotSets && window.slotSets.length > 0) {
     const firstEntry = window.slotSets.find(entry => entry.V_group_key);
+    console.log(`フォールバック - 最初のV_group_key: ${firstEntry ? firstEntry.V_group_key : 'なし'}`);
     return firstEntry ? firstEntry.V_group_key : null;
   }
 
+  console.log("❌ V_group_keyが見つかりませんでした");
   return null;
 }
 
