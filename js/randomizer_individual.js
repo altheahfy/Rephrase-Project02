@@ -43,12 +43,12 @@ export function randomizeSlot(data, key) {
 // === Sスロット個別ランダマイズ機能 ===
 
 /**
- * Sスロット専用の個別ランダマイズ関数
+ * Sスロット専用の個別ランダマイズ関数（動的記載エリア更新のみ）
  * 同じV_group_key内の他の例文からSスロット（メイン+サブスロット）をランダム選択して置き換える
- * 動的記載エリア（dynamic-content-area）のみを更新し、MutationObserver経由で静的DOMに反映
+ * MutationObserver経由で自動的に静的DOMに同期される
  */
 function randomizeSlotSIndividual() {
-  console.log("🎲 Sスロット個別ランダマイズ開始");
+  console.log("🎲 Sスロット個別ランダマイズ開始（動的記載エリア更新のみ）");
   
   // window.slotSetsが存在するかチェック（randomizer_all.jsで設定される）
   if (!window.slotSets || !Array.isArray(window.slotSets)) {
@@ -58,37 +58,24 @@ function randomizeSlotSIndividual() {
   
   console.log(`📊 利用可能な例文セット数: ${window.slotSets.length}`);
   
-  // === 現在表示中のSスロットを取得（比較用） ===
-  const dynamicArea = document.getElementById('dynamic-content-area');
-  if (!dynamicArea) {
-    console.warn("⚠️ 動的記載エリアが見つかりません");
-    return;
-  }
-  
-  const currentSSlot = dynamicArea.querySelector('[data-slot="S"]');
-  const currentSExampleId = currentSSlot ? currentSSlot.getAttribute('data-example-id') : null;
-  console.log(`📄 現在のSスロット例文ID: ${currentSExampleId}`);
-  
-  // === Sスロット候補を抽出（現在表示中以外の例文から選択） ===
-  const allSlots = window.slotSets.flat();
-  const candidates = allSlots.filter(entry => 
-    entry.Slot === "S" && 
-    entry.例文ID !== currentSExampleId // 現在表示中以外から選択
-  );
+  // === 全体ランダマイズと同じ仕組みを使用 ===
+  // Sスロット候補を抽出（全体ランダマイズのロジックをコピー）
+  const candidates = window.slotSets.flat().filter(entry => entry.Slot === "S");
   
   if (candidates.length === 0) {
-    console.warn("⚠️ 現在表示中以外のSスロット候補が見つかりません");
+    console.warn("⚠️ Sスロット候補が見つかりません");
     return;
   }
   
-  console.log(`📊 利用可能なSスロット候補: ${candidates.length}個（現在表示中を除く）`);
+  console.log(`📊 利用可能なSスロット候補: ${candidates.length}個`);
   
-  // ランダムに1つ選択
+  // ランダムに1つ選択（全体ランダマイズと同じ仕組み）
   const chosen = candidates[Math.floor(Math.random() * candidates.length)];
   console.log(`🎯 選択されたSスロット:`, chosen);
   
-  // 選択されたSスロットに関連するサブスロットも取得
-  const relatedSubslots = allSlots.filter(e =>
+  // 選択されたSスロットに関連するサブスロットも取得（全体ランダマイズと同じ仕組み）
+  const groupSlots = window.slotSets.flat(); // 全データを平坦化
+  const relatedSubslots = groupSlots.filter(e =>
     e.例文ID === chosen.例文ID &&
     e.Slot === chosen.Slot &&
     e.SubslotID
@@ -101,291 +88,175 @@ function randomizeSlotSIndividual() {
   
   console.log("🎯 最終的な新Sスロットデータ:", newSSlotData);
   
-  // 動的記載エリアのSスロットのみを更新（MutationObserver経由で静的DOMに反映される）
-  updateDynamicAreaSSlotOnly(newSSlotData);
+  // 動的記載エリアのみを更新（静的DOM更新は行わない）
+  updateDynamicSlotAreaOnly(newSSlotData);
   
-  console.log("✅ Sスロット個別ランダマイズ完了");
+  console.log("✅ Sスロット個別ランダマイズ完了（動的記載エリア更新のみ、静的DOM同期は自動実行）");
 }
 
 /**
- * 動的記載エリア（dynamic-content-area）のSスロットのみを更新
+ * 動的記載エリアのみを更新する関数
+ * MutationObserverが変更を検出して、自動的に静的DOMに同期される
  * @param {Array} newSSlotData - 新しいSスロットデータ（メイン+サブスロット）
  */
-function updateDynamicAreaSSlotOnly(newSSlotData) {
-  console.log("🔄 動的記載エリアのSスロット更新開始");
+function updateDynamicSlotAreaOnly(newSSlotData) {
+  console.log("🔄 動的記載エリアのみを更新開始");
   
-  const dynamicArea = document.getElementById('dynamic-content-area');
+  // 動的記載エリアを取得
+  const dynamicArea = document.getElementById("dynamic-slot-area");
   if (!dynamicArea) {
-    console.warn("⚠️ 動的記載エリアが見つかりません");
+    console.warn("⚠️ 動的記載エリア(dynamic-slot-area)が見つかりません");
     return;
   }
   
-  // Sスロットのメインデータを取得
-  const mainSSlot = newSSlotData.find(item => !item.SubslotID);
-  if (!mainSSlot) {
-    console.warn("⚠️ メインSスロットデータが見つかりません");
-    return;
-  }
-  
-  // 動的記載エリア内のSスロット要素を探す
-  let sSlotElement = dynamicArea.querySelector('[data-slot="S"]');
-  
-  if (!sSlotElement) {
-    // Sスロット要素が存在しない場合は作成
-    sSlotElement = document.createElement('div');
-    sSlotElement.setAttribute('data-slot', 'S');
-    dynamicArea.appendChild(sSlotElement);
-    console.log("📝 新しいSスロット要素を作成しました");
-  }
-  
-  // Sスロット要素の属性とテキストを更新
-  sSlotElement.setAttribute('data-example-id', mainSSlot.例文ID || '');
-  sSlotElement.setAttribute('data-v-group-key', mainSSlot.V_group_key || '');
-  sSlotElement.textContent = mainSSlot.Content || '';
-  
-  console.log(`📝 Sスロット更新: ${mainSSlot.Content} (例文ID: ${mainSSlot.例文ID})`);
-  
-  // サブスロットの更新
-  const subslots = newSSlotData.filter(item => item.SubslotID);
-  console.log(`📊 サブスロット更新数: ${subslots.length}個`);
-  
-  subslots.forEach(subslot => {
-    const subslotId = `${subslot.Slot.toLowerCase()}-${subslot.SubslotID}`;
-    let subslotElement = dynamicArea.querySelector(`[data-subslot="${subslotId}"]`);
-    
-    if (!subslotElement) {
-      // サブスロット要素が存在しない場合は作成
-      subslotElement = document.createElement('div');
-      subslotElement.setAttribute('data-subslot', subslotId);
-      dynamicArea.appendChild(subslotElement);
-      console.log(`� 新しいサブスロット要素を作成: ${subslotId}`);
-    }
-    
-    // サブスロット要素の属性とテキストを更新
-    subslotElement.setAttribute('data-example-id', subslot.例文ID || '');
-    subslotElement.setAttribute('data-v-group-key', subslot.V_group_key || '');
-    subslotElement.textContent = subslot.Content || '';
-    
-    console.log(`📝 サブスロット更新: ${subslotId} = ${subslot.Content}`);
+  // 現在のSスロット関連要素を削除
+  const existingSSlots = dynamicArea.querySelectorAll('[id^="slot-s"], [id*="-s-"]');
+  existingSSlots.forEach(element => {
+    console.log(`🗑️ 既存のSスロット要素を削除: ${element.id}`);
+    element.remove();
   });
   
-  console.log("✅ 動的記載エリアのSスロット更新完了");
-}
-
-// === 初期化関数 ===
-  console.log("  window.loadedJsonData長さ:", window.loadedJsonData?.length);
+  // 新しいSスロットデータを動的記載エリアに追加
+  newSSlotData.forEach(slotData => {
+    const slotElement = createDynamicSlotElement(slotData);
+    if (slotElement) {
+      dynamicArea.appendChild(slotElement);
+      console.log(`✅ 動的記載エリアに追加: ${slotElement.id}`);
+    }
+  });
   
-  if (window.loadedJsonData && window.loadedJsonData.length > 0) {
-    console.log("  最初の要素:", window.loadedJsonData[0]);
-    const sentenceId = window.loadedJsonData[0]?.例文ID;
-    console.log("  抽出された例文ID:", sentenceId);
-    return sentenceId;
-  }
-  
-  console.log("  例文IDを取得できませんでした");
-  return null;
+  console.log("✅ 動的記載エリア更新完了");
 }
 
 /**
- * 選択されたSスロットデータで現在のSスロット表示を更新
- * @param {Array} newSSlotData - 新しいSスロットデータ（メイン+サブスロット）
+ * 動的記載エリア用のスロット要素を作成
+ * @param {Object} slotData - スロットデータ
+ * @returns {HTMLElement|null} - 作成されたスロット要素
  */
-function updateSSlotWithNewData(newSSlotData) {
-  console.log("🔄 Sスロット表示更新開始");
-  console.log("🔍 新しいSスロットデータ:", newSSlotData);
-  
-  // メインスロットデータを取得
-  const mainSlotData = newSSlotData.find(item => 
-    !item.SubslotID && 
-    (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
-  );
-  
-  if (!mainSlotData) {
-    console.warn("⚠️ メインスロットデータが見つかりません");
-    return;
+function createDynamicSlotElement(slotData) {
+  if (!slotData || !slotData.Slot) {
+    console.warn("⚠️ 無効なスロットデータ:", slotData);
+    return null;
   }
   
-  console.log(`🔍 PhraseType: ${mainSlotData.PhraseType}`);
-  
-  if (mainSlotData.PhraseType === "word") {
-    // Type "word" の場合：上位スロットに書き込む
-    console.log("📝 Type 'word' → 上位スロットに書き込み");
-    
-    const container = document.getElementById('slot-s');
-    if (container) {
-      const phraseDiv = container.querySelector('.slot-phrase');
-      const textDiv = container.querySelector('.slot-text');
-      
-      if (phraseDiv) {
-        phraseDiv.textContent = mainSlotData.SlotPhrase || "";
-      }
-      if (textDiv) {
-        textDiv.textContent = mainSlotData.SlotText || "";
-      }
-      
-      console.log("✅ 上位Sスロット更新完了");
-    }
-  } else {
-    // Type "phrase" または "clause" の場合：サブスロットに分散
-    console.log(`📝 Type '${mainSlotData.PhraseType}' → サブスロットに分散`);
-    
-    // 上位スロットは空にする
-    const container = document.getElementById('slot-s');
-    if (container) {
-      const phraseDiv = container.querySelector('.slot-phrase');
-      const textDiv = container.querySelector('.slot-text');
-      if (phraseDiv) phraseDiv.textContent = "";
-      if (textDiv) textDiv.textContent = "";
-      console.log("🧹 上位Sスロットをクリア");
-    }
-    
-    // サブスロットに分散
-    distributeMainSlotToSubslots(mainSlotData);
+  // スロットIDを生成
+  let slotId = `slot-${slotData.Slot.toLowerCase()}`;
+  if (slotData.SubslotID) {
+    slotId += `-sub-${slotData.SubslotID}`;
   }
   
-  // サブスロットデータがある場合は個別に更新
-  const subSlotData = newSSlotData.filter(item => 
-    item.SubslotID && 
-    (item.SubslotElement || item.SubslotText)
-  );
+  // スロット要素を作成
+  const slotElement = document.createElement('div');
+  slotElement.id = slotId;
+  slotElement.className = slotData.SubslotID ? 'subslot' : 'slot';
   
-  if (subSlotData.length > 0) {
-    console.log(`📊 追加のサブスロット更新: ${subSlotData.length}件`);
-    subSlotData.forEach(subData => {
-      console.log(`🔧 サブスロット ${subData.SubslotID} を更新:`, subData);
-      updateSSlotDisplay(subData, true);
-    });
-  }
+  // フレーズ表示部分
+  const phraseDiv = document.createElement('div');
+  phraseDiv.className = slotData.SubslotID ? 'subslot-element' : 'slot-phrase';
+  phraseDiv.textContent = slotData.SlotPhrase || '';
+  
+  // テキスト表示部分
+  const textDiv = document.createElement('div');
+  textDiv.className = slotData.SubslotID ? 'subslot-text' : 'slot-text';
+  textDiv.textContent = slotData.SlotText || '';
+  
+  slotElement.appendChild(phraseDiv);
+  slotElement.appendChild(textDiv);
+  
+  console.log(`🔧 動的スロット要素作成: ${slotId}`, slotData);
+  
+  return slotElement;
 }
 
+// グローバル関数としてもエクスポート（動的記載エリア対応版）
+window.randomizeSlotSIndividual = randomizeSlotSIndividual;
+
 /**
- * メインスロットデータをサブスロット構造に分散
- * @param {Object} mainData - メインスロットデータ
+ * Sスロット個別ランダマイズボタンを静的スロットに設置
  */
-function distributeMainSlotToSubslots(mainData) {
-  console.log("🔄 メインスロットデータをサブスロットに分散:", mainData);
-  
-  // SlotPhraseとSlotTextを適切なサブスロットに配置
-  const phrase = mainData.SlotPhrase || "";
-  const text = mainData.SlotText || "";
-  
-  // 実際に存在するSサブスロットを探して更新
+function setupSSlotRandomizeButton() {
   const sContainer = document.getElementById('slot-s');
   if (!sContainer) {
     console.warn("⚠️ Sスロットコンテナが見つかりません");
     return;
   }
   
-  // Sスロット内の全サブスロット要素を取得
-  const subslotElements = sContainer.querySelectorAll('[id^="slot-s-"]');
-  console.log(`🔍 発見されたSサブスロット: ${subslotElements.length}個`);
-  
-  if (subslotElements.length > 0) {
-    // 最初のサブスロット（通常はメインの内容）にデータを配置
-    const firstSubslot = subslotElements[0];
-    const elementDiv = firstSubslot.querySelector('.subslot-element');
-    const textDiv = firstSubslot.querySelector('.subslot-text');
-    
-    if (elementDiv) {
-      elementDiv.textContent = phrase;
-      console.log(`✅ 最初のサブスロット要素に設定: "${phrase}"`);
-    }
-    if (textDiv) {
-      textDiv.textContent = text;
-      console.log(`✅ 最初のサブスロットテキストに設定: "${text}"`);
-    }
-  } else {
-    // サブスロットが存在しない場合の代替処理
-    console.log("ℹ️ サブスロットが見つからないため、上位スロットに配置");
-    const phraseDiv = sContainer.querySelector('.slot-phrase');
-    const textDiv = sContainer.querySelector('.slot-text');
-    if (phraseDiv) phraseDiv.textContent = phrase;
-    if (textDiv) textDiv.textContent = text;
+  // 既存ボタンがあれば削除
+  const existingButton = sContainer.querySelector('.s-individual-randomize-btn');
+  if (existingButton) {
+    existingButton.remove();
   }
+  
+  // 個別ランダマイズボタンを作成
+  const randomizeBtn = document.createElement('button');
+  randomizeBtn.className = 's-individual-randomize-btn';
+  randomizeBtn.textContent = '🎲';
+  randomizeBtn.title = 'Sスロット個別ランダマイズ';
+  randomizeBtn.style.cssText = `
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    cursor: pointer;
+    border-radius: 3px;
+    z-index: 10;
+  `;
+  
+  // クリックイベント - 動的記載エリアを更新するだけ
+  randomizeBtn.addEventListener('click', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    console.log("🎲 Sスロット個別ランダマイズボタンがクリックされました");
+    randomizeSlotSIndividual();
+  });
+  
+  // スロットコンテナに相対位置を設定
+  if (sContainer.style.position !== 'relative') {
+    sContainer.style.position = 'relative';
+  }
+  
+  // ボタンを追加
+  sContainer.appendChild(randomizeBtn);
+  
+  console.log("✅ Sスロット個別ランダマイズボタンを設置しました");
 }
 
 /**
- * Sスロットの表示を更新
- * @param {Object} data - 更新データ
- * @param {boolean} isSubslot - サブスロットかどうか
- */
-function updateSSlotDisplay(data, isSubslot = false) {
-  if (isSubslot) {
-    // サブスロットの更新
-    const subslotId = `slot-s-${data.SubslotID}`;
-    const subslotElement = document.getElementById(subslotId);
-    
-    if (subslotElement) {
-      // サブスロット要素の更新
-      const elementDiv = subslotElement.querySelector('.subslot-element');
-      if (elementDiv) {
-        elementDiv.textContent = data.SubslotElement || "";
-      }
-      
-      const textDiv = subslotElement.querySelector('.subslot-text');
-      if (textDiv) {
-        textDiv.textContent = data.SubslotText || "";
-      }
-      
-      console.log(`✅ サブスロット ${data.SubslotID} 更新完了`);
-    } else {
-      console.warn(`⚠️ サブスロット要素が見つかりません: ${subslotId}`);
-    }
-  } else {
-    // メインスロットの更新
-    const container = document.getElementById('slot-s');
-    if (container) {
-      const phraseDiv = container.querySelector('.slot-phrase');
-      if (phraseDiv) {
-        phraseDiv.textContent = data.SlotPhrase || "";
-      }
-      
-      const textDiv = container.querySelector('.slot-text');
-      if (textDiv) {
-        textDiv.textContent = data.SlotText || "";
-      }
-      
-      console.log("✅ メインSスロット更新完了");
-    } else {
-      console.warn("⚠️ Sスロットコンテナが見つかりません");
-    }
-  }
-  
-  // 視覚的な確認のため一時的に枠を赤くする
-  const container = document.getElementById('slot-s');
-  if (container) {
-    container.style.border = "3px solid red";
-    setTimeout(() => {
-      container.style.border = "";
-    }, 1000);
-  }
-}
-
-// Sスロット個別ランダマイズボタンは静的HTML側で設置済みのため、動的設置処理は削除
-
-/**
- * 初期化処理（動的ボタン設置は削除）
+ * 初期化処理（エクスポート版）
  */
 export function initializeIndividualRandomizers() {
-  console.log("🚀 個別ランダマイザー初期化完了（ボタンは静的HTML側で設置済み）");
+  console.log("🚀 個別ランダマイザー初期化開始");
+  
+  // DOMが準備できてからボタンを設置
+  function setupWhenReady() {
+    const sContainer = document.getElementById('slot-s');
+    if (sContainer) {
+      setupSSlotRandomizeButton();
+      console.log("✅ Sスロット個別ランダマイズボタン設置完了");
+    } else {
+      console.log("⏳ Sスロットが見つからないため、1秒後に再試行...");
+      setTimeout(setupWhenReady, 1000);
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupWhenReady);
+  } else {
+    setupWhenReady();
+  }
 }
-
-// グローバル関数エクスポート（ボタンイベント用）
-window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 
 // デバッグ用のヘルパー関数
 window.debugIndividualRandomizer = function() {
   console.log("🔍 個別ランダマイザーデバッグ:");
   console.log("  window.loadedJsonData:", window.loadedJsonData);
   console.log("  window.slotSets:", window.slotSets);
-  
-  // 現在の動的記載エリア状況
-  const dynamicArea = document.getElementById('dynamic-content-area');
-  if (dynamicArea) {
-    const currentSSlot = dynamicArea.querySelector('[data-slot="S"]');
-    const currentSExampleId = currentSSlot ? currentSSlot.getAttribute('data-example-id') : null;
-    console.log("  現在のSスロット例文ID:", currentSExampleId);
-  }
+  console.log("  動的記載エリア:", document.getElementById("dynamic-slot-area"));
 };
 
-console.log("✅ 個別ランダマイザー読み込み完了");
+console.log("✅ 個別ランダマイザー読み込み完了（動的記載エリア対応版）");
