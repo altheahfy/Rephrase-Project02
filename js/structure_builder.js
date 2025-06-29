@@ -175,8 +175,6 @@ function buildStructure(selectedSlots) {
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
 }
 
-export { buildStructure, buildStructure as buildStructureFromJson, renderSlot, renderSubslot };
+export { buildStructure, buildStructure as buildStructureFromJson };
 
 window.buildStructure = buildStructure;
-window.renderSlot = renderSlot;
-window.renderSubslot = renderSubslot;
