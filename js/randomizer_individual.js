@@ -261,7 +261,7 @@ function updateSSlotOnly(sSlotData) {
         slotDiv.className = 'slot';
         slotDiv.dataset.displayOrder = item.Slot_display_order;
         
-        if (item.PhraseType === 'word') {
+        if (item.PhraseType === 'word' || item.PhraseType === 'clause' || item.PhraseType === 'phrase') {
           const phraseDiv = document.createElement('div');
           phraseDiv.className = 'slot-phrase';
           phraseDiv.innerText = item.SlotPhrase || '';
@@ -361,7 +361,7 @@ function updateStaticSSlot(sSlotData) {
   console.log("  SlotPhrase:", sSlotData.SlotPhrase);
   console.log("  SlotText:", sSlotData.SlotText);
   
-  if (sSlotData.PhraseType === 'word') {
+  if (sSlotData.PhraseType === 'word' || sSlotData.PhraseType === 'clause' || sSlotData.PhraseType === 'phrase') {
     if (phraseDiv) {
       phraseDiv.textContent = sSlotData.SlotPhrase || '';
       console.log(`✅ phraseDiv更新完了: "${phraseDiv.textContent}"`);
