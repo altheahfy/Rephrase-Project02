@@ -48,68 +48,119 @@ export function randomizeSlot(data, key) {
 function randomizeSlotSIndividual() {
   console.log("🎲 Sスロット個別ランダマイズ開始");
   
+  // デバッグ：現在のデータ状況を確認
+  console.log("🔍 デバッグ情報:");
+  console.log("  window.loadedJsonData:", window.loadedJsonData);
+  console.log("  window.slotSets:", window.slotSets);
+  
   // window.slotSetsが存在するかチェック（randomizer_all.jsで設定される）
   if (!window.slotSets || !Array.isArray(window.slotSets)) {
     console.warn("⚠️ window.slotSetsが見つかりません。先に全体ランダマイズを実行してください。");
     return;
   }
   
-  // 現在表示中のデータから例文IDを取得
-  const currentSentenceId = getCurrentSentenceId();
-  if (!currentSentenceId) {
-    console.warn("⚠️ 現在の例文IDが特定できません");
-    return;
-  }
-  
-  console.log(`📍 現在の例文ID: ${currentSentenceId}`);
-  console.log(`📊 利用可能な例文セット数: ${window.slotSets.length}`);
-  
-  // 現在の例文以外のセットを取得
-  const otherSentenceSets = window.slotSets.filter(sentenceSet => {
-    if (!sentenceSet || sentenceSet.length === 0) return false;
-    const sentenceId = sentenceSet[0]?.例文ID;
-    return sentenceId && sentenceId !== currentSentenceId;
+  // window.slotSetsから全てのSスロットデータを抽出
+  const allSSlots = [];
+  window.slotSets.forEach((sentenceSet, setIndex) => {
+    const sSlotData = sentenceSet.filter(item => 
+      item.Slot && item.Slot.toLowerCase() === 's'
+    );
+    if (sSlotData.length > 0) {
+      allSSlots.push({
+        setIndex: setIndex,
+        例文ID: sentenceSet[0]?.例文ID,
+        sSlotData: sSlotData
+      });
+    }
   });
   
-  if (otherSentenceSets.length === 0) {
-    console.warn("⚠️ 他の例文セットが見つかりません（個別ランダマイズには最低2例文必要）");
+  if (allSSlots.length < 2) {
+    console.warn("⚠️ 利用可能なSスロットが不足しています（最低2つ必要）");
+    console.log("利用可能なSスロット:", allSSlots);
     return;
   }
   
-  console.log(`📊 他の例文セット数: ${otherSentenceSets.length}`);
+  console.log(`📊 利用可能なSスロット: ${allSSlots.length}種類`);
   
-  // ランダムに1つの例文セットを選択
-  const randomIndex = Math.floor(Math.random() * otherSentenceSets.length);
-  const selectedSentenceSet = otherSentenceSets[randomIndex];
-  const selectedSentenceId = selectedSentenceSet[0]?.例文ID;
+  // 現在表示中のSスロットデータを取得
+  const currentSSlot = getCurrentDisplayedSSlot();
+  console.log("📍 現在表示中のSスロット:", currentSSlot);
   
-  console.log(`🎯 選択された例文ID: ${selectedSentenceId}`);
+  // 現在表示中以外のSスロットからランダム選択
+  const availableSlots = allSSlots.filter(slot => {
+    // 現在表示中のSスロットと異なるものを選択
+    return !isSameSSlot(currentSSlot, slot.sSlotData);
+  });
   
-  // 選択された例文セットからSスロットデータを抽出
-  const selectedSSlotData = selectedSentenceSet.filter(item => 
-    item.Slot && item.Slot.toLowerCase() === 's'
-  );
-  
-  if (selectedSSlotData.length === 0) {
-    console.warn("⚠️ 選択された例文にSスロットデータが見つかりません");
+  if (availableSlots.length === 0) {
+    console.warn("⚠️ 選択可能な他のSスロットが見つかりません");
     return;
   }
   
-  console.log(`📊 選択されたSスロットデータ: ${selectedSSlotData.length}件`, selectedSSlotData);
+  // ランダムに1つ選択
+  const randomIndex = Math.floor(Math.random() * availableSlots.length);
+  const selectedSlot = availableSlots[randomIndex];
+  
+  console.log(`🎯 選択されたSスロット（例文ID: ${selectedSlot.例文ID}）:`, selectedSlot.sSlotData);
   
   // 現在のSスロット表示を選択されたデータで更新
-  updateSSlotWithNewData(selectedSSlotData);
+  updateSSlotWithNewData(selectedSlot.sSlotData);
   
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
 /**
- * 現在表示中の例文IDを取得
+ * 現在表示中のSスロットデータを取得
+ */
+function getCurrentDisplayedSSlot() {
+  const sContainer = document.getElementById('slot-s');
+  if (!sContainer) return null;
+  
+  const phraseDiv = sContainer.querySelector('.slot-phrase');
+  const textDiv = sContainer.querySelector('.slot-text');
+  
+  return {
+    SlotPhrase: phraseDiv?.textContent || "",
+    SlotText: textDiv?.textContent || ""
+  };
+}
+
+/**
+ * 2つのSスロットが同じかどうかを判定
+ */
+function isSameSSlot(currentSlot, sSlotDataArray) {
+  if (!currentSlot || !sSlotDataArray || sSlotDataArray.length === 0) return false;
+  
+  // メインスロットデータを取得
+  const mainSlotData = sSlotDataArray.find(item => 
+    !item.SubslotID && 
+    (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
+  );
+  
+  if (!mainSlotData) return false;
+  
+  // フレーズとテキストが同じかチェック
+  return currentSlot.SlotPhrase === (mainSlotData.SlotPhrase || "") &&
+         currentSlot.SlotText === (mainSlotData.SlotText || "");
+}
+
+/**
+ * 現在表示中の例文IDを取得（旧バージョン・デバッグ用）
  */
 function getCurrentSentenceId() {
+  console.log("🔍 getCurrentSentenceId デバッグ:");
+  console.log("  window.loadedJsonData存在:", !!window.loadedJsonData);
+  console.log("  window.loadedJsonData型:", typeof window.loadedJsonData);
+  console.log("  window.loadedJsonData長さ:", window.loadedJsonData?.length);
+  
   if (window.loadedJsonData && window.loadedJsonData.length > 0) {
-    return window.loadedJsonData[0]?.例文ID;
+    console.log("  最初の要素:", window.loadedJsonData[0]);
+    const sentenceId = window.loadedJsonData[0]?.例文ID;
+    console.log("  抽出された例文ID:", sentenceId);
+    return sentenceId;
   }
+  
+  console.log("  例文IDを取得できませんでした");
   return null;
 }
 
@@ -311,5 +362,13 @@ function initializeIndividualRandomizer() {
 // グローバル関数としてもエクスポート
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 window.setupSSlotRandomizeButton = setupSSlotRandomizeButton;
+
+// デバッグ用のヘルパー関数
+window.debugIndividualRandomizer = function() {
+  console.log("🔍 個別ランダマイザーデバッグ:");
+  console.log("  window.loadedJsonData:", window.loadedJsonData);
+  console.log("  window.slotSets:", window.slotSets);
+  console.log("  getCurrentSentenceId():", getCurrentSentenceId());
+};
 
 console.log("✅ 個別ランダマイザー読み込み完了");
