@@ -441,6 +441,9 @@ function updateStaticSSlot(sSlotData) {
 // グローバル関数として公開（静的HTMLボタンから呼び出し用）
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 
+// 公開確認のログ
+console.log("✅ 個別ランダマイザー関数を window に公開:", typeof window.randomizeSlotSIndividual);
+
 // デバッグ用ヘルパー関数
 window.debugIndividualRandomizer = function() {
   console.log("🔍 個別ランダマイザーデバッグ:");
