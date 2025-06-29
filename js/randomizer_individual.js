@@ -56,54 +56,127 @@ function randomizeSlotS() {
   }
   
   try {
-    // Sスロットのデータを抽出
-    // 1. メインスロット（SubslotID: ""）：PhraseTypeが"word", "phrase", "clause"のもの
-    // 2. サブスロット（SubslotID: "sub-..."）：SubslotTextにテキストがあるもの
-    const allSSlotData = window.loadedJsonData.filter(item => 
-      item.Slot && item.Slot.toLowerCase() === 's'
-    );
-    
-    console.log(`📊 Sスロット全データ: ${allSSlotData.length}件`);
-    
-    // メインスロットとサブスロットを分けて取得
-    const mainSlotData = allSSlotData.filter(item => 
-      item.SubslotID === "" && 
-      (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
-    );
-    
-    const subSlotData = allSSlotData.filter(item => 
-      item.SubslotID !== "" && 
-      item.SubslotText && 
-      item.SubslotText.trim() !== ""
-    );
-    
-    console.log(`📊 Sメインスロットデータ: ${mainSlotData.length}件`);
-    console.log(`📊 Sサブスロットデータ: ${subSlotData.length}件`);
-    
-    // ランダマイズ対象の選択
-    const totalData = [...mainSlotData, ...subSlotData];
-    if (totalData.length === 0) {
-      console.warn("⚠️ Sスロットのランダマイズ対象データが見つかりません");
+    // 現在のV_group_keyを取得（既存システムから）
+    const currentVGroupKey = window.currentVGroupKey || getCurrentVGroupKey();
+    if (!currentVGroupKey) {
+      console.warn("⚠️ 現在のV_group_keyが特定できません");
       return;
     }
     
-    console.log(`📊 Sスロット候補データ: ${totalData.length}件`);
+    console.log(`🎯 現在のV_group_key: ${currentVGroupKey}`);
     
-    // ランダムに1つ選択
-    const randomIndex = Math.floor(Math.random() * totalData.length);
-    const selectedData = totalData[randomIndex];
-    const isSubslot = selectedData.SubslotID !== "";
+    // 同じV_group_key内の全ての例文IDを取得
+    const sameVGroupData = window.loadedJsonData.filter(item => 
+      item.V_group_key === currentVGroupKey && 
+      item.Slot && item.Slot.toLowerCase() === 's'
+    );
     
-    console.log(`🎯 選択されたSスロットデータ (${isSubslot ? 'サブスロット' : 'メインスロット'}):`, selectedData);
+    if (sameVGroupData.length === 0) {
+      console.warn(`⚠️ V_group_key "${currentVGroupKey}" のSスロットデータが見つかりません`);
+      return;
+    }
     
-    // Sスロットの表示を更新
-    updateSSlotDisplay(selectedData, isSubslot);
+    // 例文IDごとにグループ化
+    const sentenceGroups = {};
+    sameVGroupData.forEach(item => {
+      const sentenceId = item.例文ID;
+      if (!sentenceGroups[sentenceId]) {
+        sentenceGroups[sentenceId] = [];
+      }
+      sentenceGroups[sentenceId].push(item);
+    });
+    
+    const availableSentenceIds = Object.keys(sentenceGroups);
+    console.log(`📊 同じV_group_key内の例文ID: ${availableSentenceIds.length}件`, availableSentenceIds);
+    
+    if (availableSentenceIds.length <= 1) {
+      console.warn(`⚠️ V_group_key "${currentVGroupKey}" に複数の例文が存在しません（個別ランダマイズには最低2例文必要）`);
+      return;
+    }
+    
+    // 現在表示中の例文ID以外からランダム選択
+    const currentSentenceId = getCurrentSentenceId();
+    const otherSentenceIds = availableSentenceIds.filter(id => id !== currentSentenceId);
+    
+    if (otherSentenceIds.length === 0) {
+      console.warn("⚠️ 現在の例文以外の選択肢が見つかりません");
+      return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * otherSentenceIds.length);
+    const selectedSentenceId = otherSentenceIds[randomIndex];
+    const selectedSentenceData = sentenceGroups[selectedSentenceId];
+    
+    console.log(`🎯 ランダマイズ選択例文ID: ${selectedSentenceId} (現在: ${currentSentenceId})`);
+    console.log(`📊 選択例文のSスロットデータ: ${selectedSentenceData.length}件`);
+    
+    // 選択された例文のSスロット構造全体を取得
+    // メインスロット + 全サブスロットを含む
+    updateSSlotWithNewSentenceData(selectedSentenceData);
     
     console.log("✅ Sスロット個別ランダマイズ完了");
     
   } catch (error) {
     console.error("❌ Sスロット個別ランダマイズエラー:", error);
   }
+}
+
+/**
+ * 現在のV_group_keyを取得
+ */
+function getCurrentVGroupKey() {
+  // 既存システムから現在のV_group_keyを取得する方法を実装
+  // とりあえず最初のデータからV_group_keyを取得
+  if (window.loadedJsonData && window.loadedJsonData.length > 0) {
+    return window.loadedJsonData[0].V_group_key;
+  }
+  return null;
+}
+
+/**
+ * 現在の例文IDを取得
+ */
+function getCurrentSentenceId() {
+  // 既存システムから現在の例文IDを取得する方法を実装
+  // とりあえず最初のデータから例文IDを取得
+  if (window.loadedJsonData && window.loadedJsonData.length > 0) {
+    return window.loadedJsonData[0].例文ID;
+  }
+  return null;
+}
+
+/**
+ * 選択された例文のSスロットデータで現在のSスロット表示を更新
+ * @param {Array} newSentenceData - 新しい例文のSスロットデータ配列
+ */
+function updateSSlotWithNewSentenceData(newSentenceData) {
+  console.log("🔄 Sスロット構造全体を新しい例文データで更新開始");
+  
+  // メインスロットデータを取得
+  const mainSlotData = newSentenceData.find(item => 
+    item.SubslotID === "" && 
+    (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
+  );
+  
+  if (mainSlotData) {
+    // メインスロット部分を更新
+    updateSSlotDisplay(mainSlotData, false);
+  }
+  
+  // サブスロットデータを取得して更新
+  const subSlotData = newSentenceData.filter(item => 
+    item.SubslotID !== "" && 
+    item.SubslotText && 
+    item.SubslotText.trim() !== ""
+  );
+  
+  console.log(`📊 更新対象サブスロット: ${subSlotData.length}件`);
+  
+  // 各サブスロットを個別に更新
+  subSlotData.forEach(subData => {
+    console.log(`🔧 サブスロット ${subData.SubslotID} を更新:`, subData.SubslotText);
+    updateSSlotDisplay(subData, true);
+  });
 }
 
 /**
