@@ -20,9 +20,9 @@ function randomizeSlotSIndividual() {
   console.log(`📊 利用可能な例文セット数: ${window.slotSets.length}`);
   
   // 動的記載エリアから現在のSスロット情報を取得
-  const dynamicArea = document.getElementById('dynamic-slot-area');
+  const dynamicArea = document.getElementById('dynamic-content-area');
   if (!dynamicArea) {
-    console.warn("⚠️ dynamic-slot-areaが見つかりません");
+    console.warn("⚠️ dynamic-content-areaが見つかりません");
     return;
   }
   
@@ -78,9 +78,9 @@ function randomizeSlotSIndividual() {
 function updateDynamicAreaSSlot(mainSSlot, subSlots) {
   console.log("🔄 動的記載エリアSスロット更新開始");
   
-  const dynamicArea = document.getElementById('dynamic-slot-area');
+  const dynamicArea = document.getElementById('dynamic-content-area');
   if (!dynamicArea) {
-    console.warn("⚠️ dynamic-slot-areaが見つかりません");
+    console.warn("⚠️ dynamic-content-areaが見つかりません");
     return;
   }
   
@@ -129,7 +129,7 @@ window.debugIndividualRandomizer = function() {
   console.log("🔍 個別ランダマイザーデバッグ:");
   console.log("  window.slotSets:", window.slotSets);
   
-  const dynamicArea = document.getElementById('dynamic-slot-area');
+  const dynamicArea = document.getElementById('dynamic-content-area');
   if (dynamicArea) {
     const currentSSlot = dynamicArea.querySelector('[data-slot="S"]');
     console.log("  現在のSスロット要素:", currentSSlot);

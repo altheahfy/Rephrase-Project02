@@ -62,7 +62,6 @@ h2 {
   margin: 4px;
   min-width: 120px; /* 最小幅を設定 */
   max-width: 200px; /* 最大幅を設定 */
-  position: relative; /* 個別ランダマイズボタンの絶対配置用 */
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
