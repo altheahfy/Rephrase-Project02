@@ -11,19 +11,8 @@ function getCurrentVGroupKey() {
   if (!dynamicArea) return null;
 
   const slots = dynamicArea.querySelectorAll('[data-v-group-key]');
-  if (slots.length > 0) {    console.log(`📝 静的Sスロット更新 (${sSlotData.PhraseType}): "${sSlotData.SlotPhrase}" / "${sSlotData.SlotText}"`);
-  } else {
-    // マーク表示の場合（その他のPhraseType）
-    if (phraseDiv) {
-      phraseDiv.textContent = '▶';
-      console.log(`✅ phraseDiv マーク更新完了: "${phraseDiv.textContent}"`);
-    }
-    if (textDiv) {
-      textDiv.textContent = '';
-      console.log(`✅ textDiv クリア完了`);
-    }
-    console.log(`📝 静的Sスロットをマーク表示に更新 (PhraseType: ${sSlotData.PhraseType})`);
-  }GroupKey = slots[0].dataset.vGroupKey;
+  if (slots.length > 0) {
+    const vGroupKey = slots[0].dataset.vGroupKey;
     if (vGroupKey) return vGroupKey;
   }
 
@@ -461,3 +450,9 @@ window.debugIndividualRandomizer = function() {
 };
 
 console.log("✅ 個別ランダマイザー読み込み完了");
+
+// 読み込み完了イベントを発火
+if (typeof window.individualRandomizerLoaded === 'undefined') {
+  window.individualRandomizerLoaded = true;
+  window.dispatchEvent(new CustomEvent('individualRandomizerReady'));
+}

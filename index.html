@@ -8,6 +8,7 @@
   <link href="style.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
   </script>
+  <script src="js/randomizer_individual.js"></script>
  </head>
  <body>
 
@@ -1003,7 +1004,6 @@
   
   
 <script src="js/insert_test_data_clean.js"></script>
-<script src="js/randomizer_individual.js"></script>
 
 <!-- 動的記載エリア用のセクション要素を追加 -->
 <section id="dynamic-area-container" style="margin-top: 30px;">
@@ -1015,22 +1015,8 @@
 </section>
 
 <script>
-  // デバッグ：関数の可用性を確認
-  window.addEventListener("DOMContentLoaded", () => {
-    console.log("🔍 DOMContentLoaded時の関数確認:");
-    console.log("  randomizeSlotSIndividual:", typeof window.randomizeSlotSIndividual);
-    console.log("  window.randomizeSlotSIndividual:", window.randomizeSlotSIndividual);
-    
-    // 関数が未定義の場合、遅延して再チェック
-    if (typeof window.randomizeSlotSIndividual === 'undefined') {
-      console.warn("⚠️ randomizeSlotSIndividual が未定義です。500ms後に再チェックします。");
-      setTimeout(() => {
-        console.log("🔍 500ms後の関数確認:");
-        console.log("  randomizeSlotSIndividual:", typeof window.randomizeSlotSIndividual);
-        console.log("  window.randomizeSlotSIndividual:", window.randomizeSlotSIndividual);
-      }, 500);
-    }
-    
+  // 個別ランダマイザーのセットアップ関数
+  function setupIndividualRandomizer() {
     // 個別ランダマイザーボタンのイベントリスナーを設定
     const sRandomizeButton = document.getElementById('s-slot-randomize-btn');
     if (sRandomizeButton) {
@@ -1039,8 +1025,12 @@
       // ボタンのテキストを設定
       sRandomizeButton.textContent = '🎲';
       
+      // 既存のイベントリスナーをクリア
+      sRandomizeButton.replaceWith(sRandomizeButton.cloneNode(true));
+      const newButton = document.getElementById('s-slot-randomize-btn');
+      
       // イベントリスナーを追加
-      sRandomizeButton.addEventListener('click', (event) => {
+      newButton.addEventListener('click', (event) => {
         event.stopPropagation();
         event.preventDefault();
         
@@ -1051,14 +1041,60 @@
           window.randomizeSlotSIndividual();
         } else {
           console.error("❌ randomizeSlotSIndividual関数が見つかりません");
+          console.log("利用可能な関数:", Object.keys(window).filter(k => k.includes('randomize')));
           alert("個別ランダマイザーが読み込まれていません。ページを再読み込みしてください。");
         }
         
         return false;
       });
+      
+      console.log("✅ Sスロット個別ランダマイザーボタンの設定完了");
     } else {
       console.warn("⚠️ Sスロット個別ランダマイズボタンが見つかりません");
     }
+  }
+
+  // 個別ランダマイザーの読み込み完了を待つ
+  function waitForIndividualRandomizer() {
+    if (typeof window.randomizeSlotSIndividual === 'function') {
+      console.log("✅ 個別ランダマイザーが読み込み済みです");
+      setupIndividualRandomizer();
+    } else {
+      console.log("⏳ 個別ランダマイザーの読み込みを待機中...");
+      
+      // カスタムイベントをリスン
+      window.addEventListener('individualRandomizerReady', () => {
+        console.log("🎉 個別ランダマイザーの読み込みが完了しました");
+        setupIndividualRandomizer();
+      }, { once: true });
+      
+      // フォールバック：タイマーで定期的にチェック
+      const checkInterval = setInterval(() => {
+        if (typeof window.randomizeSlotSIndividual === 'function') {
+          console.log("✅ 個別ランダマイザーが利用可能になりました（タイマーによる検出）");
+          clearInterval(checkInterval);
+          setupIndividualRandomizer();
+        }
+      }, 100);
+      
+      // 最大5秒待機
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (typeof window.randomizeSlotSIndividual !== 'function') {
+          console.error("❌ 個別ランダマイザーの読み込みがタイムアウトしました");
+        }
+      }, 5000);
+    }
+  }
+
+  // デバッグ：関数の可用性を確認
+  window.addEventListener("DOMContentLoaded", () => {
+    console.log("🔍 DOMContentLoaded時の関数確認:");
+    console.log("  randomizeSlotSIndividual:", typeof window.randomizeSlotSIndividual);
+    console.log("  window.randomizeSlotSIndividual:", window.randomizeSlotSIndividual);
+    
+    // 個別ランダマイザーの設定開始
+    waitForIndividualRandomizer();
     
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
