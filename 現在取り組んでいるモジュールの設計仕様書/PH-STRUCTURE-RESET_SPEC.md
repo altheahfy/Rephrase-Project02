@@ -57,7 +57,15 @@ Rephrase-Project の構造UIを正しい大前提ルールに基づいて再設�
 - 指定のデータ項目が存在しない場合、表示は行わない。
 - イラスト・目印は PhraseType = phrase / clause の場合のみ表示。
 - **ランダマイズ結果（randomizer_all の出力データ）を前提とし、そのデータを受け取り描画すること。**
+動的記載エリア → 静的DOM同期の仕組み
+動的記載エリア（dynamic-slot-area）：読み取り専用エリア
+MutationObserver：動的記載エリアの変更を監視
+safeJsonSync関数：変更検出時に自動的に静的DOMに同期
+つまり、個別ランダマイズは以下のように実装すべきです：
 
+動的記載エリアのスロット内容のみを変更
+MutationObserverが変更を検出
+自動的にsafeJsonSyncが呼ばれて静的DOMに反映
 ---
 
 ## 補足
