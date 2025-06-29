@@ -1158,26 +1158,57 @@
 </html>
 
 <script type="module">
-import { randomizeAll } from './js/randomizer_all.js';
-import { buildStructure } from './js/structure_builder.js';
+try {
+  const { randomizeAll } = await import('./js/randomizer_all.js');
+  const { buildStructure } = await import('./js/structure_builder.js');
+  
+  console.log("✅ モジュールの読み込み完了:", { randomizeAll, buildStructure });
 
-let loadedJsonData = null;
+  // DOM要素の存在確認
+  console.log("🔍 DOM要素確認:");
+  console.log("  loadJsonButton:", document.getElementById("loadJsonButton"));
+  console.log("  jsonFileInput:", document.getElementById("jsonFileInput"));
+  console.log("  randomize-all:", document.getElementById("randomize-all"));
 
-document.getElementById("loadJsonButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("jsonFileInput");
+  let loadedJsonData = null;
+
+  document.getElementById("loadJsonButton").addEventListener("click", () => {
+    console.log("🎯 JSONロードボタンがクリックされました");
+    
+    const fileInput = document.getElementById("jsonFileInput");
+    console.log("📁 ファイル入力要素:", fileInput);
+    
+    if (!fileInput) {
+      console.error("❌ ファイル入力要素が見つかりません");
+      alert("ファイル入力要素が見つかりません");
+      return;
+    }
+    
+    console.log("📁 選択されたファイル数:", fileInput.files.length);
+  
   if (fileInput.files.length === 0) {
     alert("ファイルを選択してください");
     return;
   }
+  
   const file = fileInput.files[0];
+  console.log("📄 選択されたファイル:", file.name, "サイズ:", file.size);
+  
   const reader = new FileReader();
   reader.onload = (e) => {
+    console.log("📖 ファイル読み込み完了");
     try {
       loadedJsonData = JSON.parse(e.target.result);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+      console.log("📊 JSONデータ構造確認:", {
+        length: loadedJsonData.length,
+        keys: Object.keys(loadedJsonData[0] || {}),
+        sample: loadedJsonData.slice(0, 2)
+      });
+      
       const data = randomizeAll(loadedJsonData);
-      console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
+      console.log("🎲 ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
       window.loadedJsonData = data;
       buildStructure(data);
@@ -1210,19 +1241,33 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       }
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
-      alert("無効な JSON ファイルです");
+      console.error("❌ エラー詳細:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
+      alert(`JSON処理でエラーが発生しました: ${err.message}`);
     }
   };
+  
+  reader.onerror = (err) => {
+    console.error("❌ ファイル読み込みエラー:", err);
+    alert("ファイルの読み込みに失敗しました");
+  };
+  
+  console.log("📖 ファイル読み込み開始");
   reader.readAsText(file);
-});
-
-document.getElementById("randomize-all").addEventListener("click", () => {
-  if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
-    alert("先に正しいJSONデータをロードしてください");
-    console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
-    return;
-  }
-  const data = randomizeAll(loadedJsonData);
+});  document.getElementById("randomize-all").addEventListener("click", () => {
+    console.log("🎲 全体ランダマイズボタンがクリックされました");
+    
+    if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
+      alert("先に正しいJSONデータをロードしてください");
+      console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
+      return;
+    }
+    
+    console.log("🎲 ランダマイズ実行開始");
+    const data = randomizeAll(loadedJsonData);
   console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
   window.loadedJsonData = data;
@@ -1250,5 +1295,10 @@ function validateSlotsModified(data) {
       console.warn(`⚠ 必須スロット ${slot} がランダマイズ結果に含まれていません`);
     }
   });
+}
+
+} catch (error) {
+  console.error("❌ モジュール読み込みエラー:", error);
+  alert(`モジュールの読み込みに失敗しました: ${error.message}`);
 }
 </script>
