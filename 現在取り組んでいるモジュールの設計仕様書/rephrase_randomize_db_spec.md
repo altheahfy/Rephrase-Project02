@@ -23,12 +23,16 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 ---
 
 ## 個別ランダマイズの流れ（統合仕様追加）
-- 個別ランダマイズは randomizer_all.js 内の `randomizeIndividual(slotId)` 関数で実装。
+- 個別ランダマイズは randomizer_individual.js 内の `randomizeIndividual(slotId)` 関数で実装。
 - 現在表示中の V_group_key 母集団データを流用。
 - 該当 slotId に対応するスロット候補群を抽出し、その中からランダム選出。
 - 選出したスロットデータを該当 slotId の表示にのみ反映し、他スロットには影響を与えない。
 - 描画は既存の structure_builder.js の共通描画モジュールに委ねる。
-
+（詳細）
+個別ランダマイズとは、同じV_groupe_keyの中に複数の例文がある場合（makeならmakeを使った例文が３つなど）に、そのmakeグループの例文の中から、他のSセット、M1セットなどを含めた母集団に対して、一つを選ぶというもの。
+例えば、You make me nervous. I make this project bigger one. She make it easy.という3つの例文があったとき、Sの個別ランダマイズボタンを押すと、You, I, Sheが入れ替わるということだ。もしそれらが複文構造になっていたら（The manager who tends to be nervous）、そのサブスロットの中身ごと入れ替わるということ。
+window.loadedJsonDataは全体ランダマイズ（randomizer_all.js、structure_builder.js）の結果として現在表示中のデータセット。
+個別ランダマイズは、slot_order_data.jsonをロードした時点で表示されいてる例文の個別上位スロット（例：Sスロット）だけを、同じV_group_key内の他の例文の同じ上位スロット（例：Sスロット）と入れ替える。母集団は、全体ランダマイズの結果としてrandomizer_all.js、structure_builder.jsからhtmlに渡されるwindow.slotsetsの中にある。
 ---
 
 ## DB構造との関係
