@@ -11,8 +11,19 @@ function getCurrentVGroupKey() {
   if (!dynamicArea) return null;
 
   const slots = dynamicArea.querySelectorAll('[data-v-group-key]');
-  if (slots.length > 0) {
-    const vGroupKey = slots[0].dataset.vGroupKey;
+  if (slots.length > 0) {    console.log(`📝 静的Sスロット更新 (${sSlotData.PhraseType}): "${sSlotData.SlotPhrase}" / "${sSlotData.SlotText}"`);
+  } else {
+    // マーク表示の場合（その他のPhraseType）
+    if (phraseDiv) {
+      phraseDiv.textContent = '▶';
+      console.log(`✅ phraseDiv マーク更新完了: "${phraseDiv.textContent}"`);
+    }
+    if (textDiv) {
+      textDiv.textContent = '';
+      console.log(`✅ textDiv クリア完了`);
+    }
+    console.log(`📝 静的Sスロットをマーク表示に更新 (PhraseType: ${sSlotData.PhraseType})`);
+  }GroupKey = slots[0].dataset.vGroupKey;
     if (vGroupKey) return vGroupKey;
   }
 
@@ -237,6 +248,68 @@ function updateSSlotOnly(sSlotData) {
         const slotDiv = window.renderSlot(item);
         
         // 適切な位置に挿入（display-orderに基づく）
+        // Sスロットのdisplay-orderは通常2
+        const targetOrder = parseInt(item.Slot_display_order);
+        console.log(`🎯 挿入対象のdisplay-order: ${targetOrder}`);
+        
+        const existingSlots = Array.from(dynamicArea.children).filter(el => 
+          el.classList.contains('slot') && el.dataset.displayOrder
+        );
+        
+        console.log("🔍 既存スロット一覧:", existingSlots.map(el => ({
+          order: el.dataset.displayOrder,
+          className: el.className,
+          id: el.id
+        })));
+        
+        let inserted = false;
+        for (const existingSlot of existingSlots) {
+          const existingOrder = parseInt(existingSlot.dataset.displayOrder);
+          console.log(`🔍 比較: 新規=${targetOrder} vs 既存=${existingOrder}`);
+          
+          if (existingOrder > targetOrder) {
+            console.log(`📍 ${existingOrder}の前に挿入`);
+            dynamicArea.insertBefore(slotDiv, existingSlot);
+            inserted = true;
+            break;
+          }
+        }
+        
+        if (!inserted) {
+          console.log("📍 最後に追加");
+          dynamicArea.appendChild(slotDiv);
+        }
+        
+        console.log(`📝 renderSlotでメインSスロット追加: ${item.SlotPhrase || ''} / ${item.SlotText || ''}`, slotDiv);
+      } else {
+        // フォールバック：手動でSスロット要素を作成
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'slot';
+        slotDiv.dataset.displayOrder = item.Slot_display_order;
+        
+        // PhraseTypeの判定を修正（phraseも含める）
+        console.log(`🔍 PhraseType判定: "${item.PhraseType}"`);
+        if (item.PhraseType === 'word' || item.PhraseType === 'clause' || item.PhraseType === 'phrase') {
+          const phraseDiv = document.createElement('div');
+          phraseDiv.className = 'slot-phrase';
+          phraseDiv.textContent = item.SlotPhrase || '';
+
+          const textDiv = document.createElement('div');
+          textDiv.className = 'slot-text';
+          textDiv.textContent = item.SlotText || '';
+
+          slotDiv.appendChild(phraseDiv);
+          slotDiv.appendChild(textDiv);
+          console.log(`📝 テキスト形式で追加: phrase="${item.SlotPhrase}", text="${item.SlotText}"`);
+        } else {
+          const markDiv = document.createElement('div');
+          markDiv.className = 'slot-mark';
+          markDiv.textContent = '▶';
+          slotDiv.appendChild(markDiv);
+          console.log(`📝 マーク形式で追加: PhraseType="${item.PhraseType}"`);
+        }
+        
+        // 適切な位置に挿入（display-orderに基づく）
         const existingSlots = Array.from(dynamicArea.children).filter(el => 
           el.classList.contains('slot') && el.dataset.displayOrder
         );
@@ -254,32 +327,6 @@ function updateSSlotOnly(sSlotData) {
           dynamicArea.appendChild(slotDiv);
         }
         
-        console.log(`📝 renderSlotでメインSスロット追加: ${item.SlotPhrase || ''} / ${item.SlotText || ''}`, slotDiv);
-      } else {
-        // フォールバック：手動でSスロット要素を作成
-        const slotDiv = document.createElement('div');
-        slotDiv.className = 'slot';
-        slotDiv.dataset.displayOrder = item.Slot_display_order;
-        
-        if (item.PhraseType === 'word' || item.PhraseType === 'clause' || item.PhraseType === 'phrase') {
-          const phraseDiv = document.createElement('div');
-          phraseDiv.className = 'slot-phrase';
-          phraseDiv.innerText = item.SlotPhrase || '';
-
-          const textDiv = document.createElement('div');
-          textDiv.className = 'slot-text';
-          textDiv.innerText = item.SlotText || '';
-
-          slotDiv.appendChild(phraseDiv);
-          slotDiv.appendChild(textDiv);
-        } else {
-          const markDiv = document.createElement('div');
-          markDiv.className = 'slot-mark';
-          markDiv.innerText = '▶';
-          slotDiv.appendChild(markDiv);
-        }
-        
-        dynamicArea.appendChild(slotDiv);
         console.log(`📝 手動でメインSスロット追加: ${item.SlotPhrase || ''} / ${item.SlotText || ''}`, slotDiv);
       }
     } else {
