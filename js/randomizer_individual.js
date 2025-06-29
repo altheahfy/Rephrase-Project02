@@ -170,31 +170,116 @@ function getCurrentSentenceId() {
  */
 function updateSSlotWithNewData(newSSlotData) {
   console.log("🔄 Sスロット表示更新開始");
+  console.log("🔍 新しいSスロットデータ:", newSSlotData);
   
-  // メインスロットデータを取得（SubslotID=""で、PhraseTypeが指定されているもの）
+  // メインスロットデータを取得
   const mainSlotData = newSSlotData.find(item => 
     !item.SubslotID && 
     (item.PhraseType === "word" || item.PhraseType === "phrase" || item.PhraseType === "clause")
   );
   
-  if (mainSlotData) {
-    console.log("🔧 メインSスロット更新:", mainSlotData);
-    updateSSlotDisplay(mainSlotData, false);
+  if (!mainSlotData) {
+    console.warn("⚠️ メインスロットデータが見つかりません");
+    return;
   }
   
-  // サブスロットデータを取得して更新
+  console.log(`🔍 PhraseType: ${mainSlotData.PhraseType}`);
+  
+  if (mainSlotData.PhraseType === "word") {
+    // Type "word" の場合：上位スロットに書き込む
+    console.log("📝 Type 'word' → 上位スロットに書き込み");
+    
+    const container = document.getElementById('slot-s');
+    if (container) {
+      const phraseDiv = container.querySelector('.slot-phrase');
+      const textDiv = container.querySelector('.slot-text');
+      
+      if (phraseDiv) {
+        phraseDiv.textContent = mainSlotData.SlotPhrase || "";
+      }
+      if (textDiv) {
+        textDiv.textContent = mainSlotData.SlotText || "";
+      }
+      
+      console.log("✅ 上位Sスロット更新完了");
+    }
+  } else {
+    // Type "phrase" または "clause" の場合：サブスロットに分散
+    console.log(`📝 Type '${mainSlotData.PhraseType}' → サブスロットに分散`);
+    
+    // 上位スロットは空にする
+    const container = document.getElementById('slot-s');
+    if (container) {
+      const phraseDiv = container.querySelector('.slot-phrase');
+      const textDiv = container.querySelector('.slot-text');
+      if (phraseDiv) phraseDiv.textContent = "";
+      if (textDiv) textDiv.textContent = "";
+      console.log("🧹 上位Sスロットをクリア");
+    }
+    
+    // サブスロットに分散
+    distributeMainSlotToSubslots(mainSlotData);
+  }
+  
+  // サブスロットデータがある場合は個別に更新
   const subSlotData = newSSlotData.filter(item => 
     item.SubslotID && 
     (item.SubslotElement || item.SubslotText)
   );
   
-  console.log(`📊 更新対象サブスロット: ${subSlotData.length}件`);
+  if (subSlotData.length > 0) {
+    console.log(`📊 追加のサブスロット更新: ${subSlotData.length}件`);
+    subSlotData.forEach(subData => {
+      console.log(`🔧 サブスロット ${subData.SubslotID} を更新:`, subData);
+      updateSSlotDisplay(subData, true);
+    });
+  }
+}
+
+/**
+ * メインスロットデータをサブスロット構造に分散
+ * @param {Object} mainData - メインスロットデータ
+ */
+function distributeMainSlotToSubslots(mainData) {
+  console.log("🔄 メインスロットデータをサブスロットに分散:", mainData);
   
-  // 各サブスロットを個別に更新
-  subSlotData.forEach(subData => {
-    console.log(`🔧 サブスロット ${subData.SubslotID} を更新:`, subData);
-    updateSSlotDisplay(subData, true);
-  });
+  // SlotPhraseとSlotTextを適切なサブスロットに配置
+  const phrase = mainData.SlotPhrase || "";
+  const text = mainData.SlotText || "";
+  
+  // 実際に存在するSサブスロットを探して更新
+  const sContainer = document.getElementById('slot-s');
+  if (!sContainer) {
+    console.warn("⚠️ Sスロットコンテナが見つかりません");
+    return;
+  }
+  
+  // Sスロット内の全サブスロット要素を取得
+  const subslotElements = sContainer.querySelectorAll('[id^="slot-s-"]');
+  console.log(`🔍 発見されたSサブスロット: ${subslotElements.length}個`);
+  
+  if (subslotElements.length > 0) {
+    // 最初のサブスロット（通常はメインの内容）にデータを配置
+    const firstSubslot = subslotElements[0];
+    const elementDiv = firstSubslot.querySelector('.subslot-element');
+    const textDiv = firstSubslot.querySelector('.subslot-text');
+    
+    if (elementDiv) {
+      elementDiv.textContent = phrase;
+      console.log(`✅ 最初のサブスロット要素に設定: "${phrase}"`);
+    }
+    if (textDiv) {
+      textDiv.textContent = text;
+      console.log(`✅ 最初のサブスロットテキストに設定: "${text}"`);
+    }
+  } else {
+    // サブスロットが存在しない場合の代替処理
+    console.log("ℹ️ サブスロットが見つからないため、上位スロットに配置");
+    const phraseDiv = sContainer.querySelector('.slot-phrase');
+    const textDiv = sContainer.querySelector('.slot-text');
+    if (phraseDiv) phraseDiv.textContent = phrase;
+    if (textDiv) textDiv.textContent = text;
+  }
 }
 
 /**
