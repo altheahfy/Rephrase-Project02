@@ -409,3 +409,18 @@ h2 {
 [id*="-sub-"].hidden-image .slot-image { display: none !important; }
 [id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
 [id*="-sub-"].hidden-text > .slot-phrase { display: none !important; }
+
+/* 🤖 画像自動非表示機構 */
+/* プレースホルダー画像・エラー画像・無効画像の自動非表示 */
+.slot-image.auto-hidden-image {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 手動制御と自動制御の優先度制御 */
+/* 手動制御が優先される（手動非表示が設定されている場合は自動制御を無効化） */
+.slot-container.hidden-image .slot-image.auto-hidden-image,
+.slot-container[class*="hidden-"][class*="-image"] .slot-image.auto-hidden-image {
+  /* 手動制御が設定されている場合は自動制御クラスを無効化 */
+  display: none !important; /* 手動制御の結果を優先 */
+}
