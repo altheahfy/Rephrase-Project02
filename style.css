@@ -341,17 +341,15 @@ h2 {
 }
 
 /* 補助テキスト非表示制御 */
-.slot-container.hidden-auxtext .slot-auxtext,
-.subslot.hidden-auxtext .slot-auxtext {
+.slot-container.hidden-auxtext .slot-text,
+.subslot.hidden-auxtext .slot-text {
   display: none !important;
   visibility: hidden !important;
 }
 
 /* 例文テキスト非表示制御 */
-.slot-container.hidden-text .slot-text,
-.slot-container.hidden-text .slot-phrase,
-.subslot.hidden-text .slot-text,
-.subslot.hidden-text .slot-phrase {
+.slot-container.hidden-text > .slot-phrase,
+.subslot.hidden-text > .slot-phrase {
   display: none !important;
   visibility: hidden !important;
 }
@@ -359,66 +357,55 @@ h2 {
 /* スロット個別制御用 - 各スロットに特化したクラス */
 /* S スロット */
 #slot-s.hidden-s-image .slot-image { display: none !important; }
-#slot-s.hidden-s-auxtext .slot-auxtext { display: none !important; }
-#slot-s.hidden-s-text .slot-text,
-#slot-s.hidden-s-text .slot-phrase { display: none !important; }
+#slot-s.hidden-s-auxtext .slot-text { display: none !important; }
+#slot-s.hidden-s-text > .slot-phrase { display: none !important; }
 
 /* Aux スロット */
 #slot-aux.hidden-aux-image .slot-image { display: none !important; }
-#slot-aux.hidden-aux-auxtext .slot-auxtext { display: none !important; }
-#slot-aux.hidden-aux-text .slot-text,
-#slot-aux.hidden-aux-text .slot-phrase { display: none !important; }
+#slot-aux.hidden-aux-auxtext .slot-text { display: none !important; }
+#slot-aux.hidden-aux-text > .slot-phrase { display: none !important; }
 
 /* V スロット */
 #slot-v.hidden-v-image .slot-image { display: none !important; }
-#slot-v.hidden-v-auxtext .slot-auxtext { display: none !important; }
-#slot-v.hidden-v-text .slot-text,
-#slot-v.hidden-v-text .slot-phrase { display: none !important; }
+#slot-v.hidden-v-auxtext .slot-text { display: none !important; }
+#slot-v.hidden-v-text > .slot-phrase { display: none !important; }
 
 /* M1 スロット */
 #slot-m1.hidden-m1-image .slot-image { display: none !important; }
-#slot-m1.hidden-m1-auxtext .slot-auxtext { display: none !important; }
-#slot-m1.hidden-m1-text .slot-text,
-#slot-m1.hidden-m1-text .slot-phrase { display: none !important; }
+#slot-m1.hidden-m1-auxtext .slot-text { display: none !important; }
+#slot-m1.hidden-m1-text > .slot-phrase { display: none !important; }
 
 /* M2 スロット */
 #slot-m2.hidden-m2-image .slot-image { display: none !important; }
-#slot-m2.hidden-m2-auxtext .slot-auxtext { display: none !important; }
-#slot-m2.hidden-m2-text .slot-text,
-#slot-m2.hidden-m2-text .slot-phrase { display: none !important; }
+#slot-m2.hidden-m2-auxtext .slot-text { display: none !important; }
+#slot-m2.hidden-m2-text > .slot-phrase { display: none !important; }
 
 /* C1 スロット */
 #slot-c1.hidden-c1-image .slot-image { display: none !important; }
-#slot-c1.hidden-c1-auxtext .slot-auxtext { display: none !important; }
-#slot-c1.hidden-c1-text .slot-text,
-#slot-c1.hidden-c1-text .slot-phrase { display: none !important; }
+#slot-c1.hidden-c1-auxtext .slot-text { display: none !important; }
+#slot-c1.hidden-c1-text > .slot-phrase { display: none !important; }
 
 /* O1 スロット */
 #slot-o1.hidden-o1-image .slot-image { display: none !important; }
-#slot-o1.hidden-o1-auxtext .slot-auxtext { display: none !important; }
-#slot-o1.hidden-o1-text .slot-text,
-#slot-o1.hidden-o1-text .slot-phrase { display: none !important; }
+#slot-o1.hidden-o1-auxtext .slot-text { display: none !important; }
+#slot-o1.hidden-o1-text > .slot-phrase { display: none !important; }
 
 /* O2 スロット */
 #slot-o2.hidden-o2-image .slot-image { display: none !important; }
-#slot-o2.hidden-o2-auxtext .slot-auxtext { display: none !important; }
-#slot-o2.hidden-o2-text .slot-text,
-#slot-o2.hidden-o2-text .slot-phrase { display: none !important; }
+#slot-o2.hidden-o2-auxtext .slot-text { display: none !important; }
+#slot-o2.hidden-o2-text > .slot-phrase { display: none !important; }
 
 /* C2 スロット */
 #slot-c2.hidden-c2-image .slot-image { display: none !important; }
-#slot-c2.hidden-c2-auxtext .slot-auxtext { display: none !important; }
-#slot-c2.hidden-c2-text .slot-text,
-#slot-c2.hidden-c2-text .slot-phrase { display: none !important; }
+#slot-c2.hidden-c2-auxtext .slot-text { display: none !important; }
+#slot-c2.hidden-c2-text > .slot-phrase { display: none !important; }
 
 /* M3 スロット */
 #slot-m3.hidden-m3-image .slot-image { display: none !important; }
-#slot-m3.hidden-m3-auxtext .slot-auxtext { display: none !important; }
-#slot-m3.hidden-m3-text .slot-text,
-#slot-m3.hidden-m3-text .slot-phrase { display: none !important; }
+#slot-m3.hidden-m3-auxtext .slot-text { display: none !important; }
+#slot-m3.hidden-m3-text > .slot-phrase { display: none !important; }
 
 /* サブスロットも同様に制御 */
 [id*="-sub-"].hidden-image .slot-image { display: none !important; }
-[id*="-sub-"].hidden-auxtext .slot-auxtext { display: none !important; }
-[id*="-sub-"].hidden-text .slot-text,
-[id*="-sub-"].hidden-text .slot-phrase { display: none !important; }
+[id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
+[id*="-sub-"].hidden-text > .slot-phrase { display: none !important; }
