@@ -1382,4 +1382,26 @@ function validateSlotsModified(data) {
     }
   });
 }
+
+// ページ読み込み時に疑問詞エリアを初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("🔄 ページ読み込み時の疑問詞エリア初期化");
+  if (window.initializeQuestionWordArea) {
+    window.initializeQuestionWordArea();
+  }
+  
+  // ランダマイズボタンクリック時も疑問詞エリアを初期化
+  const randomizeAllButton = document.getElementById('randomize-all');
+  if (randomizeAllButton) {
+    randomizeAllButton.addEventListener('click', function() {
+      // ランダマイズ処理の前に疑問詞エリアを初期化
+      setTimeout(() => {
+        if (window.initializeQuestionWordArea) {
+          window.initializeQuestionWordArea();
+          console.log("🔄 ランダマイズ後の疑問詞エリア初期化");
+        }
+      }, 100); // ランダマイズ処理完了後に実行
+    });
+  }
+});
 </script>
