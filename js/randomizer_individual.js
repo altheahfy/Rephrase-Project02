@@ -5,8 +5,9 @@
 
 /**
  * randomizer_all.jsの完全コピー（Sスロット専用に改造）
+ * exportを削除してグローバル関数にする
  */
-export function randomizeAll(slotData) {
+function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
     console.warn("V_group_key 母集団が見つかりません。");
