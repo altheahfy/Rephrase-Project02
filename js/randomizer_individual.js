@@ -1,40 +1,111 @@
-import { updateSlotDisplay } from './image_handler.js';
+/**
+ * Sスロット個別ランダマイザー
+ */
 
 /**
- * null や undefined に対してフォールバック値を返す
+ * Sスロット個別ランダマイズ関数
  */
-function safe(value, fallback = "") {
-  return value === null || value === undefined ? fallback : value;
+function randomizeSlotSIndividual() {
+  console.log("🎲🎯 Sスロット個別ランダマイズ開始");
+  
+  // slotSetsの存在確認
+  if (!window.slotSets || !Array.isArray(window.slotSets)) {
+    console.warn("⚠️ window.slotSetsが見つかりません。先に全体ランダマイズを実行してください。");
+    alert("エラー: 先に全体ランダマイズを実行してください。");
+    return;
+  }
+  
+  // lastSelectedSlotsの存在確認
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
+    alert("エラー: 現在の選択データが見つかりません。");
+    return;
+  }
+  
+  // slotSetsからSスロット候補を取得
+  const sCandidates = window.slotSets.flat().filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  console.log(`🔍 Sスロット候補数: ${sCandidates.length}`);
+  console.log(`🔍 Sスロット候補:`, sCandidates);
+  
+  if (sCandidates.length <= 1) {
+    console.warn("⚠️ Sスロット候補が1つ以下のため、ランダマイズできません");
+    alert("エラー: 同じグループ内にSスロットの候補が複数ありません。");
+    return;
+  }
+  
+  // 現在のSスロットを取得
+  const currentS = window.lastSelectedSlots.find(slot => slot.Slot === "S" && !slot.SubslotID);
+  console.log(`🔍 現在のSスロット:`, currentS);
+  
+  // 現在と異なるSスロット候補を取得
+  let availableCandidates = sCandidates;
+  if (currentS && currentS.例文ID) {
+    availableCandidates = sCandidates.filter(candidate => candidate.例文ID !== currentS.例文ID);
+  }
+  
+  if (availableCandidates.length === 0) {
+    console.warn("⚠️ 現在と異なるSスロット候補が見つかりません");
+    alert("エラー: 現在と異なるSスロット候補が見つかりません。");
+    return;
+  }
+  
+  // 新しいSスロットをランダム選択
+  const chosenS = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
+  console.log(`🎯 選択されたSスロット:`, chosenS);
+  
+  // 選択されたSスロットに関連するサブスロットを取得
+  const relatedSubslots = window.loadedJsonData.filter(entry =>
+    entry.例文ID === chosenS.例文ID &&
+    entry.Slot === "S" &&
+    entry.SubslotID
+  );
+  console.log(`🔍 関連サブスロット数: ${relatedSubslots.length}`);
+  console.log(`🔍 関連サブスロット:`, relatedSubslots);
+  
+  // lastSelectedSlotsからSスロット関連を削除
+  const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
+  
+  // 新しいSスロットとサブスロットを追加
+  const newSSlots = [
+    { ...chosenS },
+    ...relatedSubslots.map(sub => ({ ...sub }))
+  ];
+  filteredSlots.push(...newSSlots);
+  
+  // lastSelectedSlotsを更新
+  window.lastSelectedSlots = filteredSlots;
+  
+  // buildStructure用のデータ形式に変換
+  const data = filteredSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || ""
+  }));
+  
+  console.log("🎯 Sスロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
+  
+  // 構造を再構築（buildStructureを使用）
+  if (typeof buildStructure === "function") {
+    buildStructure(data);
+  } else {
+    console.error("❌ buildStructure関数が見つかりません");
+  }
+  
+  // 静的エリアとの同期
+  if (typeof syncDynamicToStatic === "function") {
+    syncDynamicToStatic();
+    console.log("🔄 静的エリアとの同期完了");
+  }
+  
+  console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
-/**
- * 指定された key に対応する slot 内容だけを更新
- */
-export function randomizeSlot(data, key) {
-  const contentMap = {
-    s: data.subject,
-    aux: data.auxiliary,
-    v: data.verb,
-    o1: data.object,
-    o_v: data.object_verb,
-    c1: data.complement,
-    o2: data.object2,
-    c2: data.complement2,
-    m1: data.adverbial,
-    m2: data.adverbial2,
-    m3: data.adverbial3,
-    // sub-slot
-    "o1-m1": data.sub_m1,
-    "o1-s": data.sub_s,
-    "o1-aux": data.sub_aux,
-    "o1-m2": data.sub_m2,
-    "o1-v": data.sub_v,
-    "o1-c1": data.sub_c1,
-    "o1-o1": data.sub_o1,
-    "o1-o2": data.sub_o2,
-    "o1-c2": data.sub_c2,
-    "o1-m3": data.sub_m3
-  };
-
-  updateSlotDisplay(`slot-${key}`, safe(contentMap[key]));
-}
+// グローバル関数として公開
+window.randomizeSlotSIndividual = randomizeSlotSIndividual;

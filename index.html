@@ -8,6 +8,8 @@
   <link href="style.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
   </script>
+  <script src="js/randomizer_individual.js">
+  </script>
  </head>
  <body>
 
@@ -1179,6 +1181,25 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   if (typeof applyOrderToAllSlots === 'function') {
     console.log("🔢 ランダマイズ後のスロット表示順適用");
     applyOrderToAllSlots(data);
+  }
+});
+
+// Sスロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const sIndividualBtn = document.querySelector(".s-individual-randomize-btn");
+  if (sIndividualBtn) {
+    sIndividualBtn.addEventListener("click", () => {
+      console.log("🎲 Sスロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotSIndividual === "function") {
+        window.randomizeSlotSIndividual();
+      } else {
+        console.error("❌ randomizeSlotSIndividual関数が見つかりません");
+        alert("エラー: Sスロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ Sスロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ Sスロット個別ランダマイズボタンが見つかりません");
   }
 });
 
