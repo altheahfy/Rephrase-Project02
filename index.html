@@ -100,6 +100,11 @@
        ▼ 詳細
       </button>
      </div>
+     <div class="individual-randomize-button" style="margin-top: 4px;">
+      <button class="m2-individual-randomize-btn" style="margin-left: 8px;">
+       🎲
+      </button>
+     </div>
     </div>
     <div class="slot-container" id="slot-v">
      <label>
@@ -1226,6 +1231,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ M1スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
   } else {
     console.error("❌ M1スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// M2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const m2IndividualBtn = document.querySelector(".m2-individual-randomize-btn");
+  if (m2IndividualBtn) {
+    m2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 M2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotM2Individual === "function") {
+        window.randomizeSlotM2Individual();
+      } else {
+        console.error("❌ randomizeSlotM2Individual関数が見つかりません");
+        alert("エラー: M2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ M2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ M2スロット個別ランダマイズボタンが見つかりません");
   }
 });
 
