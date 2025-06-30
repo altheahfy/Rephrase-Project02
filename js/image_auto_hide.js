@@ -29,16 +29,20 @@ const VALID_IMAGE_PATTERNS = [
 // 🔍 画像が非表示対象かどうかを判定
 function shouldHideImage(imgElement) {
   if (!imgElement || !imgElement.src) {
+    console.log(`🙈 画像にsrcがありません`);
     return true; // src が無い場合は非表示
   }
   
   const src = imgElement.src;
   const alt = imgElement.alt || '';
   
+  console.log(`🔍 画像判定中: src="${src}", alt="${alt}"`);
+  console.log(`   complete=${imgElement.complete}, naturalWidth=${imgElement.naturalWidth}, naturalHeight=${imgElement.naturalHeight}`);
+  
   // プレースホルダー画像の場合は非表示
   for (const pattern of HIDDEN_IMAGE_PATTERNS) {
     if (src.includes(pattern)) {
-      console.log(`🙈 プレースホルダー画像を検出: ${src}`);
+      console.log(`🙈 プレースホルダー画像を検出: ${src} (pattern: ${pattern})`);
       return true;
     }
   }
@@ -73,6 +77,7 @@ function shouldHideImage(imgElement) {
     return true;
   }
   
+  console.log(`👁 画像は表示対象: ${src}`);
   return false; // 有効な画像として表示
 }
 
@@ -123,19 +128,27 @@ function processAllImageSlots() {
   console.log(`📊 検出された画像スロット: ${allImages.length}個`);
   
   allImages.forEach((img, index) => {
-    console.log(`🔍 画像${index + 1}を処理中: ${img.alt || img.src}`);
+    console.log(`🔍 画像${index + 1}を処理中:`);
+    console.log(`  - src: ${img.src}`);
+    console.log(`  - alt: ${img.alt}`);
+    console.log(`  - complete: ${img.complete}`);
+    console.log(`  - naturalWidth: ${img.naturalWidth}`);
+    console.log(`  - naturalHeight: ${img.naturalHeight}`);
     
     // 画像の読み込み完了を待ってから判定
     if (img.complete) {
       applyAutoHideToImage(img);
     } else {
+      console.log(`⏳ 画像${index + 1}は読み込み中...`);
       // 画像読み込み完了時に判定
       img.addEventListener('load', () => {
+        console.log(`✅ 画像${index + 1}読み込み完了`);
         applyAutoHideToImage(img);
       });
       
       // エラー時も判定
       img.addEventListener('error', () => {
+        console.log(`❌ 画像${index + 1}読み込みエラー`);
         applyAutoHideToImage(img);
       });
     }
@@ -214,6 +227,28 @@ window.processAllImageSlots = processAllImageSlots;
 window.reprocessImagesAfterDataUpdate = reprocessImagesAfterDataUpdate;
 window.reprocessImagesAfterRandomize = reprocessImagesAfterRandomize;
 window.processAllImagesWithCoordination = processAllImagesWithCoordination;
+
+// 🔹 デバッグ用手動実行関数
+window.debugImageHiding = function() {
+  console.log("🔧 デバッグ: 手動で画像非表示処理を実行");
+  processAllImagesWithCoordination();
+};
+
+window.showAllImageInfo = function() {
+  console.log("🔍 全画像要素の情報を表示:");
+  const allImages = document.querySelectorAll('.slot-image');
+  allImages.forEach((img, index) => {
+    console.log(`画像${index + 1}:`);
+    console.log(`  src: ${img.src}`);
+    console.log(`  alt: ${img.alt}`);
+    console.log(`  complete: ${img.complete}`);
+    console.log(`  naturalWidth: ${img.naturalWidth}`);
+    console.log(`  naturalHeight: ${img.naturalHeight}`);
+    console.log(`  classes: ${img.className}`);
+    console.log(`  display: ${getComputedStyle(img).display}`);
+    console.log(`---`);
+  });
+};
 
 // 🔄 ページ読み込み時の自動実行
 document.addEventListener('DOMContentLoaded', function() {
