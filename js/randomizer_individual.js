@@ -669,6 +669,108 @@ function randomizeSlotO2Individual() {
 // グローバル関数として公開
 window.randomizeSlotO2Individual = randomizeSlotO2Individual;
 
+/**
+ * C2スロット個別ランダマイズ関数
+ */
+function randomizeSlotC2Individual() {
+  console.log("🎲🎯 C2スロット個別ランダマイズ開始");
+  
+  // fullSlotPoolの存在確認
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
+    alert("エラー: 先に全体ランダマイズを実行してください。");
+    return;
+  }
+  
+  // lastSelectedSlotsの存在確認
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
+    alert("エラー: 現在の選択データが見つかりません。");
+    return;
+  }
+  
+  // fullSlotPoolからC2スロット候補を取得
+  const c2Candidates = window.fullSlotPool.filter(entry => entry.Slot === "C2" && !entry.SubslotID);
+  console.log(`🔍 C2スロット候補数: ${c2Candidates.length}`);
+  console.log(`🔍 C2スロット候補:`, c2Candidates);
+  
+  if (c2Candidates.length <= 1) {
+    console.warn("⚠️ C2スロット候補が1つ以下のため、ランダマイズできません");
+    alert("エラー: 同じグループ内にC2スロットの候補が複数ありません。");
+    return;
+  }
+  
+  // 現在のC2スロットを取得
+  const currentC2 = window.lastSelectedSlots.find(slot => slot.Slot === "C2" && !slot.SubslotID);
+  console.log(`🔍 現在のC2スロット:`, currentC2);
+  
+  // 現在と異なるC2スロット候補を取得
+  let availableCandidates = c2Candidates;
+  if (currentC2 && currentC2.例文ID) {
+    availableCandidates = c2Candidates.filter(candidate => candidate.例文ID !== currentC2.例文ID);
+  }
+  
+  if (availableCandidates.length === 0) {
+    console.warn("⚠️ 現在と異なるC2スロット候補が見つかりません");
+    alert("エラー: 現在と異なるC2スロット候補が見つかりません。");
+    return;
+  }
+  
+  // ランダムに新しいC2スロットを選択
+  const randomIndex = Math.floor(Math.random() * availableCandidates.length);
+  const newC2 = availableCandidates[randomIndex];
+  console.log(`🎲 新しいC2スロット選択:`, newC2);
+  
+  // C2サブスロットを取得
+  const newC2Subslots = window.fullSlotPool.filter(entry => 
+    entry.Slot === "C2" && 
+    entry.SubslotID && 
+    entry.例文ID === newC2.例文ID
+  );
+  console.log(`🔍 新しいC2サブスロット (${newC2Subslots.length}個):`, newC2Subslots);
+  
+  // lastSelectedSlotsを更新（C2とそのサブスロットのみ）
+  // 既存のC2関連データを削除
+  window.lastSelectedSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "C2");
+  
+  // 新しいC2メインスロットを追加
+  window.lastSelectedSlots.push(newC2);
+  
+  // 新しいC2サブスロットを追加
+  newC2Subslots.forEach(subslot => {
+    window.lastSelectedSlots.push(subslot);
+  });
+  
+  console.log(`✅ C2スロット個別ランダマイズ完了: ${newC2.例文ID} → ${newC2.Text}`);
+  console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // 構造を再構築し、静的エリアも同期
+  if (typeof buildStructure === 'function') {
+    buildStructure(window.lastSelectedSlots);
+    console.log("🏗️ buildStructure()実行完了");
+  } else {
+    console.warn("⚠️ buildStructure関数が見つかりません");
+  }
+  
+  // 静的エリアの同期
+  if (typeof syncUpperSlotsFromJson === 'function') {
+    syncUpperSlotsFromJson(window.lastSelectedSlots);
+    console.log("🔄 syncUpperSlotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncUpperSlotsFromJson関数が見つかりません");
+  }
+  
+  if (typeof syncSubslotsFromJson === 'function') {
+    syncSubslotsFromJson(window.lastSelectedSlots);
+    console.log("🔄 syncSubslotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncSubslotsFromJson関数が見つかりません");
+  }
+}
+
+// グローバル関数として公開
+window.randomizeSlotC2Individual = randomizeSlotC2Individual;
+
 // === 母集団確認用デバッグ関数群 ===
 
 // 1. window.loadedJsonData内のSスロット母集団確認

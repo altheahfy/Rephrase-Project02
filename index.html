@@ -190,6 +190,11 @@
        ▼ 詳細
       </button>
      </div>
+     <div class="individual-randomize-button" style="margin-top: 4px;">
+      <button class="c2-individual-randomize-btn" style="margin-left: 8px;">
+       🎲
+      </button>
+     </div>
     </div>
     <div class="slot-container" id="slot-m3">
      <label>
@@ -1322,6 +1327,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ O2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
   } else {
     console.error("❌ O2スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// C2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const c2IndividualBtn = document.querySelector(".c2-individual-randomize-btn");
+  if (c2IndividualBtn) {
+    c2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 C2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotC2Individual === "function") {
+        window.randomizeSlotC2Individual();
+      } else {
+        console.error("❌ randomizeSlotC2Individual関数が見つかりません");
+        alert("エラー: C2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ C2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ C2スロット個別ランダマイズボタンが見つかりません");
   }
 });
 
