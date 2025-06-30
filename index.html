@@ -171,7 +171,7 @@
       </button>
      </div>
      <div class="individual-randomize-button" style="margin-top: 4px;">
-      <button data-individual-randomize="o2">
+      <button class="o2-individual-randomize-btn" style="margin-left: 8px;">
        🎲
       </button>
      </div>
@@ -1308,7 +1308,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // O2スロット個別ランダマイズボタンのイベントハンドラー
 document.addEventListener("DOMContentLoaded", () => {
-  const o2IndividualBtn = document.querySelector('[data-individual-randomize="o2"]');
+  const o2IndividualBtn = document.querySelector(".o2-individual-randomize-btn");
   if (o2IndividualBtn) {
     o2IndividualBtn.addEventListener("click", () => {
       console.log("🎲 O2スロット個別ランダマイズボタンがクリックされました");

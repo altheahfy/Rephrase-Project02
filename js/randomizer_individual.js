@@ -644,7 +644,7 @@ function randomizeSlotO2Individual() {
   
   // 構造を再構築し、静的エリアも同期
   if (typeof buildStructure === 'function') {
-    buildStructure();
+    buildStructure(window.lastSelectedSlots);
     console.log("🏗️ buildStructure()実行完了");
   } else {
     console.warn("⚠️ buildStructure関数が見つかりません");
@@ -652,14 +652,14 @@ function randomizeSlotO2Individual() {
   
   // 静的エリアの同期
   if (typeof syncUpperSlotsFromJson === 'function') {
-    syncUpperSlotsFromJson();
+    syncUpperSlotsFromJson(window.lastSelectedSlots);
     console.log("🔄 syncUpperSlotsFromJson()実行完了");
   } else {
     console.warn("⚠️ syncUpperSlotsFromJson関数が見つかりません");
   }
   
   if (typeof syncSubslotsFromJson === 'function') {
-    syncSubslotsFromJson();
+    syncSubslotsFromJson(window.lastSelectedSlots);
     console.log("🔄 syncSubslotsFromJson()実行完了");
   } else {
     console.warn("⚠️ syncSubslotsFromJson関数が見つかりません");
@@ -767,96 +767,6 @@ window.checkFullSlotPool = function() {
   if (!window.fullSlotPool) {
     console.warn("⚠️ window.fullSlotPoolが存在しません");
     return null;
-  }
-  
-  console.log("📊 fullSlotPool総数:", window.fullSlotPool.length);
-  
-  // Sスロット関連データの抽出
-  const sMainSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && !entry.SubslotID);
-  const sSubSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && entry.SubslotID);
-  
-  console.log("📊 Sメインスロット数:", sMainSlots.length);
-  console.log("📊 Sサブスロット数:", sSubSlots.length);
-  
-  if (sMainSlots.length > 0) {
-    console.log("🔍 Sメインスロット一覧:", sMainSlots);
-    
-    // V_group_key別の分布
-    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
-    console.log("📊 利用可能なV_group_key:", vGroupKeys);
-    
-    // 例文ID別の分布
-    const exampleIds = [...new Set(sMainSlots.map(s => s.例文ID))];
-    console.log("📊 利用可能な例文ID:", exampleIds);
-    
-    exampleIds.forEach(id => {
-      const slotsForId = sMainSlots.filter(s => s.例文ID === id);
-      const subsForId = sSubSlots.filter(s => s.例文ID === id);
-      console.log(`📊 例文ID "${id}": メイン${slotsForId.length}個 + サブ${subsForId.length}個`);
-    });
-  }
-  
-  if (sSubSlots.length > 0) {
-    console.log("🔍 Sサブスロット詳細（最初の3個）:", sSubSlots.slice(0, 3));
-  // グローバル関数として公開
-window.randomizeSlotO2Individual = randomizeSlotO2Individual;
-
-// === 母集団確認用デバッグ関数群 ===
-
-// 1. window.loadedJsonData内のSスロット母集団確認
-window.checkSSlotInLoadedJson = function() {
-  console.log("🔍=== window.loadedJsonData内のSスロット確認 ===");
-  
-  if (!window.loadedJsonData) {
-    console.warn("⚠️ window.loadedJsonDataが存在しません");
-    return;
-  }
-  
-  console.log("📊 loadedJsonData総数:", window.loadedJsonData.length);
-  
-  // Sスロット関連データの抽出
-  const sMainSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && !entry.SubslotID);
-  const sSubSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && entry.SubslotID);
-  
-  console.log("📊 Sメインスロット数:", sMainSlots.length);
-  console.log("📊 Sサブスロット数:", sSubSlots.length);
-  
-  if (sMainSlots.length > 0) {
-    console.log("🔍 Sメインスロット一覧:", sMainSlots);
-    
-    // V_group_key別の分布
-    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
-    console.log("📊 利用可能なV_group_key:", vGroupKeys);
-    
-    // 例文ID別の分布
-    const exampleIds = [...new Set(sMainSlots.map(s => s.例文ID))];
-    console.log("📊 利用可能な例文ID:", exampleIds);
-    
-    exampleIds.forEach(id => {
-      const slotsForId = sMainSlots.filter(s => s.例文ID === id);
-      const subsForId = sSubSlots.filter(s => s.例文ID === id);
-      console.log(`📊 例文ID "${id}": メイン${slotsForId.length}個 + サブ${subsForId.length}個`);
-    });
-  }
-  
-  if (sSubSlots.length > 0) {
-    console.log("🔍 Sサブスロット詳細（最初の3個）:", sSubSlots.slice(0, 3));
-  }
-  
-  return { 
-    mainSlots: sMainSlots, 
-    subSlots: sSubSlots,
-    total: window.loadedJsonData.length
-  };
-};
-
-// 2. window.fullSlotPool内のSスロット母集団確認
-window.checkFullSlotPool = function() {
-  console.log("🔍=== window.fullSlotPool内のSスロット確認 ===");
-  
-  if (!window.fullSlotPool) {
-    console.warn("⚠️ window.fullSlotPoolが存在しません");
-    return;
   }
   
   console.log("📊 fullSlotPool総数:", window.fullSlotPool.length);
