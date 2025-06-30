@@ -1,7 +1,4 @@
-/**
- * Sスロット個別ランダマイズ
- * 全体ランダマイザーの仕組みをSスロット専用にコピー
- */
+import { updateSlotDisplay } from './image_handler.js';
 
 /**
  * null や undefined に対してフォールバック値を返す
@@ -146,14 +143,4 @@ function updateSSlotOnly(selectedSlots) {
 // グローバル関数として公開
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 
-// デバッグ: 関数が正しく設定されたか確認
 console.log("✅ Sスロット個別ランダマイザー読み込み完了");
-console.log("🔍 window.randomizeSlotSIndividual:", typeof window.randomizeSlotSIndividual);
-console.log("🔍 function definition:", window.randomizeSlotSIndividual);
-
-// グローバルスコープテスト関数を追加
-window.testSRandomizer = function() {
-  console.log("🧪 テスト関数が動作しています");
-  console.log("🧪 randomizeSlotSIndividual関数:", typeof window.randomizeSlotSIndividual);
-  return "テスト成功";
-};
