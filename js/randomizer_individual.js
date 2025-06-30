@@ -336,3 +336,36 @@ function randomizeSlotSIndividual() {
 
 // グローバル関数として公開
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
+
+// テスト用関数：ボタンを探してクリック
+window.testSIndividualButton = function() {
+  console.log("🔍 Sスロット個別ランダマイズボタンのテスト開始");
+  const button = document.querySelector(".s-individual-randomize-btn");
+  if (button) {
+    console.log("✅ ボタンが見つかりました。クリックします:", button);
+    button.click();
+  } else {
+    console.error("❌ ボタンが見つかりません");
+  }
+};
+
+// ページ読み込み後にボタンの存在を確認
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔍 Sスロット個別ランダマイズボタンの確認開始");
+  const button = document.querySelector(".s-individual-randomize-btn");
+  if (button) {
+    console.log("✅ Sスロット個別ランダマイズボタンが見つかりました:", button);
+    console.log("ボタンのスタイル:", window.getComputedStyle(button));
+  } else {
+    console.error("❌ Sスロット個別ランダマイズボタンが見つかりません");
+  }
+  
+  // 個別ランダマイズボタンのコンテナも確認
+  const container = document.querySelector(".individual-randomize-button");
+  if (container) {
+    console.log("✅ 個別ランダマイズボタンコンテナが見つかりました:", container);
+    console.log("コンテナのスタイル:", window.getComputedStyle(container));
+  } else {
+    console.error("❌ 個別ランダマイズボタンコンテナが見つかりません");
+  }
+});

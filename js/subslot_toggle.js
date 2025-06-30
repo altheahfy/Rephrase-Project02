@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 初期化：全サブスロットを閉じる
   initializeSubslots();
   
-  const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button");
+  const buttons = document.querySelectorAll("[data-subslot-toggle], .subslot-toggle-button button:not(.s-individual-randomize-btn)");
   console.log(`🔍 Found ${buttons.length} toggle candidate buttons`);
   buttons.forEach(button => {
     let slotId = button.getAttribute("data-subslot-toggle");

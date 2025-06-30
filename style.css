@@ -277,3 +277,31 @@ h2 {
   opacity: 1;
   transition: opacity 0.3s ease-in;
 }
+
+/* S個別ランダマイズボタンのスタイル */
+.individual-randomize-button {
+  display: block !important;
+  visibility: visible !important;
+  margin-top: 4px;
+}
+
+.s-individual-randomize-btn {
+  display: inline-block !important;
+  visibility: visible !important;
+  background-color: #ff6b6b !important;
+  color: white !important;
+  border: 2px solid #ff4757 !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+.s-individual-randomize-btn:hover {
+  background-color: #ff5252 !important;
+  border-color: #e53935 !important;
+}
