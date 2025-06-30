@@ -99,13 +99,9 @@ function randomizeSlotSIndividual() {
   }
   
   // 静的エリアとの同期
-  if (typeof syncUpperSlotsFromJson === "function") {
-    syncUpperSlotsFromJson(data);
+  if (typeof syncDynamicToStatic === "function") {
+    syncDynamicToStatic();
     console.log("🔄 静的エリアとの同期完了");
-  }
-  if (typeof syncSubslotsFromJson === "function") {
-    syncSubslotsFromJson(data);
-    console.log("🔄 サブスロットの同期完了");
   }
   
   console.log("✅ Sスロット個別ランダマイズ完了");
@@ -113,3 +109,94 @@ function randomizeSlotSIndividual() {
 
 // グローバル関数として公開
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
+
+// === 母集団確認用デバッグ関数群 ===
+
+// 1. window.loadedJsonData内のSスロット母集団確認
+window.checkSSlotInLoadedJson = function() {
+  console.log("🔍=== window.loadedJsonData内のSスロット確認 ===");
+  
+  if (!window.loadedJsonData) {
+    console.warn("⚠️ window.loadedJsonDataが存在しません");
+    return;
+  }
+  
+  console.log("📊 loadedJsonData総数:", window.loadedJsonData.length);
+  
+  // Sスロット関連データの抽出
+  const sMainSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  const sSubSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && entry.SubslotID);
+  
+  console.log("📊 Sメインスロット数:", sMainSlots.length);
+  console.log("📊 Sサブスロット数:", sSubSlots.length);
+  
+  if (sMainSlots.length > 0) {
+    console.log("🔍 Sメインスロット一覧:", sMainSlots);
+    
+    // V_group_key別の分布
+    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
+    console.log("📊 利用可能なV_group_key:", vGroupKeys);
+    
+    vGroupKeys.forEach(key => {
+      const slotsInGroup = sMainSlots.filter(s => s.V_group_key === key);
+      const subsInGroup = sSubSlots.filter(s => s.V_group_key === key);
+      console.log(`📊 V_group_key "${key}": メイン${slotsInGroup.length}個 + サブ${subsInGroup.length}個`);
+    });
+  }
+  
+  return { mainSlots: sMainSlots, subSlots: sSubSlots };
+};
+
+// 2. window.slotSets内のSスロット確認
+window.checkSSlotInSlotSets = function() {
+  console.log("🔍=== window.slotSets内のSスロット確認 ===");
+  
+  if (!window.slotSets) {
+    console.warn("⚠️ window.slotSetsが存在しません");
+    return;
+  }
+  
+  console.log("📊 slotSets構造:", window.slotSets);
+  const flatSlots = window.slotSets.flat();
+  const sSlotsInSets = flatSlots.filter(entry => entry.Slot === "S");
+  
+  console.log("📊 slotSets内のSスロット総数:", sSlotsInSets.length);
+  console.log("🔍 slotSets内のSスロット詳細:", sSlotsInSets);
+  
+  // サブスロット情報があるかチェック
+  const sSubsInSets = sSlotsInSets.filter(entry => entry.SubslotID);
+  console.log("📊 slotSets内のSサブスロット数:", sSubsInSets.length);
+  
+  return sSlotsInSets;
+};
+
+// 3. 現在選択中のデータ確認
+window.checkCurrentSelection = function() {
+  console.log("🔍=== 現在選択中のデータ確認 ===");
+  
+  if (window.lastSelectedSlots) {
+    console.log("📊 lastSelectedSlots:", window.lastSelectedSlots);
+    const currentS = window.lastSelectedSlots.filter(slot => slot.Slot === "S");
+    console.log("📊 現在のSスロット:", currentS);
+  } else {
+    console.warn("⚠️ window.lastSelectedSlotsが存在しません");
+  }
+};
+
+// 4. 総合確認関数
+window.checkAllSSlotSources = function() {
+  console.log("🔍=== 全Sスロットデータソース確認 ===");
+  
+  const loadedJson = window.checkSSlotInLoadedJson();
+  const slotSets = window.checkSSlotInSlotSets();
+  window.checkCurrentSelection();
+  
+  console.log("📊=== まとめ ===");
+  console.log("loadedJsonData使用可能:", !!loadedJson && loadedJson.mainSlots.length > 0);
+  console.log("slotSets使用可能:", !!slotSets && slotSets.length > 0);
+  
+  return {
+    loadedJsonAvailable: !!loadedJson && loadedJson.mainSlots.length > 0,
+    slotSetsAvailable: !!slotSets && slotSets.length > 0
+  };
+};
