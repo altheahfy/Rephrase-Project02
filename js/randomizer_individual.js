@@ -115,6 +115,119 @@ function randomizeSlotSIndividual() {
 // グローバル関数として公開
 window.randomizeSlotSIndividual = randomizeSlotSIndividual;
 
+/**
+ * M1スロット個別ランダマイズ関数
+ */
+function randomizeSlotM1Individual() {
+  console.log("🎲🎯 M1スロット個別ランダマイズ開始");
+  
+  // fullSlotPoolの存在確認
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn("⚠️ window.fullSlotPoolが見つかりません。先に例文シャッフルを実行してください。");
+    alert("エラー: 先に例文シャッフルを実行してください。");
+    return;
+  }
+  
+  // lastSelectedSlotsの存在確認
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
+    alert("エラー: 現在の選択データが見つかりません。");
+    return;
+  }
+  
+  // fullSlotPoolからM1スロット候補を取得
+  const m1Candidates = window.fullSlotPool.filter(entry => entry.Slot === "M1" && !entry.SubslotID);
+  console.log(`🔍 M1スロット候補数: ${m1Candidates.length}`);
+  console.log(`🔍 M1スロット候補:`, m1Candidates);
+  
+  if (m1Candidates.length <= 1) {
+    console.warn("⚠️ M1スロット候補が1つ以下のため、ランダマイズできません");
+    alert("エラー: 同じグループ内にM1スロットの候補が複数ありません。");
+    return;
+  }
+  
+  // 現在のM1スロットを取得
+  const currentM1 = window.lastSelectedSlots.find(slot => slot.Slot === "M1" && !slot.SubslotID);
+  console.log(`🔍 現在のM1スロット:`, currentM1);
+  
+  // 現在と異なるM1スロット候補を取得
+  let availableCandidates = m1Candidates;
+  if (currentM1 && currentM1.例文ID) {
+    availableCandidates = m1Candidates.filter(candidate => candidate.例文ID !== currentM1.例文ID);
+  }
+  
+  if (availableCandidates.length === 0) {
+    console.warn("⚠️ 現在と異なるM1スロット候補が見つかりません");
+    alert("エラー: 現在と異なるM1スロット候補が見つかりません。");
+    return;
+  }
+  
+  // 新しいM1スロットをランダム選択
+  const chosenM1 = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
+  console.log(`🎯 選択されたM1スロット:`, chosenM1);
+  
+  // 選択されたM1スロットに関連するサブスロットを取得
+  const relatedSubslots = window.fullSlotPool.filter(entry =>
+    entry.例文ID === chosenM1.例文ID &&
+    entry.Slot === "M1" &&
+    entry.SubslotID
+  );
+  console.log(`🔍 関連サブスロット数: ${relatedSubslots.length}`);
+  console.log(`🔍 関連サブスロット:`, relatedSubslots);
+  
+  // lastSelectedSlotsからM1スロット関連を削除
+  const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "M1");
+  
+  // 新しいM1スロットとサブスロットを追加
+  const newM1Slots = [
+    { ...chosenM1 },
+    ...relatedSubslots.map(sub => ({ ...sub }))
+  ];
+  filteredSlots.push(...newM1Slots);
+  
+  // lastSelectedSlotsを更新
+  window.lastSelectedSlots = filteredSlots;
+  
+  // buildStructure用のデータ形式に変換
+  const data = filteredSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || ""
+  }));
+  
+  console.log("🎯 M1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
+  
+  // 構造を再構築（buildStructureを使用）
+  if (typeof buildStructure === "function") {
+    buildStructure(data);
+  } else {
+    console.error("❌ buildStructure関数が見つかりません");
+  }
+  
+  // 静的エリアとの同期
+  if (typeof syncUpperSlotsFromJson === "function") {
+    syncUpperSlotsFromJson(data);
+    console.log("🔄 上位スロット同期完了");
+  }
+  
+  if (typeof syncSubslotsFromJson === "function") {
+    syncSubslotsFromJson(data);
+    console.log("🔄 サブスロット同期完了");
+  }
+  
+  console.log("✅ M1スロット個別ランダマイズ完了");
+}
+
+// グローバル関数として公開
+window.randomizeSlotM1Individual = randomizeSlotM1Individual;
+
 // === 母集団確認用デバッグ関数群 ===
 
 // 1. window.loadedJsonData内のSスロット母集団確認
