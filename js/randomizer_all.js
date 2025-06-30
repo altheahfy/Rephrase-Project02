@@ -76,6 +76,12 @@ export function randomizeAll(slotData) {
   window.slotTypes = slotTypes;
   window.lastSelectedSlots = selectedSlots;
 
+  // === 個別ランダマイズ用: 完全なスロットプールを保存 ===
+  // 選択されたV_group_keyの全スロットデータ（メイン+サブスロット）を保存
+  window.fullSlotPool = groupSlots.map(slot => ({ ...slot }));
+  console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
+  console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
+
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
