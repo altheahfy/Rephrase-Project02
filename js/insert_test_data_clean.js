@@ -8,6 +8,24 @@
 // - 読み取り専用でのみ使用可能
 // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
+// 疑問詞エリアを初期化して確実に空状態にする関数
+function initializeQuestionWordArea() {
+  const topDiv = document.getElementById("display-top-question-word");
+  if (topDiv) {
+    topDiv.textContent = "";
+    topDiv.innerHTML = ""; // HTMLも完全にクリア
+    topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+    console.log("🧹 疑問詞エリアを初期化しました");
+  }
+  
+  // 動的エリアの疑問詞も削除
+  const dynamicQuestionDiv = document.getElementById("dynamic-question-word");
+  if (dynamicQuestionDiv) {
+    dynamicQuestionDiv.remove();
+    console.log("🧹 動的エリアの疑問詞を削除しました");
+  }
+}
+
 // 動的エリアからデータを抽出する関数
 // ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
 function extractDataFromDynamicArea() {
@@ -197,9 +215,19 @@ function syncDynamicToStatic() {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
         topDiv.textContent = topDisplayItem.DisplayText;
+        topDiv.classList.remove("empty-content"); // 空クラスを削除
         console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
       } else {
         console.warn("⚠ display-top-question-word が見つかりません");
+      }
+    } else {
+      // DisplayAtTopがない場合はクリア
+      const topDiv = document.getElementById("display-top-question-word");
+      if (topDiv) {
+        topDiv.textContent = "";
+        topDiv.innerHTML = ""; // HTMLも完全にクリア
+        topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+        console.log("🧹 DisplayAtTop 表示をクリア（syncDynamicToStatic）");
       }
     }
   }
@@ -250,14 +278,24 @@ function syncDynamicToStatic() {
   if (data.length === 0) {
     console.log("🔄 動的エリアからのデータ抽出失敗時のDisplayAtTop処理開始");
     // 🔼 分離疑問詞 (DisplayAtTop) 書き込み処理
-    const topDisplay = data.find(d => d.DisplayAtTop);
+    const topDisplay = window.loadedJsonData?.find(d => d.DisplayAtTop);
     if (topDisplay && topDisplay.DisplayText) {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
         topDiv.textContent = topDisplay.DisplayText;
+        topDiv.classList.remove("empty-content"); // 空クラスを削除
         console.log(`🔼 DisplayAtTop 表示: ${topDisplay.DisplayText}`);
       } else {
         console.warn("⚠ display-top-question-word が見つかりません");
+      }
+    } else {
+      // DisplayAtTopがない場合はクリア
+      const topDiv = document.getElementById("display-top-question-word");
+      if (topDiv) {
+        topDiv.textContent = "";
+        topDiv.innerHTML = ""; // HTMLも完全にクリア
+        topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+        console.log("🧹 DisplayAtTop 表示をクリア（動的エリア抽出失敗時）");
       }
     }
     console.warn("⚠ 動的エリアからデータ抽出できませんでした");
@@ -368,6 +406,7 @@ function displayTopQuestionWord() {
   const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
   if (topDisplayItem && topDisplayItem.DisplayText) {
     topDiv.textContent = topDisplayItem.DisplayText;
+    topDiv.classList.remove("empty-content"); // 空クラスを削除
     console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
     
     // 🔹 疑問詞を文頭（slot-wrapper内の最初）に移動
@@ -403,6 +442,8 @@ function displayTopQuestionWord() {
   } else {
     // DisplayAtTopがない場合は表示をクリア
     topDiv.textContent = "";
+    topDiv.innerHTML = ""; // HTMLも完全にクリア
+    topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
     
     // 動的エリアの疑問詞もクリア
     const dynamicQuestionDiv = document.getElementById("dynamic-question-word");
@@ -421,6 +462,7 @@ function displayTopQuestionWord() {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
         topDiv.textContent = topDisplayItem.DisplayText;
+        topDiv.classList.remove("empty-content"); // 空クラスを削除
         console.log("✅ DisplayAtTop 表示（遅延）:", topDisplayItem.DisplayText);
       }
     } else {
@@ -428,6 +470,8 @@ function displayTopQuestionWord() {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
         topDiv.textContent = "";
+        topDiv.innerHTML = ""; // HTMLも完全にクリア
+        topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
         console.log("🧹 DisplayAtTop 表示をクリア（遅延・該当データなし）");
       }
     }
@@ -1180,7 +1224,7 @@ window.safeJsonSync = function(data) {
 // ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
 window.setupSyncObserver = function() {
   try {
-    // ⚠️【編集禁止】動的記載エリアの変更を監視（読み取り専用）
+    // ⚠️【編集禁止】動的エリアの変更を監視（読み取り専用）
     const dynamicArea = document.getElementById("dynamic-slot-area");
     if (!dynamicArea) {
       console.warn("⚠ 監視対象の動的記載エリアが見つかりません");
@@ -1541,3 +1585,8 @@ function forceHideEmptySlots() {
     }
   });
 }
+
+// 🔹 グローバル関数としてエクスポート
+window.initializeQuestionWordArea = initializeQuestionWordArea;
+window.displayTopQuestionWord = displayTopQuestionWord;
+window.syncDynamicToStatic = syncDynamicToStatic;

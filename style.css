@@ -62,6 +62,8 @@ h2 {
   margin: 4px;
   min-width: 120px; /* 最小幅を設定 */
   max-width: 200px; /* 最大幅を設定 */
+  /* 空判定時の非表示制御 */
+  transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -240,6 +242,41 @@ h2 {
   visibility: hidden;
 }
 
+/* 🔥 静的スロットエリアのスマート表示制御 */
+/* 空のスロットを動的に非表示にするクラス */
+.slot-container.empty-slot {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 静的スロットエリアの基本表示設定 */
+.slot-container {
+  display: flex;
+  flex-direction: column; /* 各スロット内の要素は縦並び */
+  align-items: center; /* スロット内の要素は中央揃え */
+  gap: 8px;
+  /* order属性への対応を追加 */
+  order: 0; /* デフォルト値 */
+  border: 1px solid #eee; /* 境界線を追加して区別しやすく */
+  padding: 8px;
+  margin: 4px;
+  min-width: 120px; /* 最小幅を設定 */
+  max-width: 200px; /* 最大幅を設定 */
+  /* 空判定時の非表示制御 */
+  transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
+}
+
+/* 空スロット判定時に適用されるスタイル（グレー枠を完全に非表示） */
+.slot-container.hidden-empty {
+  display: none !important;
+  visibility: hidden !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* 🔹 分離疑問詞を文頭に配置するスタイル */
 #display-top-question-word {
   /* 他のスロットと同じフォントスタイルに調整 */
@@ -265,6 +302,21 @@ h2 {
   /* 文頭配置のための追加スタイル */
   margin-right: 12px; /* 次のスロットとの間隔 */
   background-color: #f9f9f9; /* 疑問詞であることを示す薄い背景 */
+  
+  /* 🔥 空判定による非表示制御を追加 */
+  transition: opacity 0.2s ease-out;
+}
+
+/* 疑問詞エリアが空の場合の非表示スタイル */
+#display-top-question-word:empty,
+#display-top-question-word.empty-content {
+  display: none !important;
+  visibility: hidden !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* アニメーション効果（オプション - 将来の拡張用） */
