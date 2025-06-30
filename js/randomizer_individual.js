@@ -99,9 +99,13 @@ function randomizeSlotSIndividual() {
   }
   
   // 静的エリアとの同期
-  if (typeof syncDynamicToStatic === "function") {
-    syncDynamicToStatic();
+  if (typeof syncUpperSlotsFromJson === "function") {
+    syncUpperSlotsFromJson(data);
     console.log("🔄 静的エリアとの同期完了");
+  }
+  if (typeof syncSubslotsFromJson === "function") {
+    syncSubslotsFromJson(data);
+    console.log("🔄 サブスロットの同期完了");
   }
   
   console.log("✅ Sスロット個別ランダマイズ完了");
