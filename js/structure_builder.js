@@ -132,7 +132,8 @@ function buildStructure(selectedSlots) {
   upperSlots.forEach(item => {
     console.log(`Processing upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
 
-    if (item.PhraseType === 'word') {
+    // Sスロット個別ランダマイズ時は、PhraseTypeに関係なくSスロットを表示
+    if (item.PhraseType === 'word' || item.Slot === 'S') {
       const slotDiv = renderSlot(item);
       dynamicArea.appendChild(slotDiv);
     } else {
