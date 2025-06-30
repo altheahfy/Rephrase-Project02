@@ -211,6 +211,11 @@
        ▼ 詳細
       </button>
      </div>
+     <div class="individual-randomize-button" style="margin-top: 4px;">
+      <button class="m3-individual-randomize-btn" style="margin-left: 8px;">
+       🎲
+      </button>
+     </div>
     </div>
    </div>
    <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
@@ -1346,6 +1351,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ C2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
   } else {
     console.error("❌ C2スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// M3スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const m3IndividualBtn = document.querySelector(".m3-individual-randomize-btn");
+  if (m3IndividualBtn) {
+    m3IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 M3スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotM3Individual === "function") {
+        window.randomizeSlotM3Individual();
+      } else {
+        console.error("❌ randomizeSlotM3Individual関数が見つかりません");
+        alert("エラー: M3スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ M3スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ M3スロット個別ランダマイズボタンが見つかりません");
   }
 });
 

@@ -771,6 +771,108 @@ function randomizeSlotC2Individual() {
 // グローバル関数として公開
 window.randomizeSlotC2Individual = randomizeSlotC2Individual;
 
+/**
+ * M3スロット個別ランダマイズ関数
+ */
+function randomizeSlotM3Individual() {
+  console.log("🎲🎯 M3スロット個別ランダマイズ開始");
+  
+  // fullSlotPoolの存在確認
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
+    alert("エラー: 先に全体ランダマイズを実行してください。");
+    return;
+  }
+  
+  // lastSelectedSlotsの存在確認
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
+    alert("エラー: 現在の選択データが見つかりません。");
+    return;
+  }
+  
+  // fullSlotPoolからM3スロット候補を取得
+  const m3Candidates = window.fullSlotPool.filter(entry => entry.Slot === "M3" && !entry.SubslotID);
+  console.log(`🔍 M3スロット候補数: ${m3Candidates.length}`);
+  console.log(`🔍 M3スロット候補:`, m3Candidates);
+  
+  if (m3Candidates.length <= 1) {
+    console.warn("⚠️ M3スロット候補が1つ以下のため、ランダマイズできません");
+    alert("エラー: 同じグループ内にM3スロットの候補が複数ありません。");
+    return;
+  }
+  
+  // 現在のM3スロットを取得
+  const currentM3 = window.lastSelectedSlots.find(slot => slot.Slot === "M3" && !slot.SubslotID);
+  console.log(`🔍 現在のM3スロット:`, currentM3);
+  
+  // 現在と異なるM3スロット候補を取得
+  let availableCandidates = m3Candidates;
+  if (currentM3 && currentM3.例文ID) {
+    availableCandidates = m3Candidates.filter(candidate => candidate.例文ID !== currentM3.例文ID);
+  }
+  
+  if (availableCandidates.length === 0) {
+    console.warn("⚠️ 現在と異なるM3スロット候補が見つかりません");
+    alert("エラー: 現在と異なるM3スロット候補が見つかりません。");
+    return;
+  }
+  
+  // ランダムに新しいM3スロットを選択
+  const randomIndex = Math.floor(Math.random() * availableCandidates.length);
+  const newM3 = availableCandidates[randomIndex];
+  console.log(`🎲 新しいM3スロット選択:`, newM3);
+  
+  // M3サブスロットを取得
+  const newM3Subslots = window.fullSlotPool.filter(entry => 
+    entry.Slot === "M3" && 
+    entry.SubslotID && 
+    entry.例文ID === newM3.例文ID
+  );
+  console.log(`🔍 新しいM3サブスロット (${newM3Subslots.length}個):`, newM3Subslots);
+  
+  // lastSelectedSlotsを更新（M3とそのサブスロットのみ）
+  // 既存のM3関連データを削除
+  window.lastSelectedSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "M3");
+  
+  // 新しいM3メインスロットを追加
+  window.lastSelectedSlots.push(newM3);
+  
+  // 新しいM3サブスロットを追加
+  newM3Subslots.forEach(subslot => {
+    window.lastSelectedSlots.push(subslot);
+  });
+  
+  console.log(`✅ M3スロット個別ランダマイズ完了: ${newM3.例文ID} → ${newM3.Text}`);
+  console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // 構造を再構築し、静的エリアも同期
+  if (typeof buildStructure === 'function') {
+    buildStructure(window.lastSelectedSlots);
+    console.log("🏗️ buildStructure()実行完了");
+  } else {
+    console.warn("⚠️ buildStructure関数が見つかりません");
+  }
+  
+  // 静的エリアの同期
+  if (typeof syncUpperSlotsFromJson === 'function') {
+    syncUpperSlotsFromJson(window.lastSelectedSlots);
+    console.log("🔄 syncUpperSlotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncUpperSlotsFromJson関数が見つかりません");
+  }
+  
+  if (typeof syncSubslotsFromJson === 'function') {
+    syncSubslotsFromJson(window.lastSelectedSlots);
+    console.log("🔄 syncSubslotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncSubslotsFromJson関数が見つかりません");
+  }
+}
+
+// グローバル関数として公開
+window.randomizeSlotM3Individual = randomizeSlotM3Individual;
+
 // === 母集団確認用デバッグ関数群 ===
 
 // 1. window.loadedJsonData内のSスロット母集団確認
