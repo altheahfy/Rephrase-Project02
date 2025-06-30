@@ -198,7 +198,8 @@ function setupVisibilityControlUI() {
     });
   }
   
-  // 折畳みボタン
+  // 折畳みボタン（新しいUIには存在しないのでコメントアウト）
+  /*
   const togglePanelButton = document.getElementById('toggle-visibility-panel');
   const controlsContainer = document.getElementById('slot-controls-container');
   if (togglePanelButton && controlsContainer) {
@@ -214,6 +215,7 @@ function setupVisibilityControlUI() {
       }
     });
   }
+  */
   
   console.log(`✅ 表示制御UI設定完了: チェックボックス${checkboxes.length}個`);
 }
