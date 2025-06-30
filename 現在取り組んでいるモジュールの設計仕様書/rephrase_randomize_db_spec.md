@@ -17,16 +17,18 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 ---
 
 ## 全体ランダマイズの流れ
-- **randomizer_all が初回の V_group_key 母集団選択とスロット群決定を担当する。**
+- **randomizer_all.js が初回の V_group_key 母集団選択とスロット群決定を担当する。**
 - 選ばれた V_group_key に属するスロット群からスロットをランダムに選択。
+- **重要**: 全体ランダマイズ実行時に `window.fullSlotPool` を作成し、個別ランダマイズの母集団として利用可能にする。
 
 ---
 
-## 個別ランダマイズの流れ（統合仕様追加）
-- 個別ランダマイズは randomizer_all.js 内の `randomizeIndividual(slotId)` 関数で実装。
-- 現在表示中の V_group_key 母集団データを流用。
-- 該当 slotId に対応するスロット候補群を抽出し、その中からランダム選出。
-- 選出したスロットデータを該当 slotId の表示にのみ反映し、他スロットには影響を与えない。
+## 個別ランダマイズの流れ（実装済み仕様）
+- **Sスロット個別ランダマイズ**: `randomizer_individual.js` 内の `randomizeSlotSIndividual()` 関数で実装済み。
+- **他スロット個別ランダマイズ**: 将来的に水平展開予定（V, O, C等）。
+- 現在表示中の V_group_key 母集団データ（`window.fullSlotPool`）を流用。
+- 該当スロットに対応するスロット候補群を抽出し、その中からランダム選出。
+- 選出したスロットデータを該当スロットの表示にのみ反映し、他スロットには影響を与えない。
 - 描画は既存の structure_builder.js の共通描画モジュールに委ねる。
 
 ---
@@ -39,9 +41,10 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 
 ## 注意事項
 - structure_builder.js は選択済のスロット群を受け取り描画するのみとする。
-- randomizer_all が選択責任を持ち、構造モジュールは描画責任に集中。
+- randomizer_all.js が選択責任を持ち、構造モジュールは描画責任に集中。
 - 個別ランダマイズデータも structure_builder.js がそのまま描画すること。
 - 個別ランダマイズボタン（🎲）は slot-container 内で SlotPhrase ラベルの横に配置し、slot-text 内には配置しない。
+- **同期処理**: `syncUpperSlotsFromJson()` と `syncSubslotsFromJson()` を使用（`syncDynamicToStatic()` は非推奨）。
 
 ---
 
@@ -53,3 +56,101 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
   - 上記でない場合は、他のスロット同様に subslot データを出力対象に含める。
 - Structure 側はランダマイザーから受け取ったデータをそのまま描画する。
 - この仕様により、特例例文と一般例文の親子スロット構造が両立する。
+
+---
+
+## 【2025年6月30日実装】Sスロット個別ランダマイズ機構 詳細仕様
+
+### 概要
+- **目的**: 既存の全体ランダマイズ機能を壊さず、Sスロット（主語）のみを安全に個別ランダマイズする
+- **実装ファイル**: `randomizer_individual.js`
+- **対象スロット**: Sスロット（メイン＋サブスロット）のみ
+- **データソース**: `window.fullSlotPool`（全体ランダマイズで作成される母集団）
+
+### 技術的実装詳細
+
+#### データフロー
+```
+1. 全体ランダマイズ実行 → window.fullSlotPool作成（randomizer_all.js）
+2. Sスロット個別ランダマイズ実行 → window.fullSlotPoolから候補取得
+3. 動的エリア更新 → buildStructure()で再構築
+4. 静的エリア同期 → syncUpperSlotsFromJson() + syncSubslotsFromJson()
+```
+
+#### 核心となる関数
+- **メイン関数**: `randomizeSlotSIndividual()`
+- **データソース**: `window.fullSlotPool`（配列形式）
+- **同期関数**: `syncUpperSlotsFromJson(data)`, `syncSubslotsFromJson(data)`
+
+#### 処理ステップ
+1. **前提条件チェック**
+   - `window.fullSlotPool`の存在確認
+   - `window.lastSelectedSlots`の存在確認
+
+2. **候補抽出**
+   ```javascript
+   const sCandidates = window.fullSlotPool.filter(entry => 
+     entry.Slot === "S" && !entry.SubslotID
+   );
+   ```
+
+3. **重複排除**
+   - 現在表示中のSスロット（例文ID）を除外
+   - 候補が2個以上ある場合のみ実行
+
+4. **ランダム選択**
+   - 利用可能候補からランダムに1つ選択
+   - 選択されたSスロットの例文IDに対応するサブスロットを一括取得
+
+5. **データ更新**
+   ```javascript
+   // Sスロット関連を削除
+   const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
+   
+   // 新しいSスロット＋サブスロットを追加
+   const newSSlots = [chosenS, ...relatedSubslots];
+   filteredSlots.push(...newSSlots);
+   
+   // 更新
+   window.lastSelectedSlots = filteredSlots;
+   ```
+
+6. **表示更新**
+   - `buildStructure(data)`: 動的エリア再構築
+   - `syncUpperSlotsFromJson(data)`: メインスロット同期
+   - `syncSubslotsFromJson(data)`: サブスロット同期
+
+### 安全性設計
+
+#### 既存機能への影響なし
+- 全体ランダマイズ機能：変更なし
+- 動的記載エリア表示機能：変更なし
+- 他スロット（V, O, C等）：影響なし
+
+#### エラーハンドリング
+- 母集団データ不在時：エラーメッセージ表示
+- 候補不足時：アラート表示
+- 関数不在時：コンソールエラー出力
+
+### スコープ制限
+- **対象**: Sスロットのみ
+- **母集団**: 同一V_group_key内の例文のみ
+- **更新範囲**: Sメインスロット＋Sサブスロット群
+
+### 拡張性
+この実装パターンは他スロット（V, O, C等）への**水平展開**が可能：
+- 関数名の変更（例：`randomizeSlotVIndividual()`）
+- フィルタ条件の変更（例：`entry.Slot === "V"`）
+- 基本的なデータフロー・同期処理は同一
+
+### デバッグ機能
+実装時に追加されたデバッグ関数群：
+- `window.checkFullSlotPool()`: 母集団データ確認
+- `window.checkAllSSlotSources()`: 全データソース確認
+- `window.checkCurrentSelection()`: 現在選択データ確認
+
+### 学習ポイント
+1. **スモールステップアプローチ**の有効性
+2. **既存の仕組み理解**の重要性（sync関数名等）
+3. **段階的検証**による安全な実装
+4. **データソース調査**の必要性（fullSlotPoolの構造確認）
