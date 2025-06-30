@@ -260,7 +260,7 @@ function buildStructure(selectedSlots) {
  * Sスロット個別ランダマイズ（HTMLと同じ呼び出し方式）
  */
 function randomizeSlotSIndividual() {
-  console.log("🎲🎯 Sスロット個別ランダマイズ開始（完全コピペ版）");
+  console.log("🎲🎯 Sスロット個別ランダマイズ開始（修正版）");
   
   // 既存のlastSelectedSlotsが必要
   if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
@@ -278,12 +278,43 @@ function randomizeSlotSIndividual() {
   const selectedGroup = firstSlot.V_group_key;
   console.log(`🔑 現在のV_group_key: ${selectedGroup}`);
   
-  // そのグループからSスロット候補を取得
+  // 元のrandomizeAllのロジックを使ってSスロットのみを再選択
   const groupSlots = window.loadedJsonData.filter(entry => entry.V_group_key === selectedGroup);
-  const sCandidates = groupSlots.filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  const exampleIDs = [...new Set(groupSlots.map(entry => entry.例文ID).filter(id => id))];
+  
+  console.log(`🔍 groupSlots数: ${groupSlots.length}`);
+  console.log(`🔍 例文ID数: ${exampleIDs.length}`);
+  
+  if (exampleIDs.length === 0) {
+    console.warn("例文ID 母集団が見つかりません。");
+    return;
+  }
+
+  // スロットセットを構築（元のrandomizeAllと同じロジック）
+  let slotSets = [];
+  exampleIDs.forEach((id, index) => {
+    const setNumber = index + 1;
+    const slots = groupSlots.filter(entry => entry.例文ID === id && !entry.SubslotID).map(entry => ({
+      ...entry,
+      識別番号: `${entry.Slot}-${setNumber}`
+    }));
+    slotSets.push(slots);
+  });
+  
+  // Sスロット候補を取得
+  const sCandidates = slotSets.flat().filter(entry => entry.Slot === "S");
+  console.log(`🔍 Sスロット候補数: ${sCandidates.length}`);
+  console.log(`🔍 Sスロット候補例:`, sCandidates.slice(0, 3));
   
   if (sCandidates.length === 0) {
     console.warn("⚠️ Sスロット候補が見つかりません");
+    
+    // デバッグ情報
+    const availableSlots = [...new Set(groupSlots.map(entry => entry.Slot))];
+    console.log(`🔍 利用可能なスロットタイプ:`, availableSlots);
+    console.log("🔍 slotSets:", slotSets.slice(0, 2));
+    
+    alert("エラー: Sスロット候補が見つかりません。\n現在のV_group_keyにSスロットのデータが存在しないようです。");
     return;
   }
   
@@ -291,21 +322,20 @@ function randomizeSlotSIndividual() {
   const chosenS = sCandidates[Math.floor(Math.random() * sCandidates.length)];
   console.log(`🎯 選択されたSスロット:`, chosenS);
   
-  // 既存のlastSelectedSlotsからSスロット関連を削除
-  const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
-  
-  // 新しいSスロットを追加
-  filteredSlots.push({ ...chosenS });
-  
-  // 関連サブスロットを追加
+  // 関連サブスロットを取得
   const relatedSubslots = groupSlots.filter(e =>
     e.例文ID === chosenS.例文ID &&
     e.Slot === chosenS.Slot &&
     e.SubslotID
   );
-  relatedSubslots.forEach(sub => {
-    filteredSlots.push({ ...sub });
-  });
+  console.log(`🔍 関連サブスロット数: ${relatedSubslots.length}`);
+  
+  // 既存のlastSelectedSlotsからSスロット関連を削除
+  const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
+  
+  // 新しいSスロットとサブスロットを追加
+  const newSSlots = [{ ...chosenS }, ...relatedSubslots.map(sub => ({ ...sub }))];
+  filteredSlots.push(...newSSlots);
   
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = filteredSlots;
@@ -323,7 +353,7 @@ function randomizeSlotSIndividual() {
     識別番号: slot.識別番号 || ""
   }));
   
-  console.log("ランダマイズ結果詳細（Sスロット個別）:", JSON.stringify(data, null, 2));
+  console.log("ランダマイズ結果詳細（Sスロット個別・修正版）:", JSON.stringify(data, null, 2));
   buildStructure(data);
   
   if (typeof syncDynamicToStatic === "function") {
@@ -331,7 +361,7 @@ function randomizeSlotSIndividual() {
     console.log("🔄 静的エリアとの同期完了");
   }
   
-  console.log("✅ Sスロット個別ランダマイズ完了（完全コピペ版）");
+  console.log("✅ Sスロット個別ランダマイズ完了（修正版）");
 }
 
 // グローバル関数として公開
