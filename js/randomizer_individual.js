@@ -200,3 +200,50 @@ window.checkAllSSlotSources = function() {
     slotSetsAvailable: !!slotSets && slotSets.length > 0
   };
 };
+
+// 5. 新規追加: window.fullSlotPool確認関数
+window.checkFullSlotPool = function() {
+  console.log("🔍=== window.fullSlotPool確認 ===");
+  
+  if (!window.fullSlotPool) {
+    console.warn("⚠️ window.fullSlotPoolが存在しません");
+    return null;
+  }
+  
+  console.log("📊 fullSlotPool総数:", window.fullSlotPool.length);
+  
+  // Sスロット関連データの抽出
+  const sMainSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  const sSubSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && entry.SubslotID);
+  
+  console.log("📊 Sメインスロット数:", sMainSlots.length);
+  console.log("📊 Sサブスロット数:", sSubSlots.length);
+  
+  if (sMainSlots.length > 0) {
+    console.log("🔍 Sメインスロット一覧:", sMainSlots);
+    
+    // V_group_key別の分布
+    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
+    console.log("📊 利用可能なV_group_key:", vGroupKeys);
+    
+    // 例文ID別の分布
+    const exampleIds = [...new Set(sMainSlots.map(s => s.例文ID))];
+    console.log("📊 利用可能な例文ID:", exampleIds);
+    
+    exampleIds.forEach(id => {
+      const slotsForId = sMainSlots.filter(s => s.例文ID === id);
+      const subsForId = sSubSlots.filter(s => s.例文ID === id);
+      console.log(`📊 例文ID "${id}": メイン${slotsForId.length}個 + サブ${subsForId.length}個`);
+    });
+  }
+  
+  if (sSubSlots.length > 0) {
+    console.log("🔍 Sサブスロット詳細（最初の3個）:", sSubSlots.slice(0, 3));
+  }
+  
+  return { 
+    mainSlots: sMainSlots, 
+    subSlots: sSubSlots,
+    total: window.fullSlotPool.length
+  };
+};
