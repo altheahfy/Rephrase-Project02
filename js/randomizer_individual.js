@@ -8,9 +8,9 @@
 function randomizeSlotSIndividual() {
   console.log("🎲🎯 Sスロット個別ランダマイズ開始");
   
-  // slotSetsの存在確認
-  if (!window.slotSets || !Array.isArray(window.slotSets)) {
-    console.warn("⚠️ window.slotSetsが見つかりません。先に全体ランダマイズを実行してください。");
+  // fullSlotPoolの存在確認
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
     alert("エラー: 先に全体ランダマイズを実行してください。");
     return;
   }
@@ -22,8 +22,8 @@ function randomizeSlotSIndividual() {
     return;
   }
   
-  // slotSetsからSスロット候補を取得
-  const sCandidates = window.slotSets.flat().filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  // fullSlotPoolからSスロット候補を取得
+  const sCandidates = window.fullSlotPool.filter(entry => entry.Slot === "S" && !entry.SubslotID);
   console.log(`🔍 Sスロット候補数: ${sCandidates.length}`);
   console.log(`🔍 Sスロット候補:`, sCandidates);
   
@@ -54,7 +54,7 @@ function randomizeSlotSIndividual() {
   console.log(`🎯 選択されたSスロット:`, chosenS);
   
   // 選択されたSスロットに関連するサブスロットを取得
-  const relatedSubslots = window.loadedJsonData.filter(entry =>
+  const relatedSubslots = window.fullSlotPool.filter(entry =>
     entry.例文ID === chosenS.例文ID &&
     entry.Slot === "S" &&
     entry.SubslotID
@@ -99,9 +99,14 @@ function randomizeSlotSIndividual() {
   }
   
   // 静的エリアとの同期
-  if (typeof syncDynamicToStatic === "function") {
-    syncDynamicToStatic();
-    console.log("🔄 静的エリアとの同期完了");
+  if (typeof syncUpperSlotsFromJson === "function") {
+    syncUpperSlotsFromJson(data);
+    console.log("🔄 上位スロット同期完了");
+  }
+  
+  if (typeof syncSubslotsFromJson === "function") {
+    syncSubslotsFromJson(data);
+    console.log("🔄 サブスロット同期完了");
   }
   
   console.log("✅ Sスロット個別ランダマイズ完了");
