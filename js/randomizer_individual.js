@@ -567,6 +567,108 @@ function randomizeSlotO1Individual() {
 // グローバル関数として公開
 window.randomizeSlotO1Individual = randomizeSlotO1Individual;
 
+/**
+ * O2スロット個別ランダマイズ関数
+ */
+function randomizeSlotO2Individual() {
+  console.log("🎲🎯 O2スロット個別ランダマイズ開始");
+  
+  // fullSlotPoolの存在確認
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
+    alert("エラー: 先に全体ランダマイズを実行してください。");
+    return;
+  }
+  
+  // lastSelectedSlotsの存在確認
+  if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
+    console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
+    alert("エラー: 現在の選択データが見つかりません。");
+    return;
+  }
+  
+  // fullSlotPoolからO2スロット候補を取得
+  const o2Candidates = window.fullSlotPool.filter(entry => entry.Slot === "O2" && !entry.SubslotID);
+  console.log(`🔍 O2スロット候補数: ${o2Candidates.length}`);
+  console.log(`🔍 O2スロット候補:`, o2Candidates);
+  
+  if (o2Candidates.length <= 1) {
+    console.warn("⚠️ O2スロット候補が1つ以下のため、ランダマイズできません");
+    alert("エラー: 同じグループ内にO2スロットの候補が複数ありません。");
+    return;
+  }
+  
+  // 現在のO2スロットを取得
+  const currentO2 = window.lastSelectedSlots.find(slot => slot.Slot === "O2" && !slot.SubslotID);
+  console.log(`🔍 現在のO2スロット:`, currentO2);
+  
+  // 現在と異なるO2スロット候補を取得
+  let availableCandidates = o2Candidates;
+  if (currentO2 && currentO2.例文ID) {
+    availableCandidates = o2Candidates.filter(candidate => candidate.例文ID !== currentO2.例文ID);
+  }
+  
+  if (availableCandidates.length === 0) {
+    console.warn("⚠️ 現在と異なるO2スロット候補が見つかりません");
+    alert("エラー: 現在と異なるO2スロット候補が見つかりません。");
+    return;
+  }
+  
+  // ランダムに新しいO2スロットを選択
+  const randomIndex = Math.floor(Math.random() * availableCandidates.length);
+  const newO2 = availableCandidates[randomIndex];
+  console.log(`🎲 新しいO2スロット選択:`, newO2);
+  
+  // O2サブスロットを取得
+  const newO2Subslots = window.fullSlotPool.filter(entry => 
+    entry.Slot === "O2" && 
+    entry.SubslotID && 
+    entry.例文ID === newO2.例文ID
+  );
+  console.log(`🔍 新しいO2サブスロット (${newO2Subslots.length}個):`, newO2Subslots);
+  
+  // lastSelectedSlotsを更新（O2とそのサブスロットのみ）
+  // 既存のO2関連データを削除
+  window.lastSelectedSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "O2");
+  
+  // 新しいO2メインスロットを追加
+  window.lastSelectedSlots.push(newO2);
+  
+  // 新しいO2サブスロットを追加
+  newO2Subslots.forEach(subslot => {
+    window.lastSelectedSlots.push(subslot);
+  });
+  
+  console.log(`✅ O2スロット個別ランダマイズ完了: ${newO2.例文ID} → ${newO2.Text}`);
+  console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // 構造を再構築し、静的エリアも同期
+  if (typeof buildStructure === 'function') {
+    buildStructure();
+    console.log("🏗️ buildStructure()実行完了");
+  } else {
+    console.warn("⚠️ buildStructure関数が見つかりません");
+  }
+  
+  // 静的エリアの同期
+  if (typeof syncUpperSlotsFromJson === 'function') {
+    syncUpperSlotsFromJson();
+    console.log("🔄 syncUpperSlotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncUpperSlotsFromJson関数が見つかりません");
+  }
+  
+  if (typeof syncSubslotsFromJson === 'function') {
+    syncSubslotsFromJson();
+    console.log("🔄 syncSubslotsFromJson()実行完了");
+  } else {
+    console.warn("⚠️ syncSubslotsFromJson関数が見つかりません");
+  }
+}
+
+// グローバル関数として公開
+window.randomizeSlotO2Individual = randomizeSlotO2Individual;
+
 // === 母集団確認用デバッグ関数群 ===
 
 // 1. window.loadedJsonData内のSスロット母集団確認
@@ -665,6 +767,96 @@ window.checkFullSlotPool = function() {
   if (!window.fullSlotPool) {
     console.warn("⚠️ window.fullSlotPoolが存在しません");
     return null;
+  }
+  
+  console.log("📊 fullSlotPool総数:", window.fullSlotPool.length);
+  
+  // Sスロット関連データの抽出
+  const sMainSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  const sSubSlots = window.fullSlotPool.filter(entry => entry.Slot === "S" && entry.SubslotID);
+  
+  console.log("📊 Sメインスロット数:", sMainSlots.length);
+  console.log("📊 Sサブスロット数:", sSubSlots.length);
+  
+  if (sMainSlots.length > 0) {
+    console.log("🔍 Sメインスロット一覧:", sMainSlots);
+    
+    // V_group_key別の分布
+    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
+    console.log("📊 利用可能なV_group_key:", vGroupKeys);
+    
+    // 例文ID別の分布
+    const exampleIds = [...new Set(sMainSlots.map(s => s.例文ID))];
+    console.log("📊 利用可能な例文ID:", exampleIds);
+    
+    exampleIds.forEach(id => {
+      const slotsForId = sMainSlots.filter(s => s.例文ID === id);
+      const subsForId = sSubSlots.filter(s => s.例文ID === id);
+      console.log(`📊 例文ID "${id}": メイン${slotsForId.length}個 + サブ${subsForId.length}個`);
+    });
+  }
+  
+  if (sSubSlots.length > 0) {
+    console.log("🔍 Sサブスロット詳細（最初の3個）:", sSubSlots.slice(0, 3));
+  // グローバル関数として公開
+window.randomizeSlotO2Individual = randomizeSlotO2Individual;
+
+// === 母集団確認用デバッグ関数群 ===
+
+// 1. window.loadedJsonData内のSスロット母集団確認
+window.checkSSlotInLoadedJson = function() {
+  console.log("🔍=== window.loadedJsonData内のSスロット確認 ===");
+  
+  if (!window.loadedJsonData) {
+    console.warn("⚠️ window.loadedJsonDataが存在しません");
+    return;
+  }
+  
+  console.log("📊 loadedJsonData総数:", window.loadedJsonData.length);
+  
+  // Sスロット関連データの抽出
+  const sMainSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && !entry.SubslotID);
+  const sSubSlots = window.loadedJsonData.filter(entry => entry.Slot === "S" && entry.SubslotID);
+  
+  console.log("📊 Sメインスロット数:", sMainSlots.length);
+  console.log("📊 Sサブスロット数:", sSubSlots.length);
+  
+  if (sMainSlots.length > 0) {
+    console.log("🔍 Sメインスロット一覧:", sMainSlots);
+    
+    // V_group_key別の分布
+    const vGroupKeys = [...new Set(sMainSlots.map(s => s.V_group_key))];
+    console.log("📊 利用可能なV_group_key:", vGroupKeys);
+    
+    // 例文ID別の分布
+    const exampleIds = [...new Set(sMainSlots.map(s => s.例文ID))];
+    console.log("📊 利用可能な例文ID:", exampleIds);
+    
+    exampleIds.forEach(id => {
+      const slotsForId = sMainSlots.filter(s => s.例文ID === id);
+      const subsForId = sSubSlots.filter(s => s.例文ID === id);
+      console.log(`📊 例文ID "${id}": メイン${slotsForId.length}個 + サブ${subsForId.length}個`);
+    });
+  }
+  
+  if (sSubSlots.length > 0) {
+    console.log("🔍 Sサブスロット詳細（最初の3個）:", sSubSlots.slice(0, 3));
+  }
+  
+  return { 
+    mainSlots: sMainSlots, 
+    subSlots: sSubSlots,
+    total: window.loadedJsonData.length
+  };
+};
+
+// 2. window.fullSlotPool内のSスロット母集団確認
+window.checkFullSlotPool = function() {
+  console.log("🔍=== window.fullSlotPool内のSスロット確認 ===");
+  
+  if (!window.fullSlotPool) {
+    console.warn("⚠️ window.fullSlotPoolが存在しません");
+    return;
   }
   
   console.log("📊 fullSlotPool総数:", window.fullSlotPool.length);

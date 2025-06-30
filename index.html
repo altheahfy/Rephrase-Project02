@@ -170,6 +170,11 @@
        ▼ 詳細
       </button>
      </div>
+     <div class="individual-randomize-button" style="margin-top: 4px;">
+      <button data-individual-randomize="o2">
+       🎲
+      </button>
+     </div>
     </div>
     <div class="slot-container" id="slot-c2">
      <label>
@@ -1298,6 +1303,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ O1スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
   } else {
     console.error("❌ O1スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// O2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const o2IndividualBtn = document.querySelector('[data-individual-randomize="o2"]');
+  if (o2IndividualBtn) {
+    o2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 O2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotO2Individual === "function") {
+        window.randomizeSlotO2Individual();
+      } else {
+        console.error("❌ randomizeSlotO2Individual関数が見つかりません");
+        alert("エラー: O2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ O2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ O2スロット個別ランダマイズボタンが見つかりません");
   }
 });
 
