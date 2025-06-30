@@ -134,6 +134,8 @@ function buildStructure(selectedSlots) {
 
     if (item.PhraseType === 'word') {
       const slotDiv = renderSlot(item);
+      // メインスロットにIDを設定（syncDynamicToStatic対応）
+      slotDiv.id = `dynamic-slot-${item.Slot.toLowerCase()}`;
       dynamicArea.appendChild(slotDiv);
     } else {
       console.log(`Skipped upper slot: ${item.Slot} (PhraseType: ${item.PhraseType})`);
