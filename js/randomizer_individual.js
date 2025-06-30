@@ -58,46 +58,7 @@ function randomizeSlotSIndividual() {
   
   console.log(`🎯 関連サブスロット: ${relatedSubslots.length}個`, relatedSubslots);
   
-  // 🔍 デバッグ: 選択されたSスロットの詳細情報
-  console.log("🔍 選択されたSスロットの詳細:");
-  console.log("  - 例文ID:", chosenSSlot.例文ID);
-  console.log("  - Slot:", chosenSSlot.Slot);
-  console.log("  - PhraseType:", chosenSSlot.PhraseType);
-  console.log("  - SlotPhrase:", chosenSSlot.SlotPhrase);
-  
-  // 🔍 デバッグ: 同じ例文IDを持つ全エントリをチェック
-  const sameExampleEntries = groupSlots.filter(e => e.例文ID === chosenSSlot.例文ID);
-  console.log(`🔍 同じ例文ID(${chosenSSlot.例文ID})を持つ全エントリ: ${sameExampleEntries.length}個`);
-  sameExampleEntries.forEach((entry, index) => {
-    console.log(`  [${index}] Slot: ${entry.Slot}, SubslotID: ${entry.SubslotID}, PhraseType: ${entry.PhraseType}`);
-  });
-  
-  // 🔍 特別処理: PhraseType が clause の場合の対応
-  if (chosenSSlot.PhraseType === 'clause' && relatedSubslots.length === 0) {
-    console.log("⚠️ Sスロットが clause で関連サブスロットが見つからない場合の特別処理");
-    
-    // 他のSスロット候補でword型を探す
-    const wordSSlotCandidates = sSlotCandidates.filter(entry => entry.PhraseType === 'word');
-    if (wordSSlotCandidates.length > 0) {
-      const wordChosenSSlot = wordSSlotCandidates[Math.floor(Math.random() * wordSSlotCandidates.length)];
-      console.log("🔄 word型のSスロットに変更:", wordChosenSSlot);
-      
-      // 変数を更新
-      chosenSSlot = wordChosenSSlot;
-      
-      // 関連サブスロットを再取得
-      const newRelatedSubslots = groupSlots.filter(e =>
-        e.例文ID === chosenSSlot.例文ID &&
-        e.Slot === chosenSSlot.Slot &&
-        e.SubslotID
-      );
-      console.log(`🔄 新しい関連サブスロット: ${newRelatedSubslots.length}個`, newRelatedSubslots);
-      relatedSubslots.length = 0; // 配列をクリア
-      relatedSubslots.push(...newRelatedSubslots); // 新しいサブスロットを追加
-    }
-  }
-  
-  // 新しいSスロットデータセットを作成
+  // 新しいSスロットデータセットを作成（PhraseTypeはそのまま保持）
   const newSSlots = [chosenSSlot, ...relatedSubslots].map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
