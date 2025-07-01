@@ -22,7 +22,10 @@ function toggleExclusiveSubslot(slotId) {
       
       // サブスロット用コントロールパネルを削除
       if (window.removeSubslotControlPanel) {
+        console.log(`🗑️ ${id} のサブスロット用コントロールパネルを削除します`);
         window.removeSubslotControlPanel(id);
+      } else {
+        console.warn("⚠ removeSubslotControlPanel 関数が見つかりません");
       }
     }
   });
@@ -54,6 +57,7 @@ function toggleExclusiveSubslot(slotId) {
       window.addSubslotControlPanel(slotId);
     } else {
       console.warn("⚠ addSubslotControlPanel 関数が見つかりません");
+      console.log("🔍 window.addSubslotControlPanel =", window.addSubslotControlPanel);
     }
 
   } else {
