@@ -440,6 +440,13 @@ function displayTopQuestionWord() {
     const textElement = topDiv.querySelector('.question-word-text');
     const auxtextElement = topDiv.querySelector('.question-word-auxtext');
     
+    console.log("🔍 DOM要素チェック:", {
+      topDiv: topDiv,
+      textElement: textElement,
+      auxtextElement: auxtextElement,
+      topDivHTML: topDiv.innerHTML
+    });
+    
     if (textElement && auxtextElement) {
       // 新しい構造で表示
       textElement.textContent = questionWord;
