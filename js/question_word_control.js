@@ -251,35 +251,6 @@ function handleQuestionWordAuxtextChange(event) {
   toggleQuestionWordVisibility('auxtext', isVisible);
 }
 
-// 🔧 分離疑問詞エリアを強制的に修正
-function forceFixQuestionWordArea() {
-  console.log("🔧 分離疑問詞エリアを強制修正中...");
-  
-  const questionWordArea = document.getElementById('display-top-question-word');
-  if (!questionWordArea) {
-    console.error("❌ 分離疑問詞エリアが見つかりません");
-    return false;
-  }
-  
-  // 既存の内容をクリアして新しい構造を作成
-  questionWordArea.innerHTML = `
-    <!-- メインテキスト表示エリア -->
-    <div id="question-word-text" class="question-word-element" style="margin-bottom: 0.5rem;"></div>
-    <!-- 補助テキスト表示エリア -->
-    <div id="question-word-auxtext" class="question-word-element" style="font-size: 1rem; color: #666; font-weight: normal;"></div>
-  `;
-  
-  console.log("✅ 分離疑問詞エリアの構造を修正しました");
-  
-  // データを再設定して表示
-  if (questionWordData.text) {
-    updateQuestionWordDisplay();
-    console.log("✅ 表示を更新しました");
-  }
-  
-  return true;
-}
-
 // 🔹 グローバル関数としてエクスポート
 window.setQuestionWordData = setQuestionWordData;
 window.updateQuestionWordDisplay = updateQuestionWordDisplay;
@@ -290,6 +261,5 @@ window.resetQuestionWordArea = resetQuestionWordArea;
 window.testQuestionWordFeatures = testQuestionWordFeatures;
 window.debugQuestionWordArea = debugQuestionWordArea;
 window.setupQuestionWordControlListeners = setupQuestionWordControlListeners;
-window.forceFixQuestionWordArea = forceFixQuestionWordArea;
 
 console.log("✅ question_word_control.js が読み込まれました");
