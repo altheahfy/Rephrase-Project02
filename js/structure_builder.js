@@ -175,14 +175,6 @@ function buildStructure(selectedSlots) {
     });
   });
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
-  
-  // 動的エリア配置チェック（buildStructure実行後）
-  setTimeout(() => {
-    if (typeof window.recheckDynamicAreaPlacement === 'function') {
-      console.log("📍 buildStructure後の動的エリア配置チェック");
-      window.recheckDynamicAreaPlacement();
-    }
-  }, 50);
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };

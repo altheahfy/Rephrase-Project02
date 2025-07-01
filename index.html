@@ -1192,55 +1192,28 @@
 </section>
 
 <script>
-  // 動的エリアの適切な配置を確実に実行する関数
-  function ensureDynamicAreaPlacement() {
+  // 動的エリアの生成位置を指定
+  window.addEventListener("DOMContentLoaded", () => {
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
-    const container = document.getElementById("dynamic-area-container");
     
-    if (dynamicArea && wrapper && container) {
-      // 動的エリアがラッパー内にない場合のみ移動
-      if (!wrapper.contains(dynamicArea)) {
-        wrapper.appendChild(dynamicArea);
-        console.log("✅ 動的記載エリアをラッパーに移動しました");
-      }
+    // 既存のdynamic-slot-areaがあれば移動
+    if (dynamicArea && wrapper) {
+      // 動的エリアをラッパーに移動
+      wrapper.appendChild(dynamicArea);
       
-      // コンテナが文書の最後にない場合のみ移動
-      if (document.body.lastElementChild !== container) {
+      // さらに、動的エリアのコンテナを文書の末尾に移動
+      const container = document.getElementById("dynamic-area-container");
+      if (container) {
         document.body.appendChild(container);
         console.log("✅ 動的記載エリアコンテナを文書の最後に移動しました");
       }
       
-      return true;
+      console.log("✅ 動的記載エリアを適切な位置に移動しました");
     } else {
-      console.warn("⚠ 動的記載エリア要素の一部が見つかりません", {
-        dynamicArea: !!dynamicArea,
-        wrapper: !!wrapper,
-        container: !!container
-      });
-      return false;
+      console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
     }
-  }
-
-  // 複数のタイミングで動的エリアの配置を試行
-  window.addEventListener("DOMContentLoaded", () => {
-    console.log("📍 DOMContentLoaded時の動的エリア配置チェック");
-    ensureDynamicAreaPlacement();
   });
-
-  // 少し遅延して再試行（buildStructure実行後）
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      console.log("📍 load+遅延後の動的エリア配置チェック");
-      ensureDynamicAreaPlacement();
-    }, 100);
-  });
-
-  // buildStructure実行後にも配置チェックを行う関数を追加
-  window.recheckDynamicAreaPlacement = function() {
-    console.log("📍 手動での動的エリア配置チェック");
-    return ensureDynamicAreaPlacement();
-  };
 
   // 解答全文の表示・非表示切り替え機能
   document.getElementById("toggle-dynamic-area").addEventListener("click", () => {
@@ -1308,13 +1281,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       buildStructure(data);
       syncDynamicToStatic();
       
-      // 動的エリアの配置チェック（JSONロード後）
-      setTimeout(() => {
-        if (typeof window.recheckDynamicAreaPlacement === 'function') {
-          window.recheckDynamicAreaPlacement();
-        }
-      }, 150);
-      
       // サブスロットの初期化も実行
       if (typeof initializeSubslots === 'function') {
         console.log("🔒 JSONロード後にサブスロットを初期化");
@@ -1360,13 +1326,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();
-  
-  // 動的エリアの配置チェック（全体ランダマイズ後）
-  setTimeout(() => {
-    if (typeof window.recheckDynamicAreaPlacement === 'function') {
-      window.recheckDynamicAreaPlacement();
-    }
-  }, 150);
   
   // サブスロットの初期化も実行
   if (typeof initializeSubslots === 'function') {
