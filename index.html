@@ -18,15 +18,11 @@
   </script>
   <script src="js/image_auto_hide.js">
   </script>
-  <script src="js/question_word_controller.js">
-  </script>
  </head>
  <body>
 
 <!-- 🔹 分離疑問詞用表示領域 -->
 <div id="display-top-question-word" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; color: #2a2a2a;">
-  <div class="question-word-text"></div>
-  <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;"></div>
 </div>
 
 <!-- 右上のファイル選択・ロードエリア -->
@@ -120,18 +116,6 @@
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="image" checked> 🖼️</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
-          </div>
-        </div>
-        
-        <!-- 分離疑問詞 スロット -->
-        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px; background-color: #faf8ff;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
-          </div>
-        </div>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
           </div>
         </div>
@@ -1532,24 +1516,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (window.initializeQuestionWordArea) {
     window.initializeQuestionWordArea();
   }
-  
-  // 🆕 制御パネルのチェックボックスイベントリスナーを設定
-  const visibilityCheckboxes = document.querySelectorAll('.visibility-checkbox');
-  visibilityCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const slot = this.getAttribute('data-slot');
-      const type = this.getAttribute('data-type');
-      const isChecked = this.checked;
-      
-      console.log(`🎛️ 制御パネル変更: ${slot} - ${type} - ${isChecked}`);
-      
-      // visibility_control.jsの関数を呼び出し
-      if (typeof toggleSlotElementVisibility === 'function') {
-        toggleSlotElementVisibility(slot, type, isChecked);
-      }
-    });
-  });
-  console.log(`✅ 制御パネルのチェックボックス ${visibilityCheckboxes.length}個にイベントリスナーを設定しました`);
   
   // 制御パネル表示/非表示ボタンの機能を追加
   const toggleControlPanelsBtn = document.getElementById('toggle-control-panels');
