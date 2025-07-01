@@ -39,16 +39,6 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
     return;
   }
 
-  // 🔧 状態オブジェクトが存在しない場合は初期化
-  if (!visibilityState[slotKey]) {
-    visibilityState[slotKey] = {};
-    const elementTypes = slotKey === 'question-word' ? QUESTION_WORD_ELEMENT_TYPES : ELEMENT_TYPES;
-    elementTypes.forEach(type => {
-      visibilityState[slotKey][type] = true;
-    });
-    console.log(`🔧 ${slotKey}スロットの状態を初期化しました`);
-  }
-
   // 状態を更新
   visibilityState[slotKey][elementType] = isVisible;
   
