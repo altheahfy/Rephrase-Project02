@@ -440,27 +440,14 @@ function displayTopQuestionWord() {
     let textElement = topDiv.querySelector('.question-word-text');
     let auxtextElement = topDiv.querySelector('.question-word-auxtext');
     
-    if (!textElement || !auxtextElement) {
-      // HTML構造が壊れている場合は再作成
-      topDiv.innerHTML = `
-        <div class="question-word-text"></div>
-        <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;"></div>
-      `;
-      textElement = topDiv.querySelector('.question-word-text');
-      auxtextElement = topDiv.querySelector('.question-word-auxtext');
-      console.log("🔧 分離疑問詞エリアのHTML構造を再作成しました");
-    }
+    // 🔧 常にHTML構造を強制的に再作成（確実に動作させるため）
+    const translation = translations[questionWord] || '';
+    topDiv.innerHTML = `
+      <div class="question-word-text">${questionWord}</div>
+      <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;">${translation}</div>
+    `;
     
-    // 🆕 テキストと補助テキストを設定
-    textElement.textContent = questionWord;
-    const translation = translations[questionWord];
-    if (translation) {
-      auxtextElement.textContent = translation;
-      console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
-    } else {
-      auxtextElement.textContent = '';
-      console.log("✅ 通常テキストとして表示: " + questionWord);
-    }
+    console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
     
     topDiv.classList.remove("empty-content"); // 空クラスを削除
     
