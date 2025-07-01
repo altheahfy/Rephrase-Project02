@@ -436,21 +436,24 @@ h2 {
   display: none !important; /* 手動制御の結果を優先 */
 }
 
-/* 🎯 サブスロットコントロールパネルを下側に配置 + 表示切り替え */
+/* 🎯 サブスロットコントロールパネルを下側に配置 */
 .subslot-visibility-panel {
   /* flexboxで横並びの中でも強制的に新しい行に配置 */
   flex-basis: 100% !important;
   width: 100% !important;
   order: 999 !important; /* 他の要素より後に配置 */
   margin-top: 16px !important;
-  /* 初期状態では非表示 */
-  display: none !important;
-  transition: all 0.3s ease-in-out;
 }
 
 /* 🎛️ 制御パネル表示切り替え機能 */
 /* 上位スロット制御パネルを初期状態では非表示 */
 #visibility-control-panel-inline {
+  display: none !important;
+  transition: all 0.3s ease-in-out;
+}
+
+/* サブスロット制御パネルを初期状態では非表示 */
+.subslot-visibility-panel {
   display: none !important;
   transition: all 0.3s ease-in-out;
 }
