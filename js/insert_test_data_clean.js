@@ -514,27 +514,8 @@ function displayTopQuestionWord() {
     console.log("🧹 DisplayAtTop 表示をクリア（該当データなし）");
   }
   
-  // 遅延表示（DOM操作タイミングの保険）
-  setTimeout(() => {
-    const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
-    if (topDisplayItem && topDisplayItem.DisplayText) {
-      const topDiv = document.getElementById("display-top-question-word");
-      if (topDiv) {
-        topDiv.textContent = topDisplayItem.DisplayText;
-        topDiv.classList.remove("empty-content"); // 空クラスを削除
-        console.log("✅ DisplayAtTop 表示（遅延）:", topDisplayItem.DisplayText);
-      }
-    } else {
-      // 遅延処理でもクリア
-      const topDiv = document.getElementById("display-top-question-word");
-      if (topDiv) {
-        topDiv.textContent = "";
-        topDiv.innerHTML = ""; // HTMLも完全にクリア
-        topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
-        console.log("🧹 DisplayAtTop 表示をクリア（遅延・該当データなし）");
-      }
-    }
-  }, 0);
+  // 🔧 遅延処理は削除（HTML構造を破壊するため）
+  // 上記の処理で既に正しく設定済み
 }
 
 // ✅ 修正版：window.loadedJsonData を直接参照してスロット書き込み
