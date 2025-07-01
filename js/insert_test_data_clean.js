@@ -12,7 +12,7 @@
 function initializeQuestionWordArea() {
   const topDiv = document.getElementById("display-top-question-word");
   if (topDiv) {
-    // DOM構造はHTMLで既に正しく定義されているため、内容のみクリア
+    // DOM構造を保護しつつ、テキスト内容のみをクリア
     const textElement = document.getElementById('question-word-text');
     const auxtextElement = document.getElementById('question-word-auxtext');
     
@@ -23,8 +23,30 @@ function initializeQuestionWordArea() {
       auxtextElement.textContent = "";
     }
     
-    // empty-contentクラスは追加しない（表示制御に影響する可能性があるため）
-    console.log("🧹 疑問詞エリアのテキスト内容をクリアしました");
+    // DOM構造が存在しない場合のみ、構造を作成
+    if (!textElement || !auxtextElement) {
+      console.log("🔧 分離疑問詞エリアのDOM構造を修復中...");
+      if (!textElement) {
+        const newTextElement = document.createElement('div');
+        newTextElement.id = 'question-word-text';
+        newTextElement.className = 'question-word-element';
+        newTextElement.style.marginBottom = '0.5rem';
+        topDiv.appendChild(newTextElement);
+      }
+      if (!auxtextElement) {
+        const newAuxtextElement = document.createElement('div');
+        newAuxtextElement.id = 'question-word-auxtext';
+        newAuxtextElement.className = 'question-word-element';
+        newAuxtextElement.style.fontSize = '1rem';
+        newAuxtextElement.style.color = '#666';
+        newAuxtextElement.style.fontWeight = 'normal';
+        topDiv.appendChild(newAuxtextElement);
+      }
+      console.log("✅ 分離疑問詞エリアのDOM構造を修復しました");
+    }
+    
+    topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+    console.log("🧹 疑問詞エリアを初期化しました（DOM構造は保護）");
   }
   
   // 動的エリアの疑問詞も削除

@@ -388,15 +388,31 @@ window.quickDebug = quickDebug;
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 分離疑問詞システムを初期化中...");
   
-  // 他のシステムの初期化完了を待つ
+  // 少し遅らせて実行（他のシステムの初期化完了を待つ）
   setTimeout(() => {
-    setupQuestionWordControlListeners();
+    // 強制的に構造を修正
+    forceFixQuestionWordArea();
     
-    // テスト用の疑問詞データを設定
-    setQuestionWordData('What');
+    // 追加の確認と修復
+    setTimeout(() => {
+      const textElement = document.getElementById('question-word-text');
+      const auxtextElement = document.getElementById('question-word-auxtext');
+      
+      if (!textElement || !auxtextElement) {
+        console.log("⚠ 要素がまだ存在しないため、再度修復を実行します");
+        forceFixQuestionWordArea();
+      }
+      
+      initializeQuestionWordArea();
+      setupQuestionWordControlListeners();
+      
+      // テスト用の疑問詞データを設定
+      setQuestionWordData('What');
+      
+      console.log("✅ 分離疑問詞システムの初期化完了");
+    }, 200);
     
-    console.log("✅ 分離疑問詞システムの初期化完了");
-  }, 500);
+  }, 500); // 500msに増加してより確実にする
 });
 
 console.log("✅ question_word_control.js が読み込まれました");
