@@ -1,13 +1,16 @@
 function toggleExclusiveSubslot(slotId) {
-  if (toggleExclusiveSubslot.lock) return;
+  if (toggleExclusiveSubslot.lock) {
+    console.log(`🔒 toggleExclusiveSubslot: ロック中のため処理をスキップ (${slotId})`);
+    return;
+  }
   toggleExclusiveSubslot.lock = true;
-  setTimeout(() => { toggleExclusiveSubslot.lock = false; }, 100);
   console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
 
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
   const target = document.getElementById(`slot-${slotId}-sub`);
   if (!target) {
     console.warn(`⚠ toggleExclusiveSubslot: target slot-${slotId}-sub not found`);
+    toggleExclusiveSubslot.lock = false;
     return;
   }
 
@@ -39,30 +42,41 @@ function toggleExclusiveSubslot(slotId) {
     target.style.minHeight = "100px";
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
 
-    // ★★★ 並べ替え処理を呼び出す ★★★
-    if (window.reorderSubslotsInContainer && window.loadedJsonData) {
-      console.log(`🔄 ${target.id} のサブスロットを並べ替えます`);
-      window.reorderSubslotsInContainer(target, window.loadedJsonData);
-    } else {
-      console.warn("⚠ reorderSubslotsInContainer または window.loadedJsonData が見つかりません");
-    }
-    
-    // ★★★ 空のサブスロット非表示処理を呼び出す ★★★
-    console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
-    hideEmptySubslotsInContainer(target);
+    // 少し遅延を入れて、DOM更新後に処理を実行
+    setTimeout(() => {
+      // ★★★ 並べ替え処理を呼び出す ★★★
+      if (window.reorderSubslotsInContainer && window.loadedJsonData) {
+        console.log(`🔄 ${target.id} のサブスロットを並べ替えます`);
+        window.reorderSubslotsInContainer(target, window.loadedJsonData);
+      } else {
+        console.warn("⚠ reorderSubslotsInContainer または window.loadedJsonData が見つかりません");
+      }
+      
+      // ★★★ 空のサブスロット非表示処理を呼び出す ★★★
+      console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
+      hideEmptySubslotsInContainer(target);
 
-    // ★★★ サブスロット用コントロールパネルを追加 ★★★
-    if (window.addSubslotControlPanel) {
-      console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
-      window.addSubslotControlPanel(slotId);
-    } else {
-      console.warn("⚠ addSubslotControlPanel 関数が見つかりません");
-      console.log("🔍 window.addSubslotControlPanel =", window.addSubslotControlPanel);
-    }
+      // ★★★ サブスロット用コントロールパネルを追加（最後に実行） ★★★
+      setTimeout(() => {
+        if (window.addSubslotControlPanel) {
+          console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
+          window.addSubslotControlPanel(slotId);
+        } else {
+          console.warn("⚠ addSubslotControlPanel 関数が見つかりません");
+          console.log("🔍 window.addSubslotControlPanel =", window.addSubslotControlPanel);
+        }
+      }, 50); // さらに短い遅延でパネル追加
+    }, 50); // 50ms遅延でサブスロット処理を実行
 
   } else {
     console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
   }
+  
+  // 処理完了後にロックを解除（遅延処理の完了後）
+  setTimeout(() => {
+    toggleExclusiveSubslot.lock = false;
+    console.log(`🔓 toggleExclusiveSubslot: ロック解除 (${slotId})`);
+  }, 200); // 十分な遅延を設ける
 }
 
 // ページ読み込み時に全サブスロットを初期化（閉じる）する関数
