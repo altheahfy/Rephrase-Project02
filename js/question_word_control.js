@@ -217,25 +217,35 @@ function debugQuestionWordArea() {
 function setupQuestionWordControlListeners() {
   console.log("🔧 分離疑問詞制御パネルのイベントリスナーを設定中...");
   
-  const textCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="text"]');
-  const auxtextCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="auxtext"]');
+  // 全ての制御パネルで分離疑問詞のチェックボックスを探す
+  const textCheckboxes = document.querySelectorAll('.visibility-checkbox[data-slot="question-word"][data-type="text"]');
+  const auxtextCheckboxes = document.querySelectorAll('.visibility-checkbox[data-slot="question-word"][data-type="auxtext"]');
   
-  if (textCheckbox) {
-    // 既存のイベントリスナーを削除してから新しく追加
-    textCheckbox.removeEventListener('change', handleQuestionWordTextChange);
-    textCheckbox.addEventListener('change', handleQuestionWordTextChange);
-    console.log("✅ テキストチェックボックスのイベントリスナーを設定");
-  } else {
+  console.log(`📋 見つかったチェックボックス: text=${textCheckboxes.length}個, auxtext=${auxtextCheckboxes.length}個`);
+  
+  // テキストチェックボックスの設定
+  textCheckboxes.forEach((checkbox, index) => {
+    console.log(`🔧 テキストチェックボックス ${index + 1} にイベントリスナーを設定`);
+    checkbox.removeEventListener('change', handleQuestionWordTextChange);
+    checkbox.addEventListener('change', handleQuestionWordTextChange);
+  });
+  
+  // 補助テキストチェックボックスの設定
+  auxtextCheckboxes.forEach((checkbox, index) => {
+    console.log(`🔧 補助テキストチェックボックス ${index + 1} にイベントリスナーを設定`);
+    checkbox.removeEventListener('change', handleQuestionWordAuxtextChange);
+    checkbox.addEventListener('change', handleQuestionWordAuxtextChange);
+  });
+  
+  if (textCheckboxes.length === 0) {
     console.warn("⚠ テキストチェックボックスが見つかりません");
   }
   
-  if (auxtextCheckbox) {
-    auxtextCheckbox.removeEventListener('change', handleQuestionWordAuxtextChange);
-    auxtextCheckbox.addEventListener('change', handleQuestionWordAuxtextChange);
-    console.log("✅ 補助テキストチェックボックスのイベントリスナーを設定");
-  } else {
+  if (auxtextCheckboxes.length === 0) {
     console.warn("⚠ 補助テキストチェックボックスが見つかりません");
   }
+  
+  console.log("✅ 分離疑問詞制御パネルのイベントリスナー設定完了");
 }
 
 // 🎛️ イベントハンドラー
@@ -280,6 +290,24 @@ function forceFixQuestionWordArea() {
   return true;
 }
 
+// 🧪 テスト用便利関数
+function quickTest() {
+  console.log("🧪 クイックテスト開始");
+  debugQuestionWordArea();
+  console.log("🔄 'What'を設定します");
+  setQuestionWordData('What');
+}
+
+function quickReset() {
+  console.log("🔄 クイックリセット");
+  resetQuestionWordArea();
+}
+
+function quickDebug() {
+  console.log("🔍 クイックデバッグ");
+  return debugQuestionWordArea();
+}
+
 // 🔹 グローバル関数としてエクスポート
 window.setQuestionWordData = setQuestionWordData;
 window.updateQuestionWordDisplay = updateQuestionWordDisplay;
@@ -291,5 +319,29 @@ window.testQuestionWordFeatures = testQuestionWordFeatures;
 window.debugQuestionWordArea = debugQuestionWordArea;
 window.setupQuestionWordControlListeners = setupQuestionWordControlListeners;
 window.forceFixQuestionWordArea = forceFixQuestionWordArea;
+
+// テスト用便利関数もエクスポート
+window.quickTest = quickTest;
+window.quickReset = quickReset;
+window.quickDebug = quickDebug;
+window.quickTest = quickTest;
+window.quickReset = quickReset;
+window.quickDebug = quickDebug;
+
+// 🔄 ページ読み込み時の自動初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("🔄 分離疑問詞システムを初期化中...");
+  
+  // 少し遅らせて実行（他のシステムの初期化完了を待つ）
+  setTimeout(() => {
+    initializeQuestionWordArea();
+    setupQuestionWordControlListeners();
+    
+    // テスト用の疑問詞データを設定
+    setQuestionWordData('What');
+    
+    console.log("✅ 分離疑問詞システムの初期化完了");
+  }, 200);
+});
 
 console.log("✅ question_word_control.js が読み込まれました");
