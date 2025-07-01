@@ -416,9 +416,48 @@ function displayTopQuestionWord() {
 
   const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
   if (topDisplayItem && topDisplayItem.DisplayText) {
-    topDiv.textContent = topDisplayItem.DisplayText;
+    const questionWord = topDisplayItem.DisplayText.trim();
+    
+    // 🆕 分離疑問詞の日本語訳
+    const translations = {
+      'What': '何？',
+      'Who': '誰？',
+      'When': 'いつ？',
+      'Where': 'どこ？',
+      'Why': 'なぜ？',
+      'How': 'どのように？',
+      'Which': 'どちら？',
+      'Whose': '誰の？',
+      'Whom': '誰を？',
+      'How many': 'いくつ？',
+      'How much': 'いくら？',
+      'How long': 'どのくらい？',
+      'How often': 'どのくらいの頻度で？',
+      'How far': 'どのくらい遠く？'
+    };
+    
+    // 🆕 疑問詞の場合は専用の構造で表示
+    const textElement = topDiv.querySelector('.question-word-text');
+    const auxtextElement = topDiv.querySelector('.question-word-auxtext');
+    
+    if (textElement && auxtextElement) {
+      // 新しい構造で表示
+      textElement.textContent = questionWord;
+      const translation = translations[questionWord];
+      if (translation) {
+        auxtextElement.textContent = translation;
+        console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
+      } else {
+        auxtextElement.textContent = '';
+        console.log("✅ 通常テキストとして表示: " + questionWord);
+      }
+    } else {
+      // 従来の方法で表示（後方互換性）
+      topDiv.textContent = questionWord;
+      console.log("✅ DisplayAtTop 表示: " + questionWord);
+    }
+    
     topDiv.classList.remove("empty-content"); // 空クラスを削除
-    console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
     
     // 🔹 疑問詞を文頭（slot-wrapper内の最初）に移動
     const slotWrapper = document.querySelector('.slot-wrapper');
@@ -452,8 +491,19 @@ function displayTopQuestionWord() {
     }
   } else {
     // DisplayAtTopがない場合は表示をクリア
-    topDiv.textContent = "";
-    topDiv.innerHTML = ""; // HTMLも完全にクリア
+    const textElement = topDiv.querySelector('.question-word-text');
+    const auxtextElement = topDiv.querySelector('.question-word-auxtext');
+    
+    if (textElement && auxtextElement) {
+      // 新しい構造でクリア
+      textElement.textContent = "";
+      auxtextElement.textContent = "";
+    } else {
+      // 従来の方法でクリア
+      topDiv.textContent = "";
+      topDiv.innerHTML = ""; // HTMLも完全にクリア
+    }
+    
     topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
     
     // 動的エリアの疑問詞もクリア
