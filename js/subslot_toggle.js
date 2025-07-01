@@ -19,6 +19,11 @@ function toggleExclusiveSubslot(slotId) {
     if (el) {
       el.style.setProperty("display", "none", "important");
       console.log(`❌ slot-${id}-sub display set to none`);
+      
+      // サブスロット用コントロールパネルを削除
+      if (window.removeSubslotControlPanel) {
+        window.removeSubslotControlPanel(id);
+      }
     }
   });
 
@@ -42,6 +47,14 @@ function toggleExclusiveSubslot(slotId) {
     // ★★★ 空のサブスロット非表示処理を呼び出す ★★★
     console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
     hideEmptySubslotsInContainer(target);
+
+    // ★★★ サブスロット用コントロールパネルを追加 ★★★
+    if (window.addSubslotControlPanel) {
+      console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
+      window.addSubslotControlPanel(slotId);
+    } else {
+      console.warn("⚠ addSubslotControlPanel 関数が見つかりません");
+    }
 
   } else {
     console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
