@@ -436,32 +436,30 @@ function displayTopQuestionWord() {
       'How far': 'どのくらい遠く？'
     };
     
-    // 🆕 疑問詞の場合は専用の構造で表示
-    const textElement = topDiv.querySelector('.question-word-text');
-    const auxtextElement = topDiv.querySelector('.question-word-auxtext');
+    // 🆕 HTML構造を確保（なければ作成）
+    let textElement = topDiv.querySelector('.question-word-text');
+    let auxtextElement = topDiv.querySelector('.question-word-auxtext');
     
-    console.log("🔍 DOM要素チェック:", {
-      topDiv: topDiv,
-      textElement: textElement,
-      auxtextElement: auxtextElement,
-      topDivHTML: topDiv.innerHTML
-    });
+    if (!textElement || !auxtextElement) {
+      // HTML構造が壊れている場合は再作成
+      topDiv.innerHTML = `
+        <div class="question-word-text"></div>
+        <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;"></div>
+      `;
+      textElement = topDiv.querySelector('.question-word-text');
+      auxtextElement = topDiv.querySelector('.question-word-auxtext');
+      console.log("🔧 分離疑問詞エリアのHTML構造を再作成しました");
+    }
     
-    if (textElement && auxtextElement) {
-      // 新しい構造で表示
-      textElement.textContent = questionWord;
-      const translation = translations[questionWord];
-      if (translation) {
-        auxtextElement.textContent = translation;
-        console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
-      } else {
-        auxtextElement.textContent = '';
-        console.log("✅ 通常テキストとして表示: " + questionWord);
-      }
+    // 🆕 テキストと補助テキストを設定
+    textElement.textContent = questionWord;
+    const translation = translations[questionWord];
+    if (translation) {
+      auxtextElement.textContent = translation;
+      console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
     } else {
-      // 従来の方法で表示（後方互換性）
-      topDiv.textContent = questionWord;
-      console.log("✅ DisplayAtTop 表示: " + questionWord);
+      auxtextElement.textContent = '';
+      console.log("✅ 通常テキストとして表示: " + questionWord);
     }
     
     topDiv.classList.remove("empty-content"); // 空クラスを削除
