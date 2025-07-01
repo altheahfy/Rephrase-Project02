@@ -1,9 +1,12 @@
-// 3要素表示制御システム - 全10スロット対応
-// S, Aux, V, M1, M2, C1, O1, O2, C2, M3スロットの画像・補助テキスト・例文テキストの個別表示制御
+// 3要素表示制御システム - 全10スロット+分離疑問詞対応
+// S, Aux, V, M1, M2, C1, O1, O2, C2, M3スロット + 分離疑問詞の画像・補助テキスト・例文テキストの個別表示制御
 
 // 🎯 スロット定義
-const ALL_SLOTS = ['s', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
+const ALL_SLOTS = ['question-word', 's', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
 const ELEMENT_TYPES = ['image', 'auxtext', 'text'];
+
+// 🎯 分離疑問詞専用の要素タイプ（画像なし）
+const QUESTION_WORD_ELEMENT_TYPES = ['text', 'auxtext'];
 
 // 🔧 表示状態を管理するオブジェクト
 let visibilityState = {};
@@ -12,7 +15,10 @@ let visibilityState = {};
 function initializeVisibilityState() {
   ALL_SLOTS.forEach(slot => {
     visibilityState[slot] = {};
-    ELEMENT_TYPES.forEach(type => {
+    
+    // 分離疑問詞の場合は専用の要素タイプを使用
+    const elementTypes = slot === 'question-word' ? QUESTION_WORD_ELEMENT_TYPES : ELEMENT_TYPES;
+    elementTypes.forEach(type => {
       visibilityState[slot][type] = true; // 初期状態は全て表示
     });
   });
@@ -26,14 +32,36 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
     return;
   }
   
-  if (!ELEMENT_TYPES.includes(elementType)) {
-    console.error(`❌ 無効な要素タイプ: ${elementType}`);
+  // 🎯 分離疑問詞の場合は専用の要素タイプチェック
+  const validElementTypes = slotKey === 'question-word' ? QUESTION_WORD_ELEMENT_TYPES : ELEMENT_TYPES;
+  if (!validElementTypes.includes(elementType)) {
+    console.error(`❌ 無効な要素タイプ: ${elementType} (${slotKey}スロット用)`);
     return;
   }
 
   // 状態を更新
   visibilityState[slotKey][elementType] = isVisible;
   
+  // 🎯 分離疑問詞の場合は専用処理
+  if (slotKey === 'question-word') {
+    const element = document.getElementById(`question-word-${elementType}`);
+    if (element) {
+      element.style.display = isVisible ? 'block' : 'none';
+      console.log(`✅ 分離疑問詞の${elementType}を${isVisible ? '表示' : '非表示'}に設定`);
+    } else {
+      console.warn(`⚠ 分離疑問詞要素が見つかりません: question-word-${elementType}`);
+    }
+    
+    // 分離疑問詞の表示を更新
+    if (window.updateQuestionWordDisplay) {
+      window.updateQuestionWordDisplay();
+    }
+    
+    saveVisibilityState();
+    return;
+  }
+  
+  // 🎯 通常のスロットの場合は既存処理
   // DOM要素を取得
   const slotElement = document.getElementById(`slot-${slotKey}`);
   const className = `hidden-${slotKey}-${elementType}`;

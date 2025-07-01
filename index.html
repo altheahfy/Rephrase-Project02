@@ -12,6 +12,8 @@
   </script>
   <script src="js/control_panel_manager.js">
   </script>
+  <script src="js/question_word_control.js">
+  </script>
   <script src="js/visibility_control.js">
   </script>
   <script src="js/subslot_visibility_control.js">
@@ -23,6 +25,10 @@
 
 <!-- 🔹 分離疑問詞用表示領域 -->
 <div id="display-top-question-word" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; color: #2a2a2a;">
+  <!-- メインテキスト表示エリア -->
+  <div id="question-word-text" class="question-word-element" style="margin-bottom: 0.5rem;"></div>
+  <!-- 補助テキスト表示エリア -->
+  <div id="question-word-auxtext" class="question-word-element" style="font-size: 1rem; color: #666; font-weight: normal;"></div>
 </div>
 
 <!-- 右上のファイル選択・ロードエリア -->
@@ -49,6 +55,15 @@
   <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
   <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
       <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+        
+        <!-- 分離疑問詞 スロット -->
+        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #e0c0ff; border-radius: 3px; background: rgba(224, 192, 255, 0.1);">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #663399; text-align: center;">疑問詞</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
+          </div>
+        </div>
         
         <!-- M1 スロット -->
         <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
@@ -147,6 +162,15 @@
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="image" checked> 🖼️</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝</label>
+          </div>
+        </div>
+        
+        <!-- 分離疑問詞 -->
+        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #e6f3ff; border-radius: 3px; background: rgba(70, 130, 180, 0.1);">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
           </div>
         </div>
         
