@@ -171,6 +171,86 @@ function testQuestionWordFeatures() {
   console.log("✅ テストシーケンスを開始しました（10秒間）");
 }
 
+// 🔧 デバッグ用: 分離疑問詞エリアの状態を確認
+function debugQuestionWordArea() {
+  console.log("🔍 分離疑問詞エリアの状態を確認:");
+  
+  // DOM要素の存在確認
+  const questionWordArea = document.getElementById('display-top-question-word');
+  const textElement = document.getElementById('question-word-text');
+  const auxtextElement = document.getElementById('question-word-auxtext');
+  
+  console.log("📍 DOM要素の状態:");
+  console.log("  - エリア:", questionWordArea ? "✅存在" : "❌不存在");
+  console.log("  - テキスト要素:", textElement ? "✅存在" : "❌不存在");
+  console.log("  - 補助テキスト要素:", auxtextElement ? "✅存在" : "❌不存在");
+  
+  // 制御パネルのチェックボックス確認
+  const textCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="text"]');
+  const auxtextCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="auxtext"]');
+  
+  console.log("📍 制御パネルのチェックボックス:");
+  console.log("  - テキスト:", textCheckbox ? `✅存在 (${textCheckbox.checked ? 'チェック済み' : 'チェックなし'})` : "❌不存在");
+  console.log("  - 補助テキスト:", auxtextCheckbox ? `✅存在 (${auxtextCheckbox.checked ? 'チェック済み' : 'チェックなし'})` : "❌不存在");
+  
+  // データの状態確認
+  console.log("📍 データ状態:");
+  console.log("  - questionWordData:", questionWordData);
+  
+  // 表示状態確認
+  console.log("📍 表示状態:");
+  console.log("  - text visibility:", getQuestionWordVisibility('text'));
+  console.log("  - auxtext visibility:", getQuestionWordVisibility('auxtext'));
+  
+  return {
+    dom: { questionWordArea, textElement, auxtextElement },
+    checkboxes: { textCheckbox, auxtextCheckbox },
+    data: questionWordData,
+    visibility: {
+      text: getQuestionWordVisibility('text'),
+      auxtext: getQuestionWordVisibility('auxtext')
+    }
+  };
+}
+
+// 🔧 制御パネルのイベントリスナーを手動で設定
+function setupQuestionWordControlListeners() {
+  console.log("🔧 分離疑問詞制御パネルのイベントリスナーを設定中...");
+  
+  const textCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="text"]');
+  const auxtextCheckbox = document.querySelector('.visibility-checkbox[data-slot="question-word"][data-type="auxtext"]');
+  
+  if (textCheckbox) {
+    // 既存のイベントリスナーを削除してから新しく追加
+    textCheckbox.removeEventListener('change', handleQuestionWordTextChange);
+    textCheckbox.addEventListener('change', handleQuestionWordTextChange);
+    console.log("✅ テキストチェックボックスのイベントリスナーを設定");
+  } else {
+    console.warn("⚠ テキストチェックボックスが見つかりません");
+  }
+  
+  if (auxtextCheckbox) {
+    auxtextCheckbox.removeEventListener('change', handleQuestionWordAuxtextChange);
+    auxtextCheckbox.addEventListener('change', handleQuestionWordAuxtextChange);
+    console.log("✅ 補助テキストチェックボックスのイベントリスナーを設定");
+  } else {
+    console.warn("⚠ 補助テキストチェックボックスが見つかりません");
+  }
+}
+
+// 🎛️ イベントハンドラー
+function handleQuestionWordTextChange(event) {
+  const isVisible = event.target.checked;
+  console.log(`🎛️ 疑問詞テキスト表示切り替え: ${isVisible ? '表示' : '非表示'}`);
+  toggleQuestionWordVisibility('text', isVisible);
+}
+
+function handleQuestionWordAuxtextChange(event) {
+  const isVisible = event.target.checked;
+  console.log(`🎛️ 疑問詞補助テキスト表示切り替え: ${isVisible ? '表示' : '非表示'}`);
+  toggleQuestionWordVisibility('auxtext', isVisible);
+}
+
 // 🔹 グローバル関数としてエクスポート
 window.setQuestionWordData = setQuestionWordData;
 window.updateQuestionWordDisplay = updateQuestionWordDisplay;
@@ -179,5 +259,7 @@ window.toggleQuestionWordVisibility = toggleQuestionWordVisibility;
 window.initializeQuestionWordArea = initializeQuestionWordArea;
 window.resetQuestionWordArea = resetQuestionWordArea;
 window.testQuestionWordFeatures = testQuestionWordFeatures;
+window.debugQuestionWordArea = debugQuestionWordArea;
+window.setupQuestionWordControlListeners = setupQuestionWordControlListeners;
 
 console.log("✅ question_word_control.js が読み込まれました");
