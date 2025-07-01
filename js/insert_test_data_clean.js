@@ -485,8 +485,14 @@ function displayTopQuestionWord() {
         console.log("✅ 動的エリア用疑問詞要素を作成しました");
       }
       
-      // テキストを更新
-      dynamicQuestionDiv.textContent = topDisplayItem.DisplayText;
+      // テキストを更新（HTML構造を保持）
+      const dynamicTextElement = dynamicQuestionDiv.querySelector('.question-word-text');
+      if (dynamicTextElement) {
+        dynamicTextElement.textContent = topDisplayItem.DisplayText;
+      } else {
+        // 構造がない場合は単純にテキストを設定
+        dynamicQuestionDiv.textContent = topDisplayItem.DisplayText;
+      }
       
       // 動的エリアの最初に配置
       if (!dynamicArea.contains(dynamicQuestionDiv)) {
