@@ -443,8 +443,8 @@ h2 {
   width: 100% !important;
   order: 999 !important; /* 他の要素より後に配置 */
   margin-top: 16px !important;
-  /* サブスロット展開時は常に表示（上位制御パネルボタンに依存しない） */
-  display: block !important;
+  /* 初期状態では非表示 */
+  display: none !important;
   transition: all 0.3s ease-in-out;
 }
 
@@ -455,11 +455,16 @@ h2 {
   transition: all 0.3s ease-in-out;
 }
 
-/* 🔥 制御パネルボタンは常に表示 */
-#toggle-control-panels {
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1000 !important;
+/* 制御パネル表示モード時のスタイル */
+body.control-panels-visible #visibility-control-panel-inline {
+  display: flex !important;
+}
+
+body.control-panels-visible .subslot-visibility-panel {
+  display: block !important;
+  /* サブスロットパネルは前回の設定を維持 */
+  flex-basis: 100% !important;
+  width: 100% !important;
+  order: 999 !important;
+  margin-top: 16px !important;
 }
