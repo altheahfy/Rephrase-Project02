@@ -61,16 +61,25 @@ function buildStructure(selectedSlots) {
   if (!wrapper) {
     console.error('slot-wrapper not found, skipping structure generation');
     return;
-    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
-}
+  }
 
+  // 動的記載エリアは専用のコンテナに作成（メインのslot-wrapperではなく）
   let dynamicArea = document.getElementById('dynamic-slot-area');
   if (!dynamicArea) {
     dynamicArea = document.createElement('div');
     dynamicArea.id = 'dynamic-slot-area';
-    wrapper.appendChild(dynamicArea);
-    if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
-}
+    
+    // 動的記載エリア専用のラッパーを取得（HTMLで定義済み）
+    const dynamicWrapper = document.getElementById('dynamic-slot-area-wrapper');
+    if (dynamicWrapper) {
+      dynamicWrapper.appendChild(dynamicArea);
+      console.log('✅ 動的記載エリアを専用ラッパーに配置しました');
+    } else {
+      // フォールバック：専用ラッパーがない場合のみメインwrapperに追加
+      wrapper.appendChild(dynamicArea);
+      console.log('⚠ 専用ラッパーが見つからず、メインwrapperに配置しました');
+    }
+  }
 
   dynamicArea.innerHTML = '';
 
