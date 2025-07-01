@@ -10,6 +10,8 @@
   </script>
   <script src="js/randomizer_individual.js">
   </script>
+  <script src="js/control_panel_manager.js">
+  </script>
   <script src="js/visibility_control.js">
   </script>
   <script src="js/subslot_visibility_control.js">
@@ -32,14 +34,20 @@
   <section>
   </section>
   
-  <!-- タイトルと表示制御パネルを横並びに配置 -->
+  <!-- タイトルと制御パネルボタンを横並びに配置 -->
   <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
     <h1 style="margin: 0; margin-right: 30px;">
      Rephrase トレーニングUI
     </h1>
     
-    <!-- 🎯 3要素表示制御パネル（タイトル右横版） -->
-    <div id="visibility-control-panel-inline" style="background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+    <!-- 制御パネル表示ボタン -->
+    <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 20px;">
+      制御パネル
+    </button>
+  </div>
+  
+  <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
+  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
       <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
         
         <!-- M1 スロット -->
@@ -1507,6 +1515,23 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 ページ読み込み時の疑問詞エリア初期化");
   if (window.initializeQuestionWordArea) {
     window.initializeQuestionWordArea();
+  }
+  
+  // 制御パネル表示/非表示ボタンの機能を追加
+  const toggleControlPanelsBtn = document.getElementById('toggle-control-panels');
+  
+  if (toggleControlPanelsBtn) {
+    toggleControlPanelsBtn.addEventListener('click', function() {
+      if (window.toggleAllControlPanels) {
+        window.toggleAllControlPanels();
+      } else {
+        console.error("❌ toggleAllControlPanels関数が見つかりません");
+      }
+    });
+    
+    console.log("✅ 制御パネル表示/非表示機能を初期化しました");
+  } else {
+    console.warn("⚠ 制御パネルボタンが見つかりません");
   }
   
   // ランダマイズボタンクリック時も疑問詞エリアを初期化

@@ -13,7 +13,12 @@ function createSubslotControlPanel(parentSlot) {
   const panelContainer = document.createElement('div');
   panelContainer.id = `subslot-visibility-panel-${parentSlot}`;
   panelContainer.className = 'subslot-visibility-panel';
+  
+  // 制御パネルの表示状態を取得
+  const isControlPanelsVisible = window.getControlPanelsVisibility ? window.getControlPanelsVisibility() : false;
+  
   panelContainer.style.cssText = `
+    display: ${isControlPanelsVisible ? 'block' : 'none'};
     background: rgba(240, 248, 255, 0.95);
     padding: 12px;
     margin-top: 16px;
@@ -104,6 +109,11 @@ function createSubslotControlPanel(parentSlot) {
     resetSubslotVisibility(parentSlot);
   });
   panelContainer.appendChild(resetButton);
+  
+  // 制御パネルの表示状態を同期
+  if (window.syncSubslotControlPanelVisibility) {
+    window.syncSubslotControlPanelVisibility(panelContainer);
+  }
   
   console.log(`✅ ${parentSlot}サブスロット用コントロールパネル生成完了`);
   return panelContainer;
