@@ -12,35 +12,10 @@
 function initializeQuestionWordArea() {
   const topDiv = document.getElementById("display-top-question-word");
   if (topDiv) {
-    // DOM構造を保護しつつ、テキスト内容のみをクリア
-    const textElement = topDiv.querySelector('.question-word-text');
-    const auxtextElement = topDiv.querySelector('.question-word-auxtext');
-    
-    if (textElement) {
-      textElement.textContent = "";
-    }
-    if (auxtextElement) {
-      auxtextElement.textContent = "";
-    }
-    
-    // DOM構造が存在しない場合のみ、構造を作成
-    if (!textElement || !auxtextElement) {
-      console.log("🔧 分離疑問詞エリアのDOM構造を修復中...");
-      if (!textElement) {
-        const newTextElement = document.createElement('div');
-        newTextElement.className = 'question-word-text';
-        topDiv.appendChild(newTextElement);
-      }
-      if (!auxtextElement) {
-        const newAuxtextElement = document.createElement('div');
-        newAuxtextElement.className = 'question-word-auxtext';
-        topDiv.appendChild(newAuxtextElement);
-      }
-      console.log("✅ 分離疑問詞エリアのDOM構造を修復しました");
-    }
-    
+    topDiv.textContent = "";
+    topDiv.innerHTML = ""; // HTMLも完全にクリア
     topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
-    console.log("🧹 疑問詞エリアを初期化しました（DOM構造は保護）");
+    console.log("🧹 疑問詞エリアを初期化しました");
   }
   
   // 動的エリアの疑問詞も削除
