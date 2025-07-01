@@ -300,6 +300,53 @@ function forceFixQuestionWordArea() {
   return true;
 }
 
+// 🔧 緊急時の完全修復関数
+function emergencyFixQuestionWordArea() {
+  console.log("🚨 緊急修復: 分離疑問詞エリアを完全に再構築します");
+  
+  const questionWordArea = document.getElementById('display-top-question-word');
+  if (!questionWordArea) {
+    console.error("❌ 分離疑問詞エリアが見つかりません");
+    return false;
+  }
+  
+  // 既存の内容を完全にクリア
+  questionWordArea.innerHTML = '';
+  
+  // 新しい構造を作成
+  const textElement = document.createElement('div');
+  textElement.id = 'question-word-text';
+  textElement.className = 'question-word-element';
+  textElement.style.marginBottom = '0.5rem';
+  
+  const auxtextElement = document.createElement('div');
+  auxtextElement.id = 'question-word-auxtext';
+  auxtextElement.className = 'question-word-element';
+  auxtextElement.style.fontSize = '1rem';
+  auxtextElement.style.color = '#666';
+  auxtextElement.style.fontWeight = 'normal';
+  
+  questionWordArea.appendChild(textElement);
+  questionWordArea.appendChild(auxtextElement);
+  
+  console.log("✅ 緊急修復完了");
+  
+  // 要素の存在確認
+  const checkText = document.getElementById('question-word-text');
+  const checkAuxtext = document.getElementById('question-word-auxtext');
+  console.log("📍 修復後の確認:");
+  console.log("  - textElement:", checkText ? "✅存在" : "❌不存在");
+  console.log("  - auxtextElement:", checkAuxtext ? "✅存在" : "❌不存在");
+  
+  // データを再設定
+  if (questionWordData.text) {
+    updateQuestionWordDisplay();
+    console.log("✅ 表示を更新しました");
+  }
+  
+  return true;
+}
+
 // 🧪 テスト用便利関数
 function quickTest() {
   console.log("🧪 クイックテスト開始");
@@ -329,6 +376,8 @@ window.testQuestionWordFeatures = testQuestionWordFeatures;
 window.debugQuestionWordArea = debugQuestionWordArea;
 window.setupQuestionWordControlListeners = setupQuestionWordControlListeners;
 window.forceFixQuestionWordArea = forceFixQuestionWordArea;
+window.emergencyFixQuestionWordArea = emergencyFixQuestionWordArea;
+window.emergencyFixQuestionWordArea = emergencyFixQuestionWordArea;
 
 // テスト用便利関数もエクスポート
 window.quickTest = quickTest;
@@ -344,13 +393,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // 強制的に構造を修正
     forceFixQuestionWordArea();
     
-    initializeQuestionWordArea();
-    setupQuestionWordControlListeners();
+    // 追加の確認と修復
+    setTimeout(() => {
+      const textElement = document.getElementById('question-word-text');
+      const auxtextElement = document.getElementById('question-word-auxtext');
+      
+      if (!textElement || !auxtextElement) {
+        console.log("⚠ 要素がまだ存在しないため、再度修復を実行します");
+        forceFixQuestionWordArea();
+      }
+      
+      initializeQuestionWordArea();
+      setupQuestionWordControlListeners();
+      
+      // テスト用の疑問詞データを設定
+      setQuestionWordData('What');
+      
+      console.log("✅ 分離疑問詞システムの初期化完了");
+    }, 200);
     
-    // テスト用の疑問詞データを設定
-    setQuestionWordData('What');
-    
-    console.log("✅ 分離疑問詞システムの初期化完了");
   }, 500); // 500msに増加してより確実にする
 });
 
