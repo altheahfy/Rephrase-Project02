@@ -1,25 +1,31 @@
-// 3要素表示制御システム - 全10スロット対応
+// 3要素表示制御システム - 全10スロット対応 + 分離疑問詞対応
 // S, Aux, V, M1, M2, C1, O1, O2, C2, M3スロットの画像・補助テキスト・例文テキストの個別表示制御
+// 分離疑問詞エリアの表示制御も含む
 
-// 🎯 スロット定義
-const ALL_SLOTS = ['s', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
+// 🎯 スロット定義（分離疑問詞を追加）
+const ALL_SLOTS = ['s', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3', 'question-word'];
 const ELEMENT_TYPES = ['image', 'auxtext', 'text'];
 
 // 🔧 表示状態を管理するオブジェクト
 let visibilityState = {};
 
-// 初期化：全要素を表示状態に設定
+// 初期化：全要素を表示状態に設定（分離疑問詞を含む）
 function initializeVisibilityState() {
   ALL_SLOTS.forEach(slot => {
     visibilityState[slot] = {};
     ELEMENT_TYPES.forEach(type => {
-      visibilityState[slot][type] = true; // 初期状態は全て表示
+      // 分離疑問詞はimageを持たない
+      if (slot === 'question-word' && type === 'image') {
+        visibilityState[slot][type] = false;
+      } else {
+        visibilityState[slot][type] = true; // 初期状態は全て表示
+      }
     });
   });
-  console.log("🔄 表示状態を初期化しました:", visibilityState);
+  console.log("🔄 表示状態を初期化しました（分離疑問詞含む）:", visibilityState);
 }
 
-// 🎛️ 個別スロット・要素の表示制御
+// 🎛️ 個別スロット・要素の表示制御（分離疑問詞対応）
 function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   if (!ALL_SLOTS.includes(slotKey)) {
     console.error(`❌ 無効なスロットキー: ${slotKey}`);
@@ -34,7 +40,17 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   // 状態を更新
   visibilityState[slotKey][elementType] = isVisible;
   
-  // DOM要素を取得
+  // 🆕 分離疑問詞の場合は専用処理
+  if (slotKey === 'question-word') {
+    // question_word_controller.jsの関数を呼び出し
+    if (typeof applyQuestionWordVisibility === 'function') {
+      applyQuestionWordVisibility();
+      console.log(`✅ 分離疑問詞の${elementType}表示を更新しました: ${isVisible}`);
+    }
+    return;
+  }
+  
+  // 通常のスロット処理
   const slotElement = document.getElementById(`slot-${slotKey}`);
   const className = `hidden-${slotKey}-${elementType}`;
   

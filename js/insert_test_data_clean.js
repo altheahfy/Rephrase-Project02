@@ -416,9 +416,21 @@ function displayTopQuestionWord() {
 
   const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
   if (topDisplayItem && topDisplayItem.DisplayText) {
-    topDiv.textContent = topDisplayItem.DisplayText;
-    topDiv.classList.remove("empty-content"); // 空クラスを削除
-    console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+    const questionWord = topDisplayItem.DisplayText.trim();
+    
+    // 🆕 分離疑問詞かどうかを判定
+    if (typeof isQuestionWord === 'function' && isQuestionWord(questionWord)) {
+      // 分離疑問詞の場合：専用の表示関数を使用
+      if (typeof displayQuestionWord === 'function') {
+        displayQuestionWord(questionWord);
+        console.log("✅ 分離疑問詞として表示: " + questionWord);
+      }
+    } else {
+      // 通常のテキスト表示（従来の処理）
+      topDiv.textContent = questionWord;
+      topDiv.classList.remove("empty-content");
+      console.log("✅ DisplayAtTop 表示: " + questionWord);
+    }
     
     // 🔹 疑問詞を文頭（slot-wrapper内の最初）に移動
     const slotWrapper = document.querySelector('.slot-wrapper');
@@ -442,7 +454,7 @@ function displayTopQuestionWord() {
       }
       
       // テキストを更新
-      dynamicQuestionDiv.textContent = topDisplayItem.DisplayText;
+      dynamicQuestionDiv.textContent = questionWord;
       
       // 動的エリアの最初に配置
       if (!dynamicArea.contains(dynamicQuestionDiv)) {
@@ -452,9 +464,13 @@ function displayTopQuestionWord() {
     }
   } else {
     // DisplayAtTopがない場合は表示をクリア
-    topDiv.textContent = "";
-    topDiv.innerHTML = ""; // HTMLも完全にクリア
-    topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+    if (typeof clearQuestionWord === 'function') {
+      clearQuestionWord();
+    } else {
+      topDiv.textContent = "";
+      topDiv.innerHTML = ""; // HTMLも完全にクリア
+      topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+    }
     
     // 動的エリアの疑問詞もクリア
     const dynamicQuestionDiv = document.getElementById("dynamic-question-word");
