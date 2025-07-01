@@ -14,8 +14,32 @@ function createSubslotControlPanel(parentSlot) {
   panelContainer.id = `subslot-visibility-panel-${parentSlot}`;
   panelContainer.className = 'subslot-visibility-panel';
   
-  // 制御パネルの表示状態を取得
-  const isControlPanelsVisible = window.getControlPanelsVisibility ? window.getControlPanelsVisibility() : false;
+  // 制御パネルの表示状態を複数の方法で確認
+  let isControlPanelsVisible = false;
+  
+  // 方法1: グローバル変数から取得
+  if (window.getControlPanelsVisibility) {
+    isControlPanelsVisible = window.getControlPanelsVisibility();
+    console.log(`🔍 方法1(グローバル変数): ${isControlPanelsVisible}`);
+  }
+  
+  // 方法2: ボタンのテキストから判定
+  const toggleBtn = document.getElementById('toggle-control-panels');
+  if (toggleBtn) {
+    const btnTextVisible = toggleBtn.textContent.includes('表示中');
+    console.log(`🔍 方法2(ボタンテキスト): ${btnTextVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || btnTextVisible;
+  }
+  
+  // 方法3: 上位制御パネルの表示状態から判定
+  const upperPanel = document.getElementById('visibility-control-panel-inline');
+  if (upperPanel) {
+    const upperVisible = upperPanel.style.display !== 'none';
+    console.log(`🔍 方法3(上位パネル表示): ${upperVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || upperVisible;
+  }
+  
+  console.log(`🔍 ${parentSlot} サブスロット制御パネル最終判定: ${isControlPanelsVisible}`);
   
   panelContainer.style.cssText = `
     display: ${isControlPanelsVisible ? 'block' : 'none'};
