@@ -311,30 +311,11 @@ function addSubslotControlPanel(parentSlot) {
   if (!subslotContent || !panelArea) {
     console.log(`🏗️ サブスロットコンテナを上下分割構造に変更します`);
     
-    // 動的記載エリアを一時的に保護
-    const dynamicArea = subslotContainer.querySelector('#dynamic-slot-area');
-    const dynamicWrapper = subslotContainer.querySelector('#dynamic-slot-area-wrapper');
-    let dynamicParent = null;
-    
-    if (dynamicArea && dynamicArea.parentNode === subslotContainer) {
-      dynamicParent = dynamicArea.parentNode;
-      dynamicArea.remove();
-      console.log(`🛡️ 動的記載エリアを一時的に保護しました`);
-    }
-    
-    if (dynamicWrapper && dynamicWrapper.parentNode === subslotContainer) {
-      dynamicWrapper.remove();
-      console.log(`🛡️ 動的記載エリアラッパーを一時的に保護しました`);
-    }
-    
-    // 既存のサブスロット要素を全て取得（動的記載エリアやその他重要な要素は除外）
+    // 既存のサブスロット要素を全て取得
     const existingSubslots = Array.from(subslotContainer.children).filter(child => 
       !child.classList.contains('subslot-content-area') && 
       !child.classList.contains('subslot-panel-area') &&
-      !child.classList.contains('subslot-visibility-panel') &&
-      child.id !== 'dynamic-slot-area' &&
-      child.id !== 'dynamic-slot-area-wrapper' &&
-      !child.classList.contains('dynamic-area-container')
+      !child.classList.contains('subslot-visibility-panel')
     );
     
     // コンテンツエリア（上部）を作成
@@ -365,17 +346,6 @@ function addSubslotControlPanel(parentSlot) {
     // 分割構造をコンテナに追加
     subslotContainer.appendChild(subslotContent);
     subslotContainer.appendChild(panelArea);
-    
-    // 動的記載エリアを元の場所に復元
-    if (dynamicArea && dynamicParent) {
-      dynamicParent.appendChild(dynamicArea);
-      console.log(`✅ 動的記載エリアを復元しました`);
-    }
-    
-    if (dynamicWrapper) {
-      subslotContainer.appendChild(dynamicWrapper);
-      console.log(`✅ 動的記載エリアラッパーを復元しました`);
-    }
     
     console.log(`✅ 上下分割構造を作成しました`);
   }
