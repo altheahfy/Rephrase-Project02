@@ -435,3 +435,12 @@ h2 {
   /* 手動制御が設定されている場合は自動制御クラスを無効化 */
   display: none !important; /* 手動制御の結果を優先 */
 }
+
+/* 🎯 サブスロットコントロールパネルを下側に配置 */
+.subslot-visibility-panel {
+  /* flexboxで横並びの中でも強制的に新しい行に配置 */
+  flex-basis: 100% !important;
+  width: 100% !important;
+  order: 999 !important; /* 他の要素より後に配置 */
+  margin-top: 16px !important;
+}
