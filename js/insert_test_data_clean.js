@@ -393,6 +393,17 @@ function syncDynamicToStatic() {
       console.warn(`❌ サブtext要素取得失敗: ${item.Slot}`);
     }
   });
+  
+  // 🖼 画像処理：データ同期完了後に画像の自動非表示処理を実行
+  console.log("🖼 syncDynamicToStatic完了後の画像処理を実行...");
+  if (typeof window.processAllImagesWithCoordination === 'function') {
+    setTimeout(() => {
+      window.processAllImagesWithCoordination();
+      console.log("✅ 画像自動非表示処理が完了しました");
+    }, 100);
+  } else {
+    console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
+  }
 }
 
 // DisplayAtTop に対応する疑問詞をページ上部に表示する処理
@@ -683,6 +694,17 @@ function syncUpperSlotsFromJson(data) {
       console.log(`⚠ ${slotId}が見つかりません`);
     }
   });
+  
+  // 🖼 画像処理：上位スロット同期完了後に画像の自動非表示処理を実行
+  console.log("🖼 syncUpperSlotsFromJson完了後の画像処理を実行...");
+  if (typeof window.processAllImagesWithCoordination === 'function') {
+    setTimeout(() => {
+      window.processAllImagesWithCoordination();
+      console.log("✅ 上位スロット同期後の画像自動非表示処理が完了しました");
+    }, 50);
+  } else {
+    console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
+  }
 }
 
 // ✅ サブスロット同期機能の実装
