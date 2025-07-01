@@ -271,6 +271,8 @@ function forceFixQuestionWordArea() {
     return false;
   }
   
+  console.log("📍 修正前の内容:", questionWordArea.innerHTML);
+  
   // 既存の内容をクリアして新しい構造を作成
   questionWordArea.innerHTML = `
     <!-- メインテキスト表示エリア -->
@@ -279,7 +281,15 @@ function forceFixQuestionWordArea() {
     <div id="question-word-auxtext" class="question-word-element" style="font-size: 1rem; color: #666; font-weight: normal;"></div>
   `;
   
+  console.log("📍 修正後の内容:", questionWordArea.innerHTML);
   console.log("✅ 分離疑問詞エリアの構造を修正しました");
+  
+  // 要素の存在確認
+  const textElement = document.getElementById('question-word-text');
+  const auxtextElement = document.getElementById('question-word-auxtext');
+  console.log("📍 作成された要素:");
+  console.log("  - textElement:", textElement ? "✅存在" : "❌不存在");
+  console.log("  - auxtextElement:", auxtextElement ? "✅存在" : "❌不存在");
   
   // データを再設定して表示
   if (questionWordData.text) {
@@ -324,9 +334,6 @@ window.forceFixQuestionWordArea = forceFixQuestionWordArea;
 window.quickTest = quickTest;
 window.quickReset = quickReset;
 window.quickDebug = quickDebug;
-window.quickTest = quickTest;
-window.quickReset = quickReset;
-window.quickDebug = quickDebug;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -334,6 +341,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 少し遅らせて実行（他のシステムの初期化完了を待つ）
   setTimeout(() => {
+    // 強制的に構造を修正
+    forceFixQuestionWordArea();
+    
     initializeQuestionWordArea();
     setupQuestionWordControlListeners();
     
@@ -341,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setQuestionWordData('What');
     
     console.log("✅ 分離疑問詞システムの初期化完了");
-  }, 200);
+  }, 500); // 500msに増加してより確実にする
 });
 
 console.log("✅ question_word_control.js が読み込まれました");
