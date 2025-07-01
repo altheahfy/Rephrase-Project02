@@ -233,15 +233,48 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     'auxtext': subslotElement.querySelectorAll('.slot-text')
   };
   
+// 🎛️ サブスロット要素の表示・非表示制御
+function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
+  console.log(`🎛️ サブスロット表示制御: ${subslotId} - ${elementType} = ${isVisible}`);
+  
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) {
+    console.warn(`⚠ サブスロット要素が見つかりません: ${subslotId}`);
+    return;
+  }
+  
+  console.log(`🔍 サブスロット要素が見つかりました: ${subslotId}`);
+  console.log(`🔍 現在のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
+  const className = `hidden-subslot-${elementType}`;
+  
+  if (isVisible) {
+    subslotElement.classList.remove(className);
+    console.log(`✅ ${subslotId}の${elementType}を表示しました (removed class: ${className})`);
+  } else {
+    subslotElement.classList.add(className);
+    console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
+  }
+  
+  console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
+  // 実際に要素が非表示になっているかを確認
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
   const elements = targetElements[elementType];
   if (elements && elements.length > 0) {
     elements.forEach((el, index) => {
       const computedStyle = window.getComputedStyle(el);
-      console.log(`🔍 ${elementType}要素${index + 1}: display=${computedStyle.display}`);
+      console.log(`� ${elementType}要素${index + 1}: display=${computedStyle.display}`);
     });
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
+}
 }
 
 // 🔄 サブスロットの全表示リセット
