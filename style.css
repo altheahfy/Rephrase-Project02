@@ -436,39 +436,38 @@ h2 {
   display: none !important; /* 手動制御の結果を優先 */
 }
 
-/* サブスロット表示エリア専用のレイアウト（!importantで上書き） */
+/* サブスロット表示エリア専用のレイアウト */
 .subslot-wrapper {
-  min-height: 100px !important;
-  visibility: visible !important;
+  min-height: 100px;
+  visibility: visible;
   display: block !important; /* ブロックレベル要素として配置 */
-  flex-direction: column !important; /* メインのrow指定を上書き */
-  width: 100% !important;
-  position: relative !important;
+  width: 100%;
+  position: relative;
 }
 
 /* サブスロット展開ラベル */
 .subslot-wrapper .subslot-label {
-  display: block !important;
-  margin-bottom: 12px !important;
-  font-weight: bold !important;
-  text-align: center !important;
+  display: block;
+  margin-bottom: 12px;
+  font-weight: bold;
+  text-align: center;
 }
 
-/* サブスロット群エリア（横並び）のクリアフィックス */
+/* サブスロット群エリア（横並び） */
 .subslot-wrapper::after {
-  content: "" !important;
-  display: table !important;
-  clear: both !important;
+  content: "";
+  display: table;
+  clear: both;
 }
 
 /* サブスロット個々の要素を横並び */
 .subslot-wrapper .subslot {
   display: inline-block !important;
-  vertical-align: top !important;
-  margin-right: 12px !important;
-  margin-bottom: 8px !important;
+  vertical-align: top;
+  margin-right: 12px;
+  margin-bottom: 8px;
   /* フレックスレイアウトと競合しないように */
-  float: none !important;
+  float: none;
 }
 
 /* サブスロット表示制御パネルを確実に最下部に配置 */
@@ -477,33 +476,8 @@ h2 {
   width: 100% !important;
   margin-top: 20px !important;
   clear: both !important; /* フロートのクリア */
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* サブスロット表示エリアの強制上書き（最高優先度） */
-div.subslot-wrapper,
-[id*="-sub"].subslot-wrapper,
-.subslot-wrapper[id*="-sub"] {
-  display: block !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-  width: 100% !important;
-  min-height: 100px !important;
-}
-
-/* サブスロット表示制御パネルの強制下配置 */
-div.subslot-wrapper .subslot-visibility-panel,
-[id*="-sub"] .subslot-visibility-panel {
-  display: block !important;
-  width: 100% !important;
-  margin-top: 20px !important;
-  clear: both !important;
-  position: relative !important;
-  z-index: 10 !important;
-  /* flexboxの影響を完全に除去 */
-  order: unset !important;
-  flex: none !important;
+  position: relative;
+  z-index: 1;
 }
 
 /* 既存のslot-wrapperスタイル（メインスロット用） */
