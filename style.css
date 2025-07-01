@@ -410,6 +410,17 @@ h2 {
 [id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
 [id*="-sub-"].hidden-text > .slot-phrase { display: none !important; }
 
+/* 🎛️ サブスロット専用の表示・非表示制御クラス */
+/* サブスロットの画像・テキスト・補助テキストの個別制御 */
+.subslot.hidden-subslot-image .slot-image { display: none !important; }
+.subslot.hidden-subslot-text .slot-phrase { display: none !important; }
+.subslot.hidden-subslot-auxtext .slot-text { display: none !important; }
+
+/* より具体的なセレクタでの制御（IDベース） */
+[id*="-sub-"].hidden-subslot-image .slot-image { display: none !important; }
+[id*="-sub-"].hidden-subslot-text .slot-phrase { display: none !important; }
+[id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
+
 /* 🤖 画像自動非表示機構 */
 /* プレースホルダー画像・エラー画像・無効画像の自動非表示 */
 .slot-image.auto-hidden-image {

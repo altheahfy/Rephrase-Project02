@@ -40,6 +40,11 @@ function createSubslotControlPanel(parentSlot) {
   const subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
   console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
   
+  // デバッグ: 検出されたサブスロットの詳細を表示
+  subslotElements.forEach((subslot, index) => {
+    console.log(`  - サブスロット${index + 1}: ${subslot.id} (${subslot.className})`);
+  });
+  
   if (subslotElements.length === 0) {
     const noSubslotsMsg = document.createElement('div');
     noSubslotsMsg.style.cssText = `
@@ -156,6 +161,11 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     
     // チェックボックス変更時のイベント
     checkbox.addEventListener('change', function() {
+      console.log(`🎛️ チェックボックス変更イベント:`);
+      console.log(`  - subslotId: ${this.dataset.subslotId}`);
+      console.log(`  - elementType: ${this.dataset.elementType}`);
+      console.log(`  - checked: ${this.checked}`);
+      
       toggleSubslotElementVisibility(
         this.dataset.subslotId,
         this.dataset.elementType,
@@ -195,9 +205,38 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     return;
   }
   
+  console.log(`🔍 サブスロット要素が見つかりました: ${subslotId}`);
+  console.log(`🔍 現在のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
   const className = `hidden-subslot-${elementType}`;
   
   if (isVisible) {
+    subslotElement.classList.remove(className);
+    console.log(`✅ ${subslotId}の${elementType}を表示しました (removed class: ${className})`);
+  } else {
+    subslotElement.classList.add(className);
+    console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
+  }
+  
+  console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
+  // 実際に要素が非表示になっているかを確認
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el, index) => {
+      const computedStyle = window.getComputedStyle(el);
+      console.log(`🔍 ${elementType}要素${index + 1}: display=${computedStyle.display}`);
+    });
+  } else {
+    console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
+  }
+}
     subslotElement.classList.remove(className);
     console.log(`✅ ${subslotId}の${elementType}を表示しました`);
   } else {
