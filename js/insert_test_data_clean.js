@@ -13,8 +13,8 @@ function initializeQuestionWordArea() {
   const topDiv = document.getElementById("display-top-question-word");
   if (topDiv) {
     // DOM構造を保護しつつ、テキスト内容のみをクリア
-    const textElement = document.getElementById('question-word-text');
-    const auxtextElement = document.getElementById('question-word-auxtext');
+    const textElement = topDiv.querySelector('.question-word-text');
+    const auxtextElement = topDiv.querySelector('.question-word-auxtext');
     
     if (textElement) {
       textElement.textContent = "";
@@ -28,18 +28,12 @@ function initializeQuestionWordArea() {
       console.log("🔧 分離疑問詞エリアのDOM構造を修復中...");
       if (!textElement) {
         const newTextElement = document.createElement('div');
-        newTextElement.id = 'question-word-text';
-        newTextElement.className = 'question-word-element';
-        newTextElement.style.marginBottom = '0.5rem';
+        newTextElement.className = 'question-word-text';
         topDiv.appendChild(newTextElement);
       }
       if (!auxtextElement) {
         const newAuxtextElement = document.createElement('div');
-        newAuxtextElement.id = 'question-word-auxtext';
-        newAuxtextElement.className = 'question-word-element';
-        newAuxtextElement.style.fontSize = '1rem';
-        newAuxtextElement.style.color = '#666';
-        newAuxtextElement.style.fontWeight = 'normal';
+        newAuxtextElement.className = 'question-word-auxtext';
         topDiv.appendChild(newAuxtextElement);
       }
       console.log("✅ 分離疑問詞エリアのDOM構造を修復しました");
