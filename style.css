@@ -435,3 +435,49 @@ h2 {
   /* 手動制御が設定されている場合は自動制御クラスを無効化 */
   display: none !important; /* 手動制御の結果を優先 */
 }
+
+/* サブスロット表示エリア専用のレイアウト */
+.subslot-wrapper {
+  min-height: 100px;
+  visibility: visible;
+  display: block !important; /* ブロックレベル要素として配置 */
+  width: 100%;
+  position: relative;
+}
+
+/* サブスロット展開ラベル */
+.subslot-wrapper .subslot-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* サブスロット群エリア（横並び） */
+.subslot-wrapper::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* サブスロット個々の要素を横並び */
+.subslot-wrapper .subslot {
+  display: inline-block !important;
+  vertical-align: top;
+  margin-right: 12px;
+  margin-bottom: 8px;
+  /* フレックスレイアウトと競合しないように */
+  float: none;
+}
+
+/* サブスロット表示制御パネルを確実に最下部に配置 */
+.subslot-wrapper .subslot-visibility-panel {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 20px !important;
+  clear: both !important; /* フロートのクリア */
+  position: relative;
+  z-index: 1;
+}
+
+/* 既存のslot-wrapperスタイル（メインスロット用） */
