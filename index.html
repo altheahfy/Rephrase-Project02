@@ -1539,24 +1539,6 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 ページ読み込み時の疑問詞エリア初期化");
   if (window.initializeQuestionWordArea) {
     window.initializeQuestionWordArea();
-    
-    // テスト用のデータを設定して表示確認
-    setTimeout(() => {
-      if (window.setQuestionWordData) {
-        console.log("🧪 テスト用に疑問詞データを設定します");
-        window.setQuestionWordData('What');
-      }
-      
-      // 制御パネルのイベントリスナーを設定
-      if (window.setupQuestionWordControlListeners) {
-        window.setupQuestionWordControlListeners();
-      }
-      
-      // デバッグ情報を表示
-      if (window.debugQuestionWordArea) {
-        window.debugQuestionWordArea();
-      }
-    }, 1000); // 他の初期化処理の後に実行
   }
   
   // 制御パネル表示/非表示ボタンの機能を追加
