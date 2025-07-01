@@ -435,3 +435,36 @@ h2 {
   /* 手動制御が設定されている場合は自動制御クラスを無効化 */
   display: none !important; /* 手動制御の結果を優先 */
 }
+
+/* サブスロットコンテナの上下分割構造 */
+[id^="slot-"][id$="-sub"] {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0;
+}
+
+/* サブスロットコンテンツエリア（上部） */
+.subslot-content-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+/* サブスロットパネルエリア（下部） */
+.subslot-panel-area {
+  width: 100%;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 8px;
+  flex-shrink: 0;
+}
+
+/* サブスロット個別要素のスタイル調整 */
+.subslot-content-area > .subslot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px;
+  vertical-align: top;
+}

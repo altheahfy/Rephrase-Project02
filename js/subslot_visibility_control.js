@@ -303,19 +303,66 @@ function addSubslotControlPanel(parentSlot) {
   console.log(`✅ サブスロットコンテナが見つかりました: ${subslotContainer.id}`);
   console.log(`🔍 コンテナの表示状態: display=${getComputedStyle(subslotContainer).display}`);
   
+  // 既存の分割構造があるかチェック
+  let subslotContent = subslotContainer.querySelector('.subslot-content-area');
+  let panelArea = subslotContainer.querySelector('.subslot-panel-area');
+  
+  // 分割構造を作成（初回のみ）
+  if (!subslotContent || !panelArea) {
+    console.log(`🏗️ サブスロットコンテナを上下分割構造に変更します`);
+    
+    // 既存のサブスロット要素を全て取得
+    const existingSubslots = Array.from(subslotContainer.children).filter(child => 
+      !child.classList.contains('subslot-content-area') && 
+      !child.classList.contains('subslot-panel-area') &&
+      !child.classList.contains('subslot-visibility-panel')
+    );
+    
+    // コンテンツエリア（上部）を作成
+    subslotContent = document.createElement('div');
+    subslotContent.className = 'subslot-content-area';
+    subslotContent.style.cssText = `
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    `;
+    
+    // 既存のサブスロット要素をコンテンツエリアに移動
+    existingSubslots.forEach(subslot => {
+      subslotContent.appendChild(subslot);
+    });
+    
+    // パネルエリア（下部）を作成
+    panelArea = document.createElement('div');
+    panelArea.className = 'subslot-panel-area';
+    panelArea.style.cssText = `
+      width: 100%;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 8px;
+    `;
+    
+    // 分割構造をコンテナに追加
+    subslotContainer.appendChild(subslotContent);
+    subslotContainer.appendChild(panelArea);
+    
+    console.log(`✅ 上下分割構造を作成しました`);
+  }
+  
   // 既存のパネルがあれば削除
-  const existingPanel = subslotContainer.querySelector('.subslot-visibility-panel');
+  const existingPanel = panelArea.querySelector('.subslot-visibility-panel');
   if (existingPanel) {
     existingPanel.remove();
     console.log(`🗑️ 既存のコントロールパネルを削除: ${parentSlot}`);
   }
   
-  // 新しいパネルを生成して追加
+  // 新しいパネルを生成してパネルエリアに追加
   console.log(`🏗️ 新しいコントロールパネルを生成中...`);
   const panel = createSubslotControlPanel(parentSlot);
   
   if (panel) {
-    subslotContainer.appendChild(panel);
+    panelArea.appendChild(panel);
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
     console.log(`🔍 追加されたパネル: ${panel.id}, クラス: ${panel.className}`);
   } else {
@@ -333,10 +380,21 @@ function removeSubslotControlPanel(parentSlot) {
     return;
   }
   
-  const panel = subslotContainer.querySelector('.subslot-visibility-panel');
-  if (panel) {
-    panel.remove();
-    console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
+  // 分割構造のパネルエリアからパネルを削除
+  const panelArea = subslotContainer.querySelector('.subslot-panel-area');
+  if (panelArea) {
+    const panel = panelArea.querySelector('.subslot-visibility-panel');
+    if (panel) {
+      panel.remove();
+      console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
+    }
+  } else {
+    // 従来の方式（分割構造がない場合）でも削除を試行
+    const panel = subslotContainer.querySelector('.subslot-visibility-panel');
+    if (panel) {
+      panel.remove();
+      console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了（従来方式）`);
+    }
   }
 }
 
