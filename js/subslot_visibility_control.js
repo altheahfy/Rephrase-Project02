@@ -16,15 +16,10 @@ function createSubslotControlPanel(parentSlot) {
   panelContainer.style.cssText = `
     background: rgba(240, 248, 255, 0.95);
     padding: 12px;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    margin-top: 16px;
     border-radius: 8px;
     border: 2px solid #4a90e2;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    width: 100%;
-    box-sizing: border-box;
-    clear: both;
-    display: block;
   `;
   
   // パネルタイトル
@@ -74,14 +69,13 @@ function createSubslotControlPanel(parentSlot) {
     justify-content: center;
   `;
   
-  // 各サブスロット用のコントロールを生成（上位スロットパネルと同じ順序）
-  const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
-  
-  desiredOrder.forEach(subslotType => {
-    // 該当するサブスロット要素があるかチェック
-    const subslotElement = document.getElementById(`slot-${parentSlot}-sub-${subslotType}`);
-    if (subslotElement) {
-      const subslotId = subslotElement.id;
+  // 各サブスロット用のコントロールを生成
+  subslotElements.forEach(subslotElement => {
+    const subslotId = subslotElement.id;
+    const slotMatch = subslotId.match(/slot-(.+)-sub-(.+)$/);
+    
+    if (slotMatch) {
+      const subslotType = slotMatch[2]; // 例: m1, s, aux, v, etc.
       const controlGroup = createSubslotControlGroup(parentSlot, subslotType, subslotId);
       controlsContainer.appendChild(controlGroup);
     }
