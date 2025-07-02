@@ -626,6 +626,7 @@ h2 {
 /* 疑問詞日本語補助テキスト - Grid行3 */
 #display-top-question-word .question-word-auxtext {
   grid-row: 3;
+  grid-column: 1;
   font-size: 11px; /* スロットの補助テキストと同じサイズ */
   font-weight: 400;
   color: #777;
@@ -635,6 +636,7 @@ h2 {
   align-items: center;
   justify-content: center;
   height: 100%;
+  margin: 0;
   padding: 4px; /* スロットの補助テキストと同じパディング */
   line-height: 1.1; /* スロットの補助テキストと同じ行高 */
 }
