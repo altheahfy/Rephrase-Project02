@@ -139,6 +139,27 @@ function toggleExclusiveSubslot(slotId) {
     }
 
   } else {
+    // サブスロットを閉じる場合
+    // 対象の親スロットとサブスロットエリアのクラス・インラインスタイルをリセット
+    const parentSlot = document.getElementById(`slot-${slotId}`);
+    const subslotArea = document.getElementById(`slot-${slotId}-sub`);
+    if (parentSlot) {
+      parentSlot.classList.remove('active-parent-slot');
+      parentSlot.style.background = '';
+      parentSlot.style.border = '';
+      parentSlot.style.borderBottom = '';
+      parentSlot.style.borderRadius = '';
+      parentSlot.style.boxShadow = '';
+    }
+    if (subslotArea) {
+      subslotArea.classList.remove('active-subslot-area');
+      subslotArea.style.background = '';
+      subslotArea.style.border = '';
+      subslotArea.style.borderTop = '';
+      subslotArea.style.borderRadius = '';
+      subslotArea.style.marginTop = '';
+      subslotArea.style.boxShadow = '';
+    }
     console.log(`ℹ slot-${slotId}-sub was already open, now closed`);
   }
 }
