@@ -10,6 +10,7 @@ let questionWordVisibilityState = {
 // 🔧 疑問詞の表示制御
 function toggleQuestionWordVisibility(elementType, isVisible) {
   console.log(`🎛️ 疑問詞の${elementType}表示を${isVisible ? '表示' : '非表示'}に設定`);
+  console.log(`🔍 呼び出し元: ${new Error().stack.split('\n')[2]}`);
   
   // 状態を更新
   questionWordVisibilityState[elementType] = isVisible;
@@ -17,6 +18,9 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   // DOM要素を取得して表示/非表示を切り替え
   const textElement = document.querySelector('.question-word-text');
   const auxtextElement = document.querySelector('.question-word-auxtext');
+  
+  console.log(`🔍 textElement: ${textElement ? 'found' : 'not found'}`);
+  console.log(`🔍 auxtextElement: ${auxtextElement ? 'found' : 'not found'}`);
   
   if (elementType === 'text' && textElement) {
     textElement.style.display = isVisible ? 'block' : 'none';
@@ -26,16 +30,17 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   if (elementType === 'auxtext' && auxtextElement) {
     if (isVisible) {
       // 表示時は flex に戻し、Grid位置とマージンを確実に指定
-      auxtextElement.style.setProperty('display', 'flex', 'important');
-      auxtextElement.style.setProperty('grid-column', '1', 'important');
-      auxtextElement.style.setProperty('grid-row', '3', 'important');
-      auxtextElement.style.setProperty('margin', '0', 'important');
-      auxtextElement.style.setProperty('align-items', 'center', 'important');
-      auxtextElement.style.setProperty('justify-content', 'center', 'important');
+      auxtextElement.style.display = 'flex';
+      auxtextElement.style.gridColumn = '1';
+      auxtextElement.style.gridRow = '3';
+      auxtextElement.style.margin = '0';
+      auxtextElement.style.alignItems = 'center';
+      auxtextElement.style.justifyContent = 'center';
     } else {
-      auxtextElement.style.setProperty('display', 'none', 'important');
+      auxtextElement.style.display = 'none';
     }
     console.log(`✅ 疑問詞補助テキストを${isVisible ? '表示' : '非表示'}にしました`);
+    console.log(`🔍 現在のdisplayスタイル: ${auxtextElement.style.display}`);
   }
   
   // 状態を保存
@@ -84,14 +89,14 @@ function applyQuestionWordVisibilityState() {
   if (auxtextElement) {
     if (questionWordVisibilityState.auxtext) {
       // 表示時は flex に戻し、Grid位置とマージンを確実に指定
-      auxtextElement.style.setProperty('display', 'flex', 'important');
-      auxtextElement.style.setProperty('grid-column', '1', 'important');
-      auxtextElement.style.setProperty('grid-row', '3', 'important');
-      auxtextElement.style.setProperty('margin', '0', 'important');
-      auxtextElement.style.setProperty('align-items', 'center', 'important');
-      auxtextElement.style.setProperty('justify-content', 'center', 'important');
+      auxtextElement.style.display = 'flex';
+      auxtextElement.style.gridColumn = '1';
+      auxtextElement.style.gridRow = '3';
+      auxtextElement.style.margin = '0';
+      auxtextElement.style.alignItems = 'center';
+      auxtextElement.style.justifyContent = 'center';
     } else {
-      auxtextElement.style.setProperty('display', 'none', 'important');
+      auxtextElement.style.display = 'none';
     }
   }
   
