@@ -54,7 +54,7 @@ h2 {
   display: flex;
   flex-direction: column; /* 各スロット内の要素は縦並び */
   align-items: center; /* スロット内の要素は中央揃え */
-  gap: 8px;
+  gap: 4px; /* 行間を調整 */
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
   border: 1px solid #eee; /* 境界線を追加して区別しやすく */
@@ -64,6 +64,70 @@ h2 {
   max-width: 200px; /* 最大幅を設定 */
   /* 空判定時の非表示制御 */
   transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
+  
+  /* 🎯 4行固定レイアウトの実装 */
+  height: auto;
+  min-height: 140px; /* 固定最小高さ */
+}
+
+/* 🎯 4行固定レイアウト - 行1: スロット名 */
+.slot-container label {
+  display: block;
+  width: 100%;
+  height: 20px; /* 固定高さ */
+  line-height: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  order: 1;
+}
+
+/* 🎯 4行固定レイアウト - 行2: イラスト領域 */
+.slot-container .slot-image {
+  display: block;
+  width: 100%;
+  height: 60px; /* 固定高さ */
+  object-fit: contain;
+  margin: 0;
+  padding: 0;
+  order: 2;
+  /* イラストが無い場合の透明スペース確保 */
+  min-height: 60px;
+}
+
+/* 🎯 4行固定レイアウト - 行3: 英語テキスト */
+.slot-container .slot-text {
+  display: block;
+  width: 100%;
+  min-height: 20px; /* 固定最小高さ */
+  line-height: 1.2;
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  order: 3;
+  /* テキストが無い場合のスペース確保 */
+  background: transparent;
+}
+
+/* 🎯 4行固定レイアウト - 行4: 日本語補助テキスト */
+.slot-container .slot-phrase {
+  display: block;
+  width: 100%;
+  min-height: 16px; /* 固定最小高さ */
+  line-height: 1.2;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  order: 4;
+  /* 補助テキストが無い場合のスペース確保 */
+  background: transparent;
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -144,14 +208,22 @@ h2 {
 }
 
 
-/* slot-text 表示用スタイル */
-.slot-text {
-  display: block;
-  font-size: 13px;
-  margin-top: 4px;
-  color: #333;
-  text-align: center;
-  min-height: 1em;
+/* 🎯 スロット内ボタンエリア（詳細・ランダマイズ） */
+.slot-container .subslot-toggle-button,
+.slot-container .individual-randomize-button {
+  width: 100%;
+  margin: 2px 0 0 0;
+  padding: 0;
+  order: 5; /* 4行の後に配置 */
+  display: flex;
+  justify-content: center;
+}
+
+.slot-container .subslot-toggle-button button,
+.slot-container .individual-randomize-button button {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin: 0 1px;
 }
 
 /* 動的記載エリアを横並びに設定 - 位置の修正 */
