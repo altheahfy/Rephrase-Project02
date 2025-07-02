@@ -43,23 +43,22 @@ function createSubslotControlPanel(parentSlot) {
   
   panelContainer.style.cssText = `
     display: ${isControlPanelsVisible ? 'block' : 'none'};
-    background: rgba(240, 248, 255, 0.95);
-    padding: 12px;
-    margin-top: 16px;
-    border-radius: 8px;
-    border: 2px solid #4a90e2;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
   `;
   
   // パネルタイトル
   const panelTitle = document.createElement('div');
   panelTitle.style.cssText = `
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 8px;
-    color: #2c5aa0;
+    color: #444;
     text-align: center;
-    border-bottom: 1px solid #4a90e2;
+    border-bottom: 1px solid #ddd;
     padding-bottom: 4px;
   `;
   panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
@@ -118,7 +117,7 @@ function createSubslotControlPanel(parentSlot) {
   resetButton.style.cssText = `
     margin-top: 8px;
     padding: 4px 8px;
-    background: #4a90e2;
+    background: #666;
     color: white;
     border: none;
     border-radius: 4px;
@@ -148,9 +147,9 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   const controlGroup = document.createElement('div');
   controlGroup.className = 'subslot-control-group';
   controlGroup.style.cssText = `
-    padding: 6px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    padding: 4px;
+    border: 1px solid #f0f0f0;
+    border-radius: 3px;
     background: rgba(255, 255, 255, 0.7);
     min-width: 60px;
   `;
