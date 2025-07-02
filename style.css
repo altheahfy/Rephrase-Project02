@@ -138,8 +138,8 @@ h2 {
   justify-content: center;
   width: 100%;
   height: 100%; /* セル高さを完全に使用 */
-  font-size: 36px; /* 英語テキスト用に大きく */
-  font-weight: 700;
+  font-size: 20px; /* 英語テキスト用に適度なサイズ（36px→20px） */
+  font-weight: 600;
   color: #222;
   text-align: center;
   margin: 0;
@@ -513,46 +513,65 @@ h2 {
   margin-top: 16px !important;
 }
 
-/* 🔹 分離疑問詞エリアのスタイル - スロットと同様の4行構造 */
+/* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
 #display-top-question-word {
   display: grid !important;
-  grid-template-rows: 25px 60px 25px 65px; /* 4行構造：英語テキスト行（4行目）を65pxに拡大 */
+  grid-template-rows: 30px 70px 65px 25px 25px 25px; /* スロットと完全に同じ6行構造 */
   grid-template-columns: 1fr;
   width: 160px !important; /* スロットと同じ幅 */
-  height: 175px !important; /* 全体の高さを調整 */
+  height: 265px !important; /* スロットと同じ高さ */
   margin: 4px !important; /* スロットと同じマージン */
   padding: 10px !important; /* スロットと同じパディング */
   border: 1px solid #eee !important; /* スロットと同じボーダー */
   border-radius: 0 !important; /* スロットと同じ角丸なし */
-  background-color: #f9f9f9 !important; /* 疑問詞であることを示す薄い背景 */
+  background-color: white !important; /* 背景色を白に統一 */
   align-items: center;
   justify-items: center;
   box-sizing: border-box !important;
   order: -1 !important; /* 他のスロットより前に表示 */
 }
 
-/* 疑問詞ラベル */
+/* 疑問詞ラベル - Grid行1 */
 #display-top-question-word .question-word-label {
   grid-row: 1;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 18px; /* スロットラベルと同じサイズ */
+  font-weight: bold;
   color: #333;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
-/* 疑問詞画像エリア */
+/* 疑問詞画像エリア - Grid行2 */
 #display-top-question-word .question-word-image {
   grid-row: 2;
-  width: 90px;
+  width: 90px; /* スロット画像と同じサイズ */
   height: 60px;
   background: transparent;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #f0f0f0; /* スロット画像と同じ枠 */
 }
 
-/* 疑問詞英語テキスト */
+/* 疑問詞日本語補助テキスト - Grid行3 */
+#display-top-question-word .question-word-auxtext {
+  grid-row: 3;
+  font-size: 11px; /* スロットの補助テキストと同じサイズ */
+  font-weight: 400;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 疑問詞英語テキスト - Grid行4 */
 #display-top-question-word .question-word-text {
-  grid-row: 4; /* 4行目：英語が下 */
-  font-size: 36px; /* スロットの英語テキストと同じサイズ */
+  grid-row: 4;
+  font-size: 20px; /* 適度なサイズに調整 */
   font-weight: 700;
   color: #222;
   text-align: center;
@@ -560,16 +579,20 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
-/* 疑問詞補助テキスト */
-#display-top-question-word .question-word-auxtext {
-  grid-row: 3; /* 3行目：日本語が上 */
-  font-size: 11px; /* スロットの補助テキストと同じサイズ */
-  color: #777;
-  text-align: center;
+/* 疑問詞ボタンプレースホルダー - Grid行5,6（空のスペース） */
+#display-top-question-word .question-word-button-placeholder {
+  display: block;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100%;
+}
+
+#display-top-question-word .question-word-button-placeholder:nth-of-type(5) {
+  grid-row: 5;
+}
+
+#display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
+  grid-row: 6;
 }
