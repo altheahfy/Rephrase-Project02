@@ -1339,6 +1339,17 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
     alert("ファイルを選択してください");
     return;
   }
+  
+  // 🎭 ローディング画面を表示
+  console.log("🎭 JSONロード開始 - ローディング画面を表示");
+  showLoadingOverlay();
+  
+  // ローディングメッセージを更新
+  const loadingText = document.querySelector('#loading-overlay p');
+  if (loadingText) {
+    loadingText.textContent = `${file.name} を処理中...`;
+  }
+  
   const file = fileInput.files[0];
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -1391,6 +1402,7 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
       alert("無効な JSON ファイルです");
+      console.log("🎭 エラー発生 - ローディング画面を隠します");
       hideLoadingOverlay(); // エラー時もローディングを隠す
     }
   };
