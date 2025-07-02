@@ -51,83 +51,99 @@ h2 {
 
 /* スロット全体の調整が必要な場合に備えた汎用クラス */
 .slot-container {
-  display: flex;
-  flex-direction: column; /* 各スロット内の要素は縦並び */
-  align-items: center; /* スロット内の要素は中央揃え */
-  gap: 4px; /* 行間を調整 */
+  /* 🎯 CSS Gridで完全に6行固定レイアウトを実装 */
+  display: grid;
+  grid-template-rows: 30px 70px 50px 30px 25px 25px; /* 各行の固定高さ：ラベル、イラスト、英語テキスト、日本語テキスト、詳細ボタン、個別ランダマイズボタン */
+  grid-template-columns: 1fr;
+  gap: 4px; /* 行間の固定間隔 */
+  align-items: center; /* 各セル内での中央揃え */
+  justify-items: center; /* 各セル内での中央揃え */
+  
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
   border: 1px solid #eee; /* 境界線を追加して区別しやすく */
-  padding: 8px;
+  padding: 10px;
   margin: 4px;
-  min-width: 120px; /* 最小幅を設定 */
-  max-width: 200px; /* 最大幅を設定 */
+  min-width: 160px; /* 最小幅を拡大 */
+  max-width: 260px; /* 最大幅を拡大 */
   /* 空判定時の非表示制御 */
   transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
   
-  /* 🎯 4行固定レイアウトの実装 */
-  height: auto;
-  min-height: 140px; /* 固定最小高さ */
+  /* 🎯 完全固定高さ */
+  height: 250px; /* grid-template-rowsの合計+gap+padding */
+  box-sizing: border-box;
 }
 
-/* 🎯 4行固定レイアウト - 行1: スロット名 */
+/* 🎯 Grid行1: スロット名（必ず1番目に配置） */
 .slot-container label {
-  display: block;
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  height: 20px; /* 固定高さ */
-  line-height: 20px;
-  font-size: 14px;
+  height: 100%; /* セル高さを完全に使用 */
+  font-size: 18px; /* フォントサイズを拡大 */
   font-weight: bold;
   color: #333;
   text-align: center;
   margin: 0;
   padding: 0;
-  order: 1;
+  line-height: 1.2;
 }
 
-/* 🎯 4行固定レイアウト - 行2: イラスト領域 */
+/* 🎯 Grid行2: イラスト領域（必ず2番目に配置） */
 .slot-container .slot-image {
+  grid-row: 2;
+  grid-column: 1;
   display: block;
-  width: 100%;
+  width: 90px; /* 固定幅 */
   height: 60px; /* 固定高さ */
   object-fit: contain;
   margin: 0;
   padding: 0;
-  order: 2;
   /* イラストが無い場合の透明スペース確保 */
-  min-height: 60px;
+  background: transparent;
+  border: 1px solid #f0f0f0; /* 枠を追加してサイズを視覚化 */
 }
 
-/* 🎯 4行固定レイアウト - 行3: 英語テキスト */
+/* 🎯 Grid行3: 英語テキスト（必ず3番目に配置） */
 .slot-container .slot-text {
-  display: block;
+  grid-row: 3;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  min-height: 20px; /* 固定最小高さ */
-  line-height: 1.2;
-  font-size: 13px;
-  color: #333;
+  height: 100%; /* セル高さを完全に使用 */
+  font-size: 18px; /* フォントサイズを大幅に拡大 */
+  font-weight: 600; /* 太く */
+  color: #222;
   text-align: center;
   margin: 0;
-  padding: 0;
-  order: 3;
-  /* テキストが無い場合のスペース確保 */
-  background: transparent;
+  padding: 4px;
+  line-height: 1.3;
+  /* 長いテキストの折り返し */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
-/* 🎯 4行固定レイアウト - 行4: 日本語補助テキスト */
+/* 🎯 Grid行4: 日本語補助テキスト（必ず4番目に配置） */
 .slot-container .slot-phrase {
-  display: block;
+  grid-row: 4;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  min-height: 16px; /* 固定最小高さ */
-  line-height: 1.2;
-  font-size: 11px;
+  height: 100%; /* セル高さを完全に使用 */
+  font-size: 14px; /* フォントサイズを拡大 */
   color: #666;
   text-align: center;
   margin: 0;
   padding: 0;
-  order: 4;
-  /* 補助テキストが無い場合のスペース確保 */
-  background: transparent;
+  line-height: 1.2;
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -208,22 +224,54 @@ h2 {
 }
 
 
-/* 🎯 スロット内ボタンエリア（詳細・ランダマイズ） */
-.slot-container .subslot-toggle-button,
-.slot-container .individual-randomize-button {
+/* 🎯 Grid行5: 詳細ボタン（必ず5番目に配置）- サブスロット有無で動的表示 */
+.slot-container .subslot-toggle-button {
+  grid-row: 5;
+  grid-column: 1;
   width: 100%;
-  margin: 2px 0 0 0;
+  height: 100%; /* セル高さを完全に使用 */
+  margin: 0;
   padding: 0;
-  order: 5; /* 4行の後に配置 */
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
-.slot-container .subslot-toggle-button button,
-.slot-container .individual-randomize-button button {
+.slot-container .subslot-toggle-button button {
   font-size: 10px;
-  padding: 2px 6px;
-  margin: 0 1px;
+  padding: 2px 8px;
+  margin: 0;
+  min-height: 18px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* 🎯 Grid行6: 個別ランダマイズボタン（必ず6番目に配置）- 常に表示 */
+.slot-container .individual-randomize-button {
+  grid-row: 6;
+  grid-column: 1;
+  width: 100%;
+  height: 100%; /* セル高さを完全に使用 */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slot-container .individual-randomize-button button {
+  font-size: 11px;
+  padding: 2px 8px;
+  margin: 0;
+  min-height: 18px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 /* 動的記載エリアを横並びに設定 - 位置の修正 */
@@ -321,22 +369,7 @@ h2 {
   visibility: hidden !important;
 }
 
-/* 静的スロットエリアの基本表示設定 */
-.slot-container {
-  display: flex;
-  flex-direction: column; /* 各スロット内の要素は縦並び */
-  align-items: center; /* スロット内の要素は中央揃え */
-  gap: 8px;
-  /* order属性への対応を追加 */
-  order: 0; /* デフォルト値 */
-  border: 1px solid #eee; /* 境界線を追加して区別しやすく */
-  padding: 8px;
-  margin: 4px;
-  min-width: 120px; /* 最小幅を設定 */
-  max-width: 200px; /* 最大幅を設定 */
-  /* 空判定時の非表示制御 */
-  transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
-}
+/* 静的スロットエリアの基本表示設定は上部のCSS Gridで定義済み */
 
 /* 空スロット判定時に適用されるスタイル（グレー枠を完全に非表示） */
 .slot-container.hidden-empty {
