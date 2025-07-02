@@ -535,6 +535,11 @@ h2 {
 .subslot.hidden-subslot-text .slot-phrase { display: none !important; }
 .subslot.hidden-subslot-auxtext .slot-text { display: none !important; }
 
+/* 🎯 .subslot-container対応版（新しいGrid構造） */
+.subslot-container.hidden-subslot-image .slot-image { display: none !important; }
+.subslot-container.hidden-subslot-text .slot-phrase { display: none !important; }
+.subslot-container.hidden-subslot-auxtext .slot-text { display: none !important; }
+
 /* より具体的なセレクタでの制御（IDベース） */
 [id*="-sub-"].hidden-subslot-image .slot-image { display: none !important; }
 [id*="-sub-"].hidden-subslot-text .slot-phrase { display: none !important; }
@@ -695,4 +700,105 @@ h2 {
 
 #display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
   grid-row: 6;
+}
+
+/* 🎯 サブスロット専用の4行CSS Gridレイアウト */
+.subslot-container {
+  /* CSS Gridで4行固定レイアウトを実装（詳細・ランダマイズボタンなし） */
+  display: grid;
+  grid-template-rows: 30px 75px 20px 25px; /* 4行構造 */
+  grid-template-columns: 1fr;
+  gap: 4px; /* 行間の固定間隔 */
+  align-items: center; /* 各セル内での中央揃え */
+  justify-items: center; /* 各セル内での中央揃え */
+  
+  /* スタイリング */
+  border: 1px solid #eee; /* 境界線を追加 */
+  padding: 10px;
+  margin: 4px;
+  
+  /* 動的幅調整システム */
+  min-width: 120px; /* 最小幅 */
+  width: auto; /* 自動幅調整 */
+  max-width: 400px; /* 最大幅 */
+  flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
+  /* アニメーション */
+  transition: opacity 0.2s ease-out, width 0.3s ease;
+  
+  /* 固定高さ（4行構造） */
+  height: 174px; /* 30+75+20+25+gap+padding */
+  box-sizing: border-box;
+}
+
+/* サブスロットのスロット名 - Grid行1 */
+.subslot-container label {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px; /* 上位スロットより少し小さく */
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+/* サブスロットのイラスト - Grid行2 */
+.subslot-container img.slot-image {
+  grid-row: 2;
+  grid-column: 1;
+  width: 90px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* サブスロットの補助テキスト - Grid行3 */
+.subslot-container .slot-text {
+  grid-row: 3;
+  grid-column: 1;
+  font-size: 11px;
+  font-weight: 400;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 4px;
+  line-height: 1.1;
+}
+
+/* サブスロットの例文テキスト - Grid行4（オレンジ背景・上下線） */
+.subslot-container .slot-phrase {
+  grid-row: 4;
+  grid-column: 1;
+  font-size: 14px; /* 上位スロットより少し小さく */
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  
+  /* 上位スロットと同じオレンジ背景・上下線 */
+  background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
