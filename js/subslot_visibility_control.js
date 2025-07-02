@@ -3,7 +3,7 @@
 
 // 🎯 サブスロットの表示・非表示制御に使用するスロット一覧
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
-const SUB_ELEMENT_TYPES = ['image', 'text', 'auxtext'];
+const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
 
 // 🏗️ サブスロット用コントロールパネルを生成
 function createSubslotControlPanel(parentSlot) {
