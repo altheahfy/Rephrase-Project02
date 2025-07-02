@@ -111,26 +111,23 @@ function createSubslotControlPanel(parentSlot) {
   
   panelContainer.appendChild(controlsContainer);
   
-  // 全表示ボタン
+  // 全表示ボタンを controlsContainer 内に追加（上位パネルと同じ配置）
   const resetButton = document.createElement('button');
   resetButton.style.cssText = `
-    margin-top: 8px;
-    padding: 4px 8px;
-    background: #666;
+    background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 4px;
+    padding: 6px 10px;
     font-size: 11px;
     cursor: pointer;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    border-radius: 3px;
+    margin-left: 8px;
   `;
   resetButton.textContent = '全表示';
   resetButton.addEventListener('click', () => {
     resetSubslotVisibility(parentSlot);
   });
-  panelContainer.appendChild(resetButton);
+  controlsContainer.appendChild(resetButton);
   
   // 制御パネルの表示状態を同期
   if (window.syncSubslotControlPanelVisibility) {
