@@ -443,8 +443,12 @@ function displayTopQuestionWord() {
     // 🔧 常にHTML構造を強制的に再作成（確実に動作させるため）
     const translation = translations[questionWord] || '';
     topDiv.innerHTML = `
-      <div class="question-word-text">${questionWord}</div>
+      <div class="question-word-label">疑問詞</div>
+      <div class="question-word-image"></div>
       <div class="question-word-auxtext">${translation}</div>
+      <div class="question-word-text">${questionWord}</div>
+      <div class="question-word-button-placeholder"></div>
+      <div class="question-word-button-placeholder"></div>
     `;
     
     console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
