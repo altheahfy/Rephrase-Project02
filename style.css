@@ -563,6 +563,15 @@ h2 {
   /* 他のサブスロットより後に表示されるように順序を最大にする */
   order: 999; 
   margin-top: 16px;
+  
+  /* 🆕 レイアウト調整：中央揃えと背景色変更 */
+  width: auto; /* 幅を自動調整 */
+  margin-left: auto; /* 中央揃え */
+  margin-right: auto; /* 中央揃え */
+  background-color: white; /* 背景色を白に */
+  padding: 10px; /* 内側余白 */
+  border: 1px solid #ddd; /* 枠線を追加 */
+  border-radius: 5px; /* 角を丸める */
 }
 
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
