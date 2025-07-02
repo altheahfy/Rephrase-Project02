@@ -183,8 +183,13 @@ function setupVisibilityControlUI() {
       console.log(`🎛️ UIチェンジ: ${slotKey}-${elementType} = ${isVisible}`);
       
       // 疑問詞の場合
-      if (slotKey === 'question') {
-        toggleQuestionWordVisibility(elementType, isVisible);
+      if (slotKey === 'question-word') {
+        // question_word_visibility.js の関数を呼び出し
+        if (window.toggleQuestionWordVisibility) {
+          window.toggleQuestionWordVisibility(elementType, isVisible);
+        } else {
+          console.warn("⚠ toggleQuestionWordVisibility 関数が見つかりません");
+        }
       } else {
         // 通常のスロット制御
         toggleSlotElementVisibility(slotKey, elementType, isVisible);
