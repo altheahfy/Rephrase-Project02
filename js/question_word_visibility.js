@@ -26,14 +26,14 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   if (elementType === 'auxtext' && auxtextElement) {
     if (isVisible) {
       // 表示時は flex に戻し、Grid位置とマージンを確実に指定
-      auxtextElement.style.display = 'flex';
-      auxtextElement.style.gridColumn = '1';
-      auxtextElement.style.gridRow = '3';
-      auxtextElement.style.margin = '0';
-      auxtextElement.style.alignItems = 'center';
-      auxtextElement.style.justifyContent = 'center';
+      auxtextElement.style.setProperty('display', 'flex', 'important');
+      auxtextElement.style.setProperty('grid-column', '1', 'important');
+      auxtextElement.style.setProperty('grid-row', '3', 'important');
+      auxtextElement.style.setProperty('margin', '0', 'important');
+      auxtextElement.style.setProperty('align-items', 'center', 'important');
+      auxtextElement.style.setProperty('justify-content', 'center', 'important');
     } else {
-      auxtextElement.style.display = 'none';
+      auxtextElement.style.setProperty('display', 'none', 'important');
     }
     console.log(`✅ 疑問詞補助テキストを${isVisible ? '表示' : '非表示'}にしました`);
   }
@@ -84,14 +84,14 @@ function applyQuestionWordVisibilityState() {
   if (auxtextElement) {
     if (questionWordVisibilityState.auxtext) {
       // 表示時は flex に戻し、Grid位置とマージンを確実に指定
-      auxtextElement.style.display = 'flex';
-      auxtextElement.style.gridColumn = '1';
-      auxtextElement.style.gridRow = '3';
-      auxtextElement.style.margin = '0';
-      auxtextElement.style.alignItems = 'center';
-      auxtextElement.style.justifyContent = 'center';
+      auxtextElement.style.setProperty('display', 'flex', 'important');
+      auxtextElement.style.setProperty('grid-column', '1', 'important');
+      auxtextElement.style.setProperty('grid-row', '3', 'important');
+      auxtextElement.style.setProperty('margin', '0', 'important');
+      auxtextElement.style.setProperty('align-items', 'center', 'important');
+      auxtextElement.style.setProperty('justify-content', 'center', 'important');
     } else {
-      auxtextElement.style.display = 'none';
+      auxtextElement.style.setProperty('display', 'none', 'important');
     }
   }
   
