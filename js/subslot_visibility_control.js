@@ -262,38 +262,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     'auxtext': subslotElement.querySelectorAll('.slot-text')
   };
   
-// 🎛️ サブスロット要素の表示・非表示制御
-function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
-  console.log(`🎛️ サブスロット表示制御: ${subslotId} - ${elementType} = ${isVisible}`);
-  
-  const subslotElement = document.getElementById(subslotId);
-  if (!subslotElement) {
-    console.warn(`⚠ サブスロット要素が見つかりません: ${subslotId}`);
-    return;
-  }
-  
-  console.log(`🔍 サブスロット要素が見つかりました: ${subslotId}`);
-  console.log(`🔍 現在のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
-  
-  const className = `hidden-subslot-${elementType}`;
-  
-  if (isVisible) {
-    subslotElement.classList.remove(className);
-    console.log(`✅ ${subslotId}の${elementType}を表示しました (removed class: ${className})`);
-  } else {
-    subslotElement.classList.add(className);
-    console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
-  }
-  
-  console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
-  
-  // 実際に要素が非表示になっているかを確認
-  const targetElements = {
-    'image': subslotElement.querySelectorAll('.slot-image'),
-    'text': subslotElement.querySelectorAll('.slot-phrase'),
-    'auxtext': subslotElement.querySelectorAll('.slot-text')
-  };
-  
   const elements = targetElements[elementType];
   if (elements && elements.length > 0) {
     elements.forEach((el, index) => {
@@ -303,7 +271,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
-}
 }
 
 // 🔄 サブスロットの全表示リセット
@@ -338,18 +305,19 @@ function addSubslotControlPanel(parentSlot) {
   console.log(`🔍 コンテナの表示状態: display=${getComputedStyle(subslotContainer).display}`);
   
   // 既存のパネルがあれば削除
-  const existingPanel = subslotContainer.querySelector('.subslot-visibility-panel');
+  const existingPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
   if (existingPanel) {
     existingPanel.remove();
     console.log(`🗑️ 既存のコントロールパネルを削除: ${parentSlot}`);
   }
   
-  // 新しいパネルを生成して追加
+  // 新しいパネルを生成
   console.log(`🏗️ 新しいコントロールパネルを生成中...`);
   const panel = createSubslotControlPanel(parentSlot);
   
   if (panel) {
-    subslotContainer.appendChild(panel);
+    // コンテナの直後にパネルを挿入
+    subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
     console.log(`🔍 追加されたパネル: ${panel.id}, クラス: ${panel.className}`);
   } else {
@@ -361,13 +329,7 @@ function addSubslotControlPanel(parentSlot) {
 function removeSubslotControlPanel(parentSlot) {
   console.log(`🗑️ ${parentSlot}サブスロット用コントロールパネル削除開始`);
   
-  const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
-  if (!subslotContainer) {
-    console.warn(`⚠ サブスロットコンテナが見つかりません: slot-${parentSlot}-sub`);
-    return;
-  }
-  
-  const panel = subslotContainer.querySelector('.subslot-visibility-panel');
+  const panel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
   if (panel) {
     panel.remove();
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
