@@ -91,10 +91,9 @@ function createSubslotControlPanel(parentSlot) {
   controlsContainer.style.cssText = `
     display: flex;
     gap: 8px;
-    align-items: flex-start;
+    align-items: center;
     font-size: 12px;
     flex-wrap: wrap;
-    justify-content: center;
   `;
   
   // 各サブスロット用のコントロールを生成（上位スロットパネルと同じ順序）
@@ -151,7 +150,6 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     border: 1px solid #f0f0f0;
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.7);
-    min-width: 60px;
   `;
   
   // スロット名表示
@@ -159,8 +157,8 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   slotLabel.style.cssText = `
     font-weight: bold;
     font-size: 11px;
-    margin-bottom: 4px;
-    color: #333;
+    margin-bottom: 2px;
+    color: #444;
     text-align: center;
   `;
   slotLabel.textContent = subslotType.toUpperCase();
