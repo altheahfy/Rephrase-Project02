@@ -1698,42 +1698,72 @@ function forceHideEmptySlots() {
   });
 }
 
-// 🆕 テキスト長に応じたスロット幅動的調整システム
+// 🆕 テキスト長に応じたスロット幅動的調整システム（改良版）
 function adjustSlotWidthsBasedOnText() {
   console.log("🔧 スロット幅の動的調整を開始");
   
   const slotContainers = document.querySelectorAll('.slot-container');
   
   slotContainers.forEach(container => {
+    // 分離疑問詞エリアは幅調整から除外（単一単語のため）
+    if (container.id === 'display-top-question-word') {
+      console.log(`⏭ ${container.id}: 分離疑問詞エリアのため幅調整をスキップ`);
+      return;
+    }
+    
     const phraseElement = container.querySelector('.slot-phrase');
     const textElement = container.querySelector('.slot-text');
     
     if (!phraseElement && !textElement) return;
     
-    // テキストの長さを計算
+    // テキストの実際の表示幅を計算
     const phraseText = phraseElement ? phraseElement.textContent.trim() : '';
     const auxText = textElement ? textElement.textContent.trim() : '';
-    const maxTextLength = Math.max(phraseText.length, auxText.length);
     
-    // テキスト長に応じて幅を調整
-    let targetWidth;
-    if (maxTextLength <= 10) {
-      targetWidth = '140px'; // 短いテキスト
-    } else if (maxTextLength <= 20) {
-      targetWidth = '180px'; // 中程度のテキスト
-    } else if (maxTextLength <= 35) {
-      targetWidth = '240px'; // 長めのテキスト
-    } else if (maxTextLength <= 50) {
-      targetWidth = '300px'; // 長いテキスト
-    } else {
-      targetWidth = '360px'; // 非常に長いテキスト
+    let maxTextWidth = 0;
+    
+    // 英語テキスト（phraseElement）の表示幅を計算
+    if (phraseText && phraseElement) {
+      const tempSpan = document.createElement('span');
+      tempSpan.style.font = window.getComputedStyle(phraseElement).font;
+      tempSpan.style.visibility = 'hidden';
+      tempSpan.style.position = 'absolute';
+      tempSpan.textContent = phraseText;
+      document.body.appendChild(tempSpan);
+      maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
+      document.body.removeChild(tempSpan);
     }
     
-    // 幅を適用
-    container.style.width = targetWidth;
-    container.style.minWidth = targetWidth;
+    // 補助テキスト（textElement）の表示幅を計算
+    if (auxText && textElement) {
+      const tempSpan = document.createElement('span');
+      tempSpan.style.font = window.getComputedStyle(textElement).font;
+      tempSpan.style.visibility = 'hidden';
+      tempSpan.style.position = 'absolute';
+      tempSpan.textContent = auxText;
+      document.body.appendChild(tempSpan);
+      maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
+      document.body.removeChild(tempSpan);
+    }
     
-    console.log(`📏 ${container.id}: テキスト長=${maxTextLength}, 幅=${targetWidth}`);
+    // 実際の表示幅 + パディング + マージンを考慮して適切な幅を設定
+    const padding = 60; // パディング・ボーダー・マージンの合計（増加）
+    let targetWidth = Math.max(200, maxTextWidth + padding); // 最小幅200px（増加）
+    
+    // 長いテキストの場合はさらに余裕を持たせる
+    if (maxTextWidth > 150) {
+      targetWidth = maxTextWidth + 80; // より長いテキストには追加の余白
+    }
+    
+    // 最大幅制限（画面幅の80%程度まで）
+    const maxWidth = Math.min(800, window.innerWidth * 0.8);
+    targetWidth = Math.min(targetWidth, maxWidth);
+    
+    // 幅を適用
+    container.style.width = targetWidth + 'px';
+    container.style.minWidth = targetWidth + 'px';
+    
+    console.log(`📏 ${container.id}: 英語テキスト幅=${phraseText ? maxTextWidth : 0}px, 補助テキスト幅=${auxText ? 'calculated' : 0}px, 最大幅=${maxTextWidth}px, 適用幅=${targetWidth}px`);
   });
   
   console.log("✅ スロット幅調整完了");
