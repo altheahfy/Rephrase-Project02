@@ -83,9 +83,11 @@
 <div id="main-content" style="display: none;">
 
 <!-- 🔹 分離疑問詞用表示領域 -->
-<div id="display-top-question-word" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; color: #2a2a2a;">
+<div id="display-top-question-word">
+  <div class="question-word-label">Question Word</div>
+  <div class="question-word-image"></div>
   <div class="question-word-text"></div>
-  <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;"></div>
+  <div class="question-word-auxtext"></div>
 </div>
 
   <section>
@@ -242,10 +244,8 @@
      <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
      <div class="slot-text"></div>
      <div class="slot-phrase"></div>
-     <div class="slot-button-area">
-      <button data-subslot-toggle="s">▼ 詳細</button>
-      <button class="s-individual-randomize-btn">🎲</button>
-     </div>
+     <button class="subslot-toggle-button" data-subslot-toggle="s">▼ 詳細</button>
+     <button class="individual-randomize-button s-individual-randomize-btn">🎲</button>
     </div>
     <div class="slot-container" id="slot-aux">
      <label>AUX</label>
