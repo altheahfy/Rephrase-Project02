@@ -1340,6 +1340,8 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
     return;
   }
   
+  const file = fileInput.files[0];
+  
   // 🎭 ローディング画面を表示
   console.log("🎭 JSONロード開始 - ローディング画面を表示");
   showLoadingOverlay();
@@ -1350,7 +1352,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
     loadingText.textContent = `${file.name} を処理中...`;
   }
   
-  const file = fileInput.files[0];
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
@@ -1635,8 +1636,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 🎭 ローディング制御関数
 function hideLoadingOverlay() {
+  console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
   const overlay = document.getElementById('loading-overlay');
   const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
   
   if (overlay && mainContent) {
     console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
@@ -1647,19 +1652,27 @@ function hideLoadingOverlay() {
       
       // ローディングオーバーレイを即座に隠す
       overlay.style.display = 'none';
+      console.log("🎭 overlay.style.display = 'none' 実行完了");
       
       // メインコンテンツを表示
       mainContent.style.display = 'block';
       mainContent.style.opacity = '1';
+      console.log("🎭 mainContent表示設定完了");
       
       console.log("🎭 メインコンテンツ表示完了");
     }, 500); // シンプルな500ms遅延
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
   }
 }
 
 function showLoadingOverlay() {
+  console.log("🎭 showLoadingOverlay() 関数が呼ばれました");
   const overlay = document.getElementById('loading-overlay');
   const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
   
   if (overlay && mainContent) {
     console.log("🎭 ローディング開始 - メインコンテンツを隠す");
@@ -1668,10 +1681,14 @@ function showLoadingOverlay() {
     overlay.style.display = 'flex';
     overlay.style.opacity = '1';
     overlay.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 overlay表示設定完了");
     
     mainContent.style.display = 'none';
     mainContent.style.opacity = '0';
     mainContent.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 mainContent非表示設定完了");
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
   }
 }
 
