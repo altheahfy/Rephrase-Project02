@@ -53,7 +53,7 @@ h2 {
 .slot-container {
   /* 🎯 CSS Gridで完全に6行固定レイアウトを実装 */
   display: grid;
-  grid-template-rows: 30px 70px 65px 25px 25px 25px; /* 英語テキスト行を50px→65pxに拡大 */
+  grid-template-rows: 30px 75px 20px 25px 25px 25px; /* 補助テキスト行を20pxに統一 */
   grid-template-columns: 1fr;
   gap: 4px; /* 行間の固定間隔 */
   align-items: center; /* 各セル内での中央揃え */
@@ -74,8 +74,8 @@ h2 {
   /* 空判定時の非表示制御 */
   transition: opacity 0.2s ease-out, width 0.3s ease; /* 幅変更もアニメーション */
   
-  /* 🎯 完全固定高さ */
-  height: 265px; /* grid-template-rowsの合計+gap+padding（高さ調整） */
+  /* 🎯 完全固定高さ - 新しいgrid構造に合わせて調整 */
+  height: 220px; /* 30+75+20+25+25+25+gap+padding */
   box-sizing: border-box;
 }
 
@@ -578,12 +578,12 @@ h2 {
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
 #display-top-question-word {
   display: none !important; /* 初期状態は非表示 */
-  grid-template-rows: 30px 75px 20px 25px 25px 25px; /* 補助テキスト行を20pxに修正 */
+  grid-template-rows: 30px 75px 20px 25px 25px 25px; /* 通常スロットと同じ構造に統一 */
   grid-template-columns: 1fr;
   width: auto !important; /* 🆕 自動幅調整 */
   min-width: 140px !important; /* 🆕 最小幅 */
   max-width: none !important; /* 🆕 最大幅制限なし */
-  height: 270px !important; /* 高さを少し拡大 */
+  height: 220px !important; /* 通常スロットと同じ高さに統一 */
   margin: 4px !important; /* スロットと同じマージン */
   padding: 10px !important; /* スロットと同じパディング */
   border: 1px solid #eee !important; /* スロットと同じボーダー */
