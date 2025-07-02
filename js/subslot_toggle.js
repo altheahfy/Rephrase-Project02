@@ -20,9 +20,13 @@ function toggleExclusiveSubslot(slotId) {
     const el = document.getElementById(`slot-${id}-sub`);
     if (el) {
       el.style.setProperty("display", "none", "important");
-      // 位置調整スタイルもリセット
+      // 位置調整スタイルを完全にリセット
       el.style.marginLeft = '';
       el.style.maxWidth = '';
+      el.style.left = '';
+      el.style.right = '';
+      el.style.position = '';
+      el.style.transform = '';
       el.style.removeProperty('--parent-offset');
       console.log(`❌ slot-${id}-sub display set to none`);
       
@@ -38,20 +42,34 @@ function toggleExclusiveSubslot(slotId) {
 
   // 対象のみ開く
   if (!isOpen) {
+    // 🔄 まず位置関連のスタイルを完全にリセット
+    target.style.marginLeft = '';
+    target.style.maxWidth = '';
+    target.style.left = '';
+    target.style.right = '';
+    target.style.position = '';
+    target.style.transform = '';
+    target.style.removeProperty('--parent-offset');
+    
+    // 🎯 サブスロットを表示
     target.style.setProperty("display", "flex", "important");
     target.style.setProperty("visibility", "visible", "important");
     target.style.setProperty("min-height", "100px", "important");
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
+    
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
+    console.log(`🔍 位置確認: marginLeft=${target.style.marginLeft}, maxWidth=${target.style.maxWidth}`);
 
     // 🔗 エクセル風タブ連結スタイルを適用
     applyTabConnection(slotId, true);
     
-    // 📍 サブスロット位置を調整
-    setTimeout(() => {
-      adjustSubslotPosition(slotId);
-    }, 100); // DOM更新とレンダリング完了を待つ
+    // 📍 サブスロット位置を調整（一時的に無効化）
+    // setTimeout(() => {
+    //   adjustSubslotPosition(slotId);
+    // }, 100); // DOM更新とレンダリング完了を待つ
+    
+    console.log(`🔍 位置調整を一時的に無効化 - サブスロットが見えるかテスト中`);
 
     // ★★★ 並べ替え処理を呼び出す ★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -102,9 +120,13 @@ function initializeSubslots() {
   allSubslotElements.forEach(el => {
     if (el && !el.id.includes('wrapper')) { // wrapper要素は除外
       el.style.setProperty("display", "none", "important");
-      // 位置調整スタイルもリセット
+      // 位置調整スタイルを完全にリセット
       el.style.marginLeft = '';
       el.style.maxWidth = '';
+      el.style.left = '';
+      el.style.right = '';
+      el.style.position = '';
+      el.style.transform = '';
       el.style.removeProperty('--parent-offset');
       console.log(`🔒 初期化: ${el.id} を閉じました`);
     }
@@ -309,28 +331,24 @@ function adjustSubslotPosition(parentSlotId) {
   }
   
   try {
-    // 🔍 まずサブスロットを一時的に表示して実際のサイズを測定
-    const originalDisplay = subslotArea.style.display;
-    const originalVisibility = subslotArea.style.visibility;
-    
-    subslotArea.style.visibility = 'hidden';
-    subslotArea.style.display = 'block';
-    subslotArea.style.position = 'absolute';
-    subslotArea.style.left = '0';
-    subslotArea.style.marginLeft = '0';
-    
-    // 実際のサブスロット幅を測定
-    const actualSubslotWidth = subslotArea.offsetWidth;
-    
-    // スタイルを元に戻す
-    subslotArea.style.visibility = originalVisibility;
-    subslotArea.style.display = originalDisplay;
-    subslotArea.style.position = '';
+    // 🔍 サブスロットの実際のサイズを安全に測定
+    // 表示中のサブスロットに影響を与えずに幅を取得
     
     // 各種コンテナの位置とサイズを取得
     const parentRect = parentSlot.getBoundingClientRect();
     const containerRect = parentSlot.parentElement.getBoundingClientRect();
     const windowWidth = window.innerWidth;
+    
+    // サブスロットの現在の幅を取得（一時的な変更は行わない）
+    let actualSubslotWidth = subslotArea.offsetWidth;
+    
+    // もし幅が取得できない場合は、推定値を使用
+    if (!actualSubslotWidth || actualSubslotWidth === 0) {
+      // コンテナ幅の80%を推定値とする
+      const containerWidth = containerRect.width;
+      actualSubslotWidth = containerWidth * 0.8;
+      console.log(`📏 ${parentSlotId} サブスロット幅を推定: ${actualSubslotWidth}px`);
+    }
     
     // 親スロットの中央位置を計算
     const parentCenterX = parentRect.left + (parentRect.width / 2);
@@ -341,7 +359,7 @@ function adjustSubslotPosition(parentSlotId) {
     
     // 画面境界の制約を計算
     const minLeftOffset = 20; // 左端から最低20px
-    const maxLeftOffset = windowWidth - actualSubslotWidth - 40; // 右端から最低40px
+    const maxLeftOffset = Math.max(20, windowWidth - actualSubslotWidth - 40); // 右端から最低40px
     
     // 🎯 スマートな位置調整：端の方では中央寄せを弱める
     let finalLeftOffset;
@@ -366,10 +384,13 @@ function adjustSubslotPosition(parentSlotId) {
       }
     }
     
-    // CSSスタイルを適用
+    // 最終的な境界チェック
+    finalLeftOffset = Math.max(0, Math.min(finalLeftOffset, windowWidth - 100)); // 最低100px幅を確保
+    
+    // CSSスタイルを安全に適用
     subslotArea.style.setProperty('--parent-offset', `${finalLeftOffset}px`);
     subslotArea.style.marginLeft = `${finalLeftOffset}px`;
-    subslotArea.style.maxWidth = `${windowWidth - finalLeftOffset - 40}px`; // 右端余白を確保
+    subslotArea.style.maxWidth = `${Math.max(300, windowWidth - finalLeftOffset - 40)}px`; // 最低300px幅を確保
     
     console.log(`📍 ${parentSlotId} 位置調整詳細:`);
     console.log(`  - 親スロット中央: ${parentCenterX.toFixed(1)}px`);
