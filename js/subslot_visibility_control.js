@@ -64,8 +64,15 @@ function createSubslotControlPanel(parentSlot) {
   panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
   panelContainer.appendChild(panelTitle);
   
-  // サブスロット候補を取得
-  const subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
+  // サブスロット候補を取得（新旧両方のクラスに対応）
+  let subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
+  
+  // 互換性のため.subslotクラスもチェック
+  if (subslotElements.length === 0) {
+    subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
+    console.log(`🔄 ${parentSlot}: .subslot-containerが見つからないため.subslotクラスで検索`);
+  }
+  
   console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
   
   // デバッグ: 検出されたサブスロットの詳細を表示
@@ -74,6 +81,9 @@ function createSubslotControlPanel(parentSlot) {
   });
   
   if (subslotElements.length === 0) {
+    console.warn(`⚠ ${parentSlot}: サブスロット要素が見つかりません`);
+    console.log(`🔍 デバッグ: #slot-${parentSlot}-sub の内容:`, document.querySelector(`#slot-${parentSlot}-sub`));
+    
     const noSubslotsMsg = document.createElement('div');
     noSubslotsMsg.style.cssText = `
       text-align: center;
