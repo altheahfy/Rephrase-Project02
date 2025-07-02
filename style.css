@@ -217,6 +217,7 @@ h2 {
   flex-wrap: wrap; /* サブスロットが多すぎる場合に折り返す */
   gap: 8px; /* サブスロット間の隙間 */
   visibility: visible !important;
+  align-content: flex-start; /* 🆕 折り返した行を上詰めで配置し、不要な空間を防ぐ */
 }
 
 /* 高さ潰れ・透明化・折り返し不備の対処 */
@@ -554,13 +555,14 @@ h2 {
   display: none !important; /* 手動制御の結果を優先 */
 }
 
-/* 🎯 サブスロットコントロールパネルを下側に配置 */
-.subslot-visibility-panel {
-  /* flexboxで横並びの中でも強制的に新しい行に配置 */
-  flex-basis: 100% !important;
-  width: 100% !important;
-  order: 999 !important; /* 他の要素より後に配置 */
-  margin-top: 16px !important;
+/* 🎯 サブスロットコントロールパネルを下側に配置（静的エリア限定） */
+/* 動的記載エリア（#dynamic-slot-area）の子孫要素ではないサブスロットコンテナ内のパネルのみを対象 */
+:not(#dynamic-slot-area) > [id$="-sub"] .subslot-visibility-panel {
+  /* flexコンテナの幅を100%にすることで、強制的に新しい行に折り返させる */
+  flex-basis: 100%;
+  /* 他のサブスロットより後に表示されるように順序を最大にする */
+  order: 999; 
+  margin-top: 16px;
 }
 
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
