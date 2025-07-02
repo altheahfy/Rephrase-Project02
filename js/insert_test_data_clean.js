@@ -449,7 +449,10 @@ function displayTopQuestionWord() {
     
     console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
     
-    topDiv.classList.remove("empty-content"); // 空クラスを削除
+    // 🆕 表示状態を復元
+    topDiv.style.display = "";
+    topDiv.classList.remove("empty-slot-hidden", "hidden", "empty-content");
+    topDiv.classList.add("visible"); // visibleクラスを追加してGrid表示を有効化
     
     // 🔹 疑問詞を文頭（slot-wrapper内の最初）に移動
     const slotWrapper = document.querySelector('.slot-wrapper');
@@ -503,6 +506,12 @@ function displayTopQuestionWord() {
     }
     
     topDiv.classList.add("empty-content"); // 強制的に空クラスを追加
+    
+    // 🆕 空の場合は非表示にする
+    topDiv.style.display = "none";
+    topDiv.classList.add("empty-slot-hidden", "hidden");
+    topDiv.classList.remove("visible"); // visibleクラスを削除
+    console.log("🙈 分離疑問詞エリアを非表示 (DisplayAtTopデータなし)");
     
     // 動的エリアの疑問詞もクリア
     const dynamicQuestionDiv = document.getElementById("dynamic-question-word");
@@ -899,6 +908,10 @@ function hideEmptySlots(jsonData) {
   console.log("3️⃣ サブスロットコンテナ非表示処理を開始");
   hideEmptySubslotContainers();
 
+  // 4. 分離疑問詞エリアの表示/非表示制御
+  console.log("4️⃣ 分離疑問詞エリア非表示処理を開始");
+  hideEmptyQuestionWordArea(jsonData);
+
   console.log("✅ === 空のスロット非表示処理が完了 ===");
 }
 
@@ -1055,6 +1068,36 @@ function hideEmptySubslotContainers() {
       console.log(`👁 サブスロットコンテナを表示: ${container.id} (表示中サブスロット: ${visibleSubslots.length}件)`);
     }
   });
+}
+
+/**
+ * 分離疑問詞エリアの表示/非表示制御
+ * @param {Array} jsonData - JSONデータ
+ */
+function hideEmptyQuestionWordArea(jsonData) {
+  const questionWordArea = document.getElementById("display-top-question-word");
+  
+  if (!questionWordArea) {
+    console.log("ℹ️ 分離疑問詞エリア要素が見つかりません");
+    return;
+  }
+
+  // DisplayAtTopフラグを持つアイテムがあるかチェック
+  const displayAtTopItem = jsonData?.find(d => d.DisplayAtTop && d.DisplayText && d.DisplayText.trim() !== "");
+  
+  if (displayAtTopItem) {
+    // DisplayAtTopアイテムがある場合は表示
+    questionWordArea.style.display = "";
+    questionWordArea.classList.remove("empty-slot-hidden", "hidden");
+    questionWordArea.classList.add("visible"); // Grid表示を有効化
+    console.log(`👁 分離疑問詞エリアを表示: ${displayAtTopItem.DisplayText}`);
+  } else {
+    // DisplayAtTopアイテムがない場合は非表示
+    questionWordArea.style.display = "none";
+    questionWordArea.classList.add("empty-slot-hidden", "hidden");
+    questionWordArea.classList.remove("visible"); // visibleクラスを削除
+    console.log("🙈 分離疑問詞エリアを非表示 (DisplayAtTopデータなし)");
+  }
 }
 
 // 指定されたコンテナ内のサブスロットを order に従ってDOMを直接並べ替える関数

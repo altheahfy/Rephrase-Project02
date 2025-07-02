@@ -363,6 +363,13 @@ h2 {
   visibility: hidden;
 }
 
+/* 🔹 分離疑問詞エリアの非表示状態 */
+#display-top-question-word.empty-slot-hidden,
+#display-top-question-word.hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 /* 🔥 静的スロットエリアのスマート表示制御 */
 /* 空のスロットを動的に非表示にするクラス */
 .slot-container.empty-slot {
@@ -515,7 +522,7 @@ h2 {
 
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
 #display-top-question-word {
-  display: grid !important;
+  display: none !important; /* 初期状態は非表示 */
   grid-template-rows: 30px 70px 65px 25px 25px 25px; /* スロットと完全に同じ6行構造 */
   grid-template-columns: 1fr;
   width: 160px !important; /* スロットと同じ幅 */
@@ -529,6 +536,11 @@ h2 {
   justify-items: center;
   box-sizing: border-box !important;
   order: -1 !important; /* 他のスロットより前に表示 */
+}
+
+/* JavaScriptで表示された場合のみ有効になるスタイル */
+#display-top-question-word.visible {
+  display: grid !important;
 }
 
 /* 疑問詞ラベル - Grid行1 */
