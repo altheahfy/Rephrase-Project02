@@ -13,11 +13,17 @@ function toggleExclusiveSubslot(slotId) {
 
   const isOpen = getComputedStyle(target).display !== "none";
 
-  // 全 subslot を閉じる
+  // 🔗 全サブスロットを閉じる前に、タブ連結スタイルをクリア
+  clearAllTabConnections();
+  
   subslotIds.forEach(id => {
     const el = document.getElementById(`slot-${id}-sub`);
     if (el) {
       el.style.setProperty("display", "none", "important");
+      // 位置調整スタイルもリセット
+      el.style.marginLeft = '';
+      el.style.maxWidth = '';
+      el.style.removeProperty('--parent-offset');
       console.log(`❌ slot-${id}-sub display set to none`);
       
       // サブスロット用コントロールパネルを削除
@@ -38,6 +44,14 @@ function toggleExclusiveSubslot(slotId) {
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
+
+    // 🔗 エクセル風タブ連結スタイルを適用
+    applyTabConnection(slotId, true);
+    
+    // 📍 サブスロット位置を調整
+    setTimeout(() => {
+      adjustSubslotPosition(slotId);
+    }, 50);
 
     // ★★★ 並べ替え処理を呼び出す ★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -68,6 +82,10 @@ function toggleExclusiveSubslot(slotId) {
 // ページ読み込み時に全サブスロットを初期化（閉じる）する関数
 function initializeSubslots() {
   console.log("🔄 サブスロットの初期化を実行します");
+  
+  // 🧹 まず全てのタブ連結スタイルをクリア
+  clearAllTabConnections();
+  
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
   
   // 全てのサブスロットコンテナを取得して閉じる
@@ -84,6 +102,10 @@ function initializeSubslots() {
   allSubslotElements.forEach(el => {
     if (el && !el.id.includes('wrapper')) { // wrapper要素は除外
       el.style.setProperty("display", "none", "important");
+      // 位置調整スタイルもリセット
+      el.style.marginLeft = '';
+      el.style.maxWidth = '';
+      el.style.removeProperty('--parent-offset');
       console.log(`🔒 初期化: ${el.id} を閉じました`);
     }
   });
@@ -115,6 +137,21 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn(`⚠ No slotId resolved for button`);
     }
   });
+});
+
+// ウィンドウリサイズ時にタブ連結の位置を再調整
+window.addEventListener('resize', () => {
+  // 現在展開中のサブスロットを見つけて位置を再調整
+  const activeSubslotArea = document.querySelector('.slot-wrapper.active-subslot-area');
+  if (activeSubslotArea) {
+    const parentId = activeSubslotArea.id?.replace('slot-', '').replace('-sub', '');
+    if (parentId) {
+      console.log(`🔄 リサイズ時の位置再調整: ${parentId}`);
+      setTimeout(() => {
+        adjustSubslotPosition(parentId);
+      }, 100);
+    }
+  }
 });
 
 window.toggleExclusiveSubslot = toggleExclusiveSubslot;
@@ -190,4 +227,131 @@ function hideEmptySubslotsInContainer(container) {
   
   console.log(`📊 ${container.id} 処理結果: 非表示=${hiddenCount}件, 表示=${visibleCount}件`);
   console.log(`✅ ${container.id} のサブスロット空判定完了`);
+}
+
+// 🔗 エクセル風タブ連結システム (統合版)
+
+/**
+ * 🔗 エクセル風タブ連結システム: 上位スロットとサブスロットを視覚的に連結
+ * @param {string} parentSlotId - 親スロットのID (例: 'm1', 'o2')
+ * @param {boolean} isActive - 連結を有効にするかどうか
+ */
+function applyTabConnection(parentSlotId, isActive) {
+  console.log(`🔗 タブ連結${isActive ? '適用' : '解除'}: ${parentSlotId}`);
+  
+  // 必要な要素を取得
+  const parentSlot = document.getElementById(`slot-${parentSlotId}`);
+  const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
+  const subslotLabel = subslotArea?.querySelector('.subslot-label');
+  
+  if (!parentSlot || !subslotArea) {
+    console.warn(`⚠ タブ連結: 必要な要素が見つかりません (parent: ${!!parentSlot}, subslot: ${!!subslotArea})`);
+    return;
+  }
+  
+  if (isActive) {
+    // 🔗 まず全ての既存のタブ連結をクリア
+    clearAllTabConnections();
+    
+    // 🎨 現在のスロットにタブ連結スタイルを適用
+    parentSlot.classList.add('active-parent-slot');
+    subslotArea.classList.add('active-subslot-area');
+    
+    // 📂 サブスロットラベルをタブ風にスタイリング
+    if (subslotLabel) {
+      subslotLabel.classList.add('tab-style');
+      subslotLabel.innerHTML = `📂 ${parentSlotId.toUpperCase()} の詳細スロット`;
+    }
+    
+    // 🎛️ サブスロット制御パネルが存在すれば統合スタイルを適用
+    setTimeout(() => {
+      const panel = document.getElementById(`subslot-visibility-panel-${parentSlotId}`);
+      if (panel) {
+        panel.classList.add('tab-connected');
+        console.log(`🎛️ サブスロット制御パネルにタブ連結スタイルを適用: ${parentSlotId}`);
+      }
+    }, 100);
+    
+    console.log(`✅ ${parentSlotId} のタブ連結スタイルを適用しました`);
+  } else {
+    // 🔗 タブ連結スタイルを解除
+    parentSlot.classList.remove('active-parent-slot');
+    subslotArea.classList.remove('active-subslot-area');
+    
+    // 📂 サブスロットラベルを元に戻す
+    if (subslotLabel) {
+      subslotLabel.classList.remove('tab-style');
+      subslotLabel.innerHTML = `現在展開中：${parentSlotId.toUpperCase()} の subslot`;
+    }
+    
+    // 🎛️ サブスロット制御パネルのタブスタイルも解除
+    const panel = document.getElementById(`subslot-visibility-panel-${parentSlotId}`);
+    if (panel) {
+      panel.classList.remove('tab-connected');
+    }
+    
+    console.log(`❌ ${parentSlotId} のタブ連結スタイルを解除しました`);
+  }
+}
+
+/**
+ * 📍 サブスロットエリアの位置を上位スロットに近づける
+ * @param {string} parentSlotId - 親スロットのID
+ */
+function adjustSubslotPosition(parentSlotId) {
+  const parentSlot = document.getElementById(`slot-${parentSlotId}`);
+  const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
+  
+  if (!parentSlot || !subslotArea) {
+    console.warn(`⚠ 位置調整: 必要な要素が見つかりません`);
+    return;
+  }
+  
+  try {
+    // 親スロットの位置を取得
+    const parentRect = parentSlot.getBoundingClientRect();
+    const containerRect = parentSlot.parentElement.getBoundingClientRect();
+    
+    // サブスロットエリアを親スロットの直下に配置
+    const leftOffset = parentRect.left - containerRect.left;
+    
+    // CSSカスタムプロパティとinlineスタイルで位置調整
+    subslotArea.style.setProperty('--parent-offset', `${leftOffset}px`);
+    subslotArea.style.marginLeft = `${Math.max(0, leftOffset - 10)}px`;
+    subslotArea.style.maxWidth = `calc(100% - ${Math.max(0, leftOffset - 10)}px)`;
+    
+    console.log(`📍 ${parentSlotId} サブスロットの位置を調整しました (leftOffset: ${leftOffset}px)`);
+  } catch (error) {
+    console.warn(`⚠ サブスロット位置調整エラー: ${parentSlotId}`, error);
+  }
+}
+
+/**
+ * 🧹 全てのタブ連結スタイルをクリア
+ */
+function clearAllTabConnections() {
+  // 🔗 上位スロットからタブ連結クラスを削除
+  const allParentSlots = document.querySelectorAll('.slot-container.active-parent-slot');
+  allParentSlots.forEach(slot => slot.classList.remove('active-parent-slot'));
+  
+  // 🔗 サブスロットエリアからタブ連結クラスを削除
+  const allSubslotAreas = document.querySelectorAll('.slot-wrapper.active-subslot-area');
+  allSubslotAreas.forEach(area => area.classList.remove('active-subslot-area'));
+  
+  // 📂 サブスロットラベルからタブスタイルを削除
+  const allTabLabels = document.querySelectorAll('.subslot-label.tab-style');
+  allTabLabels.forEach(label => {
+    label.classList.remove('tab-style');
+    // 元のテキストに戻す（IDから推測）
+    const parentId = label.closest('[id*="-sub"]')?.id?.replace('slot-', '').replace('-sub', '');
+    if (parentId) {
+      label.innerHTML = `現在展開中：${parentId.toUpperCase()} の subslot`;
+    }
+  });
+  
+  // 🎛️ サブスロット制御パネルからタブ連結スタイルを削除
+  const allTabPanels = document.querySelectorAll('.subslot-visibility-panel.tab-connected');
+  allTabPanels.forEach(panel => panel.classList.remove('tab-connected'));
+  
+  console.log(`🧹 全てのタブ連結スタイルをクリアしました`);
 }

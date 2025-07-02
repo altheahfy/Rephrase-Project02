@@ -802,3 +802,51 @@ h2 {
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
 }
+
+/* 🔗 エクセル風タブ連結の位置調整強化 */
+.slot-wrapper.active-subslot-area {
+  /* 親スロットとの視覚的連結を強化 */
+  position: relative;
+  margin-top: -2px !important; /* 親スロットとの境界線を重複させる */
+  box-shadow: 
+    0 -2px 4px rgba(135, 206, 235, 0.3),  /* 上向きの影で連結感を演出 */
+    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 親スロットから連結ラインを表示 */
+.slot-container.active-parent-slot::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #87CEEB;
+  z-index: 3;
+}
+
+/* タブラベルの影効果を改善 */
+.subslot-label.tab-style {
+  position: relative;
+  z-index: 4;
+  margin-bottom: 20px !important;
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.15),
+    0 -1px 2px rgba(135, 206, 235, 0.5) !important;
+}
+
+/* サブスロット制御パネルの連結効果 */
+.subslot-visibility-panel.tab-connected {
+  margin-top: 10px !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* ホバー効果で連結状態を強調 */
+.slot-container.active-parent-slot:hover {
+  background: rgba(173, 216, 230, 0.4) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4) !important;
+}
+
+/* アニメーション効果を調整 */
