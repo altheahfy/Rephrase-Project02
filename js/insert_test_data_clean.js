@@ -444,7 +444,7 @@ function displayTopQuestionWord() {
     const translation = translations[questionWord] || '';
     topDiv.innerHTML = `
       <div class="question-word-text">${questionWord}</div>
-      <div class="question-word-auxtext" style="font-size: 0.9rem; color: #666; margin-top: 4px;">${translation}</div>
+      <div class="question-word-auxtext">${translation}</div>
     `;
     
     console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");

@@ -578,13 +578,15 @@ h2 {
   align-items: center;
   justify-content: center;
   height: 100%;
+  padding: 4px; /* スロットの補助テキストと同じパディング */
+  line-height: 1.1; /* スロットの補助テキストと同じ行高 */
 }
 
 /* 疑問詞英語テキスト - Grid行4 */
 #display-top-question-word .question-word-text {
   grid-row: 4;
   font-size: 20px; /* 適度なサイズに調整 */
-  font-weight: 700;
+  font-weight: 600; /* スロットの英語テキストと同じ重み */
   color: #222;
   text-align: center;
   width: 100%;
@@ -592,6 +594,9 @@ h2 {
   align-items: center;
   justify-content: center;
   height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2; /* スロットの英語テキストと同じ行高 */
 }
 
 /* 疑問詞ボタンプレースホルダー - Grid行5,6（空のスペース） */
