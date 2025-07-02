@@ -747,6 +747,13 @@ function syncUpperSlotsFromJson(data) {
   } else {
     console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
   }
+  
+  // 🆕 スロット幅の動的調整を実行
+  setTimeout(() => {
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      window.adjustSlotWidthsBasedOnText();
+    }
+  }, 100);
 }
 
 // ✅ サブスロット同期機能の実装
@@ -805,6 +812,13 @@ function syncSubslotsFromJson(data) {
   });
   
   console.log("✅ サブスロット同期完了");
+  
+  // 🆕 サブスロット同期後にスロット幅調整を実行
+  setTimeout(() => {
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      window.adjustSlotWidthsBasedOnText();
+    }
+  }, 50);
 }
 
 // 特定のM1スロットをテスト（デバッグ用）
@@ -1484,7 +1498,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // 低頻度で定期チェック (3秒ごと)
     setInterval(() => {
-      if (window.loadedJsonData) {
+           if (window.loadedJsonData) {
         const newSignature = getDataSignature(window.loadedJsonData);
         if (newSignature && newSignature !== lastJsonDataSignature) {
           console.log("🔄 window.loadedJsonData の実質的な変更を検出");
@@ -1587,7 +1601,7 @@ function debugEmptySlots() {
     const slotElement = document.getElementById(fullSlotId);
     const isEmpty = (!item.SubslotElement || item.SubslotElement.trim() === "") && 
                    (!item.SubslotText || item.SubslotText.trim() === "");
-    
+
     console.log(`🔍 サブスロット [${item.Slot}-${item.SubslotID}]:`);
     console.log(`  - SubslotElement: "${item.SubslotElement}"`);
     console.log(`  - SubslotText: "${item.SubslotText}"`);
@@ -1684,7 +1698,46 @@ function forceHideEmptySlots() {
   });
 }
 
-// 🔹 グローバル関数としてエクスポート
-window.initializeQuestionWordArea = initializeQuestionWordArea;
-window.displayTopQuestionWord = displayTopQuestionWord;
-window.syncDynamicToStatic = syncDynamicToStatic;
+// 🆕 テキスト長に応じたスロット幅動的調整システム
+function adjustSlotWidthsBasedOnText() {
+  console.log("🔧 スロット幅の動的調整を開始");
+  
+  const slotContainers = document.querySelectorAll('.slot-container');
+  
+  slotContainers.forEach(container => {
+    const phraseElement = container.querySelector('.slot-phrase');
+    const textElement = container.querySelector('.slot-text');
+    
+    if (!phraseElement && !textElement) return;
+    
+    // テキストの長さを計算
+    const phraseText = phraseElement ? phraseElement.textContent.trim() : '';
+    const auxText = textElement ? textElement.textContent.trim() : '';
+    const maxTextLength = Math.max(phraseText.length, auxText.length);
+    
+    // テキスト長に応じて幅を調整
+    let targetWidth;
+    if (maxTextLength <= 10) {
+      targetWidth = '140px'; // 短いテキスト
+    } else if (maxTextLength <= 20) {
+      targetWidth = '180px'; // 中程度のテキスト
+    } else if (maxTextLength <= 35) {
+      targetWidth = '240px'; // 長めのテキスト
+    } else if (maxTextLength <= 50) {
+      targetWidth = '300px'; // 長いテキスト
+    } else {
+      targetWidth = '360px'; // 非常に長いテキスト
+    }
+    
+    // 幅を適用
+    container.style.width = targetWidth;
+    container.style.minWidth = targetWidth;
+    
+    console.log(`📏 ${container.id}: テキスト長=${maxTextLength}, 幅=${targetWidth}`);
+  });
+  
+  console.log("✅ スロット幅調整完了");
+}
+
+// 🆕 スロット幅調整をグローバル関数として公開
+window.adjustSlotWidthsBasedOnText = adjustSlotWidthsBasedOnText;

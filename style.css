@@ -64,10 +64,15 @@ h2 {
   border: 1px solid #eee; /* 境界線を追加して区別しやすく */
   padding: 10px;
   margin: 4px;
-  min-width: 160px; /* 最小幅を拡大 */
-  max-width: 260px; /* 最大幅を拡大 */
+  
+  /* 🆕 動的幅調整システム */
+  min-width: 120px; /* 最小幅を縮小 */
+  width: auto; /* 自動幅調整 */
+  max-width: 400px; /* 最大幅を拡大 */
+  flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
   /* 空判定時の非表示制御 */
-  transition: opacity 0.2s ease-out; /* スムーズな表示切り替え */
+  transition: opacity 0.2s ease-out, width 0.3s ease; /* 幅変更もアニメーション */
   
   /* 🎯 完全固定高さ */
   height: 265px; /* grid-template-rowsの合計+gap+padding（高さ調整） */
@@ -138,13 +143,19 @@ h2 {
   justify-content: center;
   width: 100%;
   height: 100%; /* セル高さを完全に使用 */
-  font-size: 20px; /* 英語テキスト用に適度なサイズ（36px→20px） */
+  font-size: 16px; /* 🆕 フォントサイズを調整 */
   font-weight: 600;
   color: #222;
   text-align: center;
   margin: 0;
-  padding: 0;
+  padding: 2px; /* 🆕 パディングを追加 */
   line-height: 1.2;
+  
+  /* 🆕 長いテキスト対応 */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  white-space: normal; /* 改行を許可 */
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -207,12 +218,39 @@ h2 {
 .slot-wrapper {
   min-height: 100px;
   visibility: visible;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* 🆕 横並びで折り返さない */
   flex-direction: row !important; /* 強制的に横並びに */
   display: flex !important; /* flex表示を強制 */
   align-items: flex-start;
   justify-content: flex-start; /* 左揃え */
   gap: 12px; /* スロット間の間隔 */
+  
+  /* 🆕 横スクロール対応 */
+  overflow-x: auto; /* 横スクロールを有効化 */
+  overflow-y: hidden; /* 縦スクロールは無効 */
+  padding-bottom: 10px; /* スクロールバー用の余白 */
+  
+  /* 🆕 スクロールバーのスタイル改善（Webkit系ブラウザ） */
+  scrollbar-width: thin; /* Firefox */
+}
+
+/* 🆕 Webkit系ブラウザでのスクロールバースタイル */
+.slot-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.slot-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.slot-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.slot-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
 }
 /* subslot 内のラベル表示用スタイル */
 .subslot label {
@@ -525,7 +563,9 @@ h2 {
   display: none !important; /* 初期状態は非表示 */
   grid-template-rows: 30px 75px 70px 25px 25px 25px; /* 行2と行3を微調整して位置を下げる */
   grid-template-columns: 1fr;
-  width: 160px !important; /* スロットと同じ幅 */
+  width: auto !important; /* 🆕 自動幅調整 */
+  min-width: 140px !important; /* 🆕 最小幅 */
+  max-width: none !important; /* 🆕 最大幅制限なし */
   height: 270px !important; /* 高さを少し拡大 */
   margin: 4px !important; /* スロットと同じマージン */
   padding: 10px !important; /* スロットと同じパディング */
