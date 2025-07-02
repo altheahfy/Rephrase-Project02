@@ -145,7 +145,9 @@ function toggleExclusiveSubslot(slotId) {
     const subslotArea = document.getElementById(`slot-${slotId}-sub`);
     if (parentSlot) {
       parentSlot.classList.remove('active-parent-slot');
+      // ブルータブのインラインスタイルを完全にクリア
       parentSlot.style.background = '';
+      parentSlot.style.backgroundColor = '';
       parentSlot.style.border = '';
       parentSlot.style.borderBottom = '';
       parentSlot.style.borderRadius = '';
@@ -153,7 +155,9 @@ function toggleExclusiveSubslot(slotId) {
     }
     if (subslotArea) {
       subslotArea.classList.remove('active-subslot-area');
+      // ブルータブのインラインスタイルを完全にクリア
       subslotArea.style.background = '';
+      subslotArea.style.backgroundColor = '';
       subslotArea.style.border = '';
       subslotArea.style.borderTop = '';
       subslotArea.style.borderRadius = '';
@@ -195,8 +199,28 @@ function initializeSubslots() {
       el.style.position = '';
       el.style.transform = '';
       el.style.removeProperty('--parent-offset');
+      // ブルータブのインラインスタイルも完全にクリア
+      el.style.background = '';
+      el.style.backgroundColor = '';
+      el.style.border = '';
+      el.style.borderTop = '';
+      el.style.borderRadius = '';
+      el.style.marginTop = '';
+      el.style.boxShadow = '';
       console.log(`🔒 初期化: ${el.id} を閉じました`);
     }
+  });
+
+  // 全ての上位スロットのブルータブスタイルもクリア
+  const allParentSlots = document.querySelectorAll('.slot-container');
+  allParentSlots.forEach(slot => {
+    slot.classList.remove('active-parent-slot');
+    slot.style.background = '';
+    slot.style.backgroundColor = '';
+    slot.style.border = '';
+    slot.style.borderBottom = '';
+    slot.style.borderRadius = '';
+    slot.style.boxShadow = '';
   });
 }
 
@@ -557,13 +581,32 @@ function adjustSubslotPositionSafe(parentSlotId) {
  * 🧹 全てのタブ連結スタイルをクリア
  */
 function clearAllTabConnections() {
-  // 🔗 上位スロットからタブ連結クラスを削除
-  const allParentSlots = document.querySelectorAll('.slot-container.active-parent-slot');
-  allParentSlots.forEach(slot => slot.classList.remove('active-parent-slot'));
+  // 🔗 上位スロットからタブ連結クラスを削除 + インラインスタイルをクリア
+  const allParentSlots = document.querySelectorAll('.slot-container');
+  allParentSlots.forEach(slot => {
+    slot.classList.remove('active-parent-slot');
+    // ブルータブのインラインスタイルを完全にクリア
+    slot.style.background = '';
+    slot.style.backgroundColor = '';
+    slot.style.border = '';
+    slot.style.borderBottom = '';
+    slot.style.borderRadius = '';
+    slot.style.boxShadow = '';
+  });
   
-  // 🔗 サブスロットエリアからタブ連結クラスを削除
-  const allSubslotAreas = document.querySelectorAll('.slot-wrapper.active-subslot-area');
-  allSubslotAreas.forEach(area => area.classList.remove('active-subslot-area'));
+  // 🔗 サブスロットエリアからタブ連結クラス + インラインスタイルを削除
+  const allSubslotAreas = document.querySelectorAll('[id$="-sub"]');
+  allSubslotAreas.forEach(area => {
+    area.classList.remove('active-subslot-area');
+    // ブルータブのインラインスタイルを完全にクリア
+    area.style.background = '';
+    area.style.backgroundColor = '';
+    area.style.border = '';
+    area.style.borderTop = '';
+    area.style.borderRadius = '';
+    area.style.marginTop = '';
+    area.style.boxShadow = '';
+  });
   
   // 📂 サブスロットラベルからタブスタイルを削除
   const allTabLabels = document.querySelectorAll('.subslot-label.tab-style');
@@ -580,5 +623,5 @@ function clearAllTabConnections() {
   const allTabPanels = document.querySelectorAll('.subslot-visibility-panel.tab-connected');
   allTabPanels.forEach(panel => panel.classList.remove('tab-connected'));
   
-  console.log(`🧹 全てのタブ連結スタイルをクリアしました`);
+  console.log(`🧹 全てのタブ連結スタイル（インラインスタイル含む）をクリアしました`);
 }
