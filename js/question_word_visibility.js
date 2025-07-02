@@ -24,7 +24,17 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   }
   
   if (elementType === 'auxtext' && auxtextElement) {
-    auxtextElement.style.display = isVisible ? 'block' : 'none';
+    if (isVisible) {
+      // 表示時は flex に戻し、Grid位置とマージンを確実に指定
+      auxtextElement.style.display = 'flex';
+      auxtextElement.style.gridColumn = '1';
+      auxtextElement.style.gridRow = '3';
+      auxtextElement.style.margin = '0';
+      auxtextElement.style.alignItems = 'center';
+      auxtextElement.style.justifyContent = 'center';
+    } else {
+      auxtextElement.style.display = 'none';
+    }
     console.log(`✅ 疑問詞補助テキストを${isVisible ? '表示' : '非表示'}にしました`);
   }
   
@@ -72,7 +82,17 @@ function applyQuestionWordVisibilityState() {
   }
   
   if (auxtextElement) {
-    auxtextElement.style.display = questionWordVisibilityState.auxtext ? 'block' : 'none';
+    if (questionWordVisibilityState.auxtext) {
+      // 表示時は flex に戻し、Grid位置とマージンを確実に指定
+      auxtextElement.style.display = 'flex';
+      auxtextElement.style.gridColumn = '1';
+      auxtextElement.style.gridRow = '3';
+      auxtextElement.style.margin = '0';
+      auxtextElement.style.alignItems = 'center';
+      auxtextElement.style.justifyContent = 'center';
+    } else {
+      auxtextElement.style.display = 'none';
+    }
   }
   
   console.log("🎨 疑問詞表示状態をDOMに適用しました:", questionWordVisibilityState);
