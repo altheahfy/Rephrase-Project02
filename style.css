@@ -578,7 +578,7 @@ h2 {
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
 #display-top-question-word {
   display: none !important; /* 初期状態は非表示 */
-  grid-template-rows: 30px 75px 70px 25px 25px 25px; /* 行2と行3を微調整して位置を下げる */
+  grid-template-rows: 30px 75px 20px 25px 25px 25px; /* 補助テキスト行を20pxに修正 */
   grid-template-columns: 1fr;
   width: auto !important; /* 🆕 自動幅調整 */
   min-width: 140px !important; /* 🆕 最小幅 */
@@ -593,11 +593,17 @@ h2 {
   justify-items: center;
   box-sizing: border-box !important;
   order: -1 !important; /* 他のスロットより前に表示 */
+  transition: grid-template-rows 0.3s ease; /* 行の高さ変更時のアニメーション */
 }
 
 /* JavaScriptで表示された場合のみ有効になるスタイル */
 #display-top-question-word.visible {
   display: grid !important;
+}
+
+/* 🔧 補助テキスト非表示時の行の高さ制御 */
+#display-top-question-word.hide-auxtext {
+  grid-template-rows: 30px 75px 0px 25px 25px 25px; /* 補助テキスト行を0pxに */
 }
 
 /* 疑問詞ラベル - Grid行1 */

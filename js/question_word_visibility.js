@@ -28,19 +28,23 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   }
   
   if (elementType === 'auxtext' && auxtextElement) {
+    const questionWordArea = document.getElementById('display-top-question-word');
+    
     if (isVisible) {
-      // 表示時は flex に戻し、Grid位置とマージンを確実に指定
+      // 表示時：hide-auxtextクラスを削除してGrid行を復活
+      if (questionWordArea) {
+        questionWordArea.classList.remove('hide-auxtext');
+      }
       auxtextElement.style.display = 'flex';
-      auxtextElement.style.gridColumn = '1';
-      auxtextElement.style.gridRow = '3';
-      auxtextElement.style.margin = '0';
-      auxtextElement.style.alignItems = 'center';
-      auxtextElement.style.justifyContent = 'center';
     } else {
+      // 非表示時：hide-auxtextクラスを追加してGrid行を0に
+      if (questionWordArea) {
+        questionWordArea.classList.add('hide-auxtext');
+      }
       auxtextElement.style.display = 'none';
     }
     console.log(`✅ 疑問詞補助テキストを${isVisible ? '表示' : '非表示'}にしました`);
-    console.log(`🔍 現在のdisplayスタイル: ${auxtextElement.style.display}`);
+    console.log(`🔍 questionWordAreaクラス: ${questionWordArea ? questionWordArea.className : 'not found'}`);
   }
   
   // 状態を保存
@@ -87,15 +91,19 @@ function applyQuestionWordVisibilityState() {
   }
   
   if (auxtextElement) {
+    const questionWordArea = document.getElementById('display-top-question-word');
+    
     if (questionWordVisibilityState.auxtext) {
-      // 表示時は flex に戻し、Grid位置とマージンを確実に指定
+      // 表示時：hide-auxtextクラスを削除してGrid行を復活
+      if (questionWordArea) {
+        questionWordArea.classList.remove('hide-auxtext');
+      }
       auxtextElement.style.display = 'flex';
-      auxtextElement.style.gridColumn = '1';
-      auxtextElement.style.gridRow = '3';
-      auxtextElement.style.margin = '0';
-      auxtextElement.style.alignItems = 'center';
-      auxtextElement.style.justifyContent = 'center';
     } else {
+      // 非表示時：hide-auxtextクラスを追加してGrid行を0に
+      if (questionWordArea) {
+        questionWordArea.classList.add('hide-auxtext');
+      }
       auxtextElement.style.display = 'none';
     }
   }
