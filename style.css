@@ -803,12 +803,15 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 🛡️ サブスロットエリアの安全制限 */
+/* 🛡️ サブスロットエリアの安全制限 + 位置調整対応 */
 .slot-wrapper[id$="-sub"] {
   /* 画面外に出ないように制限 */
   min-width: 300px !important;
   max-width: calc(100vw - 40px) !important;
   position: relative !important;
+  /* 位置調整用：marginLeftによる調整を有効にする */
+  left: 0 !important;
+  transition: margin-left 0.3s ease !important;
   /* margin-leftは動的に設定されるため初期値は設定しない */
 }
 
