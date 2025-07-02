@@ -195,6 +195,12 @@ function setupVisibilityControlUI() {
       // UIのチェックボックスも全てチェック状態に戻す
       const allCheckboxes = document.querySelectorAll('.visibility-checkbox');
       allCheckboxes.forEach(cb => cb.checked = true);
+      
+      // 疑問詞の表示もリセット
+      if (typeof window.resetQuestionWordVisibility === 'function') {
+        window.resetQuestionWordVisibility();
+        console.log("✅ 疑問詞表示もリセットしました");
+      }
     });
   }
   

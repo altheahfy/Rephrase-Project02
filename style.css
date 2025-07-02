@@ -319,6 +319,22 @@ h2 {
   height: 0 !important;
 }
 
+/* 🔹 疑問詞内の個別要素スタイル */
+.question-word-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #2a2a2a;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.question-word-auxtext {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
 /* アニメーション効果（オプション - 将来の拡張用） */
 .slot-container.fade-out {
   opacity: 0;
