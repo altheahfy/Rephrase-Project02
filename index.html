@@ -1381,8 +1381,12 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       
       // 🎭 ローディング完了処理
       setTimeout(() => {
-        hideLoadingOverlay();
-      }, 500); // 処理が完全に終わってから少し待つ
+        console.log("🎭 データ処理とDOM更新の完了を待機中...");
+        // さらに長い遅延で、すべての非同期処理が確実に完了するまで待つ
+        setTimeout(() => {
+          hideLoadingOverlay();
+        }, 800); // DOM更新と画像読み込みを待つための追加遅延
+      }, 1000); // 処理が完全に終わってから十分待つ
       
     } catch (err) {
       console.error("❌ JSON パースエラーまたは処理例外", err);
@@ -1626,24 +1630,34 @@ function hideLoadingOverlay() {
   const mainContent = document.getElementById('main-content');
   
   if (overlay && mainContent) {
-    console.log("🎭 ローディング完了 - メインコンテンツを表示");
+    console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
     
-    // ローディングオーバーレイをフェードアウト
-    overlay.style.transition = 'opacity 0.5s ease-out';
-    overlay.style.opacity = '0';
-    
+    // データ処理完了を待つために追加の遅延
     setTimeout(() => {
-      overlay.style.display = 'none';
+      console.log("🎭 データ処理完了 - オーバーレイをフェードアウト");
       
-      // メインコンテンツをフェードイン
-      mainContent.style.display = 'block';
-      mainContent.style.opacity = '0';
-      mainContent.style.transition = 'opacity 0.5s ease-in';
+      // ローディングオーバーレイをフェードアウト
+      overlay.style.transition = 'opacity 0.8s ease-out';
+      overlay.style.opacity = '0';
       
       setTimeout(() => {
-        mainContent.style.opacity = '1';
-      }, 50);
-    }, 500);
+        overlay.style.display = 'none';
+        console.log("🎭 オーバーレイ非表示完了 - メインコンテンツを準備");
+        
+        // メインコンテンツをさらに遅延して表示
+        setTimeout(() => {
+          console.log("🎭 メインコンテンツを表示開始");
+          mainContent.style.display = 'block';
+          mainContent.style.opacity = '0';
+          mainContent.style.transition = 'opacity 0.8s ease-in';
+          
+          setTimeout(() => {
+            mainContent.style.opacity = '1';
+            console.log("🎭 メインコンテンツ表示完了");
+          }, 100);
+        }, 300);
+      }, 800);
+    }, 800);
   }
 }
 
