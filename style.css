@@ -116,13 +116,13 @@ h2 {
   justify-content: center;
   width: 100%;
   height: 100%; /* セル高さを完全に使用 */
-  font-size: 36px; /* フォントサイズを大幅に拡大（18px→36px） */
-  font-weight: 700; /* より太く */
-  color: #222;
+  font-size: 11px; /* 日本語補助テキスト用に小さく */
+  font-weight: 400;
+  color: #777;
   text-align: center;
   margin: 0;
   padding: 4px;
-  line-height: 1.2;
+  line-height: 1.1;
   /* 長いテキストの折り返し */
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -138,12 +138,13 @@ h2 {
   justify-content: center;
   width: 100%;
   height: 100%; /* セル高さを完全に使用 */
-  font-size: 11px; /* フォントサイズを小さく（14px→11px） */
-  color: #777;
+  font-size: 36px; /* 英語テキスト用に大きく */
+  font-weight: 700;
+  color: #222;
   text-align: center;
   margin: 0;
   padding: 0;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
@@ -382,63 +383,9 @@ h2 {
   height: 0 !important;
 }
 
-/* 🔹 分離疑問詞を文頭に配置するスタイル */
-#display-top-question-word {
-  /* 他のスロットと同じフォントスタイルに調整 */
-  font-size: 13px !important;
-  font-weight: bold !important;
-  color: #333 !important;
-  
-  /* 文頭位置に配置 */
-  order: -1 !important; /* 他のスロットより前に表示 */
-  
-  /* スロットコンテナと同じスタイル */
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #eee;
-  padding: 8px;
-  margin: 4px;
-  min-width: 120px;
-  max-width: 200px;
-  min-height: 80px; /* 他のスロットと高さを合わせる */
-  
-  /* 文頭配置のための追加スタイル */
-  margin-right: 12px; /* 次のスロットとの間隔 */
-  background-color: #f9f9f9; /* 疑問詞であることを示す薄い背景 */
-  
-  /* 🔥 空判定による非表示制御を追加 */
-  transition: opacity 0.2s ease-out;
-}
+/* 古い分離疑問詞スタイルを削除 - 新しいGrid構造が下で定義済み */
 
-/* 疑問詞エリアが空の場合の非表示スタイル */
-#display-top-question-word:empty,
-#display-top-question-word.empty-content {
-  display: none !important;
-  visibility: hidden !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* 🔹 疑問詞内の個別要素スタイル */
-.question-word-text {
-  font-size: 16px;
-  font-weight: bold;
-  color: #2a2a2a;
-  margin-bottom: 4px;
-  text-align: center;
-}
-
-.question-word-auxtext {
-  font-size: 12px;
-  color: #666;
-  font-style: italic;
-  text-align: center;
-}
+/* 古い疑問詞要素スタイルを削除 - 新しいGrid構造が下で定義済み */
 
 /* アニメーション効果（オプション - 将来の拡張用） */
 .slot-container.fade-out {
@@ -568,18 +515,20 @@ h2 {
 
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の4行構造 */
 #display-top-question-word {
-  display: grid;
-  grid-template-rows: 25px 60px 65px 25px; /* 4行構造：英語テキスト行を65pxに拡大 */
+  display: grid !important;
+  grid-template-rows: 25px 60px 25px 65px; /* 4行構造：英語テキスト行（4行目）を65pxに拡大 */
   grid-template-columns: 1fr;
-  width: 120px;
-  height: 175px; /* 全体の高さを調整 */
-  margin: 10px auto;
-  padding: 8px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  width: 160px !important; /* スロットと同じ幅 */
+  height: 175px !important; /* 全体の高さを調整 */
+  margin: 4px !important; /* スロットと同じマージン */
+  padding: 10px !important; /* スロットと同じパディング */
+  border: 1px solid #eee !important; /* スロットと同じボーダー */
+  border-radius: 0 !important; /* スロットと同じ角丸なし */
+  background-color: #f9f9f9 !important; /* 疑問詞であることを示す薄い背景 */
   align-items: center;
   justify-items: center;
+  box-sizing: border-box !important;
+  order: -1 !important; /* 他のスロットより前に表示 */
 }
 
 /* 疑問詞ラベル */
@@ -602,7 +551,7 @@ h2 {
 
 /* 疑問詞英語テキスト */
 #display-top-question-word .question-word-text {
-  grid-row: 3;
+  grid-row: 4; /* 4行目：英語が下 */
   font-size: 36px; /* スロットの英語テキストと同じサイズ */
   font-weight: 700;
   color: #222;
@@ -615,7 +564,7 @@ h2 {
 
 /* 疑問詞補助テキスト */
 #display-top-question-word .question-word-auxtext {
-  grid-row: 4;
+  grid-row: 3; /* 3行目：日本語が上 */
   font-size: 11px; /* スロットの補助テキストと同じサイズ */
   color: #777;
   text-align: center;
