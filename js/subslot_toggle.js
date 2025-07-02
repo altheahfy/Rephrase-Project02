@@ -51,7 +51,7 @@ function toggleExclusiveSubslot(slotId) {
     // 📍 サブスロット位置を調整
     setTimeout(() => {
       adjustSubslotPosition(slotId);
-    }, 50);
+    }, 100); // DOM更新とレンダリング完了を待つ
 
     // ★★★ 並べ替え処理を呼び出す ★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -295,7 +295,8 @@ function applyTabConnection(parentSlotId, isActive) {
 }
 
 /**
- * 📍 サブスロットエリアの位置を上位スロットに近づける
+ * 📍 サブスロットエリアの位置を上位スロットに近づける（改良版）
+ * 画面端での制限とスマートな位置調整を実装
  * @param {string} parentSlotId - 親スロットのID
  */
 function adjustSubslotPosition(parentSlotId) {
@@ -308,19 +309,75 @@ function adjustSubslotPosition(parentSlotId) {
   }
   
   try {
-    // 親スロットの位置を取得
+    // 🔍 まずサブスロットを一時的に表示して実際のサイズを測定
+    const originalDisplay = subslotArea.style.display;
+    const originalVisibility = subslotArea.style.visibility;
+    
+    subslotArea.style.visibility = 'hidden';
+    subslotArea.style.display = 'block';
+    subslotArea.style.position = 'absolute';
+    subslotArea.style.left = '0';
+    subslotArea.style.marginLeft = '0';
+    
+    // 実際のサブスロット幅を測定
+    const actualSubslotWidth = subslotArea.offsetWidth;
+    
+    // スタイルを元に戻す
+    subslotArea.style.visibility = originalVisibility;
+    subslotArea.style.display = originalDisplay;
+    subslotArea.style.position = '';
+    
+    // 各種コンテナの位置とサイズを取得
     const parentRect = parentSlot.getBoundingClientRect();
     const containerRect = parentSlot.parentElement.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
     
-    // サブスロットエリアを親スロットの直下に配置
-    const leftOffset = parentRect.left - containerRect.left;
+    // 親スロットの中央位置を計算
+    const parentCenterX = parentRect.left + (parentRect.width / 2);
+    const containerLeft = containerRect.left;
     
-    // CSSカスタムプロパティとinlineスタイルで位置調整
-    subslotArea.style.setProperty('--parent-offset', `${leftOffset}px`);
-    subslotArea.style.marginLeft = `${Math.max(0, leftOffset - 10)}px`;
-    subslotArea.style.maxWidth = `calc(100% - ${Math.max(0, leftOffset - 10)}px)`;
+    // 理想的な位置: サブスロットの中央が親スロットの中央に合う位置
+    const idealLeftOffset = parentCenterX - containerLeft - (actualSubslotWidth / 2);
     
-    console.log(`📍 ${parentSlotId} サブスロットの位置を調整しました (leftOffset: ${leftOffset}px)`);
+    // 画面境界の制約を計算
+    const minLeftOffset = 20; // 左端から最低20px
+    const maxLeftOffset = windowWidth - actualSubslotWidth - 40; // 右端から最低40px
+    
+    // 🎯 スマートな位置調整：端の方では中央寄せを弱める
+    let finalLeftOffset;
+    
+    if (idealLeftOffset >= minLeftOffset && idealLeftOffset <= maxLeftOffset) {
+      // 理想位置が境界内なら、そのまま使用
+      finalLeftOffset = idealLeftOffset;
+    } else {
+      // 境界を超える場合は、減衰効果を適用
+      const screenCenter = windowWidth / 2;
+      const distanceFromCenter = Math.abs(parentCenterX - screenCenter);
+      const maxDistance = screenCenter * 0.8; // 画面中央の80%の位置まで
+      
+      if (distanceFromCenter <= maxDistance) {
+        // 中央寄りの場合は理想位置に近づける
+        finalLeftOffset = Math.max(minLeftOffset, Math.min(idealLeftOffset, maxLeftOffset));
+      } else {
+        // 端寄りの場合は保守的な位置調整
+        const baseOffset = parentRect.left - containerLeft;
+        const conservativeOffset = baseOffset * 0.3; // 30%だけ調整
+        finalLeftOffset = Math.max(minLeftOffset, Math.min(conservativeOffset, maxLeftOffset));
+      }
+    }
+    
+    // CSSスタイルを適用
+    subslotArea.style.setProperty('--parent-offset', `${finalLeftOffset}px`);
+    subslotArea.style.marginLeft = `${finalLeftOffset}px`;
+    subslotArea.style.maxWidth = `${windowWidth - finalLeftOffset - 40}px`; // 右端余白を確保
+    
+    console.log(`📍 ${parentSlotId} 位置調整詳細:`);
+    console.log(`  - 親スロット中央: ${parentCenterX.toFixed(1)}px`);
+    console.log(`  - サブスロット実測幅: ${actualSubslotWidth}px`);
+    console.log(`  - 理想位置: ${idealLeftOffset.toFixed(1)}px`);
+    console.log(`  - 最終位置: ${finalLeftOffset.toFixed(1)}px`);
+    console.log(`  - 画面幅: ${windowWidth}px`);
+    
   } catch (error) {
     console.warn(`⚠ サブスロット位置調整エラー: ${parentSlotId}`, error);
   }
