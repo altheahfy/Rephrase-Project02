@@ -61,7 +61,55 @@ function toggleExclusiveSubslot(slotId) {
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
     console.log(`🔍 位置確認: marginLeft=${target.style.marginLeft}, maxWidth=${target.style.maxWidth}`);
 
-    // 🔗 エクセル風タブ連結スタイルを適用
+    // 🔗 エクセル風タブ連結スタイルを適用（デバッグ強化版）
+    console.log(`🔗 タブ連結スタイル適用開始: ${slotId}`);
+    
+    // 必要な要素を直接取得してログ出力
+    const parentSlot = document.getElementById(`slot-${slotId}`);
+    const subslotArea = document.getElementById(`slot-${slotId}-sub`);
+    
+    console.log(`🔍 要素確認:`);
+    console.log(`  - parentSlot (slot-${slotId}): ${!!parentSlot}`);
+    console.log(`  - subslotArea (slot-${slotId}-sub): ${!!subslotArea}`);
+    
+    if (parentSlot && subslotArea) {
+      // 🧹 まず既存のタブ連結スタイルをクリア
+      clearAllTabConnections();
+      
+      // 直接クラスを追加
+      parentSlot.classList.add('active-parent-slot');
+      subslotArea.classList.add('active-subslot-area');
+      
+      // スタイルの強制適用（CSSだけでは不十分な場合のフォールバック）
+      parentSlot.style.background = 'rgba(173, 216, 230, 0.4)';
+      parentSlot.style.border = '2px solid #87CEEB';
+      parentSlot.style.borderBottom = 'none';
+      parentSlot.style.borderRadius = '8px 8px 0 0';
+      
+      subslotArea.style.background = 'rgba(173, 216, 230, 0.25)';
+      subslotArea.style.border = '2px solid #87CEEB';
+      subslotArea.style.borderTop = 'none';
+      subslotArea.style.borderRadius = '0 0 12px 12px';
+      subslotArea.style.marginTop = '-2px';
+      
+      console.log(`✅ クラス追加完了:`);
+      console.log(`  - parentSlot classes: ${parentSlot.className}`);
+      console.log(`  - subslotArea classes: ${subslotArea.className}`);
+      
+      // ラベルの処理
+      const subslotLabel = subslotArea.querySelector('.subslot-label');
+      if (subslotLabel) {
+        subslotLabel.classList.add('tab-style');
+        subslotLabel.innerHTML = `📂 ${slotId.toUpperCase()} の詳細スロット`;
+        console.log(`✅ ラベル更新完了: ${subslotLabel.innerHTML}`);
+      } else {
+        console.warn(`⚠ サブスロットラベルが見つかりません`);
+      }
+    } else {
+      console.error(`❌ 必要な要素が見つかりません`);
+    }
+    
+    // 従来の関数も呼び出し
     applyTabConnection(slotId, true);
     
     // 📍 サブスロット位置を調整（安全な軽微調整版）
