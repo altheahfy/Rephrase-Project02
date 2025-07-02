@@ -172,7 +172,7 @@ window.getSlotVisibilityState = getSlotVisibilityState;
 function setupVisibilityControlUI() {
   console.log("🎛️ 表示制御UIのイベントハンドラーを設定中...");
   
-  // チェックボックスのイベントハンドラー
+  // チェックボックスのイベントハンドラー（スロット用・疑問詞用）
   const checkboxes = document.querySelectorAll('.visibility-checkbox');
   checkboxes.forEach(checkbox => {
     checkbox.addEventListener('change', function() {
@@ -181,7 +181,14 @@ function setupVisibilityControlUI() {
       const isVisible = this.checked;
       
       console.log(`🎛️ UIチェンジ: ${slotKey}-${elementType} = ${isVisible}`);
-      toggleSlotElementVisibility(slotKey, elementType, isVisible);
+      
+      // 疑問詞の場合
+      if (slotKey === 'question') {
+        toggleQuestionWordVisibility(elementType, isVisible);
+      } else {
+        // 通常のスロット制御
+        toggleSlotElementVisibility(slotKey, elementType, isVisible);
+      }
     });
   });
   
@@ -230,6 +237,7 @@ function setupVisibilityControlUI() {
 function updateUIFromState() {
   console.log("🔄 保存状態に基づいてUIを更新中...");
   
+  // 通常のスロット状態を更新
   ALL_SLOTS.forEach(slotKey => {
     ELEMENT_TYPES.forEach(elementType => {
       const isVisible = visibilityState[slotKey]?.[elementType] ?? true;
@@ -241,6 +249,19 @@ function updateUIFromState() {
     });
   });
   
+  // 疑問詞状態を更新
+  ['text', 'auxtext'].forEach(elementType => {
+    const isVisible = questionWordVisibilityState[elementType] ?? true;
+    const checkbox = document.querySelector(`.visibility-checkbox[data-slot="question"][data-type="${elementType}"]`);
+    
+    if (checkbox) {
+      checkbox.checked = isVisible;
+    }
+    
+    // 実際の表示状態も適用
+    toggleQuestionWordVisibility(elementType, isVisible);
+  });
+  
   console.log("✅ UIの更新が完了しました");
 }
 
@@ -250,6 +271,92 @@ loadVisibilityState = function() {
   originalLoadVisibilityState();
   updateUIFromState();
 };
+
+// 疑問詞表示制御機能
+let questionWordVisibilityState = {
+  text: true,    // 疑問詞テキスト（What等）
+  auxtext: true  // 補助テキスト（何？等）
+};
+
+// 🔧 疑問詞の表示状態管理
+function toggleQuestionWordVisibility(elementType, isVisible) {
+  if (!['text', 'auxtext'].includes(elementType)) {
+    console.error(`❌ 無効な疑問詞要素タイプ: ${elementType}`);
+    return;
+  }
+
+  // 状態を更新
+  questionWordVisibilityState[elementType] = isVisible;
+  
+  // DOM要素を制御
+  const questionWordArea = document.getElementById('display-top-question-word');
+  if (questionWordArea) {
+    if (elementType === 'text') {
+      // 疑問詞テキスト（What等）の表示制御
+      const textElements = questionWordArea.querySelectorAll('.question-word-text');
+      textElements.forEach(element => {
+        element.style.display = isVisible ? 'inline' : 'none';
+      });
+      console.log(`🔄 疑問詞テキストを${isVisible ? '表示' : '非表示'}にしました`);
+    } else if (elementType === 'auxtext') {
+      // 補助テキスト（何？等）の表示制御
+      const auxtextElements = questionWordArea.querySelectorAll('.question-word-auxtext');
+      auxtextElements.forEach(element => {
+        element.style.display = isVisible ? 'inline' : 'none';
+      });
+      console.log(`🔄 疑問詞補助テキストを${isVisible ? '表示' : '非表示'}にしました`);
+    }
+  }
+  
+  // localStorage に状態を保存
+  saveQuestionWordVisibilityState();
+}
+
+// 📁 疑問詞表示状態をlocalStorageに保存
+function saveQuestionWordVisibilityState() {
+  try {
+    localStorage.setItem('rephrase_question_word_visibility', JSON.stringify(questionWordVisibilityState));
+    console.log("💾 疑問詞表示状態を保存しました:", questionWordVisibilityState);
+  } catch (error) {
+    console.error("❌ 疑問詞表示状態の保存に失敗:", error);
+  }
+}
+
+// 📂 疑問詞表示状態をlocalStorageから読み込み
+function loadQuestionWordVisibilityState() {
+  try {
+    const saved = localStorage.getItem('rephrase_question_word_visibility');
+    if (saved) {
+      questionWordVisibilityState = { ...questionWordVisibilityState, ...JSON.parse(saved) };
+      console.log("📂 保存された疑問詞表示状態を読み込みました:", questionWordVisibilityState);
+    }
+  } catch (error) {
+    console.error("❌ 疑問詞表示状態の読み込みに失敗:", error);
+  }
+}
+
+// 🔄 疑問詞表示をリセット
+function resetQuestionWordVisibility() {
+  questionWordVisibilityState.text = true;
+  questionWordVisibilityState.auxtext = true;
+  
+  toggleQuestionWordVisibility('text', true);
+  toggleQuestionWordVisibility('auxtext', true);
+  
+  // UIのチェックボックスも更新
+  const textCheckbox = document.querySelector('.visibility-checkbox[data-slot="question"][data-type="text"]');
+  const auxtextCheckbox = document.querySelector('.visibility-checkbox[data-slot="question"][data-type="auxtext"]');
+  
+  if (textCheckbox) textCheckbox.checked = true;
+  if (auxtextCheckbox) auxtextCheckbox.checked = true;
+  
+  console.log("🔄 疑問詞表示をリセットしました");
+}
+
+// 🔹 疑問詞機能をグローバルにエクスポート
+window.toggleQuestionWordVisibility = toggleQuestionWordVisibility;
+window.resetQuestionWordVisibility = resetQuestionWordVisibility;
+window.questionWordVisibilityState = questionWordVisibilityState;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
