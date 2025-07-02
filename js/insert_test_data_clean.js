@@ -1137,24 +1137,37 @@ function reorderSubslotsInContainer(container, jsonData) {
   console.log(`親スロットID: ${parentSlotId}`);
 
   const elementsWithOrder = Array.from(subslots).map(el => {
-    // 'slot-m1-sub-s' から 's' を取り出し、'sub-s' 形式にする
-    const subId = el.id.substring(el.id.lastIndexOf('-') + 1);
-    const fullSubslotId = `sub-${subId}`;
-    console.log(`  - 処理中のサブスロット要素: ${el.id} (検索ID: ${fullSubslotId})`);
-    
-    // 親スロットと SubslotID の両方でマッチング
-    const data = jsonData.find(d => 
-      d.Slot?.toUpperCase() === parentSlotId && 
-      d.SubslotID?.toLowerCase() === fullSubslotId.toLowerCase()
-    );
-    const order = data ? data.display_order : 999;
-    
-    if(data){
-        console.log(`    ✅ データ発見 (Slot: ${data.Slot}, SubslotID: ${data.SubslotID}), order=${order}`);
+    // id例: slot-m1-sub-s, slot-m1-sub-x など
+    // サブスロットID部分を正確に抽出
+    const match = el.id.match(/^slot-([^-]+)-sub-(.+)$/);
+    let slotKey = null, subslotKey = null;
+    if (match) {
+      slotKey = match[1];
+      subslotKey = match[2];
     } else {
-        console.log(`    ❌ データ未発見 (親: ${parentSlotId}, SubslotID: ${fullSubslotId})`);
+      // 旧形式: slot-m1-sub など
+      const match2 = el.id.match(/^slot-([^-]+)-sub$/);
+      if (match2) {
+        slotKey = match2[1];
+        subslotKey = '';
+      }
     }
-    
+    // JSONのSubslotIDと完全一致させる
+    let foundData = null;
+    if (slotKey !== null) {
+      foundData = jsonData.find(d =>
+        d.Slot?.toUpperCase() === parentSlotId &&
+        ((d.SubslotID?.toLowerCase() === `sub-${subslotKey}`) ||
+         (d.SubslotID?.toLowerCase() === subslotKey)) // 柔軟に両方対応
+      );
+    }
+    const order = foundData ? foundData.display_order : 999;
+    console.log(`  - サブスロットDOM: ${el.id} → slotKey: ${slotKey}, subslotKey: ${subslotKey}, JSONマッチ: ${!!foundData}, order=${order}`);
+    if(foundData){
+      console.log(`    ✅ データ発見 (Slot: ${foundData.Slot}, SubslotID: ${foundData.SubslotID}), order=${order}`);
+    } else {
+      console.log(`    ❌ データ未発見 (親: ${parentSlotId}, subslotKey: ${subslotKey})`);
+    }
     return { el, order };
   });
 
