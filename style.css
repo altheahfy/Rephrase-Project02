@@ -642,6 +642,11 @@ h2 {
   margin: 0;
   padding: 0;
   line-height: 1.2; /* スロットの英語テキストと同じ行高 */
+  
+  /* 🆕 例文テキストエリアを明確にする薄いオレンジの背景と黒い線 */
+  background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 
 /* 疑問詞ボタンプレースホルダー - Grid行5,6（空のスペース） */
