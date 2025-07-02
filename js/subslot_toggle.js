@@ -64,12 +64,10 @@ function toggleExclusiveSubslot(slotId) {
     // 🔗 エクセル風タブ連結スタイルを適用
     applyTabConnection(slotId, true);
     
-    // 📍 サブスロット位置を調整（一時的に無効化）
-    // setTimeout(() => {
-    //   adjustSubslotPosition(slotId);
-    // }, 100); // DOM更新とレンダリング完了を待つ
-    
-    console.log(`🔍 位置調整を一時的に無効化 - サブスロットが見えるかテスト中`);
+    // 📍 サブスロット位置を調整（安全な軽微調整版）
+    setTimeout(() => {
+      adjustSubslotPositionSafe(slotId);
+    }, 150); // DOM更新とレンダリング完了を待つ
 
     // ★★★ 並べ替え処理を呼び出す ★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -170,7 +168,7 @@ window.addEventListener('resize', () => {
     if (parentId) {
       console.log(`🔄 リサイズ時の位置再調整: ${parentId}`);
       setTimeout(() => {
-        adjustSubslotPosition(parentId);
+        adjustSubslotPositionSafe(parentId); // 安全版を使用
       }, 100);
     }
   }
@@ -401,6 +399,88 @@ function adjustSubslotPosition(parentSlotId) {
     
   } catch (error) {
     console.warn(`⚠ サブスロット位置調整エラー: ${parentSlotId}`, error);
+  }
+}
+
+/**
+ * 📍 安全なサブスロット位置調整（軽微調整版）
+ * サブスロットを消さずに最小限の位置調整のみ実行
+ * @param {string} parentSlotId - 親スロットのID
+ */
+function adjustSubslotPositionSafe(parentSlotId) {
+  const parentSlot = document.getElementById(`slot-${parentSlotId}`);
+  const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
+  
+  if (!parentSlot || !subslotArea) {
+    console.warn(`⚠ 安全位置調整: 必要な要素が見つかりません`);
+    return;
+  }
+  
+  // 🔍 現在の表示状態を確認
+  if (getComputedStyle(subslotArea).display === 'none') {
+    console.warn(`⚠ 安全位置調整: サブスロットが非表示状態のため調整をスキップ`);
+    return;
+  }
+  
+  try {
+    console.log(`📍 ${parentSlotId} 安全な位置調整を開始`);
+    
+    // 各種サイズと位置を取得
+    const parentRect = parentSlot.getBoundingClientRect();
+    const containerRect = parentSlot.parentElement.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const subslotWidth = subslotArea.offsetWidth;
+    
+    if (!subslotWidth || subslotWidth === 0) {
+      console.warn(`⚠ サブスロット幅が0のため位置調整をスキップ: ${parentSlotId}`);
+      return;
+    }
+    
+    // 親スロットの中央位置
+    const parentCenterX = parentRect.left + (parentRect.width / 2);
+    const containerLeft = containerRect.left;
+    
+    // 軽微な位置調整：画面中央寄りのスロットのみ微調整
+    const screenCenter = windowWidth / 2;
+    const distanceFromCenter = Math.abs(parentCenterX - screenCenter);
+    const maxAdjustmentDistance = screenCenter * 0.6; // 画面中央60%の範囲でのみ調整
+    
+    if (distanceFromCenter > maxAdjustmentDistance) {
+      console.log(`📍 ${parentSlotId} 画面端に近いため位置調整をスキップ`);
+      return;
+    }
+    
+    // 理想位置の計算（中央揃え）
+    const idealLeftOffset = parentCenterX - containerLeft - (subslotWidth / 2);
+    
+    // 安全な境界内での調整
+    const minOffset = 10;
+    const maxOffset = windowWidth - subslotWidth - 20;
+    const safeLeftOffset = Math.max(minOffset, Math.min(idealLeftOffset, maxOffset));
+    
+    // 現在位置からの差分が小さい場合のみ調整
+    const currentLeft = parseInt(subslotArea.style.marginLeft) || 0;
+    const adjustment = safeLeftOffset - currentLeft;
+    
+    if (Math.abs(adjustment) < 5) {
+      console.log(`📍 ${parentSlotId} 調整量が小さいためスキップ (${adjustment.toFixed(1)}px)`);
+      return;
+    }
+    
+    // 段階的な調整（一気に移動せず）
+    const maxAdjustmentStep = 50; // 最大50pxまでの調整
+    const finalAdjustment = Math.sign(adjustment) * Math.min(Math.abs(adjustment), maxAdjustmentStep);
+    const finalLeftOffset = currentLeft + finalAdjustment;
+    
+    // CSSを安全に適用
+    subslotArea.style.marginLeft = `${finalLeftOffset}px`;
+    
+    console.log(`📍 ${parentSlotId} 軽微な位置調整完了:`);
+    console.log(`  - 調整前: ${currentLeft}px → 調整後: ${finalLeftOffset}px`);
+    console.log(`  - 調整量: ${finalAdjustment.toFixed(1)}px`);
+    
+  } catch (error) {
+    console.warn(`⚠ 安全位置調整エラー: ${parentSlotId}`, error);
   }
 }
 

@@ -808,9 +808,17 @@ h2 {
   /* 画面外に出ないように制限 */
   min-width: 300px !important;
   max-width: calc(100vw - 40px) !important;
-  margin-left: 0 !important; /* 初期値を0に設定 */
-  margin-right: 20px !important;
   position: relative !important;
+  /* margin-leftは動的に設定されるため初期値は設定しない */
+}
+
+/* 🔍 タブ連結エリアが表示されるように強制表示 */
+.slot-wrapper.active-subslot-area[id$="-sub"] {
+  /* タブ連結時は確実に表示 */
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  /* 位置調整が適用されても画面内に留まるように */
   left: auto !important;
   right: auto !important;
   transform: none !important;
