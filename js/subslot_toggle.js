@@ -565,8 +565,17 @@ function adjustSubslotPositionSafe(parentSlotId) {
     const finalAdjustment = Math.sign(adjustment) * Math.min(Math.abs(adjustment), maxAdjustmentStep);
     const finalLeftOffset = currentLeft + finalAdjustment;
     
-    // CSSを安全に適用
+    // CSSを安全に適用（複数方法で確実に設定）
     subslotArea.style.marginLeft = `${finalLeftOffset}px`;
+    subslotArea.style.setProperty('--dynamic-margin-left', `${finalLeftOffset}px`);
+    subslotArea.style.setProperty('margin-left', `${finalLeftOffset}px`, 'important');
+    
+    // フォールバック：transformも併用
+    if (finalLeftOffset > 0) {
+      subslotArea.style.transform = `translateX(${finalLeftOffset}px)`;
+    } else {
+      subslotArea.style.transform = '';
+    }
     
     console.log(`📍 ${parentSlotId} 軽微な位置調整完了:`);
     console.log(`  - 調整前: ${currentLeft}px → 調整後: ${finalLeftOffset}px`);
@@ -646,10 +655,21 @@ window.testSubslotPosition = function(slotId) {
   console.log(`📊 現在の状態:`);
   console.log(`  - サブスロット表示: ${getComputedStyle(subslotArea).display}`);
   console.log(`  - 現在のmarginLeft: ${subslotArea.style.marginLeft}`);
+  console.log(`  - 計算後のmarginLeft: ${getComputedStyle(subslotArea).marginLeft}`);
   console.log(`  - サブスロット幅: ${subslotArea.offsetWidth}px`);
+  console.log(`  - 親スロット位置: ${parentSlot.getBoundingClientRect().left}px`);
   
-  // 強制的に位置調整を実行
-  adjustSubslotPositionSafe(slotId);
+  // 🎯 強制的に100px右に移動してテスト
+  console.log(`🎯 テスト用に100px右に移動します`);
+  subslotArea.style.marginLeft = '100px';
+  subslotArea.style.setProperty('margin-left', '100px', 'important');
+  subslotArea.style.transform = 'translateX(100px)';
+  subslotArea.style.backgroundColor = 'yellow'; // 視覚的確認用
+  
+  setTimeout(() => {
+    // 強制的に位置調整を実行
+    adjustSubslotPositionSafe(slotId);
+  }, 1000);
 };
 
 console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPosition('スロットID')`);
