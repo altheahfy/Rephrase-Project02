@@ -132,6 +132,9 @@ h2 {
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  /* 🆕 例文テキストエリアを明確にする薄いグレーの線 */
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 /* 🎯 Grid行4: 日本語補助テキスト（必ず4番目に配置） */
