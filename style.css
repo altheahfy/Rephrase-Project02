@@ -812,6 +812,8 @@ h2 {
   /* 位置調整用：marginLeftによる調整を有効にする */
   left: 0 !important;
   transition: margin-left 0.3s ease !important;
+  /* 🔧 親要素のflexプロパティを上書き */
+  flex-direction: column !important;
   /* margin-leftは動的に設定されるため初期値は設定しない */
 }
 
@@ -819,6 +821,8 @@ h2 {
 div.slot-wrapper[id$="-sub"] {
   /* JavaScriptで設定されるmargin-leftを確実に適用 */
   margin-left: var(--dynamic-margin-left, 0px) !important;
+  /* 🎯 transformによる位置調整も有効にする */
+  transform: var(--dynamic-transform, none) !important;
 }
 
 /* 🔍 タブ連結エリアが表示されるように強制表示 */
@@ -866,6 +870,7 @@ div.slot-wrapper[id$="-sub"] {
 
 /* 展開中のサブスロットエリア全体のスタイル */
 .slot-wrapper.active-subslot-area {
+  justify-content: flex-start !important; /* 内部要素は左揃えを維持 */
   background: rgba(173, 216, 230, 0.25) !important; /* 親より薄いブルー */
   border: 2px solid #87CEEB !important;
   border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
