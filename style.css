@@ -562,18 +562,21 @@ h2 {
   width: 100% !important;
   order: 999 !important; /* 他の要素より後に配置 */
   margin-top: 16px !important;
-  clear: both !important; /* フロートをクリア */
-  display: block !important; /* ブロック要素として配置 */
 }
 
-/* 静的エリアのサブスロット展開エリアで確実に改行を強制 */
+/* 静的エリアのサブスロット展開エリアは横並び（サブスロット）＋下配置（制御パネル）の混合レイアウト */
 [id^="slot-"][id$="-sub"]:not(#dynamic-slot-area *) {
-  flex-direction: column !important; /* 縦方向配置を強制 */
+  display: flex !important; /* flexレイアウトを維持 */
+  flex-direction: row !important; /* サブスロットは横並び */
+  flex-wrap: wrap !important; /* 必要に応じて折り返し */
+  align-items: flex-start !important; /* 上揃え */
+  gap: 8px !important; /* サブスロット間の隙間 */
 }
 
 /* 静的エリアのサブスロット展開エリア内で、サブスロット群とコントロールパネルを分離 */
 [id^="slot-"][id$="-sub"]:not(#dynamic-slot-area *) .subslot {
-  margin-bottom: 8px !important; /* サブスロット間の余白 */
+  flex: 0 0 auto !important; /* サブスロットのサイズを固定 */
+  margin-bottom: 0 !important; /* サブスロット間の余白をリセット */
 }
 
 /* 動的記載エリア内の要素には上記ルールを適用しない（明示的に除外） */
@@ -583,8 +586,21 @@ h2 {
   width: auto !important;
   order: initial !important;
   margin-top: 8px !important;
-  clear: none !important;
-  display: inline-block !important;
+}
+
+/* 動的記載エリア内のサブスロット展開エリアは従来通り */
+#dynamic-slot-area [id^="slot-"][id$="-sub"] {
+  /* 動的記載エリア内では静的エリアのルールを無効化 */
+  flex-direction: initial !important;
+  flex-wrap: initial !important;
+  align-items: initial !important;
+  gap: initial !important;
+}
+
+/* 動的記載エリア内のサブスロットは従来通り */
+#dynamic-slot-area .subslot {
+  flex: initial !important;
+  margin-bottom: initial !important;
 }
 
 /* 🔹 分離疑問詞エリアのスタイル - スロットと同様の6行構造 */
