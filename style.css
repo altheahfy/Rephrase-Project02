@@ -803,65 +803,19 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 🛡️ サブスロットエリアの安全制限 */
+/* 🛡️ サブスロットエリアの安全制限 + 位置調整対応 */
 .slot-wrapper[id$="-sub"] {
   /* 画面外に出ないように制限 */
-  min-width: 300px;
-  max-width: calc(100vw - 40px);
-  
-  /* 🆕 Flexboxレイアウトを適用して、orderプロパティを有効化 */
-  display: flex;
-  flex-wrap: wrap; /* サブスロットが折り返すようにする */
-  gap: 10px; /* サブスロット間の隙間 */
-  
-  /* 既存のスタイル */
-  padding: 10px;
-  border: 2px solid #4a90e2;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  margin: 4px;
-  position: relative;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
+  min-width: 300px !important;
+  max-width: calc(100vw - 40px) !important;
+  position: relative !important;
+  /* 位置調整用：marginLeftによる調整を有効にする */
+  left: 0 !important;
+  transition: margin-left 0.3s ease !important;
+  /* margin-leftは動的に設定されるため初期値は設定しない */
 }
 
-/* サブスロットエリアの上に表示されるタブ風ラベル */
-.subslot-label {
-  position: absolute;
-  top: -10px;
-  left: 10px;
-  right: 10px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  color: white;
-  font-weight: bold;
-  padding: 0 10px;
-  border-radius: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* サブスロットエリアがアクティブなときのスタイル */
-.slot-wrapper.active-subslot-area {
-  border-color: #007bff;
-  background-color: rgba(0, 123, 255, 0.1);
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-}
-
-/* サブスロットエリアの非表示状態 */
-.slot-wrapper[id$="-sub"].hidden {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-}
-
-/* サブスロットエリアの表示制御 - JavaScriptからの変更を優先 */
+/* 🔧 位置調整のためのより具体的なセレクタ（JavaScriptからの変更を優先） */
 div.slot-wrapper[id$="-sub"] {
   /* JavaScriptで設定されるmargin-leftを確実に適用 */
   margin-left: var(--dynamic-margin-left, 0px) !important;
