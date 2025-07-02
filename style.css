@@ -157,9 +157,10 @@ h2 {
   hyphens: auto;
   white-space: normal; /* 改行を許可 */
   
-  /* 🆕 例文テキストエリアを明確にする薄いオレンジの線 */
-  border-top: 1px solid #ffd6a5;
-  border-bottom: 1px solid #ffd6a5;
+  /* 🆕 例文テキストエリアを明確にする薄いオレンジの背景と黒い線 */
+  background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 
 /* スロット順序制御用 - JS側でdata-order属性を設定した場合の優先度 */
