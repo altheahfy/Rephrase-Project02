@@ -394,7 +394,18 @@ function syncDynamicToStatic() {
     }
   });
   
-  // 🖼 画像処理：データ同期完了後に画像の自動非表示処理を実行
+  // � サブスロット順序修正：window.loadedJsonDataを使用して正しい順序で再書き込み
+  console.log("🔢 サブスロット順序修正処理を実行...");
+  if (window.loadedJsonData && typeof window.syncSubslotsWithCorrectOrder === 'function') {
+    setTimeout(() => {
+      window.syncSubslotsWithCorrectOrder(window.loadedJsonData);
+      console.log("✅ サブスロット順序修正処理が完了しました");
+    }, 50);
+  } else {
+    console.warn("⚠ window.loadedJsonData または syncSubslotsWithCorrectOrder関数が見つかりません");
+  }
+
+  // �🖼 画像処理：データ同期完了後に画像の自動非表示処理を実行
   console.log("🖼 syncDynamicToStatic完了後の画像処理を実行...");
   if (typeof window.processAllImagesWithCoordination === 'function') {
     setTimeout(() => {
@@ -900,6 +911,84 @@ window.hideEmptySubslots = hideEmptySubslots;
 window.hideEmptySubslotContainers = hideEmptySubslotContainers;
 window.debugEmptySlots = debugEmptySlots;
 window.forceHideEmptySlots = forceHideEmptySlots;
+
+/**
+ * window.loadedJsonDataを使用してサブスロットを正しい順序で静的エリアに書き込む関数
+ * @param {Array} jsonData - window.loadedJsonData
+ */
+function syncSubslotsWithCorrectOrder(jsonData) {
+  if (!jsonData || !Array.isArray(jsonData)) {
+    console.warn("⚠ syncSubslotsWithCorrectOrder: 無効なデータです");
+    return;
+  }
+
+  console.log("🔄 === サブスロット順序修正処理を開始 ===");
+
+  // サブスロットデータのみを抽出し、display_orderでソート
+  const subslotData = jsonData.filter(item => item.SubslotID && item.SubslotID !== "");
+  
+  console.log(`📊 サブスロット総数: ${subslotData.length}`);
+
+  // 親スロット別にグループ化
+  const groupedByParent = {};
+  subslotData.forEach(item => {
+    const parentSlot = item.Slot.toLowerCase();
+    if (!groupedByParent[parentSlot]) {
+      groupedByParent[parentSlot] = [];
+    }
+    groupedByParent[parentSlot].push(item);
+  });
+
+  // 各親スロットのサブスロットを display_order でソート
+  Object.keys(groupedByParent).forEach(parentSlot => {
+    const subslots = groupedByParent[parentSlot];
+    
+    // display_orderでソート
+    subslots.sort((a, b) => {
+      const orderA = a.display_order || 0;
+      const orderB = b.display_order || 0;
+      return orderA - orderB;
+    });
+
+    console.log(`🔢 ${parentSlot}のサブスロット順序:`);
+    subslots.forEach((item, index) => {
+      console.log(`  ${index + 1}. ${item.SubslotID} (order: ${item.display_order}) - "${item.SubslotElement}"`);
+    });
+
+    // 各サブスロットを順序通りに静的エリアに書き込み
+    subslots.forEach(item => {
+      const fullSlotId = `slot-${parentSlot}-${item.SubslotID.toLowerCase()}`;
+      const slotElement = document.getElementById(fullSlotId);
+
+      if (slotElement) {
+        // phraseとtextを更新
+        const phraseElement = slotElement.querySelector(".slot-phrase");
+        const textElement = slotElement.querySelector(".slot-text");
+
+        if (phraseElement && item.SubslotElement) {
+          phraseElement.textContent = item.SubslotElement;
+          console.log(`✅ [${fullSlotId}] phrase: "${item.SubslotElement}"`);
+        }
+
+        if (textElement && item.SubslotText) {
+          textElement.textContent = item.SubslotText;
+          console.log(`✅ [${fullSlotId}] text: "${item.SubslotText}"`);
+        }
+
+        // CSSのorderプロパティも設定（DOM順序を上書き）
+        slotElement.style.order = item.display_order || 0;
+        console.log(`✅ [${fullSlotId}] CSS order: ${item.display_order || 0}`);
+      } else {
+        console.warn(`⚠ サブスロット要素が見つかりません: ${fullSlotId}`);
+      }
+    });
+  });
+
+  console.log("✅ === サブスロット順序修正処理が完了 ===");
+}
+
+// グローバルにエクスポート
+window.syncSubslotsWithCorrectOrder = syncSubslotsWithCorrectOrder;
 
 /**
  * 空のスロットを非表示にする機構
