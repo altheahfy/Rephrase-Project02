@@ -3,13 +3,12 @@
 
 // 🎯 サブスロットの表示・非表示制御に使用するスロット一覧
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
-const SUB_ELEMENT_TYPES = ['image', 'subslot-element', 'subslot-text'];
+const SUB_ELEMENT_TYPES = ['subslot-element', 'subslot-text'];
 
 // サブスロット要素タイプのラベル
 const SUB_ELEMENT_LABELS = {
-  'image': { icon: '🖼️' },
-  'subslot-element': { icon: '📄' },
-  'subslot-text': { icon: '📝' }
+  'subslot-element': { icon: '📄', label: 'English' },
+  'subslot-text': { icon: '📝', label: '日本語' }
 };
 
 // 🏗️ サブスロット用コントロールパネルを生成
@@ -142,11 +141,10 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   const controlGroup = document.createElement('div');
   controlGroup.className = 'subslot-control-group';
   controlGroup.style.cssText = `
-    padding: 6px;
+    padding: 4px;
     border: 1px solid #f0f0f0;
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.7);
-    min-width: 60px;
   `;
   
   // スロット名表示
@@ -165,21 +163,18 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   const checkboxContainer = document.createElement('div');
   checkboxContainer.style.cssText = `
     display: flex;
-    flex-direction: row;
-    gap: 6px;
-    font-size: 12px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
   `;
   
   SUB_ELEMENT_TYPES.forEach(elementType => {
     const label = document.createElement('label');
     label.style.cssText = `
       display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 2px;
       cursor: pointer;
-      padding: 2px;
     `;
     
     const checkbox = document.createElement('input');
@@ -203,15 +198,19 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     });
     
     const icon = document.createElement('span');
-    const config = SUB_ELEMENT_LABELS[elementType] || { icon: '❓' };
+    const config = SUB_ELEMENT_LABELS[elementType] || { icon: '❓', label: elementType };
     icon.textContent = config.icon;
-    icon.style.cssText = `
-      font-size: 16px;
-      margin-bottom: 2px;
+    
+    const labelText = document.createElement('span');
+    labelText.textContent = config.label;
+    labelText.style.cssText = `
+      margin-left: 2px;
+      font-size: 9px;
     `;
     
-    label.appendChild(icon);
     label.appendChild(checkbox);
+    label.appendChild(icon);
+    label.appendChild(labelText);
     checkboxContainer.appendChild(label);
   });
   
@@ -230,29 +229,16 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
       return;
     }
     
-    let targetElement = null;
-    
-    if (elementType === 'image') {
-      // イメージ要素の検索（複数のパターンを試す）
-      targetElement = subslotElement.querySelector('.image') ||
-                     subslotElement.querySelector('.slot-image') ||
-                     subslotElement.querySelector('.subslot-image') ||
-                     subslotElement.querySelector('img');
-    } else {
-      // その他の要素の検索
-      targetElement = subslotElement.querySelector(`.${elementType}`);
-    }
-    
+    // 実際のサブスロット要素構造に基づいて検索
+    const targetElement = subslotElement.querySelector(`.${elementType}`);
     if (targetElement) {
       targetElement.style.display = isVisible ? 'block' : 'none';
       console.log(`✅ ${subslotId} の ${elementType} を ${isVisible ? '表示' : '非表示'} に設定`);
     } else {
       console.warn(`⚠ ${subslotId} 内に ${elementType} 要素が見つかりません`);
       // デバッグ用：実際に存在する要素を確認
-      const childElements = Array.from(subslotElement.children).map(child => {
-        return `${child.tagName.toLowerCase()}${child.className ? '.' + child.className : ''}`;
-      });
-      console.log(`📋 ${subslotId} 内の実際の要素: ${childElements.join(', ')}`);
+      const childElements = Array.from(subslotElement.children).map(child => child.className);
+      console.log(`📋 ${subslotId} 内の実際の要素クラス: ${childElements.join(', ')}`);
     }
     
   } catch (error) {
