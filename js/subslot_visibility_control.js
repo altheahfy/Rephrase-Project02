@@ -64,7 +64,7 @@ function createSubslotControlPanel(parentSlot) {
   panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
   panelContainer.appendChild(panelTitle);
   
-  // サブスロット候補を取得（新旧両方のクラスに対応）
+  // サブスロット候補を取得（display状態に関係なく検索）
   let subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
   
   // 互換性のため.subslotクラスもチェック
@@ -73,12 +73,32 @@ function createSubslotControlPanel(parentSlot) {
     console.log(`🔄 ${parentSlot}: .subslot-containerが見つからないため.subslotクラスで検索`);
   }
   
+  // さらに直接IDベースでも検索（より確実）
+  if (subslotElements.length === 0) {
+    subslotElements = document.querySelectorAll(`[id^="slot-${parentSlot}-sub-"]`);
+    console.log(`🔄 ${parentSlot}: IDパターンで検索`);
+  }
+  
   console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
   
   // デバッグ: 検出されたサブスロットの詳細を表示
   subslotElements.forEach((subslot, index) => {
-    console.log(`  - サブスロット${index + 1}: ${subslot.id} (${subslot.className})`);
+    console.log(`  - サブスロット${index + 1}: ${subslot.id} (${subslot.className}) display:${getComputedStyle(subslot).display}`);
   });
+  
+  // さらに詳細デバッグ：サブスロットコンテナの存在確認
+  const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
+  if (subslotContainer) {
+    console.log(`🔍 ${parentSlot}サブスロットコンテナ詳細:`);
+    console.log(`  - ID: ${subslotContainer.id}`);
+    console.log(`  - 表示状態: ${getComputedStyle(subslotContainer).display}`);
+    console.log(`  - 子要素数: ${subslotContainer.children.length}`);
+    Array.from(subslotContainer.children).forEach((child, index) => {
+      console.log(`    子要素${index + 1}: ${child.id} (${child.className})`);
+    });
+  } else {
+    console.error(`❌ ${parentSlot}のサブスロットコンテナが見つかりません`);
+  }
   
   if (subslotElements.length === 0) {
     console.warn(`⚠ ${parentSlot}: サブスロット要素が見つかりません`);
@@ -315,18 +335,28 @@ function addSubslotControlPanel(parentSlot) {
     console.log(`🗑️ 既存のコントロールパネルを削除: ${parentSlot}`);
   }
   
-  // 新しいパネルを生成
-  console.log(`🏗️ 新しいコントロールパネルを生成中...`);
-  const panel = createSubslotControlPanel(parentSlot);
-  
-  if (panel) {
-    // コンテナの直後にパネルを挿入
-    subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
-    console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
-    console.log(`🔍 追加されたパネル: ${panel.id}, クラス: ${panel.className}`);
-  } else {
-    console.error(`❌ パネルの生成に失敗しました: ${parentSlot}`);
-  }
+  // サブスロットが完全に展開されるまで少し待つ
+  setTimeout(() => {
+    console.log(`🏗️ 新しいコントロールパネルを生成中... (遅延後)`);
+    const panel = createSubslotControlPanel(parentSlot);
+    
+    if (panel) {
+      // コンテナの直後にパネルを挿入
+      subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
+      console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
+      console.log(`🔍 追加されたパネル: ${panel.id}, クラス: ${panel.className}`);
+      
+      // 表示状態を同期
+      setTimeout(() => {
+        if (window.syncAllSubslotControlPanels) {
+          window.syncAllSubslotControlPanels();
+        }
+      }, 50);
+      
+    } else {
+      console.error(`❌ パネルの生成に失敗しました: ${parentSlot}`);
+    }
+  }, 200); // 200ms遅延
 }
 
 // 🗑️ サブスロット折りたたみ時にコントロールパネルを削除
