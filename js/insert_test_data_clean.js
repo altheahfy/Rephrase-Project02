@@ -794,8 +794,22 @@ function syncSubslotsFromJson(data) {
     console.log(`🧹 ${container.id} を完全クリア`);
   });
   
-  // 🔧 STEP2: 新しいデータのみで再構築
-  subslotData.forEach(item => {
+  // 🔧 STEP2: display_orderでソートしてから再構築
+  // display_orderによる正しい順序でソート
+  const sortedSubslotData = subslotData.sort((a, b) => {
+    // まず親スロットで並べ、次にdisplay_orderで並べる
+    if (a.Slot !== b.Slot) {
+      return a.Slot.localeCompare(b.Slot);
+    }
+    return (a.display_order || 0) - (b.display_order || 0);
+  });
+  
+  console.log(`📊 display_orderでソート完了: ${sortedSubslotData.length}件`);
+  sortedSubslotData.forEach((item, index) => {
+    console.log(`  ${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
+  });
+  
+  sortedSubslotData.forEach(item => {
     try {
       // DisplayAtTopの要素をサブスロットから除外
       if (displayAtTopItem && 
