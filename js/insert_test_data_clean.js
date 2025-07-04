@@ -798,10 +798,40 @@ function syncSubslotsFromJson(data) {
       const fullSlotId = `slot-${parentSlot}-${subslotId}`;
       console.log(`🔍 サブスロット処理: ${fullSlotId}`);
       
-      const slotElement = document.getElementById(fullSlotId);
+      let slotElement = document.getElementById(fullSlotId);
       if (!slotElement) {
-        console.warn(`⚠ サブスロット要素が見つかりません: ${fullSlotId}`);
-        return;
+        console.log(`🔧 サブスロット要素が見つかりません、動的生成します: ${fullSlotId}`);
+        
+        // 親コンテナを検索（slot-[親スロット名]-sub）
+        const parentContainerId = `slot-${parentSlot}-sub`;
+        const parentContainer = document.getElementById(parentContainerId);
+        
+        if (!parentContainer) {
+          console.warn(`⚠ 親コンテナが見つかりません: ${parentContainerId}`);
+          return;
+        }
+        
+        // 新しいサブスロットDOM要素を動的生成
+        slotElement = document.createElement('div');
+        slotElement.id = fullSlotId;
+        slotElement.className = 'slot-container';
+        
+        // phrase要素を作成
+        const phraseElement = document.createElement('div');
+        phraseElement.className = 'slot-phrase';
+        
+        // text要素を作成
+        const textElement = document.createElement('div');
+        textElement.className = 'slot-text';
+        
+        // 要素を組み立て
+        slotElement.appendChild(phraseElement);
+        slotElement.appendChild(textElement);
+        
+        // 親コンテナに追加
+        parentContainer.appendChild(slotElement);
+        
+        console.log(`✅ サブスロット要素を動的生成: ${fullSlotId}`);
       }
       
       // phraseとtextを更新
