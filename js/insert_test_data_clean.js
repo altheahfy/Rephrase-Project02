@@ -373,6 +373,10 @@ function syncDynamicToStatic() {
     console.log("サブスロット textElement:", slotTextElement ? slotTextElement.outerHTML : "未検出");
 
     // 🏷️ データ挿入前にラベルを保護
+    if (window.preserveAllSubslotLabels) {
+      window.preserveAllSubslotLabels();
+    }
+    
     const existingLabel = slotElement.querySelector('label');
     let labelBackup = null;
     if (existingLabel) {
@@ -404,23 +408,29 @@ function syncDynamicToStatic() {
       console.warn(`❌ サブtext要素取得失敗: ${item.Slot}`);
     }
     
-    // 🏷️ データ挿入後にラベルを復元（即座に実行）
+    // 🏷️ データ挿入後にラベルを即座に復元
     if (labelBackup) {
       const currentLabel = slotElement.querySelector('label');
       if (!currentLabel) {
         // ラベルが消失した場合は復元
         const newLabel = document.createElement('label');
         newLabel.textContent = labelBackup.textContent;
-        newLabel.style.cssText = labelBackup.style;
+        newLabel.style.cssText = labelBackup.style || `
+          display: block;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #333;
+          font-size: 14px;
+        `;
         slotElement.insertBefore(newLabel, slotElement.firstChild);
         console.log(`🏷️ ${item.Slot} のラベルを即座に復元しました`);
       }
     }
     
     // 🏷️ サブスロットデータ挿入後にラベルを復元（追加の保険）
-    if (window.restoreSubslotLabels) {
+    if (window.restoreAllSubslotLabels) {
       setTimeout(() => {
-        window.restoreSubslotLabels();
+        window.restoreAllSubslotLabels();
         console.log(`🏷️ ${item.Slot} のラベル復元を実行しました`);
       }, 10);
     }
