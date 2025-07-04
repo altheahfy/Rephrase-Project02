@@ -362,7 +362,7 @@ function processAllImagesWithCoordination() {
     
     console.log("✅ 手動制御協調型画像処理が完了しました");
     isImageProcessingActive = false;
-  }, 100); // 100ms のデバウンス
+  }, 200); // 200ms のデバウンス（より長く設定）
 }
 
 // 🗑️ 画像キャッシュをクリアする関数
