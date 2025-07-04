@@ -19,8 +19,15 @@ function initializeVisibilityState() {
   console.log("🔄 表示状態を初期化しました:", visibilityState);
 }
 
-// 🎛️ 個別スロット・要素の表示制御
+// 🎛️ 個別スロット・要素の表示制御（サブスロット対応）
 function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
+  // サブスロット（例: "m1-sub-s"）の場合
+  if (slotKey.includes('-sub-')) {
+    toggleSubslotElementVisibility(slotKey, elementType, isVisible);
+    return;
+  }
+  
+  // 通常のスロット処理
   if (!ALL_SLOTS.includes(slotKey)) {
     console.error(`❌ 無効なスロットキー: ${slotKey}`);
     return;
@@ -64,6 +71,41 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   
   // localStorage に状態を保存
   saveVisibilityState();
+}
+
+// 🎯 サブスロット専用の表示制御
+function toggleSubslotElementVisibility(slotKey, elementType, isVisible) {
+  console.log(`🎛️ サブスロット制御: ${slotKey} - ${elementType} = ${isVisible}`);
+  
+  // サブスロット要素を取得
+  const subslotElement = document.getElementById(`slot-${slotKey}`);
+  if (!subslotElement) {
+    console.warn(`⚠ サブスロット要素が見つかりません: slot-${slotKey}`);
+    return;
+  }
+  
+  // 要素タイプに応じて制御
+  let targetElements = [];
+  
+  if (elementType === 'image') {
+    // イラスト要素を検索
+    targetElements = subslotElement.querySelectorAll('img, .slot-image, .subslot-image');
+  } else if (elementType === 'auxtext') {
+    // 補助テキスト要素を検索
+    targetElements = subslotElement.querySelectorAll('.subslot-text, .slot-phrase');
+  } else if (elementType === 'text') {
+    // 英語テキスト要素を検索
+    targetElements = subslotElement.querySelectorAll('.subslot-element, .slot-text');
+  }
+  
+  console.log(`🔍 ${slotKey}の${elementType}要素: ${targetElements.length}個`);
+  
+  // 表示/非表示を切り替え
+  targetElements.forEach(element => {
+    element.style.display = isVisible ? '' : 'none';
+  });
+  
+  console.log(`✅ ${slotKey}の${elementType}を${isVisible ? '表示' : '非表示'}にしました`);
 }
 
 // 📁 表示状態をlocalStorageに保存
@@ -160,6 +202,7 @@ function getSlotVisibilityState(slotKey) {
 // 🔹 グローバル関数としてエクスポート
 window.initializeVisibilityState = initializeVisibilityState;
 window.toggleSlotElementVisibility = toggleSlotElementVisibility;
+window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
 window.loadVisibilityState = loadVisibilityState;
 window.saveVisibilityState = saveVisibilityState;
 window.applyVisibilityState = applyVisibilityState;
