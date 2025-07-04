@@ -392,6 +392,14 @@ function syncDynamicToStatic() {
     } else {
       console.warn(`❌ サブtext要素取得失敗: ${item.Slot}`);
     }
+    
+    // 🏷️ サブスロットデータ挿入後にラベルを復元
+    if (window.restoreSubslotLabels) {
+      setTimeout(() => {
+        window.restoreSubslotLabels();
+        console.log(`🏷️ ${item.Slot} のラベル復元を実行しました`);
+      }, 10);
+    }
   });
   
   // � サブスロット順序修正：window.loadedJsonDataを使用して正しい順序で再書き込み
@@ -765,6 +773,14 @@ function syncUpperSlotsFromJson(data) {
       window.adjustSlotWidthsBasedOnText();
     }
   }, 100);
+  
+  // 🏷️ 上位スロット同期後にラベルを復元
+  setTimeout(() => {
+    if (window.restoreSubslotLabels) {
+      window.restoreSubslotLabels();
+      console.log("🏷️ 上位スロット同期後のラベル復元を実行しました");
+    }
+  }, 150);
 }
 
 // ✅ サブスロット同期機能の実装（完全リセット＋再構築方式）
@@ -875,6 +891,14 @@ function syncSubslotsFromJson(data) {
       window.adjustSlotWidthsBasedOnText();
     }
   }, 50);
+  
+  // 🏷️ サブスロット同期後にラベルを復元
+  setTimeout(() => {
+    if (window.restoreSubslotLabels) {
+      window.restoreSubslotLabels();
+      console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
+    }
+  }, 100);
 }
 
 // 特定のM1スロットをテスト（デバッグ用）

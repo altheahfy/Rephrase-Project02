@@ -381,6 +381,11 @@ window.resetSubslotVisibility = resetSubslotVisibility;
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロット表示制御システムを初期化中...");
   console.log("✅ subslot_toggle.js との連携は自動的に行われます");
+  
+  // 🏷️ ラベル復元システムを有効化
+  console.log("🏷️ サブスロットラベル復元システムを有効化中...");
+  hookDataInsertionForLabelRestore();
+  console.log("✅ ラベル復元システムが有効になりました");
 });
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
