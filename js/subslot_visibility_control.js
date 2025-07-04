@@ -3,7 +3,13 @@
 
 // 🎯 サブスロットの表示・非表示制御に使用するスロット一覧
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
-const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
+const SUB_ELEMENT_TYPES = ['subslot-element', 'subslot-text'];
+
+// サブスロット要素タイプのラベル
+const SUB_ELEMENT_LABELS = {
+  'subslot-element': { icon: '📄', label: 'English' },
+  'subslot-text': { icon: '📝', label: '日本語' }
+};
 
 // 🏗️ サブスロット用コントロールパネルを生成
 function createSubslotControlPanel(parentSlot) {
@@ -42,16 +48,27 @@ function createSubslotControlPanel(parentSlot) {
     panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
     panelContainer.appendChild(panelTitle);
     
-    // サブスロット候補を取得
-    let subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
+    // サブスロット候補を取得（IDベース検索）
+    let subslotElements = document.querySelectorAll(`[id^="slot-${parentSlot}-sub-"]`);
     
-    // 互換性のため.subslotクラスもチェック
+    // 互換性のため他のパターンもチェック
+    if (subslotElements.length === 0) {
+      subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
+      console.log(`🔄 ${parentSlot}: ID検索で見つからないため.subslot-containerで検索`);
+    }
+    
     if (subslotElements.length === 0) {
       subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
-      console.log(`🔄 ${parentSlot}: .subslot-containerが見つからないため.subslotクラスで検索`);
+      console.log(`🔄 ${parentSlot}: .subslot-containerも見つからないため.subslotクラスで検索`);
     }
     
     console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
+    
+    // デバッグ用：検索されたサブスロット要素のIDを出力
+    if (subslotElements.length > 0) {
+      const foundIds = Array.from(subslotElements).map(el => el.id || el.className).join(', ');
+      console.log(`📋 検索されたサブスロット要素: ${foundIds}`);
+    }
     
     if (subslotElements.length === 0) {
       console.warn(`⚠ ${parentSlot}: サブスロット要素が見つかりません`);
@@ -181,20 +198,19 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     });
     
     const icon = document.createElement('span');
-    switch(elementType) {
-      case 'image':
-        icon.textContent = '🖼️';
-        break;
-      case 'text':
-        icon.textContent = '📄';
-        break;
-      case 'auxtext':
-        icon.textContent = '📝';
-        break;
-    }
+    const config = SUB_ELEMENT_LABELS[elementType] || { icon: '❓', label: elementType };
+    icon.textContent = config.icon;
+    
+    const labelText = document.createElement('span');
+    labelText.textContent = config.label;
+    labelText.style.cssText = `
+      margin-left: 2px;
+      font-size: 9px;
+    `;
     
     label.appendChild(checkbox);
     label.appendChild(icon);
+    label.appendChild(labelText);
     checkboxContainer.appendChild(label);
   });
   
@@ -213,12 +229,16 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
       return;
     }
     
+    // 実際のサブスロット要素構造に基づいて検索
     const targetElement = subslotElement.querySelector(`.${elementType}`);
     if (targetElement) {
       targetElement.style.display = isVisible ? 'block' : 'none';
       console.log(`✅ ${subslotId} の ${elementType} を ${isVisible ? '表示' : '非表示'} に設定`);
     } else {
       console.warn(`⚠ ${subslotId} 内に ${elementType} 要素が見つかりません`);
+      // デバッグ用：実際に存在する要素を確認
+      const childElements = Array.from(subslotElement.children).map(child => child.className);
+      console.log(`📋 ${subslotId} 内の実際の要素クラス: ${childElements.join(', ')}`);
     }
     
   } catch (error) {
