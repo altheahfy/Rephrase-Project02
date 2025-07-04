@@ -25,7 +25,6 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 
 ## 個別ランダマイズの流れ（実装済み仕様）
 - **実行**: `randomizer_individual.js` 内の各個別ランダマイズ関数（`randomizeSlotSIndividual()`, `randomizeSlotM1Individual()` 等）
-- **他スロット個別ランダマイズ**: 将来的に水平展開予定（V, O, C等）。
 - 現在表示中の V_group_key 母集団データ（`window.fullSlotPool`）を流用。
 - 該当スロットに対応するスロット候補群を抽出し、その中からランダム選出。
 - 選出したスロットデータを該当スロットの表示にのみ反映し、他スロットには影響を与えない。
@@ -49,6 +48,11 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
   - `structure_builder.js`: 動的記載エリア（dynamic-slot-area）への描画のみ
   - `insert_test_data_clean.js`: 静的記載エリア（static-slot-area）への同期処理を担当
 - **重要**: 完全な表示更新には両方のファイルでの処理が必要
+- **【重要】静的エリア同期の原則**:
+  - 動的エリアは常に正解、絶対に変更禁止
+  - 静的エリアは動的エリアとの完全同期が目標
+  - 母集団間でサブスロット構造が異なる場合に対応するため完全リセット＋再構築方式を採用
+- **display_order制御**: 例文による語順変更（O1先頭配置等）に必須
 - randomizer_all.js が選択責任を持ち、構造モジュールは描画責任に集中。
 - 個別ランダマイズボタン（🎲）は slot-container 内で SlotPhrase ラベルの横に配置し、slot-text 内には配置しない。
 - **同期処理**: 個別ランダマイズでは `syncUpperSlotsFromJson()` と `syncSubslotsFromJson()` を使用。`syncDynamicToStatic()` も実装されており利用可能。
@@ -81,7 +85,11 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 1. 全体ランダマイズ実行 → window.fullSlotPool作成（randomizer_all.js）
 2. Sスロット個別ランダマイズ実行 → window.fullSlotPoolから候補取得（randomizer_individual.js）
 3. 動的エリア更新 → buildStructure() で再構築（structure_builder.js）
+   - 必ず正確な結果を生成（読み取り専用、変更禁止）
 4. 静的エリア同期 → syncUpperSlotsFromJson() + syncSubslotsFromJson()（insert_test_data_clean.js）
+   - 動的エリアと完全同期を実現
+   - 完全リセット＋再構築方式で構造差異に対応
+   - display_order制御で正しい語順を実現
 ```
 
 #### 核心となる関数
@@ -161,3 +169,73 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 2. **既存の仕組み理解**の重要性（sync関数名等）
 3. **段階的検証**による安全な実装
 4. **データソース調査**の必要性（fullSlotPoolの構造確認）
+
+---
+
+## 【重要】静的エリア同期の技術的詳細（2025年7月4日追加）
+
+### 問題の背景
+個別ランダマイズ時に、動的エリアは正常更新されるが静的エリアで以下の問題が発生：
+1. **母集団間で異なるサブスロット構造**の場合、新しいサブスロットが表示されない
+2. **古いサブスロット要素**が残り続ける
+3. **`display_order`による語順制御**が無視される
+
+### 根本原因
+- **`syncSubslotsFromJson`の既存DOM前提処理**: 存在しないDOM要素はスキップしていた
+- **追加のみの処理**: 不要要素の削除機能がなかった
+- **順序制御の欠如**: データ配列順序でDOM追加、`display_order`無視
+
+### 解決策：完全リセット＋再構築方式
+
+#### 1. 完全クリア処理
+```javascript
+// 全サブスロットコンテナをクリア
+const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
+allSubContainers.forEach(container => {
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+});
+```
+
+#### 2. display_order順序制御
+```javascript
+// display_orderでソート
+const sortedSubslotData = subslotData.sort((a, b) => {
+  if (a.Slot !== b.Slot) {
+    return a.Slot.localeCompare(b.Slot);
+  }
+  return (a.display_order || 0) - (b.display_order || 0);
+});
+```
+
+#### 3. 動的DOM生成
+- 既存DOM要素の有無に関係なく、新しいデータのみで完全再構築
+- 各サブスロットに`slot-phrase`と`slot-text`を持つ完全なDOM構造を生成
+
+### 技術的重要ポイント
+
+#### 静的エリアの語順制御
+- **HTMLの物理構造**: 固定順序（M1, S, AUX, V, O1, O2...）
+- **例文による語順変更**: `display_order`属性で動的制御
+- **重要**: O1が先頭に来るケースなど、例文により標準とは異なる語順が必要
+
+#### データ整合性の保証
+- **動的エリア**: 常に正確（buildStructureによる完全再生成）
+- **静的エリア**: syncSubslotsFromJsonで動的エリアと同期
+- **母集団変更時**: 完全リセットにより構造不整合を回避
+
+#### デバッグ情報
+```javascript
+// ソート結果の確認
+sortedSubslotData.forEach((item, index) => {
+  console.log(`${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
+});
+```
+
+### 今後の開発における注意点
+
+1. **静的エリアの同期は完全リセット方式**を維持
+2. **display_order制御**は必須（語順変更対応）
+3. **既存DOM前提の処理**は母集団間構造差異で破綻する
+4. **動的エリアは常に正解**として静的エリア同期の基準とする
