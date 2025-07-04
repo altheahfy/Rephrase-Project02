@@ -3,13 +3,13 @@
 
 // 🎯 サブスロットの表示・非表示制御に使用するスロット一覧
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
-const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
+const SUB_ELEMENT_TYPES = ['image', 'subslot-element', 'subslot-text'];
 
-// サブスロット要素タイプのラベル（上位スロットと同じ順番・名称）
+// サブスロット要素タイプのラベル
 const SUB_ELEMENT_LABELS = {
   'image': { icon: '🖼️' },
-  'auxtext': { icon: '📝' },
-  'text': { icon: '📄' }
+  'subslot-element': { icon: '📄' },
+  'subslot-text': { icon: '📝' }
 };
 
 // 🏗️ サブスロット用コントロールパネルを生成
@@ -165,19 +165,21 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   const checkboxContainer = document.createElement('div');
   checkboxContainer.style.cssText = `
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    flex-direction: row;
+    gap: 6px;
     font-size: 12px;
+    justify-content: center;
   `;
   
   SUB_ELEMENT_TYPES.forEach(elementType => {
     const label = document.createElement('label');
     label.style.cssText = `
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       cursor: pointer;
-      padding: 2px 4px;
+      padding: 2px;
     `;
     
     const checkbox = document.createElement('input');
@@ -204,12 +206,12 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     const config = SUB_ELEMENT_LABELS[elementType] || { icon: '❓' };
     icon.textContent = config.icon;
     icon.style.cssText = `
-      font-size: 14px;
-      margin-left: 2px;
+      font-size: 16px;
+      margin-bottom: 2px;
     `;
     
-    label.appendChild(checkbox);
     label.appendChild(icon);
+    label.appendChild(checkbox);
     checkboxContainer.appendChild(label);
   });
   
@@ -236,12 +238,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
                      subslotElement.querySelector('.slot-image') ||
                      subslotElement.querySelector('.subslot-image') ||
                      subslotElement.querySelector('img');
-    } else if (elementType === 'auxtext') {
-      // 補助テキスト要素の検索
-      targetElement = subslotElement.querySelector('.subslot-text');
-    } else if (elementType === 'text') {
-      // 英語テキスト要素の検索
-      targetElement = subslotElement.querySelector('.subslot-element');
     } else {
       // その他の要素の検索
       targetElement = subslotElement.querySelector(`.${elementType}`);
