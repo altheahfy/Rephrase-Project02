@@ -370,12 +370,167 @@ function removeSubslotControlPanel(parentSlot) {
   }
 }
 
+// 🏷️ サブスロットラベル復元システム
+function hookDataInsertionForLabelRestore() {
+  console.log("🏷️ サブスロットラベル復元システムをフックします");
+  
+  // 既存のrestoreSubslotLabels関数をラップ
+  const originalRestore = window.restoreSubslotLabels;
+  
+  // 定期的なラベル復元処理
+  setInterval(() => {
+    restoreSubslotLabels();
+  }, 5000); // 5秒ごとに復元チェック
+  
+  // MutationObserverでサブスロットの変更を監視
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        // サブスロットの変更を検出した場合、ラベルを復元
+        const target = mutation.target;
+        if (target.closest && target.closest('.subslot-container')) {
+          setTimeout(() => {
+            restoreSubslotLabels();
+          }, 100);
+        }
+      }
+    });
+  });
+  
+  // 全てのサブスロットコンテナを監視
+  const subslotContainers = document.querySelectorAll('.subslot-container');
+  subslotContainers.forEach(container => {
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  });
+  
+  console.log("✅ サブスロットラベル復元システムがフックされました");
+}
+
+// 🏷️ サブスロットのラベルを復元する関数
+function restoreSubslotLabels() {
+  console.log("🏷️ サブスロットラベル復元処理を開始");
+  
+  // 全てのサブスロットコンテナを検索
+  const subslotContainers = document.querySelectorAll('.subslot-container');
+  
+  subslotContainers.forEach(container => {
+    // サブスロット要素を検索
+    const subslots = container.querySelectorAll('[id*="-sub-"]');
+    
+    subslots.forEach(subslot => {
+      const slotId = subslot.id;
+      
+      // IDからサブスロットタイプを抽出 (例: slot-m1-sub-s → s)
+      const match = slotId.match(/-sub-([^-]+)$/);
+      if (match) {
+        const subslotType = match[1];
+        
+        // 既存のラベルを確認
+        let existingLabel = subslot.querySelector('label');
+        
+        if (!existingLabel) {
+          // ラベルが存在しない場合は作成
+          existingLabel = document.createElement('label');
+          existingLabel.textContent = subslotType.toUpperCase();
+          existingLabel.style.cssText = `
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+          `;
+          
+          // サブスロットの最初の要素として挿入
+          subslot.insertBefore(existingLabel, subslot.firstChild);
+          
+          console.log(`✅ サブスロット ${slotId} にラベル "${subslotType.toUpperCase()}" を復元しました`);
+        } else {
+          // ラベルが存在する場合は内容を確認・修正
+          if (existingLabel.textContent !== subslotType.toUpperCase()) {
+            existingLabel.textContent = subslotType.toUpperCase();
+            console.log(`🔄 サブスロット ${slotId} のラベルを修正しました`);
+          }
+        }
+      }
+    });
+  });
+}
+
+// 🔍 サブスロットのラベル状態をデバッグするための関数
+function debugSubslotLabels(parentSlot) {
+  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ ===`);
+  
+  // サブスロットコンテナを検索
+  const subslotContainer = document.querySelector(`#slot-${parentSlot}-sub`);
+  if (!subslotContainer) {
+    console.error(`❌ サブスロットコンテナが見つかりません: #slot-${parentSlot}-sub`);
+    return;
+  }
+  
+  console.log(`✅ サブスロットコンテナ発見: ${subslotContainer.id}`);
+  console.log(`📋 コンテナHTML: ${subslotContainer.outerHTML.substring(0, 200)}...`);
+  
+  // 全てのサブスロット要素を検索
+  const subslotElements = subslotContainer.querySelectorAll('[id*="-sub-"]');
+  console.log(`📊 サブスロット要素数: ${subslotElements.length}`);
+  
+  subslotElements.forEach((element, index) => {
+    console.log(`\n🔍 サブスロット要素 ${index + 1}:`);
+    console.log(`  ID: ${element.id}`);
+    console.log(`  クラス: ${element.className}`);
+    
+    // ラベル要素を検索
+    const labelElements = element.querySelectorAll('label');
+    console.log(`  ラベル要素数: ${labelElements.length}`);
+    
+    labelElements.forEach((label, labelIndex) => {
+      console.log(`  ラベル ${labelIndex + 1}:`);
+      console.log(`    テキスト: "${label.textContent}"`);
+      console.log(`    スタイル: ${label.style.cssText}`);
+      console.log(`    表示状態: ${window.getComputedStyle(label).display}`);
+    });
+    
+    // 他の重要な要素も表示
+    const phraseElements = element.querySelectorAll('.slot-phrase');
+    const textElements = element.querySelectorAll('.slot-text');
+    const imageElements = element.querySelectorAll('.slot-image');
+    
+    console.log(`  フレーズ要素数: ${phraseElements.length}`);
+    console.log(`  テキスト要素数: ${textElements.length}`);
+    console.log(`  画像要素数: ${imageElements.length}`);
+    
+    // 要素の全体構造を表示
+    console.log(`  HTML構造: ${element.outerHTML.substring(0, 150)}...`);
+  });
+  
+  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ完了 ===\n`);
+}
+
+// 🏷️ 全てのサブスロットのラベル状態を一括デバッグ
+function debugAllSubslotLabels() {
+  console.log("🔍 === 全サブスロットラベル状態デバッグ開始 ===");
+  
+  SUBSLOT_PARENT_SLOTS.forEach(parentSlot => {
+    debugSubslotLabels(parentSlot);
+  });
+  
+  console.log("🔍 === 全サブスロットラベル状態デバッグ完了 ===");
+}
+
 //  グローバル関数としてエクスポート
 window.createSubslotControlPanel = createSubslotControlPanel;
 window.addSubslotControlPanel = addSubslotControlPanel;
 window.removeSubslotControlPanel = removeSubslotControlPanel;
 window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
 window.resetSubslotVisibility = resetSubslotVisibility;
+window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
+window.restoreSubslotLabels = restoreSubslotLabels;
+window.debugSubslotLabels = debugSubslotLabels;
+window.debugAllSubslotLabels = debugAllSubslotLabels;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -386,6 +541,21 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🏷️ サブスロットラベル復元システムを有効化中...");
   hookDataInsertionForLabelRestore();
   console.log("✅ ラベル復元システムが有効になりました");
+  
+  // 🔧 デバッグ用コンソールメッセージ
+  console.log("\n🔧 ===== デバッグ用コマンド =====");
+  console.log("📋 サブスロットラベル確認: debugAllSubslotLabels()");
+  console.log("🏷️ ラベル復元実行: restoreSubslotLabels()");
+  console.log("🔍 特定スロットのラベル確認: debugSubslotLabels('m1')");
+  console.log("🔧 ==============================\n");
+  
+  // 🏷️ 5秒後に初回ラベル復元を実行
+  setTimeout(() => {
+    console.log("🏷️ 初回ラベル復元を実行中...");
+    restoreSubslotLabels();
+    console.log("✅ 初回ラベル復元が完了しました");
+  }, 5000);
 });
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+console.log("🔧 デバッグ用コマンドはページ読み込み完了後に利用できます");

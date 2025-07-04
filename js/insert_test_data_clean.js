@@ -372,6 +372,17 @@ function syncDynamicToStatic() {
     const slotTextElement = slotElement.querySelector(".slot-text");
     console.log("サブスロット textElement:", slotTextElement ? slotTextElement.outerHTML : "未検出");
 
+    // 🏷️ データ挿入前にラベルを保護
+    const existingLabel = slotElement.querySelector('label');
+    let labelBackup = null;
+    if (existingLabel) {
+      labelBackup = {
+        textContent: existingLabel.textContent,
+        style: existingLabel.style.cssText
+      };
+      console.log(`🏷️ ${item.Slot} のラベルをバックアップしました: "${labelBackup.textContent}"`);
+    }
+
     if (phraseElement) {
       phraseElement.textContent = item.SlotPhrase;
       console.log(`✅ phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
@@ -393,7 +404,20 @@ function syncDynamicToStatic() {
       console.warn(`❌ サブtext要素取得失敗: ${item.Slot}`);
     }
     
-    // 🏷️ サブスロットデータ挿入後にラベルを復元
+    // 🏷️ データ挿入後にラベルを復元（即座に実行）
+    if (labelBackup) {
+      const currentLabel = slotElement.querySelector('label');
+      if (!currentLabel) {
+        // ラベルが消失した場合は復元
+        const newLabel = document.createElement('label');
+        newLabel.textContent = labelBackup.textContent;
+        newLabel.style.cssText = labelBackup.style;
+        slotElement.insertBefore(newLabel, slotElement.firstChild);
+        console.log(`🏷️ ${item.Slot} のラベルを即座に復元しました`);
+      }
+    }
+    
+    // 🏷️ サブスロットデータ挿入後にラベルを復元（追加の保険）
     if (window.restoreSubslotLabels) {
       setTimeout(() => {
         window.restoreSubslotLabels();
