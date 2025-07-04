@@ -3,74 +3,6 @@
  */
 
 /**
- * 指定されたスロットの空のサブスロット要素のみを隠す関数（安全版）
- * @param {string} slotName - 対象のスロット名（例：'S', 'V', 'O1'等）
- */
-function clearSlotSubslots(slotName) {
-  console.log(`🧹 ${slotName}スロットの空サブスロット隠し処理開始（安全版）`);
-  
-  const dynamicArea = document.getElementById("dynamic-slot-area");
-  if (!dynamicArea) {
-    console.warn("⚠ dynamic-slot-area が見つかりません");
-    return;
-  }
-  
-  // 静的エリアの該当スロット/サブスロットを検索
-  const staticSlots = document.querySelectorAll(`[id*="${slotName.toLowerCase()}"]`);
-  let clearedCount = 0;
-  let preservedCount = 0;
-  
-  staticSlots.forEach(slot => {
-    // 動的エリア内の要素はスキップ
-    if (dynamicArea.contains(slot)) {
-      console.log(`  ⏭ 動的エリア内のため除外: ${slot.id}`);
-      return;
-    }
-    
-    // 上位スロット自体はスキップ（サブスロットのみ処理）
-    if (slot.id === `slot-${slotName.toLowerCase()}`) {
-      console.log(`  ⏭ 上位スロット自体はスキップ: ${slot.id}`);
-      return;
-    }
-    
-    // サブスロットかどうかを確認
-    if (!slot.id.includes('-sub-')) {
-      console.log(`  ⏭ サブスロットでないためスキップ: ${slot.id}`);
-      return;
-    }
-    
-    // データの存在確認
-    const phraseEl = slot.querySelector('.slot-phrase, .subslot-element');
-    const textEl = slot.querySelector('.slot-text, .subslot-text');
-    
-    const phraseText = phraseEl ? phraseEl.textContent.trim() : '';
-    const textText = textEl ? textEl.textContent.trim() : '';
-    
-    console.log(`  🔍 ${slot.id}:`);
-    console.log(`    - phrase: "${phraseText}"`);
-    console.log(`    - text: "${textText}"`);
-    
-    // データがある場合は絶対に隠さない
-    if (phraseText !== '' || textText !== '') {
-      console.log(`    ✅ データがあるため保護: ${slot.id}`);
-      slot.style.display = '';
-      slot.classList.remove('empty-slot-hidden', 'hidden', 'cleared-subslot');
-      preservedCount++;
-    } else {
-      // データがない場合のみ隠す
-      console.log(`    🙈 データがないため隠す: ${slot.id}`);
-      slot.style.display = 'none';
-      slot.classList.add('empty-slot-hidden', 'hidden', 'cleared-subslot');
-      clearedCount++;
-    }
-  });
-  
-  console.log(`🧹 ${slotName}スロットの空サブスロット隠し処理完了（安全版）`);
-  console.log(`  - 隠したサブスロット数: ${clearedCount}`);
-  console.log(`  - 保護したサブスロット数: ${preservedCount}`);
-}
-
-/**
  * Sスロット個別ランダマイズ関数
  */
 function randomizeSlotSIndividual() {
@@ -171,22 +103,10 @@ function randomizeSlotSIndividual() {
     syncUpperSlotsFromJson(data);
     console.log("🔄 上位スロット同期完了");
   }
-
+  
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
-  }
-  
-  // === 空のサブスロットのみ非表示にする処理を追加 ===
-  try {
-    if (typeof window.hideEmptySubslots === 'function') {
-      window.hideEmptySubslots(data);
-      console.log("✅ 空のサブスロット非表示処理完了");
-    } else {
-      console.warn("⚠️ hideEmptySubslots関数が見つかりません");
-    }
-  } catch (hideError) {
-    console.error("❌ 空のサブスロット非表示処理中にエラーが発生:", hideError.message);
   }
   
   console.log("✅ Sスロット個別ランダマイズ完了");
@@ -620,7 +540,8 @@ function randomizeSlotO1Individual() {
     display_order: slot.display_order || 0,
     識別番号: slot.識別番号 || ""
   }));
-    console.log("🎯 O1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
+  
+  console.log("🎯 O1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
   
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
@@ -634,31 +555,10 @@ function randomizeSlotO1Individual() {
     syncUpperSlotsFromJson(data);
     console.log("🔄 上位スロット同期完了");
   }
-
+  
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
-  }
-  
-  // === 空のサブスロットのみ非表示にする処理を追加 ===
-  try {
-    // 動的エリア専用の空サブスロット非表示処理
-    if (typeof window.hideEmptySubslots === 'function') {
-      window.hideEmptySubslots(data);
-      console.log("✅ 動的エリア: 空のサブスロット非表示処理完了");
-    } else {
-      console.warn("⚠️ hideEmptySubslots関数が見つかりません");
-    }
-    
-    // 静的エリア専用の空サブスロット隠し処理
-    if (typeof window.clearSlotSubslots === 'function') {
-      window.clearSlotSubslots('O1');
-      console.log("✅ 静的エリア: O1スロット空サブスロット隠し処理完了");
-    } else {
-      console.warn("⚠️ clearSlotSubslots関数が見つかりません");
-    }
-  } catch (hideError) {
-    console.error("❌ 空のサブスロット非表示処理中にエラーが発生:", hideError.message);
   }
   
   console.log("✅ O1スロット個別ランダマイズ完了");
