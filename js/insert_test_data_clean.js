@@ -795,34 +795,80 @@ function syncSubslotsFromJson(data) {
   });
   
   // 🔧 STEP2: display_orderでソートしてから再構築
+  // display_orderによる正しい順序でソート
   const sortedSubslotData = subslotData.sort((a, b) => {
+    // まず親スロットで並べ、次にdisplay_orderで並べる
     if (a.Slot !== b.Slot) {
       return a.Slot.localeCompare(b.Slot);
     }
     return (a.display_order || 0) - (b.display_order || 0);
   });
-
+  
+  console.log(`📊 display_orderでソート完了: ${sortedSubslotData.length}件`);
+  sortedSubslotData.forEach((item, index) => {
+    console.log(`  ${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
+  });
+  
   sortedSubslotData.forEach(item => {
     try {
-      if (displayAtTopItem && displayAtTopItem.DisplayText && item.SubslotElement === displayAtTopItem.DisplayText) {
+      // DisplayAtTopの要素をサブスロットから除外
+      if (displayAtTopItem && 
+          displayAtTopItem.DisplayText && 
+          item.SubslotElement === displayAtTopItem.DisplayText) {
+        console.log(`🚫 DisplayAtTop対象のため除外: ${item.SubslotElement} (${item.Slot}-${item.SubslotID})`);
         return;
       }
+
+      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
       const parentSlot = item.Slot.toLowerCase();
       const subslotId = item.SubslotID.toLowerCase();
       const fullSlotId = `slot-${parentSlot}-${subslotId}`;
-      const slotElement = document.getElementById(fullSlotId);
-      if (!slotElement) {
-        // 既存DOMがなければ何もしない
+      console.log(` サブスロット生成: ${fullSlotId}`);
+      
+      // 親コンテナを検索（slot-[親スロット名]-sub）
+      const parentContainerId = `slot-${parentSlot}-sub`;
+      const parentContainer = document.getElementById(parentContainerId);
+      
+      if (!parentContainer) {
+        console.warn(`⚠ 親コンテナが見つかりません: ${parentContainerId}`);
         return;
       }
-      const phraseElement = slotElement.querySelector('.slot-phrase');
-      const textElement = slotElement.querySelector('.slot-text');
-      if (phraseElement) {
-        phraseElement.textContent = item.SubslotElement || '';
+      
+      // 新しいサブスロットDOM要素を生成
+      const slotElement = document.createElement('div');
+      slotElement.id = fullSlotId;
+      slotElement.className = 'slot-container';
+      
+      // phrase要素を作成
+      const phraseElement = document.createElement('div');
+      phraseElement.className = 'slot-phrase';
+      if (item.SubslotElement) {
+        phraseElement.textContent = item.SubslotElement;
       }
-      if (textElement) {
-        textElement.textContent = item.SubslotText || '';
+      
+      // text要素を作成
+      const textElement = document.createElement('div');
+      textElement.className = 'slot-text';
+      if (item.SubslotText) {
+        textElement.textContent = item.SubslotText;
       }
+      
+      // 要素を組み立て
+      slotElement.appendChild(phraseElement);
+      slotElement.appendChild(textElement);
+
+      // サブスロット制御パネルを追加
+      const controlPanel = document.createElement('div');
+      controlPanel.className = 'subslot-visibility-panel';
+      controlPanel.style.display = window.controlPanelsVisible ? 'block' : 'none';
+      // 必要に応じて制御ボタン等をここで追加
+      slotElement.appendChild(controlPanel);
+
+      // 親コンテナに追加
+      parentContainer.appendChild(slotElement);
+      
+      console.log(`✅ サブスロット完全生成: ${fullSlotId} | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
+      
     } catch (err) {
       console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
     }
