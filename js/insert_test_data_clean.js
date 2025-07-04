@@ -856,14 +856,7 @@ function syncSubslotsFromJson(data) {
       // 要素を組み立て
       slotElement.appendChild(phraseElement);
       slotElement.appendChild(textElement);
-
-      // サブスロット制御パネルを追加
-      const controlPanel = document.createElement('div');
-      controlPanel.className = 'subslot-visibility-panel';
-      controlPanel.style.display = window.controlPanelsVisible ? 'block' : 'none';
-      // 必要に応じて制御ボタン等をここで追加
-      slotElement.appendChild(controlPanel);
-
+      
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
       
@@ -1124,13 +1117,6 @@ function hideEmptyUpperSlots(jsonData) {
       slotElement.style.display = "none";
       slotElement.classList.add("empty-slot-hidden", "hidden");
       console.log(`🙈 上位スロットを非表示: ${slotId} (理由: 上位・サブスロット共に空)`);
-      
-      // サブスロットが非表示の場合、関連する画像を元に戻す
-      const slotImage = container.querySelector('.slot-image');
-      if (slotImage) {
-        slotImage.src = 'slot_images/common/placeholder.png';
-        console.log(`🖼 ${slotId}: 画像をplaceholder.pngに戻しました`);
-      }
     } else {
       slotElement.style.display = "";
       slotElement.classList.remove("empty-slot-hidden", "hidden");
