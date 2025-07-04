@@ -1,6 +1,9 @@
 // 画像スロット自動非表示機構
 // プレースホルダー画像や読み込みエラー画像を自動的に非表示にする
 
+// 🎯 画像状態キャッシュ（重複処理を回避）
+const imageStateCache = new Map();
+
 // 🎯 非表示対象とする画像のパターン
 const HIDDEN_IMAGE_PATTERNS = [
   'placeholder.png',           // プレースホルダー画像
@@ -159,7 +162,30 @@ function isValidImage(imgElement) {
 function applyAutoHideToImage(imgElement) {
   if (!imgElement) return;
   
-  if (shouldHideImage(imgElement)) {
+  const src = imgElement.src;
+  const alt = imgElement.alt || '';
+  const cacheKey = `${src}|${alt}`;
+  
+  // キャッシュから状態をチェック
+  if (imageStateCache.has(cacheKey)) {
+    const cachedResult = imageStateCache.get(cacheKey);
+    if (cachedResult.shouldHide) {
+      imgElement.classList.add('auto-hidden-image');
+      console.log(`🔄 キャッシュから非表示設定: ${imgElement.alt || imgElement.src}`);
+    } else {
+      imgElement.classList.remove('auto-hidden-image');
+      console.log(`🔄 キャッシュから表示設定: ${imgElement.alt || imgElement.src}`);
+    }
+    return;
+  }
+  
+  // 新しい判定を実行
+  const shouldHide = shouldHideImage(imgElement);
+  
+  // 結果をキャッシュに保存
+  imageStateCache.set(cacheKey, { shouldHide, timestamp: Date.now() });
+  
+  if (shouldHide) {
     imgElement.classList.add('auto-hidden-image');
     console.log(`🙈 画像を自動非表示に設定: ${imgElement.alt || imgElement.src}`);
   } else {
@@ -308,16 +334,55 @@ function processImageWithManualControl(imgElement) {
   applyAutoHideToImage(imgElement);
 }
 
-// 🔄 統合処理関数
+// 🔄 統合処理関数（デバウンス機能付き）
+let imageProcessingTimeout = null;
+let isImageProcessingActive = false;
+
 function processAllImagesWithCoordination() {
-  console.log("🔄 手動制御協調型画像処理を開始...");
+  // 既に処理中の場合は重複実行を防ぐ
+  if (isImageProcessingActive) {
+    console.log("🔄 画像処理が既に実行中のため、重複実行をスキップします");
+    return;
+  }
   
-  const allImages = document.querySelectorAll('.slot-image');
-  allImages.forEach(img => {
-    processImageWithManualControl(img);
-  });
+  // 既存のタイマーをクリア
+  if (imageProcessingTimeout) {
+    clearTimeout(imageProcessingTimeout);
+  }
   
-  console.log("✅ 手動制御協調型画像処理が完了しました");
+  // デバウンス：短時間の連続呼び出しを防ぐ
+  imageProcessingTimeout = setTimeout(() => {
+    isImageProcessingActive = true;
+    console.log("🔄 手動制御協調型画像処理を開始...");
+    
+    const allImages = document.querySelectorAll('.slot-image');
+    allImages.forEach(img => {
+      processImageWithManualControl(img);
+    });
+    
+    console.log("✅ 手動制御協調型画像処理が完了しました");
+    isImageProcessingActive = false;
+  }, 100); // 100ms のデバウンス
+}
+
+// 🗑️ 画像キャッシュをクリアする関数
+function clearImageStateCache() {
+  imageStateCache.clear();
+  console.log("🗑️ 画像状態キャッシュをクリアしました");
+}
+
+// 📊 画像処理統計を表示する関数
+function showImageProcessingStats() {
+  console.log("📊 === 画像処理統計情報 ===");
+  console.log(`キャッシュエントリ数: ${imageStateCache.size}`);
+  console.log(`現在の処理状態: ${isImageProcessingActive ? '処理中' : '待機中'}`);
+  
+  if (imageStateCache.size > 0) {
+    console.log("📋 キャッシュ内容:");
+    imageStateCache.forEach((value, key) => {
+      console.log(`  ${key} -> ${value.shouldHide ? '非表示' : '表示'}`);
+    });
+  }
 }
 
 // 🔹 グローバル関数としてエクスポート
@@ -327,6 +392,8 @@ window.reprocessImagesAfterRandomize = reprocessImagesAfterRandomize;
 window.processAllImagesWithCoordination = processAllImagesWithCoordination;
 window.setButtonImageForDetailSlots = setButtonImageForDetailSlots;
 window.processAllImagesWithButtonAutoSet = processAllImagesWithButtonAutoSet;
+window.clearImageStateCache = clearImageStateCache;
+window.showImageProcessingStats = showImageProcessingStats;
 
 // 🔹 デバッグ用手動実行関数
 window.debugImageHiding = function() {

@@ -458,6 +458,13 @@ function restoreSubslotLabels() {
       }
     });
   });
+  
+  // 🖼 ラベル復元完了後に画像処理を実行
+  if (typeof window.processAllImagesWithCoordination === 'function') {
+    setTimeout(() => {
+      window.processAllImagesWithCoordination();
+    }, 50);
+  }
 }
 
 // 🔍 サブスロットのラベル状態をデバッグするための関数

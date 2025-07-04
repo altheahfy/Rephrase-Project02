@@ -751,15 +751,16 @@ function syncUpperSlotsFromJson(data) {
   });
   
   // 🖼 画像処理：上位スロット同期完了後に画像の自動非表示処理を実行
-  console.log("🖼 syncUpperSlotsFromJson完了後の画像処理を実行...");
-  if (typeof window.processAllImagesWithCoordination === 'function') {
-    setTimeout(() => {
-      window.processAllImagesWithCoordination();
-      console.log("✅ 上位スロット同期後の画像自動非表示処理が完了しました");
-    }, 50);
-  } else {
-    console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
-  }
+  // 注意：この処理は最終的にラベル復元後に統合実行されるため、ここでは削除
+  // console.log("🖼 syncUpperSlotsFromJson完了後の画像処理を実行...");
+  // if (typeof window.processAllImagesWithCoordination === 'function') {
+  //   setTimeout(() => {
+  //     window.processAllImagesWithCoordination();
+  //     console.log("✅ 上位スロット同期後の画像自動非表示処理が完了しました");
+  //   }, 50);
+  // } else {
+  //   console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
+  // }
   
   // 🆕 スロット幅の動的調整を実行
   setTimeout(() => {
@@ -773,6 +774,11 @@ function syncUpperSlotsFromJson(data) {
     if (window.restoreSubslotLabels) {
       window.restoreSubslotLabels();
       console.log("🏷️ 上位スロット同期後のラベル復元を実行しました");
+    }
+    
+    // 🖼 画像処理：すべての処理完了後に一度だけ実行
+    if (typeof window.processAllImagesWithCoordination === 'function') {
+      window.processAllImagesWithCoordination();
     }
   }, 150);
 }
@@ -903,6 +909,11 @@ function syncSubslotsFromJson(data) {
     if (window.restoreSubslotLabels) {
       window.restoreSubslotLabels();
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
+    }
+    
+    // 🖼 画像処理：すべてのサブスロット処理完了後に一度だけ実行
+    if (typeof window.processAllImagesWithCoordination === 'function') {
+      window.processAllImagesWithCoordination();
     }
   }, 100);
 }
