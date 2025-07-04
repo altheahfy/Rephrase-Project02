@@ -372,61 +372,31 @@ function syncDynamicToStatic() {
     const slotTextElement = slotElement.querySelector(".slot-text");
     console.log("サブスロット textElement:", slotTextElement ? slotTextElement.outerHTML : "未検出");
 
-    // 🏷️ データ挿入前にラベルを保護
-    const existingLabel = slotElement.querySelector('label');
-    let labelBackup = null;
-    if (existingLabel) {
-      labelBackup = {
-        textContent: existingLabel.textContent,
-        style: existingLabel.style.cssText
-      };
-      console.log(`🏷️ ${item.Slot} のラベルをバックアップしました: "${labelBackup.textContent}"`);
-    }
-
+    // 📝 フレーズ要素への書き込み（上位スロットと同じ方式 - ラベル保護）
     if (phraseElement) {
-      phraseElement.textContent = item.SlotPhrase;
-      console.log(`✅ phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
+      phraseElement.textContent = item.SlotPhrase || "";
+      console.log(`✅ サブスロット phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
     } else {
-      console.warn(`❌ サブphrase要素取得失敗: ${item.Slot}`);
+      console.warn(`❌ サブスロット phrase要素取得失敗: ${item.Slot}`);
     }
     
+    // 📝 テキスト要素への書き込み（上位スロットと同じ方式 - ラベル保護）
     if (slotTextElement) {
-      slotTextElement.textContent = item.SlotText;
-      console.log(`✅ text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
+      slotTextElement.textContent = item.SlotText || "";
+      console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
       
-      // slotTextElement内にあるslot-phraseを確認
+      // 上位スロットと同じ入れ子構造チェック
       const nestedPhraseDiv = slotTextElement.querySelector(".slot-phrase");
       if (nestedPhraseDiv) {
-        console.warn(`⚠️ slotTextElement内にslot-phraseが入れ子になっています: ${item.Slot}`);
+        console.warn(`⚠️ サブスロット slotTextElement内にslot-phraseが入れ子になっています: ${item.Slot}`);
         console.warn(`⚠️ この入れ子構造が原因で書き込みが上書きされている可能性があります`);
       }
     } else {
-      console.warn(`❌ サブtext要素取得失敗: ${item.Slot}`);
-    }
-    
-    // 🏷️ データ挿入後にラベルを復元（即座に実行）
-    if (labelBackup) {
-      const currentLabel = slotElement.querySelector('label');
-      if (!currentLabel) {
-        // ラベルが消失した場合は復元
-        const newLabel = document.createElement('label');
-        newLabel.textContent = labelBackup.textContent;
-        newLabel.style.cssText = labelBackup.style;
-        slotElement.insertBefore(newLabel, slotElement.firstChild);
-        console.log(`🏷️ ${item.Slot} のラベルを即座に復元しました`);
-      }
-    }
-    
-    // 🏷️ サブスロットデータ挿入後にラベルを復元（追加の保険）
-    if (window.restoreSubslotLabels) {
-      setTimeout(() => {
-        window.restoreSubslotLabels();
-        console.log(`🏷️ ${item.Slot} のラベル復元を実行しました`);
-      }, 10);
+      console.warn(`❌ サブスロット text要素取得失敗: ${item.Slot}`);
     }
   });
   
-  // � サブスロット順序修正：window.loadedJsonDataを使用して正しい順序で再書き込み
+  // 🔢 サブスロット順序修正：window.loadedJsonDataを使用して正しい順序で再書き込み
   console.log("🔢 サブスロット順序修正処理を実行...");
   if (window.loadedJsonData && typeof window.syncSubslotsWithCorrectOrder === 'function') {
     setTimeout(() => {
