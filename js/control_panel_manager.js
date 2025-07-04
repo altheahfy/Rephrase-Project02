@@ -47,14 +47,6 @@ function toggleAllControlPanels() {
     console.log(`  - パネル${index + 1} (${panel.id}): ${newState ? '表示' : '非表示'}`);
   });
   
-  // ★★★ サブスロット制御パネルの同期関数を呼び出し ★★★
-  setTimeout(() => {
-    if (window.syncAllSubslotControlPanels) {
-      console.log("🔄 サブスロット制御パネルの追加同期を実行");
-      window.syncAllSubslotControlPanels();
-    }
-  }, 100);
-  
   // ボタンテキストの更新
   const toggleBtn = document.getElementById('toggle-control-panels');
   if (toggleBtn) {

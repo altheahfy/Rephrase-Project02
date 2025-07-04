@@ -9,114 +9,143 @@ const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
 function createSubslotControlPanel(parentSlot) {
   console.log(`🏗️ ${parentSlot}サブスロット用コントロールパネル生成開始`);
   
-  try {
-    // パネル全体のコンテナ
-    const panelContainer = document.createElement('div');
-    panelContainer.id = `subslot-visibility-panel-${parentSlot}`;
-    panelContainer.className = 'subslot-visibility-panel';
-    
-    // 制御パネルの表示状態を取得
-    const isControlPanelsVisible = getControlPanelVisibility();
-    console.log(`🔍 ${parentSlot} サブスロット制御パネル表示状態: ${isControlPanelsVisible}`);
-    
-    panelContainer.style.cssText = `
-      display: ${isControlPanelsVisible ? 'block' : 'none'};
-      background: rgba(255, 255, 255, 0.95);
-      padding: 8px;
-      margin-top: 15px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    `;
-    
-    // パネルタイトル
-    const panelTitle = document.createElement('div');
-    panelTitle.style.cssText = `
-      font-weight: bold;
-      font-size: 12px;
-      margin-bottom: 8px;
-      color: #444;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 4px;
-    `;
-    panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
-    panelContainer.appendChild(panelTitle);
-    
-    // サブスロット候補を取得
-    let subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
-    
-    // 互換性のため.subslotクラスもチェック
-    if (subslotElements.length === 0) {
-      subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
-      console.log(`🔄 ${parentSlot}: .subslot-containerが見つからないため.subslotクラスで検索`);
-    }
-    
-    console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
-    
-    if (subslotElements.length === 0) {
-      console.warn(`⚠ ${parentSlot}: サブスロット要素が見つかりません`);
-      const noSubslotsMsg = document.createElement('div');
-      noSubslotsMsg.style.cssText = `
-        text-align: center;
-        color: #666;
-        font-style: italic;
-        font-size: 12px;
-      `;
-      noSubslotsMsg.textContent = 'サブスロットがありません';
-      panelContainer.appendChild(noSubslotsMsg);
-      return panelContainer;
-    }
-    
-    // サブスロットコントロールのコンテナ
-    const controlsContainer = document.createElement('div');
-    controlsContainer.style.cssText = `
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 12px;
-      flex-wrap: wrap;
-    `;
-    
-    // 各サブスロット用のコントロールを生成
-    const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
-    
-    desiredOrder.forEach(subslotType => {
-      const subslotElement = document.getElementById(`slot-${parentSlot}-sub-${subslotType}`);
-      if (subslotElement) {
-        const subslotId = subslotElement.id;
-        const controlGroup = createSubslotControlGroup(parentSlot, subslotType, subslotId);
-        controlsContainer.appendChild(controlGroup);
-      }
-    });
-    
-    panelContainer.appendChild(controlsContainer);
-    
-    // 全表示ボタンを追加
-    const resetButton = document.createElement('button');
-    resetButton.style.cssText = `
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      font-size: 11px;
-      cursor: pointer;
-      border-radius: 3px;
-      margin-left: 8px;
-    `;
-    resetButton.textContent = '全表示';
-    resetButton.addEventListener('click', () => {
-      resetSubslotVisibility(parentSlot);
-    });
-    controlsContainer.appendChild(resetButton);
-    
-    console.log(`✅ ${parentSlot}サブスロット用コントロールパネル生成完了`);
-    return panelContainer;
-    
-  } catch (error) {
-    console.error(`❌ ${parentSlot}サブスロット制御パネル生成でエラー:`, error);
-    console.error("エラーの詳細:", error.stack);
-    return null;
+  // パネル全体のコンテナ
+  const panelContainer = document.createElement('div');
+  panelContainer.id = `subslot-visibility-panel-${parentSlot}`;
+  panelContainer.className = 'subslot-visibility-panel';
+  
+  // 制御パネルの表示状態を複数の方法で確認
+  let isControlPanelsVisible = false;
+  
+  // 方法1: グローバル変数から取得
+  if (window.getControlPanelsVisibility) {
+    isControlPanelsVisible = window.getControlPanelsVisibility();
+    console.log(`🔍 方法1(グローバル変数): ${isControlPanelsVisible}`);
   }
+  
+  // 方法2: ボタンのテキストから判定
+  const toggleBtn = document.getElementById('toggle-control-panels');
+  if (toggleBtn) {
+    const btnTextVisible = toggleBtn.textContent.includes('表示中');
+    console.log(`🔍 方法2(ボタンテキスト): ${btnTextVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || btnTextVisible;
+  }
+  
+  // 方法3: 上位制御パネルの表示状態から判定
+  const upperPanel = document.getElementById('visibility-control-panel-inline');
+  if (upperPanel) {
+    const upperVisible = upperPanel.style.display !== 'none';
+    console.log(`🔍 方法3(上位パネル表示): ${upperVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || upperVisible;
+  }
+  
+  console.log(`🔍 ${parentSlot} サブスロット制御パネル最終判定: ${isControlPanelsVisible}`);
+  
+  panelContainer.style.cssText = `
+    display: ${isControlPanelsVisible ? 'block' : 'none'};
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  `;
+  
+  // パネルタイトル
+  const panelTitle = document.createElement('div');
+  panelTitle.style.cssText = `
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #444;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+  `;
+  panelTitle.textContent = `${parentSlot.toUpperCase()} サブスロット表示制御`;
+  panelContainer.appendChild(panelTitle);
+  
+  // サブスロット候補を取得（新旧両方のクラスに対応）
+  let subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot-container`);
+  
+  // 互換性のため.subslotクラスもチェック
+  if (subslotElements.length === 0) {
+    subslotElements = document.querySelectorAll(`#slot-${parentSlot}-sub .subslot`);
+    console.log(`🔄 ${parentSlot}: .subslot-containerが見つからないため.subslotクラスで検索`);
+  }
+  
+  console.log(`🔍 ${parentSlot}のサブスロット要素: ${subslotElements.length}個`);
+  
+  // デバッグ: 検出されたサブスロットの詳細を表示
+  subslotElements.forEach((subslot, index) => {
+    console.log(`  - サブスロット${index + 1}: ${subslot.id} (${subslot.className})`);
+  });
+  
+  if (subslotElements.length === 0) {
+    console.warn(`⚠ ${parentSlot}: サブスロット要素が見つかりません`);
+    console.log(`🔍 デバッグ: #slot-${parentSlot}-sub の内容:`, document.querySelector(`#slot-${parentSlot}-sub`));
+    
+    const noSubslotsMsg = document.createElement('div');
+    noSubslotsMsg.style.cssText = `
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      font-size: 12px;
+    `;
+    noSubslotsMsg.textContent = 'サブスロットがありません';
+    panelContainer.appendChild(noSubslotsMsg);
+    return panelContainer;
+  }
+  
+  // サブスロットコントロールのコンテナ
+  const controlsContainer = document.createElement('div');
+  controlsContainer.style.cssText = `
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    flex-wrap: wrap;
+  `;
+  
+  // 各サブスロット用のコントロールを生成（上位スロットパネルと同じ順序）
+  const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  desiredOrder.forEach(subslotType => {
+    // 該当するサブスロット要素があるかチェック
+    const subslotElement = document.getElementById(`slot-${parentSlot}-sub-${subslotType}`);
+    if (subslotElement) {
+      const subslotId = subslotElement.id;
+      const controlGroup = createSubslotControlGroup(parentSlot, subslotType, subslotId);
+      controlsContainer.appendChild(controlGroup);
+    }
+  });
+  
+  panelContainer.appendChild(controlsContainer);
+  
+  // 全表示ボタンを controlsContainer 内に追加（上位パネルと同じ配置）
+  const resetButton = document.createElement('button');
+  resetButton.style.cssText = `
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-left: 8px;
+  `;
+  resetButton.textContent = '全表示';
+  resetButton.addEventListener('click', () => {
+    resetSubslotVisibility(parentSlot);
+  });
+  controlsContainer.appendChild(resetButton);
+  
+  // 制御パネルの表示状態を同期
+  if (window.syncSubslotControlPanelVisibility) {
+    window.syncSubslotControlPanelVisibility(panelContainer);
+  }
+  
+  console.log(`✅ ${parentSlot}サブスロット用コントロールパネル生成完了`);
+  return panelContainer;
 }
 
 // 🎛️ 個別サブスロット用コントロールグループを生成
@@ -171,7 +200,10 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     
     // チェックボックス変更時のイベント
     checkbox.addEventListener('change', function() {
-      console.log(`🎛️ チェックボックス変更: ${this.dataset.subslotId} - ${this.dataset.elementType} = ${this.checked}`);
+      console.log(`🎛️ チェックボックス変更イベント:`);
+      console.log(`  - subslotId: ${this.dataset.subslotId}`);
+      console.log(`  - elementType: ${this.dataset.elementType}`);
+      console.log(`  - checked: ${this.checked}`);
       
       toggleSubslotElementVisibility(
         this.dataset.subslotId,
@@ -206,88 +238,94 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
 function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   console.log(`🎛️ サブスロット表示制御: ${subslotId} - ${elementType} = ${isVisible}`);
   
-  try {
-    const subslotElement = document.getElementById(subslotId);
-    if (!subslotElement) {
-      console.warn(`⚠ サブスロット要素が見つかりません: ${subslotId}`);
-      return;
-    }
-    
-    const targetElement = subslotElement.querySelector(`.${elementType}`);
-    if (targetElement) {
-      targetElement.style.display = isVisible ? 'block' : 'none';
-      console.log(`✅ ${subslotId} の ${elementType} を ${isVisible ? '表示' : '非表示'} に設定`);
-    } else {
-      console.warn(`⚠ ${subslotId} 内に ${elementType} 要素が見つかりません`);
-    }
-    
-  } catch (error) {
-    console.error(`❌ サブスロット表示制御でエラー:`, error);
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) {
+    console.warn(`⚠ サブスロット要素が見つかりません: ${subslotId}`);
+    return;
+  }
+  
+  console.log(`🔍 サブスロット要素が見つかりました: ${subslotId}`);
+  console.log(`🔍 現在のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
+  const className = `hidden-subslot-${elementType}`;
+  
+  if (isVisible) {
+    subslotElement.classList.remove(className);
+    console.log(`✅ ${subslotId}の${elementType}を表示しました (removed class: ${className})`);
+  } else {
+    subslotElement.classList.add(className);
+    console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
+  }
+  
+  console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
+  
+  // 実際に要素が非表示になっているかを確認
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el, index) => {
+      const computedStyle = window.getComputedStyle(el);
+      console.log(`� ${elementType}要素${index + 1}: display=${computedStyle.display}`);
+    });
+  } else {
+    console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
 }
 
-// 🔄 サブスロットの全要素を表示状態にリセット
+// 🔄 サブスロットの全表示リセット
 function resetSubslotVisibility(parentSlot) {
-  console.log(`🔄 ${parentSlot} サブスロットの表示状態をリセット`);
+  console.log(`🔄 ${parentSlot}サブスロットの表示を全てリセット`);
   
-  try {
-    const panel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
-    if (panel) {
-      const checkboxes = panel.querySelectorAll('.subslot-visibility-checkbox');
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = true;
-        // チェックボックスの変更イベントを発火
-        checkbox.dispatchEvent(new Event('change'));
-      });
-      console.log(`✅ ${parentSlot} サブスロットの表示状態をリセット完了`);
-    }
-  } catch (error) {
-    console.error(`❌ ${parentSlot} サブスロット表示状態リセットでエラー:`, error);
-  }
+  // 該当するチェックボックスを全てチェック状態に
+  const checkboxes = document.querySelectorAll(`[data-parent-slot="${parentSlot}"].subslot-visibility-checkbox`);
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = true;
+    toggleSubslotElementVisibility(
+      checkbox.dataset.subslotId,
+      checkbox.dataset.elementType,
+      true
+    );
+  });
+  
+  console.log(`✅ ${parentSlot}サブスロットの表示リセット完了`);
 }
 
 // 📋 サブスロット展開時にコントロールパネルを追加
 function addSubslotControlPanel(parentSlot) {
   console.log(`📋 ${parentSlot}サブスロット用コントロールパネル追加開始`);
   
-  try {
-    const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
-    if (!subslotContainer) {
-      console.warn(`⚠ サブスロットコンテナが見つかりません: slot-${parentSlot}-sub`);
-      return;
-    }
-    
-    console.log(`✅ サブスロットコンテナが見つかりました: ${subslotContainer.id}`);
-    
-    // 既存のパネルがあれば削除
-    const existingPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
-    if (existingPanel) {
-      existingPanel.remove();
-      console.log(`🗑️ 既存のコントロールパネルを削除: ${parentSlot}`);
-    }
-    
-    // 新しいパネルを生成
-    const panel = createSubslotControlPanel(parentSlot);
-    
-    if (panel) {
-      // コンテナの直後にパネルを挿入
-      subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
-      console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
-      
-      // 表示状態を同期
-      setTimeout(() => {
-        if (window.syncAllSubslotControlPanels) {
-          window.syncAllSubslotControlPanels();
-        }
-      }, 50);
-      
-    } else {
-      console.error(`❌ パネルの生成に失敗しました: ${parentSlot}`);
-    }
-    
-  } catch (error) {
-    console.error(`❌ ${parentSlot}サブスロット制御パネル追加でエラー:`, error);
-    console.error("エラーの詳細:", error.stack);
+  const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
+  if (!subslotContainer) {
+    console.warn(`⚠ サブスロットコンテナが見つかりません: slot-${parentSlot}-sub`);
+    return;
+  }
+  
+  console.log(`✅ サブスロットコンテナが見つかりました: ${subslotContainer.id}`);
+  console.log(`🔍 コンテナの表示状態: display=${getComputedStyle(subslotContainer).display}`);
+  
+  // 既存のパネルがあれば削除
+  const existingPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
+  if (existingPanel) {
+    existingPanel.remove();
+    console.log(`🗑️ 既存のコントロールパネルを削除: ${parentSlot}`);
+  }
+  
+  // 新しいパネルを生成
+  console.log(`🏗️ 新しいコントロールパネルを生成中...`);
+  const panel = createSubslotControlPanel(parentSlot);
+  
+  if (panel) {
+    // コンテナの直後にパネルを挿入
+    subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
+    console.log(`✅ ${parentSlot}サブスロット用コントロールパネル追加完了`);
+    console.log(`🔍 追加されたパネル: ${panel.id}, クラス: ${panel.className}`);
+  } else {
+    console.error(`❌ パネルの生成に失敗しました: ${parentSlot}`);
   }
 }
 
@@ -295,81 +333,10 @@ function addSubslotControlPanel(parentSlot) {
 function removeSubslotControlPanel(parentSlot) {
   console.log(`🗑️ ${parentSlot}サブスロット用コントロールパネル削除開始`);
   
-  try {
-    const panel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
-    if (panel) {
-      panel.remove();
-      console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
-    }
-  } catch (error) {
-    console.error(`❌ ${parentSlot}サブスロット制御パネル削除でエラー:`, error);
-  }
-}
-
-// 🔍 制御パネルの表示状態を取得（複数の方法でチェック）
-function getControlPanelVisibility() {
-  // 方法1: グローバル変数から取得
-  if (window.getControlPanelsVisibility) {
-    return window.getControlPanelsVisibility();
-  }
-  
-  // 方法2: ボタンのテキストから判定
-  const toggleBtn = document.getElementById('toggle-control-panels');
-  if (toggleBtn && toggleBtn.textContent.includes('表示中')) {
-    return true;
-  }
-  
-  // 方法3: 上位制御パネルの表示状態から判定
-  const upperPanel = document.getElementById('visibility-control-panel-inline');
-  if (upperPanel && upperPanel.style.display !== 'none') {
-    return true;
-  }
-  
-  return false;
-}
-
-// 🔄 全てのサブスロット制御パネルの表示状態を同期
-function syncAllSubslotControlPanels() {
-  try {
-    console.log("🔄 全サブスロット制御パネルの状態同期開始");
-    
-    const subslotPanels = document.querySelectorAll('.subslot-visibility-panel');
-    const isVisible = getControlPanelVisibility();
-    
-    console.log(`🔍 制御パネル表示状態: ${isVisible}, 対象パネル数: ${subslotPanels.length}`);
-    
-    subslotPanels.forEach(panel => {
-      panel.style.display = isVisible ? 'block' : 'none';
-      console.log(`🔄 パネル ${panel.id} を ${isVisible ? '表示' : '非表示'} に設定`);
-    });
-    
-    console.log("✅ 全サブスロット制御パネルの状態同期完了");
-  } catch (error) {
-    console.error("❌ サブスロット制御パネルの状態同期でエラー:", error);
-  }
-}
-
-// 🔍 制御パネルの表示状態監視を設定
-function setupControlPanelVisibilityWatcher() {
-  const toggleButton = document.getElementById('toggle-control-panels');
-  if (toggleButton) {
-    // MutationObserver でボタンのテキスト変更を監視
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList' || mutation.type === 'characterData') {
-          console.log("🔍 制御パネルボタンのテキストが変更されました:", toggleButton.textContent);
-          syncAllSubslotControlPanels();
-        }
-      });
-    });
-    
-    observer.observe(toggleButton, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-    
-    console.log("✅ 制御パネル状態監視を設定しました");
+  const panel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
+  if (panel) {
+    panel.remove();
+    console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
   }
 }
 
@@ -379,24 +346,10 @@ window.addSubslotControlPanel = addSubslotControlPanel;
 window.removeSubslotControlPanel = removeSubslotControlPanel;
 window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
 window.resetSubslotVisibility = resetSubslotVisibility;
-window.syncAllSubslotControlPanels = syncAllSubslotControlPanels;
-window.getControlPanelVisibility = getControlPanelVisibility;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロット表示制御システムを初期化中...");
-  
-  // 初期化状態を確認
-  setTimeout(() => {
-    console.log("🔍 初期化状態チェック開始");
-    console.log("🔍 window.addSubslotControlPanel =", typeof window.addSubslotControlPanel);
-    console.log("🔍 window.removeSubslotControlPanel =", typeof window.removeSubslotControlPanel);
-    console.log("🔍 window.toggleSubslotElementVisibility =", typeof window.toggleSubslotElementVisibility);
-  }, 100);
-  
-  // 制御パネルの表示状態監視を設定
-  setupControlPanelVisibilityWatcher();
-  
   console.log("✅ subslot_toggle.js との連携は自動的に行われます");
 });
 
