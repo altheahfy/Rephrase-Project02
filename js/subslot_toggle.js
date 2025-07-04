@@ -132,20 +132,20 @@ function toggleExclusiveSubslot(slotId) {
     // ★★★ サブスロット用コントロールパネルを追加 ★★★
     console.log(`🎛️ === サブスロット制御パネル追加処理開始 ===`);
     console.log(`🔍 対象スロット: ${slotId}`);
-    console.log(`🔍 window.insertSubslotControlPanel の型: ${typeof window.insertSubslotControlPanel}`);
+    console.log(`🔍 window.addSubslotControlPanel の型: ${typeof window.addSubslotControlPanel}`);
     console.log(`🔍 サブスロットコンテナ存在確認: ${document.getElementById(`slot-${slotId}-sub`) ? '存在' : '不在'}`);
     
-    if (window.insertSubslotControlPanel) {
+    if (window.addSubslotControlPanel) {
       console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
       try {
-        window.insertSubslotControlPanel(slotId);
+        window.addSubslotControlPanel(slotId);
         console.log(`✅ ${slotId} サブスロット制御パネル追加処理完了`);
       } catch (error) {
         console.error(`❌ ${slotId} サブスロット制御パネル追加でエラー:`, error);
       }
     } else {
-      console.warn("⚠ insertSubslotControlPanel 関数が見つかりません");
-      console.log("🔍 window.insertSubslotControlPanel =", window.insertSubslotControlPanel);
+      console.warn("⚠ addSubslotControlPanel 関数が見つかりません");
+      console.log("🔍 window.addSubslotControlPanel =", window.addSubslotControlPanel);
       console.log("🔍 利用可能なwindow関数:");
       Object.keys(window).filter(key => key.includes('Subslot') || key.includes('subslot')).forEach(key => {
         console.log(`  - ${key}: ${typeof window[key]}`);
