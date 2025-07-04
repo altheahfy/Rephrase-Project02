@@ -776,10 +776,10 @@ function syncUpperSlotsFromJson(data) {
       console.log("🏷️ 上位スロット同期後のラベル復元を実行しました");
     }
     
-    // 🖼 画像処理：すべての処理完了後に一度だけ実行
-    if (typeof window.processAllImagesWithCoordination === 'function') {
-      window.processAllImagesWithCoordination();
-    }
+    // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
+    // if (typeof window.processAllImagesWithCoordination === 'function') {
+    //   window.processAllImagesWithCoordination();
+    // }
   }, 150);
 }
 
@@ -911,10 +911,10 @@ function syncSubslotsFromJson(data) {
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
     }
     
-    // 🖼 画像処理：すべてのサブスロット処理完了後に一度だけ実行
-    if (typeof window.processAllImagesWithCoordination === 'function') {
-      window.processAllImagesWithCoordination();
-    }
+    // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
+    // if (typeof window.processAllImagesWithCoordination === 'function') {
+    //   window.processAllImagesWithCoordination();
+    // }
   }, 100);
 }
 

@@ -410,61 +410,83 @@ function hookDataInsertionForLabelRestore() {
   console.log("✅ サブスロットラベル復元システムがフックされました");
 }
 
-// 🏷️ サブスロットのラベルを復元する関数
+// 🏷️ サブスロットのラベルを復元する関数（デバウンス機能付き）
+let labelRestoreTimeout = null;
+let isLabelRestoring = false;
+
 function restoreSubslotLabels() {
-  console.log("🏷️ サブスロットラベル復元処理を開始");
+  // 既に処理中の場合は重複実行を防ぐ
+  if (isLabelRestoring) {
+    console.log("⏭️ ラベル復元処理が既に実行中のため、重複実行をスキップします");
+    return;
+  }
   
-  // 全てのサブスロットコンテナを検索
-  const subslotContainers = document.querySelectorAll('.subslot-container');
+  // 既存のタイマーをクリア
+  if (labelRestoreTimeout) {
+    clearTimeout(labelRestoreTimeout);
+    console.log("⏰ 既存のラベル復元タイマーをクリアしました");
+  }
   
-  subslotContainers.forEach(container => {
-    // サブスロット要素を検索
-    const subslots = container.querySelectorAll('[id*="-sub-"]');
+  // デバウンス：短時間の連続呼び出しを防ぐ
+  labelRestoreTimeout = setTimeout(() => {
+    isLabelRestoring = true;
+    console.log("🏷️ サブスロットラベル復元処理を開始");
     
-    subslots.forEach(subslot => {
-      const slotId = subslot.id;
+    // 全てのサブスロットコンテナを検索
+    const subslotContainers = document.querySelectorAll('.subslot-container');
+    
+    subslotContainers.forEach(container => {
+      // サブスロット要素を検索
+      const subslots = container.querySelectorAll('[id*="-sub-"]');
       
-      // IDからサブスロットタイプを抽出 (例: slot-m1-sub-s → s)
-      const match = slotId.match(/-sub-([^-]+)$/);
-      if (match) {
-        const subslotType = match[1];
+      subslots.forEach(subslot => {
+        const slotId = subslot.id;
         
-        // 既存のラベルを確認
-        let existingLabel = subslot.querySelector('label');
-        
-        if (!existingLabel) {
-          // ラベルが存在しない場合は作成
-          existingLabel = document.createElement('label');
-          existingLabel.textContent = subslotType.toUpperCase();
-          existingLabel.style.cssText = `
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-            font-size: 14px;
-          `;
+        // IDからサブスロットタイプを抽出 (例: slot-m1-sub-s → s)
+        const match = slotId.match(/-sub-([^-]+)$/);
+        if (match) {
+          const subslotType = match[1];
           
-          // サブスロットの最初の要素として挿入
-          subslot.insertBefore(existingLabel, subslot.firstChild);
+          // 既存のラベルを確認
+          let existingLabel = subslot.querySelector('label');
           
-          console.log(`✅ サブスロット ${slotId} にラベル "${subslotType.toUpperCase()}" を復元しました`);
-        } else {
-          // ラベルが存在する場合は内容を確認・修正
-          if (existingLabel.textContent !== subslotType.toUpperCase()) {
+          if (!existingLabel) {
+            // ラベルが存在しない場合は作成
+            existingLabel = document.createElement('label');
             existingLabel.textContent = subslotType.toUpperCase();
-            console.log(`🔄 サブスロット ${slotId} のラベルを修正しました`);
+            existingLabel.style.cssText = `
+              display: block;
+              font-weight: bold;
+              margin-bottom: 5px;
+              color: #333;
+              font-size: 14px;
+            `;
+            
+            // サブスロットの最初の要素として挿入
+            subslot.insertBefore(existingLabel, subslot.firstChild);
+            
+            console.log(`✅ サブスロット ${slotId} にラベル "${subslotType.toUpperCase()}" を復元しました`);
+          } else {
+            // ラベルが存在する場合は内容を確認・修正
+            if (existingLabel.textContent !== subslotType.toUpperCase()) {
+              existingLabel.textContent = subslotType.toUpperCase();
+              console.log(`🔄 サブスロット ${slotId} のラベルを修正しました`);
+            }
           }
         }
-      }
+      });
     });
-  });
-  
-  // 🖼 ラベル復元完了後に画像処理を実行
-  if (typeof window.processAllImagesWithCoordination === 'function') {
-    setTimeout(() => {
-      window.processAllImagesWithCoordination();
-    }, 50);
-  }
+    
+    console.log("✅ サブスロットラベル復元処理が完了しました");
+    isLabelRestoring = false;
+    
+    // 🖼 ラベル復元完了後に画像処理を実行（一度だけ）
+    if (typeof window.processAllImagesWithCoordination === 'function') {
+      setTimeout(() => {
+        window.processAllImagesWithCoordination();
+      }, 50);
+    }
+  }, 200); // 200ms のデバウンス
 }
 
 // 🔍 サブスロットのラベル状態をデバッグするための関数
