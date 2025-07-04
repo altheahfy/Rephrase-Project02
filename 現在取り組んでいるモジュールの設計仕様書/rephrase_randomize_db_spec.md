@@ -24,12 +24,17 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 ---
 
 ## 個別ランダマイズの流れ（実装済み仕様）
-- **Sスロット個別ランダマイズ**: `randomizer_individual.js` 内の `randomizeSlotSIndividual()` 関数で実装済み。
+- **実行**: `randomizer_individual.js` 内の各個別ランダマイズ関数（`randomizeSlotSIndividual()`, `randomizeSlotM1Individual()` 等）
 - **他スロット個別ランダマイズ**: 将来的に水平展開予定（V, O, C等）。
 - 現在表示中の V_group_key 母集団データ（`window.fullSlotPool`）を流用。
 - 該当スロットに対応するスロット候補群を抽出し、その中からランダム選出。
 - 選出したスロットデータを該当スロットの表示にのみ反映し、他スロットには影響を与えない。
-- 描画は既存の structure_builder.js の共通描画モジュールに委ねる。
+- **データフロー**:
+  1. 個別ランダマイズ実行 → `randomizer_individual.js`
+  2. 動的エリア更新 → `buildStructure(data)` in `structure_builder.js`
+  3. 静的エリア同期 → `syncUpperSlotsFromJson(data)` + `syncSubslotsFromJson(data)` in `insert_test_data_clean.js`
+- **重要**: `structure_builder.js`は動的エリアのみ担当、静的エリアは`insert_test_data_clean.js`が担当
+- **注意**: 両方の同期処理が必要。`structure_builder.js`のみでは静的エリアは更新されない
 
 ---
 
@@ -40,11 +45,13 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 ---
 
 ## 注意事項
-- structure_builder.js は選択済のスロット群を受け取り描画するのみとする。
+- **ファイル責任分担**:
+  - `structure_builder.js`: 動的記載エリア（dynamic-slot-area）への描画のみ
+  - `insert_test_data_clean.js`: 静的記載エリア（static-slot-area）への同期処理を担当
+- **重要**: 完全な表示更新には両方のファイルでの処理が必要
 - randomizer_all.js が選択責任を持ち、構造モジュールは描画責任に集中。
-- 個別ランダマイズデータも structure_builder.js がそのまま描画すること。
 - 個別ランダマイズボタン（🎲）は slot-container 内で SlotPhrase ラベルの横に配置し、slot-text 内には配置しない。
-- **同期処理**: `syncUpperSlotsFromJson()` と `syncSubslotsFromJson()` を使用（`syncDynamicToStatic()` は非推奨）。
+- **同期処理**: 個別ランダマイズでは `syncUpperSlotsFromJson()` と `syncSubslotsFromJson()` を使用。`syncDynamicToStatic()` も実装されており利用可能。
 
 ---
 
@@ -72,9 +79,9 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 #### データフロー
 ```
 1. 全体ランダマイズ実行 → window.fullSlotPool作成（randomizer_all.js）
-2. Sスロット個別ランダマイズ実行 → window.fullSlotPoolから候補取得
-3. 動的エリア更新 → buildStructure()で再構築
-4. 静的エリア同期 → syncUpperSlotsFromJson() + syncSubslotsFromJson()
+2. Sスロット個別ランダマイズ実行 → window.fullSlotPoolから候補取得（randomizer_individual.js）
+3. 動的エリア更新 → buildStructure() で再構築（structure_builder.js）
+4. 静的エリア同期 → syncUpperSlotsFromJson() + syncSubslotsFromJson()（insert_test_data_clean.js）
 ```
 
 #### 核心となる関数
@@ -116,9 +123,9 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
    ```
 
 6. **表示更新**
-   - `buildStructure(data)`: 動的エリア再構築
-   - `syncUpperSlotsFromJson(data)`: メインスロット同期
-   - `syncSubslotsFromJson(data)`: サブスロット同期
+   - `buildStructure(data)`: 動的エリア再構築（structure_builder.js）
+   - `syncUpperSlotsFromJson(data)`: メインスロット同期（insert_test_data_clean.js）
+   - `syncSubslotsFromJson(data)`: サブスロット同期（insert_test_data_clean.js）
 
 ### 安全性設計
 
