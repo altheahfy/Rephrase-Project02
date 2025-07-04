@@ -849,6 +849,17 @@ function syncSubslotsFromJson(data) {
       slotElement.id = fullSlotId;
       slotElement.className = 'slot-container';
       
+      // 🏷️ ラベル要素を作成（最初に追加）
+      const labelElement = document.createElement('label');
+      labelElement.textContent = subslotId.toUpperCase();
+      labelElement.style.cssText = `
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 14px;
+      `;
+      
       // phrase要素を作成
       const phraseElement = document.createElement('div');
       phraseElement.className = 'slot-phrase';
@@ -863,14 +874,15 @@ function syncSubslotsFromJson(data) {
         textElement.textContent = item.SubslotText;
       }
       
-      // 要素を組み立て
+      // 要素を組み立て（ラベルを最初に追加）
+      slotElement.appendChild(labelElement);
       slotElement.appendChild(phraseElement);
       slotElement.appendChild(textElement);
       
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
       
-      console.log(`✅ サブスロット完全生成: ${fullSlotId} | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
+      console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
       
     } catch (err) {
       console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
