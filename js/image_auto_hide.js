@@ -341,13 +341,14 @@ let isImageProcessingActive = false;
 function processAllImagesWithCoordination() {
   // 既に処理中の場合は重複実行を防ぐ
   if (isImageProcessingActive) {
-    console.log("🔄 画像処理が既に実行中のため、重複実行をスキップします");
+    console.log("⏭️ 画像処理が既に実行中のため、重複実行をスキップします");
     return;
   }
   
   // 既存のタイマーをクリア
   if (imageProcessingTimeout) {
     clearTimeout(imageProcessingTimeout);
+    console.log("⏰ 既存のタイマーをクリアしました");
   }
   
   // デバウンス：短時間の連続呼び出しを防ぐ
@@ -362,7 +363,7 @@ function processAllImagesWithCoordination() {
     
     console.log("✅ 手動制御協調型画像処理が完了しました");
     isImageProcessingActive = false;
-  }, 200); // 200ms のデバウンス（より長く設定）
+  }, 300); // 300ms のデバウンス（さらに長く設定）
 }
 
 // 🗑️ 画像キャッシュをクリアする関数
@@ -376,12 +377,23 @@ function showImageProcessingStats() {
   console.log("📊 === 画像処理統計情報 ===");
   console.log(`キャッシュエントリ数: ${imageStateCache.size}`);
   console.log(`現在の処理状態: ${isImageProcessingActive ? '処理中' : '待機中'}`);
+  console.log(`タイマー状態: ${imageProcessingTimeout ? 'セット中' : 'クリア'}`);
   
   if (imageStateCache.size > 0) {
     console.log("📋 キャッシュ内容:");
+    let hiddenCount = 0;
+    let visibleCount = 0;
+    
     imageStateCache.forEach((value, key) => {
+      if (value.shouldHide) {
+        hiddenCount++;
+      } else {
+        visibleCount++;
+      }
       console.log(`  ${key} -> ${value.shouldHide ? '非表示' : '表示'}`);
     });
+    
+    console.log(`📈 統計: 表示=${visibleCount}個, 非表示=${hiddenCount}個`);
   }
 }
 
