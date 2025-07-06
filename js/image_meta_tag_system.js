@@ -116,6 +116,8 @@ function clearSlotImage(slotElement) {
     imageElement.removeAttribute('data-meta-tag');
     imageElement.removeAttribute('data-meta-tag-applied');
     imageElement.removeAttribute('data-applied-text');
+    // auto-hidden-image クラスも削除
+    imageElement.classList.remove('auto-hidden-image');
     console.log(`🗑️ [META] 画像クリア: ${slotElement.id}`);
   }
 }
@@ -150,6 +152,9 @@ function applyImageToSlot(slotElement, phraseText, forceRefresh = false) {
   imageElement.setAttribute('data-meta-tag', 'true');
   imageElement.setAttribute('data-meta-tag-applied', phraseText);
   imageElement.setAttribute('data-applied-text', phraseText);
+  
+  // auto-hidden-image クラスを削除（image_auto_hide.jsとの競合を回避）
+  imageElement.classList.remove('auto-hidden-image');
   
   // 表示の正規化
   imageElement.style.visibility = 'visible';
