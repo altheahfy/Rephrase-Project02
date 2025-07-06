@@ -13,23 +13,16 @@ window.imageMetaTagsLoaded = false;
 async function loadImageMetaTagsOnStartup() {
   try {
     console.log("🖼️ [META] メタタグデータの読み込みを開始...");
-    console.log("🔧 [DEBUG] 現在のURL:", window.location.href);
     
     // キャッシュ無効化のためのクエリパラメータ
     const timestamp = new Date().getTime();
-    const url = `image_meta_tags.json?_=${timestamp}`;
-    console.log("🔧 [DEBUG] リクエストURL:", url);
-    
-    const response = await fetch(url);
-    console.log("🔧 [DEBUG] レスポンス状態:", response.status, response.statusText);
+    const response = await fetch(`image_meta_tags.json?_=${timestamp}`);
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log("🔧 [DEBUG] 取得したデータ:", data);
-    
     window.imageMetaTagsData = data;
     window.imageMetaTagsLoaded = true;
 
@@ -37,8 +30,7 @@ async function loadImageMetaTagsOnStartup() {
     return true;
 
   } catch (error) {
-    console.error("❌ [META] メタタグデータの読み込みに失敗:", error.message);
-    console.error("🔧 [DEBUG] エラー詳細:", error);
+    console.warn("⚠️ [META] メタタグデータの読み込みに失敗:", error.message);
     window.imageMetaTagsData = [];
     window.imageMetaTagsLoaded = false;
     return false;
@@ -339,7 +331,3 @@ if (document.readyState === 'loading') {
 } else {
   initializeMetaTagSystem();
 }
-
-// デバッグ用：スクリプト読み込み確認
-console.log("🔧 [DEBUG] image_meta_tag_system.js が読み込まれました");
-console.log("🔧 [DEBUG] document.readyState:", document.readyState);
