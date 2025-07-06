@@ -636,17 +636,19 @@ h2 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* 上位パネルと影を合わせる */
 }
 
-/* 🔹 分離疑問詞エリアのスタイル - 7行構造でスペーサー行を追加 */
+/* 🔹 分離疑問詞エリアのスタイル - 他のスロットと同じ高さに調整 */
 #display-top-question-word {
   display: none !important; /* 初期状態は非表示 */
-  grid-template-rows: 30px 75px 10px 20px 25px 25px 25px; /* 7行構造：スペーサー行(10px)を追加 */
+  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 🎯 他のスロットと同じ6行構造 */
   grid-template-columns: 1fr;
+  gap: 6px; /* 🎯 他のスロットと同じgap */
   width: auto !important; /* 🆕 自動幅調整 */
   min-width: 140px !important; /* 🆕 最小幅 */
   max-width: none !important; /* 🆕 最大幅制限なし */
-  height: 230px !important; /* 7行構造に合わせて高さ調整 */
-  margin: 4px !important; /* スロットと同じマージン */
-  padding: 10px !important; /* スロットと同じパディング */
+  height: auto !important; /* 🎯 自動高さ調整 */
+  min-height: 380px !important; /* 🎯 他のスロットと同じ最小高さ */
+  margin: 4px 4px 20px 4px !important; /* 🎯 他のスロットと同じマージン */
+  padding: 15px !important; /* 🎯 他のスロットと同じパディング */
   border: 1px solid #eee !important; /* スロットと同じボーダー */
   border-radius: 0 !important; /* スロットと同じ角丸なし */
   background-color: white !important; /* 背景色を白に統一 */
@@ -664,7 +666,7 @@ h2 {
 
 /* 🔧 補助テキスト非表示時の行の高さ制御 */
 #display-top-question-word.hide-auxtext {
-  grid-template-rows: 30px 75px 10px 0px 25px 25px 25px; /* 補助テキスト行(4行目)を0pxに */
+  grid-template-rows: 30px 180px 0px 30px 30px 30px; /* 🎯 3行目（補助テキスト行）を0pxに */
 }
 
 /* 疑問詞ラベル - Grid行1 */
@@ -684,24 +686,17 @@ h2 {
 /* 疑問詞画像エリア - Grid行2 */
 #display-top-question-word .question-word-image {
   grid-row: 2;
-  width: 90px; /* スロット画像と同じサイズ */
-  height: 60px;
+  max-height: 150px !important; /* 🎯 他のスロット画像と同じサイズ */
+  max-width: 160px !important; /* 🎯 他のスロット画像と同じサイズ */
+  min-height: 120px !important; /* 🎯 他のスロット画像と同じサイズ */
+  min-width: 120px !important; /* 🎯 他のスロット画像と同じサイズ */
   background: transparent;
   border: 1px solid #f0f0f0; /* スロット画像と同じ枠 */
 }
 
-/* 疑問詞スペーサー行 - Grid行3（空白行） */
-#display-top-question-word .question-word-spacer {
-  grid-row: 3;
-  grid-column: 1;
-  width: 100%;
-  height: 100%;
-  /* 空白行なので背景なし */
-}
-
-/* 疑問詞日本語補助テキスト - Grid行4 */
+/* 疑問詞日本語補助テキスト - Grid行3 */
 #display-top-question-word .question-word-auxtext {
-  grid-row: 4;
+  grid-row: 3;
   grid-column: 1;
   font-size: 11px; /* スロットの補助テキストと同じサイズ */
   font-weight: 400;
@@ -717,9 +712,9 @@ h2 {
   line-height: 1.1; /* スロットの補助テキストと同じ行高 */
 }
 
-/* 疑問詞英語テキスト - Grid行5 */
+/* 疑問詞英語テキスト - Grid行4 */
 #display-top-question-word .question-word-text {
-  grid-row: 5;
+  grid-row: 4;
   font-size: 20px; /* 適度なサイズに調整 */
   font-weight: 600; /* スロットの英語テキストと同じ重み */
   color: #222;
@@ -739,23 +734,20 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 疑問詞ボタンプレースホルダー - Grid行6,7（空のスペース） */
+/* 疑問詞ボタンプレースホルダー - Grid行5,6（空のスペース） */
 #display-top-question-word .question-word-button-placeholder {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-#display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
-  grid-row: 6;
-}
-
-#display-top-question-word .question-word-button-placeholder:nth-of-type(7) {
-  grid-row: 7;
+#display-top-question-word .question-word-button-placeholder:nth-of-type(5) {
+  grid-row: 5;
 }
 
 #display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
   grid-row: 6;
+}
 }
 
 /* 🎯 サブスロット専用の4行CSS Gridレイアウト */
