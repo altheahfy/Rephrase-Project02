@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vスロット画像システム テスト</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    .test-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .slot-container {
+      border: 2px solid #007cba;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      background-color: #f8f9fa;
+    }
+    .slot-image {
+      max-width: 100px;
+      max-height: 100px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    .slot-phrase {
+      font-weight: bold;
+      color: #007cba;
+      margin: 5px 0;
+    }
+    .slot-text {
+      color: #666;
+      margin: 5px 0;
+    }
+    button {
+      background-color: #007cba;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #005a8b;
+    }
+    .debug-info {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Vスロット画像システム テスト</h1>
+  
+  <div class="test-container">
+    <h2>テスト用Vスロット</h2>
+    <div class="slot-container" id="slot-v">
+      <label>V</label>
+      <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+      <div class="slot-phrase">become</div>
+      <div class="slot-text">テスト用テキスト</div>
+    </div>
+  </div>
+  
+  <div class="test-container">
+    <h2>テスト用ボタン</h2>
+    <button onclick="window.testVSlotImage()">🧪 手動テスト実行</button>
+    <button onclick="window.updateVSlotImage(true)">🔄 画像更新（強制）</button>
+    <button onclick="window.monitorVSlotText()">📝 テキスト監視</button>
+    <button onclick="window.initializeVSlotImageSystem()">🚀 システム初期化</button>
+    <button onclick="changeVSlotText()">📝 テキスト変更</button>
+  </div>
+  
+  <div class="test-container">
+    <h2>デバッグ情報</h2>
+    <div class="debug-info" id="debug-info">
+      ここにデバッグ情報が表示されます
+    </div>
+  </div>
+
+  <script>
+    // テスト用のテキスト変更関数
+    function changeVSlotText() {
+      const vSlot = document.getElementById('slot-v');
+      const phraseElement = vSlot.querySelector('.slot-phrase');
+      const words = ['become', 'make', 'take', 'give', 'help', 'find', 'know', 'want'];
+      const randomWord = words[Math.floor(Math.random() * words.length)];
+      phraseElement.textContent = randomWord;
+      
+      updateDebugInfo('テキストを変更しました: ' + randomWord);
+      
+      // 画像更新
+      if (typeof window.updateVSlotImage === 'function') {
+        setTimeout(() => window.updateVSlotImage(true), 100);
+      }
+    }
+    
+    // デバッグ情報を表示
+    function updateDebugInfo(message) {
+      const debugDiv = document.getElementById('debug-info');
+      const timestamp = new Date().toLocaleTimeString();
+      debugDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      debugDiv.scrollTop = debugDiv.scrollHeight;
+    }
+    
+    // コンソールログをデバッグ情報にも表示
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      updateDebugInfo(args.join(' '));
+    };
+    
+    const originalError = console.error;
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      updateDebugInfo('❌ ' + args.join(' '));
+    };
+  </script>
+
+  <script src="js/v_slot_image_system.js"></script>
+</body>
+</html>

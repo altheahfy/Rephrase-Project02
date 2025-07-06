@@ -133,7 +133,7 @@ function isValidImage(imgElement) {
   
   const src = imgElement.src;
   
-  // 将来のメタタグ対応：メタタグを持つ画像は常に表示
+  // メタタグを持つ画像は常に表示
   if (hasImageMetaTag(imgElement)) {
     console.log(`✅ メタタグ付き画像を検出: ${src}`);
     return true;

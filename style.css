@@ -552,12 +552,27 @@ h2 {
   visibility: hidden !important;
 }
 
+/* 🎨 メタタグ画像は常に表示（auto-hidden-image を上書き） */
+.slot-image[data-meta-tag="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* 手動制御と自動制御の優先度制御 */
 /* 手動制御が優先される（手動非表示が設定されている場合は自動制御を無効化） */
 .slot-container.hidden-image .slot-image.auto-hidden-image,
 .slot-container[class*="hidden-"][class*="-image"] .slot-image.auto-hidden-image {
   /* 手動制御が設定されている場合は自動制御クラスを無効化 */
   display: none !important; /* 手動制御の結果を優先 */
+}
+
+/* メタタグ画像は手動制御も上書き */
+.slot-container.hidden-image .slot-image[data-meta-tag="true"],
+.slot-container[class*="hidden-"][class*="-image"] .slot-image[data-meta-tag="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* 🎯 サブスロットコントロールパネルを下側に配置（静的エリア限定） */
