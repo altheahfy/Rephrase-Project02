@@ -5,13 +5,27 @@ console.log("🎯 メタタグシステム自動実行フック読み込み");
 window.addEventListener('load', function() {
   console.log("📋 window.load イベント発生 - メタタグシステムを実行");
   
-  // 初期化時のみ実行（回数を減らす）
+  // 複数のタイミングで実行して確実にする
   setTimeout(() => {
     if (window.applyMetaTagImagesToAllSlots) {
-      console.log("🎯 [HOOK] 初期化時メタタグシステム実行");
+      console.log("🎯 [HOOK] 1秒後にメタタグシステム実行");
+      window.applyMetaTagImagesToAllSlots(true);
+    }
+  }, 1000);
+  
+  setTimeout(() => {
+    if (window.applyMetaTagImagesToAllSlots) {
+      console.log("🎯 [HOOK] 2秒後にメタタグシステム実行");
       window.applyMetaTagImagesToAllSlots(true);
     }
   }, 2000);
+  
+  setTimeout(() => {
+    if (window.applyMetaTagImagesToAllSlots) {
+      console.log("🎯 [HOOK] 3秒後にメタタグシステム実行");
+      window.applyMetaTagImagesToAllSlots(true);
+    }
+  }, 3000);
 });
 
 // スロットのテキストが変更されたときの自動実行
@@ -49,7 +63,7 @@ function setupTextChangeObserver() {
 // DOMContentLoaded時に監視を開始
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🚀 [HOOK] DOMContentLoaded - テキスト変更監視を開始");
-  setTimeout(setupTextChangeObserver, 2000); // 初期化完了を待つ
+  setTimeout(setupTextChangeObserver, 500);
 });
 
 console.log("✅ メタタグシステム自動実行フックが準備完了");
