@@ -37,21 +37,12 @@ window.resetPerformanceStats = function() {
   console.log("📊 パフォーマンス統計をリセットしました");
 };
 
-// 10秒ごとに統計を表示（無効化）
-// setInterval(() => {
-//   if (performanceCounters.imageProcessing > 0 || performanceCounters.mutationObserver > 0) {
-//     console.log("📊 定期パフォーマンス報告:", performanceCounters);
-//   }
-// }, 10000);
-
-// 手動で統計を確認する関数
-window.showPerformanceReport = function() {
+// 10秒ごとに統計を表示
+setInterval(() => {
   if (performanceCounters.imageProcessing > 0 || performanceCounters.mutationObserver > 0) {
-    console.log("📊 パフォーマンス報告:", performanceCounters);
-  } else {
-    console.log("📊 パフォーマンス報告: 処理実行なし");
+    console.log("📊 定期パフォーマンス報告:", performanceCounters);
   }
-};
+}, 10000);
 
 console.log("✅ パフォーマンス監視ツールが準備できました");
 console.log("使用方法: showPerformanceStats() - 統計表示, resetPerformanceStats() - 統計リセット");

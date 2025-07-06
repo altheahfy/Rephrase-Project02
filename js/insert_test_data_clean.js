@@ -1692,25 +1692,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
     
-    // 低頻度で定期チェックを無効化（イベントドリブンに変更）
-    // setInterval(() => {
-    //        if (window.loadedJsonData) {
-    //     const newSignature = getDataSignature(window.loadedJsonData);
-    //     if (newSignature && newSignature !== lastJsonDataSignature) {
-    //       console.log("🔄 window.loadedJsonData の実質的な変更を検出");
-    //       window.safeJsonSync(window.loadedJsonData);
-    //       lastJsonDataSignature = newSignature;
-    //     }
-    //   }
-    //   
-    //   // 定期的に動的エリアの位置も確認
-    //   ensureDynamicAreaPosition();
-    // }, 6000); // 6秒ごとに変更をチェック（頻度を半減）
-    
-    // イベントドリブンでデータ同期を実行する関数
-    function triggerDataSync() {
-      console.log("🔄 イベントドリブンでデータ同期を実行");
-      if (window.loadedJsonData) {
+    // 低頻度で定期チェック（間隔を長く）
+    setInterval(() => {
+           if (window.loadedJsonData) {
         const newSignature = getDataSignature(window.loadedJsonData);
         if (newSignature && newSignature !== lastJsonDataSignature) {
           console.log("🔄 window.loadedJsonData の実質的な変更を検出");
@@ -1718,11 +1702,10 @@ document.addEventListener("DOMContentLoaded", function() {
           lastJsonDataSignature = newSignature;
         }
       }
+      
+      // 定期的に動的エリアの位置も確認
       ensureDynamicAreaPosition();
-    }
-    
-    // グローバルに公開
-    window.triggerDataSync = triggerDataSync;
+    }, 6000); // 6秒ごとに変更をチェック（頻度を半減）
     
     // 「詳細」ボタンクリック時に順序を再適用する
     document.body.addEventListener('click', (event) => {

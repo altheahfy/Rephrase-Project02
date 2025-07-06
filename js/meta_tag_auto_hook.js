@@ -1,22 +1,28 @@
 // メタタグシステム自動実行フック
 console.log("🎯 メタタグシステム自動実行フック読み込み");
 
-// ページ読み込み完了時の自動実行（最適化版）
+// ページ読み込み完了時の自動実行
 window.addEventListener('load', function() {
   console.log("📋 window.load イベント発生 - メタタグシステムを実行");
   
-  // 初期化時のみ実行
+  // 複数のタイミングで実行して確実にする
   setTimeout(() => {
     if (window.applyMetaTagImagesToAllSlots) {
-      console.log("🎯 [HOOK] 初期化時メタタグシステム実行");
+      console.log("🎯 [HOOK] 1秒後にメタタグシステム実行");
       window.applyMetaTagImagesToAllSlots(true);
     }
   }, 1000);
   
-  // 確実性のため追加で1回実行
   setTimeout(() => {
     if (window.applyMetaTagImagesToAllSlots) {
-      console.log("🎯 [HOOK] 追加実行（確実性のため）");
+      console.log("🎯 [HOOK] 2秒後にメタタグシステム実行");
+      window.applyMetaTagImagesToAllSlots(true);
+    }
+  }, 2000);
+  
+  setTimeout(() => {
+    if (window.applyMetaTagImagesToAllSlots) {
+      console.log("🎯 [HOOK] 3秒後にメタタグシステム実行");
       window.applyMetaTagImagesToAllSlots(true);
     }
   }, 3000);
