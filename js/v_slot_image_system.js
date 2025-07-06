@@ -137,9 +137,14 @@ function applyImageToVSlot(phraseText, forceRefresh = false) {
   console.log('  現在:', currentImagePath);
   console.log('  新規:', fullNewImagePath);
   
-  // 画像を更新
-  imgElement.src = newImagePath;
+  // 画像を更新（キャッシュバスター付き）
+  const cacheBuster = Date.now(); // キャッシュ回避用のタイムスタンプ
+  const imageUrlWithCacheBuster = `${newImagePath}?t=${cacheBuster}`;
+  
+  imgElement.src = imageUrlWithCacheBuster;
   imgElement.alt = `image for V: ${imageData.description || phraseText}`;
+  
+  console.log('🔄 キャッシュバスター付きURL:', imageUrlWithCacheBuster);
   
   // メタタグ属性を設定（image_auto_hide.js対応）
   imgElement.setAttribute('data-meta-tag', 'true');
