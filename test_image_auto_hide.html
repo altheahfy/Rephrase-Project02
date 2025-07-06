@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画像自動非表示システム テスト</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧪 画像自動非表示システム テスト</h1>
+  
+  <div class="test-section">
+    <h2>📋 テスト項目</h2>
+    <ul>
+      <li>✅ メタタグ付き画像は表示される</li>
+      <li>✅ プレースホルダー画像は非表示になる</li>
+      <li>✅ 詳細ボタン付きスロットのbutton.pngは表示される</li>
+      <li>✅ 読み込みエラー画像は非表示になる</li>
+    </ul>
+  </div>
+  
+  <div class="test-images">
+    <h2>🖼 テスト画像スロット</h2>
+    
+    <!-- メタタグ付き画像（表示されるべき） -->
+    <div class="slot-container" id="test-slot-1">
+      <h3>テスト1: メタタグ付き画像</h3>
+      <img class="slot-image" src="slot_images/common/become.png" alt="become" data-meta-tag="true">
+      <p>この画像は表示されるべきです（メタタグ付き）</p>
+    </div>
+    
+    <!-- プレースホルダー画像（非表示になるべき） -->
+    <div class="slot-container" id="test-slot-2">
+      <h3>テスト2: プレースホルダー画像</h3>
+      <img class="slot-image" src="slot_images/common/placeholder.png" alt="placeholder">
+      <p>この画像は非表示になるべきです（プレースホルダー）</p>
+    </div>
+    
+    <!-- 詳細ボタン付きスロットのbutton.png（表示されるべき） -->
+    <div class="slot-container" id="test-slot-3">
+      <h3>テスト3: 詳細ボタン付きスロット</h3>
+      <img class="slot-image" src="slot_images/common/button.png" alt="Click to expand">
+      <button data-subslot-toggle="test-slot-3">詳細</button>
+      <p>この画像は表示されるべきです（詳細ボタン付き）</p>
+    </div>
+    
+    <!-- 存在しない画像（非表示になるべき） -->
+    <div class="slot-container" id="test-slot-4">
+      <h3>テスト4: 存在しない画像</h3>
+      <img class="slot-image" src="slot_images/common/nonexistent.png" alt="nonexistent">
+      <p>この画像は非表示になるべきです（存在しない画像）</p>
+    </div>
+    
+    <!-- 通常の画像（表示されるべき） -->
+    <div class="slot-container" id="test-slot-5">
+      <h3>テスト5: 通常の画像</h3>
+      <img class="slot-image" src="slot_images/common/run.png" alt="run">
+      <p>この画像は表示されるべきです（通常の画像）</p>
+    </div>
+  </div>
+  
+  <div class="test-controls">
+    <h2>🎮 テスト実行</h2>
+    <button onclick="window.debugImageHiding()">画像非表示処理を手動実行</button>
+    <button onclick="window.showAllImageInfo()">全画像情報を表示</button>
+    <button onclick="window.testVSlotImage()">Vスロット画像テスト</button>
+  </div>
+  
+  <div class="test-log">
+    <h2>📋 ログ</h2>
+    <p>コンソールを確認してください（F12 → Console）</p>
+  </div>
+  
+  <!-- 必要なJavaScriptファイルを読み込み -->
+  <script src="js/image_auto_hide.js"></script>
+  <script src="js/v_slot_image_system.js"></script>
+  
+  <script>
+    // ページ読み込み完了後にテストを実行
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🧪 テストページが読み込まれました');
+      
+      // 1秒後にテストを実行
+      setTimeout(() => {
+        console.log('🧪 自動テストを開始します...');
+        
+        // 画像非表示処理を手動実行
+        if (typeof window.debugImageHiding === 'function') {
+          window.debugImageHiding();
+        }
+        
+        // 画像情報を表示
+        if (typeof window.showAllImageInfo === 'function') {
+          window.showAllImageInfo();
+        }
+        
+        console.log('🧪 自動テストが完了しました');
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

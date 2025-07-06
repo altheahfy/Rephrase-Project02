@@ -769,6 +769,16 @@ function syncUpperSlotsFromJson(data) {
     }
   }, 100);
   
+  // 🖼 Vスロット画像更新：データ更新後にVスロット画像を再更新
+  setTimeout(() => {
+    if (typeof window.updateVSlotImageAfterDataChange === 'function') {
+      window.updateVSlotImageAfterDataChange();
+      console.log("✅ syncUpperSlotsFromJson完了後のVスロット画像更新を実行");
+    } else {
+      console.warn("⚠ updateVSlotImageAfterDataChange関数が見つかりません");
+    }
+  }, 150);
+  
   // 🏷️ 上位スロット同期後にラベルを復元
   setTimeout(() => {
     if (window.restoreSubslotLabels) {
