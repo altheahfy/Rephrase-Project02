@@ -28,13 +28,44 @@ const VALID_IMAGE_PATTERNS = [
   'hand',                      // 手関連の画像
   'pointer',                   // ポインター画像
   'icon',                      // アイコン系画像
+  'animals',                   // 動物関連の画像（メタタグ）
+  'objects',                   // 物体関連の画像（メタタグ）
+  'actions',                   // アクション関連の画像（メタタグ）
+  'emotions',                  // 感情関連の画像（メタタグ）
+  'nature',                    // 自然関連の画像（メタタグ）
+  'food',                      // 食べ物関連の画像（メタタグ）
+  'sports',                    // スポーツ関連の画像（メタタグ）
+  'weather',                   // 天気関連の画像（メタタグ）
+  'locations',                 // 場所関連の画像（メタタグ）
+  'transportation',            // 交通関連の画像（メタタグ）
 ];
 
-// 🎯 メタタグを持つ画像かどうかを判定（将来の拡張用）
+// 🎯 メタタグを持つ画像かどうかを判定（イラスト表示機構との統合）
 function hasImageMetaTag(imgElement) {
-  // 将来実装予定：data-meta-tag 属性や特定のクラスを持つ画像を判定
-  // 例：imgElement.hasAttribute('data-meta-tag') || imgElement.classList.contains('meta-image')
-  return false; // 現在は未実装
+  // イラスト表示機構によって設定された画像かどうかを判定
+  return imgElement && imgElement.hasAttribute('data-meta-tag');
+}
+
+// 🎯 サブスロットに実際に中身が入っているかどうかを判定
+function hasSubslotContent(slotContainer) {
+  if (!slotContainer) return false;
+  
+  // サブスロットを検索
+  const subslots = slotContainer.querySelectorAll('.subslot-container');
+  
+  for (const subslot of subslots) {
+    // テキストコンテンツがあるかチェック
+    const textElements = subslot.querySelectorAll('.slot-phrase, .slot-auxtext');
+    for (const element of textElements) {
+      if (element.textContent.trim()) {
+        console.log(`🔍 サブスロット内容発見: ${slotContainer.id} - "${element.textContent.trim()}"`);
+        return true;
+      }
+    }
+  }
+  
+  console.log(`🔍 サブスロット内容なし: ${slotContainer.id}`);
+  return false;
 }
 
 // 🔍 画像が非表示対象かどうかを判定
@@ -52,7 +83,7 @@ function shouldHideImage(imgElement) {
   
   // 将来のメタタグ対応：メタタグを持つ画像は常に表示
   if (hasImageMetaTag(imgElement)) {
-    console.log(`👁 メタタグ付き画像は表示対象: ${src}`);
+    console.log(`👁 メタタグ付きイラスト画像は表示対象: ${src}`);
     return false;
   }
   
@@ -60,8 +91,9 @@ function shouldHideImage(imgElement) {
   const slotContainer = imgElement.closest('.slot-container');
   if (slotContainer) {
     const hasSubslotToggle = slotContainer.querySelector('[data-subslot-toggle]');
-    if (hasSubslotToggle && src.includes('button.png')) {
-      console.log(`👁 詳細ボタン付きスロットの指アイコンは表示対象: ${src}`);
+    // サブスロットトグルがあり、実際にサブスロットに中身があり、button.pngが設定されている場合のみ表示
+    if (hasSubslotToggle && hasSubslotContent(slotContainer) && src.includes('button.png')) {
+      console.log(`👁 実際にサブスロット内容がある詳細ボタンの指アイコンは表示対象: ${src}`);
       return false;
     }
   }
@@ -126,7 +158,7 @@ function isValidImage(imgElement) {
   
   // 将来のメタタグ対応：メタタグを持つ画像は常に表示
   if (hasImageMetaTag(imgElement)) {
-    console.log(`✅ メタタグ付き画像を検出: ${src}`);
+    console.log(`✅ メタタグ付きイラスト画像を検出: ${src}`);
     return true;
   }
   
@@ -134,8 +166,9 @@ function isValidImage(imgElement) {
   const slotContainer = imgElement.closest('.slot-container');
   if (slotContainer) {
     const hasSubslotToggle = slotContainer.querySelector('[data-subslot-toggle]');
-    if (hasSubslotToggle && src.includes('button.png')) {
-      console.log(`✅ 詳細ボタン付きスロットの指アイコンを検出: ${src}`);
+    // サブスロットトグルがあり、実際にサブスロットに中身があり、button.pngが設定されている場合のみ有効
+    if (hasSubslotToggle && hasSubslotContent(slotContainer) && src.includes('button.png')) {
+      console.log(`✅ 実際にサブスロット内容がある詳細ボタンの指アイコンを検出: ${src}`);
       return true;
     }
   }
@@ -196,7 +229,7 @@ function applyAutoHideToImage(imgElement) {
 
 // 🎯 詳細ボタンがあるスロットにbutton.pngを自動設定
 function setButtonImageForDetailSlots() {
-  console.log("🎯 詳細ボタン付きスロットにbutton.png自動設定を開始...");
+  console.log("🎯 サブスロット内容がある詳細ボタン付きスロットにbutton.png自動設定を開始...");
   
   // 詳細ボタンがあるスロットコンテナを全て取得
   const slotsWithToggle = document.querySelectorAll('.slot-container:has([data-subslot-toggle])');
@@ -208,25 +241,36 @@ function setButtonImageForDetailSlots() {
     if (imgElement && toggleButton) {
       const currentSrc = imgElement.src;
       
-      // プレースホルダー画像や無効な画像の場合のみbutton.pngに変更
-      const shouldReplaceImage = HIDDEN_IMAGE_PATTERNS.some(pattern => currentSrc.includes(pattern)) ||
-                                imgElement.alt.startsWith('image for') ||
-                                (imgElement.complete && imgElement.naturalWidth === 0);
+      // サブスロットに実際に中身があるかチェック
+      const hasContent = hasSubslotContent(slotContainer);
       
-      if (shouldReplaceImage) {
-        const buttonImageSrc = 'slot_images/common/button.png';
-        imgElement.src = buttonImageSrc;
-        imgElement.alt = 'Click to expand details';
-        console.log(`✅ スロット${index + 1}にbutton.pngを設定: ${slotContainer.id}`);
-      } else if (currentSrc.includes('button.png')) {
-        console.log(`👁 スロット${index + 1}は既にbutton.pngが設定済み: ${slotContainer.id}`);
+      if (hasContent) {
+        // サブスロットに中身がある場合のみbutton.pngを設定
+        const shouldReplaceImage = !hasImageMetaTag(imgElement) && 
+                                  (HIDDEN_IMAGE_PATTERNS.some(pattern => currentSrc.includes(pattern)) ||
+                                  imgElement.alt.startsWith('image for') ||
+                                  (imgElement.complete && imgElement.naturalWidth === 0));
+        
+        if (shouldReplaceImage) {
+          const buttonImageSrc = 'slot_images/common/button.png';
+          imgElement.src = buttonImageSrc;
+          imgElement.alt = 'Click to expand details';
+          console.log(`✅ サブスロット内容ありスロット${index + 1}にbutton.pngを設定: ${slotContainer.id}`);
+        } else if (currentSrc.includes('button.png')) {
+          console.log(`� サブスロット内容ありスロット${index + 1}は既にbutton.pngが設定済み: ${slotContainer.id}`);
+        } else if (hasImageMetaTag(imgElement)) {
+          console.log(`�️ サブスロット内容ありスロット${index + 1}にはメタタグ画像が設定済み: ${slotContainer.id}`);
+        } else {
+          console.log(`🔍 サブスロット内容ありスロット${index + 1}には別の有効な画像が設定済み: ${currentSrc}`);
+        }
       } else {
-        console.log(`🔍 スロット${index + 1}には別の有効な画像が設定済み: ${currentSrc}`);
+        // サブスロットに中身がない場合は、上位スロットのテキストでイラスト表示可能
+        console.log(`📝 サブスロット内容なしスロット${index + 1}: ${slotContainer.id} - イラスト表示対象`);
       }
     }
   });
   
-  console.log("✅ 詳細ボタン付きスロットのbutton.png自動設定が完了しました");
+  console.log("✅ サブスロット内容がある詳細ボタン付きスロットのbutton.png自動設定が完了しました");
 }
 
 // 🔄 統合処理：詳細ボタン用画像設定 + 自動非表示処理
@@ -406,6 +450,7 @@ window.setButtonImageForDetailSlots = setButtonImageForDetailSlots;
 window.processAllImagesWithButtonAutoSet = processAllImagesWithButtonAutoSet;
 window.clearImageStateCache = clearImageStateCache;
 window.showImageProcessingStats = showImageProcessingStats;
+window.hasSubslotContent = hasSubslotContent;
 
 // 🔹 デバッグ用手動実行関数
 window.debugImageHiding = function() {

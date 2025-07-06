@@ -129,13 +129,39 @@ function clearSlotImage(slotElement) {
 }
 
 /**
- * 単一スロットに画像を適用（居座り防止機能付き）
+ * 単一スロットに画像を適用（居座り防止機能付き・既存ロジックとの協調）
  */
 function applyImageToSlot(slotElement, phraseText, forceRefresh = false) {
   if (!slotElement || !phraseText) return false;
 
   const imageElement = slotElement.querySelector('.slot-image');
   if (!imageElement) return false;
+
+  // 🎯 既存ロジックとの協調：サブスロットに実際に中身があるスロットのボタン画像は上書きしない
+  const hasSubslotToggle = slotElement.querySelector('[data-subslot-toggle]');
+  if (hasSubslotToggle) {
+    // サブスロットに実際に中身があるかチェック
+    const hasContent = window.hasSubslotContent ? window.hasSubslotContent(slotElement) : false;
+    
+    if (hasContent && imageElement.src.includes('button.png')) {
+      console.log(`⚠️ [META] サブスロット内容ありスロットのボタン画像は保持: ${slotElement.id}`);
+      return false;
+    } else if (!hasContent) {
+      console.log(`📝 [META] サブスロット内容なしスロット: ${slotElement.id} - イラスト表示可能`);
+    }
+  }
+
+  // 🎯 プレースホルダー画像または空の画像の場合のみイラストを適用
+  const currentSrc = imageElement.src;
+  const isPlaceholderOrEmpty = currentSrc.includes('placeholder.png') || 
+                              currentSrc === '' || 
+                              currentSrc.includes('data:image') ||
+                              (imageElement.complete && imageElement.naturalWidth === 0);
+  
+  if (!isPlaceholderOrEmpty && !imageElement.hasAttribute('data-meta-tag') && !forceRefresh) {
+    console.log(`⚠️ [META] 既存の有効な画像があるためスキップ: ${slotElement.id} → "${currentSrc}"`);
+    return false;
+  }
 
   // 居座り防止：同じテキストで同じ画像が既に適用されている場合はスキップ
   const currentAppliedText = imageElement.getAttribute('data-applied-text');
@@ -146,8 +172,8 @@ function applyImageToSlot(slotElement, phraseText, forceRefresh = false) {
 
   const imagePath = findImageByMetaTag(phraseText);
   if (!imagePath) {
-    // マッチしない場合はプレースホルダーを設定
-    if (!imageElement.src.includes('placeholder.png')) {
+    // マッチしない場合はプレースホルダーを設定（既存画像がある場合は変更しない）
+    if (isPlaceholderOrEmpty) {
       clearSlotImage(slotElement);
     }
     return false;
@@ -218,6 +244,15 @@ function applyMetaTagImagesToAllSlots(forceRefresh = false) {
   });
 
   console.log(`✅ [META] === 画像適用完了: ${appliedCount}件 ===`);
+  
+  // 画像適用完了後にimage_auto_hide.jsの処理を再実行
+  if (appliedCount > 0 && window.processAllImagesWithCoordination) {
+    console.log("🔄 [META] イラスト表示後に画像非表示処理を実行");
+    setTimeout(() => {
+      window.processAllImagesWithCoordination();
+    }, 200);
+  }
+  
   return appliedCount;
 }
 
@@ -275,13 +310,14 @@ async function initializeMetaTagSystem() {
   const loaded = await loadImageMetaTagsOnStartup();
   
   if (loaded) {
-    // 少し遅延してから初回画像適用
+    // 既存の画像処理完了後に実行（image_auto_hide.jsの処理を待つ）
     setTimeout(() => {
+      console.log("🖼️ [META] 既存画像処理完了後にイラスト表示を開始");
       applyMetaTagImagesToAllSlots();
       
       // DOM変更監視を開始
       setupIndividualRandomizeObserver();
-    }, 500);
+    }, 1200); // image_auto_hide.jsの800ms + 400ms待機
   }
 }
 
