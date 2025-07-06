@@ -109,6 +109,14 @@ function randomizeSlotSIndividual() {
     console.log("🔄 サブスロット同期完了");
   }
   
+  // V スロット画像更新
+  if (typeof window.updateVSlotImage === "function") {
+    setTimeout(() => {
+      window.updateVSlotImage(true);
+      console.log("🎨 Vスロット画像更新完了");
+    }, 100);
+  }
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 

@@ -30,11 +30,20 @@ const VALID_IMAGE_PATTERNS = [
   'icon',                      // アイコン系画像
 ];
 
-// 🎯 メタタグを持つ画像かどうかを判定（将来の拡張用）
+// 🎯 メタタグを持つ画像かどうかを判定
 function hasImageMetaTag(imgElement) {
-  // 将来実装予定：data-meta-tag 属性や特定のクラスを持つ画像を判定
-  // 例：imgElement.hasAttribute('data-meta-tag') || imgElement.classList.contains('meta-image')
-  return false; // 現在は未実装
+  // data-meta-tag 属性を持つ画像は意図したイラスト
+  if (imgElement.hasAttribute('data-meta-tag')) {
+    return true;
+  }
+  
+  // プレースホルダー以外の画像で、commonフォルダ内の画像は基本的にメタタグ画像
+  const src = imgElement.src;
+  if (src.includes('slot_images/common/') && !src.includes('placeholder.png')) {
+    return true;
+  }
+  
+  return false;
 }
 
 // 🔍 画像が非表示対象かどうかを判定
