@@ -45,7 +45,7 @@ h2 {
 .slot-image {
   display: inline-block;
   margin-right: 4px;
-  max-height: 100px; /* 60px → 100px に拡大 */
+  max-height: 150px; /* 100px → 150px にさらに拡大 */
   vertical-align: middle;
 }
 
@@ -53,7 +53,7 @@ h2 {
 .slot-container {
   /* 🎯 CSS Gridで完全に6行固定レイアウトを実装 */
   display: grid;
-  grid-template-rows: 30px 120px 20px 25px 25px 25px; /* 画像行を75px → 120px に拡大 */
+  grid-template-rows: 30px 180px 20px 25px 25px 25px; /* 画像行を120px → 180px にさらに拡大 */
   grid-template-columns: 1fr;
   gap: 4px; /* 行間の固定間隔 */
   align-items: center; /* 各セル内での中央揃え */
@@ -63,7 +63,7 @@ h2 {
   order: 0; /* デフォルト値 */
   border: 1px solid #eee; /* 境界線を追加して区別しやすく */
   padding: 10px;
-  margin: 4px;
+  margin: 4px 4px 15px 4px; /* 下部マージンを拡大して境界線との距離を確保 */
   
   /* 🆕 動的幅調整システム */
   min-width: 120px; /* 最小幅を縮小 */
@@ -102,8 +102,8 @@ h2 {
   grid-row: 2;
   grid-column: 1;
   display: block;
-  width: 120px; /* 90px → 120px に拡大 */
-  height: 100px; /* 60px → 100px に拡大 */
+  width: 160px; /* 120px → 160px にさらに拡大 */
+  height: 150px; /* 100px → 150px にさらに拡大 */
   object-fit: contain;
   margin: 0;
   padding: 0;
@@ -207,11 +207,11 @@ h2 {
 
 /* .subslot内の画像も大きくする */
 .subslot .slot-image {
-  width: 120px;
-  height: 100px;
+  width: 160px; /* 120px → 160px にさらに拡大 */
+  height: 150px; /* 100px → 150px にさらに拡大 */
   object-fit: contain;
-  max-width: 120px;
-  max-height: 100px;
+  max-width: 160px;
+  max-height: 150px;
 }
 
 /* サブスロット展開エリアは初期状態では非表示に */
@@ -334,8 +334,8 @@ h2 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 5px; /* タイトルと例文の距離を大幅に縮める */
-  padding-top: 10px;
+  margin-top: 20px; /* 5px → 20px に拡大して詳細ボタンとの距離を確保 */
+  padding-top: 20px; /* 10px → 20px に拡大 */
   padding-bottom: 24px;
   /* 点線を削除 */
   position: relative; /* 位置関係の制御のため */
@@ -381,8 +381,8 @@ h2 {
 
 /* 動的記載エリアのコンテナ要素のスタイル強化 */
 #dynamic-area-container {
-  margin-top: 40px; /* 上部の余白を縮める */
-  padding-top: 20px;
+  margin-top: 60px; /* 40px → 60px に拡大して詳細ボタンとの距離をさらに確保 */
+  padding-top: 30px; /* 20px → 30px に拡大 */
   border-top: 2px solid #666; /* 区切り線を簡素化 */
   position: relative;
   clear: both;
@@ -730,7 +730,7 @@ h2 {
 .subslot-container {
   /* CSS Gridで4行固定レイアウトを実装（詳細・ランダマイズボタンなし） */
   display: grid;
-  grid-template-rows: 30px 120px 20px 25px; /* 画像行を75px → 120px に拡大 */
+  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px → 180px にさらに拡大 */
   grid-template-columns: 1fr;
   gap: 4px; /* 行間の固定間隔 */
   align-items: center; /* 各セル内での中央揃え */
@@ -751,7 +751,7 @@ h2 {
   transition: opacity 0.2s ease-out, width 0.3s ease;
   
   /* 固定高さ（4行構造） */
-  height: 219px; /* 30+120+20+25+gap+padding に更新 */
+  height: 279px; /* 30+180+20+25+gap+padding に更新 */
   box-sizing: border-box;
 }
 
@@ -777,8 +777,8 @@ h2 {
 .subslot-container img.slot-image {
   grid-row: 2;
   grid-column: 1;
-  width: 120px; /* 90px → 120px に拡大 */
-  height: 100px; /* 60px → 100px に拡大 */
+  width: 160px; /* 120px → 160px にさらに拡大 */
+  height: 150px; /* 100px → 150px にさらに拡大 */
   object-fit: contain; /* cover → contain に変更（画像の縦横比を保持） */
   border: 1px solid #ddd;
   border-radius: 4px;
