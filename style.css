@@ -64,23 +64,32 @@ h2 {
 .slot-container {
   /* 🎯 CSS Gridで完全に6行固定レイアウトを実装 */
   display: grid;
-  grid-template-rows: 30px 180px 20px 25px 25px 25px; /* 画像行を120px → 180px にさらに拡大 */
+  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 画像以外の行も拡大して全体のバランスを調整 */
   grid-template-columns: 1fr;
-  gap: 4px; /* 行間の固定間隔 */
+  gap: 6px; /* 行間も少し拡大 */
   align-items: center; /* 各セル内での中央揃え */
   justify-items: center; /* 各セル内での中央揃え */
   
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
   border: 1px solid #eee; /* 境界線を追加して区別しやすく */
-  padding: 10px;
-  margin: 4px 4px 15px 4px; /* 下部マージンを拡大して境界線との距離を確保 */
+  padding: 15px; /* パディングも拡大 */
+  margin: 4px 4px 20px 4px; /* 下部マージンを拡大 */
   
   /* 🆕 動的幅調整システム */
   min-width: 120px; /* 最小幅を縮小 */
   width: auto; /* 自動幅調整 */
   max-width: 400px; /* 最大幅を拡大 */
   flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
+  /* アニメーション */
+  transition: opacity 0.2s ease-out, width 0.3s ease;
+  
+  /* 🆕 スロット全体の高さを適切に設定 */
+  height: auto; /* 自動高さ調整 */
+  min-height: 380px; /* 全ての要素が確実に表示される最小高さ */
+  box-sizing: border-box;
+}
   
   /* 空判定時の非表示制御 */
   transition: opacity 0.2s ease-out, width 0.3s ease; /* 幅変更もアニメーション */
@@ -351,8 +360,8 @@ h2 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 40px; /* 20px → 40px にさらに拡大 */
-  padding-top: 30px; /* 20px → 30px に拡大 */
+  margin-top: 5px; /* 元の値に戻す */
+  padding-top: 10px; /* 元の値に戻す */
   padding-bottom: 24px;
   /* 点線を削除 */
   position: relative; /* 位置関係の制御のため */
@@ -398,8 +407,8 @@ h2 {
 
 /* 動的記載エリアのコンテナ要素のスタイル強化 */
 #dynamic-area-container {
-  margin-top: 200px; /* 120px → 200px に大幅拡大 */
-  padding-top: 50px; /* 40px → 50px に拡大 */
+  margin-top: 40px; /* 元の値に戻す */
+  padding-top: 20px; /* 元の値に戻す */
   border-top: 2px solid #666; /* 区切り線を簡素化 */
   position: relative;
   clear: both;
