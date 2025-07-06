@@ -122,21 +122,11 @@ function applyImageToVSlot(phraseText, forceRefresh = false) {
   const newImagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
   console.log('🎨 新しい画像パス:', newImagePath);
   
-  // 居座り防止：現在表示中の画像と同じかつ強制更新でない場合はスキップ
-  const currentImagePath = imgElement.src;
-  const isSameImage = currentImagePath.includes(imageData.image_file);
-  
-  if (!forceRefresh && isSameImage) {
+  // 居座り防止：同じ画像の場合は更新しない
+  if (!forceRefresh && imgElement.src.includes(imageData.image_file)) {
     console.log('📌 同じ画像のため更新をスキップ:', imageData.image_file);
-    console.log('📌 現在の画像:', currentImagePath);
-    console.log('📌 新しい画像:', newImagePath);
     return;
   }
-  
-  console.log('🔄 画像を更新します:');
-  console.log('  - 現在:', currentImagePath);
-  console.log('  - 新規:', newImagePath);
-  console.log('  - 強制更新:', forceRefresh);
   
   // 画像を更新
   imgElement.src = newImagePath;
@@ -256,14 +246,7 @@ function updateVSlotImage(forceRefresh = false) {
   const currentTextText = textElement ? textElement.textContent.trim() : '';
   const currentText = currentPhraseText || currentTextText;
   
-  console.log('🔄 取得したテキスト (phrase):', currentPhraseText);
-  console.log('🔄 取得したテキスト (text):', currentTextText);
-  console.log('🔄 採用されたテキスト:', currentText);
-  
-  if (!currentText) {
-    console.warn('⚠️ Vスロットにテキストが設定されていません');
-    return;
-  }
+  console.log('🔄 取得したテキスト:', currentText);
   
   applyImageToVSlot(currentText, forceRefresh);
 }

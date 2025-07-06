@@ -758,15 +758,7 @@ function syncUpperSlotsFromJson(data) {
   //     window.processAllImagesWithCoordination();
   //     console.log("✅ 上位スロット同期後の画像自動非表示処理が完了しました");
   //   }, 50);
-  // }
-  
-  // 🎨 Vスロット画像更新
-  if (typeof window.updateVSlotImage === 'function') {
-    setTimeout(() => {
-      window.updateVSlotImage(true);
-      console.log("🎨 syncUpperSlotsFromJson後のVスロット画像更新完了");
-    }, 100);
-  } else {
+  // } else {
   //   console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
   // }
   
