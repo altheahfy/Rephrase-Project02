@@ -122,11 +122,20 @@ function applyImageToVSlot(phraseText, forceRefresh = false) {
   const newImagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
   console.log('🎨 新しい画像パス:', newImagePath);
   
-  // 居座り防止：同じ画像の場合は更新しない
-  if (!forceRefresh && imgElement.src.includes(imageData.image_file)) {
-    console.log('📌 同じ画像のため更新をスキップ:', imageData.image_file);
+  // 居座り防止：完全に同じパスの場合のみ更新をスキップ
+  const currentImagePath = imgElement.src;
+  const fullNewImagePath = new URL(newImagePath, window.location.href).href;
+  
+  if (!forceRefresh && currentImagePath === fullNewImagePath) {
+    console.log('📌 完全に同じ画像のため更新をスキップ:', imageData.image_file);
+    console.log('  現在:', currentImagePath);
+    console.log('  新規:', fullNewImagePath);
     return;
   }
+  
+  console.log('🔄 画像を更新します:');
+  console.log('  現在:', currentImagePath);
+  console.log('  新規:', fullNewImagePath);
   
   // 画像を更新
   imgElement.src = newImagePath;
