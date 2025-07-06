@@ -58,10 +58,5 @@
     "image_file": "travel.png",
     "folder": "common",
     "meta_tags": ["travel", "trip", "journey", "vacation", "tour", "visit", "explore", "adventure"]
-  },
-  {
-    "image_file": "work.png",
-    "folder": "common",
-    "meta_tags": ["become", "change", "transform", "grow", "develop", "turn"]
   }
 ]
