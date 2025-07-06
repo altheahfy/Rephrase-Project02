@@ -1684,7 +1684,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
     
-    // 低頻度で定期チェック（間隔を長く）
+    // 低頻度で定期チェック (3秒ごと)
     setInterval(() => {
            if (window.loadedJsonData) {
         const newSignature = getDataSignature(window.loadedJsonData);
@@ -1697,7 +1697,7 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // 定期的に動的エリアの位置も確認
       ensureDynamicAreaPosition();
-    }, 6000); // 6秒ごとに変更をチェック（頻度を半減）
+    }, 3000); // 3秒ごとに変更をチェック
     
     // 「詳細」ボタンクリック時に順序を再適用する
     document.body.addEventListener('click', (event) => {

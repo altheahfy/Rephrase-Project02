@@ -377,10 +377,10 @@ function hookDataInsertionForLabelRestore() {
   // 既存のrestoreSubslotLabels関数をラップ
   const originalRestore = window.restoreSubslotLabels;
   
-  // 定期的なラベル復元処理（間隔を長く）
+  // 定期的なラベル復元処理
   setInterval(() => {
     restoreSubslotLabels();
-  }, 10000); // 10秒ごとに復元チェック（頻度を半減）
+  }, 5000); // 5秒ごとに復元チェック
   
   // MutationObserverでサブスロットの変更を監視
   const observer = new MutationObserver((mutations) => {
