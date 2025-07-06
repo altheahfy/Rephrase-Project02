@@ -30,11 +30,10 @@ const VALID_IMAGE_PATTERNS = [
   'icon',                      // アイコン系画像
 ];
 
-// 🎯 メタタグを持つ画像かどうかを判定（将来の拡張用）
+// 🎯 メタタグを持つ画像かどうかを判定（イラスト表示機構との統合）
 function hasImageMetaTag(imgElement) {
-  // 将来実装予定：data-meta-tag 属性や特定のクラスを持つ画像を判定
-  // 例：imgElement.hasAttribute('data-meta-tag') || imgElement.classList.contains('meta-image')
-  return false; // 現在は未実装
+  // イラスト表示機構によって設定された画像かどうかを判定
+  return imgElement && imgElement.hasAttribute('data-meta-tag');
 }
 
 // 🔍 画像が非表示対象かどうかを判定
