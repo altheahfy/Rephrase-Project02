@@ -1666,14 +1666,6 @@ document.addEventListener("DOMContentLoaded", function() {
       window.safeJsonSync(window.loadedJsonData);
     }
     
-    // データ挿入完了後にメタタグシステムを実行
-    setTimeout(() => {
-      if (window.applyMetaTagImagesToAllSlots) {
-        console.log("🎯 データ挿入完了後にメタタグシステムを実行");
-        window.applyMetaTagImagesToAllSlots(true);
-      }
-    }, 1000);
-    
     // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
     let lastJsonDataSignature = "";
     

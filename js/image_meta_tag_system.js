@@ -279,12 +279,6 @@ async function initializeMetaTagSystem() {
       // DOM変更監視を開始
       setupIndividualRandomizeObserver();
     }, 500);
-    
-    // さらに追加で長めの遅延後にも実行（データ挿入完了後）
-    setTimeout(() => {
-      console.log("🔄 [META] 遅延実行による追加の画像適用");
-      applyMetaTagImagesToAllSlots(true);
-    }, 2000);
   }
 }
 
