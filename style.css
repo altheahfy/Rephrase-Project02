@@ -1,3 +1,11 @@
+/* 基本レイアウト設定 */
+body {
+  min-height: 100vh; /* ビューポート全体の高さを確保 */
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
 /* 右上のファイル選択・ロードエリアのスタイル */
 #file-load-area {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -334,8 +342,8 @@ h2 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 20px; /* 5px → 20px に拡大して詳細ボタンとの距離を確保 */
-  padding-top: 20px; /* 10px → 20px に拡大 */
+  margin-top: 40px; /* 20px → 40px にさらに拡大 */
+  padding-top: 30px; /* 20px → 30px に拡大 */
   padding-bottom: 24px;
   /* 点線を削除 */
   position: relative; /* 位置関係の制御のため */
@@ -381,8 +389,8 @@ h2 {
 
 /* 動的記載エリアのコンテナ要素のスタイル強化 */
 #dynamic-area-container {
-  margin-top: 60px; /* 40px → 60px に拡大して詳細ボタンとの距離をさらに確保 */
-  padding-top: 30px; /* 20px → 30px に拡大 */
+  margin-top: 120px; /* 60px → 120px に大幅拡大してスロット全体をクリア */
+  padding-top: 40px; /* 30px → 40px に拡大 */
   border-top: 2px solid #666; /* 区切り線を簡素化 */
   position: relative;
   clear: both;
