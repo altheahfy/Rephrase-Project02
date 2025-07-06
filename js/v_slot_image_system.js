@@ -157,6 +157,23 @@ function applyImageToVSlot(phraseText, forceRefresh = false) {
     this.style.visibility = 'visible';
     this.style.opacity = '1';
     this.classList.remove('auto-hidden-image');
+    
+    // 1秒後にもう一度強制表示（image_auto_hide.js対策）
+    setTimeout(() => {
+      console.log('🛡️ 遅延表示強制実行');
+      this.style.display = 'block';
+      this.style.visibility = 'visible';
+      this.style.opacity = '1';
+      this.classList.remove('auto-hidden-image');
+      
+      // 最終確認
+      const computedStyle = window.getComputedStyle(this);
+      console.log('🛡️ 最終表示状態:', {
+        display: computedStyle.display,
+        visibility: computedStyle.visibility,
+        opacity: computedStyle.opacity
+      });
+    }, 1000);
   };
   
   console.log('🎨 Vスロット画像更新完了:', phraseText, '→', newImagePath);
@@ -241,6 +258,7 @@ async function initializeVSlotImageSystem() {
 // 🔄 外部から呼び出し可能な更新関数
 function updateVSlotImage(forceRefresh = false) {
   console.log('🔄 updateVSlotImage呼び出し:', forceRefresh);
+  console.log('🔄 メタタグデータ状態:', imageMetaTags ? imageMetaTags.length : 'null');
   
   const vSlot = document.getElementById('slot-v');
   if (!vSlot) {
@@ -257,7 +275,36 @@ function updateVSlotImage(forceRefresh = false) {
   
   console.log('🔄 取得したテキスト:', currentText);
   
+  if (!currentText) {
+    console.warn('⚠️ Vスロットテキストが空です');
+    return;
+  }
+  
   applyImageToVSlot(currentText, forceRefresh);
+  
+  // 1秒後に画像の状態を再確認
+  setTimeout(() => {
+    const imgElement = vSlot.querySelector('.slot-image');
+    if (imgElement) {
+      const computedStyle = window.getComputedStyle(imgElement);
+      console.log('🔍 1秒後の画像状態:');
+      console.log('  - src:', imgElement.src);
+      console.log('  - display:', computedStyle.display);
+      console.log('  - visibility:', computedStyle.visibility);
+      console.log('  - opacity:', computedStyle.opacity);
+      console.log('  - classes:', Array.from(imgElement.classList));
+    }
+  }, 1000);
+}
+
+// 🔄 データ更新後のVスロット画像再更新
+function updateVSlotImageAfterDataChange() {
+  console.log('🔄 データ更新後のVスロット画像再更新を実行...');
+  
+  // 強制的に画像を再計算
+  updateVSlotImage(true);
+  
+  console.log('✅ データ更新後のVスロット画像再更新が完了しました');
 }
 
 // 🧪 テスト用の手動実行関数
@@ -274,6 +321,7 @@ function testVSlotImage() {
 // 🎯 グローバル関数として公開
 window.initializeVSlotImageSystem = initializeVSlotImageSystem;
 window.updateVSlotImage = updateVSlotImage;
+window.updateVSlotImageAfterDataChange = updateVSlotImageAfterDataChange;
 window.monitorVSlotText = monitorVSlotText;
 window.testVSlotImage = testVSlotImage;
 
