@@ -4,6 +4,9 @@
 // 🎯 画像状態キャッシュ（重複処理を回避）
 const imageStateCache = new Map();
 
+// 🎯 処理中フラグ（重複処理を防止）
+let isProcessingImages = false;
+
 // 🎯 非表示対象とする画像のパターン
 const HIDDEN_IMAGE_PATTERNS = [
   'placeholder.png',           // プレースホルダー画像
@@ -339,7 +342,7 @@ let isImageProcessingActive = false;
 
 function processAllImagesWithCoordination() {
   // 既に処理中の場合は重複実行を防ぐ
-  if (isImageProcessingActive) {
+  if (isImageProcessingActive || isProcessingImages) {
     console.log("⏭️ 画像処理が既に実行中のため、重複実行をスキップします");
     return;
   }
@@ -353,6 +356,7 @@ function processAllImagesWithCoordination() {
   // デバウンス：短時間の連続呼び出しを防ぐ
   imageProcessingTimeout = setTimeout(() => {
     isImageProcessingActive = true;
+    isProcessingImages = true;
     console.log("🔄 手動制御協調型画像処理を開始...");
     
     const allImages = document.querySelectorAll('.slot-image');
@@ -362,7 +366,8 @@ function processAllImagesWithCoordination() {
     
     console.log("✅ 手動制御協調型画像処理が完了しました");
     isImageProcessingActive = false;
-  }, 300); // 300ms のデバウンス（さらに長く設定）
+    isProcessingImages = false;
+  }, 500); // 500ms のデバウンス（さらに長く設定）
 }
 
 // 🗑️ 画像キャッシュをクリアする関数
@@ -439,7 +444,8 @@ document.addEventListener('DOMContentLoaded', function() {
     processAllImagesWithCoordination();
   }, 800); // より長い遅延でinsert_test_data_clean.jsの完了を確実に待つ
   
-  // データの変更を監視して画像を再判定
+  // データの変更を監視して画像を再判定（最適化版）
+  let mutationTimeout;
   const observer = new MutationObserver(function(mutations) {
     let shouldReprocess = false;
     mutations.forEach(function(mutation) {
@@ -450,9 +456,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     if (shouldReprocess) {
-      setTimeout(() => {
+      // 連続した変更をデバウンスして処理頻度を減らす
+      clearTimeout(mutationTimeout);
+      mutationTimeout = setTimeout(() => {
         processAllImagesWithCoordination();
-      }, 100);
+      }, 300); // 遅延を増やして処理頻度を減らす
     }
   });
   
