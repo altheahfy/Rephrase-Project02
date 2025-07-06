@@ -8,24 +8,18 @@ let periodicProcesses = [];
 
 // 初期化完了判定
 function checkInitializationComplete() {
-  // 基本的な要素が揃っているかチェック（条件を緩和）
+  // 基本的な要素が揃っているかチェック
   const hasSlots = document.querySelectorAll('.slot-container').length > 0;
   const hasContent = document.querySelectorAll('.slot-phrase').length > 0;
   const hasDynamicArea = document.getElementById('dynamic-area') !== null;
+  const hasJsonData = window.loadedJsonData !== null;
   
-  // JSONデータの存在確認を緩和
-  const hasJsonData = window.loadedJsonData !== null && window.loadedJsonData !== undefined;
-  
-  if (hasSlots && hasContent && hasDynamicArea) {
+  if (hasSlots && hasContent && hasDynamicArea && hasJsonData) {
     console.log("✅ 初期化完了条件を満たしています");
     return true;
   }
   
-  // ログの頻度を減らす（5秒ごとに1回のみ）
-  if (!window.lastInitCheckLog || Date.now() - window.lastInitCheckLog > 5000) {
-    console.log("⏳ 初期化未完了:", { hasSlots, hasContent, hasDynamicArea, hasJsonData });
-    window.lastInitCheckLog = Date.now();
-  }
+  console.log("⏳ 初期化未完了:", { hasSlots, hasContent, hasDynamicArea, hasJsonData });
   return false;
 }
 
@@ -47,15 +41,15 @@ function stopPeriodicProcesses() {
 function monitorInitializationComplete() {
   console.log("👀 初期化完了監視開始");
   
-  // 5秒後に強制的に初期化完了とする（短縮）
+  // 10秒後に強制的に初期化完了とする
   setTimeout(() => {
     if (!isInitializationComplete) {
-      console.log("⏰ 5秒経過 - 強制的に初期化完了");
+      console.log("⏰ 10秒経過 - 強制的に初期化完了");
       stopPeriodicProcesses();
     }
-  }, 5000);
+  }, 10000);
   
-  // 定期的に初期化完了をチェック（間隔を長く）
+  // 定期的に初期化完了をチェック
   const checkInterval = setInterval(() => {
     if (checkInitializationComplete()) {
       console.log("🎉 初期化完了を検出");
@@ -64,9 +58,9 @@ function monitorInitializationComplete() {
       // 少し待ってから定期処理を停止
       setTimeout(() => {
         stopPeriodicProcesses();
-      }, 1000);
+      }, 2000);
     }
-  }, 2000); // 2秒間隔でチェック（頻度を減らす）
+  }, 1000);
 }
 
 // 手動実行関数（ユーザー操作時に実行）
