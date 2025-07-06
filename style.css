@@ -53,7 +53,10 @@ h2 {
 .slot-image {
   display: inline-block;
   margin-right: 4px;
-  max-height: 150px; /* 100px → 150px にさらに拡大 */
+  max-height: 150px !important; /* 強制適用 */
+  max-width: 160px !important; /* 幅も制限 */
+  min-height: 120px !important; /* 最小高さを保証 */
+  min-width: 120px !important; /* 最小幅を保証 */
   vertical-align: middle;
 }
 
@@ -110,8 +113,12 @@ h2 {
   grid-row: 2;
   grid-column: 1;
   display: block;
-  width: 160px; /* 120px → 160px にさらに拡大 */
-  height: 150px; /* 100px → 150px にさらに拡大 */
+  width: 160px !important; /* 強制適用 */
+  height: 150px !important; /* 強制適用 */
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
   object-fit: contain;
   margin: 0;
   padding: 0;
@@ -215,11 +222,13 @@ h2 {
 
 /* .subslot内の画像も大きくする */
 .subslot .slot-image {
-  width: 160px; /* 120px → 160px にさらに拡大 */
-  height: 150px; /* 100px → 150px にさらに拡大 */
+  width: 160px !important; /* 強制適用 */
+  height: 150px !important; /* 強制適用 */
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
   object-fit: contain;
-  max-width: 160px;
-  max-height: 150px;
 }
 
 /* サブスロット展開エリアは初期状態では非表示に */
@@ -389,8 +398,8 @@ h2 {
 
 /* 動的記載エリアのコンテナ要素のスタイル強化 */
 #dynamic-area-container {
-  margin-top: 120px; /* 60px → 120px に大幅拡大してスロット全体をクリア */
-  padding-top: 40px; /* 30px → 40px に拡大 */
+  margin-top: 200px; /* 120px → 200px に大幅拡大 */
+  padding-top: 50px; /* 40px → 50px に拡大 */
   border-top: 2px solid #666; /* 区切り線を簡素化 */
   position: relative;
   clear: both;
@@ -574,6 +583,12 @@ h2 {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
+  width: 160px !important; /* サイズも強制適用 */
+  height: 150px !important;
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
 }
 
 /* 手動制御と自動制御の優先度制御 */
@@ -785,8 +800,12 @@ h2 {
 .subslot-container img.slot-image {
   grid-row: 2;
   grid-column: 1;
-  width: 160px; /* 120px → 160px にさらに拡大 */
-  height: 150px; /* 100px → 150px にさらに拡大 */
+  width: 160px !important; /* 強制適用 */
+  height: 150px !important; /* 強制適用 */
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
   object-fit: contain; /* cover → contain に変更（画像の縦横比を保持） */
   border: 1px solid #ddd;
   border-radius: 4px;
