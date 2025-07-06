@@ -1,0 +1,170 @@
+[
+  {
+    "image_file": "analyze.png",
+    "folder": "common",
+    "meta_tags": ["analyze", "analyzes", "analyzed", "analyzing", "analyse", "analyses", "analysed", "analysing"],
+    "priority": 3,
+    "description": "分析する"
+  },
+  {
+    "image_file": "appear.png",
+    "folder": "common",
+    "meta_tags": ["appear", "appears", "appeared", "appearing"],
+    "priority": 3,
+    "description": "現れる、見える"
+  },
+  {
+    "image_file": "ask.png",
+    "folder": "common",
+    "meta_tags": ["ask", "asks", "asked", "asking"],
+    "priority": 3,
+    "description": "尋ねる、質問する"
+  },
+  {
+    "image_file": "avoid.png",
+    "folder": "common",
+    "meta_tags": ["avoid", "avoids", "avoided", "avoiding"],
+    "priority": 3,
+    "description": "避ける"
+  },
+  {
+    "image_file": "become.png",
+    "folder": "common",
+    "meta_tags": ["become", "becomes", "became", "becoming"],
+    "priority": 3,
+    "description": "〜になる"
+  },
+  {
+    "image_file": "begin.png",
+    "folder": "common",
+    "meta_tags": ["begin", "begins", "began", "begun", "beginning"],
+    "priority": 3,
+    "description": "始める"
+  },
+  {
+    "image_file": "believe.png",
+    "folder": "common",
+    "meta_tags": ["believe", "believes", "believed", "believing"],
+    "priority": 3,
+    "description": "信じる"
+  },
+  {
+    "image_file": "catch.png",
+    "folder": "common",
+    "meta_tags": ["catch", "catches", "caught", "catching"],
+    "priority": 3,
+    "description": "つかむ、理解する"
+  },
+  {
+    "image_file": "decide.png",
+    "folder": "common",
+    "meta_tags": ["decide", "decides", "decided", "deciding"],
+    "priority": 3,
+    "description": "決める"
+  },
+  {
+    "image_file": "deliver.png",
+    "folder": "common",
+    "meta_tags": ["deliver", "delivers", "delivered", "delivering"],
+    "priority": 3,
+    "description": "配達する、提供する"
+  },
+  {
+    "image_file": "discuss.png",
+    "folder": "common",
+    "meta_tags": ["discuss", "discusses", "discussed", "discussing"],
+    "priority": 3,
+    "description": "議論する"
+  },
+  {
+    "image_file": "explain.png",
+    "folder": "common",
+    "meta_tags": ["explain", "explains", "explained", "explaining"],
+    "priority": 3,
+    "description": "説明する"
+  },
+  {
+    "image_file": "find.png",
+    "folder": "common",
+    "meta_tags": ["find", "finds", "found", "finding"],
+    "priority": 3,
+    "description": "見つける"
+  },
+  {
+    "image_file": "give.png",
+    "folder": "common",
+    "meta_tags": ["give", "gives", "gave", "given", "giving"],
+    "priority": 3,
+    "description": "与える"
+  },
+  {
+    "image_file": "help.png",
+    "folder": "common",
+    "meta_tags": ["help", "helps", "helped", "helping"],
+    "priority": 3,
+    "description": "助ける"
+  },
+  {
+    "image_file": "keep.png",
+    "folder": "common",
+    "meta_tags": ["keep", "keeps", "kept", "keeping"],
+    "priority": 3,
+    "description": "保つ、続ける"
+  },
+  {
+    "image_file": "know.png",
+    "folder": "common",
+    "meta_tags": ["know", "knows", "knew", "known", "knowing"],
+    "priority": 3,
+    "description": "知る"
+  },
+  {
+    "image_file": "make.png",
+    "folder": "common",
+    "meta_tags": ["make", "makes", "made", "making"],
+    "priority": 3,
+    "description": "作る"
+  },
+  {
+    "image_file": "notice.png",
+    "folder": "common",
+    "meta_tags": ["notice", "notices", "noticed", "noticing"],
+    "priority": 3,
+    "description": "気づく"
+  },
+  {
+    "image_file": "offer.png",
+    "folder": "common",
+    "meta_tags": ["offer", "offers", "offered", "offering"],
+    "priority": 3,
+    "description": "提供する"
+  },
+  {
+    "image_file": "refuse.png",
+    "folder": "common",
+    "meta_tags": ["refuse", "refuses", "refused", "refusing"],
+    "priority": 3,
+    "description": "拒否する"
+  },
+  {
+    "image_file": "return.png",
+    "folder": "common",
+    "meta_tags": ["return", "returns", "returned", "returning"],
+    "priority": 3,
+    "description": "戻る、返す"
+  },
+  {
+    "image_file": "take.png",
+    "folder": "common",
+    "meta_tags": ["take", "takes", "took", "taken", "taking"],
+    "priority": 3,
+    "description": "取る"
+  },
+  {
+    "image_file": "want.png",
+    "folder": "common",
+    "meta_tags": ["want", "wants", "wanted", "wanting"],
+    "priority": 3,
+    "description": "欲しい"
+  }
+]
