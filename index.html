@@ -948,9 +948,29 @@
 
 </div> <!-- main-content の終了 -->
 
-</body>
-</html>
+<!-- 🆕 強制キャッシュクリア機能 -->
+    <button id="force-clear-cache" style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+      🔄 キャッシュクリア
+    </button>
+    <script>
+      document.getElementById('force-clear-cache').addEventListener('click', function() {
+        // 全画像の強制リロード
+        document.querySelectorAll('img').forEach(img => {
+          const src = img.src;
+          if (src && !src.includes('data:')) {
+            const baseSrc = src.split('?')[0];
+            img.src = baseSrc + '?t=' + Date.now() + Math.random();
+          }
+        });
+        
+        // 2秒後に完全リロード
+        setTimeout(() => {
+          location.reload(true);
+        }, 2000);
+      });
+    </script>
 
+    <!-- 既存のスクリプト -->
 <script type="module">
 import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
