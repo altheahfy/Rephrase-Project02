@@ -377,10 +377,26 @@ function hookDataInsertionForLabelRestore() {
   // 既存のrestoreSubslotLabels関数をラップ
   const originalRestore = window.restoreSubslotLabels;
   
-  // 定期的なラベル復元処理（間隔を長く）
-  setInterval(() => {
+  // 初期化時のみ動作するラベル復元処理
+  const labelRestoreInterval = setInterval(() => {
+    // スマート制御システムによる停止チェック
+    if (window.isInitializationComplete && window.isInitializationComplete()) {
+      console.log("🛑 初期化完了によりラベル復元を停止");
+      clearInterval(labelRestoreInterval);
+      return;
+    }
+    
     restoreSubslotLabels();
-  }, 10000); // 10秒ごとに復元チェック（頻度を半減）
+  }, 5000); // 初期化時は元の間隔で実行
+  
+  // イベントドリブンでラベル復元を実行する関数
+  function triggerLabelRestore() {
+    console.log("🔄 イベントドリブンでラベル復元を実行");
+    restoreSubslotLabels();
+  }
+  
+  // グローバルに公開
+  window.triggerLabelRestore = triggerLabelRestore;
   
   // MutationObserverでサブスロットの変更を監視
   const observer = new MutationObserver((mutations) => {
