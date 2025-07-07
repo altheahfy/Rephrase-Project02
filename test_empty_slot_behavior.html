@@ -228,9 +228,6 @@
                 
                 if (textEl) textEl.textContent = '（空）';
                 if (imgEl) {
-                    // 🎯 エラーハンドラーを削除してから画像をクリア
-                    imgEl.onload = null;
-                    imgEl.onerror = null;
                     imgEl.src = '';
                     imgEl.alt = '';
                     imgEl.style.display = 'none';

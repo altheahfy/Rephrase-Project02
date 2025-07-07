@@ -231,9 +231,6 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   
   // テキストが空の場合は画像スロットを空にする
   if (!phraseText || phraseText.trim() === '') {
-    // 🎯 エラーハンドラーを削除してから画像をクリア
-    imgElement.onload = null;
-    imgElement.onerror = null;
     imgElement.src = ''; // 🎯 画像スロットを空にする
     imgElement.alt = '';
     imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
@@ -248,9 +245,6 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   
   if (!imageData) {
     console.log('🔍 マッチする画像が見つかりません（Type word等）:', phraseText);
-    // 🎯 エラーハンドラーを削除してから画像をクリア
-    imgElement.onload = null;
-    imgElement.onerror = null;
     imgElement.src = ''; // 🎯 画像スロットを空にする
     imgElement.alt = '';
     imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
@@ -362,9 +356,6 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     // 🎯 単一画像を非表示にして空にする
     const singleImg = slot.querySelector('.slot-image');
     if (singleImg) {
-      // 🎯 エラーハンドラーを削除してから画像をクリア
-      singleImg.onload = null;
-      singleImg.onerror = null;
       singleImg.src = ''; // 🎯 画像スロットを空にする
       singleImg.alt = '';
       singleImg.style.display = 'none'; // 🎯 画像要素を非表示にする
