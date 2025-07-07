@@ -62,13 +62,17 @@ h2 {
 
 /* 🖼️ 複数画像表示システム用スタイル */
 .multi-image-container {
+  /* Grid Layout対応: イラスト領域（行2）に配置 */
+  grid-row: 2;
+  grid-column: 1;
   display: flex;
   gap: 6px;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   width: 100%;
-  min-height: 80px;
+  min-height: 120px;
+  max-height: 150px;
   padding: 5px;
   box-sizing: border-box;
   border-radius: 4px;
@@ -96,6 +100,19 @@ h2 {
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border-color: rgba(40, 167, 69, 0.8);
+}
+
+/* 複数画像表示時は単一画像を非表示にする */
+.slot-container:has(.multi-image-container) .slot-image {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 複数画像表示時にコンテナを確実に表示 */
+.slot-container .multi-image-container {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* スロット全体の調整が必要な場合に備えた汎用クラス */

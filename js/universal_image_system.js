@@ -339,6 +339,19 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
 
   // テキストが空の場合は通常の単一画像処理に戻す
   if (!phraseText || phraseText.trim() === '') {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = slot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+    
+    // 単一画像を再表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+    }
+    
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
@@ -349,12 +362,38 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
 
   // マッチする画像がない場合は通常の処理に戻す
   if (imageDataArray.length === 0) {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = slot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+    
+    // 単一画像を再表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+    }
+    
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
 
   // 1個しかマッチしない場合は通常の処理に戻す
   if (imageDataArray.length === 1) {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = slot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+    
+    // 単一画像を再表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+    }
+    
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
@@ -362,23 +401,36 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   // 複数画像対応：画像コンテナを作成
   let imageContainer = slot.querySelector('.multi-image-container');
   if (!imageContainer) {
-    // 既存の単一画像を非表示
+    // 既存の単一画像を確実に非表示
     const singleImg = slot.querySelector('.slot-image');
     if (singleImg) {
       singleImg.style.display = 'none';
+      singleImg.style.visibility = 'hidden';
     }
 
     // 複数画像用のコンテナを作成
     imageContainer = document.createElement('div');
     imageContainer.className = 'multi-image-container';
+    
+    // Grid Layout対応のスタイルを設定
     imageContainer.style.cssText = `
-      display: flex;
-      gap: 5px;
+      grid-row: 2;
+      grid-column: 1;
+      display: flex !important;
+      gap: 6px;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
       width: 100%;
-      min-height: 60px;
+      min-height: 120px;
+      max-height: 150px;
+      padding: 5px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      background: rgba(40, 167, 69, 0.05);
+      border: 1px dashed rgba(40, 167, 69, 0.3);
+      visibility: visible !important;
+      opacity: 1 !important;
     `;
     slot.appendChild(imageContainer);
   }

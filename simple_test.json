@@ -1,0 +1,29 @@
+[
+  {
+    "例文ID": 1,
+    "例文全体": "The committee is responsible for implementation.",
+    "Slot": "O1",
+    "SlotText": "committee responsible implementation",
+    "Phrase": "",
+    "AuxText": "",
+    "SubslotID": null
+  },
+  {
+    "例文ID": 1,
+    "例文全体": "The committee is responsible for implementation.",
+    "Slot": "V",
+    "SlotText": "responsible",
+    "Phrase": "",
+    "AuxText": "",
+    "SubslotID": null
+  },
+  {
+    "例文ID": 1,
+    "例文全体": "The committee is responsible for implementation.",
+    "Slot": "S",
+    "SlotText": "committee",
+    "Phrase": "",
+    "AuxText": "",
+    "SubslotID": null
+  }
+]
