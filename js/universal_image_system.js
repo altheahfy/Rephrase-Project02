@@ -420,10 +420,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       gap: 6px;
       align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap !important;
       width: 100%;
-      min-height: 120px;
-      max-height: 150px;
+      height: 180px !important;
       padding: 5px;
       box-sizing: border-box;
       border-radius: 4px;
@@ -431,6 +430,7 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       border: 1px dashed rgba(40, 167, 69, 0.3);
       visibility: visible !important;
       opacity: 1 !important;
+      overflow: hidden;
     `;
     slot.appendChild(imageContainer);
   }
@@ -448,19 +448,44 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     imgElement.alt = `image ${index + 1} for ${slotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 複数画像用のスタイル（少し小さめに）
+    // 🎯 画像枚数に応じた動的サイズ調整システム
+    const imageCount = imageDataArray.length;
+    const containerWidth = 390; // スロット内の有効幅（概算）
+    const gap = 6; // 画像間の隙間
+    const totalGapWidth = (imageCount - 1) * gap;
+    const availableWidth = containerWidth - totalGapWidth - 20; // padding等を考慮
+    const dynamicWidth = Math.max(50, Math.floor(availableWidth / imageCount)); // 最小50px
+    
+    // 複数画像用のスタイル - 動的サイズ適用
     imgElement.style.cssText = `
-      max-width: 45px;
-      max-height: 45px;
-      width: auto;
-      height: auto;
-      border-radius: 3px;
-      border: 1px solid #ddd;
-      object-fit: cover;
+      height: 160px !important;
+      width: ${dynamicWidth}px !important;
+      max-width: ${dynamicWidth}px !important;
+      min-width: 50px !important;
+      border-radius: 5px;
+      border: 1px solid rgba(40, 167, 69, 0.6);
+      object-fit: contain !important;
       display: block;
       visibility: visible;
       opacity: 1;
+      flex-shrink: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     `;
+
+    // ホバー効果を追加
+    imgElement.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+      this.style.borderColor = 'rgba(40, 167, 69, 0.8)';
+    });
+
+    imgElement.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+      this.style.boxShadow = 'none';
+      this.style.borderColor = 'rgba(40, 167, 69, 0.6)';
+    });
+
+    console.log(`🎯 画像 ${index + 1}/${imageCount}: 動的幅 ${dynamicWidth}px`);
 
     // メタタグ属性を設定
     imgElement.setAttribute('data-meta-tag', 'true');
