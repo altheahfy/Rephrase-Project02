@@ -176,8 +176,23 @@ function findAllImagesByMetaTag(text) {
   let allMatches = [];
   const usedImages = new Set(); // 重複防止用
   
-  // 各単語に対してマッチする画像を探す
-  for (const word of searchWords) {
+  // フレーズ全体での検索を最初に試行
+  const phraseText = text.toLowerCase().trim();
+  for (const imageData of imageMetaTags) {
+    for (const metaTag of imageData.meta_tags) {
+      if (metaTag.toLowerCase() === phraseText) {
+        allMatches.push(imageData);
+        usedImages.add(imageData.image_file);
+        console.log('🎯 フレーズ完全マッチ:', metaTag, '→', imageData.image_file);
+        return allMatches; // フレーズ全体でマッチした場合は即座に返す
+      }
+    }
+  }
+  
+  // 個別単語でのマッチング（元の順序を保持）
+  const individualWords = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
+  
+  for (const word of individualWords) {
     let bestMatchForWord = null;
     let bestPriorityForWord = 0;
     
@@ -188,14 +203,18 @@ function findAllImagesByMetaTag(text) {
       }
       
       for (const metaTag of imageData.meta_tags) {
-        if (searchWords.includes(metaTag.toLowerCase())) {
+        // 個別単語との厳密マッチング
+        if (metaTag.toLowerCase() === word.toLowerCase() || 
+            (word.endsWith('ed') && metaTag.toLowerCase() === word.slice(0, -2).toLowerCase()) ||
+            (word.endsWith('ing') && metaTag.toLowerCase() === word.slice(0, -3).toLowerCase()) ||
+            (word.endsWith('s') && word.length > 2 && metaTag.toLowerCase() === word.slice(0, -1).toLowerCase())) {
           const priority = imageData.priority || 1;
           
           if (priority > bestPriorityForWord) {
             bestMatchForWord = imageData;
             bestPriorityForWord = priority;
           }
-          console.log('🎯 複数マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
+          console.log('🎯 個別単語マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
         }
       }
     }
