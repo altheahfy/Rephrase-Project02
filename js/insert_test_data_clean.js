@@ -395,47 +395,72 @@ function syncDynamicToStatic() {
       console.warn(`❌ サブスロット text要素取得失敗: ${item.Slot}`);
     }
 
-    // 🖼️ 画像要素への書き込み（メインスロットのテキストを使用）
+    // 🖼️ 画像要素への書き込み（テキスト書き込みと同じ方式）
+    console.log(`🔍 サブスロット画像処理開始: ${normalizeSlotId(item.Slot)}`);
+    const subslotImageElement = slotElement.querySelector(".slot-image");
+    console.log("サブスロット imageElement:", subslotImageElement ? "発見" : "未検出");
+    console.log("サブスロット imageElement詳細:", subslotImageElement ? subslotImageElement.outerHTML.substring(0, 150) + "..." : "なし");
+    
+    if (subslotImageElement) {
+      const textForImage = item.SlotText || item.SlotPhrase || "";
+      console.log(`🔍 サブスロット画像検索テキスト: "${textForImage}"`);
+      
+      if (textForImage.trim() && typeof window.findImageByMetaTag === 'function') {
+        console.log(`🔍 画像検索実行中: "${textForImage}"`);
+        const imageData = window.findImageByMetaTag(textForImage);
+        console.log(`🔍 画像検索結果:`, imageData);
+        
+        if (imageData) {
+          const imagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
+          const oldSrc = subslotImageElement.src;
+          subslotImageElement.src = imagePath;
+          console.log(`✅ サブスロット image書き込み成功: ${item.Slot}`);
+          console.log(`   旧: ${oldSrc}`);
+          console.log(`   新: ${imagePath}`);
+        } else {
+          const oldSrc = subslotImageElement.src;
+          subslotImageElement.src = 'slot_images/common/placeholder.png';
+          console.log(`📝 サブスロット image書き込み(placeholder): ${item.Slot} | テキスト: "${textForImage}"`);
+          console.log(`   旧: ${oldSrc}`);
+          console.log(`   新: slot_images/common/placeholder.png`);
+        }
+      } else {
+        const oldSrc = subslotImageElement.src;
+        subslotImageElement.src = 'slot_images/common/placeholder.png';
+        console.log(`📝 サブスロット image書き込み(空): ${item.Slot}`);
+        console.log(`   理由: テキスト="${textForImage.trim()}", findImageByMetaTag=${typeof window.findImageByMetaTag}`);
+        console.log(`   旧: ${oldSrc}`);
+        console.log(`   新: slot_images/common/placeholder.png`);
+      }
+      
+      // 処理後の状態確認
+      console.log(`🔍 処理後の画像要素状態: src="${subslotImageElement.src}", display="${getComputedStyle(subslotImageElement).display}"`);
+    } else {
+      console.warn(`❌ サブスロット image要素取得失敗: ${item.Slot}`);
+      console.warn(`   slotElement:`, slotElement ? slotElement.outerHTML.substring(0, 200) + "..." : "なし");
+    }
+    
+    // 🖼️ 画像要素への書き込み（テキスト書き込みと全く同じ方式）
     const imageElement = slotElement.querySelector(".slot-image");
     console.log("サブスロット imageElement:", imageElement ? imageElement.outerHTML : "未検出");
     if (imageElement) {
-      // 🔧 修正: サブスロットの画像はメインスロットのテキストで検索する
-      // SubslotIDがある場合は、メインスロットのSlotTextを探す
-      let textForImage = "";
-      if (item.SubslotID && window.loadedJsonData) {
-        // メインスロット（SubslotID = ""）のデータを探す
-        const mainSlotData = window.loadedJsonData.find(dataItem => 
-          dataItem.Slot === item.Slot && 
-          dataItem.SubslotID === "" && 
-          dataItem.PhraseType === "word"
-        );
-        if (mainSlotData) {
-          textForImage = mainSlotData.SlotText || mainSlotData.SlotPhrase || "";
-          console.log(`🔍 サブスロット${item.Slot}-${item.SubslotID}: メインスロットのテキスト使用 "${textForImage}"`);
-        } else {
-          console.warn(`⚠ サブスロット${item.Slot}-${item.SubslotID}: メインスロットデータが見つかりません`);
-        }
-      } else {
-        // 通常のスロットの場合
-        textForImage = item.SlotText || item.SlotPhrase || "";
-      }
-      
+      const textForImage = item.SlotText || item.SlotPhrase || "";
       if (textForImage.trim() && typeof window.findImageByMetaTag === 'function') {
         const imageData = window.findImageByMetaTag(textForImage);
         if (imageData) {
           const imagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
           imageElement.src = imagePath;
-          console.log(`✅ サブスロット画像書き込み成功: ${item.Slot}-${item.SubslotID} | メインテキスト: "${textForImage}" | 画像: "${imagePath}"`);
+          console.log(`✅ サブスロット画像書き込み成功: ${item.Slot} | 値: "${imagePath}"`);
         } else {
           imageElement.src = 'slot_images/common/placeholder.png';
-          console.log(`📝 サブスロット画像なし: ${item.Slot}-${item.SubslotID} | メインテキスト: "${textForImage}"`);
+          console.log(`📝 サブスロット画像なし: ${item.Slot} | テキスト: "${textForImage}"`);
         }
       } else {
         imageElement.src = 'slot_images/common/placeholder.png';
-        console.log(`📝 サブスロット画像プレースホルダー: ${item.Slot}-${item.SubslotID} | 理由: テキスト="${textForImage.trim()}" | findImageByMetaTag=${typeof window.findImageByMetaTag}`);
+        console.log(`📝 サブスロット画像プレースホルダー: ${item.Slot}`);
       }
     } else {
-      console.warn(`❌ サブスロット image要素取得失敗: ${item.Slot}-${item.SubslotID}`);
+      console.warn(`❌ サブスロット image要素取得失敗: ${item.Slot}`);
     }
   });
   
