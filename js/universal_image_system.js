@@ -337,12 +337,13 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     return;
   }
 
-  // テキストが空の場合は通常の単一画像処理に戻す
+  // テキストが空の場合は複数画像コンテナを完全削除して通常の単一画像処理に戻す
   if (!phraseText || phraseText.trim() === '') {
     // 複数画像コンテナがあれば削除
     const existingContainer = slot.querySelector('.multi-image-container');
     if (existingContainer) {
       existingContainer.remove();
+      console.log('🧹 テキストが空のため複数画像コンテナを削除:', slotId);
     }
     
     // 単一画像を再表示
@@ -350,8 +351,14 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     if (singleImg) {
       singleImg.style.display = 'block';
       singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
     }
     
+    // スロット全体の横幅をリセット
+    slot.style.maxWidth = '';
+    slot.style.width = '';
+    
+    // 単一画像にplaceholder.pngを設定（空テキスト処理）
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
@@ -360,12 +367,13 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   const imageDataArray = findAllImagesByMetaTag(phraseText);
   console.log('🔍 複数検索結果:', imageDataArray);
 
-  // マッチする画像がない場合は通常の処理に戻す
+  // マッチする画像がない場合は複数画像コンテナを完全削除して通常の処理に戻す
   if (imageDataArray.length === 0) {
     // 複数画像コンテナがあれば削除
     const existingContainer = slot.querySelector('.multi-image-container');
     if (existingContainer) {
       existingContainer.remove();
+      console.log('🧹 マッチなしのため複数画像コンテナを削除:', slotId);
     }
     
     // 単一画像を再表示
@@ -373,18 +381,25 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     if (singleImg) {
       singleImg.style.display = 'block';
       singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
     }
     
+    // スロット全体の横幅をリセット
+    slot.style.maxWidth = '';
+    slot.style.width = '';
+    
+    // 単一画像にplaceholder.pngまたはマッチ結果を設定
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
 
-  // 1個しかマッチしない場合は通常の処理に戻す
+  // 1個しかマッチしない場合は複数画像コンテナを完全削除して通常の処理に戻す
   if (imageDataArray.length === 1) {
     // 複数画像コンテナがあれば削除
     const existingContainer = slot.querySelector('.multi-image-container');
     if (existingContainer) {
       existingContainer.remove();
+      console.log('🧹 単一マッチのため複数画像コンテナを削除:', slotId);
     }
     
     // 単一画像を再表示
@@ -392,8 +407,14 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     if (singleImg) {
       singleImg.style.display = 'block';
       singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
     }
     
+    // スロット全体の横幅をリセット
+    slot.style.maxWidth = '';
+    slot.style.width = '';
+    
+    // 単一画像にマッチした画像を設定
     applyImageToSlot(slotId, phraseText, forceRefresh);
     return;
   }
