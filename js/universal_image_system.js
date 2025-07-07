@@ -160,20 +160,20 @@ function findImageByMetaTag(text) {
 function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   console.log('🖼️ スロット画像適用開始:', slotId, '→', phraseText);
   
-  // 画面にもログ表示
-  displayDebugMessage(`🖼️ ${slotId}: "${phraseText}" 処理開始`);
+  // デバッグメッセージは無効化
+  // displayDebugMessage(`🖼️ ${slotId}: "${phraseText}" 処理開始`);
   
   const slot = document.getElementById(slotId);
   if (!slot) {
     console.error('❌ スロットが見つかりません:', slotId);
-    displayDebugMessage(`❌ ${slotId}: スロット要素が見つかりません`, 'error');
+    // displayDebugMessage(`❌ ${slotId}: スロット要素が見つかりません`, 'error');
     return;
   }
   
   const imgElement = slot.querySelector('.slot-image');
   if (!imgElement) {
     console.error('❌ スロット内に画像要素が見つかりません:', slotId);
-    displayDebugMessage(`❌ ${slotId}: 画像要素が見つかりません`, 'error');
+    // displayDebugMessage(`❌ ${slotId}: 画像要素が見つかりません`, 'error');
     return;
   }
   
@@ -184,7 +184,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     imgElement.src = 'slot_images/common/placeholder.png';
     imgElement.alt = `image for ${slotId}`;
     console.log('📝 スロットテキストが空のため、プレースホルダーを設定:', slotId);
-    displayDebugMessage(`📝 ${slotId}: テキストが空、プレースホルダー設定`);
+    // displayDebugMessage(`📝 ${slotId}: テキストが空、プレースホルダー設定`);
     return;
   }
   
@@ -196,14 +196,14 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     console.log('🔍 マッチする画像が見つかりません:', phraseText);
     imgElement.src = 'slot_images/common/placeholder.png';
     imgElement.alt = `image for ${slotId}`;
-    displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし`, 'warning');
+    // displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし`, 'warning');
     return;
   }
   
   // 新しい画像パスを構築
   const newImagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
   console.log('🎨 新しい画像パス:', newImagePath);
-  displayDebugMessage(`🎨 ${slotId}: "${phraseText}" → ${imageData.image_file}`);
+  // displayDebugMessage(`🎨 ${slotId}: "${phraseText}" → ${imageData.image_file}`);
   
   // 居座り防止：完全に同じパスの場合のみ更新をスキップ
   const currentImagePath = imgElement.src;
@@ -241,7 +241,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   // 画像読み込み完了後に再度表示を確認
   imgElement.onload = function() {
     console.log('🎨 画像読み込み完了:', newImagePath);
-    displayDebugMessage(`✅ ${slotId}: 画像読み込み完了`, 'success');
+    // displayDebugMessage(`✅ ${slotId}: 画像読み込み完了`, 'success');
     this.style.display = 'block';
     this.style.visibility = 'visible';
     this.style.opacity = '1';
@@ -269,7 +269,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   // 画像読み込みエラー時の処理
   imgElement.onerror = function() {
     console.error('❌ 画像読み込みエラー:', newImagePath);
-    displayDebugMessage(`❌ ${slotId}: 画像読み込みエラー - ${imageData.image_file}`, 'error');
+    // displayDebugMessage(`❌ ${slotId}: 画像読み込みエラー - ${imageData.image_file}`, 'error');
     this.src = 'slot_images/common/placeholder.png';
   };
   
@@ -364,8 +364,8 @@ async function initializeUniversalImageSystem() {
     return;
   }
   
-  // 現在のスロット状態を表示するデバッグパネルを追加
-  createDebugPanel();
+  // デバッグパネルは無効化
+  // createDebugPanel();
   
   // 全上位スロットに対して処理
   for (const slotId of UPPER_SLOTS) {
@@ -399,11 +399,11 @@ async function initializeUniversalImageSystem() {
     for (const slotId of UPPER_SLOTS) {
       monitorSlotText(slotId);
     }
-    updateDebugPanel(); // デバッグパネル更新
+    // updateDebugPanel(); // デバッグパネル更新は無効化
   }, 5000);
   
-  // 定期的にデバッグパネル更新
-  setInterval(updateDebugPanel, 10000); // 10秒ごと
+  // 定期的なデバッグパネル更新は無効化
+  // setInterval(updateDebugPanel, 10000); // 10秒ごと
   
   console.log('✅ 汎用画像システム初期化完了');
 }
@@ -495,7 +495,7 @@ function observeSlotChanges(slotId) {
     if (textChanged) {
       console.log(`🔄 ${slotId} テキスト変更を検出、画像を更新中...`);
       setTimeout(() => monitorSlotText(slotId), 100); // 少し遅延させて確実に更新
-      updateDebugPanel();
+      // updateDebugPanel(); // デバッグパネル更新は無効化
     }
   });
   
