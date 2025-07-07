@@ -4,6 +4,9 @@
 // 🎯 メタタグデータのキャッシュ
 let imageMetaTags = [];
 
+// デバッグ用：グローバルに公開
+window.imageMetaTags = imageMetaTags;
+
 // 🎯 対象となる上位スロット一覧
 const UPPER_SLOTS = [
   'slot-m1',
@@ -20,16 +23,35 @@ const UPPER_SLOTS = [
 
 // 🔧 メタタグデータの読み込み
 async function loadImageMetaTags() {
+  console.log('🔄 メタタグデータ読み込み開始...');
+  console.log('📍 読み込み予定URL:', window.location.origin + '/image_meta_tags.json');
+  
   try {
     const response = await fetch('image_meta_tags.json?t=' + Date.now()); // キャッシュ回避
+    console.log('📡 Fetch response:', response);
+    console.log('📊 Response status:', response.status);
+    console.log('📊 Response ok:', response.ok);
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    imageMetaTags = await response.json();
+    
+    const data = await response.json();
+    imageMetaTags = data;
+    
+    // グローバルに公開（デバッグ用）
+    window.imageMetaTags = imageMetaTags;
+    
     console.log('✅ メタタグデータ読み込み成功:', imageMetaTags.length, '件');
+    console.log('📋 読み込まれたデータ（最初の3件）:', imageMetaTags.slice(0, 3));
     return true;
   } catch (error) {
     console.error('❌ メタタグデータ読み込み失敗:', error);
+    console.error('🔍 エラー詳細:', {
+      message: error.message,
+      stack: error.stack,
+      currentURL: window.location.href
+    });
     return false;
   }
 }
@@ -70,25 +92,64 @@ function extractWordsWithStemming(text) {
 // 🔍 テキストにマッチする画像を検索
 function findImageByMetaTag(text) {
   if (!text || !imageMetaTags.length) {
+    console.log('🔍 検索条件不足:', { text, metaTagsLength: imageMetaTags.length });
     return null;
   }
   
   const searchWords = extractWordsWithStemming(text);
   console.log('🔍 検索単語:', searchWords);
+  console.log('🔍 検索対象テキスト:', text);
+  console.log('🔍 メタタグデータ件数:', imageMetaTags.length);
   
   let bestMatch = null;
   let bestPriority = 0;
+  let matchDetails = [];
   
   for (const imageData of imageMetaTags) {
     for (const metaTag of imageData.meta_tags) {
       if (searchWords.includes(metaTag.toLowerCase())) {
         const priority = imageData.priority || 1;
+        matchDetails.push({
+          image: imageData.image_file,
+          metaTag: metaTag,
+          priority: priority
+        });
+        
         if (priority > bestPriority) {
           bestMatch = imageData;
           bestPriority = priority;
         }
-        console.log('🎯 マッチング成功:', metaTag, '→', imageData.image_file);
+        console.log('🎯 マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
       }
+    }
+  }
+  
+  console.log('🔍 全マッチング結果:', matchDetails);
+  console.log('🔍 最終選択:', bestMatch ? bestMatch.image_file : 'なし');
+  
+  // 確実にマッチしていることをアラートでも表示（デバッグ用）
+  if (bestMatch) {
+    console.log(`🎉 MATCH FOUND: "${text}" → ${bestMatch.image_file}`);
+    
+    // 重要なマッチの場合は強制アラート
+    if (text.toLowerCase().includes('analyze') || text.toLowerCase().includes('engineer') || text.toLowerCase().includes('manager')) {
+      // ブラウザアラートは使わず、ページ上に表示
+      const debugDiv = document.getElementById('debug-match-info') || (() => {
+        const div = document.createElement('div');
+        div.id = 'debug-match-info';
+        div.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #28a745; color: white; padding: 10px; border-radius: 4px; z-index: 9999; max-width: 300px;';
+        document.body.appendChild(div);
+        return div;
+      })();
+      
+      debugDiv.innerHTML = `🎉 MATCH: "${text}" → ${bestMatch.image_file}`;
+      
+      // 5秒後に削除
+      setTimeout(() => {
+        if (debugDiv.parentNode) {
+          debugDiv.parentNode.removeChild(debugDiv);
+        }
+      }, 5000);
     }
   }
   
@@ -99,15 +160,20 @@ function findImageByMetaTag(text) {
 function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   console.log('🖼️ スロット画像適用開始:', slotId, '→', phraseText);
   
+  // 画面にもログ表示
+  displayDebugMessage(`🖼️ ${slotId}: "${phraseText}" 処理開始`);
+  
   const slot = document.getElementById(slotId);
   if (!slot) {
     console.error('❌ スロットが見つかりません:', slotId);
+    displayDebugMessage(`❌ ${slotId}: スロット要素が見つかりません`, 'error');
     return;
   }
   
   const imgElement = slot.querySelector('.slot-image');
   if (!imgElement) {
     console.error('❌ スロット内に画像要素が見つかりません:', slotId);
+    displayDebugMessage(`❌ ${slotId}: 画像要素が見つかりません`, 'error');
     return;
   }
   
@@ -118,6 +184,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     imgElement.src = 'slot_images/common/placeholder.png';
     imgElement.alt = `image for ${slotId}`;
     console.log('📝 スロットテキストが空のため、プレースホルダーを設定:', slotId);
+    displayDebugMessage(`📝 ${slotId}: テキストが空、プレースホルダー設定`);
     return;
   }
   
@@ -129,12 +196,14 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     console.log('🔍 マッチする画像が見つかりません:', phraseText);
     imgElement.src = 'slot_images/common/placeholder.png';
     imgElement.alt = `image for ${slotId}`;
+    displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし`, 'warning');
     return;
   }
   
   // 新しい画像パスを構築
   const newImagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
   console.log('🎨 新しい画像パス:', newImagePath);
+  displayDebugMessage(`🎨 ${slotId}: "${phraseText}" → ${imageData.image_file}`);
   
   // 居座り防止：完全に同じパスの場合のみ更新をスキップ
   const currentImagePath = imgElement.src;
@@ -172,6 +241,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   // 画像読み込み完了後に再度表示を確認
   imgElement.onload = function() {
     console.log('🎨 画像読み込み完了:', newImagePath);
+    displayDebugMessage(`✅ ${slotId}: 画像読み込み完了`, 'success');
     this.style.display = 'block';
     this.style.visibility = 'visible';
     this.style.opacity = '1';
@@ -196,8 +266,58 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     }, 1000);
   };
   
+  // 画像読み込みエラー時の処理
+  imgElement.onerror = function() {
+    console.error('❌ 画像読み込みエラー:', newImagePath);
+    displayDebugMessage(`❌ ${slotId}: 画像読み込みエラー - ${imageData.image_file}`, 'error');
+    this.src = 'slot_images/common/placeholder.png';
+  };
+  
   console.log('🎨 スロット画像更新完了:', slotId, '→', phraseText, '→', newImagePath);
   console.log('🎨 更新後の画像src:', imgElement.src);
+}
+
+// 🛠️ デバッグメッセージ表示機能
+function displayDebugMessage(message, type = 'info') {
+  const debugLog = document.getElementById('universal-debug-log') || (() => {
+    const log = document.createElement('div');
+    log.id = 'universal-debug-log';
+    log.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 10px;
+      border-radius: 4px;
+      z-index: 10001;
+      max-width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1.2;
+    `;
+    log.innerHTML = '<strong>🔍 汎用画像システム ライブログ</strong><br>';
+    document.body.appendChild(log);
+    return log;
+  })();
+  
+  const timestamp = new Date().toLocaleTimeString();
+  const colorClass = type === 'error' ? 'color: #ff6b6b' : 
+                    type === 'warning' ? 'color: #ffa500' :
+                    type === 'success' ? 'color: #51cf66' : 'color: white';
+  
+  debugLog.innerHTML += `<div style="${colorClass}">[${timestamp}] ${message}</div>`;
+  debugLog.scrollTop = debugLog.scrollHeight;
+  
+  // 50行を超えたら古いものを削除
+  const lines = debugLog.querySelectorAll('div');
+  if (lines.length > 50) {
+    for (let i = 0; i < lines.length - 50; i++) {
+      lines[i].remove();
+    }
+  }
 }
 
 // 🎯 指定スロットのテキストを監視して画像を自動更新
@@ -244,6 +364,9 @@ async function initializeUniversalImageSystem() {
     return;
   }
   
+  // 現在のスロット状態を表示するデバッグパネルを追加
+  createDebugPanel();
+  
   // 全上位スロットに対して処理
   for (const slotId of UPPER_SLOTS) {
     console.log(`🔍 処理中のスロット: ${slotId}`);
@@ -265,6 +388,9 @@ async function initializeUniversalImageSystem() {
     
     // 初回の画像適用
     monitorSlotText(slotId);
+    
+    // スロットテキストの変更を監視（MutationObserver）
+    observeSlotChanges(slotId);
   }
   
   // 5秒後にもう一度実行（遅延読み込み対応）
@@ -273,9 +399,125 @@ async function initializeUniversalImageSystem() {
     for (const slotId of UPPER_SLOTS) {
       monitorSlotText(slotId);
     }
+    updateDebugPanel(); // デバッグパネル更新
   }, 5000);
   
+  // 定期的にデバッグパネル更新
+  setInterval(updateDebugPanel, 10000); // 10秒ごと
+  
   console.log('✅ 汎用画像システム初期化完了');
+}
+
+// 🛠️ デバッグパネル作成
+function createDebugPanel() {
+  const debugPanel = document.createElement('div');
+  debugPanel.id = 'universal-debug-panel';
+  debugPanel.style.cssText = `
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    z-index: 10000;
+    max-width: 400px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.2;
+  `;
+  debugPanel.innerHTML = '<strong>🔍 汎用画像システム デバッグパネル</strong><br>初期化中...';
+  
+  document.body.appendChild(debugPanel);
+  
+  // パネルのオン/オフ切り替え
+  debugPanel.addEventListener('click', () => {
+    if (debugPanel.style.height === '20px') {
+      debugPanel.style.height = 'auto';
+      debugPanel.style.maxHeight = '300px';
+    } else {
+      debugPanel.style.height = '20px';
+      debugPanel.style.maxHeight = '20px';
+      debugPanel.style.overflow = 'hidden';
+    }
+  });
+}
+
+// 🛠️ デバッグパネル更新
+function updateDebugPanel() {
+  const debugPanel = document.getElementById('universal-debug-panel');
+  if (!debugPanel) return;
+  
+  let debugInfo = '<strong>🔍 汎用画像システム (クリックで展開/折りたたみ)</strong><br>';
+  debugInfo += `⏰ ${new Date().toLocaleTimeString()}<br>`;
+  debugInfo += `📊 メタタグ: ${imageMetaTags.length}件<br><br>`;
+  
+  UPPER_SLOTS.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (!slot) {
+      debugInfo += `❌ ${slotId}: 見つからない<br>`;
+      return;
+    }
+    
+    const phraseEl = slot.querySelector('.slot-phrase');
+    const textEl = slot.querySelector('.slot-text');
+    const imgEl = slot.querySelector('.slot-image');
+    
+    const phrase = phraseEl ? phraseEl.textContent.trim() : '';
+    const text = textEl ? textEl.textContent.trim() : '';
+    const currentText = phrase || text;
+    const imageSrc = imgEl ? imgEl.src.split('/').pop().split('?')[0] : '不明';
+    
+    const status = currentText ? '✅' : '⚪';
+    debugInfo += `${status} ${slotId}: "${currentText}" → ${imageSrc}<br>`;
+  });
+  
+  debugPanel.innerHTML = debugInfo;
+}
+
+// 🔍 スロットの変更を監視
+function observeSlotChanges(slotId) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+  
+  const observer = new MutationObserver((mutations) => {
+    let textChanged = false;
+    
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' || 
+          (mutation.type === 'characterData' && mutation.target.nodeType === Node.TEXT_NODE)) {
+        textChanged = true;
+      }
+    });
+    
+    if (textChanged) {
+      console.log(`🔄 ${slotId} テキスト変更を検出、画像を更新中...`);
+      setTimeout(() => monitorSlotText(slotId), 100); // 少し遅延させて確実に更新
+      updateDebugPanel();
+    }
+  });
+  
+  // .slot-phrase と .slot-text の変更を監視
+  const phraseEl = slot.querySelector('.slot-phrase');
+  const textEl = slot.querySelector('.slot-text');
+  
+  if (phraseEl) {
+    observer.observe(phraseEl, { 
+      childList: true, 
+      subtree: true, 
+      characterData: true 
+    });
+  }
+  
+  if (textEl) {
+    observer.observe(textEl, { 
+      childList: true, 
+      subtree: true, 
+      characterData: true 
+    });
+  }
 }
 
 // 🔄 外部から呼び出し可能な更新関数（全スロット）
@@ -372,10 +614,17 @@ window.updateVSlotImageAfterDataChange = function() {
 
 // DOMContentLoaded で自動初期化
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('📦 DOM読み込み完了、汎用画像システム初期化開始...');
+  console.log('📦 現在時刻:', new Date().toLocaleTimeString());
+  
   // 少し遅延させて他のスクリプトの完了を待つ
-  setTimeout(initializeUniversalImageSystem, 500);
+  setTimeout(() => {
+    console.log('📦 遅延初期化実行中...');
+    initializeUniversalImageSystem();
+  }, 500);
 });
 
 console.log('📦 汎用画像システムが読み込まれました');
 console.log('📦 対象スロット:', UPPER_SLOTS);
 console.log('📦 テスト用関数: window.testUniversalImageSystem()');
+console.log('📦 スクリプト読み込み時刻:', new Date().toLocaleTimeString());

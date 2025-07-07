@@ -310,15 +310,78 @@
             }
         }
 
+        // 画像更新の詳細監視
+        function monitorImageChanges() {
+            const slots = [
+                'slot-m1', 'slot-s', 'slot-aux', 'slot-m2', 'slot-v',
+                'slot-c1', 'slot-o1', 'slot-o2', 'slot-c2', 'slot-m3'
+            ];
+            
+            slots.forEach(slotId => {
+                const slot = document.getElementById(slotId);
+                if (slot) {
+                    const img = slot.querySelector('.slot-image');
+                    if (img) {
+                        // 初期状態を記録
+                        const initialSrc = img.src;
+                        log(`📸 ${slotId} 初期画像: ${initialSrc}`);
+                        
+                        // 画像変更を監視
+                        const observer = new MutationObserver(mutations => {
+                            mutations.forEach(mutation => {
+                                if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                                    const newSrc = img.src;
+                                    log(`🔄 ${slotId} 画像更新: ${newSrc}`, 'success');
+                                }
+                            });
+                        });
+                        
+                        observer.observe(img, {
+                            attributes: true,
+                            attributeFilter: ['src']
+                        });
+                    }
+                }
+            });
+        }
+
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
             log('🚀 テストページ初期化完了');
+            
+            // 画像変更監視を開始
+            monitorImageChanges();
             
             // 3秒後に自動テスト実行
             setTimeout(() => {
                 log('🔄 自動テスト開始...');
                 testAllSlots();
             }, 3000);
+            
+            // 10秒後に詳細状態チェック
+            setTimeout(() => {
+                log('=== 10秒後詳細チェック ===');
+                showSystemStatus();
+                
+                // 各スロットの状態を詳細表示
+                const slots = ['slot-m1', 'slot-s', 'slot-aux', 'slot-m2', 'slot-v',
+                              'slot-c1', 'slot-o1', 'slot-o2', 'slot-c2', 'slot-m3'];
+                              
+                slots.forEach(slotId => {
+                    const slot = document.getElementById(slotId);
+                    if (slot) {
+                        const img = slot.querySelector('.slot-image');
+                        const phraseEl = slot.querySelector('.slot-phrase');
+                        const textEl = slot.querySelector('.slot-text');
+                        
+                        const phrase = phraseEl ? phraseEl.textContent : '';
+                        const text = textEl ? textEl.textContent : '';
+                        const src = img ? img.src : 'なし';
+                        
+                        log(`📋 ${slotId}: "${phrase || text}" → ${src}`);
+                    }
+                });
+            }, 10000);
         });
     </script>
 </body>
