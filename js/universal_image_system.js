@@ -522,6 +522,40 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   console.log(`🎨 複数画像表示完了: ${slotId} → ${imageDataArray.length}枚`);
 }
 
+// 🧹 複数画像コンテナをクリアして単一画像表示に戻す（外部制御用）
+function clearMultiImageContainer(slotId) {
+  console.log('🧹 複数画像コンテナクリア開始:', slotId);
+  
+  const slot = document.getElementById(slotId);
+  if (!slot) {
+    console.error('❌ スロットが見つかりません:', slotId);
+    return false;
+  }
+
+  // 複数画像コンテナがあれば削除
+  const existingContainer = slot.querySelector('.multi-image-container');
+  if (existingContainer) {
+    existingContainer.remove();
+    console.log('🧹 複数画像コンテナを削除しました:', slotId);
+  }
+  
+  // 単一画像を再表示
+  const singleImg = slot.querySelector('.slot-image');
+  if (singleImg) {
+    singleImg.style.display = 'block';
+    singleImg.style.visibility = 'visible';
+    singleImg.style.opacity = '1';
+    console.log('🧹 単一画像を再表示しました:', slotId);
+  }
+  
+  // スロット全体の横幅をリセット
+  slot.style.maxWidth = '';
+  slot.style.width = '';
+  
+  console.log('🧹 複数画像コンテナクリア完了:', slotId);
+  return true;
+}
+
 // 🛠️ デバッグメッセージ表示機能
 function displayDebugMessage(message, type = 'info') {
   const debugLog = document.getElementById('universal-debug-log') || (() => {
@@ -854,6 +888,7 @@ window.testUniversalImageSystem = testUniversalImageSystem;
 // 🖼️ 新機能：複数画像対応の公開関数
 window.applyMultipleImagesToSlot = applyMultipleImagesToSlot;
 window.findAllImagesByMetaTag = findAllImagesByMetaTag;
+window.clearMultiImageContainer = clearMultiImageContainer;
 
 // 🔄 旧V専用システムとの互換性維持
 window.updateVSlotImage = function(forceRefresh = false) {
