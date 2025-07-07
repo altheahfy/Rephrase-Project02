@@ -18,9 +18,7 @@
   </script>
   <script src="js/image_auto_hide.js">
   </script>
-  <script src="js/randomizer_all.js">
-  </script>
-  <script src="js/structure_builder.js">
+  <script src="js/v_slot_image_system.js">
   </script>
   <script src="js/question_word_visibility.js">
   </script>
@@ -938,8 +936,9 @@
 </div> <!-- main-content の終了 -->
 
     <!-- 既存のスクリプト -->
-<script>
-// ES6モジュールの代わりに従来のscript読み込み方式を使用
+<script type="module">
+import { randomizeAll } from './js/randomizer_all.js';
+import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
 
@@ -968,20 +967,11 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       loadedJsonData = JSON.parse(e.target.result);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
-      
-      // randomizeAll関数を直接呼び出し（グローバル関数として定義済み）
-      const data = window.randomizeAll ? window.randomizeAll(loadedJsonData) : loadedJsonData;
+      const data = randomizeAll(loadedJsonData);
       console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
       window.loadedJsonData = data;
-      
-      // buildStructure関数を直接呼び出し（グローバル関数として定義済み）
-      if (typeof window.buildStructure === 'function') {
-        window.buildStructure(data);
-      } else {
-        console.error("❌ buildStructure関数が見つかりません");
-      }
-      
+      buildStructure(data);
       syncDynamicToStatic();
       
       // サブスロットの初期化も実行
