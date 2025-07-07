@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空スロット・イラスト化不可テスト</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .test-controls button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-controls button:hover {
+            background: #0056b3;
+        }
+        .slot-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .slot {
+            width: 180px;
+            height: 180px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #f9f9f9;
+        }
+        .slot-text {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+            min-height: 20px;
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: calc(100% - 20px);
+        }
+        .slot-image {
+            max-width: 160px;
+            max-height: 140px;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .status-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 空スロット・イラスト化不可テスト</h1>
+    <p>Type wordや空テキストの場合に、画像スロットが空になることを確認するテストページです。</p>
+
+    <div class="test-section">
+        <h2>📝 テストケース1: 空テキスト</h2>
+        <div class="test-controls">
+            <button onclick="testEmptyText()">空テキストをセット</button>
+            <button onclick="clearTestSlots()">全クリア</button>
+        </div>
+        <div class="slot-container">
+            <div class="slot" id="slot-m1">
+                <div class="slot-text" id="slot-m1-text">（空）</div>
+                <img class="slot-image" id="slot-m1-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-v">
+                <div class="slot-text" id="slot-v-text">（空）</div>
+                <img class="slot-image" id="slot-v-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-o1">
+                <div class="slot-text" id="slot-o1-text">（空）</div>
+                <img class="slot-image" id="slot-o1-img" src="" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔤 テストケース2: Type word（イラスト化不可）</h2>
+        <div class="test-controls">
+            <button onclick="testTypeWords()">Type wordをセット</button>
+            <button onclick="clearTestSlots()">全クリア</button>
+        </div>
+        <div class="slot-container">
+            <div class="slot" id="slot-s">
+                <div class="slot-text" id="slot-s-text">the</div>
+                <img class="slot-image" id="slot-s-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-aux">
+                <div class="slot-text" id="slot-aux-text">is</div>
+                <img class="slot-image" id="slot-aux-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-c1">
+                <div class="slot-text" id="slot-c1-text">and</div>
+                <img class="slot-image" id="slot-c1-img" src="" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🖼️ テストケース3: イラスト化可能単語</h2>
+        <div class="test-controls">
+            <button onclick="testValidWords()">イラスト化可能単語をセット</button>
+            <button onclick="clearTestSlots()">全クリア</button>
+        </div>
+        <div class="slot-container">
+            <div class="slot" id="slot-m2">
+                <div class="slot-text" id="slot-m2-text">cat</div>
+                <img class="slot-image" id="slot-m2-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-o2">
+                <div class="slot-text" id="slot-o2-text">dog</div>
+                <img class="slot-image" id="slot-o2-img" src="" alt="">
+            </div>
+            <div class="slot" id="slot-c2">
+                <div class="slot-text" id="slot-c2-text">book</div>
+                <img class="slot-image" id="slot-c2-img" src="" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 状態確認</h2>
+        <div class="status-info" id="status-info">
+            ここに画像の状態情報が表示されます。
+        </div>
+    </div>
+
+    <script src="js/universal_image_system.js"></script>
+    <script>
+        // 🎯 メタタグデータを読み込み
+        loadImageMetaTags().then(() => {
+            console.log('✅ メタタグデータ読み込み完了');
+            updateStatusInfo();
+        });
+
+        // 空テキストテスト
+        function testEmptyText() {
+            console.log('🧪 空テキストテスト開始');
+            
+            // テキストを空にセット
+            document.getElementById('slot-m1-text').textContent = '';
+            document.getElementById('slot-v-text').textContent = '';
+            document.getElementById('slot-o1-text').textContent = '';
+            
+            // 画像適用
+            applyImageToSlot('slot-m1', '', true);
+            applyImageToSlot('slot-v', '', true);
+            applyImageToSlot('slot-o1', '', true);
+            
+            setTimeout(updateStatusInfo, 500);
+        }
+
+        // Type wordテスト
+        function testTypeWords() {
+            console.log('🧪 Type wordテスト開始');
+            
+            // Type wordをセット
+            document.getElementById('slot-s-text').textContent = 'the';
+            document.getElementById('slot-aux-text').textContent = 'is';
+            document.getElementById('slot-c1-text').textContent = 'and';
+            
+            // 画像適用
+            applyImageToSlot('slot-s', 'the', true);
+            applyImageToSlot('slot-aux', 'is', true);
+            applyImageToSlot('slot-c1', 'and', true);
+            
+            setTimeout(updateStatusInfo, 500);
+        }
+
+        // イラスト化可能単語テスト
+        function testValidWords() {
+            console.log('🧪 イラスト化可能単語テスト開始');
+            
+            // イラスト化可能単語をセット
+            document.getElementById('slot-m2-text').textContent = 'cat';
+            document.getElementById('slot-o2-text').textContent = 'dog';
+            document.getElementById('slot-c2-text').textContent = 'book';
+            
+            // 画像適用
+            applyImageToSlot('slot-m2', 'cat', true);
+            applyImageToSlot('slot-o2', 'dog', true);
+            applyImageToSlot('slot-c2', 'book', true);
+            
+            setTimeout(updateStatusInfo, 500);
+        }
+
+        // 全クリア
+        function clearTestSlots() {
+            console.log('🧹 全スロットクリア');
+            
+            const slotIds = ['slot-m1', 'slot-v', 'slot-o1', 'slot-s', 'slot-aux', 'slot-c1', 'slot-m2', 'slot-o2', 'slot-c2'];
+            
+            slotIds.forEach(slotId => {
+                const textEl = document.getElementById(slotId + '-text');
+                const imgEl = document.getElementById(slotId + '-img');
+                
+                if (textEl) textEl.textContent = '（空）';
+                if (imgEl) {
+                    imgEl.src = '';
+                    imgEl.alt = '';
+                    imgEl.style.display = 'none';
+                }
+            });
+            
+            setTimeout(updateStatusInfo, 500);
+        }
+
+        // 状態情報更新
+        function updateStatusInfo() {
+            const slotIds = ['slot-m1', 'slot-v', 'slot-o1', 'slot-s', 'slot-aux', 'slot-c1', 'slot-m2', 'slot-o2', 'slot-c2'];
+            let statusHTML = '<h3>📊 各スロットの画像状態:</h3>';
+            
+            slotIds.forEach(slotId => {
+                const imgEl = document.getElementById(slotId + '-img');
+                const textEl = document.getElementById(slotId + '-text');
+                
+                if (imgEl && textEl) {
+                    const hasImage = imgEl.src && imgEl.src !== '' && !imgEl.src.includes('undefined');
+                    const isVisible = imgEl.style.display !== 'none';
+                    const text = textEl.textContent;
+                    
+                    statusHTML += `<div><strong>${slotId}:</strong> テキスト="${text}" | 画像=${hasImage ? '有' : '無'} | 表示=${isVisible ? '有' : '無'}</div>`;
+                }
+            });
+            
+            document.getElementById('status-info').innerHTML = statusHTML;
+        }
+    </script>
+</body>
+</html>

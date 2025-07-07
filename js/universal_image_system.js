@@ -229,12 +229,13 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   
   console.log('🔍 現在の画像src:', imgElement.src);
   
-  // テキストが空の場合はプレースホルダーを設定
+  // テキストが空の場合は画像スロットを空にする
   if (!phraseText || phraseText.trim() === '') {
-    imgElement.src = 'slot_images/common/placeholder.png';
-    imgElement.alt = `image for ${slotId}`;
-    console.log('📝 スロットテキストが空のため、プレースホルダーを設定:', slotId);
-    // displayDebugMessage(`📝 ${slotId}: テキストが空、プレースホルダー設定`);
+    imgElement.src = ''; // 🎯 画像スロットを空にする
+    imgElement.alt = '';
+    imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
+    console.log('📝 スロットテキストが空のため、画像スロットを空にしました:', slotId);
+    // displayDebugMessage(`📝 ${slotId}: テキストが空、画像スロット空`);
     return;
   }
   
@@ -243,10 +244,11 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   console.log('🔍 検索結果:', imageData);
   
   if (!imageData) {
-    console.log('🔍 マッチする画像が見つかりません:', phraseText);
-    imgElement.src = 'slot_images/common/placeholder.png';
-    imgElement.alt = `image for ${slotId}`;
-    // displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし`, 'warning');
+    console.log('🔍 マッチする画像が見つかりません（Type word等）:', phraseText);
+    imgElement.src = ''; // 🎯 画像スロットを空にする
+    imgElement.alt = '';
+    imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
+    // displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし、画像スロット空`);
     return;
   }
   
@@ -337,22 +339,30 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     return;
   }
 
-  // テキストが空の場合は通常の単一画像処理に戻す
+  // テキストが空の場合は通常の単一画像処理に戻す + 完全リセット
   if (!phraseText || phraseText.trim() === '') {
-    // 複数画像コンテナがあれば削除
+    console.log('🧹 空テキスト検出 - スロット完全リセット:', slotId);
+    
+    // 🎯 複数画像コンテナがあれば削除
     const existingContainer = slot.querySelector('.multi-image-container');
     if (existingContainer) {
       existingContainer.remove();
     }
     
-    // 単一画像を再表示
+    // 🎯 スロット幅を元に戻す
+    slot.style.maxWidth = '';
+    slot.style.width = '';
+    
+    // 🎯 単一画像を非表示にして空にする
     const singleImg = slot.querySelector('.slot-image');
     if (singleImg) {
-      singleImg.style.display = 'block';
-      singleImg.style.visibility = 'visible';
+      singleImg.src = ''; // 🎯 画像スロットを空にする
+      singleImg.alt = '';
+      singleImg.style.display = 'none'; // 🎯 画像要素を非表示にする
     }
     
-    applyImageToSlot(slotId, phraseText, forceRefresh);
+    // 🎯 通常の単一画像処理も実行（空テキスト用の処理）
+    applyImageToSlot(slotId, '', true); // 強制リフレッシュ
     return;
   }
 
