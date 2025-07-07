@@ -250,9 +250,12 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     return;
   }
   
-  // 新しい画像パスを構築
-  const newImagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
+  // 新しい画像パスを構築（URLエンコーディング対応）
+  const encodedImageFile = encodeURIComponent(imageData.image_file);
+  const newImagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
   console.log('🎨 新しい画像パス:', newImagePath);
+  console.log('🔤 元ファイル名:', imageData.image_file);
+  console.log('🔤 エンコード後:', encodedImageFile);
   // displayDebugMessage(`🎨 ${slotId}: "${phraseText}" → ${imageData.image_file}`);
   
   // 居座り防止：完全に同じパスの場合のみ更新をスキップ
@@ -462,7 +465,8 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   // 各画像を追加
   imageDataArray.forEach((imageData, index) => {
     const imgElement = document.createElement('img');
-    const imagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
+    const encodedImageFile = encodeURIComponent(imageData.image_file);
+    const imagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
     const cacheBuster = Date.now() + index; // 各画像に個別のキャッシュバスター
     
     imgElement.src = `${imagePath}?t=${cacheBuster}`;
