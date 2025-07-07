@@ -1121,12 +1121,11 @@ function updateSubslotImages(parentSlotId) {
     
     console.log(`🔍 サブスロット処理中: ${subslotId}, テキスト: "${text}"`);
     
-    // 画像検索
-    const imageData = findImageByMetaTag(text);
-    if (imageData) {
-      // 単一画像適用
-      updateSlotImage(subslotId, text);
-      console.log(`✅ サブスロット画像適用成功: ${subslotId} → ${imageData.image_file}`);
+    // 複数画像対応
+    const images = findAllImagesByMetaTag(text);
+    if (images && images.length > 0) {
+      applyMultipleImagesToSlot(subslotId, images);
+      console.log(`✅ サブスロット画像適用成功: ${subslotId} → ${images.length}件`);
     } else {
       // プレースホルダー設定
       const imageElement = subslotElement.querySelector('.slot-image');
@@ -1134,7 +1133,7 @@ function updateSubslotImages(parentSlotId) {
         imageElement.src = 'slot_images/common/placeholder.png';
         imageElement.alt = `No image for ${subslotId}`;
       }
-      console.log(`📝 サブスロット画像なし: ${subslotId} (テキスト: "${text}")`);
+      console.log(`📝 サブスロット画像なし: ${subslotId}`);
     }
   }
   

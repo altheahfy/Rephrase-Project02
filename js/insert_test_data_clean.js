@@ -793,9 +793,9 @@ function syncUpperSlotsFromJson(data) {
   }, 150);
 }
 
-// ✅ サブスロット同期機能の実装（静的スロットへの書き込み方式）
+// ✅ サブスロット同期機能の実装（完全リセット＋再構築方式）
 function syncSubslotsFromJson(data) {
-  console.log("🔄 サブスロット同期（静的スロットへの書き込み）開始");
+  console.log("🔄 サブスロット同期（完全リセット＋再構築）開始");
   if (!data || !Array.isArray(data)) {
     console.warn("⚠ サブスロット同期: データが無効です");
     return;
@@ -808,40 +808,34 @@ function syncSubslotsFromJson(data) {
   const subslotData = data.filter(item => item.SubslotID && item.SubslotID !== "");
   console.log(`📊 サブスロット対象件数: ${subslotData.length}`);
   
-  // 🧹 STEP1: 静的サブスロットのテキストをクリア
-  const staticSubslots = [
-    'slot-s-sub-m1', 'slot-s-sub-s', 'slot-s-sub-aux', 'slot-s-sub-m2', 'slot-s-sub-v', 
-    'slot-s-sub-c1', 'slot-s-sub-o1', 'slot-s-sub-o2', 'slot-s-sub-c2', 'slot-s-sub-m3',
-    'slot-m1-sub-m1', 'slot-m1-sub-s', 'slot-m1-sub-aux', 'slot-m1-sub-m2', 'slot-m1-sub-v',
-    'slot-m1-sub-c1', 'slot-m1-sub-o1', 'slot-m1-sub-o2', 'slot-m1-sub-c2', 'slot-m1-sub-m3',
-    'slot-m2-sub-m1', 'slot-m2-sub-s', 'slot-m2-sub-aux', 'slot-m2-sub-m2', 'slot-m2-sub-v',
-    'slot-m2-sub-c1', 'slot-m2-sub-o1', 'slot-m2-sub-o2', 'slot-m2-sub-c2', 'slot-m2-sub-m3',
-    'slot-c1-sub-m1', 'slot-c1-sub-s', 'slot-c1-sub-aux', 'slot-c1-sub-m2', 'slot-c1-sub-v',
-    'slot-c1-sub-c1', 'slot-c1-sub-o1', 'slot-c1-sub-o2', 'slot-c1-sub-c2', 'slot-c1-sub-m3',
-    'slot-o1-sub-m1', 'slot-o1-sub-s', 'slot-o1-sub-aux', 'slot-o1-sub-m2', 'slot-o1-sub-v',
-    'slot-o1-sub-c1', 'slot-o1-sub-o1', 'slot-o1-sub-o2', 'slot-o1-sub-c2', 'slot-o1-sub-m3',
-    'slot-o2-sub-m1', 'slot-o2-sub-s', 'slot-o2-sub-aux', 'slot-o2-sub-m2', 'slot-o2-sub-v',
-    'slot-o2-sub-c1', 'slot-o2-sub-o1', 'slot-o2-sub-o2', 'slot-o2-sub-c2', 'slot-o2-sub-m3',
-    'slot-c2-sub-m1', 'slot-c2-sub-s', 'slot-c2-sub-aux', 'slot-c2-sub-m2', 'slot-c2-sub-v',
-    'slot-c2-sub-c1', 'slot-c2-sub-o1', 'slot-c2-sub-o2', 'slot-c2-sub-c2', 'slot-c2-sub-m3',
-    'slot-m3-sub-m1', 'slot-m3-sub-s', 'slot-m3-sub-aux', 'slot-m3-sub-m2', 'slot-m3-sub-v',
-    'slot-m3-sub-c1', 'slot-m3-sub-o1', 'slot-m3-sub-o2', 'slot-m3-sub-c2', 'slot-m3-sub-m3'
-  ];
+  // 🧹 STEP1: 全サブスロットコンテナをクリア
+  const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
+  console.log(`🧹 クリア対象サブスロットコンテナ: ${allSubContainers.length}件`);
   
-  staticSubslots.forEach(slotId => {
-    const slotElement = document.getElementById(slotId);
-    if (slotElement) {
-      const phraseElement = slotElement.querySelector('.slot-phrase');
-      const textElement = slotElement.querySelector('.slot-text');
-      
-      if (phraseElement) phraseElement.textContent = '';
-      if (textElement) textElement.textContent = '';
+  allSubContainers.forEach(container => {
+    // 子要素を全て削除
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
+    console.log(`🧹 ${container.id} を完全クリア`);
   });
-  console.log(`🧹 静的サブスロット ${staticSubslots.length}件をクリア完了`);
   
-  // 🔧 STEP2: データを静的サブスロットに書き込み
-  subslotData.forEach(item => {
+  // 🔧 STEP2: display_orderでソートしてから再構築
+  // display_orderによる正しい順序でソート
+  const sortedSubslotData = subslotData.sort((a, b) => {
+    // まず親スロットで並べ、次にdisplay_orderで並べる
+    if (a.Slot !== b.Slot) {
+      return a.Slot.localeCompare(b.Slot);
+    }
+    return (a.display_order || 0) - (b.display_order || 0);
+  });
+  
+  console.log(`📊 display_orderでソート完了: ${sortedSubslotData.length}件`);
+  sortedSubslotData.forEach((item, index) => {
+    console.log(`  ${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
+  });
+  
+  sortedSubslotData.forEach(item => {
     try {
       // DisplayAtTopの要素をサブスロットから除外
       if (displayAtTopItem && 
@@ -851,57 +845,67 @@ function syncSubslotsFromJson(data) {
         return;
       }
 
-      // 静的サブスロットIDを構築（slot-[親スロット名]-sub-[サブスロットID]形式）
+      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
       const parentSlot = item.Slot.toLowerCase();
       const subslotId = item.SubslotID.toLowerCase();
-      const staticSlotId = `slot-${parentSlot}-sub-${subslotId}`;
+      const fullSlotId = `slot-${parentSlot}-${subslotId}`;
+      console.log(` サブスロット生成: ${fullSlotId}`);
       
-      // 静的スロット要素を検索
-      const staticSlotElement = document.getElementById(staticSlotId);
+      // 親コンテナを検索（slot-[親スロット名]-sub）
+      const parentContainerId = `slot-${parentSlot}-sub`;
+      const parentContainer = document.getElementById(parentContainerId);
       
-      if (!staticSlotElement) {
-        console.warn(`⚠ 静的スロットが見つかりません: ${staticSlotId}`);
+      if (!parentContainer) {
+        console.warn(`⚠ 親コンテナが見つかりません: ${parentContainerId}`);
         return;
       }
       
-      // 既存のphrase要素とtext要素に書き込み
-      const phraseElement = staticSlotElement.querySelector('.slot-phrase');
-      const textElement = staticSlotElement.querySelector('.slot-text');
+      // 新しいサブスロットDOM要素を生成
+      const slotElement = document.createElement('div');
+      slotElement.id = fullSlotId;
+      slotElement.className = 'slot-container';
       
-      if (phraseElement && item.SubslotElement) {
+      // 🏷️ ラベル要素を作成（最初に追加）
+      const labelElement = document.createElement('label');
+      labelElement.textContent = subslotId.toUpperCase();
+      labelElement.style.cssText = `
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 14px;
+      `;
+      
+      // phrase要素を作成
+      const phraseElement = document.createElement('div');
+      phraseElement.className = 'slot-phrase';
+      if (item.SubslotElement) {
         phraseElement.textContent = item.SubslotElement;
       }
       
-      if (textElement && item.SubslotText) {
+      // text要素を作成
+      const textElement = document.createElement('div');
+      textElement.className = 'slot-text';
+      if (item.SubslotText) {
         textElement.textContent = item.SubslotText;
       }
       
-      console.log(`✅ 静的サブスロットに書き込み: ${staticSlotId} | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
+      // 要素を組み立て（ラベルを最初に追加）
+      slotElement.appendChild(labelElement);
+      slotElement.appendChild(phraseElement);
+      slotElement.appendChild(textElement);
+      
+      // 親コンテナに追加
+      parentContainer.appendChild(slotElement);
+      
+      console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
       
     } catch (err) {
       console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
     }
   });
   
-  console.log("✅ サブスロット同期完了（静的スロットへの書き込み）");
-  
-  // 🖼️ サブスロット画像更新を実行
-  setTimeout(() => {
-    if (typeof window.updateSubslotImages === 'function') {
-      // 各親スロットのサブスロット画像を更新
-      const parentSlots = ['s', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
-      parentSlots.forEach(parentSlotId => {
-        const container = document.getElementById(`slot-${parentSlotId}-sub`);
-        if (container) {
-          console.log(`🖼️ ${parentSlotId} のサブスロット画像を更新中...`);
-          window.updateSubslotImages(parentSlotId);
-        }
-      });
-      console.log("✅ サブスロット同期後の画像更新完了");
-    } else {
-      console.warn("⚠ updateSubslotImages関数が見つかりません");
-    }
-  }, 100);
+  console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
   
   // 🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
