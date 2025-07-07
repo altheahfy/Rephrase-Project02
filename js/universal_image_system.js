@@ -417,18 +417,18 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       grid-row: 2;
       grid-column: 1;
       display: flex !important;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
       width: 100%;
       min-height: 120px;
       max-height: 150px;
-      padding: 5px;
+      padding: 8px;
       box-sizing: border-box;
-      border-radius: 4px;
-      background: rgba(40, 167, 69, 0.05);
-      border: 1px dashed rgba(40, 167, 69, 0.3);
+      border-radius: 6px;
+      background: rgba(40, 167, 69, 0.08);
+      border: 2px dashed rgba(40, 167, 69, 0.4);
       visibility: visible !important;
       opacity: 1 !important;
     `;
@@ -437,6 +437,20 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
 
   // 既存の画像をクリア
   imageContainer.innerHTML = '';
+
+  // 🎯 画像数に応じてコンテナのクラスを設定
+  imageContainer.className = 'multi-image-container';
+  if (imageDataArray.length === 2) {
+    imageContainer.classList.add('images-2');
+  } else if (imageDataArray.length === 3) {
+    imageContainer.classList.add('images-3');
+  } else if (imageDataArray.length === 4) {
+    imageContainer.classList.add('images-4');
+  } else if (imageDataArray.length >= 5) {
+    imageContainer.classList.add('images-5-plus');
+  }
+
+  console.log(`🎨 画像コンテナクラス設定: ${imageContainer.className} (${imageDataArray.length}枚)`);
 
   // 各画像を追加
   imageDataArray.forEach((imageData, index) => {
@@ -448,19 +462,29 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     imgElement.alt = `image ${index + 1} for ${slotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 複数画像用のスタイル（少し小さめに）
+    // 🎯 画像数に応じて動的にサイズを調整
+    const baseSize = Math.max(140 - (imageDataArray.length - 2) * 20, 60);
+    const minSize = Math.max(baseSize * 0.7, 50);
+    
     imgElement.style.cssText = `
-      max-width: 45px;
-      max-height: 45px;
+      flex: 1 1 auto;
+      max-width: ${baseSize}px !important;
+      max-height: ${baseSize}px !important;
+      min-width: ${minSize}px !important;
+      min-height: ${minSize}px !important;
       width: auto;
       height: auto;
-      border-radius: 3px;
-      border: 1px solid #ddd;
+      border-radius: 6px;
+      border: 2px solid rgba(40, 167, 69, 0.6);
       object-fit: cover;
       display: block;
       visibility: visible;
       opacity: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      aspect-ratio: 1 / 1;
     `;
+
+    console.log(`🎨 画像${index + 1}サイズ: max:${baseSize}px, min:${minSize}px`);
 
     // メタタグ属性を設定
     imgElement.setAttribute('data-meta-tag', 'true');
@@ -479,9 +503,6 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       console.error(`❌ 複数画像 ${index + 1} 読み込みエラー:`, imagePath);
       this.src = 'slot_images/common/placeholder.png';
     };
-
-    imageContainer.appendChild(imgElement);
-  });
 
   console.log(`🎨 複数画像表示完了: ${slotId} → ${imageDataArray.length}枚`);
 }
