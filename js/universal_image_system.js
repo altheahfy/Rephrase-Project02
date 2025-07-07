@@ -851,11 +851,30 @@ function updateSlotImage(slotId, forceRefresh = false) {
   
   console.log('🔄 取得したテキスト:', slotId, '→', currentText);
   
-  // テキストが空の場合も複数画像のクリア処理を実行
+  // テキストが空の場合は複数画像のクリアのみ実行して従来の処理に移行
   if (!currentText) {
-    console.warn('⚠️ スロットテキストが空です - 複数画像クリア処理を実行:', slotId);
-    // 複数画像対応の処理を実行（空テキスト処理）
-    applyMultipleImagesToSlot(slotId, currentText, forceRefresh);
+    console.warn('⚠️ スロットテキストが空です - 複数画像クリア処理のみ実行:', slotId);
+    // 複数画像コンテナがあれば削除
+    const existingContainer = slot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+      console.log('🧹 空テキストのため複数画像コンテナを削除:', slotId);
+    }
+    
+    // 単一画像を再表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
+    }
+    
+    // スロット全体の横幅をリセット
+    slot.style.maxWidth = '';
+    slot.style.width = '';
+    
+    // 従来の処理（insert_test_data_clean.jsのbutton.png制御等）に任せるため、ここで処理終了
+    console.log('✅ 空テキスト時の複数画像クリア完了、従来処理に移行:', slotId);
     return;
   }
   
