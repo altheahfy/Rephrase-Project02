@@ -89,7 +89,7 @@ h2 {
   min-width: 50px !important; /* 最小横幅のみ設定（極端に細くなることを防ぐ） */
   border-radius: 5px;
   border: 1px solid rgba(40, 167, 69, 0.6);
-  object-fit: contain !important; /* 縦横比保持 */
+  object-fit: cover !important; /* 🎯 縦横比無視で縦枠いっぱいに */
   display: block;
   visibility: visible;
   opacity: 1;
