@@ -1,5 +1,7 @@
 
-export function randomizeAll(slotData) {
+// randomizer_all.js - グローバル関数として定義
+
+function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
     console.warn("V_group_key 母集団が見つかりません。");
@@ -95,3 +97,6 @@ export function randomizeAll(slotData) {
     識別番号: slot.識別番号 || ""
   }));
 }
+
+// グローバル関数として定義
+window.randomizeAll = randomizeAll;
