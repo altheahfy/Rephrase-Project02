@@ -2,7 +2,7 @@
 
 ## 概要
 
-Rephraseプロジェクトにおいて、スロット内のテキストに基づいて自動的に関連するイラストを表示する機能です。上位スロット・サブスロット問わず、単語の意味に応じた画像を動的に適用し、個別ランダマイズ時の画像更新にも対応します。
+Rephraseプロジェクトにおいて、スロット内のテキストに基づいて自動的に関連するイラストを表示する汎用システムです。上位スロット全体に対応し、単語の意味に応じた画像を動的に適用、複数画像の横並び表示、メタタグ自動生成、Type判定による表示制御、責務分離設計を実現しています。
 
 ## システム構成
 
@@ -10,16 +10,21 @@ Rephraseプロジェクトにおいて、スロット内のテキストに基づ
 
 ```
 project-root/
-├── image_meta_tags.json          # メタタグデータベース
-├── js/image_meta_tag_system.js   # 画像表示制御ロジック
-├── slot_images/                  # 画像ファイル格納ディレクトリ
+├── image_meta_tags.json                # メタタグデータベース（自動生成対応）
+├── js/universal_image_system.js        # 汎用画像表示制御システム（メインエンジン）
+├── js/insert_test_data_clean.js        # 静的データ制御・button.png制御ロジック
+├── js/generate_meta_tags.js            # メタタグ自動生成スクリプト
+├── slot_images/                        # 画像ファイル格納ディレクトリ
 │   ├── common/
-│   │   └── placeholder.png       # デフォルト画像
-│   ├── people/                   # 人物関連画像
-│   ├── actions/                  # 動作関連画像
-│   ├── objects/                  # 物体関連画像
+│   │   ├── placeholder.png             # デフォルト画像
+│   │   └── button.png                  # サブスロット展開ボタン画像
+│   ├── people/                         # 人物関連画像
+│   ├── actions/                        # 動作関連画像
+│   ├── objects/                        # 物体関連画像
 │   └── [その他カテゴリ]/
-└── index.html                    # メインUI
+├── test_universal_image_system.html    # テスト用HTML
+├── test_multiple_images.html           # 複数画像表示テスト
+└── index.html                          # メインUI
 ```
 
 ## メタタグデータベース仕様
@@ -64,48 +69,81 @@ project-root/
 
 ## JavaScript制御システム仕様
 
-### `js/image_meta_tag_system.js` アーキテクチャ
+### アーキテクチャ設計原則
 
-#### 主要関数
+#### 1. **責務分離（Separation of Concerns）**
+- **`universal_image_system.js`**: 汎用画像表示エンジン（メタタグマッチング、複数画像表示）
+- **`insert_test_data_clean.js`**: 静的データ制御、Type判定、button.png制御
+- **明確な境界**: 空テキスト時の処理は静的制御側に完全委譲
 
-##### 1. `loadImageMetaTagsOnStartup()`
-- **目的**: メタタグデータの初期読み込み
+#### 2. **全スロット対応**
+- **対象スロット**: `['slot-m1', 'slot-s', 'slot-aux', 'slot-m2', 'slot-v', 'slot-c1', 'slot-o1', 'slot-o2', 'slot-c2', 'slot-m3']`
+- **統一インターフェース**: 全スロットで同一の画像制御API
+
+#### 3. **複数画像対応システム**
+- **横並び表示**: 同一テキストから複数単語を抽出し、それぞれの画像を横並び表示
+- **動的サイズ調整**: 画像枚数に応じてスロット幅・画像サイズを自動調整
+- **重複排除**: 同一画像の重複表示を防止
+
+### `js/universal_image_system.js` 主要関数
+
+#### 核心関数
+
+##### 1. `loadImageMetaTags()`
+- **目的**: メタタグデータの非同期読み込み
 - **戻り値**: `Promise<boolean>`
-- **特徴**: キャッシュ無効化クエリパラメータ付きfetch
+- **特徴**: キャッシュ無効化、エラーハンドリング、グローバル公開
 
-##### 2. `extractWordsWithStemming(text)`
-- **目的**: テキストから検索対象単語を抽出
-- **処理内容**:
-  - 2文字以上の単語を対象（短い重要語に対応）
-  - 最小限の語幹抽出（-s, -ed, -ing）
-  - 元単語 + 語幹の両方を検索対象に含める
+##### 2. `findAllImagesByMetaTag(text)`
+- **目的**: 複数画像検索（新機能）
+- **処理**: 各単語ごとに最適マッチを検索、重複排除
+- **戻り値**: `Array<ImageData>`
 
-##### 3. `findImageByMetaTag(text)`
-- **目的**: テキストにマッチする画像を検索
-- **マッチング方式**: 厳密一致のみ（部分マッチ無し）
-- **優先度制御**: `priority`フィールドに基づく最適マッチ選択
+##### 3. `applyMultipleImagesToSlot(slotId, phraseText, forceRefresh)`
+- **目的**: 複数画像表示制御（新機能）
+- **処理フロー**:
+  - 空テキスト時: 複数画像コンテナ削除→従来制御に委譲
+  - マッチ0件: 複数画像コンテナ削除→単一画像制御
+  - マッチ1件: 複数画像コンテナ削除→単一画像制御
+  - マッチ2件以上: 複数画像コンテナ作成・表示
 
-##### 4. `applyImageToSlot(slotElement, phraseText, forceRefresh)`
-- **目的**: 単一スロットへの画像適用
-- **居座り防止**: 同一画像の重複適用回避
-- **表示制御**: visibility/opacity/display の正規化
+##### 4. `clearMultiImageContainer(slotId)`
+- **目的**: 複数画像コンテナの完全クリア（外部制御用）
+- **効果**: 単一画像表示への安全な復帰
 
-##### 5. `clearSlotImage(slotElement)`
-- **目的**: スロット画像のクリア
-- **安全性**: メタタグ画像・プレースホルダーのみ対象
+##### 5. `updateSlotImage(slotId, forceRefresh)`
+- **目的**: 個別スロット画像更新（外部API）
+- **重要な設計**: 空テキスト時は複数画像クリアのみ実行、静的制御に委譲
 
-##### 6. `applyMetaTagImagesToAllSlots(forceRefresh)`
-- **目的**: 全スロット一括画像適用
-- **対象**: `.slot-container` + `.subslot-container`
+##### 6. `updateAllSlotImages(forceRefresh)`
+- **目的**: 全スロット一括画像更新（外部API）
 
-##### 7. `handleSlotTextChange(slotElement)`
-- **目的**: テキスト変更時の画像更新
-- **処理フロー**: クリア → 新規適用（居座り防止）
+#### 複数画像表示システム
 
-##### 8. `setupIndividualRandomizeObserver()`
-- **目的**: DOM変更監視・自動画像更新
-- **監視方式**: MutationObserver
-- **対象**: `#training-container` 内の `characterData` + `childList`
+##### 画像コンテナDOM構造
+```html
+<div class="multi-image-container" style="display: flex; gap: 6px;">
+  <img class="slot-multi-image" src="slot_images/people/manager.png" style="height: 160px; width: 80px;">
+  <img class="slot-multi-image" src="slot_images/actions/analyze.png" style="height: 160px; width: 80px;">
+  <img class="slot-multi-image" src="slot_images/objects/data.png" style="height: 160px; width: 80px;">
+</div>
+```
+
+##### 動的サイズ調整ロジック
+```javascript
+// 基本設定
+const baseContainerWidth = 390;  // 1枚用基本幅
+const minImageWidth = 50;        // 最小画像幅
+const maxImageWidth = 120;       // 最大画像幅
+const gap = 6;                   // 画像間隙間
+
+// スロット拡大計算
+const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80;
+const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+
+// スロット全体の横幅制御
+slot.style.maxWidth = `${expandedContainerWidth}px`;
+```
 
 ## HTML構造仕様
 
@@ -238,59 +276,116 @@ window.debugStrictMatching()
 2. `image_meta_tags.json` に対応エントリ追加
 3. `folder` フィールドにディレクトリ名指定
 
-## 既知の制限・課題
+## 重要なトラブルシューティング事例
+
+### 🚨 責務分離違反による表示不具合
+
+#### 問題症状
+- 複数画像表示後に「全クリア」すると404エラーや空白表示
+- `button.png`が表示されるべき場面で表示されない
+
+#### 根本原因
+```javascript
+// ❌ 問題のあった実装（修正前）
+if (!currentText) {
+  // 空テキスト時に汎用システムが介入
+  applyMultipleImagesToSlot(slotId, currentText, forceRefresh);
+  return; // ← これにより静的制御が実行されない
+}
+```
+
+#### 正しい解決方法
+```javascript
+// ✅ 修正後の実装
+if (!currentText) {
+  // 複数画像クリアのみ実行
+  const existingContainer = slot.querySelector('.multi-image-container');
+  if (existingContainer) {
+    existingContainer.remove();
+  }
+  // 静的制御（button.png制御）に委譲
+  return;
+}
+```
+
+#### 教訓
+1. **空テキスト時は汎用システムが介入しない**
+2. **button.png制御は静的システムの専門領域**
+3. **責務の明確な分離が安定性を保証**
+
+## 外部API・グローバル関数
+
+### 汎用画像システム公開関数
+
+```javascript
+// 基本制御API
+window.updateAllSlotImages(forceRefresh = false)     // 全スロット更新
+window.updateSlotImage(slotId, forceRefresh = false) // 個別スロット更新
+window.initializeUniversalImageSystem()             // システム初期化
+
+// 複数画像制御API
+window.applyMultipleImagesToSlot(slotId, text, forceRefresh)  // 複数画像適用
+window.clearMultiImageContainer(slotId)                      // 複数画像クリア
+window.findAllImagesByMetaTag(text)                          // 複数画像検索
+
+// データ更新API
+window.updateAllSlotImagesAfterDataChange()         // データ変更後の全更新
+
+// テスト・デバッグAPI
+window.testUniversalImageSystem()                   // 手動テスト実行
+```
+
+### 使用例
+
+```javascript
+// 全スロットの画像を強制更新
+updateAllSlotImages(true);
+
+// 特定スロットの複数画像をクリア
+clearMultiImageContainer('slot-v');
+
+// データ更新後の再同期
+updateAllSlotImagesAfterDataChange();
+```
+
+## 既知の制限・今後の改善
 
 ### 現在の制限事項
 
 1. **単語レベルマッチング**: フレーズ全体での意味理解は未対応
 2. **文脈依存性**: 同一単語の複数意味への対応限定的
-3. **大文字小文字**: 小文字変換後のマッチングのみ
+3. **複数画像の意味的関連**: 単語レベルの独立マッチング
 4. **特殊文字**: ハイフン以外の記号は除去される
 
-### 今後の改善候補
+### 技術的改善候補
 
-1. **フレーズマッチング**: 複数単語での検索対応
-2. **曖昧マッチング**: 編集距離ベースの近似マッチ
-3. **学習機能**: ユーザー選択に基づく優先度自動調整
-4. **パフォーマンス**: 大量データでの検索最適化
-
-## 運用・保守
-
-### メタタグデータ更新手順
-
-1. `image_meta_tags.json` 編集
-2. 画像ファイルを適切なディレクトリに配置
-3. ブラウザキャッシュクリア（自動クエリパラメータで対応済み）
-4. ページリロード
-
-### トラブルシューティング
-
-#### 画像が表示されない場合
-
-1. **ブラウザコンソール確認**
-   ```javascript
-   window.debugStrictMatching()
-   ```
-
-2. **メタタグデータ読み込み状況確認**
-   ```javascript
-   console.log(window.imageMetaTagsLoaded, window.imageMetaTagsData?.length)
-   ```
-
-3. **DOM構造確認**
-   - `.slot-container` / `.subslot-container` の存在
-   - `.slot-phrase` 要素の存在
-   - `.slot-image` 要素の存在
-
-#### 画像が更新されない場合
-
-1. **MutationObserver 動作確認**
-2. **テキスト変更イベント発生確認**
-3. **同一画像スキップロジック確認**
+1. **セマンティック検索**: 意味ベースのマッチング
+2. **画像品質管理**: 自動リサイズ・最適化
+3. **キャッシング戦略**: 画像・メタデータの効率的キャッシュ
+4. **A/Bテスト**: マッチング精度の定量評価
 
 ## バージョン履歴
 
-### v1.0 (実装完了版)
+### v2.0 (汎用システム完成版) - 2025年7月7日
+#### 🎯 主要新機能
+- **汎用画像システム**: 全上位スロット対応（10スロット統一制御）
+- **複数画像横並び表示**: 動的サイズ調整・重複排除・ホバー効果
+- **メタタグ自動生成**: ファイル一覧からの自動メタデータ作成
+- **責務分離設計**: 汎用制御vs静的制御の明確な境界
+- **Type判定連携**: button.png制御との完全統合
+
+#### 🛠️ 技術仕様
+- **複数画像対応**: 2枚以上の場合のみコンテナ作成
+- **動的レイアウト**: 画像枚数×80px のスロット拡大
+- **キャッシュバスター**: タイムスタンプ付きURL生成
+- **エラーハンドリング**: 404時の自動placeholder.png適用
+
+#### 🐛 重要な修正
+- **空テキスト時の責務分離**: 汎用システムは複数画像クリアのみ実行
+- **button.png制御の保護**: 静的システムの専門領域を侵害しない設計
+- **DOM競合の解消**: 複数画像↔単一画像の安全な切り替え
+
+### v1.0 (基本実装版) - 2025年7月3日
 - メタタグベース画像表示機能
 - 上位・サブスロット対応
 - 個別ランダマイズ監視
@@ -301,5 +396,6 @@ window.debugStrictMatching()
 
 ---
 
-**最終更新**: 2025年7月3日  
-**対応バージョン**: Rephraseプロジェクト完全トレーニングUI完成フェーズ３
+**最終更新**: 2025年7月7日  
+**対応バージョン**: Rephraseプロジェクト完全トレーニングUI完成フェーズ３  
+**システム状態**: 汎用イラスト表示システム完全実装完了
