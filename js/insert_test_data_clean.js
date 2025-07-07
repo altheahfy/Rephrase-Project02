@@ -666,22 +666,14 @@ function syncUpperSlotsFromJson(data) {
       detailButton.style.display = 'none';
       console.log(`🚫 ${slotName}: PhraseType=wordのため展開ボタンを非表示`);
       
-      // 🖼 展開ボタン非表示の場合は画像を元に戻す
-      const slotImage = container.querySelector('.slot-image');
-      if (slotImage) {
-        slotImage.src = 'slot_images/common/placeholder.png';
-        console.log(`🖼 ${slotName}: 画像をplaceholder.pngに戻しました`);
-      }
+      // 🖼 Type wordの場合は画像システムに処理を委譲（手動では設定しない）
+      console.log(`🖼 ${slotName}: Type word - 画像処理はuniversal_image_systemに委譲`);
     } else if (relatedSubslotData.length === 0) {
       detailButton.style.display = 'none';
       console.log(`🚫 ${slotName}: サブスロットデータ0件のため展開ボタンを非表示`);
       
-      // 🖼 展開ボタン非表示の場合は画像を元に戻す
-      const slotImage = container.querySelector('.slot-image');
-      if (slotImage) {
-        slotImage.src = 'slot_images/common/placeholder.png';
-        console.log(`🖼 ${slotName}: 画像をplaceholder.pngに戻しました`);
-      }
+      // 🖼 サブスロットなしの場合は画像システムに処理を委譲
+      console.log(`🖼 ${slotName}: サブスロットなし - 画像処理はuniversal_image_systemに委譲`);
     } else {
       detailButton.style.display = '';
       console.log(`👁 ${slotName}: サブスロットデータ${relatedSubslotData.length}件のため展開ボタンを表示`);
@@ -690,7 +682,7 @@ function syncUpperSlotsFromJson(data) {
       const slotImage = container.querySelector('.slot-image');
       if (slotImage) {
         slotImage.src = 'slot_images/common/button.png';
-        console.log(`🖼 ${slotName}: 画像をbutton.pngに変更しました`);
+        console.log(`🖼 ${slotName}: サブスロットあり - button.pngを設定`);
       } else {
         console.warn(`⚠ ${slotName}: slot-imageが見つかりません`);
       }
