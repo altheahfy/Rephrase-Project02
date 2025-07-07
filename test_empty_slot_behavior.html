@@ -70,17 +70,6 @@
             object-fit: contain;
             border: 1px solid #ccc;
             border-radius: 4px;
-            /* 🎯 画像が非表示の場合のスタイル */
-            display: block;
-            visibility: visible;
-        }
-        
-        /* 🎯 画像が空の場合は完全に非表示 */
-        .slot-image[src=""],
-        .slot-image:not([src]),
-        .slot-image[src*="undefined"] {
-            display: none !important;
-            visibility: hidden !important;
         }
         .status-info {
             margin-top: 10px;
@@ -104,15 +93,15 @@
         <div class="slot-container">
             <div class="slot" id="slot-m1">
                 <div class="slot-text" id="slot-m1-text">（空）</div>
-                <img class="slot-image" id="slot-m1-img" alt="">
+                <img class="slot-image" id="slot-m1-img" src="" alt="">
             </div>
             <div class="slot" id="slot-v">
                 <div class="slot-text" id="slot-v-text">（空）</div>
-                <img class="slot-image" id="slot-v-img" alt="">
+                <img class="slot-image" id="slot-v-img" src="" alt="">
             </div>
             <div class="slot" id="slot-o1">
                 <div class="slot-text" id="slot-o1-text">（空）</div>
-                <img class="slot-image" id="slot-o1-img" alt="">
+                <img class="slot-image" id="slot-o1-img" src="" alt="">
             </div>
         </div>
     </div>
@@ -126,15 +115,15 @@
         <div class="slot-container">
             <div class="slot" id="slot-s">
                 <div class="slot-text" id="slot-s-text">the</div>
-                <img class="slot-image" id="slot-s-img" alt="">
+                <img class="slot-image" id="slot-s-img" src="" alt="">
             </div>
             <div class="slot" id="slot-aux">
                 <div class="slot-text" id="slot-aux-text">is</div>
-                <img class="slot-image" id="slot-aux-img" alt="">
+                <img class="slot-image" id="slot-aux-img" src="" alt="">
             </div>
             <div class="slot" id="slot-c1">
                 <div class="slot-text" id="slot-c1-text">and</div>
-                <img class="slot-image" id="slot-c1-img" alt="">
+                <img class="slot-image" id="slot-c1-img" src="" alt="">
             </div>
         </div>
     </div>
@@ -148,15 +137,15 @@
         <div class="slot-container">
             <div class="slot" id="slot-m2">
                 <div class="slot-text" id="slot-m2-text">cat</div>
-                <img class="slot-image" id="slot-m2-img" alt="">
+                <img class="slot-image" id="slot-m2-img" src="" alt="">
             </div>
             <div class="slot" id="slot-o2">
                 <div class="slot-text" id="slot-o2-text">dog</div>
-                <img class="slot-image" id="slot-o2-img" alt="">
+                <img class="slot-image" id="slot-o2-img" src="" alt="">
             </div>
             <div class="slot" id="slot-c2">
                 <div class="slot-text" id="slot-c2-text">book</div>
-                <img class="slot-image" id="slot-c2-img" alt="">
+                <img class="slot-image" id="slot-c2-img" src="" alt="">
             </div>
         </div>
     </div>
@@ -219,15 +208,6 @@
             document.getElementById('slot-o2-text').textContent = 'dog';
             document.getElementById('slot-c2-text').textContent = 'book';
             
-            // 画像適用前に画像要素を再表示
-            ['slot-m2', 'slot-o2', 'slot-c2'].forEach(slotId => {
-                const imgEl = document.getElementById(slotId + '-img');
-                if (imgEl) {
-                    imgEl.style.display = 'block';
-                    imgEl.style.visibility = 'visible';
-                }
-            });
-            
             // 画像適用
             applyImageToSlot('slot-m2', 'cat', true);
             applyImageToSlot('slot-o2', 'dog', true);
@@ -251,7 +231,7 @@
                     // 🎯 エラーハンドラーを削除してから画像をクリア
                     imgEl.onload = null;
                     imgEl.onerror = null;
-                    imgEl.removeAttribute('src'); // 🎯 src属性を完全に削除
+                    imgEl.src = '';
                     imgEl.alt = '';
                     imgEl.style.display = 'none';
                 }
