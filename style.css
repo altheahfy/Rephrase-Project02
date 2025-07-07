@@ -81,14 +81,14 @@ h2 {
 }
 
 .slot-multi-image {
-  max-width: 55px !important;
-  max-height: 55px !important;
-  min-width: 45px !important;
-  min-height: 45px !important;
+  max-width: 85px !important;
+  max-height: 85px !important;
+  min-width: 65px !important;
+  min-height: 65px !important;
   width: auto;
   height: auto;
-  border-radius: 4px;
-  border: 1px solid rgba(40, 167, 69, 0.5);
+  border-radius: 5px;
+  border: 1px solid rgba(40, 167, 69, 0.6);
   object-fit: cover;
   display: block;
   visibility: visible;
