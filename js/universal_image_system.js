@@ -450,11 +450,22 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     
     // 🎯 画像枚数に応じた動的サイズ調整システム
     const imageCount = imageDataArray.length;
-    const containerWidth = 390; // スロット内の有効幅（概算）
+    const baseContainerWidth = 390; // 基本スロット幅（1枚用）
+    const minImageWidth = 50; // 画像1枚の最小幅
+    const maxImageWidth = 120; // 画像1枚の最大幅
     const gap = 6; // 画像間の隙間
+    
+    // 🆕 スロット全体の横幅を画像枚数に応じて拡大
+    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
     const totalGapWidth = (imageCount - 1) * gap;
-    const availableWidth = containerWidth - totalGapWidth - 20; // padding等を考慮
-    const dynamicWidth = Math.max(50, Math.floor(availableWidth / imageCount)); // 最小50px
+    const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
+    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+    
+    // 🆕 スロット全体の横幅を動的に設定
+    slot.style.maxWidth = `${expandedContainerWidth}px`;
+    slot.style.width = 'auto';
+    
+    console.log(`🎯 スロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
     
     // 複数画像用のスタイル - 動的サイズ適用
     imgElement.style.cssText = `
