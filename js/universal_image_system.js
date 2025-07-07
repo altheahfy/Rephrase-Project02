@@ -234,7 +234,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     // 🎯 エラーハンドラーを削除してから画像をクリア
     imgElement.onload = null;
     imgElement.onerror = null;
-    imgElement.src = ''; // 🎯 画像スロットを空にする
+    imgElement.removeAttribute('src'); // 🎯 src属性を完全に削除
     imgElement.alt = '';
     imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
     console.log('📝 スロットテキストが空のため、画像スロットを空にしました:', slotId);
@@ -251,7 +251,7 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     // 🎯 エラーハンドラーを削除してから画像をクリア
     imgElement.onload = null;
     imgElement.onerror = null;
-    imgElement.src = ''; // 🎯 画像スロットを空にする
+    imgElement.removeAttribute('src'); // 🎯 src属性を完全に削除
     imgElement.alt = '';
     imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
     // displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし、画像スロット空`);
@@ -365,7 +365,7 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       // 🎯 エラーハンドラーを削除してから画像をクリア
       singleImg.onload = null;
       singleImg.onerror = null;
-      singleImg.src = ''; // 🎯 画像スロットを空にする
+      singleImg.removeAttribute('src'); // 🎯 src属性を完全に削除
       singleImg.alt = '';
       singleImg.style.display = 'none'; // 🎯 画像要素を非表示にする
     }
