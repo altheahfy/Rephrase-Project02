@@ -851,8 +851,11 @@ function updateSlotImage(slotId, forceRefresh = false) {
   
   console.log('🔄 取得したテキスト:', slotId, '→', currentText);
   
+  // テキストが空の場合も複数画像のクリア処理を実行
   if (!currentText) {
-    console.warn('⚠️ スロットテキストが空です:', slotId);
+    console.warn('⚠️ スロットテキストが空です - 複数画像クリア処理を実行:', slotId);
+    // 複数画像対応の処理を実行（空テキスト処理）
+    applyMultipleImagesToSlot(slotId, currentText, forceRefresh);
     return;
   }
   
