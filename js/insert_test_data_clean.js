@@ -396,48 +396,26 @@ function syncDynamicToStatic() {
     }
 
     // 🖼️ 画像要素への書き込み（テキスト書き込みと同じ方式）
-    console.log(`🔍 サブスロット画像処理開始: ${normalizeSlotId(item.Slot)}`);
     const subslotImageElement = slotElement.querySelector(".slot-image");
-    console.log("サブスロット imageElement:", subslotImageElement ? "発見" : "未検出");
-    console.log("サブスロット imageElement詳細:", subslotImageElement ? subslotImageElement.outerHTML.substring(0, 150) + "..." : "なし");
-    
+    console.log("サブスロット imageElement:", subslotImageElement ? subslotImageElement.outerHTML : "未検出");
     if (subslotImageElement) {
       const textForImage = item.SlotText || item.SlotPhrase || "";
-      console.log(`🔍 サブスロット画像検索テキスト: "${textForImage}"`);
-      
       if (textForImage.trim() && typeof window.findImageByMetaTag === 'function') {
-        console.log(`🔍 画像検索実行中: "${textForImage}"`);
         const imageData = window.findImageByMetaTag(textForImage);
-        console.log(`🔍 画像検索結果:`, imageData);
-        
         if (imageData) {
           const imagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
-          const oldSrc = subslotImageElement.src;
           subslotImageElement.src = imagePath;
-          console.log(`✅ サブスロット image書き込み成功: ${item.Slot}`);
-          console.log(`   旧: ${oldSrc}`);
-          console.log(`   新: ${imagePath}`);
+          console.log(`✅ サブスロット image書き込み成功: ${item.Slot} | 値: "${imagePath}"`);
         } else {
-          const oldSrc = subslotImageElement.src;
           subslotImageElement.src = 'slot_images/common/placeholder.png';
           console.log(`📝 サブスロット image書き込み(placeholder): ${item.Slot} | テキスト: "${textForImage}"`);
-          console.log(`   旧: ${oldSrc}`);
-          console.log(`   新: slot_images/common/placeholder.png`);
         }
       } else {
-        const oldSrc = subslotImageElement.src;
         subslotImageElement.src = 'slot_images/common/placeholder.png';
         console.log(`📝 サブスロット image書き込み(空): ${item.Slot}`);
-        console.log(`   理由: テキスト="${textForImage.trim()}", findImageByMetaTag=${typeof window.findImageByMetaTag}`);
-        console.log(`   旧: ${oldSrc}`);
-        console.log(`   新: slot_images/common/placeholder.png`);
       }
-      
-      // 処理後の状態確認
-      console.log(`🔍 処理後の画像要素状態: src="${subslotImageElement.src}", display="${getComputedStyle(subslotImageElement).display}"`);
     } else {
       console.warn(`❌ サブスロット image要素取得失敗: ${item.Slot}`);
-      console.warn(`   slotElement:`, slotElement ? slotElement.outerHTML.substring(0, 200) + "..." : "なし");
     }
     
     // 🖼️ 画像要素への書き込み（テキスト書き込みと全く同じ方式）
