@@ -150,18 +150,47 @@
             }
         };
 
-        // モックJSONデータ
-        window.loadedJsonData = {
-            sentences: [
-                {
-                    id: 1,
-                    S: "engineer",
-                    M1: "intense",
-                    V: "analyze",
-                    O1: "performance"
-                }
-            ]
-        };
+        // モックJSONデータ - insert_test_data_clean.jsが期待する形式
+        window.loadedJsonData = [
+            // Sスロット メインデータ
+            {
+                "Slot": "S",
+                "SlotPhrase": "engineer",
+                "SlotText": "エンジニア",
+                "PhraseType": "word",
+                "SubslotID": "",
+                "SubslotElement": "",
+                "SubslotText": ""
+            },
+            // Sスロットのサブスロット
+            {
+                "Slot": "S", 
+                "SlotPhrase": "engineer",
+                "SlotText": "",
+                "PhraseType": "",
+                "SubslotID": "sub-s",
+                "SubslotElement": "eng",
+                "SubslotText": "エンジニアの略"
+            },
+            {
+                "Slot": "S",
+                "SlotPhrase": "engineer", 
+                "SlotText": "",
+                "PhraseType": "",
+                "SubslotID": "sub-aux",
+                "SubslotElement": "eer",
+                "SubslotText": "エンジニア語尾"
+            },
+            {
+                "Slot": "S",
+                "SlotPhrase": "engineer",
+                "SlotText": "",
+                "PhraseType": "",
+                "SubslotID": "sub-m2", 
+                "SubslotElement": "in",
+                "SubslotText": "エンジニア語幹"
+            }
+        ];
 
         // テスト関数
         function testLoadMetaTags() {
