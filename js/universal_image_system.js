@@ -56,30 +56,36 @@ async function loadImageMetaTags() {
   }
 }
 
-// 🔍 テキストから検索対象単語を抽出（語幹抽出付き）
+// 🔍 テキストから検索対象単語を抽出（改良版語幹抽出付き）
 function extractWordsWithStemming(text) {
   if (!text || typeof text !== 'string') {
     return [];
   }
   
-  // 2文字以上の単語を抽出
-  const words = text.toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
-    .split(/\s+/)
-    .filter(word => word.length >= 2);
+  // テキストを正規化し、2文字以上の単語を抽出
+  const normalizedText = text.toLowerCase().replace(/[^\w\s-]/g, ' ');
+  const words = normalizedText.split(/\s+/).filter(word => word.length >= 2);
   
   const searchWords = new Set();
+  
+  // まず元のフレーズをそのまま追加
+  searchWords.add(normalizedText.trim());
   
   for (const word of words) {
     // 元の単語を追加
     searchWords.add(word);
     
-    // 最小限の語幹抽出
+    // 改良された語幹抽出
     if (word.endsWith('s') && word.length > 2) {
       searchWords.add(word.slice(0, -1)); // -s
     }
     if (word.endsWith('ed') && word.length > 3) {
-      searchWords.add(word.slice(0, -2)); // -ed
+      const stem = word.slice(0, -2);
+      searchWords.add(stem); // -ed
+      // 特別ケース：figured → figure
+      if (word === 'figured') {
+        searchWords.add('figure');
+      }
     }
     if (word.endsWith('ing') && word.length > 4) {
       searchWords.add(word.slice(0, -3)); // -ing
@@ -182,7 +188,7 @@ function findAllImagesByMetaTag(text) {
       }
       
       for (const metaTag of imageData.meta_tags) {
-        if (metaTag.toLowerCase() === word.toLowerCase()) {
+        if (searchWords.includes(metaTag.toLowerCase())) {
           const priority = imageData.priority || 1;
           
           if (priority > bestPriorityForWord) {
@@ -925,7 +931,100 @@ function testUniversalImageSystem() {
   console.log('🧪 汎用画像システム手動テスト完了');
 }
 
-// 🎯 グローバル関数として公開
+// 🛠️ デバッグ関数：厳密マッチング確認
+function debugStrictMatching(testText = null) {
+  console.log('🐛 === 厳密マッチングデバッグ開始 ===');
+  console.log('📊 メタタグデータ件数:', imageMetaTags.length);
+  
+  if (testText) {
+    console.log('🔍 テスト対象:', testText);
+    const searchWords = extractWordsWithStemming(testText);
+    console.log('🔍 抽出単語:', searchWords);
+    
+    const result = findImageByMetaTag(testText);
+    console.log('🔍 マッチ結果:', result);
+    
+    // figure out の詳細確認
+    const figureOutData = imageMetaTags.find(item => item.image_file === 'figure out.png');
+    if (figureOutData) {
+      console.log('🔍 figure out.png データ:', figureOutData);
+      console.log('🔍 メタタグ:', figureOutData.meta_tags);
+      
+      // 各メタタグとの照合確認
+      for (const metaTag of figureOutData.meta_tags) {
+        const matches = searchWords.includes(metaTag.toLowerCase());
+        console.log(`🔍 "${metaTag}" マッチ:`, matches);
+      }
+    }
+    
+    return;
+  }
+  
+  // 全スロットの状態確認
+  console.log('🔍 === 全スロット状態 ===');
+  UPPER_SLOTS.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (!slot) {
+      console.log(`❌ ${slotId}: 見つからない`);
+      return;
+    }
+    
+    const phraseEl = slot.querySelector('.slot-phrase');
+    const textEl = slot.querySelector('.slot-text');
+    const imgEl = slot.querySelector('.slot-image');
+    
+    const phrase = phraseEl ? phraseEl.textContent.trim() : '';
+    const text = textEl ? textEl.textContent.trim() : '';
+    const currentText = phrase || text;
+    const imageSrc = imgEl ? imgEl.src.split('/').pop().split('?')[0] : '不明';
+    
+    console.log(`${currentText ? '✅' : '⚪'} ${slotId}: "${currentText}" → ${imageSrc}`);
+    
+    if (currentText) {
+      const searchWords = extractWordsWithStemming(currentText);
+      const matchResult = findImageByMetaTag(currentText);
+      console.log(`  抽出単語: [${searchWords.join(', ')}]`);
+      console.log(`  マッチ結果: ${matchResult ? matchResult.image_file : 'なし'}`);
+    }
+  });
+  
+  console.log('🐛 === デバッグ終了 ===');
+}
+
+// 🛠️ デバッグ関数：特定単語の詳細マッチング確認
+function debugWordMatching(word) {
+  console.log('🔍 === 単語マッチング詳細 ===');
+  console.log('🔍 対象単語:', word);
+  
+  const searchWords = extractWordsWithStemming(word);
+  console.log('🔍 抽出単語:', searchWords);
+  
+  console.log('🔍 === メタタグ全件検索 ===');
+  let foundMatches = [];
+  
+  for (const imageData of imageMetaTags) {
+    for (const metaTag of imageData.meta_tags) {
+      if (searchWords.includes(metaTag.toLowerCase())) {
+        foundMatches.push({
+          image: imageData.image_file,
+          metaTag: metaTag,
+          priority: imageData.priority || 1
+        });
+        console.log(`🎯 マッチ: "${metaTag}" → ${imageData.image_file} (優先度: ${imageData.priority || 1})`);
+      }
+    }
+  }
+  
+  console.log('🔍 マッチ総数:', foundMatches.length);
+  console.log('🔍 === 詳細終了 ===');
+  return foundMatches;
+}
+
+// グローバル公開
+window.debugStrictMatching = debugStrictMatching;
+window.debugWordMatching = debugWordMatching;
+
+// グローバル関数として公開
 window.initializeUniversalImageSystem = initializeUniversalImageSystem;
 window.updateAllSlotImages = updateAllSlotImages;
 window.updateSlotImage = updateSlotImage;
