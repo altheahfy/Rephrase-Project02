@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汎用画像システム テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .slot-test {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fafafa;
+        }
+        .slot-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .slot-image {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        .slot-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .slot-phrase {
+            font-size: 14px;
+            color: #666;
+        }
+        .test-controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 汎用画像システム テスト</h1>
+    
+    <div class="test-container">
+        <h2>📋 テスト概要</h2>
+        <div class="info-box">
+            <p><strong>目的:</strong> 全上位スロットでのイラスト自動表示機能をテストします</p>
+            <p><strong>対象スロット:</strong> M1, S, Aux, M2, V, C1, O1, O2, C2, M3</p>
+            <p><strong>機能:</strong> テキスト内容に基づいて適切なイラストを自動表示</p>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🎯 スロット別テスト</h2>
+        
+        <!-- M1スロット -->
+        <div class="slot-test">
+            <h3>M1スロット</h3>
+            <div id="slot-m1" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for M1" class="slot-image">
+                <div>
+                    <div class="slot-text">manager</div>
+                    <div class="slot-phrase">管理職</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sスロット -->
+        <div class="slot-test">
+            <h3>Sスロット</h3>
+            <div id="slot-s" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for S" class="slot-image">
+                <div>
+                    <div class="slot-text">engineer</div>
+                    <div class="slot-phrase">エンジニア</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auxスロット -->
+        <div class="slot-test">
+            <h3>Auxスロット</h3>
+            <div id="slot-aux" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for Aux" class="slot-image">
+                <div>
+                    <div class="slot-text">can</div>
+                    <div class="slot-phrase">できる</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- M2スロット -->
+        <div class="slot-test">
+            <h3>M2スロット</h3>
+            <div id="slot-m2" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for M2" class="slot-image">
+                <div>
+                    <div class="slot-text">carefully</div>
+                    <div class="slot-phrase">注意深く</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vスロット -->
+        <div class="slot-test">
+            <h3>Vスロット</h3>
+            <div id="slot-v" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for V" class="slot-image">
+                <div>
+                    <div class="slot-text">analyze</div>
+                    <div class="slot-phrase">分析する</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- C1スロット -->
+        <div class="slot-test">
+            <h3>C1スロット</h3>
+            <div id="slot-c1" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for C1" class="slot-image">
+                <div>
+                    <div class="slot-text">complex</div>
+                    <div class="slot-phrase">複雑な</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- O1スロット -->
+        <div class="slot-test">
+            <h3>O1スロット</h3>
+            <div id="slot-o1" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for O1" class="slot-image">
+                <div>
+                    <div class="slot-text">data</div>
+                    <div class="slot-phrase">データ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- O2スロット -->
+        <div class="slot-test">
+            <h3>O2スロット</h3>
+            <div id="slot-o2" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for O2" class="slot-image">
+                <div>
+                    <div class="slot-text">laboratory</div>
+                    <div class="slot-phrase">研究室</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- C2スロット -->
+        <div class="slot-test">
+            <h3>C2スロット</h3>
+            <div id="slot-c2" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for C2" class="slot-image">
+                <div>
+                    <div class="slot-text">successful</div>
+                    <div class="slot-phrase">成功した</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- M3スロット -->
+        <div class="slot-test">
+            <h3>M3スロット</h3>
+            <div id="slot-m3" class="slot-container">
+                <img src="slot_images/common/placeholder.png" alt="image for M3" class="slot-image">
+                <div>
+                    <div class="slot-text">yesterday</div>
+                    <div class="slot-phrase">昨日</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🔧 テスト制御</h2>
+        <div class="test-controls">
+            <button onclick="testAllSlots()">全スロットテスト実行</button>
+            <button onclick="testSpecificSlot('slot-v')">Vスロットのみテスト</button>
+            <button onclick="testSpecificSlot('slot-m1')">M1スロットのみテスト</button>
+            <button onclick="updateAllImages()">全画像強制更新</button>
+            <button onclick="showSystemStatus()">システム状態確認</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 テスト結果ログ</h2>
+        <div id="test-log" class="info-box" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap;"></div>
+    </div>
+
+    <script src="js/universal_image_system.js"></script>
+    <script>
+        // ログ出力機能
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            // コンソールにも出力
+            console.log(`[TEST] ${message}`);
+        }
+
+        // 全スロットテスト実行
+        function testAllSlots() {
+            log('=== 全スロットテスト開始 ===');
+            
+            if (typeof window.testUniversalImageSystem === 'function') {
+                window.testUniversalImageSystem();
+                log('✅ 汎用画像システムテスト実行完了', 'success');
+            } else {
+                log('❌ 汎用画像システムが見つかりません', 'error');
+            }
+        }
+
+        // 特定スロットテスト
+        function testSpecificSlot(slotId) {
+            log(`=== ${slotId} 個別テスト開始 ===`);
+            
+            if (typeof window.updateSlotImage === 'function') {
+                window.updateSlotImage(slotId, true);
+                log(`✅ ${slotId} 画像更新完了`, 'success');
+            } else {
+                log(`❌ updateSlotImage関数が見つかりません`, 'error');
+            }
+        }
+
+        // 全画像強制更新
+        function updateAllImages() {
+            log('=== 全画像強制更新開始 ===');
+            
+            if (typeof window.updateAllSlotImages === 'function') {
+                window.updateAllSlotImages(true);
+                log('✅ 全画像強制更新完了', 'success');
+            } else {
+                log('❌ updateAllSlotImages関数が見つかりません', 'error');
+            }
+        }
+
+        // システム状態確認
+        function showSystemStatus() {
+            log('=== システム状態確認 ===');
+            
+            // 利用可能な関数の確認
+            const functions = [
+                'window.initializeUniversalImageSystem',
+                'window.updateAllSlotImages',
+                'window.updateSlotImage',
+                'window.updateAllSlotImagesAfterDataChange',
+                'window.testUniversalImageSystem'
+            ];
+            
+            functions.forEach(func => {
+                const exists = eval(`typeof ${func} === 'function'`);
+                log(`${func}: ${exists ? '✅ 利用可能' : '❌ 未定義'}`, exists ? 'success' : 'error');
+            });
+            
+            // メタタグデータの確認
+            if (typeof window.imageMetaTags !== 'undefined') {
+                log(`メタタグデータ: ${window.imageMetaTags ? window.imageMetaTags.length + '件' : '未読み込み'}`);
+            } else {
+                log('メタタグデータ: 未定義', 'error');
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 テストページ初期化完了');
+            
+            // 3秒後に自動テスト実行
+            setTimeout(() => {
+                log('🔄 自動テスト開始...');
+                testAllSlots();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

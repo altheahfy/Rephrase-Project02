@@ -63,11 +63,11 @@ export function handleExcelFileUpload(file) {
     renderAllSlots(slotData);
     renderAllSubslots(slotData);
     
-    // V スロット画像更新
-    if (typeof window.updateVSlotImage === "function") {
+    // 全スロット画像更新
+    if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
       setTimeout(() => {
-        window.updateVSlotImage(true);
-        console.log("🎨 全体ランダマイズ後のVスロット画像更新完了");
+        window.updateAllSlotImagesAfterDataChange();
+        console.log("🎨 全体ランダマイズ後の全スロット画像更新完了");
       }, 200);
     }
   };

@@ -769,13 +769,13 @@ function syncUpperSlotsFromJson(data) {
     }
   }, 100);
   
-  // 🖼 Vスロット画像更新：データ更新後にVスロット画像を再更新
+  // 🖼 全スロット画像更新：データ更新後に全スロット画像を再更新
   setTimeout(() => {
-    if (typeof window.updateVSlotImageAfterDataChange === 'function') {
-      window.updateVSlotImageAfterDataChange();
-      console.log("✅ syncUpperSlotsFromJson完了後のVスロット画像更新を実行");
+    if (typeof window.updateAllSlotImagesAfterDataChange === 'function') {
+      window.updateAllSlotImagesAfterDataChange();
+      console.log("✅ syncUpperSlotsFromJson完了後の全スロット画像更新を実行");
     } else {
-      console.warn("⚠ updateVSlotImageAfterDataChange関数が見つかりません");
+      console.warn("⚠ updateAllSlotImagesAfterDataChange関数が見つかりません");
     }
   }, 150);
   
