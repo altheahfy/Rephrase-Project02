@@ -66,30 +66,30 @@ h2 {
   grid-row: 2;
   grid-column: 1;
   display: flex;
-  gap: 6px;
+  gap: 4px; /* 画像間の間隔を縮小 */
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important; /* 🎯 折り返しを禁止して横一列に */
   width: 100%;
-  min-height: 120px;
-  max-height: 150px;
+  height: 180px !important; /* 🎯 Grid行2の高さと完全一致 */
   padding: 5px;
   box-sizing: border-box;
   border-radius: 4px;
   background: rgba(40, 167, 69, 0.05);
   border: 1px dashed rgba(40, 167, 69, 0.3);
+  overflow-x: auto; /* 🎯 横スクロールを有効化（画像が多い場合） */
+  overflow-y: hidden; /* 縦スクロールは無効 */
 }
 
 .slot-multi-image {
-  max-width: 90px !important;
-  max-height: 90px !important;
-  min-width: 70px !important;
-  min-height: 70px !important;
-  width: auto;
-  height: auto;
+  /* 🎯 縦枠いっぱい（固定高さ）+ 横幅自動調整システム */
+  height: 170px !important; /* 縦枠（180px）からpadding分を差し引いた固定高さ */
+  width: auto !important; /* 縦横比を保持して横幅を自動調整 */
+  max-width: none !important; /* 横幅制限を撤廃 */
+  min-width: 80px !important; /* 最小横幅のみ設定（極端に細くなることを防ぐ） */
   border-radius: 5px;
   border: 1px solid rgba(40, 167, 69, 0.6);
-  object-fit: cover;
+  object-fit: contain !important; /* cover → contain に変更（縦横比保持） */
   display: block;
   visibility: visible;
   opacity: 1;
