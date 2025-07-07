@@ -863,7 +863,7 @@ function syncSubslotsFromJson(data) {
       // 新しいサブスロットDOM要素を生成
       const slotElement = document.createElement('div');
       slotElement.id = fullSlotId;
-      slotElement.className = 'slot-container';
+      slotElement.className = 'subslot-container';
       
       // 🏷️ ラベル要素を作成（最初に追加）
       const labelElement = document.createElement('label');
@@ -874,6 +874,20 @@ function syncSubslotsFromJson(data) {
         margin-bottom: 5px;
         color: #333;
         font-size: 14px;
+      `;
+      
+      // 🖼️ 画像要素を作成（サブスロット用）
+      const imageElement = document.createElement('img');
+      imageElement.className = 'slot-image';
+      imageElement.alt = `image for ${fullSlotId}`;
+      imageElement.src = 'slot_images/common/placeholder.png';
+      imageElement.style.cssText = `
+        max-width: 100px;
+        max-height: 100px;
+        display: block;
+        margin: 5px 0;
+        border-radius: 4px;
+        border: 1px solid #ddd;
       `;
       
       // phrase要素を作成
@@ -890,15 +904,16 @@ function syncSubslotsFromJson(data) {
         textElement.textContent = item.SubslotText;
       }
       
-      // 要素を組み立て（ラベルを最初に追加）
+      // 要素を組み立て（ラベル、画像、phrase、textの順）
       slotElement.appendChild(labelElement);
+      slotElement.appendChild(imageElement);
       slotElement.appendChild(phraseElement);
       slotElement.appendChild(textElement);
       
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
       
-      console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
+      console.log(`✅ サブスロット完全生成（ラベル+画像付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}" | 画像: placeholder`);
       
     } catch (err) {
       console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
@@ -914,6 +929,24 @@ function syncSubslotsFromJson(data) {
     }
   }, 50);
   
+  // 🖼️ サブスロット画像更新を実行
+  setTimeout(() => {
+    if (typeof window.updateSubslotImages === 'function') {
+      // 各親スロットのサブスロット画像を更新
+      const parentSlots = ['s', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
+      parentSlots.forEach(parentSlotId => {
+        const container = document.getElementById(`slot-${parentSlotId}-sub`);
+        if (container && container.children.length > 0) {
+          console.log(`🖼️ ${parentSlotId} のサブスロット画像を更新中...`);
+          window.updateSubslotImages(parentSlotId);
+        }
+      });
+      console.log("✅ サブスロット同期後の画像更新完了");
+    } else {
+      console.warn("⚠ updateSubslotImages関数が見つかりません");
+    }
+  }, 100);
+  
   // 🏷️ サブスロット同期後にラベルを復元
   setTimeout(() => {
     if (window.restoreSubslotLabels) {
@@ -925,7 +958,7 @@ function syncSubslotsFromJson(data) {
     // if (typeof window.processAllImagesWithCoordination === 'function') {
     //   window.processAllImagesWithCoordination();
     // }
-  }, 100);
+  }, 150);
 }
 
 // 特定のM1スロットをテスト（デバッグ用）
