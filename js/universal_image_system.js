@@ -464,7 +464,7 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       min-width: 50px !important;
       border-radius: 5px;
       border: 1px solid rgba(40, 167, 69, 0.6);
-      object-fit: cover !important;
+      object-fit: fill !important;
       display: block;
       visibility: visible;
       opacity: 1;
