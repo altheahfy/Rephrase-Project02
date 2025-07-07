@@ -21,45 +21,6 @@ const UPPER_SLOTS = [
   'slot-m3'
 ];
 
-// 🔍 スロットのタイプとサブスロット情報を取得する関数
-function getSlotTypeInfo(slotId) {
-  // グローバルなJSONデータを参照
-  if (!window.loadedJsonData || !Array.isArray(window.loadedJsonData)) {
-    console.warn('⚠️ JSONデータが読み込まれていません');
-    return { phraseType: null, hasSubslots: false };
-  }
-  
-  // スロットIDからスロット名を抽出 (slot-m1 → m1)
-  const slotName = slotId.replace('slot-', '').toLowerCase();
-  
-  // 上位スロットデータを検索
-  const upperSlotData = window.loadedJsonData.find(item => 
-    item.SubslotID === "" && 
-    item.Slot && 
-    item.Slot.toLowerCase() === slotName
-  );
-  
-  if (!upperSlotData) {
-    console.warn(`⚠️ スロット "${slotName}" のデータが見つかりません`);
-    return { phraseType: null, hasSubslots: false };
-  }
-  
-  // 関連するサブスロットを検索
-  const relatedSubslots = window.loadedJsonData.filter(item => 
-    item.SubslotID !== "" && 
-    item.Slot && 
-    item.Slot.toLowerCase() === slotName
-  );
-  
-  console.log(`🔍 ${slotName}: PhraseType="${upperSlotData.PhraseType}", サブスロット数=${relatedSubslots.length}`);
-  
-  return {
-    phraseType: upperSlotData.PhraseType,
-    hasSubslots: relatedSubslots.length > 0,
-    subslotCount: relatedSubslots.length
-  };
-}
-
 // 🔧 メタタグデータの読み込み
 async function loadImageMetaTags() {
   console.log('🔄 メタタグデータ読み込み開始...');
@@ -268,10 +229,6 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   
   console.log('🔍 現在の画像src:', imgElement.src);
   
-  // 🎯 スロットタイプ情報を取得
-  const slotTypeInfo = getSlotTypeInfo(slotId);
-  console.log(`🔍 ${slotId} タイプ情報:`, slotTypeInfo);
-  
   // テキストが空の場合は画像スロットを空にする
   if (!phraseText || phraseText.trim() === '') {
     // 🎯 エラーハンドラーを削除してから画像をクリア
@@ -285,44 +242,18 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
     return;
   }
   
-  // 🎯 Type phrase/clauseでサブスロットがある場合はbutton.pngを表示
-  if (slotTypeInfo.phraseType && slotTypeInfo.phraseType !== "word" && slotTypeInfo.hasSubslots) {
-    imgElement.onload = null;
-    imgElement.onerror = null;
-    imgElement.src = 'slot_images/common/button.png?t=' + Date.now();
-    imgElement.alt = `Button for ${slotId}`;
-    imgElement.style.display = 'block';
-    imgElement.style.visibility = 'visible';
-    imgElement.style.opacity = '1';
-    console.log(`🎯 ${slotId}: Type ${slotTypeInfo.phraseType}でサブスロットあり → button.png表示`);
-    return;
-  }
-  
   // 画像を検索
   const imageData = findImageByMetaTag(phraseText);
   console.log('🔍 検索結果:', imageData);
   
   if (!imageData) {
-    // 🎯 Type wordでイラスト化できない場合は画像スロットを非表示
-    if (slotTypeInfo.phraseType === "word") {
-      console.log(`🔍 ${slotId}: Type wordでイラスト化不可 → 画像スロット非表示`);
-      // 🎯 エラーハンドラーを削除してから画像をクリア
-      imgElement.onload = null;
-      imgElement.onerror = null;
-      imgElement.removeAttribute('src'); // 🎯 src属性を完全に削除
-      imgElement.alt = '';
-      imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
-    } else {
-      // 🎯 Type phrase/clauseの場合はbutton.pngにフォールバック
-      console.log(`🔍 ${slotId}: Type ${slotTypeInfo.phraseType}でイラスト不可 → button.png表示`);
-      imgElement.onload = null;
-      imgElement.onerror = null;
-      imgElement.src = 'slot_images/common/button.png?t=' + Date.now();
-      imgElement.alt = `Button for ${slotId}`;
-      imgElement.style.display = 'block';
-      imgElement.style.visibility = 'visible';
-      imgElement.style.opacity = '1';
-    }
+    console.log('🔍 マッチする画像が見つかりません（Type word等）:', phraseText);
+    // 🎯 エラーハンドラーを削除してから画像をクリア
+    imgElement.onload = null;
+    imgElement.onerror = null;
+    imgElement.removeAttribute('src'); // 🎯 src属性を完全に削除
+    imgElement.alt = '';
+    imgElement.style.display = 'none'; // 🎯 画像要素を非表示にする
     // displayDebugMessage(`🔍 ${slotId}: "${phraseText}" マッチなし、画像スロット空`);
     return;
   }
