@@ -66,47 +66,40 @@ h2 {
   grid-row: 2;
   grid-column: 1;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   width: 100%;
   min-height: 120px;
   max-height: 150px;
-  padding: 8px;
+  padding: 5px;
   box-sizing: border-box;
-  border-radius: 6px;
-  background: rgba(40, 167, 69, 0.08);
-  border: 2px dashed rgba(40, 167, 69, 0.4);
+  border-radius: 4px;
+  background: rgba(40, 167, 69, 0.05);
+  border: 1px dashed rgba(40, 167, 69, 0.3);
 }
 
 .slot-multi-image {
-  /* 動的サイズ調整：画像数に応じて自動縮小 */
-  flex: 1 1 auto;
-  max-width: 140px !important;
-  max-height: 140px !important;
-  min-width: 60px !important;
-  min-height: 60px !important;
+  max-width: 55px !important;
+  max-height: 55px !important;
+  min-width: 45px !important;
+  min-height: 45px !important;
   width: auto;
   height: auto;
-  border-radius: 6px;
-  border: 2px solid rgba(40, 167, 69, 0.6);
+  border-radius: 4px;
+  border: 1px solid rgba(40, 167, 69, 0.5);
   object-fit: cover;
   display: block;
   visibility: visible;
   opacity: 1;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
-  /* 枠いっぱいに表示するための調整 */
-  aspect-ratio: 1 / 1;
 }
 
 .slot-multi-image:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border-color: rgba(40, 167, 69, 0.9);
-  z-index: 100;
-  position: relative;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: rgba(40, 167, 69, 0.8);
 }
 
 /* 複数画像表示時は単一画像を非表示にする */
@@ -120,27 +113,6 @@ h2 {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
-}
-
-/* 🎯 画像数に応じた動的サイズ調整 */
-.multi-image-container.images-2 .slot-multi-image {
-  max-width: 130px !important;
-  min-width: 80px !important;
-}
-
-.multi-image-container.images-3 .slot-multi-image {
-  max-width: 110px !important;
-  min-width: 70px !important;
-}
-
-.multi-image-container.images-4 .slot-multi-image {
-  max-width: 90px !important;
-  min-width: 60px !important;
-}
-
-.multi-image-container.images-5-plus .slot-multi-image {
-  max-width: 70px !important;
-  min-width: 50px !important;
 }
 
 /* スロット全体の調整が必要な場合に備えた汎用クラス */
