@@ -2773,6 +2773,19 @@
     "description": "むしろ〜したい"
   },
   {
+    "image_file": "prior.png",
+    "folder": "common",
+    "meta_tags": [
+      "prior",
+      "previous",
+      "before",
+      "earlier",
+      "former"
+    ],
+    "priority": 3,
+    "description": "以前の、前の"
+  },
+  {
     "image_file": "you.png",
     "folder": "common",
     "meta_tags": [
