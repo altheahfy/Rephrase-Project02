@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sスロット サブスロット画像表示テスト</title>
+    <link href="style.css" rel="stylesheet"/>
+    <script src="js/subslot_toggle.js"></script>
+    <script src="js/universal_image_system.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .slot-container {
+            border: 2px solid #333;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .subslot-container {
+            border: 1px solid #666;
+            margin: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .slot-image {
+            max-width: 100px;
+            max-height: 100px;
+            margin: 5px;
+        }
+        .slot-wrapper {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        .test-controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 8px;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .log-area {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Sスロット サブスロット画像表示テスト</h1>
+
+    <div class="test-controls">
+        <h3>テストコントロール</h3>
+        <button onclick="testLoadMetaTags()">📄 メタタグ読み込みテスト</button>
+        <button onclick="testSSubslotToggle()">🔄 Sサブスロット開閉テスト</button>
+        <button onclick="testSubslotImageUpdate()">🖼️ サブスロット画像更新テスト</button>
+        <button onclick="clearLogArea()">🧹 ログクリア</button>
+    </div>
+
+    <!-- Sスロット（メイン） -->
+    <div class="slot-container" id="slot-s">
+        <label><strong>S スロット</strong></label>
+        <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+        <div class="slot-text">engineer</div>
+        <div class="slot-phrase">software engineer</div>
+        <div class="subslot-toggle-button">
+            <button data-subslot-toggle="s">▼ 詳細</button>
+        </div>
+    </div>
+
+    <!-- Sスロットのサブスロット（詳細ボタンで表示される） -->
+    <div class="slot-wrapper" id="slot-s-sub" style="display: none;">
+        <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+            現在展開中：S の subslot
+        </div>
+        <div class="subslot-container" id="slot-s-sub-m1">
+            <label>M1</label>
+            <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+            <div class="slot-text">intense</div>
+            <div class="slot-phrase">intense morning</div>
+        </div>
+        <div class="subslot-container" id="slot-s-sub-s">
+            <label>S</label>
+            <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+            <div class="slot-text">engineer</div>
+            <div class="slot-phrase">software engineer</div>
+        </div>
+        <div class="subslot-container" id="slot-s-sub-aux">
+            <label>AUX</label>
+            <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+            <div class="slot-text">did</div>
+            <div class="slot-phrase">did not</div>
+        </div>
+        <div class="subslot-container" id="slot-s-sub-v">
+            <label>V</label>
+            <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+            <div class="slot-text">analyze</div>
+            <div class="slot-phrase">analyze data</div>
+        </div>
+        <div class="subslot-container" id="slot-s-sub-o1">
+            <label>O1</label>
+            <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+            <div class="slot-text">performance</div>
+            <div class="slot-phrase">system performance</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>コンソールログ</h3>
+        <div id="log-area" class="log-area"></div>
+    </div>
+
+    <script>
+        // 簡易ログ表示
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const logArea = document.getElementById('log-area');
+            if (logArea) {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = args.join(' ');
+                logArea.appendChild(logEntry);
+                logArea.scrollTop = logArea.scrollHeight;
+            }
+        };
+
+        // モックJSONデータ
+        window.loadedJsonData = {
+            sentences: [
+                {
+                    id: 1,
+                    S: "engineer",
+                    M1: "intense",
+                    V: "analyze",
+                    O1: "performance"
+                }
+            ]
+        };
+
+        // テスト関数
+        function testLoadMetaTags() {
+            console.log('🧪 メタタグ読み込みテスト開始...');
+            if (window.loadImageMetaTags) {
+                window.loadImageMetaTags();
+            } else {
+                console.error('❌ loadImageMetaTags 関数が見つかりません');
+            }
+        }
+
+        function testSSubslotToggle() {
+            console.log('🧪 Sサブスロット開閉テスト開始...');
+            if (window.toggleExclusiveSubslot) {
+                window.toggleExclusiveSubslot('s');
+            } else {
+                console.error('❌ toggleExclusiveSubslot 関数が見つかりません');
+            }
+        }
+
+        function testSubslotImageUpdate() {
+            console.log('🧪 サブスロット画像更新テスト開始...');
+            if (window.updateSubslotImages) {
+                window.updateSubslotImages('s');
+            } else {
+                console.error('❌ updateSubslotImages 関数が見つかりません');
+            }
+        }
+
+        function clearLogArea() {
+            const logArea = document.getElementById('log-area');
+            if (logArea) {
+                logArea.innerHTML = '';
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 テストページ読み込み完了');
+            console.log('📦 利用可能な関数チェック:');
+            console.log('  - loadImageMetaTags:', typeof window.loadImageMetaTags);
+            console.log('  - toggleExclusiveSubslot:', typeof window.toggleExclusiveSubslot);
+            console.log('  - updateSubslotImages:', typeof window.updateSubslotImages);
+            console.log('  - handleSubslotDisplay:', typeof window.handleSubslotDisplay);
+        });
+    </script>
+</body>
+</html>

@@ -138,6 +138,15 @@ function toggleExclusiveSubslot(slotId) {
       console.log("🔍 window.addSubslotControlPanel =", window.addSubslotControlPanel);
     }
 
+    // ★★★ サブスロット画像更新処理を追加 ★★★
+    if (window.handleSubslotDisplay) {
+      console.log(`🖼️ ${slotId} のサブスロット画像更新を開始します`);
+      window.handleSubslotDisplay(slotId);
+    } else {
+      console.warn("⚠ handleSubslotDisplay 関数が見つかりません");
+      console.log("🔍 window.handleSubslotDisplay =", window.handleSubslotDisplay);
+    }
+
   } else {
     // サブスロットを閉じる場合
     // 対象の親スロットとサブスロットエリアのクラス・インラインスタイルをリセット
