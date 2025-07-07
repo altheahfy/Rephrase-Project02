@@ -20,8 +20,6 @@
   </script>
   <script src="js/v_slot_image_system.js">
   </script>
-  <script src="js/v_slot_debug.js">
-  </script>
   <script src="js/question_word_visibility.js">
   </script>
  </head>
@@ -105,14 +103,6 @@
     <!-- 制御パネル表示ボタン -->
     <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 20px;">
       制御パネル
-    </button>
-    
-    <!-- 🔧 デバッグボタン -->
-    <button onclick="debugVSlotImage()" style="background-color: #e74c3c; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 10px;">
-      🔧 Vスロット診断
-    </button>
-    <button onclick="forceSetVSlotImage()" style="background-color: #27ae60; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 10px;">
-      🎯 画像強制設定
     </button>
   </div>
   
@@ -943,32 +933,7 @@
         console.warn("⚠ syncDynamicToStatic 関数が未定義です");
       }
     }, 200);
-  });
-</script>
-
 </div> <!-- main-content の終了 -->
-
-<!-- 🆕 強制キャッシュクリア機能 -->
-    <button id="force-clear-cache" style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
-      🔄 キャッシュクリア
-    </button>
-    <script>
-      document.getElementById('force-clear-cache').addEventListener('click', function() {
-        // 全画像の強制リロード
-        document.querySelectorAll('img').forEach(img => {
-          const src = img.src;
-          if (src && !src.includes('data:')) {
-            const baseSrc = src.split('?')[0];
-            img.src = baseSrc + '?t=' + Date.now() + Math.random();
-          }
-        });
-        
-        // 2秒後に完全リロード
-        setTimeout(() => {
-          location.reload(true);
-        }, 2000);
-      });
-    </script>
 
     <!-- 既存のスクリプト -->
 <script type="module">
