@@ -156,6 +156,56 @@ function findImageByMetaTag(text) {
   return bestMatch;
 }
 
+// 🔍 テキストにマッチする全ての画像を検索（複数画像対応）
+function findAllImagesByMetaTag(text) {
+  if (!text || !imageMetaTags.length) {
+    console.log('🔍 検索条件不足:', { text, metaTagsLength: imageMetaTags.length });
+    return [];
+  }
+  
+  const searchWords = extractWordsWithStemming(text);
+  console.log('🔍 複数検索 - 検索単語:', searchWords);
+  console.log('🔍 複数検索 - 検索対象テキスト:', text);
+  
+  let allMatches = [];
+  const usedImages = new Set(); // 重複防止用
+  
+  // 各単語に対してマッチする画像を探す
+  for (const word of searchWords) {
+    let bestMatchForWord = null;
+    let bestPriorityForWord = 0;
+    
+    for (const imageData of imageMetaTags) {
+      // 既に使用済みの画像はスキップ
+      if (usedImages.has(imageData.image_file)) {
+        continue;
+      }
+      
+      for (const metaTag of imageData.meta_tags) {
+        if (metaTag.toLowerCase() === word.toLowerCase()) {
+          const priority = imageData.priority || 1;
+          
+          if (priority > bestPriorityForWord) {
+            bestMatchForWord = imageData;
+            bestPriorityForWord = priority;
+          }
+          console.log('🎯 複数マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
+        }
+      }
+    }
+    
+    // その単語に最もマッチする画像を追加
+    if (bestMatchForWord) {
+      allMatches.push(bestMatchForWord);
+      usedImages.add(bestMatchForWord.image_file);
+      console.log(`🎉 単語 "${word}" のマッチ追加:`, bestMatchForWord.image_file);
+    }
+  }
+  
+  console.log('🔍 全複数マッチング結果:', allMatches.map(m => m.image_file));
+  return allMatches;
+}
+
 // 🖼️ 指定スロットに画像を適用
 function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   console.log('🖼️ スロット画像適用開始:', slotId, '→', phraseText);
@@ -275,6 +325,113 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   
   console.log('🎨 スロット画像更新完了:', slotId, '→', phraseText, '→', newImagePath);
   console.log('🎨 更新後の画像src:', imgElement.src);
+}
+
+// 🖼️ 指定スロットに複数画像を適用（新機能）
+function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
+  console.log('🖼️ 複数スロット画像適用開始:', slotId, '→', phraseText);
+  
+  const slot = document.getElementById(slotId);
+  if (!slot) {
+    console.error('❌ スロットが見つかりません:', slotId);
+    return;
+  }
+
+  // テキストが空の場合は通常の単一画像処理に戻す
+  if (!phraseText || phraseText.trim() === '') {
+    applyImageToSlot(slotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 複数の画像を検索
+  const imageDataArray = findAllImagesByMetaTag(phraseText);
+  console.log('🔍 複数検索結果:', imageDataArray);
+
+  // マッチする画像がない場合は通常の処理に戻す
+  if (imageDataArray.length === 0) {
+    applyImageToSlot(slotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 1個しかマッチしない場合は通常の処理に戻す
+  if (imageDataArray.length === 1) {
+    applyImageToSlot(slotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 複数画像対応：画像コンテナを作成
+  let imageContainer = slot.querySelector('.multi-image-container');
+  if (!imageContainer) {
+    // 既存の単一画像を非表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'none';
+    }
+
+    // 複数画像用のコンテナを作成
+    imageContainer = document.createElement('div');
+    imageContainer.className = 'multi-image-container';
+    imageContainer.style.cssText = `
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      min-height: 60px;
+    `;
+    slot.appendChild(imageContainer);
+  }
+
+  // 既存の画像をクリア
+  imageContainer.innerHTML = '';
+
+  // 各画像を追加
+  imageDataArray.forEach((imageData, index) => {
+    const imgElement = document.createElement('img');
+    const imagePath = `slot_images/${imageData.folder}/${imageData.image_file}`;
+    const cacheBuster = Date.now() + index; // 各画像に個別のキャッシュバスター
+    
+    imgElement.src = `${imagePath}?t=${cacheBuster}`;
+    imgElement.alt = `image ${index + 1} for ${slotId}: ${imageData.description || phraseText}`;
+    imgElement.className = 'slot-multi-image';
+    
+    // 複数画像用のスタイル（少し小さめに）
+    imgElement.style.cssText = `
+      max-width: 45px;
+      max-height: 45px;
+      width: auto;
+      height: auto;
+      border-radius: 3px;
+      border: 1px solid #ddd;
+      object-fit: cover;
+      display: block;
+      visibility: visible;
+      opacity: 1;
+    `;
+
+    // メタタグ属性を設定
+    imgElement.setAttribute('data-meta-tag', 'true');
+    imgElement.setAttribute('data-image-index', index);
+
+    // 画像読み込み完了処理
+    imgElement.onload = function() {
+      console.log(`🎨 複数画像 ${index + 1} 読み込み完了:`, imagePath);
+      this.style.display = 'block';
+      this.style.visibility = 'visible';
+      this.style.opacity = '1';
+    };
+
+    // 画像読み込みエラー処理
+    imgElement.onerror = function() {
+      console.error(`❌ 複数画像 ${index + 1} 読み込みエラー:`, imagePath);
+      this.src = 'slot_images/common/placeholder.png';
+    };
+
+    imageContainer.appendChild(imgElement);
+  });
+
+  console.log(`🎨 複数画像表示完了: ${slotId} → ${imageDataArray.length}枚`);
 }
 
 // 🛠️ デバッグメッセージ表示機能
@@ -556,11 +713,13 @@ function updateSlotImage(slotId, forceRefresh = false) {
     return;
   }
   
-  applyImageToSlot(slotId, currentText, forceRefresh);
+  // 複数画像対応の処理を実行
+  applyMultipleImagesToSlot(slotId, currentText, forceRefresh);
   
   // 1秒後に画像の状態を再確認
   setTimeout(() => {
     const imgElement = slot.querySelector('.slot-image');
+    const multiImageContainer = slot.querySelector('.multi-image-container');
     if (imgElement) {
       const computedStyle = window.getComputedStyle(imgElement);
       console.log('🔍 1秒後の画像状態:', slotId);
@@ -603,6 +762,10 @@ window.updateAllSlotImages = updateAllSlotImages;
 window.updateSlotImage = updateSlotImage;
 window.updateAllSlotImagesAfterDataChange = updateAllSlotImagesAfterDataChange;
 window.testUniversalImageSystem = testUniversalImageSystem;
+
+// 🖼️ 新機能：複数画像対応の公開関数
+window.applyMultipleImagesToSlot = applyMultipleImagesToSlot;
+window.findAllImagesByMetaTag = findAllImagesByMetaTag;
 
 // 🔄 旧V専用システムとの互換性維持
 window.updateVSlotImage = function(forceRefresh = false) {

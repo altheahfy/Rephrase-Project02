@@ -60,6 +60,44 @@ h2 {
   vertical-align: middle;
 }
 
+/* 🖼️ 複数画像表示システム用スタイル */
+.multi-image-container {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 80px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: rgba(40, 167, 69, 0.05);
+  border: 1px dashed rgba(40, 167, 69, 0.3);
+}
+
+.slot-multi-image {
+  max-width: 55px !important;
+  max-height: 55px !important;
+  min-width: 45px !important;
+  min-height: 45px !important;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(40, 167, 69, 0.5);
+  object-fit: cover;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slot-multi-image:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: rgba(40, 167, 69, 0.8);
+}
+
 /* スロット全体の調整が必要な場合に備えた汎用クラス */
 .slot-container {
   /* 🎯 CSS Gridで完全に6行固定レイアウトを実装 */
@@ -88,14 +126,6 @@ h2 {
   /* 🆕 スロット全体の高さを適切に設定 */
   height: auto; /* 自動高さ調整 */
   min-height: 380px; /* 全ての要素が確実に表示される最小高さ */
-  box-sizing: border-box;
-}
-  
-  /* 空判定時の非表示制御 */
-  transition: opacity 0.2s ease-out, width 0.3s ease; /* 幅変更もアニメーション */
-  
-  /* 🎯 完全固定高さ - 新しいgrid構造に合わせて調整 */
-  height: 220px; /* 30+75+20+25+25+25+gap+padding */
   box-sizing: border-box;
 }
 

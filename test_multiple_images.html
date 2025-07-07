@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複数画像表示システム テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .slot-test {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fafafa;
+            min-height: 120px;
+        }
+        .slot-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .slot-image {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        
+        /* 複数画像コンテナのスタイル */
+        .multi-image-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            min-height: 60px;
+            padding: 5px;
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            background: #f8fff9;
+        }
+        
+        .slot-multi-image {
+            max-width: 50px;
+            max-height: 50px;
+            border: 2px solid #28a745;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        
+        .slot-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            min-width: 200px;
+        }
+        .slot-phrase {
+            font-size: 14px;
+            color: #666;
+        }
+        .test-controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-input {
+            margin: 10px 0;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .warning { color: #ffc107; }
+        .error { color: #dc3545; }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🖼️ 複数画像表示システム テスト</h1>
+        <p>テキスト内容に応じて複数の画像を自動表示する機能をテストします。</p>
+        
+        <div class="status" id="system-status">🔄 システム初期化中...</div>
+        
+        <div class="test-controls">
+            <button onclick="testAllSlots()">📊 全スロットテスト</button>
+            <button onclick="testMultipleImages()">🎯 複数画像テスト</button>
+            <button onclick="clearAllImages()">🗑️ 画像クリア</button>
+            <button onclick="showDebugInfo()">🔍 デバッグ情報</button>
+        </div>
+        
+        <div class="test-input">
+            <label>カスタムテスト:</label><br>
+            <input type="text" id="custom-text" placeholder="テスト用テキストを入力 (例: committee responsible implementation)" />
+            <button onclick="testCustomText()">テスト実行</button>
+        </div>
+    </div>
+
+    <!-- 複数画像テスト用のスロット -->
+    <div class="test-container">
+        <h2>🎯 複数画像テストスロット</h2>
+        
+        <!-- O1スロットのテスト（committee responsible implementation） -->
+        <div class="slot-test">
+            <h3>O1スロット: "the committee responsible for implementation"</h3>
+            <div id="slot-o1" class="slot-container">
+                <div class="slot-text">the committee responsible for implementation</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="o1 image" />
+            </div>
+        </div>
+        
+        <!-- その他の複数単語テスト -->
+        <div class="slot-test">
+            <h3>M1スロット: "early morning analysis"</h3>
+            <div id="slot-m1" class="slot-container">
+                <div class="slot-text">early morning analysis</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="m1 image" />
+            </div>
+        </div>
+        
+        <div class="slot-test">
+            <h3>V スロット: "make good decisions"</h3>
+            <div id="slot-v" class="slot-container">
+                <div class="slot-text">make good decisions</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="v image" />
+            </div>
+        </div>
+        
+        <div class="slot-test">
+            <h3>C1スロット: "the new fast car"</h3>
+            <div id="slot-c1" class="slot-container">
+                <div class="slot-text">the new fast car</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="c1 image" />
+            </div>
+        </div>
+        
+        <div class="slot-test">
+            <h3>O2スロット: "big small problems"</h3>
+            <div id="slot-o2" class="slot-container">
+                <div class="slot-text">big small problems</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="o2 image" />
+            </div>
+        </div>
+    </div>
+
+    <!-- 単一画像比較用のスロット -->
+    <div class="test-container">
+        <h2>🔍 単一画像比較用スロット</h2>
+        
+        <div class="slot-test">
+            <h3>S スロット: "analysis" (単一画像)</h3>
+            <div id="slot-s" class="slot-container">
+                <div class="slot-text">analysis</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="s image" />
+            </div>
+        </div>
+        
+        <div class="slot-test">
+            <h3>M2スロット: "committee" (単一画像)</h3>
+            <div id="slot-m2" class="slot-container">
+                <div class="slot-text">committee</div>
+                <img class="slot-image" src="slot_images/common/placeholder.png" alt="m2 image" />
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-info" id="debug-output">
+        デバッグ情報がここに表示されます...
+    </div>
+
+    <script src="js/universal_image_system.js"></script>
+    <script>
+        // ページ読み込み完了後の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📦 複数画像テストページ初期化中...');
+            
+            // システム初期化を待つ
+            setTimeout(() => {
+                updateSystemStatus();
+                logDebug('複数画像テストページが読み込まれました');
+            }, 1000);
+        });
+
+        // システム状態を更新
+        function updateSystemStatus() {
+            const statusEl = document.getElementById('system-status');
+            
+            if (window.imageMetaTags && window.imageMetaTags.length > 0) {
+                statusEl.innerHTML = `✅ システム準備完了 (メタタグ: ${window.imageMetaTags.length}件)`;
+                statusEl.className = 'status success';
+            } else {
+                statusEl.innerHTML = '❌ システム初期化に失敗';
+                statusEl.className = 'status error';
+            }
+        }
+
+        // 全スロットのテスト
+        function testAllSlots() {
+            logDebug('=== 全スロットテスト開始 ===');
+            
+            const slots = ['slot-o1', 'slot-m1', 'slot-v', 'slot-c1', 'slot-o2', 'slot-s', 'slot-m2'];
+            
+            slots.forEach(slotId => {
+                logDebug(`テスト実行: ${slotId}`);
+                if (window.updateSlotImage) {
+                    window.updateSlotImage(slotId, true);
+                } else {
+                    logDebug(`エラー: updateSlotImage関数が見つかりません`);
+                }
+            });
+            
+            logDebug('=== 全スロットテスト完了 ===');
+        }
+
+        // 複数画像の特別テスト
+        function testMultipleImages() {
+            logDebug('=== 複数画像テスト開始 ===');
+            
+            // O1スロットの複数画像テスト
+            const testText = 'the committee responsible for implementation';
+            
+            if (window.findAllImagesByMetaTag) {
+                const matches = window.findAllImagesByMetaTag(testText);
+                logDebug(`検索結果: ${testText} → ${matches.length}個の画像`);
+                matches.forEach((match, index) => {
+                    logDebug(`  ${index + 1}. ${match.image_file} (${match.description})`);
+                });
+            }
+            
+            if (window.applyMultipleImagesToSlot) {
+                window.applyMultipleImagesToSlot('slot-o1', testText, true);
+                logDebug('複数画像適用完了: slot-o1');
+            }
+            
+            logDebug('=== 複数画像テスト完了 ===');
+        }
+
+        // カスタムテキストのテスト
+        function testCustomText() {
+            const customText = document.getElementById('custom-text').value.trim();
+            if (!customText) {
+                alert('テストテキストを入力してください');
+                return;
+            }
+            
+            logDebug(`=== カスタムテスト: "${customText}" ===`);
+            
+            if (window.findAllImagesByMetaTag) {
+                const matches = window.findAllImagesByMetaTag(customText);
+                logDebug(`検索結果: ${matches.length}個の画像`);
+                matches.forEach((match, index) => {
+                    logDebug(`  ${index + 1}. ${match.image_file}`);
+                });
+                
+                // O1スロットに適用してテスト
+                if (window.applyMultipleImagesToSlot) {
+                    window.applyMultipleImagesToSlot('slot-o1', customText, true);
+                }
+            }
+        }
+
+        // 全画像をクリア
+        function clearAllImages() {
+            logDebug('=== 画像クリア開始 ===');
+            
+            const images = document.querySelectorAll('.slot-image');
+            const multiContainers = document.querySelectorAll('.multi-image-container');
+            
+            images.forEach(img => {
+                img.src = 'slot_images/common/placeholder.png';
+                img.style.display = 'block';
+            });
+            
+            multiContainers.forEach(container => {
+                container.remove();
+            });
+            
+            logDebug('=== 画像クリア完了 ===');
+        }
+
+        // デバッグ情報を表示
+        function showDebugInfo() {
+            logDebug('=== システム情報 ===');
+            
+            if (window.imageMetaTags) {
+                logDebug(`メタタグデータ: ${window.imageMetaTags.length}件読み込み済み`);
+            } else {
+                logDebug('メタタグデータ: 未読み込み');
+            }
+            
+            logDebug(`利用可能な関数:`);
+            logDebug(`  - updateSlotImage: ${typeof window.updateSlotImage}`);
+            logDebug(`  - applyMultipleImagesToSlot: ${typeof window.applyMultipleImagesToSlot}`);
+            logDebug(`  - findAllImagesByMetaTag: ${typeof window.findAllImagesByMetaTag}`);
+            
+            updateSystemStatus();
+        }
+
+        // デバッグログ出力
+        function logDebug(message) {
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML += `[${timestamp}] ${message}\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            console.log(message);
+        }
+    </script>
+</body>
+</html>
