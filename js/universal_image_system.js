@@ -1209,9 +1209,9 @@ function updateSubslotImages(parentSlotId) {
   console.log(`🔍 デバッグ - fullSlotPool状態: ${window.fullSlotPool ? window.fullSlotPool.length : 'null'}`);
   console.log(`🔍 デバッグ - JSONデータ状態: ${window.loadedJsonData ? 'OK' : 'null'}`);
   
-  // 🎯 水平展開段階：C1、M1、S、M2、O1、O2、およびC2スロットに対応
-  if (parentSlotId !== 'c1' && parentSlotId !== 'm1' && parentSlotId !== 's' && parentSlotId !== 'm2' && parentSlotId !== 'o1' && parentSlotId !== 'o2' && parentSlotId !== 'c2') {
-    console.log(`⏭️ 水平展開段階のため ${parentSlotId} はスキップします（C1、M1、S、M2、O1、O2、C2スロットのみ対象）`);
+  // 🎯 水平展開段階：C1、M1、S、M2、O1、O2、C2、およびM3スロットに対応
+  if (parentSlotId !== 'c1' && parentSlotId !== 'm1' && parentSlotId !== 's' && parentSlotId !== 'm2' && parentSlotId !== 'o1' && parentSlotId !== 'o2' && parentSlotId !== 'c2' && parentSlotId !== 'm3') {
+    console.log(`⏭️ 水平展開段階のため ${parentSlotId} はスキップします（C1、M1、S、M2、O1、O2、C2、M3スロットのみ対象）`);
     return;
   }
   
