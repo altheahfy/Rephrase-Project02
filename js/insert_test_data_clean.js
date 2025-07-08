@@ -372,18 +372,24 @@ function syncDynamicToStatic() {
     const slotTextElement = slotElement.querySelector(".slot-text");
     console.log("サブスロット textElement:", slotTextElement ? slotTextElement.outerHTML : "未検出");
 
-    // 📝 フレーズ要素への書き込み（上位スロットと同じ方式 - ラベル保護）
+    // 📝 フレーズ要素への書き込み（例文テキスト - Grid行4配置責任）
     if (phraseElement) {
       phraseElement.textContent = item.SlotPhrase || "";
-      console.log(`✅ サブスロット phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
+      // 🎯 サブスロット配置責任：insert_test_data_clean.jsがGrid行4（例文テキスト）を管理
+      phraseElement.style.gridRow = '4';
+      phraseElement.style.gridColumn = '1';
+      console.log(`✅ サブスロット phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}" | Grid行4配置`);
     } else {
       console.warn(`❌ サブスロット phrase要素取得失敗: ${item.Slot}`);
     }
     
-    // 📝 テキスト要素への書き込み（上位スロットと同じ方式 - ラベル保護）
+    // 📝 テキスト要素への書き込み（補助テキスト - Grid行3配置責任）
     if (slotTextElement) {
       slotTextElement.textContent = item.SlotText || "";
-      console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
+      // 🎯 サブスロット配置責任：insert_test_data_clean.jsがGrid行3（補助テキスト）を管理
+      slotTextElement.style.gridRow = '3';
+      slotTextElement.style.gridColumn = '1';
+      console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}" | Grid行3配置`);
       
       // 上位スロットと同じ入れ子構造チェック
       const nestedPhraseDiv = slotTextElement.querySelector(".slot-phrase");
