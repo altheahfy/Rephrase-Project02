@@ -972,188 +972,78 @@ function testUniversalImageSystem() {
   console.log('🧪 汎用画像システム手動テスト完了');
 }
 
-// 🛠️ デバッグ関数：厳密マッチング確認
-function debugStrictMatching(testText = null) {
-  console.log('🐛 === 厳密マッチングデバッグ開始 ===');
-  console.log('📊 メタタグデータ件数:', imageMetaTags.length);
+// 🔧 仕様書準拠テスト関数
+function testSubslotImageSystemCompliance() {
+  console.log('🧪 ==========================================');
+  console.log('🧪 サブスロット画像システム仕様書準拠テスト開始');
+  console.log('🧪 ==========================================');
   
-  if (testText) {
-    console.log('🔍 テスト対象:', testText);
-    const searchWords = extractWordsWithStemming(testText);
-    console.log('🔍 抽出単語:', searchWords);
-    
-    const result = findImageByMetaTag(testText);
-    console.log('🔍 マッチ結果:', result);
-    
-    // figure out の詳細確認
-    const figureOutData = imageMetaTags.find(item => item.image_file === 'figure out.png');
-    if (figureOutData) {
-      console.log('🔍 figure out.png データ:', figureOutData);
-      console.log('🔍 メタタグ:', figureOutData.meta_tags);
-      
-      // 各メタタグとの照合確認
-      for (const metaTag of figureOutData.meta_tags) {
-        const matches = searchWords.includes(metaTag.toLowerCase());
-        console.log(`🔍 "${metaTag}" マッチ:`, matches);
-      }
-    }
-    
+  // テスト用のサブスロットIDを取得
+  const allSubslots = document.querySelectorAll('[id*="-sub-"]');
+  console.log('📍 発見されたサブスロット数:', allSubslots.length);
+  
+  if (allSubslots.length === 0) {
+    console.log('⚠️ サブスロットが見つかりません。C1スロットを展開してからテストしてください。');
     return;
   }
   
-  // 全スロットの状態確認
-  console.log('🔍 === 全スロット状態 ===');
-  UPPER_SLOTS.forEach(slotId => {
-    const slot = document.getElementById(slotId);
-    if (!slot) {
-      console.log(`❌ ${slotId}: 見つからない`);
-      return;
-    }
-    
-    const phraseEl = slot.querySelector('.slot-phrase');
-    const textEl = slot.querySelector('.slot-text');
-    const imgEl = slot.querySelector('.slot-image');
-    
-    const phrase = phraseEl ? phraseEl.textContent.trim() : '';
-    const text = textEl ? textEl.textContent.trim() : '';
-    const currentText = phrase || text;
-    const imageSrc = imgEl ? imgEl.src.split('/').pop().split('?')[0] : '不明';
-    
-    console.log(`${currentText ? '✅' : '⚪'} ${slotId}: "${currentText}" → ${imageSrc}`);
-    
-    if (currentText) {
-      const searchWords = extractWordsWithStemming(currentText);
-      const matchResult = findImageByMetaTag(currentText);
-      console.log(`  抽出単語: [${searchWords.join(', ')}]`);
-      console.log(`  マッチ結果: ${matchResult ? matchResult.image_file : 'なし'}`);
+  // 最初の3つのサブスロットをテスト
+  const testCases = [
+    { text: 'manager', expectedImage: 'manager.png' },
+    { text: 'analyze', expectedImage: 'analyze.png' },
+    { text: 'she', expectedImage: 'she.png' }
+  ];
+  
+  testCases.forEach((testCase, index) => {
+    if (index < allSubslots.length) {
+      const subslot = allSubslots[index];
+      const subslotId = subslot.id;
+      
+      console.log(`\n🔍 テストケース ${index + 1}: ${subslotId} → "${testCase.text}"`);
+      
+      // 画像を適用
+      applyImageToSubslot(subslotId, testCase.text);
+      
+      // 2秒後に結果を確認
+      setTimeout(() => {
+        const imgElement = subslot.querySelector('.slot-image');
+        if (imgElement) {
+          console.log(`✅ 画像要素存在: ${subslotId}`);
+          console.log(`🔍 data-meta-tag: ${imgElement.getAttribute('data-meta-tag')}`);
+          console.log(`🔍 data-meta-tag-applied: ${imgElement.getAttribute('data-meta-tag-applied')}`);
+          console.log(`🔍 data-applied-text: ${imgElement.getAttribute('data-applied-text')}`);
+          console.log(`🔍 current src: ${imgElement.src}`);
+          console.log(`🔍 display: ${imgElement.style.display}`);
+          console.log(`🔍 visibility: ${imgElement.style.visibility}`);
+          console.log(`🔍 opacity: ${imgElement.style.opacity}`);
+          
+          // 仕様書準拠性チェック
+          const hasMetaTag = imgElement.getAttribute('data-meta-tag') === 'true';
+          const hasAppliedTag = imgElement.getAttribute('data-meta-tag-applied') !== null;
+          const hasAppliedText = imgElement.getAttribute('data-applied-text') === testCase.text;
+          const isVisible = imgElement.style.display !== 'none' && imgElement.style.visibility !== 'hidden';
+          
+          console.log(`📊 仕様準拠性: メタタグ=${hasMetaTag}, 適用タグ=${hasAppliedTag}, 適用テキスト=${hasAppliedText}, 可視性=${isVisible}`);
+          
+          if (hasMetaTag && hasAppliedTag && hasAppliedText && isVisible) {
+            console.log(`✅ ${subslotId}: 仕様書完全準拠！`);
+          } else {
+            console.log(`⚠️ ${subslotId}: 仕様書との差異があります`);
+          }
+        } else {
+          console.error(`❌ ${subslotId}: 画像要素が見つかりません`);
+        }
+      }, 2000 + (index * 500)); // 段階的にチェック
     }
   });
   
-  console.log('🐛 === デバッグ終了 ===');
+  console.log('\n🧪 ==========================================');
+  console.log('🧪 テスト完了まで数秒お待ちください...');
+  console.log('🧪 ==========================================');
 }
 
-// 🛠️ デバッグ関数：特定単語の詳細マッチング確認
-function debugWordMatching(word) {
-  console.log('🔍 === 単語マッチング詳細 ===');
-  console.log('🔍 対象単語:', word);
-  
-  const searchWords = extractWordsWithStemming(word);
-  console.log('🔍 抽出単語:', searchWords);
-  
-  console.log('🔍 === メタタグ全件検索 ===');
-  let foundMatches = [];
-  
-  for (const imageData of imageMetaTags) {
-    for (const metaTag of imageData.meta_tags) {
-      if (searchWords.includes(metaTag.toLowerCase())) {
-        foundMatches.push({
-          image: imageData.image_file,
-          metaTag: metaTag,
-          priority: imageData.priority || 1
-        });
-        console.log(`🎯 マッチ: "${metaTag}" → ${imageData.image_file} (優先度: ${imageData.priority || 1})`);
-      }
-    }
-  }
-  
-  console.log('🔍 マッチ総数:', foundMatches.length);
-  console.log('🔍 === 詳細終了 ===');
-  return foundMatches;
-}
-
-// 🆕 日本語テキスト用の簡易マッチング（英語キーワードを含む場合）
-function findImageForJapaneseText(text) {
-  console.log('🇯🇵 日本語テキスト用画像検索:', text);
-  
-  // 日本語テキストから英語キーワードを抽出する簡易ロジック
-  const commonMappings = {
-    '過去完了': 'past perfect',
-    '完了': 'perfect',
-    '過去': 'past',
-    '進行': 'progressive',
-    '現在': 'present',
-    '未来': 'future',
-    'なる': 'become',
-    'する': 'do',
-    'ある': 'be',
-    'いる': 'be'
-  };
-  
-  for (const [japanese, english] of Object.entries(commonMappings)) {
-    if (text.includes(japanese)) {
-      console.log(`🎯 日本語マッピング発見: "${japanese}" → "${english}"`);
-      const result = findImageByMetaTag(english);
-      if (result) {
-        console.log(`✅ 日本語マッピング成功: "${text}" → ${result.image_file}`);
-        return result;
-      }
-    }
-  }
-  
-  console.log('🔍 日本語マッピングでマッチなし');
-  return null;
-}
-
-// 🎯 window.fullSlotPoolからサブスロット用の英語例文を取得する関数
-function getEnglishTextFromSlotPool(subslotId, parentSlotId) {
-  // window.fullSlotPoolが存在しない場合はフォールバック
-  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
-    console.warn('⚠️ window.fullSlotPoolが見つかりません。DOM要素から取得を試行します。');
-    return getEnglishTextFromDOM(subslotId);
-  }
-  
-  // サブスロットIDからスロット種別を抽出
-  // 例: 'slot-c1-sub-c1' → スロット種別='C1', サブスロット種別='C1'
-  const slotMatch = subslotId.match(/slot-([a-z0-9]+)-sub-([a-z0-9]+)/i);
-  if (!slotMatch) {
-    console.warn(`⚠️ サブスロットIDの解析に失敗: ${subslotId}`);
-    return getEnglishTextFromDOM(subslotId);
-  }
-  
-  const [, parentSlotType, subslotType] = slotMatch;
-  const targetSlotType = subslotType.toUpperCase(); // 'c1' → 'C1'
-  
-  console.log(`🔍 サブスロット解析: ${subslotId} → 親=${parentSlotType}, 対象=${targetSlotType}`);
-  
-  // window.fullSlotPoolから該当するサブスロットデータを検索
-  const subslotData = window.fullSlotPool.find(entry => 
-    entry.Slot === targetSlotType && 
-    entry.SubslotID && 
-    entry.SubslotID.includes(parentSlotType.toLowerCase())
-  );
-  
-  if (subslotData && subslotData.SubslotElement) {
-    console.log(`✅ SlotPool検索成功: ${subslotId} → "${subslotData.SubslotElement}"`);
-    return subslotData.SubslotElement;
-  }
-  
-  console.log(`🔍 SlotPool検索失敗、上位スロット方式でDOMフォールバック: ${subslotId}`);
-  return getEnglishTextFromDOM(subslotId);
-}
-
-// 🔄 フォールバック用：DOM要素から英語例文を取得（上位スロットと同じロジック）
-function getEnglishTextFromDOM(subslotId) {
-  const subslotElement = document.getElementById(subslotId);
-  if (!subslotElement) {
-    return null;
-  }
-  
-  // 🎯 上位スロットと同じ優先順位：.slot-phrase（英語例文）が最優先
-  const phraseElement = subslotElement.querySelector('.slot-phrase');
-  const textElement = subslotElement.querySelector('.slot-text');
-  
-  const currentPhraseText = phraseElement ? phraseElement.textContent.trim() : '';
-  const currentTextText = textElement ? textElement.textContent.trim() : '';
-  const currentText = currentPhraseText || currentTextText; // 上位スロットと同じロジック
-  
-  console.log(`🔄 DOM検索(上位スロット方式): ${subslotId} → phrase:"${currentPhraseText}" text:"${currentTextText}" → 選択:"${currentText}"`);
-  
-  return currentText || null;
-}
-
-// グローバル公開
-window.debugStrictMatching = debugStrictMatching;
-window.debugWordMatching = debugWordMatching;
+// グローバルに公開
+window.testSubslotImageSystemCompliance = testSubslotImageSystemCompliance;
 
 // グローバル関数として公開
 window.initializeUniversalImageSystem = initializeUniversalImageSystem;
@@ -1364,6 +1254,12 @@ function applyImageToSubslot(subslotId, phraseText) {
   
   console.log('🔄 サブスロット キャッシュバスター付きURL:', imageUrlWithCacheBuster);
   
+  // 🆕 image_auto_hide.js対策：メタタグ属性を設定（仕様書準拠）
+  imgElement.setAttribute('data-meta-tag', 'true');
+  imgElement.setAttribute('data-meta-tag-applied', imageData.meta_tags ? imageData.meta_tags[0] : phraseText);
+  imgElement.setAttribute('data-applied-text', phraseText);
+  imgElement.classList.remove('auto-hidden-image');
+  
   // 強制的に表示状態にする
   imgElement.style.display = 'block';
   imgElement.style.visibility = 'visible';
@@ -1388,6 +1284,12 @@ function applyImageToSubslot(subslotId, phraseText) {
   // 画像読み込み完了後に再度表示を確認
   imgElement.onload = function() {
     console.log('🎨 サブスロット画像読み込み完了:', newImagePath);
+    
+    // 🆕 image_auto_hide.js対策を再適用（仕様書準拠）
+    this.setAttribute('data-meta-tag', 'true');
+    this.setAttribute('data-meta-tag-applied', imageData.meta_tags ? imageData.meta_tags[0] : phraseText);
+    this.setAttribute('data-applied-text', phraseText);
+    this.classList.remove('auto-hidden-image');
     this.style.display = 'block';
     this.style.visibility = 'visible';
     this.style.opacity = '1';
