@@ -1,4 +1,3 @@
-
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -81,6 +80,17 @@ export function randomizeAll(slotData) {
   window.fullSlotPool = groupSlots.map(slot => ({ ...slot }));
   console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
   console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
+
+  // 🔄 サブスロット同期処理を実行
+  if (typeof window.syncSubslotsFromJson === 'function') {
+    window.syncSubslotsFromJson(selectedSlots);
+    console.log("✅ randomizeAll後のサブスロット同期完了");
+  } else if (typeof syncSubslotsFromJson === 'function') {
+    syncSubslotsFromJson(selectedSlots);
+    console.log("✅ randomizeAll後のサブスロット同期完了");
+  } else {
+    console.warn("⚠️ syncSubslotsFromJson関数が見つかりません");
+  }
 
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",

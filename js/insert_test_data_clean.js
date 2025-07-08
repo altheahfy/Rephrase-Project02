@@ -839,803 +839,149 @@ function syncUpperSlotsFromJson(data) {
 }
 
 // ✅ サブスロット同期機能の実装（完全リセット＋再構築方式）
-// function syncSubslotsFromJson(data) {
-//   console.log("🔄 サブスロット同期（完全リセット＋再構築）開始");
-//   if (!data || !Array.isArray(data)) {
-//     console.warn("⚠ サブスロット同期: データが無効です");
-//     return;
-//   }
-  
-//   // DisplayAtTopの要素を特定（サブスロットから除外するため）
-//   const displayAtTopItem = data.find(d => d.DisplayAtTop);
-  
-//   // サブスロット用のデータをフィルタリング
-//   const subslotData = data.filter(item => item.SubslotID && item.SubslotID !== "");
-//   console.log(`📊 サブスロット対象件数: ${subslotData.length}`);
-//   
-//   // 🧹 STEP1: 全サブスロットコンテナをクリア
-//   const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
-//   console.log(`🧹 クリア対象サブスロットコンテナ: ${allSubContainers.length}件`);
-//   
-//   allSubContainers.forEach(container => {
-//     // 子要素を全て削除
-//     while (container.firstChild) {
-//       container.removeChild(container.firstChild);
-//     }
-//     console.log(`🧹 ${container.id} を完全クリア`);
-//   });
-  
-//   // 🔧 STEP2: display_orderでソートしてから再構築
-//   // display_orderによる正しい順序でソート
-//   const sortedSubslotData = subslotData.sort((a, b) => {
-//     // まず親スロットで並べ、次にdisplay_orderで並べる
-//     if (a.Slot !== b.Slot) {
-//       return a.Slot.localeCompare(b.Slot);
-//     }
-//     return (a.display_order || 0) - (b.display_order || 0);
-//   });
-  
-//   console.log(`📊 display_orderでソート完了: ${sortedSubslotData.length}件`);
-//   sortedSubslotData.forEach((item, index) => {
-//     console.log(`  ${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
-//   });
-  
-//   sortedSubslotData.forEach(item => {
-//     try {
-//       // DisplayAtTopの要素をサブスロットから除外
-//       if (displayAtTopItem && 
-//           displayAtTopItem.DisplayText && 
-//           item.SubslotElement === displayAtTopItem.DisplayText) {
-//         console.log(`🚫 DisplayAtTop対象のため除外: ${item.SubslotElement} (${item.Slot}-${item.SubslotID})`);
-//         return;
-//       }
-
-//       // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
-//       const parentSlot = item.Slot.toLowerCase();
-//       const subslotId = item.SubslotID.toLowerCase();
-//       const fullSlotId = `slot-${parentSlot}-${subslotId}`;
-//       console.log(` サブスロット生成: ${fullSlotId}`);
-//       
-//       // 親コンテナを検索（slot-[親スロット名]-sub）
-//       const parentContainerId = `slot-${parentSlot}-sub`;
-//       const parentContainer = document.getElementById(parentContainerId);
-//       
-//       if (!parentContainer) {
-//         console.warn(`⚠ 親コンテナが見つかりません: ${parentContainerId}`);
-//         return;
-//       }
-//       
-//       // 新しいサブスロットDOM要素を生成
-//       const slotElement = document.createElement('div');
-//       slotElement.id = fullSlotId;
-//       slotElement.className = 'slot-container';
-//       
-//       // 🏷️ ラベル要素を作成（最初に追加）
-//       const labelElement = document.createElement('label');
-//       labelElement.textContent = subslotId.toUpperCase();
-//       labelElement.style.cssText = `
-//         display: block;
-//         font-weight: bold;
-//         margin-bottom: 5px;
-//         color: #333;
-//         font-size: 14px;
-//       `;
-//       
-//       // phrase要素を作成
-//       const phraseElement = document.createElement('div');
-//       phraseElement.className = 'slot-phrase';
-//       if (item.SubslotElement) {
-//         phraseElement.textContent = item.SubslotElement;
-//       }
-//       
-//       // text要素を作成
-//       const textElement = document.createElement('div');
-//       textElement.className = 'slot-text';
-//       if (item.SubslotText) {
-//         textElement.textContent = item.SubslotText;
-//       }
-//       
-//       // 要素を組み立て（ラベルを最初に追加）
-//       slotElement.appendChild(labelElement);
-//       slotElement.appendChild(phraseElement);
-//       slotElement.appendChild(textElement);
-//       
-//       // 親コンテナに追加
-//       parentContainer.appendChild(slotElement);
-//       
-//       console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
-//       
-//     } catch (err) {
-//       console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
-//     }
-//   });
-  
-//   console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
-//   
-//   // 🆕 サブスロット同期後にスロット幅調整を実行
-//   setTimeout(() => {
-//     if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
-//       window.adjustSlotWidthsBasedOnText();
-//     }
-//   }, 50);
-//   
-//   // 🏷️ サブスロット同期後にラベルを復元
-//   setTimeout(() => {
-//     if (window.restoreSubslotLabels) {
-//       window.restoreSubslotLabels();
-//       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
-//     }
-//     
-//     // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
-//     // if (typeof window.processAllImagesWithCoordination === 'function') {
-//     //   window.processAllImagesWithCoordination();
-//     // }
-//   }, 100);
-// }
-
-// 指定されたコンテナ内のサブスロットを order に従ってDOMを直接並べ替える関数
-function reorderSubslotsInContainer(container, jsonData) {
-  if (!container || !jsonData) {
-    console.warn("⚠ reorderSubslotsInContainer: コンテナまたはデータがありません");
-    return;
-  }
-  const subslots = container.querySelectorAll(".subslot");
-  if (subslots.length <= 1) {
-    console.log(`ℹ️ ${container.id} には並べ替えが必要なサブスロットが1つ以下です`);
-    return; // 並べ替える必要なし
-  }
-
-  console.log(`🔢 DOM並べ替え実行: ${container.id} (${subslots.length}個の要素)`);
-
-  // container.id = "slot-m1-sub" -> parentSlotId = "m1"
-  const parentSlotId = container.id.replace("slot-", "").replace("-sub", "").toUpperCase();
-  console.log(`親スロットID: ${parentSlotId}`);
-
-  const elementsWithOrder = Array.from(subslots).map(el => {
-    // id例: slot-m1-sub-s, slot-m1-sub-x など
-    // サブスロットID部分を正確に抽出
-    const match = el.id.match(/^slot-([^-]+)-sub-(.+)$/);
-    let slotKey = null, subslotKey = null;
-    if (match) {
-      slotKey = match[1];
-      subslotKey = match[2];
-    } else {
-      // 旧形式: slot-m1-sub など
-      const match2 = el.id.match(/^slot-([^-]+)-sub$/);
-      if (match2) {
-        slotKey = match2[1];
-        subslotKey = '';
-      }
-    }
-    // JSONのSubslotIDと完全一致させる
-    let foundData = null;
-    if (slotKey !== null) {
-      foundData = jsonData.find(d =>
-        d.Slot?.toUpperCase() === parentSlotId &&
-        ((d.SubslotID?.toLowerCase() === `sub-${subslotKey}`) ||
-         (d.SubslotID?.toLowerCase() === subslotKey)) // 柔軟に両方対応
-      );
-    }
-    const order = foundData ? foundData.display_order : 999;
-    console.log(`  - サブスロットDOM: ${el.id} → slotKey: ${slotKey}, subslotKey: ${subslotKey}, JSONマッチ: ${!!foundData}, order=${order}`);
-    if(foundData){
-      console.log(`    ✅ データ発見 (Slot: ${foundData.Slot}, SubslotID: ${foundData.SubslotID}), order=${order}`);
-    } else {
-      console.log(`    ❌ データ未発見 (親: ${parentSlotId}, subslotKey: ${subslotKey})`);
-    }
-    return { el, order };
-  });
-
-  elementsWithOrder.sort((a, b) => a.order - b.order);
-
-  console.log("📊 ソート後の順序:", elementsWithOrder.map(item => ({id: item.el.id, order: item.order})));
-  
-  console.log("🔄 DOM要素の再配置を開始");
-  elementsWithOrder.forEach(item => {
-    container.appendChild(item.el);
-  });
-
-  console.log(`✅ DOM並べ替え完了: ${container.id}`);
-}
-
-// 新しい順序付け関数
-function applyDisplayOrder(data) {
+function syncSubslotsFromJson(data) {
+  console.log("🔄 サブスロット同期（完全リセット＋再構築）開始");
   if (!data || !Array.isArray(data)) {
-    console.warn("⚠ applyDisplayOrder: 無効なデータです");
+    console.warn("⚠ サブスロット同期: データが無効です");
     return;
   }
-
-  console.log("🔢 表示順序の適用を開始します");
-  // ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
-  const dynamicArea = document.getElementById('dynamic-slot-area');
-  // dynamicAreaが存在しない場合は処理を中断
-  if (!dynamicArea) {
-      console.error("❌ 動的記載エリア #dynamic-slot-area が見つかりません。順序付けを中止します。");
-      return;
-  }
-
-  // 上位スロットの順序を適用
-  const upperSlots = data.filter(item => !item.SubslotID || item.SubslotID === "");
-  upperSlots.forEach(item => {
-    if (item.Slot && typeof item.Slot_display_order !== 'undefined') {
-      const slotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}`);
-      // 要素が存在し、かつ動的エリアの子要素ではない場合にのみ処理
-      if (slotElement && !dynamicArea.contains(slotElement)) {
-        slotElement.style.order = item.Slot_display_order;
-        console.log(`✅ 静的上位スロット[${slotElement.id}]に order: ${item.Slot_display_order} を適用`);
-      }
+  
+  // DisplayAtTopの要素を特定（サブスロットから除外するため）
+  const displayAtTopItem = data.find(d => d.DisplayAtTop);
+  
+  // サブスロット用のデータをフィルタリング
+  const subslotData = data.filter(item => item.SubslotID && item.SubslotID !== "");
+  console.log(`📊 サブスロット対象件数: ${subslotData.length}`);
+  
+  // 🧹 STEP1: 全サブスロットコンテナをクリア
+  const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
+  console.log(`🧹 クリア対象サブスロットコンテナ: ${allSubContainers.length}件`);
+  
+  allSubContainers.forEach(container => {
+    // 子要素を全て削除
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
+    console.log(`🧹 ${container.id} を完全クリア`);
   });
-
-  // サブスロットの順序を適用
-  const subSlots = data.filter(item => item.SubslotID && item.SubslotID !== "");
-  subSlots.forEach(item => {
-    if (item.Slot && item.SubslotID && typeof item.display_order !== 'undefined') {
-      const subSlotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}-sub-${item.SubslotID.toLowerCase()}`);
-      // 要素が存在し、かつ動的エリアの子要素ではない場合にのみ処理
-      if (subSlotElement && !dynamicArea.contains(subSlotElement)) {
-        subSlotElement.style.order = item.display_order;
-        console.log(`✅ 静的サブスロット[${subSlotElement.id}]に order: ${item.display_order} を適用`);
-      }
+  
+  // 🔧 STEP2: display_orderでソートしてから再構築
+  // display_orderによる正しい順序でソート
+  const sortedSubslotData = subslotData.sort((a, b) => {
+    // まず親スロットで並べ、次にdisplay_orderで並べる
+    if (a.Slot !== b.Slot) {
+      return a.Slot.localeCompare(b.Slot);
     }
+    return (a.display_order || 0) - (b.display_order || 0);
   });
-
-  // すべてのサブスロットコンテナに flexbox を適用して order を有効化
-  const subSlotContainers = document.querySelectorAll('[id$="-sub"]');
-  subSlotContainers.forEach(container => {
-      // .visible クラスを持つ（＝表示されている）コンテナのみを対象
-      if (container.classList.contains('visible')) {
-          container.style.display = 'flex';
-          container.style.flexWrap = 'wrap';
-          container.style.gap = '8px';
-          console.log(`✅ サブスロットコンテナ [${container.id}] にflexboxを適用`);
-      }
+  
+  console.log("📊 display_orderでソート完了: " + sortedSubslotData.length + "件");
+  sortedSubslotData.forEach((item, index) => {
+    console.log("  " + (index + 1) + ". " + item.Slot + "-" + item.SubslotID + ": display_order=" + item.display_order);
   });
-
-  console.log("✅ 表示順序の適用が完了しました");
-}
-
-// JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
-window.safeJsonSync = function(data) {
-  try {
-    // 重複実行防止のためのフラグ
-    if (window.isSyncInProgress) {
-      console.log("⏳ 同期処理が既に実行中のため、このリクエストはスキップします");
-      return;
-    }
-    window.isSyncInProgress = true;
-    
-    console.log("🔄 同期処理を開始します");
-    if (!data || !Array.isArray(data)) {
-      console.warn("⚠ 同期処理に渡されたデータが無効です:", typeof data);
-      if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
-        console.log("✅ window.loadedJsonDataを代わりに使用します");
-        data = window.loadedJsonData;
-      } else {
-        console.error("❌ 有効なJSONデータがありません");
-        window.isSyncInProgress = false;
-        
-        // 1秒後に再試行
-        setTimeout(() => {
-          console.log("🔄 JSONデータが無効だったため再試行します");
-          if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
-            window.safeJsonSync(window.loadedJsonData);
-          }
-        }, 1000);
+  
+  sortedSubslotData.forEach(item => {
+    try {
+      // DisplayAtTopの要素をサブスロットから除外
+      if (displayAtTopItem && 
+          displayAtTopItem.DisplayText && 
+          item.SubslotElement === displayAtTopItem.DisplayText) {
+        console.log("🚫 DisplayAtTop対象のため除外: " + item.SubslotElement + " (" + item.Slot + "-" + item.SubslotID + ")");
         return;
       }
-    }
-    
-    // 上位スロット同期を実行
-    try {
-      syncUpperSlotsFromJson(data);
-      console.log("✅ 上位スロットの同期が完了");
-    } catch (upperSlotError) {
-      console.error("❌ 上位スロット同期中にエラーが発生:", upperSlotError.message);
-    }
-    
-    // サブスロット同期関数があれば実行
-    if (typeof syncSubslotsFromJson === 'function') {
-      try {
-        syncSubslotsFromJson(data);
-        console.log("✅ サブスロットの同期が完了");
-      } catch (subslotError) {
-        console.error("❌ サブスロット同期中にエラーが発生:", subslotError.message);
-      }
-    }
-    
-    // 分離疑問詞表示の更新
-    try {
-      if (typeof displayTopQuestionWord === 'function') {
-        displayTopQuestionWord();
-        console.log("✅ 分離疑問詞表示の更新が完了");
-      }
-    } catch (displayError) {
-      console.error("❌ 分離疑問詞表示更新中にエラーが発生:", displayError.message);
-    }
-    
-    // 新機能：表示順の適用処理
-    try {
-      // スロットの表示順を適用
-      if (typeof applyOrderToAllSlots === 'function') {
-        applyOrderToAllSlots(data);
-        console.log("✅ スロット表示順の適用が完了");
+
+      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
+      const parentSlot = item.Slot.toLowerCase();
+      const subslotId = item.SubslotID.toLowerCase();
+      const fullSlotId = `slot-${parentSlot}-${subslotId}`;
+      console.log("📍 サブスロット生成: " + fullSlotId);
+      
+      // 親コンテナを検索（slot-[親スロット名]-sub）
+      const parentContainerId = `slot-${parentSlot}-sub`;
+      const parentContainer = document.getElementById(parentContainerId);
+      
+      if (!parentContainer) {
+        console.warn("⚠ 親コンテナが見つかりません: " + parentContainerId);
+        return;
       }
       
-      // 必要に応じて個別のサブスロット順序を適用（特定の上位スロットのみ）
-      // M1スロットのサブスロット順序設定例
-      if (typeof reorderSubslots === 'function') {
-        // もっとも重要な構文スロットのサブスロット順序を整理
-        reorderSubslots('slot-m1', data);
-        reorderSubslots('slot-s', data);
-        reorderSubslots('slot-v', data);
-        reorderSubslots('slot-c', data);
-        reorderSubslots('slot-o', data);
-        console.log("✅ 主要スロットのサブスロット順序適用が完了");
-      }
-
-      // ★新しい順序付け関数を呼び出す
-      applyDisplayOrder(data);
-
-    } catch (orderError) {
-      console.error("❌ 表示順適用中にエラーが発生しました:", orderError.message);
-    }
-    
-    // 空のスロット非表示処理
-    try {
-      if (typeof hideEmptySlots === 'function') {
-        hideEmptySlots(data);
-        console.log("✅ 空のスロット非表示処理が完了");
-      }
-    } catch (hideError) {
-      console.error("❌ 空のスロット非表示処理中にエラーが発生:", hideError.message);
-    }
-    
-    // 同期完了
-    window.isSyncInProgress = false;
-  } catch (err) {
-    console.error("❌ 同期処理中にエラーが発生しました:", err.message);
-    console.error("エラーの詳細:", err.stack);
-    window.isSyncInProgress = false; // エラーが発生してもフラグはリセット
-  }
-};
-
-// ランダマイズ後の同期を確保するためのMutationObserverを設定
-// ⚠️【編集禁止】動的記載エリア(dynamic-slot-area)は読み取り専用です
-window.setupSyncObserver = function() {
-  try {
-    // ⚠️【編集禁止】動的エリアの変更を監視（読み取り専用）
-    const dynamicArea = document.getElementById("dynamic-slot-area");
-    if (!dynamicArea) {
-      console.warn("⚠ 監視対象の動的記載エリアが見つかりません");
-      return;
-    }
-    
-    console.log("👁 動的記載エリアの監視を開始します");
-    
-    // 変更の監視設定
-    const observer = new MutationObserver(function(mutations) {
-      console.log("👀 動的記載エリアに変更を検出しました");
+      // 新しいサブスロットDOM要素を生成
+      const slotElement = document.createElement('div');
+      slotElement.id = fullSlotId;
+      slotElement.className = 'subslot-container';
       
-      // 処理が重複しないよう、タイマーでデバウンス
-      if (window.syncDebounceTimer) {
-        clearTimeout(window.syncDebounceTimer);
+      // 🏷️ ラベル要素を作成（Grid行1）
+      const labelElement = document.createElement('label');
+      labelElement.textContent = subslotId.toUpperCase();
+      labelElement.style.cssText = `
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 14px;
+        grid-row: 1;
+      `;
+      
+      // 空のslot-imageコンテナを作成（Grid行2）
+      const imageElement = document.createElement('div');
+      imageElement.className = 'slot-image';
+      imageElement.style.cssText = 'grid-row: 2 !important;';
+      
+      // phrase要素を作成（Grid行3）
+      const phraseElement = document.createElement('div');
+      phraseElement.className = 'slot-phrase';
+      phraseElement.style.cssText = 'grid-row: 3 !important;';
+      if (item.SubslotElement) {
+        phraseElement.textContent = item.SubslotElement;
       }
       
-      window.syncDebounceTimer = setTimeout(() => {
-        console.log("🔄 変更検出による同期処理を実行します");
-        if (window.loadedJsonData) {
-          window.safeJsonSync(window.loadedJsonData);
-        }
-      }, 300); // 300ミリ秒の遅延で実行
-    });
-    
-    // 設定を適用して監視開始
-    observer.observe(dynamicArea, { 
-      childList: true, 
-      subtree: true, 
-      characterData: true,
-      attributes: true
-    });
-    
-    console.log("✅ MutationObserverの設定が完了しました");
-    return observer;
-  } catch (err) {
-    console.error("❌ 監視設定中にエラーが発生しました:", err.message);
-  }
-};
-
-// ランダマイザーの監視と同期（ランダマイザー用の特別対応）
-window.setupRandomizerSync = function() {
-  try {
-    // ランダマイズボタンを探す
-    const randomizerButtons = document.querySelectorAll('button[data-action="randomize"], button.randomize-button, #randomize-all');
-    if (randomizerButtons.length === 0) {
-      console.warn("⚠ ランダマイズボタンが見つかりません");
-      return;
-    }
-    
-    console.log(`🎲 ランダマイズボタンを ${randomizerButtons.length}個 検出しました`);
-    
-    // 各ボタンにイベントリスナーを追加
-    randomizerButtons.forEach((button, index) => {
-      // 既存のイベントハンドラを保持するための対応
-      const originalClickHandler = button.onclick;
+      // text要素を作成（Grid行4）
+      const textElement = document.createElement('div');
+      textElement.className = 'slot-text';
+      textElement.style.cssText = 'grid-row: 4 !important;';
+      if (item.SubslotText) {
+        textElement.textContent = item.SubslotText;
+      }
       
-      button.addEventListener('click', function(event) {
-        console.log(`🎲 ランダマイズボタンがクリックされました (${index + 1})`);
-        
-        // ランダマイズ処理完了後に確実に同期処理を行う
-        setTimeout(() => {
-          console.log("🔄 ランダマイズ後の同期処理を実行します (遅延: 1000ms)");
-          if (window.loadedJsonData) {
-            // ランダマイズ後は強制的に上位スロットを再同期
-            window.DEBUG_SYNC = true; // 詳細ログを有効化
-            
-            // 表示順制御も再適用
-            if (typeof applyOrderToAllSlots === 'function') {
-              console.log("🔢 ランダマイズ後のスロット表示順適用");
-              applyOrderToAllSlots(window.loadedJsonData);
-            }
-            
-            // 全体の再同期
-            window.safeJsonSync(window.loadedJsonData);
-            
-            setTimeout(() => {
-              window.DEBUG_SYNC = false; // ログ量を元に戻す
-            }, 500);
-          }
-        }, 1000); // 1000ms（1秒）に延長 - ランダマイズ処理が確実に完了するのを待つ
-      }, true); // キャプチャフェーズでイベントをキャッチ
+      // 要素を組み立て（Grid行順序で追加）
+      slotElement.appendChild(labelElement);    // Grid行1
+      slotElement.appendChild(imageElement);    // Grid行2
+      slotElement.appendChild(phraseElement);   // Grid行3
+      slotElement.appendChild(textElement);     // Grid行4
       
-      console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
-    });
-    
-    // window.randomizeAllSlots関数をオーバーライド（存在する場合）
-    if (typeof window.randomizeAllSlots === 'function') {
-      const originalRandomizeFunc = window.randomizeAllSlots;
-      window.randomizeAllSlots = function(...args) {
-        console.log("🎲 randomizeAllSlots関数が呼び出されました");
-        const result = originalRandomizeFunc.apply(this, args);
-        
-        // ランダマイズ処理完了後に同期処理を行う
-        setTimeout(() => {
-          console.log("🔄 randomizeAllSlots後の同期処理を実行します (遅延: 1000ms)");
-          if (window.loadedJsonData) {
-            // ランダマイズ後は強制的に上位スロットを再同期
-            window.DEBUG_SYNC = true; // 詳細ログを有効化
-            
-            // 表示順制御も再適用
-            if (typeof applyOrderToAllSlots === 'function') {
-              console.log("🔢 randomizeAllSlots後のスロット表示順適用");
-              applyOrderToAllSlots(window.loadedJsonData);
-            }
-            
-            window.safeJsonSync(window.loadedJsonData);
-            setTimeout(() => {
-              window.DEBUG_SYNC = false; // ログ量を元に戻す
-            }, 500);
-          }
-        }, 1000); // 1000ms（1秒）に延長
-        
-        return result;
-      };
-      console.log("✅ randomizeAllSlots関数をオーバーライドしました");
+      // 親コンテナに追加
+      parentContainer.appendChild(slotElement);
+      
+      console.log("✅ サブスロット完全生成（Grid構造）: " + fullSlotId + " | label:\"" + subslotId.toUpperCase() + "\" | phrase:\"" + item.SubslotElement + "\" | text:\"" + item.SubslotText + "\"");
+      
+    } catch (err) {
+      console.error("❌ サブスロット処理エラー: " + err.message, item);
     }
-    
-    return true;
-  } catch (err) {
-    console.error("❌ ランダマイザー監視設定中にエラーが発生しました:", err.message);
-    return false;
-  }
-};
-
-// ページ読み込み完了時に監視を開始
-document.addEventListener("DOMContentLoaded", function() {
-  console.log("🌐 DOMContentLoaded イベント発生");
+  });
   
-  // 動的エリアの位置調整
-  ensureDynamicAreaPosition();
+  console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
   
+  // 🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
-    window.setupSyncObserver();
-    window.setupRandomizerSync();
-    
-    // 初期同期も実行
-    if (window.loadedJsonData) {
-      window.safeJsonSync(window.loadedJsonData);
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      window.adjustSlotWidthsBasedOnText();
     }
-    
-    // JSONデータ変更を監視（loadedJsonDataの監視）- 改良版
-    let lastJsonDataSignature = "";
-    
-    // データの特徴的な部分から署名を生成する関数
-    function getDataSignature(data) {
-      if (!data || !Array.isArray(data) || data.length === 0) return "";
-      try {
-        // スロットの内容からチェックサムを生成
-        const sampleItems = data.slice(0, 3); // 最初の3件のみ使用
-        const signature = sampleItems.map(item => 
-          `${item.Slot}:${item.SlotPhrase && item.SlotPhrase.substring(0, 10)}`
-        ).join('|');
-        return signature;
-      } catch (e) {
-        return "";
-      }
-    }
-    
-    // 低頻度で定期チェック (3秒ごと)
-    setInterval(() => {
-           if (window.loadedJsonData) {
-        const newSignature = getDataSignature(window.loadedJsonData);
-        if (newSignature && newSignature !== lastJsonDataSignature) {
-          console.log("🔄 window.loadedJsonData の実質的な変更を検出");
-          window.safeJsonSync(window.loadedJsonData);
-          lastJsonDataSignature = newSignature;
-        }
-      }
-      
-      // 定期的に動的エリアの位置も確認
-      ensureDynamicAreaPosition();
-    }, 3000); // 3秒ごとに変更をチェック
-    
-    // 「詳細」ボタンクリック時に順序を再適用する
-    document.body.addEventListener('click', (event) => {
-        // クリックされたのが「.slot-container」内の要素かチェック
-        const slotContainer = event.target.closest('.slot-container');
-        if (slotContainer) {
-            console.log('スロットコンテナ内の要素がクリックされました。100ms後に順序を再適用します。');
-            // 元のスクリプトがコンテナを表示するのを待つために少し遅延させる
-            setTimeout(() => {
-                if (window.loadedJsonData) {
-                    applyDisplayOrder(window.loadedJsonData);
-                }
-            }, 100); // 100ミリ秒の遅延
-        }
-    });
-    
-  }, 500); // DOMが完全に構築されるのを待つ
-});
-
-// ⚠️【編集禁止】動的エリアの位置を調整する関数 - 動的記載エリアは変更厳禁
-function ensureDynamicAreaPosition() {
-  // ⚠️【編集禁止】動的エリアコンテナを取得（読み取り専用）
-  const container = document.getElementById("dynamic-area-container");
+  }, 50);
   
-  // コンテナが存在する場合
-  if (container) {
-    // コンテナが最後の要素でない場合は移動
-    if (container !== document.body.lastElementChild) {
-      // すべてのスロット関連要素とサブスロット要素の後に配置する
-      document.body.appendChild(container);
-      console.log("🔄 動的エリアコンテナを再配置しました");
+  // 🏷️ サブスロット同期後にラベルを復元＋画像処理
+  setTimeout(() => {
+    if (window.restoreSubslotLabels) {
+      window.restoreSubslotLabels();
+      console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
     }
     
-    // ⚠️【編集禁止】動的エリア内部の調整 - DOM構造変更厳禁
-    const dynamicArea = document.getElementById("dynamic-slot-area");
-    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
-    
-    if (dynamicArea && wrapper && !wrapper.contains(dynamicArea)) {
-      wrapper.appendChild(dynamicArea);
-      console.log("🔄 動的エリアをラッパー内に再配置しました");
+    // 🖼 画像処理：統合実行
+    if (typeof window.processAllImagesWithCoordination === 'function') {
+      window.processAllImagesWithCoordination();
+      console.log("🖼 サブスロット同期後の画像処理を実行しました");
     }
-  }
+  }, 100);
 }
 
-/**
- * デバッグ用：空のスロット検出状況を詳細にレポートする関数
- */
-function debugEmptySlots() {
-  if (!window.loadedJsonData) {
-    console.warn("⚠ window.loadedJsonData が存在しません");
-    return;
-  }
-
-  console.log("🔍 === 空のスロット検出デバッグ開始 ===");
-  
-  // 上位スロットの状況確認
-  const upperSlots = window.loadedJsonData.filter(item => 
-    item.SubslotID === "" && item.PhraseType === "word"
-  );
-  
-  console.log(`📊 上位スロット総数: ${upperSlots.length}`);
-  upperSlots.forEach(item => {
-    const slotId = `slot-${item.Slot.toLowerCase()}`;
-    const slotElement = document.getElementById(slotId);
-    const isEmpty = (!item.SlotPhrase || item.SlotPhrase.trim() === "") && 
-                   (!item.SlotText || item.SlotText.trim() === "");
-    
-    console.log(`🔍 上位スロット [${item.Slot}]:`);
-    console.log(`  - SlotPhrase: "${item.SlotPhrase}"`);
-    console.log(`  - SlotText: "${item.SlotText}"`);
-    console.log(`  - isEmpty: ${isEmpty}`);
-    console.log(`  - DOM要素存在: ${!!slotElement}`);
-    if (slotElement) {
-      console.log(`  - 現在のdisplay: ${window.getComputedStyle(slotElement).display}`);
-      console.log(`  - クラス: ${slotElement.className}`);
-    }
-  });
-
-  // サブスロットの状況確認
-  const subSlots = window.loadedJsonData.filter(item => 
-    item.SubslotID && item.SubslotID !== ""
-  );
-  
-  console.log(`📊 サブスロット総数: ${subSlots.length}`);
-  subSlots.forEach(item => {
-    const parentSlot = item.Slot.toLowerCase();
-    const subslotId = item.SubslotID.toLowerCase();
-    const fullSlotId = `slot-${parentSlot}-${subslotId}`;
-    const slotElement = document.getElementById(fullSlotId);
-    const isEmpty = (!item.SubslotElement || item.SubslotElement.trim() === "") && 
-                   (!item.SubslotText || item.SubslotText.trim() === "");
-
-    console.log(`🔍 サブスロット [${item.Slot}-${item.SubslotID}]:`);
-    console.log(`  - SubslotElement: "${item.SubslotElement}"`);
-    console.log(`  - SubslotText: "${item.SubslotText}"`);
-    console.log(`  - isEmpty: ${isEmpty}`);
-    console.log(`  - DOM要素存在: ${!!slotElement}`);
-    if (slotElement) {
-      console.log(`  - 現在のdisplay: ${window.getComputedStyle(slotElement).display}`);
-      console.log(`  - クラス: ${slotElement.className}`);
-    }
-  });
-
-  console.log("✅ === 空のスロット検出デバッグ終了 ===");
-}
-
-/**
- * 強制的に空のスロットを非表示にするテスト関数（デバッグ用・改良版）
- */
-function forceHideEmptySlots() {
-  console.log("🚀 強制的な空のスロット非表示テスト（改良版）を実行");
-  
-  // 全ての上位スロットを確認
-  const allUpperSlots = document.querySelectorAll('[id^="slot-"]:not([id*="-sub"])');
-  console.log(`📊 検出された上位スロット: ${allUpperSlots.length}件`);
-  
-  allUpperSlots.forEach(slot => {
-    const phraseEl = slot.querySelector('.slot-phrase');
-    const textEl = slot.querySelector('.slot-text');
-    
-    const phraseText = phraseEl ? phraseEl.textContent.trim() : '';
-    const textText = textEl ? textEl.textContent.trim() : '';
-    
-    // この上位スロットに関連するサブスロットを確認
-    const slotName = slot.id.replace('slot-', '');
-    const relatedSubSlots = document.querySelectorAll(`[id^="slot-${slotName}-sub-"]`);
-    
-    // 関連サブスロットに内容があるかチェック
-    let hasNonEmptySubslots = false;
-    relatedSubSlots.forEach(subSlot => {
-      const subPhraseEl = subSlot.querySelector('.slot-phrase');
-      const subTextEl = subSlot.querySelector('.slot-text');
-      const subPhraseText = subPhraseEl ? subPhraseEl.textContent.trim() : '';
-      const subTextText = subTextEl ? subTextEl.textContent.trim() : '';
-      
-      if (subPhraseText !== '' || subTextText !== '') {
-        hasNonEmptySubslots = true;
-      }
-    });
-    
-    console.log(`🔍 ${slot.id}:`);
-    console.log(`  - phrase: "${phraseText}"`);
-    console.log(`  - text: "${textText}"`);
-    console.log(`  - 関連サブスロット数: ${relatedSubSlots.length}`);
-    console.log(`  - 空でないサブスロットあり: ${hasNonEmptySubslots}`);
-    
-    // 判定：上位スロット自体が空 かつ 空でないサブスロットがない場合のみ非表示
-    const upperSlotIsEmpty = phraseText === '' && textText === '';
-    const shouldHide = upperSlotIsEmpty && !hasNonEmptySubslots;
-    
-    if (shouldHide) {
-      console.log(`  🙈 空のため非表示に設定: ${slot.id}`);
-      slot.style.display = 'none';
-      slot.classList.add('empty-slot-hidden', 'hidden');
-    } else {
-      console.log(`  👁 表示維持: ${slot.id} (理由: ${!upperSlotIsEmpty ? '上位スロットに内容' : 'サブスロットに内容'})`);
-      slot.style.display = '';
-      slot.classList.remove('empty-slot-hidden', 'hidden');
-    }
-  });
-  
-  // サブスロットの処理は従来通り
-  const allSubSlots = document.querySelectorAll('[id*="-sub-"]');
-  console.log(`📊 検出されたサブスロット: ${allSubSlots.length}件`);
-  
-  allSubSlots.forEach(slot => {
-    const phraseEl = slot.querySelector('.slot-phrase');
-    const textEl = slot.querySelector('.slot-text');
-    
-    const phraseText = phraseEl ? phraseEl.textContent.trim() : '';
-    const textText = textEl ? textEl.textContent.trim() : '';
-    
-    console.log(`🔍 ${slot.id}:`);
-    console.log(`  - phrase: "${phraseText}"`);
-    console.log(`  - text: "${textText}"`);
-    
-    if (phraseText === '' && textText === '') {
-      console.log(`  🙈 空のため非表示に設定: ${slot.id}`);
-      slot.style.display = 'none';
-      slot.classList.add('empty-slot-hidden', 'hidden');
-    } else {
-      console.log(`  👁 内容があるため表示: ${slot.id}`);
-      slot.style.display = '';
-      slot.classList.remove('empty-slot-hidden', 'hidden');
-    }
-  });
-}
-
-// 🆕 テキスト長に応じたスロット幅動的調整システム（改良版）
-function adjustSlotWidthsBasedOnText() {
-  console.log("🔧 スロット幅の動的調整を開始");
-  
-  const slotContainers = document.querySelectorAll('.slot-container');
-  
-  slotContainers.forEach(container => {
-    // 分離疑問詞エリアは幅調整から除外（単一単語のため）
-    if (container.id === 'display-top-question-word') {
-      console.log(`⏭ ${container.id}: 分離疑問詞エリアのため幅調整をスキップ`);
-      return;
-    }
-    
-    const phraseElement = container.querySelector('.slot-phrase');
-    const textElement = container.querySelector('.slot-text');
-    
-    if (!phraseElement && !textElement) return;
-    
-    // テキストの実際の表示幅を計算
-    const phraseText = phraseElement ? phraseElement.textContent.trim() : '';
-    const auxText = textElement ? textElement.textContent.trim() : '';
-    
-    let maxTextWidth = 0;
-    
-    // 英語テキスト（phraseElement）の表示幅を計算
-    if (phraseText && phraseElement) {
-      const tempSpan = document.createElement('span');
-      tempSpan.style.font = window.getComputedStyle(phraseElement).font;
-      tempSpan.style.visibility = 'hidden';
-      tempSpan.style.position = 'absolute';
-      tempSpan.textContent = phraseText;
-      document.body.appendChild(tempSpan);
-      maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
-      document.body.removeChild(tempSpan);
-    }
-    
-    // 補助テキスト（textElement）の表示幅を計算
-    if (auxText && textElement) {
-      const tempSpan = document.createElement('span');
-      tempSpan.style.font = window.getComputedStyle(textElement).font;
-      tempSpan.style.visibility = 'hidden';
-      tempSpan.style.position = 'absolute';
-      tempSpan.textContent = auxText;
-      document.body.appendChild(tempSpan);
-      maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
-      document.body.removeChild(tempSpan);
-    }
-    
-    // 実際の表示幅 + パディング + マージンを考慮して適切な幅を設定
-    const padding = 60; // パディング・ボーダー・マージンの合計（増加）
-    let targetWidth = Math.max(200, maxTextWidth + padding); // 最小幅200px（増加）
-    
-    // 長いテキストの場合はさらに余裕を持たせる
-    if (maxTextWidth > 150) {
-      targetWidth = maxTextWidth + 80; // より長いテキストには追加の余白
-    }
-    
-    // 最大幅制限（画面幅の80%程度まで）
-    const maxWidth = Math.min(800, window.innerWidth * 0.8);
-    targetWidth = Math.min(targetWidth, maxWidth);
-    
-    // 幅を適用
-    container.style.width = targetWidth + 'px';
-    container.style.minWidth = targetWidth + 'px';
-    
-    console.log(`📏 ${container.id}: 英語テキスト幅=${phraseText ? maxTextWidth : 0}px, 補助テキスト幅=${auxText ? 'calculated' : 0}px, 最大幅=${maxTextWidth}px, 適用幅=${targetWidth}px`);
-  });
-  
-  console.log("✅ スロット幅調整完了");
-}
-
-// 🆕 スロット幅調整をグローバル関数として公開
-window.adjustSlotWidthsBasedOnText = adjustSlotWidthsBasedOnText;
+// サブスロット同期関数をwindowオブジェクトにエクスポート
+window.syncSubslotsFromJson = syncSubslotsFromJson;
