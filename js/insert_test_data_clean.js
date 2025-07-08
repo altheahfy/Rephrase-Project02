@@ -890,10 +890,10 @@ function syncSubslotsFromJson(data) {
         return;
       }
 
-      // スロット要素ID構築（slot-[親スロット名]-sub-[サブスロットID]形式）
+      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
       const parentSlot = item.Slot.toLowerCase();
       const subslotId = item.SubslotID.toLowerCase();
-      const fullSlotId = `slot-${parentSlot}-sub-${subslotId}`;
+      const fullSlotId = `slot-${parentSlot}-${subslotId}`;
       console.log(`📍 サブスロット生成: ${fullSlotId}`);
       
       // 親コンテナを検索（slot-[親スロット名]-sub）
@@ -908,7 +908,7 @@ function syncSubslotsFromJson(data) {
       // 新しいサブスロットDOM要素を生成
       const slotElement = document.createElement('div');
       slotElement.id = fullSlotId;
-      slotElement.className = 'subslot-container';
+      slotElement.className = 'slot-container';
       
       // 🏷️ ラベル要素を作成（Grid行1）
       const labelElement = document.createElement('label');
@@ -926,28 +926,28 @@ function syncSubslotsFromJson(data) {
       const imageElement = document.createElement('div');
       imageElement.className = 'slot-image';
       imageElement.style.cssText = 'grid-row: 2 !important;';
-      
-      // text要素を作成（Grid行3）
-      const textElement = document.createElement('div');
-      textElement.className = 'slot-text';
-      textElement.style.cssText = 'grid-row: 3 !important;';
-      if (item.SubslotText) {
-        textElement.textContent = item.SubslotText;
-      }
-      
-      // phrase要素を作成（Grid行4）
+//       
+      // phrase要素を作成（Grid行3）
       const phraseElement = document.createElement('div');
       phraseElement.className = 'slot-phrase';
-      phraseElement.style.cssText = 'grid-row: 4 !important;';
+      phraseElement.style.cssText = 'grid-row: 3 !important;';
       if (item.SubslotElement) {
         phraseElement.textContent = item.SubslotElement;
+      }
+      
+      // text要素を作成（Grid行4）
+      const textElement = document.createElement('div');
+      textElement.className = 'slot-text';
+      textElement.style.cssText = 'grid-row: 4 !important;';
+      if (item.SubslotText) {
+        textElement.textContent = item.SubslotText;
       }
       
       // 要素を組み立て（Grid行順序で追加）
       slotElement.appendChild(labelElement);    // Grid行1
       slotElement.appendChild(imageElement);    // Grid行2
-      slotElement.appendChild(textElement);     // Grid行3
-      slotElement.appendChild(phraseElement);   // Grid行4
+      slotElement.appendChild(phraseElement);   // Grid行3
+      slotElement.appendChild(textElement);     // Grid行4
       
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
@@ -976,19 +976,8 @@ function syncSubslotsFromJson(data) {
     }
     
     // 🖼 画像処理：統合実行
-    if (typeof window.updateAllSlotImages === 'function') {
-      window.updateAllSlotImages();
-      console.log("🖼️ 上位スロット画像更新完了");
-    }
-    
-    // 🖼 サブスロット画像処理：全親スロットに対して実行
-    if (typeof window.updateSubslotImages === 'function') {
-      const parentSlots = ['s', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3']; // 全親スロット
-      parentSlots.forEach(parentSlot => {
-        window.updateSubslotImages(parentSlot);
-      });
-      console.log("🖼️ サブスロット画像更新完了");
-    }
+    if (typeof window.processAllImagesWithCoordination === 'function') {
+      window.processAllImagesWithCoordination();
       console.log("🖼 サブスロット同期後の画像処理を実行しました");
     }
   }, 100);
