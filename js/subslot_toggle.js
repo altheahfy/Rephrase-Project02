@@ -147,6 +147,32 @@ function toggleExclusiveSubslot(slotId) {
       console.log("🔍 window.handleSubslotDisplay =", window.handleSubslotDisplay);
     }
 
+    // 🖼️ C1サブスロット専用：全処理完了後に画像適用
+    if (slotId === 'c1') {
+      setTimeout(() => {
+        console.log('🖼️ C1サブスロット画像を遅延適用開始');
+        const c1Subslots = [
+          'slot-c1-sub-m1', 'slot-c1-sub-s', 'slot-c1-sub-aux', 'slot-c1-sub-m2',
+          'slot-c1-sub-v', 'slot-c1-sub-c1', 'slot-c1-sub-o1', 'slot-c1-sub-o2',
+          'slot-c1-sub-c2', 'slot-c1-sub-m3'
+        ];
+        
+        c1Subslots.forEach(subslotId => {
+          const container = document.getElementById(subslotId);
+          if (container && container.style.display !== 'none') {
+            const phraseEl = container.querySelector('.slot-phrase');
+            const textEl = container.querySelector('.slot-text');
+            const englishText = (phraseEl?.textContent || textEl?.textContent || '').trim();
+            
+            if (englishText && window.applyImageToSubslot) {
+              console.log(`🎯 C1遅延画像適用: ${subslotId} → "${englishText}"`);
+              window.applyImageToSubslot(subslotId, englishText);
+            }
+          }
+        });
+      }, 1000); // 1秒遅延で確実に全処理完了後に実行
+    }
+
   } else {
     // サブスロットを閉じる場合
     // 対象の親スロットとサブスロットエリアのクラス・インラインスタイルをリセット
