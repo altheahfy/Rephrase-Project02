@@ -1182,9 +1182,33 @@ function applyImageToSubslot(subslotId, phraseText) {
   }
   
   if (!imgElement) {
-    console.error('❌ サブスロット内に画像要素が見つかりません:', subslotId);
-    console.log('🔍 サブスロットHTML構造:', subslot.innerHTML);
-    return;
+    // 🆕 画像要素が存在しない場合は動的に作成
+    console.log('🔧 サブスロット内に画像要素が存在しないため、動的に作成します:', subslotId);
+    
+    imgElement = document.createElement('img');
+    imgElement.className = 'slot-image';
+    imgElement.src = 'slot_images/common/placeholder.png';
+    imgElement.alt = `image for ${subslotId}`;
+    imgElement.style.cssText = `
+      width: 180px;
+      height: 180px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      object-fit: cover;
+      display: block;
+      margin: 5px 0;
+    `;
+    
+    // ラベルの直後に画像要素を挿入
+    const label = subslot.querySelector('label');
+    if (label && label.nextSibling) {
+      subslot.insertBefore(imgElement, label.nextSibling);
+    } else {
+      // ラベルがない場合は先頭に挿入
+      subslot.insertBefore(imgElement, subslot.firstChild);
+    }
+    
+    console.log('✅ サブスロット画像要素を動的作成・挿入完了:', subslotId);
   }
   
   console.log('🔍 サブスロット画像要素発見:', imgElement);
