@@ -1516,13 +1516,13 @@ function applyImageToSubslot(subslotId, phraseText, forceRefresh = false) {
     imgElement.className = 'slot-image';
     imgElement.alt = `image for ${subslotId}`;
     imgElement.style.cssText = `
-      width: 120px;
-      height: 120px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      object-fit: cover;
+      width: 150px;
+      height: 150px;
+      border-radius: 5px;
+      border: 1px solid rgba(40, 167, 69, 0.6);
+      object-fit: fill !important;
       display: block;
-      margin: 3px 0;
+      margin: 5px 0;
     `;
     
     // ラベルの直後に画像要素を挿入
