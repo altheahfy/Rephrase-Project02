@@ -1272,9 +1272,9 @@ function updateSubslotImages(parentSlotId) {
     
     console.log(`🔍 サブスロット処理中: ${subslotId}, 英語例文: "${englishText}"`);
     
-    // 🎯 クリア処理完了後に画像適用（既存システムと協調）
-    applyImageAfterClear(subslotId, englishText);
-    console.log(`✅ サブスロット画像処理開始: ${subslotId} → "${englishText}"`);
+    // 🎯 サブスロット専用の画像適用（英語例文を使用）
+    applyImageToSubslot(subslotId, englishText);
+    console.log(`✅ サブスロット画像処理完了: ${subslotId} → "${englishText}"`);
   }
   
   console.log(`✅ サブスロット画像更新完了: ${parentSlotId}`);
@@ -1500,44 +1500,6 @@ function monitorSubslotImageState(subslotId, duration = 5000) {
         console.warn(`⚠️ 画像が非表示になりました: ${subslotId}`);
         console.log(`🔍 非表示時の要素:`, imgElement);
         console.log(`🔍 非表示時の親要素:`, subslot);
-        
-        // 🆕 詳細なCSS状態確認
-        console.log(`🔍 CSS詳細分析:`, {
-          inlineStyle: {
-            display: imgElement.style.display,
-            visibility: imgElement.style.visibility,
-            opacity: imgElement.style.opacity
-          },
-          computedStyle: {
-            display: computedStyle.display,
-            visibility: computedStyle.visibility,
-            opacity: computedStyle.opacity
-          },
-          classList: Array.from(imgElement.classList),
-          parentDisplay: window.getComputedStyle(subslot).display,
-          parentVisibility: window.getComputedStyle(subslot).visibility
-        });
-        
-        // 🆕 適用されているCSSルールを確認
-        const styles = window.getComputedStyle(imgElement);
-        console.log(`🔍 適用CSS:`, {
-          display: styles.getPropertyValue('display'),
-          visibility: styles.getPropertyValue('visibility'),
-          opacity: styles.getPropertyValue('opacity'),
-          position: styles.getPropertyValue('position'),
-          zIndex: styles.getPropertyValue('z-index')
-        });
-        
-        // 🆕 強制再表示を試行
-        console.log(`🛡️ 強制再表示を実行: ${subslotId}`);
-        imgElement.style.display = 'block !important';
-        imgElement.style.visibility = 'visible !important';
-        imgElement.style.opacity = '1 !important';
-        imgElement.style.position = 'static';
-        imgElement.style.zIndex = '1';
-        
-        // クラスによる非表示も解除
-        imgElement.classList.remove('auto-hidden-image', 'hidden', 'invisible');
       }
     } else {
       console.warn(`⚠️ 画像要素が見つかりません: ${subslotId}`);
@@ -1656,9 +1618,9 @@ function debugImageDisappearance() {
   // 詳細監視開始
   monitorSubslotImageState(testSubslotId, 10000);
   
-  // 画像適用（クリア処理完了待ち）
-  console.log('🖼️ クリア処理協調型の画像適用実行...');
-  applyImageAfterClear(testSubslotId, 'analyze');
+  // 画像適用
+  console.log('🖼️ 画像適用実行...');
+  applyImageToSubslot(testSubslotId, 'analyze');
   
   // 1秒後に再確認
   setTimeout(() => {
@@ -1675,67 +1637,9 @@ function debugImageDisappearance() {
   }, 1000);
 }
 
-// 🎯 クリア処理完了後の画像適用システム
-function applyImageAfterClear(subslotId, phraseText, maxRetries = 10, retryDelay = 200) {
-  console.log(`🔄 クリア処理完了待ち開始: ${subslotId}`);
-  
-  let retryCount = 0;
-  
-  const checkAndApply = () => {
-    const subslot = document.getElementById(subslotId);
-    if (!subslot) {
-      console.warn(`⚠️ サブスロット要素が見つかりません: ${subslotId}`);
-      return;
-    }
-    
-    const imgElement = subslot.querySelector('.slot-image');
-    if (!imgElement) {
-      console.log(`⏳ 画像要素がまだありません: ${subslotId} (試行 ${retryCount + 1}/${maxRetries})`);
-      
-      if (retryCount < maxRetries) {
-        retryCount++;
-        setTimeout(checkAndApply, retryDelay);
-        return;
-      } else {
-        console.warn(`⚠️ 最大試行回数に達しました: ${subslotId}`);
-        return;
-      }
-    }
-    
-    // 🔍 クリア処理が完了したかを確認
-    const isCleared = imgElement.src.includes('placeholder.png') || 
-                     imgElement.src.includes('button.png') || 
-                     imgElement.src === '' ||
-                     imgElement.style.display === 'none';
-    
-    if (isCleared || retryCount === 0) {
-      console.log(`✅ クリア処理完了を確認、画像適用実行: ${subslotId}`);
-      
-      // 少し待ってから画像適用
-      setTimeout(() => {
-        applyImageToSubslot(subslotId, phraseText);
-        console.log(`🎨 クリア処理後の画像適用完了: ${subslotId} → "${phraseText}"`);
-      }, 100);
-      
-    } else if (retryCount < maxRetries) {
-      console.log(`⏳ クリア処理待機中: ${subslotId} (試行 ${retryCount + 1}/${maxRetries})`);
-      retryCount++;
-      setTimeout(checkAndApply, retryDelay);
-    } else {
-      console.warn(`⚠️ クリア処理完了を確認できませんでした: ${subslotId}`);
-      // それでも画像適用を試行
-      applyImageToSubslot(subslotId, phraseText);
-    }
-  };
-  
-  // 初回チェック開始
-  checkAndApply();
-}
-
 // グローバル公開
 window.forceUpdateSubslotImages = forceUpdateSubslotImages;
 window.updateSubslotImages = updateSubslotImages;
 window.getEnglishTextFromSlotPool = getEnglishTextFromSlotPool;
 window.monitorSubslotImageState = monitorSubslotImageState;
 window.debugImageDisappearance = debugImageDisappearance;
-window.applyImageAfterClear = applyImageAfterClear;
