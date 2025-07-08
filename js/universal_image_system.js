@@ -74,9 +74,16 @@ function extractWordsWithStemming(text) {
     return [];
   }
   
-  // テキストを正規化し、2文字以上の単語を抽出
-  const normalizedText = text.toLowerCase().replace(/[^\w\s-]/g, ' ');
+  // 🆕 日本語テキスト対応：全角・半角文字、句読点を適切に処理
+  const normalizedText = text.toLowerCase()
+    .replace(/[、。，！？]/g, ' ') // 日本語句読点を空白に
+    .replace(/[^\w\s-]/g, ' '); // その他の記号を空白に
+  
   const words = normalizedText.split(/\s+/).filter(word => word.length >= 2);
+  
+  console.log('🔍 日本語対応 - 元テキスト:', text);
+  console.log('🔍 日本語対応 - 正規化後:', normalizedText);
+  console.log('🔍 日本語対応 - 抽出単語:', words);
   
   const searchWords = new Set();
   
@@ -104,7 +111,10 @@ function extractWordsWithStemming(text) {
     }
   }
   
-  return Array.from(searchWords);
+  const result = Array.from(searchWords).filter(word => word.length > 0);
+  console.log('🔍 最終検索単語:', result);
+  
+  return result;
 }
 
 // 🔍 テキストにマッチする画像を検索
@@ -1051,6 +1061,96 @@ function debugWordMatching(word) {
   return foundMatches;
 }
 
+// 🆕 日本語テキスト用の簡易マッチング（英語キーワードを含む場合）
+function findImageForJapaneseText(text) {
+  console.log('🇯🇵 日本語テキスト用画像検索:', text);
+  
+  // 日本語テキストから英語キーワードを抽出する簡易ロジック
+  const commonMappings = {
+    '過去完了': 'past perfect',
+    '完了': 'perfect',
+    '過去': 'past',
+    '進行': 'progressive',
+    '現在': 'present',
+    '未来': 'future',
+    'なる': 'become',
+    'する': 'do',
+    'ある': 'be',
+    'いる': 'be'
+  };
+  
+  for (const [japanese, english] of Object.entries(commonMappings)) {
+    if (text.includes(japanese)) {
+      console.log(`🎯 日本語マッピング発見: "${japanese}" → "${english}"`);
+      const result = findImageByMetaTag(english);
+      if (result) {
+        console.log(`✅ 日本語マッピング成功: "${text}" → ${result.image_file}`);
+        return result;
+      }
+    }
+  }
+  
+  console.log('🔍 日本語マッピングでマッチなし');
+  return null;
+}
+
+// 🎯 window.fullSlotPoolからサブスロット用の英語例文を取得する関数
+function getEnglishTextFromSlotPool(subslotId, parentSlotId) {
+  // window.fullSlotPoolが存在しない場合はフォールバック
+  if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
+    console.warn('⚠️ window.fullSlotPoolが見つかりません。DOM要素から取得を試行します。');
+    return getEnglishTextFromDOM(subslotId);
+  }
+  
+  // サブスロットIDからスロット種別を抽出
+  // 例: 'slot-c1-sub-c1' → スロット種別='C1', サブスロット種別='C1'
+  const slotMatch = subslotId.match(/slot-([a-z0-9]+)-sub-([a-z0-9]+)/i);
+  if (!slotMatch) {
+    console.warn(`⚠️ サブスロットIDの解析に失敗: ${subslotId}`);
+    return getEnglishTextFromDOM(subslotId);
+  }
+  
+  const [, parentSlotType, subslotType] = slotMatch;
+  const targetSlotType = subslotType.toUpperCase(); // 'c1' → 'C1'
+  
+  console.log(`🔍 サブスロット解析: ${subslotId} → 親=${parentSlotType}, 対象=${targetSlotType}`);
+  
+  // window.fullSlotPoolから該当するサブスロットデータを検索
+  const subslotData = window.fullSlotPool.find(entry => 
+    entry.Slot === targetSlotType && 
+    entry.SubslotID && 
+    entry.SubslotID.includes(parentSlotType.toLowerCase())
+  );
+  
+  if (subslotData && subslotData.SubslotElement) {
+    console.log(`✅ SlotPool検索成功: ${subslotId} → "${subslotData.SubslotElement}"`);
+    return subslotData.SubslotElement;
+  }
+  
+  console.log(`🔍 SlotPool検索失敗、上位スロット方式でDOMフォールバック: ${subslotId}`);
+  return getEnglishTextFromDOM(subslotId);
+}
+
+// 🔄 フォールバック用：DOM要素から英語例文を取得（上位スロットと同じロジック）
+function getEnglishTextFromDOM(subslotId) {
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) {
+    return null;
+  }
+  
+  // 🎯 上位スロットと同じ優先順位：.slot-phrase（英語例文）が最優先
+  const phraseElement = subslotElement.querySelector('.slot-phrase');
+  const textElement = subslotElement.querySelector('.slot-text');
+  
+  const currentPhraseText = phraseElement ? phraseElement.textContent.trim() : '';
+  const currentTextText = textElement ? textElement.textContent.trim() : '';
+  const currentText = currentPhraseText || currentTextText; // 上位スロットと同じロジック
+  
+  console.log(`🔄 DOM検索(上位スロット方式): ${subslotId} → phrase:"${currentPhraseText}" text:"${currentTextText}" → 選択:"${currentText}"`);
+  
+  return currentText || null;
+}
+
 // グローバル公開
 window.debugStrictMatching = debugStrictMatching;
 window.debugWordMatching = debugWordMatching;
@@ -1086,6 +1186,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🎯 サブスロット専用画像表示システム（既存システムと完全独立）
 function updateSubslotImages(parentSlotId) {
   console.log(`🖼️ サブスロット画像更新開始: ${parentSlotId}`);
+  console.log(`🔍 デバッグ - メタタグ状態: ${imageMetaTags ? imageMetaTags.length : 'null'}`);
+  console.log(`🔍 デバッグ - fullSlotPool状態: ${window.fullSlotPool ? window.fullSlotPool.length : 'null'}`);
+  console.log(`🔍 デバッグ - JSONデータ状態: ${window.loadedJsonData ? 'OK' : 'null'}`);
   
   // 🎯 テスト段階：C1スロットのみに限定
   if (parentSlotId !== 'c1') {
@@ -1095,12 +1198,14 @@ function updateSubslotImages(parentSlotId) {
   
   // 🔍 サブスロットコンテナの表示状態を確認
   const subslotContainer = document.getElementById(`slot-${parentSlotId}-sub`);
+  console.log(`🔍 デバッグ - サブスロットコンテナ:`, subslotContainer);
   if (!subslotContainer) {
     console.warn(`⚠️ サブスロットコンテナが見つかりません: slot-${parentSlotId}-sub`);
     return;
   }
   
   const containerStyle = window.getComputedStyle(subslotContainer);
+  console.log(`🔍 デバッグ - コンテナ表示状態: ${containerStyle.display}`);
   if (containerStyle.display === 'none') {
     console.warn(`⚠️ サブスロットコンテナが非表示状態です。画像更新を中断。`);
     return;
@@ -1108,8 +1213,9 @@ function updateSubslotImages(parentSlotId) {
   
   console.log(`✅ サブスロットコンテナが表示状態です。画像処理を続行します。`);
   
-  if (!window.loadedJsonData) {
-    console.warn('⚠️ JSONデータが読み込まれていません。サブスロット画像更新を中断。');
+  // window.fullSlotPoolまたはloadedJsonDataが必要
+  if (!window.fullSlotPool && !window.loadedJsonData) {
+    console.warn('⚠️ fullSlotPoolおよびJSONデータが両方とも読み込まれていません。サブスロット画像更新を中断。');
     return;
   }
   
@@ -1118,38 +1224,57 @@ function updateSubslotImages(parentSlotId) {
     return;
   }
   
-  if (!SUBSLOT_MAPPING[parentSlotId]) {
-    console.warn(`⚠️ 未対応の親スロット: ${parentSlotId}`);
+  // 🆕 実際に存在するサブスロット要素を動的に検出
+  console.log('🔍 実際のサブスロット要素を動的検出中...');
+  const actualSubslots = [];
+  
+  // サブスロットコンテナ内のすべての子要素をチェック
+  Array.from(subslotContainer.children).forEach(child => {
+    if (child.id && child.id.includes('sub')) {
+      actualSubslots.push(child.id);
+      console.log(`  ✅ 発見: ${child.id}`);
+    }
+  });
+  
+  if (actualSubslots.length === 0) {
+    console.warn('⚠️ サブスロット要素が一つも見つかりませんでした');
     return;
   }
   
-  const subslotIds = SUBSLOT_MAPPING[parentSlotId];
-  console.log(`🎯 更新対象サブスロット:`, subslotIds);
+  console.log(`🎯 実際に存在するサブスロット: ${actualSubslots.length}個`, actualSubslots);
   
-  for (const subslotId of subslotIds) {
+  // 🎯 デバッグ - 各サブスロット存在確認
+  actualSubslots.forEach(id => {
+    const element = document.getElementById(id);
+    console.log(`  ${id}: ${element ? 'あり' : 'なし'}`);
+    if (element) {
+      const textEl = element.querySelector('.slot-text');
+      const imgEl = element.querySelector('.slot-image');
+      console.log(`    テキスト要素: ${textEl ? 'あり' : 'なし'} "${textEl?.textContent?.trim() || ''}"`);
+      console.log(`    画像要素: ${imgEl ? 'あり' : 'なし'}`);
+    }
+  });
+  
+  for (const subslotId of actualSubslots) {
     const subslotElement = document.getElementById(subslotId);
     if (!subslotElement) {
       console.warn(`⚠️ サブスロット要素が見つかりません: ${subslotId}`);
       continue;
     }
     
-    const textElement = subslotElement.querySelector('.slot-text');
-    if (!textElement) {
-      console.warn(`⚠️ テキスト要素が見つかりません in ${subslotId}`);
+    // 🆕 window.fullSlotPoolから英語例文（SubslotElement）を取得
+    const englishText = getEnglishTextFromSlotPool(subslotId, parentSlotId);
+    
+    if (!englishText) {
+      console.log(`📝 英語例文が見つからない: ${subslotId}`);
       continue;
     }
     
-    const text = textElement.textContent?.trim();
-    if (!text) {
-      console.log(`📝 テキストが空: ${subslotId}`);
-      continue;
-    }
+    console.log(`🔍 サブスロット処理中: ${subslotId}, 英語例文: "${englishText}"`);
     
-    console.log(`🔍 サブスロット処理中: ${subslotId}, テキスト: "${text}"`);
-    
-    // 🎯 サブスロット専用の画像適用（既存システムに影響しない）
-    applyImageToSubslot(subslotId, text);
-    console.log(`✅ サブスロット画像処理完了: ${subslotId} → "${text}"`);
+    // 🎯 サブスロット専用の画像適用（英語例文を使用）
+    applyImageToSubslot(subslotId, englishText);
+    console.log(`✅ サブスロット画像処理完了: ${subslotId} → "${englishText}"`);
   }
   
   console.log(`✅ サブスロット画像更新完了: ${parentSlotId}`);
@@ -1161,38 +1286,18 @@ function applyImageToSubslot(subslotId, phraseText) {
   
   const subslot = document.getElementById(subslotId);
   if (!subslot) {
-    console.error('❌ サブスロットが見つかりません:', subslotId);
+    console.error('❌ サブスロット要素が見つかりません:', subslotId);
     return;
   }
   
-  // 🔍 サブスロットのDOM構造を詳細に調査
-  console.log('🔍 サブスロットDOM詳細調査:', subslotId);
-  console.log('  クラス名:', subslot.className);
-  console.log('  子要素数:', subslot.children.length);
-  Array.from(subslot.children).forEach((child, index) => {
-    console.log(`  子要素${index + 1}: ${child.tagName}.${child.className} - "${child.textContent?.trim().substring(0, 20)}..."`);
-  });
-  
-  // サブスロット内の要素を探す（テキスト要素には一切触れない）
-  let textElement = subslot.querySelector('.slot-text');
+  // 既存の画像要素を探す
   let imgElement = subslot.querySelector('.slot-image');
   
-  // 🚨 重要：テキスト要素は既存システムで完璧に動作しているため、一切変更しない
-  
-  // サブスロット内の画像要素を探す（複数のセレクタで試行）
+  // 画像要素がない場合は動的に作成
   if (!imgElement) {
-    // .slot-imageが見つからない場合、img要素を直接探す
-    imgElement = subslot.querySelector('img');
-    console.log('🔍 .slot-imageが見つからないため、img要素を直接検索:', !!imgElement);
-  }
-  
-  if (!imgElement) {
-    // 🆕 画像要素が存在しない場合は動的に作成
-    console.log('🔧 サブスロット内に画像要素が存在しないため、動的に作成します:', subslotId);
-    
+    console.log('📱 サブスロット画像要素を動的作成:', subslotId);
     imgElement = document.createElement('img');
     imgElement.className = 'slot-image';
-    imgElement.src = 'slot_images/common/placeholder.png';
     imgElement.alt = `image for ${subslotId}`;
     imgElement.style.cssText = `
       width: 180px;
@@ -1227,9 +1332,16 @@ function applyImageToSubslot(subslotId, phraseText) {
     return;
   }
   
-  // 画像を検索（既存の関数を再利用）
-  const imageData = findImageByMetaTag(phraseText);
-  console.log('🔍 サブスロット検索結果:', imageData);
+  // 画像を検索（日本語対応を含む）
+  let imageData = findImageByMetaTag(phraseText);
+  console.log('🔍 サブスロット検索結果（通常）:', imageData);
+  
+  // 通常検索で見つからない場合、日本語マッピングを試行
+  if (!imageData) {
+    console.log('🇯🇵 日本語マッピング検索を試行:', phraseText);
+    imageData = findImageForJapaneseText(phraseText);
+    console.log('🔍 サブスロット検索結果（日本語）:', imageData);
+  }
   
   if (!imageData) {
     console.log('🔍 サブスロット：マッチする画像が見つかりません:', phraseText);
@@ -1297,6 +1409,42 @@ function handleSubslotDisplay(parentSlotId) {
   updateSubslotImages(parentSlotId);
 }
 
-// グローバル関数として公開
+// 🧪 デバッグ用：サブスロットの強制画像更新（コンソールから実行）
+function forceUpdateSubslotImages() {
+  console.log('🧪 === サブスロット強制更新テスト開始 ===');
+  
+  // C1サブスロットコンテナを強制表示
+  const container = document.getElementById('slot-c1-sub');
+  if (container) {
+    container.style.display = 'block';
+    console.log('🔧 C1サブスロットコンテナを強制表示');
+  }
+  
+  // メタタグ確認
+  console.log('📊 メタタグデータ:', imageMetaTags?.length);
+  console.log('📊 fullSlotPoolデータ:', window.fullSlotPool?.length);
+  
+  // データ構造の確認
+  if (window.fullSlotPool && window.fullSlotPool.length > 0) {
+    const sampleSubslot = window.fullSlotPool.find(entry => entry.SubslotID);
+    if (sampleSubslot) {
+      console.log('📋 サブスロットデータサンプル:', sampleSubslot);
+    }
+  }
+  
+  // サブスロット画像更新実行
+  updateSubslotImages('c1');
+  
+  // 個別テスト（英語例文を使用）
+  console.log('🧪 個別テスト実行...');
+  applyImageToSubslot('slot-c1-sub-c1', 'analyze');
+  applyImageToSubslot('slot-c1-sub-v', 'figure out');
+  applyImageToSubslot('slot-c1-sub-m1', 'manager');
+  
+  console.log('🧪 === テスト完了 ===');
+}
+
+// グローバル公開
+window.forceUpdateSubslotImages = forceUpdateSubslotImages;
 window.updateSubslotImages = updateSubslotImages;
-window.handleSubslotDisplay = handleSubslotDisplay;
+window.getEnglishTextFromSlotPool = getEnglishTextFromSlotPool;
