@@ -558,12 +558,13 @@
     "folder": "common",
     "meta_tags": [
       "confident",
+      "confidence",
+      "confidents",
       "confidented",
-      "confidenting",
-      "confidents"
+      "confidenting"
     ],
     "priority": 3,
-    "description": "自信のある"
+    "description": "自信のある - confident/confidence"
   },
   {
     "image_file": "confrontation.png",
