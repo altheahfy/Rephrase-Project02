@@ -473,15 +473,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     imageContainer = document.createElement('div');
     imageContainer.className = 'multi-image-container';
     
-    // スロットタイプに応じてGrid配置を決定
-    const isSubslot = slotId.includes('-sub-');
-    const gridRowPosition = 2; // 上位スロット・サブスロット共に行2（画像行）
-    
-    console.log(`🏗️ 複数画像コンテナ作成: ${slotId} | サブスロット: ${isSubslot} | Grid行: ${gridRowPosition}`);
-    
     // Grid Layout対応のスタイルを設定
     imageContainer.style.cssText = `
-      grid-row: ${gridRowPosition};
+      grid-row: 2;
       grid-column: 1;
       display: flex !important;
       gap: 6px;
