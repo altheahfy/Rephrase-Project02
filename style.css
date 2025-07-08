@@ -903,109 +903,31 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 🛡️ サブスロットエリアの安全制限 + 位置調整対応 */
-.slot-wrapper[id$="-sub"] {
-  /* 画面外に出ないように制限 */
-  min-width: 300px !important;
-  max-width: calc(100vw - 40px) !important;
-  position: relative !important;
-  /* 位置調整用：marginLeftによる調整を有効にする */
-  left: 0 !important;
-  transition: margin-left 0.3s ease !important;
-  /* margin-leftは動的に設定されるため初期値は設定しない */
-}
-
-/* 🔧 位置調整のためのより具体的なセレクタ（JavaScriptからの変更を優先） */
-div.slot-wrapper[id$="-sub"] {
-  /* JavaScriptで設定されるmargin-leftを確実に適用 */
-  margin-left: var(--dynamic-margin-left, 0px) !important;
-}
-
-/* 🔍 タブ連結エリアが表示されるように強制表示 */
-.slot-wrapper.active-subslot-area[id$="-sub"] {
-  /* タブ連結時は確実に表示 */
-  display: flex !important;
+/* 🚨 緊急対策：サブスロット画像の完全保護 */
+[id*="-sub-"] .slot-image {
+  display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  /* 位置調整が適用されても画面内に留まるように */
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-}
-
-/* 🔗 エクセル風タブ連結システム（再実装版） */
-
-/* 展開中の上位スロット（親）の基本スタイル */
-.slot-container.active-parent-slot {
-  background: rgba(173, 216, 230, 0.4) !important; /* 薄いブルー背景 */
-  border: 2px solid #87CEEB !important; /* スカイブルー境界線 */
-  border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
-  border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
   position: relative !important;
-  z-index: 3 !important; /* サブスロットエリアの上に表示 */
-  margin-bottom: 0 !important; /* 下部マージンを除去 */
-  transition: all 0.3s ease !important;
-  box-shadow: 0 -2px 8px rgba(135, 206, 235, 0.3) !important; /* 上部シャドウで浮遊感 */
+  z-index: 1000 !important;
 }
 
-/* 🎨 親スロット用の拡張背景（包み込み効果） */
-.slot-container.active-parent-slot::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -5px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.3) 0%, rgba(173, 216, 230, 0.1) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-radius: 12px 12px 0 0 !important;
-  border-bottom: none !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
+/* サブスロット画像はauto-hidden-imageクラスを完全無効化 */
+[id*="-sub-"] .slot-image.auto-hidden-image {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* 展開中のサブスロットエリア全体のスタイル */
-.slot-wrapper.active-subslot-area {
-  background: rgba(173, 216, 230, 0.25) !important; /* 親より薄いブルー */
-  border: 2px solid #87CEEB !important;
-  border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
-  border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
-  position: relative !important;
-  margin-top: -2px !important; /* 親スロットとの境界線を重複させる */
-  padding: 20px !important;
-  z-index: 2 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 
-    0 -2px 4px rgba(135, 206, 235, 0.3),  /* 上向きの影で連結感を演出 */
-    0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* 🎨 サブスロットエリア用の拡張背景（包み込み効果の続き） */
-.slot-wrapper.active-subslot-area::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -2px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.1) 0%, rgba(173, 216, 230, 0.3) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-top: none !important;
-  border-radius: 0 0 16px 16px !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
-}
-
-/* サブスロットラベルのタブ風デザイン */
-.subslot-label.tab-style {
-  background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-  color: white !important;
-  font-weight: bold !important;
-  padding: 8px 16px !important;
-  border-radius: 8px 8px 0 0 !important;
-  margin: -20px -20px 15px -20px !important; /* ラベルをコンテナの端まで拡張 */
-  text-align: center !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-  font-size: 14px !important;
-  position: relative !important;
+/* サブスロット画像のメタタグ属性保護（さらに強力に） */
+[id*="-sub-"] .slot-image[data-meta-tag="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 180px !important;
+  height: 180px !important;
+  border-radius: 4px !important;
+  border: 1px solid #ddd !important;
+  object-fit: cover !important;
+  margin: 5px 0 !important;
 }
