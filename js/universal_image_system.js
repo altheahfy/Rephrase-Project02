@@ -479,7 +479,7 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     
     console.log(`🏗️ 複数画像コンテナ作成: ${slotId} | サブスロット: ${isSubslot} | Grid行: ${gridRowPosition}`);
     
-    // Grid Layout対応のスタイルを設定
+    // Grid Layout対応のスタイルを設定（他の要素の位置を崩さないように）
     imageContainer.style.cssText = `
       grid-row: ${gridRowPosition};
       grid-column: 1;
@@ -498,7 +498,57 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       visibility: visible !important;
       opacity: 1 !important;
       overflow: hidden;
+      position: relative;
+      z-index: 1;
     `;
+    
+    // 🔧 重要：サブスロットのGrid構造を強制的に固定（4行構造）
+    // サブスロットの場合、全ての要素の位置を明示的に指定して行構造を保持
+    if (isSubslot) {
+      console.log(`🔧 サブスロットGrid構造修正開始: ${slotId}`);
+      
+      // 行1: スロットラベル（既に正しい位置にあると仮定）
+      const labelElement = slot.querySelector('.slot-label');
+      if (labelElement) {
+        labelElement.style.gridRow = '1';
+        labelElement.style.gridColumn = '1';
+      }
+      
+      // 行2: 画像エリア（複数画像コンテナまたは単一画像）
+      // （複数画像コンテナは既にgrid-row: 2に設定済み）
+      const singleImg = slot.querySelector('.slot-image');
+      if (singleImg) {
+        singleImg.style.gridRow = '2';
+        singleImg.style.gridColumn = '1';
+      }
+      
+      // 行3: 補助テキスト（slot-text の最初の要素）
+      const textElements = slot.querySelectorAll('.slot-text');
+      if (textElements.length > 0) {
+        textElements[0].style.gridRow = '3';
+        textElements[0].style.gridColumn = '1';
+        console.log(`🔧 補助テキスト位置固定: ${slotId} → 行3`);
+      }
+      
+      // 行4: 例文テキスト（slot-text の2番目の要素、または唯一の要素が例文の場合）
+      if (textElements.length > 1) {
+        textElements[1].style.gridRow = '4';
+        textElements[1].style.gridColumn = '1';
+        console.log(`🔧 例文テキスト位置固定: ${slotId} → 行4`);
+      } else if (textElements.length === 1) {
+        // 補助テキストがない場合、唯一のテキストが例文テキストの可能性
+        const phraseElement = slot.querySelector('.slot-phrase');
+        if (!phraseElement || phraseElement.textContent.trim() === '') {
+          // フレーズがない場合、このテキストは例文テキスト
+          textElements[0].style.gridRow = '4';
+          textElements[0].style.gridColumn = '1';
+          console.log(`🔧 例文テキスト（単一）位置固定: ${slotId} → 行4`);
+        }
+      }
+      
+      console.log(`✅ サブスロットGrid構造修正完了: ${slotId}`);
+    }
+    
     slot.appendChild(imageContainer);
   }
 
