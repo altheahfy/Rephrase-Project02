@@ -1906,7 +1906,7 @@
     "description": "気づく"
   },
   {
-    "image_file": "occured.png",
+    "image_file": "occurred.png",
     "folder": "common",
     "meta_tags": [
       "occur",
