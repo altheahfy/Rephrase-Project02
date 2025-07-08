@@ -1109,6 +1109,12 @@ function findImageForJapaneseText(text) {
 
 // 🎯 window.fullSlotPoolからサブスロット用の英語例文を取得する関数
 function getEnglishTextFromSlotPool(subslotId, parentSlotId) {
+  // 🔍 デバッグ：M1サブスロット問題調査のため一時的にDOMから直接取得
+  if (subslotId.includes('slot-m1-sub-')) {
+    console.log(`🔍 M1サブスロットのため、DOM直接取得でテスト: ${subslotId}`);
+    return getEnglishTextFromDOM(subslotId);
+  }
+  
   // window.fullSlotPoolが存在しない場合はフォールバック
   if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
     console.warn('⚠️ window.fullSlotPoolが見つかりません。DOM要素から取得を試行します。');
