@@ -1173,8 +1173,13 @@ function applyImageToSubslot(subslotId, phraseText) {
     console.log(`  子要素${index + 1}: ${child.tagName}.${child.className} - "${child.textContent?.trim().substring(0, 20)}..."`);
   });
   
-  // サブスロット内の画像要素を探す（複数のセレクタで試行）
+  // サブスロット内の要素を探す（テキスト要素には一切触れない）
+  let textElement = subslot.querySelector('.slot-text');
   let imgElement = subslot.querySelector('.slot-image');
+  
+  // 🚨 重要：テキスト要素は既存システムで完璧に動作しているため、一切変更しない
+  
+  // サブスロット内の画像要素を探す（複数のセレクタで試行）
   if (!imgElement) {
     // .slot-imageが見つからない場合、img要素を直接探す
     imgElement = subslot.querySelector('img');
