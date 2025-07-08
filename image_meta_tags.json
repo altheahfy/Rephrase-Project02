@@ -4,12 +4,13 @@
     "folder": "common",
     "meta_tags": [
       "absence",
+      "absent",
+      "absences",
       "absenced",
-      "absencing",
-      "absences"
+      "absencing"
     ],
     "priority": 3,
-    "description": "不在"
+    "description": "不在、欠席 - absence/absent"
   },
   {
     "image_file": "academic.png",
