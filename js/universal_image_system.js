@@ -661,7 +661,91 @@ function displayDebugMessage(message, type = 'info') {
   }
 }
 
-// 🎯 指定スロットのテキストを監視して画像を自動更新
+// 🔥 デバッグ用：サブスロットの表示状態を強化チェック
+function debugSubslotVisibility(parentSlotId = 'c1') {
+  console.log(`🔍 === サブスロット表示状態デバッグ: ${parentSlotId} ===`);
+  
+  const container = document.getElementById(`slot-${parentSlotId}-sub`);
+  if (!container) {
+    console.error(`❌ コンテナが見つかりません: slot-${parentSlotId}-sub`);
+    return;
+  }
+  
+  const containerStyle = window.getComputedStyle(container);
+  console.log('📊 コンテナ状態:');
+  console.log(`  - display: ${containerStyle.display}`);
+  console.log(`  - visibility: ${containerStyle.visibility}`);
+  console.log(`  - opacity: ${containerStyle.opacity}`);
+  console.log(`  - position: ${containerStyle.position}`);
+  
+  const subslots = SUBSLOT_MAPPING[parentSlotId] || [];
+  console.log(`📊 個別サブスロット状態 (${subslots.length}個):`);
+  
+  subslots.forEach((subslotId, index) => {
+    const element = document.getElementById(subslotId);
+    if (element) {
+      const style = window.getComputedStyle(element);
+      const text = element.querySelector('.slot-text')?.textContent?.trim() || '';
+      const image = element.querySelector('.slot-image');
+      
+      console.log(`  [${index + 1}] ${subslotId}:`);
+      console.log(`    - display: ${style.display}`);
+      console.log(`    - visibility: ${style.visibility}`);
+      console.log(`    - text: "${text}"`);
+      console.log(`    - image: ${image ? image.src.split('/').pop() : 'なし'}`);
+    } else {
+      console.log(`  [${index + 1}] ${subslotId}: 要素なし`);
+    }
+  });
+  
+  console.log('🔍 === デバッグ完了 ===');
+}
+
+// 🎯 強制的にサブスロット画像を適用（デバッグ用）
+function forceApplySubslotImages(parentSlotId = 'c1') {
+  console.log(`🔧 === 強制サブスロット画像適用: ${parentSlotId} ===`);
+  
+  const subslots = SUBSLOT_MAPPING[parentSlotId] || [];
+  
+  subslots.forEach((subslotId, index) => {
+    const element = document.getElementById(subslotId);
+    if (!element) {
+      console.warn(`⚠️ 要素が見つかりません: ${subslotId}`);
+      return;
+    }
+    
+    const textElement = element.querySelector('.slot-text');
+    const text = textElement ? textElement.textContent.trim() : '';
+    
+    if (!text) {
+      console.log(`📝 テキストが空: ${subslotId}`);
+      return;
+    }
+    
+    console.log(`🔧 [${index + 1}] ${subslotId}: "${text}" → 画像適用中...`);
+    
+    // 強制適用
+    applyMultipleImagesToSlot(subslotId, text, true);
+    
+    // 結果確認
+    setTimeout(() => {
+      const multiContainer = element.querySelector('.multi-image-container');
+      const singleImage = element.querySelector('.slot-image');
+      
+      if (multiContainer) {
+        console.log(`    ✅ 複数画像: ${multiContainer.children.length}枚`);
+      } else if (singleImage && !singleImage.src.includes('placeholder')) {
+        console.log(`    ✅ 単一画像: ${singleImage.src.split('/').pop()}`);
+      } else {
+        console.log(`    ❌ 画像なし`);
+      }
+    }, 500);
+  });
+  
+  console.log('🔧 === 強制適用完了 ===');
+}
+
+// 🎯 メイン処理：指定スロットのテキストを監視して画像を自動更新
 function monitorSlotText(slotId) {
   console.log('🔍 スロットテキスト監視開始:', slotId);
   
@@ -962,9 +1046,9 @@ function testUniversalImageSystem() {
   console.log('🧪 汎用画像システム手動テスト完了');
 }
 
-// 🧪 サブスロット画像システムの手動テスト関数
+// 🧪 サブスロット画像システムの手動テスト関数（C1対応版）
 function testSubslotImageSystem() {
-  console.log('🧪 === サブスロット画像システム手動テスト開始 ===');
+  console.log('🧪 === サブスロット画像システム手動テスト開始（C1対象）===');
   
   // 前提条件確認
   console.log('🔍 前提条件確認:');
@@ -973,11 +1057,27 @@ function testSubslotImageSystem() {
   console.log('  - handleSubslotDisplay:', typeof window.handleSubslotDisplay);
   console.log('  - updateSubslotImages:', typeof window.updateSubslotImages);
   
-  // Sスロットのサブスロット確認
-  console.log('🔍 Sスロットサブスロット確認:');
-  const sSubslots = SUBSLOT_MAPPING['s'] || [];
+  // C1サブスロットコンテナの表示状態確認
+  const c1SubContainer = document.getElementById('slot-c1-sub');
+  console.log('🔍 C1サブスロットコンテナ確認:');
+  console.log('  - 要素存在:', !!c1SubContainer);
   
-  sSubslots.forEach((subslotId, index) => {
+  if (c1SubContainer) {
+    const containerStyle = window.getComputedStyle(c1SubContainer);
+    console.log('  - display:', containerStyle.display);
+    console.log('  - visibility:', containerStyle.visibility);
+    
+    if (containerStyle.display === 'none') {
+      console.warn('⚠️ C1サブスロットが非表示状態です。詳細ボタンを押してから再実行してください。');
+      return;
+    }
+  }
+  
+  // C1スロットのサブスロット確認
+  console.log('🔍 C1スロットサブスロット確認:');
+  const c1Subslots = SUBSLOT_MAPPING['c1'] || [];
+  
+  c1Subslots.forEach((subslotId, index) => {
     const element = document.getElementById(subslotId);
     const textElement = element ? element.querySelector('.slot-text') : null;
     const imageElement = element ? element.querySelector('.slot-image') : null;
@@ -989,9 +1089,27 @@ function testSubslotImageSystem() {
     console.log(`    - 画像要素: ${!!imageElement}`);
     
     if (element && text) {
+      // 要素の表示状態確認
+      const elementStyle = window.getComputedStyle(element);
+      console.log(`    - 表示状態: display=${elementStyle.display}, visibility=${elementStyle.visibility}`);
+      
       // テスト実行
       console.log(`    🧪 テスト実行中...`);
       applyMultipleImagesToSlot(subslotId, text, true);
+      
+      // 結果確認
+      setTimeout(() => {
+        const multiContainer = element.querySelector('.multi-image-container');
+        const singleImage = element.querySelector('.slot-image');
+        
+        if (multiContainer) {
+          console.log(`    ✅ 複数画像表示: ${multiContainer.children.length}枚`);
+        } else if (singleImage && singleImage.src.includes('placeholder') === false) {
+          console.log(`    ✅ 単一画像表示: ${singleImage.src.split('/').pop()}`);
+        } else {
+          console.log(`    ❌ 画像表示なし`);
+        }
+      }, 300);
     }
   });
   
@@ -1030,13 +1148,28 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeUniversalImageSystem();
 });
 
-// 🎯 サブスロット用画像表示システム
+// 🎯 サブスロット用画像表示システム（表示状態チェック強化版）
 function updateSubslotImages(parentSlotId) {
   console.log(`🖼️ サブスロット画像更新開始: ${parentSlotId}`);
   
-  // 🎯 テスト段階：Sスロットのみに限定
-  if (parentSlotId !== 's') {
-    console.log(`⏭️ テスト段階のため ${parentSlotId} はスキップします（Sスロットのみ対象）`);
+  // 🎯 テスト段階：C1スロットのみに限定（becomeの悪影響チェック）
+  if (parentSlotId !== 'c1') {
+    console.log(`⏭️ テスト段階のため ${parentSlotId} はスキップします（C1スロットのみ対象）`);
+    return;
+  }
+  
+  // 🔍 サブスロットコンテナの表示状態を確認
+  const subslotContainer = document.getElementById(`slot-${parentSlotId}-sub`);
+  if (!subslotContainer) {
+    console.warn(`⚠️ サブスロットコンテナが見つかりません: slot-${parentSlotId}-sub`);
+    return;
+  }
+  
+  const containerStyle = window.getComputedStyle(subslotContainer);
+  console.log(`🔍 サブスロットコンテナ表示状態: display=${containerStyle.display}, visibility=${containerStyle.visibility}`);
+  
+  if (containerStyle.display === 'none') {
+    console.warn(`⚠️ サブスロットコンテナが非表示状態です。画像更新を中断。`);
     return;
   }
   
@@ -1098,7 +1231,7 @@ function updateSubslotImages(parentSlotId) {
       } else if (imageElement) {
         console.log(`📊 ${subslotId} 単一画像表示中: ${imageElement.src.split('/').pop()}`);
       } else {
-        console.log(`� ${subslotId} 画像表示なし`);
+        console.log(`❌ ${subslotId} 画像表示なし`);
       }
     }, 200);
   }
@@ -1106,17 +1239,38 @@ function updateSubslotImages(parentSlotId) {
   console.log(`✅ サブスロット画像更新完了: ${parentSlotId}`);
 }
 
-// 🔗 サブスロット表示時の統合処理
+// 🔗 サブスロット表示時の統合処理（表示確認強化版）
 function handleSubslotDisplay(parentSlotId) {
   console.log(`🎭 サブスロット表示統合処理開始: ${parentSlotId}`);
   
-  // 画像更新を少し遅延させてDOM更新を確実に待つ
-  setTimeout(() => {
-    updateSubslotImages(parentSlotId);
-  }, 100);
+  // 🎯 サブスロットコンテナが実際に表示されるまで待機
+  const checkAndApplyImages = () => {
+    const subslotContainer = document.getElementById(`slot-${parentSlotId}-sub`);
+    if (!subslotContainer) {
+      console.warn(`⚠️ サブスロットコンテナが見つかりません: slot-${parentSlotId}-sub`);
+      return;
+    }
+    
+    const containerStyle = window.getComputedStyle(subslotContainer);
+    console.log(`🔍 コンテナ状態チェック: display=${containerStyle.display}, visibility=${containerStyle.visibility}`);
+    
+    if (containerStyle.display !== 'none' && containerStyle.visibility !== 'hidden') {
+      console.log(`✅ サブスロットコンテナが表示状態になりました。画像更新を実行します。`);
+      updateSubslotImages(parentSlotId);
+    } else {
+      console.log(`⏳ サブスロットコンテナが非表示状態です。再チェックします。`);
+      // 100ms後に再チェック（最大10回まで）
+      setTimeout(checkAndApplyImages, 100);
+    }
+  };
+  
+  // 初回チェックを少し遅延（DOM更新完了を待つ）
+  setTimeout(checkAndApplyImages, 200);
 }
 
 // グローバル関数として公開
 window.updateSubslotImages = updateSubslotImages;
 window.handleSubslotDisplay = handleSubslotDisplay;
 window.testSubslotImageSystem = testSubslotImageSystem;
+window.debugSubslotVisibility = debugSubslotVisibility;
+window.forceApplySubslotImages = forceApplySubslotImages;
