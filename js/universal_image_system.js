@@ -1109,9 +1109,9 @@ function findImageForJapaneseText(text) {
 
 // 🎯 window.fullSlotPoolからサブスロット用の英語例文を取得する関数
 function getEnglishTextFromSlotPool(subslotId, parentSlotId) {
-  // 🔍 デバッグ：M1サブスロット問題調査のため一時的にDOMから直接取得
-  if (subslotId.includes('slot-m1-sub-')) {
-    console.log(`🔍 M1サブスロットのため、DOM直接取得でテスト: ${subslotId}`);
+  // 🔍 デバッグ：M1およびSサブスロット問題調査のため一時的にDOMから直接取得
+  if (subslotId.includes('slot-m1-sub-') || subslotId.includes('slot-s-sub-')) {
+    console.log(`🔍 M1またはSサブスロットのため、DOM直接取得でテスト: ${subslotId}`);
     return getEnglishTextFromDOM(subslotId);
   }
   
@@ -1209,9 +1209,9 @@ function updateSubslotImages(parentSlotId) {
   console.log(`🔍 デバッグ - fullSlotPool状態: ${window.fullSlotPool ? window.fullSlotPool.length : 'null'}`);
   console.log(`🔍 デバッグ - JSONデータ状態: ${window.loadedJsonData ? 'OK' : 'null'}`);
   
-  // 🎯 水平展開段階：C1およびM1スロットに対応
-  if (parentSlotId !== 'c1' && parentSlotId !== 'm1') {
-    console.log(`⏭️ 水平展開段階のため ${parentSlotId} はスキップします（C1、M1スロットのみ対象）`);
+  // 🎯 水平展開段階：C1、M1、およびSスロットに対応
+  if (parentSlotId !== 'c1' && parentSlotId !== 'm1' && parentSlotId !== 's') {
+    console.log(`⏭️ 水平展開段階のため ${parentSlotId} はスキップします（C1、M1、Sスロットのみ対象）`);
     return;
   }
   

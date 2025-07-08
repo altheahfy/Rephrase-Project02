@@ -117,6 +117,14 @@ function randomizeSlotSIndividual() {
     }, 100);
   }
   
+  // 🖼️ Sサブスロット画像更新（個別ランダム化後）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('s');
+      console.log("🎨 Sサブスロット画像更新完了");
+    }, 150);
+  }
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
