@@ -1386,24 +1386,24 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     imageContainer = document.createElement('div');
     imageContainer.className = 'multi-image-container';
     
-    // サブスロット用のスタイルを設定（上位スロットより小さめ）
+    // サブスロット用のスタイルを設定（上位スロットと同様の高さ確保）
     imageContainer.style.cssText = `
       display: flex !important;
-      gap: 4px;
+      gap: 6px;
       align-items: center;
       justify-content: center;
       flex-wrap: nowrap !important;
       width: 100%;
-      height: 120px !important;
-      padding: 3px;
+      height: 160px !important;
+      padding: 5px;
       box-sizing: border-box;
-      border-radius: 3px;
+      border-radius: 4px;
       background: rgba(40, 167, 69, 0.05);
       border: 1px dashed rgba(40, 167, 69, 0.3);
       visibility: visible !important;
       opacity: 1 !important;
       overflow: hidden;
-      margin: 2px 0;
+      margin: 3px 0;
     `;
     subslot.appendChild(imageContainer);
   }
@@ -1422,32 +1422,32 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     imgElement.alt = `image ${index + 1} for ${subslotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 🎯 サブスロット用の画像サイズ調整（上位スロットより小さめ）
+    // 🎯 上位スロットと同じ画像サイズ調整システム
     const imageCount = imageDataArray.length;
-    const baseContainerWidth = 250; // サブスロット用基本幅（上位より小さく）
-    const minImageWidth = 35; // 画像1枚の最小幅
-    const maxImageWidth = 80; // 画像1枚の最大幅
-    const gap = 4; // 画像間の隙間
+    const baseContainerWidth = 390; // 上位スロットと同じ基本幅
+    const minImageWidth = 50; // 上位スロットと同じ最小幅
+    const maxImageWidth = 120; // 上位スロットと同じ最大幅
+    const gap = 6; // 上位スロットと同じ隙間
     
-    // スロット全体の横幅を画像枚数に応じて拡大
-    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 50; // 1枚増えるごとに+50px
+    // 🆕 スロット全体の横幅を画像枚数に応じて拡大（上位スロットと同じロジック）
+    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
     const totalGapWidth = (imageCount - 1) * gap;
-    const availableWidth = expandedContainerWidth - totalGapWidth - 10; // padding等を考慮
+    const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
     const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
     
-    // サブスロット全体の横幅を動的に設定
+    // 🆕 サブスロット全体の横幅を動的に設定（上位スロットと同じ）
     subslot.style.maxWidth = `${expandedContainerWidth}px`;
     subslot.style.width = 'auto';
     
     console.log(`🎯 サブスロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
     
-    // サブスロット用複数画像スタイル - 動的サイズ適用
+    // サブスロット用複数画像スタイル - 上位スロットと同じ動的サイズ適用
     imgElement.style.cssText = `
-      height: 100px !important;
+      height: 150px !important;
       width: ${dynamicWidth}px !important;
       max-width: ${dynamicWidth}px !important;
-      min-width: 35px !important;
-      border-radius: 3px;
+      min-width: 50px !important;
+      border-radius: 5px;
       border: 1px solid rgba(40, 167, 69, 0.6);
       object-fit: fill !important;
       display: block;
