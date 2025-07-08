@@ -1141,7 +1141,7 @@ function updateSubslotImages(parentSlotId) {
     // 複数画像対応
     const images = findAllImagesByMetaTag(text);
     if (images && images.length > 0) {
-      applyMultipleImagesToSlot(subslotId, images);
+      applyMultipleImagesToSlot(subslotId, text);
       console.log(`✅ サブスロット画像適用成功: ${subslotId} → ${images.length}件`);
     } else {
       // プレースホルダー設定
