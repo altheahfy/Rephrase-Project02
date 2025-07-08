@@ -992,6 +992,14 @@ function randomizeSlotM3Individual() {
       console.log("🎨 全スロット画像更新完了");
     }, 100);
   }
+
+  // M3サブスロット画像更新
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('m3');
+      console.log("🎨 M3サブスロット画像更新完了");
+    }, 150);
+  }
 }
 
 // グローバル関数として公開
