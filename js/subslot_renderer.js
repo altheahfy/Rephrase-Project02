@@ -18,6 +18,12 @@ window.addEventListener("DOMContentLoaded", () => {
   slotIds.forEach(id => {
     const img = document.querySelector(`#${id} img`);
     if (img) {
+      // 🚫 C1サブスロットの画像は保護（applyImageToSubslotで管理されるため）
+      if (id.startsWith('slot-c1-sub-') && img.hasAttribute('data-meta-tag')) {
+        console.log(`🛡️ C1サブスロット画像を保護: ${id} (src: ${img.src})`);
+        return; // C1サブスロットの既存画像は触らない
+      }
+      
       console.log(`Rendering: ${id}`);
       img.src = `slot_images/common/placeholder.png`;
       img.alt = `Placeholder for ${id}`;
