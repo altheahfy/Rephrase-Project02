@@ -2488,6 +2488,21 @@
     "description": "suggestion"
   },
   {
+    "image_file": "support.png",
+    "folder": "common",
+    "meta_tags": [
+      "support",
+      "supports",
+      "supported",
+      "supporting",
+      "supportive",
+      "supporter",
+      "supporters"
+    ],
+    "priority": 3,
+    "description": "support - サポート、支援、支持"
+  },
+  {
     "image_file": "summary.png",
     "folder": "common",
     "meta_tags": [
