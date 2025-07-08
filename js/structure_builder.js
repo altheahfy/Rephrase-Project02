@@ -39,6 +39,35 @@ function renderSubslot(sub) {
     subDiv.dataset.displayOrder = sub.display_order;
   }
 
+  // 🏷️ ラベル要素を追加（Grid行1）
+  const labelDiv = document.createElement('label');
+  labelDiv.textContent = sub.SubslotID ? sub.SubslotID.toUpperCase() : '';
+  labelDiv.style.cssText = `
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+  `;
+
+  // 🖼️ 画像要素を追加（Grid行2）
+  const imageDiv = document.createElement('img');
+  imageDiv.className = 'slot-image';
+  imageDiv.src = 'slot_images/common/placeholder.png';
+  imageDiv.alt = `image for ${sub.SubslotID || 'subslot'}`;
+  imageDiv.style.cssText = `
+    grid-row: 2;
+    grid-column: 1;
+  `;
 
   const subElDiv = document.createElement('div');
   subElDiv.className = 'subslot-element';
@@ -48,8 +77,11 @@ function renderSubslot(sub) {
   subTextDiv.className = 'subslot-text';
   subTextDiv.innerText = sub.SubslotText || '';
 
-  subDiv.appendChild(subElDiv);
-  subDiv.appendChild(subTextDiv);
+  // Grid順序で要素を追加
+  subDiv.appendChild(labelDiv);   // Grid行1
+  subDiv.appendChild(imageDiv);   // Grid行2
+  subDiv.appendChild(subTextDiv); // Grid行3
+  subDiv.appendChild(subElDiv);   // Grid行4
 
   return subDiv;
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();

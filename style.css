@@ -81,6 +81,26 @@ h2 {
   overflow: hidden; /* スクロールを完全に無効化 */
 }
 
+/* 🎯 サブスロット対応: .subslot内の複数画像コンテナ */
+.subslot .multi-image-container {
+  /* サブスロットでも同じGrid配置 */
+  grid-row: 2;
+  grid-column: 1;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap !important;
+  width: 100%;
+  height: 180px !important;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: rgba(40, 167, 69, 0.05);
+  border: 1px dashed rgba(40, 167, 69, 0.3);
+  overflow: hidden;
+}
+
 .slot-multi-image {
   /* 🎯 縦は常に枠いっぱい、横は画像枚数に応じて動的調整 */
   height: 160px !important; /* 🎯 縦は固定（スロット枠いっぱい） */
@@ -104,13 +124,15 @@ h2 {
 }
 
 /* 複数画像表示時は単一画像を非表示にする */
-.slot-container:has(.multi-image-container) .slot-image {
+.slot-container:has(.multi-image-container) .slot-image,
+.subslot:has(.multi-image-container) .slot-image {
   display: none !important;
   visibility: hidden !important;
 }
 
 /* 複数画像表示時にコンテナを確実に表示 */
-.slot-container .multi-image-container {
+.slot-container .multi-image-container,
+.subslot .multi-image-container {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -265,20 +287,38 @@ h2 {
 
 /* subslot 表示安定化のための共通構造 */
 .subslot {
-  min-width: 80px;
-  min-height: 100px;
-  padding: 4px;
+  /* CSS Gridで4行固定レイアウトを実装（.subslot-containerと同じ構造） */
+  display: grid;
+  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px → 180px にさらに拡大 */
+  grid-template-columns: 1fr;
+  gap: 4px; /* 行間の固定間隔 */
+  align-items: center; /* 各セル内での中央揃え */
+  justify-items: center; /* 各セル内での中央揃え */
+  
+  /* スタイリング */
+  border: 1px solid #eee; /* 境界線を追加 */
+  padding: 10px;
   margin: 4px;
-  border: 1px solid #ccc;
+  
+  /* 動的幅調整システム */
+  min-width: 120px; /* 最小幅 */
+  width: auto; /* 自動幅調整 */
+  max-width: 400px; /* 最大幅 */
+  flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
+  /* アニメーション */
+  transition: opacity 0.2s ease-out, width 0.3s ease;
+  
+  /* 固定高さ（4行構造） */
+  height: 279px; /* 30+180+20+25+gap+padding に更新 */
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
-/* .subslot内の画像も大きくする */
-.subslot .slot-image {
+/* .subslot内の画像も大きくする - Grid行2 */
+.subslot .slot-image,
+.subslot img.slot-image {
+  grid-row: 2;
+  grid-column: 1;
   width: 160px !important; /* 強制適用 */
   height: 150px !important; /* 強制適用 */
   max-width: 160px !important;
@@ -286,6 +326,50 @@ h2 {
   min-width: 120px !important;
   min-height: 120px !important;
   object-fit: contain;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* .subslot用の要素配置 - structure_builder用 */
+.subslot .subslot-element {
+  grid-row: 4; /* 例文テキストは行4 */
+  grid-column: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  
+  /* 上位スロットと同じオレンジ背景・上下線 */
+  background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.subslot .subslot-text {
+  grid-row: 3; /* 補助テキストは行3 */
+  grid-column: 1;
+  font-size: 11px;
+  font-weight: 400;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 4px;
+  line-height: 1.1;
 }
 
 /* サブスロット展開エリアは初期状態では非表示に */
