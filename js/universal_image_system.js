@@ -1272,17 +1272,233 @@ function updateSubslotImages(parentSlotId) {
     
     console.log(`🔍 サブスロット処理中: ${subslotId}, 英語例文: "${englishText}"`);
     
-    // 🎯 サブスロット専用の画像適用（英語例文を使用）
-    applyImageToSubslot(subslotId, englishText);
+    // 🎯 サブスロット専用の複数画像適用（英語例文を使用）
+    applyMultipleImagesToSubslot(subslotId, englishText);
     console.log(`✅ サブスロット画像処理完了: ${subslotId} → "${englishText}"`);
   }
   
   console.log(`✅ サブスロット画像更新完了: ${parentSlotId}`);
 }
 
-// 🎯 サブスロット専用画像適用関数（既存システムと完全独立）
-function applyImageToSubslot(subslotId, phraseText) {
-  console.log('🖼️ サブスロット画像適用開始:', subslotId, '→', phraseText);
+// 🎯 サブスロット専用複数画像適用関数（上位スロット方式を継承）
+function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = false) {
+  console.log('🖼️ サブスロット複数画像適用開始:', subslotId, '→', phraseText);
+  
+  const subslot = document.getElementById(subslotId);
+  if (!subslot) {
+    console.error('❌ サブスロット要素が見つかりません:', subslotId);
+    return;
+  }
+
+  // テキストが空の場合は複数画像コンテナを完全削除して通常の単一画像処理に戻す
+  if (!phraseText || phraseText.trim() === '') {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = subslot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+      console.log('🧹 テキストが空のため複数画像コンテナを削除:', subslotId);
+    }
+    
+    // 単一画像を再表示
+    const singleImg = subslot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
+    }
+    
+    // スロット全体の横幅をリセット
+    subslot.style.maxWidth = '';
+    subslot.style.width = '';
+    
+    // 単一画像にplaceholder.pngを設定（空テキスト処理）
+    applyImageToSubslot(subslotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 複数の画像を検索
+  const imageDataArray = findAllImagesByMetaTag(phraseText);
+  console.log('🔍 サブスロット複数検索結果:', imageDataArray);
+
+  // マッチする画像がない場合は複数画像コンテナを完全削除して通常の処理に戻す
+  if (imageDataArray.length === 0) {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = subslot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+      console.log('🧹 マッチなしのため複数画像コンテナを削除:', subslotId);
+    }
+    
+    // 単一画像を再表示
+    const singleImg = subslot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
+    }
+    
+    // スロット全体の横幅をリセット
+    subslot.style.maxWidth = '';
+    subslot.style.width = '';
+    
+    // 単一画像にplaceholder.pngまたはマッチ結果を設定
+    applyImageToSubslot(subslotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 1個しかマッチしない場合は複数画像コンテナを完全削除して通常の処理に戻す
+  if (imageDataArray.length === 1) {
+    // 複数画像コンテナがあれば削除
+    const existingContainer = subslot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+      console.log('🧹 単一マッチのため複数画像コンテナを削除:', subslotId);
+    }
+    
+    // 単一画像を再表示
+    const singleImg = subslot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
+    }
+    
+    // スロット全体の横幅をリセット
+    subslot.style.maxWidth = '';
+    subslot.style.width = '';
+    
+    // 単一画像にマッチした画像を設定
+    applyImageToSubslot(subslotId, phraseText, forceRefresh);
+    return;
+  }
+
+  // 複数画像対応：画像コンテナを作成
+  let imageContainer = subslot.querySelector('.multi-image-container');
+  if (!imageContainer) {
+    // 既存の単一画像を確実に非表示
+    const singleImg = subslot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'none';
+      singleImg.style.visibility = 'hidden';
+    }
+
+    // 複数画像用のコンテナを作成
+    imageContainer = document.createElement('div');
+    imageContainer.className = 'multi-image-container';
+    
+    // サブスロット用のスタイルを設定（上位スロットより小さめ）
+    imageContainer.style.cssText = `
+      display: flex !important;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap !important;
+      width: 100%;
+      height: 120px !important;
+      padding: 3px;
+      box-sizing: border-box;
+      border-radius: 3px;
+      background: rgba(40, 167, 69, 0.05);
+      border: 1px dashed rgba(40, 167, 69, 0.3);
+      visibility: visible !important;
+      opacity: 1 !important;
+      overflow: hidden;
+      margin: 2px 0;
+    `;
+    subslot.appendChild(imageContainer);
+  }
+
+  // 既存の画像をクリア
+  imageContainer.innerHTML = '';
+
+  // 各画像を追加
+  imageDataArray.forEach((imageData, index) => {
+    const imgElement = document.createElement('img');
+    const encodedImageFile = encodeURIComponent(imageData.image_file);
+    const imagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
+    const cacheBuster = Date.now() + index; // 各画像に個別のキャッシュバスター
+    
+    imgElement.src = `${imagePath}?t=${cacheBuster}`;
+    imgElement.alt = `image ${index + 1} for ${subslotId}: ${imageData.description || phraseText}`;
+    imgElement.className = 'slot-multi-image';
+    
+    // 🎯 サブスロット用の画像サイズ調整（上位スロットより小さめ）
+    const imageCount = imageDataArray.length;
+    const baseContainerWidth = 250; // サブスロット用基本幅（上位より小さく）
+    const minImageWidth = 35; // 画像1枚の最小幅
+    const maxImageWidth = 80; // 画像1枚の最大幅
+    const gap = 4; // 画像間の隙間
+    
+    // スロット全体の横幅を画像枚数に応じて拡大
+    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 50; // 1枚増えるごとに+50px
+    const totalGapWidth = (imageCount - 1) * gap;
+    const availableWidth = expandedContainerWidth - totalGapWidth - 10; // padding等を考慮
+    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+    
+    // サブスロット全体の横幅を動的に設定
+    subslot.style.maxWidth = `${expandedContainerWidth}px`;
+    subslot.style.width = 'auto';
+    
+    console.log(`🎯 サブスロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
+    
+    // サブスロット用複数画像スタイル - 動的サイズ適用
+    imgElement.style.cssText = `
+      height: 100px !important;
+      width: ${dynamicWidth}px !important;
+      max-width: ${dynamicWidth}px !important;
+      min-width: 35px !important;
+      border-radius: 3px;
+      border: 1px solid rgba(40, 167, 69, 0.6);
+      object-fit: fill !important;
+      display: block;
+      visibility: visible;
+      opacity: 1;
+      flex-shrink: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    `;
+
+    // ホバー効果を追加
+    imgElement.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+      this.style.borderColor = 'rgba(40, 167, 69, 0.8)';
+    });
+
+    imgElement.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+      this.style.boxShadow = 'none';
+      this.style.borderColor = 'rgba(40, 167, 69, 0.6)';
+    });
+
+    console.log(`🎯 サブスロット画像 ${index + 1}/${imageCount}: 動的幅 ${dynamicWidth}px`);
+
+    // メタタグ属性を設定
+    imgElement.setAttribute('data-meta-tag', 'true');
+    imgElement.setAttribute('data-image-index', index);
+
+    // 画像読み込み完了処理
+    imgElement.onload = function() {
+      console.log(`🎨 サブスロット複数画像 ${index + 1} 読み込み完了:`, imagePath);
+      this.style.display = 'block';
+      this.style.visibility = 'visible';
+      this.style.opacity = '1';
+    };
+
+    // 画像読み込みエラー処理
+    imgElement.onerror = function() {
+      console.error(`❌ サブスロット複数画像 ${index + 1} 読み込みエラー:`, imagePath);
+      this.src = 'slot_images/common/placeholder.png';
+    };
+
+    imageContainer.appendChild(imgElement);
+  });
+
+  console.log(`🎨 サブスロット複数画像表示完了: ${subslotId} → ${imageDataArray.length}枚`);
+}
+
+// 🎯 サブスロット専用単一画像適用関数（フォールバック用）
+function applyImageToSubslot(subslotId, phraseText, forceRefresh = false) {
+  console.log('🖼️ サブスロット単一画像適用開始:', subslotId, '→', phraseText);
   
   const subslot = document.getElementById(subslotId);
   if (!subslot) {
@@ -1300,13 +1516,13 @@ function applyImageToSubslot(subslotId, phraseText) {
     imgElement.className = 'slot-image';
     imgElement.alt = `image for ${subslotId}`;
     imgElement.style.cssText = `
-      width: 180px;
-      height: 180px;
+      width: 120px;
+      height: 120px;
       border-radius: 4px;
       border: 1px solid #ddd;
       object-fit: cover;
       display: block;
-      margin: 5px 0;
+      margin: 3px 0;
     `;
     
     // ラベルの直後に画像要素を挿入
@@ -1640,6 +1856,8 @@ function debugImageDisappearance() {
 // グローバル公開
 window.forceUpdateSubslotImages = forceUpdateSubslotImages;
 window.updateSubslotImages = updateSubslotImages;
+window.applyMultipleImagesToSubslot = applyMultipleImagesToSubslot;
+window.applyImageToSubslot = applyImageToSubslot;
 window.getEnglishTextFromSlotPool = getEnglishTextFromSlotPool;
 window.monitorSubslotImageState = monitorSubslotImageState;
 window.debugImageDisappearance = debugImageDisappearance;
