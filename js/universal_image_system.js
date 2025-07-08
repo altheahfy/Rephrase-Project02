@@ -507,8 +507,8 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     if (isSubslot) {
       console.log(`🔧 サブスロットGrid構造修正開始: ${slotId}`);
       
-      // 行1: スロットラベル
-      const labelElement = slot.querySelector('label');
+      // 行1: スロットラベル（既に正しい位置にあると仮定）
+      const labelElement = slot.querySelector('.slot-label');
       if (labelElement) {
         labelElement.style.gridRow = '1';
         labelElement.style.gridColumn = '1';
@@ -522,20 +522,28 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
         singleImg.style.gridColumn = '1';
       }
       
-      // 行3: slot-text要素
-      const textElement = slot.querySelector('.slot-text');
-      if (textElement) {
-        textElement.style.gridRow = '3';
-        textElement.style.gridColumn = '1';
-        console.log(`🔧 slot-text位置固定: ${slotId} → 行3`);
+      // 行3: 補助テキスト（slot-text の最初の要素）
+      const textElements = slot.querySelectorAll('.slot-text');
+      if (textElements.length > 0) {
+        textElements[0].style.gridRow = '3';
+        textElements[0].style.gridColumn = '1';
+        console.log(`🔧 補助テキスト位置固定: ${slotId} → 行3`);
       }
       
-      // 行4: slot-phrase要素
-      const phraseElement = slot.querySelector('.slot-phrase');
-      if (phraseElement) {
-        phraseElement.style.gridRow = '4';
-        phraseElement.style.gridColumn = '1';
-        console.log(`🔧 slot-phrase位置固定: ${slotId} → 行4`);
+      // 行4: 例文テキスト（slot-text の2番目の要素、または唯一の要素が例文の場合）
+      if (textElements.length > 1) {
+        textElements[1].style.gridRow = '4';
+        textElements[1].style.gridColumn = '1';
+        console.log(`🔧 例文テキスト位置固定: ${slotId} → 行4`);
+      } else if (textElements.length === 1) {
+        // 補助テキストがない場合、唯一のテキストが例文テキストの可能性
+        const phraseElement = slot.querySelector('.slot-phrase');
+        if (!phraseElement || phraseElement.textContent.trim() === '') {
+          // フレーズがない場合、このテキストは例文テキスト
+          textElements[0].style.gridRow = '4';
+          textElements[0].style.gridColumn = '1';
+          console.log(`🔧 例文テキスト（単一）位置固定: ${slotId} → 行4`);
+        }
       }
       
       console.log(`✅ サブスロットGrid構造修正完了: ${slotId}`);
