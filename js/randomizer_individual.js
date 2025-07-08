@@ -480,6 +480,14 @@ function randomizeSlotC1Individual() {
     }, 100);
   }
   
+  // 🆕 サブスロット画像更新（C1専用）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('c1');
+      console.log("🎨 C1サブスロット画像更新完了");
+    }, 200);
+  }
+  
   console.log("✅ C1スロット個別ランダマイズ完了");
 }
 
