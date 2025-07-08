@@ -740,688 +740,248 @@ function applySingleImageToSubslot(subslotId, phraseText) {
   console.log('🎨 サブスロット画像更新完了:', subslotId, '→', phraseText, '→', newImagePath);
 }
 
-// 🎯 サブスロット表示時の画像更新を処理（タイミング調整付き）
-function handleSubslotDisplay(parentSlotId) {
-  console.log('🎭 サブスロット表示処理開始:', parentSlotId);
+// 🚀 全スロットの画像更新（個別呼び出し用）
+function updateSlotImage(slotId, forceRefresh = false) {
+  console.log('🔄 個別スロット画像更新:', slotId);
   
-  // メタタグが読み込まれていない場合は待機
-  if (imageMetaTags.length === 0) {
-    console.log('⏳ メタタグ読み込み待機中...');
-    setTimeout(() => handleSubslotDisplay(parentSlotId), 100);
+  const slot = document.getElementById(slotId);
+  if (!slot) {
+    console.warn(`⚠️ スロットが見つかりません: ${slotId}`);
     return;
   }
   
-  // 🆕 複数段階の遅延実行でタイミング競合を回避
-  console.log('⏱️ タイミング調整開始: 他システムの処理完了を待機');
+  // phraseまたはtextからテキストを取得
+  const phraseElement = slot.querySelector('.slot-phrase');
+  const textElement = slot.querySelector('.slot-text');
   
-  // 段階1: 100ms後 - 基本的なDOM生成完了待ち
-  setTimeout(() => {
-    console.log('⏱️ 段階1: 基本処理完了後の画像適用');
-    updateSubslotImages(parentSlotId);
-  }, 100);
+  console.log('🔍 phraseElement:', phraseElement, 'textElement:', textElement);
   
-  // 段階2: 300ms後 - insert_test_data_clean.js等の処理完了後
-  setTimeout(() => {
-    console.log('⏱️ 段階2: データ同期処理完了後の画像再適用');
-    updateSubslotImages(parentSlotId);
-  }, 300);
-  
-  // 段階3: 600ms後 - 最終確認・強制適用
-  setTimeout(() => {
-    console.log('⏱️ 段階3: 最終確認・強制画像適用');
-    updateSubslotImages(parentSlotId);
-  }, 600);
-}
-
-// 🔍 サブスロット画像の状態を監視する関数（デバッグ用）
-function monitorSubslotImageState(subslotId, duration = 5000) {
-  console.log(`🔍 画像状態監視開始: ${subslotId} (${duration}ms間)`);
-  
-  const subslot = document.getElementById(subslotId);
-  if (!subslot) {
-    console.warn(`⚠️ 監視対象が見つかりません: ${subslotId}`);
+  if (!phraseElement && !textElement) {
+    console.error('❌ スロット内にテキスト要素が見つかりません:', slotId);
     return;
   }
   
-  // 🆕 MutationObserverで要素の変更を監視
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes') {
-        console.log(`🔍 ${subslotId} 属性変更:`, {
-          attributeName: mutation.attributeName,
-          oldValue: mutation.oldValue,
-          newValue: mutation.target.getAttribute(mutation.attributeName)
-        });
-      } else if (mutation.type === 'childList') {
-        console.log(`🔍 ${subslotId} 子要素変更:`, {
-          addedNodes: mutation.addedNodes.length,
-          removedNodes: mutation.removedNodes.length
-        });
-      }
-    });
-  });
+  // 現在のテキストを取得
+  const currentPhraseText = phraseElement ? phraseElement.textContent.trim() : '';
+  const currentTextText = textElement ? textElement.textContent.trim() : '';
+  const currentText = currentPhraseText || currentTextText;
   
-  observer.observe(subslot, {
-    attributes: true,
-    attributeOldValue: true,
-    childList: true,
-    subtree: true
-  });
+  console.log('📝 現在のスロットテキスト:', slotId, '→', currentText);
   
-  const startTime = Date.now();
-  const checkInterval = setInterval(() => {
-    const imgElement = subslot.querySelector('.slot-image');
-    if (imgElement) {
-      const computedStyle = window.getComputedStyle(imgElement);
-      const isVisible = computedStyle.display !== 'none' && 
-                       computedStyle.visibility !== 'hidden' && 
-                       computedStyle.opacity !== '0';
-      
-      console.log(`🔍 ${subslotId} 画像状態:`, {
-        src: imgElement.src.split('/').pop(),
-        display: computedStyle.display,
-        visibility: computedStyle.visibility,
-        opacity: computedStyle.opacity,
-        isVisible: isVisible,
-        timestamp: Date.now() - startTime + 'ms'
-      });
-      
-      if (!isVisible) {
-        console.warn(`⚠️ 画像が非表示になりました: ${subslotId}`);
-        console.log(`🔍 非表示時の要素:`, imgElement);
-        console.log(`🔍 非表示時の親要素:`, subslot);
-      }
-    } else {
-      console.warn(`⚠️ 画像要素が見つかりません: ${subslotId}`);
-    }
-    
-    if (Date.now() - startTime >= duration) {
-      clearInterval(checkInterval);
-      observer.disconnect();
-      console.log(`✅ 監視終了: ${subslotId}`);
-    }
-  }, 100);
-}
-
-// 🧪 デバッグ用：サブスロット強制画像更新（コンソールから実行）
-function forceUpdateSubslotImages() {
-  console.log('🧪 === サブスロット強制更新テスト開始 ===');
-  
-  // C1サブスロットコンテナを強制表示
-  const c1Container = document.getElementById('slot-c1-sub');
-  if (c1Container) {
-    c1Container.style.display = 'block';
-    console.log('🔧 C1サブスロットコンテナを強制表示');
-  }
-  
-  // メタタグ確認
-  console.log('📊 メタタグデータ:', imageMetaTags?.length);
-  console.log('📊 fullSlotPoolデータ:', window.fullSlotPool?.length);
-  
-  // データ構造の確認
-  if (window.fullSlotPool && window.fullSlotPool.length > 0) {
-    const sampleSubslot = window.fullSlotPool.find(entry => entry.SubslotID);
-    if (sampleSubslot) {
-      console.log('📋 サブスロットデータサンプル:', sampleSubslot);
-    }
-  }
-  
-  // サブスロット画像更新実行（複数段階）
-  console.log('🧪 段階的更新テスト実行...');
-  updateSubslotImages('c1');
-  
-  setTimeout(() => {
-    console.log('🧪 300ms後の再更新...');
-    updateSubslotImages('c1');
-  }, 300);
-  
-  setTimeout(() => {
-    console.log('🧪 600ms後の最終更新...');
-    updateSubslotImages('c1');
-  }, 600);
-  
-  // 個別テスト（実際に存在するサブスロットのみ）
-  console.log('🧪 個別テスト実行...');
-  
-  // 実際に存在するサブスロットを取得
-  const testContainer = document.getElementById('slot-c1-sub');
-  if (testContainer) {
-    const existingSubslots = [];
-    Array.from(testContainer.children).forEach(child => {
-      if (child.id && child.id.includes('sub')) {
-        existingSubslots.push(child.id);
-      }
-    });
-    
-    console.log('🧪 存在するサブスロット:', existingSubslots);
-    
-    // 存在するサブスロットのみテスト
-    existingSubslots.forEach((subslotId, index) => {
-      setTimeout(() => {
-        console.log(`🧪 テスト中: ${subslotId}`);
-        
-        // サブスロット種別に応じたテストテキストを選択
-        let testText = 'analyze'; // デフォルト
-        if (subslotId.includes('-v')) testText = 'figure out';
-        else if (subslotId.includes('-m1')) testText = 'manager';
-        else if (subslotId.includes('-s')) testText = 'everyone';
-        else if (subslotId.includes('-o1')) testText = 'engineer';
-        
-        applyImageToSubslot(subslotId, testText);
-        monitorSubslotImageState(subslotId, 3000);
-      }, index * 100);
-    });
-  }
-  
-  console.log('🧪 === テスト完了 ===');
-}
-
-// 🧪 C1サブスロット画像消失問題の詳細デバッグ
-function debugImageDisappearance() {
-  console.log('🔍 === C1サブスロット画像消失デバッグ開始 ===');
-  
-  const container = document.getElementById('slot-c1-sub');
-  if (!container) {
-    console.error('❌ C1サブスロットコンテナが見つかりません');
-    return;
-  }
-  
-  // 実際に存在するサブスロットを特定
-  const existingSubslots = [];
-  Array.from(container.children).forEach(child => {
-    if (child.id && child.id.includes('sub')) {
-      existingSubslots.push(child.id);
-    }
-  });
-  
-  console.log('📋 存在するサブスロット:', existingSubslots);
-  
-  if (existingSubslots.length === 0) {
-    console.warn('⚠️ サブスロット要素が見つかりません');
-    return;
-  }
-  
-  // 最初の存在するサブスロットで詳細テスト
-  const testSubslotId = existingSubslots[0];
-  console.log(`🎯 テスト対象: ${testSubslotId}`);
-  
-  // 詳細監視開始
-  monitorSubslotImageState(testSubslotId, 10000);
-  
-  // 画像適用
-  console.log('🖼️ 画像適用実行...');
-  applyImageToSubslot(testSubslotId, 'analyze');
-  
-  // 1秒後に再確認
-  setTimeout(() => {
-    const subslot = document.getElementById(testSubslotId);
-    const imgElement = subslot?.querySelector('.slot-image');
-    if (imgElement) {
-      console.log('🔍 1秒後の画像状態:', {
-        src: imgElement.src,
-        display: imgElement.style.display,
-        visibility: imgElement.style.visibility,
-        opacity: imgElement.style.opacity
-      });
-    }
-  }, 1000);
-}
-
-// 🧪 デバッグ用：サブスロット画像状態確認
-function debugSubslotImages() {
-  console.log('🧪 === サブスロット画像状態確認 ===');
-  
-  // メタタグ状態確認
-  console.log('📊 メタタグデータ:', imageMetaTags?.length || 'なし');
-  if (imageMetaTags && imageMetaTags.length > 0) {
-    console.log('📋 メタタグサンプル:', imageMetaTags.slice(0, 3));
-  }
-  
-  // C1サブスロット確認
-  const c1Container = document.getElementById('slot-c1-sub');
-  console.log('🔍 C1サブスロットコンテナ:', c1Container ? 'あり' : 'なし');
-  
-  if (c1Container) {
-    console.log('🔍 C1コンテナ表示状態:', window.getComputedStyle(c1Container).display);
-    
-    // 実際のサブスロット要素を確認
-    const subslots = Array.from(c1Container.children).filter(child => 
-      child.id && child.id.includes('sub')
-    );
-    
-    console.log(`🔍 実際のサブスロット数: ${subslots.length}`);
-    
-    subslots.forEach(subslot => {
-      const phraseEl = subslot.querySelector('.slot-phrase');
-      const textEl = subslot.querySelector('.slot-text');
-      const imgEl = subslot.querySelector('.slot-image');
-      const multiContainer = subslot.querySelector('.multi-image-container');
-      
-      console.log(`📝 ${subslot.id}:`);
-      console.log(`  phrase: "${phraseEl?.textContent?.trim() || 'なし'}"`);
-      console.log(`  text: "${textEl?.textContent?.trim() || 'なし'}"`);
-      console.log(`  画像要素: ${imgEl ? 'あり' : 'なし'}`);
-      console.log(`  複数画像コンテナ: ${multiContainer ? 'あり' : 'なし'}`);
-      
-      if (imgEl) {
-        console.log(`  画像src: ${imgEl.src}`);
-        console.log(`  画像表示: ${imgEl.style.display || window.getComputedStyle(imgEl).display}`);
-      }
-    });
-  }
-  
-  // fullSlotPool確認
-  console.log('📊 fullSlotPool:', window.fullSlotPool?.length || 'なし');
-  if (window.fullSlotPool && window.fullSlotPool.length > 0) {
-    const c1Subslots = window.fullSlotPool.filter(entry => 
-      entry.SubslotID && entry.SubslotID.includes('c1-sub')
-    );
-    console.log(`📋 C1サブスロットデータ数: ${c1Subslots.length}`);
-    if (c1Subslots.length > 0) {
-      console.log('📋 C1サブスロットデータサンプル:', c1Subslots.slice(0, 3));
-    }
-  }
-}
-
-// 🧪 デバッグ用：簡単なサブスロット画像テスト
-function testSubslotImageSimple(subslotId, testText) {
-  console.log(`🧪 簡単テスト開始: ${subslotId} → "${testText}"`);
-  
-  const subslot = document.getElementById(subslotId);
-  if (!subslot) {
-    console.error(`❌ サブスロット要素が見つかりません: ${subslotId}`);
-    return;
-  }
-  
-  console.log('✅ サブスロット要素発見');
-  
-  // メタタグ確認
-  if (!imageMetaTags || imageMetaTags.length === 0) {
-    console.error('❌ メタタグデータがありません');
-    return;
-  }
-  
-  console.log('✅ メタタグデータあり');
-  
-  // 画像検索
-  const imageData = findImageByMetaTag(testText);
-  console.log('🔍 検索結果:', imageData);
-  
-  if (!imageData) {
-    console.warn('⚠️ マッチする画像がありません');
-    return;
-  }
-  
-  console.log('✅ 画像データ取得成功');
-  
-  // 画像要素確認
-  let imgElement = subslot.querySelector('.slot-image');
-  if (!imgElement) {
-    console.log('📱 画像要素を動的作成');
-    imgElement = document.createElement('img');
-    imgElement.className = 'slot-image';
-    imgElement.style.cssText = `
-      width: 180px;
-      height: 180px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      object-fit: cover;
-      display: block;
-      margin: 5px 0;
-    `;
-    subslot.appendChild(imgElement);
-  }
-  
-  // 画像設定
-  const encodedImageFile = encodeURIComponent(imageData.image_file);
-  const imagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
-  const cacheBuster = Date.now();
-  
-  imgElement.src = `${imagePath}?t=${cacheBuster}`;
-  imgElement.alt = `image for ${subslotId}`;
-  imgElement.setAttribute('data-meta-tag', 'true');
-  
-  console.log('🎨 画像設定完了:', imagePath);
-}
-
-// 🎯 サブスロット専用画像適用関数（既存システムと完全独立）
-function applyImageToSubslot(subslotId, phraseText) {
-  console.log('🖼️ サブスロット画像適用開始:', subslotId, '→', phraseText);
-  
-  const subslot = document.getElementById(subslotId);
-  if (!subslot) {
-    console.error('❌ サブスロット要素が見つかりません:', subslotId);
-    return;
-  }
-
-  // テキストが空の場合の処理
-  if (!phraseText || phraseText.trim() === '') {
-    // 複数画像コンテナがあれば削除
-    const existingContainer = subslot.querySelector('.multi-image-container');
+  // 空テキスト時は汎用システムが介入しない（責務分離）
+  if (!currentText) {
+    // 複数画像クリアのみ実行
+    const existingContainer = slot.querySelector('.multi-image-container');
     if (existingContainer) {
       existingContainer.remove();
-      console.log('🧹 サブスロット：テキストが空のため複数画像コンテナを削除:', subslotId);
     }
-    
-    // 単一画像にプレースホルダーを設定
-    let imgElement = subslot.querySelector('.slot-image');
-    if (imgElement) {
-      imgElement.style.display = 'block';
-      imgElement.src = 'slot_images/common/placeholder.png';
-      imgElement.alt = `image for ${subslotId}`;
-    }
-    console.log('📝 サブスロットテキストが空のため、プレースホルダーを設定:', subslotId);
+    // 静的制御（button.png制御）に委譲
     return;
   }
-
-  // 複数の画像を検索
-  const imageDataArray = findAllImagesByMetaTag(phraseText);
-  console.log('🔍 サブスロット複数検索結果:', imageDataArray);
-
-  // 複数画像が見つかった場合（2個以上）
-  if (imageDataArray.length >= 2) {
-    console.log('🎯 サブスロット複数画像表示開始:', imageDataArray.length, '個');
-    applyMultipleImagesToSubslot(subslotId, imageDataArray, phraseText);
-    return;
-  }
-
-  // 単一画像またはマッチなしの場合は従来の処理
-  applySingleImageToSubslot(subslotId, phraseText);
+  
+  // 複数画像対応：まず複数画像適用を試行
+  applyMultipleImagesToSlot(slotId, currentText, forceRefresh);
 }
 
-// 🖼️ サブスロット用複数画像表示関数（新機能）
-function applyMultipleImagesToSubslot(subslotId, imageDataArray, phraseText) {
-  console.log('🖼️ サブスロット複数画像適用開始:', subslotId, '→', imageDataArray.length, '個');
+// 🚀 全スロットの画像を一括更新
+function updateAllSlotImages(forceRefresh = false) {
+  console.log('🔄 全スロット画像一括更新開始', forceRefresh ? '（強制更新）' : '');
   
-  const subslot = document.getElementById(subslotId);
-  if (!subslot) {
-    console.error('❌ サブスロット要素が見つかりません:', subslotId);
+  for (const slotId of UPPER_SLOTS) {
+    updateSlotImage(slotId, forceRefresh);
+  }
+  
+  console.log('✅ 全スロット画像一括更新完了');
+}
+
+// 🔄 データ変更後の全スロット画像更新
+function updateAllSlotImagesAfterDataChange() {
+  console.log('🔄 データ変更後の全スロット画像更新');
+  updateAllSlotImages(true); // 強制更新
+}
+
+// 🧹 複数画像コンテナのクリア（外部制御用）
+function clearMultiImageContainer(slotId) {
+  console.log('🧹 複数画像コンテナクリア:', slotId);
+  
+  const slot = document.getElementById(slotId);
+  if (!slot) {
+    console.warn(`⚠️ スロットが見つかりません: ${slotId}`);
     return;
   }
-
-  // 既存の単一画像を非表示
-  const singleImg = subslot.querySelector('.slot-image');
-  if (singleImg) {
-    singleImg.style.display = 'none';
-    singleImg.style.visibility = 'hidden';
+  
+  const container = slot.querySelector('.multi-image-container');
+  if (container) {
+    container.remove();
+    console.log('✅ 複数画像コンテナを削除:', slotId);
+    
+    // 単一画像を再表示
+    const singleImg = slot.querySelector('.slot-image');
+    if (singleImg) {
+      singleImg.style.display = 'block';
+      singleImg.style.visibility = 'visible';
+      singleImg.style.opacity = '1';
+    }
   }
+}
 
-  // 複数画像用のコンテナを作成または取得
-  let imageContainer = subslot.querySelector('.multi-image-container');
-  if (!imageContainer) {
-    imageContainer = document.createElement('div');
-    imageContainer.className = 'multi-image-container';
-    
-    // サブスロット用のスタイルを設定（より小さく）
-    imageContainer.style.cssText = `
-      display: flex !important;
-      gap: 4px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: nowrap !important;
-      width: 100%;
-      height: 140px !important;
-      padding: 3px;
-      box-sizing: border-box;
-      border-radius: 4px;
-      background: rgba(40, 167, 69, 0.05);
-      border: 1px dashed rgba(40, 167, 69, 0.3);
-      visibility: visible !important;
-      opacity: 1 !important;
-      overflow: hidden;
-      margin: 5px 0;
-    `;
-    subslot.appendChild(imageContainer);
+// 🚀 全スロットの画像システム初期化
+async function initializeUniversalImageSystem() {
+  console.log('🚀 汎用画像システム初期化開始');
+  console.log('📍 現在のURL:', window.location.href);
+  
+  // メタタグデータを読み込み
+  const success = await loadImageMetaTags();
+  if (!success) {
+    console.error('❌ メタタグデータの読み込みに失敗しました');
+    return;
   }
-
-  // 既存の画像をクリア
-  imageContainer.innerHTML = '';
-
-  // 各画像を追加
-  imageDataArray.forEach((imageData, index) => {
-    const imgElement = document.createElement('img');
-    const encodedImageFile = encodeURIComponent(imageData.image_file);
-    const imagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
-    const cacheBuster = Date.now() + index; // 各画像に個別のキャッシュバスター
+  
+  // 全上位スロットに対して処理
+  for (const slotId of UPPER_SLOTS) {
+    console.log(`🔍 処理中のスロット: ${slotId}`);
     
-    imgElement.src = `${imagePath}?t=${cacheBuster}`;
-    imgElement.alt = `image ${index + 1} for ${subslotId}: ${imageData.description || phraseText}`;
-    imgElement.className = 'slot-multi-image subslot-multi-image';
+    const slot = document.getElementById(slotId);
+    if (!slot) {
+      console.warn(`⚠️ スロットが見つかりません: ${slotId}`);
+      continue;
+    }
     
-    // 🎯 サブスロット用画像枚数に応じた動的サイズ調整システム
-    const imageCount = imageDataArray.length;
-    const baseContainerWidth = 180; // サブスロット基本幅（上位スロットより小さく）
-    const minImageWidth = 35; // 画像1枚の最小幅
-    const maxImageWidth = 80; // 画像1枚の最大幅
-    const gap = 4; // 画像間の隙間
+    // 画像要素の存在確認
+    const imgElement = slot.querySelector('.slot-image');
+    if (!imgElement) {
+      console.warn(`⚠️ スロット内に画像要素が見つかりません: ${slotId}`);
+      continue;
+    }
     
-    // サブスロット全体の横幅を画像枚数に応じて拡大
-    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 50; // 1枚増えるごとに+50px
-    const totalGapWidth = (imageCount - 1) * gap;
-    const availableWidth = expandedContainerWidth - totalGapWidth - 10; // padding等を考慮
-    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+    console.log(`✅ スロット処理可能: ${slotId}`);
+  }
+  
+  console.log('✅ 汎用画像システム初期化完了');
+  
+  // 初回画像適用
+  setTimeout(() => {
+    console.log('🎯 初回画像適用開始');
+    updateAllSlotImages();
+  }, 500);
+}
+
+// 🔍 個別ランダマイズボタンに関連するDOM変更を監視
+function setupIndividualRandomizeObserver() {
+  console.log('👀 個別ランダマイズ監視開始');
+  
+  const targetNode = document.getElementById('training-container');
+  if (!targetNode) {
+    console.warn('⚠️ training-containerが見つかりません');
+    return;
+  }
+  
+  // 重複処理防止用のデバウンス
+  let updateTimeout = null;
+  const processedSlots = new Set();
+  
+  const observer = new MutationObserver((mutations) => {
+    let needsUpdate = false;
     
-    // サブスロット全体の横幅を動的に設定
-    subslot.style.maxWidth = `${expandedContainerWidth}px`;
-    subslot.style.width = 'auto';
-    
-    console.log(`🎯 サブスロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
-    
-    // サブスロット複数画像用のスタイル - 動的サイズ適用
-    imgElement.style.cssText = `
-      height: 120px !important;
-      width: ${dynamicWidth}px !important;
-      max-width: ${dynamicWidth}px !important;
-      min-width: 35px !important;
-      border-radius: 3px;
-      border: 1px solid rgba(40, 167, 69, 0.6);
-      object-fit: fill !important;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      flex-shrink: 0;
-      margin: 0;
-      padding: 0;
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    `;
-
-    // ホバー効果
-    imgElement.addEventListener('mouseenter', () => {
-      imgElement.style.transform = 'scale(1.05)';
-      imgElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
-      imgElement.style.zIndex = '10';
-    });
-
-    imgElement.addEventListener('mouseleave', () => {
-      imgElement.style.transform = 'scale(1)';
-      imgElement.style.boxShadow = 'none';
-      imgElement.style.zIndex = '1';
-    });
-
-    // image_auto_hide.js対策：data-meta-tag属性を設定
-    imgElement.setAttribute('data-meta-tag', 'true');
-    imgElement.setAttribute('data-meta-tag-applied', imageData.meta_tags[0] || 'unknown');
-    imgElement.setAttribute('data-applied-text', phraseText);
-
-    // エラーハンドリング
-    imgElement.addEventListener('error', () => {
-      console.error('❌ サブスロット画像読み込み失敗:', imagePath);
-      imgElement.src = 'slot_images/common/placeholder.png';
-    });
-
-    imageContainer.appendChild(imgElement);
-    console.log(`✅ サブスロット複数画像追加 ${index + 1}/${imageCount}:`, imageData.image_file);
-  });
-
-  // 競合対策：3秒間監視して表示状態を維持（image_auto_hide.js対策）
-  const forceShowInterval = setInterval(() => {
-    const images = imageContainer.querySelectorAll('.subslot-multi-image');
-    images.forEach(img => {
-      if (img.style.display === 'none' || 
-          img.classList.contains('auto-hidden-image')) {
-        img.style.display = 'block';
-        img.style.visibility = 'visible';
-        img.style.opacity = '1';
-        img.classList.remove('auto-hidden-image');
-        console.log(`🔧 サブスロット複数画像の表示を強制維持: ${subslotId}`);
+    mutations.forEach((mutation) => {
+      // デバッグコンソール関連の変更は無視
+      if (mutation.target.id === 'debug-console' ||
+          mutation.target.closest('#debug-console')) {
+        return;
+      }
+      
+      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        // スロット関連の変更を検出
+        const changedSlotIds = new Set();
+        
+        // 変更されたノードからスロットIDを抽出
+        [mutation.target, ...Array.from(mutation.addedNodes || [])].forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // 直接スロットの場合
+            if (node.id && UPPER_SLOTS.includes(node.id)) {
+              changedSlotIds.add(node.id);
+            }
+            // スロット内の要素の場合
+            const parentSlot = node.closest('.slot-container');
+            if (parentSlot && UPPER_SLOTS.includes(parentSlot.id)) {
+              changedSlotIds.add(parentSlot.id);
+            }
+          }
+        });
+        
+        changedSlotIds.forEach(slotId => {
+          if (!processedSlots.has(slotId)) {
+            processedSlots.add(slotId);
+            needsUpdate = true;
+            console.log(`🔄 変更検出: ${slotId}`);
+          }
+        });
       }
     });
-  }, 100);
+    
+    if (needsUpdate) {
+      // デバウンス：連続した変更をまとめて処理
+      clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(() => {
+        console.log('🔄 DOM変更による画像更新実行');
+        updateAllSlotImages();
+        processedSlots.clear(); // 処理済みセットをクリア
+      }, 100);
+    }
+  });
   
-  // 3秒後に監視終了
-  setTimeout(() => clearInterval(forceShowInterval), 3000);
-
-  console.log('✅ サブスロット複数画像表示完了:', subslotId, imageDataArray.length, '個');
+  observer.observe(targetNode, {
+    childList: true,
+    subtree: true,
+    characterData: true
+  });
+  
+  console.log('👀 個別ランダマイズ監視設定完了');
 }
 
-// 🖼️ サブスロット用単一画像表示関数（従来機能を分離）
-function applySingleImageToSubslot(subslotId, phraseText) {
-  console.log('🖼️ サブスロット単一画像適用開始:', subslotId, '→', phraseText);
+// 🧪 手動テスト用関数
+function testUniversalImageSystem() {
+  console.log('🧪 汎用画像システムテスト開始');
   
-  const subslot = document.getElementById(subslotId);
-  if (!subslot) {
-    console.error('❌ サブスロット要素が見つかりません:', subslotId);
-    return;
-  }
-
-  // 複数画像コンテナがあれば削除
-  const existingContainer = subslot.querySelector('.multi-image-container');
-  if (existingContainer) {
-    existingContainer.remove();
-    console.log('🧹 サブスロット：単一画像のため複数画像コンテナを削除:', subslotId);
-  }
-
-  // 既存の画像要素を探す
-  let imgElement = subslot.querySelector('.slot-image');
+  // メタタグデータ確認
+  console.log('📊 メタタグデータ:', imageMetaTags.length, '件');
   
-  // 画像要素がない場合は動的に作成
-  if (!imgElement) {
-    console.log('📱 サブスロット画像要素を動的作成:', subslotId);
-    imgElement = document.createElement('img');
-    imgElement.className = 'slot-image';
-    imgElement.alt = `image for ${subslotId}`;
-    imgElement.style.cssText = `
-      width: 180px;
-      height: 180px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      object-fit: cover;
-      display: block;
-      margin: 5px 0;
-    `;
-    
-    // ラベルの直後に画像要素を挿入
-    const label = subslot.querySelector('label');
-    if (label && label.nextSibling) {
-      subslot.insertBefore(imgElement, label.nextSibling);
+  // 各スロットの状態確認
+  UPPER_SLOTS.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (slot) {
+      const phraseEl = slot.querySelector('.slot-phrase');
+      const textEl = slot.querySelector('.slot-text');
+      const imgEl = slot.querySelector('.slot-image');
+      
+      const phrase = phraseEl ? phraseEl.textContent.trim() : '';
+      const text = textEl ? textEl.textContent.trim() : '';
+      const currentText = phrase || text;
+      
+      console.log(`📝 ${slotId}: "${currentText}" ${imgEl ? '(画像要素あり)' : '(画像要素なし)'}`);
+      
+      if (currentText && imgEl) {
+        updateSlotImage(slotId, true);
+      }
     } else {
-      // ラベルがない場合は先頭に挿入
-      subslot.insertBefore(imgElement, subslot.firstChild);
+      console.warn(`⚠️ ${slotId}: スロット要素なし`);
     }
-    
-    console.log('✅ サブスロット画像要素を動的作成・挿入完了:', subslotId);
-  }
-
-  // 単一画像を再表示
-  imgElement.style.display = 'block';
-  imgElement.style.visibility = 'visible';
-  imgElement.style.opacity = '1';
+  });
   
-  // サブスロット全体の横幅をリセット
-  subslot.style.maxWidth = '';
-  subslot.style.width = '';
-  
-  console.log('🔍 サブスロット画像要素発見:', imgElement);
-  console.log('🔍 サブスロット現在の画像src:', imgElement.src);
-  
-  // テキストが空の場合はプレースホルダーを設定
-  if (!phraseText || phraseText.trim() === '') {
-    imgElement.src = 'slot_images/common/placeholder.png';
-    imgElement.alt = `image for ${subslotId}`;
-    console.log('📝 サブスロットテキストが空のため、プレースホルダーを設定:', subslotId);
-    return;
-  }
-  
-  // 画像を検索（英語テキストのみ）
-  let imageData = findImageByMetaTag(phraseText);
-  console.log('🔍 サブスロット検索結果:', imageData);
-  
-  if (!imageData) {
-    console.log('🔍 サブスロット：マッチする画像が見つかりません:', phraseText);
-    imgElement.src = 'slot_images/common/placeholder.png';
-    imgElement.alt = `image for ${subslotId}`;
-    return;
-  }
-  
-  // 新しい画像パスを構築
-  const encodedImageFile = encodeURIComponent(imageData.image_file);
-  const newImagePath = `slot_images/${imageData.folder}/${encodedImageFile}`;
-  console.log('🎨 サブスロット新しい画像パス:', newImagePath);
-  
-  // 画像を更新（キャッシュバスター付き）
-  const cacheBuster = Date.now();
-  const imageUrlWithCacheBuster = `${newImagePath}?t=${cacheBuster}`;
-  
-  imgElement.src = imageUrlWithCacheBuster;
-  imgElement.alt = `image for ${subslotId}: ${imageData.description || phraseText}`;
-  
-  console.log('🔄 サブスロット キャッシュバスター付きURL:', imageUrlWithCacheBuster);
-  
-  // 強制的に表示状態にする
-  imgElement.style.display = 'block';
-  imgElement.style.visibility = 'visible';
-  imgElement.style.opacity = '1';
-  
-  // image_auto_hide.js対策：data-meta-tag属性を設定
-  imgElement.setAttribute('data-meta-tag', 'true');
-  imgElement.setAttribute('data-meta-tag-applied', imageData.meta_tags[0] || 'unknown');
-  imgElement.setAttribute('data-applied-text', phraseText);
-  
-  // 🆕 競合対策：定期的な強制表示チェック
-  const forceDisplayInterval = setInterval(() => {
-    if (imgElement.style.display === 'none' || imgElement.style.visibility === 'hidden' || 
-        imgElement.classList.contains('auto-hidden-image')) {
-      console.log('🛡️ 画像が隠されました。強制再表示:', subslotId);
-      imgElement.style.display = 'block';
-      imgElement.style.visibility = 'visible';
-      imgElement.style.opacity = '1';
-      imgElement.classList.remove('auto-hidden-image');
-    }
-  }, 100);
-  
-  // 3秒後にインターバルを停止
-  setTimeout(() => {
-    clearInterval(forceDisplayInterval);
-    console.log('🛡️ 強制表示監視を終了:', subslotId);
-  }, 3000);
-  
-  // 画像読み込み完了後に再度表示を確認
-  imgElement.onload = function() {
-    console.log('🎨 サブスロット画像読み込み完了:', newImagePath);
-    this.style.display = 'block';
-    this.style.visibility = 'visible';
-    this.style.opacity = '1';
-    
-    console.log('🛡️ サブスロット最終表示状態:', {
-      subslotId: subslotId,
-      src: this.src,
-      display: this.style.display,
-      visibility: this.style.visibility,
-      opacity: this.style.opacity
-    });
-  };
-  
-  // 画像読み込みエラー時の処理
-  imgElement.onerror = function() {
-    console.error('❌ サブスロット画像読み込みエラー:', newImagePath);
-    this.src = 'slot_images/common/placeholder.png';
-  };
-  
-  console.log('🎨 サブスロット画像更新完了:', subslotId, '→', phraseText, '→', newImagePath);
+  console.log('🧪 テスト完了');
 }
 
 // 🔧 グローバル公開関数
+window.loadImageMetaTags = loadImageMetaTags;
+window.updateAllSlotImages = updateAllSlotImages;
+window.updateSlotImage = updateSlotImage;
+window.updateAllSlotImagesAfterDataChange = updateAllSlotImagesAfterDataChange;
+window.testUniversalImageSystem = testUniversalImageSystem;
+window.initializeUniversalImageSystem = initializeUniversalImageSystem;
+
+// 🖼️ 新機能：複数画像対応の公開関数
+window.applyMultipleImagesToSlot = applyMultipleImagesToSlot;
+window.findAllImagesByMetaTag = findAllImagesByMetaTag;
 window.clearMultiImageContainer = clearMultiImageContainer;
 
 // 🖼️ サブスロット用公開関数
@@ -1440,3 +1000,27 @@ window.updateVSlotImage = function(forceRefresh = false) {
 window.updateVSlotImageAfterDataChange = function() {
   updateSlotImage('slot-v', true);
 };
+
+// 🚀 DOMContentLoaded で自動初期化
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('📦 DOM読み込み完了、汎用画像システム初期化開始...');
+  console.log('📦 現在時刻:', new Date().toLocaleTimeString());
+  
+  // 500ms後に初期化実行（他のスクリプトの読み込み完了を待つ）
+  setTimeout(async () => {
+    console.log('🚀 汎用画像システム初期化実行');
+    
+    try {
+      await initializeUniversalImageSystem();
+      console.log('✅ 汎用画像システム初期化成功');
+      
+      // DOM監視開始
+      setupIndividualRandomizeObserver();
+      
+    } catch (error) {
+      console.error('❌ 汎用画像システム初期化エラー:', error);
+    }
+  }, 500);
+});
+
+console.log('📋 universal_image_system.js 読み込み完了');
