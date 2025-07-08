@@ -633,6 +633,14 @@ function randomizeSlotO1Individual() {
     }, 100);
   }
   
+  // 🖼️ O1サブスロット画像更新（個別ランダム化後）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('o1');
+      console.log("🎨 O1サブスロット画像更新完了");
+    }, 150);
+  }
+  
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
