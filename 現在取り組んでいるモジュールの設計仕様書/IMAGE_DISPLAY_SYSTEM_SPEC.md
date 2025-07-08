@@ -399,3 +399,275 @@ updateAllSlotImagesAfterDataChange();
 **最終更新**: 2025年7月7日  
 **対応バージョン**: Rephraseプロジェクト完全トレーニングUI完成フェーズ３  
 **システム状態**: 汎用イラスト表示システム完全実装完了
+
+## サブスロット画像表示システム 🆕
+
+### 概要
+
+**重要課題**: C1サブスロットの詳細ボタン展開時に、画像が一瞬表示されて消える問題の完全解決
+
+このシステムは、上位スロットと同様にサブスロット（特にC1サブスロット）に自動画像表示機能を提供します。`image_auto_hide.js`との兼ね合いを慎重に考慮し、画像の安定表示を実現しています。
+
+### 核心的な技術的課題と解決方法
+
+#### 🚨 根本的問題: image_auto_hide.js との競合
+
+**問題の詳細**:
+1. C1サブスロット画像にキャッシュバスター（`?t=timestamp`）付きURLが使用される
+2. `image_auto_hide.js`のHIDDEN_IMAGE_PATTERNSに`'?'`が含まれていた
+3. キャッシュバスター付き画像が「？画像（プレースホルダー）」として誤判定され自動非表示になる
+4. 結果：画像が一瞬表示されて即座に消える現象
+
+#### ✅ 解決策: 3段階の保護システム
+
+##### 1. HIDDEN_IMAGE_PATTERNSの修正
+```javascript
+// 🚫 修正前（問題のあった実装）
+const HIDDEN_IMAGE_PATTERNS = [
+  'placeholder.png',
+  '?',  // ← この行がキャッシュバスターと誤判定を引き起こしていた
+  'question',
+  // ...
+];
+
+// ✅ 修正後（安全な実装）
+const HIDDEN_IMAGE_PATTERNS = [
+  'placeholder.png',
+  // '?',  // ← コメントアウト：キャッシュバスターと誤判定するため
+  'question',
+  // ...
+];
+```
+
+##### 2. data-meta-tag属性による保護
+```javascript
+// universal_image_system.js内でC1サブスロット画像に必須属性を設定
+imgElement.setAttribute('data-meta-tag', 'true');
+
+// image_auto_hide.js内で保護ロジックを実装
+function shouldHideImage(imgElement) {
+  // メタタグを持つ画像は常に表示（意図したイラスト）
+  if (imgElement.hasAttribute('data-meta-tag')) {
+    console.log(`✅ メタタグ付き画像は表示: ${src}`);
+    return false; // 非表示にしない
+  }
+  // ...other logic
+}
+```
+
+##### 3. 強制表示監視システム
+```javascript
+// applyImageToSubslot関数内で画像の強制表示を維持
+function applyImageToSubslot(slotId, imageData, phraseText) {
+  // ...画像設定処理...
+  
+  // 強制的に表示状態にする
+  imgElement.style.display = 'block';
+  imgElement.style.visibility = 'visible';
+  imgElement.style.opacity = '1';
+  imgElement.classList.remove('auto-hidden-image');
+  
+  // 競合対策：3秒間監視して表示状態を維持
+  const forceShowInterval = setInterval(() => {
+    if (imgElement.style.display === 'none' || 
+        imgElement.classList.contains('auto-hidden-image')) {
+      imgElement.style.display = 'block';
+      imgElement.classList.remove('auto-hidden-image');
+      console.log(`🔧 C1サブスロット画像の表示を強制維持: ${slotId}`);
+    }
+  }, 100);
+  
+  // 3秒後に監視終了
+  setTimeout(() => clearInterval(forceShowInterval), 3000);
+}
+```
+
+### ファイル間の連携仕様
+
+#### 関連ファイルと責務
+
+| ファイル | 責務 | 重要な実装 |
+|----------|------|-----------|
+| `universal_image_system.js` | C1サブスロット画像の自動適用 | `c1SubslotImageSystem`、`applyImageToSubslot` |
+| `subslot_renderer.js` | C1サブスロットのDOM制御 | `slotIds`配列への追加、画像保護ロジック |
+| `subslot_toggle.js` | 詳細ボタンによる展開制御 | C1サブスロット画像の遅延再適用 |
+| `image_auto_hide.js` | 不要画像の自動非表示 | HIDDEN_IMAGE_PATTERNS修正、data-meta-tag保護 |
+
+#### universal_image_system.js の C1サブスロット対応
+
+##### c1SubslotImageSystem オブジェクト
+```javascript
+const c1SubslotImageSystem = {
+  // C1サブスロット用の画像データキャッシュ
+  imageCache: new Map(),
+  
+  // 初期化処理
+  initialize() {
+    console.log('🎯 C1サブスロット画像システム初期化中...');
+    this.applyImagesToAllC1Subslots();
+    this.setupC1SubslotObserver();
+  },
+  
+  // 全C1サブスロットに画像を適用
+  applyImagesToAllC1Subslots() {
+    const c1Subslots = document.querySelectorAll('[id^="slot-c1-sub-"]');
+    c1Subslots.forEach(subslot => {
+      const slotId = subslot.id;
+      const phraseElement = subslot.querySelector('.slot-phrase');
+      if (phraseElement) {
+        const phraseText = phraseElement.textContent.trim();
+        if (phraseText) {
+          this.applyImageToC1Subslot(slotId, phraseText);
+        }
+      }
+    });
+  },
+  
+  // 個別C1サブスロットに画像適用
+  applyImageToC1Subslot(slotId, phraseText) {
+    if (window.imageMetaData && window.imageMetaData.length > 0) {
+      const imageData = findImageByMetaTag(phraseText);
+      if (imageData) {
+        applyImageToSubslot(slotId, imageData, phraseText);
+      }
+    }
+  }
+};
+```
+
+#### subslot_renderer.js の修正点
+
+##### slotIds配列への追加
+```javascript
+// C1サブスロットIDの動的追加
+function addC1SubslotToSlotIds() {
+  const c1Subslots = document.querySelectorAll('[id^="slot-c1-sub-"]');
+  c1Subslots.forEach(subslot => {
+    const slotId = subslot.id;
+    if (!slotIds.includes(slotId)) {
+      slotIds.push(slotId);
+      console.log(`📝 SlotIds配列にC1サブスロット追加: ${slotId}`);
+    }
+  });
+}
+```
+
+##### 画像保護ロジック
+```javascript
+function renderSubslotData(/* parameters */) {
+  // ...既存のレンダリング処理...
+  
+  // C1サブスロット画像の保護ロジック
+  if (slotId.startsWith('slot-c1-sub-') && imageElement) {
+    // data-meta-tag属性を持つ画像は上書きしない
+    if (imageElement.hasAttribute('data-meta-tag')) {
+      console.log(`🛡️ C1サブスロット画像を保護（上書きスキップ）: ${slotId}`);
+      return; // 画像の上書きを防止
+    }
+  }
+  
+  // ...残りの処理...
+}
+```
+
+#### subslot_toggle.js の拡張
+
+##### 詳細ボタン展開時の画像再適用
+```javascript
+function toggleSubslots(mainSlotId, isCollapsing = false) {
+  // ...既存の展開処理...
+  
+  // C1サブスロット画像の遅延再適用
+  if (mainSlotId === 'slot-c1') {
+    setTimeout(() => {
+      if (typeof window.c1SubslotImageSystem !== 'undefined' && 
+          window.c1SubslotImageSystem.applyImagesToAllC1Subslots) {
+        window.c1SubslotImageSystem.applyImagesToAllC1Subslots();
+        console.log('🔄 C1サブスロット展開後の画像再適用完了');
+      }
+    }, 200); // DOM更新待機
+  }
+}
+```
+
+### 重要な注意事項とトラブルシューティング
+
+#### ⚠️ 必須の実装順序
+
+1. **image_auto_hide.js の修正が最優先**
+   ```javascript
+   // この修正なしでは他の対策も無効
+   // '?' → // '?' にコメントアウト必須
+   ```
+
+2. **data-meta-tag 属性の確実な設定**
+   ```javascript
+   // universal_image_system.js内で必須
+   imgElement.setAttribute('data-meta-tag', 'true');
+   ```
+
+3. **DOM更新タイミングの調整**
+   ```javascript
+   // subslot_toggle.js で適切な遅延設定
+   setTimeout(() => { /* 画像再適用 */ }, 200);
+   ```
+
+#### 🔍 デバッグ方法
+
+##### 画像消失の監視関数
+```javascript
+// ブラウザコンソールで実行
+function watchImageChanges() {
+  const c1Images = document.querySelectorAll('[id^="slot-c1-sub-"] .slot-image');
+  c1Images.forEach(img => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+          console.log(`🔄 画像src変更: ${img.closest('[id^="slot-c1-sub-"]').id}`);
+          console.log(`旧: ${mutation.oldValue}`);
+          console.log(`新: ${img.src}`);
+        }
+      });
+    });
+    observer.observe(img, { 
+      attributes: true, 
+      attributeOldValue: true, 
+      attributeFilter: ['src'] 
+    });
+  });
+}
+```
+
+##### 画像状態の確認
+```javascript
+// 現在のC1サブスロット画像状態を確認
+function checkC1SubslotImages() {
+  const c1Images = document.querySelectorAll('[id^="slot-c1-sub-"] .slot-image');
+  c1Images.forEach(img => {
+    console.log(`🖼️ ${img.closest('[id^="slot-c1-sub-"]').id}:`);
+    console.log(`  src: ${img.src}`);
+    console.log(`  data-meta-tag: ${img.getAttribute('data-meta-tag')}`);
+    console.log(`  display: ${img.style.display}`);
+    console.log(`  visibility: ${img.style.visibility}`);
+  });
+}
+```
+
+### 動作確認手順
+
+1. **ブラウザでindex.htmlを開く**
+2. **C1スロットの詳細ボタンをクリック**
+3. **C1サブスロットが展開されることを確認**
+4. **C1サブスロット内の画像が安定して表示されることを確認**
+5. **画像が消えないことを確認（重要）**
+
+### 成功指標
+
+- ✅ C1サブスロット画像が詳細ボタン展開時に即座に表示される
+- ✅ 画像が表示後に消えることがない
+- ✅ 上位スロットの画像システムに影響を与えない
+- ✅ 語順や他の機能に齟齬が生じない
+
+---
+
+**🎯 この仕様により、ロールバック後でも新たな担当者が簡単にC1サブスロット画像システムを再実装できます。**
