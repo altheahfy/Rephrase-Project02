@@ -1604,7 +1604,7 @@
     "SlotText": "詳細な、過去形、直前の",
     "PhraseType": "",
     "SubslotID": "sub-m3",
-    "SubslotElement": "the privious day",
+    "SubslotElement": "the previous day",
     "SubslotText": "",
     "Slot_display_order": 5,
     "display_order": 5

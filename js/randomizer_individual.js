@@ -872,6 +872,16 @@ function randomizeSlotC2Individual() {
       console.log("🎨 全スロット画像更新完了");
     }, 100);
   }
+  
+  // 🖼️ C2サブスロット画像更新（個別ランダム化後）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('c2');
+      console.log("🎨 C2サブスロット画像更新完了");
+    }, 150);
+  }
+  
+  console.log("✅ C2スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
