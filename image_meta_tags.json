@@ -1909,13 +1909,17 @@
     "image_file": "occured.png",
     "folder": "common",
     "meta_tags": [
+      "occur",
+      "occurs",
+      "occurred",
+      "occurring",
       "occured",
       "occureded",
       "occureding",
       "occureds"
     ],
     "priority": 3,
-    "description": "occured"
+    "description": "occur, occurred - 起こる、発生する"
   },
   {
     "image_file": "offer.png",
