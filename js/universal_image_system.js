@@ -332,6 +332,19 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   // メタタグ属性を設定（image_auto_hide.js対応）
   imgElement.setAttribute('data-meta-tag', 'true');
   
+  // 🎨 上位スロット単一画像のスタイル設定（複数画像と統一）
+  imgElement.style.cssText = `
+    height: 160px !important;
+    width: 150px !important;
+    max-width: 150px !important;
+    border-radius: 5px;
+    border: 1px solid rgba(40, 167, 69, 0.6);
+    object-fit: fill !important;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+  `;
+  
   // 強制的に表示状態にする
   imgElement.style.display = 'block';
   imgElement.style.visibility = 'visible';
