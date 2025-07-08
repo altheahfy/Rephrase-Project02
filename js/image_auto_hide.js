@@ -8,7 +8,7 @@ const HIDDEN_IMAGE_PATTERNS = [
   'placeholder.png',           // プレースホルダー画像
   'common/placeholder.png',    // プレースホルダー画像（フルパス）
   'slot_images/common/placeholder.png', // プレースホルダー画像（完全パス）
-  '?',                         // 「？」画像
+  // '?',                      // 「？」画像 - ⚠️コメントアウト：キャッシュバスターと誤判定するため
   'question',                  // 「？」関連画像
   'unknown',                   // 不明画像
   'default',                   // デフォルト画像
