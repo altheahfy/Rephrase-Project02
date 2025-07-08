@@ -407,7 +407,7 @@ function syncDynamicToStatic() {
     console.warn("⚠ window.loadedJsonData または syncSubslotsWithCorrectOrder関数が見つかりません");
   }
 
-  // �🖼 画像処理：データ同期完了後に画像の自動非表示処理を実行
+  // 🖼 画像処理：データ同期完了後に画像の自動非表示処理を実行
   console.log("🖼 syncDynamicToStatic完了後の画像処理を実行...");
   if (typeof window.processAllImagesWithCoordination === 'function') {
     setTimeout(() => {
@@ -416,6 +416,23 @@ function syncDynamicToStatic() {
     }, 100);
   } else {
     console.warn("⚠ processAllImagesWithCoordination関数が見つかりません");
+  }
+
+  // 🎯 サブスロット画像処理：サブスロットのテキスト挿入後に画像更新を実行
+  console.log("🎯 サブスロット画像更新処理を実行...");
+  if (typeof window.updateSubslotImages === 'function') {
+    setTimeout(() => {
+      // C1のサブスロットが展開されている場合のみ更新
+      const c1SubContainer = document.getElementById('slot-c1-sub');
+      if (c1SubContainer && window.getComputedStyle(c1SubContainer).display !== 'none') {
+        window.updateSubslotImages('c1');
+        console.log("✅ C1サブスロット画像更新が完了しました");
+      } else {
+        console.log("ℹ️ C1サブスロットが展開されていないため画像更新をスキップ");
+      }
+    }, 150); // 上位スロット画像処理の後に実行
+  } else {
+    console.warn("⚠ updateSubslotImages関数が見つかりません");
   }
 }
 
