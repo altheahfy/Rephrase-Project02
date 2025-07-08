@@ -1369,6 +1369,22 @@ function applyImageToSubslot(subslotId, phraseText) {
   imgElement.style.visibility = 'visible';
   imgElement.style.opacity = '1';
   
+  // 🆕 競合対策：定期的な強制表示チェック
+  const forceDisplayInterval = setInterval(() => {
+    if (imgElement.style.display === 'none' || imgElement.style.visibility === 'hidden') {
+      console.log('🛡️ 画像が隠されました。強制再表示:', subslotId);
+      imgElement.style.display = 'block';
+      imgElement.style.visibility = 'visible';
+      imgElement.style.opacity = '1';
+    }
+  }, 200);
+  
+  // 3秒後にインターバルを停止
+  setTimeout(() => {
+    clearInterval(forceDisplayInterval);
+    console.log('🛡️ 強制表示監視を終了:', subslotId);
+  }, 3000);
+  
   // 画像読み込み完了後に再度表示を確認
   imgElement.onload = function() {
     console.log('🎨 サブスロット画像読み込み完了:', newImagePath);
@@ -1394,7 +1410,7 @@ function applyImageToSubslot(subslotId, phraseText) {
   console.log('🎨 サブスロット画像更新完了:', subslotId, '→', phraseText, '→', newImagePath);
 }
 
-// 🎯 サブスロット表示時の画像更新を処理
+// 🎯 サブスロット表示時の画像更新を処理（タイミング調整付き）
 function handleSubslotDisplay(parentSlotId) {
   console.log('🎭 サブスロット表示処理開始:', parentSlotId);
   
@@ -1405,8 +1421,68 @@ function handleSubslotDisplay(parentSlotId) {
     return;
   }
   
-  // サブスロット画像更新を呼び出し
-  updateSubslotImages(parentSlotId);
+  // 🆕 複数段階の遅延実行でタイミング競合を回避
+  console.log('⏱️ タイミング調整開始: 他システムの処理完了を待機');
+  
+  // 段階1: 100ms後 - 基本的なDOM生成完了待ち
+  setTimeout(() => {
+    console.log('⏱️ 段階1: 基本処理完了後の画像適用');
+    updateSubslotImages(parentSlotId);
+  }, 100);
+  
+  // 段階2: 300ms後 - insert_test_data_clean.js等の処理完了後
+  setTimeout(() => {
+    console.log('⏱️ 段階2: データ同期処理完了後の画像再適用');
+    updateSubslotImages(parentSlotId);
+  }, 300);
+  
+  // 段階3: 600ms後 - 最終確認・強制適用
+  setTimeout(() => {
+    console.log('⏱️ 段階3: 最終確認・強制画像適用');
+    updateSubslotImages(parentSlotId);
+  }, 600);
+}
+
+// 🔍 サブスロット画像の状態を監視する関数（デバッグ用）
+function monitorSubslotImageState(subslotId, duration = 5000) {
+  console.log(`🔍 画像状態監視開始: ${subslotId} (${duration}ms間)`);
+  
+  const subslot = document.getElementById(subslotId);
+  if (!subslot) {
+    console.warn(`⚠️ 監視対象が見つかりません: ${subslotId}`);
+    return;
+  }
+  
+  const startTime = Date.now();
+  const checkInterval = setInterval(() => {
+    const imgElement = subslot.querySelector('.slot-image');
+    if (imgElement) {
+      const computedStyle = window.getComputedStyle(imgElement);
+      const isVisible = computedStyle.display !== 'none' && 
+                       computedStyle.visibility !== 'hidden' && 
+                       computedStyle.opacity !== '0';
+      
+      console.log(`🔍 ${subslotId} 画像状態:`, {
+        src: imgElement.src.split('/').pop(),
+        display: computedStyle.display,
+        visibility: computedStyle.visibility,
+        opacity: computedStyle.opacity,
+        isVisible: isVisible,
+        timestamp: Date.now() - startTime + 'ms'
+      });
+      
+      if (!isVisible) {
+        console.warn(`⚠️ 画像が非表示になりました: ${subslotId}`);
+      }
+    } else {
+      console.warn(`⚠️ 画像要素が見つかりません: ${subslotId}`);
+    }
+    
+    if (Date.now() - startTime >= duration) {
+      clearInterval(checkInterval);
+      console.log(`✅ 監視終了: ${subslotId}`);
+    }
+  }, 100);
 }
 
 // 🧪 デバッグ用：サブスロットの強制画像更新（コンソールから実行）
@@ -1432,14 +1508,34 @@ function forceUpdateSubslotImages() {
     }
   }
   
-  // サブスロット画像更新実行
+  // サブスロット画像更新実行（複数段階）
+  console.log('🧪 段階的更新テスト実行...');
   updateSubslotImages('c1');
   
-  // 個別テスト（英語例文を使用）
+  setTimeout(() => {
+    console.log('🧪 300ms後の再更新...');
+    updateSubslotImages('c1');
+  }, 300);
+  
+  setTimeout(() => {
+    console.log('🧪 600ms後の最終更新...');
+    updateSubslotImages('c1');
+  }, 600);
+  
+  // 個別テスト（英語例文を使用）+ 状態監視
   console.log('🧪 個別テスト実行...');
   applyImageToSubslot('slot-c1-sub-c1', 'analyze');
-  applyImageToSubslot('slot-c1-sub-v', 'figure out');
-  applyImageToSubslot('slot-c1-sub-m1', 'manager');
+  monitorSubslotImageState('slot-c1-sub-c1', 3000);
+  
+  setTimeout(() => {
+    applyImageToSubslot('slot-c1-sub-v', 'figure out');
+    monitorSubslotImageState('slot-c1-sub-v', 3000);
+  }, 100);
+  
+  setTimeout(() => {
+    applyImageToSubslot('slot-c1-sub-m1', 'manager');
+    monitorSubslotImageState('slot-c1-sub-m1', 3000);
+  }, 200);
   
   console.log('🧪 === テスト完了 ===');
 }
@@ -1448,3 +1544,4 @@ function forceUpdateSubslotImages() {
 window.forceUpdateSubslotImages = forceUpdateSubslotImages;
 window.updateSubslotImages = updateSubslotImages;
 window.getEnglishTextFromSlotPool = getEnglishTextFromSlotPool;
+window.monitorSubslotImageState = monitorSubslotImageState;
