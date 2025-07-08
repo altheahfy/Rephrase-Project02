@@ -801,13 +801,12 @@ h2 {
 /* 🎯 サブスロット専用の4行CSS Gridレイアウト */
 .subslot-container {
   /* CSS Gridで4行固定レイアウトを実装（詳細・ランダマイズボタンなし） */
-  display: grid !important;
-  /* 🔧 完全固定：上下ズレ・順序入れ替わり対策 */
-  grid-template-rows: 30px 180px 20px 25px !important; /* 1:ラベル, 2:画像, 3:補助テキスト, 4:例文テキスト */
-  grid-template-columns: 1fr !important;
-  gap: 4px !important; /* 行間の固定間隔 */
-  align-items: center !important; /* 各セル内での中央揃え */
-  justify-items: center !important; /* 各セル内での中央揃え */
+  display: grid;
+  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px → 180px にさらに拡大 */
+  grid-template-columns: 1fr;
+  gap: 4px; /* 行間の固定間隔 */
+  align-items: center; /* 各セル内での中央揃え */
+  justify-items: center; /* 各セル内での中央揃え */
   
   /* スタイリング */
   border: 1px solid #eee; /* 境界線を追加 */
@@ -828,15 +827,15 @@ h2 {
   box-sizing: border-box;
 }
 
-/* サブスロットのスロット名 - Grid行1：ラベル（責任：insert_test_data_clean.js） */
+/* サブスロットのスロット名 - Grid行1 */
 .subslot-container label {
-  grid-row: 1 !important;
-  grid-column: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   font-size: 16px; /* 上位スロットより少し小さく */
   font-weight: bold;
   color: #333;
@@ -846,10 +845,10 @@ h2 {
   line-height: 1.2;
 }
 
-/* サブスロットのイラスト - Grid行2：画像（責任：universal_image_system.js） */
+/* サブスロットのイラスト - Grid行2 */
 .subslot-container img.slot-image {
-  grid-row: 2 !important;
-  grid-column: 1 !important;
+  grid-row: 2;
+  grid-column: 1;
   width: 160px !important; /* 強制適用 */
   height: 150px !important; /* 強制適用 */
   max-width: 160px !important;
@@ -863,56 +862,37 @@ h2 {
   padding: 0;
 }
 
-/* 🖼️ 複数画像コンテナ - Grid行2：複数画像（責任：universal_image_system.js） */
-.subslot-container .multi-image-container {
-  grid-row: 2 !important;
-  grid-column: 1 !important;
-  display: flex !important;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap !important;
-  width: 100%;
-  height: 180px !important; /* Grid行2の高さと完全一致 */
-  padding: 5px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  background: rgba(40, 167, 69, 0.05);
-  border: 1px dashed rgba(40, 167, 69, 0.3);
-  overflow: hidden;
-}
-
-/* サブスロットの補助テキスト - Grid行3：補助テキスト（責任：insert_test_data_clean.js） */
+/* サブスロットの補助テキスト - Grid行3 */
 .subslot-container .slot-text {
-  grid-row: 3 !important;
-  grid-column: 1 !important;
+  grid-row: 3;
+  grid-column: 1;
   font-size: 11px;
   font-weight: 400;
   color: #777;
   text-align: center;
-  width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 100% !important;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   margin: 0;
   padding: 4px;
   line-height: 1.1;
 }
 
-/* サブスロットの例文テキスト - Grid行4：例文テキスト（責任：insert_test_data_clean.js） */
+/* サブスロットの例文テキスト - Grid行4（オレンジ背景・上下線） */
 .subslot-container .slot-phrase {
-  grid-row: 4 !important;
-  grid-column: 1 !important;
+  grid-row: 4;
+  grid-column: 1;
   font-size: 14px; /* 上位スロットより少し小さく */
   font-weight: 600;
   color: #222;
   text-align: center;
-  width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 100% !important;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   margin: 0;
   padding: 0;
   line-height: 1.2;
