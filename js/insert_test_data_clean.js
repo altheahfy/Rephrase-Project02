@@ -908,7 +908,7 @@ function syncSubslotsFromJson(data) {
       // 新しいサブスロットDOM要素を生成
       const slotElement = document.createElement('div');
       slotElement.id = fullSlotId;
-      slotElement.className = 'subslot-container';
+      slotElement.className = 'slot-container';
       
       // 🏷️ ラベル要素を作成（Grid行1）
       const labelElement = document.createElement('label');
