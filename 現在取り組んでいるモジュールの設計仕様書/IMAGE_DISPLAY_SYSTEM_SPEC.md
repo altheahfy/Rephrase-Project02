@@ -671,3 +671,190 @@ function checkC1SubslotImages() {
 ---
 
 **🎯 この仕様により、ロールバック後でも新たな担当者が簡単にC1サブスロット画像システムを再実装できます。**
+
+---
+
+## 【2025年7月8日完成】サブスロット複数画像表示システム 🎉
+
+**状況**: 上位スロットの複数画像表示システムと同等の機能をサブスロット（特にC1サブスロット）に完全実装済み
+
+### 完成機能一覧
+
+#### ✅ 複数画像横並び表示
+- **機能**: 1つのサブスロットに複数の関連画像を自動検索・横並び表示
+- **動作**: テキストから複数キーワードを抽出し、各キーワードにマッチする画像を並列表示
+- **サイズ調整**: 画像枚数に応じてサブスロット全体の横幅を自動拡大（上位スロットと同じロジック）
+- **表示方式**: `object-fit: fill` による縦横比を維持しない全体表示（切り取りなし）
+
+#### ✅ 単一画像適切表示
+- **サイズ**: 150px × 150px（複数画像時と統一）
+- **表示方式**: `object-fit: fill !important` による伸縮表示（切り取りではなく全体表示）
+- **スタイル**: 上位スロットと同じ緑系ボーダー、角丸5px
+
+#### ✅ 自動フォールバック機能
+- **複数マッチ**: 複数画像コンテナで横並び表示
+- **単一マッチ**: 単一画像表示（複数画像コンテナは自動削除）
+- **マッチなし**: プレースホルダー画像表示
+- **空テキスト**: 全ての画像コンテナを削除し、従来処理に移行
+
+#### ✅ 個別ランダマイズ対応
+- **問題**: 個別ランダマイズ実行後にサブスロット画像が消失
+- **解決**: `randomizer_individual.js`の各個別ランダマイズ関数に`updateSubslotImages()`呼び出しを追加
+- **タイミング**: 上位スロット更新(100ms)→サブスロット更新(200ms)の段階的実行
+
+### 実装済み関数一覧
+
+#### `universal_image_system.js` 新規追加関数
+
+```javascript
+// サブスロット専用複数画像適用関数
+function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = false)
+
+// サブスロット専用単一画像適用関数（フォールバック用）
+function applyImageToSubslot(subslotId, phraseText, forceRefresh = false)
+
+// サブスロット画像更新システム（C1専用）
+function updateSubslotImages(parentSlotId)
+
+// デバッグ・監視関数群
+function monitorSubslotImageState(subslotId, duration = 5000)
+function forceUpdateSubslotImages()
+function debugImageDisappearance()
+```
+
+#### グローバル公開関数
+
+```javascript
+// 新規追加されたグローバル関数
+window.applyMultipleImagesToSubslot = applyMultipleImagesToSubslot;
+window.applyImageToSubslot = applyImageToSubslot;
+window.updateSubslotImages = updateSubslotImages;
+window.monitorSubslotImageState = monitorSubslotImageState;
+window.forceUpdateSubslotImages = forceUpdateSubslotImages;
+window.debugImageDisappearance = debugImageDisappearance;
+```
+
+### サイズ仕様（上位スロットと統一）
+
+#### 複数画像表示時
+
+| 設定項目 | 値 | 説明 |
+|----------|-------|------|
+| **基本コンテナ幅** | 390px | 上位スロットと同じ |
+| **画像1枚あたり最小幅** | 50px | 上位スロットと同じ |
+| **画像1枚あたり最大幅** | 120px | 上位スロットと同じ |
+| **画像間隙間** | 6px | 上位スロットと同じ |
+| **拡大率** | +80px/枚 | 1枚増えるごとに+80px |
+| **画像高さ** | 150px | 縦方向めいっぱい |
+| **コンテナ高さ** | 160px | 上位スロットと同じ |
+
+#### 単一画像表示時
+
+| 設定項目 | 値 | 説明 |
+|----------|-------|------|
+| **画像サイズ** | 150px × 150px | 複数画像時と統一 |
+| **表示方式** | `object-fit: fill !important` | 伸縮表示（切り取りなし） |
+| **ボーダー** | 1px solid rgba(40, 167, 69, 0.6) | 緑系統一 |
+| **角丸** | 5px | 複数画像時と統一 |
+
+### 個別ランダマイズ修正例
+
+#### C1スロット個別ランダマイズ (`randomizer_individual.js`)
+
+```javascript
+// 修正前（画像更新不足）
+if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
+  setTimeout(() => {
+    window.updateAllSlotImagesAfterDataChange();
+    console.log("🎨 全スロット画像更新完了");
+  }, 100);
+}
+
+// 修正後（サブスロット画像更新追加）✅
+if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
+  setTimeout(() => {
+    window.updateAllSlotImagesAfterDataChange();
+    console.log("🎨 全スロット画像更新完了");
+  }, 100);
+}
+
+// 🆕 サブスロット画像更新（C1専用）
+if (typeof window.updateSubslotImages === "function") {
+  setTimeout(() => {
+    window.updateSubslotImages('c1');
+    console.log("🎨 C1サブスロット画像更新完了");
+  }, 200);
+}
+```
+
+### 水平展開準備完了
+
+#### 他スロット対応のパターン
+
+**S、M1、AUX、V、M2、O1、O2、C2、M3**スロットの個別ランダマイズ関数にも同様の修正を適用可能：
+
+```javascript
+// 各スロットの個別ランダマイズ関数末尾に追加
+if (typeof window.updateSubslotImages === "function") {
+  setTimeout(() => {
+    window.updateSubslotImages('[スロット名小文字]'); // 例: 's', 'm1', 'aux'等
+    console.log("🎨 [スロット名]サブスロット画像更新完了");
+  }, 200);
+}
+```
+
+#### `updateSubslotImages()` 関数の対応スロット拡張
+
+```javascript
+// 現在: C1のみ対応
+if (parentSlotId !== 'c1') {
+  console.log(`⏭️ テスト段階のため ${parentSlotId} はスキップします（C1スロットのみ対象）`);
+  return;
+}
+
+// 拡張時: 全スロット対応に変更
+const supportedSlots = ['c1', 's', 'm1', 'aux', 'v', 'm2', 'o1', 'o2', 'c2', 'm3'];
+if (!supportedSlots.includes(parentSlotId)) {
+  console.log(`⏭️ 未対応スロット: ${parentSlotId}`);
+  return;
+}
+```
+
+### テスト・デバッグ機能
+
+#### コンソールテスト関数
+
+```javascript
+// C1サブスロットの強制画像更新テスト
+forceUpdateSubslotImages();
+
+// 特定サブスロットの画像状態監視（5秒間）
+monitorSubslotImageState('slot-c1-sub-c1', 5000);
+
+// 画像消失問題の詳細デバッグ
+debugImageDisappearance();
+```
+
+### 成功実績
+
+#### ✅ 達成項目
+- **複数画像横並び表示**: 2枚以上の関連画像を自動検索・横並び表示
+- **適切なサイズ調整**: 画像枚数に応じた動的幅調整
+- **縦横比の適切な処理**: 切り取りではなく伸縮による全体表示
+- **個別ランダマイズ対応**: ランダマイズ後も画像が正常表示継続
+- **既存システム非破壊**: 上位スロットの機能に一切影響なし
+- **統一されたUI**: 上位スロットと同じスタイル・動作
+
+#### 🎯 完成度
+- **C1サブスロット**: 100%完成
+- **他サブスロット**: 水平展開準備完了（設計完成、実装パターン確立）
+
+### 今後の拡張作業
+
+1. **他スロットへの水平展開**: `updateSubslotImages()`の対応スロット追加
+2. **個別ランダマイズ全対応**: 全スロットの個別ランダマイズ関数修正
+3. **パフォーマンス最適化**: 必要に応じてキャッシュ機構の強化
+
+---
+
+**🏆 サブスロット画像表示システムは上位スロットと同等の機能を持つ完全なシステムとして完成しました。**
