@@ -238,6 +238,14 @@ function randomizeSlotM1Individual() {
     }, 100);
   }
   
+  // 🖼️ M1サブスロット画像更新（個別ランダム化後）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('m1');
+      console.log("🎨 M1サブスロット画像更新完了");
+    }, 150);
+  }
+  
   console.log("✅ M1スロット個別ランダマイズ完了");
 }
 

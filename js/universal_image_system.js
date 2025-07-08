@@ -1190,9 +1190,9 @@ function updateSubslotImages(parentSlotId) {
   console.log(`🔍 デバッグ - fullSlotPool状態: ${window.fullSlotPool ? window.fullSlotPool.length : 'null'}`);
   console.log(`🔍 デバッグ - JSONデータ状態: ${window.loadedJsonData ? 'OK' : 'null'}`);
   
-  // 🎯 テスト段階：C1スロットのみに限定
-  if (parentSlotId !== 'c1') {
-    console.log(`⏭️ テスト段階のため ${parentSlotId} はスキップします（C1スロットのみ対象）`);
+  // 🎯 水平展開段階：C1およびM1スロットに対応
+  if (parentSlotId !== 'c1' && parentSlotId !== 'm1') {
+    console.log(`⏭️ 水平展開段階のため ${parentSlotId} はスキップします（C1、M1スロットのみ対象）`);
     return;
   }
   
