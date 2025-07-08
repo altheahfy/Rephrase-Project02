@@ -375,6 +375,14 @@ function randomizeSlotM2Individual() {
     }, 100);
   }
   
+  // 🖼️ M2サブスロット画像更新（個別ランダム化後）
+  if (typeof window.updateSubslotImages === "function") {
+    setTimeout(() => {
+      window.updateSubslotImages('m2');
+      console.log("🎨 M2サブスロット画像更新完了");
+    }, 150);
+  }
+  
   console.log("✅ M2スロット個別ランダマイズ完了");
 }
 
