@@ -1141,6 +1141,18 @@
     "description": "理解する、解決する"
   },
   {
+    "image_file": "figure.png",
+    "folder": "common",
+    "meta_tags": [
+      "figure",
+      "figured",
+      "figuring",
+      "figures"
+    ],
+    "priority": 3,
+    "description": "人物、数字、図形"
+  },
+  {
     "image_file": "fill.png",
     "folder": "common",
     "meta_tags": [

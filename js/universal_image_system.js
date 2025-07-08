@@ -255,7 +255,10 @@ function findAllImagesByMetaTag(text) {
 
 // 🖼️ 指定スロットに画像を適用
 function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('🖼️ スロット画像適用開始:', slotId, '→', phraseText);
+  console.log('🔄 強制更新フラグ:', forceRefresh);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   
   // デバッグメッセージは無効化
   // displayDebugMessage(`🖼️ ${slotId}: "${phraseText}" 処理開始`);
@@ -710,7 +713,17 @@ function monitorSlotText(slotId) {
   const currentTextText = textElement ? textElement.textContent.trim() : '';
   const currentText = currentPhraseText || currentTextText;
   
-  console.log('📝 現在のスロットテキスト:', slotId, '→', currentText);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📝 DOM テキスト抽出 デバッグ情報:');
+  console.log('🎯 対象スロット:', slotId);
+  console.log('📊 phraseElement:', phraseElement);
+  console.log('📊 phraseElement.textContent:', phraseElement ? `"${phraseElement.textContent}"` : 'null');
+  console.log('📊 textElement:', textElement);
+  console.log('📊 textElement.textContent:', textElement ? `"${textElement.textContent}"` : 'null');
+  console.log('📊 currentPhraseText:', `"${currentPhraseText}"`);
+  console.log('📊 currentTextText:', `"${currentTextText}"`);
+  console.log('📊 最終選択テキスト:', `"${currentText}"`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   
   // 画像を適用
   applyImageToSlot(slotId, currentText);
@@ -1109,9 +1122,9 @@ function findImageForJapaneseText(text) {
 
 // 🎯 window.fullSlotPoolからサブスロット用の英語例文を取得する関数
 function getEnglishTextFromSlotPool(subslotId, parentSlotId) {
-  // 🔍 デバッグ：M1、S、M2、O1、O2、C2サブスロット問題調査のため一時的にDOMから直接取得
-  if (subslotId.includes('slot-m1-sub-') || subslotId.includes('slot-s-sub-') || subslotId.includes('slot-m2-sub-') || subslotId.includes('slot-o1-sub-') || subslotId.includes('slot-o2-sub-') || subslotId.includes('slot-c2-sub-')) {
-    console.log(`🔍 M1、S、M2、O1、O2、またはC2サブスロットのため、DOM直接取得でテスト: ${subslotId}`);
+  // 🔍 デバッグ：M1、S、M2、O1、O2、C2、M3サブスロット問題調査のため一時的にDOMから直接取得
+  if (subslotId.includes('slot-m1-sub-') || subslotId.includes('slot-s-sub-') || subslotId.includes('slot-m2-sub-') || subslotId.includes('slot-o1-sub-') || subslotId.includes('slot-o2-sub-') || subslotId.includes('slot-c2-sub-') || subslotId.includes('slot-m3-sub-')) {
+    console.log(`🔍 M1、S、M2、O1、O2、C2、またはM3サブスロットのため、DOM直接取得でテスト: ${subslotId}`);
     return getEnglishTextFromDOM(subslotId);
   }
   
