@@ -524,40 +524,10 @@ window.randomizeSlotC1Individual = randomizeSlotC1Individual;
 function randomizeSlotO1Individual() {
   console.log("🎲🎯 O1スロット個別ランダマイズ開始");
   
-  // 🎭 O1サブスロットエリアにオーバーレイを作成（解答の一瞬表示を防ぐ）
-  const o1SubslotContainer = document.getElementById('slot-o1-sub');
-  let overlay = null;
-  if (o1SubslotContainer) {
-    overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #f8f9fa;
-      z-index: 1000;
-      opacity: 1;
-      transition: opacity 0.3s ease-out;
-      pointer-events: none;
-    `;
-    
-    // コンテナを相対配置に設定
-    const originalPosition = o1SubslotContainer.style.position;
-    o1SubslotContainer.style.position = 'relative';
-    o1SubslotContainer.appendChild(overlay);
-    
-    console.log("🎭 O1サブスロット用オーバーレイを作成しました");
-  }
-  
   // fullSlotPoolの存在確認
   if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
     console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
     alert("エラー: 先に全体ランダマイズを実行してください。");
-    // エラー時はオーバーレイを削除
-    if (overlay) {
-      overlay.remove();
-    }
     return;
   }
   
@@ -565,10 +535,6 @@ function randomizeSlotO1Individual() {
   if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
     console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
     alert("エラー: 現在の選択データが見つかりません。");
-    // エラー時はオーバーレイを削除
-    if (overlay) {
-      overlay.remove();
-    }
     return;
   }
   
@@ -580,10 +546,6 @@ function randomizeSlotO1Individual() {
   if (o1Candidates.length <= 1) {
     console.warn("⚠️ O1スロット候補が1つ以下のため、ランダマイズできません");
     alert("エラー: 同じグループ内にO1スロットの候補が複数ありません。");
-    // エラー時はオーバーレイを削除
-    if (overlay) {
-      overlay.remove();
-    }
     return;
   }
   
@@ -600,10 +562,6 @@ function randomizeSlotO1Individual() {
   if (availableCandidates.length === 0) {
     console.warn("⚠️ 現在と異なるO1スロット候補が見つかりません");
     alert("エラー: 現在と異なるO1スロット候補が見つかりません。");
-    // エラー時はオーバーレイを削除
-    if (overlay) {
-      overlay.remove();
-    }
     return;
   }
   
@@ -687,15 +645,6 @@ function randomizeSlotO1Individual() {
   setTimeout(() => {
     restoreO1SubslotVisibility();
     console.log("🎛️ O1サブスロット表示状態復元完了");
-    
-    // 🎭 オーバーレイをフェードアウト
-    if (overlay) {
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        overlay.remove();
-        console.log("🎭 オーバーレイを削除しました");
-      }, 300); // フェードアウト完了後に削除
-    }
   }, 200);
   
   console.log("✅ O1スロット個別ランダマイズ完了");
