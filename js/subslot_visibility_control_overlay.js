@@ -11,26 +11,37 @@ function createSubslotControlPanel(parentSlot) {
   
   // パネル全体のコンテナ
   const panelContainer = document.createElement('div');
-  panelContainer.id = `subslot-overlay-panel-${parentSlot}`;
-  panelContainer.className = 'subslot-overlay-panel';
+  panelContainer.id = `subslot-// 🔄 ページ読み込み時の自動初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("🔄 サブスロットオーバーレイ制御システムを初期化中...");
   
-  // 制御パネルの表示状態を確認
+  // 制御パネルの初期化（少し遅延させて他のシステムと調整）
+  setTimeout(() => {
+    initializeAllSubslotControlPanels();
+  }, 1500);
+  
+  console.log("✅ サブスロットオーバーレイ制御システム初期化完了");
+});el-${parentSlot}`;
+  panelContainer.className = 'subslot-overlay-panel subslot-visibility-panel'; // 既存システムと連携するためのクラス追加
+  
+  // 制御パネルの表示状態を確認（既存システムと連携）
   let isControlPanelsVisible = false;
   
-  if (window.getControlPanelsVisibility) {
+  if (typeof window.getControlPanelsVisibility === 'function') {
     isControlPanelsVisible = window.getControlPanelsVisibility();
-  }
-  
-  const toggleBtn = document.getElementById('toggle-control-panels');
-  if (toggleBtn) {
-    const btnTextVisible = toggleBtn.textContent.includes('表示中');
-    isControlPanelsVisible = isControlPanelsVisible || btnTextVisible;
-  }
-  
-  const upperPanel = document.getElementById('visibility-control-panel-inline');
-  if (upperPanel) {
-    const upperVisible = upperPanel.style.display !== 'none';
-    isControlPanelsVisible = isControlPanelsVisible || upperVisible;
+  } else {
+    // フォールバック：従来の方法
+    const toggleBtn = document.getElementById('toggle-control-panels');
+    if (toggleBtn) {
+      const btnTextVisible = toggleBtn.textContent.includes('表示中');
+      isControlPanelsVisible = btnTextVisible;
+    }
+    
+    const upperPanel = document.getElementById('visibility-control-panel-inline');
+    if (upperPanel) {
+      const upperVisible = upperPanel.style.display !== 'none';
+      isControlPanelsVisible = isControlPanelsVisible || upperVisible;
+    }
   }
   
   panelContainer.style.cssText = `
@@ -446,16 +457,57 @@ window.applySubslotOverlayState = applySubslotOverlayState;
 
 
 
-// 🔄 ページ読み込み時の自動初期化
+// � サブスロットコントロールパネルの一括初期化
+function initializeAllSubslotControlPanels() {
+  console.log("🏗️ 全サブスロットコントロールパネル初期化開始");
+  
+  SUBSLOT_PARENT_SLOTS.forEach(parentSlot => {
+    const subslotContainer = document.getElementById(`subslot-${parentSlot}`);
+    if (subslotContainer) {
+      // 既存のパネルがあれば削除
+      const existingPanel = document.getElementById(`subslot-overlay-panel-${parentSlot}`);
+      if (existingPanel) {
+        existingPanel.remove();
+      }
+      
+      // 新しいパネルを生成・追加
+      setTimeout(() => {
+        const panel = createSubslotControlPanel(parentSlot);
+        if (panel) {
+          subslotContainer.parentNode.insertBefore(panel, subslotContainer.nextSibling);
+          console.log(`✅ ${parentSlot}サブスロット用オーバーレイコントロールパネル追加完了`);
+          
+          // 制御パネルマネージャーと同期
+          if (typeof window.syncSubslotControlPanelVisibility === 'function') {
+            window.syncSubslotControlPanelVisibility(panel);
+          }
+        }
+      }, 200);
+    }
+  });
+  
+  // 保存されたオーバーレイ状態を復元
+  setTimeout(() => {
+    applySubslotOverlayState();
+  }, 500);
+}
+
+// �🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロットオーバーレイ制御システムを初期化中...");
   
-  // オーバーレイ状態の初期復元
+  // 制御パネルの初期化
   setTimeout(() => {
-    applySubslotOverlayState();
+    initializeAllSubslotControlPanels();
   }, 1000);
   
   console.log("✅ サブスロットオーバーレイ制御システム初期化完了");
 });
+
+// 🌐 グローバル公開
+window.toggleSubslotElementOverlay = toggleSubslotElementOverlay;
+window.applySubslotOverlayState = applySubslotOverlayState;
+window.createSubslotControlPanel = createSubslotControlPanel;
+window.initializeAllSubslotControlPanels = initializeAllSubslotControlPanels;
 
 console.log("✅ subslot_visibility_control_overlay.js が読み込まれました");

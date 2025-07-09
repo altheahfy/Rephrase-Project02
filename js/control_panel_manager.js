@@ -38,11 +38,16 @@ function toggleAllControlPanels() {
     console.warn("⚠ 上位スロット制御パネルが見つかりません");
   }
   
-  // サブスロット制御パネルの表示/非表示
+  // サブスロット制御パネルの表示/非表示（旧方式 + 新方式）
   const subslotPanels = document.querySelectorAll('.subslot-visibility-panel');
-  console.log(`🔍 見つかったサブスロット制御パネル: ${subslotPanels.length}個`);
+  const overlayPanels = document.querySelectorAll('.subslot-overlay-panel');
+  const allSubslotPanels = [...subslotPanels, ...overlayPanels];
   
-  subslotPanels.forEach((panel, index) => {
+  console.log(`🔍 見つかったサブスロット制御パネル: ${subslotPanels.length}個（旧方式）`);
+  console.log(`🔍 見つかったオーバーレイ制御パネル: ${overlayPanels.length}個（新方式）`);
+  console.log(`🔍 合計制御パネル数: ${allSubslotPanels.length}個`);
+  
+  allSubslotPanels.forEach((panel, index) => {
     panel.style.display = newState ? 'block' : 'none';
     console.log(`  - パネル${index + 1} (${panel.id}): ${newState ? '表示' : '非表示'}`);
   });
@@ -62,7 +67,7 @@ function toggleAllControlPanels() {
 
 // 🎛️ サブスロット制御パネルの表示を現在の状態に合わせる
 function syncSubslotControlPanelVisibility(panelElement) {
-  if (panelElement && panelElement.classList.contains('subslot-visibility-panel')) {
+  if (panelElement && (panelElement.classList.contains('subslot-visibility-panel') || panelElement.classList.contains('subslot-overlay-panel'))) {
     panelElement.style.display = window.controlPanelsVisible ? 'block' : 'none';
     console.log(`🔄 サブスロット制御パネルの表示を同期: ${window.controlPanelsVisible ? '表示' : '非表示'}`);
   }
@@ -86,10 +91,18 @@ window.debugControlPanelStatus = function() {
   console.log(`上位パネル表示: ${upperPanel ? upperPanel.style.display : 'パネルなし'}`);
   
   const subslotPanels = document.querySelectorAll('.subslot-visibility-panel');
-  console.log(`サブスロットパネル数: ${subslotPanels.length}`);
+  const overlayPanels = document.querySelectorAll('.subslot-overlay-panel');
+  
+  console.log(`サブスロットパネル数（旧方式）: ${subslotPanels.length}`);
   subslotPanels.forEach((panel, index) => {
-    console.log(`  - パネル${index + 1} (${panel.id}): ${panel.style.display}`);
+    console.log(`  - 旧パネル${index + 1} (${panel.id}): ${panel.style.display}`);
   });
+  
+  console.log(`オーバーレイパネル数（新方式）: ${overlayPanels.length}`);
+  overlayPanels.forEach((panel, index) => {
+    console.log(`  - 新パネル${index + 1} (${panel.id}): ${panel.style.display}`);
+  });
+  
   console.log("🔍 ========================");
 };
 
