@@ -924,7 +924,41 @@ function syncSubslotsFromJson(data) {
   
   console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
   
-  // 🆕 サブスロット同期後にスロット幅調整を実行
+  // 🔄 サブスロット作成後に表示状態を復元（永続化対応）
+  setTimeout(() => {
+    if (typeof window.applyVisibilityState === 'function') {
+      window.applyVisibilityState();
+      console.log("🔄 サブスロット同期後の表示状態復元を実行しました");
+    } else {
+      console.warn("⚠ applyVisibilityState関数が見つかりません");
+    }
+  }, 120);
+  
+  // �️ サブスロット制御パネルの再生成（制御パネル表示状態との同期）
+  setTimeout(() => {
+    // 現在展開されているサブスロットを検出
+    const expandedSubslots = document.querySelectorAll('[id^="slot-"][id$="-sub"]:not([style*="display: none"])');
+    expandedSubslots.forEach(subslotArea => {
+      const parentSlot = subslotArea.id.replace('slot-', '').replace('-sub', '');
+      
+      // 既存のサブスロット制御パネルがあれば削除
+      const existingPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
+      if (existingPanel) {
+        existingPanel.remove();
+      }
+      
+      // 新しいサブスロット制御パネルを生成
+      if (typeof window.createSubslotControlPanel === 'function') {
+        const newPanel = window.createSubslotControlPanel(parentSlot);
+        if (newPanel) {
+          subslotArea.appendChild(newPanel);
+          console.log(`🎛️ ${parentSlot}のサブスロット制御パネルを再生成しました`);
+        }
+      }
+    });
+  }, 100);
+  
+  // �🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
     if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
       window.adjustSlotWidthsBasedOnText();
