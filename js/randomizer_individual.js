@@ -1159,13 +1159,14 @@ function restoreO1SubslotVisibility() {
   try {
     // localStorageから保存された状態を取得
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (!saved) {
-      console.log("📝 O1サブスロット用の保存状態がありません");
-      return;
-    }
+    let subslotVisibilityState = {};
     
-    const subslotVisibilityState = JSON.parse(saved);
-    console.log("📂 復元する状態:", subslotVisibilityState);
+    if (saved) {
+      subslotVisibilityState = JSON.parse(saved);
+      console.log("📂 復元する状態:", subslotVisibilityState);
+    } else {
+      console.log("📝 O1サブスロット用の保存状態がありません - デフォルト状態（全て表示）で復元");
+    }
     
     // O1サブスロットのIDパターンを取得
     const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
@@ -1176,24 +1177,22 @@ function restoreO1SubslotVisibility() {
       const subslotId = subslotElement.id;
       const savedState = subslotVisibilityState[subslotId];
       
-      if (savedState) {
-        console.log(`🎛️ ${subslotId}の状態を復元中:`, savedState);
+      // 各要素タイプ（image, text, auxtext）について復元
+      ['image', 'text', 'auxtext'].forEach(elementType => {
+        // 保存状態がある場合はそれを使用、ない場合はデフォルト（true=表示）
+        const isVisible = savedState && savedState[elementType] !== undefined 
+          ? savedState[elementType] 
+          : true; // デフォルトは表示
         
-        // 各要素タイプ（image, text, auxtext）について復元
-        ['image', 'text', 'auxtext'].forEach(elementType => {
-          const isVisible = savedState[elementType];
-          if (isVisible !== undefined) {
-            console.log(`  - ${elementType}: ${isVisible}`);
-            
-            // 既存のtoggleSubslotElementVisibility関数を使用
-            if (typeof toggleSubslotElementVisibility === "function") {
-              toggleSubslotElementVisibility(subslotId, elementType, isVisible);
-            } else {
-              console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
-            }
-          }
-        });
-      }
+        console.log(`🎛️ ${subslotId}の${elementType}: ${isVisible} ${savedState ? '(保存済み)' : '(デフォルト)'}`);
+        
+        // 既存のtoggleSubslotElementVisibility関数を使用
+        if (typeof toggleSubslotElementVisibility === "function") {
+          toggleSubslotElementVisibility(subslotId, elementType, isVisible);
+        } else {
+          console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
+        }
+      });
     });
     
     console.log("✅ O1サブスロット表示状態復元完了");
