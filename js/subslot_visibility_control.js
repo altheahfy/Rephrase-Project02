@@ -568,6 +568,65 @@ window.restoreSubslotLabels = restoreSubslotLabels;
 window.debugSubslotLabels = debugSubslotLabels;
 window.debugAllSubslotLabels = debugAllSubslotLabels;
 
+// 🆕 サブスロット表示状態の復元機能
+function applySubslotVisibilityState() {
+  console.log("🎨 サブスロット表示状態をDOMに適用中...");
+  
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (!saved) {
+      console.log("📝 保存されたサブスロット表示状態がありません");
+      return;
+    }
+    
+    const subslotVisibilityState = JSON.parse(saved);
+    console.log("📂 復元するサブスロット表示状態:", subslotVisibilityState);
+    
+    Object.keys(subslotVisibilityState).forEach(subslotId => {
+      const subslot = subslotVisibilityState[subslotId];
+      
+      ['image', 'auxtext', 'text'].forEach(elementType => {
+        const isVisible = subslot[elementType];
+        if (isVisible !== undefined) {
+          const subslotElement = document.getElementById(subslotId);
+          if (subslotElement) {
+            const className = `hidden-subslot-${elementType}`;
+            
+            if (isVisible) {
+              subslotElement.classList.remove(className);
+            } else {
+              subslotElement.classList.add(className);
+            }
+            
+            // 複数画像コンテナの直接制御（image要素の場合）
+            if (elementType === 'image') {
+              const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+              if (multiImageContainer) {
+                if (isVisible) {
+                  multiImageContainer.style.display = 'flex';
+                  multiImageContainer.style.visibility = 'visible';
+                } else {
+                  multiImageContainer.style.display = 'none';
+                  multiImageContainer.style.visibility = 'hidden';
+                }
+              }
+            }
+            
+            console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
+          }
+        }
+      });
+    });
+    
+    console.log("✅ サブスロット表示状態の復元完了");
+  } catch (error) {
+    console.error("❌ サブスロット表示状態の復元に失敗:", error);
+  }
+}
+
+// 🆕 グローバル関数としてエクスポート
+window.applySubslotVisibilityState = applySubslotVisibilityState;
+
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロット表示制御システムを初期化中...");
