@@ -926,36 +926,35 @@ function syncSubslotsFromJson(data) {
   
   // 🔄 サブスロット表示状態を復元（永続化対応）
   setTimeout(() => {
-    console.log("�🔥🔥 サブスロット表示状態復元処理開始 🔥🔥🔥");
-    console.log("🔥🔥🔥 この日付でログを確認してください: " + new Date().toLocaleTimeString() + " 🔥🔥🔥");
+    console.log("🔄 サブスロット表示状態復元処理開始");
     
     // まず現在の表示状態をチェック
     if (typeof window.getVisibilityState === 'function') {
       const currentState = window.getVisibilityState();
-      console.log("🔥📊 現在の表示状態:", currentState);
+      console.log("📊 現在の表示状態:", currentState);
     }
     
     // 新しく作成されたサブスロットを確認
     const allSubslots = document.querySelectorAll('[id^="slot-"][id$="-sub-"]');
-    console.log(`🔥🔍 検出されたサブスロット数: ${allSubslots.length}`);
+    console.log(`🔍 検出されたサブスロット数: ${allSubslots.length}`);
     allSubslots.forEach(subslot => {
-      console.log(`🔥  - ${subslot.id}: classes=[${subslot.className}]`);
+      console.log(`  - ${subslot.id}: classes=[${subslot.className}]`);
     });
     
     if (typeof window.applyVisibilityState === 'function') {
       window.applyVisibilityState();
-      console.log("��🔄 サブスロット表示状態を復元しました");
+      console.log("🔄 サブスロット表示状態を復元しました");
       
       // 復元後の状態を確認
       setTimeout(() => {
         const updatedSubslots = document.querySelectorAll('[id^="slot-"][id$="-sub-"]');
-        console.log("��📊 復元後のサブスロット状態:");
+        console.log("📊 復元後のサブスロット状態:");
         updatedSubslots.forEach(subslot => {
-          console.log(`🔥  - ${subslot.id}: classes=[${subslot.className}]`);
+          console.log(`  - ${subslot.id}: classes=[${subslot.className}]`);
         });
       }, 10);
     } else {
-      console.warn("🔥⚠ applyVisibilityState関数が見つかりません");
+      console.warn("⚠ applyVisibilityState関数が見つかりません");
     }
   }, 150);
   
