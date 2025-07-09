@@ -508,3 +508,76 @@ function restoreSubslotLabels() {
 // 🔍 サブスロットのラベル状態をデバッグするための関数
 function debugSubslotLabels(parentSlot) {
   console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ ===`);
+  
+  const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
+  if (!subslotContainer) {
+    console.log(`❌ サブスロットコンテナが見つかりません: slot-${parentSlot}-sub`);
+    return;
+  }
+  
+  const subslots = subslotContainer.querySelectorAll('.subslot-container, .subslot');
+  console.log(`🔍 ${parentSlot} サブスロット総数: ${subslots.length}`);
+  
+  subslots.forEach((subslot, index) => {
+    const labelElement = subslot.querySelector('label');
+    const labelText = labelElement ? labelElement.textContent.trim() : 'ラベルなし';
+    console.log(`  ${index + 1}. ${subslot.id}: ラベル="${labelText}"`);
+  });
+  
+  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ完了 ===`);
+}
+
+// 🔍 全サブスロットのラベル状態をデバッグ
+function debugAllSubslotLabels() {
+  console.log("🔍 === 全サブスロットラベル状態デバッグ開始 ===");
+  
+  SUBSLOT_PARENT_SLOTS.forEach(parentSlot => {
+    debugSubslotLabels(parentSlot);
+  });
+  
+  console.log("🔍 === 全サブスロットラベル状態デバッグ完了 ===");
+}
+
+// 🔹 グローバル関数としてエクスポート
+window.createSubslotControlPanel = createSubslotControlPanel;
+window.addSubslotControlPanel = addSubslotControlPanel;
+window.removeSubslotControlPanel = removeSubslotControlPanel;
+window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
+window.resetSubslotVisibility = resetSubslotVisibility;
+window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
+window.restoreSubslotLabels = restoreSubslotLabels;
+window.debugSubslotLabels = debugSubslotLabels;
+window.debugAllSubslotLabels = debugAllSubslotLabels;
+
+// 🔄 ページ読み込み時の自動初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("🔄 サブスロット表示制御システムを初期化中...");
+  console.log("✅ subslot_toggle.js との連携は自動的に行われます");
+  
+  // 🏷️ ラベル復元システムを有効化
+  console.log("🏷️ サブスロットラベル復元システムを有効化中...");
+  hookDataInsertionForLabelRestore();
+  
+  // サブスロットの展開・折りたたみ監視
+  if (window.MutationObserver) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' || mutation.type === 'attributes') {
+          // サブスロットの表示状態が変化した場合の処理
+          restoreSubslotLabels();
+        }
+      });
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+  }
+  
+  console.log("✅ サブスロット表示制御システム初期化完了");
+});
+
+console.log("✅ subslot_visibility_control.js が読み込まれました");
