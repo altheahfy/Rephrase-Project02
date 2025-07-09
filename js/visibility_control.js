@@ -158,10 +158,13 @@ function applyVisibilityState() {
         // サブスロットも同様に適用
         const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
         subSlots.forEach(subSlot => {
+          // サブスロットには汎用的なクラス名を使用
+          const subslotClassName = `hidden-${elementType}`;
+          
           if (isVisible) {
-            subSlot.classList.remove(className);
+            subSlot.classList.remove(subslotClassName);
           } else {
-            subSlot.classList.add(className);
+            subSlot.classList.add(subslotClassName);
           }
           
           // 🆕 サブスロットの複数画像コンテナも直接制御
