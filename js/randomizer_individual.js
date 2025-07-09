@@ -524,21 +524,10 @@ window.randomizeSlotC1Individual = randomizeSlotC1Individual;
 function randomizeSlotO1Individual() {
   console.log("🎲🎯 O1スロット個別ランダマイズ開始");
   
-  // 🙈 O1サブスロットを一時的に非表示（解答の一瞬表示を防ぐ）
-  const o1SubslotContainer = document.getElementById('slot-o1-sub');
-  if (o1SubslotContainer) {
-    o1SubslotContainer.style.visibility = 'hidden';
-    console.log("🙈 O1サブスロットを一時的に非表示にしました");
-  }
-  
   // fullSlotPoolの存在確認
   if (!window.fullSlotPool || !Array.isArray(window.fullSlotPool)) {
     console.warn("⚠️ window.fullSlotPoolが見つかりません。先に全体ランダマイズを実行してください。");
     alert("エラー: 先に全体ランダマイズを実行してください。");
-    // エラー時は表示を復元
-    if (o1SubslotContainer) {
-      o1SubslotContainer.style.visibility = 'visible';
-    }
     return;
   }
   
@@ -546,10 +535,6 @@ function randomizeSlotO1Individual() {
   if (!window.lastSelectedSlots || !Array.isArray(window.lastSelectedSlots)) {
     console.warn("⚠️ window.lastSelectedSlotsが見つかりません。");
     alert("エラー: 現在の選択データが見つかりません。");
-    // エラー時は表示を復元
-    if (o1SubslotContainer) {
-      o1SubslotContainer.style.visibility = 'visible';
-    }
     return;
   }
   
@@ -561,10 +546,6 @@ function randomizeSlotO1Individual() {
   if (o1Candidates.length <= 1) {
     console.warn("⚠️ O1スロット候補が1つ以下のため、ランダマイズできません");
     alert("エラー: 同じグループ内にO1スロットの候補が複数ありません。");
-    // エラー時は表示を復元
-    if (o1SubslotContainer) {
-      o1SubslotContainer.style.visibility = 'visible';
-    }
     return;
   }
   
@@ -581,10 +562,6 @@ function randomizeSlotO1Individual() {
   if (availableCandidates.length === 0) {
     console.warn("⚠️ 現在と異なるO1スロット候補が見つかりません");
     alert("エラー: 現在と異なるO1スロット候補が見つかりません。");
-    // エラー時は表示を復元
-    if (o1SubslotContainer) {
-      o1SubslotContainer.style.visibility = 'visible';
-    }
     return;
   }
   
@@ -668,13 +645,6 @@ function randomizeSlotO1Individual() {
   setTimeout(() => {
     restoreO1SubslotVisibility();
     console.log("🎛️ O1サブスロット表示状態復元完了");
-    
-    // 👁️ O1サブスロットの表示を復元（一時的な非表示を解除）
-    const o1SubslotContainer = document.getElementById('slot-o1-sub');
-    if (o1SubslotContainer) {
-      o1SubslotContainer.style.visibility = 'visible';
-      console.log("👁️ O1サブスロットを表示状態に復元しました");
-    }
   }, 200);
   
   console.log("✅ O1スロット個別ランダマイズ完了");
