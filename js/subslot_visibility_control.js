@@ -575,7 +575,7 @@ function applySubslotVisibilityState() {
   try {
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
     if (!saved) {
-      console.log("📝 保存されたサブスロット表示状態がありません - デフォルト状態を維持");
+      console.log("📝 保存されたサブスロット表示状態がありません");
       return;
     }
     
@@ -594,10 +594,8 @@ function applySubslotVisibilityState() {
             
             if (isVisible) {
               subslotElement.classList.remove(className);
-              console.log(`🎨 ${subslotId}の${elementType}を表示: hiddenクラス削除`);
             } else {
               subslotElement.classList.add(className);
-              console.log(`🎨 ${subslotId}の${elementType}を非表示: hiddenクラス追加`);
             }
             
             // 複数画像コンテナの直接制御（image要素の場合）
@@ -614,9 +612,7 @@ function applySubslotVisibilityState() {
               }
             }
             
-            console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible} (クラス: ${subslotElement.className})`);
-          } else {
-            console.warn(`⚠️ ${subslotId}の要素が見つかりません - 復元をスキップ`);
+            console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
           }
         }
       });
@@ -630,8 +626,6 @@ function applySubslotVisibilityState() {
 
 // 🆕 グローバル関数としてエクスポート
 window.applySubslotVisibilityState = applySubslotVisibilityState;
-window.diagnoseAndFixSubslotVisibility = diagnoseAndFixSubslotVisibility;
-window.resetSubslotVisibilityState = resetSubslotVisibilityState;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -677,135 +671,4 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("✅ サブスロット表示制御システム初期化完了");
 });
 
-// 🔧 ページ読み込み完了後にO1, C1, C2の診断を実行
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
-      window.diagnoseAndFixSubslotVisibility();
-      console.log("🔧 ページ初期化後: O1, C1, C2の診断を実行しました");
-    }
-  }, 2000); // 2秒後に実行（他の初期化処理の完了を待つ）
-});
-
-// 🔧 デバッグ用: コンソールから実行可能な修正関数
-window.fixO1C1C2 = function() {
-  console.log("🔧 O1, C1, C2の修正を手動実行中...");
-  
-  if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
-    window.diagnoseAndFixSubslotVisibility();
-  }
-  
-  // 追加で非表示設定を再適用
-  if (typeof window.applySubslotVisibilityState === 'function') {
-    window.applySubslotVisibilityState();
-  }
-  
-  console.log("✅ O1, C1, C2の修正完了");
-};
-
-// 🧹 デバッグ用: サブスロット表示状態の完全リセット
-window.resetAllSubslots = function() {
-  console.log("🧹 サブスロット表示状態を完全リセット中...");
-  
-  if (typeof window.resetSubslotVisibilityState === 'function') {
-    window.resetSubslotVisibilityState();
-  }
-  
-  // ページをリロード
-  setTimeout(() => {
-    location.reload();
-  }, 1000);
-};
-
 console.log("✅ subslot_visibility_control.js が読み込まれました");
-
-// 🔧 O1, C1, C2の表示問題診断・修正機能
-function diagnoseAndFixSubslotVisibility() {
-  console.log("🔧 O1, C1, C2のサブスロット表示問題を診断中...");
-  
-  const problematicSlots = ['o1', 'c1', 'c2'];
-  
-  problematicSlots.forEach(slotId => {
-    console.log(`🔍 ${slotId.toUpperCase()}スロットの診断開始`);
-    
-    // サブスロット要素を検索
-    const subslotElements = document.querySelectorAll(`[id^="slot-${slotId}-"]`);
-    console.log(`  - 検出されたサブスロット要素: ${subslotElements.length}個`);
-    
-    subslotElements.forEach(subslot => {
-      if (subslot.id.includes('-sub-')) {
-        console.log(`  - サブスロット: ${subslot.id}`);
-        
-        // テキスト要素の表示状態を確認
-        const textElement = subslot.querySelector('.slot-text');
-        if (textElement) {
-          const computedStyle = getComputedStyle(textElement);
-          const isHidden = subslot.classList.contains('hidden-subslot-text');
-          
-          console.log(`    - テキスト要素: display=${computedStyle.display}, visibility=${computedStyle.visibility}`);
-          console.log(`    - hiddenクラス: ${isHidden}`);
-          console.log(`    - 内容: "${textElement.textContent}"`);
-          
-          // 非表示クラスが不正に適用されている場合は削除
-          if (isHidden && textElement.textContent.trim() !== '') {
-            console.log(`    - 🔧 不正な非表示クラスを削除: ${subslot.id}`);
-            subslot.classList.remove('hidden-subslot-text');
-          }
-        }
-        
-        // 画像要素の表示状態を確認
-        const imageContainer = subslot.querySelector('.multi-image-container');
-        if (imageContainer) {
-          const isImageHidden = subslot.classList.contains('hidden-subslot-image');
-          console.log(`    - 画像要素: display=${imageContainer.style.display}, hidden=${isImageHidden}`);
-          
-          if (isImageHidden) {
-            console.log(`    - 🔧 画像の非表示クラスを削除: ${subslot.id}`);
-            subslot.classList.remove('hidden-subslot-image');
-            imageContainer.style.display = 'flex';
-            imageContainer.style.visibility = 'visible';
-          }
-        }
-        
-        // aux要素の表示状態を確認
-        const auxElement = subslot.querySelector('.slot-phrase');
-        if (auxElement) {
-          const isAuxHidden = subslot.classList.contains('hidden-subslot-auxtext');
-          console.log(`    - aux要素: hidden=${isAuxHidden}, 内容: "${auxElement.textContent}"`);
-          
-          if (isAuxHidden && auxElement.textContent.trim() !== '') {
-            console.log(`    - 🔧 auxの非表示クラスを削除: ${subslot.id}`);
-            subslot.classList.remove('hidden-subslot-auxtext');
-          }
-        }
-      }
-    });
-  });
-  
-  console.log("✅ O1, C1, C2のサブスロット表示問題診断完了");
-}
-
-// 🧹 サブスロット表示状態のリセット機能
-function resetSubslotVisibilityState() {
-  console.log("🧹 サブスロット表示状態をリセット中...");
-  
-  // localStorageをクリア
-  localStorage.removeItem('rephrase_subslot_visibility_state');
-  
-  // 全てのサブスロットから非表示クラスを削除
-  const allSubslots = document.querySelectorAll('[id^="slot-"][id*="-sub-"]');
-  allSubslots.forEach(subslot => {
-    subslot.classList.remove('hidden-subslot-text', 'hidden-subslot-image', 'hidden-subslot-auxtext');
-    
-    // 画像コンテナの表示を復元
-    const imageContainer = subslot.querySelector('.multi-image-container');
-    if (imageContainer) {
-      imageContainer.style.display = 'flex';
-      imageContainer.style.visibility = 'visible';
-    }
-    
-    console.log(`🧹 ${subslot.id}の表示状態をリセット`);
-  });
-  
-  console.log("✅ サブスロット表示状態のリセット完了");
-}
