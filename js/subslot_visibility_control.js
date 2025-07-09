@@ -636,6 +636,11 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🏷️ サブスロットラベル復元システムを有効化中...");
   hookDataInsertionForLabelRestore();
   
+  // 🆕 サブスロット表示状態の初期復元
+  setTimeout(() => {
+    applySubslotVisibilityState();
+  }, 1000); // DOM構築完了を待って復元
+  
   // サブスロットの展開・折りたたみ監視
   if (window.MutationObserver) {
     const observer = new MutationObserver((mutations) => {
@@ -643,6 +648,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mutation.type === 'childList' || mutation.type === 'attributes') {
           // サブスロットの表示状態が変化した場合の処理
           restoreSubslotLabels();
+          
+          // 🆕 サブスロット再生成時に非表示設定を復元
+          setTimeout(() => {
+            applySubslotVisibilityState();
+          }, 100); // DOM変更後少し待ってから復元
         }
       });
     });
