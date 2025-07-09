@@ -950,7 +950,13 @@ function syncSubslotsFromJson(data) {
       console.log("🔄 サブスロット同期後: 非表示設定を復元しました");
     }
     
-    // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
+    // � O1, C1, C2の表示問題を診断・修正
+    if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
+      window.diagnoseAndFixSubslotVisibility();
+      console.log("🔧 O1, C1, C2の表示問題診断・修正を実行しました");
+    }
+    
+    // �🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
     // if (typeof window.processAllImagesWithCoordination === 'function') {
     //   window.processAllImagesWithCoordination();
     // }
