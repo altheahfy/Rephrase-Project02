@@ -1595,22 +1595,27 @@ window.setupSyncObserver = function() {
 // ランダマイザーの監視と同期（ランダマイザー用の特別対応）
 window.setupRandomizerSync = function() {
   try {
-    // ランダマイズボタンを探す
-    const randomizerButtons = document.querySelectorAll('button[data-action="randomize"], button.randomize-button, #randomize-all');
-    if (randomizerButtons.length === 0) {
+    // 🎯 ランダマイズボタンを幅広く検出
+    const randomizerButtons = document.querySelectorAll('button[data-action="randomize"], button.randomize-button, #randomize-all, button[onclick*="randomize"], button[onclick*="refresh"], button[onclick*="random"]');
+    
+    // 個別スロットのランダマイズボタンも検出
+    const individualButtons = document.querySelectorAll('.slot-container button, .subslot-container button');
+    const allButtons = new Set([...randomizerButtons, ...individualButtons]);
+    
+    if (allButtons.size === 0) {
       console.warn("⚠ ランダマイズボタンが見つかりません");
       return;
     }
     
-    console.log(`🎲 ランダマイズボタンを ${randomizerButtons.length}個 検出しました`);
+    console.log(`🎲 ランダマイズボタンを ${allButtons.size}個 検出しました`);
     
     // 各ボタンにイベントリスナーを追加
-    randomizerButtons.forEach((button, index) => {
+    Array.from(allButtons).forEach((button, index) => {
       // 既存のイベントハンドラを保持するための対応
       const originalClickHandler = button.onclick;
       
       button.addEventListener('click', function(event) {
-        console.log(`🎲 ランダマイズボタンがクリックされました (${index + 1})`);
+        console.log(`🎲 ランダマイズボタンがクリックされました (${index + 1}): ${button.id || button.className}`);
         
         // ランダマイズ処理完了後に確実に同期処理を行う
         setTimeout(() => {
@@ -1628,6 +1633,14 @@ window.setupRandomizerSync = function() {
             // 全体の再同期
             window.safeJsonSync(window.loadedJsonData);
             
+            // 🆕 サブスロット表示状態の安全な復元
+            setTimeout(() => {
+              if (typeof window.applySubslotVisibilityState === 'function') {
+                console.log("🎨 ランダマイズ後のサブスロット表示状態を復元します");
+                window.applySubslotVisibilityState();
+              }
+            }, 200); // 同期処理完了後に実行
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);
@@ -1635,7 +1648,7 @@ window.setupRandomizerSync = function() {
         }, 1000); // 1000ms（1秒）に延長 - ランダマイズ処理が確実に完了するのを待つ
       }, true); // キャプチャフェーズでイベントをキャッチ
       
-      console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました`);
+      console.log(`✅ ランダマイズボタン(${index + 1})に同期処理を追加しました: ${button.id || button.className}`);
     });
     
     // window.randomizeAllSlots関数をオーバーライド（存在する場合）
@@ -1659,6 +1672,15 @@ window.setupRandomizerSync = function() {
             }
             
             window.safeJsonSync(window.loadedJsonData);
+            
+            // 🆕 サブスロット表示状態の安全な復元
+            setTimeout(() => {
+              if (typeof window.applySubslotVisibilityState === 'function') {
+                console.log("🎨 randomizeAllSlots後のサブスロット表示状態を復元します");
+                window.applySubslotVisibilityState();
+              }
+            }, 200); // 同期処理完了後に実行
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);
