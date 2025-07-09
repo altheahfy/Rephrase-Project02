@@ -641,14 +641,6 @@ function randomizeSlotO1Individual() {
     }, 150);
   }
   
-  // 🎨 O1サブスロット表示状態を安全に復元（個別ランダマイズ後）
-  setTimeout(() => {
-    if (typeof window.applyO1SubslotVisibilityState === "function") {
-      window.applyO1SubslotVisibilityState();
-      console.log("🎨 O1スロット個別ランダマイズ後の表示状態復元完了");
-    }
-  }, 200);
-  
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
