@@ -74,15 +74,25 @@ function applySubslotVisibilityState() {
       
       const elements = targetElements[elementType];
       if (elements && elements.length > 0) {
-        elements.forEach((el) => {
-          if (isVisible) {
+        if (isVisible) {
+          // 表示時は完全解除機能を使用
+          forceShowByAllMeans(subslotId, elementType);
+          
+          // 追加で基本的な解除も実行
+          elements.forEach((el) => {
             el.style.display = '';
             el.style.visibility = '';
-          } else {
+          });
+        } else {
+          // 非表示時は通常の制御 + 強制非表示
+          elements.forEach((el) => {
             el.style.display = 'none';
             el.style.visibility = 'hidden';
-          }
-        });
+          });
+          
+          // 追加で強制非表示も実行
+          forceHideByAllMeans(subslotId, elementType);
+        }
       }
       
       // 複数画像コンテナの直接制御
@@ -90,11 +100,27 @@ function applySubslotVisibilityState() {
         const multiImageContainer = subslotElement.querySelector('.multi-image-container');
         if (multiImageContainer) {
           if (isVisible) {
+            // 表示時は完全解除
+            multiImageContainer.style.removeProperty('display');
+            multiImageContainer.style.removeProperty('visibility');
+            multiImageContainer.style.removeProperty('opacity');
+            multiImageContainer.style.removeProperty('height');
+            multiImageContainer.style.removeProperty('width');
+            multiImageContainer.style.removeProperty('overflow');
+            multiImageContainer.style.removeProperty('position');
+            multiImageContainer.style.removeProperty('left');
+            multiImageContainer.removeAttribute('data-force-hidden');
+            multiImageContainer.removeAttribute('aria-hidden');
+            multiImageContainer.hidden = false;
             multiImageContainer.style.display = 'flex';
             multiImageContainer.style.visibility = 'visible';
           } else {
+            // 非表示時は強制非表示
             multiImageContainer.style.display = 'none';
             multiImageContainer.style.visibility = 'hidden';
+            multiImageContainer.style.setProperty('opacity', '0', 'important');
+            multiImageContainer.setAttribute('data-force-hidden', 'true');
+            multiImageContainer.hidden = true;
           }
         }
       }
@@ -130,6 +156,21 @@ function restoreSubslotVisibilityAfterIndividualRandomization(targetSlot) {
     
     // 基本的な状態復元
     applySubslotVisibilityState();
+    
+    // 🆕 強制的な状態復元も追加
+    Object.keys(subslotVisibilityState).forEach(subslotId => {
+      const elementState = subslotVisibilityState[subslotId];
+      Object.keys(elementState).forEach(elementType => {
+        const isVisible = elementState[elementType];
+        if (isVisible) {
+          // 表示状態の要素は完全解除を適用
+          forceShowByAllMeans(subslotId, elementType);
+        } else {
+          // 非表示状態の要素は強制非表示を適用
+          forceHideByAllMeans(subslotId, elementType);
+        }
+      });
+    });
     
     // 対象スロットのサブスロットコントロールパネルを再構築
     if (targetSlot) {
@@ -500,7 +541,13 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   
   // 🆕 強制制御も併用（他のスクリプトによる上書きを防ぐ）
   if (isVisible) {
+    // 表示時は完全解除機能を使用
+    forceShowByAllMeans(subslotId, elementType);
+    
+    // 追加で基本的な解除も実行
     forceShowSubslotElements(subslotId, elementType);
+    
+    console.log(`✅ ${subslotId} - ${elementType} 完全表示処理完了`);
   } else {
     // 診断実行
     console.log(`🔬 非表示処理前の診断:`);
@@ -664,11 +711,24 @@ function forceHideSubslotElements(subslotId, elementType) {
   }
 }
 
-// 🔓 サブスロット要素の強制非表示解除
+// 🔓 サブスロット要素の強制非表示解除（完全版）
 function forceShowSubslotElements(subslotId, elementType) {
+  console.log(`🔓 完全解除開始: ${subslotId} - ${elementType}`);
+  
   const subslotElement = document.getElementById(subslotId);
   if (!subslotElement) return;
   
+  // 1. CSSクラス削除
+  const className = `hidden-subslot-${elementType}`;
+  subslotElement.classList.remove(className);
+  
+  // 2. 親要素からもクラス削除
+  const parentContainer = subslotElement.closest('.subslot-container, .subslot');
+  if (parentContainer) {
+    parentContainer.classList.remove(className);
+  }
+  
+  // 3. 対象要素への直接制御解除
   const targetElements = {
     'image': subslotElement.querySelectorAll('.slot-image'),
     'text': subslotElement.querySelectorAll('.slot-phrase'),
@@ -677,28 +737,68 @@ function forceShowSubslotElements(subslotId, elementType) {
   
   const elements = targetElements[elementType];
   if (elements && elements.length > 0) {
-    elements.forEach((el) => {
+    elements.forEach((el, index) => {
+      // 全てのforceHideByAllMeansで適用したスタイルを削除
       el.style.removeProperty('display');
       el.style.removeProperty('visibility');
       el.style.removeProperty('opacity');
+      el.style.removeProperty('height');
+      el.style.removeProperty('width');
+      el.style.removeProperty('overflow');
+      el.style.removeProperty('position');
+      el.style.removeProperty('left');
+      
+      // 全ての非表示属性を削除
       el.removeAttribute('data-force-hidden');
-      console.log(`🔓 強制非表示解除: ${el.tagName}.${el.className}`);
+      el.removeAttribute('aria-hidden');
+      el.hidden = false;
+      
+      // デフォルトの表示状態を復元
+      if (elementType === 'image') {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'inline-block';
+      }
+      
+      console.log(`🔓 ${elementType}要素${index + 1}完全解除完了`);
     });
   }
   
-  // 複数画像コンテナも同様に制御
+  // 4. 複数画像コンテナの完全解除
   if (elementType === 'image') {
     const multiImageContainer = subslotElement.querySelector('.multi-image-container');
     if (multiImageContainer) {
+      // 全てのforceHideByAllMeansで適用したスタイルを削除
       multiImageContainer.style.removeProperty('display');
       multiImageContainer.style.removeProperty('visibility');
       multiImageContainer.style.removeProperty('opacity');
+      multiImageContainer.style.removeProperty('height');
+      multiImageContainer.style.removeProperty('width');
+      multiImageContainer.style.removeProperty('overflow');
+      multiImageContainer.style.removeProperty('position');
+      multiImageContainer.style.removeProperty('left');
+      
+      // 全ての非表示属性を削除
       multiImageContainer.removeAttribute('data-force-hidden');
-      // 複数画像コンテナのデフォルト表示を復元
+      multiImageContainer.removeAttribute('aria-hidden');
+      multiImageContainer.hidden = false;
+      
+      // デフォルトの表示状態を復元
       multiImageContainer.style.display = 'flex';
-      console.log(`🔓 複数画像コンテナ強制非表示解除`);
+      console.log(`🔓 複数画像コンテナ完全解除完了`);
     }
   }
+  
+  // 5. 隠れているCSSクラスも削除
+  const hiddenClasses = ['hidden', 'hide', 'invisible', 'd-none'];
+  hiddenClasses.forEach(cls => {
+    subslotElement.classList.remove(cls);
+    elements.forEach(el => {
+      el.classList.remove(cls);
+    });
+  });
+  
+  console.log(`✅ ${subslotId} - ${elementType} 完全解除完了`);
 }
 
 // 🔬 サブスロット要素の詳細診断
@@ -836,6 +936,96 @@ function forceHideByAllMeans(subslotId, elementType) {
   if (parentContainer) {
     parentContainer.classList.add(className);
   }
+}
+
+// 🔧 全手段による強制非表示の完全解除
+function forceShowByAllMeans(subslotId, elementType) {
+  console.log(`🔧 全手段による強制非表示の完全解除: ${subslotId} - ${elementType}`);
+  
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) return;
+  
+  // 1. CSSクラス削除
+  const className = `hidden-subslot-${elementType}`;
+  subslotElement.classList.remove(className);
+  
+  // 2. 親要素からもクラス削除
+  const parentContainer = subslotElement.closest('.subslot-container, .subslot');
+  if (parentContainer) {
+    parentContainer.classList.remove(className);
+  }
+  
+  // 3. 対象要素への直接制御解除
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el, index) => {
+      // 全てのforceHideByAllMeansで適用したスタイルを削除
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('height');
+      el.style.removeProperty('width');
+      el.style.removeProperty('overflow');
+      el.style.removeProperty('position');
+      el.style.removeProperty('left');
+      
+      // 全ての非表示属性を削除
+      el.removeAttribute('data-force-hidden');
+      el.removeAttribute('aria-hidden');
+      el.hidden = false;
+      
+      // デフォルトの表示状態を復元
+      if (elementType === 'image') {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'inline-block';
+      }
+      
+      console.log(`🔧 ${elementType}要素${index + 1}完全解除完了`);
+    });
+  }
+  
+  // 4. 複数画像コンテナの完全解除
+  if (elementType === 'image') {
+    const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+    if (multiImageContainer) {
+      // 全てのforceHideByAllMeansで適用したスタイルを削除
+      multiImageContainer.style.removeProperty('display');
+      multiImageContainer.style.removeProperty('visibility');
+      multiImageContainer.style.removeProperty('opacity');
+      multiImageContainer.style.removeProperty('height');
+      multiImageContainer.style.removeProperty('width');
+      multiImageContainer.style.removeProperty('overflow');
+      multiImageContainer.style.removeProperty('position');
+      multiImageContainer.style.removeProperty('left');
+      
+      // 全ての非表示属性を削除
+      multiImageContainer.removeAttribute('data-force-hidden');
+      multiImageContainer.removeAttribute('aria-hidden');
+      multiImageContainer.hidden = false;
+      
+      // デフォルトの表示状態を復元
+      multiImageContainer.style.display = 'flex';
+      console.log(`🔧 複数画像コンテナ完全解除完了`);
+    }
+  }
+  
+  // 5. 隠れているCSSクラスも削除
+  const hiddenClasses = ['hidden', 'hide', 'invisible', 'd-none'];
+  hiddenClasses.forEach(cls => {
+    subslotElement.classList.remove(cls);
+    elements.forEach(el => {
+      el.classList.remove(cls);
+    });
+  });
+  
+  console.log(`✅ ${subslotId} - ${elementType} 全手段による完全解除完了`);
 }
 
 // 🏷️ サブスロットラベル復元システム
@@ -1014,6 +1204,8 @@ window.forceShowSubslotElements = forceShowSubslotElements;
 // 🔬 診断・強制制御関数をエクスポート
 window.diagnoseSubslotElementVisibility = diagnoseSubslotElementVisibility;
 window.forceHideByAllMeans = forceHideByAllMeans;
+// 🆕 新しい完全解除機能をエクスポート
+window.forceShowByAllMeans = forceShowByAllMeans;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -1081,6 +1273,9 @@ document.addEventListener('DOMContentLoaded', function() {
           if (!isVisible) {
             // 非表示であるべき要素の状態を維持
             forceHideByAllMeans(subslotId, elementType);
+          } else {
+            // 表示であるべき要素の状態を維持（完全解除）
+            forceShowByAllMeans(subslotId, elementType);
           }
         });
       });
