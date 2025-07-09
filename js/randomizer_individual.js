@@ -125,16 +125,7 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
-  // 🆕 サブスロット表示状態を即座に復元（DOM再構築直後）
-  if (window.neutralizeUpperSlotVisibility) {
-    window.neutralizeUpperSlotVisibility('s');
-  }
-  
-  if (window.applySubslotVisibilityStateImmediately) {
-    window.applySubslotVisibilityStateImmediately('s');
-  }
-  
-  // 🆕 サブスロット表示状態を復元（従来の方法も併用）
+  // 🆕 サブスロット表示状態を復元
   setTimeout(() => {
     if (window.restoreSubslotVisibilityAfterIndividualRandomization) {
       console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
@@ -143,7 +134,7 @@ function randomizeSlotSIndividual() {
       console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
       window.applySubslotVisibilityState();
     }
-  }, 50);
+  }, 200);
   
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
@@ -274,16 +265,7 @@ function randomizeSlotM1Individual() {
     }, 150);
   }
   
-  // 🆕 サブスロット表示状態を即座に復元（DOM再構築直後）
-  if (window.neutralizeUpperSlotVisibility) {
-    window.neutralizeUpperSlotVisibility('m1');
-  }
-  
-  if (window.applySubslotVisibilityStateImmediately) {
-    window.applySubslotVisibilityStateImmediately('m1');
-  }
-  
-  // 🆕 サブスロット表示状態を復元（従来の方法も併用）
+  // 🆕 サブスロット表示状態を復元
   setTimeout(() => {
     if (window.restoreSubslotVisibilityAfterIndividualRandomization) {
       console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
@@ -292,7 +274,7 @@ function randomizeSlotM1Individual() {
       console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
       window.applySubslotVisibilityState();
     }
-  }, 50);
+  }, 200);
   
   console.log("✅ M1スロット個別ランダマイズ完了");
 }
@@ -422,26 +404,6 @@ function randomizeSlotM2Individual() {
       console.log("🎨 M2サブスロット画像更新完了");
     }, 150);
   }
-  
-  // 🆕 サブスロット表示状態を即座に復元（DOM再構築直後）
-  if (window.neutralizeUpperSlotVisibility) {
-    window.neutralizeUpperSlotVisibility('m2');
-  }
-  
-  if (window.applySubslotVisibilityStateImmediately) {
-    window.applySubslotVisibilityStateImmediately('m2');
-  }
-  
-  // 🆕 サブスロット表示状態を復元（従来の方法も併用）
-  setTimeout(() => {
-    if (window.restoreSubslotVisibilityAfterIndividualRandomization) {
-      console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
-      window.restoreSubslotVisibilityAfterIndividualRandomization('m2');
-    } else if (window.applySubslotVisibilityState) {
-      console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
-      window.applySubslotVisibilityState();
-    }
-  }, 50);
   
   console.log("✅ M2スロット個別ランダマイズ完了");
 }
