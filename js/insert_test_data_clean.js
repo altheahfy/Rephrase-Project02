@@ -1628,6 +1628,14 @@ window.setupRandomizerSync = function() {
             // 全体の再同期
             window.safeJsonSync(window.loadedJsonData);
             
+            // 🆕 サブスロットの非表示設定を復元
+            if (typeof window.applySubslotVisibilityState === 'function') {
+              console.log("🎨 ランダマイズ後のサブスロット非表示設定復元");
+              setTimeout(() => {
+                window.applySubslotVisibilityState();
+              }, 300); // DOM更新を待って実行
+            }
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);
@@ -1659,6 +1667,15 @@ window.setupRandomizerSync = function() {
             }
             
             window.safeJsonSync(window.loadedJsonData);
+            
+            // 🆕 サブスロットの非表示設定を復元
+            if (typeof window.applySubslotVisibilityState === 'function') {
+              console.log("🎨 randomizeAllSlots後のサブスロット非表示設定復元");
+              setTimeout(() => {
+                window.applySubslotVisibilityState();
+              }, 300); // DOM更新を待って実行
+            }
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);
