@@ -641,12 +641,6 @@ function randomizeSlotO1Individual() {
     }, 150);
   }
   
-  // 🎛️ O1サブスロットの表示状態を復元（パネル設定を再適用）
-  setTimeout(() => {
-    restoreO1SubslotVisibility();
-    console.log("🎛️ O1サブスロット表示状態復元完了");
-  }, 200);
-  
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
@@ -1148,56 +1142,3 @@ window.checkFullSlotPool = function() {
     total: window.fullSlotPool.length
   };
 };
-
-/**
- * O1サブスロットの表示状態を復元する関数
- * 個別ランダマイズ後に制御パネルの設定を再適用
- */
-function restoreO1SubslotVisibility() {
-  console.log("🎛️ O1サブスロット表示状態復元開始");
-  
-  try {
-    // localStorageから保存された状態を取得
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (!saved) {
-      console.log("📝 O1サブスロット用の保存状態がありません");
-      return;
-    }
-    
-    const subslotVisibilityState = JSON.parse(saved);
-    console.log("📂 復元する状態:", subslotVisibilityState);
-    
-    // O1サブスロットのIDパターンを取得
-    const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
-    console.log(`🔍 O1サブスロット要素: ${o1SubslotElements.length}個`);
-    
-    // 各O1サブスロットについて状態を復元
-    o1SubslotElements.forEach(subslotElement => {
-      const subslotId = subslotElement.id;
-      const savedState = subslotVisibilityState[subslotId];
-      
-      if (savedState) {
-        console.log(`🎛️ ${subslotId}の状態を復元中:`, savedState);
-        
-        // 各要素タイプ（image, text, auxtext）について復元
-        ['image', 'text', 'auxtext'].forEach(elementType => {
-          const isVisible = savedState[elementType];
-          if (isVisible !== undefined) {
-            console.log(`  - ${elementType}: ${isVisible}`);
-            
-            // 既存のtoggleSubslotElementVisibility関数を使用
-            if (typeof toggleSubslotElementVisibility === "function") {
-              toggleSubslotElementVisibility(subslotId, elementType, isVisible);
-            } else {
-              console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
-            }
-          }
-        });
-      }
-    });
-    
-    console.log("✅ O1サブスロット表示状態復元完了");
-  } catch (error) {
-    console.error("❌ O1サブスロット表示状態復元に失敗:", error);
-  }
-}
