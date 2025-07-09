@@ -125,6 +125,13 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization();
+    }, 200);
+  }
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
@@ -252,6 +259,13 @@ function randomizeSlotM1Individual() {
       window.updateSubslotImages('m1');
       console.log("🎨 M1サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization();
+    }, 200);
   }
   
   console.log("✅ M1スロット個別ランダマイズ完了");
