@@ -65,6 +65,26 @@ function applySubslotVisibilityState() {
         subslotElement.classList.add(className);
       }
       
+      // 🆕 直接的なスタイル制御も併用
+      const targetElements = {
+        'image': subslotElement.querySelectorAll('.slot-image'),
+        'text': subslotElement.querySelectorAll('.slot-phrase'),
+        'auxtext': subslotElement.querySelectorAll('.slot-text')
+      };
+      
+      const elements = targetElements[elementType];
+      if (elements && elements.length > 0) {
+        elements.forEach((el) => {
+          if (isVisible) {
+            el.style.display = '';
+            el.style.visibility = '';
+          } else {
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+          }
+        });
+      }
+      
       // 複数画像コンテナの直接制御
       if (elementType === 'image') {
         const multiImageContainer = subslotElement.querySelector('.multi-image-container');
@@ -447,12 +467,42 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   
   const className = `hidden-subslot-${elementType}`;
   
+  // CSSクラスによる制御
   if (isVisible) {
     subslotElement.classList.remove(className);
     console.log(`✅ ${subslotId}の${elementType}を表示しました (removed class: ${className})`);
   } else {
     subslotElement.classList.add(className);
     console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
+  }
+  
+  // 🆕 直接的なスタイル制御も併用（より確実にするため）
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el, index) => {
+      if (isVisible) {
+        el.style.display = '';
+        el.style.visibility = '';
+        console.log(`✅ ${elementType}要素${index + 1}を直接表示: ${el.tagName}.${el.className}`);
+      } else {
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+        console.log(`🙈 ${elementType}要素${index + 1}を直接非表示: ${el.tagName}.${el.className}`);
+      }
+    });
+  }
+  
+  // 🆕 強制制御も併用（他のスクリプトによる上書きを防ぐ）
+  if (isVisible) {
+    forceShowSubslotElements(subslotId, elementType);
+  } else {
+    forceHideSubslotElements(subslotId, elementType);
   }
   
   // 🆕 複数画像コンテナの直接制御（image要素の場合）
@@ -477,17 +527,10 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   saveSubslotVisibilityState();
   
   // 実際に要素が非表示になっているかを確認
-  const targetElements = {
-    'image': subslotElement.querySelectorAll('.slot-image'),
-    'text': subslotElement.querySelectorAll('.slot-phrase'),
-    'auxtext': subslotElement.querySelectorAll('.slot-text')
-  };
-  
-  const elements = targetElements[elementType];
   if (elements && elements.length > 0) {
     elements.forEach((el, index) => {
       const computedStyle = window.getComputedStyle(el);
-      console.log(`📊 ${elementType}要素${index + 1}: display=${computedStyle.display}`);
+      console.log(`📊 ${elementType}要素${index + 1}: display=${computedStyle.display}, visibility=${computedStyle.visibility}`);
     });
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
@@ -564,6 +607,80 @@ function removeSubslotControlPanel(parentSlot) {
   if (panel) {
     panel.remove();
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
+  }
+}
+
+// 🔷 強制非表示制御機能追加
+// 🔒 サブスロット要素の強制非表示制御（他のスクリプトによる上書きを防ぐ）
+function forceHideSubslotElements(subslotId, elementType) {
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) return;
+  
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el) => {
+      // 複数の方法で強制非表示
+      el.style.setProperty('display', 'none', 'important');
+      el.style.setProperty('visibility', 'hidden', 'important');
+      el.style.setProperty('opacity', '0', 'important');
+      el.setAttribute('data-force-hidden', 'true');
+      console.log(`🔒 強制非表示適用: ${el.tagName}.${el.className}`);
+    });
+  }
+  
+  // 複数画像コンテナも同様に制御
+  if (elementType === 'image') {
+    const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+    if (multiImageContainer) {
+      multiImageContainer.style.setProperty('display', 'none', 'important');
+      multiImageContainer.style.setProperty('visibility', 'hidden', 'important');
+      multiImageContainer.style.setProperty('opacity', '0', 'important');
+      multiImageContainer.setAttribute('data-force-hidden', 'true');
+      console.log(`🔒 複数画像コンテナ強制非表示適用`);
+    }
+  }
+}
+
+// 🔓 サブスロット要素の強制非表示解除
+function forceShowSubslotElements(subslotId, elementType) {
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) return;
+  
+  const targetElements = {
+    'image': subslotElement.querySelectorAll('.slot-image'),
+    'text': subslotElement.querySelectorAll('.slot-phrase'),
+    'auxtext': subslotElement.querySelectorAll('.slot-text')
+  };
+  
+  const elements = targetElements[elementType];
+  if (elements && elements.length > 0) {
+    elements.forEach((el) => {
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('opacity');
+      el.removeAttribute('data-force-hidden');
+      console.log(`🔓 強制非表示解除: ${el.tagName}.${el.className}`);
+    });
+  }
+  
+  // 複数画像コンテナも同様に制御
+  if (elementType === 'image') {
+    const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+    if (multiImageContainer) {
+      multiImageContainer.style.removeProperty('display');
+      multiImageContainer.style.removeProperty('visibility');
+      multiImageContainer.style.removeProperty('opacity');
+      multiImageContainer.removeAttribute('data-force-hidden');
+      // 複数画像コンテナのデフォルト表示を復元
+      multiImageContainer.style.display = 'flex';
+      console.log(`🔓 複数画像コンテナ強制非表示解除`);
+    }
   }
 }
 
@@ -737,16 +854,19 @@ window.applySubslotVisibilityState = applySubslotVisibilityState;
 window.getSubslotVisibilityState = getSubslotVisibilityState;
 // 🔄 個別ランダマイズ後の状態復元関数をエクスポート
 window.restoreSubslotVisibilityAfterIndividualRandomization = restoreSubslotVisibilityAfterIndividualRandomization;
+// 🔒 強制制御関数をエクスポート
+window.forceHideSubslotElements = forceHideSubslotElements;
+window.forceShowSubslotElements = forceShowSubslotElements;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロット表示制御システムを初期化中...");
   console.log("✅ subslot_toggle.js との連携は自動的に行われます");
   
-  // � サブスロット状態管理システムを初期化
+  // サブスロット状態管理システムを初期化
   initializeSubslotVisibilityState();
   
-  // �🏷️ ラベル復元システムを有効化
+  // 🏷️ ラベル復元システムを有効化
   console.log("🏷️ サブスロットラベル復元システムを有効化中...");
   hookDataInsertionForLabelRestore();
   
@@ -771,6 +891,28 @@ document.addEventListener('DOMContentLoaded', function() {
       subtree: true,
       attributes: true,
       attributeFilter: ['style', 'class']
+    });
+    
+    // 🆕 強制非表示状態を維持するための監視
+    const forceHideObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const target = mutation.target;
+          if (target.hasAttribute('data-force-hidden')) {
+            // 強制非表示状態が上書きされた場合は復元
+            target.style.setProperty('display', 'none', 'important');
+            target.style.setProperty('visibility', 'hidden', 'important');
+            target.style.setProperty('opacity', '0', 'important');
+            console.log(`🔒 強制非表示状態を復元: ${target.tagName}.${target.className}`);
+          }
+        }
+      });
+    });
+    
+    forceHideObserver.observe(document.body, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['style']
     });
   }
   
