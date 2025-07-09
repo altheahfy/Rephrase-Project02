@@ -650,9 +650,12 @@ document.addEventListener('DOMContentLoaded', function() {
           restoreSubslotLabels();
           
           // 🆕 サブスロット再生成時に非表示設定を復元
+          // 一時的に無効化 - 無限ループの可能性があるため
+          /*
           setTimeout(() => {
             applySubslotVisibilityState();
           }, 100); // DOM変更後少し待ってから復元
+          */
         }
       });
     });
