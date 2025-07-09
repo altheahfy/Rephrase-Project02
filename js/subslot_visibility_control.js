@@ -146,85 +146,83 @@ function getSubslotVisibilityState() {
 function restoreSubslotVisibilityAfterIndividualRandomization(targetSlot) {
   console.log(`🔄 個別ランダマイズ後の状態復元開始: ${targetSlot}`);
   
-  // 複数回の復元試行（DOM再構築の遅延を考慮）
-  const maxRetries = 5;
-  let retryCount = 0;
+  // 0. 上位スロットの非表示状態を即座に回避
+  neutralizeUpperSlotVisibility(targetSlot);
   
-  const attemptRestore = () => {
-    retryCount++;
-    console.log(`🔄 状態復元試行 ${retryCount}/${maxRetries}`);
-    
-    // 基本的な状態復元
+  // 1. 即座適用（DOM再構築直後に即実行）
+  applySubslotVisibilityStateImmediately(targetSlot);
+  
+  // 2. 少し遅延してから通常の適用も実行（安全策）
+  setTimeout(() => {
     applySubslotVisibilityState();
-    
-    // 🆕 強制的な状態復元も追加
-    Object.keys(subslotVisibilityState).forEach(subslotId => {
-      const elementState = subslotVisibilityState[subslotId];
-      Object.keys(elementState).forEach(elementType => {
-        const isVisible = elementState[elementType];
-        if (isVisible) {
-          // 表示状態の要素は完全解除を適用
-          forceShowByAllMeans(subslotId, elementType);
-        } else {
-          // 非表示状態の要素は強制非表示を適用
-          forceHideByAllMeans(subslotId, elementType);
-        }
-      });
-    });
-    
-    // 対象スロットのサブスロットコントロールパネルを再構築
-    if (targetSlot) {
-      const subslotContainer = document.getElementById(`slot-${targetSlot}-sub`);
-      if (subslotContainer && getComputedStyle(subslotContainer).display !== 'none') {
-        // パネルを再作成
-        setTimeout(() => {
-          removeSubslotControlPanel(targetSlot);
-          setTimeout(() => {
-            addSubslotControlPanel(targetSlot);
-            console.log(`🎛️ ${targetSlot}サブスロットコントロールパネル再構築完了`);
-          }, 100);
-        }, 50);
-      }
-    }
-    
-    // 復元が完了していない場合は再試行
-    if (retryCount < maxRetries) {
+    console.log(`🔄 ${targetSlot} 通常適用完了`);
+  }, 50);
+  
+  // 3. さらに遅延してサブスロットコントロールパネルを再構築
+  setTimeout(() => {
+    const subslotContainer = document.getElementById(`slot-${targetSlot}-sub`);
+    if (subslotContainer && getComputedStyle(subslotContainer).display !== 'none') {
+      // パネルを再作成
+      removeSubslotControlPanel(targetSlot);
       setTimeout(() => {
-        // 状態が正しく適用されているかチェック
-        let needsRetry = false;
-        Object.keys(subslotVisibilityState).forEach(subslotId => {
-          const subslotElement = document.getElementById(subslotId);
-          if (subslotElement) {
-            const elementState = subslotVisibilityState[subslotId];
-            Object.keys(elementState).forEach(elementType => {
-              const isVisible = elementState[elementType];
-              const className = `hidden-subslot-${elementType}`;
-              const hasHiddenClass = subslotElement.classList.contains(className);
-              
-              if (isVisible && hasHiddenClass) {
-                needsRetry = true;
-                console.log(`🔄 要素が表示されるべきなのに非表示: ${subslotId}-${elementType}`);
-              } else if (!isVisible && !hasHiddenClass) {
-                needsRetry = true;
-                console.log(`🔄 要素が非表示であるべきなのに表示: ${subslotId}-${elementType}`);
-              }
-            });
+        addSubslotControlPanel(targetSlot);
+        console.log(`🎛️ ${targetSlot}サブスロットコントロールパネル再構築完了`);
+      }, 100);
+    }
+  }, 150);
+  
+  // 4. 最終確認（最大3回まで再試行）
+  let retryCount = 0;
+  const maxRetries = 3;
+  
+  const finalCheck = () => {
+    retryCount++;
+    console.log(`🔄 最終確認試行 ${retryCount}/${maxRetries}`);
+    
+    let needsRetry = false;
+    Object.keys(subslotVisibilityState).forEach(subslotId => {
+      if (!subslotId.includes(`slot-${targetSlot}-sub-`)) return;
+      
+      const subslotElement = document.getElementById(subslotId);
+      if (subslotElement) {
+        const elementState = subslotVisibilityState[subslotId];
+        Object.keys(elementState).forEach(elementType => {
+          const isVisible = elementState[elementType];
+          
+          if (!isVisible) {
+            // 非表示であるべき要素が表示されていないかチェック
+            const targetElements = {
+              'image': subslotElement.querySelectorAll('.slot-image'),
+              'text': subslotElement.querySelectorAll('.slot-phrase'),
+              'auxtext': subslotElement.querySelectorAll('.slot-text')
+            };
+            
+            const elements = targetElements[elementType];
+            if (elements && elements.length > 0) {
+              elements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                if (computedStyle.display !== 'none' || computedStyle.visibility !== 'hidden') {
+                  needsRetry = true;
+                  console.log(`🔄 要素が非表示されていません: ${subslotId}-${elementType}`);
+                  // 再度強制非表示を適用
+                  forceHideByAllMeans(subslotId, elementType);
+                }
+              });
+            }
           }
         });
-        
-        if (needsRetry) {
-          attemptRestore();
-        } else {
-          console.log(`✅ 状態復元完了: ${targetSlot}`);
-        }
-      }, 200);
+      }
+    });
+    
+    if (needsRetry && retryCount < maxRetries) {
+      setTimeout(finalCheck, 200);
     } else {
-      console.log(`⚠️ 状態復元の最大試行回数に達しました: ${targetSlot}`);
+      console.log(`✅ 状態復元完了: ${targetSlot} (試行回数: ${retryCount})`);
     }
   };
   
-  // 初回試行
-  setTimeout(attemptRestore, 100);
+  // 最終確認を開始
+  setTimeout(finalCheck, 300);
 }
 
 // 🏗️ サブスロット用コントロールパネルを生成
@@ -1028,184 +1026,132 @@ function forceShowByAllMeans(subslotId, elementType) {
   console.log(`✅ ${subslotId} - ${elementType} 全手段による完全解除完了`);
 }
 
-// 🏷️ サブスロットラベル復元システム
-function hookDataInsertionForLabelRestore() {
-  console.log("🏷️ サブスロットラベル復元システムをフックします");
+// 🔧 個別ランダマイズ時の即座適用機能（DOM再構築直後に即実行）
+function applySubslotVisibilityStateImmediately(targetSlot) {
+  console.log(`⚡ 個別ランダマイズ時の即座適用: ${targetSlot}`);
   
-  // 既存のrestoreSubslotLabels関数をラップ
-  const originalRestore = window.restoreSubslotLabels;
+  // 1. 上位スロットの非表示状態を一時的に無効化
+  const upperSlotElement = document.getElementById(`slot-${targetSlot}`);
+  if (upperSlotElement) {
+    // 上位スロットの非表示クラスを一時的に削除
+    const upperHiddenClasses = Array.from(upperSlotElement.classList).filter(cls => cls.startsWith('hidden-'));
+    upperHiddenClasses.forEach(cls => {
+      upperSlotElement.classList.remove(cls);
+      console.log(`🔓 上位スロット非表示クラス削除: ${cls}`);
+    });
+  }
   
-  // 定期的なラベル復元処理
-  setInterval(() => {
-    restoreSubslotLabels();
-  }, 5000); // 5秒ごとに復元チェック
-  
-  // MutationObserverでサブスロットの変更を監視
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList' || mutation.type === 'characterData') {
-        // サブスロットの変更を検出した場合、ラベルを復元
-        const target = mutation.target;
-        if (target.closest && target.closest('.subslot-container')) {
-          setTimeout(() => {
-            restoreSubslotLabels();
-          }, 100);
+  // 2. サブスロットの非表示状態を即座に適用
+  Object.keys(subslotVisibilityState).forEach(subslotId => {
+    const subslotElement = document.getElementById(subslotId);
+    if (!subslotElement) return;
+    
+    // 対象スロットのサブスロットのみ処理
+    if (!subslotId.includes(`slot-${targetSlot}-sub-`)) return;
+    
+    const elementState = subslotVisibilityState[subslotId];
+    Object.keys(elementState).forEach(elementType => {
+      const isVisible = elementState[elementType];
+      
+      if (!isVisible) {
+        console.log(`⚡ 即座強制非表示: ${subslotId} - ${elementType}`);
+        
+        // 即座に完全非表示を適用
+        forceHideByAllMeans(subslotId, elementType);
+        
+        // 追加で要素を確実に非表示
+        const targetElements = {
+          'image': subslotElement.querySelectorAll('.slot-image'),
+          'text': subslotElement.querySelectorAll('.slot-phrase'),
+          'auxtext': subslotElement.querySelectorAll('.slot-text')
+        };
+        
+        const elements = targetElements[elementType];
+        if (elements && elements.length > 0) {
+          elements.forEach(el => {
+            el.style.setProperty('display', 'none', 'important');
+            el.style.setProperty('visibility', 'hidden', 'important');
+            el.style.setProperty('opacity', '0', 'important');
+            el.hidden = true;
+            el.setAttribute('data-force-hidden', 'true');
+          });
         }
+        
+        // 複数画像コンテナも即座に非表示
+        if (elementType === 'image') {
+          const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+          if (multiImageContainer) {
+            multiImageContainer.style.setProperty('display', 'none', 'important');
+            multiImageContainer.style.setProperty('visibility', 'hidden', 'important');
+            multiImageContainer.style.setProperty('opacity', '0', 'important');
+            multiImageContainer.hidden = true;
+            multiImageContainer.setAttribute('data-force-hidden', 'true');
+          }
+        }
+      } else {
+        console.log(`⚡ 即座表示解除: ${subslotId} - ${elementType}`);
+        
+        // 表示時は完全解除
+        forceShowByAllMeans(subslotId, elementType);
       }
     });
   });
   
-  // 全てのサブスロットコンテナを監視
-  const subslotContainers = document.querySelectorAll('.subslot-container');
-  subslotContainers.forEach(container => {
-    observer.observe(container, {
-      childList: true,
-      subtree: true,
-      characterData: true
+  // 3. チェックボックスの状態も同期
+  Object.keys(subslotVisibilityState).forEach(subslotId => {
+    if (!subslotId.includes(`slot-${targetSlot}-sub-`)) return;
+    
+    const elementState = subslotVisibilityState[subslotId];
+    Object.keys(elementState).forEach(elementType => {
+      const isVisible = elementState[elementType];
+      const checkbox = document.querySelector(`[data-subslot-id="${subslotId}"][data-element-type="${elementType}"]`);
+      if (checkbox) {
+        checkbox.checked = isVisible;
+      }
     });
   });
   
-  console.log("✅ サブスロットラベル復元システムがフックされました");
+  console.log(`✅ 即座適用完了: ${targetSlot}`);
 }
 
-// 🏷️ サブスロットのラベルを復元する関数（デバウンス機能付き）
-// let labelRestoreTimeout = null;
-// let isLabelRestoring = false;
-
-function restoreSubslotLabels() {
-  // 既に処理中の場合は重複実行を防ぐ
-  if (isLabelRestoring) {
-    console.log("⏭️ ラベル復元処理が既に実行中のため、重複実行をスキップします");
-    return;
-  }
+// 🔧 個別ランダマイズ用の上位スロット非表示状態回避機能
+function neutralizeUpperSlotVisibility(targetSlot) {
+  console.log(`🔧 上位スロット非表示状態を回避: ${targetSlot}`);
   
-  // 既存のタイマーをクリア
-  if (labelRestoreTimeout) {
-    clearTimeout(labelRestoreTimeout);
-    console.log("⏰ 既存のラベル復元タイマーをクリアしました");
-  }
+  const upperSlotElement = document.getElementById(`slot-${targetSlot}`);
+  if (!upperSlotElement) return;
   
-  // デバウンス：短時間の連続呼び出しを防ぐ
-  labelRestoreTimeout = setTimeout(() => {
-    isLabelRestoring = true;
-    console.log("🏷️ サブスロットラベル復元処理を開始");
-    
-    // 全てのサブスロットコンテナを検索
-    const subslotContainers = document.querySelectorAll('.subslot-container');
-    
-    subslotContainers.forEach(container => {
-      // サブスロット要素を検索
-      const subslots = container.querySelectorAll('[id*="-sub-"]');
-      
-      subslots.forEach(subslot => {
-        const slotId = subslot.id;
-        
-        // IDからサブスロットタイプを抽出 (例: slot-m1-sub-s → s)
-        const match = slotId.match(/-sub-([^-]+)$/);
-        if (match) {
-          const subslotType = match[1];
-          
-          // 既存のラベルを確認
-          let existingLabel = subslot.querySelector('label');
-          
-          if (!existingLabel) {
-            // ラベルが存在しない場合は作成
-            existingLabel = document.createElement('label');
-            existingLabel.textContent = subslotType.toUpperCase();
-            existingLabel.style.cssText = `
-              display: block;
-              font-weight: bold;
-              margin-bottom: 5px;
-              color: #333;
-              font-size: 14px;
-            `;
-            
-            // サブスロットの最初の要素として挿入
-            subslot.insertBefore(existingLabel, subslot.firstChild);
-            
-            console.log(`✅ サブスロット ${slotId} にラベル "${subslotType.toUpperCase()}" を復元しました`);
-          } else {
-            // ラベルが存在する場合は内容を確認・修正
-            if (existingLabel.textContent !== subslotType.toUpperCase()) {
-              existingLabel.textContent = subslotType.toUpperCase();
-              console.log(`🔄 サブスロット ${slotId} のラベルを修正しました`);
-            }
-          }
-        }
-      });
-    });
-    
-    console.log("✅ サブスロットラベル復元処理が完了しました");
-    isLabelRestoring = false;
-    
-    // 🖼 ラベル復元完了後に画像処理を実行（一度だけ）
-    if (typeof window.processAllImagesWithCoordination === 'function') {
-      setTimeout(() => {
-        window.processAllImagesWithCoordination();
-      }, 50);
-    }
-  }, 200); // 200ms のデバウンス
-}
-
-// 🔍 サブスロットのラベル状態をデバッグするための関数
-function debugSubslotLabels(parentSlot) {
-  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ ===`);
-  
-  const subslotContainer = document.getElementById(`slot-${parentSlot}-sub`);
-  if (!subslotContainer) {
-    console.log(`❌ サブスロットコンテナが見つかりません: slot-${parentSlot}-sub`);
-    return;
-  }
-  
-  const subslots = subslotContainer.querySelectorAll('.subslot-container, .subslot');
-  console.log(`🔍 ${parentSlot} サブスロット総数: ${subslots.length}`);
-  
-  subslots.forEach((subslot, index) => {
-    const labelElement = subslot.querySelector('label');
-    const labelText = labelElement ? labelElement.textContent.trim() : 'ラベルなし';
-    console.log(`  ${index + 1}. ${subslot.id}: ラベル="${labelText}"`);
+  // 上位スロットの非表示クラスを全て削除
+  const hiddenClasses = Array.from(upperSlotElement.classList).filter(cls => cls.startsWith('hidden-'));
+  hiddenClasses.forEach(cls => {
+    upperSlotElement.classList.remove(cls);
+    console.log(`🔓 上位スロット非表示クラス削除: ${cls}`);
   });
   
-  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ完了 ===`);
-}
-
-// 🔍 全サブスロットのラベル状態をデバッグ
-function debugAllSubslotLabels() {
-  console.log("🔍 === 全サブスロットラベル状態デバッグ開始 ===");
+  // 上位スロットの直接スタイルも削除
+  upperSlotElement.style.removeProperty('display');
+  upperSlotElement.style.removeProperty('visibility');
+  upperSlotElement.style.removeProperty('opacity');
+  upperSlotElement.removeAttribute('data-force-hidden');
+  upperSlotElement.hidden = false;
   
-  SUBSLOT_PARENT_SLOTS.forEach(parentSlot => {
-    debugSubslotLabels(parentSlot);
-  });
+  // サブスロットコンテナも表示状態に
+  const subslotContainer = document.getElementById(`slot-${targetSlot}-sub`);
+  if (subslotContainer) {
+    subslotContainer.style.removeProperty('display');
+    subslotContainer.style.removeProperty('visibility');
+    subslotContainer.style.removeProperty('opacity');
+    subslotContainer.removeAttribute('data-force-hidden');
+    subslotContainer.hidden = false;
+    
+    // 上位スロットの影響を受けないようにサブスロットコンテナを強制表示
+    subslotContainer.style.setProperty('display', 'block', 'important');
+    subslotContainer.style.setProperty('visibility', 'visible', 'important');
+    subslotContainer.style.setProperty('opacity', '1', 'important');
+  }
   
-  console.log("🔍 === 全サブスロットラベル状態デバッグ完了 ===");
+  console.log(`✅ 上位スロット非表示状態回避完了: ${targetSlot}`);
 }
-
-// 🔹 グローバル関数としてエクスポート
-window.createSubslotControlPanel = createSubslotControlPanel;
-window.addSubslotControlPanel = addSubslotControlPanel;
-window.removeSubslotControlPanel = removeSubslotControlPanel;
-window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
-window.resetSubslotVisibility = resetSubslotVisibility;
-window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
-window.restoreSubslotLabels = restoreSubslotLabels;
-window.debugSubslotLabels = debugSubslotLabels;
-window.debugAllSubslotLabels = debugAllSubslotLabels;
-// 🆕 状態管理関数をエクスポート
-window.initializeSubslotVisibilityState = initializeSubslotVisibilityState;
-window.saveSubslotVisibilityState = saveSubslotVisibilityState;
-window.loadSubslotVisibilityState = loadSubslotVisibilityState;
-window.applySubslotVisibilityState = applySubslotVisibilityState;
-window.getSubslotVisibilityState = getSubslotVisibilityState;
-// 🔄 個別ランダマイズ後の状態復元関数をエクスポート
-window.restoreSubslotVisibilityAfterIndividualRandomization = restoreSubslotVisibilityAfterIndividualRandomization;
-// 🔒 強制制御関数をエクスポート
-window.forceHideSubslotElements = forceHideSubslotElements;
-window.forceShowSubslotElements = forceShowSubslotElements;
-// 🔬 診断・強制制御関数をエクスポート
-window.diagnoseSubslotElementVisibility = diagnoseSubslotElementVisibility;
-window.forceHideByAllMeans = forceHideByAllMeans;
-// 🆕 新しい完全解除機能をエクスポート
-window.forceShowByAllMeans = forceShowByAllMeans;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -1286,3 +1232,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+
+// 🔹 グローバル関数としてエクスポート
+window.createSubslotControlPanel = createSubslotControlPanel;
+window.addSubslotControlPanel = addSubslotControlPanel;
+window.removeSubslotControlPanel = removeSubslotControlPanel;
+window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
+window.resetSubslotVisibility = resetSubslotVisibility;
+window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
+window.restoreSubslotLabels = restoreSubslotLabels;
+window.debugSubslotLabels = debugSubslotLabels;
+window.debugAllSubslotLabels = debugAllSubslotLabels;
+// 🆕 状態管理関数をエクスポート
+window.initializeSubslotVisibilityState = initializeSubslotVisibilityState;
+window.saveSubslotVisibilityState = saveSubslotVisibilityState;
+window.loadSubslotVisibilityState = loadSubslotVisibilityState;
+window.applySubslotVisibilityState = applySubslotVisibilityState;
+window.getSubslotVisibilityState = getSubslotVisibilityState;
+// 🔄 個別ランダマイズ後の状態復元関数をエクスポート
+window.restoreSubslotVisibilityAfterIndividualRandomization = restoreSubslotVisibilityAfterIndividualRandomization;
+// 🔒 強制制御関数をエクスポート
+window.forceHideSubslotElements = forceHideSubslotElements;
+window.forceShowSubslotElements = forceShowSubslotElements;
+// 🔬 診断・強制制御関数をエクスポート
+window.diagnoseSubslotElementVisibility = diagnoseSubslotElementVisibility;
+window.forceHideByAllMeans = forceHideByAllMeans;
+window.forceShowByAllMeans = forceShowByAllMeans;
+// 🆕 個別ランダマイズ時の即座適用機能をエクスポート
+window.applySubslotVisibilityStateImmediately = applySubslotVisibilityStateImmediately;
+window.neutralizeUpperSlotVisibility = neutralizeUpperSlotVisibility;
