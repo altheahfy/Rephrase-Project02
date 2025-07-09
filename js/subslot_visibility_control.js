@@ -48,17 +48,13 @@ function applySubslotVisibilityState() {
   
   Object.keys(subslotVisibilityState).forEach(subslotId => {
     const subslotElement = document.getElementById(subslotId);
-    if (!subslotElement) {
-      console.warn(`⚠️ サブスロット要素が見つかりません: ${subslotId}`);
-      return;
-    }
+    if (!subslotElement) return;
     
     const elementState = subslotVisibilityState[subslotId];
     Object.keys(elementState).forEach(elementType => {
       const isVisible = elementState[elementType];
       const className = `hidden-subslot-${elementType}`;
       
-      // DOM要素のクラス制御
       if (isVisible) {
         subslotElement.classList.remove(className);
       } else {
@@ -78,13 +74,6 @@ function applySubslotVisibilityState() {
           }
         }
       }
-      
-      // 🆕 対応するチェックボックスの状態も同期
-      const checkbox = document.querySelector(`[data-subslot-id="${subslotId}"][data-element-type="${elementType}"]`);
-      if (checkbox) {
-        checkbox.checked = isVisible;
-        console.log(`🔄 チェックボックス同期: ${subslotId}-${elementType} = ${isVisible}`);
-      }
     });
   });
   
@@ -94,76 +83,6 @@ function applySubslotVisibilityState() {
 // 📊 サブスロットの表示状態を取得
 function getSubslotVisibilityState() {
   return { ...subslotVisibilityState };
-}
-
-// 🔄 個別ランダマイズ後の状態復元を強化
-function restoreSubslotVisibilityAfterIndividualRandomization(targetSlot) {
-  console.log(`🔄 個別ランダマイズ後の状態復元開始: ${targetSlot}`);
-  
-  // 複数回の復元試行（DOM再構築の遅延を考慮）
-  const maxRetries = 5;
-  let retryCount = 0;
-  
-  const attemptRestore = () => {
-    retryCount++;
-    console.log(`🔄 状態復元試行 ${retryCount}/${maxRetries}`);
-    
-    // 基本的な状態復元
-    applySubslotVisibilityState();
-    
-    // 対象スロットのサブスロットコントロールパネルを再構築
-    if (targetSlot) {
-      const subslotContainer = document.getElementById(`slot-${targetSlot}-sub`);
-      if (subslotContainer && getComputedStyle(subslotContainer).display !== 'none') {
-        // パネルを再作成
-        setTimeout(() => {
-          removeSubslotControlPanel(targetSlot);
-          setTimeout(() => {
-            addSubslotControlPanel(targetSlot);
-            console.log(`🎛️ ${targetSlot}サブスロットコントロールパネル再構築完了`);
-          }, 100);
-        }, 50);
-      }
-    }
-    
-    // 復元が完了していない場合は再試行
-    if (retryCount < maxRetries) {
-      setTimeout(() => {
-        // 状態が正しく適用されているかチェック
-        let needsRetry = false;
-        Object.keys(subslotVisibilityState).forEach(subslotId => {
-          const subslotElement = document.getElementById(subslotId);
-          if (subslotElement) {
-            const elementState = subslotVisibilityState[subslotId];
-            Object.keys(elementState).forEach(elementType => {
-              const isVisible = elementState[elementType];
-              const className = `hidden-subslot-${elementType}`;
-              const hasHiddenClass = subslotElement.classList.contains(className);
-              
-              if (isVisible && hasHiddenClass) {
-                needsRetry = true;
-                console.log(`🔄 要素が表示されるべきなのに非表示: ${subslotId}-${elementType}`);
-              } else if (!isVisible && !hasHiddenClass) {
-                needsRetry = true;
-                console.log(`🔄 要素が非表示であるべきなのに表示: ${subslotId}-${elementType}`);
-              }
-            });
-          }
-        });
-        
-        if (needsRetry) {
-          attemptRestore();
-        } else {
-          console.log(`✅ 状態復元完了: ${targetSlot}`);
-        }
-      }, 200);
-    } else {
-      console.log(`⚠️ 状態復元の最大試行回数に達しました: ${targetSlot}`);
-    }
-  };
-  
-  // 初回試行
-  setTimeout(attemptRestore, 100);
 }
 
 // 🏗️ サブスロット用コントロールパネルを生成
@@ -735,8 +654,6 @@ window.saveSubslotVisibilityState = saveSubslotVisibilityState;
 window.loadSubslotVisibilityState = loadSubslotVisibilityState;
 window.applySubslotVisibilityState = applySubslotVisibilityState;
 window.getSubslotVisibilityState = getSubslotVisibilityState;
-// 🔄 個別ランダマイズ後の状態復元関数をエクスポート
-window.restoreSubslotVisibilityAfterIndividualRandomization = restoreSubslotVisibilityAfterIndividualRandomization;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
