@@ -201,53 +201,117 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   `;
   
   SUB_ELEMENT_TYPES.forEach(elementType => {
-    const label = document.createElement('label');
-    label.style.cssText = `
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      cursor: pointer;
-    `;
+    // O1のSサブスロットのイラスト部分のみをボタンに変更
+    const isO1SubS = (parentSlot === 'o1' && subslotType === 's' && elementType === 'image');
     
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'subslot-visibility-checkbox';
-    checkbox.dataset.parentSlot = parentSlot;
-    checkbox.dataset.subslotId = subslotId;
-    checkbox.dataset.subslotType = subslotType;
-    checkbox.dataset.elementType = elementType;
-    checkbox.checked = true; // 初期状態は表示
-    
-    // チェックボックス変更時のイベント
-    checkbox.addEventListener('change', function() {
-      console.log(`🎛️ チェックボックス変更イベント:`);
-      console.log(`  - subslotId: ${this.dataset.subslotId}`);
-      console.log(`  - elementType: ${this.dataset.elementType}`);
-      console.log(`  - checked: ${this.checked}`);
+    if (isO1SubS) {
+      // ボタン形式で作成
+      const button = document.createElement('button');
+      button.className = 'subslot-visibility-button';
+      button.dataset.parentSlot = parentSlot;
+      button.dataset.subslotId = subslotId;
+      button.dataset.subslotType = subslotType;
+      button.dataset.elementType = elementType;
+      button.dataset.overlayActive = 'false'; // オーバーレイ状態を管理
       
-      toggleSubslotElementVisibility(
-        this.dataset.subslotId,
-        this.dataset.elementType,
-        this.checked
-      );
-    });
-    
-    const icon = document.createElement('span');
-    switch(elementType) {
-      case 'image':
-        icon.textContent = '🖼️';
-        break;
-      case 'text':
-        icon.textContent = '📄';
-        break;
-      case 'auxtext':
-        icon.textContent = '📝';
-        break;
+      // ボタンスタイル
+      button.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 10px;
+        margin-bottom: 2px;
+      `;
+      
+      // アイコンとテキスト
+      const icon = document.createElement('span');
+      icon.textContent = '🖼️';
+      const text = document.createElement('span');
+      text.textContent = '表示';
+      
+      button.appendChild(icon);
+      button.appendChild(text);
+      
+      // ボタンクリック時のイベント（オーバーレイ方式）
+      button.addEventListener('click', function() {
+        const isOverlayActive = this.dataset.overlayActive === 'true';
+        const newState = !isOverlayActive;
+        
+        console.log(`🎛️ O1-S イラストボタンクリック: ${subslotId} - overlay: ${isOverlayActive} → ${newState}`);
+        
+        // オーバーレイの切り替え
+        toggleSubslotElementOverlay(subslotId, elementType, newState);
+        
+        // ボタンの状態を更新
+        this.dataset.overlayActive = newState.toString();
+        const textSpan = this.querySelector('span:last-child');
+        if (newState) {
+          textSpan.textContent = '非表示';
+          this.style.background = '#ffcccc';
+          this.style.borderColor = '#ff9999';
+        } else {
+          textSpan.textContent = '表示';
+          this.style.background = '#f0f0f0';
+          this.style.borderColor = '#ccc';
+        }
+      });
+      
+      checkboxContainer.appendChild(button);
+    } else {
+      // 他の要素は従来通りチェックボックス
+      const label = document.createElement('label');
+      label.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        cursor: pointer;
+      `;
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'subslot-visibility-checkbox';
+      checkbox.dataset.parentSlot = parentSlot;
+      checkbox.dataset.subslotId = subslotId;
+      checkbox.dataset.subslotType = subslotType;
+      checkbox.dataset.elementType = elementType;
+      checkbox.checked = true; // 初期状態は表示
+      
+      // チェックボックス変更時のイベント
+      checkbox.addEventListener('change', function() {
+        console.log(`🎛️ チェックボックス変更イベント:`);
+        console.log(`  - subslotId: ${this.dataset.subslotId}`);
+        console.log(`  - elementType: ${this.dataset.elementType}`);
+        console.log(`  - checked: ${this.checked}`);
+        
+        toggleSubslotElementVisibility(
+          this.dataset.subslotId,
+          this.dataset.elementType,
+          this.checked
+        );
+      });
+      
+      const icon = document.createElement('span');
+      switch(elementType) {
+        case 'image':
+          icon.textContent = '🖼️';
+          break;
+        case 'text':
+          icon.textContent = '📄';
+          break;
+        case 'auxtext':
+          icon.textContent = '📝';
+          break;
+      }
+      
+      label.appendChild(checkbox);
+      label.appendChild(icon);
+      checkboxContainer.appendChild(label);
     }
-    
-    label.appendChild(checkbox);
-    label.appendChild(icon);
-    checkboxContainer.appendChild(label);
   });
   
   controlGroup.appendChild(checkboxContainer);
@@ -403,6 +467,81 @@ function removeSubslotControlPanel(parentSlot) {
     panel.remove();
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
   }
+}
+
+// 🎭 オーバーレイ方式でのサブスロット要素制御
+function toggleSubslotElementOverlay(subslotId, elementType, showOverlay) {
+  console.log(`🎭 オーバーレイ制御: ${subslotId} - ${elementType} = ${showOverlay ? 'オーバーレイ表示' : 'オーバーレイ削除'}`);
+  
+  const subslotElement = document.getElementById(subslotId);
+  if (!subslotElement) {
+    console.warn(`⚠ サブスロット要素が見つかりません: ${subslotId}`);
+    return;
+  }
+  
+  // 対象要素を特定
+  let targetElements = [];
+  if (elementType === 'image') {
+    targetElements = subslotElement.querySelectorAll('.slot-image, .multi-image-container');
+  } else if (elementType === 'text') {
+    targetElements = subslotElement.querySelectorAll('.slot-text');
+  } else if (elementType === 'auxtext') {
+    targetElements = subslotElement.querySelectorAll('.slot-auxtext');
+  }
+  
+  console.log(`🔍 対象要素数: ${targetElements.length}`);
+  
+  targetElements.forEach((element, index) => {
+    const overlayId = `overlay-${subslotId}-${elementType}-${index}`;
+    const existingOverlay = document.getElementById(overlayId);
+    
+    if (showOverlay) {
+      // オーバーレイを表示
+      if (!existingOverlay) {
+        const overlay = document.createElement('div');
+        overlay.id = overlayId;
+        overlay.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #f0f0f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          color: #666;
+          font-weight: bold;
+          z-index: 1000;
+          pointer-events: none;
+          border: 2px solid #ddd;
+          box-sizing: border-box;
+        `;
+        overlay.textContent = '非表示';
+        
+        // 親要素をrelativeにする
+        const computedStyle = getComputedStyle(element);
+        if (computedStyle.position === 'static') {
+          element.style.position = 'relative';
+        }
+        
+        element.appendChild(overlay);
+        console.log(`✅ オーバーレイ追加: ${overlayId}`);
+      }
+    } else {
+      // オーバーレイを削除
+      if (existingOverlay) {
+        existingOverlay.remove();
+        console.log(`✅ オーバーレイ削除: ${overlayId}`);
+      }
+    }
+  });
+  
+  // 状態をlocalStorageに保存
+  const storageKey = `subslot-overlay-${subslotId}-${elementType}`;
+  localStorage.setItem(storageKey, showOverlay.toString());
+  console.log(`💾 状態保存: ${storageKey} = ${showOverlay}`);
 }
 
 // 🏷️ サブスロットラベル復元システム
@@ -648,27 +787,3 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mutation.type === 'childList' || mutation.type === 'attributes') {
           // サブスロットの表示状態が変化した場合の処理
           restoreSubslotLabels();
-          
-          // 🆕 サブスロット再生成時に非表示設定を復元
-          // 一時的に無効化 - 無限ループの可能性があるため
-          /*
-          setTimeout(() => {
-            applySubslotVisibilityState();
-          }, 100); // DOM変更後少し待ってから復元
-          */
-        }
-      });
-    });
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'class']
-    });
-  }
-  
-  console.log("✅ サブスロット表示制御システム初期化完了");
-});
-
-console.log("✅ subslot_visibility_control.js が読み込まれました");
