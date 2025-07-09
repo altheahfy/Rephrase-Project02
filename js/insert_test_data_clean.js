@@ -812,7 +812,7 @@ function syncUpperSlotsFromJson(data) {
 
 // ✅ サブスロット同期機能の実装（完全リセット＋再構築方式）
 function syncSubslotsFromJson(data) {
-  console.log("🔄 サブスロット同期（DOM保持型）開始");
+  console.log("🔄 サブスロット同期（DOM保持型v2）開始");
   if (!data || !Array.isArray(data)) {
     console.warn("⚠ サブスロット同期: データが無効です");
     return;
@@ -856,21 +856,15 @@ function syncSubslotsFromJson(data) {
       return;
     }
     
-    // 既存のサブスロット要素を取得
-    const existingSubslots = parentContainer.querySelectorAll('.slot-container');
-    const existingSubslotMap = new Map();
+    console.log(`🔍 ${parentSlot}の処理開始`);
     
-    existingSubslots.forEach(el => {
-      if (el.id) {
-        existingSubslotMap.set(el.id, el);
-      }
-    });
+    // 🧹 STEP3.1: 親コンテナを完全にクリア（確実にリセット）
+    console.log(`🧹 ${parentContainerId} を完全クリア`);
+    while (parentContainer.firstChild) {
+      parentContainer.removeChild(parentContainer.firstChild);
+    }
     
-    console.log(`📊 ${parentSlot}: 既存サブスロット ${existingSubslots.length}個, 新データ ${groupedData[parentSlot].length}個`);
-    
-    // 新しいデータに基づいてサブスロットを更新/作成
-    const processedIds = new Set();
-    
+    // 🔧 STEP3.2: 新しいデータに基づいてサブスロットを作成
     groupedData[parentSlot].forEach(item => {
       try {
         // DisplayAtTopの要素をサブスロットから除外
@@ -883,94 +877,58 @@ function syncSubslotsFromJson(data) {
 
         const subslotId = item.SubslotID.toLowerCase();
         const fullSlotId = `slot-${parentSlot}-${subslotId}`;
-        processedIds.add(fullSlotId);
         
-        // 既存要素があるかチェック
-        const existingElement = existingSubslotMap.get(fullSlotId);
+        console.log(`🆕 サブスロット作成: ${fullSlotId}`);
         
-        if (existingElement) {
-          // 🔄 既存要素のテキスト内容だけを更新（DOMやクラスは保持）
-          console.log(`🔄 既存サブスロット更新: ${fullSlotId}`);
-          
-          // ラベル要素を更新
-          const labelElement = existingElement.querySelector('label');
-          if (labelElement) {
-            labelElement.textContent = subslotId.toUpperCase();
-          }
-          
-          // phrase要素を更新
-          const phraseElement = existingElement.querySelector('.slot-phrase');
-          if (phraseElement) {
-            phraseElement.textContent = item.SubslotElement || '';
-          }
-          
-          // text要素を更新
-          const textElement = existingElement.querySelector('.slot-text');
-          if (textElement) {
-            textElement.textContent = item.SubslotText || '';
-          }
-          
-          console.log(`✅ サブスロット更新完了: ${fullSlotId} | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
-          
-        } else {
-          // 🆕 新規要素を作成
-          console.log(`🆕 新規サブスロット作成: ${fullSlotId}`);
-          
-          const slotElement = document.createElement('div');
-          slotElement.id = fullSlotId;
-          slotElement.className = 'slot-container';
-          
-          // 🏷️ ラベル要素を作成（最初に追加）
-          const labelElement = document.createElement('label');
-          labelElement.textContent = subslotId.toUpperCase();
-          labelElement.style.cssText = `
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-            font-size: 14px;
-          `;
-          
-          // phrase要素を作成
-          const phraseElement = document.createElement('div');
-          phraseElement.className = 'slot-phrase';
-          if (item.SubslotElement) {
-            phraseElement.textContent = item.SubslotElement;
-          }
-          
-          // text要素を作成
-          const textElement = document.createElement('div');
-          textElement.className = 'slot-text';
-          if (item.SubslotText) {
-            textElement.textContent = item.SubslotText;
-          }
-          
-          // 要素を組み立て（ラベルを最初に追加）
-          slotElement.appendChild(labelElement);
-          slotElement.appendChild(phraseElement);
-          slotElement.appendChild(textElement);
-          
-          // 親コンテナに追加
-          parentContainer.appendChild(slotElement);
-          
-          console.log(`✅ サブスロット新規作成完了: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
+        // 🆕 新しいサブスロットDOM要素を作成
+        const slotElement = document.createElement('div');
+        slotElement.id = fullSlotId;
+        slotElement.className = 'slot-container';
+        
+        // 🏷️ ラベル要素を作成（最初に追加）
+        const labelElement = document.createElement('label');
+        labelElement.textContent = subslotId.toUpperCase();
+        labelElement.style.cssText = `
+          display: block;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #333;
+          font-size: 14px;
+        `;
+        
+        // phrase要素を作成
+        const phraseElement = document.createElement('div');
+        phraseElement.className = 'slot-phrase';
+        if (item.SubslotElement) {
+          phraseElement.textContent = item.SubslotElement;
         }
+        
+        // text要素を作成
+        const textElement = document.createElement('div');
+        textElement.className = 'slot-text';
+        if (item.SubslotText) {
+          textElement.textContent = item.SubslotText;
+        }
+        
+        // 要素を組み立て（ラベルを最初に追加）
+        slotElement.appendChild(labelElement);
+        slotElement.appendChild(phraseElement);
+        slotElement.appendChild(textElement);
+        
+        // 親コンテナに追加
+        parentContainer.appendChild(slotElement);
+        
+        console.log(`✅ サブスロット作成完了: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
         
       } catch (err) {
         console.error(`❌ サブスロット処理エラー: ${err.message}`, item);
       }
     });
     
-    // 🗑️ STEP4: 不要な既存サブスロットを削除
-    existingSubslots.forEach(el => {
-      if (el.id && !processedIds.has(el.id)) {
-        console.log(`🗑️ 不要サブスロット削除: ${el.id}`);
-        el.remove();
-      }
-    });
+    console.log(`✅ ${parentSlot}の処理完了: ${groupedData[parentSlot].length}個のサブスロット作成`);
   });
   
-  console.log("✅ サブスロット同期完了（DOM保持型）");
+  console.log("✅ サブスロット同期完了（DOM保持型v2）");
   
   // 🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
@@ -984,6 +942,12 @@ function syncSubslotsFromJson(data) {
     if (window.restoreSubslotLabels) {
       window.restoreSubslotLabels();
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
+    }
+    
+    // 🔄 非表示設定を復元
+    if (typeof window.applySubslotVisibilityState === 'function') {
+      window.applySubslotVisibilityState();
+      console.log("🔄 サブスロット同期後: 非表示設定を復元しました");
     }
     
     // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
