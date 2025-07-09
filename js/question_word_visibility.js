@@ -1,11 +1,8 @@
 // 🔹 分離疑問詞の表示制御システム
 // question-word-text (疑問詞テキスト) と question-word-auxtext (補助テキスト) の表示/非表示を制御
 
-// 🎯 疑問詞の表示状態を管理
-let questionWordVisibilityState = {
-  text: true,     // 疑問詞テキスト（What, Who等）
-  auxtext: true   // 補助テキスト（何？、誰？等）
-};
+// 🎯 疑問詞の表示状態を管理（グローバル変数を使用）
+// questionWordVisibilityState は visibility_control.js で宣言済み
 
 // 🔧 疑問詞の表示制御
 function toggleQuestionWordVisibility(elementType, isVisible) {
