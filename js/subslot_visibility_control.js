@@ -228,26 +228,31 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
       button.dataset.elementType = elementType;
       button.dataset.overlayActive = 'false'; // 初期状態は非表示オーバーレイ無し
       
-      // ボタンの初期状態を設定
-      const updateButtonState = (isOverlayActive) => {
-        if (isOverlayActive) {
-          button.style.background = '#ffcc99';
-          button.style.color = '#333';
-          button.textContent = '🖼️ 隠す';
-        } else {
-          button.style.background = '#f0f0f0';
-          button.style.color = '#333';
-          button.textContent = '🖼️ 表示';
-        }
-      };
-      
-      // 初期状態を設定
-      updateButtonState(false);
+      // ボタンの初期状態を設定（②修正: 切替ボタンに）
+      button.style.background = '#f0f0f0';
+      button.style.color = '#333';
+      button.textContent = '🖼️';
       
       // ボタンクリック時のイベント
       button.addEventListener('click', function() {
         const currentOverlayState = this.dataset.overlayActive === 'true';
         const newOverlayState = !currentOverlayState;
+        
+        console.log(`🎛️ O1-sub-s-imageボタンクリック:`);
+        console.log(`  - subslotId: ${this.dataset.subslotId}`);
+        console.log(`  - elementType: ${this.dataset.elementType}`);
+        console.log(`  - overlayActive: ${currentOverlayState} → ${newOverlayState}`);
+        
+        // オーバーレイ制御を呼び出し
+        toggleSubslotElementOverlay(
+          this.dataset.subslotId,
+          this.dataset.elementType,
+          newOverlayState
+        );
+        
+        // ボタンの状態を更新
+        this.dataset.overlayActive = newOverlayState.toString();
+      });
         
         console.log(`🎛️ O1-sub-s-imageボタンクリック:`);
         console.log(`  - subslotId: ${this.dataset.subslotId}`);
@@ -435,21 +440,21 @@ function toggleSubslotElementOverlay(subslotId, elementType, isOverlayActive) {
         multiImageContainer.style.position = 'relative';
         
         // 既存のオーバーレイを削除
-        const existingOverlay = multiImageContainer.querySelector('.image-overlay');
+        const existingOverlay = multiImageContainer.querySelector('.persistent-image-overlay');
         if (existingOverlay) {
           existingOverlay.remove();
         }
         
-        // 新しいオーバーレイを作成
+        // 新しいオーバーレイを作成（①修正: 完全不透明に）
         const overlay = document.createElement('div');
-        overlay.className = 'image-overlay';
+        overlay.className = 'persistent-image-overlay';
         overlay.style.cssText = `
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(255, 255, 255, 0.8);
+          background: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -460,7 +465,7 @@ function toggleSubslotElementOverlay(subslotId, elementType, isOverlayActive) {
         // オーバーレイ内容
         const overlayContent = document.createElement('div');
         overlayContent.style.cssText = `
-          background: rgba(0, 0, 0, 0.7);
+          background: rgba(0, 0, 0, 0.8);
           color: white;
           padding: 8px 12px;
           border-radius: 4px;
@@ -475,7 +480,7 @@ function toggleSubslotElementOverlay(subslotId, elementType, isOverlayActive) {
         console.log(`✅ ${subslotId}の複数画像コンテナにオーバーレイを適用しました`);
       } else {
         // オーバーレイを削除
-        const existingOverlay = multiImageContainer.querySelector('.image-overlay');
+        const existingOverlay = multiImageContainer.querySelector('.persistent-image-overlay');
         if (existingOverlay) {
           existingOverlay.remove();
           console.log(`🙈 ${subslotId}の複数画像コンテナのオーバーレイを削除しました`);
@@ -533,6 +538,7 @@ function resetSubslotVisibility(parentSlot) {
     
     // ボタンの状態を更新
     button.dataset.overlayActive = 'false';
+    
     button.style.background = '#f0f0f0';
     button.style.color = '#333';
     button.textContent = '🖼️ 表示';
@@ -845,17 +851,6 @@ function applySubslotOverlayState() {
           const button = document.querySelector(`[data-subslot-id="${subslotId}"][data-element-type="${elementType}"]`);
           if (button && button.dataset.overlayActive !== undefined) {
             button.dataset.overlayActive = isOverlayActive.toString();
-            
-            // ボタンの表示を更新
-            if (isOverlayActive) {
-              button.style.background = '#ffcc99';
-              button.style.color = '#333';
-              button.textContent = '🖼️ 隠す';
-            } else {
-              button.style.background = '#f0f0f0';
-              button.style.color = '#333';
-              button.textContent = '🖼️ 表示';
-            }
           }
           
           console.log(`🎨 ${subslotId}の${elementType}オーバーレイ状態を復元: ${isOverlayActive}`);
@@ -869,9 +864,32 @@ function applySubslotOverlayState() {
   }
 }
 
-// 🆕 グローバル関数としてエクスポート
-window.applySubslotVisibilityState = applySubslotVisibilityState;
-window.applySubslotOverlayState = applySubslotOverlayState;
+// 🆕 ランダマイズ後のオーバーレイ復元を確実にするためのフック
+function hookRandomizeButton() {
+  console.log("🎯 ランダマイズボタンにオーバーレイ復元機能をフック中...");
+  
+  // ランダマイズボタンを取得
+  const randomizeButton = document.getElementById('randomize-btn');
+  if (randomizeButton) {
+    // 既存のクリックイベントリスナーに追加でフック
+    randomizeButton.addEventListener('click', function() {
+      console.log("🎯 ランダマイズボタンがクリックされました - オーバーレイ復元を準備中...");
+      
+      // ランダマイズ完了後にオーバーレイ状態を復元
+      setTimeout(() => {
+        console.log("🔄 ランダマイズ後のオーバーレイ状態復元を実行中...");
+        applySubslotOverlayState();
+      }, 1500); // ランダマイズ処理完了を待つ
+    });
+    
+    console.log("✅ ランダマイズボタンにオーバーレイ復元機能をフックしました");
+  } else {
+    console.warn("⚠ ランダマイズボタンが見つかりません");
+  }
+}
+
+// グローバル関数としてエクスポート
+window.hookRandomizeButton = hookRandomizeButton;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -886,6 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     applySubslotVisibilityState();
     applySubslotOverlayState();
+    hookRandomizeButton(); // ③④修正: ランダマイズボタンをフック
   }, 1000); // DOM構築完了を待って復元
   
   // サブスロットの展開・折りたたみ監視
@@ -896,13 +915,10 @@ document.addEventListener('DOMContentLoaded', function() {
           // サブスロットの表示状態が変化した場合の処理
           restoreSubslotLabels();
           
-          // 🆕 サブスロット再生成時に非表示設定を復元
-          // 一時的に無効化 - 無限ループの可能性があるため
-          /*
+          // 🆕 ③④修正: ランダマイズ後のオーバーレイ状態復元
           setTimeout(() => {
-            applySubslotVisibilityState();
-          }, 100); // DOM変更後少し待ってから復元
-          */
+            applySubslotOverlayState();
+          }, 800); // DOM更新完了を待ってからオーバーレイを復元
         }
       });
     });
