@@ -311,25 +311,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
-  
-  // 🆕 サブスロット表示状態をlocalStorageに保存
-  try {
-    let subslotVisibilityState = {};
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (saved) {
-      subslotVisibilityState = JSON.parse(saved);
-    }
-    
-    if (!subslotVisibilityState[subslotId]) {
-      subslotVisibilityState[subslotId] = {};
-    }
-    subslotVisibilityState[subslotId][elementType] = isVisible;
-    
-    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
-    console.log(`💾 ${subslotId}の${elementType}状態を保存しました: ${isVisible}`);
-  } catch (error) {
-    console.error("❌ サブスロット表示状態の保存に失敗:", error);
-  }
 }
 
 // 🔄 サブスロットの全表示リセット
@@ -446,8 +427,8 @@ function hookDataInsertionForLabelRestore() {
 }
 
 // 🏷️ サブスロットのラベルを復元する関数（デバウンス機能付き）
-let labelRestoreTimeout = null;
-let isLabelRestoring = false;
+// let labelRestoreTimeout = null;
+// let isLabelRestoring = false;
 
 function restoreSubslotLabels() {
   // 既に処理中の場合は重複実行を防ぐ
@@ -567,65 +548,7 @@ window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
 window.restoreSubslotLabels = restoreSubslotLabels;
 window.debugSubslotLabels = debugSubslotLabels;
 window.debugAllSubslotLabels = debugAllSubslotLabels;
-
-// 🆕 サブスロット表示状態の復元機能
-function applySubslotVisibilityState() {
-  console.log("🎨 サブスロット表示状態をDOMに適用中...");
-  
-  try {
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (!saved) {
-      console.log("📝 保存されたサブスロット表示状態がありません");
-      return;
-    }
-    
-    const subslotVisibilityState = JSON.parse(saved);
-    console.log("📂 復元するサブスロット表示状態:", subslotVisibilityState);
-    
-    Object.keys(subslotVisibilityState).forEach(subslotId => {
-      const subslot = subslotVisibilityState[subslotId];
-      
-      ['image', 'auxtext', 'text'].forEach(elementType => {
-        const isVisible = subslot[elementType];
-        if (isVisible !== undefined) {
-          const subslotElement = document.getElementById(subslotId);
-          if (subslotElement) {
-            const className = `hidden-subslot-${elementType}`;
-            
-            if (isVisible) {
-              subslotElement.classList.remove(className);
-            } else {
-              subslotElement.classList.add(className);
-            }
-            
-            // 複数画像コンテナの直接制御（image要素の場合）
-            if (elementType === 'image') {
-              const multiImageContainer = subslotElement.querySelector('.multi-image-container');
-              if (multiImageContainer) {
-                if (isVisible) {
-                  multiImageContainer.style.display = 'flex';
-                  multiImageContainer.style.visibility = 'visible';
-                } else {
-                  multiImageContainer.style.display = 'none';
-                  multiImageContainer.style.visibility = 'hidden';
-                }
-              }
-            }
-            
-            console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
-          }
-        }
-      });
-    });
-    
-    console.log("✅ サブスロット表示状態の復元完了");
-  } catch (error) {
-    console.error("❌ サブスロット表示状態の復元に失敗:", error);
-  }
-}
-
-// 🆕 グローバル関数としてエクスポート
-window.applySubslotVisibilityState = applySubslotVisibilityState;
+window.applyO1SubslotVisibilityState = applyO1SubslotVisibilityState;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -636,11 +559,6 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🏷️ サブスロットラベル復元システムを有効化中...");
   hookDataInsertionForLabelRestore();
   
-  // 🆕 サブスロット表示状態の初期復元
-  setTimeout(() => {
-    applySubslotVisibilityState();
-  }, 1000); // DOM構築完了を待って復元
-  
   // サブスロットの展開・折りたたみ監視
   if (window.MutationObserver) {
     const observer = new MutationObserver((mutations) => {
@@ -648,14 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mutation.type === 'childList' || mutation.type === 'attributes') {
           // サブスロットの表示状態が変化した場合の処理
           restoreSubslotLabels();
-          
-          // 🆕 サブスロット再生成時に非表示設定を復元
-          // 一時的に無効化 - 無限ループの可能性があるため
-          /*
-          setTimeout(() => {
-            applySubslotVisibilityState();
-          }, 100); // DOM変更後少し待ってから復元
-          */
         }
       });
     });
@@ -672,3 +582,72 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+
+// 🆕 O1サブスロット専用の安全な表示状態復元機能
+function applyO1SubslotVisibilityState() {
+  console.log("🎨 O1サブスロット表示状態をDOMに適用中...");
+  
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (!saved) {
+      console.log("📝 O1: 保存されたサブスロット表示状態がありません");
+      return;
+    }
+    
+    const subslotVisibilityState = JSON.parse(saved);
+    console.log("📂 O1: 復元するサブスロット表示状態:", subslotVisibilityState);
+    
+    // O1のサブスロットのみに限定して処理
+    Object.keys(subslotVisibilityState).forEach(subslotId => {
+      // O1のサブスロットのみを対象とする
+      if (!subslotId.startsWith('slot-o1-sub-')) {
+        return;
+      }
+      
+      const subslot = subslotVisibilityState[subslotId];
+      const subslotElement = document.getElementById(subslotId);
+      
+      if (!subslotElement) {
+        console.warn(`⚠️ O1サブスロット要素が見つかりません: ${subslotId}`);
+        return;
+      }
+      
+      ['image', 'auxtext', 'text'].forEach(elementType => {
+        const isVisible = subslot[elementType];
+        
+        // 明示的に記録されている場合のみ処理
+        if (isVisible !== undefined) {
+          const className = `hidden-subslot-${elementType}`;
+          
+          if (isVisible) {
+            subslotElement.classList.remove(className);
+            console.log(`✅ O1復元: ${subslotId}の${elementType}を表示`);
+          } else {
+            subslotElement.classList.add(className);
+            console.log(`🙈 O1復元: ${subslotId}の${elementType}を非表示`);
+          }
+          
+          // 複数画像コンテナの直接制御（image要素の場合）
+          if (elementType === 'image') {
+            const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+            if (multiImageContainer) {
+              if (isVisible) {
+                multiImageContainer.style.display = 'flex';
+                multiImageContainer.style.visibility = 'visible';
+              } else {
+                multiImageContainer.style.display = 'none';
+                multiImageContainer.style.visibility = 'hidden';
+              }
+            }
+          }
+        } else {
+          console.log(`📝 O1スキップ: ${subslotId}の${elementType}は記録なし - 現在の状態を維持`);
+        }
+      });
+    });
+    
+    console.log("✅ O1サブスロット表示状態の復元完了");
+  } catch (error) {
+    console.error("❌ O1サブスロット表示状態の復元に失敗:", error);
+  }
+}
