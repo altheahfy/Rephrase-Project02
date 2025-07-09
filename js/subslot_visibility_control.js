@@ -5,91 +5,6 @@
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
 const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
 
-// 🔧 サブスロットの表示状態を管理するオブジェクト
-let subslotVisibilityState = {};
-
-// 🔧 サブスロット表示状態を初期化
-function initializeSubslotVisibilityState() {
-  // 既存の状態がある場合は保持
-  if (Object.keys(subslotVisibilityState).length === 0) {
-    subslotVisibilityState = {};
-  }
-  console.log("🔄 サブスロット表示状態を初期化しました:", subslotVisibilityState);
-}
-
-// 📁 サブスロット表示状態をlocalStorageに保存
-function saveSubslotVisibilityState() {
-  try {
-    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
-    console.log("💾 サブスロット表示状態を保存しました:", subslotVisibilityState);
-  } catch (error) {
-    console.error("❌ サブスロット表示状態の保存に失敗:", error);
-  }
-}
-
-// 📂 サブスロット表示状態をlocalStorageから読み込み
-function loadSubslotVisibilityState() {
-  try {
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (saved) {
-      subslotVisibilityState = JSON.parse(saved);
-      console.log("📂 保存されたサブスロット表示状態を読み込みました:", subslotVisibilityState);
-      
-      // 読み込んだ状態をDOMに適用
-      applySubslotVisibilityState();
-    } else {
-      console.log("📝 保存されたサブスロット表示状態がないため、初期化します");
-      initializeSubslotVisibilityState();
-    }
-  } catch (error) {
-    console.error("❌ サブスロット表示状態の読み込みに失敗:", error);
-    initializeSubslotVisibilityState();
-  }
-}
-
-// 🎨 現在のサブスロット表示状態をDOMに適用
-function applySubslotVisibilityState() {
-  console.log("🎨 サブスロット表示状態をDOMに適用中...");
-  
-  Object.keys(subslotVisibilityState).forEach(subslotId => {
-    const subslot = subslotVisibilityState[subslotId];
-    
-    SUB_ELEMENT_TYPES.forEach(elementType => {
-      const isVisible = subslot[elementType];
-      if (isVisible !== undefined) {
-        const subslotElement = document.getElementById(subslotId);
-        if (subslotElement) {
-          const className = `hidden-subslot-${elementType}`;
-          
-          if (isVisible) {
-            subslotElement.classList.remove(className);
-          } else {
-            subslotElement.classList.add(className);
-          }
-          
-          // 複数画像コンテナの直接制御（image要素の場合）
-          if (elementType === 'image') {
-            const multiImageContainer = subslotElement.querySelector('.multi-image-container');
-            if (multiImageContainer) {
-              if (isVisible) {
-                multiImageContainer.style.display = 'flex';
-                multiImageContainer.style.visibility = 'visible';
-              } else {
-                multiImageContainer.style.display = 'none';
-                multiImageContainer.style.visibility = 'hidden';
-              }
-            }
-          }
-          
-          console.log(`🎨 ${subslotId}の${elementType}表示状態を適用: ${isVisible}`);
-        }
-      }
-    });
-  });
-  
-  console.log("✅ サブスロット表示状態のDOM適用完了");
-}
-
 // 🏗️ サブスロット用コントロールパネルを生成
 function createSubslotControlPanel(parentSlot) {
   console.log(`🏗️ ${parentSlot}サブスロット用コントロールパネル生成開始`);
@@ -352,12 +267,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   console.log(`🔍 サブスロット要素が見つかりました: ${subslotId}`);
   console.log(`🔍 現在のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
   
-  // 状態を保存
-  if (!subslotVisibilityState[subslotId]) {
-    subslotVisibilityState[subslotId] = {};
-  }
-  subslotVisibilityState[subslotId][elementType] = isVisible;
-  
   const className = `hidden-subslot-${elementType}`;
   
   if (isVisible) {
@@ -402,9 +311,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
-  
-  // localStorage に状態を保存
-  saveSubslotVisibilityState();
 }
 
 // 🔄 サブスロットの全表示リセット
@@ -642,10 +548,6 @@ window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
 window.restoreSubslotLabels = restoreSubslotLabels;
 window.debugSubslotLabels = debugSubslotLabels;
 window.debugAllSubslotLabels = debugAllSubslotLabels;
-window.loadSubslotVisibilityState = loadSubslotVisibilityState;
-window.saveSubslotVisibilityState = saveSubslotVisibilityState;
-window.applySubslotVisibilityState = applySubslotVisibilityState;
-window.initializeSubslotVisibilityState = initializeSubslotVisibilityState;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -663,11 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mutation.type === 'childList' || mutation.type === 'attributes') {
           // サブスロットの表示状態が変化した場合の処理
           restoreSubslotLabels();
-          
-          // 🆕 サブスロット再生成時に非表示設定を復元
-          setTimeout(() => {
-            applySubslotVisibilityState();
-          }, 100); // DOM変更後少し待ってから適用
         }
       });
     });
@@ -679,9 +576,6 @@ document.addEventListener('DOMContentLoaded', function() {
       attributeFilter: ['style', 'class']
     });
   }
-  
-  // サブスロット表示状態の初期化
-  loadSubslotVisibilityState();
   
   console.log("✅ サブスロット表示制御システム初期化完了");
 });
