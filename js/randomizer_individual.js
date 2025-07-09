@@ -109,14 +109,6 @@ function randomizeSlotSIndividual() {
     console.log("🔄 サブスロット同期完了");
   }
   
-  // 🆕 S専用のサブスロット表示状態を復元
-  if (typeof window.applySSubslotVisibilityState === "function") {
-    setTimeout(() => {
-      window.applySSubslotVisibilityState();
-      console.log("🎨 Sサブスロット表示状態復元完了");
-    }, 50);
-  }
-  
   // 全スロット画像更新
   if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
     setTimeout(() => {
