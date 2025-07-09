@@ -22,8 +22,6 @@
   </script>
   <script src="js/question_word_visibility.js">
   </script>
-  <script src="js/insert_test_data_clean.js">
-  </script>
  </head>
  <body>
 
@@ -977,15 +975,7 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       validateSlotsModified(data);
       window.loadedJsonData = data;
       buildStructure(data);
-      
-      // 🆕 安全なJSON同期処理を呼び出し
-      if (typeof window.safeJsonSync === 'function') {
-        console.log("🔄 JSONロード後の安全な同期処理を開始");
-        window.safeJsonSync(data);
-      } else {
-        console.warn("⚠ safeJsonSync関数が見つかりません、従来の同期処理を実行");
-        syncDynamicToStatic();
-      }
+      syncDynamicToStatic();
       
       // サブスロットの初期化も実行
       if (typeof initializeSubslots === 'function') {
@@ -993,21 +983,9 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
         initializeSubslots();
       }
       
-      // 🆕 ランダマイザー同期も設定
-      if (typeof window.setupRandomizerSync === 'function') {
-        console.log("🎲 ランダマイザー同期設定を開始");
-        window.setupRandomizerSync();
-      }
-      
-      // 🆕 監視システムも起動
-      if (typeof window.setupSyncObserver === 'function') {
-        console.log("👁 同期監視システムを起動");
-        window.setupSyncObserver();
-      }
-      
-      // 明示的に上位スロットとサブスロットの同期を呼び出す（従来コードとの互換性のため）
+      // 明示的に上位スロットとサブスロットの同期を呼び出す
       if (typeof syncUpperSlotsFromJson === 'function') {
-        console.log("🔄 JSONロード後の従来同期呼び出し");
+        console.log("🔄 JSONロード後の明示的同期呼び出し");
         syncUpperSlotsFromJson(data);
         if (typeof syncSubslotsFromJson === 'function') {
           syncSubslotsFromJson(data);
@@ -1024,14 +1002,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
           debugM1Slot();
         }
       }
-      
-      // 🆕 サブスロット表示状態の初期復元
-      setTimeout(() => {
-        if (typeof window.applySubslotVisibilityState === 'function') {
-          console.log("🎨 JSONロード後のサブスロット表示状態を復元");
-          window.applySubslotVisibilityState();
-        }
-      }, 500); // 初期化完了後に復元
       
       // 🎭 ローディング完了処理
       setTimeout(() => {
@@ -1060,15 +1030,7 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   validateSlotsModified(data);
   window.loadedJsonData = data;
   buildStructure(data);
-  
-  // 🆕 安全なJSON同期処理を呼び出し
-  if (typeof window.safeJsonSync === 'function') {
-    console.log("🔄 全体ランダマイズ後の安全な同期処理を開始");
-    window.safeJsonSync(data);
-  } else {
-    console.warn("⚠ safeJsonSync関数が見つかりません、従来の同期処理を実行");
-    syncDynamicToStatic();
-  }
+  syncDynamicToStatic();
   
   // サブスロットの初期化も実行
   if (typeof initializeSubslots === 'function') {
@@ -1081,14 +1043,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     console.log("🔢 ランダマイズ後のスロット表示順適用");
     applyOrderToAllSlots(data);
   }
-  
-  // 🆕 サブスロット表示状態の復元
-  setTimeout(() => {
-    if (typeof window.applySubslotVisibilityState === 'function') {
-      console.log("🎨 全体ランダマイズ後のサブスロット表示状態を復元");
-      window.applySubslotVisibilityState();
-    }
-  }, 300); // 同期処理完了後に復元
 });
 
 // Sスロット個別ランダマイズボタンのイベントハンドラー
