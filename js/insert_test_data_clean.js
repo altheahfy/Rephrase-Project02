@@ -924,37 +924,27 @@ function syncSubslotsFromJson(data) {
   
   console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
   
-  // �️ サブスロット同期後にラベルを復元
+  // 🆕 サブスロット同期後に表示状態を復元
+  setTimeout(() => {
+    if (typeof window.applyVisibilityState === 'function') {
+      window.applyVisibilityState();
+      console.log("🔄 サブスロット同期後の表示状態復元を実行しました");
+    }
+  }, 10);
+  
+  // 🆕 サブスロット同期後にスロット幅調整を実行
+  setTimeout(() => {
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      window.adjustSlotWidthsBasedOnText();
+    }
+  }, 50);
+  
+  // 🏷️ サブスロット同期後にラベルを復元
   setTimeout(() => {
     if (window.restoreSubslotLabels) {
       window.restoreSubslotLabels();
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
     }
-    
-    // 🆕 ラベル復元後に表示状態を復元（最も重要）
-    setTimeout(() => {
-      if (typeof window.applyVisibilityState === 'function') {
-        console.log("🔄 表示状態復元を開始します...");
-        window.applyVisibilityState();
-        console.log("🔄 サブスロット同期後の表示状態復元を実行しました");
-        
-        // デバッグ用：復元後の状態確認
-        setTimeout(() => {
-          const m1SubSlots = document.querySelectorAll('[id^="slot-m1-sub-"]');
-          console.log("🔍 復元後のM1サブスロット状態:");
-          m1SubSlots.forEach(el => {
-            console.log(`  ${el.id}: classes=[${el.className}]`);
-          });
-        }, 100);
-      }
-    }, 50);
-    
-    // 🆕 サブスロット同期後にスロット幅調整を実行
-    setTimeout(() => {
-      if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
-        window.adjustSlotWidthsBasedOnText();
-      }
-    }, 150);
     
     // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
     // if (typeof window.processAllImagesWithCoordination === 'function') {
