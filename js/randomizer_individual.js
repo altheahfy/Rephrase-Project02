@@ -109,6 +109,14 @@ function randomizeSlotSIndividual() {
     console.log("🔄 サブスロット同期完了");
   }
   
+  // 🆕 サブスロット表示状態を復元
+  setTimeout(() => {
+    if (window.applySubslotVisibilityState) {
+      console.log("🎨 個別ランダマイズ後にサブスロット表示状態を復元中...");
+      window.applySubslotVisibilityState();
+    }
+  }, 150);
+  
   // 全スロット画像更新
   if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
     setTimeout(() => {
@@ -237,6 +245,14 @@ function randomizeSlotM1Individual() {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
   }
+  
+  // 🆕 サブスロット表示状態を復元  
+  setTimeout(() => {
+    if (window.applySubslotVisibilityState) {
+      console.log("🎨 M1個別ランダマイズ後にサブスロット表示状態を復元中...");
+      window.applySubslotVisibilityState();
+    }
+  }, 150);
   
   // 全スロット画像更新
   if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
@@ -496,14 +512,6 @@ function randomizeSlotC1Individual() {
     console.log("🔄 サブスロット同期完了");
   }
   
-  // 全スロット画像更新
-  if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
-    setTimeout(() => {
-      window.updateAllSlotImagesAfterDataChange();
-      console.log("🎨 全スロット画像更新完了");
-    }, 100);
-  }
-  
   // 🆕 サブスロット画像更新（C1専用）
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
@@ -623,14 +631,6 @@ function randomizeSlotO1Individual() {
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
-  }
-  
-  // 全スロット画像更新
-  if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
-    setTimeout(() => {
-      window.updateAllSlotImagesAfterDataChange();
-      console.log("🎨 全スロット画像更新完了");
-    }, 100);
   }
   
   // 🖼️ O1サブスロット画像更新（個別ランダム化後）

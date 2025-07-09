@@ -82,6 +82,14 @@ export function randomizeAll(slotData) {
   console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
   console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
 
+  // 🆕 ランダマイズ完了後にサブスロット状態を復元
+  setTimeout(() => {
+    if (window.applySubslotVisibilityState) {
+      console.log(`🎨 ランダマイズ後にサブスロット表示状態を復元中...`);
+      window.applySubslotVisibilityState();
+    }
+  }, 300);
+
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
