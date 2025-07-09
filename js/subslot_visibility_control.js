@@ -1027,24 +1027,18 @@ function forceShowByAllMeans(subslotId, elementType) {
 }
 
 // 🔧 個別ランダマイズ時の即座適用機能（DOM再構築直後に即実行）
-function applySubslotVisibilityStateImmediately(targetSlot = null) {
-  if (targetSlot) {
-    console.log(`⚡ 個別ランダマイズ時の即座適用: ${targetSlot}`);
-  } else {
-    console.log(`⚡ 全スロット即座適用（buildStructure後）`);
-  }
+function applySubslotVisibilityStateImmediately(targetSlot) {
+  console.log(`⚡ 個別ランダマイズ時の即座適用: ${targetSlot}`);
   
-  // 1. 上位スロットの非表示状態を一時的に無効化（特定スロットのみ）
-  if (targetSlot) {
-    const upperSlotElement = document.getElementById(`slot-${targetSlot}`);
-    if (upperSlotElement) {
-      // 上位スロットの非表示クラスを一時的に削除
-      const upperHiddenClasses = Array.from(upperSlotElement.classList).filter(cls => cls.startsWith('hidden-'));
-      upperHiddenClasses.forEach(cls => {
-        upperSlotElement.classList.remove(cls);
-        console.log(`🔓 上位スロット非表示クラス削除: ${cls}`);
-      });
-    }
+  // 1. 上位スロットの非表示状態を一時的に無効化
+  const upperSlotElement = document.getElementById(`slot-${targetSlot}`);
+  if (upperSlotElement) {
+    // 上位スロットの非表示クラスを一時的に削除
+    const upperHiddenClasses = Array.from(upperSlotElement.classList).filter(cls => cls.startsWith('hidden-'));
+    upperHiddenClasses.forEach(cls => {
+      upperSlotElement.classList.remove(cls);
+      console.log(`🔓 上位スロット非表示クラス削除: ${cls}`);
+    });
   }
   
   // 2. サブスロットの非表示状態を即座に適用
@@ -1052,17 +1046,15 @@ function applySubslotVisibilityStateImmediately(targetSlot = null) {
     const subslotElement = document.getElementById(subslotId);
     if (!subslotElement) return;
     
-    // 特定スロットが指定されている場合は、そのスロットのサブスロットのみ処理
-    if (targetSlot && !subslotId.includes(`slot-${targetSlot}-sub-`)) return;
+    // 対象スロットのサブスロットのみ処理
+    if (!subslotId.includes(`slot-${targetSlot}-sub-`)) return;
     
     const elementState = subslotVisibilityState[subslotId];
     Object.keys(elementState).forEach(elementType => {
       const isVisible = elementState[elementType];
       
       if (!isVisible) {
-        if (targetSlot) {
-          console.log(`⚡ 即座強制非表示: ${subslotId} - ${elementType}`);
-        }
+        console.log(`⚡ 即座強制非表示: ${subslotId} - ${elementType}`);
         
         // 即座に完全非表示を適用
         forceHideByAllMeans(subslotId, elementType);
@@ -1097,9 +1089,7 @@ function applySubslotVisibilityStateImmediately(targetSlot = null) {
           }
         }
       } else {
-        if (targetSlot) {
-          console.log(`⚡ 即座表示解除: ${subslotId} - ${elementType}`);
-        }
+        console.log(`⚡ 即座表示解除: ${subslotId} - ${elementType}`);
         
         // 表示時は完全解除
         forceShowByAllMeans(subslotId, elementType);
@@ -1109,8 +1099,7 @@ function applySubslotVisibilityStateImmediately(targetSlot = null) {
   
   // 3. チェックボックスの状態も同期
   Object.keys(subslotVisibilityState).forEach(subslotId => {
-    // 特定スロットが指定されている場合は、そのスロットのサブスロットのみ処理
-    if (targetSlot && !subslotId.includes(`slot-${targetSlot}-sub-`)) return;
+    if (!subslotId.includes(`slot-${targetSlot}-sub-`)) return;
     
     const elementState = subslotVisibilityState[subslotId];
     Object.keys(elementState).forEach(elementType => {
@@ -1122,11 +1111,7 @@ function applySubslotVisibilityStateImmediately(targetSlot = null) {
     });
   });
   
-  if (targetSlot) {
-    console.log(`✅ 即座適用完了: ${targetSlot}`);
-  } else {
-    console.log(`✅ 全スロット即座適用完了`);
-  }
+  console.log(`✅ 即座適用完了: ${targetSlot}`);
 }
 
 // 🔧 個別ランダマイズ用の上位スロット非表示状態回避機能
@@ -1276,21 +1261,3 @@ window.forceShowByAllMeans = forceShowByAllMeans;
 // 🆕 個別ランダマイズ時の即座適用機能をエクスポート
 window.applySubslotVisibilityStateImmediately = applySubslotVisibilityStateImmediately;
 window.neutralizeUpperSlotVisibility = neutralizeUpperSlotVisibility;
-// 🆕 buildStructure実行後の統合適用関数をエクスポート
-window.applyVisibilityStateAfterBuildStructure = applyVisibilityStateAfterBuildStructure;
-
-// 🔄 buildStructure実行後の統合適用関数
-function applyVisibilityStateAfterBuildStructure() {
-  console.log("🔄 buildStructure実行後のサブスロット表示制御適用開始");
-  
-  // 上位スロットの表示状態を適用（上位スロットの制御システムとの統合）
-  if (typeof window.applyVisibilityState === 'function') {
-    console.log("🔄 上位スロットの表示状態を適用中...");
-    window.applyVisibilityState();
-  }
-  
-  // サブスロットの表示状態を即座に適用
-  applySubslotVisibilityStateImmediately();
-  
-  console.log("✅ buildStructure実行後のサブスロット表示制御適用完了");
-}

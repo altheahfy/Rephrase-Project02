@@ -977,11 +977,6 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       buildStructure(data);
       syncDynamicToStatic();
       
-      // 🔄 buildStructure実行後の統合表示制御適用
-      if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
-        window.applyVisibilityStateAfterBuildStructure();
-      }
-      
       // サブスロットの初期化も実行
       if (typeof initializeSubslots === 'function') {
         console.log("🔒 JSONロード後にサブスロットを初期化");
@@ -1036,11 +1031,6 @@ document.getElementById("randomize-all").addEventListener("click", () => {
   window.loadedJsonData = data;
   buildStructure(data);
   syncDynamicToStatic();
-  
-  // 🔄 buildStructure実行後の統合表示制御適用
-  if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
-    window.applyVisibilityStateAfterBuildStructure();
-  }
   
   // サブスロットの初期化も実行
   if (typeof initializeSubslots === 'function') {

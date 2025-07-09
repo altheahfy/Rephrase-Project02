@@ -128,8 +128,6 @@ function loadVisibilityState() {
 
 // 🎨 現在の表示状態をDOMに適用
 function applyVisibilityState() {
-  console.log("🎨 上位スロットの表示状態をDOMに適用開始");
-  
   ALL_SLOTS.forEach(slotKey => {
     ELEMENT_TYPES.forEach(elementType => {
       const isVisible = visibilityState[slotKey]?.[elementType] ?? true;
@@ -183,14 +181,7 @@ function applyVisibilityState() {
       }
     });
   });
-  
-  console.log("🎨 上位スロットの表示状態のDOM適用完了");
-  
-  // 🔄 サブスロットの表示制御システムとの統合
-  if (typeof window.applySubslotVisibilityState === 'function') {
-    console.log("🔄 サブスロット表示制御システムと連携適用中...");
-    window.applySubslotVisibilityState();
-  }
+  console.log("🎨 表示状態をDOMに適用しました");
 }
 
 // 🔄 特定スロットの全要素表示をリセット
@@ -434,17 +425,10 @@ window.questionWordVisibilityState = questionWordVisibilityState;
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 3要素表示制御システムを初期化中...");
   loadVisibilityState();
-  loadQuestionWordVisibilityState();
   
   // UI設定は少し遅らせて実行（DOM構築完了を確実にするため）
   setTimeout(() => {
     setupVisibilityControlUI();
-    
-    // サブスロットの表示制御システムとの統合
-    if (typeof window.loadSubslotVisibilityState === 'function') {
-      console.log("🔄 サブスロット表示制御システムと連携中...");
-      window.loadSubslotVisibilityState();
-    }
   }, 100);
 });
 
