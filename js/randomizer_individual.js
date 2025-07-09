@@ -1156,71 +1156,35 @@ window.checkFullSlotPool = function() {
 };
 
 /**
- * O1サブスロットの表示状態を復元する関数
- * 個別ランダマイズ後に制御パネルの設定を再適用
+ * O1サブスロットの表示状態をリセットする関数
+ * 個別ランダマイズ後は新しいコンテンツなので全て表示状態にリセット
  */
 function restoreO1SubslotVisibility() {
-  console.log("🎛️ O1サブスロット表示状態復元開始");
-  
-  // ⏰ 復元前の状態を詳細にログ出力
-  const o1SubslotElementsBefore = document.querySelectorAll('[id^="slot-o1-sub-"]');
-  console.log(`🔍 復元前のO1サブスロット要素数: ${o1SubslotElementsBefore.length}個`);
-  
-  o1SubslotElementsBefore.forEach(element => {
-    const textElements = element.querySelectorAll('.slot-phrase, .slot-text');
-    const imageElements = element.querySelectorAll('.slot-image');
-    console.log(`📊 ${element.id} 復元前状態:`);
-    console.log(`  - テキスト要素数: ${textElements.length}`);
-    console.log(`  - 画像要素数: ${imageElements.length}`);
-    console.log(`  - 表示状態: display=${getComputedStyle(element).display}`);
-    console.log(`  - クラスリスト: ${Array.from(element.classList).join(', ')}`);
-    
-    textElements.forEach((textEl, idx) => {
-      console.log(`  - テキスト${idx + 1}: "${textEl.textContent.substring(0, 50)}..." display=${getComputedStyle(textEl).display}`);
-    });
-  });
+  console.log("🎛️ O1サブスロット表示状態リセット開始（新しいコンテンツのため全て表示）");
   
   try {
-    // localStorageから保存された状態を取得
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    let subslotVisibilityState = {};
-    
-    if (saved) {
-      subslotVisibilityState = JSON.parse(saved);
-      console.log("📂 復元する状態:", subslotVisibilityState);
-    } else {
-      console.log("📝 O1サブスロット用の保存状態がありません - デフォルト状態（全て表示）で復元");
-    }
-    
     // O1サブスロットのIDパターンを取得
     const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
     console.log(`🔍 O1サブスロット要素: ${o1SubslotElements.length}個`);
     
-  // 🚫 復元処理を一時的に無効化してテスト
-  console.log("🎛️ サブスロット表示状態復元処理を実行します");
-  
-  // 各O1サブスロットについて状態を復元
-  o1SubslotElements.forEach(subslotElement => {
-    const subslotId = subslotElement.id;
-    const savedState = subslotVisibilityState[subslotId];
+    console.log("🎛️ O1サブスロット表示状態を全て表示にリセット中...");
     
-    // 各要素タイプ（image, text, auxtext）について復元
-    ['image', 'text', 'auxtext'].forEach(elementType => {
-      // 保存状態がある場合はそれを使用、ない場合はデフォルト（true=表示）
-      const isVisible = savedState && savedState[elementType] !== undefined 
-        ? savedState[elementType] 
-        : true; // デフォルトは表示
+    // 各O1サブスロットについて全て表示状態に設定
+    o1SubslotElements.forEach(subslotElement => {
+      const subslotId = subslotElement.id;
       
-      console.log(`🎛️ ${subslotId}の${elementType}: ${isVisible} ${savedState ? '(保存済み)' : '(デフォルト)'}`);
-      
-      // 既存のtoggleSubslotElementVisibility関数を使用
-      if (typeof toggleSubslotElementVisibility === "function") {
-        toggleSubslotElementVisibility(subslotId, elementType, isVisible);
-      } else {
-        console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
-      }
+      // 各要素タイプ（image, text, auxtext）について全て表示（true）に設定
+      ['image', 'text', 'auxtext'].forEach(elementType => {
+        console.log(`🎛️ ${subslotId}の${elementType}: true (新しいコンテンツのためリセット)`);
+        
+        // 既存のtoggleSubslotElementVisibility関数を使用して表示状態に設定
+        if (typeof toggleSubslotElementVisibility === "function") {
+          toggleSubslotElementVisibility(subslotId, elementType, true);
+        } else {
+          console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
+        }
+      });
     });
-  });
     
     // ⏰ 復元後の状態を詳細にログ出力
     setTimeout(() => {
