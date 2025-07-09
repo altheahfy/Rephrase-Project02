@@ -311,6 +311,25 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
+  
+  // 🆕 サブスロット表示状態をlocalStorageに保存
+  try {
+    let subslotVisibilityState = {};
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (saved) {
+      subslotVisibilityState = JSON.parse(saved);
+    }
+    
+    if (!subslotVisibilityState[subslotId]) {
+      subslotVisibilityState[subslotId] = {};
+    }
+    subslotVisibilityState[subslotId][elementType] = isVisible;
+    
+    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
+    console.log(`💾 ${subslotId}の${elementType}状態を保存しました: ${isVisible}`);
+  } catch (error) {
+    console.error("❌ サブスロット表示状態の保存に失敗:", error);
+  }
 }
 
 // 🔄 サブスロットの全表示リセット
@@ -590,12 +609,14 @@ function applyO1SubslotVisibilityState() {
   try {
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
     if (!saved) {
-      console.log("📝 O1: 保存されたサブスロット表示状態がありません");
+      console.log("📝 O1: 保存されたサブスロット表示状態がありません - 全て表示状態を維持");
       return;
     }
     
     const subslotVisibilityState = JSON.parse(saved);
     console.log("📂 O1: 復元するサブスロット表示状態:", subslotVisibilityState);
+    
+    let hasO1Settings = false;
     
     // O1のサブスロットのみに限定して処理
     Object.keys(subslotVisibilityState).forEach(subslotId => {
@@ -604,6 +625,7 @@ function applyO1SubslotVisibilityState() {
         return;
       }
       
+      hasO1Settings = true;
       const subslot = subslotVisibilityState[subslotId];
       const subslotElement = document.getElementById(subslotId);
       
@@ -645,6 +667,10 @@ function applyO1SubslotVisibilityState() {
         }
       });
     });
+    
+    if (!hasO1Settings) {
+      console.log("📝 O1: localStorage内にO1の設定が見つかりません - デフォルト表示状態を維持");
+    }
     
     console.log("✅ O1サブスロット表示状態の復元完了");
   } catch (error) {
