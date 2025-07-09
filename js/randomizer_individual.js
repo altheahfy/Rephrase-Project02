@@ -1156,6 +1156,24 @@ window.checkFullSlotPool = function() {
 function restoreO1SubslotVisibility() {
   console.log("🎛️ O1サブスロット表示状態復元開始");
   
+  // ⏰ 復元前の状態を詳細にログ出力
+  const o1SubslotElementsBefore = document.querySelectorAll('[id^="slot-o1-sub-"]');
+  console.log(`🔍 復元前のO1サブスロット要素数: ${o1SubslotElementsBefore.length}個`);
+  
+  o1SubslotElementsBefore.forEach(element => {
+    const textElements = element.querySelectorAll('.slot-phrase, .slot-text');
+    const imageElements = element.querySelectorAll('.slot-image');
+    console.log(`📊 ${element.id} 復元前状態:`);
+    console.log(`  - テキスト要素数: ${textElements.length}`);
+    console.log(`  - 画像要素数: ${imageElements.length}`);
+    console.log(`  - 表示状態: display=${getComputedStyle(element).display}`);
+    console.log(`  - クラスリスト: ${Array.from(element.classList).join(', ')}`);
+    
+    textElements.forEach((textEl, idx) => {
+      console.log(`  - テキスト${idx + 1}: "${textEl.textContent.substring(0, 50)}..." display=${getComputedStyle(textEl).display}`);
+    });
+  });
+  
   try {
     // localStorageから保存された状態を取得
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
@@ -1172,6 +1190,9 @@ function restoreO1SubslotVisibility() {
     const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
     console.log(`🔍 O1サブスロット要素: ${o1SubslotElements.length}個`);
     
+    // 🚫 復元処理を一時的に無効化してテスト
+    console.log("⚠️ 復元処理を一時的にスキップしてテストします");
+    /*
     // 各O1サブスロットについて状態を復元
     o1SubslotElements.forEach(subslotElement => {
       const subslotId = subslotElement.id;
@@ -1194,8 +1215,29 @@ function restoreO1SubslotVisibility() {
         }
       });
     });
+    */
     
-    console.log("✅ O1サブスロット表示状態復元完了");
+    // ⏰ 復元後の状態を詳細にログ出力
+    setTimeout(() => {
+      const o1SubslotElementsAfter = document.querySelectorAll('[id^="slot-o1-sub-"]');
+      console.log(`🔍 復元後のO1サブスロット要素数: ${o1SubslotElementsAfter.length}個`);
+      
+      o1SubslotElementsAfter.forEach(element => {
+        const textElements = element.querySelectorAll('.slot-phrase, .slot-text');
+        const imageElements = element.querySelectorAll('.slot-image');
+        console.log(`📊 ${element.id} 復元後状態:`);
+        console.log(`  - テキスト要素数: ${textElements.length}`);
+        console.log(`  - 画像要素数: ${imageElements.length}`);
+        console.log(`  - 表示状態: display=${getComputedStyle(element).display}`);
+        console.log(`  - クラスリスト: ${Array.from(element.classList).join(', ')}`);
+        
+        textElements.forEach((textEl, idx) => {
+          console.log(`  - テキスト${idx + 1}: "${textEl.textContent.substring(0, 50)}..." display=${getComputedStyle(textEl).display}`);
+        });
+      });
+    }, 100);
+    
+    console.log("✅ O1サブスロット表示状態復元完了（復元処理はスキップ）");
   } catch (error) {
     console.error("❌ O1サブスロット表示状態復元に失敗:", error);
   }
