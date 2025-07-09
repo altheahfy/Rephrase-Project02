@@ -924,14 +924,6 @@ function syncSubslotsFromJson(data) {
   
   console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
   
-  // 🔄 サブスロット表示状態を復元（永続化対応）
-  setTimeout(() => {
-    if (typeof window.applyVisibilityState === 'function') {
-      window.applyVisibilityState();
-      console.log("🔄 サブスロット表示状態を復元しました");
-    }
-  }, 150);
-  
   // 🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
     if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
