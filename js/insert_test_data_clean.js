@@ -938,12 +938,6 @@ function syncSubslotsFromJson(data) {
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
     }
     
-    // 🎨 O1サブスロット表示状態を安全に復元（同期後）
-    if (typeof window.applyO1SubslotVisibilityState === "function") {
-      window.applyO1SubslotVisibilityState();
-      console.log("🎨 サブスロット同期後のO1表示状態復元完了");
-    }
-    
     // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
     // if (typeof window.processAllImagesWithCoordination === 'function') {
     //   window.processAllImagesWithCoordination();
