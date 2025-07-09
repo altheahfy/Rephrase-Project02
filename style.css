@@ -132,7 +132,7 @@ h2 {
   padding: 15px; /* パディングも拡大 */
   margin: 4px 4px 20px 4px; /* 下部マージンを拡大 */
   
-  /* 🆕 動的幅調整システム - 複数画像対応で大幅拡拡大 */
+  /* 🆕 動的幅調整システム - 複数画像対応で大幅拡大 */
   min-width: 160px; /* 最小幅を拡大 */
   width: auto; /* 自動幅調整 */
   max-width: 1000px; /* 🎯 複数画像表示のためさらに拡大 */
@@ -1021,47 +1021,4 @@ div.slot-wrapper[id$="-sub"] {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
   font-size: 14px !important;
   position: relative !important;
-}
-
-/* 🔒 最強の非表示制御（data-force-hidden属性による） */
-[data-force-hidden] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  width: 0 !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  left: -9999px !important;
-  top: -9999px !important;
-  z-index: -9999 !important;
-}
-
-/* 🔒 hidden属性との組み合わせ */
-[hidden][data-force-hidden] {
-  display: none !important;
-}
-
-/* 🔒 特定要素への最強制御 */
-.slot-image[data-force-hidden],
-.slot-phrase[data-force-hidden],
-.slot-text[data-force-hidden],
-.multi-image-container[data-force-hidden] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  width: 0 !important;
-  max-height: 0 !important;
-  max-width: 0 !important;
-  min-height: 0 !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  z-index: -99999 !important;
 }
