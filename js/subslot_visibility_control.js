@@ -677,25 +677,12 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("✅ サブスロット表示制御システム初期化完了");
 });
 
-// 🔧 ページ読み込み完了後にO1, C1, C2の診断を実行（軽量版）
+// 🔧 ページ読み込み完了後にO1, C1, C2の診断を実行
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
-    console.log("🔧 ページ初期化: O1, C1, C2の軽量診断を実行中...");
-    
-    // 軽量版の診断: 保存された設定がない場合のみ実行
-    try {
-      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-      if (!saved) {
-        console.log("📝 保存された設定がないため、軽量診断を実行");
-        if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
-          window.diagnoseAndFixSubslotVisibility();
-          console.log("🔧 ページ初期化: O1, C1, C2の軽量診断を実行しました");
-        }
-      } else {
-        console.log("📝 保存された設定があるため、軽量診断をスキップ");
-      }
-    } catch (error) {
-      console.error("❌ 軽量診断の実行に失敗:", error);
+    if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
+      window.diagnoseAndFixSubslotVisibility();
+      console.log("🔧 ページ初期化後: O1, C1, C2の診断を実行しました");
     }
   }, 2000); // 2秒後に実行（他の初期化処理の完了を待つ）
 });
@@ -732,21 +719,9 @@ window.resetAllSubslots = function() {
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
 
-// 🔧 O1, C1, C2の表示問題診断・修正機能（改良版）
+// 🔧 O1, C1, C2の表示問題診断・修正機能
 function diagnoseAndFixSubslotVisibility() {
   console.log("🔧 O1, C1, C2のサブスロット表示問題を診断中...");
-  
-  // 保存された設定を読み込み
-  let savedSettings = {};
-  try {
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (saved) {
-      savedSettings = JSON.parse(saved);
-      console.log("📂 保存されたサブスロット設定を読み込み:", savedSettings);
-    }
-  } catch (error) {
-    console.error("❌ 保存された設定の読み込みに失敗:", error);
-  }
   
   const problematicSlots = ['o1', 'c1', 'c2'];
   
@@ -761,36 +736,19 @@ function diagnoseAndFixSubslotVisibility() {
       if (subslot.id.includes('-sub-')) {
         console.log(`  - サブスロット: ${subslot.id}`);
         
-        // 保存された設定を確認
-        const savedSubslotSettings = savedSettings[subslot.id];
-        
         // テキスト要素の表示状態を確認
         const textElement = subslot.querySelector('.slot-text');
         if (textElement) {
           const computedStyle = getComputedStyle(textElement);
           const isHidden = subslot.classList.contains('hidden-subslot-text');
-          const hasContent = textElement.textContent.trim() !== '';
           
           console.log(`    - テキスト要素: display=${computedStyle.display}, visibility=${computedStyle.visibility}`);
           console.log(`    - hiddenクラス: ${isHidden}`);
           console.log(`    - 内容: "${textElement.textContent}"`);
-          console.log(`    - 保存された設定: ${savedSubslotSettings ? JSON.stringify(savedSubslotSettings) : 'なし'}`);
           
-          // 修正ロジック: 保存された設定を優先
-          if (savedSubslotSettings && savedSubslotSettings.text !== undefined) {
-            // 保存された設定がある場合は、それに従う
-            const shouldBeVisible = savedSubslotSettings.text;
-            
-            if (shouldBeVisible && isHidden) {
-              console.log(`    - 🔧 保存された設定に従って表示: ${subslot.id}`);
-              subslot.classList.remove('hidden-subslot-text');
-            } else if (!shouldBeVisible && !isHidden) {
-              console.log(`    - 🔧 保存された設定に従って非表示: ${subslot.id}`);
-              subslot.classList.add('hidden-subslot-text');
-            }
-          } else if (isHidden && hasContent) {
-            // 保存された設定がない場合のみ、不正な非表示状態を修正
-            console.log(`    - 🔧 保存された設定がないため、不正な非表示クラスを削除: ${subslot.id}`);
+          // 非表示クラスが不正に適用されている場合は削除
+          if (isHidden && textElement.textContent.trim() !== '') {
+            console.log(`    - 🔧 不正な非表示クラスを削除: ${subslot.id}`);
             subslot.classList.remove('hidden-subslot-text');
           }
         }
@@ -801,24 +759,8 @@ function diagnoseAndFixSubslotVisibility() {
           const isImageHidden = subslot.classList.contains('hidden-subslot-image');
           console.log(`    - 画像要素: display=${imageContainer.style.display}, hidden=${isImageHidden}`);
           
-          // 保存された設定を確認
-          if (savedSubslotSettings && savedSubslotSettings.image !== undefined) {
-            const shouldBeVisible = savedSubslotSettings.image;
-            
-            if (shouldBeVisible && isImageHidden) {
-              console.log(`    - 🔧 保存された設定に従って画像表示: ${subslot.id}`);
-              subslot.classList.remove('hidden-subslot-image');
-              imageContainer.style.display = 'flex';
-              imageContainer.style.visibility = 'visible';
-            } else if (!shouldBeVisible && !isImageHidden) {
-              console.log(`    - 🔧 保存された設定に従って画像非表示: ${subslot.id}`);
-              subslot.classList.add('hidden-subslot-image');
-              imageContainer.style.display = 'none';
-              imageContainer.style.visibility = 'hidden';
-            }
-          } else if (isImageHidden && imageContainer.children.length > 0) {
-            // 保存された設定がない場合のみ、不正な非表示状態を修正
-            console.log(`    - 🔧 保存された設定がないため、画像の非表示クラスを削除: ${subslot.id}`);
+          if (isImageHidden) {
+            console.log(`    - 🔧 画像の非表示クラスを削除: ${subslot.id}`);
             subslot.classList.remove('hidden-subslot-image');
             imageContainer.style.display = 'flex';
             imageContainer.style.visibility = 'visible';
@@ -829,24 +771,10 @@ function diagnoseAndFixSubslotVisibility() {
         const auxElement = subslot.querySelector('.slot-phrase');
         if (auxElement) {
           const isAuxHidden = subslot.classList.contains('hidden-subslot-auxtext');
-          const hasAuxContent = auxElement.textContent.trim() !== '';
-          
           console.log(`    - aux要素: hidden=${isAuxHidden}, 内容: "${auxElement.textContent}"`);
           
-          // 保存された設定を確認
-          if (savedSubslotSettings && savedSubslotSettings.auxtext !== undefined) {
-            const shouldBeVisible = savedSubslotSettings.auxtext;
-            
-            if (shouldBeVisible && isAuxHidden) {
-              console.log(`    - 🔧 保存された設定に従ってaux表示: ${subslot.id}`);
-              subslot.classList.remove('hidden-subslot-auxtext');
-            } else if (!shouldBeVisible && !isAuxHidden) {
-              console.log(`    - 🔧 保存された設定に従ってaux非表示: ${subslot.id}`);
-              subslot.classList.add('hidden-subslot-auxtext');
-            }
-          } else if (isAuxHidden && hasAuxContent) {
-            // 保存された設定がない場合のみ、不正な非表示状態を修正
-            console.log(`    - 🔧 保存された設定がないため、auxの非表示クラスを削除: ${subslot.id}`);
+          if (isAuxHidden && auxElement.textContent.trim() !== '') {
+            console.log(`    - 🔧 auxの非表示クラスを削除: ${subslot.id}`);
             subslot.classList.remove('hidden-subslot-auxtext');
           }
         }

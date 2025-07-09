@@ -951,13 +951,10 @@ function syncSubslotsFromJson(data) {
     }
     
     // � O1, C1, C2の表示問題を診断・修正
-    // 🔧 O1, C1, C2の表示問題を診断・修正（非表示設定復元後に実行）
-    setTimeout(() => {
-      if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
-        window.diagnoseAndFixSubslotVisibility();
-        console.log("🔧 O1, C1, C2の表示問題診断・修正を実行しました");
-      }
-    }, 50); // 非表示設定復元後50ms後に実行
+    if (typeof window.diagnoseAndFixSubslotVisibility === 'function') {
+      window.diagnoseAndFixSubslotVisibility();
+      console.log("🔧 O1, C1, C2の表示問題診断・修正を実行しました");
+    }
     
     // �🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
     // if (typeof window.processAllImagesWithCoordination === 'function') {
