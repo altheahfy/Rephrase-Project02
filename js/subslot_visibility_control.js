@@ -427,8 +427,8 @@ function hookDataInsertionForLabelRestore() {
 }
 
 // 🏷️ サブスロットのラベルを復元する関数（デバウンス機能付き）
-let labelRestoreTimeout = null;
-let isLabelRestoring = false;
+// let labelRestoreTimeout = null;
+// let isLabelRestoring = false;
 
 function restoreSubslotLabels() {
   // 既に処理中の場合は重複実行を防ぐ
