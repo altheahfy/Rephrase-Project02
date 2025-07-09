@@ -631,13 +631,40 @@ function randomizeSlotO1Individual() {
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
+    
+    // 🔍 同期直後のO1サブスロット状態を確認
+    setTimeout(() => {
+      console.log("🔍 === syncSubslotsFromJson直後のO1状態 ===");
+      const o1Subslots = document.querySelectorAll('[id^="slot-o1-sub-"]');
+      o1Subslots.forEach((subslot, index) => {
+        const textElements = subslot.querySelectorAll('.slot-phrase');
+        console.log(`O1サブスロット${index + 1} (${subslot.id}): テキスト要素数=${textElements.length}`);
+        textElements.forEach((el, i) => {
+          console.log(`  テキスト${i + 1}: "${el.textContent}" display=${getComputedStyle(el).display}`);
+        });
+      });
+    }, 10);
   }
   
   // 🆕 O1専用のサブスロット表示状態を復元（Sと同じタイミング）
   if (typeof window.applyO1SubslotVisibilityState === "function") {
     setTimeout(() => {
+      console.log("🎨 O1表示状態復元開始...");
       window.applyO1SubslotVisibilityState();
       console.log("🎨 O1サブスロット表示状態復元完了");
+      
+      // 🔍 復元後のO1サブスロット状態を確認
+      setTimeout(() => {
+        console.log("🔍 === O1復元処理後の状態 ===");
+        const o1Subslots = document.querySelectorAll('[id^="slot-o1-sub-"]');
+        o1Subslots.forEach((subslot, index) => {
+          const textElements = subslot.querySelectorAll('.slot-phrase');
+          console.log(`O1サブスロット${index + 1} (${subslot.id}): テキスト要素数=${textElements.length}`);
+          textElements.forEach((el, i) => {
+            console.log(`  テキスト${i + 1}: "${el.textContent}" display=${getComputedStyle(el).display}`);
+          });
+        });
+      }, 10);
     }, 50);
   }
   
@@ -652,8 +679,22 @@ function randomizeSlotO1Individual() {
   // 🖼️ O1サブスロット画像更新（個別ランダム化後）
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
+      console.log("🖼️ O1画像更新開始...");
       window.updateSubslotImages('o1');
       console.log("🎨 O1サブスロット画像更新完了");
+      
+      // 🔍 画像更新後のO1サブスロット状態を確認
+      setTimeout(() => {
+        console.log("🔍 === O1画像更新後の状態 ===");
+        const o1Subslots = document.querySelectorAll('[id^="slot-o1-sub-"]');
+        o1Subslots.forEach((subslot, index) => {
+          const textElements = subslot.querySelectorAll('.slot-phrase');
+          console.log(`O1サブスロット${index + 1} (${subslot.id}): テキスト要素数=${textElements.length}`);
+          textElements.forEach((el, i) => {
+            console.log(`  テキスト${i + 1}: "${el.textContent}" display=${getComputedStyle(el).display}`);
+          });
+        });
+      }, 10);
     }, 150);
   }
   
