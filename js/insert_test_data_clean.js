@@ -880,7 +880,7 @@ function syncSubslotsFromJson(data) {
       // 新しいサブスロットDOM要素を生成
       const slotElement = document.createElement('div');
       slotElement.id = fullSlotId;
-      slotElement.className = 'slot-container';
+      slotElement.className = 'slot-container subslot';
       
       // 🏷️ ラベル要素を作成（最初に追加）
       const labelElement = document.createElement('label');
@@ -952,7 +952,16 @@ function syncSubslotsFromJson(data) {
         const updatedSubslots = document.querySelectorAll('[id*="-sub-"]:not([id$="-sub"])');
         console.log("🔥📊 復元後のサブスロット状態:");
         updatedSubslots.forEach(subslot => {
-          console.log(`🔥  - ${subslot.id}: classes=[${subslot.className}]`);
+          const classList = Array.from(subslot.classList).join(' ');
+          console.log(`🔥  - ${subslot.id}: classes=[${classList}]`);
+          
+          // hidden-*クラスの確認
+          const hiddenClasses = Array.from(subslot.classList).filter(c => c.startsWith('hidden-'));
+          if (hiddenClasses.length > 0) {
+            console.log(`🔥    └ hidden classes: [${hiddenClasses.join(', ')}]`);
+          } else {
+            console.log(`🔥    └ hidden classes: なし`);
+          }
         });
       }, 10);
     } else {
