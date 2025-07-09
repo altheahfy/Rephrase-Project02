@@ -311,6 +311,25 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
+  
+  // 🆕 サブスロット表示状態をlocalStorageに保存
+  try {
+    let subslotVisibilityState = {};
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (saved) {
+      subslotVisibilityState = JSON.parse(saved);
+    }
+    
+    if (!subslotVisibilityState[subslotId]) {
+      subslotVisibilityState[subslotId] = {};
+    }
+    subslotVisibilityState[subslotId][elementType] = isVisible;
+    
+    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
+    console.log(`💾 ${subslotId}の${elementType}状態を保存しました: ${isVisible}`);
+  } catch (error) {
+    console.error("❌ サブスロット表示状態の保存に失敗:", error);
+  }
 }
 
 // 🔄 サブスロットの全表示リセット
