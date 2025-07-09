@@ -938,6 +938,12 @@ function syncSubslotsFromJson(data) {
       console.log("🏷️ サブスロット同期後のラベル復元を実行しました");
     }
     
+    // 🆕 サブスロット表示状態を復元
+    if (window.applySubslotVisibilityState) {
+      window.applySubslotVisibilityState();
+      console.log("🎨 サブスロット同期後の表示状態復元を実行しました");
+    }
+    
     // 🖼 画像処理：この処理はラベル復元内で統合実行されるため、ここでは削除
     // if (typeof window.processAllImagesWithCoordination === 'function') {
     //   window.processAllImagesWithCoordination();

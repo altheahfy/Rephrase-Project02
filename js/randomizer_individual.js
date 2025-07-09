@@ -125,6 +125,14 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
+  // 🎨 サブスロット表示状態を明示的に復元（個別ランダマイズ後）
+  setTimeout(() => {
+    if (window.applySubslotVisibilityState) {
+      window.applySubslotVisibilityState();
+      console.log("🎨 Sスロット個別ランダマイズ後のサブスロット表示状態復元完了");
+    }
+  }, 200);
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
