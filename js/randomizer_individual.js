@@ -94,6 +94,11 @@ function randomizeSlotSIndividual() {
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.error("❌ buildStructure関数が見つかりません");
   }
@@ -243,6 +248,11 @@ function randomizeSlotM1Individual() {
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.error("❌ buildStructure関数が見つかりません");
   }
@@ -392,6 +402,11 @@ function randomizeSlotM2Individual() {
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.error("❌ buildStructure関数が見つかりません");
   }
@@ -541,8 +556,14 @@ function randomizeSlotC1Individual() {
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.error("❌ buildStructure関数が見つかりません");
+  }
   }
   
   // 静的エリアとの同期
@@ -670,6 +691,11 @@ function randomizeSlotO1Individual() {
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.error("❌ buildStructure関数が見つかりません");
   }
@@ -786,6 +812,11 @@ function randomizeSlotO2Individual() {
   if (typeof buildStructure === 'function') {
     buildStructure(window.lastSelectedSlots);
     console.log("🏗️ buildStructure()実行完了");
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.warn("⚠️ buildStructure関数が見つかりません");
   }
@@ -906,6 +937,11 @@ function randomizeSlotC2Individual() {
   if (typeof buildStructure === 'function') {
     buildStructure(window.lastSelectedSlots);
     console.log("🏗️ buildStructure()実行完了");
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.warn("⚠️ buildStructure関数が見つかりません");
   }
@@ -1026,6 +1062,11 @@ function randomizeSlotM3Individual() {
   if (typeof buildStructure === 'function') {
     buildStructure(window.lastSelectedSlots);
     console.log("🏗️ buildStructure()実行完了");
+    
+    // 🔄 buildStructure実行後の統合表示制御適用
+    if (typeof window.applyVisibilityStateAfterBuildStructure === 'function') {
+      window.applyVisibilityStateAfterBuildStructure();
+    }
   } else {
     console.warn("⚠️ buildStructure関数が見つかりません");
   }
