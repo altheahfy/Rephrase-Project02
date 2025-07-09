@@ -444,8 +444,6 @@ window.toggleSubslotElementOverlay = toggleSubslotElementOverlay;
 window.resetSubslotVisibility = resetSubslotVisibility;
 window.applySubslotOverlayState = applySubslotOverlayState;
 
-
-
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロットオーバーレイ制御システムを初期化中...");

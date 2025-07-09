@@ -1161,29 +1161,56 @@ function restoreO1SubslotVisibility() {
     const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
     console.log(`🔍 O1サブスロット要素: ${o1SubslotElements.length}個`);
     
+<<<<<<< HEAD
     console.log("🎛️ O1サブスロット表示状態を全て表示にリセット中...");
     
     // 各O1サブスロットについて全て表示状態に設定
     o1SubslotElements.forEach(subslotElement => {
       const subslotId = subslotElement.id;
       
-      // 各要素タイプ（image, text, auxtext）について全て表示状態にリセット
+      // 各要素タイプ（image, text, auxtext）について全て表示（true）に設定
       ['image', 'text', 'auxtext'].forEach(elementType => {
-        console.log(`🎛️ ${subslotId}の${elementType}: 表示状態にリセット (新しいコンテンツのため)`);
+        console.log(`🎛️ ${subslotId}の${elementType}: true (新しいコンテンツのためリセット)`);
         
-        // 新しいオーバーレイシステムでオーバーレイを削除して表示状態にする
-        if (typeof toggleSubslotElementOverlay === "function") {
-          toggleSubslotElementOverlay(subslotId, elementType, false); // falseでオーバーレイ削除=表示
+        // 既存のtoggleSubslotElementVisibility関数を使用して表示状態に設定
+        if (typeof toggleSubslotElementVisibility === "function") {
+          toggleSubslotElementVisibility(subslotId, elementType, true);
+=======
+    // 🚫 復元処理を一時的に無効化してテスト
+    console.log("⚠️ 復元処理を一時的にスキップしてテストします");
+    /*
+    // 各O1サブスロットについて状態を復元
+    o1SubslotElements.forEach(subslotElement => {
+      const subslotId = subslotElement.id;
+      const savedState = subslotVisibilityState[subslotId];
+      
+      // 各要素タイプ（image, text, auxtext）について復元
+      ['image', 'text', 'auxtext'].forEach(elementType => {
+        // 保存状態がある場合はそれを使用、ない場合はデフォルト（true=表示）
+        const isVisible = savedState && savedState[elementType] !== undefined 
+          ? savedState[elementType] 
+          : true; // デフォルトは表示
+        
+        console.log(`🎛️ ${subslotId}の${elementType}: ${isVisible} ${savedState ? '(保存済み)' : '(デフォルト)'}`);
+        
+        // 既存のtoggleSubslotElementVisibility関数を使用
+        if (typeof toggleSubslotElementVisibility === "function") {
+          toggleSubslotElementVisibility(subslotId, elementType, isVisible);
+>>>>>>> parent of b534df4 (タイミング調整)
         } else {
-          console.warn(`⚠️ toggleSubslotElementOverlay関数が見つかりません`);
+          console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
         }
       });
     });
+<<<<<<< HEAD
+=======
+    */
+>>>>>>> parent of b534df4 (タイミング調整)
     
-  // ⏰ 復元後の状態を詳細にログ出力
-  setTimeout(() => {
-    const o1SubslotElementsAfter = document.querySelectorAll('[id^="slot-o1-sub-"]');
-    console.log(`🔍 復元後のO1サブスロット要素数: ${o1SubslotElementsAfter.length}個`);
+    // ⏰ 復元後の状態を詳細にログ出力
+    setTimeout(() => {
+      const o1SubslotElementsAfter = document.querySelectorAll('[id^="slot-o1-sub-"]');
+      console.log(`🔍 復元後のO1サブスロット要素数: ${o1SubslotElementsAfter.length}個`);
       
       o1SubslotElementsAfter.forEach(element => {
         const textElements = element.querySelectorAll('.slot-phrase, .slot-text');
