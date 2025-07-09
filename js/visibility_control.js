@@ -66,13 +66,10 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
     // サブスロットも同様に制御
     const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
     subSlots.forEach(subSlot => {
-      // サブスロットには汎用的なクラス名を使用
-      const subslotClassName = `hidden-${elementType}`;
-      
       if (isVisible) {
-        subSlot.classList.remove(subslotClassName);
+        subSlot.classList.remove(className);
       } else {
-        subSlot.classList.add(subslotClassName);
+        subSlot.classList.add(className);
       }
       
       // 🆕 サブスロットの複数画像コンテナも直接制御
