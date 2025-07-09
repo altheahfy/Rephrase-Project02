@@ -131,6 +131,17 @@ function loadVisibilityState() {
 
 // 🎨 現在の表示状態をDOMに適用
 function applyVisibilityState() {
+  // 🆕 サブスロット専用の表示状態を読み込み
+  let subslotVisibilityState = {};
+  try {
+    const stored = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (stored) {
+      subslotVisibilityState = JSON.parse(stored);
+    }
+  } catch (e) {
+    console.warn('サブスロット表示状態の読み込みに失敗:', e);
+  }
+
   ALL_SLOTS.forEach(slotKey => {
     ELEMENT_TYPES.forEach(elementType => {
       const isVisible = visibilityState[slotKey]?.[elementType] ?? true;
@@ -158,13 +169,18 @@ function applyVisibilityState() {
           }
         }
         
-        // サブスロットも同様に適用
+        // サブスロットも同様に適用（🆕 個別設定を優先）
         const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
         subSlots.forEach(subSlot => {
+          // 🆕 サブスロット個別設定があるかチェック
+          const subslotId = subSlot.id;
+          const subslotSpecificVisible = subslotVisibilityState[subslotId]?.[elementType];
+          const finalVisible = subslotSpecificVisible !== undefined ? subslotSpecificVisible : isVisible;
+          
           // サブスロットには汎用的なクラス名を使用
           const subslotClassName = `hidden-${elementType}`;
           
-          if (isVisible) {
+          if (finalVisible) {
             subSlot.classList.remove(subslotClassName);
           } else {
             subSlot.classList.add(subslotClassName);
@@ -174,7 +190,7 @@ function applyVisibilityState() {
           if (elementType === 'image') {
             const subMultiImageContainer = subSlot.querySelector('.multi-image-container');
             if (subMultiImageContainer) {
-              if (isVisible) {
+              if (finalVisible) {
                 subMultiImageContainer.style.display = 'flex';
                 subMultiImageContainer.style.visibility = 'visible';
               } else {
@@ -187,7 +203,7 @@ function applyVisibilityState() {
       }
     });
   });
-  console.log("🎨 表示状態をDOMに適用しました");
+  console.log("🎨 表示状態をDOMに適用しました（サブスロット個別設定込み）");
 }
 
 // 🔄 特定スロットの全要素表示をリセット
