@@ -125,16 +125,6 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
-  // 🎯 サブスロット表示状態復元（個別ランダマイズ後）
-  if (typeof window.applySubslotVisibilityState === "function") {
-    setTimeout(() => {
-      window.applySubslotVisibilityState();
-      console.log("🔄 Sスロット個別ランダマイズ後の表示状態復元完了");
-    }, 200);
-  } else {
-    console.warn("⚠️ applySubslotVisibilityState関数が見つかりません");
-  }
-  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
