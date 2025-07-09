@@ -575,53 +575,45 @@ function applySubslotVisibilityState() {
   try {
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
     if (!saved) {
-      console.log("📝 保存されたサブスロット表示状態がありません - 既存の表示状態を維持");
+      console.log("📝 保存されたサブスロット表示状態がありません");
       return;
     }
     
     const subslotVisibilityState = JSON.parse(saved);
     console.log("📂 復元するサブスロット表示状態:", subslotVisibilityState);
     
-    // 🔒 安全な復元：既存のDOM状態を尊重
     Object.keys(subslotVisibilityState).forEach(subslotId => {
       const subslot = subslotVisibilityState[subslotId];
-      const subslotElement = document.getElementById(subslotId);
-      
-      if (!subslotElement) {
-        console.log(`⚠️ サブスロット要素が見つかりません: ${subslotId} - スキップ`);
-        return;
-      }
       
       ['image', 'auxtext', 'text'].forEach(elementType => {
         const isVisible = subslot[elementType];
-        
-        // 🔍 localStorageに明示的に記録がある場合のみ適用
         if (isVisible !== undefined) {
-          const className = `hidden-subslot-${elementType}`;
-          
-          if (isVisible) {
-            subslotElement.classList.remove(className);
-          } else {
-            subslotElement.classList.add(className);
-          }
-          
-          // 複数画像コンテナの直接制御（image要素の場合）
-          if (elementType === 'image') {
-            const multiImageContainer = subslotElement.querySelector('.multi-image-container');
-            if (multiImageContainer) {
-              if (isVisible) {
-                multiImageContainer.style.display = 'flex';
-                multiImageContainer.style.visibility = 'visible';
-              } else {
-                multiImageContainer.style.display = 'none';
-                multiImageContainer.style.visibility = 'hidden';
+          const subslotElement = document.getElementById(subslotId);
+          if (subslotElement) {
+            const className = `hidden-subslot-${elementType}`;
+            
+            if (isVisible) {
+              subslotElement.classList.remove(className);
+            } else {
+              subslotElement.classList.add(className);
+            }
+            
+            // 複数画像コンテナの直接制御（image要素の場合）
+            if (elementType === 'image') {
+              const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+              if (multiImageContainer) {
+                if (isVisible) {
+                  multiImageContainer.style.display = 'flex';
+                  multiImageContainer.style.visibility = 'visible';
+                } else {
+                  multiImageContainer.style.display = 'none';
+                  multiImageContainer.style.visibility = 'hidden';
+                }
               }
             }
+            
+            console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
           }
-          
-          console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
-        } else {
-          console.log(`📝 ${subslotId}の${elementType}はlocalStorageに記録なし - 現在の状態を維持`);
         }
       });
     });
