@@ -125,6 +125,13 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('s');
+    }, 200);
+  }
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
@@ -252,6 +259,13 @@ function randomizeSlotM1Individual() {
       window.updateSubslotImages('m1');
       console.log("🎨 M1サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('m1');
+    }, 200);
   }
   
   console.log("✅ M1スロット個別ランダマイズ完了");
@@ -383,6 +397,13 @@ function randomizeSlotM2Individual() {
     }, 150);
   }
   
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('m2');
+    }, 200);
+  }
+  
   console.log("✅ M2スロット個別ランダマイズ完了");
 }
 
@@ -510,6 +531,13 @@ function randomizeSlotC1Individual() {
       window.updateSubslotImages('c1');
       console.log("🎨 C1サブスロット画像更新完了");
     }, 200);
+  }
+  
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('c1');
+    }, 250);
   }
   
   console.log("✅ C1スロット個別ランダマイズ完了");
@@ -641,6 +669,13 @@ function randomizeSlotO1Individual() {
     }, 150);
   }
   
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('o1');
+    }, 200);
+  }
+  
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
@@ -759,6 +794,13 @@ function randomizeSlotO2Individual() {
       window.updateSubslotImages('o2');
       console.log("🎨 O2サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('o2');
+    }, 200);
   }
   
   console.log("✅ O2スロット個別ランダマイズ完了");
@@ -881,6 +923,13 @@ function randomizeSlotC2Individual() {
     }, 150);
   }
   
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('c2');
+    }, 200);
+  }
+  
   console.log("✅ C2スロット個別ランダマイズ完了");
 }
 
@@ -999,6 +1048,13 @@ function randomizeSlotM3Individual() {
       window.updateSubslotImages('m3');
       console.log("🎨 M3サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🔄 サブスロット表示状態復元
+  if (typeof window.restoreSubslotVisibilityAfterIndividualRandomization === "function") {
+    setTimeout(() => {
+      window.restoreSubslotVisibilityAfterIndividualRandomization('m3');
+    }, 200);
   }
 }
 
