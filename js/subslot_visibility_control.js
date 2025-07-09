@@ -549,6 +549,15 @@ window.restoreSubslotLabels = restoreSubslotLabels;
 window.debugSubslotLabels = debugSubslotLabels;
 window.debugAllSubslotLabels = debugAllSubslotLabels;
 
+// 🔹 サブスロット表示状態管理関数をグローバルに公開
+window.saveSubslotVisibilityState = saveSubslotVisibilityState;
+window.loadSubslotVisibilityState = loadSubslotVisibilityState;
+window.applySubslotVisibilityState = applySubslotVisibilityState;
+window.restoreSubslotVisibilityAfterIndividualRandomization = restoreSubslotVisibilityAfterIndividualRandomization;
+window.forceHideAllSubslots = forceHideAllSubslots;
+window.forceShowAllSubslots = forceShowAllSubslots;
+window.diagnoseSubslotVisibility = diagnoseSubslotVisibility;
+
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 サブスロット表示制御システムを初期化中...");
@@ -581,3 +590,144 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+
+// 🔹 サブスロット表示状態管理機能
+// LocalStorageキー
+const SUBSLOT_VISIBILITY_STORAGE_KEY = 'subslotVisibilityState';
+
+/**
+ * 現在のサブスロット表示状態をlocalStorageに保存
+ */
+function saveSubslotVisibilityState() {
+  console.log("💾 サブスロット表示状態を保存中...");
+  const visibilityState = {};
+  
+  SUBSLOT_PARENT_SLOTS.forEach(slotType => {
+    const subslotElements = document.querySelectorAll(`[id^="slot-${slotType}-sub-"]`);
+    subslotElements.forEach(element => {
+      const isVisible = element.style.display !== 'none';
+      visibilityState[element.id] = isVisible;
+      console.log(`💾 ${element.id}: ${isVisible ? '表示' : '非表示'}`);
+    });
+  });
+  
+  localStorage.setItem(SUBSLOT_VISIBILITY_STORAGE_KEY, JSON.stringify(visibilityState));
+  console.log("✅ サブスロット表示状態の保存完了");
+  return visibilityState;
+}
+
+/**
+ * localStorageからサブスロット表示状態を読み込み
+ */
+function loadSubslotVisibilityState() {
+  try {
+    const stored = localStorage.getItem(SUBSLOT_VISIBILITY_STORAGE_KEY);
+    if (stored) {
+      const visibilityState = JSON.parse(stored);
+      console.log("📂 サブスロット表示状態を読み込み:", visibilityState);
+      return visibilityState;
+    }
+  } catch (error) {
+    console.warn("⚠️ サブスロット表示状態の読み込みに失敗:", error);
+  }
+  return {};
+}
+
+/**
+ * サブスロットの表示状態を適用（DOM要素が存在する場合のみ）
+ */
+function applySubslotVisibilityState(visibilityState = null) {
+  console.log("🔄 サブスロット表示状態を適用中...");
+  
+  if (!visibilityState) {
+    visibilityState = loadSubslotVisibilityState();
+  }
+  
+  if (Object.keys(visibilityState).length === 0) {
+    console.log("ℹ️ 適用する表示状態がありません");
+    return;
+  }
+  
+  let appliedCount = 0;
+  Object.entries(visibilityState).forEach(([elementId, isVisible]) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = isVisible ? '' : 'none';
+      appliedCount++;
+      console.log(`🔄 ${elementId}: ${isVisible ? '表示' : '非表示'}に設定`);
+    }
+  });
+  
+  console.log(`✅ サブスロット表示状態の適用完了 (${appliedCount}個)`);
+}
+
+/**
+ * 個別ランダマイズ後のサブスロット表示状態復元
+ */
+function restoreSubslotVisibilityAfterIndividualRandomization() {
+  console.log("🔄 個別ランダマイズ後のサブスロット表示状態復元開始");
+  
+  // 少し遅延させて、DOM構築完了後に実行
+  setTimeout(() => {
+    applySubslotVisibilityState();
+    console.log("✅ 個別ランダマイズ後のサブスロット表示状態復元完了");
+  }, 100);
+}
+
+/**
+ * サブスロット強制非表示（デバッグ用）
+ */
+function forceHideAllSubslots() {
+  console.log("🙈 全サブスロットを強制非表示");
+  SUBSLOT_PARENT_SLOTS.forEach(slotType => {
+    const subslotElements = document.querySelectorAll(`[id^="slot-${slotType}-sub-"]`);
+    subslotElements.forEach(element => {
+      element.style.display = 'none';
+    });
+  });
+}
+
+/**
+ * サブスロット強制表示（デバッグ用）
+ */
+function forceShowAllSubslots() {
+  console.log("👀 全サブスロットを強制表示");
+  SUBSLOT_PARENT_SLOTS.forEach(slotType => {
+    const subslotElements = document.querySelectorAll(`[id^="slot-${slotType}-sub-"]`);
+    subslotElements.forEach(element => {
+      element.style.display = '';
+    });
+  });
+}
+
+/**
+ * サブスロット表示状態診断（デバッグ用）
+ */
+function diagnoseSubslotVisibility() {
+  console.log("🔍 サブスロット表示状態診断開始");
+  
+  const currentState = {};
+  const storedState = loadSubslotVisibilityState();
+  
+  SUBSLOT_PARENT_SLOTS.forEach(slotType => {
+    const subslotElements = document.querySelectorAll(`[id^="slot-${slotType}-sub-"]`);
+    console.log(`🔍 ${slotType.toUpperCase()}スロット: ${subslotElements.length}個`);
+    
+    subslotElements.forEach(element => {
+      const isVisible = element.style.display !== 'none';
+      const storedVisible = storedState[element.id];
+      currentState[element.id] = isVisible;
+      
+      const status = storedVisible !== undefined 
+        ? (isVisible === storedVisible ? '✅' : '❌') 
+        : '❓';
+      
+      console.log(`  ${status} ${element.id}: 現在=${isVisible ? '表示' : '非表示'}, 保存=${storedVisible !== undefined ? (storedVisible ? '表示' : '非表示') : '未保存'}`);
+    });
+  });
+  
+  console.log("📊 localStorage保存状態:", storedState);
+  console.log("📊 現在の表示状態:", currentState);
+  
+  return { currentState, storedState };
+}
