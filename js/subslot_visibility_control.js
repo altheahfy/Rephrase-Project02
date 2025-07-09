@@ -277,6 +277,22 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
   }
   
+  // 🆕 複数画像コンテナの直接制御（image要素の場合）
+  if (elementType === 'image') {
+    const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+    if (multiImageContainer) {
+      if (isVisible) {
+        multiImageContainer.style.display = 'flex';
+        multiImageContainer.style.visibility = 'visible';
+        console.log(`✅ ${subslotId}の複数画像コンテナを表示しました`);
+      } else {
+        multiImageContainer.style.display = 'none';
+        multiImageContainer.style.visibility = 'hidden';
+        console.log(`🙈 ${subslotId}の複数画像コンテナを非表示にしました`);
+      }
+    }
+  }
+  
   console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
   
   // 実際に要素が非表示になっているかを確認
@@ -290,7 +306,7 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   if (elements && elements.length > 0) {
     elements.forEach((el, index) => {
       const computedStyle = window.getComputedStyle(el);
-      console.log(`� ${elementType}要素${index + 1}: display=${computedStyle.display}`);
+      console.log(`📊 ${elementType}要素${index + 1}: display=${computedStyle.display}`);
     });
   } else {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
@@ -411,8 +427,8 @@ function hookDataInsertionForLabelRestore() {
 }
 
 // 🏷️ サブスロットのラベルを復元する関数（デバウンス機能付き）
-let labelRestoreTimeout = null;
-let isLabelRestoring = false;
+// let labelRestoreTimeout = null;
+// let isLabelRestoring = false;
 
 function restoreSubslotLabels() {
   // 既に処理中の場合は重複実行を防ぐ
@@ -492,99 +508,3 @@ function restoreSubslotLabels() {
 // 🔍 サブスロットのラベル状態をデバッグするための関数
 function debugSubslotLabels(parentSlot) {
   console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ ===`);
-  
-  // サブスロットコンテナを検索
-  const subslotContainer = document.querySelector(`#slot-${parentSlot}-sub`);
-  if (!subslotContainer) {
-    console.error(`❌ サブスロットコンテナが見つかりません: #slot-${parentSlot}-sub`);
-    return;
-  }
-  
-  console.log(`✅ サブスロットコンテナ発見: ${subslotContainer.id}`);
-  console.log(`📋 コンテナHTML: ${subslotContainer.outerHTML.substring(0, 200)}...`);
-  
-  // 全てのサブスロット要素を検索
-  const subslotElements = subslotContainer.querySelectorAll('[id*="-sub-"]');
-  console.log(`📊 サブスロット要素数: ${subslotElements.length}`);
-  
-  subslotElements.forEach((element, index) => {
-    console.log(`\n🔍 サブスロット要素 ${index + 1}:`);
-    console.log(`  ID: ${element.id}`);
-    console.log(`  クラス: ${element.className}`);
-    
-    // ラベル要素を検索
-    const labelElements = element.querySelectorAll('label');
-    console.log(`  ラベル要素数: ${labelElements.length}`);
-    
-    labelElements.forEach((label, labelIndex) => {
-      console.log(`  ラベル ${labelIndex + 1}:`);
-      console.log(`    テキスト: "${label.textContent}"`);
-      console.log(`    スタイル: ${label.style.cssText}`);
-      console.log(`    表示状態: ${window.getComputedStyle(label).display}`);
-    });
-    
-    // 他の重要な要素も表示
-    const phraseElements = element.querySelectorAll('.slot-phrase');
-    const textElements = element.querySelectorAll('.slot-text');
-    const imageElements = element.querySelectorAll('.slot-image');
-    
-    console.log(`  フレーズ要素数: ${phraseElements.length}`);
-    console.log(`  テキスト要素数: ${textElements.length}`);
-    console.log(`  画像要素数: ${imageElements.length}`);
-    
-    // 要素の全体構造を表示
-    console.log(`  HTML構造: ${element.outerHTML.substring(0, 150)}...`);
-  });
-  
-  console.log(`🔍 === ${parentSlot} サブスロットラベル状態デバッグ完了 ===\n`);
-}
-
-// 🏷️ 全てのサブスロットのラベル状態を一括デバッグ
-function debugAllSubslotLabels() {
-  console.log("🔍 === 全サブスロットラベル状態デバッグ開始 ===");
-  
-  SUBSLOT_PARENT_SLOTS.forEach(parentSlot => {
-    debugSubslotLabels(parentSlot);
-  });
-  
-  console.log("🔍 === 全サブスロットラベル状態デバッグ完了 ===");
-}
-
-//  グローバル関数としてエクスポート
-window.createSubslotControlPanel = createSubslotControlPanel;
-window.addSubslotControlPanel = addSubslotControlPanel;
-window.removeSubslotControlPanel = removeSubslotControlPanel;
-window.toggleSubslotElementVisibility = toggleSubslotElementVisibility;
-window.resetSubslotVisibility = resetSubslotVisibility;
-window.hookDataInsertionForLabelRestore = hookDataInsertionForLabelRestore;
-window.restoreSubslotLabels = restoreSubslotLabels;
-window.debugSubslotLabels = debugSubslotLabels;
-window.debugAllSubslotLabels = debugAllSubslotLabels;
-
-// 🔄 ページ読み込み時の自動初期化
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("🔄 サブスロット表示制御システムを初期化中...");
-  console.log("✅ subslot_toggle.js との連携は自動的に行われます");
-  
-  // 🏷️ ラベル復元システムを有効化
-  console.log("🏷️ サブスロットラベル復元システムを有効化中...");
-  hookDataInsertionForLabelRestore();
-  console.log("✅ ラベル復元システムが有効になりました");
-  
-  // 🔧 デバッグ用コンソールメッセージ
-  console.log("\n🔧 ===== デバッグ用コマンド =====");
-  console.log("📋 サブスロットラベル確認: debugAllSubslotLabels()");
-  console.log("🏷️ ラベル復元実行: restoreSubslotLabels()");
-  console.log("🔍 特定スロットのラベル確認: debugSubslotLabels('m1')");
-  console.log("🔧 ==============================\n");
-  
-  // 🏷️ 5秒後に初回ラベル復元を実行
-  setTimeout(() => {
-    console.log("🏷️ 初回ラベル復元を実行中...");
-    restoreSubslotLabels();
-    console.log("✅ 初回ラベル復元が完了しました");
-  }, 5000);
-});
-
-console.log("✅ subslot_visibility_control.js が読み込まれました");
-console.log("🔧 デバッグ用コマンドはページ読み込み完了後に利用できます");
