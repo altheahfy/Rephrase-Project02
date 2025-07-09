@@ -638,14 +638,20 @@ function randomizeSlotO1Individual() {
     setTimeout(() => {
       window.updateSubslotImages('o1');
       console.log("🎨 O1サブスロット画像更新完了");
+      
+      // 🎛️ 画像更新完了後にサブスロット表示状態を復元
+      setTimeout(() => {
+        restoreO1SubslotVisibility();
+        console.log("🎛️ O1サブスロット表示状態復元完了");
+      }, 100); // 画像更新完了後さらに100ms待機
     }, 150);
+  } else {
+    // updateSubslotImages関数がない場合の fallback
+    setTimeout(() => {
+      restoreO1SubslotVisibility();
+      console.log("🎛️ O1サブスロット表示状態復元完了（fallback）");
+    }, 300);
   }
-  
-  // 🎛️ O1サブスロットの表示状態を復元（パネル設定を再適用）
-  setTimeout(() => {
-    restoreO1SubslotVisibility();
-    console.log("🎛️ O1サブスロット表示状態復元完了");
-  }, 200);
   
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
@@ -1161,7 +1167,6 @@ function restoreO1SubslotVisibility() {
     const o1SubslotElements = document.querySelectorAll('[id^="slot-o1-sub-"]');
     console.log(`🔍 O1サブスロット要素: ${o1SubslotElements.length}個`);
     
-<<<<<<< HEAD
     console.log("🎛️ O1サブスロット表示状態を全て表示にリセット中...");
     
     // 各O1サブスロットについて全て表示状態に設定
@@ -1175,37 +1180,11 @@ function restoreO1SubslotVisibility() {
         // 既存のtoggleSubslotElementVisibility関数を使用して表示状態に設定
         if (typeof toggleSubslotElementVisibility === "function") {
           toggleSubslotElementVisibility(subslotId, elementType, true);
-=======
-    // 🚫 復元処理を一時的に無効化してテスト
-    console.log("⚠️ 復元処理を一時的にスキップしてテストします");
-    /*
-    // 各O1サブスロットについて状態を復元
-    o1SubslotElements.forEach(subslotElement => {
-      const subslotId = subslotElement.id;
-      const savedState = subslotVisibilityState[subslotId];
-      
-      // 各要素タイプ（image, text, auxtext）について復元
-      ['image', 'text', 'auxtext'].forEach(elementType => {
-        // 保存状態がある場合はそれを使用、ない場合はデフォルト（true=表示）
-        const isVisible = savedState && savedState[elementType] !== undefined 
-          ? savedState[elementType] 
-          : true; // デフォルトは表示
-        
-        console.log(`🎛️ ${subslotId}の${elementType}: ${isVisible} ${savedState ? '(保存済み)' : '(デフォルト)'}`);
-        
-        // 既存のtoggleSubslotElementVisibility関数を使用
-        if (typeof toggleSubslotElementVisibility === "function") {
-          toggleSubslotElementVisibility(subslotId, elementType, isVisible);
->>>>>>> parent of b534df4 (タイミング調整)
         } else {
           console.warn(`⚠️ toggleSubslotElementVisibility関数が見つかりません`);
         }
       });
     });
-<<<<<<< HEAD
-=======
-    */
->>>>>>> parent of b534df4 (タイミング調整)
     
     // ⏰ 復元後の状態を詳細にログ出力
     setTimeout(() => {
@@ -1227,7 +1206,7 @@ function restoreO1SubslotVisibility() {
       });
     }, 100);
     
-    console.log("✅ O1サブスロット表示状態復元完了（復元処理はスキップ）");
+    console.log("✅ O1サブスロット表示状態復元完了（画像更新後の最適タイミング）");
   } catch (error) {
     console.error("❌ O1サブスロット表示状態復元に失敗:", error);
   }
