@@ -614,8 +614,7 @@ function applySubslotVisibilityState() {
             
             console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);
           }
-        }
-      });
+        });
     });
     
     console.log("✅ サブスロット表示状態の復元完了");
@@ -624,8 +623,78 @@ function applySubslotVisibilityState() {
   }
 }
 
+// 🆕 O1サブスロット専用の安全な表示状態復元機能
+function applyO1SubslotVisibilityState() {
+  console.log("🎨 O1サブスロット表示状態をDOMに適用中...");
+  
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (!saved) {
+      console.log("📝 O1: 保存されたサブスロット表示状態がありません");
+      return;
+    }
+    
+    const subslotVisibilityState = JSON.parse(saved);
+    console.log("📂 O1: 復元するサブスロット表示状態:", subslotVisibilityState);
+    
+    // O1のサブスロットのみに限定して処理
+    Object.keys(subslotVisibilityState).forEach(subslotId => {
+      // O1のサブスロットのみを対象とする
+      if (!subslotId.startsWith('slot-o1-sub-')) {
+        return;
+      }
+      
+      const subslot = subslotVisibilityState[subslotId];
+      const subslotElement = document.getElementById(subslotId);
+      
+      if (!subslotElement) {
+        console.warn(`⚠️ O1サブスロット要素が見つかりません: ${subslotId}`);
+        return;
+      }
+      
+      ['image', 'auxtext', 'text'].forEach(elementType => {
+        const isVisible = subslot[elementType];
+        
+        // 明示的に記録されている場合のみ処理
+        if (isVisible !== undefined) {
+          const className = `hidden-subslot-${elementType}`;
+          
+          if (isVisible) {
+            subslotElement.classList.remove(className);
+            console.log(`✅ O1復元: ${subslotId}の${elementType}を表示`);
+          } else {
+            subslotElement.classList.add(className);
+            console.log(`🙈 O1復元: ${subslotId}の${elementType}を非表示`);
+          }
+          
+          // 複数画像コンテナの直接制御（image要素の場合）
+          if (elementType === 'image') {
+            const multiImageContainer = subslotElement.querySelector('.multi-image-container');
+            if (multiImageContainer) {
+              if (isVisible) {
+                multiImageContainer.style.display = 'flex';
+                multiImageContainer.style.visibility = 'visible';
+              } else {
+                multiImageContainer.style.display = 'none';
+                multiImageContainer.style.visibility = 'hidden';
+              }
+            }
+          }
+        } else {
+          console.log(`📝 O1スキップ: ${subslotId}の${elementType}は記録なし - 現在の状態を維持`);
+        }
+      });
+    });
+    
+    console.log("✅ O1サブスロット表示状態の復元完了");
+  } catch (error) {
+    console.error("❌ O1サブスロット表示状態の復元に失敗:", error);
+  }
+}
+
 // 🆕 グローバル関数としてエクスポート
 window.applySubslotVisibilityState = applySubslotVisibilityState;
+window.applyO1SubslotVisibilityState = applyO1SubslotVisibilityState;
 
 // 🔄 ページ読み込み時の自動初期化
 document.addEventListener('DOMContentLoaded', function() {
