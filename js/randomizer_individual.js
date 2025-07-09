@@ -633,6 +633,14 @@ function randomizeSlotO1Individual() {
     console.log("🔄 サブスロット同期完了");
   }
   
+  // 🆕 O1専用のサブスロット表示状態を復元（Sと同じタイミング）
+  if (typeof window.applyO1SubslotVisibilityState === "function") {
+    setTimeout(() => {
+      window.applyO1SubslotVisibilityState();
+      console.log("🎨 O1サブスロット表示状態復元完了");
+    }, 50);
+  }
+  
   // 全スロット画像更新
   if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
     setTimeout(() => {
@@ -648,14 +656,6 @@ function randomizeSlotO1Individual() {
       console.log("🎨 O1サブスロット画像更新完了");
     }, 150);
   }
-  
-  // 🎨 O1サブスロット表示状態を安全に復元（個別ランダマイズ後）
-  setTimeout(() => {
-    if (typeof window.applyO1SubslotVisibilityState === "function") {
-      window.applyO1SubslotVisibilityState();
-      console.log("🎨 O1スロット個別ランダマイズ後の表示状態復元完了");
-    }
-  }, 200);
   
   console.log("✅ O1スロット個別ランダマイズ完了");
 }
