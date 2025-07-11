@@ -978,48 +978,6 @@ function syncSubslotsFromJson(data) {
       phraseElement.className = 'slot-phrase';
       if (item.SubslotElement) {
         phraseElement.textContent = item.SubslotElement;
-        
-        // 🔍 localStorage で英語例文テキスト表示設定をチェック
-        try {
-          const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-          if (saved) {
-            const subslotVisibilityState = JSON.parse(saved);
-            if (subslotVisibilityState[fullSlotId] && subslotVisibilityState[fullSlotId]['text'] === false) {
-              // 英語例文テキストを透明化（DOMには残す）
-              phraseElement.style.opacity = '0';
-              phraseElement.style.visibility = 'hidden';
-              phraseElement.style.color = 'transparent';
-              phraseElement.style.textShadow = 'none';
-              console.log(`🙈 サブスロット "${fullSlotId}" の英語例文テキストを透明化`);
-            }
-          }
-        } catch (error) {
-          console.warn('localStorage解析エラー:', error);
-        }
-      }
-      
-      // 🎯 メタレベル制御：phrase要素作成直後に表示制御を適用
-      try {
-        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-        console.log(`🔍 デバッグ: ${fullSlotId} のlocalStorage確認`);
-        console.log(`🔍 saved:`, saved);
-        
-        if (saved) {
-          const subslotVisibilityState = JSON.parse(saved);
-          console.log(`🔍 subslotVisibilityState:`, subslotVisibilityState);
-          console.log(`🔍 ${fullSlotId}の設定:`, subslotVisibilityState[fullSlotId]);
-          
-          if (subslotVisibilityState[fullSlotId] && subslotVisibilityState[fullSlotId]['phrase'] === false) {
-            phraseElement.style.opacity = '0';
-            console.log(`🎯 非表示制御適用: ${fullSlotId} の phrase要素を透明化`);
-          } else {
-            console.log(`🔍 ${fullSlotId}は表示設定または設定なし`);
-          }
-        } else {
-          console.log(`🔍 localStorageにデータなし`);
-        }
-      } catch (error) {
-        console.error("❌ サブスロット表示制御の適用に失敗:", error);
       }
       
       // text要素を作成
@@ -1070,6 +1028,30 @@ function syncSubslotsFromJson(data) {
       
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
+      
+      // 🎯 DOM追加後にlocalStorage設定に基づいてCSSクラスを適用
+      try {
+        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+        if (saved) {
+          const subslotVisibilityState = JSON.parse(saved);
+          if (subslotVisibilityState[fullSlotId]) {
+            // 英語例文テキストの表示制御
+            if (subslotVisibilityState[fullSlotId]['text'] === false) {
+              slotElement.classList.add('hidden-subslot-text');
+            }
+            // 日本語補助テキストの表示制御
+            if (subslotVisibilityState[fullSlotId]['auxtext'] === false) {
+              slotElement.classList.add('hidden-subslot-auxtext');
+            }
+            // 画像の表示制御
+            if (subslotVisibilityState[fullSlotId]['image'] === false) {
+              slotElement.classList.add('hidden-subslot-image');
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('localStorage設定適用エラー:', error);
+      }
       
       console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);
       
