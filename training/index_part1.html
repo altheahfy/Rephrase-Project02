@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   トレーニング - Rephrase 英語学習システム
+  </title>
+  <link href="../style.css" rel="stylesheet"/>
+  <script src="../js/subslot_toggle.js">
+  </script>
+  <script src="../js/randomizer_individual.js">
+  </script>
+  <script src="../js/control_panel_manager.js">
+  </script>
+  <script src="../js/visibility_control.js">
+  </script>
+  <script src="../js/subslot_visibility_control.js">
+  </script>
+  <script src="../js/image_auto_hide.js">
+  </script>
+  <script src="../js/universal_image_system.js">
+  </script>
+  <script src="../js/question_word_visibility.js">
+  </script>
+ </head>
+ <body>
+
+<!-- ナビゲーションバー -->
+<nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 15000; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e0e0e0; padding: 10px 0;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="../" style="text-decoration: none; color: #2196F3; font-weight: bold; font-size: 18px;">🔄 Rephrase</a>
+      <span style="color: #666; font-size: 14px;">トレーニングモード</span>
+    </div>
+    <div style="display: flex; gap: 15px;">
+      <a href="../" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">🏠 ホーム</a>
+      <a href="../grammar/" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">📚 文法説明</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 🎭 ローディングオーバーレイ -->
+<div id="loading-overlay" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+">
+  <div style="text-align: center; pointer-events: auto;">
+    <div style="
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    "></div>
+    <h2 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 300;">
+      データを準備しています...
+    </h2>
+    <p style="margin: 0; font-size: 14px; opacity: 0.8;">
+      JSONファイルをロードしてください
+    </p>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<!-- 右上のファイル選択・ロードエリア -->
+<div id="file-load-area" style="position: fixed; top: 60px; right: 10px; z-index: 10000; background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 8px; border: 2px solid #2196F3; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+  <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 8px; font-size: 13px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
+  <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 8px 16px; font-size: 13px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">ロード</button>
+</div>
+
+<!-- タイトル（常に表示） -->
+<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 70px; margin-right: 280px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+  <h1 style="margin: 0; margin-right: 30px; color: #333; font-size: 28px; font-weight: bold;">
+   🎯 Rephrase トレーニング
+  </h1>
+</div>
+
+<!-- 🎯 メインコンテンツエリア（ローディング完了まで非表示） -->
+<div id="main-content" style="display: none;">
+
+<!-- 🔹 分離疑問詞用表示領域 -->
+<div id="display-top-question-word">
+  <div class="question-word-label">WH</div>
+  <div class="question-word-image"></div>
+  <div class="question-word-spacer"></div>
+  <div class="question-word-auxtext"></div>
+  <div class="question-word-text"></div>
+  <div class="question-word-button-placeholder"></div>
+  <div class="question-word-button-placeholder"></div>
+</div>
+
+  <section>
+  </section>
+  
+  <!-- 制御パネル表示ボタンと制御パネル -->
+  <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
+    <!-- 制御パネル表示ボタン -->
+    <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 20px;">
+      制御パネル
+    </button>
+  </div>
+  
+  <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
+  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
+      <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+        
+        <!-- 疑問詞 スロット -->
+        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M1 スロット -->
+        <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- S スロット -->
+        <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- Aux スロット -->
+        <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M2 スロット -->
+        <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- V スロット -->
+        <div class="slot-control-group" data-slot="v" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">V</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- C1 スロット -->
+        <div class="slot-control-group" data-slot="c1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- O1 スロット -->
+        <div class="slot-control-group" data-slot="o1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- O2 スロット -->
+        <div class="slot-control-group" data-slot="o2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- C2 スロット -->
+        <div class="slot-control-group" data-slot="c2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M3 スロット -->
+        <div class="slot-control-group" data-slot="m3" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M3</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- 全表示ボタン -->
+        <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
+        
+        <!-- 全英文非表示ボタン -->
+        <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
+      </div>
+    </div>
+  </div>
+  <section>
+   <button id="randomize-all">
+    例文シャッフル
+   </button>
+   <h2 style="margin-bottom: 15px; margin-top: 20px;">
+    例文
+   </h2>
+   <div class="slot-wrapper">
+    <div class="slot-container" id="slot-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="s">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="s-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="slot-container" id="slot-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="slot-container" id="slot-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="c1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="c1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="o1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="o1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="o2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="o2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="c2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="c2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="../slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m3">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m3-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+   </div>
