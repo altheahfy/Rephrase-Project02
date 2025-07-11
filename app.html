@@ -82,6 +82,7 @@
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
     <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
       <option value="">-- サンプルを選択 --</option>
+      <option value="slot_order_data.json">🎯 メインデータセット</option>
       <option value="data/sample_basic.json">基本例文セット</option>
       <option value="data/sample_advanced.json">応用例文セット</option>
       <option value="data/sample_questions.json">疑問文セット</option>
@@ -984,6 +985,27 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
   let presetData = null;
   
+  if (selectedPreset === 'slot_order_data.json') {
+    // 🎯 **メインデータセット：fetchでslot_order_data.jsonを読み込み**
+    fetch('slot_order_data.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        processPresetData(data);
+      })
+      .catch(error => {
+        console.error("slot_order_data.jsonの読み込みに失敗:", error);
+        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択からslot_order_data.jsonを選択してください。`);
+        hideLoadingOverlay();
+      });
+    return; // 早期リターン
+  }
+  
+  // 🎯 **既存のサンプルデータ**
   switch(selectedPreset) {
     case 'data/sample_basic.json':
       presetData = [
@@ -1202,29 +1224,40 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
       return;
   }
   
-  try {
-    // 🔄 JSONロード時にサブスロット表示設定をリセット
-    localStorage.removeItem('rephrase_subslot_visibility_state');
-    console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
-    
-    loadedJsonData = presetData;
-    window.loadedJsonData = loadedJsonData;  // コンソール確認用
-    console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
-    const processedData = randomizeAll(loadedJsonData);
-    console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
-    validateSlotsModified(processedData);
-    window.loadedJsonData = processedData;
-    buildStructure(processedData);
-    syncDynamicToStatic();
-    
-    // サブスロットの初期化も実行
-    if (typeof initializeSubslots === 'function') {
-      initializeSubslots();
+  // 🎯 **データ処理を共通化**
+  function processPresetData(data) {
+    try {
+      // 🔄 JSONロード時にサブスロット表示設定をリセット
+      localStorage.removeItem('rephrase_subslot_visibility_state');
+      console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+      
+      loadedJsonData = data;
+      window.loadedJsonData = loadedJsonData;  // コンソール確認用
+      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+      const processedData = randomizeAll(loadedJsonData);
+      console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+      validateSlotsModified(processedData);
+      window.loadedJsonData = processedData;
+      buildStructure(processedData);
+      syncDynamicToStatic();
+      
+      // サブスロットの初期化も実行
+      if (typeof initializeSubslots === 'function') {
+        initializeSubslots();
+      }
+      
+      // 🎭 ローディング画面を非表示
+      console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+      hideLoadingOverlay();
+    } catch (error) {
+      console.error("プリセットJSONデータの処理に失敗:", error);
+      alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+      hideLoadingOverlay();
     }
-    
-    // 🎭 ローディング画面を非表示
-    console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
-    hideLoadingOverlay();
+  }
+  
+  try {
+    processPresetData(presetData);
   } catch (error) {
     console.error("プリセットJSONデータの処理に失敗:", error);
     alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
