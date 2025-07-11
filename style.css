@@ -550,10 +550,14 @@ h2 {
 }
 
 /* 例文テキスト非表示制御 */
-.slot-container.hidden-text > .slot-phrase,
-.subslot.hidden-text > .slot-phrase {
+.slot-container.hidden-text > .slot-phrase {
   display: none !important;
   visibility: hidden !important;
+}
+
+/* サブスロットのテキスト非表示制御 - opacity で統一 */
+.subslot.hidden-text > .slot-phrase {
+  opacity: 0 !important;
 }
 
 /* スロット個別制御用 - 各スロットに特化したクラス */
@@ -621,7 +625,7 @@ h2 {
 [id*="-sub-"].hidden-image .slot-image { display: none !important; }
 [id*="-sub-"].hidden-image .multi-image-container { display: none !important; }
 [id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
-[id*="-sub-"].hidden-text > .slot-phrase { display: none !important; }
+[id*="-sub-"].hidden-text > .slot-phrase { opacity: 0 !important; }
 
 /* 🎛️ サブスロット専用の表示・非表示制御クラス */
 /* サブスロットの画像・テキスト・補助テキストの個別制御 */

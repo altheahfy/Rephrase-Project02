@@ -3,6 +3,21 @@
 
 console.log("🔄 image_auto_hide_fixed.js が読み込まれました");
 
+// 🔄 MutationObserver の制御用変数
+let imageObserver = null;
+let isObserverEnabled = true;
+
+// 🔄 MutationObserver の一時停止/再開機能
+function pauseImageObserver() {
+  isObserverEnabled = false;
+  console.log("⏸️ 画像監視システムを一時停止しました");
+}
+
+function resumeImageObserver() {
+  isObserverEnabled = true;
+  console.log("▶️ 画像監視システムを再開しました");
+}
+
 // 🎯 非表示対象とする画像のパターン
 const HIDDEN_IMAGE_PATTERNS = [
   'placeholder.png',           // プレースホルダー画像
@@ -198,6 +213,8 @@ window.reprocessImagesAfterDataUpdate = reprocessImagesAfterDataUpdate;
 window.reprocessImagesAfterRandomize = reprocessImagesAfterRandomize;
 window.setButtonImageForDetailSlots = setButtonImageForDetailSlots;
 window.processAllImagesWithButtonAutoSet = processAllImagesWithButtonAutoSet;
+window.pauseImageObserver = pauseImageObserver;
+window.resumeImageObserver = resumeImageObserver;
 
 // 🔹 デバッグ用手動実行関数
 window.debugImageHiding = function() {
