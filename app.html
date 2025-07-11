@@ -77,8 +77,24 @@
 
 <!-- 右上のファイル選択・ロードエリア -->
 <div id="file-load-area" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 8px; border: 2px solid #2196F3; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-  <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 8px; font-size: 13px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
-  <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 8px 16px; font-size: 13px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">ロード</button>
+  <!-- プリセットJSONファイル選択 -->
+  <div style="margin-bottom: 8px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
+    <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
+      <option value="">-- サンプルを選択 --</option>
+      <option value="data/sample_basic.json">基本例文セット</option>
+      <option value="data/sample_advanced.json">応用例文セット</option>
+      <option value="data/sample_questions.json">疑問文セット</option>
+    </select>
+    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
+  </div>
+  
+  <!-- ファイル選択 -->
+  <div style="border-top: 1px solid #eee; padding-top: 8px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ファイル選択</label>
+    <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 4px; font-size: 13px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
+    <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold;">ロード</button>
+  </div>
 </div>
 
 <!-- タイトル（常に表示） -->
@@ -945,6 +961,66 @@ import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
 
+// 🎯 **プリセットJSONファイルをロードする機能**
+document.getElementById("loadPresetButton").addEventListener("click", () => {
+  const presetSelect = document.getElementById("presetSelect");
+  const selectedPreset = presetSelect.value;
+  
+  if (!selectedPreset) {
+    alert("サンプルデータを選択してください");
+    return;
+  }
+  
+  // 🎭 ローディング画面を表示
+  console.log("🎭 プリセットJSONロード開始 - ローディング画面を表示");
+  showLoadingOverlay();
+  
+  // ローディングメッセージを更新
+  const loadingText = document.querySelector('#loading-overlay p');
+  if (loadingText) {
+    loadingText.textContent = `${selectedPreset} を読み込み中...`;
+  }
+  
+  // fetchでプリセットJSONファイルをロード
+  fetch(selectedPreset)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 🔄 JSONロード時にサブスロット表示設定をリセット
+      localStorage.removeItem('rephrase_subslot_visibility_state');
+      console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+      
+      loadedJsonData = data;
+      window.loadedJsonData = loadedJsonData;  // コンソール確認用
+      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+      const processedData = randomizeAll(loadedJsonData);
+      console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+      validateSlotsModified(processedData);
+      window.loadedJsonData = processedData;
+      buildStructure(processedData);
+      syncDynamicToStatic();
+      
+      // サブスロットの初期化も実行
+      if (typeof initializeSubslots === 'function') {
+        initializeSubslots();
+      }
+      
+      // 🎭 ローディング画面を非表示
+      console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+      hideLoadingOverlay();
+    })
+    .catch(error => {
+      console.error("プリセットJSONファイルの読み込みに失敗:", error);
+      alert(`プリセットJSONファイルの読み込みに失敗しました: ${error.message}`);
+      hideLoadingOverlay();
+    });
+});
+
+// 既存のファイル選択からのロード機能
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
   if (fileInput.files.length === 0) {
