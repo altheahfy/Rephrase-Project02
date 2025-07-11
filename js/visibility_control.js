@@ -274,6 +274,19 @@ function setupVisibilityControlUI() {
     });
   }
   
+  // 🆕 全英文非表示ボタン
+  const hideAllEnglishButton = document.getElementById('hide-all-english-visibility');
+  if (hideAllEnglishButton) {
+    hideAllEnglishButton.addEventListener('click', function() {
+      console.log("🔒 全英文非表示ボタンがクリックされました");
+      hideAllEnglishText();
+      
+      // UIの英文チェックボックスも全て非チェック状態に戻す
+      const englishCheckboxes = document.querySelectorAll('.visibility-checkbox[data-element-type="text"]');
+      englishCheckboxes.forEach(cb => cb.checked = false);
+    });
+  }
+  
   // 折畳みボタン（新しいUIには存在しないのでコメントアウト）
   /*
   const togglePanelButton = document.getElementById('toggle-visibility-panel');
@@ -415,6 +428,30 @@ function resetQuestionWordVisibility() {
   
   console.log("🔄 疑問詞表示をリセットしました");
 }
+
+// 🔒 全英文例文を非表示にする
+function hideAllEnglishText() {
+  console.log("🔒 全英文例文を非表示にします");
+  
+  // 全スロットの英文例文（text要素）を非表示にする
+  ALL_SLOTS.forEach(slot => {
+    toggleSlotElementVisibility(slot, 'text', false);
+  });
+  
+  // 疑問詞の英文例文も非表示にする
+  if (typeof window.toggleQuestionWordVisibility === 'function') {
+    window.toggleQuestionWordVisibility('text', false);
+    console.log("🔒 疑問詞の英文例文も非表示にしました");
+  }
+  
+  // 状態を永続化
+  saveVisibilityState();
+  
+  console.log("✅ 全英文例文を非表示にしました");
+}
+
+// 🔹 新しい関数もグローバルにエクスポート
+window.hideAllEnglishText = hideAllEnglishText;
 
 // 🔹 疑問詞機能をグローバルにエクスポート
 window.toggleQuestionWordVisibility = toggleQuestionWordVisibility;
