@@ -1128,3 +1128,136 @@ h2 {
   
   /* 上位スロットと同じオレンジ背景・上下線 */
   background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+/* 🔗 エクセル風タブ連結システム（再実装版） */
+
+/* 展開中の上位スロット（親）の基本スタイル */
+.slot-container.active-parent-slot {
+  background: rgba(173, 216, 230, 0.4) !important; /* 薄いブルー背景 */
+  border: 2px solid #87CEEB !important; /* スカイブルー境界線 */
+  border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
+  border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
+  position: relative !important;
+  z-index: 3 !important; /* サブスロットエリアの上に表示 */
+  margin-bottom: 0 !important; /* 下部マージンを除去 */
+  transition: all 0.3s ease !important;
+  box-shadow: 0 -2px 8px rgba(135, 206, 235, 0.3) !important; /* 上部シャドウで浮遊感 */
+}
+
+/* 🎨 親スロット用の拡張背景（包み込み効果） */
+.slot-container.active-parent-slot::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -5px !important;
+  left: -5px !important;
+  right: -5px !important;
+  bottom: -5px !important;
+  background: linear-gradient(180deg, rgba(173, 216, 230, 0.3) 0%, rgba(173, 216, 230, 0.1) 100%) !important;
+  border: 2px solid rgba(135, 206, 235, 0.6) !important;
+  border-radius: 12px 12px 0 0 !important;
+  border-bottom: none !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* 展開中のサブスロットエリア全体のスタイル */
+[id$="-sub"].active-subslot-area {
+  background: rgba(173, 216, 230, 0.25) !important; /* 親より薄いブルー */
+  border: 2px solid #87CEEB !important;
+  border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
+  border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
+  position: relative !important;
+  margin-top: -2px !important; /* 親スロットとの境界線を重複させる */
+  padding: 20px !important;
+  z-index: 2 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 
+    0 -2px 4px rgba(135, 206, 235, 0.3),  /* 上向きの影で連結感を演出 */
+    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 🎨 サブスロットエリア用の拡張背景（包み込み効果の続き） */
+[id$="-sub"].active-subslot-area::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  left: -5px !important;
+  right: -5px !important;
+  bottom: -5px !important;
+  background: linear-gradient(180deg, rgba(173, 216, 230, 0.1) 0%, rgba(173, 216, 230, 0.3) 100%) !important;
+  border: 2px solid rgba(135, 206, 235, 0.6) !important;
+  border-top: none !important;
+  border-radius: 0 0 16px 16px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* サブスロットラベルのタブ風デザイン */
+.subslot-label.tab-style {
+  background: rgba(173, 216, 230, 0.6) !important;
+  border: 2px solid #87CEEB !important;
+  border-radius: 8px 8px 0 0 !important;
+  padding: 8px 16px !important;
+  font-weight: bold !important;
+  color: #2E5984 !important;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7) !important;
+  margin-bottom: -2px !important;
+  position: relative !important;
+  z-index: 4 !important;
+  display: inline-block !important;
+  box-shadow: 0 -2px 4px rgba(135, 206, 235, 0.4) !important;
+}
+
+/* サブスロットラベルのホバー効果 */
+.subslot-label.tab-style:hover {
+  background: rgba(173, 216, 230, 0.8) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 -4px 8px rgba(135, 206, 235, 0.6) !important;
+}
+
+/* 🔗 タブ連結時のアニメーション効果 */
+.slot-container.active-parent-slot,
+[id$="-sub"].active-subslot-area {
+  animation: tabConnect 0.4s ease-out forwards !important;
+}
+
+@keyframes tabConnect {
+  0% {
+    transform: scale(0.98) translateY(2px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.01) translateY(-1px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 🎨 タブ連結時の視覚的な境界線除去 */
+.slot-container.active-parent-slot + [id$="-sub"].active-subslot-area {
+  border-top: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+/* 🔄 タブ連結解除時のフェードアウト効果 */
+.slot-container.tab-disconnecting,
+[id$="-sub"].tab-disconnecting {
+  animation: tabDisconnect 0.3s ease-in forwards !important;
+}
+
+@keyframes tabDisconnect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.98);
+    opacity: 0.7;
+  }
+}

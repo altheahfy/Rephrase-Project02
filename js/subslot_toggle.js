@@ -80,18 +80,7 @@ function toggleExclusiveSubslot(slotId) {
       parentSlot.classList.add('active-parent-slot');
       subslotArea.classList.add('active-subslot-area');
       
-      // スタイルの強制適用（CSSだけでは不十分な場合のフォールバック）
-      parentSlot.style.background = 'rgba(173, 216, 230, 0.4)';
-      parentSlot.style.border = '2px solid #87CEEB';
-      parentSlot.style.borderBottom = 'none';
-      parentSlot.style.borderRadius = '8px 8px 0 0';
-      
-      subslotArea.style.background = 'rgba(173, 216, 230, 0.25)';
-      subslotArea.style.border = '2px solid #87CEEB';
-      subslotArea.style.borderTop = 'none';
-      subslotArea.style.borderRadius = '0 0 12px 12px';
-      subslotArea.style.marginTop = '-2px';
-      
+      // CSSが優先されるように、インラインスタイルは最小限に（CSS !importantが効くように）
       console.log(`✅ クラス追加完了:`);
       console.log(`  - parentSlot classes: ${parentSlot.className}`);
       console.log(`  - subslotArea classes: ${subslotArea.className}`);
@@ -632,12 +621,15 @@ function clearAllTabConnections() {
   allParentSlots.forEach(slot => {
     slot.classList.remove('active-parent-slot');
     // ブルータブのインラインスタイルを完全にクリア
-    slot.style.background = '';
-    slot.style.backgroundColor = '';
-    slot.style.border = '';
-    slot.style.borderBottom = '';
-    slot.style.borderRadius = '';
-    slot.style.boxShadow = '';
+    slot.style.removeProperty('background');
+    slot.style.removeProperty('background-color');
+    slot.style.removeProperty('border');
+    slot.style.removeProperty('border-bottom');
+    slot.style.removeProperty('border-radius');
+    slot.style.removeProperty('box-shadow');
+    slot.style.removeProperty('margin-bottom');
+    slot.style.removeProperty('z-index');
+    slot.style.removeProperty('position');
   });
   
   // 🔗 サブスロットエリアからタブ連結クラス + インラインスタイルを削除
@@ -645,13 +637,16 @@ function clearAllTabConnections() {
   allSubslotAreas.forEach(area => {
     area.classList.remove('active-subslot-area');
     // ブルータブのインラインスタイルを完全にクリア
-    area.style.background = '';
-    area.style.backgroundColor = '';
-    area.style.border = '';
-    area.style.borderTop = '';
-    area.style.borderRadius = '';
-    area.style.marginTop = '';
-    area.style.boxShadow = '';
+    area.style.removeProperty('background');
+    area.style.removeProperty('background-color');
+    area.style.removeProperty('border');
+    area.style.removeProperty('border-top');
+    area.style.removeProperty('border-radius');
+    area.style.removeProperty('margin-top');
+    area.style.removeProperty('box-shadow');
+    area.style.removeProperty('padding');
+    area.style.removeProperty('z-index');
+    area.style.removeProperty('position');
   });
   
   // 📂 サブスロットラベルからタブスタイルを削除
