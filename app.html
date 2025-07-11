@@ -82,7 +82,7 @@
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
     <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
       <option value="">-- サンプルを選択 --</option>
-      <option value="slot_order_data.json">🎯 メインデータセット</option>
+      <option value="data/slot_order_data.json">🎯 メインデータセット</option>
       <option value="data/sample_basic.json">基本例文セット</option>
       <option value="data/sample_advanced.json">応用例文セット</option>
       <option value="data/sample_questions.json">疑問文セット</option>
@@ -985,9 +985,9 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
   let presetData = null;
   
-  if (selectedPreset === 'slot_order_data.json') {
+  if (selectedPreset === 'data/slot_order_data.json') {
     // 🎯 **メインデータセット：fetchでslot_order_data.jsonを読み込み**
-    fetch('slot_order_data.json')
+    fetch('data/slot_order_data.json')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -998,8 +998,8 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
         processPresetData(data);
       })
       .catch(error => {
-        console.error("slot_order_data.jsonの読み込みに失敗:", error);
-        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択からslot_order_data.jsonを選択してください。`);
+        console.error("data/slot_order_data.jsonの読み込みに失敗:", error);
+        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択からdata/slot_order_data.jsonを選択してください。`);
         hideLoadingOverlay();
       });
     return; // 早期リターン
