@@ -8,8 +8,19 @@ body {
 
 /* 🚨 最優先：サブスロット制御パネル専用ルール（他のルールより優先） */
 [id*="-sub-"].hidden-subslot-text .slot-phrase {
+  opacity: 0 !important;
+  visibility: hidden !important;
   color: transparent !important;
-  /* 🎯 テキスト内容のみ透明化、枠（背景・境界線）は残す */
+  text-shadow: none !important;
+  /* 🎯 テキストを透明化（DOMには残す） */
+}
+
+/* より具体的なセレクタで確実に透明化 */
+.hidden-subslot-text {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  color: transparent !important;
+  text-shadow: none !important;
 }
 
 /* 右上のファイル選択・ロードエリアのスタイル */
