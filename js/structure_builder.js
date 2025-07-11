@@ -51,16 +51,25 @@ function renderSubslot(sub) {
   subDiv.appendChild(subElDiv);
   subDiv.appendChild(subTextDiv);
 
-  // 🎯 **修正：新しく作成したサブスロット要素にlocalStorageの状態を適用**
+  // 🎯 **修正：正しいlocalStorageシステムを使用**
   if (sub.SubslotID) {
-    const storageKey = `subslot-${sub.Slot.toLowerCase()}-${sub.SubslotID.toLowerCase()}-visible`;
-    const isVisible = localStorage.getItem(storageKey) !== 'false';
-    
-    if (!isVisible) {
-      subTextDiv.style.opacity = '0';
-      console.log(`Applied localStorage state: ${storageKey} = false (hidden)`);
-    } else {
-      console.log(`Applied localStorage state: ${storageKey} = true (visible)`);
+    // 実際に使用されているシステムに合わせる
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (saved) {
+      try {
+        const visibilityState = JSON.parse(saved);
+        const elementId = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
+        const elementState = visibilityState[elementId];
+        
+        if (elementState && elementState.text === false) {
+          subTextDiv.style.opacity = '0';
+          console.log(`Applied rephrase_subslot_visibility_state: ${elementId}.text = false (hidden)`);
+        } else {
+          console.log(`Applied rephrase_subslot_visibility_state: ${elementId}.text = true (visible)`);
+        }
+      } catch (e) {
+        console.error('Error parsing rephrase_subslot_visibility_state:', e);
+      }
     }
   }
 

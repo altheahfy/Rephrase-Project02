@@ -431,16 +431,46 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
 function resetSubslotVisibility(parentSlot) {
   console.log(`🔄 ${parentSlot}サブスロットの表示を全てリセット`);
   
+  const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  // 🎯 **修正：rephrase_subslot_visibility_stateシステムを使用**
+  const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+  let visibilityState = {};
+  if (saved) {
+    try {
+      visibilityState = JSON.parse(saved);
+    } catch (e) {
+      console.error('Error parsing rephrase_subslot_visibility_state:', e);
+    }
+  }
+  
+  desiredOrder.forEach(subslotType => {
+    const subslotId = `slot-${parentSlot}-sub-${subslotType}`;
+    const elementId = `slot-${parentSlot.toLowerCase()}-sub-${subslotType.toLowerCase()}`;
+    const subslotElement = document.getElementById(subslotId);
+    
+    // 🎯 **修正：全10種類のサブスロットをtrueに設定**
+    if (!visibilityState[elementId]) {
+      visibilityState[elementId] = {};
+    }
+    visibilityState[elementId].text = true;
+    console.log(`🔄 rephrase_subslot_visibility_state設定: ${elementId}.text = true`);
+    
+    if (subslotElement) {
+      // 英文を表示にする（textタイプのみ）
+      toggleSubslotElementVisibility(subslotId, 'text', true);
+      console.log(`🔄 ${subslotId}の英文を表示にしました`);
+    } else {
+      console.log(`🔄 ${subslotId}は表示されていませんが、localStorage設定済み`);
+    }
+  });
+  
+  // localStorageに保存
+  localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+  
   // 該当するトグルボタンを全て表示状態に
   const toggleButtons = document.querySelectorAll(`[data-parent-slot="${parentSlot}"].subslot-toggle-button`);
   toggleButtons.forEach(button => {
-    // 表示状態を設定
-    toggleSubslotElementVisibility(
-      button.dataset.subslotId,
-      button.dataset.elementType,
-      true
-    );
-    
     // ボタンスタイルを更新
     updateToggleButtonStyle(button, true);
   });
@@ -509,14 +539,28 @@ function hideAllEnglishInSubslots(parentSlot) {
   
   const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
   
+  // 🎯 **修正：rephrase_subslot_visibility_stateシステムを使用**
+  const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+  let visibilityState = {};
+  if (saved) {
+    try {
+      visibilityState = JSON.parse(saved);
+    } catch (e) {
+      console.error('Error parsing rephrase_subslot_visibility_state:', e);
+    }
+  }
+  
   desiredOrder.forEach(subslotType => {
     const subslotId = `slot-${parentSlot}-sub-${subslotType}`;
+    const elementId = `slot-${parentSlot.toLowerCase()}-sub-${subslotType.toLowerCase()}`;
     const subslotElement = document.getElementById(subslotId);
     
-    // 🎯 **修正：表示されていないサブスロットも含めて全10種類をfalseに設定**
-    const storageKey = `subslot-${parentSlot.toLowerCase()}-${subslotType.toLowerCase()}-visible`;
-    localStorage.setItem(storageKey, 'false');
-    console.log(`🔒 localStorage設定: ${storageKey} = false`);
+    // 🎯 **修正：全10種類のサブスロットをfalseに設定**
+    if (!visibilityState[elementId]) {
+      visibilityState[elementId] = {};
+    }
+    visibilityState[elementId].text = false;
+    console.log(`🔒 rephrase_subslot_visibility_state設定: ${elementId}.text = false`);
     
     if (subslotElement) {
       // 英文のみを非表示にする（textタイプのみ）
@@ -526,6 +570,9 @@ function hideAllEnglishInSubslots(parentSlot) {
       console.log(`🔒 ${subslotId}は表示されていませんが、localStorage設定済み`);
     }
   });
+  
+  // localStorageに保存
+  localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
   
   // サブスロット制御パネルのボタン状態を更新
   const controlPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
