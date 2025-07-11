@@ -38,12 +38,12 @@ function applySubslotVisibilityControl(slotElement, slotType) {
     console.log(`🔍 DEBUG: 対象スロットID = ${slotId}`);
     console.log(`🔍 DEBUG: スロット設定 =`, subslotVisibilityState[slotId]);
     
-    // 該当スロットの設定を確認
-    if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['phrase'] === false) {
+    // 該当スロットの設定を確認（text項目がfalseの場合に透明化）
+    if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['text'] === false) {
       const phraseElement = slotElement.querySelector('.slot-phrase');
       if (phraseElement) {
         phraseElement.style.opacity = '0';
-        console.log(`🎯 非表示制御適用: ${slotId} の phrase要素を透明化`);
+        console.log(`🎯 非表示制御適用: ${slotId} の phrase要素を透明化（text=false）`);
       }
     } else {
       console.log(`🔍 DEBUG: ${slotId} は表示設定または設定なし`);
