@@ -3,7 +3,7 @@
 
 // 🎯 サブスロットの表示・非表示制御に使用するスロット一覧
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
-const SUB_ELEMENT_TYPES = ['image', 'auxtext', 'text'];
+const SUB_ELEMENT_TYPES = ['auxtext', 'text'];
 
 // 🏗️ サブスロット用コントロールパネルを生成
 function createSubslotControlPanel(parentSlot) {
@@ -234,9 +234,6 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     
     const icon = document.createElement('span');
     switch(elementType) {
-      case 'image':
-        icon.textContent = '🖼️';
-        break;
       case 'text':
         icon.textContent = '📄';
         break;
@@ -277,27 +274,10 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     console.log(`🙈 ${subslotId}の${elementType}を非表示にしました (added class: ${className})`);
   }
   
-  // 🆕 複数画像コンテナの直接制御（image要素の場合）
-  if (elementType === 'image') {
-    const multiImageContainer = subslotElement.querySelector('.multi-image-container');
-    if (multiImageContainer) {
-      if (isVisible) {
-        multiImageContainer.style.display = 'flex';
-        multiImageContainer.style.visibility = 'visible';
-        console.log(`✅ ${subslotId}の複数画像コンテナを表示しました`);
-      } else {
-        multiImageContainer.style.display = 'none';
-        multiImageContainer.style.visibility = 'hidden';
-        console.log(`🙈 ${subslotId}の複数画像コンテナを非表示にしました`);
-      }
-    }
-  }
-  
   console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
   
   // 実際に要素が非表示になっているかを確認
   const targetElements = {
-    'image': subslotElement.querySelectorAll('.slot-image'),
     'text': subslotElement.querySelectorAll('.slot-phrase'),
     'auxtext': subslotElement.querySelectorAll('.slot-text')
   };
@@ -585,7 +565,7 @@ function applySubslotVisibilityState() {
     Object.keys(subslotVisibilityState).forEach(subslotId => {
       const subslot = subslotVisibilityState[subslotId];
       
-      ['image', 'auxtext', 'text'].forEach(elementType => {
+      ['auxtext', 'text'].forEach(elementType => {
         const isVisible = subslot[elementType];
         if (isVisible !== undefined) {
           const subslotElement = document.getElementById(subslotId);
@@ -596,20 +576,6 @@ function applySubslotVisibilityState() {
               subslotElement.classList.remove(className);
             } else {
               subslotElement.classList.add(className);
-            }
-            
-            // 複数画像コンテナの直接制御（image要素の場合）
-            if (elementType === 'image') {
-              const multiImageContainer = subslotElement.querySelector('.multi-image-container');
-              if (multiImageContainer) {
-                if (isVisible) {
-                  multiImageContainer.style.display = 'flex';
-                  multiImageContainer.style.visibility = 'visible';
-                } else {
-                  multiImageContainer.style.display = 'none';
-                  multiImageContainer.style.visibility = 'hidden';
-                }
-              }
             }
             
             console.log(`🎨 ${subslotId}の${elementType}表示状態を復元: ${isVisible}`);

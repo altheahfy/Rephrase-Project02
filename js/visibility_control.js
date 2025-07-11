@@ -3,7 +3,7 @@
 
 // 🎯 スロット定義
 const ALL_SLOTS = ['s', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
-const ELEMENT_TYPES = ['image', 'auxtext', 'text'];
+const ELEMENT_TYPES = ['auxtext', 'text'];
 
 // 🔧 表示状態を管理するオブジェクト
 let visibilityState = {};
@@ -63,22 +63,6 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
       }
     }
     
-    // 🆕 複数画像コンテナの直接制御（image要素の場合）
-    if (elementType === 'image') {
-      const multiImageContainer = slotElement.querySelector('.multi-image-container');
-      if (multiImageContainer) {
-        if (isVisible) {
-          multiImageContainer.style.display = 'flex';
-          multiImageContainer.style.visibility = 'visible';
-          console.log(`✅ ${slotKey}スロットの複数画像コンテナを表示しました`);
-        } else {
-          multiImageContainer.style.display = 'none';
-          multiImageContainer.style.visibility = 'hidden';
-          console.log(`🙈 ${slotKey}スロットの複数画像コンテナを非表示にしました`);
-        }
-      }
-    }
-    
     // サブスロットも同様に制御
     const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
     subSlots.forEach(subSlot => {
@@ -98,20 +82,6 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
           } else {
             subTextElement.style.opacity = '0';
             subTextElement.style.visibility = 'hidden';
-          }
-        }
-      }
-      
-      // 🆕 サブスロットの複数画像コンテナも直接制御
-      if (elementType === 'image') {
-        const subMultiImageContainer = subSlot.querySelector('.multi-image-container');
-        if (subMultiImageContainer) {
-          if (isVisible) {
-            subMultiImageContainer.style.display = 'flex';
-            subMultiImageContainer.style.visibility = 'visible';
-          } else {
-            subMultiImageContainer.style.display = 'none';
-            subMultiImageContainer.style.visibility = 'hidden';
           }
         }
       }
@@ -185,20 +155,6 @@ function applyVisibilityState() {
           }
         }
         
-        // 🆕 複数画像コンテナの直接制御（image要素の場合）
-        if (elementType === 'image') {
-          const multiImageContainer = slotElement.querySelector('.multi-image-container');
-          if (multiImageContainer) {
-            if (isVisible) {
-              multiImageContainer.style.display = 'flex';
-              multiImageContainer.style.visibility = 'visible';
-            } else {
-              multiImageContainer.style.display = 'none';
-              multiImageContainer.style.visibility = 'hidden';
-            }
-          }
-        }
-        
         // サブスロットも同様に適用
         const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
         subSlots.forEach(subSlot => {
@@ -218,20 +174,6 @@ function applyVisibilityState() {
               } else {
                 subTextElement.style.opacity = '0';
                 subTextElement.style.visibility = 'hidden';
-              }
-            }
-          }
-          
-          // 🆕 サブスロットの複数画像コンテナも直接制御
-          if (elementType === 'image') {
-            const subMultiImageContainer = subSlot.querySelector('.multi-image-container');
-            if (subMultiImageContainer) {
-              if (isVisible) {
-                subMultiImageContainer.style.display = 'flex';
-                subMultiImageContainer.style.visibility = 'visible';
-              } else {
-                subMultiImageContainer.style.display = 'none';
-                subMultiImageContainer.style.visibility = 'hidden';
               }
             }
           }

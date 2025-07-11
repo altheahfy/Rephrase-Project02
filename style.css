@@ -541,28 +541,20 @@ h2 {
 /* 🎯 統一された表示制御システム */
 
 /* 上位スロット用の汎用表示制御 */
-.slot-container.hidden-image .slot-image,
-.slot-container.hidden-image .multi-image-container { display: none !important; }
 .slot-container.hidden-auxtext .slot-text { display: none !important; }
 .slot-container.hidden-text > .slot-phrase { display: none !important; }
 
 /* サブスロット用の汎用表示制御（opacity統一） */
-.subslot.hidden-image .slot-image,
-.subslot.hidden-image .multi-image-container { display: none !important; }
 .subslot.hidden-auxtext .slot-text { display: none !important; }
 /* サブスロットの一般的なhidden-textクラス - 無効化 */
 /* .subslot.hidden-text > .slot-phrase { opacity: 0 !important; } */
 
 /* サブスロット表示制御 - 統一版（古いルールは削除済み） */
-[id*="-sub-"].hidden-image .slot-image,
-[id*="-sub-"].hidden-image .multi-image-container { display: none !important; }
 [id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
 /* 一般的なhidden-textクラス - 無効化（制御パネル専用を優先） */
 /* [id*="-sub-"].hidden-text > .slot-phrase { opacity: 0 !important; } */
 
 /* 🎛️ サブスロット制御パネル専用クラス（hidden-subslot-xxxシリーズ） */
-[id*="-sub-"].hidden-subslot-image .slot-image,
-[id*="-sub-"].hidden-subslot-image .multi-image-container { display: none !important; }
 [id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
 /* 制御パネル専用テキスト制御は最上部で定義済み */
 
@@ -863,8 +855,6 @@ h2 {
 #slot-m3.hidden-m3-auxtext .slot-text { display: none !important; }
 
 /* 🎛️ サブスロット制御パネル専用クラス（hidden-subslot-xxxシリーズ） */
-[id*="-sub-"].hidden-subslot-image .slot-image,
-[id*="-sub-"].hidden-subslot-image .multi-image-container { display: none !important; }
 [id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
 /* 制御パネル専用テキスト制御は最上部で定義済み */
 
