@@ -992,16 +992,46 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
         return response.json();
       })
       .then(data => {
-        processPresetData(data);
+        // データ処理を直接実行
+        try {
+          // 🔄 JSONロード時にサブスロット表示設定をリセット
+          localStorage.removeItem('rephrase_subslot_visibility_state');
+          console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+          
+          loadedJsonData = data;
+          window.loadedJsonData = loadedJsonData;  // コンソール確認用
+          console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+          const processedData = randomizeAll(loadedJsonData);
+          console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+          validateSlotsModified(processedData);
+          window.loadedJsonData = processedData;
+          buildStructure(processedData);
+          syncDynamicToStatic();
+          
+          // サブスロットの初期化も実行
+          if (typeof initializeSubslots === 'function') {
+            initializeSubslots();
+          }
+          
+          // 🎭 ローディング画面を非表示
+          console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+          hideLoadingOverlay();
+        } catch (error) {
+          console.error("プリセットJSONデータの処理に失敗:", error);
+          alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+          hideLoadingOverlay();
+        }
       })
       .catch(error => {
         console.error("data/slot_order_data.jsonの読み込みに失敗:", error);
-        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択からdata/slot_order_data.jsonを選択してください。`);
+        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から slot_order_data.json を選択してください。\n\nエラー詳細: ${error.message}`);
         hideLoadingOverlay();
       });
     return; // 早期リターン
-  }
-  
+  } else {
+    alert("不明なプリセットが選択されました");
+    hideLoadingOverlay();
+    return;
   }
 });
 
