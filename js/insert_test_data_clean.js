@@ -978,6 +978,24 @@ function syncSubslotsFromJson(data) {
       phraseElement.className = 'slot-phrase';
       if (item.SubslotElement) {
         phraseElement.textContent = item.SubslotElement;
+        
+        // 🔍 localStorage で英語例文テキスト表示設定をチェック
+        try {
+          const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+          if (saved) {
+            const subslotVisibilityState = JSON.parse(saved);
+            if (subslotVisibilityState[fullSlotId] && subslotVisibilityState[fullSlotId]['text'] === false) {
+              // 英語例文テキストを透明化（DOMには残す）
+              phraseElement.style.opacity = '0';
+              phraseElement.style.visibility = 'hidden';
+              phraseElement.style.color = 'transparent';
+              phraseElement.style.textShadow = 'none';
+              console.log(`🙈 サブスロット "${fullSlotId}" の英語例文テキストを透明化`);
+            }
+          }
+        } catch (error) {
+          console.warn('localStorage解析エラー:', error);
+        }
       }
       
       // 🎯 メタレベル制御：phrase要素作成直後に表示制御を適用
