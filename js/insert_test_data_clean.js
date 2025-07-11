@@ -8,6 +8,28 @@
 // - 読み取り専用でのみ使用可能
 // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
+// 🎯 メタレベル制御：サブスロット表示設定管理
+function setSubslotVisibility(slotType, isVisible) {
+  document.body.setAttribute(`data-${slotType}-sub-visible`, isVisible);
+  console.log(`🎯 サブスロット表示設定: ${slotType} = ${isVisible}`);
+}
+
+function getSubslotVisibility(slotType) {
+  const value = document.body.getAttribute(`data-${slotType}-sub-visible`);
+  return value !== 'false'; // デフォルトは表示
+}
+
+function applySubslotVisibilityControl(slotElement, slotType) {
+  const isVisible = getSubslotVisibility(slotType);
+  if (!isVisible) {
+    const phraseElement = slotElement.querySelector('.slot-phrase');
+    if (phraseElement) {
+      phraseElement.style.opacity = '0';
+      console.log(`🎯 非表示制御適用: ${slotElement.id} の phrase要素を透明化`);
+    }
+  }
+}
+
 // 疑問詞エリアを初期化して確実に空状態にする関数
 function initializeQuestionWordArea() {
   const topDiv = document.getElementById("display-top-question-word");
@@ -912,6 +934,9 @@ function syncSubslotsFromJson(data) {
       slotElement.appendChild(phraseElement);
       slotElement.appendChild(textElement);
       
+      // 🎯 メタレベル制御：表示設定を適用
+      applySubslotVisibilityControl(slotElement, parentSlot);
+      
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
       
@@ -1014,16 +1039,35 @@ function debugM1Slot() {
 // グローバルにエクスポートする（index.htmlから呼び出せるように）
 window.syncUpperSlotsFromJson = syncUpperSlotsFromJson;
 window.syncSubslotsFromJson = syncSubslotsFromJson;
-window.debugM1Slot = debugM1Slot;
-window.displayTopQuestionWord = displayTopQuestionWord;
-window.applyOrderToAllSlots = applyOrderToAllSlots;
-window.reorderSubslots = reorderSubslots;
-window.hideEmptySlots = hideEmptySlots;
-window.hideEmptyUpperSlots = hideEmptyUpperSlots;
-window.hideEmptySubslots = hideEmptySubslots;
-window.hideEmptySubslotContainers = hideEmptySubslotContainers;
-window.debugEmptySlots = debugEmptySlots;
-window.forceHideEmptySlots = forceHideEmptySlots;
+
+// 🎯 メタレベル制御関数をグローバルに公開
+window.setSubslotVisibility = setSubslotVisibility;
+window.getSubslotVisibility = getSubslotVisibility;
+window.applySubslotVisibilityControl = applySubslotVisibilityControl;
+
+// 🎯 O1サブスロット制御のテスト関数
+window.hideO1Subslot = function() {
+  setSubslotVisibility('o1', false);
+  console.log('🎯 O1サブスロットを非表示に設定');
+};
+
+window.showO1Subslot = function() {
+  setSubslotVisibility('o1', true);
+  console.log('🎯 O1サブスロットを表示に設定');
+};
+
+window.testO1SubslotControl = function() {
+  console.log('🎯 O1サブスロット制御テスト開始');
+  console.log('現在の設定:', getSubslotVisibility('o1'));
+  
+  // 現在の設定を切り替え
+  const currentVisible = getSubslotVisibility('o1');
+  setSubslotVisibility('o1', !currentVisible);
+  
+  console.log('変更後の設定:', getSubslotVisibility('o1'));
+  console.log('🎯 個別ランダマイズを実行して効果を確認してください');
+};
+
 
 /**
  * window.loadedJsonDataを使用してサブスロットを正しい順序で静的エリアに書き込む関数
