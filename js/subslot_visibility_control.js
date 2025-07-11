@@ -320,6 +320,13 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
         newVisibility
       );
       
+      // 🎯 **追加：グローバル設定も更新**
+      setGlobalSubslotVisibility(
+        this.dataset.subslotId,
+        this.dataset.elementType,
+        newVisibility
+      );
+      
       // ボタンスタイルを更新
       updateToggleButtonStyle(this, newVisibility);
     });
@@ -461,19 +468,8 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
 function resetSubslotVisibility(parentSlot) {
   console.log(`🔄 ${parentSlot}サブスロットの表示を全てリセット`);
   
-  // 該当するトグルボタンを全て表示状態に
-  const toggleButtons = document.querySelectorAll(`[data-parent-slot="${parentSlot}"].subslot-toggle-button`);
-  toggleButtons.forEach(button => {
-    // 表示状態を設定
-    toggleSubslotElementVisibility(
-      button.dataset.subslotId,
-      button.dataset.elementType,
-      true
-    );
-    
-    // ボタンスタイルを更新
-    updateToggleButtonStyle(button, true);
-  });
+  // 🎯 **新システム：グローバル制御を使用**
+  showAllSubslotsGlobal();
   
   console.log(`✅ ${parentSlot}サブスロットの表示リセット完了`);
 }
@@ -537,40 +533,135 @@ function removeSubslotControlPanel(parentSlot) {
 function hideAllEnglishInSubslots(parentSlot) {
   console.log(`🔒 全スロットのサブスロット内の全英文例文を非表示にします（トリガー: ${parentSlot}）`);
   
-  const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
-  
-  // 🎯 **修正：全てのスロットを対象にする**
-  const allSlots = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3', 'aux', 'v'];
-  
-  allSlots.forEach(slotType => {
-    desiredOrder.forEach(subslotType => {
-      const subslotId = `slot-${slotType}-sub-${subslotType}`;
-      const subslotElement = document.getElementById(subslotId);
-      
-      if (subslotElement) {
-        // 英文のみを非表示にする（textタイプのみ）
-        toggleSubslotElementVisibility(subslotId, 'text', false);
-        console.log(`🔒 ${subslotId}の英文を非表示にしました`);
-      }
-    });
-    
-    // 各スロットのサブスロット制御パネルのボタン状態を更新
-    const controlPanel = document.getElementById(`subslot-visibility-panel-${slotType}`);
-    if (controlPanel) {
-      const textButtons = controlPanel.querySelectorAll('.subslot-toggle-button[data-element-type="text"]');
-      textButtons.forEach(button => {
-        // データの有無に関係なく常にボタンを更新
-        updateToggleButtonStyle(button, false);
-      });
-    }
-  });
-  
-  // 🎯 **追加：グローバル設定として保存**
-  localStorage.setItem('rephrase_all_english_hidden', 'true');
-  console.log('📁 全英文非表示設定をlocalStorageに保存しました');
+  // 🎯 **新システム：グローバル制御を使用**
+  hideAllEnglishInSubslotsGlobal();
   
   console.log(`✅ 全スロットのサブスロット内の全英文例文を非表示にしました`);
 }
+
+// 🎯 **新システム：グローバルサブスロット制御システム**
+// 上位スロットと同様に、存在しないスロットでも制御できるシステム
+
+// 全スロット・全サブスロットの可視性状態を管理
+const GLOBAL_SUBSLOT_VISIBILITY = {
+  // 各スロットの各サブスロットの表示状態を管理
+  // 例: 'slot-m1-sub-s': { auxtext: true, text: true }
+};
+
+// 🎯 グローバルサブスロット可視性設定を初期化
+function initializeGlobalSubslotVisibility() {
+  const allSlots = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  const subslotTypes = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  allSlots.forEach(slot => {
+    subslotTypes.forEach(subType => {
+      const key = `slot-${slot}-sub-${subType}`;
+      if (!GLOBAL_SUBSLOT_VISIBILITY[key]) {
+        GLOBAL_SUBSLOT_VISIBILITY[key] = {
+          auxtext: true,
+          text: true
+        };
+      }
+    });
+  });
+  
+  console.log('🎯 グローバルサブスロット可視性設定を初期化しました');
+}
+
+// 🎯 グローバルサブスロット可視性設定を取得
+function getGlobalSubslotVisibility(subslotId, elementType) {
+  if (!GLOBAL_SUBSLOT_VISIBILITY[subslotId]) {
+    return true; // デフォルトは表示
+  }
+  return GLOBAL_SUBSLOT_VISIBILITY[subslotId][elementType] !== false;
+}
+
+// 🎯 グローバルサブスロット可視性設定を設定
+function setGlobalSubslotVisibility(subslotId, elementType, isVisible) {
+  if (!GLOBAL_SUBSLOT_VISIBILITY[subslotId]) {
+    GLOBAL_SUBSLOT_VISIBILITY[subslotId] = {};
+  }
+  GLOBAL_SUBSLOT_VISIBILITY[subslotId][elementType] = isVisible;
+  
+  // 実際の要素が存在する場合は即座に適用
+  const element = document.getElementById(subslotId);
+  if (element) {
+    toggleSubslotElementVisibility(subslotId, elementType, isVisible);
+  }
+  
+  console.log(`🎯 グローバル設定更新: ${subslotId}.${elementType} = ${isVisible}`);
+}
+
+// 🎯 新しいサブスロットが作成されたときにグローバル設定を適用
+function applyGlobalSubslotVisibility(subslotId) {
+  const elementTypes = ['auxtext', 'text'];
+  
+  elementTypes.forEach(elementType => {
+    const visibility = getGlobalSubslotVisibility(subslotId, elementType);
+    toggleSubslotElementVisibility(subslotId, elementType, visibility);
+  });
+}
+
+// 🎯 **修正版：全英文非表示関数**
+function hideAllEnglishInSubslotsGlobal() {
+  console.log('🔒 グローバル全英文非表示を実行');
+  
+  const allSlots = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  const subslotTypes = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  allSlots.forEach(slot => {
+    subslotTypes.forEach(subType => {
+      const subslotId = `slot-${slot}-sub-${subType}`;
+      // グローバル設定を更新（実際の要素の存在は問わない）
+      setGlobalSubslotVisibility(subslotId, 'text', false);
+    });
+  });
+  
+  // 全てのサブスロット制御パネルのボタン状態を更新
+  updateAllSubslotControlPanels();
+  
+  console.log('✅ グローバル全英文非表示完了');
+}
+
+// 🎯 **修正版：全表示関数**
+function showAllSubslotsGlobal() {
+  console.log('🔓 グローバル全表示を実行');
+  
+  const allSlots = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  const subslotTypes = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  allSlots.forEach(slot => {
+    subslotTypes.forEach(subType => {
+      const subslotId = `slot-${slot}-sub-${subType}`;
+      // グローバル設定を更新（実際の要素の存在は問わない）
+      setGlobalSubslotVisibility(subslotId, 'auxtext', true);
+      setGlobalSubslotVisibility(subslotId, 'text', true);
+    });
+  });
+  
+  // 全てのサブスロット制御パネルのボタン状態を更新
+  updateAllSubslotControlPanels();
+  
+  console.log('✅ グローバル全表示完了');
+}
+
+// 🎯 全てのサブスロット制御パネルのボタン状態を更新
+function updateAllSubslotControlPanels() {
+  const controlPanels = document.querySelectorAll('.subslot-visibility-panel');
+  
+  controlPanels.forEach(panel => {
+    const buttons = panel.querySelectorAll('.subslot-toggle-button');
+    buttons.forEach(button => {
+      const subslotId = button.dataset.subslotId;
+      const elementType = button.dataset.elementType;
+      const visibility = getGlobalSubslotVisibility(subslotId, elementType);
+      updateToggleButtonStyle(button, visibility);
+    });
+  });
+}
+
+// 初期化
+initializeGlobalSubslotVisibility();
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
 applyGlobalEnglishHiddenSetting();
