@@ -167,8 +167,7 @@ function buildStructure(selectedSlots) {
         const phrase = target.querySelector(".slot-phrase");
         if (phrase) { phrase.textContent = sub.SubslotElement || ""; console.log(`✅ phrase書き込み: ${target.id}`); }
         const text = target.querySelector(".slot-text");
-        // コメントアウト - 検証用
-        // if (text) { text.textContent = sub.SubslotText || ""; console.log(`✅ text書き込み: ${target.id}`); }
+        if (text) { text.textContent = sub.SubslotText || ""; console.log(`✅ text書き込み: ${target.id}`); }
       } else {
         console.warn(`⚠ サブスロットが見つからない: slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
       }
