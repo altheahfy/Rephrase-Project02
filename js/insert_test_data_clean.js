@@ -1026,8 +1026,7 @@ function syncSubslotsFromJson(data) {
         
         // 設定に応じてテキスト表示またはスタイル上書きで非表示
         if (shouldShowText) {
-          // コメントアウト - 検証用
-          // textElement.textContent = item.SubslotText;
+          textElement.textContent = item.SubslotText;
           // 通常表示のスタイル（必要に応じて）
           textElement.style.cssText = `
             display: block;
@@ -1035,8 +1034,7 @@ function syncSubslotsFromJson(data) {
             font-size: 14px;
           `;
         } else {
-          // コメントアウト - 検証用
-          // textElement.textContent = item.SubslotText;
+          textElement.textContent = item.SubslotText;
           // 非表示スタイル（CSS上書き）
           textElement.style.cssText = `
             display: none;
