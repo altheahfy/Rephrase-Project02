@@ -25,12 +25,18 @@ function applySubslotVisibilityControl(slotElement, slotType) {
   // localStorageから詳細な表示状態を取得
   try {
     const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    console.log(`🔍 DEBUG: localStorage内容 =`, saved);
+    
     if (!saved) {
+      console.log(`🔍 DEBUG: localStorageに設定がありません - デフォルト表示`);
       return; // 設定がない場合はデフォルト表示
     }
     
     const subslotVisibilityState = JSON.parse(saved);
     const slotId = slotElement.id;
+    
+    console.log(`🔍 DEBUG: 対象スロットID = ${slotId}`);
+    console.log(`🔍 DEBUG: スロット設定 =`, subslotVisibilityState[slotId]);
     
     // 該当スロットの設定を確認
     if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['phrase'] === false) {
@@ -39,6 +45,8 @@ function applySubslotVisibilityControl(slotElement, slotType) {
         phraseElement.style.opacity = '0';
         console.log(`🎯 非表示制御適用: ${slotId} の phrase要素を透明化`);
       }
+    } else {
+      console.log(`🔍 DEBUG: ${slotId} は表示設定または設定なし`);
     }
   } catch (error) {
     console.error("❌ サブスロット表示制御の適用に失敗:", error);
@@ -937,6 +945,30 @@ function syncSubslotsFromJson(data) {
         phraseElement.textContent = item.SubslotElement;
       }
       
+      // 🎯 メタレベル制御：phrase要素作成直後に表示制御を適用
+      try {
+        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+        console.log(`🔍 デバッグ: ${fullSlotId} のlocalStorage確認`);
+        console.log(`🔍 saved:`, saved);
+        
+        if (saved) {
+          const subslotVisibilityState = JSON.parse(saved);
+          console.log(`🔍 subslotVisibilityState:`, subslotVisibilityState);
+          console.log(`🔍 ${fullSlotId}の設定:`, subslotVisibilityState[fullSlotId]);
+          
+          if (subslotVisibilityState[fullSlotId] && subslotVisibilityState[fullSlotId]['phrase'] === false) {
+            phraseElement.style.opacity = '0';
+            console.log(`🎯 非表示制御適用: ${fullSlotId} の phrase要素を透明化`);
+          } else {
+            console.log(`🔍 ${fullSlotId}は表示設定または設定なし`);
+          }
+        } else {
+          console.log(`🔍 localStorageにデータなし`);
+        }
+      } catch (error) {
+        console.error("❌ サブスロット表示制御の適用に失敗:", error);
+      }
+      
       // text要素を作成
       const textElement = document.createElement('div');
       textElement.className = 'slot-text';
@@ -948,9 +980,6 @@ function syncSubslotsFromJson(data) {
       slotElement.appendChild(labelElement);
       slotElement.appendChild(phraseElement);
       slotElement.appendChild(textElement);
-      
-      // 🎯 メタレベル制御：表示設定を適用
-      applySubslotVisibilityControl(slotElement, parentSlot);
       
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
