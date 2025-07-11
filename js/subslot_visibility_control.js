@@ -513,10 +513,17 @@ function hideAllEnglishInSubslots(parentSlot) {
     const subslotId = `slot-${parentSlot}-sub-${subslotType}`;
     const subslotElement = document.getElementById(subslotId);
     
+    // 🎯 **修正：表示されていないサブスロットも含めて全10種類をfalseに設定**
+    const storageKey = `subslot-${parentSlot.toLowerCase()}-${subslotType.toLowerCase()}-visible`;
+    localStorage.setItem(storageKey, 'false');
+    console.log(`🔒 localStorage設定: ${storageKey} = false`);
+    
     if (subslotElement) {
       // 英文のみを非表示にする（textタイプのみ）
       toggleSubslotElementVisibility(subslotId, 'text', false);
       console.log(`🔒 ${subslotId}の英文を非表示にしました`);
+    } else {
+      console.log(`🔒 ${subslotId}は表示されていませんが、localStorage設定済み`);
     }
   });
   
