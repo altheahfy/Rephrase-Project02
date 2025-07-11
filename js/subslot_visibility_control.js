@@ -266,11 +266,9 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
     // 初期状態のボタンスタイルを適用
     updateToggleButtonStyle(button, isVisible);
     
-    // データがない場合は視覚的に区別するがボタンは有効にする
-    if (!hasData) {
-      button.style.opacity = '0.6';
-      button.title = 'データがありませんが制御できます';
-    }
+    // 🎯 **修正：データがない場合でも常にアクティブ**
+    // データがない場合でも完全にアクティブにする
+    button.title = hasData ? '' : 'データはありませんが制御は有効です';
     
     // クリック時のイベント（データの有無に関係なく常に有効）
     button.addEventListener('click', function() {
