@@ -532,119 +532,31 @@ h2 {
   transition: opacity 0.3s ease-in;
 }
 
-/* 🎯 3要素表示制御システム - 全10スロット対応 */
-/* S, Aux, V, M1, M2, C1, O1, O2, C2, M3スロットの画像・補助テキスト・例文テキストの個別表示制御 */
+/* 🎯 統一された表示制御システム */
 
-/* 画像非表示制御 */
+/* 上位スロット用の汎用表示制御 */
 .slot-container.hidden-image .slot-image,
-.subslot.hidden-image .slot-image {
-  display: none !important;
-  visibility: hidden !important;
-}
+.slot-container.hidden-image .multi-image-container { display: none !important; }
+.slot-container.hidden-auxtext .slot-text { display: none !important; }
+.slot-container.hidden-text > .slot-phrase { display: none !important; }
 
-/* 補助テキスト非表示制御 */
-.slot-container.hidden-auxtext .slot-text,
-.subslot.hidden-auxtext .slot-text {
-  display: none !important;
-  visibility: hidden !important;
-}
+/* サブスロット用の汎用表示制御（opacity統一） */
+.subslot.hidden-image .slot-image,
+.subslot.hidden-image .multi-image-container { display: none !important; }
+.subslot.hidden-auxtext .slot-text { display: none !important; }
+.subslot.hidden-text > .slot-phrase { opacity: 0 !important; }
 
-/* 例文テキスト非表示制御 */
-.slot-container.hidden-text > .slot-phrase {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* サブスロットのテキスト非表示制御 - opacity で統一 */
-.subslot.hidden-text > .slot-phrase {
-  opacity: 0 !important;
-}
-
-/* スロット個別制御用 - 各スロットに特化したクラス */
-/* S スロット */
-#slot-s.hidden-s-image .slot-image { display: none !important; }
-#slot-s.hidden-s-image .multi-image-container { display: none !important; }
-#slot-s.hidden-s-auxtext .slot-text { display: none !important; }
-#slot-s.hidden-s-text > .slot-phrase { display: none !important; }
-
-/* Aux スロット */
-#slot-aux.hidden-aux-image .slot-image { display: none !important; }
-#slot-aux.hidden-aux-image .multi-image-container { display: none !important; }
-#slot-aux.hidden-aux-auxtext .slot-text { display: none !important; }
-#slot-aux.hidden-aux-text > .slot-phrase { display: none !important; }
-
-/* V スロット */
-#slot-v.hidden-v-image .slot-image { display: none !important; }
-#slot-v.hidden-v-image .multi-image-container { display: none !important; }
-#slot-v.hidden-v-auxtext .slot-text { display: none !important; }
-#slot-v.hidden-v-text > .slot-phrase { display: none !important; }
-
-/* M1 スロット */
-#slot-m1.hidden-m1-image .slot-image { display: none !important; }
-#slot-m1.hidden-m1-image .multi-image-container { display: none !important; }
-#slot-m1.hidden-m1-auxtext .slot-text { display: none !important; }
-#slot-m1.hidden-m1-text > .slot-phrase { display: none !important; }
-
-/* M2 スロット */
-#slot-m2.hidden-m2-image .slot-image { display: none !important; }
-#slot-m2.hidden-m2-image .multi-image-container { display: none !important; }
-#slot-m2.hidden-m2-auxtext .slot-text { display: none !important; }
-#slot-m2.hidden-m2-text > .slot-phrase { display: none !important; }
-
-/* C1 スロット */
-#slot-c1.hidden-c1-image .slot-image { display: none !important; }
-#slot-c1.hidden-c1-image .multi-image-container { display: none !important; }
-#slot-c1.hidden-c1-auxtext .slot-text { display: none !important; }
-#slot-c1.hidden-c1-text > .slot-phrase { display: none !important; }
-
-/* O1 スロット */
-#slot-o1.hidden-o1-image .slot-image { display: none !important; }
-#slot-o1.hidden-o1-image .multi-image-container { display: none !important; }
-#slot-o1.hidden-o1-auxtext .slot-text { display: none !important; }
-#slot-o1.hidden-o1-text > .slot-phrase { display: none !important; }
-
-/* O2 スロット */
-#slot-o2.hidden-o2-image .slot-image { display: none !important; }
-#slot-o2.hidden-o2-image .multi-image-container { display: none !important; }
-#slot-o2.hidden-o2-auxtext .slot-text { display: none !important; }
-#slot-o2.hidden-o2-text > .slot-phrase { display: none !important; }
-
-/* C2 スロット */
-#slot-c2.hidden-c2-image .slot-image { display: none !important; }
-#slot-c2.hidden-c2-image .multi-image-container { display: none !important; }
-#slot-c2.hidden-c2-auxtext .slot-text { display: none !important; }
-#slot-c2.hidden-c2-text > .slot-phrase { display: none !important; }
-
-/* M3 スロット */
-#slot-m3.hidden-m3-image .slot-image { display: none !important; }
-#slot-m3.hidden-m3-image .multi-image-container { display: none !important; }
-#slot-m3.hidden-m3-auxtext .slot-text { display: none !important; }
-#slot-m3.hidden-m3-text > .slot-phrase { display: none !important; }
-
-/* サブスロットも同様に制御 */
-[id*="-sub-"].hidden-image .slot-image { display: none !important; }
+/* サブスロット表示制御 - 統一版（古いルールは削除済み） */
+[id*="-sub-"].hidden-image .slot-image,
 [id*="-sub-"].hidden-image .multi-image-container { display: none !important; }
 [id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
 [id*="-sub-"].hidden-text > .slot-phrase { opacity: 0 !important; }
 
-/* 🎛️ サブスロット専用の表示・非表示制御クラス */
-/* サブスロットの画像・テキスト・補助テキストの個別制御 */
-.subslot.hidden-subslot-image .slot-image { display: none !important; }
-.subslot.hidden-subslot-image .multi-image-container { display: none !important; }
-.subslot.hidden-subslot-text .slot-phrase { opacity: 0 !important; }
-.subslot.hidden-subslot-auxtext .slot-text { display: none !important; }
-
-/* 🎯 .subslot-container対応版（新しいGrid構造） */
-.subslot-container.hidden-subslot-image .slot-image { display: none !important; }
-.subslot-container.hidden-subslot-image .multi-image-container { display: none !important; }
-.subslot-container.hidden-subslot-text .slot-phrase { opacity: 0 !important; }
-.subslot-container.hidden-subslot-auxtext .slot-text { display: none !important; }
-
-/* より具体的なセレクタでの制御（IDベース） */
-[id*="-sub-"].hidden-subslot-image .slot-image { display: none !important; }
+/* 🎛️ サブスロット制御パネル専用クラス（hidden-subslot-xxxシリーズ） */
+[id*="-sub-"].hidden-subslot-image .slot-image,
 [id*="-sub-"].hidden-subslot-image .multi-image-container { display: none !important; }
-[id*="-sub-"].hidden-subslot-text .slot-phrase { opacity: 0 !important; }
 [id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
+[id*="-sub-"].hidden-subslot-text .slot-phrase { opacity: 0 !important; }
 
 /* 🤖 画像自動非表示機構 */
 /* プレースホルダー画像・エラー画像・無効画像の自動非表示 */
