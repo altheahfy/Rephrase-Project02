@@ -8,25 +8,40 @@
 // - 読み取り専用でのみ使用可能
 // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
-// 🎯 メタレベル制御：サブスロット表示設定管理
+// 🎯 メタレベル制御：サブスロット表示設定管理（localStorage版）
 function setSubslotVisibility(slotType, isVisible) {
-  document.body.setAttribute(`data-${slotType}-sub-visible`, isVisible);
-  console.log(`🎯 サブスロット表示設定: ${slotType} = ${isVisible}`);
+  const storageKey = `subslot_visibility_${slotType}`;
+  localStorage.setItem(storageKey, JSON.stringify(isVisible));
+  console.log(`🎯 サブスロット表示設定保存: ${slotType} = ${isVisible}`);
 }
 
 function getSubslotVisibility(slotType) {
-  const value = document.body.getAttribute(`data-${slotType}-sub-visible`);
-  return value !== 'false'; // デフォルトは表示
+  const storageKey = `subslot_visibility_${slotType}`;
+  const stored = localStorage.getItem(storageKey);
+  return stored !== null ? JSON.parse(stored) : true; // デフォルトは表示
 }
 
 function applySubslotVisibilityControl(slotElement, slotType) {
-  const isVisible = getSubslotVisibility(slotType);
-  if (!isVisible) {
-    const phraseElement = slotElement.querySelector('.slot-phrase');
-    if (phraseElement) {
-      phraseElement.style.opacity = '0';
-      console.log(`🎯 非表示制御適用: ${slotElement.id} の phrase要素を透明化`);
+  // localStorageから詳細な表示状態を取得
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (!saved) {
+      return; // 設定がない場合はデフォルト表示
     }
+    
+    const subslotVisibilityState = JSON.parse(saved);
+    const slotId = slotElement.id;
+    
+    // 該当スロットの設定を確認
+    if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['phrase'] === false) {
+      const phraseElement = slotElement.querySelector('.slot-phrase');
+      if (phraseElement) {
+        phraseElement.style.opacity = '0';
+        console.log(`🎯 非表示制御適用: ${slotId} の phrase要素を透明化`);
+      }
+    }
+  } catch (error) {
+    console.error("❌ サブスロット表示制御の適用に失敗:", error);
   }
 }
 
