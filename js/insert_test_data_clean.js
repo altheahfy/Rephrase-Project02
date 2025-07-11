@@ -1007,6 +1007,7 @@ function syncSubslotsFromJson(data) {
       // text要素を作成
       const textElement = document.createElement('div');
       textElement.className = 'slot-text';
+      /* コメントアウト開始 - 検証用
       if (item.SubslotText) {
         // 🔍 localStorageでテキスト表示設定をチェック
         const saved = localStorage.getItem('rephrase_subslot_visibility_state');
@@ -1044,6 +1045,7 @@ function syncSubslotsFromJson(data) {
           console.log(`🙈 サブスロット "${fullSlotId}" の英語テキストを非表示化`);
         }
       }
+      コメントアウト終了 */
       
       // 要素を組み立て（ラベルを最初に追加）
       slotElement.appendChild(labelElement);
