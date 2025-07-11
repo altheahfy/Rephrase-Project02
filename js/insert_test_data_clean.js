@@ -453,20 +453,16 @@ function syncDynamicToStatic() {
           color: #333;
           font-size: 14px;
         `;
-        // 非表示クラスを削除
-        slotTextElement.classList.remove('hidden-subslot-text');
         console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
       } else {
-        // 非表示設定の場合、テキストを透明化（DOMには残す）
-        slotTextElement.classList.add('hidden-subslot-text');
-        // 透明化スタイル（CSS上書き）
+        slotTextElement.textContent = item.SlotText || "";
+        // 非表示スタイル（CSS上書き）
         slotTextElement.style.cssText = `
+          display: none !important;
           opacity: 0 !important;
           visibility: hidden !important;
-          color: transparent !important;
-          text-shadow: none !important;
         `;
-        console.log(`🙈 サブスロット text透明化: ${item.Slot}`);
+        console.log(`🙈 サブスロット text非表示: ${item.Slot}`);
       }
       
       // 上位スロットと同じ入れ子構造チェック
@@ -1037,19 +1033,15 @@ function syncSubslotsFromJson(data) {
             color: #333;
             font-size: 14px;
           `;
-          // 非表示クラスを削除
-          textElement.classList.remove('hidden-subslot-text');
         } else {
-          // 非表示設定の場合、テキストを透明化（DOMには残す）
-          textElement.classList.add('hidden-subslot-text');
-          // 透明化スタイル（CSS上書き）
+          textElement.textContent = item.SubslotText;
+          // 非表示スタイル（CSS上書き）
           textElement.style.cssText = `
-            opacity: 0 !important;
-            visibility: hidden !important;
-            color: transparent !important;
-            text-shadow: none !important;
+            display: none;
+            opacity: 0;
+            visibility: hidden;
           `;
-          console.log(`🙈 サブスロット "${fullSlotId}" の英語テキストを透明化`);
+          console.log(`🙈 サブスロット "${fullSlotId}" の英語テキストを非表示化`);
         }
       }
       
