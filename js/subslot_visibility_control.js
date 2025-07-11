@@ -293,28 +293,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     }
   }
   
-  // 🆕 テキスト要素の直接制御（text要素の場合）
-  if (elementType === 'text') {
-    const textElements = subslotElement.querySelectorAll('.slot-phrase');
-    textElements.forEach((textElement, index) => {
-      if (isVisible) {
-        // テキストを表示
-        textElement.style.opacity = '1';
-        textElement.style.visibility = 'visible';
-        textElement.style.color = '';
-        textElement.style.textShadow = '';
-        console.log(`✅ ${subslotId}のテキスト要素${index + 1}を表示しました`);
-      } else {
-        // テキストを透明化（DOMには残す）
-        textElement.style.opacity = '0';
-        textElement.style.visibility = 'hidden';
-        textElement.style.color = 'transparent';
-        textElement.style.textShadow = 'none';
-        console.log(`🙈 ${subslotId}のテキスト要素${index + 1}を透明化しました`);
-      }
-    });
-  }
-  
   console.log(`🔍 更新後のクラスリスト: ${Array.from(subslotElement.classList).join(', ')}`);
   
   // 実際に要素が非表示になっているかを確認
