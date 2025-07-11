@@ -51,6 +51,19 @@ function renderSubslot(sub) {
   subDiv.appendChild(subElDiv);
   subDiv.appendChild(subTextDiv);
 
+  // 🎯 **修正：新しく作成したサブスロット要素にlocalStorageの状態を適用**
+  if (sub.SubslotID) {
+    const storageKey = `subslot-${sub.Slot.toLowerCase()}-${sub.SubslotID.toLowerCase()}-visible`;
+    const isVisible = localStorage.getItem(storageKey) !== 'false';
+    
+    if (!isVisible) {
+      subTextDiv.style.opacity = '0';
+      console.log(`Applied localStorage state: ${storageKey} = false (hidden)`);
+    } else {
+      console.log(`Applied localStorage state: ${storageKey} = true (visible)`);
+    }
+  }
+
   return subDiv;
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
 }
