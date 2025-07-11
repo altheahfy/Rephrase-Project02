@@ -1007,7 +1007,15 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
         }
       }
       
-      // 🎭 ローディング完了処理
+      // � **追加：全英文非表示設定を適用**
+      setTimeout(() => {
+        if (typeof applyGlobalEnglishHiddenSetting === 'function') {
+          console.log("🔒 JSONロード後に全英文非表示設定を適用");
+          applyGlobalEnglishHiddenSetting();
+        }
+      }, 500); // サブスロット作成後に実行
+      
+      // �🎭 ローディング完了処理
       setTimeout(() => {
         console.log("🎭 JSONデータ処理完了 - ローディングを隠します");
         hideLoadingOverlay();
@@ -1047,6 +1055,14 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     console.log("🔢 ランダマイズ後のスロット表示順適用");
     applyOrderToAllSlots(data);
   }
+  
+  // 🎯 **追加：全英文非表示設定を適用**
+  setTimeout(() => {
+    if (typeof applyGlobalEnglishHiddenSetting === 'function') {
+      console.log("🔒 ランダマイズ後に全英文非表示設定を適用");
+      applyGlobalEnglishHiddenSetting();
+    }
+  }, 500); // サブスロット作成後に実行
 });
 
 // Sスロット個別ランダマイズボタンのイベントハンドラー

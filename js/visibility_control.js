@@ -271,6 +271,10 @@ function setupVisibilityControlUI() {
         window.resetQuestionWordVisibility();
         console.log("✅ 疑問詞表示もリセットしました");
       }
+      
+      // 🎯 **追加：全英文非表示設定をリセット**
+      localStorage.removeItem('rephrase_all_english_hidden');
+      console.log('📁 全英文非表示設定をリセットしました（上位レベル）');
     });
   }
   

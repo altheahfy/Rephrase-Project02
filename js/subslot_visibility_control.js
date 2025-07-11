@@ -5,6 +5,31 @@
 const SUBSLOT_PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
 const SUB_ELEMENT_TYPES = ['auxtext', 'text'];
 
+// 🎯 **追加：全英文非表示設定をチェックして適用する関数**
+function applyGlobalEnglishHiddenSetting() {
+  const isAllEnglishHidden = localStorage.getItem('rephrase_all_english_hidden') === 'true';
+  
+  if (isAllEnglishHidden) {
+    console.log('📁 全英文非表示設定が有効です。新しいサブスロットに適用します');
+    
+    const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+    const allSlots = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3', 'aux', 'v'];
+    
+    allSlots.forEach(slotType => {
+      desiredOrder.forEach(subslotType => {
+        const subslotId = `slot-${slotType}-sub-${subslotType}`;
+        const subslotElement = document.getElementById(subslotId);
+        
+        if (subslotElement) {
+          // 英文のみを非表示にする（textタイプのみ）
+          toggleSubslotElementVisibility(subslotId, 'text', false);
+          console.log(`🔒 ${subslotId}の英文を非表示にしました（グローバル設定適用）`);
+        }
+      });
+    });
+  }
+}
+
 // 🏗️ サブスロット用コントロールパネルを生成
 function createSubslotControlPanel(parentSlot) {
   console.log(`🏗️ ${parentSlot}サブスロット用コントロールパネル生成開始`);
@@ -153,6 +178,9 @@ function createSubslotControlPanel(parentSlot) {
   resetButton.textContent = '全表示';
   resetButton.addEventListener('click', () => {
     resetSubslotVisibility(parentSlot);
+    // 🎯 **追加：全英文非表示設定をリセット**
+    localStorage.removeItem('rephrase_all_english_hidden');
+    console.log('📁 全英文非表示設定をリセットしました');
   });
   controlsContainer.appendChild(resetButton);
   
@@ -507,32 +535,42 @@ function removeSubslotControlPanel(parentSlot) {
 
 // 🔒 特定の親スロットのサブスロット内の全英文例文を非表示にする
 function hideAllEnglishInSubslots(parentSlot) {
-  console.log(`🔒 ${parentSlot}のサブスロット内の全英文例文を非表示にします`);
+  console.log(`🔒 全スロットのサブスロット内の全英文例文を非表示にします（トリガー: ${parentSlot}）`);
   
   const desiredOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
   
-  desiredOrder.forEach(subslotType => {
-    const subslotId = `slot-${parentSlot}-sub-${subslotType}`;
-    const subslotElement = document.getElementById(subslotId);
+  // 🎯 **修正：全てのスロットを対象にする**
+  const allSlots = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3', 'aux', 'v'];
+  
+  allSlots.forEach(slotType => {
+    desiredOrder.forEach(subslotType => {
+      const subslotId = `slot-${slotType}-sub-${subslotType}`;
+      const subslotElement = document.getElementById(subslotId);
+      
+      if (subslotElement) {
+        // 英文のみを非表示にする（textタイプのみ）
+        toggleSubslotElementVisibility(subslotId, 'text', false);
+        console.log(`🔒 ${subslotId}の英文を非表示にしました`);
+      }
+    });
     
-    if (subslotElement) {
-      // 英文のみを非表示にする（textタイプのみ）
-      toggleSubslotElementVisibility(subslotId, 'text', false);
-      console.log(`🔒 ${subslotId}の英文を非表示にしました`);
+    // 各スロットのサブスロット制御パネルのボタン状態を更新
+    const controlPanel = document.getElementById(`subslot-visibility-panel-${slotType}`);
+    if (controlPanel) {
+      const textButtons = controlPanel.querySelectorAll('.subslot-toggle-button[data-element-type="text"]');
+      textButtons.forEach(button => {
+        // データの有無に関係なく常にボタンを更新
+        updateToggleButtonStyle(button, false);
+      });
     }
   });
   
-  // サブスロット制御パネルのボタン状態を更新
-  const controlPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
-  if (controlPanel) {
-    const textButtons = controlPanel.querySelectorAll('.subslot-toggle-button[data-element-type="text"]');
-    textButtons.forEach(button => {
-      // データの有無に関係なく常にボタンを更新
-      updateToggleButtonStyle(button, false);
-    });
-  }
+  // 🎯 **追加：グローバル設定として保存**
+  localStorage.setItem('rephrase_all_english_hidden', 'true');
+  console.log('📁 全英文非表示設定をlocalStorageに保存しました');
   
-  console.log(`✅ ${parentSlot}のサブスロット内の全英文例文を非表示にしました`);
+  console.log(`✅ 全スロットのサブスロット内の全英文例文を非表示にしました`);
 }
 
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+applyGlobalEnglishHiddenSetting();
