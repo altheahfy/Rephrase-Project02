@@ -39,6 +39,7 @@ function renderSubslot(sub) {
     subDiv.dataset.displayOrder = sub.display_order;
   }
 
+
   const subElDiv = document.createElement('div');
   subElDiv.className = 'subslot-element';
   subElDiv.innerText = sub.SubslotElement || '';
@@ -49,15 +50,6 @@ function renderSubslot(sub) {
 
   subDiv.appendChild(subElDiv);
   subDiv.appendChild(subTextDiv);
-
-  // 🎯 **追加：サブスロット作成時にグローバル設定を適用**
-  if (sub.SubslotID && typeof applyGlobalSubslotVisibility === 'function') {
-    const subslotId = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
-    setTimeout(() => {
-      applyGlobalSubslotVisibility(subslotId);
-      console.log(`🎯 グローバル設定を適用: ${subslotId}`);
-    }, 100); // DOM追加後に実行
-  }
 
   return subDiv;
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
