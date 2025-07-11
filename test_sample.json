@@ -1,0 +1,42 @@
+[
+  {
+    "sentence_id": 1,
+    "questionword": ["Who", "What", "Where", "When", "Why", "How"],
+    "M1": [
+      {"text": "will", "auxtext": "未来", "image": "img1.jpg"},
+      {"text": "can", "auxtext": "可能", "image": "img2.jpg"}
+    ],
+    "S": [
+      {"text": "you", "auxtext": "あなた", "image": "person1.jpg"},
+      {"text": "he", "auxtext": "彼", "image": "person2.jpg"}
+    ],
+    "M2": [
+      {"text": "go", "auxtext": "行く", "image": "action1.jpg"},
+      {"text": "stay", "auxtext": "いる", "image": "action2.jpg"}
+    ],
+    "C": [
+      {"text": "home", "auxtext": "家", "image": "home.jpg"},
+      {"text": "school", "auxtext": "学校", "image": "school.jpg"}
+    ]
+  },
+  {
+    "sentence_id": 2,
+    "questionword": ["What", "Where", "When"],
+    "M1": [
+      {"text": "is", "auxtext": "です", "image": "be1.jpg"},
+      {"text": "was", "auxtext": "だった", "image": "be2.jpg"}
+    ],
+    "S": [
+      {"text": "this", "auxtext": "これ", "image": "this.jpg"},
+      {"text": "that", "auxtext": "あれ", "image": "that.jpg"}
+    ],
+    "M2": [
+      {"text": "beautiful", "auxtext": "美しい", "image": "beautiful.jpg"},
+      {"text": "interesting", "auxtext": "面白い", "image": "interesting.jpg"}
+    ],
+    "C": [
+      {"text": "book", "auxtext": "本", "image": "book.jpg"},
+      {"text": "movie", "auxtext": "映画", "image": "movie.jpg"}
+    ]
+  }
+]
