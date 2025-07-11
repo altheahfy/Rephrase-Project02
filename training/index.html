@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Rephrase トレーニングUI
+  </title>
+  <link href="../style.css" rel="stylesheet"/>
+  <script src="../js/subslot_toggle.js">
+  </script>
+  <script src="../js/randomizer_individual.js">
+  </script>
+  <script src="../js/control_panel_manager.js">
+  </script>
+  <script src="../js/visibility_control.js">
+  </script>
+  <script src="../js/subslot_visibility_control.js">
+  </script>
+  <script src="../js/image_auto_hide.js">
+  </script>
+  <script src="../js/universal_image_system.js">
+  </script>
+  <script src="../js/question_word_visibility.js">
+  </script>
+ </head>
+ <body>
+
+<!-- ナビゲーションバー -->
+<nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 15000; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e0e0e0; padding: 10px 0;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="../" style="text-decoration: none; color: #2196F3; font-weight: bold; font-size: 18px;">🔄 Rephrase</a>
+      <span style="color: #666; font-size: 14px;">トレーニングモード</span>
+    </div>
+    <div style="display: flex; gap: 15px;">
+      <a href="../" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">🏠 ホーム</a>
+      <a href="../grammar/" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">📚 文法説明</a>
+    </div>
+  </div>
+</nav>
+
+<div style="margin-top: 60px;"> <!-- ナビゲーションバー分のスペース -->
+
+<!-- 🎭 ローディングオーバーレイ -->
+<div id="loading-overlay" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+">
+  <div style="text-align: center; pointer-events: auto;">
+    <div style="
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    "></div>
+    <h2 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 300;">
+      データを準備しています...
+    </h2>
+    <p style="margin: 0; font-size: 14px; opacity: 0.8;">
+      JSONファイルをロードしてください
+    </p>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<!-- 右上のファイル選択・ロードエリア -->
+<div id="file-load-area" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 8px; border: 2px solid #2196F3; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+  <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 8px; font-size: 13px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
+  <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 8px 16px; font-size: 13px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">ロード</button>
+</div>
+
+<!-- タイトル（常に表示） -->
+<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; margin-right: 280px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+  <h1 style="margin: 0; margin-right: 30px; color: #333; font-size: 28px; font-weight: bold;">
+   🔄 Rephrase トレーニングUI
+  </h1>
+</div>
+
+<!-- 🎯 メインコンテンツエリア（ローディング完了まで非表示） -->
+<div id="main-content" style="display: none;">
+
+<!-- 🔹 分離疑問詞用表示領域 -->
+<div id="display-top-question-word">
+  <div class="question-word-label">WH</div>
+  <div class="question-word-image"></div>
+  <div class="question-word-spacer"></div>
+  <div class="question-word-auxtext"></div>
+  <div class="question-word-text"></div>
+  <div class="question-word-button-placeholder"></div>
+  <div class="question-word-button-placeholder"></div>
+</div>
+
+  <section>
+  </section>
+  
+  <!-- 制御パネル表示ボタンと制御パネル -->
+  <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
+    <!-- 制御パネル表示ボタン -->
+    <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 20px;">
+      制御パネル
+    </button>
+  </div>
+  
+  <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
+  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
+      <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+        
+        <!-- 疑問詞 スロット -->
+        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M1 スロット -->
+        <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- S スロット -->
+        <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- Aux スロット -->
+        <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M2 スロット -->
+        <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- V スロット -->
+        <div class="slot-control-group" data-slot="v" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">V</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- C1 スロット -->
+        <div class="slot-control-group" data-slot="c1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- O1 スロット -->
+        <div class="slot-control-group" data-slot="o1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O1</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- O2 スロット -->
+        <div class="slot-control-group" data-slot="o2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- C2 スロット -->
+        <div class="slot-control-group" data-slot="c2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C2</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- M3 スロット -->
+        <div class="slot-control-group" data-slot="m3" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M3</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝</label>
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄</label>
+          </div>
+        </div>
+        
+        <!-- 全表示ボタン -->
+        <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
+        
+        <!-- 全英文非表示ボタン -->
+        <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
+      </div>
+    </div>
+  </div>
+  <section>
+   <button id="randomize-all">
+    例文シャッフル
+   </button>
+   <h2 style="margin-bottom: 15px; margin-top: 20px;">
+    例文
+   </h2>
+   <div class="slot-wrapper">
+    <div class="slot-container" id="slot-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="s">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="s-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="slot-container" id="slot-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="slot-container" id="slot-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="c1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="c1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="o1">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="o1-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="o2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="o2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="c2">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="c2-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+    <div class="slot-container" id="slot-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+     <div class="subslot-toggle-button">
+      <button data-subslot-toggle="m3">▼ 詳細</button>
+     </div>
+     <div class="individual-randomize-button">
+      <button class="m3-individual-randomize-btn">🎲</button>
+     </div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O1 の subslot
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o1-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m1-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：M1 の subslot
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m1-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-o2-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：O2 の subslot
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-o2-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m2-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：M2 の subslot
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m2-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-c2-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：C2 の subslot
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-c2-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+   <div class="slot-wrapper" id="slot-m3-sub" style="display: none;">
+    <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+     現在展開中：M3 の subslot
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-m1">
+     <label>M1</label>
+     <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-s">
+     <label>S</label>
+     <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-aux">
+     <label>AUX</label>
+     <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-m2">
+     <label>M2</label>
+     <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-v">
+     <label>V</label>
+     <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-c1">
+     <label>C1</label>
+     <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-o1">
+     <label>O1</label>
+     <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-o2">
+     <label>O2</label>
+     <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-c2">
+     <label>C2</label>
+     <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+    <div class="subslot-container" id="slot-m3-sub-m3">
+     <label>M3</label>
+     <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+     <div class="slot-text"></div>
+     <div class="slot-phrase"></div>
+    </div>
+   </div>
+  </section>
+  <div class="slot-wrapper" id="slot-s-sub" style="display: none;">
+   <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+    現在展開中：S の subslot
+   </div>
+   <div class="subslot-container" id="slot-s-sub-m1">
+    <label>M1</label>
+    <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-s">
+    <label>S</label>
+    <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-aux">
+    <label>AUX</label>
+    <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-m2">
+    <label>M2</label>
+    <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-v">
+    <label>V</label>
+    <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-c1">
+    <label>C1</label>
+    <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-o1">
+    <label>O1</label>
+    <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-o2">
+    <label>O2</label>
+    <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-c2">
+    <label>C2</label>
+    <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-s-sub-m3">
+    <label>M3</label>
+    <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+  </div>
+  <div class="slot-wrapper" id="slot-c1-sub" style="display: none;">
+   <div class="subslot-label" style="font-weight: bold; margin-bottom: 0.5rem;">
+    現在展開中：C1 の subslot
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-m1">
+    <label>M1</label>
+    <img alt="image for M1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-s">
+    <label>S</label>
+    <img alt="image for S" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-aux">
+    <label>AUX</label>
+    <img alt="image for AUX" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-m2">
+    <label>M2</label>
+    <img alt="image for M2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-v">
+    <label>V</label>
+    <img alt="image for V" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-c1">
+    <label>C1</label>
+    <img alt="image for C1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-o1">
+    <label>O1</label>
+    <img alt="image for O1" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-o2">
+    <label>O2</label>
+    <img alt="image for O2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-c2">
+    <label>C2</label>
+    <img alt="image for C2" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+   <div class="subslot-container" id="slot-c1-sub-m3">
+    <label>M3</label>
+    <img alt="image for M3" class="slot-image" src="slot_images/common/placeholder.png"/>
+    <div class="slot-text"></div>
+    <div class="slot-phrase"></div>
+   </div>
+  </div>
+  
+  
+<script src="js/insert_test_data_clean.js"></script>
+
+<!-- 動的記載エリア用のセクション要素を追加 -->
+<section id="dynamic-area-container" style="margin-top: 30px;">
+  <button id="toggle-dynamic-area" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; font-size: 16px; cursor: pointer; border-radius: 4px; margin-bottom: 5px;">
+    ▼ 解答全文
+  </button>
+  <!-- 動的記載エリアがここに生成されます -->
+  <div id="dynamic-slot-area-wrapper" style="display: none;"></div>
+</section>
+
+<script>
+  // 動的エリアの生成位置を指定
+  window.addEventListener("DOMContentLoaded", () => {
+    const dynamicArea = document.getElementById("dynamic-slot-area");
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    
+    // 既存のdynamic-slot-areaがあれば移動
+    if (dynamicArea && wrapper) {
+      // 動的エリアをラッパーに移動
+      wrapper.appendChild(dynamicArea);
+      
+      // さらに、動的エリアのコンテナを文書の末尾に移動
+      const container = document.getElementById("dynamic-area-container");
+      if (container) {
+        document.body.appendChild(container);
+        console.log("✅ 動的記載エリアコンテナを文書の最後に移動しました");
+      }
+      
+      console.log("✅ 動的記載エリアを適切な位置に移動しました");
+    } else {
+      console.warn("⚠ 動的記載エリアまたはラッパーが見つかりません");
+    }
+  });
+
+  // 解答全文の表示・非表示切り替え機能
+  document.getElementById("toggle-dynamic-area").addEventListener("click", () => {
+    const wrapper = document.getElementById("dynamic-slot-area-wrapper");
+    const button = document.getElementById("toggle-dynamic-area");
+    
+    if (wrapper.style.display === "none") {
+      wrapper.style.display = "block";
+      button.textContent = "▲ 解答全文";
+      button.style.backgroundColor = "#f44336"; // 赤色（閉じる状態）
+      console.log("✅ 解答全文エリアを表示しました");
+    } else {
+      wrapper.style.display = "none";
+      button.textContent = "▼ 解答全文";
+      button.style.backgroundColor = "#4CAF50"; // 緑色（開く状態）
+      console.log("✅ 解答全文エリアを非表示にしました");
+    }
+  });
+
+  // syncDynamicToStatic() をDOM描画完了後に遅延実行
+  window.addEventListener("load", () => {
+    // サブスロットを明示的に初期化（再度実行して確実に閉じる）
+    if (typeof initializeSubslots === 'function') {
+      console.log("🔒 ページ読み込み完了時にサブスロットを初期化");
+      initializeSubslots();
+    }
+    
+    setTimeout(() => {
+      console.log("🚀 syncDynamicToStatic() 遅延呼び出し");
+      if (typeof syncDynamicToStatic === "function") {
+        syncDynamicToStatic();
+      } else {
+        console.warn("⚠ syncDynamicToStatic 関数が未定義です");
+      }
+    }, 200);
+  });
+</script>
+
+</div> <!-- main-content の終了 -->
+
+    <!-- 既存のスクリプト -->
+<script type="module">
+import { randomizeAll } from '../js/randomizer_all.js';
+import { buildStructure } from '../js/structure_builder.js';
+
+let loadedJsonData = null;
+
+document.getElementById("loadJsonButton").addEventListener("click", () => {
+  const fileInput = document.getElementById("jsonFileInput");
+  if (fileInput.files.length === 0) {
+    alert("ファイルを選択してください");
+    return;
+  }
+  
+  const file = fileInput.files[0];
+  
+  // 🎭 ローディング画面を表示
+  console.log("🎭 JSONロード開始 - ローディング画面を表示");
+  showLoadingOverlay();
+  
+  // ローディングメッセージを更新
+  const loadingText = document.querySelector('#loading-overlay p');
+  if (loadingText) {
+    loadingText.textContent = `${file.name} を処理中...`;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      // 🔄 JSONロード時にサブスロット表示設定をリセット
+      localStorage.removeItem('rephrase_subslot_visibility_state');
+      console.log('📁 JSONロード時にサブスロット表示設定をリセットしました');
+      
+      loadedJsonData = JSON.parse(e.target.result);
+      window.loadedJsonData = loadedJsonData;  // コンソール確認用
+      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+      const data = randomizeAll(loadedJsonData);
+      console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
+      validateSlotsModified(data);
+      window.loadedJsonData = data;
+      buildStructure(data);
+      syncDynamicToStatic();
+      
+      // サブスロットの初期化も実行
+      if (typeof initializeSubslots === 'function') {
+        console.log("🔒 JSONロード後にサブスロットを初期化");
+        initializeSubslots();
+      }
+      
+      // 明示的に上位スロットとサブスロットの同期を呼び出す
+      if (typeof syncUpperSlotsFromJson === 'function') {
+        console.log("🔄 JSONロード後の明示的同期呼び出し");
+        syncUpperSlotsFromJson(data);
+        if (typeof syncSubslotsFromJson === 'function') {
+          syncSubslotsFromJson(data);
+        }
+        
+        // 表示順制御機能の呼び出し
+        if (typeof applyOrderToAllSlots === 'function') {
+          console.log("🔢 JSONロード後にスロット表示順適用");
+          applyOrderToAllSlots(data);
+        }
+        
+        if (typeof debugM1Slot === 'function') {
+          console.log("🔍 M1スロットのデバッグ実行");
+          debugM1Slot();
+        }
+      }
+      
+      // 🎭 ローディング完了処理
+      setTimeout(() => {
+        console.log("🎭 JSONデータ処理完了 - ローディングを隠します");
+        hideLoadingOverlay();
+      }, 300); // シンプルな300ms遅延
+      
+    } catch (err) {
+      console.error("❌ JSON パースエラーまたは処理例外", err);
+      alert("無効な JSON ファイルです");
+      console.log("🎭 エラー発生 - ローディング画面を隠します");
+      hideLoadingOverlay(); // エラー時もローディングを隠す
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("randomize-all").addEventListener("click", () => {
+  if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
+    alert("先に正しいJSONデータをロードしてください");
+    console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
+    return;
+  }
+  const data = randomizeAll(loadedJsonData);
+  console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
+  validateSlotsModified(data);
+  window.loadedJsonData = data;
+  buildStructure(data);
+  syncDynamicToStatic();
+  
+  // サブスロットの初期化も実行
+  if (typeof initializeSubslots === 'function') {
+    console.log("🔒 ランダマイズ後にサブスロットを初期化");
+    initializeSubslots();
+  }
+  
+  // ランダマイズ後も表示順制御を適用
+  if (typeof applyOrderToAllSlots === 'function') {
+    console.log("🔢 ランダマイズ後のスロット表示順適用");
+    applyOrderToAllSlots(data);
+  }
+});
+
+// Sスロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const sIndividualBtn = document.querySelector(".s-individual-randomize-btn");
+  if (sIndividualBtn) {
+    sIndividualBtn.addEventListener("click", () => {
+      console.log("🎲 Sスロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotSIndividual === "function") {
+        window.randomizeSlotSIndividual();
+      } else {
+        console.error("❌ randomizeSlotSIndividual関数が見つかりません");
+        alert("エラー: Sスロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ Sスロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ Sスロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// M1スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const m1IndividualBtn = document.querySelector(".m1-individual-randomize-btn");
+  if (m1IndividualBtn) {
+    m1IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 M1スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotM1Individual === "function") {
+        window.randomizeSlotM1Individual();
+      } else {
+        console.error("❌ randomizeSlotM1Individual関数が見つかりません");
+        alert("エラー: M1スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ M1スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ M1スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// M2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const m2IndividualBtn = document.querySelector(".m2-individual-randomize-btn");
+  if (m2IndividualBtn) {
+    m2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 M2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotM2Individual === "function") {
+        window.randomizeSlotM2Individual();
+      } else {
+        console.error("❌ randomizeSlotM2Individual関数が見つかりません");
+        alert("エラー: M2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ M2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ M2スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// C1スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const c1IndividualBtn = document.querySelector(".c1-individual-randomize-btn");
+  if (c1IndividualBtn) {
+    c1IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 C1スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotC1Individual === "function") {
+        window.randomizeSlotC1Individual();
+      } else {
+        console.error("❌ randomizeSlotC1Individual関数が見つかりません");
+        alert("エラー: C1スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ C1スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ C1スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// O1スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const o1IndividualBtn = document.querySelector(".o1-individual-randomize-btn");
+  if (o1IndividualBtn) {
+    o1IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 O1スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotO1Individual === "function") {
+        window.randomizeSlotO1Individual();
+      } else {
+        console.error("❌ randomizeSlotO1Individual関数が見つかりません");
+        alert("エラー: O1スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ O1スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ O1スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// O2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const o2IndividualBtn = document.querySelector(".o2-individual-randomize-btn");
+  if (o2IndividualBtn) {
+    o2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 O2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotO2Individual === "function") {
+        window.randomizeSlotO2Individual();
+      } else {
+        console.error("❌ randomizeSlotO2Individual関数が見つかりません");
+        alert("エラー: O2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ O2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ O2スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// C2スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const c2IndividualBtn = document.querySelector(".c2-individual-randomize-btn");
+  if (c2IndividualBtn) {
+    c2IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 C2スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotC2Individual === "function") {
+        window.randomizeSlotC2Individual();
+      } else {
+        console.error("❌ randomizeSlotC2Individual関数が見つかりません");
+        alert("エラー: C2スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ C2スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ C2スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+// M3スロット個別ランダマイズボタンのイベントハンドラー
+document.addEventListener("DOMContentLoaded", () => {
+  const m3IndividualBtn = document.querySelector(".m3-individual-randomize-btn");
+  if (m3IndividualBtn) {
+    m3IndividualBtn.addEventListener("click", () => {
+      console.log("🎲 M3スロット個別ランダマイズボタンがクリックされました");
+      if (typeof window.randomizeSlotM3Individual === "function") {
+        window.randomizeSlotM3Individual();
+      } else {
+        console.error("❌ randomizeSlotM3Individual関数が見つかりません");
+        alert("エラー: M3スロット個別ランダマイズ機能が読み込まれていません。");
+      }
+    });
+    console.log("✅ M3スロット個別ランダマイズボタンのイベントハンドラーを設定しました");
+  } else {
+    console.error("❌ M3スロット個別ランダマイズボタンが見つかりません");
+  }
+});
+
+function validateSlotsModified(data) {
+  const requiredSlots = ["M1", "S", "V"];
+  const presentSlots = data.map(d => d.Slot);
+  requiredSlots.forEach(slot => {
+    if (!presentSlots.includes(slot)) {
+      console.warn(`⚠ 必須スロット ${slot} がランダマイズ結果に含まれていません`);
+    }
+  });
+}
+
+// ページ読み込み時に疑問詞エリアを初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("🔄 ページ読み込み時の疑問詞エリア初期化");
+  if (window.initializeQuestionWordArea) {
+    window.initializeQuestionWordArea();
+  }
+  
+  // 制御パネル表示/非表示ボタンの機能を追加
+  const toggleControlPanelsBtn = document.getElementById('toggle-control-panels');
+  
+  if (toggleControlPanelsBtn) {
+    toggleControlPanelsBtn.addEventListener('click', function() {
+      if (window.toggleAllControlPanels) {
+        window.toggleAllControlPanels();
+      } else {
+        console.error("❌ toggleAllControlPanels関数が見つかりません");
+      }
+    });
+    
+    console.log("✅ 制御パネル表示/非表示機能を初期化しました");
+  } else {
+    console.warn("⚠ 制御パネルボタンが見つかりません");
+  }
+  
+  // ランダマイズボタンクリック時も疑問詞エリアを初期化
+  const randomizeAllButton = document.getElementById('randomize-all');
+  if (randomizeAllButton) {
+    randomizeAllButton.addEventListener('click', function() {
+      // ランダマイズ処理の前に疑問詞エリアを初期化
+      setTimeout(() => {
+        if (window.initializeQuestionWordArea) {
+          window.initializeQuestionWordArea();
+          console.log("🔄 ランダマイズ後の疑問詞エリア初期化");
+        }
+      }, 100); // ランダマイズ処理完了後に実行
+    });
+  }
+});
+
+// 🎭 ローディング制御関数
+function hideLoadingOverlay() {
+  console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
+  const overlay = document.getElementById('loading-overlay');
+  const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
+  
+  if (overlay && mainContent) {
+    console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
+    
+    // シンプルな遅延でローディングを隠す
+    setTimeout(() => {
+      console.log("🎭 ローディングオーバーレイを隠します");
+      
+      // ローディングオーバーレイを即座に隠す
+      overlay.style.display = 'none';
+      console.log("🎭 overlay.style.display = 'none' 実行完了");
+      
+      // メインコンテンツを表示
+      mainContent.style.display = 'block';
+      mainContent.style.opacity = '1';
+      console.log("🎭 mainContent表示設定完了");
+      
+      console.log("🎭 メインコンテンツ表示完了");
+    }, 500); // シンプルな500ms遅延
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
+  }
+}
+
+function showLoadingOverlay() {
+  console.log("🎭 showLoadingOverlay() 関数が呼ばれました");
+  const overlay = document.getElementById('loading-overlay');
+  const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
+  
+  if (overlay && mainContent) {
+    console.log("🎭 ローディング開始 - メインコンテンツを隠す");
+    
+    // 確実にローディングを表示し、メインコンテンツを隠す
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    overlay.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 overlay表示設定完了");
+    
+    mainContent.style.display = 'none';
+    mainContent.style.opacity = '0';
+    mainContent.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 mainContent非表示設定完了");
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
+  }
+}
+
+// JSONファイルが選択された時のローディング表示更新
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('jsonFileInput');
+  const loadingText = document.querySelector('#loading-overlay p');
+  
+  if (fileInput && loadingText) {
+    fileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        loadingText.textContent = `${this.files[0].name} を読み込み準備完了`;
+      } else {
+        loadingText.textContent = 'JSONファイルをロードしてください';
+      }
+    });
+  }
+});
+
+</script>
+
+</div> <!-- ナビゲーションバー分のスペース閉じタグ -->
+</body>
+</html>
