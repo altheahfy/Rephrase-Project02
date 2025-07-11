@@ -959,14 +959,22 @@ import { buildStructure } from '../js/structure_builder.js';
 
 let loadedJsonData = null;
 
+console.log("🟢 Script loaded successfully");
+console.log("🟢 randomizeAll function:", randomizeAll);
+console.log("🟢 buildStructure function:", buildStructure);
+
 document.getElementById("loadJsonButton").addEventListener("click", () => {
+  console.log("🟢 Load button clicked");
   const fileInput = document.getElementById("jsonFileInput");
+  console.log("🟢 File input:", fileInput);
+  
   if (fileInput.files.length === 0) {
     alert("ファイルを選択してください");
     return;
   }
   
   const file = fileInput.files[0];
+  console.log("🟢 Selected file:", file.name, file.size, "bytes");
   
   // 🎭 ローディング画面を表示
   console.log("🎭 JSONロード開始 - ローディング画面を表示");
@@ -980,12 +988,16 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   
   const reader = new FileReader();
   reader.onload = (e) => {
+    console.log("🟢 FileReader onload triggered");
     try {
       loadedJsonData = JSON.parse(e.target.result);
+      console.log("🟢 JSON parsed successfully:", loadedJsonData);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+      
       const data = randomizeAll(loadedJsonData);
-      console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
+      console.log("🟢 randomizeAll completed:", data);
+      
       validateSlotsModified(data);
       window.loadedJsonData = data;
       buildStructure(data);
