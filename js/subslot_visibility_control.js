@@ -191,9 +191,9 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   slotLabel.textContent = subslotType.toUpperCase();
   controlGroup.appendChild(slotLabel);
   
-  // 各要素タイプのチェックボックス
-  const checkboxContainer = document.createElement('div');
-  checkboxContainer.style.cssText = `
+  // 各要素タイプのトグルボタン
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.cssText = `
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -201,54 +201,143 @@ function createSubslotControlGroup(parentSlot, subslotType, subslotId) {
   `;
   
   SUB_ELEMENT_TYPES.forEach(elementType => {
-    const label = document.createElement('label');
-    label.style.cssText = `
+    const button = document.createElement('button');
+    button.className = 'subslot-toggle-button';
+    button.dataset.parentSlot = parentSlot;
+    button.dataset.subslotId = subslotId;
+    button.dataset.subslotType = subslotType;
+    button.dataset.elementType = elementType;
+    
+    // ボタンスタイル
+    const baseStyle = `
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
+      padding: 3px 6px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
       cursor: pointer;
+      font-size: 10px;
+      transition: all 0.2s;
     `;
     
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'subslot-visibility-checkbox';
-    checkbox.dataset.parentSlot = parentSlot;
-    checkbox.dataset.subslotId = subslotId;
-    checkbox.dataset.subslotType = subslotType;
-    checkbox.dataset.elementType = elementType;
-    checkbox.checked = true; // 初期状態は表示
+    // 初期状態の設定（localStorageから取得）
+    const isVisible = getSubslotElementVisibility(subslotId, elementType);
     
-    // チェックボックス変更時のイベント
-    checkbox.addEventListener('change', function() {
-      console.log(`🎛️ チェックボックス変更イベント:`);
-      console.log(`  - subslotId: ${this.dataset.subslotId}`);
-      console.log(`  - elementType: ${this.dataset.elementType}`);
-      console.log(`  - checked: ${this.checked}`);
-      
-      toggleSubslotElementVisibility(
-        this.dataset.subslotId,
-        this.dataset.elementType,
-        this.checked
-      );
-    });
-    
+    // アイコンとテキストを設定
     const icon = document.createElement('span');
+    const text = document.createElement('span');
+    
     switch(elementType) {
       case 'text':
         icon.textContent = '📄';
+        text.textContent = '英文';
         break;
       case 'auxtext':
         icon.textContent = '📝';
+        text.textContent = '補助';
         break;
     }
     
-    label.appendChild(checkbox);
-    label.appendChild(icon);
-    checkboxContainer.appendChild(label);
+    button.appendChild(icon);
+    button.appendChild(text);
+    
+    // 初期状態のボタンスタイルを適用
+    updateToggleButtonStyle(button, isVisible);
+    
+    // クリック時のイベント
+    button.addEventListener('click', function() {
+      console.log(`🎛️ トグルボタンクリック:`);
+      console.log(`  - subslotId: ${this.dataset.subslotId}`);
+      console.log(`  - elementType: ${this.dataset.elementType}`);
+      
+      // 現在の状態を取得して反転
+      const currentVisibility = getSubslotElementVisibility(this.dataset.subslotId, this.dataset.elementType);
+      const newVisibility = !currentVisibility;
+      
+      console.log(`  - 現在の状態: ${currentVisibility} → 新しい状態: ${newVisibility}`);
+      
+      // 表示状態を切り替え
+      toggleSubslotElementVisibility(
+        this.dataset.subslotId,
+        this.dataset.elementType,
+        newVisibility
+      );
+      
+      // ボタンスタイルを更新
+      updateToggleButtonStyle(this, newVisibility);
+    });
+    
+    buttonsContainer.appendChild(button);
   });
   
-  controlGroup.appendChild(checkboxContainer);
+  controlGroup.appendChild(buttonsContainer);
   return controlGroup;
+}
+
+// 🎨 トグルボタンのスタイルを更新
+function updateToggleButtonStyle(button, isVisible) {
+  const baseStyle = `
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    transition: all 0.2s;
+  `;
+  
+  if (isVisible) {
+    // 表示状態（有効）
+    button.style.cssText = baseStyle + `
+      background-color: #e8f5e8;
+      border-color: #4CAF50;
+      color: #2e7d32;
+    `;
+    button.title = 'クリックして非表示にする';
+  } else {
+    // 非表示状態（無効）
+    button.style.cssText = baseStyle + `
+      background-color: #ffebee;
+      border-color: #f44336;
+      color: #c62828;
+      opacity: 0.8;
+    `;
+    button.title = 'クリックして表示する';
+  }
+}
+
+// 🔍 サブスロット要素の表示状態を取得
+function getSubslotElementVisibility(subslotId, elementType) {
+  // まず、localStorageから永続化された状態を取得
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (saved) {
+      const state = JSON.parse(saved);
+      const key = `${subslotId}_${elementType}`;
+      if (state.hasOwnProperty(key)) {
+        console.log(`🔍 localStorageから取得: ${key} = ${state[key]}`);
+        return state[key];
+      }
+    }
+  } catch (error) {
+    console.warn('⚠ localStorage読み取りエラー:', error);
+  }
+  
+  // localStorageにない場合は、DOM要素から現在の状態を取得
+  const subslotElement = document.getElementById(subslotId);
+  if (subslotElement) {
+    const className = `hidden-subslot-${elementType}`;
+    const isHidden = subslotElement.classList.contains(className);
+    console.log(`🔍 DOM要素から取得: ${subslotId} ${elementType} = ${!isHidden}`);
+    return !isHidden;
+  }
+  
+  // デフォルトは表示
+  console.log(`🔍 デフォルト値を返す: ${subslotId} ${elementType} = true`);
+  return true;
 }
 
 // 🎛️ サブスロット要素の表示・非表示制御
@@ -316,15 +405,18 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
 function resetSubslotVisibility(parentSlot) {
   console.log(`🔄 ${parentSlot}サブスロットの表示を全てリセット`);
   
-  // 該当するチェックボックスを全てチェック状態に
-  const checkboxes = document.querySelectorAll(`[data-parent-slot="${parentSlot}"].subslot-visibility-checkbox`);
-  checkboxes.forEach(checkbox => {
-    checkbox.checked = true;
+  // 該当するトグルボタンを全て表示状態に
+  const toggleButtons = document.querySelectorAll(`[data-parent-slot="${parentSlot}"].subslot-toggle-button`);
+  toggleButtons.forEach(button => {
+    // 表示状態を設定
     toggleSubslotElementVisibility(
-      checkbox.dataset.subslotId,
-      checkbox.dataset.elementType,
+      button.dataset.subslotId,
+      button.dataset.elementType,
       true
     );
+    
+    // ボタンスタイルを更新
+    updateToggleButtonStyle(button, true);
   });
   
   console.log(`✅ ${parentSlot}サブスロットの表示リセット完了`);
