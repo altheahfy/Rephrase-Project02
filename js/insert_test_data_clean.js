@@ -447,9 +447,21 @@ function syncDynamicToStatic() {
       // 設定に応じてテキストを書き込みまたは非表示
       if (shouldShowText) {
         slotTextElement.textContent = item.SlotText || "";
+        // 通常表示のスタイル確保
+        slotTextElement.style.cssText = `
+          display: block;
+          color: #333;
+          font-size: 14px;
+        `;
         console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
       } else {
-        slotTextElement.textContent = "";
+        slotTextElement.textContent = item.SlotText || "";
+        // 非表示スタイル（CSS上書き）
+        slotTextElement.style.cssText = `
+          display: none !important;
+          opacity: 0 !important;
+          visibility: hidden !important;
+        `;
         console.log(`🙈 サブスロット text非表示: ${item.Slot}`);
       }
       
