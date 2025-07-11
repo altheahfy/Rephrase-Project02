@@ -282,8 +282,11 @@ function setupVisibilityControlUI() {
       hideAllEnglishText();
       
       // UIの英文チェックボックスも全て非チェック状態に戻す
-      const englishCheckboxes = document.querySelectorAll('.visibility-checkbox[data-element-type="text"]');
-      englishCheckboxes.forEach(cb => cb.checked = false);
+      const englishCheckboxes = document.querySelectorAll('.visibility-checkbox[data-type="text"]');
+      englishCheckboxes.forEach(cb => {
+        cb.checked = false;
+        console.log(`🔒 チェックボックスを非チェックに: ${cb.dataset.slot} - ${cb.dataset.type}`);
+      });
     });
   }
   
