@@ -840,109 +840,301 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 🛡️ サブスロットエリアの安全制限 + 位置調整対応 */
-.slot-wrapper[id$="-sub"] {
-  /* 画面外に出ないように制限 */
-  min-width: 300px !important;
-  max-width: calc(100vw - 40px) !important;
-  position: relative !important;
-  /* 位置調整用：marginLeftによる調整を有効にする */
-  left: 0 !important;
-  transition: margin-left 0.3s ease !important;
-  /* margin-leftは動的に設定されるため初期値は設定しない */
+/* 🎛️ 上位スロット個別表示制御ルール */
+#slot-m1.hidden-m1-text > .slot-phrase { display: none !important; }
+#slot-m1.hidden-m1-auxtext .slot-text { display: none !important; }
+#slot-s.hidden-s-text > .slot-phrase { display: none !important; }
+#slot-s.hidden-s-auxtext .slot-text { display: none !important; }
+#slot-v.hidden-v-text > .slot-phrase { display: none !important; }
+#slot-v.hidden-v-auxtext .slot-text { display: none !important; }
+#slot-aux.hidden-aux-text > .slot-phrase { display: none !important; }
+#slot-aux.hidden-aux-auxtext .slot-text { display: none !important; }
+#slot-m2.hidden-m2-text > .slot-phrase { display: none !important; }
+#slot-m2.hidden-m2-auxtext .slot-text { display: none !important; }
+#slot-c1.hidden-c1-text > .slot-phrase { display: none !important; }
+#slot-c1.hidden-c1-auxtext .slot-text { display: none !important; }
+#slot-c2.hidden-c2-text > .slot-phrase { display: none !important; }
+#slot-c2.hidden-c2-auxtext .slot-text { display: none !important; }
+#slot-o1.hidden-o1-text > .slot-phrase { display: none !important; }
+#slot-o1.hidden-o1-auxtext .slot-text { display: none !important; }
+#slot-o2.hidden-o2-text > .slot-phrase { display: none !important; }
+#slot-o2.hidden-o2-auxtext .slot-text { display: none !important; }
+#slot-m3.hidden-m3-text > .slot-phrase { display: none !important; }
+#slot-m3.hidden-m3-auxtext .slot-text { display: none !important; }
+
+/* 🎛️ サブスロット制御パネル専用クラス（hidden-subslot-xxxシリーズ） */
+[id*="-sub-"].hidden-subslot-image .slot-image,
+[id*="-sub-"].hidden-subslot-image .multi-image-container { display: none !important; }
+[id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
+/* 制御パネル専用テキスト制御は最上部で定義済み */
+
+/* 🤖 画像自動非表示機構 */
+/* プレースホルダー画像・エラー画像・無効画像の自動非表示 */
+.slot-image.auto-hidden-image {
+  display: none !important;
+  visibility: hidden !important;
 }
 
-/* 🔧 位置調整のためのより具体的なセレクタ（JavaScriptからの変更を優先） */
-div.slot-wrapper[id$="-sub"] {
-  /* JavaScriptで設定されるmargin-leftを確実に適用 */
-  margin-left: var(--dynamic-margin-left, 0px) !important;
-}
-
-/* 🔍 タブ連結エリアが表示されるように強制表示 */
-.slot-wrapper.active-subslot-area[id$="-sub"] {
-  /* タブ連結時は確実に表示 */
-  display: flex !important;
+/* 🎨 メタタグ画像は常に表示（auto-hidden-image を上書き） */
+.slot-image[data-meta-tag="true"] {
+  display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  /* 位置調整が適用されても画面内に留まるように */
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
+  width: 160px !important; /* サイズも強制適用 */
+  height: 150px !important;
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
 }
 
-/* 🔗 エクセル風タブ連結システム（再実装版） */
-
-/* 展開中の上位スロット（親）の基本スタイル */
-.slot-container.active-parent-slot {
-  background: rgba(173, 216, 230, 0.4) !important; /* 薄いブルー背景 */
-  border: 2px solid #87CEEB !important; /* スカイブルー境界線 */
-  border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
-  border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
-  position: relative !important;
-  z-index: 3 !important; /* サブスロットエリアの上に表示 */
-  margin-bottom: 0 !important; /* 下部マージンを除去 */
-  transition: all 0.3s ease !important;
-  box-shadow: 0 -2px 8px rgba(135, 206, 235, 0.3) !important; /* 上部シャドウで浮遊感 */
+/* 手動制御と自動制御の優先度制御 */
+/* 手動制御が優先される（手動非表示が設定されている場合は自動制御を無効化） */
+.slot-container.hidden-image .slot-image.auto-hidden-image,
+.slot-container[class*="hidden-"][class*="-image"] .slot-image.auto-hidden-image {
+  /* 手動制御が設定されている場合は自動制御クラスを無効化 */
+  display: none !important; /* 手動制御の結果を優先 */
 }
 
-/* 🎨 親スロット用の拡張背景（包み込み効果） */
-.slot-container.active-parent-slot::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -5px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.3) 0%, rgba(173, 216, 230, 0.1) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-radius: 12px 12px 0 0 !important;
-  border-bottom: none !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
+/* メタタグ画像は手動制御も上書き */
+.slot-container.hidden-image .slot-image[data-meta-tag="true"],
+.slot-container[class*="hidden-"][class*="-image"] .slot-image[data-meta-tag="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* 展開中のサブスロットエリア全体のスタイル */
-.slot-wrapper.active-subslot-area {
-  background: rgba(173, 216, 230, 0.25) !important; /* 親より薄いブルー */
-  border: 2px solid #87CEEB !important;
-  border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
-  border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
-  position: relative !important;
-  margin-top: -2px !important; /* 親スロットとの境界線を重複させる */
-  padding: 20px !important;
-  z-index: 2 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 
-    0 -2px 4px rgba(135, 206, 235, 0.3),  /* 上向きの影で連結感を演出 */
-    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+/* 🎯 サブスロットコントロールパネルを下側に配置（静的エリア限定） */
+/* #dynamic-slot-area の子孫ではない [id$="-sub"] 内のパネルのみを対象とする */
+[id$="-sub"]:not(#dynamic-slot-area *) .subslot-visibility-panel {
+  /* flexコンテナの幅を100%にすることで、強制的に新しい行に折り返させる */
+  flex-basis: 100%;
+  /* 他のサブスロットより後に表示されるように順序を最大にする */
+  order: 999; 
+  margin-top: 16px;
+  
+  /* 🆕 レイアウト調整：中央揃えと背景色変更（!importantで強制適用） */
+  width: auto !important; /* 幅を自動調整 */
+  margin-left: auto !important; /* 中央揃え */
+  margin-right: auto !important; /* 中央揃え */
+  background-color: white !important; /* 背景色を白に */
+  padding: 10px !important; /* 内側余白 */
+  border: 1px solid #ddd !important; /* 枠線を追加 */
+  border-radius: 5px !important; /* 角を丸める */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* 上位パネルと影を合わせる */
 }
 
-/* 🎨 サブスロットエリア用の拡張背景（包み込み効果の続き） */
-.slot-wrapper.active-subslot-area::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -2px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.1) 0%, rgba(173, 216, 230, 0.3) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-top: none !important;
-  border-radius: 0 0 16px 16px !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
+/* 🔹 分離疑問詞エリアのスタイル - 他のスロットと同じ高さに調整 */
+#display-top-question-word {
+  display: none !important; /* 初期状態は非表示 */
+  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 🎯 他のスロットと同じ6行構造 */
+  grid-template-columns: 1fr;
+  gap: 6px; /* 🎯 他のスロットと同じgap */
+  width: auto !important; /* 🆕 自動幅調整 */
+  min-width: 140px !important; /* 🆕 最小幅 */
+  max-width: none !important; /* 🆕 最大幅制限なし */
+  height: auto !important; /* 🎯 自動高さ調整 */
+  min-height: 380px !important; /* 🎯 他のスロットと同じ最小高さ */
+  margin: 4px 4px 20px 4px !important; /* 🎯 他のスロットと同じマージン */
+  padding: 15px !important; /* 🎯 他のスロットと同じパディング */
+  border: 1px solid #eee !important; /* スロットと同じボーダー */
+  border-radius: 0 !important; /* スロットと同じ角丸なし */
+  background-color: white !important; /* 背景色を白に統一 */
+  align-items: center;
+  justify-items: center;
+  box-sizing: border-box !important;
+  order: -1 !important; /* 他のスロットより前に表示 */
+  transition: grid-template-rows 0.3s ease; /* 行の高さ変更時のアニメーション */
 }
 
-/* サブスロットラベルのタブ風デザイン */
-.subslot-label.tab-style {
-  background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-  color: white !important;
-  font-weight: bold !important;
-  padding: 8px 16px !important;
-  border-radius: 8px 8px 0 0 !important;
-  margin: -20px -20px 15px -20px !important; /* ラベルをコンテナの端まで拡張 */
-  text-align: center !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-  font-size: 14px !important;
-  position: relative !important;
+/* JavaScriptで表示された場合のみ有効になるスタイル */
+#display-top-question-word.visible {
+  display: grid !important;
 }
+
+/* 🔧 補助テキスト非表示時の行の高さ制御 */
+#display-top-question-word.hide-auxtext {
+  grid-template-rows: 30px 180px 0px 30px 30px 30px; /* 🎯 3行目（補助テキスト行）を0pxに */
+}
+
+/* 疑問詞ラベル - Grid行1 */
+#display-top-question-word .question-word-label {
+  grid-row: 1;
+  font-size: 18px; /* スロットラベルと同じサイズ */
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 疑問詞画像エリア - Grid行2 */
+#display-top-question-word .question-word-image {
+  grid-row: 2;
+  max-height: 150px !important; /* 🎯 他のスロット画像と同じサイズ */
+  max-width: 160px !important; /* 🎯 他のスロット画像と同じサイズ */
+  min-height: 120px !important; /* 🎯 他のスロット画像と同じサイズ */
+  min-width: 120px !important; /* 🎯 他のスロット画像と同じサイズ */
+  background: transparent;
+  border: 1px solid #f0f0f0; /* スロット画像と同じ枠 */
+}
+
+/* 疑問詞日本語補助テキスト - Grid行3 */
+#display-top-question-word .question-word-auxtext {
+  grid-row: 3;
+  grid-column: 1;
+  font-size: 11px; /* スロットの補助テキストと同じサイズ */
+  font-weight: 400;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 4px; /* スロットの補助テキストと同じパディング */
+  line-height: 1.1; /* スロットの補助テキストと同じ行高 */
+}
+
+/* 疑問詞英語テキスト - Grid行4 */
+#display-top-question-word .question-word-text {
+  grid-row: 4;
+  font-size: 20px; /* 適度なサイズに調整 */
+  font-weight: 600; /* スロットの英語テキストと同じ重み */
+  color: #222;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2; /* スロットの英語テキストと同じ行高 */
+  
+  /* 🆕 例文テキストエリアを明確にする薄いオレンジの背景と黒い線 */
+  background-color: #ffd6a5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+/* 疑問詞ボタンプレースホルダー - Grid行5,6（空のスペース） */
+#display-top-question-word .question-word-button-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#display-top-question-word .question-word-button-placeholder:nth-of-type(5) {
+  grid-row: 5;
+}
+
+#display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
+  grid-row: 6;
+}
+
+/* 🎯 サブスロット専用の4行CSS Gridレイアウト */
+.subslot-container {
+  /* CSS Gridで4行固定レイアウトを実装（詳細・ランダマイズボタンなし） */
+  display: grid;
+  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px → 180px にさらに拡大 */
+  grid-template-columns: 1fr;
+  gap: 4px; /* 行間の固定間隔 */
+  align-items: center; /* 各セル内での中央揃え */
+  justify-items: center; /* 各セル内での中央揃え */
+  
+  /* スタイリング */
+  border: 1px solid #eee; /* 境界線を追加 */
+  padding: 10px;
+  margin: 4px;
+  
+  /* 動的幅調整システム */
+  min-width: 120px; /* 最小幅 */
+  width: auto; /* 自動幅調整 */
+  max-width: 400px; /* 最大幅 */
+  flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
+  /* アニメーション */
+  transition: opacity 0.2s ease-out, width 0.3s ease;
+  
+  /* 固定高さ（4行構造） */
+  height: 279px; /* 30+180+20+25+gap+padding に更新 */
+  box-sizing: border-box;
+}
+
+/* サブスロットのスロット名 - Grid行1 */
+.subslot-container label {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px; /* 上位スロットより少し小さく */
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+/* サブスロットのイラスト - Grid行2 */
+.subslot-container img.slot-image {
+  grid-row: 2;
+  grid-column: 1;
+  width: 160px !important; /* 強制適用 */
+  height: 150px !important; /* 強制適用 */
+  max-width: 160px !important;
+  max-height: 150px !important;
+  min-width: 120px !important;
+  min-height: 120px !important;
+  object-fit: contain; /* cover → contain に変更（画像の縦横比を保持） */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* サブスロットの補助テキスト - Grid行3 */
+.subslot-container .slot-text {
+  grid-row: 3;
+  grid-column: 1;
+  font-size: 11px;
+  font-weight: 400;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 4px;
+  line-height: 1.1;
+}
+
+/* サブスロットの例文テキスト - Grid行4（オレンジ背景・上下線） */
+.subslot-container .slot-phrase {
+  grid-row: 4;
+  grid-column: 1;
+  font-size: 14px; /* 上位スロットより少し小さく */
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  
+  /* 上位スロットと同じオレンジ背景・上下線 */
+  background-color: #ffd6a5;

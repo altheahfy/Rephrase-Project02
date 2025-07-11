@@ -47,6 +47,22 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
       console.log(`🙈 ${slotKey}スロットの${elementType}を非表示にしました`);
     }
     
+    // 🆕 英語例文（text要素）の直接制御
+    if (elementType === 'text') {
+      const textElement = slotElement.querySelector('.slot-phrase');
+      if (textElement) {
+        if (isVisible) {
+          textElement.style.opacity = '1';
+          textElement.style.visibility = 'visible';
+          console.log(`✅ ${slotKey}スロットの英語例文を表示しました`);
+        } else {
+          textElement.style.opacity = '0';
+          textElement.style.visibility = 'hidden';
+          console.log(`🙈 ${slotKey}スロットの英語例文を非表示にしました`);
+        }
+      }
+    }
+    
     // 🆕 複数画像コンテナの直接制御（image要素の場合）
     if (elementType === 'image') {
       const multiImageContainer = slotElement.querySelector('.multi-image-container');
@@ -70,6 +86,20 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
         subSlot.classList.remove(className);
       } else {
         subSlot.classList.add(className);
+      }
+      
+      // 🆕 サブスロットの英語例文（text要素）も直接制御
+      if (elementType === 'text') {
+        const subTextElement = subSlot.querySelector('.slot-phrase');
+        if (subTextElement) {
+          if (isVisible) {
+            subTextElement.style.opacity = '1';
+            subTextElement.style.visibility = 'visible';
+          } else {
+            subTextElement.style.opacity = '0';
+            subTextElement.style.visibility = 'hidden';
+          }
+        }
       }
       
       // 🆕 サブスロットの複数画像コンテナも直接制御
@@ -141,6 +171,20 @@ function applyVisibilityState() {
           slotElement.classList.add(className);
         }
         
+        // 🆕 英語例文（text要素）の直接制御
+        if (elementType === 'text') {
+          const textElement = slotElement.querySelector('.slot-phrase');
+          if (textElement) {
+            if (isVisible) {
+              textElement.style.opacity = '1';
+              textElement.style.visibility = 'visible';
+            } else {
+              textElement.style.opacity = '0';
+              textElement.style.visibility = 'hidden';
+            }
+          }
+        }
+        
         // 🆕 複数画像コンテナの直接制御（image要素の場合）
         if (elementType === 'image') {
           const multiImageContainer = slotElement.querySelector('.multi-image-container');
@@ -162,6 +206,20 @@ function applyVisibilityState() {
             subSlot.classList.remove(className);
           } else {
             subSlot.classList.add(className);
+          }
+          
+          // 🆕 サブスロットの英語例文（text要素）も直接制御
+          if (elementType === 'text') {
+            const subTextElement = subSlot.querySelector('.slot-phrase');
+            if (subTextElement) {
+              if (isVisible) {
+                subTextElement.style.opacity = '1';
+                subTextElement.style.visibility = 'visible';
+              } else {
+                subTextElement.style.opacity = '0';
+                subTextElement.style.visibility = 'hidden';
+              }
+            }
           }
           
           // 🆕 サブスロットの複数画像コンテナも直接制御
