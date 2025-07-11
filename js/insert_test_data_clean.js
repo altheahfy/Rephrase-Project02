@@ -977,7 +977,8 @@ function syncSubslotsFromJson(data) {
       const phraseElement = document.createElement('div');
       phraseElement.className = 'slot-phrase';
       if (item.SubslotElement) {
-        phraseElement.textContent = item.SubslotElement;
+        // コメントアウト - 検証用
+        // phraseElement.textContent = item.SubslotElement;
       }
       
       // 🎯 メタレベル制御：phrase要素作成直後に表示制御を適用
