@@ -967,6 +967,10 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
+      // 🔄 JSONロード時にサブスロット表示設定をリセット
+      localStorage.removeItem('rephrase_subslot_visibility_state');
+      console.log('📁 JSONロード時にサブスロット表示設定をリセットしました');
+      
       loadedJsonData = JSON.parse(e.target.result);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
