@@ -8,222 +8,205 @@
   <link href="../assets/styles/grammar.css" rel="stylesheet">
 </head>
 <body>
-  <!-- ナビゲーションバー -->
-  <nav class="top-nav" style="position: fixed; top: 0; left: 0; right: 0; z-index: 15000; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e0e0e0; padding: 10px 0;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <a href="../" style="text-decoration: none; color: #2196F3; font-weight: bold; font-size: 18px;">🔄 Rephrase</a>
-        <span style="color: #666; font-size: 14px;">文法説明</span>
-      </div>
-      <div style="display: flex; gap: 15px;">
-        <a href="../" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">🏠 ホーム</a>
-        <a href="../training/" style="text-decoration: none; color: #666; font-size: 14px; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">🎯 トレーニング</a>
-      </div>
+  <header class="page-header">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="../">🏠 ホーム</a>
+        <span>></span>
+        <span>文法説明</span>
+      </nav>
+      <h1>📚 Rephrase 文法システム</h1>
+      <p class="page-subtitle">構文分析による英語学習の基本概念</p>
     </div>
-  </nav>
+  </header>
 
-  <div style="margin-top: 60px;"> <!-- ナビゲーションバー分のスペース -->
-    <header class="page-header">
-      <div class="container">
-        <nav class="breadcrumb">
-          <a href="../">🏠 ホーム</a>
-          <span>></span>
-          <span>文法説明</span>
-        </nav>
-        <h1>📚 Rephrase 文法システム</h1>
-        <p class="page-subtitle">構文分析による英語学習の基本概念</p>
-      </div>
-    </header>
+  <main class="main-content">
+    <div class="container">
+      <section class="intro-section">
+        <h2>Rephraseシステムとは</h2>
+        <div class="intro-content">
+          <p>
+            Rephraseは、英語の文章を構文要素（スロット）に分解して学習する革新的なシステムです。
+            従来の文法学習とは異なり、文章の構造を視覚的に表現することで、より直感的な理解を促進します。
+          </p>
+          <div class="highlight-box">
+            <h3>🎯 学習の特徴</h3>
+            <ul>
+              <li>文章をスロット（構文要素）に分解</li>
+              <li>各スロットの役割を色分けで表示</li>
+              <li>ランダマイズ機能で多様な例文練習</li>
+              <li>画像表示による理解促進</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-    <main class="main-content">
-      <div class="container">
-        <section class="intro-section">
-          <h2>Rephraseシステムとは</h2>
-          <div class="intro-content">
+      <section class="slots-section">
+        <h2>スロットシステム</h2>
+        <div class="slots-grid">
+          <div class="slot-card slot-s">
+            <div class="slot-label">S</div>
+            <h3>主語 (Subject)</h3>
+            <p>文章の主体となる人や物を表します。「誰が」「何が」にあたる部分です。</p>
+            <div class="example">
+              <strong>例:</strong> <span class="slot-highlight-s">She</span> speaks English.
+            </div>
+          </div>
+
+          <div class="slot-card slot-v">
+            <div class="slot-label">V</div>
+            <h3>動詞 (Verb)</h3>
+            <p>動作や状態を表す語です。文章の核となる要素です。</p>
+            <div class="example">
+              <strong>例:</strong> She <span class="slot-highlight-v">speaks</span> English.
+            </div>
+          </div>
+
+          <div class="slot-card slot-o">
+            <div class="slot-label">O</div>
+            <h3>目的語 (Object)</h3>
+            <p>動作の対象となる語です。「何を」「誰を」にあたる部分です。</p>
+            <div class="example">
+              <strong>例:</strong> She speaks <span class="slot-highlight-o">English</span>.
+            </div>
+          </div>
+
+          <div class="slot-card slot-c">
+            <div class="slot-label">C</div>
+            <h3>補語 (Complement)</h3>
+            <p>主語や目的語の状態や性質を説明する語です。</p>
+            <div class="example">
+              <strong>例:</strong> She is <span class="slot-highlight-c">happy</span>.
+            </div>
+          </div>
+
+          <div class="slot-card slot-m">
+            <div class="slot-label">M</div>
+            <h3>修飾語 (Modifier)</h3>
+            <p>他の語句を修飾して、より詳しい情報を提供する語です。</p>
+            <div class="example">
+              <strong>例:</strong> <span class="slot-highlight-m">Yesterday</span> she spoke English.
+            </div>
+          </div>
+
+          <div class="slot-card slot-aux">
+            <div class="slot-label">AUX</div>
+            <h3>助動詞 (Auxiliary)</h3>
+            <p>動詞を補助して、時制や態、法を表す語です。</p>
+            <div class="example">
+              <strong>例:</strong> She <span class="slot-highlight-aux">will</span> speak English.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="example-section">
+        <h2>実践例</h2>
+        <div class="example-container">
+          <h3>例文の構文分析</h3>
+          <div class="sentence-analysis">
+            <div class="original-sentence">
+              "Yesterday, she will carefully study English grammar."
+            </div>
+            <div class="analyzed-sentence">
+              <span class="slot-highlight-m">Yesterday</span>,
+              <span class="slot-highlight-s">she</span>
+              <span class="slot-highlight-aux">will</span>
+              <span class="slot-highlight-m">carefully</span>
+              <span class="slot-highlight-v">study</span>
+              <span class="slot-highlight-o">English grammar</span>.
+            </div>
+            <div class="analysis-breakdown">
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-m">M</span>
+                <span>Yesterday</span>
+                <span class="description">時間の修飾語</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-s">S</span>
+                <span>she</span>
+                <span class="description">主語</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-aux">AUX</span>
+                <span>will</span>
+                <span class="description">未来を表す助動詞</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-m">M</span>
+                <span>carefully</span>
+                <span class="description">方法の修飾語</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-v">V</span>
+                <span>study</span>
+                <span class="description">動詞</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="slot-label-small slot-o">O</span>
+                <span>English grammar</span>
+                <span class="description">目的語</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-detail-section">
+        <h2>学習機能</h2>
+        <div class="features-detail-grid">
+          <div class="feature-detail-card">
+            <div class="feature-icon">🎲</div>
+            <h3>ランダマイズ機能</h3>
             <p>
-              Rephraseは、英語の文章を構文要素（スロット）に分解して学習する革新的なシステムです。
-              従来の文法学習とは異なり、文章の構造を視覚的に表現することで、より直感的な理解を促進します。
+              同じ構文パターンの異なる例文を自動的に生成します。
+              多様な文章パターンに触れることで、構文理解を深めることができます。
             </p>
-            <div class="highlight-box">
-              <h3>🎯 学習の特徴</h3>
-              <ul>
-                <li>文章をスロット（構文要素）に分解</li>
-                <li>各スロットの役割を色分けで表示</li>
-                <li>ランダマイズ機能で多様な例文練習</li>
-                <li>画像表示による理解促進</li>
-              </ul>
-            </div>
           </div>
-        </section>
-
-        <section class="slots-section">
-          <h2>スロットシステム</h2>
-          <div class="slots-grid">
-            <div class="slot-card slot-s">
-              <div class="slot-label">S</div>
-              <h3>主語 (Subject)</h3>
-              <p>文章の主体となる人や物を表します。「誰が」「何が」にあたる部分です。</p>
-              <div class="example">
-                <strong>例:</strong> <span class="slot-highlight-s">She</span> speaks English.
-              </div>
-            </div>
-
-            <div class="slot-card slot-v">
-              <div class="slot-label">V</div>
-              <h3>動詞 (Verb)</h3>
-              <p>動作や状態を表す語です。文章の核となる要素です。</p>
-              <div class="example">
-                <strong>例:</strong> She <span class="slot-highlight-v">speaks</span> English.
-              </div>
-            </div>
-
-            <div class="slot-card slot-o">
-              <div class="slot-label">O</div>
-              <h3>目的語 (Object)</h3>
-              <p>動作の対象となる語です。「何を」「誰を」にあたる部分です。</p>
-              <div class="example">
-                <strong>例:</strong> She speaks <span class="slot-highlight-o">English</span>.
-              </div>
-            </div>
-
-            <div class="slot-card slot-c">
-              <div class="slot-label">C</div>
-              <h3>補語 (Complement)</h3>
-              <p>主語や目的語の状態や性質を説明する語です。</p>
-              <div class="example">
-                <strong>例:</strong> She is <span class="slot-highlight-c">happy</span>.
-              </div>
-            </div>
-
-            <div class="slot-card slot-m">
-              <div class="slot-label">M</div>
-              <h3>修飾語 (Modifier)</h3>
-              <p>他の語句を修飾して、より詳しい情報を提供する語です。</p>
-              <div class="example">
-                <strong>例:</strong> <span class="slot-highlight-m">Yesterday</span> she spoke English.
-              </div>
-            </div>
-
-            <div class="slot-card slot-aux">
-              <div class="slot-label">AUX</div>
-              <h3>助動詞 (Auxiliary)</h3>
-              <p>動詞を補助して、時制や態、法を表す語です。</p>
-              <div class="example">
-                <strong>例:</strong> She <span class="slot-highlight-aux">will</span> speak English.
-              </div>
-            </div>
+          
+          <div class="feature-detail-card">
+            <div class="feature-icon">🔍</div>
+            <h3>スロット展開</h3>
+            <p>
+              各スロットをクリックすると、詳細な構文要素が表示されます。
+              複雑な文章でも段階的に理解を深めることができます。
+            </p>
           </div>
-        </section>
-
-        <section class="example-section">
-          <h2>実践例</h2>
-          <div class="example-container">
-            <h3>例文の構文分析</h3>
-            <div class="sentence-analysis">
-              <div class="original-sentence">
-                "Yesterday, she will carefully study English grammar."
-              </div>
-              <div class="analyzed-sentence">
-                <span class="slot-highlight-m">Yesterday</span>,
-                <span class="slot-highlight-s">she</span>
-                <span class="slot-highlight-aux">will</span>
-                <span class="slot-highlight-m">carefully</span>
-                <span class="slot-highlight-v">study</span>
-                <span class="slot-highlight-o">English grammar</span>.
-              </div>
-              <div class="analysis-breakdown">
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-m">M</span>
-                  <span>Yesterday</span>
-                  <span class="description">時間の修飾語</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-s">S</span>
-                  <span>she</span>
-                  <span class="description">主語</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-aux">AUX</span>
-                  <span>will</span>
-                  <span class="description">未来を表す助動詞</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-m">M</span>
-                  <span>carefully</span>
-                  <span class="description">方法の修飾語</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-v">V</span>
-                  <span>study</span>
-                  <span class="description">動詞</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="slot-label-small slot-o">O</span>
-                  <span>English grammar</span>
-                  <span class="description">目的語</span>
-                </div>
-              </div>
-            </div>
+          
+          <div class="feature-detail-card">
+            <div class="feature-icon">🖼️</div>
+            <h3>画像表示</h3>
+            <p>
+              単語に対応した画像が自動的に表示されます。
+              視覚的な情報により、語彙の理解と記憶を促進します。
+            </p>
           </div>
-        </section>
-
-        <section class="features-detail-section">
-          <h2>学習機能</h2>
-          <div class="features-detail-grid">
-            <div class="feature-detail-card">
-              <div class="feature-icon">🎲</div>
-              <h3>ランダマイズ機能</h3>
-              <p>
-                同じ構文パターンの異なる例文を自動的に生成します。
-                多様な文章パターンに触れることで、構文理解を深めることができます。
-              </p>
-            </div>
-            
-            <div class="feature-detail-card">
-              <div class="feature-icon">🔍</div>
-              <h3>スロット展開</h3>
-              <p>
-                各スロットをクリックすると、詳細な構文要素が表示されます。
-                複雑な文章でも段階的に理解を深めることができます。
-              </p>
-            </div>
-            
-            <div class="feature-detail-card">
-              <div class="feature-icon">🖼️</div>
-              <h3>画像表示</h3>
-              <p>
-                単語に対応した画像が自動的に表示されます。
-                視覚的な情報により、語彙の理解と記憶を促進します。
-              </p>
-            </div>
-            
-            <div class="feature-detail-card">
-              <div class="feature-icon">📊</div>
-              <h3>構文可視化</h3>
-              <p>
-                文章の構造を色分けと配置で視覚的に表現します。
-                抽象的な文法概念を具体的に理解できます。
-              </p>
-            </div>
+          
+          <div class="feature-detail-card">
+            <div class="feature-icon">📊</div>
+            <h3>構文可視化</h3>
+            <p>
+              文章の構造を色分けと配置で視覚的に表現します。
+              抽象的な文法概念を具体的に理解できます。
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="cta-section">
-          <div class="cta-content">
-            <h2>さあ、トレーニングを始めましょう！</h2>
-            <p>基本概念を理解したら、実際のトレーニングで練習してみましょう。</p>
-            <a href="../training/" class="btn btn-primary btn-large">🎯 トレーニング開始</a>
-          </div>
-        </section>
-      </div>
-    </main>
+      <section class="cta-section">
+        <div class="cta-content">
+          <h2>さあ、トレーニングを始めましょう！</h2>
+          <p>基本概念を理解したら、実際のトレーニングで練習してみましょう。</p>
+          <a href="../training/" class="btn btn-primary btn-large">🎯 トレーニング開始</a>
+        </div>
+      </section>
+    </div>
+  </main>
 
-    <footer class="footer">
-      <div class="container">
-        <p>&copy; 2025 Rephrase 英語学習システム. All rights reserved.</p>
-      </div>
-    </footer>
-    
-  </div> <!-- ナビゲーションバー分のスペース閉じタグ -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Rephrase 英語学習システム. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
