@@ -627,19 +627,19 @@ h2 {
 /* サブスロットの画像・テキスト・補助テキストの個別制御 */
 .subslot.hidden-subslot-image .slot-image { display: none !important; }
 .subslot.hidden-subslot-image .multi-image-container { display: none !important; }
-.subslot.hidden-subslot-text .slot-phrase { display: none !important; }
+.subslot.hidden-subslot-text .slot-phrase { opacity: 0 !important; }
 .subslot.hidden-subslot-auxtext .slot-text { display: none !important; }
 
 /* 🎯 .subslot-container対応版（新しいGrid構造） */
 .subslot-container.hidden-subslot-image .slot-image { display: none !important; }
 .subslot-container.hidden-subslot-image .multi-image-container { display: none !important; }
-.subslot-container.hidden-subslot-text .slot-phrase { display: none !important; }
+.subslot-container.hidden-subslot-text .slot-phrase { opacity: 0 !important; }
 .subslot-container.hidden-subslot-auxtext .slot-text { display: none !important; }
 
 /* より具体的なセレクタでの制御（IDベース） */
 [id*="-sub-"].hidden-subslot-image .slot-image { display: none !important; }
 [id*="-sub-"].hidden-subslot-image .multi-image-container { display: none !important; }
-[id*="-sub-"].hidden-subslot-text .slot-phrase { display: none !important; }
+[id*="-sub-"].hidden-subslot-text .slot-phrase { opacity: 0 !important; }
 [id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
 
 /* 🤖 画像自動非表示機構 */
