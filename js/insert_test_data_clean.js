@@ -427,8 +427,31 @@ function syncDynamicToStatic() {
     
     // 📝 テキスト要素への書き込み（上位スロットと同じ方式 - ラベル保護）
     if (slotTextElement) {
-      slotTextElement.textContent = item.SlotText || "";
-      console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
+      // 🔍 localStorageでテキスト表示設定をチェック
+      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+      let shouldShowText = true; // デフォルトは表示
+      
+      if (saved) {
+        try {
+          const subslotVisibilityState = JSON.parse(saved);
+          const slotId = normalizeSlotId(item.Slot);
+          if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['text'] === false) {
+            shouldShowText = false;
+            console.log(`🚫 サブスロット "${item.Slot}" の英語テキストは非表示設定のためスキップ`);
+          }
+        } catch (e) {
+          console.warn('localStorage解析エラー:', e);
+        }
+      }
+      
+      // 設定に応じてテキストを書き込みまたは非表示
+      if (shouldShowText) {
+        slotTextElement.textContent = item.SlotText || "";
+        console.log(`✅ サブスロット text書き込み成功: ${item.Slot} | 値: "${item.SlotText}"`);
+      } else {
+        slotTextElement.textContent = "";
+        console.log(`🙈 サブスロット text非表示: ${item.Slot}`);
+      }
       
       // 上位スロットと同じ入れ子構造チェック
       const nestedPhraseDiv = slotTextElement.querySelector(".slot-phrase");
@@ -973,7 +996,41 @@ function syncSubslotsFromJson(data) {
       const textElement = document.createElement('div');
       textElement.className = 'slot-text';
       if (item.SubslotText) {
-        textElement.textContent = item.SubslotText;
+        // 🔍 localStorageでテキスト表示設定をチェック
+        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+        let shouldShowText = true; // デフォルトは表示
+        
+        if (saved) {
+          try {
+            const subslotVisibilityState = JSON.parse(saved);
+            if (subslotVisibilityState[fullSlotId] && subslotVisibilityState[fullSlotId]['text'] === false) {
+              shouldShowText = false;
+              console.log(`🚫 サブスロット "${fullSlotId}" の英語テキストは非表示設定`);
+            }
+          } catch (e) {
+            console.warn('localStorage解析エラー:', e);
+          }
+        }
+        
+        // 設定に応じてテキスト表示またはスタイル上書きで非表示
+        if (shouldShowText) {
+          textElement.textContent = item.SubslotText;
+          // 通常表示のスタイル（必要に応じて）
+          textElement.style.cssText = `
+            display: block;
+            color: #333;
+            font-size: 14px;
+          `;
+        } else {
+          textElement.textContent = item.SubslotText;
+          // 非表示スタイル（CSS上書き）
+          textElement.style.cssText = `
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+          `;
+          console.log(`🙈 サブスロット "${fullSlotId}" の英語テキストを非表示化`);
+        }
       }
       
       // 要素を組み立て（ラベルを最初に追加）
