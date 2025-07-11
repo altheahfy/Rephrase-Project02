@@ -981,43 +981,255 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
     loadingText.textContent = `${selectedPreset} を読み込み中...`;
   }
   
-  // fetchでプリセットJSONファイルをロード
-  fetch(selectedPreset)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      // 🔄 JSONロード時にサブスロット表示設定をリセット
-      localStorage.removeItem('rephrase_subslot_visibility_state');
-      console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+  // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
+  let presetData = null;
+  
+  switch(selectedPreset) {
+    case 'data/sample_basic.json':
+      presetData = [
+        {
+          "ID": 1,
+          "Text": "I like reading books",
+          "Slot": "S",
+          "Slot_display_order": 1,
+          "SlotPhrase": "I",
+          "SlotText": "私は",
+          "PhraseType": "word",
+          "Role": "s",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 1
+        },
+        {
+          "ID": 2,
+          "Text": "I like reading books",
+          "Slot": "V",
+          "Slot_display_order": 2,
+          "SlotPhrase": "like",
+          "SlotText": "好き",
+          "PhraseType": "word",
+          "Role": "v",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 2
+        },
+        {
+          "ID": 3,
+          "Text": "I like reading books",
+          "Slot": "O1",
+          "Slot_display_order": 3,
+          "SlotPhrase": "reading books",
+          "SlotText": "本を読むこと",
+          "PhraseType": "word",
+          "Role": "o1",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 3
+        },
+        {
+          "ID": 4,
+          "Text": "She plays the piano",
+          "Slot": "S",
+          "Slot_display_order": 1,
+          "SlotPhrase": "She",
+          "SlotText": "彼女は",
+          "PhraseType": "word",
+          "Role": "s",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 1
+        },
+        {
+          "ID": 5,
+          "Text": "She plays the piano",
+          "Slot": "V",
+          "Slot_display_order": 2,
+          "SlotPhrase": "plays",
+          "SlotText": "弾く",
+          "PhraseType": "word",
+          "Role": "v",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 2
+        },
+        {
+          "ID": 6,
+          "Text": "She plays the piano",
+          "Slot": "O1",
+          "Slot_display_order": 3,
+          "SlotPhrase": "the piano",
+          "SlotText": "ピアノを",
+          "PhraseType": "word",
+          "Role": "o1",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 3
+        }
+      ];
+      break;
       
-      loadedJsonData = data;
-      window.loadedJsonData = loadedJsonData;  // コンソール確認用
-      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
-      const processedData = randomizeAll(loadedJsonData);
-      console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
-      validateSlotsModified(processedData);
-      window.loadedJsonData = processedData;
-      buildStructure(processedData);
-      syncDynamicToStatic();
+    case 'data/sample_advanced.json':
+      presetData = [
+        {
+          "ID": 1,
+          "Text": "The company responsible for quality control made a mistake",
+          "Slot": "S",
+          "Slot_display_order": 1,
+          "SlotPhrase": "The company responsible for quality control",
+          "SlotText": "品質管理を担当する会社が",
+          "PhraseType": "word",
+          "Role": "s",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 1
+        },
+        {
+          "ID": 2,
+          "Text": "The company responsible for quality control made a mistake",
+          "Slot": "V",
+          "Slot_display_order": 2,
+          "SlotPhrase": "made",
+          "SlotText": "犯した",
+          "PhraseType": "word",
+          "Role": "v",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 2
+        },
+        {
+          "ID": 3,
+          "Text": "The company responsible for quality control made a mistake",
+          "Slot": "O1",
+          "Slot_display_order": 3,
+          "SlotPhrase": "a mistake",
+          "SlotText": "間違いを",
+          "PhraseType": "word",
+          "Role": "o1",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 3
+        }
+      ];
+      break;
       
-      // サブスロットの初期化も実行
-      if (typeof initializeSubslots === 'function') {
-        initializeSubslots();
-      }
+    case 'data/sample_questions.json':
+      presetData = [
+        {
+          "ID": 1,
+          "Text": "What did you buy yesterday?",
+          "Slot": "M1",
+          "Slot_display_order": 1,
+          "SlotPhrase": "",
+          "SlotText": "",
+          "PhraseType": "expression",
+          "Role": "m1",
+          "SubslotID": "m1",
+          "SubslotElement": "What",
+          "SubslotText": "何を",
+          "display_order": 1
+        },
+        {
+          "ID": 2,
+          "Text": "What did you buy yesterday?",
+          "Slot": "M1",
+          "Slot_display_order": 1,
+          "SlotPhrase": "",
+          "SlotText": "",
+          "PhraseType": "expression",
+          "Role": "m1",
+          "SubslotID": "aux",
+          "SubslotElement": "did",
+          "SubslotText": "～した",
+          "display_order": 2
+        },
+        {
+          "ID": 3,
+          "Text": "What did you buy yesterday?",
+          "Slot": "S",
+          "Slot_display_order": 2,
+          "SlotPhrase": "you",
+          "SlotText": "あなたは",
+          "PhraseType": "word",
+          "Role": "s",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 3
+        },
+        {
+          "ID": 4,
+          "Text": "What did you buy yesterday?",
+          "Slot": "V",
+          "Slot_display_order": 3,
+          "SlotPhrase": "buy",
+          "SlotText": "買う",
+          "PhraseType": "word",
+          "Role": "v",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 4
+        },
+        {
+          "ID": 5,
+          "Text": "What did you buy yesterday?",
+          "Slot": "M2",
+          "Slot_display_order": 4,
+          "SlotPhrase": "yesterday",
+          "SlotText": "昨日",
+          "PhraseType": "word",
+          "Role": "m2",
+          "SubslotID": "",
+          "SubslotElement": "",
+          "SubslotText": "",
+          "display_order": 5
+        }
+      ];
+      break;
       
-      // 🎭 ローディング画面を非表示
-      console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+    default:
+      alert("不明なプリセットです");
       hideLoadingOverlay();
-    })
-    .catch(error => {
-      console.error("プリセットJSONファイルの読み込みに失敗:", error);
-      alert(`プリセットJSONファイルの読み込みに失敗しました: ${error.message}`);
-      hideLoadingOverlay();
-    });
+      return;
+  }
+  
+  try {
+    // 🔄 JSONロード時にサブスロット表示設定をリセット
+    localStorage.removeItem('rephrase_subslot_visibility_state');
+    console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+    
+    loadedJsonData = presetData;
+    window.loadedJsonData = loadedJsonData;  // コンソール確認用
+    console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+    const processedData = randomizeAll(loadedJsonData);
+    console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+    validateSlotsModified(processedData);
+    window.loadedJsonData = processedData;
+    buildStructure(processedData);
+    syncDynamicToStatic();
+    
+    // サブスロットの初期化も実行
+    if (typeof initializeSubslots === 'function') {
+      initializeSubslots();
+    }
+    
+    // 🎭 ローディング画面を非表示
+    console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+    hideLoadingOverlay();
+  } catch (error) {
+    console.error("プリセットJSONデータの処理に失敗:", error);
+    alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+    hideLoadingOverlay();
+  }
 });
 
 // 既存のファイル選択からのロード機能
