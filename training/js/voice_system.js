@@ -41,11 +41,17 @@ class VoiceSystem {
     getCurrentSentence() {
         console.log('🔍 例文テキスト取得を開始...');
         
+        // デバッグ: 利用可能なグローバル変数をチェック
+        console.log('🔍 window.lastSelectedSlots:', window.lastSelectedSlots);
+        console.log('🔍 window.loadedJsonData:', window.loadedJsonData ? '存在' : '未定義');
+        console.log('🔍 window.fullSlotPool:', window.fullSlotPool ? '存在' : '未定義');
+        
         // JSONデータから現在の例文を構築する方法を試す
-        if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots)) {
+        if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots) && window.lastSelectedSlots.length > 0) {
             return this.buildSentenceFromJsonData();
         }
         
+        console.log('⚠️ JSONデータが利用できません。DOMから取得を試行します。');
         // フォールバック: DOMから取得
         return this.buildSentenceFromDOM();
     }
@@ -56,14 +62,23 @@ class VoiceSystem {
     buildSentenceFromJsonData() {
         console.log('📊 JSONデータから例文を構築中...');
         console.log('利用可能なスロットデータ:', window.lastSelectedSlots);
+        console.log('スロットデータの件数:', window.lastSelectedSlots.length);
+        
+        // データ構造の詳細ログ
+        if (window.lastSelectedSlots.length > 0) {
+            console.log('最初のスロットの構造:', window.lastSelectedSlots[0]);
+            console.log('利用可能なキー:', Object.keys(window.lastSelectedSlots[0]));
+        }
         
         const slotOrder = ['question-word', 'm1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         const sentenceParts = [];
         
         // 疑問詞を最初にチェック
         const questionWordSlot = window.lastSelectedSlots.find(slot => 
-            slot.Slot === 'question-word' || slot.Slot === 'WH'
+            slot.Slot === 'question-word' || slot.Slot === 'WH' || slot.Slot === 'wh'
         );
+        console.log('🔍 疑問詞スロット検索結果:', questionWordSlot);
+        
         if (questionWordSlot && questionWordSlot.例文) {
             console.log(`疑問詞: "${questionWordSlot.例文}"`);
             sentenceParts.push(questionWordSlot.例文);
@@ -79,14 +94,20 @@ class VoiceSystem {
                 slot.Slot === upperCaseSlotName && !slot.SubslotID
             );
             
+            console.log(`🔍 ${slotName} (${upperCaseSlotName}) スロット検索結果:`, slot);
+            
             if (slot && slot.例文) {
                 console.log(`${slotName}: "${slot.例文}"`);
                 sentenceParts.push(slot.例文);
             } else {
+                console.log(`⚠️ ${slotName} の上位スロットにデータがありません。サブスロットを確認します。`);
+                
                 // サブスロットから構築を試す
                 const subSlots = window.lastSelectedSlots.filter(slot => 
                     slot.SubslotID && slot.SubslotID.startsWith(upperCaseSlotName + '-')
                 );
+                
+                console.log(`🔍 ${slotName} のサブスロット検索結果:`, subSlots);
                 
                 if (subSlots.length > 0) {
                     const subSentenceParts = [];
@@ -97,6 +118,7 @@ class VoiceSystem {
                             slot.Slot === subSlotName.toUpperCase()
                         );
                         if (subSlot && subSlot.例文) {
+                            console.log(`  ${subSlotName} (サブ): "${subSlot.例文}"`);
                             subSentenceParts.push(subSlot.例文);
                         }
                     });
@@ -112,6 +134,8 @@ class VoiceSystem {
         
         const sentence = sentenceParts.join(' ').trim();
         console.log(`📝 JSONから構築した例文: "${sentence}"`);
+        console.log(`📝 例文パーツ数: ${sentenceParts.length}`);
+        console.log(`📝 例文パーツ詳細:`, sentenceParts);
         
         if (sentence && !sentence.endsWith('.') && !sentence.endsWith('?') && !sentence.endsWith('!')) {
             return sentence + '.';
@@ -131,6 +155,9 @@ class VoiceSystem {
         
         // 疑問詞を最初にチェック（英語テキスト部分を取得）
         const questionWordElement = document.querySelector('#display-top-question-word .question-word-text');
+        console.log('🔍 疑問詞要素:', questionWordElement);
+        console.log('🔍 疑問詞テキスト:', questionWordElement ? questionWordElement.textContent : 'なし');
+        
         if (questionWordElement && questionWordElement.textContent.trim()) {
             const text = questionWordElement.textContent.trim();
             console.log(`疑問詞: "${text}"`);
@@ -143,15 +170,31 @@ class VoiceSystem {
             
             // 上位スロットの英語例文を取得
             const slotElement = document.querySelector(`#slot-${slotName} .slot-phrase`);
+            console.log(`🔍 ${slotName} .slot-phrase 要素:`, slotElement);
+            console.log(`🔍 ${slotName} .slot-phrase テキスト:`, slotElement ? slotElement.textContent : 'なし');
+            
             if (slotElement && slotElement.textContent.trim()) {
                 const text = slotElement.textContent.trim();
                 console.log(`${slotName}: "${text}"`);
                 sentenceParts.push(text);
+            } else {
+                // .slot-text も試してみる
+                const slotTextElement = document.querySelector(`#slot-${slotName} .slot-text`);
+                console.log(`🔍 ${slotName} .slot-text 要素:`, slotTextElement);
+                console.log(`🔍 ${slotName} .slot-text テキスト:`, slotTextElement ? slotTextElement.textContent : 'なし');
+                
+                if (slotTextElement && slotTextElement.textContent.trim()) {
+                    const text = slotTextElement.textContent.trim();
+                    console.log(`${slotName} (slot-text): "${text}"`);
+                    sentenceParts.push(text);
+                }
             }
         });
         
         const sentence = sentenceParts.join(' ').trim();
         console.log(`📝 DOMから構築した例文: "${sentence}"`);
+        console.log(`📝 例文パーツ数: ${sentenceParts.length}`);
+        console.log(`📝 例文パーツ詳細:`, sentenceParts);
         
         if (sentence && !sentence.endsWith('.') && !sentence.endsWith('?') && !sentence.endsWith('!')) {
             return sentence + '.';
