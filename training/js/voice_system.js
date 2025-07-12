@@ -70,7 +70,6 @@ class VoiceSystem {
             console.log('利用可能なキー:', Object.keys(window.lastSelectedSlots[0]));
         }
         
-        const slotOrder = ['question-word', 'm1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         const sentenceParts = [];
         
         // 疑問詞を最初にチェック
@@ -81,61 +80,79 @@ class VoiceSystem {
         
         if (questionWordSlot && questionWordSlot.SlotPhrase) {
             console.log(`疑問詞: "${questionWordSlot.SlotPhrase}"`);
-            sentenceParts.push(questionWordSlot.SlotPhrase);
+            sentenceParts.push({
+                text: questionWordSlot.SlotPhrase,
+                order: -1, // 疑問詞は最初
+                slot: 'question-word'
+            });
         }
         
-        // 各スロットの例文を順番に取得
-        slotOrder.forEach(slotName => {
-            if (slotName === 'question-word') return; // 既に処理済み
-            
-            // 上位スロットを探す
-            const upperCaseSlotName = slotName.toUpperCase();
-            const slot = window.lastSelectedSlots.find(slot => 
-                slot.Slot === upperCaseSlotName && !slot.SubslotID
-            );
-            
-            console.log(`🔍 ${slotName} (${upperCaseSlotName}) スロット検索結果:`, slot);
-            
-            if (slot && slot.SlotPhrase) {
-                console.log(`${slotName}: "${slot.SlotPhrase}"`);
-                sentenceParts.push(slot.SlotPhrase);
+        // 上位スロットを Slot_display_order 順にソート
+        const upperSlots = window.lastSelectedSlots
+            .filter(slot => !slot.SubslotID && slot.Slot !== 'question-word' && slot.Slot !== 'WH' && slot.Slot !== 'wh')
+            .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+        
+        console.log('� 上位スロットの順序:', upperSlots.map(slot => 
+            `${slot.Slot}(order:${slot.Slot_display_order})`
+        ));
+        
+        upperSlots.forEach(slot => {
+            if (slot.SlotPhrase) {
+                console.log(`${slot.Slot} (order:${slot.Slot_display_order}): "${slot.SlotPhrase}"`);
+                sentenceParts.push({
+                    text: slot.SlotPhrase,
+                    order: slot.Slot_display_order || 0,
+                    slot: slot.Slot
+                });
             } else {
-                console.log(`⚠️ ${slotName} の上位スロットにSlotPhraseがありません。サブスロットを確認します。`);
+                console.log(`⚠️ ${slot.Slot} の上位スロットにSlotPhraseがありません。サブスロットを確認します。`);
                 
-                // サブスロットから構築を試す
-                const subSlots = window.lastSelectedSlots.filter(slot => 
-                    slot.SubslotID && slot.SubslotID.startsWith(upperCaseSlotName + '-')
-                );
+                // このスロットのサブスロットから構築を試す
+                const subSlots = window.lastSelectedSlots
+                    .filter(subSlot => 
+                        subSlot.SubslotID && subSlot.SubslotID.startsWith(slot.Slot + '-')
+                    )
+                    .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
                 
-                console.log(`🔍 ${slotName} のサブスロット検索結果:`, subSlots);
+                console.log(`🔍 ${slot.Slot} のサブスロット順序:`, subSlots.map(subSlot => 
+                    `${subSlot.Slot}(order:${subSlot.display_order})`
+                ));
                 
                 if (subSlots.length > 0) {
                     const subSentenceParts = [];
-                    const subSlotOrder = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
                     
-                    subSlotOrder.forEach(subSlotName => {
-                        const subSlot = subSlots.find(slot => 
-                            slot.Slot === subSlotName.toUpperCase()
-                        );
-                        if (subSlot && subSlot.SlotPhrase) {
-                            console.log(`  ${subSlotName} (サブ): "${subSlot.SlotPhrase}"`);
+                    subSlots.forEach(subSlot => {
+                        if (subSlot.SlotPhrase) {
+                            console.log(`  ${subSlot.Slot} (サブ, order:${subSlot.display_order}): "${subSlot.SlotPhrase}"`);
                             subSentenceParts.push(subSlot.SlotPhrase);
                         }
                     });
                     
                     if (subSentenceParts.length > 0) {
                         const subSentence = subSentenceParts.join(' ');
-                        console.log(`${slotName} (サブスロットから): "${subSentence}"`);
-                        sentenceParts.push(subSentence);
+                        console.log(`${slot.Slot} (サブスロットから): "${subSentence}"`);
+                        sentenceParts.push({
+                            text: subSentence,
+                            order: slot.Slot_display_order || 0,
+                            slot: slot.Slot
+                        });
                     }
                 }
             }
         });
         
-        const sentence = sentenceParts.join(' ').trim();
+        // 最終的に order でソートして例文を構築
+        sentenceParts.sort((a, b) => a.order - b.order);
+        
+        const finalParts = sentenceParts.map(part => part.text);
+        const sentence = finalParts.join(' ').trim();
+        
+        console.log(`📝 ソート後の順序:`, sentenceParts.map(part => 
+            `${part.slot}(${part.order}): "${part.text}"`
+        ));
         console.log(`📝 JSONから構築した例文: "${sentence}"`);
-        console.log(`📝 例文パーツ数: ${sentenceParts.length}`);
-        console.log(`📝 例文パーツ詳細:`, sentenceParts);
+        console.log(`📝 例文パーツ数: ${finalParts.length}`);
+        console.log(`📝 例文パーツ詳細:`, finalParts);
         
         if (sentence && !sentence.endsWith('.') && !sentence.endsWith('?') && !sentence.endsWith('!')) {
             return sentence + '.';
