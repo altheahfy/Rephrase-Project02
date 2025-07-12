@@ -79,9 +79,9 @@ class VoiceSystem {
         );
         console.log('🔍 疑問詞スロット検索結果:', questionWordSlot);
         
-        if (questionWordSlot && questionWordSlot.例文) {
-            console.log(`疑問詞: "${questionWordSlot.例文}"`);
-            sentenceParts.push(questionWordSlot.例文);
+        if (questionWordSlot && questionWordSlot.SlotPhrase) {
+            console.log(`疑問詞: "${questionWordSlot.SlotPhrase}"`);
+            sentenceParts.push(questionWordSlot.SlotPhrase);
         }
         
         // 各スロットの例文を順番に取得
@@ -96,11 +96,11 @@ class VoiceSystem {
             
             console.log(`🔍 ${slotName} (${upperCaseSlotName}) スロット検索結果:`, slot);
             
-            if (slot && slot.例文) {
-                console.log(`${slotName}: "${slot.例文}"`);
-                sentenceParts.push(slot.例文);
+            if (slot && slot.SlotPhrase) {
+                console.log(`${slotName}: "${slot.SlotPhrase}"`);
+                sentenceParts.push(slot.SlotPhrase);
             } else {
-                console.log(`⚠️ ${slotName} の上位スロットにデータがありません。サブスロットを確認します。`);
+                console.log(`⚠️ ${slotName} の上位スロットにSlotPhraseがありません。サブスロットを確認します。`);
                 
                 // サブスロットから構築を試す
                 const subSlots = window.lastSelectedSlots.filter(slot => 
@@ -117,9 +117,9 @@ class VoiceSystem {
                         const subSlot = subSlots.find(slot => 
                             slot.Slot === subSlotName.toUpperCase()
                         );
-                        if (subSlot && subSlot.例文) {
-                            console.log(`  ${subSlotName} (サブ): "${subSlot.例文}"`);
-                            subSentenceParts.push(subSlot.例文);
+                        if (subSlot && subSlot.SlotPhrase) {
+                            console.log(`  ${subSlotName} (サブ): "${subSlot.SlotPhrase}"`);
+                            subSentenceParts.push(subSlot.SlotPhrase);
                         }
                     });
                     
