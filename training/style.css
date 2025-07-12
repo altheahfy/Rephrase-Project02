@@ -832,137 +832,156 @@ h2 {
   border-bottom: 1px solid #000;
 }
 
-/* 🔗 エクセル風タブ連結システム（再実装版） */
-
-/* 展開中の上位スロット（親）の基本スタイル */
-.slot-container.active-parent-slot {
-  background: rgba(173, 216, 230, 0.4) !important; /* 薄いブルー背景 */
-  border: 2px solid #87CEEB !important; /* スカイブルー境界線 */
-  border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
-  border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
-  position: relative !important;
-  z-index: 3 !important; /* サブスロットエリアの上に表示 */
-  margin-bottom: 0 !important; /* 下部マージンを除去 */
-  transition: all 0.3s ease !important;
-  box-shadow: 0 -2px 8px rgba(135, 206, 235, 0.3) !important; /* 上部シャドウで浮遊感 */
+/* 🎤 音声学習システム用スタイル */
+#voice-control-panel {
+  border: 2px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
-/* 🎨 親スロット用の拡張背景（包み込み効果） */
-.slot-container.active-parent-slot::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -5px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.3) 0%, rgba(173, 216, 230, 0.1) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-radius: 12px 12px 0 0 !important;
-  border-bottom: none !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
+#voice-control-panel:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
 }
 
-/* 展開中のサブスロットエリア全体のスタイル */
-[id$="-sub"].active-subslot-area,
-.slot-wrapper.active-subslot-area {
-  background: rgba(173, 216, 230, 0.25) !important; /* 親より薄いブルー */
-  border: 2px solid #87CEEB !important;
-  border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
-  border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
-  position: relative !important;
-  margin-top: -2px !important; /* 親スロットとの境界線を重複させる */
-  padding: 20px !important;
-  z-index: 2 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 
-    0 -2px 4px rgba(135, 206, 235, 0.3),  /* 上向きの影で連結感を演出 */
-    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+.voice-btn {
+  background: rgba(255,255,255,0.9);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* 🎨 サブスロットエリア用の拡張背景（包み込み効果の続き） */
-[id$="-sub"].active-subslot-area::before,
-.slot-wrapper.active-subslot-area::before {
-  content: '' !important;
-  position: absolute !important;
-  top: -2px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.1) 0%, rgba(173, 216, 230, 0.3) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-top: none !important;
-  border-radius: 0 0 16px 16px !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
+.voice-btn:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* サブスロットラベルのタブ風デザイン */
-.subslot-label.tab-style {
-  background: rgba(173, 216, 230, 0.6) !important;
-  border: 2px solid #87CEEB !important;
-  border-radius: 8px 8px 0 0 !important;
-  padding: 8px 16px !important;
-  font-weight: bold !important;
-  color: #2E5984 !important;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7) !important;
-  margin-bottom: -2px !important;
-  position: relative !important;
-  z-index: 4 !important;
-  display: inline-block !important;
-  box-shadow: 0 -2px 4px rgba(135, 206, 235, 0.4) !important;
+.voice-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* サブスロットラベルのホバー効果 */
-.subslot-label.tab-style:hover {
-  background: rgba(173, 216, 230, 0.8) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 -4px 8px rgba(135, 206, 235, 0.6) !important;
+.voice-btn.recording {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  animation: pulse 1.5s infinite;
 }
 
-/* 🔗 タブ連結時のアニメーション効果 */
-.slot-container.active-parent-slot,
-[id$="-sub"].active-subslot-area,
-.slot-wrapper.active-subslot-area {
-  animation: tabConnect 0.4s ease-out forwards !important;
+.voice-btn.stop {
+  background: linear-gradient(135deg, #ff4757, #c44569);
+  color: white;
 }
 
-@keyframes tabConnect {
+@keyframes pulse {
   0% {
-    transform: scale(0.98) translateY(2px);
-    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
   }
-  50% {
-    transform: scale(1.01) translateY(-1px);
-    opacity: 0.9;
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
   }
   100% {
-    transform: scale(1) translateY(0);
-    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
   }
 }
 
-/* 🎨 タブ連結時の視覚的な境界線除去 */
-.slot-container.active-parent-slot + [id$="-sub"].active-subslot-area,
-.slot-container.active-parent-slot + .slot-wrapper.active-subslot-area {
-  border-top: 2px solid transparent !important;
-  background-clip: padding-box !important;
+.voice-status {
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  transition: all 0.3s ease;
 }
 
-/* 🔄 タブ連結解除時のフェードアウト効果 */
-.slot-container.tab-disconnecting,
-[id$="-sub"].tab-disconnecting,
-.slot-wrapper.tab-disconnecting {
-  animation: tabDisconnect 0.3s ease-in forwards !important;
+.voice-status.info {
+  background: rgba(33, 150, 243, 0.8);
+  color: white;
 }
 
-@keyframes tabDisconnect {
-  0% {
-    transform: scale(1);
+.voice-status.success {
+  background: rgba(76, 175, 80, 0.8);
+  color: white;
+}
+
+.voice-status.error {
+  background: rgba(244, 67, 54, 0.8);
+  color: white;
+}
+
+.voice-status.recording {
+  background: rgba(255, 107, 107, 0.8);
+  color: white;
+  animation: blink 1s infinite;
+}
+
+.voice-status.playing {
+  background: rgba(156, 39, 176, 0.8);
+  color: white;
+}
+
+.voice-status.speaking {
+  background: rgba(255, 193, 7, 0.8);
+  color: black;
+}
+
+.voice-status.analyzing {
+  background: rgba(96, 125, 139, 0.8);
+  color: white;
+}
+
+.voice-status.stopped {
+  background: rgba(158, 158, 158, 0.8);
+  color: white;
+}
+
+@keyframes blink {
+  0%, 50% {
     opacity: 1;
   }
-  100% {
-    transform: scale(0.98);
-    opacity: 0.7;
+  51%, 100% {
+    opacity: 0.5;
+  }
+}
+
+.analysis-results {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.analysis-results h4 {
+  margin: 0 0 10px 0;
+  color: white;
+  font-size: 16px;
+}
+
+.analysis-item {
+  margin: 5px 0;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.analysis-item:last-child {
+  border-bottom: none;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  #voice-control-panel {
+    padding: 10px;
+  }
+  
+  #voice-control-panel > div:nth-child(2) {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .voice-btn {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 }
