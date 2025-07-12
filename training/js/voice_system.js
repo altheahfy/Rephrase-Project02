@@ -268,6 +268,18 @@ class VoiceSystem {
         if (analyzeBtn) {
             analyzeBtn.addEventListener('click', () => this.analyzeRecording());
         }
+        
+        // パネル開くボタン
+        const openBtn = document.getElementById('voice-panel-open-btn');
+        if (openBtn) {
+            openBtn.addEventListener('click', () => this.showVoicePanel());
+        }
+        
+        // パネル閉じるボタン
+        const closeBtn = document.getElementById('voice-panel-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hideVoicePanel());
+        }
     }
     
     /**
@@ -536,13 +548,9 @@ class VoiceSystem {
             <div class="analysis-results">
                 <h4>📊 音響分析結果</h4>
                 <div class="analysis-item">⏱️ 録音時間: ${analysis.duration.toFixed(2)}秒</div>
-                <div class="analysis-item">🎵 サンプルレート: ${analysis.sampleRate}Hz</div>
-                <div class="analysis-item">🔊 平均音量: ${analysis.averageVolume.toFixed(2)}%</div>
-                <div class="analysis-item">📈 最大振幅: ${analysis.maxAmplitude.toFixed(2)}%</div>
                 <div class="analysis-item">💬 単語数: ${analysis.wordCount}</div>
                 <div class="analysis-item">⚡ 発話速度: ${analysis.wordsPerSecond.toFixed(2)} 語/秒 (${analysis.wordsPerMinute.toFixed(0)} 語/分)</div>
                 <div class="analysis-item">🎯 評価: ${analysis.level}</div>
-                <div class="analysis-item">📝 例文: "${analysis.sentence}"</div>
             </div>
         `;
         
@@ -552,6 +560,39 @@ class VoiceSystem {
         }
         
         this.updateStatus('✅ 分析完了', 'success');
+    }
+    
+    /**
+     * 音声パネルを表示
+     */
+    showVoicePanel() {
+        const panel = document.getElementById('voice-control-panel');
+        if (panel) {
+            panel.style.display = 'block';
+            // アニメーション用のクラスを追加
+            setTimeout(() => {
+                panel.classList.add('show');
+            }, 10);
+        }
+    }
+    
+    /**
+     * 音声パネルを非表示
+     */
+    hideVoicePanel() {
+        const panel = document.getElementById('voice-control-panel');
+        if (panel) {
+            panel.classList.remove('show');
+            // アニメーション完了後に非表示
+            setTimeout(() => {
+                panel.style.display = 'none';
+                // 分析結果もクリア
+                const resultsContainer = document.getElementById('voice-analysis-results');
+                if (resultsContainer) {
+                    resultsContainer.innerHTML = '';
+                }
+            }, 300);
+        }
     }
     
     /**
