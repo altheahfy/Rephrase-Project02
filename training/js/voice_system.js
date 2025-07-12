@@ -17,6 +17,9 @@ class VoiceSystem {
         // 音声合成関連
         this.currentUtterance = null;
         
+        // 🔧 再生用Audioオブジェクト管理
+        this.currentAudio = null;
+        
         this.init();
     }
     
@@ -306,6 +309,9 @@ class VoiceSystem {
         }
         
         try {
+            // 🔧 前回の録音データを完全にクリア
+            this.recordedBlob = null;
+            
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     sampleRate: 44100,
@@ -318,6 +324,7 @@ class VoiceSystem {
                 mimeType: 'audio/webm;codecs=opus'
             });
             
+            // 🔧 新しい録音用のチャンク配列を初期化
             const audioChunks = [];
             
             this.mediaRecorder.ondataavailable = (event) => {
@@ -327,7 +334,10 @@ class VoiceSystem {
             };
             
             this.mediaRecorder.onstop = () => {
+                // 🔧 新しいBlobとして確実に上書き
                 this.recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                console.log('🎤 新しい録音データ作成:', this.recordedBlob.size, 'bytes');
+                
                 this.stopVolumeMonitoring();
                 stream.getTracks().forEach(track => track.stop());
                 this.updateRecordingUI(false);
@@ -372,12 +382,33 @@ class VoiceSystem {
             return;
         }
         
-        const audio = new Audio(URL.createObjectURL(this.recordedBlob));
-        audio.onloadstart = () => this.updateStatus('🔊 録音再生中...', 'playing');
-        audio.onended = () => this.updateStatus('✅ 再生完了', 'success');
-        audio.onerror = () => this.updateStatus('❌ 再生エラー', 'error');
+        // 🔧 前回の再生を停止（既存のAudioオブジェクトをクリア）
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
         
-        audio.play();
+        // 🔧 新しいBlobURLを作成（前回のを確実にクリア）
+        const audioUrl = URL.createObjectURL(this.recordedBlob);
+        this.currentAudio = new Audio(audioUrl);
+        
+        console.log('🔊 再生開始:', this.recordedBlob.size, 'bytes');
+        
+        this.currentAudio.onloadstart = () => this.updateStatus('🔊 録音再生中...', 'playing');
+        this.currentAudio.onended = () => {
+            this.updateStatus('✅ 再生完了', 'success');
+            // 🔧 再生完了後にBlobURLを解放
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        };
+        this.currentAudio.onerror = () => {
+            this.updateStatus('❌ 再生エラー', 'error');
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        };
+        
+        this.currentAudio.play();
     }
     
     /**
@@ -453,6 +484,13 @@ class VoiceSystem {
         // 録音停止
         if (this.isRecording) {
             this.stopRecording();
+        }
+        
+        // 🔧 録音再生停止
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
         }
         
         // 音声合成停止
