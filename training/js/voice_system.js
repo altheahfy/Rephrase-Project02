@@ -384,11 +384,34 @@ class VoiceSystem {
         
         this.currentUtterance = new SpeechSynthesisUtterance(sentence);
         
-        // 音声設定
+        // 音声設定 - 女性の英語音声を優先選択
         const voices = speechSynthesis.getVoices();
-        const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
-        if (englishVoice) {
-            this.currentUtterance.voice = englishVoice;
+        console.log('🔍 利用可能な音声一覧:', voices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
+        
+        // 女性の英語音声を最優先で探す
+        let selectedVoice = voices.find(voice => 
+            voice.lang.startsWith('en') && 
+            (voice.name.toLowerCase().includes('female') || 
+             voice.name.toLowerCase().includes('woman') ||
+             voice.name.toLowerCase().includes('zira') ||  // Microsoft Zira (女性)
+             voice.name.toLowerCase().includes('hazel') || // Microsoft Hazel (女性)
+             voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
+             voice.name.toLowerCase().includes('karen') ||    // macOS Karen (女性)
+             voice.name.toLowerCase().includes('anna') ||     // Anna (女性)
+             voice.name.toLowerCase().includes('linda') ||    // Linda (女性)
+             voice.name.toLowerCase().includes('heather'))    // Heather (女性)
+        );
+        
+        // 女性音声が見つからない場合は、一般的な英語音声を選択
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+        }
+        
+        if (selectedVoice) {
+            this.currentUtterance.voice = selectedVoice;
+            console.log(`🗣️ 選択された音声: ${selectedVoice.name} (${selectedVoice.lang})`);
+        } else {
+            console.log('⚠️ 英語音声が見つかりません。デフォルト音声を使用します。');
         }
         
         this.currentUtterance.rate = 0.8; // 少しゆっくり
@@ -668,6 +691,43 @@ class VoiceSystem {
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
             if (englishVoices.length > 0) {
                 console.log(`🇺🇸 英語音声: ${englishVoices.length}個見つかりました`);
+                console.log('📋 英語音声一覧:');
+                englishVoices.forEach(voice => {
+                    const isFemale = voice.name.toLowerCase().includes('female') || 
+                                   voice.name.toLowerCase().includes('woman') ||
+                                   voice.name.toLowerCase().includes('zira') ||
+                                   voice.name.toLowerCase().includes('hazel') ||
+                                   voice.name.toLowerCase().includes('samantha') ||
+                                   voice.name.toLowerCase().includes('karen') ||
+                                   voice.name.toLowerCase().includes('anna') ||
+                                   voice.name.toLowerCase().includes('linda') ||
+                                   voice.name.toLowerCase().includes('heather');
+                    
+                    const gender = isFemale ? '👩 女性' : '👨 男性/不明';
+                    console.log(`  - ${voice.name} (${voice.lang}) ${gender}`);
+                });
+                
+                // 女性音声をハイライト
+                const femaleVoices = englishVoices.filter(voice => 
+                    voice.name.toLowerCase().includes('female') || 
+                    voice.name.toLowerCase().includes('woman') ||
+                    voice.name.toLowerCase().includes('zira') ||
+                    voice.name.toLowerCase().includes('hazel') ||
+                    voice.name.toLowerCase().includes('samantha') ||
+                    voice.name.toLowerCase().includes('karen') ||
+                    voice.name.toLowerCase().includes('anna') ||
+                    voice.name.toLowerCase().includes('linda') ||
+                    voice.name.toLowerCase().includes('heather')
+                );
+                
+                if (femaleVoices.length > 0) {
+                    console.log(`👩 女性の英語音声: ${femaleVoices.length}個見つかりました`);
+                    console.log('🎯 優先使用される女性音声:', femaleVoices[0].name);
+                } else {
+                    console.log('⚠️ 女性の英語音声が見つかりませんでした。利用可能な英語音声を使用します。');
+                }
+            } else {
+                console.log('⚠️ 英語音声が見つかりませんでした。');
             }
         };
         
