@@ -166,24 +166,23 @@
   <div id="voice-analysis-results"></div>
 </div>
 
-<!-- 音声パネル開くボタン（制御パネルの右側） -->
+<!-- 音声パネル開くボタン（制御パネルの左隣） -->
 <button id="voice-panel-open-btn" style="
   position: fixed;
-  top: 20px;
-  right: 50%;
-  transform: translateX(50%);
+  top: 10px;
+  right: 250px;
   z-index: 14000;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   transition: all 0.2s ease;
-" onmouseover="this.style.transform='translateX(50%) scale(1.05)'" onmouseout="this.style.transform='translateX(50%) scale(1)'">
+" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
   🎤 音声学習
 </button>
 
