@@ -494,12 +494,12 @@ class VoiceTechValidator {
                 this.log('analysis-results', `💬 推定単語数: ${wordCount}`);
                 this.log('analysis-results', `⚡ 発話速度: ${wordsPerSecond.toFixed(2)} 語/秒 (${wordsPerMinute.toFixed(0)} 語/分)`);
                 
-                // レベル評価
+                // レベル評価（一般的な英語学習者データに基づく）
                 let level = '';
-                if (wordsPerSecond < 0.8) level = '初心者レベル';
-                else if (wordsPerSecond < 1.2) level = '中級者レベル';
-                else if (wordsPerSecond < 2.0) level = '上級者レベル';
-                else level = '達人レベル';
+                if (wordsPerSecond < 1.33) level = '初心者レベル (80語/分以下)';
+                else if (wordsPerSecond < 2.17) level = '中級者レベル (130語/分以下)';
+                else if (wordsPerSecond < 2.5) level = '上級者レベル (150語/分以下)';
+                else level = '達人レベル (150語/分超)';
                 
                 this.log('analysis-results', `🎯 評価: ${level}`);
             }
