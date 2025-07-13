@@ -160,31 +160,31 @@ function toggleExclusiveSubslot(slotId) {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
 
-    // ★★★ サブスロット制御パネルの作成は後でDOM再配置後に実行 ★★★
-    // if (window.createSubslotControlPanel) {
-    //   console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
-    //   window.createSubslotControlPanel(slotId);
-    //   
-    //   // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
-    //   if (window.subslotControlPanelVisible) {
-    //     console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
-    //     setTimeout(() => {
-    //       // 作成されたパネルを直接表示
-    //       const newPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
-    //       if (newPanel) {
-    //         newPanel.style.display = 'block';
-    //         console.log(`✅ ${slotId} 制御パネルを直接表示しました`);
-    //       }
-    //       
-    //       // グローバル更新関数も呼び出し
-    //       if (window.updateSubslotControlPanelsVisibility) {
-    //         window.updateSubslotControlPanelsVisibility(true);
-    //       }
-    //     }, 100); // 初回作成時は短時間で実行
-    //   }
-    // } else {
-    //   console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
-    // }
+    // ★★★ サブスロット制御パネルを作成 ★★★
+    if (window.createSubslotControlPanel) {
+      console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
+      window.createSubslotControlPanel(slotId);
+      
+      // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
+      if (window.subslotControlPanelVisible) {
+        console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
+        setTimeout(() => {
+          // 作成されたパネルを直接表示
+          const newPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
+          if (newPanel) {
+            newPanel.style.display = 'block';
+            console.log(`✅ ${slotId} 制御パネルを直接表示しました`);
+          }
+          
+          // グローバル更新関数も呼び出し
+          if (window.updateSubslotControlPanelsVisibility) {
+            window.updateSubslotControlPanelsVisibility(true);
+          }
+        }, 100); // 初回作成時は短時間で実行
+      }
+    } else {
+      console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
+    }
 
     // ★★★ 並べ替え処理を呼び出す（制御パネル作成後）★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -193,32 +193,29 @@ function toggleExclusiveSubslot(slotId) {
       
       // 🎛️ DOM再配置後に制御パネルを再作成
       setTimeout(() => {
-        // 制御パネル再作成時のlocalStorage状態復元
-        console.log(`🔄 DOM再配置後の制御パネル復元開始: ${slotId}`);
-        
-        // localStorage から保存された状態を読み込み
-        let shouldShowPanel = true; // デフォルトは表示
-        if (window.loadSubslotControlPanelState) {
-          const savedState = window.loadSubslotControlPanelState();
-          if (savedState !== null) {
-            shouldShowPanel = savedState;
-            console.log(`📦 localStorage から制御パネル状態を復元: ${shouldShowPanel}`);
-          }
-        }
-        
-        // 既存パネルを削除
-        if (window.removeSubslotControlPanel) {
-          window.removeSubslotControlPanel(slotId);
-        }
-        
-        // 制御パネルを再作成（localStorage状態が確実に反映される）
-        if (window.createSubslotControlPanel) {
-          window.createSubslotControlPanel(slotId);
-          console.log(`✅ DOM再配置後の制御パネル復元完了: ${slotId} (表示: ${shouldShowPanel})`);
+        if (window.subslotControlPanelVisible) {
+          console.log(`🔄 DOM再配置後の制御パネル復元: ${slotId}`);
           
-          // グローバル更新も実行（localStorage状態に基づく）
-          if (window.updateSubslotControlPanelsVisibility) {
-            window.updateSubslotControlPanelsVisibility(shouldShowPanel);
+          // 既存パネルを削除
+          if (window.removeSubslotControlPanel) {
+            window.removeSubslotControlPanel(slotId);
+          }
+          
+          // 制御パネルを再作成
+          if (window.createSubslotControlPanel) {
+            window.createSubslotControlPanel(slotId);
+            
+            // パネルを表示状態で復元
+            const recreatedPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
+            if (recreatedPanel) {
+              recreatedPanel.style.display = 'block';
+              console.log(`✅ DOM再配置後の制御パネル復元完了: ${slotId}`);
+              
+              // グローバル更新も実行
+              if (window.updateSubslotControlPanelsVisibility) {
+                window.updateSubslotControlPanelsVisibility(true);
+              }
+            }
           }
         }
       }, 300); // DOM再配置完了を確実に待つ
@@ -833,34 +830,4 @@ window.testSubslotPosition = function(slotId) {
   }, 1000);
 };
 
-console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPosition('スロットID')`;
-
-/**
- * ★★★ DOM再配置前に制御パネルを作成 ★★★
- */
-window.createSubslotControlPanel = function(slotId) {
-  console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
-  
-  // 既存のパネルがある場合は削除
-  if (window.removeSubslotControlPanel) {
-    window.removeSubslotControlPanel(slotId);
-  }
-  
-  // 新しいパネル要素を作成
-  const panel = document.createElement('div');
-  panel.id = `subslot-visibility-panel-${slotId}`;
-  panel.className = 'subslot-visibility-panel';
-  panel.style.display = window.subslotControlPanelVisible ? 'block' : 'none';
-  
-  // パネルのコンテンツを設定（例: スロットID表示）
-  panel.innerHTML = `<strong>${slotId.toUpperCase()} の制御パネル</strong>`;
-  
-  // スロットに追加
-  const targetSlot = document.getElementById(`slot-${slotId}`);
-  if (targetSlot) {
-    targetSlot.appendChild(panel);
-    console.log(`✅ ${slotId} に制御パネルを追加しました`);
-  } else {
-    console.warn(`⚠ ${slotId} スロットが見つかりません`);
-  }
-};
+console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPosition('スロットID')`);
