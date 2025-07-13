@@ -607,10 +607,7 @@ class VoiceSystem {
         const panel = document.getElementById('voice-control-panel');
         if (panel) {
             panel.style.display = 'block';
-            // アニメーション用のクラスを追加
-            setTimeout(() => {
-                panel.classList.add('show');
-            }, 10);
+            console.log('🎤 音声パネルを表示（インライン）');
         }
     }
     
@@ -620,16 +617,13 @@ class VoiceSystem {
     hideVoicePanel() {
         const panel = document.getElementById('voice-control-panel');
         if (panel) {
-            panel.classList.remove('show');
-            // アニメーション完了後に非表示
-            setTimeout(() => {
-                panel.style.display = 'none';
-                // 分析結果もクリア
-                const resultsContainer = document.getElementById('voice-analysis-results');
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = '';
-                }
-            }, 300);
+            panel.style.display = 'none';
+            // 分析結果もクリア
+            const resultsContainer = document.getElementById('voice-analysis-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+            }
+            console.log('🎤 音声パネルを非表示（インライン）');
         }
     }
     
