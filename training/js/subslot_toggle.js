@@ -160,18 +160,6 @@ function toggleExclusiveSubslot(slotId) {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
 
-    // ★★★ 並べ替え処理を呼び出す ★★★
-    if (window.reorderSubslotsInContainer && window.loadedJsonData) {
-      console.log(`🔄 ${target.id} のサブスロットを並べ替えます`);
-      window.reorderSubslotsInContainer(target, window.loadedJsonData);
-    } else {
-      console.warn("⚠ reorderSubslotsInContainer または window.loadedJsonData が見つかりません");
-    }
-    
-    // ★★★ 空のサブスロット非表示処理を呼び出す ★★★
-    console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
-    hideEmptySubslotsInContainer(target);
-
     // ★★★ サブスロット制御パネルを作成 ★★★
     if (window.createSubslotControlPanel) {
       console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
@@ -192,11 +180,52 @@ function toggleExclusiveSubslot(slotId) {
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(true);
           }
-        }, 150); // パネル作成完了を確実に待つ
+        }, 100); // 初回作成時は短時間で実行
       }
     } else {
       console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
     }
+
+    // ★★★ 並べ替え処理を呼び出す（制御パネル作成後）★★★
+    if (window.reorderSubslotsInContainer && window.loadedJsonData) {
+      console.log(`� ${target.id} のサブスロットを並べ替えます`);
+      window.reorderSubslotsInContainer(target, window.loadedJsonData);
+      
+      // 🎛️ DOM再配置後に制御パネルを再作成
+      setTimeout(() => {
+        if (window.subslotControlPanelVisible) {
+          console.log(`🔄 DOM再配置後の制御パネル復元: ${slotId}`);
+          
+          // 既存パネルを削除
+          if (window.removeSubslotControlPanel) {
+            window.removeSubslotControlPanel(slotId);
+          }
+          
+          // 制御パネルを再作成
+          if (window.createSubslotControlPanel) {
+            window.createSubslotControlPanel(slotId);
+            
+            // パネルを表示状態で復元
+            const recreatedPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
+            if (recreatedPanel) {
+              recreatedPanel.style.display = 'block';
+              console.log(`✅ DOM再配置後の制御パネル復元完了: ${slotId}`);
+              
+              // グローバル更新も実行
+              if (window.updateSubslotControlPanelsVisibility) {
+                window.updateSubslotControlPanelsVisibility(true);
+              }
+            }
+          }
+        }
+      }, 300); // DOM再配置完了を確実に待つ
+    } else {
+      console.warn("⚠ reorderSubslotsInContainer または window.loadedJsonData が見つかりません");
+    }
+    
+    // ★★★ 空のサブスロット非表示処理を呼び出す ★★★
+    console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
+    hideEmptySubslotsInContainer(target);
 
     // ★★★ サブスロット用コントロールパネルを追加 ★★★
     if (window.addSubslotControlPanel) {
