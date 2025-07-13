@@ -6,6 +6,7 @@
    Rephrase トレーニングUI
   </title>
   <link href="style.css" rel="stylesheet"/>
+  <link href="css/voice_progress.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
   </script>
   <script src="js/randomizer_individual.js">
@@ -23,6 +24,10 @@
   <script src="js/question_word_visibility.js">
   </script>
   <script src="js/voice_system.js">
+  </script>
+  <script src="js/voice_progress_tracker.js">
+  </script>
+  <script src="js/voice_progress_ui.js">
   </script>
  </head>
  <body>
@@ -325,6 +330,11 @@
     
     <!-- 分析結果表示エリア -->
     <div id="voice-analysis-results" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 30px; color: #333; font-size: 11px;">分析結果がここに表示されます</div>
+    
+    <!-- 進捗表示ボタン -->
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+      <button id="voice-progress-btn" class="voice-btn" style="background-color: #607D8B; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 学習進捗</button>
+    </div>
   </div>
   
   <section>
@@ -1577,3 +1587,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<!-- 音声学習システムのスクリプト -->
+<script src="js/voice_system.js"></script>
+<script src="js/voice_progress_tracker.js"></script>
+<script src="js/voice_progress_ui.js"></script>
+
+</body>
+</html>

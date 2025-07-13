@@ -928,7 +928,7 @@ class VoiceSystem {
     /**
      * 分析結果を表示（簡潔版）
      */
-    displayAnalysisResults(analysis) {
+    async displayAnalysisResults(analysis) {
         let contentVerificationHtml = '';
         
         if (analysis.qualityIssue) {
@@ -968,6 +968,9 @@ class VoiceSystem {
                 <div class="analysis-item">⚡ 発話速度: ${(analysis.wordsPerMinute || 0).toFixed(0)} 語/分</div>
                 <div class="analysis-item">🎯 評価: ${analysis.level} ${analysis.levelExplanation || ''}</div>
                 ${contentVerificationHtml}
+                <div class="progress-save-status">
+                    <div id="progress-save-message">📊 進捗データを保存中...</div>
+                </div>
             </div>
         `;
         
@@ -976,7 +979,86 @@ class VoiceSystem {
             resultsContainer.innerHTML = resultsHtml;
         }
         
+        // 🎯 進捗追跡システムにデータを自動保存
+        await this.saveProgressData(analysis);
+        
         this.updateStatus('✅ 分析完了', 'success');
+    }
+    
+    /**
+     * 分析結果を進捗追跡システムに保存
+     */
+    async saveProgressData(analysisResult) {
+        try {
+            // 進捗追跡システムが利用可能かチェック
+            if (!window.voiceProgressTracker || !window.voiceProgressTracker.db) {
+                console.log('⚠️ 進捗追跡システムが利用できません');
+                const messageElement = document.getElementById('progress-save-message');
+                if (messageElement) {
+                    messageElement.innerHTML = '⚠️ 進捗追跡システムが無効です';
+                }
+                return;
+            }
+            
+            console.log('💾 進捗データ保存開始:', analysisResult);
+            
+            // 分析結果を保存
+            const savedSession = await window.voiceProgressTracker.saveVoiceSession(analysisResult);
+            
+            console.log('✅ 進捗データ保存完了:', savedSession);
+            
+            // UI更新
+            const messageElement = document.getElementById('progress-save-message');
+            if (messageElement) {
+                messageElement.innerHTML = '✅ 進捗データを保存しました';
+                messageElement.style.color = '#28a745';
+            }
+            
+            // 進捗表示ボタンを表示（まだ存在しない場合）
+            this.showProgressButton();
+            
+        } catch (error) {
+            console.error('❌ 進捗データ保存失敗:', error);
+            
+            const messageElement = document.getElementById('progress-save-message');
+            if (messageElement) {
+                messageElement.innerHTML = '❌ 進捗データ保存失敗';
+                messageElement.style.color = '#dc3545';
+            }
+        }
+    }
+    
+    /**
+     * 進捗表示ボタンを音声パネルに追加
+     */
+    showProgressButton() {
+        // 既にボタンが存在するかチェック
+        if (document.getElementById('voice-progress-btn')) {
+            return;
+        }
+        
+        // ボタンを作成
+        const progressButton = document.createElement('button');
+        progressButton.id = 'voice-progress-btn';
+        progressButton.innerHTML = '📊 進捗表示';
+        progressButton.className = 'voice-btn secondary';
+        progressButton.style.marginTop = '10px';
+        progressButton.style.width = '100%';
+        
+        // イベントリスナーを追加
+        progressButton.addEventListener('click', () => {
+            if (window.voiceProgressUI) {
+                window.voiceProgressUI.showProgressPanel();
+            } else {
+                alert('⚠️ 進捗表示システムが初期化されていません');
+            }
+        });
+        
+        // 音声分析結果エリアに追加
+        const resultsContainer = document.getElementById('voice-analysis-results');
+        if (resultsContainer) {
+            resultsContainer.appendChild(progressButton);
+        }
     }
 
     /**
