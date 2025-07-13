@@ -43,6 +43,9 @@ class VoiceSystem {
         // イベントリスナーを設定
         this.setupEventListeners();
         
+        // 分析ボタンを非表示（リアルタイム認識では不要）
+        this.hideAnalyzeButton();
+        
         console.log('✅ 音声システム初期化完了');
     }
     
@@ -272,12 +275,6 @@ class VoiceSystem {
         const stopBtn = document.getElementById('voice-stop-btn');
         if (stopBtn) {
             stopBtn.addEventListener('click', () => this.stopAll());
-        }
-        
-        // 分析ボタン
-        const analyzeBtn = document.getElementById('voice-analyze-btn');
-        if (analyzeBtn) {
-            analyzeBtn.addEventListener('click', () => this.analyzeRecording());
         }
         
         // パネル開くボタン（トグル機能）
@@ -1735,6 +1732,17 @@ class VoiceSystem {
         };
         
         console.log('✅ 音声認識初期化完了');
+    }
+    
+    /**
+     * 分析ボタンを非表示にする（リアルタイム認識では不要）
+     */
+    hideAnalyzeButton() {
+        const analyzeBtn = document.getElementById('voice-analyze-btn');
+        if (analyzeBtn) {
+            analyzeBtn.style.display = 'none';
+            console.log('🔧 分析ボタンを非表示にしました（自動分析のため不要）');
+        }
     }
 }
 
