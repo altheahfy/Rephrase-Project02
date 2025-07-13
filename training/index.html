@@ -257,6 +257,21 @@
         <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
       </div>
     </div>
+    
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 11px;">
+        <div id="voice-status" class="voice-status info" style="flex: 1; font-size: 10px; padding: 4px 8px;">待機中...</div>
+        <div>⏱️ <span id="voice-recording-timer" style="font-family: monospace; font-weight: bold;">00:00</span></div>
+      </div>
+      
+      <!-- 音量バー -->
+      <div style="background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 10px;">
+        <div id="voice-volume-bar" style="height: 100%; background: #4CAF50; width: 0%; transition: width 0.1s;"></div>
+      </div>
+      
+      <!-- 分析結果（シンプル版） -->
+      <div id="voice-analysis-results" style="font-size: 10px;"></div>
+    </div>
   </div>
   <section>
    <button id="randomize-all">
