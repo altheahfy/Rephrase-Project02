@@ -20,6 +20,11 @@ class VoiceSystem {
         // 🔧 再生用Audioオブジェクト管理
         this.currentAudio = null;
         
+        // 🎤 リアルタイム音声認識
+        this.recognition = null;
+        this.recognizedText = '';
+        this.isRecognitionActive = false;
+        
         this.init();
     }
     
@@ -31,6 +36,9 @@ class VoiceSystem {
         
         // マイクアクセス許可を確認
         await this.checkMicrophonePermission();
+        
+        // 音声認識を初期化
+        this.initSpeechRecognition();
         
         // イベントリスナーを設定
         this.setupEventListeners();
@@ -309,8 +317,9 @@ class VoiceSystem {
         }
         
         try {
-            // 🔧 前回の録音データを完全にクリア
+            // 🔧 前回の録音データと認識結果をクリア
             this.recordedBlob = null;
+            this.recognizedText = '';
             
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -341,7 +350,9 @@ class VoiceSystem {
                 this.stopVolumeMonitoring();
                 stream.getTracks().forEach(track => track.stop());
                 this.updateRecordingUI(false);
-                this.updateStatus('✅ 録音完了', 'success');
+                
+                // 🎯 録音完了時に即座に分析実行
+                this.analyzeRecording();
             };
             
             // 録音開始
@@ -349,12 +360,21 @@ class VoiceSystem {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
             
+            // 🎤 音声認識も同時開始
+            if (this.recognition && !this.isRecognitionActive) {
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    console.warn('⚠️ 音声認識開始失敗:', error.message);
+                }
+            }
+            
             // UI更新
             this.updateRecordingUI(true);
             this.startRecordingTimer();
             this.setupVolumeMonitoring(stream);
             
-            this.updateStatus('🎤 録音開始...', 'recording');
+            this.updateStatus('🎤 録音・認識開始...', 'recording');
             
         } catch (error) {
             console.error('録音開始エラー:', error);
@@ -370,6 +390,15 @@ class VoiceSystem {
             this.mediaRecorder.stop();
             this.isRecording = false;
             this.stopRecordingTimer();
+        }
+        
+        // 🎤 音声認識も停止
+        if (this.recognition && this.isRecognitionActive) {
+            try {
+                this.recognition.stop();
+            } catch (error) {
+                console.warn('⚠️ 音声認識停止失敗:', error.message);
+            }
         }
     }
     
@@ -496,6 +525,15 @@ class VoiceSystem {
         // 音声合成停止
         speechSynthesis.cancel();
         
+        // 🎤 音声認識停止
+        if (this.recognition && this.isRecognitionActive) {
+            try {
+                this.recognition.stop();
+            } catch (error) {
+                console.warn('⚠️ 音声認識停止失敗:', error.message);
+            }
+        }
+        
         // ボリュームモニタリング停止
         this.stopVolumeMonitoring();
         
@@ -503,7 +541,7 @@ class VoiceSystem {
     }
     
     /**
-     * 録音の音響分析
+     * 録音の分析（リアルタイム音声認識結果を使用）
      */
     async analyzeRecording() {
         if (!this.recordedBlob) {
@@ -512,7 +550,7 @@ class VoiceSystem {
         }
         
         try {
-            this.updateStatus('📊 音響分析中...', 'analyzing');
+            this.updateStatus('📊 分析中...', 'analyzing');
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContextClass();
@@ -520,14 +558,98 @@ class VoiceSystem {
             const arrayBuffer = await this.recordedBlob.arrayBuffer();
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
             
-            // 🔄 非同期分析に変更
-            const analysis = await this.performAcousticAnalysis(audioBuffer);
-            this.displayAnalysisResults(analysis);
+            // 期待される文章を取得
+            const expectedSentence = this.getCurrentSentence();
+            const recognizedText = this.recognizedText.trim();
             
+            console.log('� 期待文章:', expectedSentence);
+            console.log('🎯 認識結果:', recognizedText);
+            
+            // 音声品質チェック（最低限のみ）
+            const qualityCheck = this.checkAudioQuality(audioBuffer);
+            
+            let analysisResult;
+            
+            if (!qualityCheck.isAcceptable) {
+                // 音質が悪すぎる場合
+                analysisResult = {
+                    level: '❌ 音質不良',
+                    levelExplanation: '録音品質が悪すぎて判定できません',
+                    expectedSentence,
+                    recognizedText: '',
+                    contentAccuracy: 0,
+                    verificationStatus: '音質不良により判定不可',
+                    duration: audioBuffer.duration,
+                    qualityIssue: qualityCheck.issue
+                };
+            } else if (!recognizedText || recognizedText.length === 0) {
+                // 音声認識結果がない場合
+                analysisResult = {
+                    level: '❌ 音声未検出',
+                    levelExplanation: '音声が認識されませんでした',
+                    expectedSentence,
+                    recognizedText: '',
+                    contentAccuracy: 0,
+                    verificationStatus: '音声認識失敗',
+                    duration: audioBuffer.duration
+                };
+            } else {
+                // 正常に認識された場合の分析
+                const similarity = this.calculateTextSimilarity(expectedSentence, recognizedText);
+                const duration = audioBuffer.duration;
+                const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
+                const actualWordCount = recognizedText.split(/\s+/).length;
+                const wordsPerSecond = actualWordCount / duration;
+                const wordsPerMinute = wordsPerSecond * 60;
+                
+                let level, levelExplanation, verificationStatus;
+                
+                if (similarity < 0.3) {
+                    level = '❌ 内容不一致';
+                    levelExplanation = '発話内容が大きく異なります';
+                    verificationStatus = '内容要確認';
+                } else if (similarity < 0.6) {
+                    level = '⚠️ 内容要改善';
+                    levelExplanation = '発話内容に改善の余地があります';
+                    verificationStatus = '部分的一致';
+                } else {
+                    // 内容が正しい場合のレベル評価
+                    if (wordsPerSecond < 1.33) {
+                        level = '🐌 初心者レベル';
+                        levelExplanation = '(80語/分以下)';
+                    } else if (wordsPerSecond < 2.17) {
+                        level = '📈 中級者レベル';
+                        levelExplanation = '(130語/分以下)';
+                    } else if (wordsPerSecond < 2.5) {
+                        level = '🚀 上級者レベル';
+                        levelExplanation = '(150語/分以下)';
+                    } else {
+                        level = '⚡ 達人レベル';
+                        levelExplanation = '(150語/分超)';
+                    }
+                    verificationStatus = '内容一致確認';
+                }
+                
+                analysisResult = {
+                    duration,
+                    expectedWordCount,
+                    actualWordCount,
+                    wordsPerSecond,
+                    wordsPerMinute,
+                    level,
+                    levelExplanation,
+                    expectedSentence,
+                    recognizedText,
+                    contentAccuracy: similarity,
+                    verificationStatus
+                };
+            }
+            
+            this.displayAnalysisResults(analysisResult);
             await audioContext.close();
             
         } catch (error) {
-            console.error('音響分析エラー:', error);
+            console.error('分析エラー:', error);
             this.updateStatus(`❌ 分析エラー: ${error.message}`, 'error');
         }
     }
@@ -668,6 +790,53 @@ class VoiceSystem {
     }
 
     /**
+     * 音声品質の基本チェック（録音品質が悪すぎる場合のみ判定）
+     */
+    checkAudioQuality(audioBuffer) {
+        const channelData = audioBuffer.getChannelData(0);
+        const duration = audioBuffer.duration;
+        
+        // 音量分析
+        let sumSquared = 0;
+        let maxAmplitude = 0;
+        
+        for (let i = 0; i < channelData.length; i++) {
+            const amplitude = Math.abs(channelData[i]);
+            sumSquared += amplitude * amplitude;
+            maxAmplitude = Math.max(maxAmplitude, amplitude);
+        }
+        
+        const rmsAmplitude = Math.sqrt(sumSquared / channelData.length);
+        const averageVolume = rmsAmplitude * 100;
+        
+        // 録音品質が悪すぎる場合のみチェック
+        if (duration < 0.3) {
+            return {
+                isAcceptable: false,
+                issue: '録音時間が短すぎます（0.3秒未満）'
+            };
+        }
+        
+        if (averageVolume < 0.1) {
+            return {
+                isAcceptable: false,
+                issue: '音量が極めて低く、音声が検出されません'
+            };
+        }
+        
+        if (maxAmplitude < 0.001) {
+            return {
+                isAcceptable: false,
+                issue: '音声信号が検出されません'
+            };
+        }
+        
+        return {
+            isAcceptable: true
+        };
+    }
+    
+    /**
      * 録音時間から内容の妥当性を推定（音声認識の代替手段）
      */
     calculateDurationBasedAccuracy(actualDuration, expectedWordCount) {
@@ -760,51 +929,47 @@ class VoiceSystem {
     }
     
     /**
-     * 分析結果を表示（改良版）
+     * 分析結果を表示（簡潔版）
      */
     displayAnalysisResults(analysis) {
         let contentVerificationHtml = '';
         
-        if (analysis.recognizedText) {
-            // 音声認識成功の場合（現在は無効化されているため使用されない）
+        if (analysis.qualityIssue) {
+            // 音質不良の場合
             contentVerificationHtml = `
                 <div class="content-verification">
-                    <h5>🔍 発話内容検証</h5>
-                    <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
-                    <div class="verification-item"><strong>認識結果:</strong> "${analysis.recognizedText}"</div>
-                    <div class="verification-item"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}% (${analysis.verificationStatus})</div>
+                    <div class="verification-item poor"><strong>品質問題:</strong> ${analysis.qualityIssue}</div>
+                </div>
+            `;
+        } else if (!analysis.recognizedText) {
+            // 音声認識失敗の場合
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <div class="verification-item poor"><strong>認識失敗:</strong> 音声が認識されませんでした</div>
+                    <div class="verification-item info"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
                 </div>
             `;
         } else {
-            // 時間・音質ベース評価の場合
-            const accuracyClass = analysis.contentAccuracy >= 0.8 ? 'good' : 
-                                 analysis.contentAccuracy >= 0.6 ? 'fair' : 'poor';
+            // 正常認識の場合
+            const accuracyClass = analysis.contentAccuracy >= 0.6 ? 'good' : 
+                                 analysis.contentAccuracy >= 0.3 ? 'fair' : 'poor';
             
             contentVerificationHtml = `
                 <div class="content-verification">
-                    <h5>📊 発話品質評価</h5>
                     <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
-                    <div class="verification-item info"><strong>評価方法:</strong> 録音時間と音声品質による包括的評価</div>
-                    <div class="verification-item ${accuracyClass}"><strong>総合評価:</strong> ${analysis.verificationStatus}</div>
-                    <div class="verification-item"><strong>品質スコア:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}%</div>
-                    
-                    <div style="margin-top: 10px; padding: 8px; background: #f0f9ff; border-radius: 6px; font-size: 12px; color: #0369a1;">
-                        💡 <strong>評価について:</strong><br>
-                        • 録音時間が期待される範囲内かを確認<br>
-                        • 音声の明瞭度と音量レベルを評価<br>
-                        • 将来的に音声認識機能を追加予定
-                    </div>
+                    <div class="verification-item"><strong>認識結果:</strong> "${analysis.recognizedText}"</div>
+                    <div class="verification-item ${accuracyClass}"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}%</div>
                 </div>
             `;
         }
         
         const resultsHtml = `
             <div class="analysis-results">
-                <h4>📊 音響分析結果</h4>
+                <h4>📊 発話分析結果</h4>
                 <div class="analysis-item">⏱️ 録音時間: ${analysis.duration.toFixed(2)}秒</div>
-                <div class="analysis-item">💬 期待単語数: ${analysis.expectedWordCount} / 実際: ${analysis.actualWordCount}</div>
-                <div class="analysis-item">⚡ 発話速度: ${analysis.wordsPerSecond.toFixed(2)} 語/秒 (${analysis.wordsPerMinute.toFixed(0)} 語/分)</div>
-                <div class="analysis-item">🎯 評価: ${analysis.level} ${analysis.levelExplanation}</div>
+                <div class="analysis-item">💬 単語数: ${analysis.expectedWordCount || 0} → ${analysis.actualWordCount || 0}</div>
+                <div class="analysis-item">⚡ 発話速度: ${(analysis.wordsPerMinute || 0).toFixed(0)} 語/分</div>
+                <div class="analysis-item">🎯 評価: ${analysis.level} ${analysis.levelExplanation || ''}</div>
                 ${contentVerificationHtml}
             </div>
         `;
@@ -1515,6 +1680,61 @@ class VoiceSystem {
         } else {
             speechSynthesis.onvoiceschanged = updateVoices;
         }
+    }
+    
+    /**
+     * 音声認識を初期化
+     */
+    initSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            console.warn('⚠️ このブラウザは音声認識をサポートしていません');
+            return;
+        }
+        
+        this.recognition = new SpeechRecognition();
+        this.recognition.lang = 'en-US';
+        this.recognition.continuous = true;  // 連続認識
+        this.recognition.interimResults = false; // 最終結果のみ
+        this.recognition.maxAlternatives = 1;
+        
+        // 認識結果を受信
+        this.recognition.onresult = (event) => {
+            let finalTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript + ' ';
+                }
+            }
+            
+            if (finalTranscript.trim()) {
+                this.recognizedText += finalTranscript;
+                console.log('🎯 認識結果追加:', finalTranscript.trim());
+                console.log('🎯 累積認識結果:', this.recognizedText.trim());
+            }
+        };
+        
+        // 認識開始
+        this.recognition.onstart = () => {
+            console.log('🎤 音声認識開始');
+            this.isRecognitionActive = true;
+        };
+        
+        // 認識終了
+        this.recognition.onend = () => {
+            console.log('🔚 音声認識終了');
+            this.isRecognitionActive = false;
+        };
+        
+        // 認識エラー
+        this.recognition.onerror = (event) => {
+            console.warn('⚠️ 音声認識エラー:', event.error);
+            this.isRecognitionActive = false;
+        };
+        
+        console.log('✅ 音声認識初期化完了');
     }
 }
 
