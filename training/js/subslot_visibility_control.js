@@ -587,4 +587,24 @@ function hideAllEnglishInSubslots(parentSlot) {
   console.log(`✅ ${parentSlot}のサブスロット内の全英文例文を非表示にしました`);
 }
 
+// 🎛️ サブスロット制御パネルの表示・非表示を一括制御
+function updateSubslotControlPanelsVisibility(isVisible) {
+  console.log(`🎛️ サブスロット制御パネル表示状態を ${isVisible ? '表示' : '非表示'} に変更`);
+  
+  const subslotPanels = document.querySelectorAll('.subslot-visibility-panel');
+  subslotPanels.forEach(panel => {
+    panel.style.display = isVisible ? 'block' : 'none';
+  });
+  
+  console.log(`✅ ${subslotPanels.length}個のサブスロット制御パネルを更新しました`);
+}
+
+// 🌍 グローバル関数として公開
+window.createSubslotControlPanel = createSubslotControlPanel;
+window.removeSubslotControlPanel = removeSubslotControlPanel;
+window.hideAllSubslotText = hideAllSubslotText;
+window.updateSubslotControlPanelsVisibility = updateSubslotControlPanelsVisibility;
+window.updateSubslotControlPanelsVisibility = updateSubslotControlPanelsVisibility;
+
 console.log("✅ subslot_visibility_control.js が読み込まれました");
+console.log("✅ サブスロット制御関数をグローバルスコープに公開しました");

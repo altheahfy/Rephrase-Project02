@@ -174,6 +174,7 @@
         <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
           <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="image" checked> 🖼️</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄</label>
           </div>
@@ -183,6 +184,7 @@
         <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
           <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="image" checked> 🖼️</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄</label>
           </div>
@@ -192,10 +194,11 @@
         <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
           <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="image" checked> 🖼️</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄</label>
           </div>
-        </div>
+        >
         
         <!-- M2 スロット -->
         <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
@@ -1419,11 +1422,19 @@ document.addEventListener('DOMContentLoaded', function() {
           if (voicePanel && voicePanel.style.display === 'block') {
             voicePanel.style.display = 'none';
           }
+          // サブスロット制御パネルも非表示
+          if (window.updateSubslotControlPanelsVisibility) {
+            window.updateSubslotControlPanelsVisibility(false);
+          }
           toggleControlPanelsBtn.innerHTML = '📝 制御パネル';
           console.log('🔒 制御パネルを非表示にしました');
         } else {
           // パネルを表示する  
           controlPanel.style.display = 'block';
+          // サブスロット制御パネルも表示
+          if (window.updateSubslotControlPanelsVisibility) {
+            window.updateSubslotControlPanelsVisibility(true);
+          }
           toggleControlPanelsBtn.innerHTML = '📝 パネル閉じる';
           console.log('🔓 制御パネルを表示しました');
         }

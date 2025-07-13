@@ -118,6 +118,14 @@ function toggleExclusiveSubslot(slotId) {
     console.log(`🙈 ${target.id} 内の空サブスロットを非表示にします`);
     hideEmptySubslotsInContainer(target);
 
+    // ★★★ サブスロット制御パネルを作成 ★★★
+    if (window.createSubslotControlPanel) {
+      console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
+      window.createSubslotControlPanel(slotId);
+    } else {
+      console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
+    }
+
     // ★★★ サブスロット用コントロールパネルを追加 ★★★
     if (window.addSubslotControlPanel) {
       console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
