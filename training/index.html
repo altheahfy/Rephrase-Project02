@@ -1433,6 +1433,10 @@ document.addEventListener('DOMContentLoaded', function() {
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(false);
           }
+          // 制御パネルの非表示状態をlocalStorageに保存
+          if (window.saveSubslotControlPanelState) {
+            window.saveSubslotControlPanelState(false);
+          }
           toggleControlPanelsBtn.innerHTML = '📝 制御パネル';
           console.log('🔒 制御パネルを非表示にしました');
         } else {
@@ -1441,6 +1445,10 @@ document.addEventListener('DOMContentLoaded', function() {
           // サブスロット制御パネルも表示
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(true);
+          }
+          // 制御パネルの表示状態をlocalStorageに保存
+          if (window.saveSubslotControlPanelState) {
+            window.saveSubslotControlPanelState(true);
           }
           toggleControlPanelsBtn.innerHTML = '📝 パネル閉じる';
           console.log('🔓 制御パネルを表示しました');
@@ -1455,6 +1463,35 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("❌ toggleAllControlPanels関数が見つかりません");
       }
     });
+    
+    // ページ読み込み時にlocalStorageから制御パネルの状態を復元
+    setTimeout(() => {
+      if (window.loadSubslotControlPanelState) {
+        const savedState = window.loadSubslotControlPanelState();
+        if (savedState !== null) {
+          console.log(`🔄 localStorageから制御パネル状態を復元: ${savedState}`);
+          
+          const controlPanel = document.getElementById('visibility-control-panel-inline');
+          if (controlPanel) {
+            if (savedState) {
+              // 表示状態に復元
+              controlPanel.style.display = 'block';
+              if (window.updateSubslotControlPanelsVisibility) {
+                window.updateSubslotControlPanelsVisibility(true);
+              }
+              toggleControlPanelsBtn.innerHTML = '📝 パネル閉じる';
+            } else {
+              // 非表示状態に復元
+              controlPanel.style.display = 'none';
+              if (window.updateSubslotControlPanelsVisibility) {
+                window.updateSubslotControlPanelsVisibility(false);
+              }
+              toggleControlPanelsBtn.innerHTML = '📝 制御パネル';
+            }
+          }
+        }
+      }
+    }, 100); // subslot_visibility_control.jsの読み込みを待つ
     
     console.log("✅ 制御パネル表示/非表示機能を初期化しました");
   } else {
