@@ -288,6 +288,42 @@ class VoiceSystem {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
         }
+        
+        // 学習進捗ボタン（動的に追加される可能性があるため遅延設定）
+        this.setupProgressButtonListener();
+    }
+    
+    /**
+     * 進捗ボタンのイベントリスナーを設定（動的対応）
+     */
+    setupProgressButtonListener() {
+        const setupButton = () => {
+            const progressBtn = document.getElementById('voice-progress-btn');
+            if (progressBtn && !progressBtn.hasAttribute('data-listener-added')) {
+                progressBtn.addEventListener('click', () => this.showProgress());
+                progressBtn.setAttribute('data-listener-added', 'true');
+                console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました');
+                return true;
+            }
+            return false;
+        };
+        
+        // 即座に試行
+        if (!setupButton()) {
+            // ボタンが見つからない場合、定期的にチェック
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (setupButton() || attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    if (attempts >= maxAttempts) {
+                        console.warn('⚠️ 学習進捗ボタンが見つかりませんでした（最大試行回数に達しました）');
+                    }
+                }
+            }, 500);
+        }
     }
     
     /**
@@ -1544,6 +1580,11 @@ class VoiceSystem {
         const panel = document.getElementById('voice-control-panel');
         if (panel) {
             panel.style.display = 'block';
+            
+            // パネルが表示されたので、進捗ボタンのイベントリスナーを再設定
+            setTimeout(() => {
+                this.setupProgressButtonListener();
+            }, 100);
         }
     }
     
@@ -1826,6 +1867,30 @@ class VoiceSystem {
             console.log('🔧 分析ボタンを非表示にしました（自動分析のため不要）');
         }
     }
+    
+    /**
+     * 学習進捗を表示
+     */
+    showProgress() {
+        console.log('📊 学習進捗表示を開始');
+        
+        // VoiceProgressUIが利用可能かチェック
+        if (typeof VoiceProgressUI === 'undefined') {
+            console.error('❌ VoiceProgressUI クラスが読み込まれていません');
+            alert('エラー: 進捗表示システムが読み込まれていません。\nページを再読み込みしてください。');
+            return;
+        }
+        
+        try {
+            // VoiceProgressUIのインスタンスを作成して進捗パネルを表示
+            const progressUI = new VoiceProgressUI();
+            progressUI.showProgressPanel();
+            console.log('✅ 学習進捗パネルを表示しました');
+        } catch (error) {
+            console.error('❌ 進捗表示エラー:', error);
+            alert('進捗表示でエラーが発生しました: ' + error.message);
+        }
+    }
 }
 
 // グローバルインスタンス
@@ -1833,5 +1898,9 @@ let voiceSystem = null;
 
 // DOMロード後に初期化
 document.addEventListener('DOMContentLoaded', () => {
-    voiceSystem = new VoiceSystem();
+    // VoiceProgressTrackerが確実に読み込まれるまで少し待機
+    setTimeout(() => {
+        voiceSystem = new VoiceSystem();
+        console.log('✅ 音声システムを初期化しました');
+    }, 500);
 });
