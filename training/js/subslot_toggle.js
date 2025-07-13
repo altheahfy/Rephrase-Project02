@@ -160,31 +160,31 @@ function toggleExclusiveSubslot(slotId) {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
 
-    // ★★★ サブスロット制御パネルを作成 ★★★
-    if (window.createSubslotControlPanel) {
-      console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
-      window.createSubslotControlPanel(slotId);
-      
-      // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
-      if (window.subslotControlPanelVisible) {
-        console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
-        setTimeout(() => {
-          // 作成されたパネルを直接表示
-          const newPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
-          if (newPanel) {
-            newPanel.style.display = 'block';
-            console.log(`✅ ${slotId} 制御パネルを直接表示しました`);
-          }
-          
-          // グローバル更新関数も呼び出し
-          if (window.updateSubslotControlPanelsVisibility) {
-            window.updateSubslotControlPanelsVisibility(true);
-          }
-        }, 100); // 初回作成時は短時間で実行
-      }
-    } else {
-      console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
-    }
+    // ★★★ サブスロット制御パネルの作成は後でDOM再配置後に実行 ★★★
+    // if (window.createSubslotControlPanel) {
+    //   console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
+    //   window.createSubslotControlPanel(slotId);
+    //   
+    //   // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
+    //   if (window.subslotControlPanelVisible) {
+    //     console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
+    //     setTimeout(() => {
+    //       // 作成されたパネルを直接表示
+    //       const newPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
+    //       if (newPanel) {
+    //         newPanel.style.display = 'block';
+    //         console.log(`✅ ${slotId} 制御パネルを直接表示しました`);
+    //       }
+    //       
+    //       // グローバル更新関数も呼び出し
+    //       if (window.updateSubslotControlPanelsVisibility) {
+    //         window.updateSubslotControlPanelsVisibility(true);
+    //       }
+    //     }, 100); // 初回作成時は短時間で実行
+    //   }
+    // } else {
+    //   console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
+    // }
 
     // ★★★ 並べ替え処理を呼び出す（制御パネル作成後）★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
