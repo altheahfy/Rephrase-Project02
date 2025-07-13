@@ -1067,42 +1067,155 @@ h1 {
   border-bottom: 1px solid #000;
 }
 
-/* 🎤 音声学習シスチE��用スタイル */
-#voice-control-panel {
-  border: 2px solid rgba(255,255,255,0.3);
-  backdrop-filter: blur(10px);
+/* ==============================================
+   🎤 音声システム用スタイル
+   ============================================== */
+
+/* 音声分析結果表示 */
+.analysis-results {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px solid #0284c7;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+.analysis-results h4 {
+  color: #0369a1;
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #0284c7;
+  padding-bottom: 8px;
+}
+
+.analysis-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #7dd3fc;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
   transition: all 0.3s ease;
 }
 
-#voice-control-panel:hover {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  transform: translateY(-2px);
-}
-
-.voice-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: bold;
-  transition: all 0.2s ease;
-}
-
-.voice-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+.analysis-item:hover {
+  background: rgba(255, 255, 255, 0.95);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
 }
 
-.voice-btn:active {
-  transform: translateY(0);
+/* 内容検証セクション */
+.content-verification {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
 }
 
-.voice-btn.recording {
-  background: #ff4444;
-  animation: pulse 1.5s infinite;
+.content-verification h5 {
+  color: #92400e;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.verification-item {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  font-size: 13px;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+.verification-item strong {
+  color: #92400e;
+  font-weight: bold;
+}
+
+/* レベル評価の色分け */
+.analysis-item:has-text("❌ 内容不一致") {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.analysis-item:has-text("⚠️ 内容要改善") {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  color: #d97706;
+}
+
+.analysis-item:has-text("🐌 初心者レベル") {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-color: #6b7280;
+  color: #374151;
+}
+
+.analysis-item:has-text("📈 中級者レベル") {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.analysis-item:has-text("🚀 上級者レベル") {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+  color: #15803d;
+}
+
+.analysis-item:has-text("⚡ 達人レベル") {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+  border-color: #eab308;
+  color: #a16207;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+}
+
+/* 音声ステータス表示 */
+.voice-status {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  transition: all 0.3s ease;
+}
+
+.voice-status.info {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #0284c7;
+}
+
+.voice-status.analyzing {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  animation: pulse 2s infinite;
+}
+
+.voice-status.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #22c55e;
+}
+
+.voice-status.error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #ef4444;
 }
 
 @keyframes pulse {
@@ -1111,814 +1224,36 @@ h1 {
   100% { opacity: 1; }
 }
 
-.voice-status {
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.voice-status.info {
-  background: rgba(33, 150, 243, 0.2);
-  color: white;
-}
-
-.voice-status.recording {
-  background: rgba(255, 68, 68, 0.2);
-  color: white;
-  animation: pulse 1.5s infinite;
-}
-
-.voice-status.playing,
-.voice-status.speaking {
-  background: rgba(76, 175, 80, 0.2);
-  color: white;
-}
-
-.voice-status.success {
-  background: rgba(76, 175, 80, 0.2);
-  color: white;
-}
-
-.voice-status.error {
-  background: rgba(244, 67, 54, 0.2);
-  color: white;
-}
-
-.voice-status.analyzing {
-  background: rgba(156, 39, 176, 0.2);
-  color: white;
-}
-
-.voice-status.stopped {
-  background: rgba(158, 158, 158, 0.2);
-  color: white;
-}
-
-/* 刁E��結果のスタイル�E�シンプル版！E*/
-.analysis-results {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-.analysis-results h4 {
-  margin: 0 0 10px 0;
-  font-size: 14px;
-}
-
-.analysis-item {
-  margin: 6px 0;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-/* パネル表示/非表示アニメーション */
-#voice-control-panel {
+/* 音声ボタンのスタイル強化 */
+.voice-btn {
   transition: all 0.3s ease;
-  opacity: 0;
-  visibility: hidden;
-  transform: translate(-50%, -50%) scale(0.9);
-}
-
-#voice-control-panel.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-#voice-panel-open-btn {
-  transition: all 0.2s ease;
-}
-
-#voice-panel-open-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-}
-
-/* スロチE��画像（褁E��対応）�E共通スタイル */
-.slot-image {
-  display: inline-block;
-  margin-right: 4px;
-  max-height: 150px !important; /* 強制適用 */
-  max-width: 160px !important; /* 幁E��制陁E*/
-  min-height: 120px !important; /* 最小高さを保証 */
-  min-width: 120px !important; /* 最小幁E��保証 */
-  vertical-align: middle;
-}
-
-/* 🖼�E�E褁E��画像表示シスチE��用スタイル */
-.multi-image-container {
-  /* Grid Layout対忁E イラスト領域�E�衁E�E�に配置 */
-  grid-row: 2;
-  grid-column: 1;
-  display: flex;
-  gap: 6px; /* 画像間の間隔を調整 */
-  align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap !important; /* 🎯 折り返しを禁止して横一列に */
-  width: 100%;
-  height: 180px !important; /* 🎯 Grid衁Eの高さと完�E一致 */
-  padding: 5px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  background: rgba(40, 167, 69, 0.05);
-  border: 1px dashed rgba(40, 167, 69, 0.3);
-  /* 🚫 スクロールバ�Eを削除 - 代わりに画像サイズを動皁E��整 */
-  overflow: hidden; /* スクロールを完�Eに無効匁E*/
-}
-
-.slot-multi-image {
-  /* 🎯 縦は常に枠ぁE��ぱぁE��横は画像枚数に応じて動的調整 */
-  height: 160px !important; /* 🎯 縦は固定（スロチE��枠ぁE��ぱぁE��E*/
-  width: auto !important; /* 🎯 横幁E�E動的計算で設定！ES側で制御�E�E*/
-  max-width: none !important; /* 最大横幁E��限なぁE*/
-  min-width: 50px !important; /* 最小横幁E�Eみ設定（極端に細くなることを防ぐ！E*/
-  border-radius: 5px;
-  border: 1px solid rgba(40, 167, 69, 0.6);
-  object-fit: fill !important; /* 🎯 画像を強制皁E��持E��サイズに変形�E�縦横比無視！E*/
-  display: block;
-  visibility: visible;
-  opacity: 1;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, width 0.3s ease;
-  flex-shrink: 1; /* 🎯 フレチE��スアイチE��として縮小可能 */
-}
-
-.slot-multi-image:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border-color: rgba(40, 167, 69, 0.8);
-}
-
-/* 褁E��画像表示時�E単一画像を非表示にする */
-.slot-container:has(.multi-image-container) .slot-image {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* 褁E��画像表示時にコンチE��を確実に表示 */
-.slot-container .multi-image-container {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* スロチE��全体�E調整が忁E��な場合に備えた汎用クラス */
-.slot-container {
-  /* 🎯 CSS Gridで完�Eに6行固定レイアウトを実裁E*/
-  display: grid;
-  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 画像以外�E行も拡大して全体�Eバランスを調整 */
-  grid-template-columns: 1fr;
-  gap: 6px; /* 行間も少し拡大 */
-  align-items: center; /* 吁E��ル冁E��の中央揁E�� */
-  justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
-  
-  /* order属性への対応を追加 */
-  order: 0; /* チE��ォルト値 */
-  border: 1px solid #eee; /* 墁E��線を追加して区別しやすく */
-  padding: 15px; /* パディングも拡大 */
-  margin: 4px 4px 20px 4px; /* 下部マ�Eジンを拡大 */
-  
-  /* �E 動的幁E��整シスチE�� - 褁E��画像対応で大幁E��大 */
-  min-width: 160px; /* 最小幁E��拡大 */
-  width: auto; /* 自動幁E��整 */
-  max-width: 1000px; /* 🎯 褁E��画像表示のためさらに拡大 */
-  flex: 0 0 auto; /* flexアイチE��として自動サイズ */
-  
-  /* アニメーション */
-  transition: opacity 0.2s ease-out, width 0.3s ease;
-  
-  /* �E スロチE��全体�E高さを適刁E��設宁E*/
-  height: auto; /* 自動高さ調整 */
-  min-height: 380px; /* 全ての要素が確実に表示される最小高さ */
-  box-sizing: border-box;
-}
-
-/* 🎯 Grid衁E: スロチE��名（忁E��1番目に配置�E�E*/
-.slot-container label {
-  grid-row: 1;
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%; /* セル高さを完�Eに使用 */
-  font-size: 18px; /* フォントサイズを拡大 */
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  line-height: 1.2;
-}
-
-/* 🎯 Grid衁E: イラスト領域�E�忁E��2番目に配置�E�E*/
-.slot-container .slot-image {
-  grid-row: 2;
-  grid-column: 1;
-  display: block;
-  width: 160px !important; /* 強制適用 */
-  height: 150px !important; /* 強制適用 */
-  max-width: 160px !important;
-  max-height: 150px !important;
-  min-width: 120px !important;
-  min-height: 120px !important;
-  object-fit: contain;
-  margin: 0;
-  padding: 0;
-  /* イラストが無ぁE��合�E透�Eスペ�Eス確俁E*/
-  background: transparent;
-  border: 1px solid #f0f0f0; /* 枠を追加してサイズを視覚化 */
-}
-
-/* 🎯 Grid衁E: 英語テキスト（忁E��3番目に配置�E�E*/
-.slot-container .slot-text {
-  grid-row: 3;
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%; /* セル高さを完�Eに使用 */
-  font-size: 11px; /* 日本語補助チE��スト用に小さぁE*/
-  font-weight: 400;
-  color: #777;
-  text-align: center;
-  margin: 0;
-  padding: 4px;
-  line-height: 1.1;
-  /* 長ぁE��キスト�E折り返し */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
-/* 🎯 Grid衁E: 日本語補助チE��スト（忁E��4番目に配置�E�E*/
-.slot-container .slot-phrase {
-  grid-row: 4;
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%; /* セル高さを完�Eに使用 */
-  font-size: 16px; /* �E フォントサイズを調整 */
-  font-weight: 600;
-  color: #222;
-  text-align: center;
-  margin: 0;
-  padding: 2px; /* �E パディングを追加 */
-  line-height: 1.2;
-  
-  /* �E 長ぁE��キスト対忁E*/
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  white-space: normal; /* 改行を許可 */
-  
-  /* �E 例文チE��ストエリアを�E確にする薁E��オレンジの背景と黒い緁E*/
-  background-color: #ffd6a5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-}
-
-/* スロチE��頁E��制御用 - JS側でdata-order属性を設定した場合�E優先度 */
-[data-order] {
-  order: attr(data-order number, 0);
-}
-
-
-/* Slot label for identifying slotKey (e.g., m1, s, o1) */
-.slot-label {
-  font-size: 12px;
-  font-weight: bold;
-  color: #444;
-  margin-bottom: 4px;
-}
-
-
-/* 非表示制御用クラス */
-.hidden {
-  display: none;
-}
-
-.slot-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-direction: column; /* 上から下への流れを確俁E*/
-}
-
-/* subslot 表示安定化のための共通構造 */
-.subslot {
-  min-width: 80px;
-  min-height: 100px;
-  padding: 4px;
-  margin: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* .subslot冁E�E画像も大きくする */
-.subslot .slot-image {
-  width: 160px !important; /* 強制適用 */
-  height: 150px !important; /* 強制適用 */
-  max-width: 160px !important;
-  max-height: 150px !important;
-  min-width: 120px !important;
-  min-height: 120px !important;
-  object-fit: contain;
-}
-
-/* サブスロチE��展開エリアは初期状態では非表示に */
-[id^="slot-"][id$="-sub"] {
-  display: none !important; /* 初期状態では忁E��非表示 */
-  visibility: hidden; /* 視覚的にも隠ぁE*/
-}
-
-/* JavaScriptで表示された場合�Eみ有効になるスタイル */
-[id^="slot-"][id$="-sub"].visible {
-  display: flex !important;
-  flex-wrap: wrap; /* サブスロチE��が多すぎる場合に折り返す */
-  gap: 8px; /* サブスロチE��間�E隙間 */
-  visibility: visible !important;
-  align-content: flex-start; /* �E 折り返した行を上詰めで配置し、不要な空間を防ぁE*/
-}
-
-/* 高さ潰れ�E透�E化�E折り返し不備の対処 */
-.slot-wrapper {
-  min-height: 100px;
-  visibility: visible;
-  flex-wrap: nowrap; /* �E 横並びで折り返さなぁE*/
-  flex-direction: row !important; /* 強制皁E��横並びに */
-  display: flex !important; /* flex表示を強制 */
-  align-items: flex-start;
-  justify-content: flex-start; /* 左揁E�� */
-  gap: 12px; /* スロチE��間�E間隔 */
-  
-  /* �E 横スクロール対忁E*/
-  overflow-x: auto; /* 横スクロールを有効匁E*/
-  overflow-y: hidden; /* 縦スクロールは無効 */
-  padding-bottom: 10px; /* スクロールバ�E用の余白 */
-  
-  /* �E スクロールバ�Eのスタイル改喁E��Eebkit系ブラウザ�E�E*/
-  scrollbar-width: thin; /* Firefox */
-}
-
-/* �E Webkit系ブラウザでのスクロールバ�Eスタイル */
-.slot-wrapper::-webkit-scrollbar {
-  height: 8px;
-}
-
-.slot-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.slot-wrapper::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.slot-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-/* subslot 冁E�Eラベル表示用スタイル */
-.subslot label {
-  display: block;
-  font-size: 13px;
-  font-weight: bold;
-  margin-bottom: 4px;
-  color: #333;
-  text-align: center;
-}
-
-
-/* 🎯 Grid衁E: 詳細ボタン�E�忁E��5番目に配置�E�E サブスロチE��有無で動的表示 */
-.slot-container .subslot-toggle-button {
-  grid-row: 5;
-  grid-column: 1;
-  width: 100%;
-  height: 100%; /* セル高さを完�Eに使用 */
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.slot-container .subslot-toggle-button button {
-  font-size: 10px;
-  padding: 2px 8px;
-  margin: 0;
-  min-height: 18px;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 3px;
+  border-radius: 8px;
+  font-size: 16px;
+  padding: 10px 15px;
+  border: 2px solid;
   cursor: pointer;
+  font-weight: bold;
 }
 
-/* 🎯 Grid衁E: 個別ランダマイズボタン�E�忁E��6番目に配置�E�E 常に表示 */
-.slot-container .individual-randomize-button {
-  grid-row: 6;
-  grid-column: 1;
-  width: 100%;
-  height: 100%; /* セル高さを完�Eに使用 */
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.voice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.slot-container .individual-randomize-button button {
-  font-size: 11px;
-  padding: 2px 8px;
-  margin: 0;
-  min-height: 18px;
-  background-color: #ff9800;
+.voice-btn:active {
+  transform: translateY(0);
+}
+
+/* 録音中状態のスタイル */
+.voice-btn.recording {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
+  border-color: #dc2626;
+  animation: recordingPulse 1.5s infinite;
 }
 
-/* 動的記載エリアを横並びに設宁E- 位置の修正 */
-#dynamic-slot-area {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 5px; /* 允E�E値に戻ぁE*/
-  padding-top: 10px; /* 允E�E値に戻ぁE*/
-  padding-bottom: 24px;
-  /* 点線を削除 */
-  position: relative; /* 位置関係�E制御のため */
-  clear: both; /* 他�E要素の影響を受けなぁE��ぁE�� */
-  order: 9999; /* 表示優先度を最低に設定（一番最後に表示�E�E*/
+@keyframes recordingPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
-
-/* 動的記載エリア冁E�EスロチE��要素のスタイル */
-#dynamic-slot-area .slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 120px;
-  max-width: 200px;
-  border: 1px solid #ddd;
-  padding: 8px;
-  margin: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* 動的エリア冁E�Esubslotのスタイル */
-#dynamic-slot-area .subslot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 120px;
-  border: 1px solid #eee;
-  padding: 8px;
-  margin: 4px;
-}
-
-/* 動的記載エリアのタイトルを削除 */
-#dynamic-slot-area::before {
-  display: none;
-}
-
-/* 全サブスロチE��展開エリアのコンチE��スタイル */
-[id$="-sub"] {
-  margin-bottom: 24px; /* 展開エリア間�E間隔を確俁E*/
-  border-bottom: 1px solid #eee;
-  padding-bottom: 16px;
-}
-
-/* 動的記載エリアのコンチE��要素のスタイル強匁E*/
-#dynamic-area-container {
-  margin-top: 40px; /* 允E�E値に戻ぁE*/
-  padding-top: 20px; /* 允E�E値に戻ぁE*/
-  border-top: 2px solid #666; /* 区刁E��線を簡素匁E*/
-  position: relative;
-  clear: both;
-  display: block;
-  order: 9999; /* フレチE��スコンチE��冁E��確実に最後に配置 */
-  z-index: 1; /* z-indexを低めに設宁E*/
-  
-  /* ビジュアルマ�Eカーの追加�E�デバッグ用�E�E*/
-  position: relative;
-}
-
-/* 動的エリアの前�E区刁E��線を削除 */
-#dynamic-area-container::before {
-  /* グレーの実線を削除 */
-  display: none;
-}
-
-/* 空のスロチE��非表示機構用のスタイル */
-.empty-slot-hidden {
-  display: none !important;
-  visibility: hidden;
-}
-
-.display-at-top-hidden {
-  display: none !important;
-  visibility: hidden;
-}
-
-.empty-container-hidden {
-  display: none !important;
-  visibility: hidden;
-}
-
-/* 🔹 刁E��疑問詞エリアの非表示状慁E*/
-#display-top-question-word.empty-slot-hidden,
-#display-top-question-word.hidden {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* 🔥 静的スロチE��エリアのスマ�Eト表示制御 */
-/* 空のスロチE��を動皁E��非表示にするクラス */
-.slot-container.empty-slot {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* 静的スロチE��エリアの基本表示設定�E上部のCSS Gridで定義済み */
-
-/* 空スロチE��判定時に適用されるスタイル�E�グレー枠を完�Eに非表示�E�E*/
-.slot-container.hidden-empty {
-  display: none !important;
-  visibility: hidden !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* 古ぁE�E離疑問詞スタイルを削除 - 新しいGrid構造が下で定義済み */
-
-/* 古ぁE��問詞要素スタイルを削除 - 新しいGrid構造が下で定義済み */
-
-/* アニメーション効果（オプション - 封E��の拡張用�E�E*/
-.slot-container.fade-out {
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-}
-
-.slot-container.fade-in {
-  opacity: 1;
-  transition: opacity 0.3s ease-in;
-}
-
-/* 🎯 統一された表示制御シスチE�� */
-
-/* 上位スロチE��用の汎用表示制御 */
-.slot-container.hidden-auxtext .slot-text { display: none !important; }
-.slot-container.hidden-text > .slot-phrase { display: none !important; }
-
-/* サブスロチE��用の汎用表示制御�E�Epacity統一�E�E*/
-.subslot.hidden-auxtext .slot-text { display: none !important; }
-/* サブスロチE��の一般皁E��hidden-textクラス - 無効匁E*/
-/* .subslot.hidden-text > .slot-phrase { opacity: 0 !important; } */
-
-/* サブスロチE��表示制御 - 統一版（古ぁE��ールは削除済み�E�E*/
-[id*="-sub-"].hidden-auxtext .slot-text { display: none !important; }
-/* 一般皁E��hidden-textクラス - 無効化（制御パネル専用を優先！E*/
-/* [id*="-sub-"].hidden-text > .slot-phrase { opacity: 0 !important; } */
-
-/* 🎛�E�EサブスロチE��制御パネル専用クラス�E�Eidden-subslot-xxxシリーズ�E�E*/
-[id*="-sub-"].hidden-subslot-auxtext .slot-text { display: none !important; }
-/* 制御パネル専用チE��スト制御は最上部で定義済み */
-
-/* 🤁E画像�E動非表示機槁E*/
-/* プレースホルダー画像�Eエラー画像�E無効画像�E自動非表示 */
-.slot-image.auto-hidden-image {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* 🎨 メタタグ画像�E常に表示�E�Euto-hidden-image を上書き！E*/
-.slot-image[data-meta-tag="true"] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 160px !important; /* サイズも強制適用 */
-  height: 150px !important;
-  max-width: 160px !important;
-  max-height: 150px !important;
-  min-width: 120px !important;
-  min-height: 120px !important;
-}
-
-/* 手動制御と自動制御の優先度制御 */
-/* 手動制御が優先される�E�手動非表示が設定されてぁE��場合�E自動制御を無効化！E*/
-.slot-container.hidden-image .slot-image.auto-hidden-image,
-.slot-container[class*="hidden-"][class*="-image"] .slot-image.auto-hidden-image {
-  /* 手動制御が設定されてぁE��場合�E自動制御クラスを無効匁E*/
-  display: none !important; /* 手動制御の結果を優允E*/
-}
-
-/* メタタグ画像�E手動制御も上書ぁE*/
-.slot-container.hidden-image .slot-image[data-meta-tag="true"],
-.slot-container[class*="hidden-"][class*="-image"] .slot-image[data-meta-tag="true"] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* 🎯 サブスロチE��コントロールパネルを下�Eに配置�E�静皁E��リア限定！E*/
-/* #dynamic-slot-area の子孫ではなぁE[id$="-sub"] 冁E�Eパネルのみを対象とする */
-[id$="-sub"]:not(#dynamic-slot-area *) .subslot-visibility-panel {
-  /* flexコンチE��の幁E��100%にすることで、強制皁E��新しい行に折り返させる */
-  flex-basis: 100%;
-  /* 他�EサブスロチE��より後に表示されるよぁE��頁E��を最大にする */
-  order: 999; 
-  margin-top: 16px;
-  
-  /* �E レイアウト調整�E�中央揁E��と背景色変更�E�Eimportantで強制適用�E�E*/
-  width: auto !important; /* 幁E��自動調整 */
-  margin-left: auto !important; /* 中央揁E�� */
-  margin-right: auto !important; /* 中央揁E�� */
-  background-color: white !important; /* 背景色を白に */
-  padding: 10px !important; /* 冁E�E余白 */
-  border: 1px solid #ddd !important; /* 枠線を追加 */
-  border-radius: 5px !important; /* 角を丸める */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* 上位パネルと影を合わせめE*/
-}
-
-/* 🔹 刁E��疑問詞エリアのスタイル - 他�EスロチE��と同じ高さに調整 */
-#display-top-question-word {
-  display: none !important; /* 初期状態�E非表示 */
-  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 🎯 他�EスロチE��と同じ6行構造 */
-  grid-template-columns: 1fr;
-  gap: 6px; /* 🎯 他�EスロチE��と同じgap */
-  width: auto !important; /* �E 自動幁E��整 */
-  min-width: 140px !important; /* �E 最小幁E*/
-  max-width: none !important; /* �E 最大幁E��限なぁE*/
-  height: auto !important; /* 🎯 自動高さ調整 */
-  min-height: 380px !important; /* 🎯 他�EスロチE��と同じ最小高さ */
-  margin: 4px 4px 20px 4px !important; /* 🎯 他�EスロチE��と同じマ�Eジン */
-  padding: 15px !important; /* 🎯 他�EスロチE��と同じパディング */
-  border: 1px solid #eee !important; /* スロチE��と同じボ�Eダー */
-  border-radius: 0 !important; /* スロチE��と同じ角丸なぁE*/
-  background-color: white !important; /* 背景色を白に統一 */
-  align-items: center;
-  justify-items: center;
-  box-sizing: border-box !important;
-  order: -1 !important; /* 他�EスロチE��より前に表示 */
-  transition: grid-template-rows 0.3s ease; /* 行�E高さ変更時�Eアニメーション */
-}
-
-/* JavaScriptで表示された場合�Eみ有効になるスタイル */
-#display-top-question-word.visible {
-  display: grid !important;
-}
-
-/* 🔧 補助チE��スト非表示時�E行�E高さ制御 */
-#display-top-question-word.hide-auxtext {
-  grid-template-rows: 30px 180px 0px 30px 30px 30px; /* 🎯 3行目�E�補助チE��スト行）を0pxに */
-}
-
-/* 疑問詞ラベル - Grid衁E */
-#display-top-question-word .question-word-label {
-  grid-row: 1;
-  font-size: 18px; /* スロチE��ラベルと同じサイズ */
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-/* 疑問詞画像エリア - Grid衁E */
-#display-top-question-word .question-word-image {
-  grid-row: 2;
-  max-height: 150px !important; /* 🎯 他�EスロチE��画像と同じサイズ */
-  max-width: 160px !important; /* 🎯 他�EスロチE��画像と同じサイズ */
-  min-height: 120px !important; /* 🎯 他�EスロチE��画像と同じサイズ */
-  min-width: 120px !important; /* 🎯 他�EスロチE��画像と同じサイズ */
-  background: transparent;
-  border: 1px solid #f0f0f0; /* スロチE��画像と同じ枠 */
-}
-
-/* 疑問詞日本語補助チE��スチE- Grid衁E */
-#display-top-question-word .question-word-auxtext {
-  grid-row: 3;
-  grid-column: 1;
-  font-size: 11px; /* スロチE��の補助チE��ストと同じサイズ */
-  font-weight: 400;
-  color: #777;
-  text-align: center;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  margin: 0;
-  padding: 4px; /* スロチE��の補助チE��ストと同じパディング */
-  line-height: 1.1; /* スロチE��の補助チE��ストと同じ行髁E*/
-}
-
-/* 疑問詞英語テキスチE- Grid衁E */
-#display-top-question-word .question-word-text {
-  grid-row: 4;
-  font-size: 20px; /* 適度なサイズに調整 */
-  font-weight: 600; /* スロチE��の英語テキストと同じ重み */
-  color: #222;
-  text-align: center;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  line-height: 1.2; /* スロチE��の英語テキストと同じ行髁E*/
-  
-  /* �E 例文チE��ストエリアを�E確にする薁E��オレンジの背景と黒い緁E*/
-  background-color: #ffd6a5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-}
-
-/* 疑問詞�Eタンプレースホルダー - Grid衁E,6�E�空のスペ�Eス�E�E*/
-#display-top-question-word .question-word-button-placeholder {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-#display-top-question-word .question-word-button-placeholder:nth-of-type(5) {
-  grid-row: 5;
-}
-
-#display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
-  grid-row: 6;
-}
-
-/* 🎯 サブスロチE��専用の4行CSS GridレイアウチE*/
-.subslot-container {
-  /* CSS Gridで4行固定レイアウトを実裁E��詳細・ランダマイズボタンなし！E*/
-  display: grid;
-  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px ↁE180px にさらに拡大 */
-  grid-template-columns: 1fr;
-  gap: 4px; /* 行間の固定間隁E*/
-  align-items: center; /* 吁E��ル冁E��の中央揁E�� */
-  justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
-  
-  /* スタイリング */
-  border: 1px solid #eee; /* 墁E��線を追加 */
-  padding: 10px;
-  margin: 4px;
-  
-  /* 動的幁E��整シスチE�� */
-  min-width: 120px; /* 最小幁E*/
-  width: auto; /* 自動幁E��整 */
-  max-width: 400px; /* 最大幁E*/
-  flex: 0 0 auto; /* flexアイチE��として自動サイズ */
-  
-  /* アニメーション */
-  transition: opacity 0.2s ease-out, width 0.3s ease;
-  
-  /* 固定高さ�E�E行構造�E�E*/
-  height: 279px; /* 30+180+20+25+gap+padding に更新 */
-  box-sizing: border-box;
-}
-
-/* サブスロチE��のスロチE��吁E- Grid衁E */
-.subslot-container label {
-  grid-row: 1;
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-size: 16px; /* 上位スロチE��より少し小さぁE*/
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  line-height: 1.2;
-}
-
-/* サブスロチE��のイラスチE- Grid衁E */
-.subslot-container img.slot-image {
-  grid-row: 2;
-  grid-column: 1;
-  width: 160px !important;

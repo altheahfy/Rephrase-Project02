@@ -520,7 +520,8 @@ class VoiceSystem {
             const arrayBuffer = await this.recordedBlob.arrayBuffer();
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
             
-            const analysis = this.performAcousticAnalysis(audioBuffer);
+            // 🔄 非同期分析に変更
+            const analysis = await this.performAcousticAnalysis(audioBuffer);
             this.displayAnalysisResults(analysis);
             
             await audioContext.close();
@@ -532,9 +533,9 @@ class VoiceSystem {
     }
     
     /**
-     * 音響分析を実行
+     * 音響分析を実行（内容検証機能付き）
      */
-    performAcousticAnalysis(audioBuffer) {
+    async performAcousticAnalysis(audioBuffer) {
         const duration = audioBuffer.duration;
         const sampleRate = audioBuffer.sampleRate;
         const channelData = audioBuffer.getChannelData(0);
@@ -552,43 +553,113 @@ class VoiceSystem {
         const rmsAmplitude = Math.sqrt(sumSquared / channelData.length);
         const averageVolume = rmsAmplitude * 100;
         
-        // 発話速度分析
-        const sentence = this.getCurrentSentence();
-        const wordCount = sentence ? sentence.trim().split(/\s+/).length : 0;
-        const wordsPerSecond = wordCount / duration;
+        // 期待される文章を取得
+        const expectedSentence = this.getCurrentSentence();
+        const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
+        
+        // 🔍 音声認識による内容検証を試行
+        let recognizedText = '';
+        let contentAccuracy = 1.0; // デフォルトは100%（音声認識が利用できない場合）
+        let verificationStatus = '音声認識未実行';
+        
+        try {
+            recognizedText = await this.recognizeSpeechFromBlob(this.recordedBlob);
+            console.log(`🎯 期待文章: "${expectedSentence}"`);
+            console.log(`🎤 認識結果: "${recognizedText}"`);
+            
+            if (recognizedText) {
+                contentAccuracy = this.calculateTextSimilarity(expectedSentence, recognizedText);
+                verificationStatus = contentAccuracy >= 0.7 ? '内容一致' : '内容不一致';
+                console.log(`📊 内容一致度: ${(contentAccuracy * 100).toFixed(1)}%`);
+            } else {
+                verificationStatus = '音声認識失敗';
+            }
+        } catch (error) {
+            console.log('⚠️ 音声認識エラー:', error.message);
+            verificationStatus = '音声認識エラー';
+        }
+        
+        // 発話速度分析（認識された内容または期待される内容を使用）
+        let actualWordCount = expectedWordCount;
+        if (recognizedText && contentAccuracy >= 0.5) {
+            actualWordCount = recognizedText.trim().split(/\s+/).length;
+        }
+        
+        const wordsPerSecond = actualWordCount / duration;
         const wordsPerMinute = wordsPerSecond * 60;
         
-        // レベル評価
+        // 🎯 改良された評価システム
         let level = '';
-        if (wordsPerSecond < 1.33) level = '初心者レベル (80語/分以下)';
-        else if (wordsPerSecond < 2.17) level = '中級者レベル (130語/分以下)';
-        else if (wordsPerSecond < 2.5) level = '上級者レベル (150語/分以下)';
-        else level = '達人レベル (150語/分超)';
+        let levelExplanation = '';
+        
+        if (contentAccuracy < 0.5) {
+            level = '❌ 内容不一致';
+            levelExplanation = '発話内容が期待される文章と大きく異なります';
+        } else if (contentAccuracy < 0.7) {
+            level = '⚠️ 内容要改善';
+            levelExplanation = '発話内容に改善の余地があります';
+        } else {
+            // 内容が正しい場合のみ速度評価
+            const adjustedSpeed = wordsPerSecond * contentAccuracy; // 精度で補正
+            
+            if (adjustedSpeed < 1.33) {
+                level = '🐌 初心者レベル';
+                levelExplanation = '(80語/分以下)';
+            } else if (adjustedSpeed < 2.17) {
+                level = '📈 中級者レベル';
+                levelExplanation = '(130語/分以下)';
+            } else if (adjustedSpeed < 2.5) {
+                level = '🚀 上級者レベル';
+                levelExplanation = '(150語/分以下)';
+            } else {
+                level = '⚡ 達人レベル';
+                levelExplanation = '(150語/分超)';
+            }
+        }
         
         return {
             duration,
             sampleRate,
             averageVolume,
             maxAmplitude: maxAmplitude * 100,
-            wordCount,
+            expectedWordCount,
+            actualWordCount,
             wordsPerSecond,
             wordsPerMinute,
             level,
-            sentence
+            levelExplanation,
+            expectedSentence,
+            recognizedText,
+            contentAccuracy,
+            verificationStatus
         };
     }
     
     /**
-     * 分析結果を表示
+     * 分析結果を表示（改良版）
      */
     displayAnalysisResults(analysis) {
+        const contentVerificationHtml = analysis.recognizedText ? `
+            <div class="content-verification">
+                <h5>🔍 発話内容検証</h5>
+                <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
+                <div class="verification-item"><strong>認識結果:</strong> "${analysis.recognizedText}"</div>
+                <div class="verification-item"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}% (${analysis.verificationStatus})</div>
+            </div>
+        ` : `
+            <div class="content-verification">
+                <div class="verification-item">⚠️ 音声認識による内容検証は実行されませんでした</div>
+            </div>
+        `;
+        
         const resultsHtml = `
             <div class="analysis-results">
                 <h4>📊 音響分析結果</h4>
                 <div class="analysis-item">⏱️ 録音時間: ${analysis.duration.toFixed(2)}秒</div>
-                <div class="analysis-item">💬 単語数: ${analysis.wordCount}</div>
+                <div class="analysis-item">💬 期待単語数: ${analysis.expectedWordCount} / 実際: ${analysis.actualWordCount}</div>
                 <div class="analysis-item">⚡ 発話速度: ${analysis.wordsPerSecond.toFixed(2)} 語/秒 (${analysis.wordsPerMinute.toFixed(0)} 語/分)</div>
-                <div class="analysis-item">🎯 評価: ${analysis.level}</div>
+                <div class="analysis-item">🎯 評価: ${analysis.level} ${analysis.levelExplanation}</div>
+                ${contentVerificationHtml}
             </div>
         `;
         
@@ -598,6 +669,122 @@ class VoiceSystem {
         }
         
         this.updateStatus('✅ 分析完了', 'success');
+    }
+
+    /**
+     * 音声認識でBlobから文章を認識
+     */
+    async recognizeSpeechFromBlob(audioBlob) {
+        return new Promise((resolve, reject) => {
+            // Web Speech API の SpeechRecognition を使用
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                reject(new Error('このブラウザは音声認識をサポートしていません'));
+                return;
+            }
+            
+            // AudioオブジェクトでBlobを再生し、その間に音声認識を実行
+            const audio = new Audio();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audio.src = audioUrl;
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            
+            let timeoutId = null;
+            
+            recognition.onstart = () => {
+                console.log('🎤 音声認識開始...');
+                // 5秒でタイムアウト
+                timeoutId = setTimeout(() => {
+                    recognition.stop();
+                    reject(new Error('音声認識タイムアウト'));
+                }, 5000);
+            };
+            
+            recognition.onresult = (event) => {
+                if (timeoutId) clearTimeout(timeoutId);
+                
+                const result = event.results[0][0];
+                const transcript = result.transcript;
+                const confidence = result.confidence;
+                
+                console.log(`🎯 認識結果: "${transcript}" (信頼度: ${(confidence * 100).toFixed(1)}%)`);
+                
+                URL.revokeObjectURL(audioUrl);
+                resolve(transcript);
+            };
+            
+            recognition.onerror = (event) => {
+                if (timeoutId) clearTimeout(timeoutId);
+                console.error('音声認識エラー:', event.error);
+                URL.revokeObjectURL(audioUrl);
+                reject(new Error(`音声認識エラー: ${event.error}`));
+            };
+            
+            recognition.onend = () => {
+                if (timeoutId) clearTimeout(timeoutId);
+                console.log('🔚 音声認識終了');
+            };
+            
+            // 録音音声を再生しながら認識を開始
+            try {
+                audio.play();
+                recognition.start();
+            } catch (error) {
+                URL.revokeObjectURL(audioUrl);
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * 2つのテキストの類似度を計算（簡易版）
+     */
+    calculateTextSimilarity(expected, actual) {
+        if (!expected || !actual) return 0;
+        
+        // 大文字小文字を統一し、句読点を除去
+        const normalizeText = (text) => {
+            return text.toLowerCase()
+                      .replace(/[^\w\s]/g, '') // 句読点除去
+                      .trim()
+                      .split(/\s+/);
+        };
+        
+        const expectedWords = normalizeText(expected);
+        const actualWords = normalizeText(actual);
+        
+        console.log('🔍 期待単語:', expectedWords);
+        console.log('🔍 実際単語:', actualWords);
+        
+        // 単語レベルでの一致度計算
+        let matchCount = 0;
+        const expectedSet = new Set(expectedWords);
+        const actualSet = new Set(actualWords);
+        
+        // 期待される単語のうち、実際に含まれているものの数
+        for (let word of expectedSet) {
+            if (actualSet.has(word)) {
+                matchCount++;
+            }
+        }
+        
+        // レーベンシュタイン距離も考慮した類似度
+        const maxLength = Math.max(expectedWords.length, actualWords.length);
+        const lengthPenalty = Math.abs(expectedWords.length - actualWords.length) / maxLength;
+        
+        // 基本一致度から長さペナルティを差し引く
+        const wordMatchRatio = expectedSet.size > 0 ? matchCount / expectedSet.size : 0;
+        const similarity = Math.max(0, wordMatchRatio - lengthPenalty * 0.5);
+        
+        console.log(`📊 単語一致数: ${matchCount}/${expectedSet.size}, 長さペナルティ: ${(lengthPenalty * 100).toFixed(1)}%, 最終類似度: ${(similarity * 100).toFixed(1)}%`);
+        
+        return similarity;
     }
     
     /**
