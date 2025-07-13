@@ -90,6 +90,7 @@
     <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
       <option value="">-- データを選択 --</option>
       <option value="data/slot_order_data.json">🎯 メインデータセット</option>
+      <option value="data/slot_order_data2.json">📚 例文データセット2</option>
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
   </div>
@@ -1094,9 +1095,9 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
   let presetData = null;
   
-  if (selectedPreset === 'data/slot_order_data.json') {
-    // 🎯 **メインデータセット：fetchでslot_order_data.jsonを読み込み**
-    fetch('data/slot_order_data.json')
+  if (selectedPreset === 'data/slot_order_data.json' || selectedPreset === 'data/slot_order_data2.json') {
+    // 🎯 **データセット：fetchでJSONファイルを読み込み**
+    fetch(selectedPreset)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -1135,8 +1136,8 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
         }
       })
       .catch(error => {
-        console.error("data/slot_order_data.jsonの読み込みに失敗:", error);
-        alert(`メインデータセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から slot_order_data.json を選択してください。\n\nエラー詳細: ${error.message}`);
+        console.error(`${selectedPreset}の読み込みに失敗:`, error);
+        alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
         hideLoadingOverlay();
       });
     return; // 早期リターン

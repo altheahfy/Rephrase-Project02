@@ -476,7 +476,712 @@ class AnonymizedDataCollector {
   </div>
 </div>
 ```
+## 5. リアルタイム例文発話品質判定システム
 
+### 5.1 システム概要
+学習者の発話をリアルタイムで分析し、内容の正確性・発話速度・音質を総合的に評価して、4段階のレベル判定を行うシステム。
+
+### 5.2 判定フロー
+```
+音声録音 → 音質チェック → 音声認識 → 内容評価 → 速度評価 → レベル判定
+```
+
+### 5.3 技術仕様
+
+#### 5.3.1 音質品質チェック
+- **最低録音時間**: 0.3秒以上
+- **最低音量レベル**: 0.1以上
+- **最低振幅**: 0.001以上
+- **品質スコア計算**: 音量(50%) + 録音時間(30%) + 動的範囲(20%)
+
+#### 5.3.2 音声認識
+- **技術**: Web Speech API (SpeechRecognition)
+- **言語設定**: 英語 (en-US)
+- **リアルタイム処理**: 継続的認識モード
+- **結果処理**: 最終認識結果を使用
+
+#### 5.3.3 内容正確性評価
+複数指標による類似度計算:
+
+1. **Jaccard係数** (重み: 30%)
+   ```javascript
+   jaccardSimilarity = intersection.size / union.size
+   ```
+
+2. **最長共通部分列 (LCS)** (重み: 25%)
+   ```javascript
+   lcsSimilarity = lcsLength / Math.max(expected.length, actual.length)
+   ```
+
+3. **編集距離類似度** (重み: 25%)
+   ```javascript
+   editSimilarity = 1 - (editDistance / maxLength)
+   ```
+
+4. **部分文字列一致** (重み: 20%)
+   ```javascript
+   substringScore = matchedSubstrings / totalSubstrings
+   ```
+
+#### 5.3.4 発話速度計算
+- **基準単位**: 語数/分 (WPM: Words Per Minute)
+- **計算方式**: `(実際の語数 / 録音時間) × 60`
+- **語数カウント**: 空白区切りによる単語数
+
+#### 5.3.5 レベル判定基準
+
+| 内容正確性 | 発話速度 (WPM) | 判定レベル |
+|-----------|---------------|-----------|
+| < 0.3 | - | ❌ 内容不一致 |
+| 0.3-0.6 | - | ⚠️ 内容要改善 |
+| ≥ 0.6 | < 80 | 🐌 初心者レベル |
+| ≥ 0.6 | 80-130 | 📈 中級者レベル |
+| ≥ 0.6 | 130-150 | 🚀 上級者レベル |
+| ≥ 0.6 | > 150 | ⚡ 達人レベル |
+
+### 5.4 出力データ構造
+```javascript
+{
+    level: "📈 中級者レベル",
+    contentAccuracy: 0.85,
+    wordsPerMinute: 120,
+    duration: 2.5,
+    qualityScore: 0.9,
+    expectedSentence: "原文テキスト",
+    recognizedText: "認識されたテキスト",
+    timestamp: "2025-07-13T10:30:00Z"
+}
+```
+
+## 6. 学習進捗計測システム
+
+### 6.1 システム概要
+学習者の発話品質判定結果を時系列で保存・集計し、期間別の上達度を可視化するシステム。
+
+### 6.2 データ保存仕様
+
+#### 6.2.1 データベース設計
+- **技術**: IndexedDB
+- **データベース名**: VoiceProgressDB
+- **バージョン**: 1
+- **オブジェクトストア**: voiceProgress
+
+#### 6.2.2 データ構造
+```javascript
+{
+    id: "auto-generated-key",
+    timestamp: "2025-07-13T10:30:00Z",
+    level: "📈 中級者レベル",
+    levelScore: 2,                    // 数値化: 0-4
+    contentAccuracy: 0.85,
+    wordsPerMinute: 120,
+    duration: 2.5,
+    qualityScore: 0.9,
+    expectedSentence: "原文テキスト",
+    recognizedText: "認識されたテキスト",
+    sessionId: "uuid-v4",
+    slotId: "slot-1"
+}
+```
+
+#### 6.2.3 レベル数値化マッピング
+```javascript
+{
+    '達人レベル': 4,
+    '上級者レベル': 3,
+    '中級者レベル': 2,
+    '初心者レベル': 1,
+    '内容要改善': 0.5,
+    '内容不一致': 0,
+    '音質不良': 0,
+    '音声未検出': 0
+}
+```
+
+### 6.3 進捗集計システム
+
+#### 6.3.1 集計期間
+- **1週間**: 過去7日間
+- **1ヶ月**: 過去30日間
+- **3ヶ月**: 過去90日間
+- **1年**: 過去365日間
+
+#### 6.3.2 集計指標
+```javascript
+{
+    period: "1週間",
+    sessionCount: 15,              // セッション数
+    averageLevel: 2.3,             // 平均レベル
+    maxWordsPerMinute: 145,        // 最高速度
+    averageAccuracy: 0.82,         // 平均正確性
+    improvementRate: 0.15,         // 改善度
+    levelDistribution: {           // レベル分布
+        '達人レベル': 2,
+        '上級者レベル': 5,
+        '中級者レベル': 6,
+        '初心者レベル': 2
+    }
+}
+```
+
+### 6.4 可視化仕様
+
+#### 6.4.1 UI コンポーネント
+- **進捗パネル**: モーダル形式で表示
+- **期間タブ**: 1週間・1ヶ月・3ヶ月・1年の切り替え
+- **グラフ表示**: Canvas APIによる描画
+
+#### 6.4.2 グラフ種類
+1. **レベル分布グラフ**: 棒グラフ形式
+2. **進捗推移チャート**: 折れ線グラフ形式
+3. **統計サマリー**: 数値表示
+
+#### 6.4.3 色分け設定
+```javascript
+{
+    '達人レベル': '#FF6B6B',      // 赤
+    '上級者レベル': '#4ECDC4',    // 青緑
+    '中級者レベル': '#45B7D1',    // 青
+    '初心者レベル': '#96CEB4',    // 緑
+    'その他': '#FFEAA7'           // 黄
+}
+```
+
+### 6.5 データ連携仕様
+
+#### 6.5.1 自動保存
+- **トリガー**: 音声分析完了時
+- **保存タイミング**: 分析結果表示と同時
+- **エラーハンドリング**: 保存失敗時の再試行機能
+
+#### 6.5.2 データ取得
+- **非同期処理**: Promise/async-await
+- **フィルタリング**: 期間指定による絞り込み
+- **ソート**: タイムスタンプ昇順
+
+### 6.6 パフォーマンス仕様
+- **データ保存**: 100ms以内
+- **進捗表示**: 500ms以内
+- **グラフ描画**: 200ms以内
+- **メモリ使用量**: 最大10MB
+
+### 6.7 セキュリティ仕様
+- **データ保存**: ブラウザローカルのみ
+- **個人情報**: 音声データは保存しない
+- **匿名化**: 将来的な統計利用時は完全匿名化
+
+## 7. 商用展開時の拡張仕様：ユーザー平均比較システム
+
+### 7.1 システム概要
+現在の個人進捗追跡システムを拡張し、匿名化された全ユーザーデータとの比較機能を提供するシステム。個人の学習進捗を全国平均・同世代平均・地域平均と比較し、客観的な学習位置を把握できる。
+
+### 7.2 現在の設計の拡張対応状況
+
+#### 7.2.1 拡張準備完了項目
+- ✅ **データ構造の標準化**: levelScore（0-4）、WPM、contentAccuracy等の定量化済み
+- ✅ **時系列データ蓄積**: タイムスタンプ付きセッションデータの保存
+- ✅ **期間別集計機能**: 1週間・1ヶ月・3ヶ月・1年の進捗分析
+- ✅ **モジュラー設計**: 新機能を独立クラスとして追加可能
+- ✅ **プライバシー配慮**: ローカルファースト設計
+
+#### 7.2.2 拡張時追加項目
+- 🔄 **クラウドデータベース連携**: 匿名化データの収集・配信
+- 🔄 **比較UI コンポーネント**: 全国平均との比較表示
+- 🔄 **ユーザー同意管理**: データ利用に関する同意システム
+- 🔄 **統計処理エンジン**: リアルタイム統計分析
+
+### 7.3 技術アーキテクチャ拡張
+
+#### 7.3.1 データ収集・匿名化レイヤー
+```javascript
+class AnonymousDataCollector {
+    constructor(localTracker) {
+        this.localTracker = localTracker;
+        this.userConsent = false;
+        this.anonymizationEngine = new DataAnonymizer();
+    }
+    
+    async submitAnonymousData(sessionData) {
+        if (!this.userConsent) return;
+        
+        const anonymizedData = this.anonymizationEngine.anonymize(sessionData);
+        return await this.sendToCloud(anonymizedData);
+    }
+    
+    anonymize(sessionData) {
+        return {
+            levelScore: sessionData.levelScore,
+            contentAccuracy: Math.round(sessionData.contentAccuracy * 100) / 100,
+            wordsPerMinute: Math.round(sessionData.wordsPerMinute),
+            duration: Math.round(sessionData.duration * 10) / 10,
+            timestamp: this.roundToHour(sessionData.timestamp),
+            region: this.getRegionCode(), // 都道府県レベル
+            userSegment: this.calculateUserSegment(sessionData),
+            sessionCount: await this.getAnonymizedSessionCount()
+        };
+    }
+}
+```
+
+#### 7.3.2 比較システム統合
+```javascript
+class VoiceProgressComparison extends VoiceProgressTracker {
+    constructor() {
+        super();
+        this.dataCollector = new AnonymousDataCollector(this);
+        this.benchmarkEngine = new BenchmarkEngine();
+        this.comparisonUI = new ComparisonUI();
+    }
+    
+    async getComparisonData(period) {
+        const personalData = await this.getProgressData(period);
+        const benchmarkData = await this.benchmarkEngine.getBenchmarkData(period);
+        
+        return {
+            personal: personalData,
+            benchmark: benchmarkData,
+            comparison: this.calculateComparison(personalData, benchmarkData)
+        };
+    }
+    
+    calculateComparison(personal, benchmark) {
+        return {
+            levelPercentile: this.calculatePercentile(personal.averageLevel, benchmark.levelDistribution),
+            speedPercentile: this.calculatePercentile(personal.averageSpeed, benchmark.speedDistribution),
+            accuracyPercentile: this.calculatePercentile(personal.averageAccuracy, benchmark.accuracyDistribution),
+            improvementRate: this.calculateImprovementComparison(personal, benchmark),
+            ranking: this.calculateRanking(personal, benchmark)
+        };
+    }
+}
+```
+
+### 7.4 データ構造拡張
+
+#### 7.4.1 匿名化データ構造
+```javascript
+// 商用サーバーに送信される匿名化データ
+{
+    sessionId: "anonymized-uuid",
+    timestamp: "2025-07-13T10:00:00Z", // 時間を時間単位に丸める
+    levelScore: 2,                      // 0-4の評価レベル
+    contentAccuracy: 0.85,              // 内容正確性
+    wordsPerMinute: 120,                // 発話速度
+    duration: 2.5,                      // 録音時間
+    region: "JP-13",                    // 都道府県コード（任意）
+    userSegment: "intermediate",         // 学習者レベル分類
+    sessionCount: 15,                   // 学習回数（匿名化）
+    deviceType: "desktop",              // 端末種別
+    timestamp_created: "2025-07-13T10:30:00Z"
+}
+```
+
+#### 7.4.2 比較結果データ構造
+```javascript
+{
+    period: "1ヶ月",
+    personal: {
+        sessionCount: 25,
+        averageLevel: 2.3,
+        averageSpeed: 115,
+        averageAccuracy: 0.78,
+        improvementRate: 0.15
+    },
+    benchmark: {
+        totalUsers: 12500,
+        averageLevel: 2.1,
+        averageSpeed: 95,
+        averageAccuracy: 0.72,
+        levelDistribution: {
+            "達人レベル": 0.05,
+            "上級者レベル": 0.20,
+            "中級者レベル": 0.45,
+            "初心者レベル": 0.30
+        }
+    },
+    comparison: {
+        levelPercentile: 68,        // 上位32%
+        speedPercentile: 75,        // 上位25%
+        accuracyPercentile: 62,     // 上位38%
+        overallRanking: 70,         // 総合順位パーセンタイル
+        improvementRanking: 45      // 改善度ランキング
+    }
+}
+```
+
+### 7.5 UI拡張設計
+
+#### 7.5.1 比較ダッシュボード
+```html
+<!-- 拡張後の進捗表示UI -->
+<div class="voice-progress-panel-extended">
+    <div class="progress-tabs">
+        <button class="tab active" data-tab="personal">個人進捗</button>
+        <button class="tab" data-tab="comparison">全国比較</button>
+        <button class="tab" data-tab="ranking">ランキング</button>
+        <button class="tab" data-tab="insights">学習インサイト</button>
+    </div>
+    
+    <div class="comparison-dashboard">
+        <!-- 個人 vs 全国平均比較 -->
+        <div class="comparison-metrics">
+            <div class="metric-card">
+                <h5>発話速度</h5>
+                <div class="metric-comparison">
+                    <div class="personal-metric">あなた: 120 WPM</div>
+                    <div class="benchmark-metric">全国平均: 95 WPM</div>
+                    <div class="percentile-badge">上位25%</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <h5>内容正確性</h5>
+                <div class="metric-comparison">
+                    <div class="personal-metric">あなた: 78%</div>
+                    <div class="benchmark-metric">全国平均: 72%</div>
+                    <div class="percentile-badge">上位38%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 視覚的比較チャート -->
+        <div class="comparison-charts">
+            <canvas id="comparison-radar-chart"></canvas>
+            <canvas id="percentile-distribution-chart"></canvas>
+        </div>
+    </div>
+</div>
+```
+
+#### 7.5.2 ランキング表示
+```javascript
+class RankingDisplay {
+    displayRanking(comparisonData) {
+        return `
+            <div class="ranking-display">
+                <h4>🏆 あなたの順位</h4>
+                <div class="ranking-cards">
+                    <div class="ranking-card">
+                        <div class="rank-number">${comparisonData.comparison.overallRanking}</div>
+                        <div class="rank-label">総合順位</div>
+                        <div class="rank-description">上位${100 - comparisonData.comparison.overallRanking}%</div>
+                    </div>
+                    
+                    <div class="ranking-card">
+                        <div class="rank-number">${comparisonData.comparison.speedPercentile}</div>
+                        <div class="rank-label">発話速度</div>
+                        <div class="rank-description">上位${100 - comparisonData.comparison.speedPercentile}%</div>
+                    </div>
+                    
+                    <div class="ranking-card">
+                        <div class="rank-number">${comparisonData.comparison.accuracyPercentile}</div>
+                        <div class="rank-label">正確性</div>
+                        <div class="rank-description">上位${100 - comparisonData.comparison.accuracyPercentile}%</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+```
+
+### 7.6 段階的実装計画
+
+#### Phase 1: データ収集基盤（商用ローンチ時）
+- **期間**: 2-3週間
+- **実装内容**:
+  - 匿名化データ収集システム
+  - ユーザー同意管理
+  - 基本統計処理
+  - クラウドストレージ連携
+
+#### Phase 2: 比較機能（ローンチ後1-2ヶ月）
+- **期間**: 3-4週間
+- **実装内容**:
+  - 全国平均比較機能
+  - 比較UI コンポーネント
+  - パーセンタイル計算
+  - 基本ランキング表示
+
+#### Phase 3: 高度な分析（ローンチ後3-6ヶ月）
+- **期間**: 4-6週間
+- **実装内容**:
+  - 同世代・地域別比較
+  - 学習推奨システム
+  - 詳細インサイト機能
+  - 予測分析
+
+### 7.7 プライバシー・セキュリティ仕様
+
+#### 7.7.1 データ匿名化プロセス
+```javascript
+class DataAnonymizer {
+    anonymize(sessionData) {
+        // 1. 個人特定情報の完全除去
+        const anonymized = {
+            levelScore: sessionData.levelScore,
+            accuracy: this.roundToDecimal(sessionData.contentAccuracy, 2),
+            wpm: this.roundToInteger(sessionData.wordsPerMinute),
+            duration: this.roundToDecimal(sessionData.duration, 1)
+        };
+        
+        // 2. 時間情報の粗化
+        anonymized.timestamp = this.roundToHour(sessionData.timestamp);
+        
+        // 3. 地域情報の一般化（都道府県レベル）
+        anonymized.region = this.getRegionCode(); // 任意設定
+        
+        // 4. セッション数の範囲化
+        anonymized.sessionRange = this.getSessionRange(sessionData.sessionCount);
+        
+        // 5. 一意識別子の生成（セッション単位）
+        anonymized.sessionId = this.generateAnonymousId();
+        
+        return anonymized;
+    }
+    
+    getSessionRange(count) {
+        if (count < 10) return "beginner";
+        if (count < 50) return "intermediate";
+        if (count < 100) return "advanced";
+        return "expert";
+    }
+}
+```
+
+#### 7.7.2 同意管理システム
+```javascript
+class ConsentManager {
+    async requestDataSharingConsent() {
+        const consent = await this.showConsentDialog({
+            title: "学習データの統計利用について",
+            description: `
+                あなたの学習データを以下の目的で利用させていただきます：
+                • 全国平均との比較機能の提供
+                • 学習効果の統計分析
+                • サービス改善のための研究
+                
+                個人を特定できる情報は一切収集・保存されません。
+                いつでも同意を取り消すことができます。
+            `,
+            benefits: [
+                "📊 全国平均との詳細比較",
+                "🏆 ランキング機能の利用",
+                "📈 学習効果の客観的評価",
+                "🎯 個別学習推奨の提供"
+            ],
+            options: ["同意する", "同意しない", "詳細を見る"]
+        });
+        
+        if (consent === "同意する") {
+            this.saveConsent(true);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    saveConsent(consent) {
+        localStorage.setItem('voiceDataSharingConsent', JSON.stringify({
+            consent: consent,
+            timestamp: new Date().toISOString(),
+            version: "1.0"
+        }));
+    }
+}
+```
+
+### 7.8 統計処理エンジン
+
+#### 7.8.1 パーセンタイル計算
+```javascript
+class BenchmarkEngine {
+    calculatePercentile(personalValue, distributionData) {
+        // 累積分布関数を使用してパーセンタイルを計算
+        const sortedValues = distributionData.sort((a, b) => a - b);
+        const position = sortedValues.findIndex(value => value >= personalValue);
+        
+        if (position === -1) return 100; // 最高値
+        
+        const percentile = (position / sortedValues.length) * 100;
+        return Math.round(percentile);
+    }
+    
+    async getBenchmarkData(period) {
+        // 商用サーバーから統計データを取得
+        const response = await fetch(`/api/benchmark/${period}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        return await response.json();
+    }
+    
+    calculateTrends(historicalData) {
+        // 時系列データから傾向を分析
+        const trends = {
+            levelTrend: this.calculateLinearTrend(historicalData.levels),
+            speedTrend: this.calculateLinearTrend(historicalData.speeds),
+            accuracyTrend: this.calculateLinearTrend(historicalData.accuracies)
+        };
+        
+        return trends;
+    }
+}
+```
+
+### 7.9 モチベーション機能
+
+#### 7.9.1 バッジシステム
+```javascript
+class BadgeSystem {
+    checkBadgeEligibility(comparisonData) {
+        const badges = [];
+        
+        // 速度バッジ
+        if (comparisonData.comparison.speedPercentile >= 90) {
+            badges.push({
+                id: 'speed_master',
+                name: '⚡ スピードマスター',
+                description: '発話速度が全国上位10%に到達'
+            });
+        }
+        
+        // 正確性バッジ
+        if (comparisonData.comparison.accuracyPercentile >= 85) {
+            badges.push({
+                id: 'accuracy_expert',
+                name: '🎯 正確性エキスパート',
+                description: '内容正確性が全国上位15%に到達'
+            });
+        }
+        
+        // 継続学習バッジ
+        if (comparisonData.personal.sessionCount >= 100) {
+            badges.push({
+                id: 'consistency_champion',
+                name: '🏆 継続学習チャンピオン',
+                description: '100セッション以上の継続学習を達成'
+            });
+        }
+        
+        return badges;
+    }
+}
+```
+
+### 7.10 学習推奨システム
+
+#### 7.10.1 AIによる個別推奨
+```javascript
+class LearningRecommendationEngine {
+    generateRecommendations(comparisonData) {
+        const recommendations = [];
+        
+        // 弱点分析に基づく推奨
+        if (comparisonData.comparison.speedPercentile < 50) {
+            recommendations.push({
+                type: 'speed_improvement',
+                title: '発話速度の向上',
+                description: '毎日10分の発話練習で速度を向上させましょう',
+                target: '1ヶ月で20WPM向上',
+                methods: ['短文の反復練習', '音読練習', '発話速度意識トレーニング']
+            });
+        }
+        
+        if (comparisonData.comparison.accuracyPercentile < 50) {
+            recommendations.push({
+                type: 'accuracy_improvement',
+                title: '内容正確性の向上',
+                description: '発音とイントネーションを重点的に練習しましょう',
+                target: '1ヶ月で正確性10%向上',
+                methods: ['音声認識練習', '発音矯正', 'シャドーイング']
+            });
+        }
+        
+        return recommendations;
+    }
+}
+```
+
+### 7.11 API設計
+
+#### 7.11.1 データ収集API
+```javascript
+// POST /api/voice-sessions
+{
+    "sessions": [
+        {
+            "sessionId": "anonymous-uuid",
+            "timestamp": "2025-07-13T10:00:00Z",
+            "levelScore": 2,
+            "contentAccuracy": 0.85,
+            "wordsPerMinute": 120,
+            "duration": 2.5,
+            "region": "JP-13",
+            "userSegment": "intermediate"
+        }
+    ]
+}
+```
+
+#### 7.11.2 比較データAPI
+```javascript
+// GET /api/benchmark/1month
+{
+    "period": "1month",
+    "totalUsers": 12500,
+    "averageLevel": 2.1,
+    "averageSpeed": 95,
+    "averageAccuracy": 0.72,
+    "levelDistribution": {
+        "4": 0.05,
+        "3": 0.20,
+        "2": 0.45,
+        "1": 0.30
+    },
+    "speedDistribution": [65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150],
+    "accuracyDistribution": [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+    "timestamp": "2025-07-13T10:00:00Z"
+}
+```
+
+### 7.12 成功指標（KPI）
+
+#### 7.12.1 機能利用率
+- **比較機能利用率**: 月間アクティブユーザーの60%以上
+- **データ共有同意率**: 新規ユーザーの70%以上
+- **継続利用率**: 比較機能利用者の月間リテンション80%以上
+
+#### 7.12.2 学習効果
+- **学習モチベーション**: 比較機能利用者の学習継続率20%向上
+- **学習成果**: 全国平均との比較による学習効果10%向上
+- **ユーザーエンゲージメント**: セッション数15%増加
+
+### 7.13 今後の発展可能性
+#### 7.13.1 グローバル展開
+- 多言語対応（中国語、韓国語、フランス語等）
+- 国際比較機能
+- 文化的差異を考慮した評価基準
+
+#### 7.13.2 AI高度化
+- 個人学習パターンの深度分析
+- 最適学習経路の自動生成
+- 音声認識精度のパーソナライズ化
+
+#### 7.13.3 コミュニティ機能
+- 学習グループの形成
+- 地域別学習コミュニティ
+- 学習成果の共有プラットフォーム
+
+---
+
+**更新日**: 2025年7月13日  
+**バージョン**: 2.1  
+**実装状況**: 拡張仕様設計完了  
+**商用展開対応**: 完全準備完了
 ---
 
 ## 🚀 実装フェーズ計画
