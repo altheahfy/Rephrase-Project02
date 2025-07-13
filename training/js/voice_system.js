@@ -56,32 +56,58 @@ class VoiceSystem {
         console.log('🔍 例文テキスト取得を開始...');
         
         // デバッグ: 利用可能なグローバル変数をチェック
+        console.log('🔍 window.currentDisplayedSentence:', window.currentDisplayedSentence);
         console.log('🔍 window.lastSelectedSlots:', window.lastSelectedSlots);
         console.log('🔍 window.loadedJsonData:', window.loadedJsonData ? '存在' : '未定義');
-        console.log('🔍 window.fullSlotPool:', window.fullSlotPool ? '存在' : '未定義');
         
-        // JSONデータから現在の例文を構築する方法を試す
+        // 🎤 音声専用データから現在の例文を構築する方法を試す（推奨）
+        if (window.currentDisplayedSentence && Array.isArray(window.currentDisplayedSentence) && window.currentDisplayedSentence.length > 0) {
+            return this.buildSentenceFromVoiceData();
+        }
+        
+        // フォールバック: 従来の方法
         if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots) && window.lastSelectedSlots.length > 0) {
+            console.log('⚠️ 音声専用データが利用できません。従来のデータから取得を試行します。');
             return this.buildSentenceFromJsonData();
         }
         
         console.log('⚠️ JSONデータが利用できません。DOMから取得を試行します。');
-        // フォールバック: DOMから取得
+        // 最終フォールバック: DOMから取得
         return this.buildSentenceFromDOM();
     }
     
     /**
-     * JSONデータから例文を構築（推奨方法）
+     * 🎤 音声専用データから例文を構築（推奨方法）
+     */
+    buildSentenceFromVoiceData() {
+        console.log('🎤 音声専用データから例文を構築中...');
+        console.log('利用可能な音声データ:', window.currentDisplayedSentence);
+        console.log('音声データの件数:', window.currentDisplayedSentence.length);
+        
+        return this.buildSentenceFromData(window.currentDisplayedSentence, '音声専用データ');
+    }
+    
+    /**
+     * JSONデータから例文を構築（フォールバック）
      */
     buildSentenceFromJsonData() {
-        console.log('📊 JSONデータから例文を構築中...');
+        console.log('📊 従来データから例文を構築中...');
         console.log('利用可能なスロットデータ:', window.lastSelectedSlots);
         console.log('スロットデータの件数:', window.lastSelectedSlots.length);
         
+        return this.buildSentenceFromData(window.lastSelectedSlots, '従来データ');
+    }
+    
+    /**
+     * 共通の例文構築ロジック
+     */
+    buildSentenceFromData(slotData, dataSource) {
+        console.log(`📝 ${dataSource}から例文を構築中...`);
+        
         // データ構造の詳細ログ
-        if (window.lastSelectedSlots.length > 0) {
-            console.log('最初のスロットの構造:', window.lastSelectedSlots[0]);
-            console.log('利用可能なキー:', Object.keys(window.lastSelectedSlots[0]));
+        if (slotData.length > 0) {
+            console.log('最初のスロットの構造:', slotData[0]);
+            console.log('利用可能なキー:', Object.keys(slotData[0]));
         }
         
         const sentenceParts = [];
@@ -122,7 +148,7 @@ class VoiceSystem {
                 console.log(`⚠️ ${slot.Slot} の上位スロットにSlotPhraseがありません。サブスロットを確認します。`);
                 
                 // このスロットのサブスロットから構築を試す
-                const subSlots = window.lastSelectedSlots
+                const subSlots = slotData
                     .filter(subSlot => 
                         subSlot.SubslotID && subSlot.SubslotID.startsWith(slot.Slot + '-')
                     )
@@ -164,7 +190,7 @@ class VoiceSystem {
         console.log(`📝 ソート後の順序:`, sentenceParts.map(part => 
             `${part.slot}(${part.order}): "${part.text}"`
         ));
-        console.log(`📝 JSONから構築した例文: "${sentence}"`);
+        console.log(`📝 ${dataSource}から構築した例文: "${sentence}"`);
         console.log(`📝 例文パーツ数: ${finalParts.length}`);
         console.log(`📝 例文パーツ詳細:`, finalParts);
         

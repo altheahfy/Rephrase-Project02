@@ -3,6 +3,18 @@
  */
 
 /**
+ * 🎤 音声読み上げ用データを更新する共通関数
+ */
+function updateCurrentDisplayedSentence() {
+  if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots)) {
+    window.currentDisplayedSentence = window.lastSelectedSlots.map(slot => ({ ...slot }));
+    console.log(`🎤 音声用データ更新完了: ${window.currentDisplayedSentence.length}件`);
+  } else {
+    console.warn("⚠️ lastSelectedSlotsが見つからないため、音声用データを更新できませんでした");
+  }
+}
+
+/**
  * Sスロット個別ランダマイズ関数
  */
 function randomizeSlotSIndividual() {
@@ -74,6 +86,9 @@ function randomizeSlotSIndividual() {
   
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = filteredSlots;
+  
+  // 🎤 音声読み上げ用データも更新
+  updateCurrentDisplayedSentence();
   
   // buildStructure用のデータ形式に変換
   const data = filteredSlots.map(slot => ({
