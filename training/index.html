@@ -122,13 +122,13 @@
   </section>
   
   <!-- 制御パネル表示ボタンと制御パネル -->
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+  <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
     <!-- 制御パネル表示ボタン -->
-    <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px;">
+    <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px; margin-right: 20px;">
       制御パネル
     </button>
     
-    <!-- 音声学習ボタン -->
+    <!-- 音声学習ボタン（制御パネルの右隣、画面中央付近） -->
     <button id="voice-panel-open-btn" style="
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
@@ -140,13 +140,15 @@
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: all 0.2s ease;
-    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      margin-left: 50vw;
+      transform: translateX(-50%);
+    " onmouseover="this.style.transform='translateX(-50%) scale(1.05)'" onmouseout="this.style.transform='translateX(-50%) scale(1)'">
       🎤 音声学習
     </button>
   </div>
   
   <!-- � 音声学習コントロールパネル（音声学習ボタンの直下） -->
-  <div id="voice-control-panel" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 15px; max-width: 60%; margin-left: auto; margin-right: auto;">
+  <div id="voice-control-panel" style="display: none; position: absolute; top: 160px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-width: 500px; z-index: 1000;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
       <h3 style="margin: 0; color: white; font-size: 16px; font-weight: bold;">🎤 音声学習システム</h3>
       <button id="voice-panel-close-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
@@ -186,7 +188,7 @@
   </div>
   
   <!-- �🎯 上位スロット表示制御パネル（デフォルト非表示） -->
-  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px; max-width: 60%; margin-left: auto; margin-right: auto;">
+  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
       <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
         
         <!-- 疑問詞 スロット -->
