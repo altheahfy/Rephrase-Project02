@@ -121,14 +121,15 @@
   <section>
   </section>
   
-  <!-- 制御パネル表示ボタンと制御パネル -->
-  <div style="display: flex !important; align-items: center; justify-content: space-between; margin-bottom: 15px; width: 100%; background-color: rgba(0,255,0,0.1); padding: 10px; border: 1px solid red;">
-    <!-- 制御パネル表示ボタン -->
+  <!-- 制御パネル表示ボタン -->
+  <div style="display: flex !important; align-items: center; justify-content: flex-start; margin-bottom: 15px; width: 100%; background-color: rgba(0,255,0,0.1); padding: 10px; border: 1px solid red;">
     <button id="toggle-control-panels" style="background-color: #4a90e2; color: white; border: none; padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 5px;">
       制御パネル
     </button>
-    
-    <!-- 音声学習ボタン -->
+  </div>
+  
+  <!-- 音声学習ボタンエリア（独立） -->
+  <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px; padding: 10px;">
     <button id="voice-panel-open-btn" style="
       display: block !important;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
