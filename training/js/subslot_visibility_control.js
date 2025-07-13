@@ -14,36 +14,29 @@ function createSubslotControlPanel(parentSlot) {
   panelContainer.id = `subslot-visibility-panel-${parentSlot}`;
   panelContainer.className = 'subslot-visibility-panel';
   
-  // 制御パネルの表示状態を複数の方法で確認（localStorage最優先）
+  // 制御パネルの表示状態を複数の方法で確認
   let isControlPanelsVisible = false;
   
-  // 方法1: localStorage から取得（最優先）
-  const savedState = loadSubslotControlPanelState();
-  if (savedState !== null) {
-    isControlPanelsVisible = savedState;
-    console.log(`🔍 方法1(localStorage): ${isControlPanelsVisible}`);
-  }
-  // 方法2: グローバル変数から取得
-  else if (window.getControlPanelsVisibility) {
+  // 方法1: グローバル変数から取得
+  if (window.getControlPanelsVisibility) {
     isControlPanelsVisible = window.getControlPanelsVisibility();
-    console.log(`🔍 方法2(グローバル変数): ${isControlPanelsVisible}`);
+    console.log(`🔍 方法1(グローバル変数): ${isControlPanelsVisible}`);
   }
-  // 方法3: ボタンのテキストから判定
-  else {
-    const toggleBtn = document.getElementById('toggle-control-panels');
-    if (toggleBtn) {
-      const btnTextVisible = toggleBtn.textContent.includes('表示中');
-      console.log(`🔍 方法3(ボタンテキスト): ${btnTextVisible}`);
-      isControlPanelsVisible = btnTextVisible;
-    }
-    
-    // 方法4: 上位制御パネルの表示状態から判定
-    const upperPanel = document.getElementById('visibility-control-panel-inline');
-    if (upperPanel && !isControlPanelsVisible) {
-      const upperVisible = upperPanel.style.display !== 'none';
-      console.log(`🔍 方法4(上位パネル表示): ${upperVisible}`);
-      isControlPanelsVisible = upperVisible;
-    }
+  
+  // 方法2: ボタンのテキストから判定
+  const toggleBtn = document.getElementById('toggle-control-panels');
+  if (toggleBtn) {
+    const btnTextVisible = toggleBtn.textContent.includes('表示中');
+    console.log(`🔍 方法2(ボタンテキスト): ${btnTextVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || btnTextVisible;
+  }
+  
+  // 方法3: 上位制御パネルの表示状態から判定
+  const upperPanel = document.getElementById('visibility-control-panel-inline');
+  if (upperPanel) {
+    const upperVisible = upperPanel.style.display !== 'none';
+    console.log(`🔍 方法3(上位パネル表示): ${upperVisible}`);
+    isControlPanelsVisible = isControlPanelsVisible || upperVisible;
   }
   
   console.log(`🔍 ${parentSlot} サブスロット制御パネル最終判定: ${isControlPanelsVisible}`);
@@ -434,30 +427,6 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
   }
 }
 
-// 🗄️ localStorage を使用した制御パネル状態管理
-function saveSubslotControlPanelState(isVisible) {
-  try {
-    localStorage.setItem('rephrase_subslot_control_panel_state', JSON.stringify(isVisible));
-    console.log(`💾 制御パネル状態をlocalStorageに保存: ${isVisible}`);
-  } catch (error) {
-    console.warn('⚠️ localStorage保存エラー:', error);
-  }
-}
-
-function loadSubslotControlPanelState() {
-  try {
-    const saved = localStorage.getItem('rephrase_subslot_control_panel_state');
-    if (saved !== null) {
-      const state = JSON.parse(saved);
-      console.log(`📦 localStorageから制御パネル状態を読み込み: ${state}`);
-      return state;
-    }
-  } catch (error) {
-    console.warn('⚠️ localStorage読み込みエラー:', error);
-  }
-  return null; // 保存された状態がない場合
-}
-
 // 🔄 サブスロットの全表示リセット
 function resetSubslotVisibility(parentSlot) {
   console.log(`🔄 ${parentSlot}サブスロットの表示を全てリセット`);
@@ -558,7 +527,7 @@ function removeSubslotControlPanel(parentSlot) {
   console.log(`🗑️ ${parentSlot}サブスロット用コントロールパネル削除開始`);
   
   const panel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
-  if panel) {
+  if (panel) {
     panel.remove();
     console.log(`✅ ${parentSlot}サブスロット用コントロールパネル削除完了`);
   }
@@ -633,9 +602,6 @@ function updateSubslotControlPanelsVisibility(isVisible) {
 // 🌍 グローバル関数として公開
 window.createSubslotControlPanel = createSubslotControlPanel;
 window.removeSubslotControlPanel = removeSubslotControlPanel;
-window.updateSubslotControlPanelsVisibility = updateSubslotControlPanelsVisibility;
-window.saveSubslotControlPanelState = saveSubslotControlPanelState;
-window.loadSubslotControlPanelState = loadSubslotControlPanelState;
 window.hideAllSubslotText = hideAllSubslotText;
 window.updateSubslotControlPanelsVisibility = updateSubslotControlPanelsVisibility;
 window.updateSubslotControlPanelsVisibility = updateSubslotControlPanelsVisibility;
