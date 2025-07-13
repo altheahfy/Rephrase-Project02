@@ -750,7 +750,7 @@ class VoiceSystem {
     }
 
     /**
-     * 音声認識でBlobから文章を認識（改良版）
+     * 音声認識でBlobから文章を認識（修正版）
      */
     async recognizeSpeechFromBlob(audioBlob) {
         console.log('🎤 音声認識処理開始...');
@@ -769,154 +769,290 @@ class VoiceSystem {
             
             console.log('✅ SpeechRecognition API利用可能');
             
-            // 🎵 方法1: 直接音声認識を実行（推奨）
+            // 🎵 修正: Web Speech APIは録音データを直接処理できないため、
+            // より確実な方法として、録音データを無音で再生しながらマイクで認識
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
             recognition.continuous = false;
             recognition.interimResults = false;
-            recognition.maxAlternatives = 3; // 複数候補を取得
+            recognition.maxAlternatives = 5; // より多くの候補を取得
             
             let timeoutId = null;
             let hasResult = false;
+            let audioUrl = null;
+            let audio = null;
             
             console.log('🔧 音声認識設定完了');
             console.log('📍 言語設定:', recognition.lang);
-            console.log('📍 継続モード:', recognition.continuous);
-            console.log('📍 中間結果:', recognition.interimResults);
+            console.log('📍 最大候補数:', recognition.maxAlternatives);
             
-            recognition.onstart = () => {
-                console.log('🎤 音声認識開始...');
-                console.log('⏰ 10秒のタイムアウトを設定');
-                // タイムアウトを10秒に延長
-                timeoutId = setTimeout(() => {
-                    console.log('⏰ 音声認識タイムアウト');
-                    recognition.stop();
-                    if (!hasResult) {
-                        reject(new Error('音声認識タイムアウト (10秒)'));
-                    }
-                }, 10000);
-            };
-            
-            recognition.onresult = (event) => {
-                console.log('🎯 音声認識結果受信!');
-                if (timeoutId) clearTimeout(timeoutId);
-                hasResult = true;
-                
-                console.log('📊 認識結果数:', event.results.length);
-                for (let i = 0; i < event.results.length; i++) {
-                    console.log(`📝 結果${i+1}:`, event.results[i]);
-                    for (let j = 0; j < event.results[i].length; j++) {
-                        const alternative = event.results[i][j];
-                        console.log(`  - 候補${j+1}: "${alternative.transcript}" (信頼度: ${(alternative.confidence * 100).toFixed(1)}%)`);
-                    }
-                }
-                
-                if (event.results.length > 0 && event.results[0].length > 0) {
-                    const result = event.results[0][0];
-                    const transcript = result.transcript;
-                    const confidence = result.confidence || 0;
+            // 🎯 代替方法: MediaSource APIを使用した音声データの直接処理を試行
+            this.tryDirectAudioRecognition(audioBlob)
+                .then(result => {
+                    console.log('✅ 直接音声認識成功:', result);
+                    resolve(result);
+                })
+                .catch(directError => {
+                    console.log('⚠️ 直接音声認識失敗、フォールバック方式を使用:', directError.message);
                     
-                    console.log(`✅ 最終認識結果: "${transcript}" (信頼度: ${(confidence * 100).toFixed(1)}%)`);
-                    resolve(transcript);
-                } else {
-                    console.log('⚠️ 音声認識結果が空です');
-                    reject(new Error('音声認識結果が空です'));
-                }
-            };
-            
-            recognition.onerror = (event) => {
-                console.error('❌ 音声認識エラー発生:', event);
-                console.error('エラータイプ:', event.error);
-                console.error('エラーメッセージ:', event.message || 'なし');
-                
-                if (timeoutId) clearTimeout(timeoutId);
-                
-                let errorMessage = '音声認識エラー';
-                switch (event.error) {
-                    case 'no-speech':
-                        errorMessage = '音声が検出されませんでした';
-                        break;
-                    case 'audio-capture':
-                        errorMessage = '音声キャプチャエラー';
-                        break;
-                    case 'not-allowed':
-                        errorMessage = 'マイクアクセスが許可されていません';
-                        break;
-                    case 'network':
-                        errorMessage = 'ネットワークエラー';
-                        break;
-                    case 'service-not-allowed':
-                        errorMessage = '音声認識サービスが許可されていません';
-                        break;
-                    default:
-                        errorMessage = `音声認識エラー: ${event.error}`;
-                }
-                
-                reject(new Error(errorMessage));
-            };
-            
-            recognition.onend = () => {
-                console.log('🔚 音声認識処理終了');
-                if (timeoutId) clearTimeout(timeoutId);
-                
-                if (!hasResult) {
-                    console.log('⚠️ 結果なしで音声認識が終了しました');
-                    reject(new Error('音声認識結果なし'));
-                }
-            };
-            
-            // 🎵 方法2: Blobから音声を再生しながら音声認識を実行
+                    // フォールバック: 従来の方法だが改良版
+                    recognition.onstart = () => {
+                        console.log('🎤 音声認識開始...');
+                        console.log('⏰ 15秒のタイムアウトを設定');
+                        timeoutId = setTimeout(() => {
+                            console.log('⏰ 音声認識タイムアウト');
+                            recognition.stop();
+                            if (audio) {
+                                audio.pause();
+                                URL.revokeObjectURL(audioUrl);
+                            }
+                            if (!hasResult) {
+                                reject(new Error('音声認識タイムアウト (15秒)'));
+                            }
+                        }, 15000);
+                    };
+                    
+                    recognition.onresult = (event) => {
+                        console.log('🎯 音声認識結果受信!');
+                        if (timeoutId) clearTimeout(timeoutId);
+                        hasResult = true;
+                        
+                        if (audio) {
+                            audio.pause();
+                            URL.revokeObjectURL(audioUrl);
+                        }
+                        
+                        console.log('📊 認識結果数:', event.results.length);
+                        
+                        // すべての候補を詳細ログ出力
+                        for (let i = 0; i < event.results.length; i++) {
+                            console.log(`📝 結果グループ${i+1}:`, event.results[i]);
+                            for (let j = 0; j < event.results[i].length; j++) {
+                                const alternative = event.results[i][j];
+                                console.log(`  - 候補${j+1}: "${alternative.transcript}" (信頼度: ${(alternative.confidence * 100).toFixed(1)}%)`);
+                            }
+                        }
+                        
+                        if (event.results.length > 0 && event.results[0].length > 0) {
+                            // 最も信頼度の高い結果を選択
+                            let bestResult = event.results[0][0];
+                            let bestConfidence = bestResult.confidence || 0;
+                            
+                            // 全候補から最高信頼度を探す
+                            for (let i = 0; i < event.results.length; i++) {
+                                for (let j = 0; j < event.results[i].length; j++) {
+                                    const alternative = event.results[i][j];
+                                    const confidence = alternative.confidence || 0;
+                                    if (confidence > bestConfidence) {
+                                        bestResult = alternative;
+                                        bestConfidence = confidence;
+                                    }
+                                }
+                            }
+                            
+                            console.log(`✅ 最終選択結果: "${bestResult.transcript}" (信頼度: ${(bestConfidence * 100).toFixed(1)}%)`);
+                            resolve(bestResult.transcript);
+                        } else {
+                            console.log('⚠️ 音声認識結果が空です');
+                            reject(new Error('音声認識結果が空です'));
+                        }
+                    };
+                    
+                    recognition.onerror = (event) => {
+                        console.error('❌ 音声認識エラー発生:', event);
+                        console.error('エラータイプ:', event.error);
+                        
+                        if (timeoutId) clearTimeout(timeoutId);
+                        if (audio) {
+                            audio.pause();
+                            URL.revokeObjectURL(audioUrl);
+                        }
+                        
+                        let errorMessage = '音声認識エラー';
+                        switch (event.error) {
+                            case 'no-speech':
+                                errorMessage = '音声が検出されませんでした';
+                                break;
+                            case 'audio-capture':
+                                errorMessage = '音声キャプチャエラー';
+                                break;
+                            case 'not-allowed':
+                                errorMessage = 'マイクアクセスが許可されていません';
+                                break;
+                            case 'network':
+                                errorMessage = 'ネットワークエラー';
+                                break;
+                            case 'service-not-allowed':
+                                errorMessage = '音声認識サービスが許可されていません';
+                                break;
+                            default:
+                                errorMessage = `音声認識エラー: ${event.error}`;
+                        }
+                        
+                        reject(new Error(errorMessage));
+                    };
+                    
+                    recognition.onend = () => {
+                        console.log('🔚 音声認識処理終了');
+                        if (timeoutId) clearTimeout(timeoutId);
+                        if (audio) {
+                            audio.pause();
+                            URL.revokeObjectURL(audioUrl);
+                        }
+                        
+                        if (!hasResult) {
+                            console.log('⚠️ 結果なしで音声認識が終了しました');
+                            reject(new Error('音声認識結果なし'));
+                        }
+                    };
+                    
+                    // 🔊 録音音声を小音量で再生しながら認識開始
+                    try {
+                        console.log('🔊 録音音声の再生準備...');
+                        audioUrl = URL.createObjectURL(audioBlob);
+                        audio = new Audio(audioUrl);
+                        
+                        // 音量を最小に設定（スピーカーからの音漏れを防止）
+                        audio.volume = 0.1;
+                        audio.muted = false; // 完全にミュートすると認識されない
+                        
+                        audio.oncanplaythrough = () => {
+                            console.log('🔊 音声再生準備完了、音声認識開始');
+                            try {
+                                recognition.start();
+                                audio.play();
+                            } catch (startError) {
+                                console.error('❌ 音声認識開始エラー:', startError);
+                                reject(new Error(`音声認識開始失敗: ${startError.message}`));
+                            }
+                        };
+                        
+                        audio.onerror = (error) => {
+                            console.error('🔊 音声再生エラー:', error);
+                            reject(new Error('音声再生エラー'));
+                        };
+                        
+                        // 音声ファイル読み込み開始
+                        audio.load();
+                        
+                    } catch (error) {
+                        console.error('❌ 音声再生+認識の初期化エラー:', error);
+                        reject(new Error(`初期化エラー: ${error.message}`));
+                    }
+                });
+        });
+    }
+
+    /**
+     * 直接音声認識を試行（実験的）
+     */
+    async tryDirectAudioRecognition(audioBlob) {
+        // 🔬 実験: より高度な音声認識手法
+        // 注意: この方法は全てのブラウザでサポートされていない可能性があります
+        
+        return new Promise((resolve, reject) => {
             try {
-                console.log('🔊 録音音声の再生開始...');
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
+                // AudioContext を使用して音声データを解析
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                const audioContext = new AudioContextClass();
                 
-                audio.oncanplaythrough = () => {
-                    console.log('🔊 音声再生準備完了');
-                    console.log('🎤 音声認識開始...');
-                    recognition.start();
-                };
-                
-                audio.onended = () => {
-                    console.log('🔊 音声再生終了');
-                    URL.revokeObjectURL(audioUrl);
-                };
-                
-                audio.onerror = (error) => {
-                    console.error('🔊 音声再生エラー:', error);
-                    URL.revokeObjectURL(audioUrl);
-                    reject(new Error('音声再生エラー'));
-                };
-                
-                // 音量を少し下げて再生
-                audio.volume = 0.8;
-                audio.play();
+                audioBlob.arrayBuffer().then(arrayBuffer => {
+                    return audioContext.decodeAudioData(arrayBuffer);
+                }).then(audioBuffer => {
+                    console.log('🔬 AudioBuffer取得成功');
+                    console.log('📊 サンプルレート:', audioBuffer.sampleRate);
+                    console.log('📊 チャンネル数:', audioBuffer.numberOfChannels);
+                    console.log('📊 長さ:', audioBuffer.duration, '秒');
+                    
+                    // 🎯 より高品質な音声認識のため、AudioBufferを最適化
+                    const optimizedBuffer = this.optimizeAudioForRecognition(audioBuffer, audioContext);
+                    
+                    // AudioBufferからBlobを再作成
+                    this.audioBufferToBlob(optimizedBuffer, audioContext)
+                        .then(optimizedBlob => {
+                            console.log('✅ 音声最適化完了');
+                            // 最適化された音声で再度認識を試行
+                            reject(new Error('直接認識は現在開発中です'));
+                        })
+                        .catch(error => {
+                            reject(error);
+                        });
+                    
+                }).catch(error => {
+                    console.error('AudioBuffer生成エラー:', error);
+                    reject(error);
+                });
                 
             } catch (error) {
-                console.error('❌ 音声再生+認識の初期化エラー:', error);
-                
-                // フォールバック: 直接音声認識を開始
-                console.log('🔄 フォールバック: 直接音声認識を試行');
-                try {
-                    recognition.start();
-                } catch (startError) {
-                    console.error('❌ 音声認識開始エラー:', startError);
-                    reject(new Error(`音声認識開始失敗: ${startError.message}`));
-                }
+                console.error('直接音声認識エラー:', error);
+                reject(error);
             }
         });
     }
 
     /**
-     * 2つのテキストの類似度を計算（簡易版）
+     * 音声認識用に音声を最適化
+     */
+    optimizeAudioForRecognition(audioBuffer, audioContext) {
+        // 🔧 音声認識精度向上のための処理
+        const sampleRate = audioBuffer.sampleRate;
+        const length = audioBuffer.length;
+        const numberOfChannels = Math.min(audioBuffer.numberOfChannels, 1); // モノラルに統一
+        
+        // 新しいバッファを作成
+        const optimizedBuffer = audioContext.createBuffer(numberOfChannels, length, sampleRate);
+        
+        // チャンネルデータをコピー（ノイズ除去、音量正規化）
+        for (let channel = 0; channel < numberOfChannels; channel++) {
+            const inputData = audioBuffer.getChannelData(channel);
+            const outputData = optimizedBuffer.getChannelData(channel);
+            
+            // 音量正規化とノイズ除去
+            let maxAmplitude = 0;
+            for (let i = 0; i < length; i++) {
+                maxAmplitude = Math.max(maxAmplitude, Math.abs(inputData[i]));
+            }
+            
+            const normalizationFactor = maxAmplitude > 0 ? 0.8 / maxAmplitude : 1;
+            
+            for (let i = 0; i < length; i++) {
+                let sample = inputData[i] * normalizationFactor;
+                
+                // 簡単なノイズゲート（小さすぎる信号をカット）
+                if (Math.abs(sample) < 0.01) {
+                    sample = 0;
+                }
+                
+                outputData[i] = sample;
+            }
+        }
+        
+        return optimizedBuffer;
+    }
+
+    /**
+     * AudioBufferをBlobに変換
+     */
+    async audioBufferToBlob(audioBuffer, audioContext) {
+        // この機能は現在開発中です
+        return Promise.reject(new Error('AudioBuffer to Blob 変換は現在開発中です'));
+    }
+
+    /**
+     * 2つのテキストの類似度を計算（改良版）
      */
     calculateTextSimilarity(expected, actual) {
         if (!expected || !actual) return 0;
         
-        // 大文字小文字を統一し、句読点を除去
+        console.log('🔍 類似度計算開始');
+        console.log('期待文章:', expected);
+        console.log('実際文章:', actual);
+        
+        // 大文字小文字を統一し、句読点を除去して正規化
         const normalizeText = (text) => {
             return text.toLowerCase()
                       .replace(/[^\w\s]/g, '') // 句読点除去
+                      .replace(/\s+/g, ' ')    // 複数スペースを1つに
                       .trim()
                       .split(/\s+/);
         };
@@ -924,32 +1060,169 @@ class VoiceSystem {
         const expectedWords = normalizeText(expected);
         const actualWords = normalizeText(actual);
         
-        console.log('🔍 期待単語:', expectedWords);
-        console.log('🔍 実際単語:', actualWords);
+        console.log('🔍 正規化後の期待単語:', expectedWords);
+        console.log('🔍 正規化後の実際単語:', actualWords);
         
-        // 単語レベルでの一致度計算
-        let matchCount = 0;
+        // 🎯 複数の類似度指標を計算して総合評価
+        
+        // 1. 単語レベルの一致度（Jaccard係数）
         const expectedSet = new Set(expectedWords);
         const actualSet = new Set(actualWords);
         
-        // 期待される単語のうち、実際に含まれているものの数
-        for (let word of expectedSet) {
-            if (actualSet.has(word)) {
-                matchCount++;
+        const intersection = new Set([...expectedSet].filter(x => actualSet.has(x)));
+        const union = new Set([...expectedSet, ...actualSet]);
+        
+        const jaccardSimilarity = union.size > 0 ? intersection.size / union.size : 0;
+        console.log(`📊 Jaccard類似度: ${(jaccardSimilarity * 100).toFixed(1)}%`);
+        console.log(`📊 一致単語:`, [...intersection]);
+        
+        // 2. 順序を考慮した類似度（Longest Common Subsequence）
+        const lcsSimilarity = this.calculateLCS(expectedWords, actualWords);
+        console.log(`📊 LCS類似度: ${(lcsSimilarity * 100).toFixed(1)}%`);
+        
+        // 3. 編集距離ベースの類似度（Levenshtein距離）
+        const editSimilarity = this.calculateEditSimilarity(expected, actual);
+        console.log(`📊 編集距離類似度: ${(editSimilarity * 100).toFixed(1)}%`);
+        
+        // 4. 部分文字列の一致度
+        const substringMatch = this.calculateSubstringMatch(expectedWords, actualWords);
+        console.log(`📊 部分一致度: ${(substringMatch * 100).toFixed(1)}%`);
+        
+        // 🎯 重み付き総合評価
+        const weights = {
+            jaccard: 0.3,      // 単語の重複
+            lcs: 0.25,         // 順序の重要性
+            edit: 0.25,        // 全体的な類似性
+            substring: 0.2     // 部分一致
+        };
+        
+        const weightedSimilarity = 
+            (jaccardSimilarity * weights.jaccard) +
+            (lcsSimilarity * weights.lcs) +
+            (editSimilarity * weights.edit) +
+            (substringMatch * weights.substring);
+        
+        // 🔧 長さ補正を適用
+        const lengthRatio = Math.min(expectedWords.length, actualWords.length) / 
+                           Math.max(expectedWords.length, actualWords.length);
+        const lengthPenalty = 1 - Math.abs(1 - lengthRatio) * 0.3; // 長さ差によるペナルティを緩和
+        
+        const finalSimilarity = Math.max(0, Math.min(1, weightedSimilarity * lengthPenalty));
+        
+        console.log(`📊 重み付き類似度: ${(weightedSimilarity * 100).toFixed(1)}%`);
+        console.log(`📊 長さ補正係数: ${(lengthPenalty * 100).toFixed(1)}%`);
+        console.log(`📊 最終類似度: ${(finalSimilarity * 100).toFixed(1)}%`);
+        
+        return finalSimilarity;
+    }
+
+    /**
+     * Longest Common Subsequence による類似度計算
+     */
+    calculateLCS(arr1, arr2) {
+        if (arr1.length === 0 || arr2.length === 0) return 0;
+        
+        const m = arr1.length;
+        const n = arr2.length;
+        const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+        
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (arr1[i-1] === arr2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
             }
         }
         
-        // レーベンシュタイン距離も考慮した類似度
-        const maxLength = Math.max(expectedWords.length, actualWords.length);
-        const lengthPenalty = Math.abs(expectedWords.length - actualWords.length) / maxLength;
+        const lcsLength = dp[m][n];
+        const maxLength = Math.max(m, n);
         
-        // 基本一致度から長さペナルティを差し引く
-        const wordMatchRatio = expectedSet.size > 0 ? matchCount / expectedSet.size : 0;
-        const similarity = Math.max(0, wordMatchRatio - lengthPenalty * 0.5);
+        return maxLength > 0 ? lcsLength / maxLength : 0;
+    }
+
+    /**
+     * 編集距離による類似度計算
+     */
+    calculateEditSimilarity(str1, str2) {
+        const editDistance = this.levenshteinDistance(str1.toLowerCase(), str2.toLowerCase());
+        const maxLength = Math.max(str1.length, str2.length);
         
-        console.log(`📊 単語一致数: ${matchCount}/${expectedSet.size}, 長さペナルティ: ${(lengthPenalty * 100).toFixed(1)}%, 最終類似度: ${(similarity * 100).toFixed(1)}%`);
+        return maxLength > 0 ? 1 - (editDistance / maxLength) : 0;
+    }
+
+    /**
+     * Levenshtein距離の計算
+     */
+    levenshteinDistance(str1, str2) {
+        const m = str1.length;
+        const n = str2.length;
+        const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
         
-        return similarity;
+        for (let i = 0; i <= m; i++) dp[i][0] = i;
+        for (let j = 0; j <= n; j++) dp[0][j] = j;
+        
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (str1[i-1] === str2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1];
+                } else {
+                    dp[i][j] = Math.min(
+                        dp[i-1][j] + 1,     // 削除
+                        dp[i][j-1] + 1,     // 挿入
+                        dp[i-1][j-1] + 1    // 置換
+                    );
+                }
+            }
+        }
+        
+        return dp[m][n];
+    }
+
+    /**
+     * 部分文字列一致度の計算
+     */
+    calculateSubstringMatch(words1, words2) {
+        if (words1.length === 0 && words2.length === 0) return 1;
+        if (words1.length === 0 || words2.length === 0) return 0;
+        
+        let matches = 0;
+        const usedIndices = new Set();
+        
+        // 各単語について、部分一致を探す
+        for (const word1 of words1) {
+            for (let i = 0; i < words2.length; i++) {
+                if (usedIndices.has(i)) continue;
+                
+                const word2 = words2[i];
+                
+                // 完全一致
+                if (word1 === word2) {
+                    matches += 1;
+                    usedIndices.add(i);
+                    break;
+                }
+                
+                // 部分一致（3文字以上の単語に対して）
+                if (word1.length >= 3 && word2.length >= 3) {
+                    if (word1.includes(word2) || word2.includes(word1)) {
+                        matches += 0.7;
+                        usedIndices.add(i);
+                        break;
+                    }
+                    
+                    // 語幹の類似性（最初の3文字が一致）
+                    if (word1.substring(0, 3) === word2.substring(0, 3)) {
+                        matches += 0.5;
+                        usedIndices.add(i);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return matches / Math.max(words1.length, words2.length);
     }
     
     /**
