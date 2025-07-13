@@ -1433,6 +1433,19 @@ document.addEventListener('DOMContentLoaded', function() {
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(false);
           }
+          // 制御パネル非表示状態をlocalStorageに保存
+          try {
+            let state = {};
+            const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+            if (saved) {
+              state = JSON.parse(saved);
+            }
+            state['global_control_panels_visible'] = false;
+            localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(state));
+            console.log('💾 制御パネル非表示状態をlocalStorageに保存');
+          } catch (error) {
+            console.warn('⚠️ localStorage保存エラー:', error);
+          }
           toggleControlPanelsBtn.innerHTML = '📝 制御パネル';
           console.log('🔒 制御パネルを非表示にしました');
         } else {
@@ -1441,6 +1454,19 @@ document.addEventListener('DOMContentLoaded', function() {
           // サブスロット制御パネルも表示
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(true);
+          }
+          // 制御パネル表示状態をlocalStorageに保存
+          try {
+            let state = {};
+            const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+            if (saved) {
+              state = JSON.parse(saved);
+            }
+            state['global_control_panels_visible'] = true;
+            localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(state));
+            console.log('💾 制御パネル表示状態をlocalStorageに保存');
+          } catch (error) {
+            console.warn('⚠️ localStorage保存エラー:', error);
           }
           toggleControlPanelsBtn.innerHTML = '📝 パネル閉じる';
           console.log('🔓 制御パネルを表示しました');

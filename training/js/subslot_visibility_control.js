@@ -17,8 +17,22 @@ function createSubslotControlPanel(parentSlot) {
   // 制御パネルの表示状態を複数の方法で確認
   let isControlPanelsVisible = false;
   
-  // 方法1: グローバル変数から取得
-  if (window.getControlPanelsVisibility) {
+  // 最優先: localStorageから制御パネル状態を取得
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    if (saved) {
+      const state = JSON.parse(saved);
+      if (state.hasOwnProperty('global_control_panels_visible')) {
+        isControlPanelsVisible = state['global_control_panels_visible'];
+        console.log(`🔍 localStorage: ${isControlPanelsVisible}`);
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ localStorage読み込みエラー:', error);
+  }
+  
+  // 方法1: グローバル変数から取得（フォールバック）
+  if (!isControlPanelsVisible && window.getControlPanelsVisibility) {
     isControlPanelsVisible = window.getControlPanelsVisibility();
     console.log(`🔍 方法1(グローバル変数): ${isControlPanelsVisible}`);
   }
