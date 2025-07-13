@@ -1405,6 +1405,31 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleControlPanelsBtn = document.getElementById('toggle-control-panels');
   
   if (toggleControlPanelsBtn) {
+    // 制御パネルの表示・非表示を制御する関数を定義
+    window.toggleAllControlPanels = function() {
+      const controlPanel = document.getElementById('visibility-control-panel-inline');
+      const voicePanel = document.getElementById('voice-control-panel');
+      
+      if (controlPanel) {
+        const isCurrentlyVisible = controlPanel.style.display === 'block';
+        
+        if (isCurrentlyVisible) {
+          // パネルを非表示にする
+          controlPanel.style.display = 'none';
+          if (voicePanel && voicePanel.style.display === 'block') {
+            voicePanel.style.display = 'none';
+          }
+          toggleControlPanelsBtn.innerHTML = '📝 制御パネル';
+          console.log('🔒 制御パネルを非表示にしました');
+        } else {
+          // パネルを表示する  
+          controlPanel.style.display = 'block';
+          toggleControlPanelsBtn.innerHTML = '📝 パネル閉じる';
+          console.log('🔓 制御パネルを表示しました');
+        }
+      }
+    };
+    
     toggleControlPanelsBtn.addEventListener('click', function() {
       if (window.toggleAllControlPanels) {
         window.toggleAllControlPanels();
