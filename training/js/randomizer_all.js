@@ -82,11 +82,6 @@ export function randomizeAll(slotData) {
   console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
   console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
 
-  // === 🎤 音声読み上げ用: 現在選択されている例文のみを保存 ===
-  window.currentDisplayedSentence = selectedSlots.map(slot => ({ ...slot }));
-  console.log(`🎤 音声読み上げ用データ保存完了: ${window.currentDisplayedSentence.length}件`);
-  console.log(`🎤 現在表示中の例文スロットのみを保存しました`);
-
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",

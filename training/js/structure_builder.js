@@ -196,7 +196,72 @@ function buildStructure(selectedSlots) {
     }
     });
   });
+  
+  // 🎤 音声読み上げ用データの作成：実際に表示されているスロットのみを抽出
+  createVoiceDataFromDisplayedSlots(selectedSlots);
+  
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
+
+/**
+ * 🎤 実際に表示されているスロットから音声用データを作成
+ */
+function createVoiceDataFromDisplayedSlots(selectedSlots) {
+  const voiceData = [];
+  
+  // DOMから実際に表示されている内容を取得
+  const slotContainers = document.querySelectorAll('.slot-container');
+  
+  slotContainers.forEach(container => {
+    const slotId = container.id;
+    const slotName = slotId.replace('display-top-', '').replace('-', '_').toUpperCase();
+    
+    // .slot-phrase が存在し、テキストがある場合のみ音声用データに追加
+    const phraseElement = container.querySelector('.slot-phrase');
+    if (phraseElement && phraseElement.textContent.trim()) {
+      // selectedSlotsから対応するスロットデータを取得
+      const slotData = selectedSlots.find(slot => 
+        slot.Slot && slot.Slot.toLowerCase() === slotName.toLowerCase() && 
+        slot.SlotPhrase === phraseElement.textContent.trim()
+      );
+      
+      if (slotData) {
+        voiceData.push({ ...slotData });
+      }
+    }
+  });
+  
+  // 疑問詞も追加（分離表示の場合）
+  const questionWordElement = document.querySelector('#display-top-question-word .question-word-text');
+  if (questionWordElement && questionWordElement.textContent.trim()) {
+    const questionWordData = selectedSlots.find(slot => 
+      (slot.Slot === 'question-word' || slot.Slot === 'WH' || slot.Slot === 'wh') &&
+      slot.SlotPhrase === questionWordElement.textContent.trim()
+    );
+    if (questionWordData) {
+      voiceData.unshift({ ...questionWordData }); // 疑問詞は先頭に
+    }
+  }
+  
+  // サブスロットも追加（表示されているもののみ）
+  const subslotElements = document.querySelectorAll('.subslot');
+  subslotElements.forEach(subElement => {
+    const subElText = subElement.querySelector('.subslot-element');
+    if (subElText && subElText.textContent.trim()) {
+      const subData = selectedSlots.find(slot => 
+        slot.SubslotID && 
+        slot.SubslotElement === subElText.textContent.trim()
+      );
+      if (subData) {
+        voiceData.push({ ...subData });
+      }
+    }
+  });
+  
+  // 音声用データを保存
+  window.currentDisplayedSentence = voiceData;
+  console.log(`🎤 音声用データ更新完了: ${voiceData.length}件`);
+  console.log('🎤 表示されているスロットのみ抽出:', voiceData.map(s => `${s.Slot}: ${s.SlotPhrase || s.SubslotElement}`));
 }
 
 export { buildStructure, buildStructure as buildStructureFromJson };
