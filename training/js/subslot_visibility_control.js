@@ -17,21 +17,15 @@ function createSubslotControlPanel(parentSlot) {
   // 制御パネルの表示状態を複数の方法で確認
   let isControlPanelsVisible = false;
   
-  // 方法1: localStorage から制御パネル開閉状態を取得（最優先）
-  const savedPanelState = loadSubslotControlPanelState();
-  if (savedPanelState !== null) {
-    isControlPanelsVisible = savedPanelState;
-    console.log(`🔍 方法1(localStorage制御パネル状態): ${isControlPanelsVisible}`);
-  }
-  // 方法2: サブスロット制御パネル状態変数から取得
-  else if (window.subslotControlPanelVisible !== undefined) {
+  // 方法1: サブスロット制御パネル状態変数から取得（最優先）
+  if (window.subslotControlPanelVisible !== undefined) {
     isControlPanelsVisible = window.subslotControlPanelVisible;
-    console.log(`🔍 方法2(サブスロット状態変数): ${isControlPanelsVisible}`);
+    console.log(`🔍 方法1(サブスロット状態変数): ${isControlPanelsVisible}`);
   }
-  // 方法3: グローバル変数から取得
+  // 方法2: グローバル変数から取得
   else if (window.getControlPanelsVisibility) {
     isControlPanelsVisible = window.getControlPanelsVisibility();
-    console.log(`🔍 方法3(グローバル変数): ${isControlPanelsVisible}`);
+    console.log(`🔍 方法2(グローバル変数): ${isControlPanelsVisible}`);
   }
   // 方法3: ボタンのテキストから判定
   else {
@@ -610,35 +604,6 @@ function updateSubslotControlPanelsVisibility(isVisible) {
   
   console.log(`✅ ${subslotPanels.length}個のサブスロット制御パネルを更新しました`);
 }
-
-// 🎛️ サブスロット制御パネルの開閉状態をlocalStorageで管理
-function saveSubslotControlPanelState(isOpen) {
-  try {
-    localStorage.setItem('rephrase_subslot_control_panel_state', JSON.stringify(isOpen));
-    console.log(`💾 サブスロット制御パネル状態を保存: ${isOpen}`);
-  } catch (error) {
-    console.error("❌ サブスロット制御パネル状態の保存に失敗:", error);
-  }
-}
-
-function loadSubslotControlPanelState() {
-  try {
-    const saved = localStorage.getItem('rephrase_subslot_control_panel_state');
-    if (saved !== null) {
-      const state = JSON.parse(saved);
-      console.log(`📂 サブスロット制御パネル状態を読み込み: ${state}`);
-      return state;
-    }
-    return false; // デフォルトは閉じた状態
-  } catch (error) {
-    console.error("❌ サブスロット制御パネル状態の読み込みに失敗:", error);
-    return false;
-  }
-}
-
-// グローバルにエクスポート
-window.saveSubslotControlPanelState = saveSubslotControlPanelState;
-window.loadSubslotControlPanelState = loadSubslotControlPanelState;
 
 // 🌍 グローバル関数として公開
 window.createSubslotControlPanel = createSubslotControlPanel;
