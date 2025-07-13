@@ -1143,6 +1143,18 @@ h1 {
   font-weight: bold;
 }
 
+/* エラー表示用スタイル */
+.verification-item.error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.verification-item.error strong {
+  color: #dc2626;
+}
+
 /* レベル評価の色分け */
 .analysis-item:has-text("❌ 内容不一致") {
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);

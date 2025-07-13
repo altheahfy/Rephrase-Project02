@@ -561,22 +561,50 @@ class VoiceSystem {
         let recognizedText = '';
         let contentAccuracy = 1.0; // デフォルトは100%（音声認識が利用できない場合）
         let verificationStatus = '音声認識未実行';
+        let recognitionError = '';
+        
+        console.log('🔍 音声認識による内容検証を開始...');
+        console.log('📊 期待文章:', expectedSentence);
         
         try {
             recognizedText = await this.recognizeSpeechFromBlob(this.recordedBlob);
             console.log(`🎯 期待文章: "${expectedSentence}"`);
             console.log(`🎤 認識結果: "${recognizedText}"`);
             
-            if (recognizedText) {
+            if (recognizedText && recognizedText.trim().length > 0) {
                 contentAccuracy = this.calculateTextSimilarity(expectedSentence, recognizedText);
                 verificationStatus = contentAccuracy >= 0.7 ? '内容一致' : '内容不一致';
                 console.log(`📊 内容一致度: ${(contentAccuracy * 100).toFixed(1)}%`);
+                console.log(`✅ 音声認識成功 - 検証完了`);
             } else {
-                verificationStatus = '音声認識失敗';
+                verificationStatus = '音声認識結果が空';
+                recognitionError = '認識結果が空文字でした';
+                console.log('⚠️ 音声認識結果が空です');
             }
         } catch (error) {
             console.log('⚠️ 音声認識エラー:', error.message);
+            recognitionError = error.message;
             verificationStatus = '音声認識エラー';
+            
+            // 🔄 音声認識が失敗した場合の代替評価
+            // 音声の長さと期待される長さから基本的な妥当性をチェック
+            const estimatedWordsFromDuration = Math.round(duration * 2); // 大まかに1秒あたり2語と仮定
+            const durationBasedAccuracy = this.calculateDurationBasedAccuracy(duration, expectedWordCount);
+            
+            console.log(`🔄 代替評価: 録音時間 ${duration.toFixed(2)}秒 から推定単語数 ${estimatedWordsFromDuration}`);
+            console.log(`🔄 時間ベース妥当性: ${(durationBasedAccuracy * 100).toFixed(1)}%`);
+            
+            // 時間ベースの妥当性が低い場合は評価を下げる
+            if (durationBasedAccuracy < 0.3) {
+                contentAccuracy = 0.2; // 音声認識なしでも明らかに短すぎる/長すぎる場合
+                verificationStatus = '時間ベース: 不適切';
+            } else if (durationBasedAccuracy < 0.7) {
+                contentAccuracy = 0.6; // やや疑わしい
+                verificationStatus = '時間ベース: 要注意';
+            } else {
+                contentAccuracy = 0.8; // 音声認識なしでも時間的には妥当
+                verificationStatus = '時間ベース: 妥当';
+            }
         }
         
         // 発話速度分析（認識された内容または期待される内容を使用）
@@ -631,26 +659,76 @@ class VoiceSystem {
             expectedSentence,
             recognizedText,
             contentAccuracy,
-            verificationStatus
+            verificationStatus,
+            recognitionError
         };
+    }
+
+    /**
+     * 録音時間から内容の妥当性を推定（音声認識の代替手段）
+     */
+    calculateDurationBasedAccuracy(actualDuration, expectedWordCount) {
+        // 一般的な発話速度の範囲
+        // 初心者: 1-2語/秒, 中級者: 2-3語/秒, 上級者: 3-4語/秒, 達人: 4-5語/秒
+        const minWordsPerSecond = 0.5; // 最低速度
+        const maxWordsPerSecond = 6.0;  // 最高速度
+        
+        const minExpectedDuration = expectedWordCount / maxWordsPerSecond; // 最短時間
+        const maxExpectedDuration = expectedWordCount / minWordsPerSecond; // 最長時間
+        
+        console.log(`⏰ 期待時間範囲: ${minExpectedDuration.toFixed(2)}秒 - ${maxExpectedDuration.toFixed(2)}秒`);
+        console.log(`⏰ 実際の時間: ${actualDuration.toFixed(2)}秒`);
+        
+        if (actualDuration >= minExpectedDuration && actualDuration <= maxExpectedDuration) {
+            // 妥当な範囲内
+            return 1.0;
+        } else if (actualDuration < minExpectedDuration) {
+            // 短すぎる（早口すぎる、または内容不足）
+            const ratio = actualDuration / minExpectedDuration;
+            return Math.max(0, ratio); // 0-1の範囲
+        } else {
+            // 長すぎる（遅すぎる、または無関係な発話）
+            const ratio = maxExpectedDuration / actualDuration;
+            return Math.max(0, ratio); // 0-1の範囲
+        }
     }
     
     /**
      * 分析結果を表示（改良版）
      */
     displayAnalysisResults(analysis) {
-        const contentVerificationHtml = analysis.recognizedText ? `
-            <div class="content-verification">
-                <h5>🔍 発話内容検証</h5>
-                <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
-                <div class="verification-item"><strong>認識結果:</strong> "${analysis.recognizedText}"</div>
-                <div class="verification-item"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}% (${analysis.verificationStatus})</div>
-            </div>
-        ` : `
-            <div class="content-verification">
-                <div class="verification-item">⚠️ 音声認識による内容検証は実行されませんでした</div>
-            </div>
-        `;
+        let contentVerificationHtml = '';
+        
+        if (analysis.recognizedText) {
+            // 音声認識成功の場合
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <h5>🔍 発話内容検証</h5>
+                    <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
+                    <div class="verification-item"><strong>認識結果:</strong> "${analysis.recognizedText}"</div>
+                    <div class="verification-item"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}% (${analysis.verificationStatus})</div>
+                </div>
+            `;
+        } else if (analysis.recognitionError) {
+            // 音声認識エラーの場合
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <h5>⚠️ 発話内容検証</h5>
+                    <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
+                    <div class="verification-item error"><strong>音声認識エラー:</strong> ${analysis.recognitionError}</div>
+                    <div class="verification-item"><strong>代替評価:</strong> ${analysis.verificationStatus}</div>
+                    <div class="verification-item"><strong>妥当性:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}%</div>
+                </div>
+            `;
+        } else {
+            // 音声認識未実行の場合
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <div class="verification-item">⚠️ 音声認識による内容検証は実行されませんでした</div>
+                    <div class="verification-item">時間ベース評価: ${analysis.verificationStatus}</div>
+                </div>
+            `;
+        }
         
         const resultsHtml = `
             <div class="analysis-results">
@@ -672,72 +750,159 @@ class VoiceSystem {
     }
 
     /**
-     * 音声認識でBlobから文章を認識
+     * 音声認識でBlobから文章を認識（改良版）
      */
     async recognizeSpeechFromBlob(audioBlob) {
+        console.log('🎤 音声認識処理開始...');
+        console.log('📊 音声Blobサイズ:', audioBlob.size, 'bytes');
+        console.log('📊 音声Blobタイプ:', audioBlob.type);
+        
         return new Promise((resolve, reject) => {
-            // Web Speech API の SpeechRecognition を使用
+            // 🔍 ブラウザサポート確認
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
             if (!SpeechRecognition) {
+                console.error('❌ このブラウザは音声認識をサポートしていません');
                 reject(new Error('このブラウザは音声認識をサポートしていません'));
                 return;
             }
             
-            // AudioオブジェクトでBlobを再生し、その間に音声認識を実行
-            const audio = new Audio();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            audio.src = audioUrl;
+            console.log('✅ SpeechRecognition API利用可能');
             
+            // 🎵 方法1: 直接音声認識を実行（推奨）
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
             recognition.continuous = false;
             recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+            recognition.maxAlternatives = 3; // 複数候補を取得
             
             let timeoutId = null;
+            let hasResult = false;
+            
+            console.log('🔧 音声認識設定完了');
+            console.log('📍 言語設定:', recognition.lang);
+            console.log('📍 継続モード:', recognition.continuous);
+            console.log('📍 中間結果:', recognition.interimResults);
             
             recognition.onstart = () => {
                 console.log('🎤 音声認識開始...');
-                // 5秒でタイムアウト
+                console.log('⏰ 10秒のタイムアウトを設定');
+                // タイムアウトを10秒に延長
                 timeoutId = setTimeout(() => {
+                    console.log('⏰ 音声認識タイムアウト');
                     recognition.stop();
-                    reject(new Error('音声認識タイムアウト'));
-                }, 5000);
+                    if (!hasResult) {
+                        reject(new Error('音声認識タイムアウト (10秒)'));
+                    }
+                }, 10000);
             };
             
             recognition.onresult = (event) => {
+                console.log('🎯 音声認識結果受信!');
                 if (timeoutId) clearTimeout(timeoutId);
+                hasResult = true;
                 
-                const result = event.results[0][0];
-                const transcript = result.transcript;
-                const confidence = result.confidence;
+                console.log('📊 認識結果数:', event.results.length);
+                for (let i = 0; i < event.results.length; i++) {
+                    console.log(`📝 結果${i+1}:`, event.results[i]);
+                    for (let j = 0; j < event.results[i].length; j++) {
+                        const alternative = event.results[i][j];
+                        console.log(`  - 候補${j+1}: "${alternative.transcript}" (信頼度: ${(alternative.confidence * 100).toFixed(1)}%)`);
+                    }
+                }
                 
-                console.log(`🎯 認識結果: "${transcript}" (信頼度: ${(confidence * 100).toFixed(1)}%)`);
-                
-                URL.revokeObjectURL(audioUrl);
-                resolve(transcript);
+                if (event.results.length > 0 && event.results[0].length > 0) {
+                    const result = event.results[0][0];
+                    const transcript = result.transcript;
+                    const confidence = result.confidence || 0;
+                    
+                    console.log(`✅ 最終認識結果: "${transcript}" (信頼度: ${(confidence * 100).toFixed(1)}%)`);
+                    resolve(transcript);
+                } else {
+                    console.log('⚠️ 音声認識結果が空です');
+                    reject(new Error('音声認識結果が空です'));
+                }
             };
             
             recognition.onerror = (event) => {
+                console.error('❌ 音声認識エラー発生:', event);
+                console.error('エラータイプ:', event.error);
+                console.error('エラーメッセージ:', event.message || 'なし');
+                
                 if (timeoutId) clearTimeout(timeoutId);
-                console.error('音声認識エラー:', event.error);
-                URL.revokeObjectURL(audioUrl);
-                reject(new Error(`音声認識エラー: ${event.error}`));
+                
+                let errorMessage = '音声認識エラー';
+                switch (event.error) {
+                    case 'no-speech':
+                        errorMessage = '音声が検出されませんでした';
+                        break;
+                    case 'audio-capture':
+                        errorMessage = '音声キャプチャエラー';
+                        break;
+                    case 'not-allowed':
+                        errorMessage = 'マイクアクセスが許可されていません';
+                        break;
+                    case 'network':
+                        errorMessage = 'ネットワークエラー';
+                        break;
+                    case 'service-not-allowed':
+                        errorMessage = '音声認識サービスが許可されていません';
+                        break;
+                    default:
+                        errorMessage = `音声認識エラー: ${event.error}`;
+                }
+                
+                reject(new Error(errorMessage));
             };
             
             recognition.onend = () => {
+                console.log('🔚 音声認識処理終了');
                 if (timeoutId) clearTimeout(timeoutId);
-                console.log('🔚 音声認識終了');
+                
+                if (!hasResult) {
+                    console.log('⚠️ 結果なしで音声認識が終了しました');
+                    reject(new Error('音声認識結果なし'));
+                }
             };
             
-            // 録音音声を再生しながら認識を開始
+            // 🎵 方法2: Blobから音声を再生しながら音声認識を実行
             try {
+                console.log('🔊 録音音声の再生開始...');
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                audio.oncanplaythrough = () => {
+                    console.log('🔊 音声再生準備完了');
+                    console.log('🎤 音声認識開始...');
+                    recognition.start();
+                };
+                
+                audio.onended = () => {
+                    console.log('🔊 音声再生終了');
+                    URL.revokeObjectURL(audioUrl);
+                };
+                
+                audio.onerror = (error) => {
+                    console.error('🔊 音声再生エラー:', error);
+                    URL.revokeObjectURL(audioUrl);
+                    reject(new Error('音声再生エラー'));
+                };
+                
+                // 音量を少し下げて再生
+                audio.volume = 0.8;
                 audio.play();
-                recognition.start();
+                
             } catch (error) {
-                URL.revokeObjectURL(audioUrl);
-                reject(error);
+                console.error('❌ 音声再生+認識の初期化エラー:', error);
+                
+                // フォールバック: 直接音声認識を開始
+                console.log('🔄 フォールバック: 直接音声認識を試行');
+                try {
+                    recognition.start();
+                } catch (startError) {
+                    console.error('❌ 音声認識開始エラー:', startError);
+                    reject(new Error(`音声認識開始失敗: ${startError.message}`));
+                }
             }
         });
     }
