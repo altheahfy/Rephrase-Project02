@@ -48,13 +48,18 @@ function createSubslotControlPanel(parentSlot) {
   
   console.log(`🔍 ${parentSlot} サブスロット制御パネル最終判定: ${isControlPanelsVisible}`);
   
+  // 🐛 デバッグ: 強制的に表示状態をテスト
+  console.log(`🐛 デバッグ: ${parentSlot}制御パネルを強制表示でテスト`);
+  const forceVisible = true; // テスト用
+  
   panelContainer.style.cssText = `
-    display: ${isControlPanelsVisible ? 'block' : 'none'};
+    display: ${forceVisible ? 'block' : 'none'};
     background: rgba(255, 255, 255, 0.95);
     padding: 8px;
     margin-top: 15px;
     border-radius: 5px;
     border: 1px solid #ddd;
+    border: 2px solid red; /* デバッグ用の赤枠 */
   `;
   
   // パネルタイトル
