@@ -202,6 +202,70 @@ function resetAllVisibility() {
   ALL_SLOTS.forEach(slotKey => {
     resetSlotVisibility(slotKey);
   });
+  
+  // 🆕 全サブスロットの英文状態もlocalStorageでリセット
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    let visibilityState = {};
+    if (saved) {
+      visibilityState = JSON.parse(saved);
+    }
+    
+    // 全親スロットの全サブスロットの英文をtrueに設定
+    const PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
+    const SUBSLOT_TYPES = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+    
+    PARENT_SLOTS.forEach(parentSlot => {
+      SUBSLOT_TYPES.forEach(subslotType => {
+        const subslotId = `slot-${parentSlot.toLowerCase()}-sub-${subslotType.toLowerCase()}`;
+        if (!visibilityState[subslotId]) {
+          visibilityState[subslotId] = {};
+        }
+        visibilityState[subslotId].text = true;
+      });
+    });
+    
+    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+    console.log("🔄 全サブスロットの英文状態をlocalStorageでリセットしました");
+    
+    // 🆕 現在画面上にあるサブスロットの表示も直接更新
+    PARENT_SLOTS.forEach(parentSlot => {
+      SUBSLOT_TYPES.forEach(subslotType => {
+        const subslotId = `slot-${parentSlot.toLowerCase()}-sub-${subslotType.toLowerCase()}`;
+        const subslotElement = document.getElementById(subslotId);
+        
+        if (subslotElement) {
+          // 非表示クラスを削除
+          subslotElement.classList.remove('hidden-subslot-text');
+          
+          // 英文要素の直接制御
+          const textElements = subslotElement.querySelectorAll('.slot-phrase');
+          textElements.forEach(textElement => {
+            textElement.style.opacity = '1';
+            textElement.style.visibility = 'visible';
+          });
+          
+          console.log(`🔄 ${subslotId}の英文表示を復活させました`);
+        }
+      });
+    });
+    
+    // サブスロット制御パネルのボタンも更新
+    const subslotPanels = document.querySelectorAll('.subslot-visibility-panel');
+    subslotPanels.forEach(panel => {
+      const textButtons = panel.querySelectorAll('.subslot-toggle-button[data-element-type="text"]');
+      textButtons.forEach(button => {
+        // ボタンスタイルを表示状態に更新
+        if (window.updateToggleButtonStyle) {
+          window.updateToggleButtonStyle(button, true);
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error("❌ サブスロット英文状態のリセットに失敗:", error);
+  }
+  
   console.log("🔄 全スロットの表示をリセットしました");
 }
 
