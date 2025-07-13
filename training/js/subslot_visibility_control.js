@@ -191,6 +191,23 @@ function createSubslotControlPanel(parentSlot) {
     window.syncSubslotControlPanelVisibility(panelContainer);
   }
   
+  // 🏗️ 制御パネルをサブスロットエリアに挿入
+  const subslotArea = document.getElementById(`slot-${parentSlot}-sub`);
+  if (subslotArea) {
+    // 既存の制御パネルを削除（重複防止）
+    const existingPanel = subslotArea.querySelector(`#subslot-visibility-panel-${parentSlot}`);
+    if (existingPanel) {
+      existingPanel.remove();
+      console.log(`🗑️ 既存の制御パネルを削除: ${parentSlot}`);
+    }
+    
+    // 制御パネルをサブスロットエリアの最後に挿入
+    subslotArea.appendChild(panelContainer);
+    console.log(`🏗️ 制御パネルをDOM挿入完了: ${parentSlot}`);
+  } else {
+    console.error(`❌ サブスロットエリアが見つかりません: slot-${parentSlot}-sub`);
+  }
+  
   console.log(`✅ ${parentSlot}サブスロット用コントロールパネル生成完了`);
   return panelContainer;
 }
