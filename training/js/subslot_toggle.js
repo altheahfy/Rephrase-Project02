@@ -1,3 +1,6 @@
+// 🎛️ サブスロット制御パネルの表示状態を管理
+let subslotControlPanelVisible = false;
+
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
   toggleExclusiveSubslot.lock = true;
@@ -15,6 +18,13 @@ function toggleExclusiveSubslot(slotId) {
 
   // 🔗 全サブスロットを閉じる前に、タブ連結スタイルをクリア
   clearAllTabConnections();
+  
+  // 🎛️ 制御パネルの表示状態を確認・記憶
+  const existingPanel = document.querySelector('.subslot-visibility-panel');
+  if (existingPanel) {
+    subslotControlPanelVisible = (existingPanel.style.display !== 'none');
+    console.log(`🎛️ 制御パネル表示状態を記憶: ${subslotControlPanelVisible}`);
+  }
   
   subslotIds.forEach(id => {
     const el = document.getElementById(`slot-${id}-sub`);
@@ -122,6 +132,16 @@ function toggleExclusiveSubslot(slotId) {
     if (window.createSubslotControlPanel) {
       console.log(`🎛️ ${slotId} のサブスロット制御パネルを作成します`);
       window.createSubslotControlPanel(slotId);
+      
+      // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
+      if (subslotControlPanelVisible) {
+        console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
+        setTimeout(() => {
+          if (window.updateSubslotControlPanelsVisibility) {
+            window.updateSubslotControlPanelsVisibility(true);
+          }
+        }, 100); // パネル作成完了を待つ
+      }
     } else {
       console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
     }

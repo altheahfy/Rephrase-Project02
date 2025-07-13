@@ -17,26 +17,32 @@ function createSubslotControlPanel(parentSlot) {
   // 制御パネルの表示状態を複数の方法で確認
   let isControlPanelsVisible = false;
   
-  // 方法1: グローバル変数から取得
-  if (window.getControlPanelsVisibility) {
+  // 方法1: サブスロット制御パネル状態変数から取得（最優先）
+  if (window.subslotControlPanelVisible !== undefined) {
+    isControlPanelsVisible = window.subslotControlPanelVisible;
+    console.log(`🔍 方法1(サブスロット状態変数): ${isControlPanelsVisible}`);
+  }
+  // 方法2: グローバル変数から取得
+  else if (window.getControlPanelsVisibility) {
     isControlPanelsVisible = window.getControlPanelsVisibility();
-    console.log(`🔍 方法1(グローバル変数): ${isControlPanelsVisible}`);
+    console.log(`🔍 方法2(グローバル変数): ${isControlPanelsVisible}`);
   }
-  
-  // 方法2: ボタンのテキストから判定
-  const toggleBtn = document.getElementById('toggle-control-panels');
-  if (toggleBtn) {
-    const btnTextVisible = toggleBtn.textContent.includes('表示中');
-    console.log(`🔍 方法2(ボタンテキスト): ${btnTextVisible}`);
-    isControlPanelsVisible = isControlPanelsVisible || btnTextVisible;
-  }
-  
-  // 方法3: 上位制御パネルの表示状態から判定
-  const upperPanel = document.getElementById('visibility-control-panel-inline');
-  if (upperPanel) {
-    const upperVisible = upperPanel.style.display !== 'none';
-    console.log(`🔍 方法3(上位パネル表示): ${upperVisible}`);
-    isControlPanelsVisible = isControlPanelsVisible || upperVisible;
+  // 方法3: ボタンのテキストから判定
+  else {
+    const toggleBtn = document.getElementById('toggle-control-panels');
+    if (toggleBtn) {
+      const btnTextVisible = toggleBtn.textContent.includes('表示中');
+      console.log(`🔍 方法3(ボタンテキスト): ${btnTextVisible}`);
+      isControlPanelsVisible = btnTextVisible;
+    }
+    
+    // 方法4: 上位制御パネルの表示状態から判定
+    const upperPanel = document.getElementById('visibility-control-panel-inline');
+    if (upperPanel && !isControlPanelsVisible) {
+      const upperVisible = upperPanel.style.display !== 'none';
+      console.log(`🔍 方法4(上位パネル表示): ${upperVisible}`);
+      isControlPanelsVisible = upperVisible;
+    }
   }
   
   console.log(`🔍 ${parentSlot} サブスロット制御パネル最終判定: ${isControlPanelsVisible}`);
