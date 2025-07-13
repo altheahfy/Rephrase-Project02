@@ -1,27 +1,5 @@
-// 🎛️ サブスロット制御パネルの表示状態を管理（グローバル）
-window.subslotControlPanelVisible = window.subslotControlPanelVisible || false;
-
-// 🔍 デバッグ用: 状態監視関数
-window.debugSubslotPanelState = function() {
-  console.log(`🔍 デバッグ情報:`);
-  console.log(`  - window.subslotControlPanelVisible: ${window.subslotControlPanelVisible}`);
-  
-  const existingPanels = document.querySelectorAll('.subslot-visibility-panel');
-  console.log(`  - 既存サブスロット制御パネル数: ${existingPanels.length}`);
-  existingPanels.forEach((panel, index) => {
-    const computed = window.getComputedStyle(panel);
-    console.log(`    [${index}] ${panel.id}: display=${computed.display}, style.display=${panel.style.display}`);
-  });
-  
-  const toggleBtn = document.getElementById('toggle-control-panels');
-  if (toggleBtn) {
-    console.log(`  - 制御パネルボタンテキスト: "${toggleBtn.textContent}"`);
-  }
-  
-  if (window.getControlPanelsVisibility) {
-    console.log(`  - getControlPanelsVisibility(): ${window.getControlPanelsVisibility()}`);
-  }
-};
+// 🎛️ サブスロット制御パネルの表示状態を管理
+let subslotControlPanelVisible = false;
 
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
@@ -41,34 +19,12 @@ function toggleExclusiveSubslot(slotId) {
   // 🔗 全サブスロットを閉じる前に、タブ連結スタイルをクリア
   clearAllTabConnections();
   
-  // 🎛️ 制御パネルの表示状態を確認・記憶（複数の方法で確認）
-  let panelWasVisible = false;
-  
-  // 方法1: 既存のサブスロット制御パネルをチェック
+  // 🎛️ 制御パネルの表示状態を確認・記憶
   const existingPanel = document.querySelector('.subslot-visibility-panel');
   if (existingPanel) {
-    const panelStyle = window.getComputedStyle(existingPanel);
-    panelWasVisible = (panelStyle.display !== 'none' && existingPanel.style.display !== 'none');
-    console.log(`🔍 方法1 - 既存パネルの表示状態: ${panelWasVisible}`);
+    subslotControlPanelVisible = (existingPanel.style.display !== 'none');
+    console.log(`🎛️ 制御パネル表示状態を記憶: ${subslotControlPanelVisible}`);
   }
-  
-  // 方法2: グローバル制御パネル表示状態をチェック
-  if (!panelWasVisible && window.getControlPanelsVisibility) {
-    panelWasVisible = window.getControlPanelsVisibility();
-    console.log(`🔍 方法2 - グローバル制御パネル状態: ${panelWasVisible}`);
-  }
-  
-  // 方法3: 上位制御パネルボタンの状態をチェック
-  if (!panelWasVisible) {
-    const toggleBtn = document.getElementById('toggle-control-panels');
-    if (toggleBtn) {
-      panelWasVisible = toggleBtn.textContent.includes('表示中');
-      console.log(`🔍 方法3 - ボタンテキスト状態: ${panelWasVisible}`);
-    }
-  }
-  
-  window.subslotControlPanelVisible = panelWasVisible;
-  console.log(`🎛️ 制御パネル表示状態を記憶: ${window.subslotControlPanelVisible}`);
   
   subslotIds.forEach(id => {
     const el = document.getElementById(`slot-${id}-sub`);
@@ -178,21 +134,13 @@ function toggleExclusiveSubslot(slotId) {
       window.createSubslotControlPanel(slotId);
       
       // 🎛️ 前回制御パネルが表示されていた場合は、新しいパネルを自動表示
-      if (window.subslotControlPanelVisible) {
+      if (subslotControlPanelVisible) {
         console.log(`🎛️ 前回の表示状態に基づいて ${slotId} の制御パネルを表示します`);
         setTimeout(() => {
-          // 作成されたパネルを直接表示
-          const newPanel = document.querySelector(`#subslot-visibility-panel-${slotId}`);
-          if (newPanel) {
-            newPanel.style.display = 'block';
-            console.log(`✅ ${slotId} 制御パネルを直接表示しました`);
-          }
-          
-          // グローバル更新関数も呼び出し
           if (window.updateSubslotControlPanelsVisibility) {
             window.updateSubslotControlPanelsVisibility(true);
           }
-        }, 150); // パネル作成完了を確実に待つ
+        }, 100); // パネル作成完了を待つ
       }
     } else {
       console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
@@ -327,25 +275,6 @@ function initializeSubslots() {
     slot.style.boxShadow = '';
   });
 }
-
-// 🎛️ ページ読み込み時の初期化
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 subslot_toggle.js: DOM読み込み完了');
-  
-  // 制御パネルの初期状態を設定
-  if (window.subslotControlPanelVisible === undefined) {
-    window.subslotControlPanelVisible = false;
-    console.log('🎛️ 制御パネル状態を初期化: false');
-  }
-  
-  // デバッグ情報を出力
-  if (window.debugSubslotPanelState) {
-    setTimeout(() => {
-      console.log('🔍 初期化後のデバッグ情報:');
-      window.debugSubslotPanelState();
-    }, 1000);
-  }
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   // 初期化：全サブスロットを閉じる
