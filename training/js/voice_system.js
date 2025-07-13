@@ -272,10 +272,10 @@ class VoiceSystem {
             analyzeBtn.addEventListener('click', () => this.analyzeRecording());
         }
         
-        // パネル開くボタン
+        // パネル開くボタン（トグル機能）
         const openBtn = document.getElementById('voice-panel-open-btn');
         if (openBtn) {
-            openBtn.addEventListener('click', () => this.showVoicePanel());
+            openBtn.addEventListener('click', () => this.toggleVoicePanel());
         }
         
         // パネル閉じるボタン
@@ -630,6 +630,21 @@ class VoiceSystem {
                     resultsContainer.innerHTML = '';
                 }
             }, 300);
+        }
+    }
+    
+    /**
+     * 音声パネルの表示/非表示を切り替え
+     */
+    toggleVoicePanel() {
+        const panel = document.getElementById('voice-control-panel');
+        if (panel) {
+            const isVisible = panel.style.display === 'block';
+            if (isVisible) {
+                this.hideVoicePanel();
+            } else {
+                this.showVoicePanel();
+            }
         }
     }
     
