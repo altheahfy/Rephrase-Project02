@@ -260,47 +260,46 @@
   <!-- 🎤 音声学習パネル（制御パネルの下に縦積み、デフォルト非表示） -->
   <div id="voice-control-panel" style="
     display: none; 
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-    padding: 15px; 
-    border-radius: 8px; 
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 8px; 
+    border-radius: 5px; 
     border: 1px solid #ddd; 
     margin-bottom: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: static;
+    transform: none;
   ">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="margin: 0; color: white; font-size: 16px; font-weight: bold;">🎤 音声学習システム</h3>
-      <button id="voice-panel-close-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+      <h3 style="margin: 0; color: #333; font-size: 16px; font-weight: bold;">🎤 音声学習システム</h3>
+      <button id="voice-panel-close-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
     </div>
     
     <!-- 音声コントロールボタン -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
-      <button id="voice-record-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🎤 録音</button>
-      <button id="voice-play-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🔊 再生</button>
-      <button id="voice-tts-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🗣️ 読み上げ</button>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-      <button id="voice-analyze-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">📊 分析</button>
-      <button id="voice-stop-btn" class="voice-btn" style="display: none; padding: 6px 8px; font-size: 12px;">⏹️ 停止</button>
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+      <button id="voice-record-btn" class="voice-btn" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
+      <button id="voice-play-btn" class="voice-btn" style="background-color: #2196F3; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+      <button id="voice-tts-btn" class="voice-btn" style="background-color: #FF9800; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
+      <button id="voice-analyze-btn" class="voice-btn" style="background-color: #9C27B0; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+      <button id="voice-stop-btn" class="voice-btn" style="display: none; background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">⏹️ 停止</button>
     </div>
     
     <!-- ステータス表示 -->
-    <div id="voice-status" class="voice-status info" style="color: white; font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 12px; margin-bottom: 8px; text-align: center;">待機中...</div>
+    <div id="voice-status" class="voice-status info" style="color: #333; font-size: 11px; background: rgba(76, 175, 80, 0.1); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: center;">待機中...</div>
     
     <!-- 録音タイマー -->
-    <div style="text-align: center; margin-bottom: 8px;">
-      <span style="color: white; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer">⏱️ 00:00</span>
+    <div style="text-align: center; margin: 8px 0;">
+      <span style="color: #333; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer">⏱️ 00:00</span>
     </div>
     
     <!-- 音量バー -->
-    <div style="margin-bottom: 10px;">
-      <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden;">
+    <div style="margin: 8px 0;">
+      <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden;">
         <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
       </div>
     </div>
     
     <!-- 分析結果表示エリア -->
-    <div id="voice-analysis-results" style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; min-height: 30px; color: white; font-size: 11px;">分析結果がここに表示されます</div>
+    <div id="voice-analysis-results" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 30px; color: #333; font-size: 11px;">分析結果がここに表示されます</div>
   </div>
   
   <section>
