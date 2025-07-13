@@ -559,52 +559,55 @@ class VoiceSystem {
         
         // 🔍 音声認識による内容検証を試行
         let recognizedText = '';
-        let contentAccuracy = 1.0; // デフォルトは100%（音声認識が利用できない場合）
-        let verificationStatus = '音声認識未実行';
+        let contentAccuracy = 0.8; // デフォルトを音声認識なしでも妥当な値に設定
+        let verificationStatus = '時間ベース評価';
         let recognitionError = '';
         
-        console.log('🔍 音声認識による内容検証を開始...');
+        console.log('🔍 音声内容の評価を開始...');
         console.log('📊 期待文章:', expectedSentence);
         
-        try {
-            recognizedText = await this.recognizeSpeechFromBlob(this.recordedBlob);
-            console.log(`🎯 期待文章: "${expectedSentence}"`);
-            console.log(`🎤 認識結果: "${recognizedText}"`);
-            
-            if (recognizedText && recognizedText.trim().length > 0) {
-                contentAccuracy = this.calculateTextSimilarity(expectedSentence, recognizedText);
-                verificationStatus = contentAccuracy >= 0.7 ? '内容一致' : '内容不一致';
-                console.log(`📊 内容一致度: ${(contentAccuracy * 100).toFixed(1)}%`);
-                console.log(`✅ 音声認識成功 - 検証完了`);
-            } else {
-                verificationStatus = '音声認識結果が空';
-                recognitionError = '認識結果が空文字でした';
-                console.log('⚠️ 音声認識結果が空です');
+        // 🎯 改良: 音声認識は試行するが、エラー時は時間ベース評価を使用
+        console.log('⚠️ 注意: Web Speech APIの制限により、録音データからの直接音声認識は技術的に困難です');
+        console.log('🔄 代替として、録音時間と音声品質による評価を実行します');
+        
+        // 🔄 時間ベース + 音質ベースの包括的評価
+        const durationBasedAccuracy = this.calculateDurationBasedAccuracy(duration, expectedWordCount);
+        const qualityBasedAccuracy = this.calculateAudioQualityScore(averageVolume, maxAmplitude, duration);
+        
+        console.log(`📊 時間ベース妥当性: ${(durationBasedAccuracy * 100).toFixed(1)}%`);
+        console.log(`📊 音質ベース妥当性: ${(qualityBasedAccuracy * 100).toFixed(1)}%`);
+        
+        // 時間と音質を組み合わせた総合評価
+        contentAccuracy = (durationBasedAccuracy * 0.7) + (qualityBasedAccuracy * 0.3);
+        
+        if (contentAccuracy >= 0.8) {
+            verificationStatus = '高品質発話 (時間・音質良好)';
+        } else if (contentAccuracy >= 0.6) {
+            verificationStatus = '標準品質発話 (時間・音質普通)';
+        } else if (contentAccuracy >= 0.4) {
+            verificationStatus = '要改善発話 (時間・音質に課題)';
+        } else {
+            verificationStatus = '不適切発話 (時間・音質不良)';
+        }
+        
+        // 🎯 オプション: 将来的な音声認識の実装準備
+        if (false) { // 現在は無効化
+            try {
+                console.log('🔬 実験的音声認識を試行中...');
+                recognizedText = await this.recognizeSpeechFromBlob(this.recordedBlob);
+                
+                if (recognizedText && recognizedText.trim().length > 0) {
+                    const speechAccuracy = this.calculateTextSimilarity(expectedSentence, recognizedText);
+                    contentAccuracy = (contentAccuracy * 0.4) + (speechAccuracy * 0.6); // 音声認識結果を重視
+                    verificationStatus = speechAccuracy >= 0.7 ? '内容一致確認' : '内容要確認';
+                    console.log(`✅ 音声認識成功 - 内容一致度: ${(speechAccuracy * 100).toFixed(1)}%`);
+                }
+            } catch (error) {
+                console.log('ℹ️ 音声認識は利用できませんが、時間・音質ベース評価で継続します');
+                recognitionError = `音声認識未対応 (${error.message})`;
             }
-        } catch (error) {
-            console.log('⚠️ 音声認識エラー:', error.message);
-            recognitionError = error.message;
-            verificationStatus = '音声認識エラー';
-            
-            // 🔄 音声認識が失敗した場合の代替評価
-            // 音声の長さと期待される長さから基本的な妥当性をチェック
-            const estimatedWordsFromDuration = Math.round(duration * 2); // 大まかに1秒あたり2語と仮定
-            const durationBasedAccuracy = this.calculateDurationBasedAccuracy(duration, expectedWordCount);
-            
-            console.log(`🔄 代替評価: 録音時間 ${duration.toFixed(2)}秒 から推定単語数 ${estimatedWordsFromDuration}`);
-            console.log(`🔄 時間ベース妥当性: ${(durationBasedAccuracy * 100).toFixed(1)}%`);
-            
-            // 時間ベースの妥当性が低い場合は評価を下げる
-            if (durationBasedAccuracy < 0.3) {
-                contentAccuracy = 0.2; // 音声認識なしでも明らかに短すぎる/長すぎる場合
-                verificationStatus = '時間ベース: 不適切';
-            } else if (durationBasedAccuracy < 0.7) {
-                contentAccuracy = 0.6; // やや疑わしい
-                verificationStatus = '時間ベース: 要注意';
-            } else {
-                contentAccuracy = 0.8; // 音声認識なしでも時間的には妥当
-                verificationStatus = '時間ベース: 妥当';
-            }
+        } else {
+            recognitionError = '音声認識は現在無効化されています (時間・音質ベース評価を使用)';
         }
         
         // 発話速度分析（認識された内容または期待される内容を使用）
@@ -692,6 +695,69 @@ class VoiceSystem {
             return Math.max(0, ratio); // 0-1の範囲
         }
     }
+
+    /**
+     * 音声品質によるスコア計算
+     */
+    calculateAudioQualityScore(averageVolume, maxAmplitude, duration) {
+        console.log(`🔊 音質評価開始:`);
+        console.log(`📊 平均音量: ${averageVolume.toFixed(2)}`);
+        console.log(`📊 最大振幅: ${maxAmplitude.toFixed(2)}`);
+        console.log(`📊 録音時間: ${duration.toFixed(2)}秒`);
+        
+        let qualityScore = 1.0;
+        
+        // 1. 音量レベルの評価
+        let volumeScore = 1.0;
+        if (averageVolume < 1.0) {
+            volumeScore = 0.3; // 音量が低すぎる
+            console.log('⚠️ 音量が低すぎます (マイクに近づいてください)');
+        } else if (averageVolume < 5.0) {
+            volumeScore = 0.6; // やや低い音量
+            console.log('📢 音量がやや低めです');
+        } else if (averageVolume > 50.0) {
+            volumeScore = 0.7; // 音量が高すぎる
+            console.log('⚠️ 音量が高すぎます (マイクから離れてください)');
+        } else {
+            volumeScore = 1.0; // 適切な音量
+            console.log('✅ 音量レベル良好');
+        }
+        
+        // 2. 録音時間の評価
+        let durationScore = 1.0;
+        if (duration < 0.5) {
+            durationScore = 0.2; // 短すぎる
+            console.log('⚠️ 録音時間が短すぎます');
+        } else if (duration < 1.0) {
+            durationScore = 0.5; // やや短い
+            console.log('📏 録音時間がやや短めです');
+        } else if (duration > 20.0) {
+            durationScore = 0.6; // 長すぎる
+            console.log('⚠️ 録音時間が長すぎます');
+        } else {
+            console.log('✅ 録音時間適切');
+        }
+        
+        // 3. 音声の動的範囲（ダイナミックレンジ）
+        let dynamicRangeScore = 1.0;
+        const dynamicRange = maxAmplitude - (averageVolume / 100);
+        if (dynamicRange < 10) {
+            dynamicRangeScore = 0.7; // 単調な音声
+            console.log('📊 音声の変化が少ないです');
+        } else {
+            console.log('✅ 音声の変化良好');
+        }
+        
+        // 総合音質スコア
+        qualityScore = (volumeScore * 0.5) + (durationScore * 0.3) + (dynamicRangeScore * 0.2);
+        
+        console.log(`📊 音量スコア: ${(volumeScore * 100).toFixed(1)}%`);
+        console.log(`📊 時間スコア: ${(durationScore * 100).toFixed(1)}%`);
+        console.log(`📊 変化スコア: ${(dynamicRangeScore * 100).toFixed(1)}%`);
+        console.log(`📊 総合音質スコア: ${(qualityScore * 100).toFixed(1)}%`);
+        
+        return qualityScore;
+    }
     
     /**
      * 分析結果を表示（改良版）
@@ -700,7 +766,7 @@ class VoiceSystem {
         let contentVerificationHtml = '';
         
         if (analysis.recognizedText) {
-            // 音声認識成功の場合
+            // 音声認識成功の場合（現在は無効化されているため使用されない）
             contentVerificationHtml = `
                 <div class="content-verification">
                     <h5>🔍 発話内容検証</h5>
@@ -709,23 +775,25 @@ class VoiceSystem {
                     <div class="verification-item"><strong>一致度:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}% (${analysis.verificationStatus})</div>
                 </div>
             `;
-        } else if (analysis.recognitionError) {
-            // 音声認識エラーの場合
-            contentVerificationHtml = `
-                <div class="content-verification">
-                    <h5>⚠️ 発話内容検証</h5>
-                    <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
-                    <div class="verification-item error"><strong>音声認識エラー:</strong> ${analysis.recognitionError}</div>
-                    <div class="verification-item"><strong>代替評価:</strong> ${analysis.verificationStatus}</div>
-                    <div class="verification-item"><strong>妥当性:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}%</div>
-                </div>
-            `;
         } else {
-            // 音声認識未実行の場合
+            // 時間・音質ベース評価の場合
+            const accuracyClass = analysis.contentAccuracy >= 0.8 ? 'good' : 
+                                 analysis.contentAccuracy >= 0.6 ? 'fair' : 'poor';
+            
             contentVerificationHtml = `
                 <div class="content-verification">
-                    <div class="verification-item">⚠️ 音声認識による内容検証は実行されませんでした</div>
-                    <div class="verification-item">時間ベース評価: ${analysis.verificationStatus}</div>
+                    <h5>📊 発話品質評価</h5>
+                    <div class="verification-item"><strong>期待文章:</strong> "${analysis.expectedSentence}"</div>
+                    <div class="verification-item info"><strong>評価方法:</strong> 録音時間と音声品質による包括的評価</div>
+                    <div class="verification-item ${accuracyClass}"><strong>総合評価:</strong> ${analysis.verificationStatus}</div>
+                    <div class="verification-item"><strong>品質スコア:</strong> ${(analysis.contentAccuracy * 100).toFixed(1)}%</div>
+                    
+                    <div style="margin-top: 10px; padding: 8px; background: #f0f9ff; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                        💡 <strong>評価について:</strong><br>
+                        • 録音時間が期待される範囲内かを確認<br>
+                        • 音声の明瞭度と音量レベルを評価<br>
+                        • 将来的に音声認識機能を追加予定
+                    </div>
                 </div>
             `;
         }

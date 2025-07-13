@@ -1155,6 +1155,33 @@ h1 {
   color: #dc2626;
 }
 
+/* 品質評価用スタイル */
+.verification-item.good {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+  color: #15803d;
+  font-weight: bold;
+}
+
+.verification-item.fair {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.verification-item.poor {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.verification-item.info {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
 /* レベル評価の色分け */
 .analysis-item:has-text("❌ 内容不一致") {
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
