@@ -187,7 +187,7 @@
       制御パネル
     </button>
     
-    <!-- 音声学習ボタン（制御パネルの右隣、画面中央付近） -->
+    <!-- 音声学習ボタン（制御パネルの右隣） -->
     <button id="voice-panel-open-btn" style="
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
@@ -199,123 +199,174 @@
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: all 0.2s ease;
-      margin-left: 50vw;
-      transform: translateX(-50%);
-    " onmouseover="this.style.transform='translateX(-50%) scale(1.05)'" onmouseout="this.style.transform='translateX(-50%) scale(1)'">
+    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
       🎤 音声学習
     </button>
   </div>
   
-  <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
-  <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
-      <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
-        
-        <!-- 疑問詞 スロット -->
-        <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
-          </div>
+  <!-- 制御パネル（可視性制御用、ボタンの下） -->
+  <div id="visibility-control-panel-inline" style="
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: none;
+  ">
+    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+      
+      <!-- 疑問詞 スロット -->
+      <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- M1 スロット -->
-        <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- M1 スロット -->
+      <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- S スロット -->
-        <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- S スロット -->
+      <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- Aux スロット -->
-        <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- Aux スロット -->
+      <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- M2 スロット -->
-        <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M2</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- M2 スロット -->
+      <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M2</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- V スロット -->
-        <div class="slot-control-group" data-slot="v" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">V</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- V スロット -->
+      <div class="slot-control-group" data-slot="v" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">V</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- C1 スロット -->
-        <div class="slot-control-group" data-slot="c1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C1</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- C1 スロット -->
+      <div class="slot-control-group" data-slot="c1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C1</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- O1 スロット -->
-        <div class="slot-control-group" data-slot="o1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O1</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- O1 スロット -->
+      <div class="slot-control-group" data-slot="o1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O1</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- O2 スロット -->
-        <div class="slot-control-group" data-slot="o2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O2</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- O2 スロット -->
+      <div class="slot-control-group" data-slot="o2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O2</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- C2 スロット -->
-        <div class="slot-control-group" data-slot="c2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C2</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- C2 スロット -->
+      <div class="slot-control-group" data-slot="c2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C2</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- M3 スロット -->
-        <div class="slot-control-group" data-slot="m3" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M3</div>
-          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝</label>
-            <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄</label>
-          </div>
+      </div>
+      
+      <!-- M3 スロット -->
+      <div class="slot-control-group" data-slot="m3" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M3</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝</label>
+          <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄</label>
         </div>
-        
-        <!-- 全表示ボタン -->
-        <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
-        
-        <!-- 全英文非表示ボタン -->
-        <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
+      </div>
+      
+      <!-- 全表示ボタン -->
+      <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
+      
+      <!-- 全英文非表示ボタン -->
+      <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
+    </div>
+
+  <!-- 音声パネル（制御パネルの下に積み重ね） -->
+  <div id="voice-control-panel" style="
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: none;
+  ">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="margin: 0; color: white; font-size: 16px; font-weight: bold;">🎤 音声学習システム</h3>
+      <button id="voice-panel-close-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+    </div>
+    
+    <!-- 音声コントロールボタン -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
+      <button id="voice-record-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🎤 録音</button>
+      <button id="voice-play-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🔊 再生</button>
+      <button id="voice-tts-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">🗣️ 読み上げ</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+      <button id="voice-analyze-btn" class="voice-btn" style="padding: 6px 8px; font-size: 12px;">📊 分析</button>
+      <button id="voice-stop-btn" class="voice-btn" style="display: none; padding: 6px 8px; font-size: 12px;">⏹️ 停止</button>
+    </div>
+    
+    <!-- ステータス表示 -->
+    <div id="voice-status" class="voice-status info" style="color: white; font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 12px; margin-bottom: 8px; text-align: center;">待機中...</div>
+    
+    <!-- 録音タイマー -->
+    <div style="text-align: center; margin-bottom: 8px;">
+      <span style="color: white; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer">⏱️ 00:00</span>
+    </div>
+    
+    <!-- 音量バー -->
+    <div style="margin-bottom: 10px;">
+      <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden;">
+        <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
       </div>
     </div>
+    
+    <!-- 分析結果表示エリア -->
+    <div id="voice-analysis-results" style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; min-height: 30px; color: white; font-size: 11px;">分析結果がここに表示されます</div>
   </div>
   <section>
    <button id="randomize-all">
@@ -324,40 +375,6 @@
    <h2 style="margin-bottom: 15px; margin-top: 20px;">
     例文
    </h2>
-
-   <!-- 🎤 音声学習コントロールパネル -->
-   <div id="voice-control-panel" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-       <h3 style="margin: 0; color: white; font-size: 18px; font-weight: bold;">🎤 音声学習システム</h3>
-       <div id="voice-status" class="voice-status info" style="color: white; font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 15px;">準備完了</div>
-     </div>
-     
-     <!-- メインコントロールボタン -->
-     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
-       <button id="voice-record-btn" class="voice-btn">🎤 録音</button>
-       <button id="voice-play-btn" class="voice-btn">🔊 再生</button>
-       <button id="voice-tts-btn" class="voice-btn">🗣️ 読み上げ</button>
-       <button id="voice-stop-btn" class="voice-btn stop" style="display: none;">⏹️ 停止</button>
-       <button id="voice-analyze-btn" class="voice-btn">📊 分析</button>
-       
-       <!-- 録音タイマー -->
-       <div style="color: white; font-family: monospace; font-size: 16px; font-weight: bold; margin-left: auto;">
-         ⏱️ <span id="voice-recording-timer">00:00</span>
-       </div>
-     </div>
-     
-     <!-- 音量レベルバー -->
-     <div style="margin-bottom: 15px;">
-       <div style="color: white; font-size: 12px; margin-bottom: 5px;">🔊 音量レベル</div>
-       <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden;">
-         <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
-       </div>
-     </div>
-     
-     <!-- 分析結果表示エリア -->
-     <div id="voice-analysis-results" style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; min-height: 40px; color: white;"></div>
-   </div>
-
    <div class="slot-wrapper">
     <div class="slot-container" id="slot-m1">
      <label>M1</label>
