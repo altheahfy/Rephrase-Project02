@@ -50,13 +50,9 @@ export function randomizeAll(slotData) {
   const uniqueOrders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
 
   if (uniqueOrders.length > 1) {
-    // 複数のdisplay_orderがある場合、各orderから1つずつランダム選択
     uniqueOrders.forEach(order => {
       const targets = o1Entries.filter(e => e.Slot_display_order === order);
-      if (targets.length > 0) {
-        const chosen = targets[Math.floor(Math.random() * targets.length)];
-        selectedSlots.push({ ...chosen });
-      }
+      targets.forEach(t => selectedSlots.push({ ...t }));
     });
   } else if (o1Entries.length > 0) {
     const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
