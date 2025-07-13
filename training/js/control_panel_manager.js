@@ -63,8 +63,24 @@ function toggleAllControlPanels() {
 // 🎛️ サブスロット制御パネルの表示を現在の状態に合わせる
 function syncSubslotControlPanelVisibility(panelElement) {
   if (panelElement && panelElement.classList.contains('subslot-visibility-panel')) {
-    panelElement.style.display = window.controlPanelsVisible ? 'block' : 'none';
-    console.log(`🔄 サブスロット制御パネルの表示を同期: ${window.controlPanelsVisible ? '表示' : '非表示'}`);
+    // localStorageから最新の状態を取得
+    let isVisible = false;
+    try {
+      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+      if (saved) {
+        const state = JSON.parse(saved);
+        if (state.hasOwnProperty('global_control_panels_visible')) {
+          isVisible = state['global_control_panels_visible'];
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ localStorage読み込みエラー:', error);
+      // フォールバック: window.controlPanelsVisibleを使用
+      isVisible = window.controlPanelsVisible;
+    }
+    
+    panelElement.style.display = isVisible ? 'block' : 'none';
+    console.log(`🔄 サブスロット制御パネルの表示を同期: ${isVisible ? '表示' : '非表示'} (localStorage: ${isVisible})`);
   }
 }
 
