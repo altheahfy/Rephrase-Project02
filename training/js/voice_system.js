@@ -55,35 +55,18 @@ class VoiceSystem {
     getCurrentSentence() {
         console.log('📝 現在の例文取得を開始...');
         
-        // 🎯 最優先: 動的エリアから表示されているスロットのみを抽出
-        const dynamicSentence = this.extractCurrentSentenceFromDynamicArea();
-        if (dynamicSentence && dynamicSentence.trim().length > 0) {
-            console.log('✅ 動的エリアから例文を取得しました:', dynamicSentence);
-            return dynamicSentence;
+        // 🎯 直接window.loadedJsonDataから順序通りに例文を構築
+        if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+            const sentence = this.buildSentenceFromOrderedData();
+            if (sentence && sentence.trim().length > 0) {
+                console.log('✅ データから例文を取得しました:', sentence);
+                return sentence;
+            }
         }
         
-        // フォールバック: 既存の音声データから例文を構築
-        if (window.lastSelectedSlots && window.lastSelectedSlots.voiceData) {
-            console.log('🎤 音声専用データから例文を構築中...');
-            const voiceSentence = this.buildSentenceFromVoiceData();
-            if (voiceSentence && voiceSentence.trim().length > 0) {
-                console.log('✅ 音声データから例文を取得しました:', voiceSentence);
-                return voiceSentence;
-            }
-        }
-
-        // さらなるフォールバック: JSONデータから例文を構築
-        if (window.lastSelectedSlots && window.lastSelectedSlots.jsonData) {
-            console.log('📊 JSONデータから例文を構築中...');
-            const jsonSentence = this.buildSentenceFromJsonData();
-            if (jsonSentence && jsonSentence.trim().length > 0) {
-                console.log('✅ JSONデータから例文を取得しました:', jsonSentence);
-                return jsonSentence;
-            }
-        }
-
-        // 最終フォールバック: DOMから直接取得
-        console.log('🌐 DOMから例文を構築中...');
+        console.warn('⚠️ データからの取得に失敗。フォールバック処理を実行');
+        
+        // フォールバック: DOMから直接取得
         const domSentence = this.buildSentenceFromDOM();
         if (domSentence && domSentence.trim().length > 0) {
             console.log('✅ DOMから例文を取得しました:', domSentence);
@@ -92,6 +75,93 @@ class VoiceSystem {
 
         console.warn('⚠️ どの方法でも例文を取得できませんでした');
         return '';
+    }
+
+    /**
+     * window.loadedJsonDataから順序通りに例文を構築
+     */
+    buildSentenceFromOrderedData() {
+        console.log('📊 順序データから例文を構築中...');
+        const data = window.loadedJsonData;
+        
+        const sentenceParts = [];
+        
+        // 疑問詞をチェック（DisplayAtTopまたは分離表示）
+        const questionWordData = data.find(item => 
+            item.DisplayAtTop === true && item.DisplayText
+        );
+        if (questionWordData) {
+            console.log('✅ 疑問詞:', questionWordData.DisplayText);
+            sentenceParts.push({
+                order: -1,
+                text: questionWordData.DisplayText,
+                slot: 'question-word'
+            });
+        }
+        
+        // 上位スロット（SubslotIDがないもの）をSlot_display_order順にソート
+        const upperSlots = data
+            .filter(item => !item.SubslotID && item.SlotPhrase)
+            .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+        
+        console.log('📊 上位スロット順序:', upperSlots.map(slot => 
+            `${slot.Slot}(order:${slot.Slot_display_order}): "${slot.SlotPhrase}"`
+        ));
+        
+        upperSlots.forEach(slot => {
+            // DisplayAtTopで分離表示されるスロットはスキップ
+            if (slot.DisplayAtTop === true) {
+                console.log(`🚫 DisplayAtTop により ${slot.Slot} をスキップ`);
+                return;
+            }
+            
+            sentenceParts.push({
+                order: slot.Slot_display_order || 0,
+                text: slot.SlotPhrase,
+                slot: slot.Slot,
+                type: 'upper'
+            });
+        });
+        
+        // サブスロット（SubslotIDがあるもの）をdisplay_order順にソート
+        const subSlots = data
+            .filter(item => item.SubslotID && item.SubslotElement)
+            .sort((a, b) => {
+                // 親の順序を基準に、その中でサブの順序でソート
+                const parentOrderA = a.Slot_display_order || 0;
+                const parentOrderB = b.Slot_display_order || 0;
+                if (parentOrderA !== parentOrderB) {
+                    return parentOrderA - parentOrderB;
+                }
+                return (a.display_order || 0) - (b.display_order || 0);
+            });
+        
+        console.log('📊 サブスロット順序:', subSlots.map(sub => 
+            `${sub.SubslotID}(親:${sub.Slot_display_order}, サブ:${sub.display_order}): "${sub.SubslotElement}"`
+        ));
+        
+        subSlots.forEach(subSlot => {
+            const totalOrder = (subSlot.Slot_display_order || 0) * 1000 + (subSlot.display_order || 0);
+            sentenceParts.push({
+                order: totalOrder,
+                text: subSlot.SubslotElement,
+                slot: subSlot.SubslotID,
+                type: 'sub',
+                parent: subSlot.Slot
+            });
+        });
+        
+        // 最終的に順序でソート
+        sentenceParts.sort((a, b) => a.order - b.order);
+        
+        console.log('📊 最終ソート結果:', sentenceParts.map(part => 
+            `${part.slot}(${part.type || 'question'}, order:${part.order}): "${part.text}"`
+        ));
+        
+        const sentence = sentenceParts.map(part => part.text).join(' ').trim();
+        console.log(`📝 構築した例文: "${sentence}"`);
+        
+        return sentence;
     }
 
     /**
