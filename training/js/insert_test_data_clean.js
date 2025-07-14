@@ -253,6 +253,10 @@ function applyOrderToAllSlots(jsonData) {
 // 動的エリアから静的DOMへの同期関数
 function syncDynamicToStatic() {
   console.log("🔄 syncDynamicToStatic 実行開始");
+  console.log("🔍 window.loadedJsonDataの確認:", window.loadedJsonData ? `${window.loadedJsonData.length}件` : '未設定');
+  if (window.loadedJsonData && window.loadedJsonData.length > 0) {
+    console.log("🔍 loadedJsonDataのM1スロット:", window.loadedJsonData.filter(item => item.Slot === 'M1' && !item.SubslotID));
+  }
   // 🔼 DisplayAtTop 対応（分離疑問詞表示）
   if (window.loadedJsonData) {
     const topDisplayItem = window.loadedJsonData.find(d => d.DisplayAtTop);

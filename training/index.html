@@ -1124,8 +1124,17 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           loadedJsonData = data;
           window.loadedJsonData = loadedJsonData;  // コンソール確認用
           console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
+          
+          // 🔍 デバッグ：ランダマイズ前のデータを確認
+          console.log("🔍 ランダマイズ前のloadedJsonDataの最初の5件:", loadedJsonData.slice(0, 5));
+          
           const processedData = randomizeAll(loadedJsonData);
           console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+          
+          // 🔍 デバッグ：ランダマイズ後のprocessedDataを確認
+          console.log("🔍 ランダマイズ後のprocessedDataの最初の5件:", processedData.slice(0, 5));
+          console.log("🔍 processedDataの上位スロット（M1）:", processedData.filter(item => item.Slot === 'M1' && !item.SubslotID));
+          
           validateSlotsModified(processedData);
           
           // 🎤 音声システム用: processedDataをwindow.lastSelectedSlotsにも保存

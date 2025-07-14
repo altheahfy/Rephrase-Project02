@@ -82,6 +82,9 @@ function renderSubslot(sub) {
 
 function buildStructure(selectedSlots) {
   console.log("buildStructure called with selectedSlots:", selectedSlots);
+  console.log("🔍 buildStructure受信データの件数:", selectedSlots.length);
+  console.log("🔍 buildStructure受信データのM1スロット:", selectedSlots.filter(item => item.Slot === 'M1' && !item.SubslotID));
+  
   let wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
     console.error('slot-wrapper not found, skipping structure generation');
