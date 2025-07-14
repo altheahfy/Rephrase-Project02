@@ -61,12 +61,36 @@ class VoiceSystem {
             console.log('✅ 動的エリアから例文を取得しました:', dynamicSentence);
             return dynamicSentence;
         }
-
-        console.warn('⚠️ 動的記載エリアから例文を取得できませんでした。語順が正しくない可能性があります。');
         
-        // 🚨 フォールバック処理は語順が正しくないため、空文字列を返す
-        // フォールバック処理で標準順序を使用すると語順が狂うため無効化
-        console.error('❌ 動的記載エリアからの取得に失敗したため、音声再生を中止します');
+        // フォールバック: 既存の音声データから例文を構築
+        if (window.lastSelectedSlots && window.lastSelectedSlots.voiceData) {
+            console.log('🎤 音声専用データから例文を構築中...');
+            const voiceSentence = this.buildSentenceFromVoiceData();
+            if (voiceSentence && voiceSentence.trim().length > 0) {
+                console.log('✅ 音声データから例文を取得しました:', voiceSentence);
+                return voiceSentence;
+            }
+        }
+
+        // さらなるフォールバック: JSONデータから例文を構築
+        if (window.lastSelectedSlots && window.lastSelectedSlots.jsonData) {
+            console.log('📊 JSONデータから例文を構築中...');
+            const jsonSentence = this.buildSentenceFromJsonData();
+            if (jsonSentence && jsonSentence.trim().length > 0) {
+                console.log('✅ JSONデータから例文を取得しました:', jsonSentence);
+                return jsonSentence;
+            }
+        }
+
+        // 最終フォールバック: DOMから直接取得
+        console.log('🌐 DOMから例文を構築中...');
+        const domSentence = this.buildSentenceFromDOM();
+        if (domSentence && domSentence.trim().length > 0) {
+            console.log('✅ DOMから例文を取得しました:', domSentence);
+            return domSentence;
+        }
+
+        console.warn('⚠️ どの方法でも例文を取得できませんでした');
         return '';
     }
 
@@ -85,17 +109,20 @@ class VoiceSystem {
         const sentenceParts = [];
 
         // 疑問詞をチェック（特別扱い - 常に最初）
-        const questionWordElement = document.querySelector('#display-top-question-word .question-word-text');
-        if (questionWordElement && this.isElementVisible(questionWordElement)) {
-            const text = questionWordElement.textContent.trim();
-            if (text) {
-                console.log('✅ 疑問詞:', text);
-                sentenceParts.push({ order: -1, text: text, slot: 'question-word' });
+        const questionWordElement = dynamicArea.querySelector('.question-word-slot');
+        if (questionWordElement) {
+            const textElement = questionWordElement.querySelector('.question-word-text');
+            if (textElement && this.isElementVisible(textElement)) {
+                const text = textElement.textContent.trim();
+                if (text) {
+                    console.log('✅ 疑問詞:', text);
+                    sentenceParts.push({ order: -1, text: text, slot: 'question-word' });
+                }
             }
         }
 
         // 上位スロット（data-slot属性を持つ要素）を取得
-        const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]');
+        const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]:not([data-slot="question-word"])');
         
         upperSlotElements.forEach(slotElement => {
             const phraseElement = slotElement.querySelector('.slot-phrase');
@@ -120,7 +147,7 @@ class VoiceSystem {
         const subSlotElements = dynamicArea.querySelectorAll('[data-subslot-id]');
         
         subSlotElements.forEach(subSlotElement => {
-            const phraseElement = subSlotElement.querySelector('.subslot-element');
+            const phraseElement = subSlotElement.querySelector('.slot-phrase');
             if (phraseElement && this.isElementVisible(phraseElement)) {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {

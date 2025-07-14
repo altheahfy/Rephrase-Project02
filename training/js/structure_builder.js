@@ -4,7 +4,6 @@ function renderSlot(item) {
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
-  slotDiv.dataset.slot = item.Slot.toLowerCase(); // 音声システム用のdata-slot属性を追加
 
   if (item.PhraseType === 'word') {
     const phraseDiv = document.createElement('div');
@@ -35,7 +34,6 @@ function renderSubslot(sub) {
   subDiv.className = 'subslot';
   if (sub.SubslotID) {
     subDiv.id = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
-    subDiv.dataset.subslotId = sub.SubslotID.toLowerCase(); // 音声システム用のdata-subslot-id属性を追加
   }
   if (typeof sub.display_order !== 'undefined') {
     subDiv.dataset.displayOrder = sub.display_order;
