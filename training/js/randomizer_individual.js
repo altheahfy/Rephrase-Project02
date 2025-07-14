@@ -239,6 +239,10 @@ function randomizeSlotM1Individual() {
   
   console.log("🎯 M1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
   
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = data;
+  console.log("🔄 window.loadedJsonData 更新完了（M1スロット個別ランダマイズ）");
+  
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
@@ -367,6 +371,10 @@ function randomizeSlotM2Individual() {
   }));
   
   console.log("🎯 M2スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
+  
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = data;
+  console.log("🔄 window.loadedJsonData 更新完了（M2スロット個別ランダマイズ）");
   
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
@@ -497,6 +505,10 @@ function randomizeSlotC1Individual() {
   
   console.log("🎯 C1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
   
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = data;
+  console.log("🔄 window.loadedJsonData 更新完了（C1スロット個別ランダマイズ）");
+  
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
@@ -626,6 +638,10 @@ function randomizeSlotO1Individual() {
   
   console.log("🎯 O1スロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
   
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = data;
+  console.log("🔄 window.loadedJsonData 更新完了（O1スロット個別ランダマイズ）");
+  
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);
@@ -740,6 +756,21 @@ function randomizeSlotO2Individual() {
   
   console.log(`✅ O2スロット個別ランダマイズ完了: ${newO2.例文ID} → ${newO2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = window.lastSelectedSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || ""
+  }));
+  console.log("🔄 window.loadedJsonData 更新完了（O2スロット個別ランダマイズ）");
   
   // 構造を再構築し、静的エリアも同期
   if (typeof buildStructure === 'function') {
@@ -861,6 +892,21 @@ function randomizeSlotC2Individual() {
   console.log(`✅ C2スロット個別ランダマイズ完了: ${newC2.例文ID} → ${newC2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
   
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = window.lastSelectedSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || ""
+  }));
+  console.log("🔄 window.loadedJsonData 更新完了（C2スロット個別ランダマイズ）");
+  
   // 構造を再構築し、静的エリアも同期
   if (typeof buildStructure === 'function') {
     buildStructure(window.lastSelectedSlots);
@@ -980,6 +1026,21 @@ function randomizeSlotM3Individual() {
   
   console.log(`✅ M3スロット個別ランダマイズ完了: ${newM3.例文ID} → ${newM3.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
+  
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = window.lastSelectedSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || ""
+  }));
+  console.log("🔄 window.loadedJsonData 更新完了（M3スロット個別ランダマイズ）");
   
   // 構造を再構築し、静的エリアも同期
   if (typeof buildStructure === 'function') {
