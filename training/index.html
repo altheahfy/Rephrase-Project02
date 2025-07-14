@@ -1387,8 +1387,7 @@ document.getElementById("loadPresetButton").addEventListener("click", async () =
 
     // データを保存
     loadedJsonData = jsonData;
-    window.loadedJsonData = jsonData;
-    console.log("✅ JSONデータ読み込み完了:", Array.isArray(jsonData) ? jsonData.length : Object.keys(jsonData).length, "件");
+    console.log("✅ JSONデータ読み込み完了:", Object.keys(jsonData).length, "件");
 
     // ランダマイズと表示を実行
     const selectedSlots = randomizeAll(jsonData);
