@@ -53,27 +53,134 @@ class VoiceSystem {
      * 現在表示されている全スロットのテキストを取得して完全な例文を作成
      */
     getCurrentSentence() {
-        console.log('🔍 例文テキスト取得を開始...');
+        console.log('📝 現在の例文取得を開始...');
         
-        // デバッグ: 利用可能なグローバル変数をチェック
-        console.log('🔍 window.currentDisplayedSentence:', window.currentDisplayedSentence);
-        console.log('🔍 window.lastSelectedSlots:', window.lastSelectedSlots);
-        console.log('🔍 window.loadedJsonData:', window.loadedJsonData ? '存在' : '未定義');
-        
-        // 🎤 音声専用データから現在の例文を構築する方法を試す（推奨）
-        if (window.currentDisplayedSentence && Array.isArray(window.currentDisplayedSentence) && window.currentDisplayedSentence.length > 0) {
-            return this.buildSentenceFromVoiceData();
+        // 🎯 最優先: 動的エリアから表示されているスロットのみを抽出
+        const dynamicSentence = this.extractCurrentSentenceFromDynamicArea();
+        if (dynamicSentence && dynamicSentence.trim().length > 0) {
+            console.log('✅ 動的エリアから例文を取得しました:', dynamicSentence);
+            return dynamicSentence;
         }
         
-        // フォールバック: 従来の方法
-        if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots) && window.lastSelectedSlots.length > 0) {
-            console.log('⚠️ 音声専用データが利用できません。従来のデータから取得を試行します。');
-            return this.buildSentenceFromJsonData();
+        // フォールバック: 既存の音声データから例文を構築
+        if (window.lastSelectedSlots && window.lastSelectedSlots.voiceData) {
+            console.log('🎤 音声専用データから例文を構築中...');
+            const voiceSentence = this.buildSentenceFromVoiceData();
+            if (voiceSentence && voiceSentence.trim().length > 0) {
+                console.log('✅ 音声データから例文を取得しました:', voiceSentence);
+                return voiceSentence;
+            }
+        }
+
+        // さらなるフォールバック: JSONデータから例文を構築
+        if (window.lastSelectedSlots && window.lastSelectedSlots.jsonData) {
+            console.log('📊 JSONデータから例文を構築中...');
+            const jsonSentence = this.buildSentenceFromJsonData();
+            if (jsonSentence && jsonSentence.trim().length > 0) {
+                console.log('✅ JSONデータから例文を取得しました:', jsonSentence);
+                return jsonSentence;
+            }
+        }
+
+        // 最終フォールバック: DOMから直接取得
+        console.log('🌐 DOMから例文を構築中...');
+        const domSentence = this.buildSentenceFromDOM();
+        if (domSentence && domSentence.trim().length > 0) {
+            console.log('✅ DOMから例文を取得しました:', domSentence);
+            return domSentence;
+        }
+
+        console.warn('⚠️ どの方法でも例文を取得できませんでした');
+        return '';
+    }
+
+    /**
+     * 動的エリアから現在表示されているスロットのテキストのみを抽出
+     */
+    extractCurrentSentenceFromDynamicArea() {
+        console.log('🎯 動的記載エリアから表示中の音声用例文を抽出中...');
+        
+        const dynamicArea = document.getElementById('dynamic-slot-area');
+        if (!dynamicArea) {
+            console.warn('⚠️ 動的エリアが見つかりません');
+            return '';
+        }
+
+        const slotOrder = ['question-word', 'm1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+        const sentenceParts = [];
+
+        // 疑問詞をチェック（特別扱い）
+        const questionWordElement = dynamicArea.querySelector('.question-word-slot');
+        if (questionWordElement) {
+            const textElement = questionWordElement.querySelector('.question-word-text');
+            if (textElement && this.isElementVisible(textElement)) {
+                const text = textElement.textContent.trim();
+                if (text) {
+                    console.log('✅ 疑問詞:', text);
+                    sentenceParts.push({ order: 0, text: text });
+                }
+            }
+        }
+
+        // 各スロットを順番に処理
+        slotOrder.forEach((slotName, index) => {
+            if (slotName === 'question-word') return; // 既に処理済み
+
+            const slotElements = dynamicArea.querySelectorAll(`[data-slot="${slotName}"]`);
+            
+            slotElements.forEach(slotElement => {
+                const phraseElement = slotElement.querySelector('.slot-phrase');
+                if (phraseElement && this.isElementVisible(phraseElement)) {
+                    const text = phraseElement.textContent.trim();
+                    if (text && text !== 'N/A' && text !== '') {
+                        console.log(`✅ ${slotName.toUpperCase()}: "${text}"`);
+                        sentenceParts.push({ 
+                            order: index + 1, 
+                            text: text,
+                            slot: slotName.toUpperCase()
+                        });
+                        return; // 同じスロットタイプで最初に見つかった表示中の要素のみ使用
+                    }
+                }
+            });
+        });
+
+        // 順序でソートして例文を構築
+        sentenceParts.sort((a, b) => a.order - b.order);
+        const sentence = sentenceParts.map(part => part.text).join(' ').trim();
+
+        console.log(`🎯 完成した例文: ${sentence}`);
+        console.log(`📊 使用されたパーツ数: ${sentenceParts.length}`);
+        
+        return sentence;
+    }
+
+    /**
+     * DOM要素が表示されているかどうかを判定
+     */
+    isElementVisible(element) {
+        if (!element) return false;
+        
+        // CSSスタイルで非表示になっていないかチェック
+        const style = window.getComputedStyle(element);
+        if (style.display === 'none' || 
+            style.visibility === 'hidden' || 
+            style.opacity === '0') {
+            return false;
         }
         
-        console.log('⚠️ JSONデータが利用できません。DOMから取得を試行します。');
-        // 最終フォールバック: DOMから取得
-        return this.buildSentenceFromDOM();
+        // 親要素も確認
+        let parent = element.parentElement;
+        while (parent && parent !== document.body) {
+            const parentStyle = window.getComputedStyle(parent);
+            if (parentStyle.display === 'none' || 
+                parentStyle.visibility === 'hidden') {
+                return false;
+            }
+            parent = parent.parentElement;
+        }
+        
+        return true;
     }
     
     /**
