@@ -96,6 +96,14 @@
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
   </div>
   
+  <!-- ローカルファイルアップロード -->
+  <div style="margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ローカルファイル</label>
+    <input type="file" id="localFileInput" accept=".json" style="width: 140px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; margin-bottom: 4px;">
+    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">登録</button>
+    <button id="manageFilesButton" style="background-color: #9C27B0; color: white; border: none; padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; margin-left: 2px;" title="ローカルファイル管理">🗂️</button>
+  </div>
+  
   <!-- ファイル選択 -->
   <div style="border-top: 1px solid #eee; padding-top: 8px;">
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ファイル選択</label>
@@ -1084,29 +1092,85 @@ import { buildStructure } from './js/structure_builder.js';
 let loadedJsonData = null;
 
 // 🎯 **プリセットJSONファイルをロードする機能**
-document.getElementById("loadPresetButton").addEventListener("click", () => {
+document.getElementById("loadPresetButton").addEventListener("click", async () => {
   const presetSelect = document.getElementById("presetSelect");
   const selectedPreset = presetSelect.value;
   
   if (!selectedPreset) {
-    alert("サンプルデータを選択してください");
+    alert("データを選択してください");
     return;
   }
   
   // 🎭 ローディング画面を表示
-  console.log("🎭 プリセットJSONロード開始 - ローディング画面を表示");
+  console.log("🎭 データロード開始 - ローディング画面を表示");
   showLoadingOverlay();
   
   // ローディングメッセージを更新
   const loadingText = document.querySelector('#loading-overlay p');
   if (loadingText) {
-    loadingText.textContent = `${selectedPreset} を読み込み中...`;
+    const fileName = selectedPreset.startsWith('local_') ? 
+      localFileManager.uploadedFiles[selectedPreset]?.name || 'ローカルファイル' :
+      selectedPreset.split('/').pop();
+    loadingText.textContent = `${fileName} を読み込み中...`;
   }
-  
-  // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
-  let presetData = null;
-  
-  if (selectedPreset === 'data/slot_order_data.json' || selectedPreset === 'data/slot_order_data2.json') {
+
+  try {
+    let jsonData;
+    
+    // ローカルファイルかサーバーファイルかを判定
+    if (selectedPreset.startsWith('local_')) {
+      // ローカルアップロードファイルの場合
+      const content = localFileManager.getFileContent(selectedPreset);
+      if (!content) {
+        throw new Error('ローカルファイルが見つかりません');
+      }
+      jsonData = JSON.parse(content);
+      console.log(`📁 ローカルファイル読み込み成功: ${selectedPreset}`);
+    } else {
+      // サーバーファイルの場合（従来の処理）
+      const response = await fetch(selectedPreset);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      jsonData = await response.json();
+      console.log(`🌐 サーバーファイル読み込み成功: ${selectedPreset}`);
+    }
+
+    // データを保存
+    loadedJsonData = jsonData;
+    console.log("✅ JSONデータ読み込み完了:", Object.keys(jsonData).length, "件");
+
+    // ランダマイズと表示を実行
+    const selectedSlots = randomizeAll(jsonData);
+    const processedData = Array.isArray(selectedSlots) ? selectedSlots : Object.values(selectedSlots).flat();
+    
+    // 🎤 音声システム用データを設定
+    window.selectedSlots = processedData;
+    window.lastSelectedSlots = [...processedData];
+    console.log("🎤 音声システム用 lastSelectedSlots確認:", window.lastSelectedSlots ? `${window.lastSelectedSlots.length}件` : '未設定');
+    
+    // 構造を構築
+    buildStructure(processedData);
+    syncDynamicToStatic();
+    
+    // サブスロットの初期化も実行
+    if (typeof initializeSubslots === 'function') {
+      initializeSubslots();
+    }
+    
+    // 🎭 ローディング画面を非表示
+    console.log("🎭 データロード完了 - ローディング画面を非表示");
+    hideLoadingOverlay();
+    
+  } catch (error) {
+    console.error(`データ読み込みエラー:`, error);
+    const errorMsg = selectedPreset.startsWith('local_') ? 
+      `ローカルファイルの読み込みに失敗しました:\n${error.message}` :
+      `サーバーファイルの読み込みに失敗しました:\n${error.message}`;
+    alert(errorMsg);
+    hideLoadingOverlay();
+  }
+});
     // 🎯 **データセット：fetchでJSONファイルを読み込み**
     fetch(selectedPreset)
       .then(response => {
@@ -1154,16 +1218,6 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
       .catch(error => {
         console.error(`${selectedPreset}の読み込みに失敗:`, error);
         alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
-        hideLoadingOverlay();
-      });
-    return; // 早期リターン
-  } else {
-    alert("不明なプリセットが選択されました");
-    hideLoadingOverlay();
-    return;
-  }
-});
-
 // 既存のファイル選択からのロード機能
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
@@ -1568,6 +1622,165 @@ async function autoDetectDataFiles() {
 
 // ページ読み込み時に自動検出を実行
 document.addEventListener('DOMContentLoaded', autoDetectDataFiles);
+
+// 🌐 ローカルファイル管理システム
+class LocalFileManager {
+  constructor() {
+    this.uploadedFiles = this.loadUploadedFiles();
+    this.initializeUI();
+  }
+  
+  // localStorage からアップロード済みファイル情報を読み込み
+  loadUploadedFiles() {
+    const stored = localStorage.getItem('rephrase_uploaded_files');
+    return stored ? JSON.parse(stored) : {};
+  }
+  
+  // localStorage にアップロード済みファイル情報を保存
+  saveUploadedFiles() {
+    localStorage.setItem('rephrase_uploaded_files', JSON.stringify(this.uploadedFiles));
+  }
+  
+  // UIの初期化
+  initializeUI() {
+    // アップロード済みファイルを選択肢に追加
+    this.refreshFileOptions();
+    
+    // 登録ボタンのイベントリスナー
+    document.getElementById('registerFileButton').addEventListener('click', () => {
+      this.registerLocalFile();
+    });
+    
+    // 管理ボタンのイベントリスナー
+    document.getElementById('manageFilesButton').addEventListener('click', () => {
+      this.showFileManager();
+    });
+  }
+  
+  // ローカルファイルを登録
+  async registerLocalFile() {
+    const fileInput = document.getElementById('localFileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+      alert('JSONファイルを選択してください');
+      return;
+    }
+    
+    if (!file.name.endsWith('.json')) {
+      alert('JSONファイルのみ対応しています');
+      return;
+    }
+    
+    try {
+      // ファイル内容を読み込み
+      const content = await this.readFileContent(file);
+      
+      // JSON形式チェック
+      JSON.parse(content);
+      
+      // ファイル情報を保存
+      const fileId = `local_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      this.uploadedFiles[fileId] = {
+        name: file.name,
+        content: content,
+        uploadDate: new Date().toISOString(),
+        size: file.size
+      };
+      
+      this.saveUploadedFiles();
+      this.refreshFileOptions();
+      
+      // 成功メッセージ
+      alert(`✅ "${file.name}" を登録しました！\n選択肢から選んで「読込」できます。`);
+      
+      // ファイル入力をクリア
+      fileInput.value = '';
+      
+      console.log(`📁 ローカルファイル登録成功: ${file.name} (ID: ${fileId})`);
+      
+    } catch (error) {
+      alert(`❌ ファイル登録に失敗しました:\n${error.message}`);
+      console.error('ローカルファイル登録エラー:', error);
+    }
+  }
+  
+  // ファイル内容を読み込み
+  readFileContent(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (e) => reject(new Error('ファイル読み込みエラー'));
+      reader.readAsText(file);
+    });
+  }
+  
+  // 選択肢を更新
+  refreshFileOptions() {
+    const select = document.getElementById('presetSelect');
+    
+    // 既存のローカルファイルオプションを削除
+    Array.from(select.options).forEach(option => {
+      if (option.value.startsWith('local_')) {
+        option.remove();
+      }
+    });
+    
+    // アップロード済みファイルを追加
+    Object.entries(this.uploadedFiles).forEach(([fileId, fileInfo]) => {
+      const option = document.createElement('option');
+      option.value = fileId;
+      option.textContent = `📁 ${fileInfo.name}`;
+      option.title = `アップロード日時: ${new Date(fileInfo.uploadDate).toLocaleString()}`;
+      select.appendChild(option);
+    });
+  }
+  
+  // ファイル内容を取得
+  getFileContent(fileId) {
+    return this.uploadedFiles[fileId]?.content || null;
+  }
+  
+  // ファイルを削除
+  removeFile(fileId) {
+    if (this.uploadedFiles[fileId]) {
+      delete this.uploadedFiles[fileId];
+      this.saveUploadedFiles();
+      this.refreshFileOptions();
+      console.log(`🗑️ ローカルファイル削除: ${fileId}`);
+    }
+  }
+  
+  // ファイル管理ダイアログを表示
+  showFileManager() {
+    const files = Object.entries(this.uploadedFiles);
+    
+    if (files.length === 0) {
+      alert('登録済みのローカルファイルはありません');
+      return;
+    }
+    
+    const fileList = files.map(([fileId, fileInfo], index) => 
+      `${index + 1}. ${fileInfo.name} (${(fileInfo.size / 1024).toFixed(1)}KB)\n   登録日時: ${new Date(fileInfo.uploadDate).toLocaleString()}`
+    ).join('\n\n');
+    
+    const message = `📁 登録済みローカルファイル (${files.length}件)\n\n${fileList}\n\n削除したいファイルの番号を入力してください（キャンセルは0）:`;
+    
+    const input = prompt(message);
+    const fileIndex = parseInt(input);
+    
+    if (fileIndex > 0 && fileIndex <= files.length) {
+      const [fileId, fileInfo] = files[fileIndex - 1];
+      if (confirm(`"${fileInfo.name}" を削除しますか？\nこの操作は取り消せません。`)) {
+        this.removeFile(fileId);
+        alert(`✅ "${fileInfo.name}" を削除しました`);
+      }
+    }
+  }
+}
+
+// ローカルファイルマネージャーを初期化
+const localFileManager = new LocalFileManager();
 
 </script>
 
