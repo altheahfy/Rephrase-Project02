@@ -762,7 +762,7 @@ class VoiceProgressComparison extends VoiceProgressTracker {
 ```javascript
 // 商用サーバーに送信される匿名化データ
 {
-    sessionId: "anonymized-uuid",
+    sessionId: "anonymous-uuid",
     timestamp: "2025-07-13T10:00:00Z", // 時間を時間単位に丸める
     levelScore: 2,                      // 0-4の評価レベル
     contentAccuracy: 0.85,              // 内容正確性
@@ -1072,9 +1072,9 @@ class BadgeSystem {
 }
 ```
 
-### 7.10 学習推奨システム
+#### 7.10 学習推奨システム
 
-#### 7.10.1 AIによる個別推奨
+##### 7.10.1 AIによる個別推奨
 ```javascript
 class LearningRecommendationEngine {
     generateRecommendations(comparisonData) {
@@ -1278,3 +1278,199 @@ class LearningRecommendationEngine {
 4. **将来拡張性**を考慮した柔軟な設計
 
 この仕様書に基づいて、Phase 1から順次実装を開始できます。
+
+---
+
+## 🎯 2025年7月 実装完了機能
+
+### ✅ 高度な例文読み上げシステム（完全実装済み）
+
+#### 1. 複合データソース対応読み上げ機能
+```javascript
+buildSentenceFromOrderedData() {
+    // 🎯 混合アプローチ：各スロットの表示順序ごとに処理
+    const slotOrderGroups = {};
+    
+    // 上位スロットをグループ化（window.loadedJsonDataから）
+    upperSlotData.forEach(item => {
+        const order = item.Slot_display_order;
+        if (!slotOrderGroups[order]) {
+            slotOrderGroups[order] = { upperSlot: null, subSlots: [] };
+        }
+        
+        if (!item.SubslotID) {
+            slotOrderGroups[order].upperSlot = item;
+        }
+    });
+    
+    // サブスロットをグループ化（window.lastSelectedSlotsから）
+    subSlotData.forEach(item => {
+        const order = item.Slot_display_order;
+        if (!slotOrderGroups[order]) {
+            slotOrderGroups[order] = { upperSlot: null, subSlots: [] };
+        }
+        
+        if (item.SubslotID) {
+            slotOrderGroups[order].subSlots.push(item);
+        }
+    });
+}
+```
+
+**実現された機能:**
+- 上位スロット（window.loadedJsonData）とサブスロット（window.lastSelectedSlots）の混合データソース対応
+- Slot_display_order（上位スロット）とdisplay_order（サブスロット内順序）による正確な順序制御
+- 上位スロットとサブスロットの重複回避ロジック（either/or選択）
+
+#### 2. スロット選択優先度システム
+```javascript
+// 🎯 判定：上位スロットにテキストがあるかどうか
+if (upperSlot && upperSlot.SlotPhrase && upperSlot.SlotPhrase.trim()) {
+    // 上位スロットにテキストがある場合：上位スロットを使用
+    console.log(`✅ 上位スロット使用 ${upperSlot.Slot}(order:${order}): "${upperSlot.SlotPhrase}"`);
+    sentenceParts.push({
+        order: parseInt(order),
+        text: upperSlot.SlotPhrase,
+        slot: upperSlot.Slot,
+        type: 'upper'
+    });
+} else if (subSlots.length > 0) {
+    // 上位スロットが空でサブスロットがある場合：サブスロットを使用
+    console.log(`✅ サブスロット使用 (order:${order})`);
+    subSlots
+        .filter(sub => sub.SubslotElement && sub.SubslotElement.trim())
+        .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+        .forEach(subSlot => {
+            const totalOrder = parseInt(order) * 1000 + (subSlot.display_order || 0);
+            sentenceParts.push({
+                order: totalOrder,
+                text: subSlot.SubslotElement,
+                slot: subSlot.SubslotID,
+                type: 'sub',
+                parent: subSlot.Slot
+            });
+        });
+}
+```
+
+**実現された機能:**
+- 上位スロットに内容がある場合は上位スロットを優先
+- 上位スロットが空の場合のみサブスロットを使用
+- サブスロット重複読み上げの完全回避
+- サブスロット内での正確な順序制御（display_order準拠）
+
+#### 3. ランダマイズ結果対応読み上げ
+**全体ランダマイズ対応:**
+- `randomizer.js`による全スロット一括ランダマイズ後も正確な読み上げ
+- 新しく選択されたスロット内容を即座に反映
+- window.loadedJsonDataの更新を自動検知
+
+**個別ランダマイズ対応:**
+- `randomizer_individual.js`による個別スロットランダマイズ対応
+- `randomizer_slot.js`による単一スロットランダマイズ対応
+- ランダマイズ後のwindow.lastSelectedSlots更新を即座に反映
+
+#### 4. 疑問詞特別処理システム
+```javascript
+// 疑問詞をチェック（上位スロットデータから）
+const questionWordData = upperSlotData.find(item => 
+    item.DisplayAtTop === true && item.DisplayText
+);
+if (questionWordData) {
+    console.log('✅ 疑問詞:', questionWordData.DisplayText);
+    sentenceParts.push({
+        order: -1,
+        text: questionWordData.DisplayText,
+        slot: 'question-word'
+    });
+}
+```
+
+**実現された機能:**
+- DisplayAtTop=true要素の特別扱い（文頭配置）
+- 疑問詞の自動認識と優先順位制御
+- 通常スロットとの適切な分離処理
+
+#### 5. フォールバック機能付きDOM読み取り
+```javascript
+extractCurrentSentenceFromDynamicArea() {
+    // ID ベースでの検出
+    const slotNames = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+    
+    slotNames.forEach(slotName => {
+        const dynamicSlotElement = dynamicArea.querySelector(`#dynamic-slot-${slotName}, .slot[data-display-order]`);
+        if (dynamicSlotElement) {
+            const phraseElement = dynamicSlotElement.querySelector('.slot-phrase');
+            if (phraseElement && this.isElementVisible(phraseElement)) {
+                const text = phraseElement.textContent.trim();
+                if (text && text !== 'N/A' && text !== '') {
+                    // data-display-order から順序を取得
+                    let displayOrder = parseInt(dynamicSlotElement.dataset.displayOrder);
+                    if (!displayOrder) {
+                        const slotOrderMap = { m1: 1, s: 2, aux: 3, m2: 4, v: 5, c1: 6, o1: 7, o2: 8, c2: 9, m3: 10 };
+                        displayOrder = slotOrderMap[slotName] || 999;
+                    }
+                }
+            }
+        }
+    });
+}
+```
+
+**実現された機能:**
+- データソース失敗時のDOM直接読み取りフォールバック
+- 要素可視性判定（CSS display/visibility/opacity チェック）
+- 複数の要素検索方法（ID、クラス、data属性）
+- N/A値や空文字の適切な除外処理
+
+### ✅ 完全実装済み音声合成機能
+
+#### 1. Web Speech API統合
+- 高品質音声合成による模範読み上げ
+- 音声速度・音量・声質のカスタマイズ対応
+- 複数言語対応（英語・日本語）
+
+#### 2. 録音・再生機能
+- MediaRecorder APIによる高品質録音
+- WebM/MP3フォーマット対応
+- リアルタイム録音レベル表示
+- ワンクリック再生機能
+
+#### 3. 基本音響分析
+- 録音時間計測機能
+- 音量レベル分析
+- 発話速度評価システム
+- レベル別目標時間設定
+
+#### 4. 学習進捗管理
+- ローカルストレージによるデータ永続化
+- 練習回数・スコア・改善率の追跡
+- 日次・週次・月次統計機能
+
+---
+
+## 🚀 未実装機能（将来拡張）
+
+### ⚠️ 他ユーザーとの比較機能
+- **必要技術**: サーバーサイド開発、データベース設計
+- **実装要件**: ユーザー認証、データ匿名化、集計システム
+- **技術課題**: プライバシー保護、スケーラビリティ、リアルタイム更新
+
+---
+
+## 📊 技術的達成度
+
+| 機能カテゴリ | 実装状況 | 達成度 |
+|------------|----------|--------|
+| 基本読み上げ機能 | ✅ 完了 | 100% |
+| 複合データ対応 | ✅ 完了 | 100% |
+| ランダマイズ対応 | ✅ 完了 | 100% |
+| 録音・再生機能 | ✅ 完了 | 100% |
+| 音響分析・評価 | ✅ 完了 | 100% |
+| 進捗管理 | ✅ 完了 | 100% |
+| UI/UX統合 | ✅ 完了 | 100% |
+| サーバー連携 | ❌ 未実装 | 0% |
+
+**総合達成度: 87.5%** （8機能中7機能完了）
+
+---
