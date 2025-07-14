@@ -1085,44 +1085,6 @@
 </div> <!-- main-content の終了 -->
 
     <!-- 既存のスクリプト -->
-<script>
-// 🧪 グローバル関数：登録ボタンのテスト
-function testRegisterButton() {
-  console.log('🧪 testRegisterButton関数が呼び出されました');
-  
-  if (!window.localFileManager) {
-    console.error('❌ window.localFileManager が存在しません');
-    alert('LocalFileManagerが初期化されていません');
-    return;
-  }
-  
-  console.log('✅ LocalFileManager存在確認OK');
-  
-  const fileInput = document.getElementById('localFileInput');
-  if (!fileInput) {
-    console.error('❌ localFileInput が見つかりません');
-    alert('ファイル入力要素が見つかりません');
-    return;
-  }
-  
-  console.log('✅ ファイル入力要素確認OK');
-  console.log('📄 選択されたファイル数:', fileInput.files.length);
-  
-  if (fileInput.files.length === 0) {
-    alert('まずJSONファイルを選択してください');
-    return;
-  }
-  
-  try {
-    window.localFileManager.registerLocalFile();
-    console.log('✅ registerLocalFile関数呼び出し完了');
-  } catch (error) {
-    console.error('❌ registerLocalFile関数でエラー:', error);
-    alert('登録処理でエラーが発生しました: ' + error.message);
-  }
-}
-</script>
-
 <script type="module">
 import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
