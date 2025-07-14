@@ -100,7 +100,7 @@
   <div style="margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ローカルファイル</label>
     <input type="file" id="localFileInput" accept=".json" style="width: 140px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; margin-bottom: 4px;">
-    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;" onclick="console.log('🔧 直接クリックテスト'); testRegisterButton();">登録</button>
+    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">登録</button>
     <button id="manageFilesButton" style="background-color: #9C27B0; color: white; border: none; padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; margin-left: 2px;" title="ローカルファイル管理">🗂️</button>
   </div>
   
@@ -1109,7 +1109,7 @@ document.getElementById("loadPresetButton").addEventListener("click", async () =
   const loadingText = document.querySelector('#loading-overlay p');
   if (loadingText) {
     const fileName = selectedPreset.startsWith('local_') ? 
-      window.localFileManager?.uploadedFiles[selectedPreset]?.name || 'ローカルファイル' :
+      localFileManager.uploadedFiles[selectedPreset]?.name || 'ローカルファイル' :
       selectedPreset.split('/').pop();
     loadingText.textContent = `${fileName} を読み込み中...`;
   }
@@ -1120,7 +1120,7 @@ document.getElementById("loadPresetButton").addEventListener("click", async () =
     // ローカルファイルかサーバーファイルかを判定
     if (selectedPreset.startsWith('local_')) {
       // ローカルアップロードファイルの場合
-      const content = window.localFileManager?.getFileContent(selectedPreset);
+      const content = localFileManager.getFileContent(selectedPreset);
       if (!content) {
         throw new Error('ローカルファイルが見つかりません');
       }
@@ -1620,6 +1620,9 @@ async function autoDetectDataFiles() {
   }
 }
 
+// ページ読み込み時に自動検出を実行
+document.addEventListener('DOMContentLoaded', autoDetectDataFiles);
+
 // 🌐 ローカルファイル管理システム
 class LocalFileManager {
   constructor() {
@@ -1640,71 +1643,31 @@ class LocalFileManager {
   
   // UIの初期化
   initializeUI() {
-    console.log('🔄 LocalFileManager UIの初期化開始');
-    
     // アップロード済みファイルを選択肢に追加
     this.refreshFileOptions();
     
-    // 登録ボタンの存在確認
-    const registerButton = document.getElementById('registerFileButton');
-    const manageButton = document.getElementById('manageFilesButton');
-    
-    if (!registerButton) {
-      console.error('❌ registerFileButton が見つかりません');
-      return;
-    }
-    if (!manageButton) {
-      console.error('❌ manageFilesButton が見つかりません');
-      return;
-    }
-    
-    console.log('✅ ボタン要素確認完了');
-    
     // 登録ボタンのイベントリスナー
-    registerButton.addEventListener('click', (e) => {
-      console.log('🔄 登録ボタンがクリックされました');
-      e.preventDefault();
+    document.getElementById('registerFileButton').addEventListener('click', () => {
       this.registerLocalFile();
     });
     
     // 管理ボタンのイベントリスナー
-    manageButton.addEventListener('click', (e) => {
-      console.log('🔄 管理ボタンがクリックされました');
-      e.preventDefault();
+    document.getElementById('manageFilesButton').addEventListener('click', () => {
       this.showFileManager();
     });
-    
-    console.log('✅ イベントリスナー設定完了');
   }
   
   // ローカルファイルを登録
   async registerLocalFile() {
-    console.log('🔄 registerLocalFile関数が呼び出されました');
-    
     const fileInput = document.getElementById('localFileInput');
-    if (!fileInput) {
-      console.error('❌ localFileInput が見つかりません');
-      alert('ファイル入力要素が見つかりません');
-      return;
-    }
-    
-    console.log('📄 選択されたファイル:', fileInput.files.length, '件');
     const file = fileInput.files[0];
     
     if (!file) {
-      console.log('⚠️ ファイルが選択されていません');
       alert('JSONファイルを選択してください');
       return;
     }
     
-    console.log('📄 ファイル情報:', {
-      name: file.name,
-      size: file.size,
-      type: file.type
-    });
-    
     if (!file.name.endsWith('.json')) {
-      console.log('⚠️ JSONファイルではありません:', file.name);
       alert('JSONファイルのみ対応しています');
       return;
     }
@@ -1816,68 +1779,8 @@ class LocalFileManager {
   }
 }
 
-// 🧪 テスト関数：登録ボタンの動作確認
-function testRegisterButton() {
-  console.log('🧪 testRegisterButton関数が呼び出されました');
-  
-  // LocalFileManagerが初期化されているかチェック
-  if (!window.localFileManager) {
-    console.error('❌ window.localFileManager が存在しません');
-    alert('LocalFileManagerが初期化されていません');
-    return;
-  }
-  
-  console.log('✅ LocalFileManager存在確認OK');
-  
-  // ファイル入力要素をチェック
-  const fileInput = document.getElementById('localFileInput');
-  if (!fileInput) {
-    console.error('❌ localFileInput が見つかりません');
-    alert('ファイル入力要素が見つかりません');
-    return;
-  }
-  
-  console.log('✅ ファイル入力要素確認OK');
-  console.log('📄 選択されたファイル数:', fileInput.files.length);
-  
-  if (fileInput.files.length === 0) {
-    alert('まずJSONファイルを選択してください');
-    return;
-  }
-  
-  // LocalFileManagerのregisterLocalFile関数を直接呼び出し
-  try {
-    window.localFileManager.registerLocalFile();
-    console.log('✅ registerLocalFile関数呼び出し完了');
-  } catch (error) {
-    console.error('❌ registerLocalFile関数でエラー:', error);
-    alert('登録処理でエラーが発生しました: ' + error.message);
-  }
-}
-
-// ローカルファイルマネージャーをグローバル変数として宣言
-let localFileManager = null;
-
-// ページ読み込み完了後に初期化
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔄 ページ読み込み完了 - LocalFileManager初期化開始');
-  
-  // 自動検出を実行
-  try {
-    autoDetectDataFiles();
-    console.log('✅ 自動検出完了');
-  } catch (e) {
-    console.warn('⚠️ 自動検出エラー:', e);
-  }
-  
-  // ローカルファイルマネージャーを初期化
-  try {
-    window.localFileManager = new LocalFileManager();
-    console.log('✅ LocalFileManager初期化完了');
-  } catch (e) {
-    console.error('❌ LocalFileManager初期化失敗:', e);
-  }
-});
+// ローカルファイルマネージャーを初期化
+const localFileManager = new LocalFileManager();
 
 </script>
 
