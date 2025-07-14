@@ -50,10 +50,28 @@ export function randomizeAll(slotData) {
   const uniqueOrders = [...new Set(o1Entries.map(e => e.Slot_display_order))];
 
   if (uniqueOrders.length > 1) {
-    uniqueOrders.forEach(order => {
-      const targets = o1Entries.filter(e => e.Slot_display_order === order);
-      targets.forEach(t => selectedSlots.push({ ...t }));
+    // 🔍 同一例文内でのO1複数順序チェック
+    const hasSameExampleMultipleOrders = o1Entries.some(entry => {
+      const sameExampleO1s = o1Entries.filter(e => e.例文ID === entry.例文ID);
+      const ordersInSameExample = [...new Set(sameExampleO1s.map(e => e.Slot_display_order))];
+      return ordersInSameExample.length > 1;
     });
+    
+    if (hasSameExampleMultipleOrders) {
+      // 分離疑問詞構文：同一例文内の複数順序O1を全て選択
+      console.log("🔄 分離疑問詞構文検出: 複数O1を選択");
+      uniqueOrders.forEach(order => {
+        const targets = o1Entries.filter(e => e.Slot_display_order === order);
+        targets.forEach(t => selectedSlots.push({ ...t }));
+      });
+    } else {
+      // 異なる例文由来のO1混在：1つだけランダム選択
+      console.log("🔄 異なる例文のO1混在検出: 1つだけ選択");
+      const chosen = o1Entries[Math.floor(Math.random() * o1Entries.length)];
+      selectedSlots.push({ ...chosen });
+      const subslots = groupSlots.filter(e => e.例文ID === chosen.例文ID && e.Slot === chosen.Slot && e.SubslotID);
+      subslots.forEach(sub => selectedSlots.push({ ...sub }));
+    }
   } else if (o1Entries.length > 0) {
     const clauseO1 = o1Entries.filter(e => e.PhraseType === "clause");
     if (clauseO1.length > 0) {
