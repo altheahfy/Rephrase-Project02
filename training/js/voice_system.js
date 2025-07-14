@@ -106,10 +106,9 @@ class VoiceSystem {
             return '';
         }
 
-        const slotOrder = ['question-word', 'm1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         const sentenceParts = [];
 
-        // 疑問詞をチェック（特別扱い）
+        // 疑問詞をチェック（特別扱い - 常に最初）
         const questionWordElement = dynamicArea.querySelector('.question-word-slot');
         if (questionWordElement) {
             const textElement = questionWordElement.querySelector('.question-word-text');
@@ -117,36 +116,75 @@ class VoiceSystem {
                 const text = textElement.textContent.trim();
                 if (text) {
                     console.log('✅ 疑問詞:', text);
-                    sentenceParts.push({ order: 0, text: text });
+                    sentenceParts.push({ order: -1, text: text, slot: 'question-word' });
                 }
             }
         }
 
-        // 各スロットを順番に処理
-        slotOrder.forEach((slotName, index) => {
-            if (slotName === 'question-word') return; // 既に処理済み
-
-            const slotElements = dynamicArea.querySelectorAll(`[data-slot="${slotName}"]`);
-            
-            slotElements.forEach(slotElement => {
-                const phraseElement = slotElement.querySelector('.slot-phrase');
-                if (phraseElement && this.isElementVisible(phraseElement)) {
-                    const text = phraseElement.textContent.trim();
-                    if (text && text !== 'N/A' && text !== '') {
-                        console.log(`✅ ${slotName.toUpperCase()}: "${text}"`);
-                        sentenceParts.push({ 
-                            order: index + 1, 
-                            text: text,
-                            slot: slotName.toUpperCase()
-                        });
-                        return; // 同じスロットタイプで最初に見つかった表示中の要素のみ使用
-                    }
+        // 上位スロット（data-slot属性を持つ要素）を取得
+        const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]:not([data-slot="question-word"])');
+        
+        upperSlotElements.forEach(slotElement => {
+            const phraseElement = slotElement.querySelector('.slot-phrase');
+            if (phraseElement && this.isElementVisible(phraseElement)) {
+                const text = phraseElement.textContent.trim();
+                if (text && text !== 'N/A' && text !== '') {
+                    const slotName = slotElement.dataset.slot;
+                    const displayOrder = parseInt(slotElement.dataset.displayOrder) || 999;
+                    
+                    console.log(`✅ 上位スロット ${slotName.toUpperCase()} (order:${displayOrder}): "${text}"`);
+                    sentenceParts.push({ 
+                        order: displayOrder, 
+                        text: text,
+                        slot: slotName.toUpperCase(),
+                        type: 'upper'
+                    });
                 }
-            });
+            }
         });
 
-        // 順序でソートして例文を構築
+        // サブスロット（data-subslot-id属性を持つ要素）を取得
+        const subSlotElements = dynamicArea.querySelectorAll('[data-subslot-id]');
+        
+        subSlotElements.forEach(subSlotElement => {
+            const phraseElement = subSlotElement.querySelector('.slot-phrase');
+            if (phraseElement && this.isElementVisible(phraseElement)) {
+                const text = phraseElement.textContent.trim();
+                if (text && text !== 'N/A' && text !== '') {
+                    const subslotId = subSlotElement.dataset.subslotId;
+                    const displayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
+                    
+                    // 親スロットの情報を取得
+                    const parentSlot = subSlotElement.closest('[data-slot]');
+                    const parentSlotName = parentSlot ? parentSlot.dataset.slot : 'unknown';
+                    const parentDisplayOrder = parentSlot ? parseInt(parentSlot.dataset.displayOrder) || 999 : 999;
+                    
+                    console.log(`✅ サブスロット ${subslotId} (parent:${parentSlotName}, parent_order:${parentDisplayOrder}, sub_order:${displayOrder}): "${text}"`);
+                    
+                    // 複合order：親スロットのorder * 1000 + サブスロットのorder
+                    const compositeOrder = parentDisplayOrder * 1000 + displayOrder;
+                    
+                    sentenceParts.push({ 
+                        order: compositeOrder, 
+                        text: text,
+                        slot: subslotId,
+                        type: 'sub',
+                        parentSlot: parentSlotName,
+                        parentOrder: parentDisplayOrder,
+                        subOrder: displayOrder
+                    });
+                }
+            }
+        });
+
+        // Slot_display_order（上位スロット）とdisplay_order（サブスロット内）で順序をソート
         sentenceParts.sort((a, b) => a.order - b.order);
+        
+        console.log('📊 発見されたスロット数:', sentenceParts.length);
+        console.log('📊 ソート後の順序:', sentenceParts.map(part => 
+            `${part.slot}(${part.type}, order:${part.order}): "${part.text}"`
+        ));
+
         const sentence = sentenceParts.map(part => part.text).join(' ').trim();
 
         console.log(`🎯 完成した例文: ${sentence}`);
