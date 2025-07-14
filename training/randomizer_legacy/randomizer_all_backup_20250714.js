@@ -1,4 +1,3 @@
-
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -35,24 +34,7 @@ export function randomizeAll(slotData) {
     
     let candidates = slotSets.flat().filter(entry => entry.Slot === type);
     
-    // � 空スロット選択肢を追加（「案2」実装）
-    // このスロットタイプが存在しない例文がある場合、空の選択肢を追加
-    const totalExampleCount = exampleIDs.length;
-    const slotExampleCount = [...new Set(candidates.map(c => c.例文ID))].length;
-    if (slotExampleCount < totalExampleCount) {
-      // 空スロットを表現する仮想エントリを追加
-      candidates.push({
-        Slot: type,
-        SlotPhrase: "",
-        SlotText: "",
-        例文ID: "EMPTY_SLOT",
-        V_group_key: selectedGroup,
-        識別番号: `${type}-EMPTY`
-      });
-      console.log(`🎲 ${type}スロットに空選択肢を追加（${slotExampleCount}/${totalExampleCount}例文にのみ存在）`);
-    }
-    
-    // �🎯 疑問詞競合回避ロジック
+    // 🎯 疑問詞競合回避ロジック
     if (candidates.some(c => c.QuestionType === 'wh-word')) {
       const alreadyHasWhWord = selectedSlots.some(s => s.QuestionType === 'wh-word');
       if (alreadyHasWhWord) {
@@ -66,14 +48,6 @@ export function randomizeAll(slotData) {
     
     if (candidates.length > 0) {
       const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-      
-      // 🎲 空スロットが選択された場合の処理
-      if (chosen.例文ID === "EMPTY_SLOT") {
-        console.log(`🎯 ${type}スロット: 空選択肢が選ばれました（スロットなし）`);
-        // 空スロットの場合は何も追加しない（スキップ）
-        return;
-      }
-      
       selectedSlots.push({ ...chosen });
       
       // 疑問詞が選択された場合のログ
