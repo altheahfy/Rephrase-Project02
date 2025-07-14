@@ -149,6 +149,11 @@ export function randomizeAll(slotData) {
   console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
   console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
 
+  // 🔤 疑問文判定とピリオド/クエスチョンマーク自動付与
+  const isQuestionSentence = detectQuestionPattern(selectedSlots);
+  const punctuation = isQuestionSentence ? "?" : ".";
+  console.log(`🔤 文型判定: ${isQuestionSentence ? "疑問文" : "平叙文"} → 句読点: "${punctuation}"`);
+
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
@@ -159,6 +164,42 @@ export function randomizeAll(slotData) {
     SubslotElement: slot.SubslotElement || "",
     SubslotText: slot.SubslotText || "",
     display_order: slot.display_order || 0,
-    識別番号: slot.識別番号 || ""
+    識別番号: slot.識別番号 || "",
+    sentencePunctuation: punctuation  // 🔤 句読点情報を追加
   }));
+}
+
+/**
+ * 🔤 疑問文判定関数
+ * @param {Array} selectedSlots - 選択されたスロットデータ
+ * @returns {boolean} true: 疑問文, false: 平叙文
+ */
+function detectQuestionPattern(selectedSlots) {
+  // Slot_display_order順にソート
+  const sortedSlots = selectedSlots
+    .filter(slot => !slot.SubslotID) // メインスロットのみ
+    .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+  
+  if (sortedSlots.length === 0) return false;
+  
+  // パターン1: 文頭が do/does/did
+  const firstSlot = sortedSlots[0];
+  if (firstSlot && firstSlot.SlotText) {
+    const firstText = firstSlot.SlotText.toLowerCase().trim();
+    if (firstText === "do" || firstText === "does" || firstText === "did") {
+      console.log(`🔤 疑問文パターン1検出: 文頭に "${firstText}"`);
+      return true;
+    }
+  }
+  
+  // パターン2: 上位2スロット内に疑問詞
+  const upperSlots = sortedSlots.slice(0, 2);
+  for (const slot of upperSlots) {
+    if (slot.QuestionType === 'wh-word') {
+      console.log(`🔤 疑問文パターン2検出: 上位スロットに疑問詞 "${slot.SlotPhrase}"`);
+      return true;
+    }
+  }
+  
+  return false;
 }
