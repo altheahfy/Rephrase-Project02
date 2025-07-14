@@ -71,7 +71,7 @@ class VoiceSystem {
     }
 
     /**
-     * 動的エリアから現在表示されているスロットのテキストのみを抽出（デバッグ版）
+     * 動的エリアから現在表示されているスロットのテキストのみを抽出
      */
     extractCurrentSentenceFromDynamicArea() {
         console.log('🎯 動的記載エリアから表示中の音声用例文を抽出中...');
@@ -82,14 +82,10 @@ class VoiceSystem {
             return '';
         }
 
-        console.log('📋 動的エリアのHTML構造:', dynamicArea.innerHTML);
-        console.log('📋 動的エリアの子要素数:', dynamicArea.children.length);
-
         const sentenceParts = [];
 
         // 疑問詞をチェック（特別扱い - 常に最初）
         const questionWordElement = document.querySelector('#display-top-question-word .question-word-text');
-        console.log('🔍 疑問詞要素:', questionWordElement);
         if (questionWordElement && this.isElementVisible(questionWordElement)) {
             const text = questionWordElement.textContent.trim();
             if (text) {
@@ -100,19 +96,9 @@ class VoiceSystem {
 
         // 上位スロット（data-slot属性を持つ要素）を取得
         const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]');
-        console.log('🔍 上位スロット要素数:', upperSlotElements.length);
         
-        upperSlotElements.forEach((slotElement, index) => {
-            console.log(`🔍 上位スロット${index + 1}:`, {
-                element: slotElement,
-                dataSlot: slotElement.dataset.slot,
-                dataDisplayOrder: slotElement.dataset.displayOrder,
-                innerHTML: slotElement.innerHTML
-            });
-            
+        upperSlotElements.forEach(slotElement => {
             const phraseElement = slotElement.querySelector('.slot-phrase');
-            console.log(`🔍 phraseElement${index + 1}:`, phraseElement, phraseElement?.textContent);
-            
             if (phraseElement && this.isElementVisible(phraseElement)) {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {
@@ -126,29 +112,15 @@ class VoiceSystem {
                         slot: slotName.toUpperCase(),
                         type: 'upper'
                     });
-                } else {
-                    console.log(`⚠️ 上位スロット${index + 1}: テキストが空または無効 "${text}"`);
                 }
-            } else {
-                console.log(`⚠️ 上位スロット${index + 1}: phraseElementが見つからないか非表示`);
             }
         });
 
         // サブスロット（data-subslot-id属性を持つ要素）を取得
         const subSlotElements = dynamicArea.querySelectorAll('[data-subslot-id]');
-        console.log('🔍 サブスロット要素数:', subSlotElements.length);
         
-        subSlotElements.forEach((subSlotElement, index) => {
-            console.log(`🔍 サブスロット${index + 1}:`, {
-                element: subSlotElement,
-                dataSubslotId: subSlotElement.dataset.subslotId,
-                dataDisplayOrder: subSlotElement.dataset.displayOrder,
-                innerHTML: subSlotElement.innerHTML
-            });
-            
+        subSlotElements.forEach(subSlotElement => {
             const phraseElement = subSlotElement.querySelector('.subslot-element');
-            console.log(`🔍 subslot phraseElement${index + 1}:`, phraseElement, phraseElement?.textContent);
-            
             if (phraseElement && this.isElementVisible(phraseElement)) {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {
@@ -174,11 +146,7 @@ class VoiceSystem {
                         parentOrder: parentDisplayOrder,
                         subOrder: displayOrder
                     });
-                } else {
-                    console.log(`⚠️ サブスロット${index + 1}: テキストが空または無効 "${text}"`);
                 }
-            } else {
-                console.log(`⚠️ サブスロット${index + 1}: phraseElementが見つからないか非表示`);
             }
         });
 
@@ -192,7 +160,7 @@ class VoiceSystem {
 
         const sentence = sentenceParts.map(part => part.text).join(' ').trim();
 
-        console.log(`🎯 完成した例文: "${sentence}"`);
+        console.log(`🎯 完成した例文: ${sentence}`);
         console.log(`📊 使用されたパーツ数: ${sentenceParts.length}`);
         
         return sentence;
