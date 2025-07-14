@@ -100,8 +100,8 @@
   <div style="margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ローカルファイル</label>
     <input type="file" id="localFileInput" accept=".json" style="width: 140px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; margin-bottom: 4px;">
-    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;" onclick="handleFileRegister()">登録</button>
-    <button id="manageFilesButton" style="background-color: #9C27B0; color: white; border: none; padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; margin-left: 2px;" title="ローカルファイル管理" onclick="handleFileManage()">🗂️</button>
+    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;" onclick="console.log('🔧 直接クリックテスト'); testRegisterButton();">登録</button>
+    <button id="manageFilesButton" style="background-color: #9C27B0; color: white; border: none; padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; margin-left: 2px;" title="ローカルファイル管理">🗂️</button>
   </div>
   
   <!-- ファイル選択 -->
@@ -1092,17 +1092,8 @@ function testRegisterButton() {
   
   if (!window.localFileManager) {
     console.error('❌ window.localFileManager が存在しません');
-    console.log('🔄 LocalFileManagerを手動初期化を試行');
-    
-    // 手動でLocalFileManagerを初期化してみる
-    try {
-      window.localFileManager = new LocalFileManager();
-      console.log('✅ 手動初期化成功');
-    } catch (e) {
-      console.error('❌ 手動初期化も失敗:', e);
-      alert('LocalFileManagerが初期化できません: ' + e.message);
-      return;
-    }
+    alert('LocalFileManagerが初期化されていません');
+    return;
   }
   
   console.log('✅ LocalFileManager存在確認OK');
@@ -1130,104 +1121,6 @@ function testRegisterButton() {
     alert('登録処理でエラーが発生しました: ' + error.message);
   }
 }
-
-// 🌐 LocalFileManagerクラス（シンプル版）
-class LocalFileManager {
-  constructor() {
-    console.log('🔄 LocalFileManager constructor呼び出し');
-    this.uploadedFiles = {};
-    
-    // localStorageから既存データを読み込み
-    try {
-      const stored = localStorage.getItem('rephrase_uploaded_files');
-      if (stored) {
-        this.uploadedFiles = JSON.parse(stored);
-        console.log('✅ localStorage読み込み成功:', Object.keys(this.uploadedFiles).length, '件');
-      }
-    } catch (e) {
-      console.warn('⚠️ localStorage読み込みエラー:', e);
-    }
-    
-    console.log('✅ LocalFileManager constructor完了');
-  }
-  
-  async registerLocalFile() {
-    console.log('🔄 registerLocalFile開始');
-    
-    const fileInput = document.getElementById('localFileInput');
-    const file = fileInput.files[0];
-    
-    if (!file) {
-      alert('JSONファイルを選択してください');
-      return;
-    }
-    
-    if (!file.name.endsWith('.json')) {
-      alert('JSONファイルのみ対応しています');
-      return;
-    }
-    
-    try {
-      // ファイル読み込み
-      const content = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('ファイル読み込みエラー'));
-        reader.readAsText(file);
-      });
-      
-      // JSON検証
-      JSON.parse(content);
-      
-      // 保存
-      const fileId = `local_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-      this.uploadedFiles[fileId] = {
-        name: file.name,
-        content: content,
-        uploadDate: new Date().toISOString(),
-        size: file.size
-      };
-      
-      localStorage.setItem('rephrase_uploaded_files', JSON.stringify(this.uploadedFiles));
-      
-      // 選択肢に追加
-      const select = document.getElementById('presetSelect');
-      const option = document.createElement('option');
-      option.value = fileId;
-      option.textContent = `📁 ${file.name}`;
-      select.appendChild(option);
-      
-      alert(`✅ "${file.name}" を登録しました！`);
-      fileInput.value = '';
-      
-      console.log('✅ ファイル登録成功:', fileId);
-      
-    } catch (error) {
-      console.error('❌ 登録エラー:', error);
-      alert(`❌ ファイル登録に失敗しました:\n${error.message}`);
-    }
-  }
-  
-  getFileContent(fileId) {
-    return this.uploadedFiles[fileId]?.content || null;
-  }
-}
-
-// 確実な初期化
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔄 DOMContentLoaded - LocalFileManager初期化開始');
-  
-  setTimeout(() => {
-    try {
-      if (!window.localFileManager) {
-        window.localFileManager = new LocalFileManager();
-        console.log('✅ LocalFileManager初期化成功');
-      }
-    } catch (e) {
-      console.error('❌ LocalFileManager初期化失敗:', e);
-    }
-  }, 100); // 100ms遅延で確実に初期化
-});
 </script>
 
 <script type="module">
