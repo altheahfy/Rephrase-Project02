@@ -29,12 +29,33 @@ export function randomizeAll(slotData) {
 
   let selectedSlots = [];
   const slotTypes = [...new Set(groupSlots.map(entry => entry.Slot).filter(s => s))];
+  
   slotTypes.forEach(type => {
     if (type === "O1") return;
-    const candidates = slotSets.flat().filter(entry => entry.Slot === type);
+    
+    let candidates = slotSets.flat().filter(entry => entry.Slot === type);
+    
+    // 🎯 疑問詞競合回避ロジック
+    if (candidates.some(c => c.QuestionType === 'wh-word')) {
+      const alreadyHasWhWord = selectedSlots.some(s => s.QuestionType === 'wh-word');
+      if (alreadyHasWhWord) {
+        // 既に疑問詞が選択済みなら、非疑問詞のみ選択候補にする
+        candidates = candidates.filter(c => c.QuestionType !== 'wh-word');
+        console.log(`🔒 疑問詞競合回避: ${type}スロットから疑問詞を除外`);
+      } else {
+        console.log(`✅ 疑問詞選択可能: ${type}スロット`);
+      }
+    }
+    
     if (candidates.length > 0) {
       const chosen = candidates[Math.floor(Math.random() * candidates.length)];
       selectedSlots.push({ ...chosen });
+      
+      // 疑問詞が選択された場合のログ
+      if (chosen.QuestionType === 'wh-word') {
+        console.log(`🎯 疑問詞選択: ${chosen.SlotPhrase} (${chosen.Slot})`);
+      }
+      
       const relatedSubslots = groupSlots.filter(e =>
         e.例文ID === chosen.例文ID &&
         e.Slot === chosen.Slot &&
