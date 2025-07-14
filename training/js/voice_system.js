@@ -113,8 +113,7 @@ class VoiceSystem {
             const phraseElement = slotElement.querySelector('.slot-phrase');
             console.log(`🔍 phraseElement${index + 1}:`, phraseElement, phraseElement?.textContent);
             
-            // 🎯 動的記載エリア内の要素は常に表示中として扱う
-            if (phraseElement) {
+            if (phraseElement && this.isElementVisible(phraseElement)) {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {
                     const slotName = slotElement.dataset.slot;
@@ -131,7 +130,7 @@ class VoiceSystem {
                     console.log(`⚠️ 上位スロット${index + 1}: テキストが空または無効 "${text}"`);
                 }
             } else {
-                console.log(`⚠️ 上位スロット${index + 1}: phraseElementが見つからない`);
+                console.log(`⚠️ 上位スロット${index + 1}: phraseElementが見つからないか非表示`);
             }
         });
 
@@ -150,8 +149,7 @@ class VoiceSystem {
             const phraseElement = subSlotElement.querySelector('.subslot-element');
             console.log(`🔍 subslot phraseElement${index + 1}:`, phraseElement, phraseElement?.textContent);
             
-            // 🎯 動的記載エリア内の要素は常に表示中として扱う
-            if (phraseElement) {
+            if (phraseElement && this.isElementVisible(phraseElement)) {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {
                     const subslotId = subSlotElement.dataset.subslotId;
@@ -180,7 +178,7 @@ class VoiceSystem {
                     console.log(`⚠️ サブスロット${index + 1}: テキストが空または無効 "${text}"`);
                 }
             } else {
-                console.log(`⚠️ サブスロット${index + 1}: phraseElementが見つからない`);
+                console.log(`⚠️ サブスロット${index + 1}: phraseElementが見つからないか非表示`);
             }
         });
 
