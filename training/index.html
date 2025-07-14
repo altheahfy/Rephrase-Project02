@@ -91,6 +91,7 @@
       <option value="">-- データを選択 --</option>
       <option value="data/slot_order_data.json">🎯 メインデータセット</option>
       <option value="data/slot_order_data2.json">📚 例文データセット2</option>
+      <option value="data/absolute_order_data.json">🔢 絶対順序テストデータ</option>
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
   </div>
@@ -1528,79 +1529,45 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 🎭 ローディング制御関数
-function hideLoadingOverlay() {
-  console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
-  const overlay = document.getElementById('loading-overlay');
-  const mainContent = document.getElementById('main-content');
+// 🔄 起動時にdataフォルダの全JSONファイルを自動検出
+async function autoDetectDataFiles() {
+  const knownFiles = [
+    { path: 'data/slot_order_data.json', name: '🎯 メインデータセット' },
+    { path: 'data/slot_order_data2.json', name: '📚 例文データセット2' },
+    { path: 'data/absolute_order_data.json', name: '🔢 絶対順序テストデータ' }
+  ];
   
-  console.log("🎭 overlay要素:", overlay);
-  console.log("🎭 mainContent要素:", mainContent);
+  const select = document.getElementById('presetSelect');
+  const currentOptions = Array.from(select.options).map(opt => opt.value);
   
-  if (overlay && mainContent) {
-    console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
-    
-    // シンプルな遅延でローディングを隠す
-    setTimeout(() => {
-      console.log("🎭 ローディングオーバーレイを隠します");
-      
-      // ローディングオーバーレイを即座に隠す
-      overlay.style.display = 'none';
-      console.log("🎭 overlay.style.display = 'none' 実行完了");
-      
-      // メインコンテンツを表示
-      mainContent.style.display = 'block';
-      mainContent.style.opacity = '1';
-      console.log("🎭 mainContent表示設定完了");
-      
-      console.log("🎭 メインコンテンツ表示完了");
-    }, 500); // シンプルな500ms遅延
-  } else {
-    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
-  }
-}
-
-function showLoadingOverlay() {
-  console.log("🎭 showLoadingOverlay() 関数が呼ばれました");
-  const overlay = document.getElementById('loading-overlay');
-  const mainContent = document.getElementById('main-content');
+  // 🔍 追加のJSONファイルを検出試行（エラーは無視）
+  const potentialFiles = [
+    'data/new_data.json',
+    'data/test_data.json', 
+    'data/sample_data.json',
+    'data/custom_data.json',
+    'data/updated_data.json',
+    'data/fixed_data.json'
+  ];
   
-  console.log("🎭 overlay要素:", overlay);
-  console.log("🎭 mainContent要素:", mainContent);
-  
-  if (overlay && mainContent) {
-    console.log("🎭 ローディング開始 - メインコンテンツを隠す");
-    
-    // 確実にローディングを表示し、メインコンテンツを隠す
-    overlay.style.display = 'flex';
-    overlay.style.opacity = '1';
-    overlay.style.transition = 'none'; // トランジションをリセット
-    console.log("🎭 overlay表示設定完了");
-    
-    mainContent.style.display = 'none';
-    mainContent.style.opacity = '0';
-    mainContent.style.transition = 'none'; // トランジションをリセット
-    console.log("🎭 mainContent非表示設定完了");
-  } else {
-    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
-  }
-}
-
-// JSONファイルが選択された時のローディング表示更新
-document.addEventListener('DOMContentLoaded', function() {
-  const fileInput = document.getElementById('jsonFileInput');
-  const loadingText = document.querySelector('#loading-overlay p');
-  
-  if (fileInput && loadingText) {
-    fileInput.addEventListener('change', function() {
-      if (this.files.length > 0) {
-        loadingText.textContent = `${this.files[0].name} を読み込み準備完了`;
-      } else {
-        loadingText.textContent = 'JSONファイルをロードしてください';
+  for (const filePath of potentialFiles) {
+    try {
+      const response = await fetch(filePath, { method: 'HEAD' });
+      if (response.ok && !currentOptions.includes(filePath)) {
+        const option = document.createElement('option');
+        option.value = filePath;
+        option.textContent = `📄 ${filePath.replace('data/', '').replace('.json', '')}`;
+        select.appendChild(option);
+        console.log(`✅ 自動検出: ${filePath}`);
       }
-    });
+    } catch (e) {
+      // ファイルが存在しない場合は無視
+    }
   }
-});
+}
+
+// ページ読み込み時に自動検出を実行
+document.addEventListener('DOMContentLoaded', autoDetectDataFiles);
 
 </script>
 
