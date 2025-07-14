@@ -155,17 +155,56 @@ class VoiceSystem {
                 const text = phraseElement.textContent.trim();
                 if (text && text !== 'N/A' && text !== '') {
                     const subslotId = subSlotElement.dataset.subslotId;
-                    const displayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
+                    const subDisplayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
                     
-                    // 親スロットの情報を取得
-                    const parentSlot = subSlotElement.closest('[data-slot]');
-                    const parentSlotName = parentSlot ? parentSlot.dataset.slot : 'unknown';
-                    const parentDisplayOrder = parentSlot ? parseInt(parentSlot.dataset.displayOrder) || 999 : 999;
+                    // 🎯 修正: サブスロットIDから確実に親スロット名を抽出
+                    // サブスロットIDの形式: "slot-{親スロット名}-sub-{サブスロット名}"
+                    // 例: "slot-s-sub-sub-s" → 親は "s"
+                    // 例: "slot-o1-sub-sub-aux" → 親は "o1"
                     
-                    console.log(`✅ サブスロット ${subslotId} (parent:${parentSlotName}, parent_order:${parentDisplayOrder}, sub_order:${displayOrder}): "${text}"`);
+                    let parentSlotName = 'unknown';
+                    let parentSlotElement = null;
                     
-                    // 複合order：親スロットのorder * 1000 + サブスロットのorder
-                    const compositeOrder = parentDisplayOrder * 1000 + displayOrder;
+                    // IDから親スロット名を抽出（最優先）
+                    const idParts = subSlotElement.id.split('-');
+                    console.log(`🔍 サブスロット${index + 1} ID解析:`, {
+                        fullId: subSlotElement.id,
+                        idParts: idParts
+                    });
+                    
+                    if (idParts.length >= 2 && idParts[0] === 'slot') {
+                        // "slot-s-sub-..." または "slot-o1-sub-..." の形式
+                        parentSlotName = idParts[1];
+                        parentSlotElement = dynamicArea.querySelector(`[data-slot="${parentSlotName}"]`);
+                        console.log(`🎯 ID解析による親スロット: "${parentSlotName}"`);
+                    }
+                    
+                    // フォールバック: 前の要素から探索
+                    if (!parentSlotElement) {
+                        let element = subSlotElement.previousElementSibling;
+                        while (element && !element.dataset.slot) {
+                            element = element.previousElementSibling;
+                        }
+                        if (element) {
+                            parentSlotElement = element;
+                            parentSlotName = element.dataset.slot;
+                            console.log(`🔄 前要素探索による親スロット: "${parentSlotName}"`);
+                        }
+                    }
+                    
+                    const parentDisplayOrder = parentSlotElement ? parseInt(parentSlotElement.dataset.displayOrder) || 999 : 999;
+                    
+                    console.log(`🔍 サブスロット${index + 1} 親情報:`, {
+                        parentElement: parentSlotElement,
+                        parentSlotName: parentSlotName,
+                        parentDisplayOrder: parentDisplayOrder,
+                        subDisplayOrder: subDisplayOrder
+                    });
+                    
+                    // 🎯 統合順序計算: 親のSlot_display_order * 1000 + サブのdisplay_order
+                    const compositeOrder = parentDisplayOrder * 1000 + subDisplayOrder;
+                    
+                    console.log(`✅ サブスロット ${subslotId} (parent:${parentSlotName}, parent_order:${parentDisplayOrder}, sub_order:${subDisplayOrder}, composite:${compositeOrder}): "${text}"`);
                     
                     sentenceParts.push({ 
                         order: compositeOrder, 
@@ -174,7 +213,7 @@ class VoiceSystem {
                         type: 'sub',
                         parentSlot: parentSlotName,
                         parentOrder: parentDisplayOrder,
-                        subOrder: displayOrder
+                        subOrder: subDisplayOrder
                     });
                 } else {
                     console.log(`⚠️ サブスロット${index + 1}: テキストが空または無効 "${text}"`);
