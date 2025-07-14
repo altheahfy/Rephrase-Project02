@@ -106,6 +106,10 @@ function randomizeSlotSIndividual() {
   
   console.log("🎯 Sスロット個別ランダマイズ結果:", JSON.stringify(data, null, 2));
   
+  // 🔄 音声システム用データを更新
+  window.loadedJsonData = data;
+  console.log("🔄 window.loadedJsonData 更新完了（Sスロット個別ランダマイズ）");
+  
   // 構造を再構築（buildStructureを使用）
   if (typeof buildStructure === "function") {
     buildStructure(data);

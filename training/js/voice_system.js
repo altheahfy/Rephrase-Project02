@@ -78,16 +78,21 @@ class VoiceSystem {
     }
 
     /**
-     * window.loadedJsonDataから順序通りに例文を構築
+     * 🎯 上位スロットはwindow.loadedJsonData、サブスロットはwindow.lastSelectedSlotsから構築
      */
     buildSentenceFromOrderedData() {
-        console.log('📊 順序データから例文を構築中...');
-        const data = window.loadedJsonData;
+        console.log('📊 混合データソースから例文を構築中...');
+        
+        // データソース確認
+        const upperSlotData = window.loadedJsonData || [];
+        const subSlotData = window.lastSelectedSlots || [];
+        
+        console.log(`📊 データソース: 上位スロット=${upperSlotData.length}件, サブスロット=${subSlotData.length}件`);
         
         const sentenceParts = [];
         
-        // 疑問詞をチェック（DisplayAtTopまたは分離表示）
-        const questionWordData = data.find(item => 
+        // 疑問詞をチェック（上位スロットデータから）
+        const questionWordData = upperSlotData.find(item => 
             item.DisplayAtTop === true && item.DisplayText
         );
         if (questionWordData) {
@@ -99,11 +104,11 @@ class VoiceSystem {
             });
         }
         
-        // 🎯 修正：各スロットの表示順序ごとに上位スロットまたはサブスロットのどちらかを選択
+        // 🎯 混合アプローチ：各スロットの表示順序ごとに処理
         const slotOrderGroups = {};
         
-        // スロット表示順序ごとにグループ化
-        data.forEach(item => {
+        // 上位スロットをグループ化（window.loadedJsonDataから）
+        upperSlotData.forEach(item => {
             const order = item.Slot_display_order;
             if (!slotOrderGroups[order]) {
                 slotOrderGroups[order] = {
@@ -114,7 +119,20 @@ class VoiceSystem {
             
             if (!item.SubslotID) {
                 slotOrderGroups[order].upperSlot = item;
-            } else {
+            }
+        });
+        
+        // サブスロットをグループ化（window.lastSelectedSlotsから）
+        subSlotData.forEach(item => {
+            const order = item.Slot_display_order;
+            if (!slotOrderGroups[order]) {
+                slotOrderGroups[order] = {
+                    upperSlot: null,
+                    subSlots: []
+                };
+            }
+            
+            if (item.SubslotID) {
                 slotOrderGroups[order].subSlots.push(item);
             }
         });
@@ -126,6 +144,8 @@ class VoiceSystem {
             const group = slotOrderGroups[order];
             const upperSlot = group.upperSlot;
             const subSlots = group.subSlots;
+            
+            console.log(`🔍 order:${order} - 上位:${upperSlot ? upperSlot.Slot : 'なし'}, サブ:${subSlots.length}個`);
             
             // DisplayAtTopで分離表示されるスロットはスキップ
             if (upperSlot && upperSlot.DisplayAtTop === true) {
