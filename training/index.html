@@ -1362,6 +1362,22 @@ document.getElementById("loadPresetButton").addEventListener("click", async () =
     hideLoadingOverlay();
   }
 });
+    // 🎯 **データセット：fetchでJSONファイルを読み込み**
+    fetch(selectedPreset)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // データ処理を直接実行
+        try {
+          // 🔄 JSONロード時にサブスロット表示設定をリセット
+          localStorage.removeItem('rephrase_subslot_visibility_state');
+          console.log('📁 プリセットJSONロード時にサブスロット表示設定をリセットしました');
+          
+          loadedJsonData = data;
           window.loadedJsonData = loadedJsonData;  // コンソール確認用
           console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
           const processedData = randomizeAll(loadedJsonData);
@@ -1377,6 +1393,22 @@ document.getElementById("loadPresetButton").addEventListener("click", async () =
           syncDynamicToStatic();
           
           // サブスロットの初期化も実行
+          if (typeof initializeSubslots === 'function') {
+            initializeSubslots();
+          }
+          
+          // 🎭 ローディング画面を非表示
+          console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
+          hideLoadingOverlay();
+        } catch (error) {
+          console.error("プリセットJSONデータの処理に失敗:", error);
+          alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+          hideLoadingOverlay();
+        }
+      })
+      .catch(error => {
+        console.error(`${selectedPreset}の読み込みに失敗:`, error);
+        alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
 // 既存のファイル選択からのロード機能
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
