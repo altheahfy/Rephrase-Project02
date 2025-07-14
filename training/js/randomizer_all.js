@@ -152,7 +152,8 @@ export function randomizeAll(slotData) {
   // 🔤 疑問文判定とピリオド/クエスチョンマーク自動付与
   const isQuestionSentence = detectQuestionPattern(selectedSlots);
   const punctuation = isQuestionSentence ? "?" : ".";
-  console.log(`🔤 文型判定: ${isQuestionSentence ? "疑問文" : "平叙文"} → 句読点: "${punctuation}"`);
+  console.log(`🔤 文型判定結果: ${isQuestionSentence ? "疑問文" : "平叙文"} → 句読点: "${punctuation}"`);
+  console.log(`🔤 判定対象スロット:`, selectedSlots.filter(s => !s.SubslotID).map(s => `${s.Slot}(${s.Slot_display_order}): "${s.SlotText}"`));
 
   return selectedSlots.map(slot => ({
     Slot: slot.Slot || "",

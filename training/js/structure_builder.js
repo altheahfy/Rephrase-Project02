@@ -219,6 +219,7 @@ function addPunctuationToLastSlot(selectedSlots) {
   // sentencePunctuation プロパティから句読点を取得
   const punctuation = selectedSlots.length > 0 ? selectedSlots[0].sentencePunctuation || "." : ".";
   console.log(`🔤 句読点表示処理開始: "${punctuation}"`);
+  console.log(`🔤 対象データ:`, selectedSlots[0]);
   
   // 既存の句読点要素を削除
   const existingPunctuation = document.querySelector('.sentence-punctuation');
@@ -227,29 +228,50 @@ function addPunctuationToLastSlot(selectedSlots) {
     console.log('🔤 既存の句読点を削除');
   }
   
-  // slot-wrapper を取得
-  const wrapper = document.querySelector('.slot-wrapper');
-  if (!wrapper) {
-    console.warn('⚠️ .slot-wrapper が見つかりません');
-    return;
+  // 表示されているスロットコンテナを取得
+  const slotContainers = document.querySelectorAll('.slot-container');
+  console.log(`🔤 検索対象コンテナ数: ${slotContainers.length}`);
+  
+  // 最後に表示されているコンテナを見つける
+  let lastVisibleContainer = null;
+  let lastOrder = -1;
+  
+  slotContainers.forEach(container => {
+    const phraseElement = container.querySelector('.slot-phrase');
+    const textElement = container.querySelector('.slot-text');
+    
+    if ((phraseElement && phraseElement.textContent.trim()) || 
+        (textElement && textElement.textContent.trim())) {
+      
+      // data-display-order を確認
+      const displayOrder = parseInt(container.dataset.displayOrder) || 0;
+      if (displayOrder > lastOrder) {
+        lastOrder = displayOrder;
+        lastVisibleContainer = container;
+      }
+      console.log(`🔤 表示中コンテナ発見: ${container.id}, order: ${displayOrder}`);
+    }
+  });
+  
+  if (lastVisibleContainer) {
+    // 句読点要素を作成
+    const punctuationElement = document.createElement('span');
+    punctuationElement.className = 'sentence-punctuation';
+    punctuationElement.textContent = punctuation;
+    punctuationElement.style.cssText = `
+      margin-left: 3px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #d32f2f;
+      display: inline;
+    `;
+    
+    // 最後のコンテナの直後に追加
+    lastVisibleContainer.insertAdjacentElement('afterend', punctuationElement);
+    console.log(`🔤 句読点 "${punctuation}" を ${lastVisibleContainer.id} の後に追加`);
+  } else {
+    console.warn('⚠️ 表示中のスロットコンテナが見つかりませんでした');
   }
-  
-  // 句読点要素を作成
-  const punctuationElement = document.createElement('div');
-  punctuationElement.className = 'sentence-punctuation';
-  punctuationElement.textContent = punctuation;
-  punctuationElement.style.cssText = `
-    display: inline-block;
-    margin-left: 5px;
-    font-size: 2em;
-    font-weight: bold;
-    color: #333;
-    vertical-align: bottom;
-  `;
-  
-  // wrapper の最後に句読点を追加
-  wrapper.appendChild(punctuationElement);
-  console.log(`🔤 句読点 "${punctuation}" をwrapperの最後に追加しました`);
 }
 
 /**
