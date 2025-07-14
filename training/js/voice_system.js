@@ -78,21 +78,20 @@ class VoiceSystem {
     }
 
     /**
-     * 🎯 上位スロットはwindow.loadedJsonData、サブスロットはwindow.lastSelectedSlotsから構築
+     * 🎯 window.lastSelectedSlotsから順序通りに例文を構築（個別ランダマイズ対応）
      */
     buildSentenceFromOrderedData() {
-        console.log('📊 混合データソースから例文を構築中...');
+        console.log('📊 lastSelectedSlotsから例文を構築中...');
         
-        // データソース確認
-        const upperSlotData = window.loadedJsonData || [];
-        const subSlotData = window.lastSelectedSlots || [];
+        // データソースはlastSelectedSlotsのみ使用
+        const data = window.lastSelectedSlots || [];
         
-        console.log(`📊 データソース: 上位スロット=${upperSlotData.length}件, サブスロット=${subSlotData.length}件`);
+        console.log(`📊 データソース: lastSelectedSlots=${data.length}件`);
         
         const sentenceParts = [];
         
-        // 疑問詞をチェック（上位スロットデータから）
-        const questionWordData = upperSlotData.find(item => 
+        // 疑問詞をチェック（DisplayAtTopまたは分離表示）
+        const questionWordData = data.find(item => 
             item.DisplayAtTop === true && item.DisplayText
         );
         if (questionWordData) {
@@ -104,11 +103,11 @@ class VoiceSystem {
             });
         }
         
-        // 🎯 混合アプローチ：各スロットの表示順序ごとに処理
+        // 🎯 各スロットの表示順序ごとに上位スロットまたはサブスロットのどちらかを選択
         const slotOrderGroups = {};
         
-        // 上位スロットをグループ化（window.loadedJsonDataから）
-        upperSlotData.forEach(item => {
+        // スロット表示順序ごとにグループ化
+        data.forEach(item => {
             const order = item.Slot_display_order;
             if (!slotOrderGroups[order]) {
                 slotOrderGroups[order] = {
@@ -118,6 +117,11 @@ class VoiceSystem {
             }
             
             if (!item.SubslotID) {
+                slotOrderGroups[order].upperSlot = item;
+            } else {
+                slotOrderGroups[order].subSlots.push(item);
+            }
+        });
                 slotOrderGroups[order].upperSlot = item;
             }
         });
