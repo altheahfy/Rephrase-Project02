@@ -23,12 +23,6 @@
   </script>
   <script src="js/question_word_visibility.js">
   </script>
-  <script src="js/voice_system.js">
-  </script>
-  <script src="js/voice_progress_tracker.js">
-  </script>
-  <script src="js/voice_progress_ui.js">
-  </script>
  </head>
  <body>
 
@@ -1644,16 +1638,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- 🎤 音声システム初期化 -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // 音声システムを初期化
+// 音声システムの初期化を遅延実行（より確実）
+function initVoiceSystem() {
+  console.log('🎤 音声システム初期化試行...');
+  
+  // ボタンの存在確認
+  const voiceBtn = document.getElementById('voice-panel-open-btn');
+  const voicePanel = document.getElementById('voice-control-panel');
+  
+  console.log('🔍 音声ボタン:', voiceBtn);
+  console.log('🔍 音声パネル:', voicePanel);
+  console.log('🔍 VoiceSystemクラス確認:', typeof VoiceSystem);
+  
   if (typeof VoiceSystem !== 'undefined') {
-    console.log('🎤 音声システムを初期化中...');
-    window.voiceSystem = new VoiceSystem();
-    console.log('✅ 音声システム初期化完了');
+    console.log('✅ VoiceSystemクラス確認済み');
+    try {
+      window.voiceSystem = new VoiceSystem();
+      console.log('✅ 音声システム初期化完了');
+      
+      // 手動でイベントリスナーも設定（バックアップ）
+      if (voiceBtn && !voiceBtn.hasAttribute('data-listener-added')) {
+        voiceBtn.addEventListener('click', function() {
+          console.log('🎤 音声ボタンがクリックされました');
+          if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
+            window.voiceSystem.toggleVoicePanel();
+          } else {
+            console.error('❌ voiceSystemまたはtoggleVoicePanelが見つかりません');
+          }
+        });
+        voiceBtn.setAttribute('data-listener-added', 'true');
+        console.log('✅ 手動イベントリスナー設定完了');
+      }
+    } catch (error) {
+      console.error('❌ VoiceSystem初期化エラー:', error);
+    }
   } else {
     console.error('❌ VoiceSystemクラスが見つかりません');
+    console.log('🔍 利用可能なオブジェクト:', Object.keys(window).filter(key => key.includes('Voice')));
   }
-});
+}
+
+// 複数のタイミングで初期化を試行
+document.addEventListener('DOMContentLoaded', initVoiceSystem);
+window.addEventListener('load', initVoiceSystem);
+
+// さらに遅延して実行
+setTimeout(initVoiceSystem, 1000);
+
+// データ読み込み後の初期化用関数
+window.initVoiceSystemAfterData = function() {
+  console.log('📊 データ読み込み後の音声システム初期化...');
+  if (!window.voiceSystem) {
+    initVoiceSystem();
+  }
+};
 </script>
 
 </body>

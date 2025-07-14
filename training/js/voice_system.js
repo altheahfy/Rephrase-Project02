@@ -55,8 +55,8 @@ class VoiceSystem {
     getCurrentSentence() {
         console.log('📝 現在の例文取得を開始...');
         
-        // 🎯 直接window.loadedJsonDataから順序通りに例文を構築
-        if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+        // 🎯 直接window.lastSelectedSlotsから順序通りに例文を構築
+        if (window.lastSelectedSlots && Array.isArray(window.lastSelectedSlots)) {
             const sentence = this.buildSentenceFromOrderedData();
             if (sentence && sentence.trim().length > 0) {
                 console.log('✅ データから例文を取得しました:', sentence);
