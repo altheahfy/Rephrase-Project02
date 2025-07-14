@@ -85,16 +85,6 @@ class VoiceSystem {
         console.log('📋 動的エリアのHTML構造:', dynamicArea.innerHTML);
         console.log('📋 動的エリアの子要素数:', dynamicArea.children.length);
 
-        // 🔍 動的エリア全体のサブスロット検索
-        const allSubSlots = dynamicArea.querySelectorAll('[data-subslot-id]');
-        console.log('🔍 動的エリア全体のサブスロット数:', allSubSlots.length);
-        console.log('🔍 動的エリア全体のサブスロット一覧:', Array.from(allSubSlots).map(sub => ({
-            id: sub.dataset.subslotId,
-            order: sub.dataset.displayOrder,
-            text: sub.textContent.trim(),
-            html: sub.outerHTML
-        })));
-
         const sentenceParts = [];
 
         // 疑問詞をチェック（特別扱い - 常に最初）
@@ -153,11 +143,6 @@ class VoiceSystem {
             
             // この上位スロット内のサブスロットを処理
             const subSlotElements = slotElement.querySelectorAll('[data-subslot-id]');
-            console.log(`🔍 ${slotElement.dataset.slot}内のサブスロット検索:`);
-            console.log(`   - querySelectorAll('[data-subslot-id]')結果:`, subSlotElements);
-            console.log(`   - サブスロット数:`, subSlotElements.length);
-            console.log(`   - 上位スロットのHTML:`, slotElement.outerHTML);
-            
             if (subSlotElements.length > 0) {
                 console.log(`🔍 ${slotElement.dataset.slot}内のサブスロット数:`, subSlotElements.length);
                 
@@ -173,25 +158,10 @@ class VoiceSystem {
                 );
                 
                 sortedSubSlots.forEach((subSlotElement, subIndex) => {
-                    console.log(`🔍 サブスロット${subIndex}の詳細:`);
-                    console.log(`   - element:`, subSlotElement);
-                    console.log(`   - outerHTML:`, subSlotElement.outerHTML);
-                    
                     const phraseElement = subSlotElement.querySelector('.subslot-element');
-                    console.log(`   - phraseElement (.subslot-element):`, phraseElement);
-                    
-                    // 他の可能なセレクターも試す
-                    const altElements = [
-                        subSlotElement.querySelector('.slot-phrase'),
-                        subSlotElement.querySelector('.phrase'),
-                        subSlotElement.querySelector('[class*="phrase"]'),
-                        subSlotElement.querySelector('[class*="text"]')
-                    ];
-                    console.log(`   - 代替セレクター結果:`, altElements);
                     
                     if (phraseElement) {
                         const text = phraseElement.textContent.trim();
-                        console.log(`   - テキスト: "${text}"`);
                         if (text && text !== 'N/A' && text !== '') {
                             const subslotId = subSlotElement.dataset.subslotId;
                             const parentDisplayOrder = parseInt(slotElement.dataset.displayOrder) || 999;
@@ -211,37 +181,9 @@ class VoiceSystem {
                                 parentOrder: parentDisplayOrder,
                                 subOrder: subDisplayOrder
                             });
-                        } else {
-                            console.log(`   - ⚠️ テキストが空または無効: "${text}"`);
-                        }
-                    } else {
-                        console.log(`   - ⚠️ phraseElementが見つからない`);
-                        console.log(`   - サブスロット要素の全内容:`, subSlotElement.textContent);
-                        
-                        // 直接テキストを取得してみる
-                        const directText = subSlotElement.textContent.trim();
-                        if (directText && directText !== 'N/A' && directText !== '') {
-                            const subslotId = subSlotElement.dataset.subslotId;
-                            const parentDisplayOrder = parseInt(slotElement.dataset.displayOrder) || 999;
-                            const subDisplayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
-                            const totalOrder = (parentDisplayOrder * 1000) + subDisplayOrder;
-                            
-                            console.log(`✅ サブスロット ${subslotId} (直接テキスト取得) (親:${parentDisplayOrder}, サブ:${subDisplayOrder}, 総合:${totalOrder}): "${directText}"`);
-                            
-                            sentenceParts.push({ 
-                                order: totalOrder, 
-                                text: directText,
-                                slot: subslotId,
-                                type: 'sub',
-                                parent: slotElement.dataset.slot,
-                                parentOrder: parentDisplayOrder,
-                                subOrder: subDisplayOrder
-                            });
                         }
                     }
                 });
-            } else {
-                console.log(`⚠️ ${slotElement.dataset.slot}内にサブスロットが見つかりません`);
             }
         });
 
