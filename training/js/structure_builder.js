@@ -206,7 +206,57 @@ function buildStructure(selectedSlots) {
   // 🎤 音声読み上げ用データの作成：実際に表示されているスロットのみを抽出
   createVoiceDataFromDisplayedSlots(selectedSlots);
   
+  // 🔤 句読点の表示処理
+  addPunctuationToLastSlot(selectedSlots);
+  
   if (typeof bindSubslotToggleButtons === "function") bindSubslotToggleButtons();
+}
+
+/**
+ * 🔤 最後のスロットに句読点を追加する関数
+ */
+function addPunctuationToLastSlot(selectedSlots) {
+  // sentencePunctuation プロパティから句読点を取得
+  const punctuation = selectedSlots.length > 0 ? selectedSlots[0].sentencePunctuation || "." : ".";
+  console.log(`🔤 句読点表示: "${punctuation}"`);
+  
+  // 既存の句読点要素を削除
+  const existingPunctuation = document.querySelector('.sentence-punctuation');
+  if (existingPunctuation) {
+    existingPunctuation.remove();
+  }
+  
+  // 最後に表示されているスロットを探す
+  const slotContainers = document.querySelectorAll('.slot-container');
+  let lastVisibleContainer = null;
+  
+  // 後ろから順に確認して、内容があるスロットを見つける
+  for (let i = slotContainers.length - 1; i >= 0; i--) {
+    const container = slotContainers[i];
+    const phraseElement = container.querySelector('.slot-phrase');
+    const textElement = container.querySelector('.slot-text');
+    
+    if ((phraseElement && phraseElement.textContent.trim()) || 
+        (textElement && textElement.textContent.trim())) {
+      lastVisibleContainer = container;
+      break;
+    }
+  }
+  
+  // 句読点要素を作成して追加
+  if (lastVisibleContainer) {
+    const punctuationElement = document.createElement('span');
+    punctuationElement.className = 'sentence-punctuation';
+    punctuationElement.textContent = punctuation;
+    punctuationElement.style.marginLeft = '2px';
+    punctuationElement.style.fontSize = '1.2em';
+    punctuationElement.style.fontWeight = 'bold';
+    
+    lastVisibleContainer.appendChild(punctuationElement);
+    console.log(`🔤 句読点 "${punctuation}" を追加しました`);
+  } else {
+    console.warn('⚠️ 句読点を追加する場所が見つかりませんでした');
+  }
 }
 
 /**
