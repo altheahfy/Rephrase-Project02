@@ -1138,7 +1138,28 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           
           // サブスロットの初期化も実行
           if (typeof initializeSubslots === 'function') {
+            console.log("🔒 プリセットJSONロード後にサブスロットを初期化");
             initializeSubslots();
+          }
+          
+          // 明示的に上位スロットとサブスロットの同期を呼び出す（ローカルファイルと同じ処理）
+          if (typeof syncUpperSlotsFromJson === 'function') {
+            console.log("🔄 プリセットJSONロード後の明示的同期呼び出し");
+            syncUpperSlotsFromJson(processedData);
+            if (typeof syncSubslotsFromJson === 'function') {
+              syncSubslotsFromJson(processedData);
+            }
+            
+            // 表示順制御機能の呼び出し
+            if (typeof applyOrderToAllSlots === 'function') {
+              console.log("🔢 プリセットJSONロード後にスロット表示順適用");
+              applyOrderToAllSlots(processedData);
+            }
+            
+            if (typeof debugM1Slot === 'function') {
+              console.log("🔍 M1スロットのデバッグ実行");
+              debugM1Slot();
+            }
           }
           
           // 🎭 ローディング画面を非表示

@@ -105,45 +105,80 @@ class VoiceSystem {
             console.warn('⚠️ 動的エリアが見つかりません');
             return '';
         }
+        
+        console.log('🔍 動的エリア詳細調査:');
+        console.log('  - innerHTML:', dynamicArea.innerHTML.substring(0, 500) + '...');
+        console.log('  - 子要素数:', dynamicArea.children.length);
 
         const sentenceParts = [];
 
-        // 疑問詞をチェック（特別扱い - 常に最初）
-        const questionWordElement = dynamicArea.querySelector('.question-word-slot');
-        if (questionWordElement) {
-            const textElement = questionWordElement.querySelector('.question-word-text');
-            if (textElement && this.isElementVisible(textElement)) {
-                const text = textElement.textContent.trim();
-                if (text) {
-                    console.log('✅ 疑問詞:', text);
-                    sentenceParts.push({ order: -1, text: text, slot: 'question-word' });
-                }
+        // 🔍 疑問詞をチェック（動的エリア内で特別扱い）
+        const questionWordElement = dynamicArea.querySelector('.question-word-text, #dynamic-question-word .question-word-text');
+        if (questionWordElement && this.isElementVisible(questionWordElement)) {
+            const text = questionWordElement.textContent.trim();
+            if (text) {
+                console.log('✅ 疑問詞（動的エリア）:', text);
+                sentenceParts.push({ order: -1, text: text, slot: 'question-word' });
             }
         }
 
-        // 上位スロット（data-slot属性を持つ要素）を取得
-        const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]:not([data-slot="question-word"])');
+        // 🔍 改良された動的スロット検出：ID ベースでの検出
+        const slotNames = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         
-        upperSlotElements.forEach(slotElement => {
-            const phraseElement = slotElement.querySelector('.slot-phrase');
-            if (phraseElement && this.isElementVisible(phraseElement)) {
-                const text = phraseElement.textContent.trim();
-                if (text && text !== 'N/A' && text !== '') {
-                    const slotName = slotElement.dataset.slot;
-                    const displayOrder = parseInt(slotElement.dataset.displayOrder) || 999;
-                    
-                    console.log(`✅ 上位スロット ${slotName.toUpperCase()} (order:${displayOrder}): "${text}"`);
-                    sentenceParts.push({ 
-                        order: displayOrder, 
-                        text: text,
-                        slot: slotName.toUpperCase(),
-                        type: 'upper'
-                    });
+        slotNames.forEach(slotName => {
+            // dynamic-slot-{slotName} の形式で検索
+            const dynamicSlotElement = dynamicArea.querySelector(`#dynamic-slot-${slotName}, .slot[data-display-order]`);
+            if (dynamicSlotElement) {
+                const phraseElement = dynamicSlotElement.querySelector('.slot-phrase');
+                if (phraseElement && this.isElementVisible(phraseElement)) {
+                    const text = phraseElement.textContent.trim();
+                    if (text && text !== 'N/A' && text !== '') {
+                        // data-display-order から順序を取得、なければスロット名から推定
+                        let displayOrder = parseInt(dynamicSlotElement.dataset.displayOrder);
+                        if (!displayOrder) {
+                            const slotOrderMap = { m1: 1, s: 2, aux: 3, m2: 4, v: 5, c1: 6, o1: 7, o2: 8, c2: 9, m3: 10 };
+                            displayOrder = slotOrderMap[slotName] || 999;
+                        }
+                        
+                        console.log(`✅ 動的スロット ${slotName.toUpperCase()} (order:${displayOrder}): "${text}"`);
+                        sentenceParts.push({ 
+                            order: displayOrder, 
+                            text: text,
+                            slot: slotName.toUpperCase(),
+                            type: 'upper'
+                        });
+                    }
                 }
             }
         });
 
-        // サブスロット（data-subslot-id属性を持つ要素）を取得
+        // 🔍 fallback: 汎用的な .slot クラス要素を検索
+        if (sentenceParts.length === 0) {
+            console.log('🔄 フォールバック: 汎用スロット要素を検索中...');
+            const genericSlots = dynamicArea.querySelectorAll('.slot');
+            console.log(`🔍 汎用スロット要素数: ${genericSlots.length}`);
+            
+            genericSlots.forEach((slotElement, index) => {
+                const phraseElement = slotElement.querySelector('.slot-phrase');
+                if (phraseElement && this.isElementVisible(phraseElement)) {
+                    const text = phraseElement.textContent.trim();
+                    if (text && text !== 'N/A' && text !== '') {
+                        const displayOrder = parseInt(slotElement.dataset.displayOrder) || (index + 1);
+                        const slotId = slotElement.id || `slot-${index}`;
+                        
+                        console.log(`✅ 汎用スロット ${slotId} (order:${displayOrder}): "${text}"`);
+                        sentenceParts.push({ 
+                            order: displayOrder, 
+                            text: text,
+                            slot: slotId,
+                            type: 'generic'
+                        });
+                    }
+                }
+            });
+        }
+
+        // サブスロット検索（従来通り）
         const subSlotElements = dynamicArea.querySelectorAll('[data-subslot-id]');
         
         subSlotElements.forEach(subSlotElement => {
@@ -648,6 +683,9 @@ class VoiceSystem {
      * 現在の例文を音声合成で読み上げ
      */
     speakSentence() {
+        // 🔍 デバッグ：動的エリアと静的スロットの内容を比較
+        this.debugCompareAreas();
+        
         const sentence = this.getCurrentSentence();
         
         if (!sentence) {
@@ -2061,6 +2099,70 @@ class VoiceSystem {
             console.error('❌ 進捗表示エラー:', error);
             alert('進捗表示でエラーが発生しました: ' + error.message);
         }
+    }
+    
+    /**
+     * 🔍 デバッグ用：動的エリアと静的スロットの内容を比較
+     */
+    debugCompareAreas() {
+        console.log('🔍 ===== 動的エリア vs 静的スロット比較デバッグ =====');
+        
+        // 動的エリアの内容
+        const dynamicArea = document.getElementById('dynamic-slot-area');
+        console.log('📊 動的エリアの状態:');
+        if (dynamicArea) {
+            console.log('  - HTML:', dynamicArea.innerHTML.substring(0, 200) + '...');
+            console.log('  - 子要素数:', dynamicArea.children.length);
+            
+            const dynamicSlots = dynamicArea.querySelectorAll('[data-slot]');
+            console.log('  - 上位スロット数:', dynamicSlots.length);
+            
+            dynamicSlots.forEach(slot => {
+                const slotName = slot.dataset.slot;
+                const order = slot.dataset.displayOrder;
+                const phraseEl = slot.querySelector('.slot-phrase');
+                const phrase = phraseEl ? phraseEl.textContent.trim() : 'なし';
+                console.log(`    ${slotName}(order:${order}): "${phrase}"`);
+            });
+            
+            const dynamicSubslots = dynamicArea.querySelectorAll('[data-subslot-id]');
+            console.log('  - サブスロット数:', dynamicSubslots.length);
+            
+            dynamicSubslots.forEach(subslot => {
+                const subslotId = subslot.dataset.subslotId;
+                const order = subslot.dataset.displayOrder;
+                const phraseEl = subslot.querySelector('.slot-phrase');
+                const phrase = phraseEl ? phraseEl.textContent.trim() : 'なし';
+                console.log(`    sub-${subslotId}(order:${order}): "${phrase}"`);
+            });
+        } else {
+            console.log('  - 動的エリアが見つかりません');
+        }
+        
+        // 静的スロットの内容
+        console.log('📊 静的スロットの状態:');
+        const staticSlots = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+        
+        staticSlots.forEach(slotName => {
+            const staticSlot = document.getElementById(`slot-${slotName}`);
+            if (staticSlot) {
+                const phraseEl = staticSlot.querySelector('.slot-phrase');
+                const phrase = phraseEl ? phraseEl.textContent.trim() : 'なし';
+                console.log(`  static-${slotName}: "${phrase}"`);
+            } else {
+                console.log(`  static-${slotName}: 要素なし`);
+            }
+        });
+        
+        // 疑問詞の比較
+        console.log('📊 疑問詞の状態:');
+        const questionWordStatic = document.querySelector('#display-top-question-word .question-word-text');
+        const questionWordDynamic = dynamicArea ? dynamicArea.querySelector('.question-word-text') : null;
+        
+        console.log(`  static疑問詞: "${questionWordStatic ? questionWordStatic.textContent.trim() : 'なし'}"`);
+        console.log(`  dynamic疑問詞: "${questionWordDynamic ? questionWordDynamic.textContent.trim() : 'なし'}"`);
+        
+        console.log('🔍 ===== 比較デバッグ終了 =====');
     }
 }
 

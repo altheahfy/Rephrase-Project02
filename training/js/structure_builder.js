@@ -4,6 +4,9 @@ function renderSlot(item) {
   const slotDiv = document.createElement('div');
   slotDiv.className = 'slot';
   slotDiv.dataset.displayOrder = item.Slot_display_order;
+  
+  // 🎤 音声システム用：data-slot属性を追加
+  slotDiv.dataset.slot = item.Slot.toLowerCase();
 
   if (item.PhraseType === 'word') {
     const phraseDiv = document.createElement('div');
