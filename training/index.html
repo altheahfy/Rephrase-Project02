@@ -1642,19 +1642,5 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="js/voice_progress_tracker.js"></script>
 <script src="js/voice_progress_ui.js"></script>
 
-<!-- 🎤 音声システム初期化 -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // 音声システムを初期化
-  if (typeof VoiceSystem !== 'undefined') {
-    console.log('🎤 音声システムを初期化中...');
-    window.voiceSystem = new VoiceSystem();
-    console.log('✅ 音声システム初期化完了');
-  } else {
-    console.error('❌ VoiceSystemクラスが見つかりません');
-  }
-});
-</script>
-
 </body>
 </html>
