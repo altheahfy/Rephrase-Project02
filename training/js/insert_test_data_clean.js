@@ -913,6 +913,14 @@ function syncUpperSlotsFromJson(data) {
     //   window.processAllImagesWithCoordination();
     // }
   }, 150);
+  
+  // 🎤 音声読み上げ用データの更新（上位スロット同期完了後）
+  setTimeout(() => {
+    // 受け取ったdataをそのまま音声用データとして格納
+    window.currentDisplayedSentence = data.map(slot => ({ ...slot }));
+    console.log(`🎤 音声用データ更新完了（上位スロット同期後）: ${window.currentDisplayedSentence.length}件`);
+    console.log(`🎤 音声用データ詳細:`, window.currentDisplayedSentence.map(s => `${s.Slot}: ${s.SlotPhrase || s.SubslotElement}`));
+  }, 200);
 }
 
 // ✅ サブスロット同期機能の実装（完全リセット＋再構築方式）
@@ -1082,6 +1090,14 @@ function syncSubslotsFromJson(data) {
     //   window.processAllImagesWithCoordination();
     // }
   }, 100);
+  
+  // 🎤 音声読み上げ用データの更新（サブスロット同期完了後）
+  setTimeout(() => {
+    // 受け取ったdataをそのまま音声用データとして格納
+    window.currentDisplayedSentence = data.map(slot => ({ ...slot }));
+    console.log(`🎤 音声用データ更新完了（サブスロット同期後）: ${window.currentDisplayedSentence.length}件`);
+    console.log(`🎤 音声用データ詳細:`, window.currentDisplayedSentence.map(s => `${s.Slot}: ${s.SlotPhrase || s.SubslotElement}`));
+  }, 150);
 }
 
 // 特定のM1スロットをテスト（デバッグ用）
@@ -2140,6 +2156,83 @@ function adjustSlotWidthsBasedOnText() {
   });
   
   console.log("✅ スロット幅調整完了");
+}
+
+/**
+ * 🎤 DOMから音声読み上げ用データを更新する関数
+ */
+function updateVoiceDataFromDOM() {
+  console.log("🎤 DOMから音声読み上げ用データを更新中...");
+  
+  const voiceData = [];
+  
+  // 上位スロットの取得
+  const slotNames = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+  
+  slotNames.forEach(slotName => {
+    const slotElement = document.getElementById(`slot-${slotName}`);
+    if (slotElement) {
+      const phraseElement = slotElement.querySelector(':scope > .slot-phrase');
+      if (phraseElement && phraseElement.textContent.trim()) {
+        // 表示されているテキストから音声用データを作成
+        voiceData.push({
+          Slot: slotName.toUpperCase(),
+          SlotPhrase: phraseElement.textContent.trim(),
+          Slot_display_order: getSlotDisplayOrder(slotName),
+          PhraseType: 'word'
+        });
+        console.log(`🎤 上位スロット追加: ${slotName.toUpperCase()} = "${phraseElement.textContent.trim()}"`);
+      }
+    }
+  });
+  
+  // 疑問詞の取得
+  const questionWordElement = document.querySelector('#display-top-question-word .question-word-text');
+  if (questionWordElement && questionWordElement.textContent.trim()) {
+    voiceData.unshift({
+      Slot: 'question-word',
+      SlotPhrase: questionWordElement.textContent.trim(),
+      Slot_display_order: -1,
+      PhraseType: 'word'
+    });
+    console.log(`🎤 疑問詞追加: "${questionWordElement.textContent.trim()}"`);
+  }
+  
+  // サブスロットの取得
+  const subslotElements = document.querySelectorAll('.subslot');
+  subslotElements.forEach(subElement => {
+    const subElementText = subElement.querySelector('.subslot-element');
+    if (subElementText && subElementText.textContent.trim()) {
+      const subslotId = subElement.id; // slot-s-sub-s-1 のような形式
+      const matches = subslotId.match(/slot-(\w+)-sub-/);
+      const parentSlot = matches ? matches[1].toUpperCase() : 'UNKNOWN';
+      
+      voiceData.push({
+        Slot: parentSlot,
+        SubslotElement: subElementText.textContent.trim(),
+        SubslotID: subslotId,
+        display_order: parseInt(subElement.dataset.displayOrder) || 0,
+        PhraseType: 'clause'
+      });
+      console.log(`🎤 サブスロット追加: ${parentSlot} = "${subElementText.textContent.trim()}"`);
+    }
+  });
+  
+  // 音声用データを保存
+  window.currentDisplayedSentence = voiceData;
+  console.log(`🎤 音声用データ更新完了: ${voiceData.length}件`);
+  console.log('🎤 音声用データ詳細:', voiceData.map(s => `${s.Slot}: ${s.SlotPhrase || s.SubslotElement}`));
+}
+
+/**
+ * スロット名から display_order を取得する関数
+ */
+function getSlotDisplayOrder(slotName) {
+  const orderMap = {
+    'm1': 1, 's': 2, 'aux': 3, 'm2': 4, 'v': 5,
+    'c1': 6, 'o1': 7, 'o2': 8, 'c2': 9, 'm3': 10
+  };
+  return orderMap[slotName.toLowerCase()] || 0;
 }
 
 // 🆕 スロット幅調整をグローバル関数として公開
