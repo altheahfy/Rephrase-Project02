@@ -177,10 +177,17 @@ class VoiceSystem {
                         parentSlotName = idParts[1];
                         parentSlotElement = dynamicArea.querySelector(`[data-slot="${parentSlotName}"]`);
                         console.log(`🎯 ID解析による親スロット: "${parentSlotName}"`);
+                        
+                        if (parentSlotElement) {
+                            console.log(`✅ ID解析で親スロットを正常に検出: "${parentSlotName}"`);
+                        } else {
+                            console.log(`⚠️ ID解析で親スロット名は検出したが、要素が見つからない: "${parentSlotName}"`);
+                        }
                     }
                     
-                    // フォールバック: 前の要素から探索
-                    if (!parentSlotElement) {
+                    // フォールバック: ID解析が完全に失敗した場合のみ前要素探索を実行
+                    if (!parentSlotElement && parentSlotName === 'unknown') {
+                        console.log(`🔄 ID解析失敗のため前要素探索を開始...`);
                         let element = subSlotElement.previousElementSibling;
                         while (element && !element.dataset.slot) {
                             element = element.previousElementSibling;
@@ -190,6 +197,8 @@ class VoiceSystem {
                             parentSlotName = element.dataset.slot;
                             console.log(`🔄 前要素探索による親スロット: "${parentSlotName}"`);
                         }
+                    } else if (parentSlotName !== 'unknown') {
+                        console.log(`⏭️ ID解析が成功したため前要素探索をスキップ`);
                     }
                     
                     const parentDisplayOrder = parentSlotElement ? parseInt(parentSlotElement.dataset.displayOrder) || 999 : 999;
