@@ -98,22 +98,11 @@ class VoiceSystem {
             }
         }
 
-        // 上位スロット（data-slot属性を持つ要素）を取得して順序通りに処理
+        // 上位スロット（data-slot属性を持つ要素）を取得
         const upperSlotElements = dynamicArea.querySelectorAll('[data-slot]');
         console.log('🔍 上位スロット要素数:', upperSlotElements.length);
         
-        // 上位スロットをSlot_display_order順にソート
-        const sortedUpperSlots = Array.from(upperSlotElements).sort((a, b) => {
-            const orderA = parseInt(a.dataset.displayOrder) || 999;
-            const orderB = parseInt(b.dataset.displayOrder) || 999;
-            return orderA - orderB;
-        });
-        
-        console.log('📊 上位スロットの順序:', sortedUpperSlots.map(slot => 
-            `${slot.dataset.slot}(order:${slot.dataset.displayOrder})`
-        ));
-        
-        sortedUpperSlots.forEach((slotElement, index) => {
+        upperSlotElements.forEach((slotElement, index) => {
             console.log(`🔍 上位スロット${index + 1}:`, {
                 element: slotElement,
                 dataSlot: slotElement.dataset.slot,
@@ -138,52 +127,49 @@ class VoiceSystem {
                         slot: slotName.toUpperCase(),
                         type: 'upper'
                     });
+                } else {
+                    console.log(`⚠️ 上位スロット${index + 1}: テキストが空または無効 "${text}"`);
                 }
+            } else {
+                console.log(`⚠️ 上位スロット${index + 1}: phraseElementが見つからない`);
             }
+        });
+
+        // サブスロット（data-subslot-id属性を持つ要素）を取得
+        const subSlotElements = dynamicArea.querySelectorAll('[data-subslot-id]');
+        console.log('🔍 サブスロット要素数:', subSlotElements.length);
+        
+        subSlotElements.forEach((subSlotElement, index) => {
+            console.log(`🔍 サブスロット${index + 1}:`, {
+                element: subSlotElement,
+                dataSubslotId: subSlotElement.dataset.subslotId,
+                dataDisplayOrder: subSlotElement.dataset.displayOrder,
+                innerHTML: subSlotElement.innerHTML
+            });
             
-            // この上位スロット内のサブスロットを処理
-            const subSlotElements = slotElement.querySelectorAll('[data-subslot-id]');
-            if (subSlotElements.length > 0) {
-                console.log(`🔍 ${slotElement.dataset.slot}内のサブスロット数:`, subSlotElements.length);
-                
-                // サブスロットをdisplay_order順にソート
-                const sortedSubSlots = Array.from(subSlotElements).sort((a, b) => {
-                    const orderA = parseInt(a.dataset.displayOrder) || 999;
-                    const orderB = parseInt(b.dataset.displayOrder) || 999;
-                    return orderA - orderB;
-                });
-                
-                console.log(`📊 ${slotElement.dataset.slot}内サブスロットの順序:`, 
-                    sortedSubSlots.map(sub => `${sub.dataset.subslotId}(order:${sub.dataset.displayOrder})`)
-                );
-                
-                sortedSubSlots.forEach((subSlotElement, subIndex) => {
-                    const phraseElement = subSlotElement.querySelector('.subslot-element');
+            const phraseElement = subSlotElement.querySelector('.subslot-element');
+            console.log(`🔍 subslot phraseElement${index + 1}:`, phraseElement, phraseElement?.textContent);
+            
+            // 🎯 動的記載エリア内の要素は常に表示中として扱う
+            if (phraseElement) {
+                const text = phraseElement.textContent.trim();
+                if (text && text !== 'N/A' && text !== '') {
+                    const subslotId = subSlotElement.dataset.subslotId;
+                    const displayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
                     
-                    if (phraseElement) {
-                        const text = phraseElement.textContent.trim();
-                        if (text && text !== 'N/A' && text !== '') {
-                            const subslotId = subSlotElement.dataset.subslotId;
-                            const parentDisplayOrder = parseInt(slotElement.dataset.displayOrder) || 999;
-                            const subDisplayOrder = parseInt(subSlotElement.dataset.displayOrder) || 999;
-                            
-                            // 親の順序 + サブ順序で総合順序を計算
-                            const totalOrder = (parentDisplayOrder * 1000) + subDisplayOrder;
-                            
-                            console.log(`✅ サブスロット ${subslotId} (親:${parentDisplayOrder}, サブ:${subDisplayOrder}, 総合:${totalOrder}): "${text}"`);
-                            
-                            sentenceParts.push({ 
-                                order: totalOrder, 
-                                text: text,
-                                slot: subslotId,
-                                type: 'sub',
-                                parent: slotElement.dataset.slot,
-                                parentOrder: parentDisplayOrder,
-                                subOrder: subDisplayOrder
-                            });
-                        }
-                    }
-                });
+                    console.log(`✅ サブスロット ${subslotId} (order:${displayOrder}): "${text}"`);
+                    
+                    sentenceParts.push({ 
+                        order: displayOrder, 
+                        text: text,
+                        slot: subslotId,
+                        type: 'sub'
+                    });
+                } else {
+                    console.log(`⚠️ サブスロット${index + 1}: テキストが空または無効 "${text}"`);
+                }
+            } else {
+                console.log(`⚠️ サブスロット${index + 1}: phraseElementが見つからない`);
             }
         });
 
@@ -191,13 +177,9 @@ class VoiceSystem {
         sentenceParts.sort((a, b) => a.order - b.order);
         
         console.log('📊 発見されたスロット数:', sentenceParts.length);
-        console.log('📊 ソート後の順序:', sentenceParts.map(part => {
-            if (part.type === 'sub') {
-                return `${part.slot}(${part.type}, 親:${part.parent}, 親順:${part.parentOrder}, サブ順:${part.subOrder}, 総合:${part.order}): "${part.text}"`;
-            } else {
-                return `${part.slot}(${part.type}, order:${part.order}): "${part.text}"`;
-            }
-        }));
+        console.log('📊 ソート後の順序:', sentenceParts.map(part => 
+            `${part.slot}(${part.type}, order:${part.order}): "${part.text}"`
+        ));
 
         const sentence = sentenceParts.map(part => part.text).join(' ').trim();
 
