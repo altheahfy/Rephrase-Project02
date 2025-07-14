@@ -35,11 +35,12 @@ export function randomizeAll(slotData) {
     
     let candidates = slotSets.flat().filter(entry => entry.Slot === type);
     
-    // � 空スロット選択肢を追加（「案2」実装）
-    // このスロットタイプが存在しない例文がある場合、空の選択肢を追加
+    // 🎲 空スロット選択肢を追加（「案2」実装）
+    // ただし、疑問詞スロットは例外：疑問詞グループでは必ず疑問詞を表示する
+    const hasWhWordInType = candidates.some(c => c.QuestionType === 'wh-word');
     const totalExampleCount = exampleIDs.length;
     const slotExampleCount = [...new Set(candidates.map(c => c.例文ID))].length;
-    if (slotExampleCount < totalExampleCount) {
+    if (slotExampleCount < totalExampleCount && !hasWhWordInType) {
       // 空スロットを表現する仮想エントリを追加
       candidates.push({
         Slot: type,
@@ -50,6 +51,8 @@ export function randomizeAll(slotData) {
         識別番号: `${type}-EMPTY`
       });
       console.log(`🎲 ${type}スロットに空選択肢を追加（${slotExampleCount}/${totalExampleCount}例文にのみ存在）`);
+    } else if (hasWhWordInType) {
+      console.log(`🔒 ${type}スロット: 疑問詞を含むため空選択肢は追加しません`);
     }
     
     // �🎯 疑問詞競合回避ロジック
