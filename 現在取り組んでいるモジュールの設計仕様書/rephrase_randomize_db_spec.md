@@ -1,53 +1,206 @@
-# Rephraseプロジェクト ランダマイズアルゴリズム・DB設計仕様書（改訂版）
+# Rephraseプロジェクト ランダマイズ・表示システム設計仕様書（2025年7月改訂版）
 
 ## 目的
-Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設計との関係、全体ランダマイズ・個別ランダマイズの詳細を記述し、実装・引き継ぎ時の基準文書とする。
+Rephraseプロジェクトにおけるランダマイズ処理から表示までの統合的なデータフロー、各モジュールの役割分担、効率性を重視した設計理念を記述し、実装・引き継ぎ時の基準文書とする。---
+
+## 🎲 **個別ランダマイズシステム仕様**
+
+### **全体ランダマイズとの関係**
+- **前提条件**: 全体ランダマイズ実行時に `window.fullSlotPool` を作成
+- **データソース**: `window.fullSlotPool`（個別ランダマイズの母集団として利用）
+- **実行主体**: `randomizer_individual.js` 内の各個別ランダマイズ関数
+
+### **個別ランダマイズの実行フロー**
+```
+1. 個別ランダマイズ実行 → randomizer_individual.js
+   └─ 例：randomizeSlotSIndividual(), randomizeSlotM1Individual() 等
+
+2. 候補抽出・選択 → window.fullSlotPoolから該当スロット候補を抽出
+   └─ 現在表示中のスロットを除外してランダム選出
+
+3. データ更新 → window.lastSelectedSlotsを更新
+
+4. 動的エリア更新 → buildStructure(window.lastSelectedSlots)呼び出し
+   └─ structure_builder.js で動的記載エリア再構築
+
+5. 静的エリア同期 → MutationObserverが動的エリア変更を検出
+   └─ insert_test_data_clean.js でsafeJsonSync自動実行
+```
+
+### **安全性設計**
+- **影響範囲制限**: 該当スロットのみに影響、他スロットは維持
+- **既存機能保護**: 全体ランダマイズ機能に変更なし
+- **エラーハンドリング**: 母集団データ不在時・候補不足時の適切な処理
 
 ---
 
-## ランダマイズ母集団の設計
-- 母集団キーは **構文ID + V_group_key (Aux＋V セット)**。
-- V_group_key は助動詞＋動詞の組を一意に示すもの。
-- 各スロットデータは V_group_key によってどの母集団に属するかが決まる。
-## V_group_key 母集団の識別番号ランダマイズ仕様（追加）
-- V_group_key 母集団内のスロットは、例文IDを手掛かりに親スロットとサブスロットをペアとして整理する。
-- 各スロットは、例文IDを超えた混合母集団形成のため「識別番号」を付与し、例：M1-1, M1-2 のように管理する。
-- ランダマイズは識別番号単位で行われ、選出された識別番号に対応する親スロットとそのサブスロットを一括で出力対象とする。
-- ExampleID は識別番号付与後のランダマイズ処理では使用せず、スロット種間の自然な混合を保証する。
----
-
-## 全体ランダマイズの流れ
-- **randomizer_all.js が初回の V_group_key 母集団選択とスロット群決定を担当する。**
-- 選ばれた V_group_key に属するスロット群からスロットをランダムに選択。
-- **重要**: 全体ランダマイズ実行時に `window.fullSlotPool` を作成し、個別ランダマイズの母集団として利用可能にする。
+## 🔧 **O1 表示特例仕様**
+- **特例条件**: O1 に `Slot_display_order` が複数存在する場合（例：What do you think it is? の分離構造）
+- **特例処理**: subslot を生成せず、slot-mark のみを出力データに含める
+- **一般処理**: 上記以外の場合は、他のスロット同様に subslot データを出力対象に含める
+- **実装責任**: ランダマイザーが判定・制御、Structure側は受け取ったデータをそのまま描画
 
 ---
 
-## 個別ランダマイズの流れ（実装済み仕様）
-- **実行**: `randomizer_individual.js` 内の各個別ランダマイズ関数（`randomizeSlotSIndividual()`, `randomizeSlotM1Individual()` 等）
-- 現在表示中の V_group_key 母集団データ（`window.fullSlotPool`）を流用。
-- 該当スロットに対応するスロット候補群を抽出し、その中からランダム選出。
-- 選出したスロットデータを該当スロットの表示にのみ反映し、他スロットには影響を与えない。
-- **データフロー**:
-  1. 個別ランダマイズ実行 → `randomizer_individual.js`
-  2. 動的エリア更新 → `buildStructure(data)` in `structure_builder.js`
-  3. 静的エリア同期 → `syncUpperSlotsFromJson(data)` + `syncSubslotsFromJson(data)` in `insert_test_data_clean.js`
-- **重要**: `structure_builder.js`は動的エリアのみ担当、静的エリアは`insert_test_data_clean.js`が担当
-- **注意**: 両方の同期処理が必要。`structure_builder.js`のみでは静的エリアは更新されない
+## 📋 **開発・保守に関する重要事項**
+
+### **デバッグ機能**
+実装済みのデバッグ関数群：
+- `window.checkFullSlotPool()`: 母集団データ確認
+- `window.checkAllSSlotSources()`: 全データソース確認  
+- `window.checkCurrentSelection()`: 現在選択データ確認
+
+### **拡張性設計**
+- **水平展開対応**: 個別ランダマイズパターンは他スロット（V, O, C等）への展開が可能
+- **設定変更の局所化**: 表示ルール変更は主にinsert_test_data_clean.js内で完結
+- **データ構造変更の影響最小化**: 候補提供と表示選択の分離により影響範囲を制限
+
+### **学習・継承のポイント**
+1. **段階的検証の重要性**: スモールステップアプローチによる安全な実装
+2. **既存システム理解の必要性**: 同期関数名等の既存の仕組みを活用
+3. **責任分離の利点**: 各モジュールが単一責任を持つことによる保守性向上
+4. **データソース調査の必要性**: fullSlotPoolの構造等の実装前調査の重要性システム設計の基本思想**
+
+### **柔軟性優先のアーキテクチャ**
+- **データ提供者**と**表示担当者**の明確な責任分離
+- 候補データの提供は事前に行い、実際の選択・表示は表示時に決定
+- データ構造変更に対する柔軟な対応能力を確保
+
+### **効率性の根拠**
+1. **保守性**: 表示ルールの変更が局所化される（insert_test_data_clean.js）
+2. **拡張性**: 新データが追加されても、表示ロジックのみの変更で対応可能
+3. **責任分離**: 各モジュールが単一責任を持ち、相互依存を最小化
 
 ---
 
-## DB構造との関係
-- DB (slot_order_data.json) は V_group_key 単位でスロット群を構造化。
-- ExampleID は不要。母集団キーとして Aux＋V セットで管理。
+## 📊 **データフロー全体像**
+
+### **実際のアーキテクチャ（検証済み）**
+
+```
+1. V_group_key選択・候補データ抽出
+   └─ randomizer_all.js: V_group_keyを決定、該当する全候補をwindow.lastSelectedSlotsに格納（例：14個）
+
+2. 動的記載エリアでの表示選択・レンダリング  
+   └─ randomizer_individual.js: buildStructure(window.lastSelectedSlots)を呼び出し
+   └─ structure_builder.js: 候補から実際の表示項目を選択し、動的記載エリアに描画（例：7個）
+
+3. 静的スロットエリアとの同期
+   └─ insert_test_data_clean.js: MutationObserverで動的記載エリアを監視
+   └─ 変更検出時：safeJsonSync(window.loadedJsonData)を実行
+   └─ 結果的に候補データ（14個）から同じ表示選択ロジックで静的スロットを更新
+```
+
+### **重要な設計判断：なぜこの方式なのか**
+
+#### **従来型（事前選択方式）との比較**
+- ❌ **事前選択方式**: randomizer → 選択済みデータ → 表示
+- ✅ **現在方式**: randomizer → 全候補データ → 表示時選択
+
+#### **現在方式の優位性**
+1. **表示ロジックの柔軟性**: 画面サイズ、ユーザー設定等に応じた動的調整が可能
+2. **データ構造の簡素化**: randomizer側で複雑な表示判定不要
+3. **将来の拡張性**: 新しい表示条件追加時の影響範囲最小化
 
 ---
 
-## 注意事項
-- **ファイル責任分担**:
-  - `structure_builder.js`: 動的記載エリア（dynamic-slot-area）への描画のみ
-  - `insert_test_data_clean.js`: 静的記載エリア（static-slot-area）への同期処理を担当
-- **重要**: 完全な表示更新には両方のファイルでの処理が必要
+## 🔧 **各モジュールの詳細責任**
+
+### **randomizer_all.js**
+**役割**: 候補母集団の提供者
+- V_group_key選択による候補データセット抽出
+- `window.lastSelectedSlots`と`window.fullSlotPool`に候補データ格納
+- **重要**: 選択ではなく候補提供が主責任
+
+### **randomizer_individual.js** 
+**役割**: 個別ランダマイズの制御
+- `buildStructure(window.lastSelectedSlots)`呼び出し
+- 特定スロットのみの再ランダマイズ制御
+- 動的記載エリア更新のトリガー
+
+### **structure_builder.js**
+**役割**: 動的記載エリアでの実際の表示選択・レンダリング
+- **核心機能**: `buildStructure(selectedSlots)`で候補データから表示項目を決定
+- `upperSlots.forEach()`により最終的な表示選択を実行
+- 動的記載エリア（dynamic-slot-area）への描画専任
+- **編集禁止**: 動的記載エリアは他モジュールからの変更を禁止
+
+### **insert_test_data_clean.js**
+**役割**: 動的記載エリア→静的スロット同期システム
+- **主要機能1**: MutationObserverによる動的記載エリア監視
+- **主要機能2**: 変更検出時の`safeJsonSync(window.loadedJsonData)`実行
+- **主要機能3**: 候補データから静的スロットへの同期処理
+- **重要**: 独自選択ではなく、動的記載エリアとの同期が目的
+
+---
+
+## 🎯 **同期システムの詳細技術仕様**
+
+### **動的記載エリア監視メカニズム**
+```javascript
+// MutationObserver設定（insert_test_data_clean.js）
+const observer = new MutationObserver(function(mutations) {
+  console.log("👀 動的記載エリアに変更を検出しました");
+  
+  if (window.syncDebounceTimer) {
+    clearTimeout(window.syncDebounceTimer);
+  }
+  
+  window.syncDebounceTimer = setTimeout(() => {
+    console.log("🔄 変更検出による同期処理を実行します");
+    if (window.loadedJsonData) {
+      window.safeJsonSync(window.loadedJsonData);  // ← 候補データで同期
+    }
+  }, 300);
+});
+```
+
+### **同期処理の核心ロジック**
+1. **動的記載エリア変更検出** → MutationObserver発動
+2. **デバウンス処理** → 300ms遅延で重複防止
+3. **safeJsonSync実行** → `window.loadedJsonData`（候補データ）を使用
+4. **同じ選択ロジック適用** → `syncUpperSlotsFromJson(data)`のforEachループ
+5. **結果的な一致** → 動的記載エリアと静的スロットが100％一致
+
+### **なぜ100％一致するのか**
+- **同一の候補データソース**: 両方とも`window.loadedJsonData`を使用
+- **同一の選択ロジック**: forEachループで最後の項目が選ばれる仕様
+- **タイミング同期**: 動的記載エリア更新→即座に静的スロット同期
+
+---
+
+## 📝 **データ構造・母集団設計**
+
+### **V_group_key 母集団の識別番号ランダマイズ仕様**
+- V_group_key 母集団内のスロットは、例文IDを手掛かりに親スロットとサブスロットをペアとして整理
+- 各スロットは、例文IDを超えた混合母集団形成のため「識別番号」を付与（例：M1-1, M1-2）
+- ランダマイズは識別番号単位で行われ、選出された識別番号に対応する親スロットとそのサブスロットを一括で出力対象とする
+- ExampleID は識別番号付与後のランダマイズ処理では使用せず、スロット種間の自然な混合を保証
+
+### **DB構造との関係**
+- DB (slot_order_data.json) は V_group_key 単位でスロット群を構造化
+- 母集団キーは **構文ID + V_group_key (Aux＋V セット)**
+- V_group_key は助動詞＋動詞の組を一意に示すもの
+- 各スロットデータは V_group_key によってどの母集団に属するかが決まる
+
+---
+
+## 🚨 **重要な実装上の注意事項**
+
+### **動的記載エリアの編集禁止原則**
+- **絶対ルール**: `dynamic-slot-area`は読み取り専用
+- **変更禁止**: DOM構造の変更、位置の移動、ラッパーへの移動すべて禁止
+- **理由**: 他モジュールとの整合性確保、予期しない動作の防止
+
+### **完全な表示更新の要件**
+- **必須プロセス**: 動的記載エリア更新 + 静的スロット同期
+- `structure_builder.js`のみでは不完全（静的エリア未更新）
+- `insert_test_data_clean.js`の同期処理が必須
+
+### **同期処理の技術的詳細**
+- **完全リセット＋再構築方式**: 母集団間で異なるサブスロット構造に対応
+- **display_order制御**: 例文による語順変更（O1先頭配置等）に必須
+- **重複実行防止**: `window.isSyncInProgress`フラグによる制御
 - **【重要】静的エリア同期の原則**:
   - 動的エリアは常に正解、絶対に変更禁止
   - 静的エリアは動的エリアとの完全同期が目標
@@ -70,172 +223,41 @@ Rephraseプロジェクトにおけるランダマイズ処理の仕様、DB設�
 
 ---
 
-## 【2025年6月30日実装】Sスロット個別ランダマイズ機構 詳細仕様
+## 📚 **実装履歴・技術的課題の解決記録**
 
-### 概要
-- **目的**: 既存の全体ランダマイズ機能を壊さず、Sスロット（主語）のみを安全に個別ランダマイズする
-- **実装ファイル**: `randomizer_individual.js`
-- **対象スロット**: Sスロット（メイン＋サブスロット）のみ
-- **データソース**: `window.fullSlotPool`（全体ランダマイズで作成される母集団）
+### **【2025年6月30日】Sスロット個別ランダマイズ機構実装**
+- **目的**: 既存の全体ランダマイズ機能を壊さず、Sスロット（主語）のみを安全に個別ランダマイズ
+- **技術的成果**: 上記の統合システム設計パターンの確立
+- **学習成果**: スモールステップアプローチと既存システム理解の重要性を実証
 
-### 技術的実装詳細
+### **【2025年7月4日】静的エリア同期システム完全リセット方式**
+- **問題**: 母集団間で異なるサブスロット構造の場合、新しいサブスロットが表示されない
+- **解決**: 完全リセット＋再構築方式の導入
+- **技術的改善**: display_order による語順制御の実装
 
-#### データフロー
-```
-1. 全体ランダマイズ実行 → window.fullSlotPool作成（randomizer_all.js）
-2. Sスロット個別ランダマイズ実行 → window.fullSlotPoolから候補取得（randomizer_individual.js）
-3. 動的エリア更新 → buildStructure() で再構築（structure_builder.js）
-   - 必ず正確な結果を生成（読み取り専用、変更禁止）
-4. 静的エリア同期 → syncUpperSlotsFromJson() + syncSubslotsFromJson()（insert_test_data_clean.js）
-   - 動的エリアと完全同期を実現
-   - 完全リセット＋再構築方式で構造差異に対応
-   - display_order制御で正しい語順を実現
-```
-
-#### 核心となる関数
-- **メイン関数**: `randomizeSlotSIndividual()`
-- **データソース**: `window.fullSlotPool`（配列形式）
-- **同期関数**: `syncUpperSlotsFromJson(data)`, `syncSubslotsFromJson(data)`
-
-#### 処理ステップ
-1. **前提条件チェック**
-   - `window.fullSlotPool`の存在確認
-   - `window.lastSelectedSlots`の存在確認
-
-2. **候補抽出**
-   ```javascript
-   const sCandidates = window.fullSlotPool.filter(entry => 
-     entry.Slot === "S" && !entry.SubslotID
-   );
-   ```
-
-3. **重複排除**
-   - 現在表示中のSスロット（例文ID）を除外
-   - 候補が2個以上ある場合のみ実行
-
-4. **ランダム選択**
-   - 利用可能候補からランダムに1つ選択
-   - 選択されたSスロットの例文IDに対応するサブスロットを一括取得
-
-5. **データ更新**
-   ```javascript
-   // Sスロット関連を削除
-   const filteredSlots = window.lastSelectedSlots.filter(slot => slot.Slot !== "S");
-   
-   // 新しいSスロット＋サブスロットを追加
-   const newSSlots = [chosenS, ...relatedSubslots];
-   filteredSlots.push(...newSSlots);
-   
-   // 更新
-   window.lastSelectedSlots = filteredSlots;
-   ```
-
-6. **表示更新**
-   - `buildStructure(data)`: 動的エリア再構築（structure_builder.js）
-   - `syncUpperSlotsFromJson(data)`: メインスロット同期（insert_test_data_clean.js）
-   - `syncSubslotsFromJson(data)`: サブスロット同期（insert_test_data_clean.js）
-
-### 安全性設計
-
-#### 既存機能への影響なし
-- 全体ランダマイズ機能：変更なし
-- 動的記載エリア表示機能：変更なし
-- 他スロット（V, O, C等）：影響なし
-
-#### エラーハンドリング
-- 母集団データ不在時：エラーメッセージ表示
-- 候補不足時：アラート表示
-- 関数不在時：コンソールエラー出力
-
-### スコープ制限
-- **対象**: Sスロットのみ
-- **母集団**: 同一V_group_key内の例文のみ
-- **更新範囲**: Sメインスロット＋Sサブスロット群
-
-### 拡張性
-この実装パターンは他スロット（V, O, C等）への**水平展開**が可能：
-- 関数名の変更（例：`randomizeSlotVIndividual()`）
-- フィルタ条件の変更（例：`entry.Slot === "V"`）
-- 基本的なデータフロー・同期処理は同一
-
-### デバッグ機能
-実装時に追加されたデバッグ関数群：
-- `window.checkFullSlotPool()`: 母集団データ確認
-- `window.checkAllSSlotSources()`: 全データソース確認
-- `window.checkCurrentSelection()`: 現在選択データ確認
-
-### 学習ポイント
-1. **スモールステップアプローチ**の有効性
-2. **既存の仕組み理解**の重要性（sync関数名等）
-3. **段階的検証**による安全な実装
-4. **データソース調査**の必要性（fullSlotPoolの構造確認）
+### **【2025年7月14日】データフロー設計真実の解明**
+- **発見**: insert_test_data_clean.jsの二重機能（候補データ処理 + 動的エリア監視）
+- **設計理念の明確化**: 柔軟性・効率性を重視したアーキテクチャの合理性を確認
+- **仕様書の更新**: 実装と設計書の整合性確保
 
 ---
 
-## 【重要】静的エリア同期の技術的詳細（2025年7月4日追加）
+## 🎯 **音声システム連携に関する設計上の注意**
 
-### 問題の背景
-個別ランダマイズ時に、動的エリアは正常更新されるが静的エリアで以下の問題が発生：
-1. **母集団間で異なるサブスロット構造**の場合、新しいサブスロットが表示されない
-2. **古いサブスロット要素**が残り続ける
-3. **`display_order`による語順制御**が無視される
+### **現在の問題点**
+- **音声システムの参照先**: `window.lastSelectedSlots`（候補データ14個）を参照
+- **実際の表示**: 動的記載エリア・静的スロット（実際の表示7個程度）
+- **問題**: 音声が候補データ全体を読み上げ、実際の表示と不一致
 
-### 根本原因
-- **`syncSubslotsFromJson`の既存DOM前提処理**: 存在しないDOM要素はスキップしていた
-- **追加のみの処理**: 不要要素の削除機能がなかった
-- **順序制御の欠如**: データ配列順序でDOM追加、`display_order`無視
+### **推奨される修正方針**
+- **音声データソース変更**: `window.lastSelectedSlots` → 実際の表示内容
+- **参照先候補**: 動的記載エリアの内容または`window.currentDisplayedSentence`
+- **修正対象**: `voice_system.js`のデータソース指定
 
-### 解決策：完全リセット＋再構築方式
+### **設計一貫性の確保**
+- 音声システムも「実際に表示されている内容」を参照することで、システム全体の一貫性を保つ
+- 候補データではなく、確定した表示内容をユーザー体験の基準とする
 
-#### 1. 完全クリア処理
-```javascript
-// 全サブスロットコンテナをクリア
-const allSubContainers = document.querySelectorAll('[id^="slot-"][id$="-sub"]');
-allSubContainers.forEach(container => {
-  while (container.firstChild) {
-    container.removeChild(container.firstChild);
-  }
-});
-```
+---
 
-#### 2. display_order順序制御
-```javascript
-// display_orderでソート
-const sortedSubslotData = subslotData.sort((a, b) => {
-  if (a.Slot !== b.Slot) {
-    return a.Slot.localeCompare(b.Slot);
-  }
-  return (a.display_order || 0) - (b.display_order || 0);
-});
-```
-
-#### 3. 動的DOM生成
-- 既存DOM要素の有無に関係なく、新しいデータのみで完全再構築
-- 各サブスロットに`slot-phrase`と`slot-text`を持つ完全なDOM構造を生成
-
-### 技術的重要ポイント
-
-#### 静的エリアの語順制御
-- **HTMLの物理構造**: 固定順序（M1, S, AUX, V, O1, O2...）
-- **例文による語順変更**: `display_order`属性で動的制御
-- **重要**: O1が先頭に来るケースなど、例文により標準とは異なる語順が必要
-
-#### データ整合性の保証
-- **動的エリア**: 常に正確（buildStructureによる完全再生成）
-- **静的エリア**: syncSubslotsFromJsonで動的エリアと同期
-- **母集団変更時**: 完全リセットにより構造不整合を回避
-
-#### デバッグ情報
-```javascript
-// ソート結果の確認
-sortedSubslotData.forEach((item, index) => {
-  console.log(`${index + 1}. ${item.Slot}-${item.SubslotID}: display_order=${item.display_order}`);
-});
-```
-
-### 今後の開発における注意点
-
-1. **静的エリアの同期は完全リセット方式**を維持
-2. **display_order制御**は必須（語順変更対応）
-3. **既存DOM前提の処理**は母集団間構造差異で破綻する
-4. **動的エリアは常に正解**として静的エリア同期の基準とする
+*この設計仕様書は、実装検証に基づく正確な情報を記載しており、今後の開発・保守・機能拡張の基準文書として活用される。*
