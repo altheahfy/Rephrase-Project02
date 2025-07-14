@@ -100,7 +100,7 @@
   <div style="margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ローカルファイル</label>
     <input type="file" id="localFileInput" accept=".json" style="width: 140px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; margin-bottom: 4px;">
-    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;" onclick="handleFileRegister()">登録</button>
+    <button id="registerFileButton" style="background-color: #FF9800; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;" onclick="testRegisterButton()">登録</button>
     <button id="manageFilesButton" style="background-color: #9C27B0; color: white; border: none; padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; margin-left: 2px;" title="ローカルファイル管理" onclick="handleFileManage()">🗂️</button>
   </div>
   
@@ -1210,6 +1210,52 @@ class LocalFileManager {
   
   getFileContent(fileId) {
     return this.uploadedFiles[fileId]?.content || null;
+  }
+}
+
+// 🗂️ ファイル管理関数
+function handleFileManage() {
+  console.log('🗂️ ファイル管理ボタンがクリックされました');
+  
+  if (!window.localFileManager) {
+    console.error('❌ LocalFileManagerが存在しません');
+    alert('LocalFileManagerが初期化されていません');
+    return;
+  }
+  
+  const files = Object.entries(window.localFileManager.uploadedFiles);
+  
+  if (files.length === 0) {
+    alert('登録済みのローカルファイルはありません');
+    return;
+  }
+  
+  const fileList = files.map(([fileId, fileInfo], index) => 
+    `${index + 1}. ${fileInfo.name} (${(fileInfo.size / 1024).toFixed(1)}KB)\n   登録日時: ${new Date(fileInfo.uploadDate).toLocaleString()}`
+  ).join('\n\n');
+  
+  const message = `📁 登録済みローカルファイル (${files.length}件)\n\n${fileList}\n\n削除したいファイルの番号を入力してください（キャンセルは0）:`;
+  
+  const input = prompt(message);
+  const fileIndex = parseInt(input);
+  
+  if (fileIndex > 0 && fileIndex <= files.length) {
+    const [fileId, fileInfo] = files[fileIndex - 1];
+    if (confirm(`"${fileInfo.name}" を削除しますか？\nこの操作は取り消せません。`)) {
+      // ファイル削除
+      delete window.localFileManager.uploadedFiles[fileId];
+      localStorage.setItem('rephrase_uploaded_files', JSON.stringify(window.localFileManager.uploadedFiles));
+      
+      // 選択肢から削除
+      const select = document.getElementById('presetSelect');
+      const optionToRemove = select.querySelector(`option[value="${fileId}"]`);
+      if (optionToRemove) {
+        optionToRemove.remove();
+      }
+      
+      alert(`✅ "${fileInfo.name}" を削除しました`);
+      console.log(`🗑️ ファイル削除完了: ${fileId}`);
+    }
   }
 }
 
