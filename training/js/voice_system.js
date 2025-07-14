@@ -99,56 +99,68 @@ class VoiceSystem {
             });
         }
         
-        // 上位スロット（SubslotIDがないもの）をSlot_display_order順にソート
-        const upperSlots = data
-            .filter(item => !item.SubslotID && item.SlotPhrase)
-            .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+        // 🎯 修正：各スロットの表示順序ごとに上位スロットまたはサブスロットのどちらかを選択
+        const slotOrderGroups = {};
         
-        console.log('📊 上位スロット順序:', upperSlots.map(slot => 
-            `${slot.Slot}(order:${slot.Slot_display_order}): "${slot.SlotPhrase}"`
-        ));
+        // スロット表示順序ごとにグループ化
+        data.forEach(item => {
+            const order = item.Slot_display_order;
+            if (!slotOrderGroups[order]) {
+                slotOrderGroups[order] = {
+                    upperSlot: null,
+                    subSlots: []
+                };
+            }
+            
+            if (!item.SubslotID) {
+                slotOrderGroups[order].upperSlot = item;
+            } else {
+                slotOrderGroups[order].subSlots.push(item);
+            }
+        });
         
-        upperSlots.forEach(slot => {
+        // 順序順に処理
+        const sortedOrders = Object.keys(slotOrderGroups).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        sortedOrders.forEach(order => {
+            const group = slotOrderGroups[order];
+            const upperSlot = group.upperSlot;
+            const subSlots = group.subSlots;
+            
             // DisplayAtTopで分離表示されるスロットはスキップ
-            if (slot.DisplayAtTop === true) {
-                console.log(`🚫 DisplayAtTop により ${slot.Slot} をスキップ`);
+            if (upperSlot && upperSlot.DisplayAtTop === true) {
+                console.log(`🚫 DisplayAtTop により ${upperSlot.Slot}(order:${order}) をスキップ`);
                 return;
             }
             
-            sentenceParts.push({
-                order: slot.Slot_display_order || 0,
-                text: slot.SlotPhrase,
-                slot: slot.Slot,
-                type: 'upper'
-            });
-        });
-        
-        // サブスロット（SubslotIDがあるもの）をdisplay_order順にソート
-        const subSlots = data
-            .filter(item => item.SubslotID && item.SubslotElement)
-            .sort((a, b) => {
-                // 親の順序を基準に、その中でサブの順序でソート
-                const parentOrderA = a.Slot_display_order || 0;
-                const parentOrderB = b.Slot_display_order || 0;
-                if (parentOrderA !== parentOrderB) {
-                    return parentOrderA - parentOrderB;
-                }
-                return (a.display_order || 0) - (b.display_order || 0);
-            });
-        
-        console.log('📊 サブスロット順序:', subSlots.map(sub => 
-            `${sub.SubslotID}(親:${sub.Slot_display_order}, サブ:${sub.display_order}): "${sub.SubslotElement}"`
-        ));
-        
-        subSlots.forEach(subSlot => {
-            const totalOrder = (subSlot.Slot_display_order || 0) * 1000 + (subSlot.display_order || 0);
-            sentenceParts.push({
-                order: totalOrder,
-                text: subSlot.SubslotElement,
-                slot: subSlot.SubslotID,
-                type: 'sub',
-                parent: subSlot.Slot
-            });
+            // 🎯 判定：上位スロットにテキストがあるかどうか
+            if (upperSlot && upperSlot.SlotPhrase && upperSlot.SlotPhrase.trim()) {
+                // 上位スロットにテキストがある場合：上位スロットを使用
+                console.log(`✅ 上位スロット使用 ${upperSlot.Slot}(order:${order}): "${upperSlot.SlotPhrase}"`);
+                sentenceParts.push({
+                    order: parseInt(order),
+                    text: upperSlot.SlotPhrase,
+                    slot: upperSlot.Slot,
+                    type: 'upper'
+                });
+            } else if (subSlots.length > 0) {
+                // 上位スロットが空でサブスロットがある場合：サブスロットを使用
+                console.log(`✅ サブスロット使用 (order:${order})`);
+                subSlots
+                    .filter(sub => sub.SubslotElement && sub.SubslotElement.trim())
+                    .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+                    .forEach(subSlot => {
+                        const totalOrder = parseInt(order) * 1000 + (subSlot.display_order || 0);
+                        console.log(`  - ${subSlot.SubslotID}(サブ:${subSlot.display_order}): "${subSlot.SubslotElement}"`);
+                        sentenceParts.push({
+                            order: totalOrder,
+                            text: subSlot.SubslotElement,
+                            slot: subSlot.SubslotID,
+                            type: 'sub',
+                            parent: subSlot.Slot
+                        });
+                    });
+            }
         });
         
         // 最終的に順序でソート
