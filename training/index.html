@@ -1282,7 +1282,65 @@ import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
 
-// 🎯 **プリセットJSONファイルをロードする機能**
+// � ローディングオーバーレイ制御関数
+function showLoadingOverlay() {
+  console.log("🎭 showLoadingOverlay() 関数が呼ばれました");
+  const overlay = document.getElementById('loading-overlay');
+  const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
+  
+  if (overlay && mainContent) {
+    console.log("🎭 ローディング開始 - メインコンテンツを隠す");
+    
+    // 確実にローディングを表示し、メインコンテンツを隠す
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    overlay.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 overlay表示設定完了");
+    
+    mainContent.style.display = 'none';
+    mainContent.style.opacity = '0';
+    mainContent.style.transition = 'none'; // トランジションをリセット
+    console.log("🎭 mainContent非表示設定完了");
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
+  }
+}
+
+function hideLoadingOverlay() {
+  console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
+  const overlay = document.getElementById('loading-overlay');
+  const mainContent = document.getElementById('main-content');
+  
+  console.log("🎭 overlay要素:", overlay);
+  console.log("🎭 mainContent要素:", mainContent);
+  
+  if (overlay && mainContent) {
+    console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
+    
+    // シンプルな遅延でローディングを隠す
+    setTimeout(() => {
+      console.log("🎭 ローディングオーバーレイを隠します");
+      
+      // ローディングオーバーレイを即座に隠す
+      overlay.style.display = 'none';
+      console.log("🎭 overlay.style.display = 'none' 実行完了");
+      
+      // メインコンテンツを表示
+      mainContent.style.display = 'block';
+      mainContent.style.opacity = '1';
+      console.log("🎭 mainContent表示設定完了");
+      
+      console.log("🎭 メインコンテンツ表示完了");
+    }, 500); // シンプルな500ms遅延
+  } else {
+    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
+  }
+}
+
+// �🎯 **プリセットJSONファイルをロードする機能**
 document.getElementById("loadPresetButton").addEventListener("click", async () => {
   const presetSelect = document.getElementById("presetSelect");
   const selectedPreset = presetSelect.value;
