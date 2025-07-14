@@ -1137,6 +1137,9 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           
           validateSlotsModified(processedData);
           
+          // 🎯 修正：ローカルファイル読み込みと同じパターンに変更
+          window.loadedJsonData = processedData;
+          
           // 🎤 音声システム用: processedDataをwindow.lastSelectedSlotsにも保存
           // （randomizeAll内で設定されたwindow.lastSelectedSlotsを保持）
           console.log("🎤 音声システム用 lastSelectedSlots確認:", window.lastSelectedSlots ? `${window.lastSelectedSlots.length}件` : '未設定');
