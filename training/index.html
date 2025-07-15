@@ -89,7 +89,8 @@
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
     <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
       <option value="">-- データを選択 --</option>
-      <!-- プリセットオプションは JavaScript で動的に読み込まれます -->
+      <option value="data/slot_order_data.json">🎯 メインデータセット</option>
+      <option value="data/slot_order_data2.json">📚 例文データセット2</option>
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
   </div>
@@ -1076,47 +1077,7 @@
 import { randomizeAll } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
 
-// 🔧 **プリセット設定を動的に読み込む機能**
-async function loadPresetConfig() {
-  try {
-    const response = await fetch('data/preset_config.json');
-    const config = await response.json();
-    
-    const presetSelect = document.getElementById('presetSelect');
-    
-    // 既存のオプション（"-- データを選択 --"）以外をクリア
-    const options = presetSelect.querySelectorAll('option');
-    options.forEach((option, index) => {
-      if (index > 0) option.remove(); // 最初のオプション以外を削除
-    });
-    
-    // 設定ファイルからプリセットを動的に追加
-    config.presets.forEach(preset => {
-      const option = document.createElement('option');
-      option.value = preset.file;
-      option.textContent = preset.name;
-      option.title = preset.description; // ツールチップとして説明を表示
-      presetSelect.appendChild(option);
-    });
-    
-    console.log('🔧 プリセット設定を動的に読み込み完了:', config.presets.length + '件');
-  } catch (error) {
-    console.error('🔧 プリセット設定の読み込みに失敗:', error);
-    // フォールバック：デフォルトのプリセットを手動で追加
-    const presetSelect = document.getElementById('presetSelect');
-    const defaultPresets = [
-      { file: 'data/slot_order_data.json', name: '🎯 メインデータセット' },
-      { file: 'data/slot_order_data2.json', name: '📚 例文データセット2' }
-    ];
-    
-    defaultPresets.forEach(preset => {
-      const option = document.createElement('option');
-      option.value = preset.file;
-      option.textContent = preset.name;
-      presetSelect.appendChild(option);
-    });
-  }
-}
+let loadedJsonData = null;
 
 // 🎯 **プリセットJSONファイルをロードする機能**
 document.getElementById("loadPresetButton").addEventListener("click", () => {
@@ -1197,7 +1158,6 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
             if (typeof syncSubslotsFromJson === 'function') {
               syncSubslotsFromJson(processedData);
             }
- }
             
             // 表示順制御機能の呼び出し
             if (typeof applyOrderToAllSlots === 'function') {
@@ -1503,10 +1463,6 @@ function validateSlotsModified(data) {
 // ページ読み込み時に疑問詞エリアを初期化
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 ページ読み込み時の疑問詞エリア初期化");
-  
-  // 🔧 プリセット設定を動的に読み込み
-  loadPresetConfig();
-  
   if (window.initializeQuestionWordArea) {
     window.initializeQuestionWordArea();
   }
