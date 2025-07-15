@@ -313,6 +313,92 @@ if (!currentText) {
 2. **button.png制御は静的システムの専門領域**
 3. **責務の明確な分離が安定性を保証**
 
+### 🚨 句読点による複数画像表示不具合【2025年7月15日修正】
+
+#### 問題症状
+- 文末に句読点（. ? ! , 等）が付くスロットで複数画像が期待通りに表示されない
+- 例：「important message.」→ message.png のみ表示（important.png が表示されない）
+- 例：「funny story?」→ story.png のみ表示（funny.png が表示されない）
+
+#### 根本原因
+**複数画像検索と単一画像検索で異なる正規化処理**
+
+1. **複数画像検索**（`findAllImagesByMetaTag`）：
+   ```javascript
+   // 修正前：句読点が残る
+   const individualWords = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
+   // 結果：["important", "message."] → "message." がマッチしない
+   ```
+
+2. **単一画像検索**（`findImageByMetaTag`）：
+   ```javascript
+   // 正常：句読点が除去される
+   const searchWords = extractWordsWithStemming(text);
+   // 結果：["important", "message"] → "message" がマッチする
+   ```
+
+#### 修正内容
+**`findAllImagesByMetaTag`関数の個別単語処理を正規化**
+
+```javascript
+// ✅ 修正後の実装
+const individualWords = text.toLowerCase()
+  .replace(/[^\w\s-]/g, ' ')  // 句読点を除去
+  .split(/\s+/)
+  .filter(word => word.length >= 2);
+```
+
+#### 影響範囲
+- **全ての上位スロット**：文末に来る可能性（O2, C1, C2, M3等）
+- **全てのサブスロット**：親スロットの内容次第で句読点が付く可能性
+- **対象句読点**：`. ? ! , ; : " ' ( ) [ ]` など
+
+#### 解決効果
+- 「important message.」→ [important.png, message.png] の2枚表示
+- 「funny story?」→ [funny.png, story.png] の2枚表示
+- 「What do you think?」→ [what.png, think.png] の2枚表示
+
+#### 技術的詳細
+**正規表現 `[^\w\s-]` の効果**：
+- `\w`：英数字とアンダースコア
+- `\s`：空白文字
+- `-`：ハイフン（単語の一部として保持）
+- `[^...]`：上記以外の文字（句読点）を空白に置換
+
+#### 予防策
+**新機能実装時の注意点**：
+1. **統一された正規化処理**：全ての画像検索関数で同じ処理を使用
+2. **句読点テスト**：文末テキストでの動作確認を必須とする
+3. **デバッグ用関数**：句読点問題の早期発見用テスト関数の活用
+
+#### デバッグ用テストケース
+```javascript
+// 句読点問題のテスト用関数
+function testPunctuationHandling() {
+  const testCases = [
+    "important message.",
+    "funny story?",
+    "What do you think!",
+    "Hello, world;",
+    "Let's go:",
+    "She said \"Hello\"",
+    "Number (1)",
+    "Item [A]"
+  ];
+  
+  testCases.forEach(text => {
+    console.log(`テスト: "${text}"`);
+    const results = window.findAllImagesByMetaTag(text);
+    console.log(`結果: ${results.map(r => r.image_file).join(', ')}`);
+  });
+}
+```
+
+#### 修正履歴
+- **2025年7月15日**: 句読点による複数画像表示不具合を修正
+- **対象関数**: `findAllImagesByMetaTag`の個別単語処理ロジック
+- **修正方法**: 句読点除去の正規化処理を追加
+
 ## 外部API・グローバル関数
 
 ### 汎用画像システム公開関数
@@ -364,7 +450,88 @@ updateAllSlotImagesAfterDataChange();
 3. **キャッシング戦略**: 画像・メタデータの効率的キャッシュ
 4. **A/Bテスト**: マッチング精度の定量評価
 
+### 🔧 メンテナンス時の重要な確認事項
+
+#### 新機能実装時の必須チェック
+1. **句読点テスト**: 文末に句読点が付くテキストでの動作確認
+2. **複数画像検索**: 2語以上の組み合わせで期待通りの結果が得られるか
+3. **単一画像検索**: 1語のみの場合の動作確認
+4. **空テキスト処理**: 空文字列やスペースのみの場合の動作確認
+
+#### 画像検索関数の修正時の注意点
+```javascript
+// ✅ 必須：句読点除去の正規化処理
+const normalizedText = text.toLowerCase()
+  .replace(/[^\w\s-]/g, ' ')  // 句読点を除去
+  .split(/\s+/)
+  .filter(word => word.length >= 2);
+
+// ❌ 禁止：生の split のみ
+const words = text.toLowerCase().split(/\s+/);
+```
+
+#### 新しい句読点・記号への対応
+現在の正規表現 `[^\w\s-]` でカバーされていない文字が問題になる場合：
+
+1. **`extractWordsWithStemming`関数を修正**（全関数に適用）
+2. **`findAllImagesByMetaTag`関数を修正**（個別単語処理のみ）
+3. **両方の修正を推奨**（統一性のため）
+
+#### テスト用デバッグ関数
+```javascript
+// 句読点問題の早期発見用
+function validatePunctuationHandling() {
+  const punctuationCases = [
+    "word.", "word?", "word!", "word,", "word;", "word:",
+    "word'", "word\"", "word(", "word)", "word[", "word]",
+    "two words.", "three word test!"
+  ];
+  
+  punctuationCases.forEach(testCase => {
+    const multiResults = window.findAllImagesByMetaTag(testCase);
+    const singleResult = window.findImageByMetaTag(testCase);
+    console.log(`"${testCase}": 複数=${multiResults.length}, 単一=${singleResult ? '有' : '無'}`);
+  });
+}
+```
+
+### 🎯 将来の拡張方向
+
+1. **多言語対応**: 日本語・中国語等の句読点に対応
+2. **文脈理解**: 前後の文脈を考慮したマッチング
+3. **学習機能**: ユーザーの選択から最適な画像を学習
+4. **画像生成**: 存在しない画像を自動生成
+
 ## バージョン履歴
+
+### v2.1 (句読点対応版) - 2025年7月15日
+#### 🚨 重要な修正
+- **句読点による複数画像表示不具合を修正**
+- **対象関数**: `findAllImagesByMetaTag`の個別単語処理ロジック
+- **修正内容**: 句読点除去の正規化処理を追加
+- **影響範囲**: 全スロット（上位・サブスロット）の文末句読点処理
+
+#### 🔧 技術的改善
+- **正規化処理の統一**: 複数画像検索と単一画像検索で同じ句読点処理
+- **デバッグ機能の強化**: 句読点問題の早期発見用テスト関数
+- **メンテナンス性向上**: 設計仕様書にトラブルシューティング事例を追加
+
+#### 📝 修正詳細
+```javascript
+// 修正前（問題のあった実装）
+const individualWords = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
+
+// 修正後（句読点対応）
+const individualWords = text.toLowerCase()
+  .replace(/[^\w\s-]/g, ' ')  // 句読点を除去
+  .split(/\s+/)
+  .filter(word => word.length >= 2);
+```
+
+#### 🎯 解決した問題
+- 「important message.」→ [important.png, message.png] の2枚表示
+- 「funny story?」→ [funny.png, story.png] の2枚表示
+- 「What do you think!」→ [what.png, think.png] の2枚表示
 
 ### v2.0 (汎用システム完成版) - 2025年7月7日
 #### 🎯 主要新機能
@@ -396,9 +563,9 @@ updateAllSlotImagesAfterDataChange();
 
 ---
 
-**最終更新**: 2025年7月7日  
+**最終更新**: 2025年7月15日  
 **対応バージョン**: Rephraseプロジェクト完全トレーニングUI完成フェーズ３  
-**システム状態**: 汎用イラスト表示システム完全実装完了
+**システム状態**: 汎用イラスト表示システム完全実装完了（句読点対応済み）
 
 ## サブスロット画像表示システム 🆕
 
