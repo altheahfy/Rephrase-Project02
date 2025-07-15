@@ -1286,6 +1286,7 @@ function setupPresetButtonListener() {
             if (typeof syncSubslotsFromJson === 'function') {
               syncSubslotsFromJson(processedData);
             }
+ }
             
             // 表示順制御機能の呼び出し
             if (typeof applyOrderToAllSlots === 'function') {
@@ -1705,27 +1706,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-// 🔧 簡単なテスト関数
-function testButtonClicks() {
-  console.log('🔧 ボタンクリックテスト開始');
-  
-  const loadPresetButton = document.getElementById('loadPresetButton');
-  const presetSelect = document.getElementById('presetSelect');
-  
-  if (loadPresetButton && presetSelect) {
-    console.log('🔧 ボタンとセレクトボックスが見つかりました');
-    console.log('🔧 現在の選択値:', presetSelect.value);
-    
-    // 手動でクリックイベントを発生させる
-    loadPresetButton.click();
-  } else {
-    console.error('🔧 ボタンまたはセレクトボックスが見つかりません');
-  }
-}
-
-// グローバルに公開
-window.testButtonClicks = testButtonClicks;
 
 // 🎭 ローディング制御関数
 function hideLoadingOverlay() {
