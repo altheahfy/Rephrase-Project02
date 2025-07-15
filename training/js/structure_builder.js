@@ -218,38 +218,45 @@ function buildStructure(selectedSlots) {
 function addPunctuationToLastSlot(selectedSlots) {
   // sentencePunctuation プロパティから句読点を取得
   const punctuation = selectedSlots.length > 0 ? selectedSlots[0].sentencePunctuation || "." : ".";
-  console.log(`🔤 句読点表示処理開始: "${punctuation}"`);
+  console.log(`🔤 句読点表示: "${punctuation}"`);
   
   // 既存の句読点要素を削除
   const existingPunctuation = document.querySelector('.sentence-punctuation');
   if (existingPunctuation) {
     existingPunctuation.remove();
-    console.log('🔤 既存の句読点を削除');
   }
   
-  // slot-wrapper を取得
-  const wrapper = document.querySelector('.slot-wrapper');
-  if (!wrapper) {
-    console.warn('⚠️ .slot-wrapper が見つかりません');
-    return;
+  // 最後に表示されているスロットを探す
+  const slotContainers = document.querySelectorAll('.slot-container');
+  let lastVisibleContainer = null;
+  
+  // 後ろから順に確認して、内容があるスロットを見つける
+  for (let i = slotContainers.length - 1; i >= 0; i--) {
+    const container = slotContainers[i];
+    const phraseElement = container.querySelector('.slot-phrase');
+    const textElement = container.querySelector('.slot-text');
+    
+    if ((phraseElement && phraseElement.textContent.trim()) || 
+        (textElement && textElement.textContent.trim())) {
+      lastVisibleContainer = container;
+      break;
+    }
   }
   
-  // 句読点要素を作成
-  const punctuationElement = document.createElement('div');
-  punctuationElement.className = 'sentence-punctuation';
-  punctuationElement.textContent = punctuation;
-  punctuationElement.style.cssText = `
-    display: inline-block;
-    margin-left: 5px;
-    font-size: 2em;
-    font-weight: bold;
-    color: #333;
-    vertical-align: bottom;
-  `;
-  
-  // wrapper の最後に句読点を追加
-  wrapper.appendChild(punctuationElement);
-  console.log(`🔤 句読点 "${punctuation}" をwrapperの最後に追加しました`);
+  // 句読点要素を作成して追加
+  if (lastVisibleContainer) {
+    const punctuationElement = document.createElement('span');
+    punctuationElement.className = 'sentence-punctuation';
+    punctuationElement.textContent = punctuation;
+    punctuationElement.style.marginLeft = '2px';
+    punctuationElement.style.fontSize = '1.2em';
+    punctuationElement.style.fontWeight = 'bold';
+    
+    lastVisibleContainer.appendChild(punctuationElement);
+    console.log(`🔤 句読点 "${punctuation}" を追加しました`);
+  } else {
+    console.warn('⚠️ 句読点を追加する場所が見つかりませんでした');
+  }
 }
 
 /**
