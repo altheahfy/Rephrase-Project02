@@ -495,7 +495,7 @@ function randomizeSlotM2Individual() {
   window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
-  const data = finalProcessedSlots.map(slot => ({
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -631,7 +631,7 @@ function randomizeSlotC1Individual() {
   window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
-  const data = finalProcessedSlots.map(slot => ({
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -767,7 +767,7 @@ function randomizeSlotO1Individual() {
   window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
-  const data = finalProcessedSlots.map(slot => ({
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
