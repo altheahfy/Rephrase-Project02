@@ -179,7 +179,8 @@ export function randomizeAll(slotData) {
     let phrase = slot.SlotPhrase || "";
     // 最後のメインスロットのみ句読点をSlotPhraseに付与（英語例文テキストのみ）
     if (idx === lastMainSlotIndex && phrase) {
-      phrase = phrase + punctuation;
+      // 既存の句読点を除去してから新しい句読点を追加
+      phrase = phrase.replace(/[.?!]+$/, "") + punctuation;
     }
     return {
       Slot: slot.Slot || "",
