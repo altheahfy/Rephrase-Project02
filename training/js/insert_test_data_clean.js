@@ -559,7 +559,9 @@ function displayTopQuestionWord() {
 
   const topDisplayItem = window.loadedJsonData?.find(d => d.DisplayAtTop);
   if (topDisplayItem && topDisplayItem.DisplayText) {
+    // 🔤 分離疑問詞は常に文頭なので必ず大文字化
     const questionWord = topDisplayItem.DisplayText.trim();
+    const capitalizedQuestionWord = questionWord.charAt(0).toUpperCase() + questionWord.slice(1);
     
     // 🆕 分離疑問詞の日本語訳
     const translations = {
@@ -584,17 +586,17 @@ function displayTopQuestionWord() {
     let auxtextElement = topDiv.querySelector('.question-word-auxtext');
     
     // 🔧 常にHTML構造を強制的に再作成（確実に動作させるため）
-    const translation = translations[questionWord] || '';
+    const translation = translations[capitalizedQuestionWord] || translations[questionWord] || '';
     topDiv.innerHTML = `
       <div class="question-word-label">疑問詞</div>
       <div class="question-word-image"></div>
       <div class="question-word-auxtext">${translation}</div>
-      <div class="question-word-text">${questionWord}</div>
+      <div class="question-word-text">${capitalizedQuestionWord}</div>
       <div class="question-word-button-placeholder"></div>
       <div class="question-word-button-placeholder"></div>
     `;
     
-    console.log("✅ 分離疑問詞として表示: " + questionWord + " (" + translation + ")");
+    console.log("✅ 分離疑問詞として表示（大文字化）: " + capitalizedQuestionWord + " (" + translation + ")");
     
     // 🆕 表示状態を復元
     topDiv.style.display = "";
@@ -625,10 +627,11 @@ function displayTopQuestionWord() {
       // テキストを更新（HTML構造を保持）
       const dynamicTextElement = dynamicQuestionDiv.querySelector('.question-word-text');
       if (dynamicTextElement) {
-        dynamicTextElement.textContent = topDisplayItem.DisplayText;
+        // 🔤 動的エリアでも大文字化
+        dynamicTextElement.textContent = capitalizedQuestionWord;
       } else {
         // 構造がない場合は単純にテキストを設定
-        dynamicQuestionDiv.textContent = topDisplayItem.DisplayText;
+        dynamicQuestionDiv.textContent = capitalizedQuestionWord;
       }
       
       // 動的エリアの最初に配置
