@@ -2367,7 +2367,7 @@
     "SubslotText": "",
     "Slot_display_order": 5,
     "display_order": 0,
-    "QuestionType": ""
+    "QuestionType": "wh-word"
   },
   {
     "構文ID": "",
@@ -2622,7 +2622,7 @@
     "SubslotText": "",
     "Slot_display_order": 5,
     "display_order": 0,
-    "QuestionType": ""
+    "QuestionType": "wh-word"
   },
   {
     "構文ID": "",
@@ -2877,7 +2877,7 @@
     "SubslotText": "",
     "Slot_display_order": 5,
     "display_order": 0,
-    "QuestionType": ""
+    "QuestionType": "wh-word"
   },
   {
     "構文ID": "",
