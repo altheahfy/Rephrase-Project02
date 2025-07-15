@@ -1010,19 +1010,12 @@ function syncSubslotsFromJson(data) {
         font-size: 14px;
       `;
       
-      // phrase要素を作成
+      // phrase要素を作成（英語例文テキスト）
       const phraseElement = document.createElement('div');
       phraseElement.className = 'slot-phrase';
       if (item.SubslotElement) {
-        phraseElement.textContent = item.SubslotElement;
-      }
-      
-      // text要素を作成（日本語補助テキスト）
-      const textElement = document.createElement('div');
-      textElement.className = 'slot-text';
-      if (item.SubslotText) {
-        // 🎯 LocalStorageから文頭・文末スロット情報を取得してサブスロットに適用
-        let processedSubslotText = item.SubslotText;
+        // 🎯 LocalStorageから文頭・文末スロット情報を取得して英語例文テキスト（phrase）に適用
+        let processedSubslotPhrase = item.SubslotElement;
         
         try {
           const storedInfo = localStorage.getItem('sentencePositionInfo');
@@ -1047,8 +1040,8 @@ function syncSubslotsFromJson(data) {
             if (firstSlotSubslots.length > 0 && 
                 item.SubslotID === firstSlotSubslots[0].SubslotID && 
                 item.Slot === firstSlot) {
-              processedSubslotText = processedSubslotText.charAt(0).toUpperCase() + processedSubslotText.slice(1);
-              console.log(`💡 文頭サブスロット大文字化: ${item.SubslotID} -> ${processedSubslotText}`);
+              processedSubslotPhrase = processedSubslotPhrase.charAt(0).toUpperCase() + processedSubslotPhrase.slice(1);
+              console.log(`💡 文頭サブスロット大文字化: ${item.SubslotID} -> ${processedSubslotPhrase}`);
             }
             
             // 文末スロットの最後のサブスロットなら句読点付与
@@ -1056,8 +1049,8 @@ function syncSubslotsFromJson(data) {
                 item.SubslotID === lastSlotSubslots[lastSlotSubslots.length - 1].SubslotID && 
                 item.Slot === lastSlot) {
               const punctuation = isQuestionSentence ? "?" : ".";
-              processedSubslotText = processedSubslotText.replace(/[.?!]+$/, "") + punctuation;
-              console.log(`💡 文末サブスロット句読点付与: ${item.SubslotID} -> ${processedSubslotText}`);
+              processedSubslotPhrase = processedSubslotPhrase.replace(/[.?!]+$/, "") + punctuation;
+              console.log(`💡 文末サブスロット句読点付与: ${item.SubslotID} -> ${processedSubslotPhrase}`);
             }
           } else {
             console.log(`🔍 DEBUG: LocalStorageにsentencePositionInfoがありません`);
@@ -1066,7 +1059,14 @@ function syncSubslotsFromJson(data) {
           console.warn('⚠️ サブスロット大文字化・句読点処理エラー:', error);
         }
         
-        textElement.textContent = processedSubslotText;
+        phraseElement.textContent = processedSubslotPhrase;
+      }
+      
+      // text要素を作成（日本語補助テキスト）
+      const textElement = document.createElement('div');
+      textElement.className = 'slot-text';
+      if (item.SubslotText) {
+        textElement.textContent = item.SubslotText;
         // 通常表示のスタイル
         textElement.style.cssText = `
           display: block;
