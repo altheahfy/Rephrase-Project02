@@ -1,3 +1,4 @@
+
 export function randomizeAll(slotData) {
   const groups = [...new Set(slotData.map(entry => entry.V_group_key).filter(v => v))];
   if (groups.length === 0) {
@@ -154,34 +155,19 @@ export function randomizeAll(slotData) {
   console.log(`🔤 文型判定結果: ${isQuestionSentence ? "疑問文" : "平叙文"} → 句読点: "${punctuation}"`);
   console.log(`🔤 判定対象スロット:`, selectedSlots.filter(s => !s.SubslotID).map(s => `${s.Slot}(${s.Slot_display_order}): "${s.SlotText}"`));
 
-  // 最後のメインスロットを特定
-  const mainSlots = selectedSlots.filter(slot => !slot.SubslotID);
-  let lastMainSlotIndex = -1;
-  if (mainSlots.length > 0) {
-    const lastOrder = Math.max(...mainSlots.map(s => s.Slot_display_order || 0));
-    lastMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === lastOrder);
-  }
-
-  return selectedSlots.map((slot, idx) => {
-    let text = slot.SlotText || "";
-    // 最後のメインスロットのみ句読点を付与
-    if (idx === lastMainSlotIndex && text) {
-      text = text + punctuation;
-    }
-    return {
-      Slot: slot.Slot || "",
-      SlotPhrase: slot.SlotPhrase || "",
-      SlotText: text,
-      Slot_display_order: slot.Slot_display_order || 0,
-      PhraseType: slot.PhraseType || "",
-      SubslotID: slot.SubslotID || "",
-      SubslotElement: slot.SubslotElement || "",
-      SubslotText: slot.SubslotText || "",
-      display_order: slot.display_order || 0,
-      識別番号: slot.識別番号 || "",
-      sentencePunctuation: punctuation  // 参考用
-    };
-  });
+  return selectedSlots.map(slot => ({
+    Slot: slot.Slot || "",
+    SlotPhrase: slot.SlotPhrase || "",
+    SlotText: slot.SlotText || "",
+    Slot_display_order: slot.Slot_display_order || 0,
+    PhraseType: slot.PhraseType || "",
+    SubslotID: slot.SubslotID || "",
+    SubslotElement: slot.SubslotElement || "",
+    SubslotText: slot.SubslotText || "",
+    display_order: slot.display_order || 0,
+    識別番号: slot.識別番号 || "",
+    sentencePunctuation: punctuation  // 🔤 句読点情報を追加
+  }));
 }
 
 /**
@@ -192,23 +178,29 @@ export function randomizeAll(slotData) {
 function detectQuestionPattern(selectedSlots) {
   // Slot_display_order順にソート
   const sortedSlots = selectedSlots
-    .filter(slot => !slot.SubslotID)
+    .filter(slot => !slot.SubslotID) // メインスロットのみ
     .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
-
+  
   if (sortedSlots.length === 0) return false;
-
-  // 上位2スロットを判定
-  const upperSlots = sortedSlots.slice(0, 2);
-  for (const slot of upperSlots) {
-    if (slot.QuestionType === 'wh-word') {
-      console.log(`🔤 疑問文パターン: 上位スロットに疑問詞 "${slot.SlotPhrase}"`);
-      return true;
-    }
-    const text = (slot.SlotText || "").toLowerCase().trim();
-    if (text === "do" || text === "does" || text === "did") {
-      console.log(`🔤 疑問文パターン: 上位スロットに助動詞 "${text}"`);
+  
+  // パターン1: 文頭が do/does/did
+  const firstSlot = sortedSlots[0];
+  if (firstSlot && firstSlot.SlotText) {
+    const firstText = firstSlot.SlotText.toLowerCase().trim();
+    if (firstText === "do" || firstText === "does" || firstText === "did") {
+      console.log(`🔤 疑問文パターン1検出: 文頭に "${firstText}"`);
       return true;
     }
   }
+  
+  // パターン2: 上位2スロット内に疑問詞
+  const upperSlots = sortedSlots.slice(0, 2);
+  for (const slot of upperSlots) {
+    if (slot.QuestionType === 'wh-word') {
+      console.log(`🔤 疑問文パターン2検出: 上位スロットに疑問詞 "${slot.SlotPhrase}"`);
+      return true;
+    }
+  }
+  
   return false;
 }
