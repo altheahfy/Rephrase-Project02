@@ -154,8 +154,8 @@ function randomizeSlotSIndividual() {
   // 🎤 音声読み上げ用データも更新
   updateCurrentDisplayedSentence();
   
-  // buildStructure用のデータ形式に変換
-  const data = filteredSlots.map(slot => ({
+  // buildStructure用のデータ形式に変換（processedSlotsを使用）
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -290,8 +290,8 @@ function randomizeSlotM1Individual() {
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = processedSlots;
   
-  // buildStructure用のデータ形式に変換
-  const data = filteredSlots.map(slot => ({
+  // buildStructure用のデータ形式に変換（processedSlotsを使用）
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -426,8 +426,8 @@ function randomizeSlotM2Individual() {
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = processedSlots;
   
-  // buildStructure用のデータ形式に変換
-  const data = filteredSlots.map(slot => ({
+  // buildStructure用のデータ形式に変換（processedSlotsを使用）
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -562,8 +562,8 @@ function randomizeSlotC1Individual() {
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = processedSlots;
   
-  // buildStructure用のデータ形式に変換
-  const data = filteredSlots.map(slot => ({
+  // buildStructure用のデータ形式に変換（processedSlotsを使用）
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -698,8 +698,8 @@ function randomizeSlotO1Individual() {
   // lastSelectedSlotsを更新
   window.lastSelectedSlots = processedSlots;
   
-  // buildStructure用のデータ形式に変換
-  const data = filteredSlots.map(slot => ({
+  // buildStructure用のデータ形式に変換（processedSlotsを使用）
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
