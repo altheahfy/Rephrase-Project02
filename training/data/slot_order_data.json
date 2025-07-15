@@ -4,14 +4,15 @@
     "V_group_key": "make",
     "例文ID": "ex007",
     "Slot": "M1",
-    "SlotPhrase": "That afternoon at the crucial point in the presentation",
+    "SlotPhrase": "that afternoon at the crucial point in the presentation",
     "SlotText": "あの、～の時点・地点で、～の中に、～の中で",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -25,7 +26,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -39,7 +41,8 @@
     "SubslotElement": "the manager who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -53,7 +56,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -67,7 +71,8 @@
     "SubslotElement": "recently",
     "SubslotText": "最近",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -81,7 +86,8 @@
     "SubslotElement": "taken",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -95,7 +101,8 @@
     "SubslotElement": "charge of the project",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -109,7 +116,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -123,7 +131,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -137,7 +146,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -151,7 +161,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -165,7 +176,8 @@
     "SubslotElement": "deliver",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -179,7 +191,8 @@
     "SubslotElement": "the final proposal",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -193,7 +206,8 @@
     "SubslotElement": "flawlessly",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -207,7 +221,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -221,7 +236,8 @@
     "SubslotElement": "even though",
     "SubslotText": "たとえ～でも",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -235,7 +251,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -249,7 +266,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -263,7 +281,8 @@
     "SubslotElement": "under intense pressure",
     "SubslotText": "～の下・元で",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -277,7 +296,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -291,7 +311,8 @@
     "SubslotElement": "so",
     "SubslotText": "だから",
     "Slot_display_order": 8,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -305,7 +326,8 @@
     "SubslotElement": "the outcome",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -319,7 +341,8 @@
     "SubslotElement": "would",
     "SubslotText": "過去から未来を推量",
     "Slot_display_order": 8,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -333,7 +356,8 @@
     "SubslotElement": "reflect",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -347,21 +371,23 @@
     "SubslotElement": "the full potential",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "know",
     "例文ID": "ex001",
     "Slot": "M1",
-    "SlotPhrase": "This morning",
+    "SlotPhrase": "this morning",
     "SlotText": "この",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -375,7 +401,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -389,7 +416,8 @@
     "SubslotElement": "the woman who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -403,7 +431,8 @@
     "SubslotElement": "seemed",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -417,7 +446,8 @@
     "SubslotElement": "indecisive",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -431,7 +461,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -445,7 +476,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -459,7 +491,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -473,7 +506,8 @@
     "SubslotElement": "although",
     "SubslotText": "～だが",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -487,7 +521,8 @@
     "SubslotElement": "it",
     "SubslotText": "指示語「それ」",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -501,7 +536,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -515,7 +551,8 @@
     "SubslotElement": "emotionally",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -529,7 +566,8 @@
     "SubslotElement": "hard",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -543,7 +581,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -557,7 +596,8 @@
     "SubslotElement": "that he",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -571,7 +611,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -585,7 +626,8 @@
     "SubslotElement": "been trying",
     "SubslotText": "be動詞、進行形",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -599,7 +641,8 @@
     "SubslotElement": "to avoid Tom",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -613,7 +656,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -627,7 +671,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -641,7 +686,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -655,7 +701,8 @@
     "SubslotElement": "was afraid of",
     "SubslotText": "be動詞過去",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -669,21 +716,23 @@
     "SubslotElement": "hurting her feelings",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "figure out",
     "例文ID": "ex002",
     "Slot": "M1",
-    "SlotPhrase": "At the very last second",
+    "SlotPhrase": "at the very last second",
     "SlotText": "～の時点・地点で、まさにその、最後の",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -697,7 +746,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -711,7 +761,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -725,7 +776,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -739,7 +791,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -753,7 +806,8 @@
     "SubslotElement": "that he",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -767,7 +821,8 @@
     "SubslotElement": "wanted",
     "SubslotText": "過去形",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -781,7 +836,8 @@
     "SubslotElement": "to avoid confrontation",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -795,7 +851,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -809,7 +866,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -823,7 +881,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -837,7 +896,8 @@
     "SubslotElement": "feared",
     "SubslotText": "過去形",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -851,21 +911,23 @@
     "SubslotElement": "upsetting her",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "give",
     "例文ID": "ex003",
     "Slot": "M1",
-    "SlotPhrase": "This morning when the request became urgent",
+    "SlotPhrase": "this morning when the request became urgent",
     "SlotText": "この、この、～のとき",
     "PhraseType": "clause",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -876,10 +938,11 @@
     "SlotText": "この、この、～のとき",
     "PhraseType": "",
     "SubslotID": "sub-m1",
-    "SubslotElement": "This morning when",
+    "SubslotElement": "this morning when",
     "SubslotText": "この、この、～のとき",
     "Slot_display_order": 1,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -893,7 +956,8 @@
     "SubslotElement": "the request",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -907,7 +971,8 @@
     "SubslotElement": "became",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -921,7 +986,8 @@
     "SubslotElement": "urgent",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -935,7 +1001,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -949,7 +1016,8 @@
     "SubslotElement": "the teacher who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -963,7 +1031,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -977,7 +1046,8 @@
     "SubslotElement": "just",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -991,7 +1061,8 @@
     "SubslotElement": "returned",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1005,7 +1076,8 @@
     "SubslotElement": "from a long absence",
     "SubslotText": "～から",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1019,7 +1091,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1033,7 +1106,8 @@
     "SubslotElement": "while",
     "SubslotText": "～の間",
     "Slot_display_order": 3,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1047,7 +1121,8 @@
     "SubslotElement": "the principal",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1061,7 +1136,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 3,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1075,7 +1151,8 @@
     "SubslotElement": "still",
     "SubslotText": "まだ",
     "Slot_display_order": 3,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1089,7 +1166,8 @@
     "SubslotElement": "explaining",
     "SubslotText": "進行形",
     "Slot_display_order": 3,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1103,7 +1181,8 @@
     "SubslotElement": "the policy",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 6
+    "display_order": 6,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1117,7 +1196,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1131,7 +1211,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1145,7 +1226,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1159,7 +1241,8 @@
     "SubslotElement": "the student who",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1173,7 +1256,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1187,7 +1271,8 @@
     "SubslotElement": "been",
     "SubslotText": "be動詞",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1201,7 +1286,8 @@
     "SubslotElement": "absent",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1215,7 +1301,8 @@
     "SubslotElement": "for several days",
     "SubslotText": "数日間、～のために",
     "Slot_display_order": 6,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1229,7 +1316,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1243,7 +1331,8 @@
     "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1257,7 +1346,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1271,7 +1361,8 @@
     "SubslotElement": "missed",
     "SubslotText": "過去形",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1285,7 +1376,8 @@
     "SubslotElement": "a summary of the content",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1299,7 +1391,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1313,7 +1406,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 8,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1327,7 +1421,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1341,7 +1436,8 @@
     "SubslotElement": "believed",
     "SubslotText": "過去形",
     "Slot_display_order": 8,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1355,21 +1451,23 @@
     "SubslotElement": "it would help her to catch up",
     "SubslotText": "指示語「それ」、過去から未来を推量",
     "Slot_display_order": 8,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "offer",
     "例文ID": "ex004",
     "Slot": "M1",
-    "SlotPhrase": "During the intense morning meeting",
+    "SlotPhrase": "during the intense morning meeting",
     "SlotText": "～の間に",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1383,7 +1481,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1397,7 +1496,8 @@
     "SubslotElement": "the manager who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1411,7 +1511,8 @@
     "SubslotElement": "often",
     "SubslotText": "しばしば",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1425,7 +1526,8 @@
     "SubslotElement": "avoided",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1439,7 +1541,8 @@
     "SubslotElement": "direct suggestions",
     "SubslotText": "直接の",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1453,7 +1556,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1467,7 +1571,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1481,7 +1586,8 @@
     "SubslotElement": "the new employee who",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1495,7 +1601,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 4,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1509,7 +1616,8 @@
     "SubslotElement": "recently",
     "SubslotText": "最近",
     "Slot_display_order": 4,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1523,7 +1631,8 @@
     "SubslotElement": "joined",
     "SubslotText": "過去形",
     "Slot_display_order": 4,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1537,7 +1646,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1551,7 +1661,8 @@
     "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1565,7 +1676,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1579,7 +1691,8 @@
     "SubslotElement": "prepared",
     "SubslotText": "過去形",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1593,7 +1706,8 @@
     "SubslotElement": "a detailed plan",
     "SubslotText": "詳細な、過去形",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1607,7 +1721,8 @@
     "SubslotElement": "the previous day",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1621,7 +1736,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1635,7 +1751,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1649,7 +1766,8 @@
     "SubslotElement": "the team",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1663,7 +1781,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1677,7 +1796,8 @@
     "SubslotElement": "facing",
     "SubslotText": "進行形",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1691,7 +1811,8 @@
     "SubslotElement": "unexpected challenges",
     "SubslotText": "予期せぬ、過去形",
     "Slot_display_order": 6,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1705,21 +1826,23 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "become",
     "例文ID": "ex005",
     "Slot": "M1",
-    "SlotPhrase": "During the critical moment when silence filled the room",
+    "SlotPhrase": "during the critical moment when silence filled the room",
     "SlotText": "～の間に、過去形",
     "PhraseType": "clause",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1730,10 +1853,11 @@
     "SlotText": "～の間に、過去形",
     "PhraseType": "",
     "SubslotID": "sub-m1",
-    "SubslotElement": "During the critical moment when",
+    "SubslotElement": "during the critical moment when",
     "SubslotText": "～の間に",
     "Slot_display_order": 1,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1747,7 +1871,8 @@
     "SubslotElement": "silence",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1761,7 +1886,8 @@
     "SubslotElement": "filled",
     "SubslotText": "過去形",
     "Slot_display_order": 1,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1775,7 +1901,8 @@
     "SubslotElement": "the room",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1789,7 +1916,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1803,7 +1931,8 @@
     "SubslotElement": "the student who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1817,7 +1946,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1831,7 +1961,8 @@
     "SubslotElement": "once",
     "SubslotText": "かつて",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1845,7 +1976,8 @@
     "SubslotElement": "lacked",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1859,7 +1991,8 @@
     "SubslotElement": "all confidence",
     "SubslotText": "全ての",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1873,7 +2006,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1887,7 +2021,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1901,7 +2036,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1915,7 +2051,8 @@
     "SubslotElement": "although",
     "SubslotText": "～だが",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1929,7 +2066,8 @@
     "SubslotElement": "doubt",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1943,7 +2081,8 @@
     "SubslotElement": "still",
     "SubslotText": "まだ",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1957,7 +2096,8 @@
     "SubslotElement": "lingered",
     "SubslotText": "過去形",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1971,7 +2111,8 @@
     "SubslotElement": "in his mind",
     "SubslotText": "～の中に、～の中で、彼の",
     "Slot_display_order": 6,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1985,7 +2126,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -1999,7 +2141,8 @@
     "SubslotElement": "everyone",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2013,7 +2156,8 @@
     "SubslotElement": "had been",
     "SubslotText": "過去完了、過去完了進行、be動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2027,7 +2171,8 @@
     "SubslotElement": "waiting for",
     "SubslotText": "～のために",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2041,7 +2186,8 @@
     "SubslotElement": "the dependable voice",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2055,7 +2201,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2069,7 +2216,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2083,7 +2231,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2097,7 +2246,8 @@
     "SubslotElement": "spoke",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2111,21 +2261,23 @@
     "SubslotElement": "with unexpected clarity",
     "SubslotText": "～の状態で、～を保持して、予期せぬ、過去形",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "become",
     "例文ID": "ex006",
     "Slot": "M1",
-    "SlotPhrase": "At the decisive instant when the alarm echoed through the building",
+    "SlotPhrase": "at the decisive instant when the alarm echoed through the building",
     "SlotText": "～の時点・地点で、過去形、～を通して",
     "PhraseType": "clause",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2136,10 +2288,11 @@
     "SlotText": "～の時点・地点で、過去形、～を通して",
     "PhraseType": "",
     "SubslotID": "sub-m1",
-    "SubslotElement": "At the decisive instant when",
+    "SubslotElement": "at the decisive instant when",
     "SubslotText": "～の時点・地点で",
     "Slot_display_order": 1,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2153,7 +2306,8 @@
     "SubslotElement": "the alarm",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2167,7 +2321,8 @@
     "SubslotElement": "echoed",
     "SubslotText": "過去形",
     "Slot_display_order": 1,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2181,7 +2336,8 @@
     "SubslotElement": "through the building",
     "SubslotText": "～を通して",
     "Slot_display_order": 1,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2195,7 +2351,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2209,7 +2366,8 @@
     "SubslotElement": "the engineer who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2223,7 +2381,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2237,7 +2396,8 @@
     "SubslotElement": "never",
     "SubslotText": "決して",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2251,7 +2411,8 @@
     "SubslotElement": "shown",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2265,7 +2426,8 @@
     "SubslotElement": "much hesitation",
     "SubslotText": "多くの",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2279,7 +2441,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2293,7 +2456,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2307,7 +2471,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2321,7 +2486,8 @@
     "SubslotElement": "the crucial leader",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2335,7 +2501,8 @@
     "SubslotElement": "the team",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2349,7 +2516,8 @@
     "SubslotElement": "had been",
     "SubslotText": "過去完了、過去完了進行、be動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2363,7 +2531,8 @@
     "SubslotElement": "counting on",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2377,7 +2546,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2391,7 +2561,8 @@
     "SubslotElement": "although",
     "SubslotText": "～だが",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2405,7 +2576,8 @@
     "SubslotElement": "uncertainty",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2419,7 +2591,8 @@
     "SubslotElement": "still",
     "SubslotText": "まだ",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2433,7 +2606,8 @@
     "SubslotElement": "clouded",
     "SubslotText": "過去形",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2447,7 +2621,8 @@
     "SubslotElement": "his thoughts",
     "SubslotText": "彼の",
     "Slot_display_order": 6,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2461,7 +2636,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2475,7 +2651,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2489,7 +2666,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2503,7 +2681,8 @@
     "SubslotElement": "responded",
     "SubslotText": "過去形",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2517,21 +2696,23 @@
     "SubslotElement": "with remarkable composure",
     "SubslotText": "～を保持して",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "make",
     "例文ID": "ex008",
     "Slot": "M1",
-    "SlotPhrase": "That morning near the central laboratory",
+    "SlotPhrase": "that morning near the central laboratory",
     "SlotText": "あの",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2545,7 +2726,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2559,7 +2741,8 @@
     "SubslotElement": "the scientist who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2573,7 +2756,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2587,7 +2771,8 @@
     "SubslotElement": "just",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2601,7 +2786,8 @@
     "SubslotElement": "completed",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2615,7 +2801,8 @@
     "SubslotElement": "a critical experiment",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2629,7 +2816,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2643,7 +2831,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2657,7 +2846,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2671,7 +2861,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2685,7 +2876,8 @@
     "SubslotElement": "analyze",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2699,7 +2891,8 @@
     "SubslotElement": "the complex data",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2713,7 +2906,8 @@
     "SubslotElement": "meticulously",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2727,7 +2921,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2741,7 +2936,8 @@
     "SubslotElement": "even though",
     "SubslotText": "たとえ～でも",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2755,7 +2951,8 @@
     "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2769,7 +2966,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2783,7 +2981,8 @@
     "SubslotElement": "facing",
     "SubslotText": "進行形",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2797,7 +2996,8 @@
     "SubslotElement": "severe fatigue",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2811,7 +3011,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2825,7 +3026,8 @@
     "SubslotElement": "so",
     "SubslotText": "だから",
     "Slot_display_order": 8,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2839,7 +3041,8 @@
     "SubslotElement": "the publication",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2853,7 +3056,8 @@
     "SubslotElement": "would",
     "SubslotText": "過去から未来を推量",
     "Slot_display_order": 8,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2867,7 +3071,8 @@
     "SubslotElement": "enhance",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2881,21 +3086,23 @@
     "SubslotElement": "their academic reputation",
     "SubslotText": "彼らの",
     "Slot_display_order": 8,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "know",
     "例文ID": "ex011",
     "Slot": "M1",
-    "SlotPhrase": "Earlier today",
+    "SlotPhrase": "earlier today",
     "SlotText": "今日",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2909,7 +3116,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2923,7 +3131,8 @@
     "SubslotElement": "the teacher who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2937,7 +3146,8 @@
     "SubslotElement": "appeared",
     "SubslotText": "過去形",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2951,7 +3161,8 @@
     "SubslotElement": "confident",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2965,7 +3176,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2979,7 +3191,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -2993,7 +3206,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3007,7 +3221,8 @@
     "SubslotElement": "although",
     "SubslotText": "～だが",
     "Slot_display_order": 5,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3021,7 +3236,8 @@
     "SubslotElement": "it",
     "SubslotText": "指示語「それ」",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3035,7 +3251,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3049,7 +3266,8 @@
     "SubslotElement": "mentally",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3063,7 +3281,8 @@
     "SubslotElement": "exhausting",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3077,7 +3296,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3091,7 +3311,8 @@
     "SubslotElement": "that she",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3105,7 +3326,8 @@
     "SubslotElement": "had been",
     "SubslotText": "過去完了、過去完了進行、be動詞",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3119,7 +3341,8 @@
     "SubslotElement": "working",
     "SubslotText": "進行形",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3133,7 +3356,8 @@
     "SubslotElement": "to support her students",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3147,7 +3371,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3161,7 +3386,8 @@
     "SubslotElement": "because",
     "SubslotText": "～だから",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3175,7 +3401,8 @@
     "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3189,7 +3416,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3203,7 +3431,8 @@
     "SubslotElement": "determined",
     "SubslotText": "過去形",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3217,35 +3446,38 @@
     "SubslotElement": "to encourage their growth",
     "SubslotText": "彼らの",
     "Slot_display_order": 7,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "think",
     "例文ID": "ex009",
     "Slot": "O1",
-    "SlotPhrase": "What",
+    "SlotPhrase": "what",
     "SlotText": "疑問詞【何？】",
     "PhraseType": "clause",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "think",
     "例文ID": "ex009",
     "Slot": "O1",
-    "SlotPhrase": "What",
+    "SlotPhrase": "what",
     "SlotText": "疑問詞【何？】",
     "PhraseType": "",
     "SubslotID": "sub-c1",
-    "SubslotElement": "What",
+    "SubslotElement": "what",
     "SubslotText": "疑問詞【何？】",
     "Slot_display_order": 1,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3259,7 +3491,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3273,7 +3506,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3287,7 +3521,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3301,7 +3536,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3315,7 +3551,8 @@
     "SubslotElement": "it",
     "SubslotText": "指示語「それ」",
     "Slot_display_order": 5,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3329,21 +3566,23 @@
     "SubslotElement": "is",
     "SubslotText": "be動詞、進行形のbe動詞",
     "Slot_display_order": 5,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
     "V_group_key": "be capable of",
     "例文ID": "ex010",
     "Slot": "O1",
-    "SlotPhrase": "What cruelty",
+    "SlotPhrase": "what cruelty",
     "SlotText": "疑問詞【何？】",
     "PhraseType": "word",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3357,7 +3596,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "5001",
@@ -3371,21 +3611,23 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
     "V_group_key": "give",
     "例文ID": "ex012",
     "Slot": "M1",
-    "SlotPhrase": "This morning when the power outage occurred",
+    "SlotPhrase": "this morning when the power outage occurred",
     "SlotText": "この、この、～のとき、過去形",
     "PhraseType": "clause",
     "SubslotID": "",
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3396,10 +3638,11 @@
     "SlotText": "この、この、～のとき",
     "PhraseType": "",
     "SubslotID": "sub-m1",
-    "SubslotElement": "This morning when",
+    "SubslotElement": "this morning when",
     "SubslotText": "この、この、～のとき",
     "Slot_display_order": 1,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3413,7 +3656,8 @@
     "SubslotElement": "the power outage",
     "SubslotText": "",
     "Slot_display_order": 1,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3427,7 +3671,8 @@
     "SubslotElement": "occurred",
     "SubslotText": "過去形",
     "Slot_display_order": 1,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3441,7 +3686,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3455,7 +3701,8 @@
     "SubslotElement": "the math instructor who",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3469,7 +3716,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 2,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3483,7 +3731,8 @@
     "SubslotElement": "been",
     "SubslotText": "be動詞",
     "Slot_display_order": 2,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3497,7 +3746,8 @@
     "SubslotElement": "absent",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3511,7 +3761,8 @@
     "SubslotElement": "last week",
     "SubslotText": "",
     "Slot_display_order": 2,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3525,7 +3776,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3539,7 +3791,8 @@
     "SubslotElement": "while",
     "SubslotText": "～の間",
     "Slot_display_order": 3,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3553,7 +3806,8 @@
     "SubslotElement": "the administrator",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3567,7 +3821,8 @@
     "SubslotElement": "was",
     "SubslotText": "be動詞過去、進行形のbe動詞",
     "Slot_display_order": 3,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3581,7 +3836,8 @@
     "SubslotElement": "briefing",
     "SubslotText": "進行形",
     "Slot_display_order": 3,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3595,7 +3851,8 @@
     "SubslotElement": "the staff",
     "SubslotText": "",
     "Slot_display_order": 3,
-    "display_order": 5
+    "display_order": 5,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3609,7 +3866,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 4,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3623,7 +3881,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 5,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3637,7 +3896,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3651,7 +3911,8 @@
     "SubslotElement": "the new student who",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3665,7 +3926,8 @@
     "SubslotElement": "transferred",
     "SubslotText": "過去形",
     "Slot_display_order": 6,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3679,7 +3941,8 @@
     "SubslotElement": "last week",
     "SubslotText": "",
     "Slot_display_order": 6,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3693,7 +3956,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3707,7 +3971,8 @@
     "SubslotElement": "an outline of the previous week's lessons",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3721,7 +3986,8 @@
     "SubslotElement": "she",
     "SubslotText": "",
     "Slot_display_order": 7,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3735,7 +4001,8 @@
     "SubslotElement": "had",
     "SubslotText": "過去完了",
     "Slot_display_order": 7,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3749,7 +4016,8 @@
     "SubslotElement": "missed",
     "SubslotText": "過去形",
     "Slot_display_order": 7,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3763,7 +4031,8 @@
     "SubslotElement": "",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 0
+    "display_order": 0,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3777,7 +4046,8 @@
     "SubslotElement": "since",
     "SubslotText": "～だから",
     "Slot_display_order": 8,
-    "display_order": 1
+    "display_order": 1,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3791,7 +4061,8 @@
     "SubslotElement": "he",
     "SubslotText": "",
     "Slot_display_order": 8,
-    "display_order": 2
+    "display_order": 2,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3805,7 +4076,8 @@
     "SubslotElement": "figured",
     "SubslotText": "過去形",
     "Slot_display_order": 8,
-    "display_order": 3
+    "display_order": 3,
+    "QuestionType": ""
   },
   {
     "構文ID": "",
@@ -3819,6 +4091,7 @@
     "SubslotElement": "she had missed too much already",
     "SubslotText": "過去形、～すぎる、多くの",
     "Slot_display_order": 8,
-    "display_order": 4
+    "display_order": 4,
+    "QuestionType": ""
   }
 ]
