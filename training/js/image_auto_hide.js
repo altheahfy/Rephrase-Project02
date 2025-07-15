@@ -139,11 +139,16 @@ function setButtonImageForDetailSlots() {
 function processAllImageSlots() {
   console.log("🔄 画像スロット自動非表示処理を開始...");
   
-  const allImages = document.querySelectorAll('.slot-image');
-  console.log(`📊 検出された画像スロット: ${allImages.length}個`);
+  // 単一画像と複数画像コンテナ内の画像を両方処理
+  const singleImages = document.querySelectorAll('.slot-image');
+  const multipleImages = document.querySelectorAll('.multi-image-container img');
   
-  allImages.forEach((img, index) => {
-    console.log(`🔍 画像${index + 1}を処理中:`);
+  console.log(`📊 検出された単一画像スロット: ${singleImages.length}個`);
+  console.log(`📊 検出された複数画像スロット: ${multipleImages.length}個`);
+  
+  // 単一画像の処理
+  singleImages.forEach((img, index) => {
+    console.log(`🔍 単一画像${index + 1}を処理中:`);
     console.log(`  - src: ${img.src}`);
     console.log(`  - alt: ${img.alt}`);
     console.log(`  - complete: ${img.complete}`);
@@ -154,17 +159,68 @@ function processAllImageSlots() {
     if (img.complete) {
       applyAutoHideToImage(img);
     } else {
-      console.log(`⏳ 画像${index + 1}は読み込み中...`);
+      console.log(`⏳ 単一画像${index + 1}は読み込み中...`);
       // 画像読み込み完了時に判定
       img.addEventListener('load', () => {
-        console.log(`✅ 画像${index + 1}読み込み完了`);
+        console.log(`✅ 単一画像${index + 1}読み込み完了`);
         applyAutoHideToImage(img);
       });
       
       // エラー時も判定
       img.addEventListener('error', () => {
-        console.log(`❌ 画像${index + 1}読み込みエラー`);
+        console.log(`❌ 単一画像${index + 1}読み込みエラー`);
         applyAutoHideToImage(img);
+      });
+    }
+  });
+  
+  // 複数画像の処理（複数画像コンテナ内の画像は基本的に全て表示）
+  multipleImages.forEach((img, index) => {
+    console.log(`🔍 複数画像${index + 1}を処理中:`);
+    console.log(`  - src: ${img.src}`);
+    console.log(`  - alt: ${img.alt}`);
+    console.log(`  - complete: ${img.complete}`);
+    console.log(`  - naturalWidth: ${img.naturalWidth}`);
+    console.log(`  - naturalHeight: ${img.naturalHeight}`);
+    
+    // 複数画像コンテナ内の画像は基本的に表示を維持
+    // ただし、プレースホルダーなどの明らかな非表示対象は除外
+    if (img.complete) {
+      // 複数画像の場合はより寛容な判定
+      const shouldHide = shouldHideImage(img);
+      if (shouldHide && img.src.includes('placeholder.png')) {
+        console.log(`🙈 複数画像${index + 1}を非表示に設定: プレースホルダー`);
+        img.style.display = 'none';
+      } else {
+        console.log(`👁 複数画像${index + 1}を表示に設定`);
+        img.style.display = 'block';
+      }
+    } else {
+      console.log(`⏳ 複数画像${index + 1}は読み込み中...`);
+      // 画像読み込み完了時に判定
+      img.addEventListener('load', () => {
+        console.log(`✅ 複数画像${index + 1}読み込み完了`);
+        const shouldHide = shouldHideImage(img);
+        if (shouldHide && img.src.includes('placeholder.png')) {
+          console.log(`🙈 複数画像${index + 1}を非表示に設定: プレースホルダー`);
+          img.style.display = 'none';
+        } else {
+          console.log(`👁 複数画像${index + 1}を表示に設定`);
+          img.style.display = 'block';
+        }
+      });
+      
+      // エラー時も判定
+      img.addEventListener('error', () => {
+        console.log(`❌ 複数画像${index + 1}読み込みエラー`);
+        const shouldHide = shouldHideImage(img);
+        if (shouldHide && img.src.includes('placeholder.png')) {
+          console.log(`🙈 複数画像${index + 1}を非表示に設定: エラー`);
+          img.style.display = 'none';
+        } else {
+          console.log(`👁 複数画像${index + 1}を表示に設定`);
+          img.style.display = 'block';
+        }
       });
     }
   });
