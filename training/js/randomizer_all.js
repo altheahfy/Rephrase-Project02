@@ -170,13 +170,22 @@ export function randomizeAll(slotData) {
   // 最後のメインスロットを特定
   const mainSlots = selectedSlots.filter(slot => !slot.SubslotID);
   let lastMainSlotIndex = -1;
+  let firstMainSlotIndex = -1;
   if (mainSlots.length > 0) {
     const lastOrder = Math.max(...mainSlots.map(s => s.Slot_display_order || 0));
+    const firstOrder = Math.min(...mainSlots.map(s => s.Slot_display_order || 0));
     lastMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === lastOrder);
+    firstMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === firstOrder);
   }
 
   return selectedSlots.map((slot, idx) => {
     let phrase = slot.SlotPhrase || "";
+    
+    // 一つ目のメインスロットの一文字目を大文字にする
+    if (idx === firstMainSlotIndex && phrase) {
+      phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+    }
+    
     // 最後のメインスロットのみ句読点をSlotPhraseに付与（英語例文テキストのみ）
     if (idx === lastMainSlotIndex && phrase) {
       // 既存の句読点を除去してから新しい句読点を追加
