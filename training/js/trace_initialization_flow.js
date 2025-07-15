@@ -172,24 +172,112 @@ function hookInitializationCalls() {
   console.log("✅ 初期化時関数呼び出しフック設定完了");
 }
 
+// JSONロード完了を待って初期化処理を監視
+function waitForJSONAndTrace() {
+  console.log("🔍 === JSONロード完了待機 ===");
+  
+  // JSONロード完了を監視
+  const checkJSONLoaded = setInterval(() => {
+    if (window.loadedJsonData && window.imageMetaTags) {
+      console.log("✅ JSONロード完了を確認");
+      clearInterval(checkJSONLoaded);
+      
+      // 初期化処理を監視
+      console.log("🔍 初期化処理監視開始");
+      
+      // 関数呼び出しフック設定
+      hookInitializationCalls();
+      
+      // 初期化完了を待つ
+      setTimeout(() => {
+        console.log("🔍 === 初期化完了後の状態分析 ===");
+        analyzePostInitializationState();
+      }, 3000);
+    }
+  }, 100);
+  
+  // 10秒でタイムアウト
+  setTimeout(() => {
+    clearInterval(checkJSONLoaded);
+    console.log("⏰ JSONロード待機タイムアウト");
+  }, 10000);
+}
+
+// 初期化完了後の状態分析
+function analyzePostInitializationState() {
+  console.log("📊 === 初期化完了後の状態分析 ===");
+  
+  const o1State = captureSlotState('slot-o1');
+  const o2State = captureSlotState('slot-o2');
+  
+  console.log("📊 O1初期化完了後状態:", o1State);
+  console.log("📊 O2初期化完了後状態:", o2State);
+  
+  // 重要な発見
+  if (o1State && o2State) {
+    if (o1State.hasMultiContainer && !o2State.hasMultiContainer) {
+      console.log("🎯 重要な発見: O1には複数画像コンテナがありますが、O2にはありません");
+      console.log("これは初期化処理でO1にのみ複数画像が適用されたことを示しています");
+      
+      // O1が複数画像適用された理由を調査
+      analyzeWhyO1HasMultipleImages();
+    }
+  }
+}
+
+// O1が複数画像適用された理由を調査
+function analyzeWhyO1HasMultipleImages() {
+  console.log("🔍 === O1複数画像適用理由調査 ===");
+  
+  const o1PhraseText = document.querySelector('#slot-o1 .slot-phrase')?.textContent || '';
+  console.log(`📊 O1初期テキスト: "${o1PhraseText}"`);
+  
+  if (window.findAllImagesByMetaTag) {
+    const images = window.findAllImagesByMetaTag(o1PhraseText);
+    console.log(`📊 O1画像検索結果: ${images.length}個`);
+    
+    if (images.length >= 2) {
+      console.log("🎯 O1は複数画像適用条件を満たしています");
+      console.log("しかし、初期化処理はmonitorSlotText → applyImageToSlot（単一画像）しか実行しません");
+      console.log("つまり、O1の複数画像は初期化後に別の処理で適用されています");
+      
+      // 複数画像適用のタイミングを調査
+      setTimeout(() => {
+        console.log("🔍 === 遅延複数画像適用調査 ===");
+        const o1Container = document.querySelector('#slot-o1 .multi-image-container');
+        if (o1Container) {
+          console.log("✅ O1に複数画像コンテナが検出されました");
+          console.log("これは初期化から数秒後に複数画像適用が実行されたことを示しています");
+        }
+      }, 5000);
+    }
+  }
+}
+
+// スロット状態キャプチャ
+function captureSlotState(slotId) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return null;
+  
+  return {
+    hasSlotImage: !!slot.querySelector('.slot-image'),
+    hasMultiContainer: !!slot.querySelector('.multi-image-container'),
+    imageCount: slot.querySelectorAll('img').length,
+    multiImageCount: slot.querySelectorAll('.slot-multi-image').length,
+    phraseText: slot.querySelector('.slot-phrase')?.textContent || '',
+    textContent: slot.querySelector('.slot-text')?.textContent || ''
+  };
+}
+
 // メイン処理フロートレース実行
 function runInitializationFlowTrace() {
   console.log("🎯 === 初期化処理フロートレース ===");
   
-  // 1. 関数呼び出しフック設定
-  hookInitializationCalls();
-  
-  // 2. 初期テキストでの画像検索トレース
-  traceInitialImageApplication();
-  
-  // 3. テキスト正規化処理分析
-  analyzeTextNormalization();
-  
-  // 4. 画像適用条件分析
-  analyzeImageApplicationConditions();
+  // JSONロード完了を待って監視開始
+  waitForJSONAndTrace();
   
   console.log("\n🎯 === 重要な発見 ===");
-  console.log("フック設定完了。今度はページをリロードして初期化処理を観察してください。");
+  console.log("JSONロード完了を待機中。完了後に初期化処理が監視されます。");
 }
 
 // グローバルに公開
