@@ -2434,13 +2434,17 @@
     "image_file": "shown.png",
     "folder": "common",
     "meta_tags": [
+      "show",
+      "shows",
+      "showed",
+      "showing",
       "shown",
       "showned",
       "showning",
       "showns"
     ],
     "priority": 3,
-    "description": "shown"
+    "description": "見せる、示す - show/shown"
   },
   {
     "image_file": "silence.png",
@@ -2833,5 +2837,208 @@
     ],
     "priority": 3,
     "description": "あなた"
+  },
+  {
+    "image_file": "message.png",
+    "folder": "common",
+    "meta_tags": [
+      "message",
+      "messages",
+      "messaged",
+      "messaging"
+    ],
+    "priority": 3,
+    "description": "メッセージ、伝言"
+  },
+  {
+    "image_file": "secret.png",
+    "folder": "common",
+    "meta_tags": [
+      "secret",
+      "secrets",
+      "secreted",
+      "secreting"
+    ],
+    "priority": 3,
+    "description": "秘密"
+  },
+  {
+    "image_file": "weekend.png",
+    "folder": "common",
+    "meta_tags": [
+      "weekend",
+      "weekends",
+      "weekended",
+      "weekending"
+    ],
+    "priority": 3,
+    "description": "週末"
+  },
+  {
+    "image_file": "curious.png",
+    "folder": "common",
+    "meta_tags": [
+      "curious",
+      "curiously",
+      "curiosity",
+      "curiosities"
+    ],
+    "priority": 3,
+    "description": "好奇心がある"
+  },
+  {
+    "image_file": "important.png",
+    "folder": "common",
+    "meta_tags": [
+      "important",
+      "importantly",
+      "importance",
+      "importances"
+    ],
+    "priority": 3,
+    "description": "重要な"
+  },
+  {
+    "image_file": "warning.png",
+    "folder": "common",
+    "meta_tags": [
+      "warning",
+      "warnings",
+      "warned",
+      "warning",
+      "warn",
+      "warns"
+    ],
+    "priority": 3,
+    "description": "警告"
+  },
+  {
+    "image_file": "surprise.png",
+    "folder": "common",
+    "meta_tags": [
+      "surprise",
+      "surprises",
+      "surprised",
+      "surprising",
+      "surprisingly"
+    ],
+    "priority": 3,
+    "description": "驚き"
+  },
+  {
+    "image_file": "friend.png",
+    "folder": "common",
+    "meta_tags": [
+      "friend",
+      "friends",
+      "friended",
+      "friending",
+      "friendly",
+      "friendship"
+    ],
+    "priority": 3,
+    "description": "友達"
+  },
+  {
+    "image_file": "news.png",
+    "folder": "common",
+    "meta_tags": [
+      "news",
+      "new",
+      "newest",
+      "newly"
+    ],
+    "priority": 3,
+    "description": "ニュース、新しい"
+  },
+  {
+    "image_file": "some.png",
+    "folder": "common",
+    "meta_tags": [
+      "some",
+      "something",
+      "someone",
+      "sometime",
+      "somewhere",
+      "somewhat"
+    ],
+    "priority": 3,
+    "description": "いくつかの、何か"
+  },
+  {
+    "image_file": "tell.png",
+    "folder": "common",
+    "meta_tags": [
+      "tell",
+      "tells",
+      "told",
+      "telling"
+    ],
+    "priority": 3,
+    "description": "話す、教える"
+  },
+  {
+    "image_file": "story.png",
+    "folder": "common",
+    "meta_tags": [
+      "story",
+      "stories",
+      "storied",
+      "storying"
+    ],
+    "priority": 3,
+    "description": "物語、話"
+  },
+  {
+    "image_file": "truth.png",
+    "folder": "common",
+    "meta_tags": [
+      "truth",
+      "truths",
+      "truthed",
+      "truthing",
+      "true",
+      "truly"
+    ],
+    "priority": 3,
+    "description": "真実"
+  },
+  {
+    "image_file": "dinner.png",
+    "folder": "common",
+    "meta_tags": [
+      "dinner",
+      "dinners",
+      "dinnered",
+      "dinnering"
+    ],
+    "priority": 3,
+    "description": "夕食"
+  },
+  {
+    "image_file": "little.png",
+    "folder": "common",
+    "meta_tags": [
+      "little",
+      "littler",
+      "littlest",
+      "littled",
+      "littling"
+    ],
+    "priority": 3,
+    "description": "小さい"
+  },
+  {
+    "image_file": "funny.png",
+    "folder": "common",
+    "meta_tags": [
+      "funny",
+      "funnier",
+      "funniest",
+      "funnily",
+      "fun"
+    ],
+    "priority": 3,
+    "description": "面白い、楽しい"
   }
 ]
