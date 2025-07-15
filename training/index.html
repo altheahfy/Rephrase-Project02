@@ -89,9 +89,7 @@
     <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
     <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
       <option value="">-- データを選択 --</option>
-      <option value="data/slot_order_data.json">🎯 フルレングステスト</option>
-      <option value="data/slot_order_data2.json">📚 第4文型と極性活用</option>
-      <!-- 動的に追加されるプリセットがここに表示されます -->
+      <!-- プリセットオプションは JavaScript で動的に読み込まれます -->
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
   </div>
@@ -1006,15 +1004,6 @@
 <script>
   // 動的エリアの生成位置を指定
   window.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ 動的エリア用のDOMContentLoaded実行");
-    
-    // 🔧 プリセット設定を動的に読み込み（フォールバック）
-    setTimeout(() => {
-      loadPresetConfig();
-      setupPresetButtonListener();
-      setupLoadJsonButtonListener();
-    }, 100);
-    
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
     
@@ -1089,51 +1078,25 @@ import { buildStructure } from './js/structure_builder.js';
 
 // 🔧 **プリセット設定を動的に読み込む機能**
 async function loadPresetConfig() {
-  console.log('🔧 プリセット設定の読み込み開始');
   try {
     const response = await fetch('data/preset_config.json');
-    console.log('🔧 preset_config.json のレスポンス:', response.status);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
     const config = await response.json();
-    console.log('🔧 プリセット設定データ:', config);
     
     const presetSelect = document.getElementById('presetSelect');
-    console.log('🔧 プリセット選択要素:', presetSelect);
     
-    if (!presetSelect) {
-      console.error('🔧 プリセット選択要素が見つかりません');
-      return;
-    }
-    
-    // 既存のオプション（"-- データを選択 --"と静的に追加されたもの）は保持
-    // 動的に追加されたオプションのみをクリア
-    const existingOptions = presetSelect.querySelectorAll('option');
-    const dynamicOptions = Array.from(existingOptions).filter(option => 
-      option.dataset.dynamic === 'true'
-    );
-    dynamicOptions.forEach(option => option.remove());
+    // 既存のオプション（"-- データを選択 --"）以外をクリア
+    const options = presetSelect.querySelectorAll('option');
+    options.forEach((option, index) => {
+      if (index > 0) option.remove(); // 最初のオプション以外を削除
+    });
     
     // 設定ファイルからプリセットを動的に追加
     config.presets.forEach(preset => {
-      // 既存の静的オプションと重複しないかチェック
-      const existingOption = presetSelect.querySelector(`option[value="${preset.file}"]`);
-      if (!existingOption) {
-        console.log('🔧 プリセット追加:', preset.name);
-        const option = document.createElement('option');
-        option.value = preset.file;
-        option.textContent = preset.name;
-        option.title = preset.description; // ツールチップとして説明を表示
-        option.dataset.dynamic = 'true'; // 動的に追加されたことを示すフラグ
-        presetSelect.appendChild(option);
-      } else {
-        // 既存のオプションの表示名を更新
-        existingOption.textContent = preset.name;
-        existingOption.title = preset.description;
-      }
+      const option = document.createElement('option');
+      option.value = preset.file;
+      option.textContent = preset.name;
+      option.title = preset.description; // ツールチップとして説明を表示
+      presetSelect.appendChild(option);
     });
     
     console.log('🔧 プリセット設定を動的に読み込み完了:', config.presets.length + '件');
@@ -1141,93 +1104,41 @@ async function loadPresetConfig() {
     console.error('🔧 プリセット設定の読み込みに失敗:', error);
     // フォールバック：デフォルトのプリセットを手動で追加
     const presetSelect = document.getElementById('presetSelect');
-    if (presetSelect) {
-      const defaultPresets = [
-        { file: 'data/slot_order_data.json', name: '🎯 メインデータセット' },
-        { file: 'data/slot_order_data2.json', name: '📚 例文データセット2' }
-      ];
-      
-      defaultPresets.forEach(preset => {
-        const option = document.createElement('option');
-        option.value = preset.file;
-        option.textContent = preset.name;
-        presetSelect.appendChild(option);
-      });
-      console.log('🔧 フォールバック: デフォルトプリセットを追加');
-    }
-  }
-}
-
-// 🔧 デバッグ用テスト関数
-function testPresetConfig() {
-  console.log('🔧 プリセット設定テスト開始');
-  
-  // プリセット選択要素の確認
-  const presetSelect = document.getElementById('presetSelect');
-  console.log('🔧 プリセット選択要素:', presetSelect);
-  
-  // プリセット読込ボタンの確認
-  const loadPresetButton = document.getElementById('loadPresetButton');
-  console.log('🔧 プリセット読込ボタン:', loadPresetButton);
-  
-  // JSON読込ボタンの確認
-  const loadJsonButton = document.getElementById('loadJsonButton');
-  console.log('🔧 JSON読込ボタン:', loadJsonButton);
-  
-  if (presetSelect) {
-    const options = presetSelect.querySelectorAll('option');
-    console.log('🔧 現在のオプション数:', options.length);
-    options.forEach((option, index) => {
-      console.log(`🔧 オプション${index}: ${option.textContent} (${option.value})`);
+    const defaultPresets = [
+      { file: 'data/slot_order_data.json', name: '🎯 メインデータセット' },
+      { file: 'data/slot_order_data2.json', name: '📚 例文データセット2' }
+    ];
+    
+    defaultPresets.forEach(preset => {
+      const option = document.createElement('option');
+      option.value = preset.file;
+      option.textContent = preset.name;
+      presetSelect.appendChild(option);
     });
   }
-  
-  // 手動でプリセット設定を読み込み
-  loadPresetConfig();
-  
-  // 手動でイベントリスナーを設定
-  setupPresetButtonListener();
-  setupLoadJsonButtonListener();
 }
 
-// コンソールから呼び出し可能にする
-window.testPresetConfig = testPresetConfig;
-
 // 🎯 **プリセットJSONファイルをロードする機能**
-function setupPresetButtonListener() {
-  const loadPresetButton = document.getElementById("loadPresetButton");
+document.getElementById("loadPresetButton").addEventListener("click", () => {
+  const presetSelect = document.getElementById("presetSelect");
+  const selectedPreset = presetSelect.value;
   
-  if (!loadPresetButton) {
-    console.error("🔧 loadPresetButton要素が見つかりません");
+  if (!selectedPreset) {
+    alert("サンプルデータを選択してください");
     return;
   }
   
-  console.log("🔧 loadPresetButtonのイベントリスナーを設定");
+  // 🎭 ローディング画面を表示
+  console.log("🎭 プリセットJSONロード開始 - ローディング画面を表示");
+  showLoadingOverlay();
   
-  loadPresetButton.addEventListener("click", () => {
-    console.log("🔧 loadPresetButtonがクリックされました");
-    
-    const presetSelect = document.getElementById("presetSelect");
-    const selectedPreset = presetSelect.value;
-    
-    console.log("🔧 選択されたプリセット:", selectedPreset);
-    
-    if (!selectedPreset) {
-      alert("サンプルデータを選択してください");
-      return;
-    }
-    
-    // 🎭 ローディング画面を表示
-    console.log("🎭 プリセットJSONロード開始 - ローディング画面を表示");
-    showLoadingOverlay();
-    
-    // ローディングメッセージを更新
-    const loadingText = document.querySelector('#loading-overlay p');
-    if (loadingText) {
-      loadingText.textContent = `${selectedPreset} を読み込み中...`;
-    }
-    
-    // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
+  // ローディングメッセージを更新
+  const loadingText = document.querySelector('#loading-overlay p');
+  if (loadingText) {
+    loadingText.textContent = `${selectedPreset} を読み込み中...`;
+  }
+  
+  // 🎯 **修正：JSONデータを直接埋め込み（CORSエラー回避）**
   let presetData = null;
   
   if (selectedPreset === 'data/slot_order_data.json' || selectedPreset === 'data/slot_order_data2.json') {
@@ -1320,21 +1231,10 @@ function setupPresetButtonListener() {
     hideLoadingOverlay();
     return;
   }
-  }); // addEventListener の終わり
-} // setupPresetButtonListener 関数の終わり
+});
 
 // 既存のファイル選択からのロード機能
-function setupLoadJsonButtonListener() {
-  const loadJsonButton = document.getElementById("loadJsonButton");
-  
-  if (!loadJsonButton) {
-    console.error("🔧 loadJsonButton要素が見つかりません");
-    return;
-  }
-  
-  console.log("🔧 loadJsonButtonのイベントリスナーを設定");
-  
-  loadJsonButton.addEventListener("click", () => {
+document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
   if (fileInput.files.length === 0) {
     alert("ファイルを選択してください");
@@ -1410,8 +1310,7 @@ function setupLoadJsonButtonListener() {
     }
   };
   reader.readAsText(file);
-  }); // addEventListener の終わり
-} // setupLoadJsonButtonListener 関数の終わり
+});
 
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
@@ -1607,10 +1506,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 🔧 プリセット設定を動的に読み込み
   loadPresetConfig();
-  
-  // 🔧 ボタンのイベントリスナーを設定
-  setupPresetButtonListener();
-  setupLoadJsonButtonListener();
   
   if (window.initializeQuestionWordArea) {
     window.initializeQuestionWordArea();
