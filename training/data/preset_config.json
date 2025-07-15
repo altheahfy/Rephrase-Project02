@@ -1,0 +1,31 @@
+{
+  "presets": [
+    {
+      "id": "main_dataset",
+      "name": "🎯 メインデータセット",
+      "file": "data/slot_order_data.json",
+      "description": "基本的な例文データセット"
+    },
+    {
+      "id": "dataset2",
+      "name": "📚 例文データセット2",
+      "file": "data/slot_order_data2.json",
+      "description": "追加の例文データセット"
+    }
+  ],
+  "instructions": {
+    "title": "🔧 新規例文セットJSONの追加方法",
+    "steps": [
+      "1. 新しいJSONファイルを data/ フォルダに配置",
+      "2. 上記の presets 配列に新しいオブジェクトを追加:",
+      "   {",
+      "     \"id\": \"ユニークなID\",",
+      "     \"name\": \"表示名\",",
+      "     \"file\": \"data/ファイル名.json\",",
+      "     \"description\": \"説明文\"",
+      "   }",
+      "3. ブラウザでページを再読み込み"
+    ],
+    "note": "この方法により、HTMLファイルを編集することなく新しいデータセットを追加できます。"
+  }
+}
