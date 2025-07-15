@@ -1026,15 +1026,22 @@ function syncSubslotsFromJson(data) {
         
         try {
           const storedInfo = localStorage.getItem('sentencePositionInfo');
+          console.log(`🔍 DEBUG: LocalStorage sentencePositionInfo = ${storedInfo}`);
+          
           if (storedInfo) {
             const sentencePositionInfo = JSON.parse(storedInfo);
             const { firstSlot, lastSlot, isQuestionSentence } = sentencePositionInfo;
             
-            // 全サブスロットから最初と最後を特定
+            console.log(`🔍 DEBUG: firstSlot=${firstSlot}, lastSlot=${lastSlot}, isQuestionSentence=${isQuestionSentence}`);
+            console.log(`🔍 DEBUG: 現在のサブスロット: ${item.Slot}-${item.SubslotID}`);
+            
+            // 全てのサブスロットから最初と最後を特定
             const firstSlotSubslots = data.filter(d => d.SubslotID && d.Slot === firstSlot)
               .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
             const lastSlotSubslots = data.filter(d => d.SubslotID && d.Slot === lastSlot)
               .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+            
+            console.log(`🔍 DEBUG: firstSlotSubslots=${firstSlotSubslots.length}件, lastSlotSubslots=${lastSlotSubslots.length}件`);
             
             // 文頭スロットの最初のサブスロットなら大文字化
             if (firstSlotSubslots.length > 0 && 
@@ -1052,6 +1059,8 @@ function syncSubslotsFromJson(data) {
               processedSubslotText = processedSubslotText.replace(/[.?!]+$/, "") + punctuation;
               console.log(`💡 文末サブスロット句読点付与: ${item.SubslotID} -> ${processedSubslotText}`);
             }
+          } else {
+            console.log(`🔍 DEBUG: LocalStorageにsentencePositionInfoがありません`);
           }
         } catch (error) {
           console.warn('⚠️ サブスロット大文字化・句読点処理エラー:', error);
@@ -2277,3 +2286,48 @@ function getSlotDisplayOrder(slotName) {
 
 // 🆕 スロット幅調整をグローバル関数として公開
 window.adjustSlotWidthsBasedOnText = adjustSlotWidthsBasedOnText;
+
+// デバッグ用関数：サブスロット大文字化・句読点処理の状況を確認
+window.debugSubslotPunctuation = function() {
+  console.log('=== サブスロット大文字化・句読点処理デバッグ ===');
+  
+  // LocalStorageの情報を確認
+  const storedInfo = localStorage.getItem('sentencePositionInfo');
+  console.log('📖 LocalStorage情報:', storedInfo);
+  
+  if (storedInfo) {
+    try {
+      const sentencePositionInfo = JSON.parse(storedInfo);
+      console.log('📖 解析済み情報:', sentencePositionInfo);
+      
+      // 現在のlastSelectedSlotsを確認
+      if (window.lastSelectedSlots) {
+        console.log('📊 現在のlastSelectedSlots:', window.lastSelectedSlots);
+        
+        // サブスロットのみを抽出
+        const subslots = window.lastSelectedSlots.filter(slot => slot.SubslotID);
+        console.log('📊 サブスロット一覧:', subslots);
+        
+        // 文頭・文末スロットのサブスロットを特定
+        const firstSlotSubslots = subslots.filter(slot => slot.Slot === sentencePositionInfo.firstSlot)
+          .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        const lastSlotSubslots = subslots.filter(slot => slot.Slot === sentencePositionInfo.lastSlot)
+          .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        
+        console.log('📊 文頭スロット(' + sentencePositionInfo.firstSlot + ')のサブスロット:', firstSlotSubslots);
+        console.log('📊 文末スロット(' + sentencePositionInfo.lastSlot + ')のサブスロット:', lastSlotSubslots);
+        
+        if (firstSlotSubslots.length > 0) {
+          console.log('🎯 文頭対象サブスロット:', firstSlotSubslots[0].SubslotID, '- SubslotText:', firstSlotSubslots[0].SubslotText);
+        }
+        if (lastSlotSubslots.length > 0) {
+          console.log('🎯 文末対象サブスロット:', lastSlotSubslots[lastSlotSubslots.length - 1].SubslotID, '- SubslotText:', lastSlotSubslots[lastSlotSubslots.length - 1].SubslotText);
+        }
+      }
+    } catch (error) {
+      console.error('❌ LocalStorage情報の解析エラー:', error);
+    }
+  }
+  
+  console.log('=== デバッグ終了 ===');
+};

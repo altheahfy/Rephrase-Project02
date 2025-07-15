@@ -185,6 +185,18 @@ export function randomizeAll(slotData) {
     firstMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === firstOrder);
   }
 
+  // 個別ランダマイズ用の位置情報をLocalStorageに保存
+  if (mainSlots.length > 0) {
+    const sentencePositionInfo = {
+      firstSlot: mainSlots.find(s => (s.Slot_display_order || 0) === Math.min(...mainSlots.map(s => s.Slot_display_order || 0))).Slot,
+      lastSlot: mainSlots.find(s => (s.Slot_display_order || 0) === Math.max(...mainSlots.map(s => s.Slot_display_order || 0))).Slot,
+      isQuestionSentence: isQuestionSentence,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('sentencePositionInfo', JSON.stringify(sentencePositionInfo));
+    console.log('💾 個別ランダマイズ用位置情報を保存:', sentencePositionInfo);
+  }
+
   return selectedSlots.map((slot, idx) => {
     let phrase = slot.SlotPhrase || "";
     

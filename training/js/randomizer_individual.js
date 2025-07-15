@@ -48,15 +48,23 @@ function applyPunctuationAndCapitalization(selectedSlots) {
     const firstSlot = selectedSlots[firstMainSlotIndex];
     const lastSlot = selectedSlots[lastMainSlotIndex];
     
-    const sentencePositionInfo = {
-      firstSlot: firstSlot.Slot,
-      lastSlot: lastSlot.Slot,
-      isQuestionSentence: isQuestionSentence,
-      timestamp: Date.now()
-    };
+    // 全体ランダマイズから位置情報を取得
+    const storedPositionInfo = localStorage.getItem('sentencePositionInfo');
+    let sentencePositionInfo = null;
     
-    localStorage.setItem('sentencePositionInfo', JSON.stringify(sentencePositionInfo));
-    console.log('💾 文頭・文末スロット情報を保存:', sentencePositionInfo);
+    if (storedPositionInfo) {
+      sentencePositionInfo = JSON.parse(storedPositionInfo);
+      console.log('📖 全体ランダマイズからの位置情報を取得:', sentencePositionInfo);
+    } else {
+      // フォールバック：個別ランダマイズでも最低限の情報を生成
+      sentencePositionInfo = {
+        firstSlot: firstSlot.Slot,
+        lastSlot: lastSlot.Slot,
+        isQuestionSentence: isQuestionSentence,
+        timestamp: Date.now()
+      };
+      console.log('⚠️ 位置情報なし - フォールバック生成:', sentencePositionInfo);
+    }
   }
   
   // 各スロットのサブスロットの最初と最後を特定する関数
