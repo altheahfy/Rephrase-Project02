@@ -733,10 +733,15 @@ class VoiceSystem {
             this.stopRecordingTimer();
         }
         
-        // 🎤 音声認識も停止
+        // 🎤 音声認識も停止（認識結果を受信するため少し時間を与える）
         if (this.recognition && this.isRecognitionActive) {
             try {
-                this.recognition.stop();
+                // 認識結果の受信を待つため、少し遅延してから停止
+                setTimeout(() => {
+                    if (this.recognition && this.isRecognitionActive) {
+                        this.recognition.stop();
+                    }
+                }, 500); // 500ms待機
             } catch (error) {
                 console.warn('⚠️ 音声認識停止失敗:', error.message);
             }
@@ -896,6 +901,9 @@ class VoiceSystem {
         try {
             this.updateStatus('📊 分析中...', 'analyzing');
             
+            // 🎤 音声認識結果の最終取得のため少し待機
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContextClass();
             
@@ -906,8 +914,10 @@ class VoiceSystem {
             const expectedSentence = this.getCurrentSentence();
             const recognizedText = this.recognizedText.trim();
             
-            console.log('� 期待文章:', expectedSentence);
-            console.log('🎯 認識結果:', recognizedText);
+            console.log('📝 期待文章:', expectedSentence);
+            console.log('🎯 認識結果 (長さ: ' + recognizedText.length + '):', recognizedText);
+            console.log('🎯 生の認識結果:', JSON.stringify(this.recognizedText));
+            console.log('🎯 認識アクティブ状態:', this.isRecognitionActive);
             
             // 音声品質チェック（最低限のみ）
             const qualityCheck = this.checkAudioQuality(audioBuffer);
@@ -2127,14 +2137,17 @@ class VoiceSystem {
         this.recognition = new SpeechRecognition();
         this.recognition.lang = 'en-US';
         this.recognition.continuous = true;  // 連続認識
-        this.recognition.interimResults = false; // 最終結果のみ
+        this.recognition.interimResults = true; // 中間結果も取得（認識確実性向上）
         this.recognition.maxAlternatives = 1;
         
         // 認識結果を受信
         this.recognition.onresult = (event) => {
             let finalTranscript = '';
             
+            console.log('🎯 音声認識結果イベント - 結果数:', event.results.length);
+            
             for (let i = event.resultIndex; i < event.results.length; i++) {
+                console.log('🎯 結果', i, '- isFinal:', event.results[i].isFinal, '- transcript:', event.results[i][0].transcript);
                 if (event.results[i].isFinal) {
                     finalTranscript += event.results[i][0].transcript + ' ';
                 }
@@ -2144,6 +2157,8 @@ class VoiceSystem {
                 this.recognizedText += finalTranscript;
                 console.log('🎯 認識結果追加:', finalTranscript.trim());
                 console.log('🎯 累積認識結果:', this.recognizedText.trim());
+            } else {
+                console.log('🎯 最終認識結果が空です');
             }
         };
         
