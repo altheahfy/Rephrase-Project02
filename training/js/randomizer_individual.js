@@ -3,6 +3,67 @@
  */
 
 /**
+ * 疑問文判定と句読点処理の共通関数
+ */
+function applyPunctuationAndCapitalization(selectedSlots) {
+  // 疑問文判定
+  function detectQuestionPattern(selectedSlots) {
+    const sortedSlots = selectedSlots.filter(slot => !slot.SubslotID)
+      .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+    if (sortedSlots.length === 0) return false;
+    
+    const upperSlots = sortedSlots.slice(0, 2);
+    for (const slot of upperSlots) {
+      if (slot.QuestionType === 'wh-word') {
+        console.log(`🔍 疑問文判定: wh-wordで判定 (${slot.SlotPhrase})`);
+        return true;
+      }
+      const text = (slot.SlotPhrase || "").toLowerCase().trim();
+      if (text === "do" || text === "does" || text === "did") {
+        console.log(`🔍 疑問文判定: do/does/didで判定 (${text})`);
+        return true;
+      }
+    }
+    console.log(`🔍 疑問文判定: 平叙文と判定`);
+    return false;
+  }
+  
+  const isQuestionSentence = detectQuestionPattern(selectedSlots);
+  const punctuation = isQuestionSentence ? "?" : ".";
+  
+  // 最初と最後のメインスロットを特定
+  const mainSlots = selectedSlots.filter(slot => !slot.SubslotID);
+  let lastMainSlotIndex = -1;
+  let firstMainSlotIndex = -1;
+  
+  if (mainSlots.length > 0) {
+    const lastOrder = Math.max(...mainSlots.map(s => s.Slot_display_order || 0));
+    const firstOrder = Math.min(...mainSlots.map(s => s.Slot_display_order || 0));
+    lastMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === lastOrder);
+    firstMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === firstOrder);
+  }
+  
+  return selectedSlots.map((slot, idx) => {
+    let phrase = slot.SlotPhrase || "";
+    
+    // 一つ目のメインスロットの一文字目を大文字にする
+    if (idx === firstMainSlotIndex && phrase) {
+      phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+    }
+    
+    // 最後のメインスロットに句読点を追加
+    if (idx === lastMainSlotIndex && phrase) {
+      phrase = phrase.replace(/[.?!]+$/, "") + punctuation;
+    }
+    
+    return {
+      ...slot,
+      SlotPhrase: phrase
+    };
+  });
+}
+
+/**
  * 🎤 音声読み上げ用データを更新する共通関数
  */
 function updateCurrentDisplayedSentence() {
@@ -84,8 +145,11 @@ function randomizeSlotSIndividual() {
   ];
   filteredSlots.push(...newSSlots);
   
+  // 句読点と大文字化を適用
+  const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
+  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = filteredSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // 🎤 音声読み上げ用データも更新
   updateCurrentDisplayedSentence();
@@ -220,8 +284,11 @@ function randomizeSlotM1Individual() {
   ];
   filteredSlots.push(...newM1Slots);
   
+  // 句読点と大文字化を適用
+  const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
+  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = filteredSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換
   const data = filteredSlots.map(slot => ({
@@ -353,8 +420,11 @@ function randomizeSlotM2Individual() {
   ];
   filteredSlots.push(...newM2Slots);
   
+  // 句読点と大文字化を適用
+  const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
+  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = filteredSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換
   const data = filteredSlots.map(slot => ({
@@ -486,8 +556,11 @@ function randomizeSlotC1Individual() {
   ];
   filteredSlots.push(...newC1Slots);
   
+  // 句読点と大文字化を適用
+  const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
+  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = filteredSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換
   const data = filteredSlots.map(slot => ({
@@ -619,8 +692,11 @@ function randomizeSlotO1Individual() {
   ];
   filteredSlots.push(...newO1Slots);
   
+  // 句読点と大文字化を適用
+  const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
+  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = filteredSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換
   const data = filteredSlots.map(slot => ({
@@ -753,6 +829,9 @@ function randomizeSlotO2Individual() {
   newO2Subslots.forEach(subslot => {
     window.lastSelectedSlots.push(subslot);
   });
+  
+  // 句読点と大文字化を適用
+  window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
   
   console.log(`✅ O2スロット個別ランダマイズ完了: ${newO2.例文ID} → ${newO2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
@@ -889,6 +968,9 @@ function randomizeSlotC2Individual() {
     window.lastSelectedSlots.push(subslot);
   });
   
+  // 句読点と大文字化を適用
+  window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
+  
   console.log(`✅ C2スロット個別ランダマイズ完了: ${newC2.例文ID} → ${newC2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
   
@@ -1023,6 +1105,9 @@ function randomizeSlotM3Individual() {
   newM3Subslots.forEach(subslot => {
     window.lastSelectedSlots.push(subslot);
   });
+  
+  // 句読点と大文字化を適用
+  window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
   
   console.log(`✅ M3スロット個別ランダマイズ完了: ${newM3.例文ID} → ${newM3.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
