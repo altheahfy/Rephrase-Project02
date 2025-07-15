@@ -263,9 +263,11 @@ function syncDynamicToStatic() {
     if (topDisplayItem && topDisplayItem.DisplayText) {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
-        topDiv.textContent = topDisplayItem.DisplayText;
+        // 🔤 分離疑問詞は常に文頭なので必ず大文字化
+        const capitalizedText = topDisplayItem.DisplayText.charAt(0).toUpperCase() + topDisplayItem.DisplayText.slice(1);
+        topDiv.textContent = capitalizedText;
         topDiv.classList.remove("empty-content"); // 空クラスを削除
-        console.log("✅ DisplayAtTop 表示: " + topDisplayItem.DisplayText);
+        console.log("✅ DisplayAtTop 表示（大文字化）: " + capitalizedText);
       } else {
         console.warn("⚠ display-top-question-word が見つかりません");
       }
@@ -331,9 +333,11 @@ function syncDynamicToStatic() {
     if (topDisplay && topDisplay.DisplayText) {
       const topDiv = document.getElementById("display-top-question-word");
       if (topDiv) {
-        topDiv.textContent = topDisplay.DisplayText;
+        // 🔤 分離疑問詞は常に文頭なので必ず大文字化
+        const capitalizedText = topDisplay.DisplayText.charAt(0).toUpperCase() + topDisplay.DisplayText.slice(1);
+        topDiv.textContent = capitalizedText;
         topDiv.classList.remove("empty-content"); // 空クラスを削除
-        console.log(`🔼 DisplayAtTop 表示: ${topDisplay.DisplayText}`);
+        console.log(`🔼 DisplayAtTop 表示（大文字化）: ${capitalizedText}`);
       } else {
         console.warn("⚠ display-top-question-word が見つかりません");
       }
