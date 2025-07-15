@@ -1021,7 +1021,43 @@ function syncSubslotsFromJson(data) {
       const textElement = document.createElement('div');
       textElement.className = 'slot-text';
       if (item.SubslotText) {
-        textElement.textContent = item.SubslotText;
+        // 🎯 LocalStorageから文頭・文末スロット情報を取得してサブスロットに適用
+        let processedSubslotText = item.SubslotText;
+        
+        try {
+          const storedInfo = localStorage.getItem('sentencePositionInfo');
+          if (storedInfo) {
+            const sentencePositionInfo = JSON.parse(storedInfo);
+            const { firstSlot, lastSlot, isQuestionSentence } = sentencePositionInfo;
+            
+            // 全サブスロットから最初と最後を特定
+            const firstSlotSubslots = data.filter(d => d.SubslotID && d.Slot === firstSlot)
+              .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+            const lastSlotSubslots = data.filter(d => d.SubslotID && d.Slot === lastSlot)
+              .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+            
+            // 文頭スロットの最初のサブスロットなら大文字化
+            if (firstSlotSubslots.length > 0 && 
+                item.SubslotID === firstSlotSubslots[0].SubslotID && 
+                item.Slot === firstSlot) {
+              processedSubslotText = processedSubslotText.charAt(0).toUpperCase() + processedSubslotText.slice(1);
+              console.log(`💡 文頭サブスロット大文字化: ${item.SubslotID} -> ${processedSubslotText}`);
+            }
+            
+            // 文末スロットの最後のサブスロットなら句読点付与
+            if (lastSlotSubslots.length > 0 && 
+                item.SubslotID === lastSlotSubslots[lastSlotSubslots.length - 1].SubslotID && 
+                item.Slot === lastSlot) {
+              const punctuation = isQuestionSentence ? "?" : ".";
+              processedSubslotText = processedSubslotText.replace(/[.?!]+$/, "") + punctuation;
+              console.log(`💡 文末サブスロット句読点付与: ${item.SubslotID} -> ${processedSubslotText}`);
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ サブスロット大文字化・句読点処理エラー:', error);
+        }
+        
+        textElement.textContent = processedSubslotText;
         // 通常表示のスタイル
         textElement.style.cssText = `
           display: block;

@@ -208,17 +208,14 @@ function randomizeSlotSIndividual() {
   // 句読点と大文字化を適用
   const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
   
-  // サブスロット句読点・大文字化を適用
-  const finalProcessedSlots = applySubslotPunctuationForIndividual(processedSlots);
-  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = finalProcessedSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // 🎤 音声読み上げ用データも更新
   updateCurrentDisplayedSentence();
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
-  const data = finalProcessedSlots.map(slot => ({
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -350,14 +347,11 @@ function randomizeSlotM1Individual() {
   // 句読点と大文字化を適用
   const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
   
-  // サブスロット句読点・大文字化を適用
-  const finalProcessedSlots = applySubslotPunctuationForIndividual(processedSlots);
-  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = finalProcessedSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
-  const data = finalProcessedSlots.map(slot => ({
+  const data = processedSlots.map(slot => ({
     Slot: slot.Slot || "",
     SlotPhrase: slot.SlotPhrase || "",
     SlotText: slot.SlotText || "",
@@ -489,11 +483,8 @@ function randomizeSlotM2Individual() {
   // 句読点と大文字化を適用
   const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
   
-  // サブスロット句読点・大文字化を適用
-  const finalProcessedSlots = applySubslotPunctuationForIndividual(processedSlots);
-  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = finalProcessedSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
   const data = finalProcessedSlots.map(slot => ({
@@ -628,11 +619,8 @@ function randomizeSlotC1Individual() {
   // 句読点と大文字化を適用
   const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
   
-  // サブスロット句読点・大文字化を適用
-  const finalProcessedSlots = applySubslotPunctuationForIndividual(processedSlots);
-  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = finalProcessedSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
   const data = finalProcessedSlots.map(slot => ({
@@ -767,11 +755,8 @@ function randomizeSlotO1Individual() {
   // 句読点と大文字化を適用
   const processedSlots = applyPunctuationAndCapitalization(filteredSlots);
   
-  // サブスロット句読点・大文字化を適用
-  const finalProcessedSlots = applySubslotPunctuationForIndividual(processedSlots);
-  
   // lastSelectedSlotsを更新
-  window.lastSelectedSlots = finalProcessedSlots;
+  window.lastSelectedSlots = processedSlots;
   
   // buildStructure用のデータ形式に変換（processedSlotsを使用）
   const data = finalProcessedSlots.map(slot => ({
@@ -907,9 +892,6 @@ function randomizeSlotO2Individual() {
   
   // 句読点と大文字化を適用
   window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
-  
-  // サブスロット句読点・大文字化を適用
-  window.lastSelectedSlots = applySubslotPunctuationForIndividual(window.lastSelectedSlots);
   
   console.log(`✅ O2スロット個別ランダマイズ完了: ${newO2.例文ID} → ${newO2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
@@ -1049,9 +1031,6 @@ function randomizeSlotC2Individual() {
   // 句読点と大文字化を適用
   window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
   
-  // サブスロット句読点・大文字化を適用
-  window.lastSelectedSlots = applySubslotPunctuationForIndividual(window.lastSelectedSlots);
-  
   console.log(`✅ C2スロット個別ランダマイズ完了: ${newC2.例文ID} → ${newC2.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
   
@@ -1189,9 +1168,6 @@ function randomizeSlotM3Individual() {
   
   // 句読点と大文字化を適用
   window.lastSelectedSlots = applyPunctuationAndCapitalization(window.lastSelectedSlots);
-  
-  // サブスロット句読点・大文字化を適用
-  window.lastSelectedSlots = applySubslotPunctuationForIndividual(window.lastSelectedSlots);
   
   console.log(`✅ M3スロット個別ランダマイズ完了: ${newM3.例文ID} → ${newM3.Text}`);
   console.log(`📊 更新後のlastSelectedSlots:`, window.lastSelectedSlots);
@@ -1391,70 +1367,3 @@ window.checkFullSlotPool = function() {
     total: window.fullSlotPool.length
   };
 };
-
-/**
- * 個別ランダマイズ用サブスロット句読点・大文字化処理
- * LocalStorageから文頭・文末スロット情報を取得して適用
- */
-function applySubslotPunctuationForIndividual(selectedSlots) {
-  // LocalStorageから文頭・文末スロット情報を取得
-  const storedInfo = localStorage.getItem('sentencePositionInfo');
-  if (!storedInfo) {
-    console.log('💡 文頭・文末スロット情報が見つかりません');
-    return selectedSlots;
-  }
-  
-  let sentencePositionInfo;
-  try {
-    sentencePositionInfo = JSON.parse(storedInfo);
-  } catch (error) {
-    console.warn('⚠️ 文頭・文末スロット情報の解析に失敗:', error);
-    return selectedSlots;
-  }
-  
-  console.log('📖 取得した文頭・文末スロット情報:', sentencePositionInfo);
-  
-  const { firstSlot, lastSlot, isQuestionSentence } = sentencePositionInfo;
-  const punctuation = isQuestionSentence ? "?" : ".";
-  
-  // 各スロットのサブスロットの最初と最後を特定する関数
-  function getFirstAndLastSubslots(selectedSlots, targetSlot) {
-    const subslots = selectedSlots.filter(slot => 
-      slot.SubslotID && slot.Slot === targetSlot
-    ).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-    
-    if (subslots.length === 0) return { first: null, last: null };
-    
-    return {
-      first: subslots[0],
-      last: subslots[subslots.length - 1]
-    };
-  }
-  
-  // 文頭・文末スロットのサブスロット情報を取得
-  const firstSlotSubslots = getFirstAndLastSubslots(selectedSlots, firstSlot);
-  const lastSlotSubslots = getFirstAndLastSubslots(selectedSlots, lastSlot);
-  
-  return selectedSlots.map((slot) => {
-    let phrase = slot.SlotPhrase || "";
-    let subslotText = slot.SubslotText || "";
-    
-    // 文頭スロットの最初のサブスロットの一文字目を大文字にする
-    if (firstSlotSubslots.first && slot.SubslotID === firstSlotSubslots.first.SubslotID && subslotText) {
-      subslotText = subslotText.charAt(0).toUpperCase() + subslotText.slice(1);
-      console.log(`💡 個別ランダマイズ - 文頭サブスロット大文字化: ${slot.SubslotID} -> ${subslotText}`);
-    }
-    
-    // 文末スロットの最後のサブスロットに句読点を追加
-    if (lastSlotSubslots.last && slot.SubslotID === lastSlotSubslots.last.SubslotID && subslotText) {
-      subslotText = subslotText.replace(/[.?!]+$/, "") + punctuation;
-      console.log(`💡 個別ランダマイズ - 文末サブスロット句読点付与: ${slot.SubslotID} -> ${subslotText}`);
-    }
-    
-    return {
-      ...slot,
-      SlotPhrase: phrase,
-      SubslotText: subslotText
-    };
-  });
-}
