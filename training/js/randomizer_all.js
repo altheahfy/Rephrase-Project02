@@ -149,16 +149,49 @@ export function randomizeAll(slotData) {
   console.log(`💾 個別ランダマイズ用データプール保存完了: ${window.fullSlotPool.length}件`);
   console.log(`💾 V_group_key "${selectedGroup}" の全スロットデータを保存しました`);
 
-  return selectedSlots.map(slot => ({
-    Slot: slot.Slot || "",
-    SlotPhrase: slot.SlotPhrase || "",
-    SlotText: slot.SlotText || "",
-    Slot_display_order: slot.Slot_display_order || 0,
-    PhraseType: slot.PhraseType || "",
-    SubslotID: slot.SubslotID || "",
-    SubslotElement: slot.SubslotElement || "",
-    SubslotText: slot.SubslotText || "",
-    display_order: slot.display_order || 0,
-    識別番号: slot.識別番号 || ""
-  }));
+  // 疑問文判定と句読点付与
+  function detectQuestionPattern(selectedSlots) {
+    // Slot_display_order順にソート
+    const sortedSlots = selectedSlots.filter(slot => !slot.SubslotID)
+      .sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+    if (sortedSlots.length === 0) return false;
+    // 上位2スロットを判定
+    const upperSlots = sortedSlots.slice(0, 2);
+    for (const slot of upperSlots) {
+      if (slot.QuestionType === 'wh-word') return true;
+      const text = (slot.SlotText || "").toLowerCase().trim();
+      if (text === "do" || text === "does" || text === "did") return true;
+    }
+    return false;
+  }
+  const isQuestionSentence = detectQuestionPattern(selectedSlots);
+  const punctuation = isQuestionSentence ? "?" : ".";
+  
+  // 最後のメインスロットを特定
+  const mainSlots = selectedSlots.filter(slot => !slot.SubslotID);
+  let lastMainSlotIndex = -1;
+  if (mainSlots.length > 0) {
+    const lastOrder = Math.max(...mainSlots.map(s => s.Slot_display_order || 0));
+    lastMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === lastOrder);
+  }
+
+  return selectedSlots.map((slot, idx) => {
+    let phrase = slot.SlotPhrase || "";
+    // 最後のメインスロットのみ句読点をSlotPhraseに付与（英語例文テキストのみ）
+    if (idx === lastMainSlotIndex && phrase) {
+      phrase = phrase + punctuation;
+    }
+    return {
+      Slot: slot.Slot || "",
+      SlotPhrase: phrase,
+      SlotText: slot.SlotText || "",
+      Slot_display_order: slot.Slot_display_order || 0,
+      PhraseType: slot.PhraseType || "",
+      SubslotID: slot.SubslotID || "",
+      SubslotElement: slot.SubslotElement || "",
+      SubslotText: slot.SubslotText || "",
+      display_order: slot.display_order || 0,
+      識別番号: slot.識別番号 || ""
+    };
+  });
 }
