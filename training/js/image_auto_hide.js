@@ -183,43 +183,52 @@ function processAllImageSlots() {
     console.log(`  - naturalWidth: ${img.naturalWidth}`);
     console.log(`  - naturalHeight: ${img.naturalHeight}`);
     
-    // 複数画像コンテナ内の画像は基本的に表示を維持
-    // ただし、プレースホルダーなどの明らかな非表示対象は除外
+    // 複数画像コンテナ内の画像は常に表示を維持（プレースホルダー以外）
+    // 複数画像は意図的に配置されたものなので、非表示にしない
     if (img.complete) {
-      // 複数画像の場合はより寛容な判定
-      const shouldHide = shouldHideImage(img);
-      if (shouldHide && img.src.includes('placeholder.png')) {
+      // プレースホルダーのみ非表示、それ以外は強制表示
+      if (img.src.includes('placeholder.png')) {
         console.log(`🙈 複数画像${index + 1}を非表示に設定: プレースホルダー`);
         img.style.display = 'none';
       } else {
-        console.log(`👁 複数画像${index + 1}を表示に設定`);
+        console.log(`👁 複数画像${index + 1}を強制表示に設定`);
         img.style.display = 'block';
+        img.style.visibility = 'visible';
+        img.style.opacity = '1';
+        // 自動非表示クラスを削除
+        img.classList.remove('auto-hidden-image');
       }
     } else {
       console.log(`⏳ 複数画像${index + 1}は読み込み中...`);
       // 画像読み込み完了時に判定
       img.addEventListener('load', () => {
         console.log(`✅ 複数画像${index + 1}読み込み完了`);
-        const shouldHide = shouldHideImage(img);
-        if (shouldHide && img.src.includes('placeholder.png')) {
+        if (img.src.includes('placeholder.png')) {
           console.log(`🙈 複数画像${index + 1}を非表示に設定: プレースホルダー`);
           img.style.display = 'none';
         } else {
-          console.log(`👁 複数画像${index + 1}を表示に設定`);
+          console.log(`👁 複数画像${index + 1}を強制表示に設定`);
           img.style.display = 'block';
+          img.style.visibility = 'visible';
+          img.style.opacity = '1';
+          // 自動非表示クラスを削除
+          img.classList.remove('auto-hidden-image');
         }
       });
       
       // エラー時も判定
       img.addEventListener('error', () => {
         console.log(`❌ 複数画像${index + 1}読み込みエラー`);
-        const shouldHide = shouldHideImage(img);
-        if (shouldHide && img.src.includes('placeholder.png')) {
+        if (img.src.includes('placeholder.png')) {
           console.log(`🙈 複数画像${index + 1}を非表示に設定: エラー`);
           img.style.display = 'none';
         } else {
-          console.log(`👁 複数画像${index + 1}を表示に設定`);
+          console.log(`👁 複数画像${index + 1}を強制表示に設定`);
           img.style.display = 'block';
+          img.style.visibility = 'visible';
+          img.style.opacity = '1';
+          // 自動非表示クラスを削除
+          img.classList.remove('auto-hidden-image');
         }
       });
     }
@@ -271,6 +280,21 @@ window.setButtonImageForDetailSlots = setButtonImageForDetailSlots;
 window.processAllImagesWithButtonAutoSet = processAllImagesWithButtonAutoSet;
 window.pauseImageObserver = pauseImageObserver;
 window.resumeImageObserver = resumeImageObserver;
+
+// 🔒 複数画像保護関数
+window.protectMultipleImages = function() {
+  console.log("🔒 複数画像を強制保護中...");
+  const multipleImages = document.querySelectorAll('.multi-image-container img');
+  multipleImages.forEach((img, index) => {
+    if (!img.src.includes('placeholder.png')) {
+      img.style.display = 'block';
+      img.style.visibility = 'visible';
+      img.style.opacity = '1';
+      img.classList.remove('auto-hidden-image');
+      console.log(`🔒 複数画像${index + 1}を強制保護: ${img.src}`);
+    }
+  });
+};
 
 // 🔹 デバッグ用手動実行関数
 window.debugImageHiding = function() {
