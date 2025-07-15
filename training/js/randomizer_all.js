@@ -158,10 +158,17 @@ export function randomizeAll(slotData) {
     // 上位2スロットを判定
     const upperSlots = sortedSlots.slice(0, 2);
     for (const slot of upperSlots) {
-      if (slot.QuestionType === 'wh-word') return true;
-      const text = (slot.SlotText || "").toLowerCase().trim();
-      if (text === "do" || text === "does" || text === "did") return true;
+      if (slot.QuestionType === 'wh-word') {
+        console.log(`🔍 疑問文判定: wh-wordで判定 (${slot.SlotPhrase})`);
+        return true;
+      }
+      const text = (slot.SlotPhrase || "").toLowerCase().trim();
+      if (text === "do" || text === "does" || text === "did") {
+        console.log(`🔍 疑問文判定: do/does/didで判定 (${text})`);
+        return true;
+      }
     }
+    console.log(`🔍 疑問文判定: 平叙文と判定`);
     return false;
   }
   const isQuestionSentence = detectQuestionPattern(selectedSlots);
