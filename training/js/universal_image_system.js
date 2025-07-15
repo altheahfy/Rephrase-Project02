@@ -186,6 +186,9 @@ function findImageByMetaTag(text) {
 
 // 🔍 テキストにマッチする全ての画像を検索（複数画像対応）
 function findAllImagesByMetaTag(text) {
+  console.log('🔍 ===== 複数画像検索開始 =====');
+  console.log('🔍 検索対象テキスト:', text);
+  
   if (!text || !imageMetaTags.length) {
     console.log('🔍 検索条件不足:', { text, metaTagsLength: imageMetaTags.length });
     return [];
@@ -193,23 +196,27 @@ function findAllImagesByMetaTag(text) {
   
   const searchWords = extractWordsWithStemming(text);
   console.log('🔍 複数検索 - 検索単語:', searchWords);
-  console.log('🔍 複数検索 - 検索対象テキスト:', text);
   
   let allMatches = [];
   const usedImages = new Set(); // 重複防止用
   
   // フレーズ全体での検索を最初に試行
   const phraseText = text.toLowerCase().trim();
+  console.log('🔍 フレーズ全体での検索:', phraseText);
+  
   for (const imageData of imageMetaTags) {
     for (const metaTag of imageData.meta_tags) {
       if (metaTag.toLowerCase() === phraseText) {
         allMatches.push(imageData);
         usedImages.add(imageData.image_file);
         console.log('🎯 フレーズ完全マッチ:', metaTag, '→', imageData.image_file);
+        console.log('🎯 フレーズ完全マッチのため即座に返却:', allMatches.map(m => m.image_file));
         return allMatches; // フレーズ全体でマッチした場合は即座に返す
       }
     }
   }
+  
+  console.log('🔍 フレーズ全体でのマッチなし、個別単語でのマッチング開始');
   
   // 個別単語でのマッチング（元の順序を保持）
   const individualWords = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
@@ -217,8 +224,12 @@ function findAllImagesByMetaTag(text) {
   for (const word of individualWords) {
     let bestMatchForWord = null;
     let bestPriorityForWord = 0;
+    let firstMatchIndex = -1; // 最初にマッチした画像のインデックス
     
-    for (const imageData of imageMetaTags) {
+    console.log(`🔍 単語 "${word}" のマッチング開始`);
+    
+    for (let i = 0; i < imageMetaTags.length; i++) {
+      const imageData = imageMetaTags[i];
       // 既に使用済みの画像はスキップ
       if (usedImages.has(imageData.image_file)) {
         continue;
@@ -232,11 +243,15 @@ function findAllImagesByMetaTag(text) {
             (word.endsWith('s') && word.length > 2 && metaTag.toLowerCase() === word.slice(0, -1).toLowerCase())) {
           const priority = imageData.priority || 1;
           
-          if (priority > bestPriorityForWord) {
+          console.log(`🎯 単語 "${word}" マッチング発見:`, metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
+          
+          // 優先度が高い場合、または同じ優先度で最初のマッチの場合
+          if (priority > bestPriorityForWord || (priority === bestPriorityForWord && firstMatchIndex === -1)) {
             bestMatchForWord = imageData;
             bestPriorityForWord = priority;
+            firstMatchIndex = i;
+            console.log(`✅ 単語 "${word}" の現在の最良マッチ更新:`, imageData.image_file, `(優先度: ${priority})`);
           }
-          console.log('🎯 個別単語マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
         }
       }
     }
@@ -245,11 +260,16 @@ function findAllImagesByMetaTag(text) {
     if (bestMatchForWord) {
       allMatches.push(bestMatchForWord);
       usedImages.add(bestMatchForWord.image_file);
-      console.log(`🎉 単語 "${word}" のマッチ追加:`, bestMatchForWord.image_file);
+      console.log(`🎉 単語 "${word}" のマッチ確定:`, bestMatchForWord.image_file);
+    } else {
+      console.log(`❌ 単語 "${word}" にマッチする画像が見つかりません`);
     }
   }
   
-  console.log('🔍 全複数マッチング結果:', allMatches.map(m => m.image_file));
+  console.log('🔍 ===== 複数画像検索完了 =====');
+  console.log('🔍 最終的な複数マッチング結果:', allMatches.map(m => m.image_file));
+  console.log('🔍 使用された画像:', Array.from(usedImages));
+  console.log('🔍 ===========================');
   return allMatches;
 }
 
