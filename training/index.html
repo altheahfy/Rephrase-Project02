@@ -1558,6 +1558,49 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// 🔧 **プリセット設定を動的に読み込む機能**
+async function loadPresetConfig() {
+  try {
+    const response = await fetch('data/preset_config.json');
+    if (!response.ok) {
+      console.log('preset_config.jsonが見つかりません。デフォルトのプリセットを使用します。');
+      return;
+    }
+    
+    const config = await response.json();
+    const presetSelect = document.getElementById('presetSelect');
+    
+    if (presetSelect && config.presets) {
+      // 既存のオプションをクリア（最初のデフォルトオプションは保持)
+      const defaultOption = presetSelect.querySelector('option[value=""]');
+      presetSelect.innerHTML = '';
+      if (defaultOption) {
+        presetSelect.appendChild(defaultOption);
+      } else {
+        presetSelect.innerHTML = '<option value="">-- データを選択 --</option>';
+      }
+      
+      // 設定ファイルからプリセットを追加
+      config.presets.forEach(preset => {
+        const option = document.createElement('option');
+        option.value = preset.file;
+        option.textContent = preset.name;
+        option.title = preset.description;
+        presetSelect.appendChild(option);
+      });
+      
+      console.log(`🔧 プリセット設定を動的に読み込み完了: ${config.presets.length}件`);
+    }
+  } catch (error) {
+    console.log('プリセット設定の読み込みに失敗しました。デフォルトのプリセットを使用します。', error);
+  }
+}
+
+// DOMContentLoadedでプリセット設定を読み込み
+document.addEventListener('DOMContentLoaded', loadPresetConfig);
+
+
+
 // 🎭 ローディング制御関数
 function hideLoadingOverlay() {
   console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
