@@ -74,20 +74,27 @@ function extractWordsWithStemming(text) {
     return [];
   }
   
-  // 🆕 日本語テキスト対応：全角・半角文字、句読点を適切に処理
+  // 🆕 句読点・記号を適切に処理して単語を抽出
   const normalizedText = text.toLowerCase()
     .replace(/[、。，！？]/g, ' ') // 日本語句読点を空白に
-    .replace(/[^\w\s-]/g, ' '); // その他の記号を空白に
+    .replace(/[^\w\s-]/g, ' '); // その他の記号（ピリオド、コンマ等）を空白に
   
-  const words = normalizedText.split(/\s+/).filter(word => word.length >= 2);
+  // 単語分割後、さらに各単語から句読点を除去
+  const words = normalizedText.split(/\s+/)
+    .map(word => word.replace(/[^\w-]/g, '')) // 各単語から記号を除去
+    .filter(word => word.length >= 2);
   
-  console.log('🔍 日本語対応 - 元テキスト:', text);
-  console.log('🔍 日本語対応 - 正規化後:', normalizedText);
-  console.log('🔍 日本語対応 - 抽出単語:', words);
+  console.log('🔍 句読点対応 - 元テキスト:', text);
+  console.log('🔍 句読点対応 - 正規化後:', normalizedText);
+  console.log('🔍 句読点対応 - 抽出単語:', words);
   
   const searchWords = new Set();
   
-  // まず元のフレーズをそのまま追加
+  // まず元のフレーズをそのまま追加（句読点除去済み）
+  const cleanPhrase = normalizedText.replace(/[^\w\s-]/g, ' ').trim();
+  if (cleanPhrase) {
+    searchWords.add(cleanPhrase);
+  }
   searchWords.add(normalizedText.trim());
   
   for (const word of words) {
@@ -219,7 +226,12 @@ function findAllImagesByMetaTag(text) {
   console.log('🔍 フレーズ全体でのマッチなし、個別単語でのマッチング開始');
   
   // 個別単語でのマッチング（元の順序を保持）
-  const individualWords = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
+  const individualWords = text.toLowerCase()
+    .replace(/[^\w\s-]/g, ' ')  // 句読点を除去
+    .split(/\s+/)
+    .filter(word => word.length >= 2);
+  
+  console.log('🔍 個別単語（正規化後）:', individualWords);
   
   for (const word of individualWords) {
     let bestMatchForWord = null;
