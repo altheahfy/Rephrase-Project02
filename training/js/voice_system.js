@@ -597,18 +597,6 @@ class VoiceSystem {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
         }
         
-        // 🗣️ 音声言語選択ドロップダウン
-        const voiceSelect = document.getElementById('voice-language-select');
-        if (voiceSelect) {
-            voiceSelect.addEventListener('change', (e) => this.onVoiceSelectionChange(e));
-        }
-        
-        // 🔄 音声リスト再読み込みボタン
-        const refreshBtn = document.getElementById('voice-language-refresh-btn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => this.refreshVoiceList());
-        }
-        
         // 学習進捗ボタン（動的に追加される可能性があるため遅延設定）
         this.setupProgressButtonListener();
     }
@@ -817,37 +805,32 @@ class VoiceSystem {
         
         this.currentUtterance = new SpeechSynthesisUtterance(sentence);
         
-        // 🎯 音声設定 - ユーザーが選択した音声を優先使用
-        let selectedVoice = this.applySavedVoiceSettings();
+        // 音声設定 - 女性の英語音声を優先選択
+        const voices = speechSynthesis.getVoices();
+        console.log('🔍 利用可能な音声一覧:', voices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
         
-        // 保存された音声がない場合は、自動選択
+        // 女性の英語音声を最優先で探す
+        let selectedVoice = voices.find(voice => 
+            voice.lang.startsWith('en') && 
+            (voice.name.toLowerCase().includes('female') || 
+             voice.name.toLowerCase().includes('woman') ||
+             voice.name.toLowerCase().includes('zira') ||  // Microsoft Zira (女性)
+             voice.name.toLowerCase().includes('hazel') || // Microsoft Hazel (女性)
+             voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
+             voice.name.toLowerCase().includes('karen') ||    // macOS Karen (女性)
+             voice.name.toLowerCase().includes('anna') ||     // Anna (女性)
+             voice.name.toLowerCase().includes('linda') ||    // Linda (女性)
+             voice.name.toLowerCase().includes('heather'))    // Heather (女性)
+        );
+        
+        // 女性音声が見つからない場合は、一般的な英語音声を選択
         if (!selectedVoice) {
-            const voices = speechSynthesis.getVoices();
-            console.log('🔍 利用可能な音声一覧:', voices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
-            
-            // 女性の英語音声を最優先で探す
-            selectedVoice = voices.find(voice => 
-                voice.lang.startsWith('en') && 
-                (voice.name.toLowerCase().includes('female') || 
-                 voice.name.toLowerCase().includes('woman') ||
-                 voice.name.toLowerCase().includes('zira') ||  // Microsoft Zira (女性)
-                 voice.name.toLowerCase().includes('hazel') || // Microsoft Hazel (女性)
-                 voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
-                 voice.name.toLowerCase().includes('karen') ||    // macOS Karen (女性)
-                 voice.name.toLowerCase().includes('anna') ||     // Anna (女性)
-                 voice.name.toLowerCase().includes('linda') ||    // Linda (女性)
-                 voice.name.toLowerCase().includes('heather'))    // Heather (女性)
-            );
-            
-            // 女性音声が見つからない場合は、一般的な英語音声を選択
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
-            }
+            selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
         }
         
         if (selectedVoice) {
             this.currentUtterance.voice = selectedVoice;
-            console.log(`🗣️ 使用する音声: ${selectedVoice.name} (${selectedVoice.lang})`);
+            console.log(`🗣️ 選択された音声: ${selectedVoice.name} (${selectedVoice.lang})`);
         } else {
             console.log('⚠️ 英語音声が見つかりません。デフォルト音声を使用します。');
         }
@@ -2088,9 +2071,6 @@ class VoiceSystem {
         const updateVoices = () => {
             const voices = speechSynthesis.getVoices();
             console.log(`📢 利用可能な音声: ${voices.length}個`);
-            
-            // 🗣️ 音声言語選択ドロップダウンを構築
-            this.populateVoiceLanguageSelect();
             
             // 英語音声を優先して選択
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
