@@ -50,6 +50,36 @@ export function randomizeAll(slotData) {
     return [];
   }
 
+  console.log(`🎯 [デバッグ] ${selectedGroup}の例文ID: ${exampleIDs.join(', ')}`);
+  
+  // 🎯 **例文IDレベルでの重複回避** (Phase 1.5)
+  let availableExampleIDs = exampleIDs;
+  if (window.currentRandomizedState && 
+      window.currentRandomizedState.vGroupKey === selectedGroup &&
+      window.currentRandomizedState.exampleId) {
+    const currentExampleIds = window.currentRandomizedState.exampleId.split(',');
+    availableExampleIDs = exampleIDs.filter(id => !currentExampleIds.includes(id));
+    console.log(`🎯 [デバッグ] 同じV_group_key内で例文ID重複回避: ${currentExampleIds.join(',')} を除外`);
+    console.log(`🎯 [デバッグ] 除外後の例文ID候補: ${availableExampleIDs.join(', ')}`);
+  }
+  
+  // 🎯 **履歴ベース例文ID重複回避**
+  if (window.randomizeHistory && typeof window.randomizeHistory.filterAvoidDuplicates === 'function') {
+    const beforeHistoryFilter = availableExampleIDs.length;
+    availableExampleIDs = window.randomizeHistory.filterAvoidDuplicates(
+      availableExampleIDs, 
+      window.currentRandomizedState?.exampleId, 
+      'exampleIds'
+    );
+    console.log(`🎯 [デバッグ] 例文ID履歴フィルタ: ${beforeHistoryFilter} → ${availableExampleIDs.length}候補`);
+  }
+  
+  // 例文ID選択肢が枯渇した場合は全候補を復活
+  if (availableExampleIDs.length === 0) {
+    console.log("🎯 例文ID重複回避後に選択肢がなくなったため、全候補を復活");
+    availableExampleIDs = exampleIDs;
+  }
+
   let slotSets = [];
   exampleIDs.forEach((id, index) => {
     const setNumber = index + 1;
