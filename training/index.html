@@ -1490,6 +1490,7 @@ window.randomizeHistory = {
   // ローカルストレージに履歴を保存
   save: function(vGroupKey, exampleId) {
     try {
+      console.log('🎯 [デバッグ] 履歴保存試行:', { vGroupKey, exampleId });
       const history = this.load();
       
       // 新しい選択を履歴に追加
@@ -1498,6 +1499,9 @@ window.randomizeHistory = {
         if (history.vGroupKeys.length > history.maxHistorySize) {
           history.vGroupKeys.shift(); // 古い履歴を削除
         }
+        console.log('🎯 [デバッグ] vGroupKey履歴更新:', history.vGroupKeys);
+      } else {
+        console.log('🎯 [デバッグ] vGroupKeyが空のため履歴保存しません');
       }
       
       if (exampleId) {
@@ -1505,6 +1509,9 @@ window.randomizeHistory = {
         if (history.exampleIds.length > history.maxHistorySize) {
           history.exampleIds.shift(); // 古い履歴を削除
         }
+        console.log('🎯 [デバッグ] exampleId履歴更新:', history.exampleIds);
+      } else {
+        console.log('🎯 [デバッグ] exampleIdが空のため履歴保存しません');
       }
       
       localStorage.setItem('rephrase_randomize_history', JSON.stringify(history));
@@ -1774,11 +1781,26 @@ window.debugRandomizeAvoidance = function() {
     console.log('🎯 履歴: 履歴管理機能なし');
   }
   
-  if (window.loadedJsonData) {
-    const groups = [...new Set(window.loadedJsonData.map(entry => entry.V_group_key).filter(v => v))];
-    console.log('🎯 利用可能なV_group_key:', groups);
-  } else {
-    console.log('🎯 利用可能なV_group_key: データ未ロード');
+  // 元データから直接V_group_keyを取得
+  let groups = [];
+  if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+    // 処理済みデータの場合、元データを検索
+    groups = [...new Set(window.loadedJsonData.map(entry => entry.V_group_key).filter(v => v))];
+    
+    // 元データが見つからない場合は、フルプールから取得
+    if (groups.length === 0 && window.fullSlotPool) {
+      groups = [...new Set(window.fullSlotPool.map(entry => entry.V_group_key).filter(v => v))];
+    }
+  }
+  
+  console.log('🎯 利用可能なV_group_key:', groups);
+  console.log('🎯 利用可能なV_group_key数:', groups.length);
+  
+  // 追加のデバッグ情報
+  if (window.fullSlotPool) {
+    console.log('🎯 fullSlotPool サイズ:', window.fullSlotPool.length);
+    const fullPoolGroups = [...new Set(window.fullSlotPool.map(entry => entry.V_group_key).filter(v => v))];
+    console.log('🎯 fullSlotPool内のV_group_key:', fullPoolGroups);
   }
 };
 

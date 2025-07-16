@@ -6,20 +6,30 @@ export function randomizeAll(slotData) {
     return [];
   }
 
+  console.log(`🎯 [デバッグ] 全V_group_key: ${groups.join(', ')}`);
+  console.log(`🎯 [デバッグ] 現在の状態:`, window.currentRandomizedState);
+
   // 🎯 **重複回避ロジック**: 現在のV_group_keyを除外
   let availableGroups = groups;
   if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
     availableGroups = groups.filter(g => g !== window.currentRandomizedState.vGroupKey);
     console.log(`🎯 現在のV_group_key「${window.currentRandomizedState.vGroupKey}」を除外`);
+    console.log(`🎯 [デバッグ] 除外後の候補: ${availableGroups.join(', ')}`);
+  } else {
+    console.log('🎯 [デバッグ] 現在の状態が未設定、除外なし');
   }
   
   // 🎯 **履歴ベース重複回避**: 最近選択されたV_group_keyも除外
   if (window.randomizeHistory && typeof window.randomizeHistory.filterAvoidDuplicates === 'function') {
+    const beforeHistoryFilter = availableGroups.length;
     availableGroups = window.randomizeHistory.filterAvoidDuplicates(
       availableGroups, 
       window.currentRandomizedState?.vGroupKey, 
       'vGroupKeys'
     );
+    console.log(`🎯 [デバッグ] 履歴フィルタ: ${beforeHistoryFilter} → ${availableGroups.length}候補`);
+  } else {
+    console.log('🎯 [デバッグ] 履歴機能が利用できません');
   }
   
   // 選択肢が枯渇した場合は全候補を復活
@@ -30,6 +40,7 @@ export function randomizeAll(slotData) {
 
   const selectedGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
   console.log(`🟢 選択 V_group_key: ${selectedGroup} (${availableGroups.length}/${groups.length}候補から選択)`);
+  console.log(`🎯 [デバッグ] 選択された候補: ${availableGroups.join(', ')}`);
 
   const groupSlots = slotData.filter(entry => entry.V_group_key === selectedGroup);
   const exampleIDs = [...new Set(groupSlots.map(entry => entry.例文ID).filter(id => id))];
@@ -99,7 +110,8 @@ export function randomizeAll(slotData) {
         return;
       }
       
-      selectedSlots.push({ ...chosen });
+      // 🎯 V_group_keyを保持してスロットを追加
+      selectedSlots.push({ ...chosen, V_group_key: selectedGroup });
       
       // 疑問詞が選択された場合のログ
       if (chosen.QuestionType === 'wh-word') {
@@ -249,31 +261,71 @@ export function randomizeAll(slotData) {
 
 // 🎯 **状態保存付きランダマイズ関数のエクスポート**
 export function randomizeAllWithStateManagement(slotData) {
+  console.log('🎯 [デバッグ] randomizeAllWithStateManagement 開始');
+  
+  // allPresetDataを使用してV_group_keyを取得
+  const allData = window.allPresetData || slotData;
+  if (!allData || allData.length === 0) {
+    console.log('🎯 [デバッグ] データが見つかりません:', { allData, slotData });
+    return [];
+  }
+  
+  console.log('🎯 [デバッグ] 利用可能なデータ件数:', allData.length);
+  
   const result = randomizeAll(slotData);
   
   // 🎯 現在の選択状態を保存
   if (result.length > 0) {
-    const firstSlot = result[0];
+    // V_group_keyを元データから直接取得
+    const groups = [...new Set(allData.map(entry => entry.V_group_key).filter(v => v))];
     const selectedExampleIds = [...new Set(result.filter(r => r.SlotPhrase).map(r => r.識別番号))];
     
-    // V_group_keyを取得（result内のスロットから）
-    const vGroupKey = result.find(r => r.V_group_key)?.V_group_key;
+    console.log('🎯 [デバッグ] 全V_group_key:', groups);
+    console.log('🎯 [デバッグ] 選択された例文ID:', selectedExampleIds);
+    
+    // 実際に選択されたV_group_keyを特定
+    let selectedVGroupKey = null;
+    if (result.length > 0) {
+      // 結果から最初に見つかるV_group_keyを使用
+      for (const slot of result) {
+        if (slot.SlotPhrase && slot.SlotPhrase.trim()) {
+          // 元データから該当するエントリを検索
+          const matchingEntry = allData.find(entry => 
+            entry.Slot === slot.Slot && 
+            entry.SlotPhrase === slot.SlotPhrase &&
+            entry.V_group_key
+          );
+          if (matchingEntry && matchingEntry.V_group_key) {
+            selectedVGroupKey = matchingEntry.V_group_key;
+            console.log('🎯 [デバッグ] V_group_key発見:', selectedVGroupKey, 'スロット:', slot.Slot);
+            break;
+          }
+        }
+      }
+    }
+    
+    console.log(`🎯 [デバッグ] 選択されたV_group_key: ${selectedVGroupKey}`);
+    console.log(`🎯 [デバッグ] 利用可能なV_group_key: ${groups.join(', ')}`);
     
     // グローバル状態を更新
     if (window.currentRandomizedState) {
-      window.currentRandomizedState.vGroupKey = vGroupKey;
+      window.currentRandomizedState.vGroupKey = selectedVGroupKey;
       window.currentRandomizedState.exampleId = selectedExampleIds.join(',');
       window.currentRandomizedState.lastRandomizedTime = Date.now();
       window.currentRandomizedState.selectedSlots = result;
+      console.log('🎯 [デバッグ] グローバル状態更新:', window.currentRandomizedState);
     }
     
     // 履歴を保存
     if (window.randomizeHistory && typeof window.randomizeHistory.save === 'function') {
-      window.randomizeHistory.save(vGroupKey, selectedExampleIds.join(','));
+      window.randomizeHistory.save(selectedVGroupKey, selectedExampleIds.join(','));
+      console.log('🎯 [デバッグ] 履歴保存実行:', { selectedVGroupKey, exampleIds: selectedExampleIds.join(',') });
+    } else {
+      console.log('🎯 [デバッグ] 履歴保存機能が利用できません');
     }
     
     console.log('🎯 全体ランダマイズ状態保存完了:', {
-      vGroupKey: vGroupKey,
+      vGroupKey: selectedVGroupKey,
       exampleIds: selectedExampleIds
     });
   }
