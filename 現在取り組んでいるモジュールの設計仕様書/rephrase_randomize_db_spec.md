@@ -260,4 +260,92 @@ const observer = new MutationObserver(function(mutations) {
 
 ---
 
+## 🔄 **重複回避ランダマイズ最適化仕様（2025年7月16日実装）**
+
+### **実装背景**
+ユーザーエクスペリエンス向上のため、「ランダマイズボタンを押すと必ず異なる内容が表示される」ことを目指した重複回避システムを実装。
+
+### **Phase 1: V_group_keyレベル重複回避**
+
+#### **基本動作原理**
+1. **現在状態の記録**: `window.currentRandomizedState.vGroupKey`で現在のV_group_keyを保存
+2. **即座の重複回避**: 現在のV_group_keyを候補から除外
+3. **履歴ベース回避**: `window.randomizeHistory`でN個前までの選択を記録し、重複を回避
+
+#### **重複回避の段階的処理**
+```javascript
+// 段階1: 現在のV_group_keyを除外
+let availableGroups = groups.filter(g => g !== window.currentRandomizedState.vGroupKey);
+
+// 段階2: 履歴による重複回避
+availableGroups = window.randomizeHistory.filterAvoidDuplicates(
+  availableGroups, 
+  window.currentRandomizedState?.vGroupKey, 
+  'vGroupKeys'
+);
+
+// 段階3: 選択肢枯渇時の復活処理
+if (availableGroups.length === 0) {
+  console.log("🎯 重複回避後に選択肢がなくなったため、全候補を復活");
+  availableGroups = groups;
+}
+```
+
+#### **履歴管理システム**
+- **保存場所**: `localStorage`（ブラウザ閉じても持続）
+- **保存内容**: 
+  - `vGroupKeys`: 過去N個のV_group_key履歴
+  - `exampleIds`: 過去N個の例文ID履歴
+- **履歴サイズ**: デフォルト10件（設定可能）
+- **デバッグ機能**: `debugRandomizeAvoidance()`で現在の履歴状況を確認可能
+
+#### **重複回避の優先順位**
+1. **最優先**: 直前のV_group_keyを避ける
+2. **次**: 履歴に記録された過去N個のV_group_keyを避ける
+3. **最終**: 選択肢が枯渇した場合は全候補を復活
+
+### **実装における技術的特徴**
+
+#### **データフロー**
+```
+全体ランダマイズ実行
+├─ V_group_key重複回避選択 (randomizer_all.js)
+├─ 状態保存 (window.currentRandomizedState)
+├─ 履歴保存 (window.randomizeHistory)
+└─ 通常の表示処理継続
+```
+
+#### **安全性設計**
+- **既存機能保護**: 従来のランダマイズロジックを完全に保持
+- **段階的フォールバック**: 重複回避 → 履歴回避 → 全候補復活
+- **エラーハンドリング**: LocalStorage失敗時でも基本機能は動作
+
+#### **デバッグ支援**
+- **詳細ログ**: 各段階でのフィルタリング状況を記録
+- **デバッグ関数**: `debugRandomizeAvoidance()`で状態確認
+- **履歴確認**: `window.randomizeHistory.load()`で履歴内容を確認
+
+### **制限事項と今後の拡張可能性**
+
+#### **現在の制限**
+- **V_group_keyレベルのみ**: 同じV_group_key内での例文重複は回避されない
+- **選択肢枯渇時**: 全候補復活により、短期間での重複が発生する可能性
+
+#### **Phase 2 拡張案（未実装）**
+- **例文IDレベル重複回避**: 同じV_group_key内でも異なる例文を選択
+- **スロットレベル重複回避**: 個別スロットでの重複回避
+- **複合条件回避**: V_group_key + 例文ID + 特定スロットの組み合わせ回避
+
+### **運用上の注意事項**
+- **履歴クリア**: `window.randomizeHistory.clear()`で履歴リセット可能
+- **履歴サイズ調整**: 大きすぎると選択肢が枯渇しやすい
+- **デバッグモード**: 開発時は`debugRandomizeAvoidance()`で動作確認推奨
+
+### **ユーザーエクスペリエンス向上効果**
+- **体感改善**: 連続同一表示の大幅減少
+- **学習効率**: 多様な例文に効率的に触れられる
+- **操作感向上**: 「ランダマイズボタンが必ず変化をもたらす」という期待に応える
+
+---
+
 *この設計仕様書は、実装検証に基づく正確な情報を記載しており、今後の開発・保守・機能拡張の基準文書として活用される。*
