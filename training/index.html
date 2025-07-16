@@ -314,6 +314,31 @@
       <button id="voice-stop-btn" class="voice-btn" style="display: none; background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">⏹️ 停止</button>
     </div>
     
+    <!-- 音声言語選択 -->
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+      <label style="color: #333; font-size: 11px; font-weight: bold;">🗣️ 音声言語:</label>
+      <select id="voice-language-select" style="
+        padding: 4px 8px; 
+        font-size: 11px; 
+        border: 1px solid #ddd; 
+        border-radius: 3px; 
+        background: white; 
+        color: #333;
+        min-width: 150px;
+      ">
+        <option value="">🔄 自動検出中...</option>
+      </select>
+      <button id="voice-language-refresh-btn" style="
+        background-color: #607D8B; 
+        color: white; 
+        border: none; 
+        padding: 4px 8px; 
+        font-size: 11px; 
+        cursor: pointer; 
+        border-radius: 3px;
+      ">🔄 再読み込み</button>
+    </div>
+    
     <!-- ステータス表示 -->
     <div id="voice-status" class="voice-status info" style="color: #333; font-size: 11px; background: rgba(76, 175, 80, 0.1); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: center;">待機中...</div>
     
