@@ -1074,7 +1074,7 @@
 
     <!-- 既存のスクリプト -->
 <script type="module">
-import { randomizeAll } from './js/randomizer_all.js';
+import { randomizeAll, randomizeAllWithStateManagement } from './js/randomizer_all.js';
 import { buildStructure } from './js/structure_builder.js';
 
 let loadedJsonData = null;
@@ -1125,8 +1125,9 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           // 🔍 デバッグ：ランダマイズ前のデータを確認
           console.log("🔍 ランダマイズ前のloadedJsonDataの最初の5件:", loadedJsonData.slice(0, 5));
           
-          const processedData = randomizeAll(loadedJsonData);
-          console.log("ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
+          // 🎯 **重複回避機能付きランダマイズを実行**
+          const processedData = randomizeAllWithStateManagement(loadedJsonData);
+          console.log("🎯 重複回避ランダマイズ結果詳細:", JSON.stringify(processedData, null, 2));
           
           // 🔍 デバッグ：ランダマイズ後のprocessedDataを確認
           console.log("🔍 ランダマイズ後のprocessedDataの最初の5件:", processedData.slice(0, 5));
@@ -1223,8 +1224,10 @@ document.getElementById("loadJsonButton").addEventListener("click", () => {
       loadedJsonData = JSON.parse(e.target.result);
       window.loadedJsonData = loadedJsonData;  // コンソール確認用
       console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
-      const data = randomizeAll(loadedJsonData);
-      console.log("ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
+      
+      // 🎯 **重複回避機能付きランダマイズを実行**
+      const data = randomizeAllWithStateManagement(loadedJsonData);
+      console.log("🎯 重複回避ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
       validateSlotsModified(data);
       window.loadedJsonData = data;
       buildStructure(data);
@@ -1278,8 +1281,10 @@ document.getElementById("randomize-all").addEventListener("click", () => {
     console.error("❌ 全体ランダマイズ：ロード済データが不正または未ロード");
     return;
   }
-  const data = randomizeAll(loadedJsonData);
-  console.log("ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
+  
+  // 🎯 **重複回避機能付きランダマイズを実行**
+  const data = randomizeAllWithStateManagement(loadedJsonData);
+  console.log("🎯 重複回避ランダマイズ結果詳細（全体ボタン）:", JSON.stringify(data, null, 2));
   validateSlotsModified(data);
   window.loadedJsonData = data;
   buildStructure(data);
@@ -1449,6 +1454,83 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ M3スロット個別ランダマイズボタンが見つかりません");
   }
 });
+
+// 🎯 **全体ランダマイズの重複回避用グローバル状態管理**
+window.currentRandomizedState = {
+  vGroupKey: null,           // 現在選択されているV_group_key
+  exampleId: null,           // 現在選択されている例文ID
+  lastRandomizedTime: null,  // 最後にランダマイズされた時刻
+  selectedSlots: []          // 現在選択されているスロット情報
+};
+
+// 🎯 **重複回避用ローカルストレージ管理**
+window.randomizeHistory = {
+  // ローカルストレージから履歴を読み込み
+  load: function() {
+    try {
+      const saved = localStorage.getItem('rephrase_randomize_history');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          vGroupKeys: parsed.vGroupKeys || [],
+          exampleIds: parsed.exampleIds || [],
+          maxHistorySize: 3 // 最近3回の履歴を保持
+        };
+      }
+    } catch (error) {
+      console.log('重複回避履歴の読み込みに失敗:', error);
+    }
+    return {
+      vGroupKeys: [],
+      exampleIds: [],
+      maxHistorySize: 3
+    };
+  },
+  
+  // ローカルストレージに履歴を保存
+  save: function(vGroupKey, exampleId) {
+    try {
+      const history = this.load();
+      
+      // 新しい選択を履歴に追加
+      if (vGroupKey) {
+        history.vGroupKeys.push(vGroupKey);
+        if (history.vGroupKeys.length > history.maxHistorySize) {
+          history.vGroupKeys.shift(); // 古い履歴を削除
+        }
+      }
+      
+      if (exampleId) {
+        history.exampleIds.push(exampleId);
+        if (history.exampleIds.length > history.maxHistorySize) {
+          history.exampleIds.shift(); // 古い履歴を削除
+        }
+      }
+      
+      localStorage.setItem('rephrase_randomize_history', JSON.stringify(history));
+      console.log('🎯 重複回避履歴を保存:', { vGroupKey, exampleId, history });
+    } catch (error) {
+      console.log('重複回避履歴の保存に失敗:', error);
+    }
+  },
+  
+  // 重複回避用フィルタリング
+  filterAvoidDuplicates: function(candidates, currentValue, historyKey) {
+    const history = this.load();
+    const recentValues = history[historyKey] || [];
+    
+    // 現在の値と履歴の値を除外
+    const valuesToAvoid = currentValue ? [currentValue, ...recentValues] : recentValues;
+    const filtered = candidates.filter(candidate => !valuesToAvoid.includes(candidate));
+    
+    console.log(`🎯 重複回避フィルタリング: ${candidates.length} → ${filtered.length}件`);
+    console.log(`🎯 回避対象: ${valuesToAvoid.join(', ')}`);
+    
+    // フィルタリング後に候補がない場合は全候補を返す
+    return filtered.length > 0 ? filtered : candidates;
+  }
+};
+
 
 function validateSlotsModified(data) {
   const requiredSlots = ["M1", "S", "V"];
@@ -1674,6 +1756,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// 🎯 **重複回避デバッグ用関数**
+window.debugRandomizeAvoidance = function() {
+  console.log('🎯 === 重複回避機能デバッグ情報 ===');
+  
+  if (window.currentRandomizedState) {
+    console.log('🎯 現在の状態:', window.currentRandomizedState);
+  } else {
+    console.log('🎯 現在の状態: 未初期化');
+  }
+  
+  if (window.randomizeHistory) {
+    const history = window.randomizeHistory.load();
+    console.log('🎯 履歴:', history);
+  } else {
+    console.log('🎯 履歴: 履歴管理機能なし');
+  }
+  
+  if (window.loadedJsonData) {
+    const groups = [...new Set(window.loadedJsonData.map(entry => entry.V_group_key).filter(v => v))];
+    console.log('🎯 利用可能なV_group_key:', groups);
+  } else {
+    console.log('🎯 利用可能なV_group_key: データ未ロード');
+  }
+};
+
+// 🎯 **重複回避履歴クリア関数**
+window.clearRandomizeHistory = function() {
+  try {
+    localStorage.removeItem('rephrase_randomize_history');
+    if (window.currentRandomizedState) {
+      window.currentRandomizedState.vGroupKey = null;
+      window.currentRandomizedState.exampleId = null;
+      window.currentRandomizedState.lastRandomizedTime = null;
+      window.currentRandomizedState.selectedSlots = [];
+    }
+    console.log('🎯 重複回避履歴をクリアしました');
+  } catch (error) {
+    console.error('🎯 重複回避履歴のクリアに失敗:', error);
+  }
+};
+
 
 </script>
 
