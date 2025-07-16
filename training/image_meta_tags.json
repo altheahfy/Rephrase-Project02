@@ -2944,12 +2944,12 @@
     "folder": "common",
     "meta_tags": [
       "news",
-      "new",
-      "newest",
-      "newly"
+      "newspaper",
+      "article",
+      "media"
     ],
-    "priority": 3,
-    "description": "ニュース、新しい"
+    "priority": 5,
+    "description": "ニュース、新聞、記事"
   },
   {
     "image_file": "some.png",
