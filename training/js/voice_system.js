@@ -803,27 +803,75 @@ class VoiceSystem {
         // 既存の音声を停止
         speechSynthesis.cancel();
         
+        // 🔄 音声リストを確実に読み込む
+        let availableVoices = speechSynthesis.getVoices();
+        console.log(`🔍 初回音声取得: ${availableVoices.length}個`);
+        
+        // 音声が読み込まれていない場合、少し待つ
+        if (availableVoices.length === 0) {
+            console.log('⏳ 音声リストの読み込みを待機中...');
+            await new Promise(resolve => {
+                const checkVoices = () => {
+                    availableVoices = speechSynthesis.getVoices();
+                    if (availableVoices.length > 0) {
+                        console.log(`✅ 音声リスト読み込み完了: ${availableVoices.length}個`);
+                        resolve();
+                    } else {
+                        setTimeout(checkVoices, 100);
+                    }
+                };
+                checkVoices();
+            });
+        }
+        
         this.currentUtterance = new SpeechSynthesisUtterance(sentence);
         
         // 音声設定 - 女性の英語音声を優先選択
-        const voices = speechSynthesis.getVoices();
-        console.log('🔍 利用可能な音声一覧:', voices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
+        console.log('🔍 利用可能な音声一覧:', availableVoices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
         
         // 保存された音声設定を確認
         const savedVoiceName = localStorage.getItem('selectedVoiceName');
         let selectedVoice = null;
         
+        console.log(`🔍 保存された音声名: ${savedVoiceName || 'なし'}`);
+        
         if (savedVoiceName) {
-            selectedVoice = voices.find(voice => voice.name === savedVoiceName);
+            selectedVoice = availableVoices.find(voice => voice.name === savedVoiceName);
             if (selectedVoice) {
                 console.log(`💾 保存された音声を使用: ${selectedVoice.name} (${selectedVoice.lang})`);
                 
                 // 🚨 日本語音声が選択されている場合の警告
                 if (selectedVoice.lang.startsWith('ja')) {
+                    console.log('🚨 日本語音声が検出されました！警告ダイアログを表示します');
                     const shouldSwitchToEnglish = await this.showLanguageWarningDialog();
                     if (shouldSwitchToEnglish) {
                         selectedVoice = null; // 英語音声を自動選択させる
                         localStorage.removeItem('selectedVoiceName'); // 保存された設定をクリア
+                        console.log('✅ 英語音声に変更しました');
+                    } else {
+                        console.log('👌 日本語音声を継続します');
+                    }
+                }
+            }
+        }
+        
+        // 自動選択の場合の詳細ログ
+        if (!selectedVoice) {
+            console.log('🔍 自動音声選択を開始...');
+            
+            // デフォルト音声を確認
+            const defaultVoice = availableVoices[0];
+            if (defaultVoice) {
+                console.log(`📢 デフォルト音声: ${defaultVoice.name} (${defaultVoice.lang})`);
+                
+                // デフォルト音声が日本語の場合の警告
+                if (defaultVoice.lang.startsWith('ja')) {
+                    console.log('🚨 デフォルト音声が日本語です！警告ダイアログを表示します');
+                    const shouldSwitchToEnglish = await this.showLanguageWarningDialog();
+                    if (!shouldSwitchToEnglish) {
+                        selectedVoice = defaultVoice;
+                        localStorage.setItem('selectedVoiceName', defaultVoice.name);
+                        console.log('👌 日本語音声を継続し、保存しました');
                     }
                 }
             }
@@ -832,7 +880,7 @@ class VoiceSystem {
         // 英語音声を自動選択
         if (!selectedVoice) {
             // 女性の英語音声を最優先で探す
-            selectedVoice = voices.find(voice => 
+            selectedVoice = availableVoices.find(voice => 
                 voice.lang.startsWith('en') && 
                 (voice.name.toLowerCase().includes('female') || 
                  voice.name.toLowerCase().includes('woman') ||
@@ -847,7 +895,7 @@ class VoiceSystem {
             
             // 女性音声が見つからない場合は、一般的な英語音声を選択
             if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+                selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en'));
             }
             
             // 英語音声を見つけた場合、保存しておく
@@ -2315,6 +2363,8 @@ class VoiceSystem {
      * 🚨 言語警告ダイアログを表示
      */
     showLanguageWarningDialog() {
+        console.log('🚨 showLanguageWarningDialog() を呼び出しました');
+        
         return new Promise((resolve) => {
             // 既存のダイアログがある場合は削除
             const existingDialog = document.getElementById('language-warning-dialog');
@@ -2330,61 +2380,75 @@ class VoiceSystem {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.7);
+                    background: rgba(0, 0, 0, 0.8);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    z-index: 10000;
+                    z-index: 99999;
                     font-family: Arial, sans-serif;
+                    touch-action: none;
                 ">
                     <div style="
                         background: white;
-                        padding: 30px;
-                        border-radius: 10px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-                        max-width: 450px;
+                        padding: 20px;
+                        border-radius: 15px;
+                        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+                        max-width: 90%;
+                        width: 400px;
                         text-align: center;
+                        margin: 20px;
                     ">
                         <div style="
-                            font-size: 48px;
-                            margin-bottom: 15px;
+                            font-size: 60px;
+                            margin-bottom: 20px;
+                            line-height: 1;
                         ">⚠️</div>
                         <h3 style="
-                            margin: 0 0 15px 0;
+                            margin: 0 0 20px 0;
                             color: #333;
-                            font-size: 18px;
+                            font-size: 20px;
+                            font-weight: bold;
                         ">音声言語の確認</h3>
                         <p style="
-                            margin: 0 0 25px 0;
+                            margin: 0 0 30px 0;
                             color: #666;
-                            font-size: 14px;
-                            line-height: 1.5;
+                            font-size: 16px;
+                            line-height: 1.6;
                         ">現在、日本語音声が選択されています。<br>
                         英語学習のため、英語音声に変更することをお勧めします。</p>
                         <div style="
                             display: flex;
+                            flex-direction: column;
                             gap: 15px;
-                            justify-content: center;
+                            align-items: center;
                         ">
                             <button id="switch-to-english-btn" style="
                                 background: #007bff;
                                 color: white;
                                 border: none;
-                                padding: 10px 20px;
-                                border-radius: 5px;
+                                padding: 15px 30px;
+                                border-radius: 8px;
                                 cursor: pointer;
-                                font-size: 14px;
+                                font-size: 16px;
                                 font-weight: bold;
-                            ">英語音声に変更</button>
+                                width: 100%;
+                                max-width: 250px;
+                                touch-action: manipulation;
+                                -webkit-tap-highlight-color: transparent;
+                            ">🇺🇸 英語音声に変更</button>
                             <button id="keep-japanese-btn" style="
                                 background: #6c757d;
                                 color: white;
                                 border: none;
-                                padding: 10px 20px;
-                                border-radius: 5px;
+                                padding: 15px 30px;
+                                border-radius: 8px;
                                 cursor: pointer;
-                                font-size: 14px;
-                            ">日本語音声を継続</button>
+                                font-size: 16px;
+                                width: 100%;
+                                max-width: 250px;
+                                touch-action: manipulation;
+                                -webkit-tap-highlight-color: transparent;
+                            ">🇯🇵 日本語音声を継続</button>
                         </div>
                     </div>
                 </div>
@@ -2392,25 +2456,57 @@ class VoiceSystem {
 
             // ダイアログをDOMに追加
             document.body.insertAdjacentHTML('beforeend', dialogHTML);
+            console.log('✅ ダイアログをDOMに追加しました');
 
             // イベントリスナー
-            document.getElementById('switch-to-english-btn').addEventListener('click', () => {
-                document.getElementById('language-warning-dialog').remove();
-                resolve(true);
-            });
+            const switchBtn = document.getElementById('switch-to-english-btn');
+            const keepBtn = document.getElementById('keep-japanese-btn');
+            
+            if (switchBtn) {
+                switchBtn.addEventListener('click', () => {
+                    console.log('🇺🇸 英語音声に変更ボタンがクリックされました');
+                    document.getElementById('language-warning-dialog').remove();
+                    resolve(true);
+                });
+                
+                // タッチイベントも追加
+                switchBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    console.log('🇺🇸 英語音声に変更ボタンがタッチされました');
+                    document.getElementById('language-warning-dialog').remove();
+                    resolve(true);
+                });
+            }
 
-            document.getElementById('keep-japanese-btn').addEventListener('click', () => {
-                document.getElementById('language-warning-dialog').remove();
-                resolve(false);
-            });
-
-            // 背景クリックで閉じる
-            document.getElementById('language-warning-dialog').addEventListener('click', (e) => {
-                if (e.target.id === 'language-warning-dialog') {
+            if (keepBtn) {
+                keepBtn.addEventListener('click', () => {
+                    console.log('🇯🇵 日本語音声を継続ボタンがクリックされました');
                     document.getElementById('language-warning-dialog').remove();
                     resolve(false);
-                }
-            });
+                });
+                
+                // タッチイベントも追加
+                keepBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    console.log('🇯🇵 日本語音声を継続ボタンがタッチされました');
+                    document.getElementById('language-warning-dialog').remove();
+                    resolve(false);
+                });
+            }
+
+            // 背景クリックで閉じる
+            const dialog = document.getElementById('language-warning-dialog');
+            if (dialog) {
+                dialog.addEventListener('click', (e) => {
+                    if (e.target.id === 'language-warning-dialog') {
+                        console.log('🔲 背景がクリックされました');
+                        document.getElementById('language-warning-dialog').remove();
+                        resolve(false);
+                    }
+                });
+            }
+            
+            console.log('✅ イベントリスナーを設定しました');
         });
     }
 }
