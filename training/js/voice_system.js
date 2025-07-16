@@ -789,7 +789,7 @@ class VoiceSystem {
     /**
      * 現在の例文を音声合成で読み上げ
      */
-    speakSentence() {
+    async speakSentence() {
         // 🔍 デバッグ：動的エリアと静的スロットの内容を比較
         this.debugCompareAreas();
         
@@ -809,23 +809,52 @@ class VoiceSystem {
         const voices = speechSynthesis.getVoices();
         console.log('🔍 利用可能な音声一覧:', voices.map(v => `${v.name} (${v.lang}) - ${v.gender || 'unknown'}`));
         
-        // 女性の英語音声を最優先で探す
-        let selectedVoice = voices.find(voice => 
-            voice.lang.startsWith('en') && 
-            (voice.name.toLowerCase().includes('female') || 
-             voice.name.toLowerCase().includes('woman') ||
-             voice.name.toLowerCase().includes('zira') ||  // Microsoft Zira (女性)
-             voice.name.toLowerCase().includes('hazel') || // Microsoft Hazel (女性)
-             voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
-             voice.name.toLowerCase().includes('karen') ||    // macOS Karen (女性)
-             voice.name.toLowerCase().includes('anna') ||     // Anna (女性)
-             voice.name.toLowerCase().includes('linda') ||    // Linda (女性)
-             voice.name.toLowerCase().includes('heather'))    // Heather (女性)
-        );
+        // 保存された音声設定を確認
+        const savedVoiceName = localStorage.getItem('selectedVoiceName');
+        let selectedVoice = null;
         
-        // 女性音声が見つからない場合は、一般的な英語音声を選択
+        if (savedVoiceName) {
+            selectedVoice = voices.find(voice => voice.name === savedVoiceName);
+            if (selectedVoice) {
+                console.log(`💾 保存された音声を使用: ${selectedVoice.name} (${selectedVoice.lang})`);
+                
+                // 🚨 日本語音声が選択されている場合の警告
+                if (selectedVoice.lang.startsWith('ja')) {
+                    const shouldSwitchToEnglish = await this.showLanguageWarningDialog();
+                    if (shouldSwitchToEnglish) {
+                        selectedVoice = null; // 英語音声を自動選択させる
+                        localStorage.removeItem('selectedVoiceName'); // 保存された設定をクリア
+                    }
+                }
+            }
+        }
+        
+        // 英語音声を自動選択
         if (!selectedVoice) {
-            selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+            // 女性の英語音声を最優先で探す
+            selectedVoice = voices.find(voice => 
+                voice.lang.startsWith('en') && 
+                (voice.name.toLowerCase().includes('female') || 
+                 voice.name.toLowerCase().includes('woman') ||
+                 voice.name.toLowerCase().includes('zira') ||  // Microsoft Zira (女性)
+                 voice.name.toLowerCase().includes('hazel') || // Microsoft Hazel (女性)
+                 voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
+                 voice.name.toLowerCase().includes('karen') ||    // macOS Karen (女性)
+                 voice.name.toLowerCase().includes('anna') ||     // Anna (女性)
+                 voice.name.toLowerCase().includes('linda') ||    // Linda (女性)
+                 voice.name.toLowerCase().includes('heather'))    // Heather (女性)
+            );
+            
+            // 女性音声が見つからない場合は、一般的な英語音声を選択
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+            }
+            
+            // 英語音声を見つけた場合、保存しておく
+            if (selectedVoice) {
+                localStorage.setItem('selectedVoiceName', selectedVoice.name);
+                console.log(`💾 英語音声を保存: ${selectedVoice.name}`);
+            }
         }
         
         if (selectedVoice) {
@@ -2280,6 +2309,109 @@ class VoiceSystem {
         console.log(`  dynamic疑問詞: "${questionWordDynamic ? questionWordDynamic.textContent.trim() : 'なし'}"`);
         
         console.log('🔍 ===== 比較デバッグ終了 =====');
+    }
+
+    /**
+     * 🚨 言語警告ダイアログを表示
+     */
+    showLanguageWarningDialog() {
+        return new Promise((resolve) => {
+            // 既存のダイアログがある場合は削除
+            const existingDialog = document.getElementById('language-warning-dialog');
+            if (existingDialog) {
+                existingDialog.remove();
+            }
+
+            // ダイアログのHTML
+            const dialogHTML = `
+                <div id="language-warning-dialog" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    font-family: Arial, sans-serif;
+                ">
+                    <div style="
+                        background: white;
+                        padding: 30px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                        max-width: 450px;
+                        text-align: center;
+                    ">
+                        <div style="
+                            font-size: 48px;
+                            margin-bottom: 15px;
+                        ">⚠️</div>
+                        <h3 style="
+                            margin: 0 0 15px 0;
+                            color: #333;
+                            font-size: 18px;
+                        ">音声言語の確認</h3>
+                        <p style="
+                            margin: 0 0 25px 0;
+                            color: #666;
+                            font-size: 14px;
+                            line-height: 1.5;
+                        ">現在、日本語音声が選択されています。<br>
+                        英語学習のため、英語音声に変更することをお勧めします。</p>
+                        <div style="
+                            display: flex;
+                            gap: 15px;
+                            justify-content: center;
+                        ">
+                            <button id="switch-to-english-btn" style="
+                                background: #007bff;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 14px;
+                                font-weight: bold;
+                            ">英語音声に変更</button>
+                            <button id="keep-japanese-btn" style="
+                                background: #6c757d;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 14px;
+                            ">日本語音声を継続</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // ダイアログをDOMに追加
+            document.body.insertAdjacentHTML('beforeend', dialogHTML);
+
+            // イベントリスナー
+            document.getElementById('switch-to-english-btn').addEventListener('click', () => {
+                document.getElementById('language-warning-dialog').remove();
+                resolve(true);
+            });
+
+            document.getElementById('keep-japanese-btn').addEventListener('click', () => {
+                document.getElementById('language-warning-dialog').remove();
+                resolve(false);
+            });
+
+            // 背景クリックで閉じる
+            document.getElementById('language-warning-dialog').addEventListener('click', (e) => {
+                if (e.target.id === 'language-warning-dialog') {
+                    document.getElementById('language-warning-dialog').remove();
+                    resolve(false);
+                }
+            });
+        });
     }
 }
 
