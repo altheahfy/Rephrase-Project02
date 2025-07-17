@@ -134,6 +134,8 @@ h1 {
   padding: 12px;
   border-radius: 8px;
   margin-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .analysis-results h4 {
@@ -145,6 +147,33 @@ h1 {
   margin: 6px 0;
   font-size: 12px;
   line-height: 1.4;
+}
+
+/* 音声分析結果エリア - 上に突き抜けないようにスクロール追加 */
+#voice-analysis-results {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+/* Webkit browsers (Chrome, Safari) */
+#voice-analysis-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* パネル表示/非表示アニメーション */
@@ -254,6 +283,8 @@ h1 {
   padding: 12px;
   border-radius: 8px;
   margin-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .analysis-results h4 {
@@ -265,6 +296,33 @@ h1 {
   margin: 6px 0;
   font-size: 12px;
   line-height: 1.4;
+}
+
+/* 音声分析結果エリア - 上に突き抜けないようにスクロール追加 */
+#voice-analysis-results {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+/* Webkit browsers (Chrome, Safari) */
+#voice-analysis-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+#voice-analysis-results::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* パネル表示/非表示アニメーション */
