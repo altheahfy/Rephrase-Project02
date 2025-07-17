@@ -1092,8 +1092,33 @@
     <button id="voice-panel-close" style="background-color: #f44336; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
   </div>
   
-  <div style="text-align: center; padding: 20px; color: #666;">
-    準備中...
+  <!-- Phase 2: 音声コントロールボタン -->
+  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px;">
+    <button id="voice-record-btn" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
+    <button id="voice-play-btn" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+    <button id="voice-analyze-btn" style="background-color: #9C27B0; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+  </div>
+  
+  <!-- ステータス表示 -->
+  <div id="voice-status" style="color: #333; font-size: 10px; background: rgba(76, 175, 80, 0.1); padding: 4px 8px; border-radius: 10px; text-align: center; margin-bottom: 8px;">待機中...</div>
+  
+  <!-- 録音タイマー -->
+  <div id="voice-timer" style="display: none; font-size: 10px; color: #666; text-align: center; margin-top: 4px;">録音時間: <span id="voice-timer-text">0:00</span></div>
+  
+  <!-- 学習進捗ボタン -->
+  <div style="text-align: center; margin-top: 12px;">
+    <button id="voice-progress-btn" style="
+      background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      width: 100%;
+    ">📊 学習進捗</button>
   </div>
 </div>
 
@@ -1890,14 +1915,14 @@ window.clearRandomizeHistory = function() {
 
 </script>
 
-<!-- Phase 1: 基本音声パネル制御 -->
+<!-- Phase 1: 基本音声パネル制御 + Phase 2: 音声機能 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const voicePanel = document.getElementById('voice-panel');
   const voicePanelToggle = document.getElementById('voice-panel-toggle');
   const voicePanelClose = document.getElementById('voice-panel-close');
   
-  // トグルボタンの動作
+  // Phase 1: 基本パネル制御
   if (voicePanelToggle) {
     voicePanelToggle.addEventListener('click', function() {
       if (voicePanel.style.display === 'none' || voicePanel.style.display === '') {
@@ -1910,7 +1935,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // 閉じるボタンの動作
   if (voicePanelClose) {
     voicePanelClose.addEventListener('click', function() {
       voicePanel.style.display = 'none';
@@ -1918,7 +1942,179 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  console.log('✅ Phase 1: 基本音声パネル制御の初期化完了');
+  // Phase 2: 音声機能の基本制御
+  const voiceRecordBtn = document.getElementById('voice-record-btn');
+  const voicePlayBtn = document.getElementById('voice-play-btn');
+  const voiceAnalyzeBtn = document.getElementById('voice-analyze-btn');
+  const voiceProgressBtn = document.getElementById('voice-progress-btn');
+  const voiceStatus = document.getElementById('voice-status');
+  const voiceTimer = document.getElementById('voice-timer');
+  const voiceTimerText = document.getElementById('voice-timer-text');
+  
+  let isRecording = false;
+  let recordingStartTime = null;
+  let recordingInterval = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordedAudio = null;
+  
+  // ステータス更新関数
+  function updateVoiceStatus(message, type = 'info') {
+    if (voiceStatus) {
+      voiceStatus.textContent = message;
+      voiceStatus.className = `voice-status ${type}`;
+      console.log(`🎤 ステータス: ${message}`);
+    }
+  }
+  
+  // 録音ボタン
+  if (voiceRecordBtn) {
+    voiceRecordBtn.addEventListener('click', async function() {
+      if (!isRecording) {
+        try {
+          updateVoiceStatus('録音開始中...', 'recording');
+          
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          
+          mediaRecorder.ondataavailable = function(event) {
+            audioChunks.push(event.data);
+          };
+          
+          mediaRecorder.onstop = function() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            recordedAudio = audioBlob;
+            updateVoiceStatus('録音完了', 'success');
+            
+            // 録音完了後、再生ボタンを有効化
+            if (voicePlayBtn) {
+              voicePlayBtn.disabled = false;
+              voicePlayBtn.style.opacity = '1';
+            }
+            if (voiceAnalyzeBtn) {
+              voiceAnalyzeBtn.disabled = false;
+              voiceAnalyzeBtn.style.opacity = '1';
+            }
+          };
+          
+          mediaRecorder.start();
+          isRecording = true;
+          recordingStartTime = Date.now();
+          
+          // ボタンのテキストを変更
+          voiceRecordBtn.textContent = '⏹️ 停止';
+          voiceRecordBtn.style.backgroundColor = '#f44336';
+          
+          // タイマー表示
+          if (voiceTimer) {
+            voiceTimer.style.display = 'block';
+            recordingInterval = setInterval(updateRecordingTimer, 100);
+          }
+          
+          updateVoiceStatus('録音中...', 'recording');
+          
+        } catch (error) {
+          console.error('録音エラー:', error);
+          updateVoiceStatus('録音エラー', 'error');
+        }
+      } else {
+        // 録音停止
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+        stopRecording();
+      }
+    });
+  }
+  
+  // 再生ボタン
+  if (voicePlayBtn) {
+    voicePlayBtn.disabled = true;
+    voicePlayBtn.style.opacity = '0.5';
+    
+    voicePlayBtn.addEventListener('click', function() {
+      if (recordedAudio) {
+        const audioUrl = URL.createObjectURL(recordedAudio);
+        const audio = new Audio(audioUrl);
+        
+        updateVoiceStatus('再生中...', 'playing');
+        
+        audio.onended = function() {
+          updateVoiceStatus('再生完了', 'success');
+        };
+        
+        audio.onerror = function() {
+          updateVoiceStatus('再生エラー', 'error');
+        };
+        
+        audio.play();
+      }
+    });
+  }
+  
+  // 分析ボタン
+  if (voiceAnalyzeBtn) {
+    voiceAnalyzeBtn.disabled = true;
+    voiceAnalyzeBtn.style.opacity = '0.5';
+    
+    voiceAnalyzeBtn.addEventListener('click', function() {
+      if (recordedAudio) {
+        updateVoiceStatus('分析中...', 'analyzing');
+        
+        // 簡易分析（実際の分析はPhase 3で実装）
+        setTimeout(() => {
+          updateVoiceStatus('分析完了', 'success');
+          console.log('🎤 音声分析完了（簡易版）');
+        }, 2000);
+      }
+    });
+  }
+  
+  // 学習進捗ボタン
+  if (voiceProgressBtn) {
+    voiceProgressBtn.addEventListener('click', function() {
+      updateVoiceStatus('進捗表示準備中...', 'info');
+      console.log('📊 学習進捗ボタンクリック（Phase 3で実装予定）');
+    });
+  }
+  
+  // 録音タイマー更新
+  function updateRecordingTimer() {
+    if (recordingStartTime) {
+      const elapsed = Date.now() - recordingStartTime;
+      const seconds = Math.floor(elapsed / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      
+      if (voiceTimerText) {
+        voiceTimerText.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+      }
+    }
+  }
+  
+  // 録音停止処理
+  function stopRecording() {
+    isRecording = false;
+    recordingStartTime = null;
+    
+    if (recordingInterval) {
+      clearInterval(recordingInterval);
+      recordingInterval = null;
+    }
+    
+    if (voiceTimer) {
+      voiceTimer.style.display = 'none';
+    }
+    
+    // ボタンを元に戻す
+    if (voiceRecordBtn) {
+      voiceRecordBtn.textContent = '🎤 録音';
+      voiceRecordBtn.style.backgroundColor = '#4CAF50';
+    }
+  }
+  
+  console.log('✅ Phase 1 & 2: 音声パネルと基本機能の初期化完了');
 });
 </script>
 
