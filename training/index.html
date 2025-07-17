@@ -337,13 +337,16 @@
         </div>
       </div>
       
+      <!-- 分析結果表示エリア（基本パネル内） -->
+      <div id="voice-analysis-results" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 30px; color: #333; font-size: 11px; margin: 8px 0;">分析結果がここに表示されます</div>
+      
       <!-- 進捗表示ボタン -->
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
         <button id="voice-progress-btn" class="voice-btn" style="background-color: #607D8B; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 学習進捗</button>
       </div>
     </div>
     
-    <!-- 拡張パネル（下方向に展開） -->
+    <!-- 拡張パネル（下方向に展開、必要に応じて） -->
     <div id="voice-analysis-expanded" style="
       display: none;
       position: absolute;
@@ -362,13 +365,13 @@
       overflow-y: auto;
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h4 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">📊 分析結果</h4>
+        <h4 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">📊 詳細分析結果</h4>
         <button id="voice-analysis-close-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px;">✕ 閉じる</button>
       </div>
       
-      <!-- 分析結果表示エリア -->
-      <div id="voice-analysis-results" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 80px; color: #333; font-size: 11px; line-height: 1.4;">
-        分析結果がここに表示されます
+      <!-- 詳細分析結果表示エリア -->
+      <div id="voice-analysis-details" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 80px; color: #333; font-size: 11px; line-height: 1.4;">
+        詳細分析結果がここに表示されます
       </div>
     </div>
   </div>
