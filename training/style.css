@@ -415,43 +415,38 @@ h1 {
   opacity: 1 !important;
 }
 
-/* スロット全体の調整が必要な場合に備えた汎用クラス */
+/* スロチE��全体�E調整が忁E��な場合に備えた汎用クラス */
 .slot-container {
-  /* 🎯 CSS Gridで動的レスポンシブレイアウト */
+  /* 🎯 CSS Gridで完�Eに6行固定レイアウトを実裁E*/
   display: grid;
-  grid-template-rows: 
-    calc(30px * var(--font-scale, 1)) 
-    calc(180px * var(--image-scale, 1)) 
-    calc(30px * var(--font-scale, 1)) 
-    calc(30px * var(--font-scale, 1)) 
-    calc(30px * var(--font-scale, 1)) 
-    calc(30px * var(--font-scale, 1));
+  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 画像以外�E行も拡大して全体�Eバランスを調整 */
   grid-template-columns: 1fr;
-  gap: calc(6px * var(--font-scale, 1));
-  align-items: center;
-  justify-items: center;
+  gap: 6px; /* 行間も少し拡大 */
+  align-items: center; /* 吁E��ル冁E��の中央揁E�� */
+  justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
   
   /* order属性への対応を追加 */
-  order: 0;
-  border: 1px solid #eee;
-  padding: calc(15px * var(--font-scale, 1));
-  margin: 4px 4px 20px 4px;
+  order: 0; /* チE��ォルト値 */
+  border: 1px solid #eee; /* 墁E��線を追加して区別しやすく */
+  padding: 15px; /* パディングも拡大 */
+  margin: 4px 4px 20px 4px; /* 下部マ�Eジンを拡大 */
   
-  /* 動的幅調整システム */
-  min-width: var(--slot-min-width, 160px);
-  width: 100%; /* Gridセル内で100%使用 */
-  max-width: none; /* 最大幅制限を削除 */
+  /* �E 動的幁E��整シスチE�� - 褁E��画像対応で大幁E��大 */
+  min-width: 160px; /* 最小幁E��拡大 */
+  width: auto; /* 自動幁E��整 */
+  max-width: 1000px; /* 🎯 褁E��画像表示のためさらに拡大 */
+  flex: 0 0 auto; /* flexアイチE��として自動サイズ */
   
   /* アニメーション */
-  transition: all 0.3s ease;
+  transition: opacity 0.2s ease-out, width 0.3s ease;
   
-  /* スロット全体の高さを適切に設定 */
-  height: auto;
-  min-height: calc(380px * var(--image-scale, 1));
+  /* �E スロチE��全体�E高さを適刁E��設宁E*/
+  height: auto; /* 自動高さ調整 */
+  min-height: 380px; /* 全ての要素が確実に表示される最小高さ */
   box-sizing: border-box;
 }
 
-/* 🎯 Grid列: スロット名（第1番目に配置） */
+/* 🎯 Grid衁E: スロチE��名（忁E��1番目に配置�E�E*/
 .slot-container label {
   grid-row: 1;
   grid-column: 1;
@@ -459,8 +454,8 @@ h1 {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
-  font-size: calc(18px * var(--font-scale, 1)); /* 動的フォントサイズ */
+  height: 100%; /* セル高さを完�Eに使用 */
+  font-size: 18px; /* フォントサイズを拡大 */
   font-weight: bold;
   color: #333;
   text-align: center;
@@ -488,7 +483,7 @@ h1 {
   border: 1px solid #f0f0f0; /* 枠を追加してサイズを視覚化 */
 }
 
-/* 🎯 Grid列: 英語テキスト（第3番目に配置） */
+/* 🎯 Grid衁E: 英語テキスト（忁E��3番目に配置�E�E*/
 .slot-container .slot-text {
   grid-row: 3;
   grid-column: 1;
@@ -496,21 +491,21 @@ h1 {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
-  font-size: calc(11px * var(--font-scale, 1)); /* 動的フォントサイズ */
+  height: 100%; /* セル高さを完�Eに使用 */
+  font-size: 11px; /* 日本語補助チE��スト用に小さぁE*/
   font-weight: 400;
   color: #777;
   text-align: center;
   margin: 0;
   padding: 4px;
   line-height: 1.1;
-  /* 長いテキストの折り返し */
+  /* 長ぁE��キスト�E折り返し */
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
 }
 
-/* 🎯 Grid列: 日本語補助テキスト（第4番目に配置） */
+/* 🎯 Grid衁E: 日本語補助チE��スト（忁E��4番目に配置�E�E*/
 .slot-container .slot-phrase {
   grid-row: 4;
   grid-column: 1;
@@ -518,22 +513,22 @@ h1 {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
-  font-size: calc(16px * var(--font-scale, 1)); /* 動的フォントサイズ */
+  height: 100%; /* セル高さを完�Eに使用 */
+  font-size: 16px; /* �E フォントサイズを調整 */
   font-weight: 600;
   color: #222;
   text-align: center;
   margin: 0;
-  padding: 2px;
+  padding: 2px; /* �E パディングを追加 */
   line-height: 1.2;
   
-  /* 長いテキスト対応 */
+  /* �E 長ぁE��キスト対忁E*/
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
   white-space: normal; /* 改行を許可 */
   
-  /* 例文テキストエリアを明確にする薄オレンジの背景と黒い枠 */
+  /* �E 例文チE��ストエリアを�E確にする薁E��オレンジの背景と黒い緁E*/
   background-color: #ffd6a5;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
@@ -607,75 +602,24 @@ h1 {
   align-content: flex-start; /* �E 折り返した行を上詰めで配置し、不要な空間を防ぁE*/
 }
 
-/* 高さ潰れ・透明化・折り返し不備の対処 */
+/* 高さ潰れ�E透�E化�E折り返し不備の対処 */
 .slot-wrapper {
   min-height: 100px;
   visibility: visible;
+  flex-wrap: nowrap; /* �E 横並びで折り返さなぁE*/
+  flex-direction: row !important; /* 強制皁E��横並びに */
+  display: flex !important; /* flex表示を強制 */
+  align-items: flex-start;
+  justify-content: flex-start; /* 左揁E�� */
+  gap: 12px; /* スロチE��間�E間隔 */
   
-  /* 🎯 レスポンシブ自動調整：CSS Grid使用 */
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(var(--slot-min-width, 160px), 1fr));
-  gap: clamp(8px, 1vw, 20px); /* 画面サイズに応じたギャップ */
-  align-items: start;
-  justify-content: stretch;
+  /* �E 横スクロール対忁E*/
+  overflow-x: auto; /* 横スクロールを有効匁E*/
+  overflow-y: hidden; /* 縦スクロールは無効 */
+  padding-bottom: 10px; /* スクロールバ�E用の余白 */
   
-  /* スクロール無効化 - 全て表示に変更 */
-  overflow: visible;
-  padding: 10px 0;
-  
-  /* 動的サイズ調整用CSS変数 */
-  --slot-min-width: 160px;
-  --font-scale: 1;
-  --image-scale: 1;
-}
-
-/* 画面サイズ別の自動調整 */
-@media (max-width: 1200px) {
-  .slot-wrapper {
-    --slot-min-width: 140px;
-    --font-scale: 0.9;
-    --image-scale: 0.9;
-  }
-}
-
-@media (max-width: 900px) {
-  .slot-wrapper {
-    --slot-min-width: 120px;
-    --font-scale: 0.8;
-    --image-scale: 0.8;
-  }
-}
-
-@media (max-width: 600px) {
-  .slot-wrapper {
-    --slot-min-width: 100px;
-    --font-scale: 0.7;
-    --image-scale: 0.7;
-  }
-}
-
-/* 超小画面（タブレット縦・スマホ）対応 */
-@media (max-width: 480px) {
-  .slot-wrapper {
-    --slot-min-width: 80px;
-    --font-scale: 0.6;
-    --image-scale: 0.5;
-    gap: clamp(4px, 0.5vw, 12px);
-  }
-  
-  .slot-container {
-    padding: calc(8px * var(--font-scale, 1));
-    margin: 2px 2px 10px 2px;
-  }
-}
-
-/* 極小画面（小さなスマホ）対応 */
-@media (max-width: 320px) {
-  .slot-wrapper {
-    --slot-min-width: 70px;
-    --font-scale: 0.5;
-    --image-scale: 0.4;
-  }
+  /* �E スクロールバ�Eのスタイル改喁E��Eebkit系ブラウザ�E�E*/
+  scrollbar-width: thin; /* Firefox */
 }
 
 /* �E Webkit系ブラウザでのスクロールバ�Eスタイル */
