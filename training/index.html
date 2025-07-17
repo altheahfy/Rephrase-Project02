@@ -288,7 +288,7 @@
     opacity: 1 !important;
   ">
     <!-- 基本パネル部分 -->
-    <div id="voice-panel-basic" style="display: block; position: relative;">
+    <div id="voice-panel-basic" style="display: block;">
       <div style="display: flex; align-items: center; margin-bottom: 8px;">
         <h3 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">🎤 音声学習</h3>
         <button id="voice-panel-minimize-btn" style="background-color: #ccc; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">−</button>
@@ -317,54 +317,20 @@
       </div>
     </div>
     
-    <!-- 拡張パネル部分（分析結果表示） - 下方向に拡張 -->
-    <div id="voice-panel-expanded" style="
-      display: none; 
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.98);
-      border: 2px solid #667eea;
-      border-top: none;
-      border-radius: 0 0 8px 8px;
-      padding: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      z-index: 16000;
-      min-height: 250px;
-      max-height: 400px;
-      overflow-y: auto;
-    ">
-      <div style="display: flex; align-items: center; margin-bottom: 12px;">
-        <h4 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">📊 分析結果</h4>
-        <button id="voice-panel-close-expanded-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕ 閉じる</button>
+    <!-- 拡張パネル部分（分析結果表示） -->
+    <div id="voice-panel-expanded" style="display: none; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;">
+      <div style="display: flex; align-items: center; margin-bottom: 8px;">
+        <h4 style="margin: 0; color: #333; font-size: 12px; font-weight: bold;">📊 分析結果</h4>
+        <button id="voice-panel-close-expanded-btn" style="background-color: #f44336; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
       </div>
       
       <!-- 分析結果表示エリア -->
-      <div id="voice-analysis-results" style="font-size: 12px; color: #555;">
-        <div id="voice-evaluation-result" style="margin-bottom: 12px; padding: 8px; background: #f9f9f9; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
-        <div id="voice-waveform-container" style="margin-bottom: 12px; display: none;">
-          <canvas id="voice-waveform-canvas" width="280" height="60" style="width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 4px; background: white;"></canvas>
+      <div id="voice-analysis-results" style="font-size: 11px; color: #555; max-height: 200px; overflow-y: auto;">
+        <div id="voice-evaluation-result" style="margin-bottom: 8px; padding: 4px; background: #f9f9f9; border-radius: 4px;"></div>
+        <div id="voice-waveform-container" style="margin-bottom: 8px; display: none;">
+          <canvas id="voice-waveform-canvas" width="250" height="40" style="width: 100%; height: 40px; border: 1px solid #ddd; border-radius: 3px; background: white;"></canvas>
         </div>
-        <div id="voice-progress-display" style="margin-bottom: 12px; padding: 8px; background: #e8f5e8; border-radius: 6px; border: 1px solid #d0d0d0;"></div>
-        
-        <!-- 学習進捗ボタンを拡張パネル内に配置 -->
-        <div style="text-align: center; margin-top: 16px;">
-          <button id="voice-progress-btn" style="
-            background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: bold;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-          " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            📈 詳細学習進捗を表示
-          </button>
-        </div>
+        <div id="voice-progress-display" style="margin-bottom: 8px; padding: 4px; background: #e8f5e8; border-radius: 4px;"></div>
       </div>
     </div>
     
@@ -2218,102 +2184,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // 簡単な波形を描画
       setTimeout(() => drawSimpleWaveform(audioBlob), 100);
-      
-      // 学習進捗ボタンのイベントリスナーを設定
-      setTimeout(() => setupProgressButton(), 200);
-    }
-  }
-  
-  // 学習進捗ボタン設定
-  function setupProgressButton() {
-    const progressBtn = document.getElementById('voice-progress-btn');
-    if (progressBtn && !progressBtn.hasAttribute('data-listener-added')) {
-      progressBtn.addEventListener('click', function() {
-        console.log('📈 学習進捗ボタンクリック');
-        showDetailedProgress();
-      });
-      progressBtn.setAttribute('data-listener-added', 'true');
-      console.log('✅ 学習進捗ボタンのイベントリスナーを設定');
-    }
-  }
-  
-  // 詳細学習進捗表示
-  function showDetailedProgress() {
-    const progressDisplay = document.getElementById('voice-progress-display');
-    if (progressDisplay) {
-      const today = new Date().toDateString();
-      const todayCount = localStorage.getItem(`recording_count_${today}`) || '0';
-      const totalTime = localStorage.getItem('total_recording_time') || '0';
-      
-      // 週間進捗を計算
-      const weeklyProgress = calculateWeeklyProgress();
-      
-      progressDisplay.innerHTML = `
-        <strong>📈 詳細学習進捗:</strong><br>
-        <div style="margin: 8px 0; padding: 6px; background: #f0f8ff; border-radius: 4px; border: 1px solid #b3d9ff;">
-          <strong>📅 本日の実績:</strong><br>
-          録音回数: ${todayCount}回<br>
-          録音時間: ${Math.floor(parseInt(totalTime) / 60)}分
-        </div>
-        <div style="margin: 8px 0; padding: 6px; background: #f0fff0; border-radius: 4px; border: 1px solid #b3ffb3;">
-          <strong>📊 週間進捗:</strong><br>
-          ${weeklyProgress}
-        </div>
-        <div style="margin: 8px 0; padding: 6px; background: #fff8f0; border-radius: 4px; border: 1px solid #ffcc99;">
-          <strong>🎯 目標達成度:</strong><br>
-          ${getAchievementStatus(parseInt(todayCount))}
-        </div>
-        <div style="text-align: center; margin-top: 10px;">
-          <button onclick="clearProgress()" style="
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            font-size: 10px;
-            cursor: pointer;
-            border-radius: 3px;
-          ">🗑️ 進捗リセット</button>
-        </div>
-      `;
-    }
-  }
-  
-  // 週間進捗計算
-  function calculateWeeklyProgress() {
-    const today = new Date();
-    let weeklyCount = 0;
-    
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dateStr = date.toDateString();
-      const dayCount = parseInt(localStorage.getItem(`recording_count_${dateStr}`) || '0');
-      weeklyCount += dayCount;
-    }
-    
-    return `今週の録音回数: ${weeklyCount}回<br>平均: ${(weeklyCount / 7).toFixed(1)}回/日`;
-  }
-  
-  // 目標達成状況
-  function getAchievementStatus(todayCount) {
-    if (todayCount >= 10) return '🏆 優秀！目標大幅達成';
-    if (todayCount >= 5) return '🎉 良好！目標達成';
-    if (todayCount >= 3) return '👍 順調！もう少し';
-    if (todayCount >= 1) return '🌱 開始！継続が大切';
-    return '💪 頑張ろう！';
-  }
-  
-  // 進捗リセット
-  function clearProgress() {
-    if (confirm('学習進捗データをリセットしますか？')) {
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('recording_count_') || key === 'total_recording_time') {
-          localStorage.removeItem(key);
-        }
-      });
-      alert('進捗データがリセットされました。');
-      showDetailedProgress(); // 表示を更新
     }
   }
   
@@ -2366,42 +2236,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // キャンバスをクリア
     ctx.clearRect(0, 0, width, height);
     
-    // 背景グラデーション
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, '#e3f2fd');
-    gradient.addColorStop(1, '#f9f9f9');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-    
-    // 波形パターンを描画
+    // 簡単な波形パターンを描画
     ctx.strokeStyle = '#4CAF50';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     
-    const amplitude = (height / 2) * 0.7;
-    const frequency = 0.02;
-    
     for (let x = 0; x < width; x++) {
-      const y = height / 2 + Math.sin(x * frequency) * amplitude * (0.3 + Math.random() * 0.7);
+      const y = height / 2 + Math.sin(x * 0.1) * (Math.random() * 15 + 5);
       if (x === 0) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
       }
-    }
-    
-    ctx.stroke();
-    
-    // 音声の特徴を示すピーク
-    ctx.strokeStyle = '#FF9800';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    
-    for (let i = 0; i < 5; i++) {
-      const x = (width / 6) * (i + 1);
-      const peakHeight = amplitude * (0.5 + Math.random() * 0.5);
-      ctx.moveTo(x, height / 2 - peakHeight);
-      ctx.lineTo(x, height / 2 + peakHeight);
     }
     
     ctx.stroke();
@@ -2481,21 +2327,12 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 #voice-panel-expanded {
-  animation: slideDownExpand 0.4s ease-out;
-  transform-origin: top;
+  animation: slideDown 0.3s ease;
 }
 
-@keyframes slideDownExpand {
-  from { 
-    opacity: 0; 
-    transform: translateY(-20px) scaleY(0.8);
-    max-height: 0;
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scaleY(1);
-    max-height: 400px;
-  }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
