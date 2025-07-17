@@ -1072,6 +1072,48 @@
       </script>
 </div> <!-- main-content の終了 -->
 
+<!-- 🎤 音声学習パネル (Phase 1: 基本構造) -->
+<div id="voice-panel" style="
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  z-index: 15000;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #667eea;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  min-width: 200px;
+  max-width: 300px;
+  display: none;
+">
+  <div style="display: flex; align-items: center; margin-bottom: 8px;">
+    <h3 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">🎤 音声学習</h3>
+    <button id="voice-panel-close" style="background-color: #f44336; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; color: #666;">
+    準備中...
+  </div>
+</div>
+
+<!-- 音声パネル表示ボタン -->
+<button id="voice-panel-toggle" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 16000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  font-weight: bold;
+">🎤 音声</button>
+
     <!-- 既存のスクリプト -->
 <script type="module">
 import { randomizeAll, randomizeAllWithStateManagement } from './js/randomizer_all.js';
@@ -1846,6 +1888,38 @@ window.clearRandomizeHistory = function() {
 };
 
 
+</script>
+
+<!-- Phase 1: 基本音声パネル制御 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const voicePanel = document.getElementById('voice-panel');
+  const voicePanelToggle = document.getElementById('voice-panel-toggle');
+  const voicePanelClose = document.getElementById('voice-panel-close');
+  
+  // トグルボタンの動作
+  if (voicePanelToggle) {
+    voicePanelToggle.addEventListener('click', function() {
+      if (voicePanel.style.display === 'none' || voicePanel.style.display === '') {
+        voicePanel.style.display = 'block';
+        console.log('🎤 音声パネル表示');
+      } else {
+        voicePanel.style.display = 'none';
+        console.log('🎤 音声パネル非表示');
+      }
+    });
+  }
+  
+  // 閉じるボタンの動作
+  if (voicePanelClose) {
+    voicePanelClose.addEventListener('click', function() {
+      voicePanel.style.display = 'none';
+      console.log('🎤 音声パネル閉じる');
+    });
+  }
+  
+  console.log('✅ Phase 1: 基本音声パネル制御の初期化完了');
+});
 </script>
 
 <!-- 音声学習システムのスクリプト -->
