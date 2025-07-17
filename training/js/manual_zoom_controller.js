@@ -10,7 +10,7 @@ class ManualZoomController {
         this.minZoom = 0.5;
         this.maxZoom = 2.0;
         this.zoomStep = 0.1;
-        this.targetSelector = '#static-slot-area, .sentence-display-area';
+        this.targetSelector = '#main-content, #dynamic-slot-area';
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -21,9 +21,18 @@ class ManualZoomController {
      * システム初期化
      */
     initialize() {
-        if (this.isInitialized) return;
+        if (this.isInitialized) {
+            console.log('⚠️ 手動ズーム調整システム既に初期化済み');
+            return;
+        }
         
         console.log('🔍 手動ズーム調整システム初期化開始');
+        
+        // DOM要素の存在確認
+        const mainContent = document.getElementById('main-content');
+        const dynamicArea = document.getElementById('dynamic-slot-area');
+        console.log('🔍 main-content要素:', mainContent);
+        console.log('🔍 dynamic-slot-area要素:', dynamicArea);
         
         // 保存されたズームレベルを読み込み
         this.loadZoomLevel();
@@ -39,6 +48,9 @@ class ManualZoomController {
         
         this.isInitialized = true;
         console.log('✅ 手動ズーム調整システム初期化完了');
+        
+        // 状態をログ出力
+        console.log('📊 システム状態:', this.getStatus());
     }
     
     /**
@@ -83,9 +95,9 @@ class ManualZoomController {
         // スタイルを設定
         this.controlPanel.style.cssText = `
             position: fixed;
-            top: 120px;
+            top: 20px;
             right: 20px;
-            z-index: 15000;
+            z-index: 16000;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 12px;
@@ -281,39 +293,83 @@ class ManualZoomController {
      * パネルイベントリスナーを設定
      */
     setupPanelEvents() {
-        // ズームイン・アウトボタン
+        console.log('🔧 パネルイベントリスナー設定開始');
+        
+        // DOM要素を取得
         const zoomInBtn = this.controlPanel.querySelector('#zoom-in-btn');
         const zoomOutBtn = this.controlPanel.querySelector('#zoom-out-btn');
+        const slider = this.controlPanel.querySelector('#zoom-slider');
+        const presetBtns = this.controlPanel.querySelectorAll('.preset-btn');
+        const toggleBtn = this.controlPanel.querySelector('#zoom-panel-toggle');
         
-        zoomInBtn.addEventListener('click', () => this.zoomIn());
-        zoomOutBtn.addEventListener('click', () => this.zoomOut());
+        // デバッグ: 要素の存在確認
+        console.log('🔧 ズームインボタン:', zoomInBtn);
+        console.log('🔧 ズームアウトボタン:', zoomOutBtn);
+        console.log('🔧 スライダー:', slider);
+        console.log('🔧 プリセットボタン数:', presetBtns.length);
+        console.log('🔧 トグルボタン:', toggleBtn);
+        
+        // ズームイン・アウトボタン
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('➕ ズームインボタンクリック');
+                this.zoomIn();
+            });
+        }
+        
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('➖ ズームアウトボタンクリック');
+                this.zoomOut();
+            });
+        }
         
         // スライダー
-        const slider = this.controlPanel.querySelector('#zoom-slider');
-        slider.addEventListener('input', (e) => {
-            this.setZoom(parseFloat(e.target.value));
-        });
+        if (slider) {
+            slider.addEventListener('input', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const zoom = parseFloat(e.target.value);
+                console.log('🎚️ スライダー変更:', zoom);
+                this.setZoom(zoom);
+            });
+        }
         
         // プリセットボタン
-        const presetBtns = this.controlPanel.querySelectorAll('.preset-btn');
-        presetBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+        presetBtns.forEach((btn, index) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const zoom = parseFloat(btn.dataset.zoom);
+                console.log(`📱 プリセットボタン${index + 1}クリック:`, zoom);
                 this.setZoom(zoom);
             });
         });
         
         // 折りたたみボタン
-        const toggleBtn = this.controlPanel.querySelector('#zoom-panel-toggle');
-        toggleBtn.addEventListener('click', () => this.togglePanel());
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📐 トグルボタンクリック');
+                this.togglePanel();
+            });
+        }
         
         // パネルの折りたたみ状態をクリックで展開
         this.controlPanel.addEventListener('click', (e) => {
             if (this.controlPanel.classList.contains('collapsed')) {
+                console.log('📐 折りたたみパネルクリック - 展開');
                 this.togglePanel();
                 e.stopPropagation();
             }
         });
+        
+        console.log('✅ パネルイベントリスナー設定完了');
     }
     
     /**
@@ -373,10 +429,16 @@ class ManualZoomController {
      * ズームを適用
      */
     applyZoom() {
-        const targetElements = document.querySelectorAll(this.targetSelector);
+        console.log(`🔍 ズーム適用開始: ${Math.round(this.currentZoom * 100)}%`);
         
-        targetElements.forEach(element => {
+        const targetElements = document.querySelectorAll(this.targetSelector);
+        console.log(`🔍 対象要素数: ${targetElements.length}`);
+        console.log(`🔍 セレクター: ${this.targetSelector}`);
+        
+        let appliedCount = 0;
+        targetElements.forEach((element, index) => {
             if (element) {
+                console.log(`🔍 要素${index + 1}にズーム適用:`, element.id || element.className);
                 element.style.transform = `scale(${this.currentZoom})`;
                 element.style.transformOrigin = 'top center';
                 element.style.transition = 'transform 0.3s ease';
@@ -384,8 +446,11 @@ class ManualZoomController {
                 // スケール変更に伴うレイアウト調整
                 const scaledHeight = element.scrollHeight * this.currentZoom;
                 element.style.marginBottom = `${scaledHeight * 0.1}px`;
+                appliedCount++;
             }
         });
+        
+        console.log(`✅ ズーム適用完了: ${appliedCount}個の要素に適用`);
     }
     
     /**
@@ -509,10 +574,40 @@ if (document.readyState === 'loading') {
 
 // デバッグ用グローバル関数
 window.debugZoom = {
-    status: () => window.manualZoomController.getStatus(),
-    setZoom: (zoom) => window.manualZoomController.setZoom(zoom),
-    reset: () => window.manualZoomController.reset(),
-    toggle: () => window.manualZoomController.toggleVisibility()
+    status: () => {
+        console.log('📊 ズームシステム状態:', window.manualZoomController.getStatus());
+        return window.manualZoomController.getStatus();
+    },
+    setZoom: (zoom) => {
+        console.log(`🔧 手動ズーム設定: ${zoom}`);
+        window.manualZoomController.setZoom(zoom);
+    },
+    reset: () => {
+        console.log('🔄 ズームリセット');
+        window.manualZoomController.reset();
+    },
+    toggle: () => {
+        console.log('👁️ パネル表示切り替え');
+        window.manualZoomController.toggleVisibility();
+    },
+    reinitialize: () => {
+        console.log('🔄 システム再初期化');
+        window.manualZoomController.isInitialized = false;
+        window.manualZoomController.initialize();
+    },
+    testButtons: () => {
+        console.log('🧪 ボタンテスト実行');
+        const panel = document.getElementById('zoom-control-panel');
+        if (panel) {
+            const buttons = panel.querySelectorAll('button');
+            console.log(`🧪 パネル内ボタン数: ${buttons.length}`);
+            buttons.forEach((btn, i) => {
+                console.log(`🧪 ボタン${i + 1}:`, btn.id || btn.className, btn);
+            });
+        } else {
+            console.log('❌ ズームパネルが見つかりません');
+        }
+    }
 };
 
 console.log('🔍 手動ズーム調整システム読み込み完了');
@@ -521,4 +616,8 @@ console.log('  - Ctrl + + : 拡大');
 console.log('  - Ctrl + - : 縮小');
 console.log('  - Ctrl + 0 : リセット');
 console.log('  - 右上のパネルでマウス操作');
-console.log('🛠️ デバッグ: window.debugZoom.status(), .setZoom(1.2), .reset()');
+console.log('🛠️ デバッグコマンド:');
+console.log('  - debugZoom.status() : 状態確認');
+console.log('  - debugZoom.setZoom(1.2) : ズーム設定');
+console.log('  - debugZoom.testButtons() : ボタン動作確認');
+console.log('  - debugZoom.reinitialize() : 再初期化');
