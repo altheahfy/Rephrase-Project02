@@ -8,9 +8,9 @@ console.log('🚀 manual_zoom_controller.js ファイル読み込み開始');
 
 class ManualZoomController {
     constructor() {
-        this.currentZoom = 1.0; // デフォルトは中央（100%）
-        this.minZoom = 0.5; // 縮小範囲
-        this.maxZoom = 1.5; // 拡大範囲
+        this.currentZoom = 0.8; // デフォルトを右寄り（縮小状態）に
+        this.minZoom = 0.3; // 大幅縮小可能
+        this.maxZoom = 1.2; // 拡大は控えめ
         this.zoomStep = 0.1;
         this.targetSelector = '.slot-container'; // 上位・サブスロットのみ対象
         this.storageKey = 'rephrase_zoom_level';
@@ -203,7 +203,7 @@ class ManualZoomController {
             // Ctrl + 0 (リセット)
             if (e.ctrlKey && e.key === '0') {
                 e.preventDefault();
-                this.setZoom(1.0); // 中央（100%）にリセット
+                this.setZoom(0.8); // 縮小デフォルトに
             }
         });
     }
@@ -325,7 +325,7 @@ class ManualZoomController {
      * システムリセット
      */
     reset() {
-        this.setZoom(1.0); // 中央（100%）にリセット
+        this.setZoom(0.8); // 縮小デフォルトに
     }
 }
 
