@@ -271,21 +271,18 @@
   
   <!-- 🎤 右上フロート音声学習パネル -->
   <div id="voice-control-panel" style="
-    position: fixed !important;
-    top: 60px !important;
-    right: 10px !important;
-    z-index: 15000 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    padding: 12px !important;
-    border-radius: 8px !important;
-    border: 2px solid #667eea !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-    min-width: 200px !important;
-    max-width: 300px !important;
-    transition: all 0.3s ease !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    z-index: 15000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #667eea;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    min-width: 200px;
+    max-width: 300px;
+    transition: all 0.3s ease;
   ">
     <!-- 基本パネル部分 -->
     <div id="voice-panel-basic" style="display: block;">
@@ -1852,56 +1849,11 @@ window.clearRandomizeHistory = function() {
 
 </script>
 
-<!-- 🎤 音声パネル強制表示 - 最優先実行 -->
-<script>
-// 即座に音声パネルを強制表示
-(function() {
-  const forceShowVoicePanel = () => {
-    const panel = document.getElementById('voice-control-panel');
-    if (panel) {
-      panel.style.display = 'block !important';
-      panel.style.visibility = 'visible !important';
-      panel.style.opacity = '1 !important';
-      console.log('🎤 音声パネル強制表示実行');
-      return true;
-    }
-    return false;
-  };
-  
-  // DOM読み込み完了後に実行
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', forceShowVoicePanel);
-  } else {
-    forceShowVoicePanel();
-  }
-  
-  // 継続的に監視（他のスクリプトが非表示にした場合の対策）
-  setInterval(() => {
-    const panel = document.getElementById('voice-control-panel');
-    if (panel && (panel.style.display === 'none' || panel.style.visibility === 'hidden')) {
-      forceShowVoicePanel();
-    }
-  }, 1000);
-})();
-</script>
-
 <!-- 右上フロート音声学習パネル制御JavaScript -->
 <script>
-// 🎤 音声パネル強制表示スクリプト
+// 右上フロート音声学習パネル制御
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎤 音声パネル初期化開始...');
-  
-  // パネルを強制表示
   const voicePanel = document.getElementById('voice-control-panel');
-  if (voicePanel) {
-    voicePanel.style.display = 'block';
-    voicePanel.style.visibility = 'visible';
-    voicePanel.style.opacity = '1';
-    console.log('✅ 音声パネル表示完了');
-  } else {
-    console.error('❌ 音声パネルが見つかりません');
-  }
-  
   const voicePanelBasic = document.getElementById('voice-panel-basic');
   const voicePanelExpanded = document.getElementById('voice-panel-expanded');
   const voicePanelMinimized = document.getElementById('voice-panel-minimized');
@@ -1911,188 +1863,128 @@ document.addEventListener('DOMContentLoaded', function() {
   const analyzeBtn = document.getElementById('voice-analyze-btn');
   
   // 最小化ボタンクリック
-  if (minimizeBtn) {
-    minimizeBtn.addEventListener('click', function() {
-      if (voicePanelBasic) voicePanelBasic.style.display = 'none';
-      if (voicePanelExpanded) voicePanelExpanded.style.display = 'none';
-      if (voicePanelMinimized) voicePanelMinimized.style.display = 'block';
-      if (voicePanel) {
-        voicePanel.style.minWidth = '40px';
-        voicePanel.style.maxWidth = '40px';
-        voicePanel.style.padding = '8px';
-      }
-    });
-  }
+  minimizeBtn.addEventListener('click', function() {
+    voicePanelBasic.style.display = 'none';
+    voicePanelExpanded.style.display = 'none';
+    voicePanelMinimized.style.display = 'block';
+    voicePanel.style.minWidth = '40px';
+    voicePanel.style.maxWidth = '40px';
+    voicePanel.style.padding = '8px';
+  });
   
   // 復元ボタンクリック
-  if (restoreBtn) {
-    restoreBtn.addEventListener('click', function() {
-      if (voicePanelMinimized) voicePanelMinimized.style.display = 'none';
-      if (voicePanelBasic) voicePanelBasic.style.display = 'block';
-      if (voicePanel) {
-        voicePanel.style.minWidth = '200px';
-        voicePanel.style.maxWidth = '300px';
-        voicePanel.style.padding = '12px';
-      }
-    });
-  }
+  restoreBtn.addEventListener('click', function() {
+    voicePanelMinimized.style.display = 'none';
+    voicePanelBasic.style.display = 'block';
+    voicePanel.style.minWidth = '200px';
+    voicePanel.style.maxWidth = '300px';
+    voicePanel.style.padding = '12px';
+  });
   
   // 分析ボタンクリック（拡張パネル表示）
-  if (analyzeBtn) {
-    analyzeBtn.addEventListener('click', function() {
-      console.log('🔍 分析ボタンクリック');
-      
-      // 分析実行処理
-      performVoiceAnalysis();
-      
-      // 拡張パネルを表示
-      if (voicePanelExpanded) {
-        voicePanelExpanded.style.display = 'block';
-      }
-      
-      // 分析結果を表示
-      const analysisResults = document.getElementById('voice-analysis-results');
-      if (analysisResults) {
-        analysisResults.innerHTML = `
-          <div id="voice-evaluation-result" style="margin-bottom: 8px; padding: 4px; background: #f9f9f9; border-radius: 4px;">
-            <strong>📊 評価結果:</strong><br>
-            発音精度: 85%<br>
-            流暢さ: 良好<br>
-            音量レベル: 適切
-          </div>
-          <div id="voice-progress-display" style="margin-bottom: 8px; padding: 4px; background: #e8f5e8; border-radius: 4px;">
-            <strong>📈 学習進捗:</strong><br>
-            今日の練習回数: 3回<br>
-            累計練習時間: 15分
-          </div>
-        `;
-      }
-    });
-  }
+  analyzeBtn.addEventListener('click', function() {
+    // 分析実行処理（既存の処理をここに呼び出し）
+    performVoiceAnalysis();
+    
+    // 拡張パネルを表示
+    voicePanelExpanded.style.display = 'block';
+    
+    // 分析結果を表示
+    const analysisResults = document.getElementById('voice-analysis-results');
+    analysisResults.innerHTML = `
+      <div id="voice-evaluation-result" style="margin-bottom: 8px; padding: 4px; background: #f9f9f9; border-radius: 4px;">
+        <strong>📊 評価結果:</strong><br>
+        発音精度: 85%<br>
+        流暢さ: 良好<br>
+        音量レベル: 適切
+      </div>
+      <div id="voice-progress-display" style="margin-bottom: 8px; padding: 4px; background: #e8f5e8; border-radius: 4px;">
+        <strong>📈 学習進捗:</strong><br>
+        今日の練習回数: 3回<br>
+        累計練習時間: 15分
+      </div>
+    `;
+  });
   
   // 拡張パネル閉じるボタンクリック
-  if (closeExpandedBtn) {
-    closeExpandedBtn.addEventListener('click', function() {
-      if (voicePanelExpanded) {
-        voicePanelExpanded.style.display = 'none';
-      }
-    });
-  }
+  closeExpandedBtn.addEventListener('click', function() {
+    voicePanelExpanded.style.display = 'none';
+  });
   
-  // 分析実行処理
+  // 分析実行処理（既存の処理を呼び出し）
   function performVoiceAnalysis() {
+    // 既存の音声分析機能をここに統合
     const statusElement = document.getElementById('voice-status');
-    if (statusElement) {
-      statusElement.textContent = '分析中...';
-      statusElement.className = 'voice-status warning';
-      
-      // 模擬分析処理
-      setTimeout(() => {
-        statusElement.textContent = '分析完了';
-        statusElement.className = 'voice-status success';
-      }, 2000);
-    }
+    statusElement.textContent = '分析中...';
+    statusElement.className = 'voice-status warning';
+    
+    // 模擬分析処理
+    setTimeout(() => {
+      statusElement.textContent = '分析完了';
+      statusElement.className = 'voice-status success';
+    }, 2000);
   }
   
   // 音声コントロールボタンのイベントリスナー設定
-  const recordBtn = document.getElementById('voice-record-btn');
-  const stopBtn = document.getElementById('voice-stop-btn');
-  const playBtn = document.getElementById('voice-play-btn');
-  const ttsBtn = document.getElementById('voice-tts-btn');
+  document.getElementById('voice-record-btn').addEventListener('click', function() {
+    const statusElement = document.getElementById('voice-status');
+    statusElement.textContent = '録音中...';
+    statusElement.className = 'voice-status warning';
+    
+    // 録音タイマー表示
+    const timerElement = document.getElementById('voice-timer');
+    timerElement.style.display = 'block';
+    
+    // 音量バー表示
+    const volumeContainer = document.getElementById('voice-volume-container');
+    volumeContainer.style.display = 'block';
+    
+    // 停止ボタン表示
+    document.getElementById('voice-stop-btn').style.display = 'inline-block';
+    this.style.display = 'none';
+  });
   
-  if (recordBtn) {
-    recordBtn.addEventListener('click', function() {
-      console.log('🎤 録音ボタンクリック');
-      const statusElement = document.getElementById('voice-status');
-      if (statusElement) {
-        statusElement.textContent = '録音中...';
-        statusElement.className = 'voice-status warning';
-      }
-      
-      // 録音タイマー表示
-      const timerElement = document.getElementById('voice-timer');
-      if (timerElement) {
-        timerElement.style.display = 'block';
-      }
-      
-      // 音量バー表示
-      const volumeContainer = document.getElementById('voice-volume-container');
-      if (volumeContainer) {
-        volumeContainer.style.display = 'block';
-      }
-      
-      // 停止ボタン表示
-      if (stopBtn) {
-        stopBtn.style.display = 'inline-block';
-      }
-      this.style.display = 'none';
-    });
-  }
+  document.getElementById('voice-stop-btn').addEventListener('click', function() {
+    const statusElement = document.getElementById('voice-status');
+    statusElement.textContent = '録音停止';
+    statusElement.className = 'voice-status info';
+    
+    // 録音タイマー非表示
+    const timerElement = document.getElementById('voice-timer');
+    timerElement.style.display = 'none';
+    
+    // 音量バー非表示
+    const volumeContainer = document.getElementById('voice-volume-container');
+    volumeContainer.style.display = 'none';
+    
+    // 録音ボタン復元
+    document.getElementById('voice-record-btn').style.display = 'inline-block';
+    this.style.display = 'none';
+  });
   
-  if (stopBtn) {
-    stopBtn.addEventListener('click', function() {
-      console.log('⏹️ 停止ボタンクリック');
-      const statusElement = document.getElementById('voice-status');
-      if (statusElement) {
-        statusElement.textContent = '録音停止';
-        statusElement.className = 'voice-status info';
-      }
-      
-      // 録音タイマー非表示
-      const timerElement = document.getElementById('voice-timer');
-      if (timerElement) {
-        timerElement.style.display = 'none';
-      }
-      
-      // 音量バー非表示
-      const volumeContainer = document.getElementById('voice-volume-container');
-      if (volumeContainer) {
-        volumeContainer.style.display = 'none';
-      }
-      
-      // 録音ボタン復元
-      if (recordBtn) {
-        recordBtn.style.display = 'inline-block';
-      }
-      this.style.display = 'none';
-    });
-  }
+  document.getElementById('voice-play-btn').addEventListener('click', function() {
+    const statusElement = document.getElementById('voice-status');
+    statusElement.textContent = '再生中...';
+    statusElement.className = 'voice-status info';
+    
+    // 模擬再生処理
+    setTimeout(() => {
+      statusElement.textContent = '再生完了';
+      statusElement.className = 'voice-status success';
+    }, 3000);
+  });
   
-  if (playBtn) {
-    playBtn.addEventListener('click', function() {
-      console.log('🔊 再生ボタンクリック');
-      const statusElement = document.getElementById('voice-status');
-      if (statusElement) {
-        statusElement.textContent = '再生中...';
-        statusElement.className = 'voice-status info';
-        
-        // 模擬再生処理
-        setTimeout(() => {
-          statusElement.textContent = '再生完了';
-          statusElement.className = 'voice-status success';
-        }, 3000);
-      }
-    });
-  }
-  
-  if (ttsBtn) {
-    ttsBtn.addEventListener('click', function() {
-      console.log('🗣️ 読み上げボタンクリック');
-      const statusElement = document.getElementById('voice-status');
-      if (statusElement) {
-        statusElement.textContent = '読み上げ中...';
-        statusElement.className = 'voice-status info';
-        
-        // 模擬読み上げ処理
-        setTimeout(() => {
-          statusElement.textContent = '読み上げ完了';
-          statusElement.className = 'voice-status success';
-        }, 2000);
-      }
-    });
-  }
-  
-  console.log('✅ 音声パネル制御JavaScript初期化完了');
+  document.getElementById('voice-tts-btn').addEventListener('click', function() {
+    const statusElement = document.getElementById('voice-status');
+    statusElement.textContent = '読み上げ中...';
+    statusElement.className = 'voice-status info';
+    
+    // 模擬読み上げ処理
+    setTimeout(() => {
+      statusElement.textContent = '読み上げ完了';
+      statusElement.className = 'voice-status success';
+    }, 2000);
+  });
 });
 </script>
 
