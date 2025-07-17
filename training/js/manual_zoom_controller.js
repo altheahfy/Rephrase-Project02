@@ -289,11 +289,22 @@ class ManualZoomController {
         try {
             const saved = localStorage.getItem(this.storageKey);
             if (saved) {
-                this.currentZoom = parseFloat(saved);
-                console.log(`💾 保存されたズームレベルを読み込み: ${Math.round(this.currentZoom * 100)}%`);
+                const savedZoom = parseFloat(saved);
+                // 古い範囲の値（0.3-1.2）をリセット
+                if (savedZoom < this.minZoom || savedZoom > this.maxZoom) {
+                    console.log(`⚠️ 古いズーム値 ${savedZoom} をリセットします`);
+                    this.currentZoom = 1.0; // デフォルトに戻す
+                    localStorage.removeItem(this.storageKey); // 古い値を削除
+                } else {
+                    this.currentZoom = savedZoom;
+                    console.log(`💾 保存されたズームレベルを読み込み: ${Math.round(this.currentZoom * 100)}%`);
+                }
+            } else {
+                this.currentZoom = 1.0; // デフォルト値
             }
         } catch (error) {
             console.warn('ズームレベルの読み込みに失敗:', error);
+            this.currentZoom = 1.0; // エラー時はデフォルト
         }
     }
     
@@ -331,6 +342,14 @@ class ManualZoomController {
 
 // グローバルインスタンス作成
 window.manualZoomController = new ManualZoomController();
+
+// 古いLocalStorageをクリア（一度だけ実行）
+const migrationKey = 'rephrase_zoom_migration_v2';
+if (!localStorage.getItem(migrationKey)) {
+    localStorage.removeItem('rephrase_zoom_level');
+    localStorage.setItem(migrationKey, 'true');
+    console.log('🔄 古いズーム設定をリセットしました');
+}
 
 // DOM読み込み完了時に初期化
 if (document.readyState === 'loading') {
