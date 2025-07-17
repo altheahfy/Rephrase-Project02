@@ -30,27 +30,10 @@ class ResponsiveLayoutManager {
         // リサイズ監視
         this.setupResizeObserver();
         
-        // ウィンドウリサイズイベント（複数の方法で監視）
+        // ウィンドウリサイズイベント
         window.addEventListener('resize', () => {
             this.debounceAdjustLayout();
         });
-        
-        // オリエンテーション変更対応（モバイル端末用）
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                this.adjustLayout();
-            }, 500); // オリエンテーション変更後少し待つ
-        });
-        
-        // ビューポート変更監視（より細かい制御）
-        let lastWindowWidth = window.innerWidth;
-        setInterval(() => {
-            const currentWidth = window.innerWidth;
-            if (Math.abs(currentWidth - lastWindowWidth) > 10) {
-                lastWindowWidth = currentWidth;
-                this.adjustLayout();
-            }
-        }, 1000); // 1秒ごとにチェック
         
         this.initialized = true;
         console.log('✅ レスポンシブレイアウトマネージャー開始');
@@ -82,7 +65,7 @@ class ResponsiveLayoutManager {
         clearTimeout(this.adjustTimeout);
         this.adjustTimeout = setTimeout(() => {
             this.adjustLayout();
-        }, 50); // より高速な反応
+        }, 100);
     }
     
     /**
@@ -91,15 +74,13 @@ class ResponsiveLayoutManager {
     adjustLayout() {
         if (!this.slotWrapper) return;
         
-        // 🎯 ウィンドウ幅も考慮した幅計算
-        const windowWidth = window.innerWidth;
-        const containerWidth = Math.min(this.slotWrapper.offsetWidth, windowWidth - 40); // 余白を考慮
+        const containerWidth = this.slotWrapper.offsetWidth;
         const slotContainers = document.querySelectorAll('.slot-container:not(.hidden-empty)');
         const slotCount = slotContainers.length;
         
         if (slotCount === 0) return;
         
-        console.log(`📐 レイアウト調整: ウィンドウ幅${windowWidth}px, コンテナ幅${containerWidth}px, スロット数${slotCount}`);
+        console.log(`📐 レイアウト調整: 幅${containerWidth}px, スロット数${slotCount}`);
         
         // 🎯 全体スケール調整方式：横一列を維持して全体を縮小
         const { globalScale } = this.calculateOptimalScale(containerWidth, slotCount);
@@ -126,19 +107,15 @@ class ResponsiveLayoutManager {
         
         if (idealTotalWidth > containerWidth) {
             // 必要な縮小率を計算
-            globalScale = Math.max(0.2, containerWidth / idealTotalWidth); // 最小スケールを0.2に
+            globalScale = Math.max(0.3, containerWidth / idealTotalWidth);
             
-            // 🎯 より細かい調整 - HD解像度対応
-            if (containerWidth < 400) {
-                globalScale = Math.min(globalScale, 0.3); // 非常に小さい画面
-            } else if (containerWidth < 600) {
-                globalScale = Math.min(globalScale, 0.5); // スマートフォン
-            } else if (containerWidth < 800) {
-                globalScale = Math.min(globalScale, 0.6); // 小型タブレット
-            } else if (containerWidth < 1000) {
-                globalScale = Math.min(globalScale, 0.7); // 中型タブレット・小型PC
+            // より細かい調整
+            if (containerWidth < 600) {
+                globalScale = Math.min(globalScale, 0.5);
+            } else if (containerWidth < 900) {
+                globalScale = Math.min(globalScale, 0.7);
             } else if (containerWidth < 1200) {
-                globalScale = Math.min(globalScale, 0.85); // 中型PC
+                globalScale = Math.min(globalScale, 0.85);
             }
         }
         
