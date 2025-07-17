@@ -53,8 +53,11 @@ class ZoomController {
    * 上位スロット・サブスロット全体を含む領域
    */
   identifyTargetContainers() {
+    // 既存のコンテナリストをクリア
+    this.targetContainers = [];
+
     // メインスロットエリア（上位スロット群）
-    const mainSlotWrapper = document.querySelector('.slot-wrapper');
+    const mainSlotWrapper = document.querySelector('.slot-wrapper:not([id$="-sub"])');
     if (mainSlotWrapper) {
       this.targetContainers.push({
         element: mainSlotWrapper,
@@ -63,17 +66,26 @@ class ZoomController {
       });
     }
 
-    // サブスロットエリア群
+    // サブスロットエリア群（より確実な検出）
     const subSlotWrappers = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
     subSlotWrappers.forEach((wrapper, index) => {
-      this.targetContainers.push({
-        element: wrapper,
-        type: 'sub',
-        id: wrapper.id || `sub-slots-${index}`
-      });
+      // 表示されているサブスロットのみを対象
+      const isVisible = wrapper.style.display !== 'none' && 
+                       getComputedStyle(wrapper).display !== 'none';
+      
+      if (isVisible) {
+        this.targetContainers.push({
+          element: wrapper,
+          type: 'sub',
+          id: wrapper.id || `sub-slots-${index}`
+        });
+      }
     });
 
     console.log(`🎯 ズーム対象コンテナ: ${this.targetContainers.length}個を特定`);
+    this.targetContainers.forEach(container => {
+      console.log(`  - ${container.type}: ${container.id}`);
+    });
   }
 
   /**
@@ -229,33 +241,63 @@ class ZoomController {
   setupDynamicSubslotObserver() {
     const observer = new MutationObserver((mutations) => {
       let needsUpdate = false;
+      let subslotChange = false;
 
       mutations.forEach((mutation) => {
+        // 1. スタイル変更の監視（display: none ↔ block）
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           const target = mutation.target;
           if (target.classList.contains('slot-wrapper') && target.id && target.id.endsWith('-sub')) {
+            console.log(`📱 サブスロット表示変更検出: ${target.id}`);
             needsUpdate = true;
+            subslotChange = true;
           }
+        }
+        
+        // 2. DOM追加・削除の監視
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // サブスロット要素の追加
+              if (node.classList && node.classList.contains('slot-wrapper') && 
+                  node.id && node.id.endsWith('-sub')) {
+                console.log(`➕ サブスロット要素追加: ${node.id}`);
+                needsUpdate = true;
+                subslotChange = true;
+              }
+              
+              // サブスロット内の子要素追加
+              const subWrappers = node.querySelectorAll && node.querySelectorAll('.slot-wrapper[id$="-sub"]');
+              if (subWrappers && subWrappers.length > 0) {
+                console.log(`➕ サブスロット子要素追加: ${subWrappers.length}個`);
+                needsUpdate = true;
+                subslotChange = true;
+              }
+            }
+          });
         }
       });
 
       if (needsUpdate) {
-        // 新たに表示されたサブスロットにもズームを適用
+        // サブスロット変更時は少し遅延させて確実に適用
+        const delay = subslotChange ? 300 : 100;
         setTimeout(() => {
+          console.log('🔄 サブスロット変更によるズーム再適用');
           this.identifyTargetContainers();
           this.applyZoom(this.currentZoom);
-        }, 100);
+        }, delay);
       }
     });
 
-    // body全体を監視（サブスロット表示の変更を捕捉）
+    // より広範囲を監視
     observer.observe(document.body, {
       attributes: true,
+      childList: true,
       subtree: true,
-      attributeFilter: ['style']
+      attributeFilter: ['style', 'class']
     });
 
-    console.log('👁️ サブスロット動的監視を開始');
+    console.log('👁️ 強化されたサブスロット動的監視を開始');
   }
 
   /**
@@ -277,6 +319,23 @@ class ZoomController {
    */
   getCurrentZoom() {
     return this.currentZoom;
+  }
+
+  /**
+   * サブスロット検出を強制実行
+   * サブスロット展開後に手動で呼び出し可能
+   */
+  forceSubslotDetection() {
+    console.log('🔍 サブスロット強制検出を実行');
+    this.identifyTargetContainers();
+    this.applyZoom(this.currentZoom);
+    
+    // 検出結果をログ出力
+    const subslots = this.targetContainers.filter(c => c.type === 'sub');
+    console.log(`📱 検出されたサブスロット: ${subslots.length}個`);
+    subslots.forEach(sub => {
+      console.log(`  - ${sub.id}: 表示=${sub.element.style.display !== 'none'}`);
+    });
   }
 
   /**
@@ -327,6 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setZoom = (level) => zoomController.setZoom(level);
     window.resetZoom = () => zoomController.resetZoom();
     window.getCurrentZoom = () => zoomController.getCurrentZoom();
+    window.forceSubslotDetection = () => zoomController.forceSubslotDetection();
     
   }, 500);
 });

@@ -126,6 +126,16 @@ function toggleExclusiveSubslot(slotId) {
       console.warn("⚠ createSubslotControlPanel 関数が見つかりません");
     }
 
+    // 🔍 ★★★ ズーム機能連携：サブスロット展開後にズーム適用 ★★★
+    if (window.forceSubslotDetection) {
+      setTimeout(() => {
+        console.log(`🔍 ${slotId} サブスロット展開完了 - ズーム適用`);
+        window.forceSubslotDetection();
+      }, 500); // サブスロット生成完了を確実に待つ
+    } else {
+      console.warn("⚠ ズームコントローラーが利用できません");
+    }
+
     // ★★★ サブスロット用コントロールパネルを追加 ★★★
     if (window.addSubslotControlPanel) {
       console.log(`🎛️ ${slotId} にサブスロット用コントロールパネルを追加します`);
