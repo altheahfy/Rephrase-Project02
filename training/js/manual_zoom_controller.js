@@ -12,7 +12,7 @@ class ManualZoomController {
         this.minZoom = 0.5; // 縮小範囲
         this.maxZoom = 1.5; // 拡大範囲
         this.zoomStep = 0.1;
-        this.targetSelector = '.slot-container, .upper-slot, .sub-slot'; // スロット要素のみ対象
+        this.targetSelector = '#main-content'; // 全体コンテナを対象
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -242,12 +242,6 @@ class ManualZoomController {
     applyZoom() {
         const targetElements = document.querySelectorAll(this.targetSelector);
         
-        console.log(`🎯 ズーム対象セレクター: ${this.targetSelector}`);
-        console.log(`🎯 見つかった要素数: ${targetElements.length}`);
-        targetElements.forEach((element, index) => {
-            console.log(`🎯 要素${index}:`, element.className, element.tagName);
-        });
-        
         targetElements.forEach(element => {
             if (element) {
                 // 左右位置関係を保つため、左上基準でスケール
@@ -349,10 +343,13 @@ class ManualZoomController {
 // グローバルインスタンス作成
 window.manualZoomController = new ManualZoomController();
 
-// 強制的にLocalStorageをクリア（デバッグ用）
-localStorage.removeItem('rephrase_zoom_level');
-localStorage.removeItem('rephrase_zoom_migration_v2');
-console.log('🔄 強制的にズーム設定をクリアしました');
+// 古いLocalStorageをクリア（一度だけ実行）
+const migrationKey = 'rephrase_zoom_migration_v2';
+if (!localStorage.getItem(migrationKey)) {
+    localStorage.removeItem('rephrase_zoom_level');
+    localStorage.setItem(migrationKey, 'true');
+    console.log('🔄 古いズーム設定をリセットしました');
+}
 
 // DOM読み込み完了時に初期化
 if (document.readyState === 'loading') {
