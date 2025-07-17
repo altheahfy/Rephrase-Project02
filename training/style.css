@@ -434,7 +434,7 @@ h1 {
   /* �E 動的幁E��整シスチE�� - 褁E��画像対応で大幁E��大 */
   min-width: 160px; /* 最小幁E��拡大 */
   width: auto; /* 自動幁E��整 */
-  max-width: 1000px; /* 🎯 褁E��画像表示のためさらに拡大 */
+  max-width: none; /* 🎯 ズーム機能のため固定幅制限を撤去 */
   flex: 0 0 auto; /* flexアイチE��として自動サイズ */
   
   /* アニメーション */
@@ -1367,12 +1367,16 @@ h1 {
 .slot-wrapper {
   transition: transform 0.3s ease;
   transform-origin: top left;
+  /* ズーム時の幅制限を撤去してブラウザ幅に適応 */
+  max-width: none;
+  width: 100%;
 }
 
 /* ズーム時のオーバーフロー対応 */
 .zoomed-container {
-  overflow-x: auto;
+  overflow-x: visible; /* ズーム時は横スクロールを無効化 */
   overflow-y: visible;
+  width: 100%;
 }
 
 /* ズーム値表示のスタイル強化 */

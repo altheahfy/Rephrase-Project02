@@ -115,6 +115,17 @@ class ZoomController {
         container.element.style.transform = `scale(${zoomLevel})`;
         container.element.style.transformOrigin = 'top left';
         
+        // ズーム時の幅制限を動的に調整
+        if (zoomLevel < 1.0) {
+          // 縮小時は幅制限を撤去してブラウザ幅を最大活用
+          container.element.style.maxWidth = 'none';
+          container.element.style.width = '100%';
+        } else {
+          // 拡大時も柔軟な幅設定
+          container.element.style.maxWidth = 'none';
+          container.element.style.width = 'auto';
+        }
+        
         // スケール適用時の位置調整
         if (zoomLevel !== 1.0) {
           container.element.style.marginBottom = `${(1 - zoomLevel) * 100}px`;
@@ -124,8 +135,8 @@ class ZoomController {
       }
     });
 
-    // ズーム倍率が高い場合のスクロールヒント表示
-    if (zoomLevel > 1.2) {
+    // ズーム倍率が高い場合のスクロールヒント表示（縮小時はスクロール不要）
+    if (zoomLevel > 1.3) {
       this.showScrollHint(true);
     }
 
