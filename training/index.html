@@ -7,6 +7,9 @@
   </title>
   <link href="style.css" rel="stylesheet"/>
   <link href="css/voice_progress.css" rel="stylesheet"/>
+  <script src="js/voice_system.js"></script>
+  <script src="js/voice_progress_tracker.js"></script>
+  <script src="js/voice_progress_ui.js"></script>
   <script src="js/subslot_toggle.js">
   </script>
   <script src="js/randomizer_individual.js">
@@ -112,6 +115,113 @@
 
 <!-- 🎯 メインコンテンツエリア（ローディング完了まで非表示） -->
 <div id="main-content" style="display: none;">
+
+<!-- 🎤 音声学習パネル（右上固定） -->
+<div id="voice-panel-container" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 15000;
+  width: 250px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #667eea;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+">
+  <!-- 基本パネル部分 -->
+  <div id="voice-panel-basic" style="display: block; position: relative;">
+    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+      <h3 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">🎤 音声学習</h3>
+      <button id="voice-panel-minimize-btn" style="background-color: #ccc; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">−</button>
+    </div>
+    
+    <!-- 音声コントロールボタン -->
+    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px;">
+      <button id="voice-record-btn" class="voice-btn" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
+      <button id="voice-play-btn" class="voice-btn" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+      <button id="voice-tts-btn" class="voice-btn" style="background-color: #FF9800; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
+      <button id="voice-analyze-btn" class="voice-btn" style="background-color: #9C27B0; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+      <button id="voice-stop-btn" class="voice-btn" style="display: none; background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">⏹️ 停止</button>
+    </div>
+    
+    <!-- ステータス表示 -->
+    <div id="voice-status" class="voice-status info" style="color: #333; font-size: 10px; background: rgba(76, 175, 80, 0.1); padding: 2px 4px; border-radius: 10px; text-align: center;">待機中...</div>
+    
+    <!-- 録音タイマー -->
+    <div id="voice-timer" style="display: none; font-size: 10px; color: #666; text-align: center; margin-top: 4px;">録音時間: <span id="voice-timer-text">0:00</span></div>
+    
+    <!-- 音量バー -->
+    <div id="voice-volume-container" style="margin-top: 8px; display: none;">
+      <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden;">
+        <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
+      </div>
+    </div>
+    
+    <!-- 学習進捗ボタン - 基本パネル内に配置 -->
+    <div style="text-align: center; margin-top: 12px;">
+      <button id="voice-progress-btn" style="
+        background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        font-size: 11px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
+        width: 100%;
+      " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+        📊 学習進捗
+      </button>
+    </div>
+  </div>
+  
+  <!-- 拡張パネル部分（分析結果表示） - 下方向に拡張 -->
+  <div id="voice-panel-expanded" style="
+    display: none; 
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid #667eea;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 16000;
+    min-height: 250px;
+    max-height: 400px;
+    overflow-y: auto;
+  ">
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+      <h4 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">📊 分析結果</h4>
+      <button id="voice-panel-close-expanded-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕ 閉じる</button>
+    </div>
+    
+    <!-- 分析結果表示エリア -->
+    <div id="voice-analysis-results" style="font-size: 12px; color: #555;">
+      <div id="voice-evaluation-result" style="margin-bottom: 12px; padding: 8px; background: #f9f9f9; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
+      <div id="voice-waveform-container" style="margin-bottom: 12px; display: none;">
+        <canvas id="voice-waveform-canvas" width="280" height="60" style="width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 4px; background: white;"></canvas>
+      </div>
+      <div id="voice-progress-display" style="margin-bottom: 12px; padding: 8px; background: #e8f5e8; border-radius: 6px; border: 1px solid #d0d0d0;"></div>
+    </div>
+  </div>
+  
+  <!-- 最小化表示 -->
+  <div id="voice-panel-minimized" style="display: none;">
+    <div style="display: flex; align-items: center; justify-content: center;">
+      <span style="font-size: 18px; cursor: pointer;" id="voice-panel-restore-btn">🎤</span>
+    </div>
+  </div>
+</div>
 
 <!-- 🔹 分離疑問詞用表示領域 -->
 <div id="display-top-question-word">
@@ -335,6 +445,114 @@
     <!-- 進捗表示ボタン -->
     <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
       <button id="voice-progress-btn" class="voice-btn" style="background-color: #607D8B; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 学習進捗</button>
+    </div>
+  </div>
+  
+  <!-- 🎤 右上フロート音声学習パネル -->
+  <div id="voice-control-panel" style="
+    position: fixed !important;
+    top: 60px !important;
+    right: 10px !important;
+    z-index: 15000 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    border: 2px solid #667eea !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+    min-width: 200px !important;
+    max-width: 300px !important;
+    transition: all 0.3s ease !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  ">
+    <!-- 基本パネル部分 -->
+    <div id="voice-panel-basic" style="display: block; position: relative;">
+      <div style="display: flex; align-items: center; margin-bottom: 8px;">
+        <h3 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">🎤 音声学習</h3>
+        <button id="voice-panel-minimize-btn" style="background-color: #ccc; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; margin-left: auto;">−</button>
+      </div>
+      
+      <!-- 音声コントロールボタン -->
+      <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px;">
+        <button id="voice-record-btn" class="voice-btn" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
+        <button id="voice-play-btn" class="voice-btn" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+        <button id="voice-tts-btn" class="voice-btn" style="background-color: #FF9800; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
+        <button id="voice-analyze-btn" class="voice-btn" style="background-color: #9C27B0; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+        <button id="voice-stop-btn" class="voice-btn" style="display: none; background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">⏹️ 停止</button>
+      </div>
+      
+      <!-- ステータス表示 -->
+      <div id="voice-status" class="voice-status info" style="color: #333; font-size: 10px; background: rgba(76, 175, 80, 0.1); padding: 2px 4px; border-radius: 10px; text-align: center;">待機中...</div>
+      
+      <!-- 録音タイマー -->
+      <div id="voice-timer" style="display: none; font-size: 10px; color: #666; text-align: center; margin-top: 4px;">録音時間: <span id="voice-timer-text">0:00</span></div>
+      
+      <!-- 音量バー -->
+      <div id="voice-volume-container" style="margin-top: 8px; display: none;">
+        <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden;">
+          <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
+        </div>
+      </div>
+      
+      <!-- 学習進捗ボタン - 基本パネル内に配置 -->
+      <div style="text-align: center; margin-top: 12px;">
+        <button id="voice-progress-btn" style="
+          background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          font-size: 11px;
+          cursor: pointer;
+          border-radius: 4px;
+          font-weight: bold;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          transition: all 0.2s ease;
+          width: 100%;
+        " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          📊 学習進捗
+        </button>
+      </div>
+    </div>
+    
+    <!-- 拡張パネル部分（分析結果表示） - 下方向に拡張 -->
+    <div id="voice-panel-expanded" style="
+      display: none; 
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid #667eea;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 16000;
+      min-height: 250px;
+      max-height: 400px;
+      overflow-y: auto;
+    ">
+      <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <h4 style="margin: 0; color: #333; font-size: 14px; font-weight: bold;">📊 分析結果</h4>
+        <button id="voice-panel-close-expanded-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕ 閉じる</button>
+      </div>
+      
+      <!-- 分析結果表示エリア -->
+      <div id="voice-analysis-results" style="font-size: 12px; color: #555;">
+        <div id="voice-evaluation-result" style="margin-bottom: 12px; padding: 8px; background: #f9f9f9; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
+        <div id="voice-waveform-container" style="margin-bottom: 12px; display: none;">
+          <canvas id="voice-waveform-canvas" width="280" height="60" style="width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 4px; background: white;"></canvas>
+        </div>
+        <div id="voice-progress-display" style="margin-bottom: 12px; padding: 8px; background: #e8f5e8; border-radius: 6px; border: 1px solid #d0d0d0;"></div>
+      </div>
+    </div>
+    
+    <!-- 最小化表示 -->
+    <div id="voice-panel-minimized" style="display: none;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 18px; cursor: pointer;" id="voice-panel-restore-btn">🎤</span>
+      </div>
     </div>
   </div>
   
@@ -1148,7 +1366,7 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           
           // 🎤 音声システム用: processedDataをwindow.lastSelectedSlotsにも保存
           // （randomizeAll内で設定されたwindow.lastSelectedSlotsを保持）
-          console.log("🎤 音声システム用 lastSelectedSlots確認:", window.lastSelectedSlots ? `${window.lastSelectedSlots.length}件` : '未設定');
+//           console.log("🎤 音声システム用 lastSelectedSlots確認:", window.lastSelectedSlots ? `${window.lastSelectedSlots.length}件` : '未設定');
           
           // 構造を構築（processedDataは表示用、lastSelectedSlotsは音声システム用として分離）
           buildStructure(processedData);
@@ -1672,180 +1890,233 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 🔧 **プリセット設定を動的に読み込む機能**
-async function loadPresetConfig() {
-  try {
-    const response = await fetch('data/preset_config.json');
-    if (!response.ok) {
-      console.log('preset_config.jsonが見つかりません。デフォルトのプリセットを使用します。');
-      return;
-    }
-    
-    const config = await response.json();
-    const presetSelect = document.getElementById('presetSelect');
-    
-    if (presetSelect && config.presets) {
-      // 既存のオプションをクリア（最初のデフォルトオプションは保持)
-      const defaultOption = presetSelect.querySelector('option[value=""]');
-      presetSelect.innerHTML = '';
-      if (defaultOption) {
-        presetSelect.appendChild(defaultOption);
-      } else {
-        presetSelect.innerHTML = '<option value="">-- データを選択 --</option>';
-      }
-      
-      // 設定ファイルからプリセットを追加
-      config.presets.forEach(preset => {
-        const option = document.createElement('option');
-        option.value = preset.file;
-        option.textContent = preset.name;
-        option.title = preset.description;
-        presetSelect.appendChild(option);
-      });
-      
-      console.log(`🔧 プリセット設定を動的に読み込み完了: ${config.presets.length}件`);
-    }
-  } catch (error) {
-    console.log('プリセット設定の読み込みに失敗しました。デフォルトのプリセットを使用します。', error);
-  }
-}
-
-// DOMContentLoadedでプリセット設定を読み込み
-document.addEventListener('DOMContentLoaded', loadPresetConfig);
-
-
-
-// 🎭 ローディング制御関数
-function hideLoadingOverlay() {
-  console.log("🎭 hideLoadingOverlay() 関数が呼ばれました");
-  const overlay = document.getElementById('loading-overlay');
-  const mainContent = document.getElementById('main-content');
-  
-  console.log("🎭 overlay要素:", overlay);
-  console.log("🎭 mainContent要素:", mainContent);
-  
-  if (overlay && mainContent) {
-    console.log("🎭 ローディング完了 - メインコンテンツを表示準備中...");
-    
-    // シンプルな遅延でローディングを隠す
-    setTimeout(() => {
-      console.log("🎭 ローディングオーバーレイを隠します");
-      
-      // ローディングオーバーレイを即座に隠す
-      overlay.style.display = 'none';
-      console.log("🎭 overlay.style.display = 'none' 実行完了");
-      
-      // メインコンテンツを表示
-      mainContent.style.display = 'block';
-      mainContent.style.opacity = '1';
-      console.log("🎭 mainContent表示設定完了");
-      
-      console.log("🎭 メインコンテンツ表示完了");
-    }, 500); // シンプルな500ms遅延
-  } else {
-    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
-  }
-}
-
-function showLoadingOverlay() {
-  console.log("🎭 showLoadingOverlay() 関数が呼ばれました");
-  const overlay = document.getElementById('loading-overlay');
-  const mainContent = document.getElementById('main-content');
-  
-  console.log("🎭 overlay要素:", overlay);
-  console.log("🎭 mainContent要素:", mainContent);
-  
-  if (overlay && mainContent) {
-    console.log("🎭 ローディング開始 - メインコンテンツを隠す");
-    
-    // 確実にローディングを表示し、メインコンテンツを隠す
-    overlay.style.display = 'flex';
-    overlay.style.opacity = '1';
-    overlay.style.transition = 'none'; // トランジションをリセット
-    console.log("🎭 overlay表示設定完了");
-    
-    mainContent.style.display = 'none';
-    mainContent.style.opacity = '0';
-    mainContent.style.transition = 'none'; // トランジションをリセット
-    console.log("🎭 mainContent非表示設定完了");
-  } else {
-    console.error("🎭 エラー: overlay または mainContent 要素が見つかりません");
-  }
-}
-
-// JSONファイルが選択された時のローディング表示更新
+// 🎤 音声システムの初期化
 document.addEventListener('DOMContentLoaded', function() {
-  const fileInput = document.getElementById('jsonFileInput');
-  const loadingText = document.querySelector('#loading-overlay p');
+  console.log('🎤 音声システムの初期化開始');
   
-  if (fileInput && loadingText) {
-    fileInput.addEventListener('change', function() {
-      if (this.files.length > 0) {
-        loadingText.textContent = `${this.files[0].name} を読み込み準備完了`;
-      } else {
-        loadingText.textContent = 'JSONファイルをロードしてください';
+  // 音声システムの初期化を遅延実行
+  setTimeout(() => {
+    if (typeof setupVoiceSystem === 'function') {
+      console.log('🎤 音声システムセットアップ実行');
+      setupVoiceSystem();
+    } else {
+      console.log('🎤 音声システムの手動初期化');
+      // 手動で音声パネルのイベントリスナーを設定
+      setupVoicePanel();
+    }
+    
+    // 音声進捗システムの初期化
+    if (typeof VoiceProgressTracker !== 'undefined' && typeof VoiceProgressUI !== 'undefined') {
+      console.log('🎤 音声進捗システムを初期化中...');
+      
+      // トラッカーの初期化
+      window.voiceProgressTracker = new VoiceProgressTracker();
+      
+      // UIの初期化
+      window.voiceProgressUI = new VoiceProgressUI();
+      
+      console.log('✅ 音声進捗システムの初期化完了');
+    } else {
+      console.log('⚠️ 音声進捗システムのスクリプトが読み込まれていません');
+    }
+  }, 1000);
+});
+
+// 🎤 音声パネルのイベントリスナー設定
+function setupVoicePanel() {
+  console.log('🎤 音声パネルの手動セットアップ開始');
+  
+  // 最小化ボタン
+  const minimizeBtn = document.getElementById('voice-panel-minimize-btn');
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener('click', function() {
+      const basicPanel = document.getElementById('voice-panel-basic');
+      const minimizedPanel = document.getElementById('voice-panel-minimized');
+      if (basicPanel && minimizedPanel) {
+        basicPanel.style.display = 'none';
+        minimizedPanel.style.display = 'block';
       }
     });
   }
+  
+  // 復元ボタン
+  const restoreBtn = document.getElementById('voice-panel-restore-btn');
+  if (restoreBtn) {
+    restoreBtn.addEventListener('click', function() {
+      const basicPanel = document.getElementById('voice-panel-basic');
+      const minimizedPanel = document.getElementById('voice-panel-minimized');
+      if (basicPanel && minimizedPanel) {
+        basicPanel.style.display = 'block';
+        minimizedPanel.style.display = 'none';
+      }
+    });
+  }
+  
+  // 拡張パネル閉じるボタン
+  const closeExpandedBtn = document.getElementById('voice-panel-close-expanded-btn');
+  if (closeExpandedBtn) {
+    closeExpandedBtn.addEventListener('click', function() {
+      const expandedPanel = document.getElementById('voice-panel-expanded');
+      if (expandedPanel) {
+        expandedPanel.style.display = 'none';
+      }
+    });
+  }
+  
+  // 学習進捗ボタン
+  const progressBtn = document.getElementById('voice-progress-btn');
+  if (progressBtn) {
+    progressBtn.addEventListener('click', function() {
+      console.log('📊 学習進捗ボタンクリック');
+      
+      // 音声進捗システムを使用
+      if (window.voiceProgressUI) {
+        window.voiceProgressUI.show();
+      } else {
+        console.log('⚠️ 音声進捗システムが利用できません');
+        alert('音声進捗システムが初期化されていません。\nページを再読み込みしてください。');
+      }
+    });
+  }
+  
+  // 音声コントロールボタンの基本設定
+  const voiceBtns = document.querySelectorAll('.voice-btn');
+  voiceBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      console.log(`🎤 音声ボタンクリック: ${this.id}`);
+      
+      // 基本的な音声機能のプレースホルダー
+      if (this.id === 'voice-record-btn') {
+        handleVoiceRecord();
+      } else if (this.id === 'voice-play-btn') {
+        handleVoicePlay();
+      } else if (this.id === 'voice-tts-btn') {
+        handleVoiceTTS();
+      } else if (this.id === 'voice-analyze-btn') {
+        handleVoiceAnalyze();
+      } else if (this.id === 'voice-stop-btn') {
+        handleVoiceStop();
+      }
+    });
+  });
+  
+  console.log('✅ 音声パネルの手動セットアップ完了');
+}
+
+// 🎤 音声機能のプレースホルダー関数
+function handleVoiceRecord() {
+  console.log('🎤 録音機能（未実装）');
+  const status = document.getElementById('voice-status');
+  if (status) {
+    status.textContent = '録音機能は今後実装予定です';
+    status.className = 'voice-status warning';
+  }
+}
+
+function handleVoicePlay() {
+  console.log('🔊 再生機能（未実装）');
+  const status = document.getElementById('voice-status');
+  if (status) {
+    status.textContent = '再生機能は今後実装予定です';
+    status.className = 'voice-status warning';
+  }
+}
+
+function handleVoiceTTS() {
+  console.log('🗣️ TTS機能（未実装）');
+  const status = document.getElementById('voice-status');
+  if (status) {
+    status.textContent = 'TTS機能は今後実装予定です';
+    status.className = 'voice-status warning';
+  }
+}
+
+function handleVoiceAnalyze() {
+  console.log('📊 分析機能（未実装）');
+  const expandedPanel = document.getElementById('voice-panel-expanded');
+  const resultsDiv = document.getElementById('voice-evaluation-result');
+  
+  if (expandedPanel && resultsDiv) {
+    expandedPanel.style.display = 'block';
+    resultsDiv.innerHTML = `
+      <h4>📊 音声分析結果</h4>
+      <p>音声分析機能は今後実装予定です。</p>
+      <div style="margin-top: 8px; padding: 8px; background: #fff3cd; border-radius: 4px; border: 1px solid #ffeaa7;">
+        <strong>実装予定機能:</strong>
+        <ul style="margin: 4px 0; padding-left: 20px;">
+          <li>発音精度の評価</li>
+          <li>音声波形の表示</li>
+          <li>進捗記録の保存</li>
+        </ul>
+      </div>
+    `;
+  }
+}
+
+function handleVoiceStop() {
+  console.log('⏹️ 停止機能（未実装）');
+  const status = document.getElementById('voice-status');
+  if (status) {
+    status.textContent = '待機中...';
+    status.className = 'voice-status info';
+  }
+}
+
+console.log('🎤 音声システム関連のスクリプトロード完了');
+</script>
+
+<!-- 音声進捗システムの初期化 -->
+<script>
+// 音声進捗システムの初期化
+document.addEventListener('DOMContentLoaded', function() {
+  // 音声進捗システムの初期化
+  if (typeof VoiceProgressTracker !== 'undefined' && typeof VoiceProgressUI !== 'undefined') {
+    console.log('音声進捗システムを初期化中...');
+    
+    // トラッカーの初期化
+    window.voiceProgressTracker = new VoiceProgressTracker();
+    
+    // UIの初期化
+    window.voiceProgressUI = new VoiceProgressUI();
+    
+    console.log('✅ 音声進捗システムの初期化完了');
+  } else {
+    console.log('⚠️ 音声進捗システムのスクリプトが読み込まれていません');
+  }
 });
 
-// 🎯 **重複回避デバッグ用関数**
-window.debugRandomizeAvoidance = function() {
-  console.log('🎯 === 重複回避機能デバッグ情報 ===');
-  
-  if (window.currentRandomizedState) {
-    console.log('🎯 現在の状態:', window.currentRandomizedState);
-  } else {
-    console.log('🎯 現在の状態: 未初期化');
+// 学習進捗ボタン設定
+function setupProgressButton() {
+  const progressBtn = document.getElementById('voice-progress-btn');
+  if (progressBtn && !progressBtn.hasAttribute('data-listener-added')) {
+    progressBtn.addEventListener('click', function() {
+      console.log('📊 学習進捗ボタンクリック');
+      
+      // 以前のシステムを使用して進捗表示
+      if (window.voiceProgressUI) {
+        window.voiceProgressUI.show();
+      } else {
+        console.log('音声進捗UIシステムを初期化中...');
+        // UIシステムが未初期化の場合は初期化
+        setTimeout(() => {
+          if (window.voiceProgressUI) {
+            window.voiceProgressUI.show();
+          } else {
+            console.log('フォールバック: 簡易進捗表示');
+            alert('音声進捗システムが初期化されていません。');
+          }
+        }, 100);
+      }
+    });
+    progressBtn.setAttribute('data-listener-added', 'true');
+    console.log('✅ 学習進捗ボタンのイベントリスナーを設定');
   }
-  
-  if (window.randomizeHistory) {
-    const history = window.randomizeHistory.load();
-    console.log('🎯 履歴:', history);
-  } else {
-    console.log('🎯 履歴: 履歴管理機能なし');
-  }
-  
-  // 元データから直接V_group_keyを取得
-  let groups = [];
-  if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
-    // 処理済みデータの場合、元データを検索
-    groups = [...new Set(window.loadedJsonData.map(entry => entry.V_group_key).filter(v => v))];
-    
-    // 元データが見つからない場合は、フルプールから取得
-    if (groups.length === 0 && window.fullSlotPool) {
-      groups = [...new Set(window.fullSlotPool.map(entry => entry.V_group_key).filter(v => v))];
-    }
-  }
-  
-  console.log('🎯 利用可能なV_group_key:', groups);
-  console.log('🎯 利用可能なV_group_key数:', groups.length);
-  
-  // 追加のデバッグ情報
-  if (window.fullSlotPool) {
-    console.log('🎯 fullSlotPool サイズ:', window.fullSlotPool.length);
-    const fullPoolGroups = [...new Set(window.fullSlotPool.map(entry => entry.V_group_key).filter(v => v))];
-    console.log('🎯 fullSlotPool内のV_group_key:', fullPoolGroups);
-  }
-};
+}
 
-// 🎯 **重複回避履歴クリア関数**
-window.clearRandomizeHistory = function() {
-  try {
-    localStorage.removeItem('rephrase_randomize_history');
-    if (window.currentRandomizedState) {
-      window.currentRandomizedState.vGroupKey = null;
-      window.currentRandomizedState.exampleId = null;
-      window.currentRandomizedState.lastRandomizedTime = null;
-      window.currentRandomizedState.selectedSlots = [];
-    }
-    console.log('🎯 重複回避履歴をクリアしました');
-  } catch (error) {
-    console.error('🎯 重複回避履歴のクリアに失敗:', error);
-  }
-};
-
-
+// 初期化実行
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => setupProgressButton(), 200);
+});
 </script>
 
 <!-- 音声学習システムのスクリプト -->
