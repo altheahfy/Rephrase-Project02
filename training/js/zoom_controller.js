@@ -50,42 +50,49 @@ class ZoomController {
 
   /**
    * ズーム対象となるコンテナを特定
-   * 上位スロット・サブスロット全体を含む領域
+   * スロット領域全体（上位スロット・サブスロット）を含むsection要素を対象
    */
   identifyTargetContainers() {
     // 既存のコンテナリストをクリア
     this.targetContainers = [];
 
-    // メインスロットエリア（上位スロット群）
-    const mainSlotWrapper = document.querySelector('.slot-wrapper:not([id$="-sub"])');
-    if (mainSlotWrapper) {
-      this.targetContainers.push({
-        element: mainSlotWrapper,
-        type: 'main',
-        id: 'main-slots'
-      });
-    }
-
-    // サブスロットエリア群（より確実な検出）
-    const subSlotWrappers = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
-    subSlotWrappers.forEach((wrapper, index) => {
-      // 表示されているサブスロットのみを対象
-      const isVisible = wrapper.style.display !== 'none' && 
-                       getComputedStyle(wrapper).display !== 'none';
+    // スロット領域全体を含むsection要素を特定
+    const sections = document.querySelectorAll('section');
+    let slotSection = null;
+    
+    sections.forEach(section => {
+      // 例文シャッフルボタンとslot-wrapperを含むsectionを探す
+      const hasShuffleButton = section.querySelector('#randomize-all');
+      const hasSlotWrapper = section.querySelector('.slot-wrapper');
       
-      if (isVisible) {
-        this.targetContainers.push({
-          element: wrapper,
-          type: 'sub',
-          id: wrapper.id || `sub-slots-${index}`
-        });
+      if (hasShuffleButton && hasSlotWrapper) {
+        slotSection = section;
       }
     });
 
+    if (slotSection) {
+      this.targetContainers.push({
+        element: slotSection,
+        type: 'slot-section',
+        id: 'slot-section'
+      });
+      console.log('🎯 ズーム対象: スロット領域全体（section要素）');
+    } else {
+      console.warn('⚠️ スロット領域のsection要素が見つかりません');
+      
+      // フォールバック：個別にslot-wrapperを対象とする
+      const mainSlotWrapper = document.querySelector('.slot-wrapper:not([id$="-sub"])');
+      if (mainSlotWrapper) {
+        this.targetContainers.push({
+          element: mainSlotWrapper,
+          type: 'main',
+          id: 'main-slots'
+        });
+        console.log('🎯 フォールバック: メインスロットのみ対象');
+      }
+    }
+
     console.log(`🎯 ズーム対象コンテナ: ${this.targetContainers.length}個を特定`);
-    this.targetContainers.forEach(container => {
-      console.log(`  - ${container.type}: ${container.id}`);
-    });
   }
 
   /**
@@ -136,12 +143,6 @@ class ZoomController {
         container.element.style.setProperty('width', '100%', 'important');
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
-        
-        // 🎯 サブスロット専用：シンプルな配置調整のみ
-        if (container.type === 'sub') {
-          console.log(`    サブスロット要素: ${container.id}`);
-          // サブスロットは親要素のscaleで自動的にズームされるため、追加の処理は不要
-        }
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
         console.log(`  [${index}] 実際のDOM要素:`, container.element);
