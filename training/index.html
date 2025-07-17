@@ -2,9 +2,13 @@
 <html lang="en">
  <head>
   <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>
    Rephrase トレーニングUI
   </title>
+  <!-- 🎯 レスポンシブ最適化CSS（最優先） -->
+  <link href="responsive_styles.css" rel="stylesheet"/>
+  <!-- 既存CSS（フォールバック） -->
   <link href="style.css" rel="stylesheet"/>
   <link href="css/voice_progress.css" rel="stylesheet"/>
   <script src="js/subslot_toggle.js">
@@ -28,6 +32,11 @@
   <script src="js/voice_progress_tracker.js">
   </script>
   <script src="js/voice_progress_ui.js">
+  </script>
+  <!-- 🎯 レスポンシブシステム（順序重要：統合→最適化） -->
+  <script src="js/responsive_integration.js">
+  </script>
+  <script src="js/responsive_optimizer.js">
   </script>
  </head>
  <body>

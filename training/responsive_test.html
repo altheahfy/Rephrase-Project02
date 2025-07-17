@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rephraseプロジェクト - レスポンシブテスト</title>
+    <link href="responsive_styles.css" rel="stylesheet">
+    <style>
+        /* テスト用の追加スタイル */
+        .test-controls {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 9999;
+            max-width: 250px;
+        }
+        
+        .test-slot {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px;
+            color: white;
+            text-align: center;
+        }
+        
+        .test-slot img {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .test-slot .slot-text {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            padding: 6px;
+            margin-bottom: 4px;
+        }
+        
+        .test-slot .slot-phrase {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- テスト情報表示 -->
+        <div class="test-info">
+            <div id="viewport-info">画面: <span id="viewport-size">-</span></div>
+            <div id="category-info">カテゴリ: <span id="screen-category">-</span></div>
+            <div id="slot-info">スロット数: <span id="slot-count">-</span></div>
+            <div id="optimization-info">最適化: <span id="optimization-status">待機中</span></div>
+        </div>
+        
+        <!-- テスト制御パネル -->
+        <div class="test-controls">
+            <button onclick="addTestSlot()">スロット追加</button>
+            <button onclick="removeTestSlot()">スロット削除</button>
+            <button onclick="forceOptimization()">手動最適化</button>
+            <button onclick="toggleImages()">画像切替</button>
+        </div>
+        
+        <!-- ナビゲーションエリア -->
+        <div class="navigation-area">
+            <h1 style="margin: 0; color: white; text-align: center;">🎯 レスポンシブテスト</h1>
+        </div>
+        
+        <!-- メイン例文表示エリア -->
+        <div class="sentence-display-area" id="test-slot-area">
+            <!-- テスト用スロット要素 -->
+            <div class="slot-container test-slot" id="slot-m1">
+                <div class="slot-label">M1</div>
+                <div class="slot-image">📝 画像</div>
+                <div class="slot-text">She is a teacher</div>
+                <div class="slot-phrase">先生をしている彼女</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            </div>
+            
+            <div class="slot-container test-slot" id="slot-s">
+                <div class="slot-label">S</div>
+                <div class="slot-image">👩 画像</div>
+                <div class="slot-text">She</div>
+                <div class="slot-phrase">彼女は</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            </div>
+            
+            <div class="slot-container test-slot" id="slot-aux">
+                <div class="slot-label">AUX</div>
+                <div class="slot-image">⚡ 画像</div>
+                <div class="slot-text">is</div>
+                <div class="slot-phrase">である</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            </div>
+            
+            <div class="slot-container test-slot" id="slot-v">
+                <div class="slot-label">V</div>
+                <div class="slot-image">🎯 画像</div>
+                <div class="slot-text">working</div>
+                <div class="slot-phrase">働いている</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            </div>
+            
+            <div class="slot-container test-slot" id="slot-o1">
+                <div class="slot-label">O1</div>
+                <div class="slot-image">🏢 画像</div>
+                <div class="slot-text">at the office</div>
+                <div class="slot-phrase">オフィスで</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- コントロールパネル -->
+        <div class="control-panel">
+            <button class="control-btn">🔄 ランダマイズ</button>
+            <button class="control-btn">🎤 音声学習</button>
+            <button class="control-btn">📊 進捗確認</button>
+            <button class="control-btn">⚙️ 設定</button>
+        </div>
+    </div>
+    
+    <!-- レスポンシブシステム読み込み -->
+    <script src="js/responsive_integration.js"></script>
+    <script src="js/responsive_optimizer.js"></script>
+    
+    <script>
+        // テスト用スクリプト
+        let slotCounter = 6;
+        let showImages = true;
+        
+        function updateInfo() {
+            document.getElementById('viewport-size').textContent = 
+                `${window.innerWidth}x${window.innerHeight}`;
+            
+            if (window.responsiveOptimizer) {
+                const status = window.responsiveOptimizer.getSystemStatus();
+                document.getElementById('screen-category').textContent = status.screenCategory;
+                document.getElementById('slot-count').textContent = status.slotCount;
+                document.getElementById('optimization-status').textContent = 
+                    status.isInitialized ? '✅ 完了' : '⏳ 待機中';
+            }
+        }
+        
+        function addTestSlot() {
+            const area = document.getElementById('test-slot-area');
+            const newSlot = document.createElement('div');
+            newSlot.className = 'slot-container test-slot';
+            newSlot.id = `slot-test${slotCounter}`;
+            newSlot.innerHTML = `
+                <div class="slot-label">T${slotCounter}</div>
+                <div class="slot-image">🆕 画像</div>
+                <div class="slot-text">Test ${slotCounter}</div>
+                <div class="slot-phrase">テストスロット${slotCounter}</div>
+                <div class="voice-control-area">
+                    <button class="voice-btn">🎤</button>
+                    <button class="voice-btn">▶️</button>
+                </div>
+            `;
+            area.appendChild(newSlot);
+            slotCounter++;
+            
+            // 自動最適化をトリガー
+            setTimeout(updateInfo, 300);
+        }
+        
+        function removeTestSlot() {
+            const area = document.getElementById('test-slot-area');
+            const slots = area.querySelectorAll('.slot-container');
+            if (slots.length > 1) {
+                area.removeChild(slots[slots.length - 1]);
+                setTimeout(updateInfo, 300);
+            }
+        }
+        
+        function forceOptimization() {
+            if (window.responsiveOptimizer) {
+                window.responsiveOptimizer.forceOptimization();
+            }
+            if (window.responsiveIntegration) {
+                window.responsiveIntegration.forceIntegration();
+            }
+            setTimeout(updateInfo, 300);
+        }
+        
+        function toggleImages() {
+            const images = document.querySelectorAll('.slot-image');
+            showImages = !showImages;
+            images.forEach(img => {
+                img.style.display = showImages ? 'flex' : 'none';
+            });
+            setTimeout(updateInfo, 300);
+        }
+        
+        // 情報更新の定期実行
+        setInterval(updateInfo, 1000);
+        
+        // 初期化後に情報更新
+        setTimeout(updateInfo, 2000);
+        
+        // リサイズイベントでも更新
+        window.addEventListener('resize', () => {
+            setTimeout(updateInfo, 300);
+        });
+        
+        console.log('🧪 レスポンシブテスト画面準備完了');
+        console.log('💡 テスト機能:');
+        console.log('  - スロット追加/削除');
+        console.log('  - 手動最適化実行');
+        console.log('  - 画像表示切替');
+        console.log('  - リアルタイム情報表示');
+    </script>
+</body>
+</html>
