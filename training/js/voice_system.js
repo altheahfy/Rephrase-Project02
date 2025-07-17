@@ -1413,6 +1413,9 @@ class VoiceSystem {
             resultsContainer.innerHTML = resultsHtml;
         }
         
+        // 🎯 分析結果表示後にパネル位置を調整
+        this.adjustPanelPosition();
+        
         // 🎯 進捗追跡システムにデータを自動保存
         await this.saveProgressData(analysis);
         
@@ -1492,6 +1495,38 @@ class VoiceSystem {
         const resultsContainer = document.getElementById('voice-analysis-results');
         if (resultsContainer) {
             resultsContainer.appendChild(progressButton);
+        }
+    }
+    
+    /**
+     * 音声パネルの位置を画面内に調整
+     * 分析結果表示時に上に突き抜けないようにする
+     */
+    adjustPanelPosition() {
+        const panel = document.getElementById('voice-control-panel');
+        if (!panel) return;
+        
+        // パネルの現在のサイズを取得
+        const panelRect = panel.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        // パネルの上端が画面外に出ている場合
+        if (panelRect.top < 0) {
+            // 上端が0になるよう調整
+            const currentTop = parseInt(panel.style.top || '120px');
+            const adjustment = Math.abs(panelRect.top) + 10; // 10px余白
+            panel.style.top = `${currentTop + adjustment}px`;
+            
+            console.log(`🎯 パネル位置調整: ${currentTop}px → ${currentTop + adjustment}px`);
+        }
+        
+        // パネルの下端が画面外に出ている場合
+        if (panelRect.bottom > windowHeight) {
+            const currentTop = parseInt(panel.style.top || '120px');
+            const adjustment = panelRect.bottom - windowHeight + 10; // 10px余白
+            panel.style.top = `${currentTop - adjustment}px`;
+            
+            console.log(`🎯 パネル位置調整（下端）: ${currentTop}px → ${currentTop - adjustment}px`);
         }
     }
 
@@ -1979,8 +2014,9 @@ class VoiceSystem {
         if (panel) {
             panel.style.display = 'block';
             
-            // パネルが表示されたので、進捗ボタンのイベントリスナーを再設定
+            // パネルが表示された後、位置調整を実行
             setTimeout(() => {
+                this.adjustPanelPosition();
                 this.setupProgressButtonListener();
             }, 100);
         }
@@ -1998,6 +2034,9 @@ class VoiceSystem {
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
             }
+            // パネル位置をリセット
+            panel.style.top = '120px';
+            panel.style.right = '20px';
         }
     }
     
