@@ -315,6 +315,25 @@
           <div id="voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
         </div>
       </div>
+      
+      <!-- 学習進捗ボタン - 基本パネル内に配置 -->
+      <div style="text-align: center; margin-top: 12px;">
+        <button id="voice-progress-btn" style="
+          background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          font-size: 11px;
+          cursor: pointer;
+          border-radius: 4px;
+          font-weight: bold;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          transition: all 0.2s ease;
+          width: 100%;
+        " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          📊 学習進捗
+        </button>
+      </div>
     </div>
     
     <!-- 拡張パネル部分（分析結果表示） - 下方向に拡張 -->
@@ -347,24 +366,6 @@
           <canvas id="voice-waveform-canvas" width="280" height="60" style="width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 4px; background: white;"></canvas>
         </div>
         <div id="voice-progress-display" style="margin-bottom: 12px; padding: 8px; background: #e8f5e8; border-radius: 6px; border: 1px solid #d0d0d0;"></div>
-        
-        <!-- 学習進捗ボタンを拡張パネル内に配置 -->
-        <div style="text-align: center; margin-top: 16px;">
-          <button id="voice-progress-btn" style="
-            background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: bold;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-          " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            📈 詳細学習進捗を表示
-          </button>
-        </div>
       </div>
     </div>
     
@@ -2204,17 +2205,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBtn = document.getElementById('voice-progress-btn');
     if (progressBtn && !progressBtn.hasAttribute('data-listener-added')) {
       progressBtn.addEventListener('click', function() {
-        console.log('📈 学習進捗ボタンクリック');
-        showDetailedProgress();
+        console.log('� 学習進捗ボタンクリック');
+        showProgressPanel();
       });
       progressBtn.setAttribute('data-listener-added', 'true');
       console.log('✅ 学習進捗ボタンのイベントリスナーを設定');
     }
   }
   
+  // 進捗パネル表示
+  function showProgressPanel() {
+    // 拡張パネルを表示
+    const voicePanelExpanded = document.getElementById('voice-panel-expanded');
+    if (voicePanelExpanded) {
+      voicePanelExpanded.style.display = 'block';
+    }
+    
+    // 進捗データを表示
+    showDetailedProgress();
+  }
+  
   // 詳細学習進捗表示
   function showDetailedProgress() {
     const progressDisplay = document.getElementById('voice-progress-display');
+    const evaluationResult = document.getElementById('voice-evaluation-result');
+    
     if (progressDisplay) {
       const today = new Date().toDateString();
       const todayCount = localStorage.getItem(`recording_count_${today}`) || '0';
@@ -2224,14 +2239,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const weeklyProgress = calculateWeeklyProgress();
       
       progressDisplay.innerHTML = `
-        <strong>📈 詳細学習進捗:</strong><br>
+        <strong>� 詳細学習進捗:</strong><br>
         <div style="margin: 8px 0; padding: 6px; background: #f0f8ff; border-radius: 4px; border: 1px solid #b3d9ff;">
           <strong>📅 本日の実績:</strong><br>
           録音回数: ${todayCount}回<br>
           録音時間: ${Math.floor(parseInt(totalTime) / 60)}分
         </div>
         <div style="margin: 8px 0; padding: 6px; background: #f0fff0; border-radius: 4px; border: 1px solid #b3ffb3;">
-          <strong>📊 週間進捗:</strong><br>
+          <strong>� 週間進捗:</strong><br>
           ${weeklyProgress}
         </div>
         <div style="margin: 8px 0; padding: 6px; background: #fff8f0; border-radius: 4px; border: 1px solid #ffcc99;">
@@ -2251,6 +2266,43 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
     }
+    
+    // 分析結果エリアに学習状況を表示
+    if (evaluationResult) {
+      evaluationResult.innerHTML = `
+        <strong>📊 学習状況概要:</strong><br>
+        最新の学習状況: ${getRecentActivity()}<br>
+        総合評価: ${getOverallRating(parseInt(localStorage.getItem(`recording_count_${new Date().toDateString()}`) || '0'))}<br>
+        推奨練習: ${getRecommendation(parseInt(localStorage.getItem(`recording_count_${new Date().toDateString()}`) || '0'))}
+      `;
+    }
+  }
+  
+  // 最近の活動状況
+  function getRecentActivity() {
+    const todayCount = parseInt(localStorage.getItem(`recording_count_${new Date().toDateString()}`) || '0');
+    if (todayCount > 0) {
+      return `本日${todayCount}回練習済み`;
+    }
+    return '本日はまだ練習していません';
+  }
+  
+  // 総合評価
+  function getOverallRating(todayCount) {
+    if (todayCount >= 10) return '🏆 エクセレント';
+    if (todayCount >= 5) return '🌟 とても良い';
+    if (todayCount >= 3) return '👍 良い';
+    if (todayCount >= 1) return '🌱 スタート';
+    return '💪 始めましょう';
+  }
+  
+  // 推奨練習
+  function getRecommendation(todayCount) {
+    if (todayCount >= 10) return '素晴らしい！このペースを維持';
+    if (todayCount >= 5) return '良いペースです！';
+    if (todayCount >= 3) return 'もう少し練習してみましょう';
+    if (todayCount >= 1) return '継続して練習しましょう';
+    return '今日から始めてみましょう';
   }
   
   // 週間進捗計算
@@ -2417,6 +2469,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   console.log('✅ 音声パネル制御JavaScript初期化完了');
+  
+  // 学習進捗ボタンを初期化
+  setupProgressButton();
 });
 </script>
 
