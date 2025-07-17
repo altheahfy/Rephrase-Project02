@@ -4,8 +4,6 @@
  * 目的: ユーザーが手動でコンテンツサイズを調整できる機能
  */
 
-console.log('🚀 manual_zoom_controller.js ファイル読み込み開始');
-
 class ManualZoomController {
     constructor() {
         this.currentZoom = 0.8; // デフォルトを右寄り（縮小状態）に
@@ -181,6 +179,21 @@ class ManualZoomController {
                 this.setZoom(parseFloat(e.target.value));
             });
         }
+    }
+            });
+        });
+        
+        // 折りたたみボタン
+        const toggleBtn = this.controlPanel.querySelector('#zoom-panel-toggle');
+        toggleBtn.addEventListener('click', () => this.togglePanel());
+        
+        // パネルの折りたたみ状態をクリックで展開
+        this.controlPanel.addEventListener('click', (e) => {
+            if (this.controlPanel.classList.contains('collapsed')) {
+                this.togglePanel();
+                e.stopPropagation();
+            }
+        });
     }
     
     /**
