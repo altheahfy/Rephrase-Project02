@@ -285,17 +285,21 @@
     </div>
   </div>
   
-  <!-- 🎤 音声学習パネル（制御パネルの下に縦積み、デフォルト非表示） -->
+  <!-- 🎤 音声学習パネル（右上フロート） -->
   <div id="voice-control-panel" style="
-    display: none !important; 
+    position: fixed !important;
+    top: 120px !important;
+    right: 20px !important;
+    z-index: 15000 !important;
     background: rgba(255, 255, 255, 0.95) !important; 
-    padding: 8px !important; 
-    border-radius: 5px !important; 
-    border: 1px solid #ddd !important; 
-    margin-bottom: 15px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
-    position: static !important;
-    transform: none !important;
+    padding: 12px !important; 
+    border-radius: 8px !important; 
+    border: 2px solid #667eea !important; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+    min-width: 200px !important;
+    max-width: 300px !important;
+    transition: all 0.3s ease !important;
+    display: none !important;
     visibility: visible !important;
     opacity: 1 !important;
     min-height: auto !important;
