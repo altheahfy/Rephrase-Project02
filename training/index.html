@@ -33,10 +33,31 @@
  <body>
 
 <!-- シンプルなナビゲーションリンク -->
-<div style="position: fixed; top: 10px; left: 10px; z-index: 16000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+<div style="position: fixed; top: 10px; left: 10px; z-index: 16000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px;">
   <a href="../" style="text-decoration: none; color: #2196F3; font-size: 14px; font-weight: bold;">🏠 ホーム</a>
-  <span style="margin: 0 8px; color: #ccc;">|</span>
+  <span style="color: #ccc;">|</span>
   <a href="grammar/" style="text-decoration: none; color: #2196F3; font-size: 14px;">📚 文法</a>
+  <span style="color: #ccc;">|</span>
+  
+  <!-- サンプルデータ選択 -->
+  <div style="display: flex; align-items: center; gap: 4px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333;">📋 サンプルデータ</label>
+    <select id="presetSelect" style="width: 150px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+      <option value="">-- データを選択 --</option>
+      <option value="data/slot_order_data.json">🎯 メインデータセット</option>
+      <option value="data/slot_order_data2.json">📚 例文データセット2</option>
+    </select>
+    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">読込</button>
+  </div>
+  
+  <span style="color: #ccc;">|</span>
+  
+  <!-- ファイル選択 -->
+  <div style="display: flex; align-items: center; gap: 4px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333;">📁 ファイル選択</label>
+    <input type="file" id="jsonFileInput" accept=".json" style="font-size: 11px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; width: 120px;">
+    <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">ロード</button>
+  </div>
 </div>
 
 <!-- 🎭 ローディングオーバーレイ -->
@@ -82,29 +103,8 @@
 }
 </style>
 
-<!-- 右上のファイル選択・ロードエリア -->
-<div id="file-load-area" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 8px; border: 2px solid #2196F3; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-  <!-- プリセットJSONファイル選択 -->
-  <div style="margin-bottom: 8px;">
-    <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📋 サンプルデータ</label>
-    <select id="presetSelect" style="width: 200px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-bottom: 4px;">
-      <option value="">-- データを選択 --</option>
-      <option value="data/slot_order_data.json">🎯 メインデータセット</option>
-      <option value="data/slot_order_data2.json">📚 例文データセット2</option>
-    </select>
-    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 4px;">読込</button>
-  </div>
-  
-  <!-- ファイル選択 -->
-  <div style="border-top: 1px solid #eee; padding-top: 8px;">
-    <label style="font-size: 12px; font-weight: bold; color: #333; display: block; margin-bottom: 4px;">📁 ファイル選択</label>
-    <input type="file" id="jsonFileInput" accept=".json" style="margin-bottom: 4px; font-size: 13px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
-    <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; font-weight: bold;">ロード</button>
-  </div>
-</div>
-
 <!-- タイトル（常に表示） -->
-<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; margin-right: 280px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
   <h1 style="margin: 0; margin-right: 30px; color: #333; font-size: 28px; font-weight: bold;">
    🔄 Rephrase トレーニングUI
   </h1>
