@@ -10,7 +10,7 @@ class ManualZoomController {
         this.minZoom = 0.5;
         this.maxZoom = 2.0;
         this.zoomStep = 0.1;
-        this.targetSelector = '#main-content, #dynamic-slot-area';
+        this.targetSelector = '.slot-container';
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -68,7 +68,7 @@ class ManualZoomController {
         this.controlPanel.id = 'zoom-control-panel';
         this.controlPanel.innerHTML = `
             <div class="zoom-panel-content">
-                <div class="zoom-title">🔍 表示サイズ調整</div>
+                <div class="zoom-title">🔍 サイズ調整</div>
                 <div class="zoom-controls">
                     <button class="zoom-btn zoom-out" id="zoom-out-btn" title="縮小 (Ctrl + -)">➖</button>
                     <div class="zoom-display">
@@ -92,26 +92,40 @@ class ManualZoomController {
             </div>
         `;
         
+        // ツールバーの末尾に追加するため、適切な親要素を探す
+        const toolbar = document.querySelector('div[style*="padding: 8px"][style*="background-color: #f5f5f5"]');
+        if (toolbar) {
+            // ツールバー内のインライン要素として追加
+            const span = document.createElement('span');
+            span.style.cssText = 'color: #ccc; margin: 0 8px;';
+            span.textContent = '|';
+            toolbar.appendChild(span);
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'display: inline-flex; align-items: center; margin-left: 8px;';
+            wrapper.appendChild(this.controlPanel);
+            toolbar.appendChild(wrapper);
+        } else {
+            // フォールバック: bodyに追加
+            document.body.appendChild(this.controlPanel);
+        }
+        
         // スタイルを設定
         this.controlPanel.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 16000;
+            display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            padding: 6px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             font-family: Arial, sans-serif;
-            font-size: 12px;
-            min-width: 200px;
+            font-size: 10px;
+            min-width: 140px;
             transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 1000;
         `;
-        
-        // パネルをDOMに追加
-        document.body.appendChild(this.controlPanel);
         
         // イベントリスナーを設定
         this.setupPanelEvents();
@@ -130,35 +144,35 @@ class ManualZoomController {
             .zoom-panel-content {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 4px;
                 align-items: center;
             }
             
             .zoom-title {
                 font-weight: bold;
-                font-size: 13px;
+                font-size: 10px;
                 text-align: center;
-                margin-bottom: 4px;
+                margin-bottom: 2px;
             }
             
             .zoom-controls {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 4px;
                 background: rgba(255,255,255,0.1);
-                padding: 8px;
-                border-radius: 8px;
+                padding: 4px;
+                border-radius: 4px;
             }
             
             .zoom-btn {
                 background: rgba(255,255,255,0.2);
                 border: none;
                 color: white;
-                width: 28px;
-                height: 28px;
-                border-radius: 6px;
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 10px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -178,20 +192,20 @@ class ManualZoomController {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 4px;
-                min-width: 80px;
+                gap: 2px;
+                min-width: 60px;
             }
             
             #zoom-percentage {
                 font-weight: bold;
-                font-size: 14px;
+                font-size: 10px;
                 text-align: center;
-                min-width: 45px;
+                min-width: 35px;
             }
             
             #zoom-slider {
-                width: 100px;
-                height: 4px;
+                width: 60px;
+                height: 3px;
                 background: rgba(255,255,255,0.3);
                 border-radius: 2px;
                 outline: none;
@@ -200,39 +214,39 @@ class ManualZoomController {
             
             #zoom-slider::-webkit-slider-thumb {
                 appearance: none;
-                width: 16px;
-                height: 16px;
+                width: 12px;
+                height: 12px;
                 background: white;
                 border-radius: 50%;
                 cursor: pointer;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             }
             
             #zoom-slider::-moz-range-thumb {
-                width: 16px;
-                height: 16px;
+                width: 12px;
+                height: 12px;
                 background: white;
                 border-radius: 50%;
                 cursor: pointer;
                 border: none;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             }
             
             .zoom-presets {
                 display: flex;
-                gap: 6px;
-                margin-top: 4px;
+                gap: 3px;
+                margin-top: 2px;
             }
             
             .preset-btn {
                 background: rgba(255,255,255,0.2);
                 border: none;
                 color: white;
-                width: 32px;
-                height: 24px;
-                border-radius: 4px;
+                width: 24px;
+                height: 18px;
+                border-radius: 3px;
                 cursor: pointer;
-                font-size: 12px;
+                font-size: 10px;
                 transition: all 0.2s ease;
             }
             
@@ -243,18 +257,18 @@ class ManualZoomController {
             
             .preset-btn.active {
                 background: rgba(255,255,255,0.4);
-                box-shadow: 0 0 8px rgba(255,255,255,0.3);
+                box-shadow: 0 0 6px rgba(255,255,255,0.3);
             }
             
             .zoom-toggle {
                 background: rgba(255,255,255,0.15);
                 border: none;
                 color: white;
-                padding: 4px 8px;
-                border-radius: 4px;
+                padding: 2px 4px;
+                border-radius: 3px;
                 cursor: pointer;
-                font-size: 10px;
-                margin-top: 4px;
+                font-size: 8px;
+                margin-top: 2px;
                 transition: all 0.2s ease;
             }
             
@@ -264,9 +278,9 @@ class ManualZoomController {
             
             /* 折りたたみ状態 */
             #zoom-control-panel.collapsed {
-                width: 40px;
-                height: 40px;
-                padding: 8px;
+                width: 30px;
+                height: 24px;
+                padding: 4px;
                 overflow: hidden;
             }
             
@@ -281,7 +295,7 @@ class ManualZoomController {
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                font-size: 16px;
+                font-size: 12px;
                 cursor: pointer;
             }
         `;
