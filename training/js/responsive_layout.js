@@ -112,13 +112,13 @@ class ResponsiveLayoutManager {
         const bodyPaddingRight = parseInt(bodyStyle.paddingRight) || 0;
         const totalBodyPadding = bodyPaddingLeft + bodyPaddingRight;
         
-        // 利用可能幅の計算（ウィンドウ幅ベース）
-        const availableWidth = windowWidth - totalBodyPadding;
+        // 利用可能幅の計算
+        const availableWidth = Math.min(containerWidth, windowWidth - totalBodyPadding);
         
         console.log(`📐 レイアウト調整詳細:`);
         console.log(`   ウィンドウ幅: ${windowWidth}px`);
         console.log(`   コンテナ幅: ${containerWidth}px`);
-        console.log(`   基本スロット幅: ${baseSlotWidth}px`);
+        console.log(`   実際のスロット幅: ${actualSlotWidth}px`);
         console.log(`   body padding: ${totalBodyPadding}px`);
         console.log(`   利用可能幅: ${availableWidth}px`);
         console.log(`   スロット数: ${slotCount}`);
@@ -129,11 +129,6 @@ class ResponsiveLayoutManager {
         // CSS変数を更新
         this.slotWrapper.style.setProperty('--global-scale', globalScale);
         this.slotWrapper.style.setProperty('--overflow-x', globalScale < 1 ? 'visible' : 'visible');
-        
-        // 🔍 設定確認ログ
-        const setScale = this.slotWrapper.style.getPropertyValue('--global-scale');
-        console.log(`🔍 CSS変数設定確認: --global-scale = ${setScale}`);
-        console.log(`🔍 .slot-wrapper element:`, this.slotWrapper);
         
         console.log(`🎯 調整結果: 全体スケール${globalScale}`);
     }
