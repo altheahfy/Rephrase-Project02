@@ -1104,22 +1104,14 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   
   if (selectedPreset === 'data/slot_order_data.json' || selectedPreset === 'data/slot_order_data2.json') {
     // 🎯 **データセット：fetchでJSONファイルを読み込み**
-    console.log(`📁 フェッチ開始: ${selectedPreset}`);
     fetch(selectedPreset)
       .then(response => {
-        console.log(`📁 フェッチ応答: ${response.status} ${response.statusText}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
       .then(data => {
-        console.log(`📁 JSONパース成功: ${Object.keys(data).length} プロパティ, データ型: ${typeof data}`);
-        if (Array.isArray(data)) {
-          console.log(`📁 配列データ: ${data.length} 要素`);
-        } else {
-          console.log(`📁 オブジェクトデータ: ${JSON.stringify(data).slice(0, 100)}...`);
-        }
         // データ処理を直接実行
         try {
           // 🔄 JSONロード時にサブスロット表示設定をリセット
@@ -1184,31 +1176,14 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           console.log("🎭 プリセットJSONロード完了 - ローディング画面を非表示");
           hideLoadingOverlay();
         } catch (error) {
-          console.error("❌ プリセットJSONデータの処理に失敗:", error);
-          console.error('❌ データ処理エラーの詳細:', {
-            name: error.name,
-            message: error.message,
-            stack: error.stack
-          });
-          console.error('❌ 問題のあるデータ:', data);
-          alert(`プリセットJSONデータの処理に失敗しました。\n\nデータ形式に問題がある可能性があります。\n\nエラー詳細: ${error.message}`);
+          console.error("プリセットJSONデータの処理に失敗:", error);
+          alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
           hideLoadingOverlay();
         }
       })
       .catch(error => {
-        console.error(`❌ ${selectedPreset}の読み込みに失敗:`, error);
-        console.error('❌ エラーの詳細:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
-        
-        // CORSエラーの場合の特別な処理
-        if (error.message.includes('CORS') || error.message.includes('Network')) {
-          alert(`データセットの読み込みに失敗しました。\n\nCORSエラーの可能性があります。\n以下の方法をお試しください：\n\n1. ローカルサーバーを使用する\n2. ファイル選択からJSONファイルを直接読み込む\n\nエラー詳細: ${error.message}`);
-        } else {
-          alert(`データセットの読み込みに失敗しました。\n\nエラー詳細: ${error.message}`);
-        }
+        console.error(`${selectedPreset}の読み込みに失敗:`, error);
+        alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
         hideLoadingOverlay();
       });
     return; // 早期リターン
