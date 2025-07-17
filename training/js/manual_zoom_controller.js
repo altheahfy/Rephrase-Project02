@@ -10,7 +10,7 @@ class ManualZoomController {
         this.minZoom = 0.5;
         this.maxZoom = 2.0;
         this.zoomStep = 0.1;
-        this.targetSelector = '.slot-container';
+        this.targetSelector = '#main-content';
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -74,15 +74,27 @@ class ManualZoomController {
         this.controlPanel.id = 'zoom-control-panel';
         this.controlPanel.innerHTML = `
             <div class="zoom-panel-content">
-                <span class="zoom-label">🔍</span>
-                <input type="range" 
-                       id="zoom-slider" 
-                       min="${this.minZoom}" 
-                       max="${this.maxZoom}" 
-                       step="${this.zoomStep}" 
-                       value="${this.currentZoom}"
-                       title="表示サイズ調整">
-                <span id="zoom-percentage">${Math.round(this.currentZoom * 100)}%</span>
+                <div class="zoom-title">🔍 サイズ調整</div>
+                <div class="zoom-controls">
+                    <button class="zoom-btn zoom-out" id="zoom-out-btn" title="縮小 (Ctrl + -)">➖</button>
+                    <div class="zoom-display">
+                        <span id="zoom-percentage">${Math.round(this.currentZoom * 100)}%</span>
+                        <input type="range" 
+                               id="zoom-slider" 
+                               min="${this.minZoom}" 
+                               max="${this.maxZoom}" 
+                               step="${this.zoomStep}" 
+                               value="${this.currentZoom}"
+                               title="ドラッグでサイズ調整">
+                    </div>
+                    <button class="zoom-btn zoom-in" id="zoom-in-btn" title="拡大 (Ctrl + +)">➕</button>
+                </div>
+                <div class="zoom-presets">
+                    <button class="preset-btn" data-zoom="0.7" title="コンパクト表示">📱</button>
+                    <button class="preset-btn" data-zoom="1.0" title="標準サイズ">💻</button>
+                    <button class="preset-btn" data-zoom="1.3" title="大きく表示">🖥️</button>
+                </div>
+                <button class="zoom-toggle" id="zoom-panel-toggle" title="パネルを折りたたみ">📐</button>
             </div>
         `;
         
@@ -109,11 +121,12 @@ class ManualZoomController {
             margin-left: 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            padding: 6px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             font-family: Arial, sans-serif;
             font-size: 10px;
+            min-width: 140px;
             transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.2);
         `;
@@ -134,30 +147,73 @@ class ManualZoomController {
         style.innerHTML = `
             .zoom-panel-content {
                 display: flex;
+                flex-direction: column;
+                gap: 4px;
                 align-items: center;
-                gap: 6px;
             }
             
-            .zoom-label {
-                font-size: 12px;
-                margin-right: 2px;
+            .zoom-title {
+                font-weight: bold;
+                font-size: 10px;
+                text-align: center;
+                margin-bottom: 2px;
+            }
+            
+            .zoom-controls {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                background: rgba(255,255,255,0.1);
+                padding: 4px;
+                border-radius: 4px;
+            }
+            
+            .zoom-btn {
+                background: rgba(255,255,255,0.2);
+                border: none;
+                color: white;
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+            }
+            
+            .zoom-btn:hover {
+                background: rgba(255,255,255,0.3);
+                transform: scale(1.1);
+            }
+            
+            .zoom-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .zoom-display {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                min-width: 60px;
             }
             
             #zoom-percentage {
                 font-weight: bold;
                 font-size: 10px;
-                min-width: 35px;
                 text-align: center;
+                min-width: 35px;
             }
             
             #zoom-slider {
-                width: 80px;
+                width: 60px;
                 height: 3px;
                 background: rgba(255,255,255,0.3);
                 border-radius: 2px;
                 outline: none;
                 cursor: pointer;
-                margin: 0 4px;
             }
             
             #zoom-slider::-webkit-slider-thumb {
@@ -179,6 +235,74 @@ class ManualZoomController {
                 border: none;
                 box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             }
+            
+            .zoom-presets {
+                display: flex;
+                gap: 3px;
+                margin-top: 2px;
+            }
+            
+            .preset-btn {
+                background: rgba(255,255,255,0.2);
+                border: none;
+                color: white;
+                width: 24px;
+                height: 18px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 10px;
+                transition: all 0.2s ease;
+            }
+            
+            .preset-btn:hover {
+                background: rgba(255,255,255,0.3);
+                transform: translateY(-1px);
+            }
+            
+            .preset-btn.active {
+                background: rgba(255,255,255,0.4);
+                box-shadow: 0 0 6px rgba(255,255,255,0.3);
+            }
+            
+            .zoom-toggle {
+                background: rgba(255,255,255,0.15);
+                border: none;
+                color: white;
+                padding: 2px 4px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 8px;
+                margin-top: 2px;
+                transition: all 0.2s ease;
+            }
+            
+            .zoom-toggle:hover {
+                background: rgba(255,255,255,0.25);
+            }
+            
+            /* 折りたたみ状態 */
+            #zoom-control-panel.collapsed {
+                width: 30px;
+                height: 24px;
+                padding: 4px;
+                overflow: hidden;
+                min-width: unset;
+            }
+            
+            #zoom-control-panel.collapsed .zoom-panel-content {
+                transform: scale(0);
+                opacity: 0;
+            }
+            
+            #zoom-control-panel.collapsed::after {
+                content: "🔍";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 12px;
+                cursor: pointer;
+            }
         `;
         
         document.head.appendChild(style);
@@ -191,10 +315,37 @@ class ManualZoomController {
         console.log('🔧 パネルイベントリスナー設定開始');
         
         // DOM要素を取得
+        const zoomInBtn = this.controlPanel.querySelector('#zoom-in-btn');
+        const zoomOutBtn = this.controlPanel.querySelector('#zoom-out-btn');
         const slider = this.controlPanel.querySelector('#zoom-slider');
+        const presetBtns = this.controlPanel.querySelectorAll('.preset-btn');
+        const toggleBtn = this.controlPanel.querySelector('#zoom-panel-toggle');
         
         // デバッグ: 要素の存在確認
+        console.log('🔧 ズームインボタン:', zoomInBtn);
+        console.log('🔧 ズームアウトボタン:', zoomOutBtn);
         console.log('🔧 スライダー:', slider);
+        console.log('🔧 プリセットボタン数:', presetBtns.length);
+        console.log('🔧 トグルボタン:', toggleBtn);
+        
+        // ズームイン・アウトボタン
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('➕ ズームインボタンクリック');
+                this.zoomIn();
+            });
+        }
+        
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('➖ ズームアウトボタンクリック');
+                this.zoomOut();
+            });
+        }
         
         // スライダー
         if (slider) {
@@ -206,6 +357,36 @@ class ManualZoomController {
                 this.setZoom(zoom);
             });
         }
+        
+        // プリセットボタン
+        presetBtns.forEach((btn, index) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const zoom = parseFloat(btn.dataset.zoom);
+                console.log(`📱 プリセットボタン${index + 1}クリック:`, zoom);
+                this.setZoom(zoom);
+            });
+        });
+        
+        // 折りたたみボタン
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📐 トグルボタンクリック');
+                this.togglePanel();
+            });
+        }
+        
+        // パネルの折りたたみ状態をクリックで展開
+        this.controlPanel.addEventListener('click', (e) => {
+            if (this.controlPanel.classList.contains('collapsed')) {
+                console.log('📐 折りたたみパネルクリック - 展開');
+                this.togglePanel();
+                e.stopPropagation();
+            }
+        });
         
         console.log('✅ パネルイベントリスナー設定完了');
     }
@@ -278,15 +459,19 @@ class ManualZoomController {
             if (element) {
                 console.log(`🔍 要素${index + 1}にズーム適用:`, element.id || element.className);
                 
-                // スロットコンテナごとに個別にスケール適用
+                // 全体の拡大縮小（位置関係も含む）
                 element.style.transform = `scale(${this.currentZoom})`;
                 element.style.transformOrigin = 'top left'; // 左上を基準点に
                 element.style.transition = 'transform 0.3s ease';
                 
-                // スケール変更に伴うマージン調整（重複を避ける）
-                const scaleFactor = this.currentZoom;
-                const margin = scaleFactor < 1 ? `${(1 - scaleFactor) * 20}px` : '0px';
-                element.style.marginBottom = margin;
+                // スケール変更時のスクロール領域調整
+                const wrapper = element.parentElement;
+                if (wrapper) {
+                    const originalHeight = element.scrollHeight;
+                    const scaledHeight = originalHeight * this.currentZoom;
+                    // コンテナのmin-heightを調整してスクロール可能領域を確保
+                    wrapper.style.minHeight = `${scaledHeight}px`;
+                }
                 
                 appliedCount++;
             }
@@ -312,6 +497,17 @@ class ManualZoomController {
         if (slider) {
             slider.value = this.currentZoom;
         }
+        
+        // プリセットボタンのアクティブ状態を更新
+        const presetBtns = this.controlPanel.querySelectorAll('.preset-btn');
+        presetBtns.forEach(btn => {
+            const presetZoom = parseFloat(btn.dataset.zoom);
+            if (Math.abs(presetZoom - this.currentZoom) < 0.05) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
     
     /**
