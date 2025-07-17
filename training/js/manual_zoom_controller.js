@@ -21,22 +21,9 @@ class ManualZoomController {
      * システム初期化
      */
     initialize() {
-        if (this.isInitialized) {
-            console.log('⚠️ 手動ズーム調整システム既に初期化済み');
-            return;
-        }
+        if (this.isInitialized) return;
         
         console.log('🔍 手動ズーム調整システム初期化開始');
-        
-        // DOM要素の存在確認
-        const toolbar = document.querySelector('div[style*="position: fixed"][style*="top: 10px"][style*="left: 10px"]');
-        console.log('🔍 ツールバー要素:', toolbar);
-        
-        if (!toolbar) {
-            console.warn('⚠️ ツールバー要素が見つかりません。1秒後に再試行します');
-            setTimeout(() => this.initialize(), 1000);
-            return;
-        }
         
         // 保存されたズームレベルを読み込み
         this.loadZoomLevel();
@@ -52,7 +39,6 @@ class ManualZoomController {
         
         this.isInitialized = true;
         console.log('✅ 手動ズーム調整システム初期化完了');
-        console.log('📊 パネル要素:', this.controlPanel);
     }
     
     /**
