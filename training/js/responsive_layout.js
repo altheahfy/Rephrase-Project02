@@ -91,30 +91,32 @@ class ResponsiveLayoutManager {
     adjustLayout() {
         if (!this.slotWrapper) return;
         
-        // 🎯 ウィンドウ幅も考慮した幅計算
+        // 🎯 利用可能な実際の幅を正確に計算
         const windowWidth = window.innerWidth;
-        const containerWidth = Math.min(this.slotWrapper.offsetWidth, windowWidth - 40); // 余白を考慮
+        const bodyPadding = 40; // body padding考慮
+        const availableWidth = windowWidth - bodyPadding;
+        
         const slotContainers = document.querySelectorAll('.slot-container:not(.hidden-empty)');
         const slotCount = slotContainers.length;
         
         if (slotCount === 0) return;
         
-        console.log(`📐 レイアウト調整: ウィンドウ幅${windowWidth}px, コンテナ幅${containerWidth}px, スロット数${slotCount}`);
+        console.log(`📐 レイアウト調整: ウィンドウ幅${windowWidth}px, 利用可能幅${availableWidth}px, スロット数${slotCount}`);
         
         // 🎯 全体スケール調整方式：横一列を維持して全体を縮小
-        const { globalScale } = this.calculateOptimalScale(containerWidth, slotCount);
+        const { globalScale } = this.calculateOptimalScale(availableWidth, slotCount);
         
         // CSS変数を更新
         this.slotWrapper.style.setProperty('--global-scale', globalScale);
         this.slotWrapper.style.setProperty('--overflow-x', globalScale < 1 ? 'visible' : 'visible');
         
-        console.log(`🎯 調整結果: 全体スケール${globalScale}`);
+        console.log(`🎯 調整結果: 全体スケール${globalScale} (利用可能幅: ${availableWidth}px)`);
     }
     
     /**
      * 最適なスケールを計算
      */
-    calculateOptimalScale(containerWidth, slotCount) {
+    calculateOptimalScale(availableWidth, slotCount) {
         const baseSlotWidth = 180; // 基本スロット幅
         const gap = 12; // スロット間のギャップ
         
@@ -124,22 +126,14 @@ class ResponsiveLayoutManager {
         // スケール計算
         let globalScale = 1;
         
-        if (idealTotalWidth > containerWidth) {
-            // 必要な縮小率を計算
-            globalScale = Math.max(0.2, containerWidth / idealTotalWidth); // 最小スケールを0.2に
-            
-            // 🎯 より細かい調整 - HD解像度対応
-            if (containerWidth < 400) {
-                globalScale = Math.min(globalScale, 0.3); // 非常に小さい画面
-            } else if (containerWidth < 600) {
-                globalScale = Math.min(globalScale, 0.5); // スマートフォン
-            } else if (containerWidth < 800) {
-                globalScale = Math.min(globalScale, 0.6); // 小型タブレット
-            } else if (containerWidth < 1000) {
-                globalScale = Math.min(globalScale, 0.7); // 中型タブレット・小型PC
-            } else if (containerWidth < 1200) {
-                globalScale = Math.min(globalScale, 0.85); // 中型PC
-            }
+        if (idealTotalWidth > availableWidth) {
+            // コンテンツが画面幅を超える場合のみ縮小
+            globalScale = Math.max(0.2, availableWidth / idealTotalWidth);
+            console.log(`🔍 縮小が必要: 必要幅${idealTotalWidth}px > 利用可能幅${availableWidth}px → スケール${globalScale}`);
+        } else {
+            // 画面に収まる場合は通常サイズ（1.0）を維持
+            globalScale = 1.0;
+            console.log(`✅ 通常サイズで表示: 必要幅${idealTotalWidth}px ≤ 利用可能幅${availableWidth}px`);
         }
         
         return {
