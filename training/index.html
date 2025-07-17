@@ -29,6 +29,8 @@
   </script>
   <script src="js/voice_progress_ui.js">
   </script>
+  <script src="js/zoom_controller.js">
+  </script>
  </head>
  <body>
 
@@ -57,6 +59,16 @@
     <label style="font-size: 12px; font-weight: bold; color: #333;">📁 ファイル選択</label>
     <input type="file" id="jsonFileInput" accept=".json" style="font-size: 11px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; width: 120px;">
     <button id="loadJsonButton" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">ロード</button>
+  </div>
+  
+  <span style="color: #ccc;">|</span>
+  
+  <!-- ズームコントローラー -->
+  <div style="display: flex; align-items: center; gap: 4px;">
+    <label style="font-size: 12px; font-weight: bold; color: #333;">🔍 ズーム</label>
+    <input type="range" id="zoomSlider" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 80px; height: 20px; cursor: pointer;">
+    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 35px; text-align: center;">100%</span>
+    <button id="zoomResetButton" style="background-color: #FF9800; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; font-weight: bold;">リセット</button>
   </div>
 </div>
 

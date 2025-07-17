@@ -1320,3 +1320,128 @@ h1 {
 #save-no-btn:hover {
   background: #5a6268 !important;
 }
+
+/* =====================================
+   🔍 手動ズーム・縮小機構スタイル
+   ===================================== */
+
+/* ズームスライダーのカスタムスタイル */
+#zoomSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #FF5722 0%, #FFC107 50%, #4CAF50 100%);
+  outline: none;
+  border-radius: 10px;
+  height: 6px;
+}
+
+#zoomSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2196F3;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+}
+
+#zoomSlider::-webkit-slider-thumb:hover {
+  background: #1976D2;
+  transform: scale(1.1);
+}
+
+#zoomSlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2196F3;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ズーム適用時のコンテナ調整 */
+.slot-wrapper {
+  transition: transform 0.3s ease;
+  transform-origin: top left;
+}
+
+/* ズーム時のオーバーフロー対応 */
+.zoomed-container {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* ズーム値表示のスタイル強化 */
+#zoomValue {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: color 0.2s ease;
+}
+
+/* ズームリセットボタンのホバー効果 */
+#zoomResetButton:hover {
+  background-color: #F57C00 !important;
+  transform: scale(1.05);
+}
+
+#zoomResetButton:active {
+  transform: scale(0.95);
+}
+
+/* 高ズーム時の調整（150%以上） */
+.slot-wrapper[style*="scale(1.5)"] {
+  margin-bottom: -50px;
+}
+
+/* 低ズーム時の調整（50%以下） */
+.slot-wrapper[style*="scale(0.5)"] {
+  margin-bottom: 50px;
+}
+
+/* ズーム時のスクロールヒント */
+.zoom-scroll-hint {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(33, 150, 243, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.zoom-scroll-hint.show {
+  opacity: 1;
+}
+
+/* レスポンシブ対応：小画面でのズームコントローラー */
+@media (max-width: 768px) {
+  #zoomSlider {
+    width: 60px;
+  }
+  
+  #zoomValue {
+    min-width: 30px;
+    font-size: 10px;
+  }
+  
+  #zoomResetButton {
+    padding: 1px 4px;
+    font-size: 9px;
+  }
+}
+
+/* デバッグ用：ズーム境界表示 */
+.debug-zoom-bounds {
+  outline: 2px dashed rgba(255, 0, 0, 0.3);
+  outline-offset: 2px;
+}
