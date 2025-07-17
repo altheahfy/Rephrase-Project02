@@ -137,64 +137,23 @@ class ZoomController {
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
-        // 🎯 サブスロット専用：内部要素にもズーム適用 + 配置間隔調整
+        // 🎯 サブスロット専用：シンプルな配置調整のみ
         if (container.type === 'sub') {
-          const subContainers = container.element.querySelectorAll('.subslot-container');
-          console.log(`    サブスロット内のコンテナ数: ${subContainers.length}`);
-          
-          // サブスロット全体の配置間隔を調整
-          const originalGap = 8; // 元のgap値
-          const scaledGap = originalGap * zoomLevel;
-          container.element.style.setProperty('gap', `${scaledGap}px`, 'important');
-          
-          // サブスロットコンテナごとにズームと配置調整を適用
-          subContainers.forEach((subContainer, subIndex) => {
-            // ズーム適用
-            subContainer.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
-            subContainer.style.setProperty('transform-origin', 'top left', 'important');
-            
-            // 🚀 配置間隔をズームレベルに応じて調整
-            const originalMargin = 4; // 元のmargin値
-            const originalPadding = 10; // 元のpadding値
-            const scaledMargin = originalMargin * zoomLevel;
-            const scaledPadding = originalPadding * zoomLevel;
-            
-            subContainer.style.setProperty('margin', `${scaledMargin}px`, 'important');
-            subContainer.style.setProperty('padding', `${scaledPadding}px`, 'important');
-            
-            console.log(`      [${subIndex}] ズーム適用 + 配置調整: margin=${scaledMargin}px, padding=${scaledPadding}px`);
-          });
-          
-          console.log(`    サブスロット全体のgap調整: ${scaledGap}px`);
+          console.log(`    サブスロット要素: ${container.id}`);
+          // サブスロットは親要素のscaleで自動的にズームされるため、追加の処理は不要
         }
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
         console.log(`  [${index}] 実際のDOM要素:`, container.element);
         
         // スケール適用時の位置調整（縮小時の空白削減）
-        if (container.type === 'sub') {
-          // サブスロット専用：上位スロットとの間隔調整
-          if (zoomLevel < 1.0) {
-            // 縮小時は上位スロットとの間隔を詰める
-            container.element.style.marginTop = `${(zoomLevel - 1) * 30}px`;
-          } else {
-            container.element.style.marginTop = '';
-          }
+        if (zoomLevel < 1.0) {
+          // 縮小時は要素間の空白を削減
+          const spaceReduction = (1 - zoomLevel) * 50;
+          container.element.style.marginBottom = `-${spaceReduction}px`;
         } else {
-          // 上位スロット用の通常の位置調整
-          if (zoomLevel < 1.0) {
-            // 縮小時は上下のマージンを削減
-            container.element.style.marginTop = `${(zoomLevel - 1) * 50}px`;
-            container.element.style.marginBottom = `${(zoomLevel - 1) * 50}px`;
-          } else if (zoomLevel > 1.0) {
-            // 拡大時は下のマージンを削減
-            container.element.style.marginBottom = `${(1 - zoomLevel) * 100}px`;
-            container.element.style.marginTop = '';
-          } else {
-            // ズーム100%時はマージンリセット
-            container.element.style.marginBottom = '';
-            container.element.style.marginTop = '';
-          }
+          // 100%以上の場合はマージンリセット
+          container.element.style.marginBottom = '';
         }
       } else {
         console.warn(`  [${index}] ${container.type}(${container.id}): 要素が存在しません`);
