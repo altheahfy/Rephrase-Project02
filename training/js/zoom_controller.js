@@ -115,16 +115,11 @@ class ZoomController {
         container.element.style.transform = `scale(${zoomLevel})`;
         container.element.style.transformOrigin = 'top left';
         
-        // ズーム時の幅制限を動的に調整
-        if (zoomLevel < 1.0) {
-          // 縮小時は幅制限を撤去してブラウザ幅を最大活用
-          container.element.style.maxWidth = 'none';
-          container.element.style.width = '100%';
-        } else {
-          // 拡大時も柔軟な幅設定
-          container.element.style.maxWidth = 'none';
-          container.element.style.width = 'auto';
-        }
+        // 🔍 ズーム時の幅・オーバーフロー制御
+        container.element.style.maxWidth = 'none';
+        container.element.style.width = '100%';
+        container.element.style.overflowX = 'visible';
+        container.element.style.overflowY = 'visible';
         
         // スケール適用時の位置調整
         if (zoomLevel !== 1.0) {
@@ -182,16 +177,36 @@ class ZoomController {
       const savedZoom = localStorage.getItem(this.storageKey);
       if (savedZoom) {
         const zoomLevel = parseFloat(savedZoom);
-        if (zoomLevel >= 0.5 && zoomLevel <= 1.5) {
+        // 🚨 デフォルト1.0を強制：保存値が1.0以外の場合はリセット
+        if (zoomLevel >= 0.5 && zoomLevel <= 1.5 && zoomLevel === 1.0) {
           this.zoomSlider.value = zoomLevel;
           this.applyZoom(zoomLevel);
           this.updateZoomDisplay(zoomLevel);
           console.log(`📚 保存されたズームレベル復元: ${Math.round(zoomLevel * 100)}%`);
+        } else {
+          // 1.0以外の値が保存されている場合は強制リセット
+          this.forceDefaultZoom();
         }
+      } else {
+        // 保存値がない場合はデフォルトを適用
+        this.forceDefaultZoom();
       }
     } catch (error) {
       console.warn('⚠️ ズームレベルの読み込みに失敗:', error);
+      this.forceDefaultZoom();
     }
+  }
+
+  /**
+   * 強制的にデフォルト100%を設定
+   */
+  forceDefaultZoom() {
+    const defaultZoom = 1.0;
+    this.zoomSlider.value = defaultZoom;
+    this.applyZoom(defaultZoom);
+    this.updateZoomDisplay(defaultZoom);
+    this.saveZoomLevel(defaultZoom);
+    console.log('🔄 ズームレベルを強制的に100%に設定');
   }
 
   /**
@@ -325,5 +340,18 @@ window.debugZoomController = () => {
     console.log('- 対象コンテナ詳細:', zoomController.targetContainers);
   } else {
     console.log('❌ ズームコントローラーが初期化されていません');
+  }
+};
+
+// ズーム設定リセット用関数
+window.resetZoomSettings = () => {
+  try {
+    localStorage.removeItem('rephrase_zoom_level');
+    if (zoomController) {
+      zoomController.forceDefaultZoom();
+    }
+    console.log('🔄 ズーム設定を完全リセットしました');
+  } catch (error) {
+    console.error('❌ ズーム設定リセットに失敗:', error);
   }
 };
