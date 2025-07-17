@@ -121,17 +121,35 @@ class ZoomController {
   applyZoom(zoomLevel) {
     this.currentZoom = zoomLevel;
     
-    this.targetContainers.forEach(container => {
+    console.log(`🔍 ズーム適用開始: ${Math.round(zoomLevel * 100)}% - 対象コンテナ数: ${this.targetContainers.length}`);
+    
+    this.targetContainers.forEach((container, index) => {
       if (container.element) {
+        console.log(`  [${index}] ${container.type}(${container.id}): 適用前transform = ${container.element.style.transform}`);
+        
         // transform: scale で縦横比を保ったまま縮小・拡大
-        container.element.style.transform = `scale(${zoomLevel})`;
-        container.element.style.transformOrigin = 'top left';
+        container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+        container.element.style.setProperty('transform-origin', 'top left', 'important');
         
         // 🔍 ズーム時の幅・オーバーフロー制御
-        container.element.style.maxWidth = 'none';
-        container.element.style.width = '100%';
-        container.element.style.overflowX = 'visible';
-        container.element.style.overflowY = 'visible';
+        container.element.style.setProperty('max-width', 'none', 'important');
+        container.element.style.setProperty('width', '100%', 'important');
+        container.element.style.setProperty('overflow-x', 'visible', 'important');
+        container.element.style.setProperty('overflow-y', 'visible', 'important');
+        
+        // 🎯 サブスロット専用：内部要素にもズーム適用
+        if (container.type === 'sub') {
+          const subContainers = container.element.querySelectorAll('.subslot-container');
+          console.log(`    サブスロット内のコンテナ数: ${subContainers.length}`);
+          subContainers.forEach((subContainer, subIndex) => {
+            subContainer.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+            subContainer.style.setProperty('transform-origin', 'top left', 'important');
+            console.log(`      [${subIndex}] 内部コンテナにもズーム適用`);
+          });
+        }
+        
+        console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
+        console.log(`  [${index}] 実際のDOM要素:`, container.element);
         
         // スケール適用時の位置調整
         if (zoomLevel !== 1.0) {
@@ -139,6 +157,8 @@ class ZoomController {
         } else {
           container.element.style.marginBottom = '';
         }
+      } else {
+        console.warn(`  [${index}] ${container.type}(${container.id}): 要素が存在しません`);
       }
     });
 
@@ -147,7 +167,7 @@ class ZoomController {
       this.showScrollHint(true);
     }
 
-    console.log(`🔍 ズーム適用: ${Math.round(zoomLevel * 100)}%`);
+    console.log(`🔍 ズーム適用完了: ${Math.round(zoomLevel * 100)}%`);
   }
 
   /**
@@ -327,12 +347,27 @@ class ZoomController {
    */
   forceSubslotDetection() {
     console.log('🔍 サブスロット強制検出を実行');
+    
+    // より詳細な検出情報
+    const allSubSlotWrappers = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+    console.log(`📊 発見されたサブスロット要素総数: ${allSubSlotWrappers.length}`);
+    
+    allSubSlotWrappers.forEach((wrapper, index) => {
+      const computedStyle = getComputedStyle(wrapper);
+      const isVisible = wrapper.style.display !== 'none' && computedStyle.display !== 'none';
+      console.log(`  [${index}] ${wrapper.id}:`);
+      console.log(`    - style.display: "${wrapper.style.display}"`);
+      console.log(`    - computed.display: "${computedStyle.display}"`);
+      console.log(`    - isVisible: ${isVisible}`);
+      console.log(`    - 現在のtransform: "${wrapper.style.transform}"`);
+    });
+    
     this.identifyTargetContainers();
     this.applyZoom(this.currentZoom);
     
     // 検出結果をログ出力
     const subslots = this.targetContainers.filter(c => c.type === 'sub');
-    console.log(`📱 検出されたサブスロット: ${subslots.length}個`);
+    console.log(`📱 最終的に対象となったサブスロット: ${subslots.length}個`);
     subslots.forEach(sub => {
       console.log(`  - ${sub.id}: 表示=${sub.element.style.display !== 'none'}`);
     });
