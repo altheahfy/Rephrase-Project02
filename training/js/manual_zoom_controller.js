@@ -10,7 +10,7 @@ class ManualZoomController {
         this.minZoom = 0.5;
         this.maxZoom = 2.0;
         this.zoomStep = 0.1;
-        this.targetSelector = '.slot-container';
+        this.targetSelector = '#main-content';
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -30,9 +30,15 @@ class ManualZoomController {
         
         // DOM要素の存在確認
         const mainContent = document.getElementById('main-content');
-        const dynamicArea = document.getElementById('dynamic-slot-area');
+        const toolbar = document.querySelector('div[style*="position: fixed"][style*="top: 10px"][style*="left: 10px"]');
         console.log('🔍 main-content要素:', mainContent);
-        console.log('🔍 dynamic-slot-area要素:', dynamicArea);
+        console.log('🔍 ツールバー要素:', toolbar);
+        
+        if (!mainContent) {
+            console.warn('⚠️ main-content要素が見つかりません。1秒後に再試行します');
+            setTimeout(() => this.initialize(), 1000);
+            return;
+        }
         
         // 保存されたズームレベルを読み込み
         this.loadZoomLevel();
@@ -92,19 +98,17 @@ class ManualZoomController {
             </div>
         `;
         
-        // ツールバーの末尾に追加するため、適切な親要素を探す
-        const toolbar = document.querySelector('div[style*="padding: 8px"][style*="background-color: #f5f5f5"]');
+        // ツールバーの正確な位置に追加
+        const toolbar = document.querySelector('div[style*="position: fixed"][style*="top: 10px"][style*="left: 10px"]');
         if (toolbar) {
-            // ツールバー内のインライン要素として追加
-            const span = document.createElement('span');
-            span.style.cssText = 'color: #ccc; margin: 0 8px;';
-            span.textContent = '|';
-            toolbar.appendChild(span);
+            // 区切り線を追加
+            const separator = document.createElement('span');
+            separator.style.cssText = 'color: #ccc;';
+            separator.textContent = '|';
+            toolbar.appendChild(separator);
             
-            const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'display: inline-flex; align-items: center; margin-left: 8px;';
-            wrapper.appendChild(this.controlPanel);
-            toolbar.appendChild(wrapper);
+            // パネルを直接ツールバーに追加
+            toolbar.appendChild(this.controlPanel);
         } else {
             // フォールバック: bodyに追加
             document.body.appendChild(this.controlPanel);
@@ -112,7 +116,9 @@ class ManualZoomController {
         
         // スタイルを設定
         this.controlPanel.style.cssText = `
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 6px;
@@ -123,8 +129,6 @@ class ManualZoomController {
             min-width: 140px;
             transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.2);
-            position: relative;
-            z-index: 1000;
         `;
         
         // イベントリスナーを設定
@@ -282,6 +286,7 @@ class ManualZoomController {
                 height: 24px;
                 padding: 4px;
                 overflow: hidden;
+                min-width: unset;
             }
             
             #zoom-control-panel.collapsed .zoom-panel-content {
@@ -453,13 +458,21 @@ class ManualZoomController {
         targetElements.forEach((element, index) => {
             if (element) {
                 console.log(`🔍 要素${index + 1}にズーム適用:`, element.id || element.className);
+                
+                // 全体の拡大縮小（位置関係も含む）
                 element.style.transform = `scale(${this.currentZoom})`;
-                element.style.transformOrigin = 'top center';
+                element.style.transformOrigin = 'top left'; // 左上を基準点に
                 element.style.transition = 'transform 0.3s ease';
                 
-                // スケール変更に伴うレイアウト調整
-                const scaledHeight = element.scrollHeight * this.currentZoom;
-                element.style.marginBottom = `${scaledHeight * 0.1}px`;
+                // スケール変更時のスクロール領域調整
+                const wrapper = element.parentElement;
+                if (wrapper) {
+                    const originalHeight = element.scrollHeight;
+                    const scaledHeight = originalHeight * this.currentZoom;
+                    // コンテナのmin-heightを調整してスクロール可能領域を確保
+                    wrapper.style.minHeight = `${scaledHeight}px`;
+                }
+                
                 appliedCount++;
             }
         });
