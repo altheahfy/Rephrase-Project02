@@ -1403,7 +1403,14 @@ class VoiceSystem {
                 <div class="analysis-item">🎯 評価: ${analysis.level} ${analysis.levelExplanation || ''}</div>
                 ${contentVerificationHtml}
                 <div class="progress-save-status">
-                    <div id="progress-save-message">📊 進捗データを保存中...</div>
+                    <div id="progress-save-message">分析が完了しました</div>
+                    <div class="save-confirmation" style="margin-top: 10px;">
+                        <p style="margin: 5px 0; font-size: 12px; color: #555;">この結果を学習データに保存しますか？</p>
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <button id="save-yes-btn" class="voice-btn" style="background: #28a745; color: white; font-size: 11px; padding: 4px 12px;">✅ はい</button>
+                            <button id="save-no-btn" class="voice-btn" style="background: #6c757d; color: white; font-size: 11px; padding: 4px 12px;">❌ いいえ</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -1416,10 +1423,64 @@ class VoiceSystem {
         // 🎯 分析結果表示後にパネル位置を調整
         this.adjustPanelPosition();
         
-        // 🎯 進捗追跡システムにデータを自動保存
-        await this.saveProgressData(analysis);
+        // 🎯 保存確認ボタンのイベントリスナーを設定
+        this.setupSaveConfirmationButtons(analysis);
         
         this.updateStatus('✅ 分析完了', 'success');
+    }
+    
+    /**
+     * 保存確認ボタンのイベントリスナーを設定
+     */
+    setupSaveConfirmationButtons(analysisResult) {
+        const saveYesBtn = document.getElementById('save-yes-btn');
+        const saveNoBtn = document.getElementById('save-no-btn');
+        const messageElement = document.getElementById('progress-save-message');
+        
+        if (saveYesBtn && saveNoBtn) {
+            // 「はい」ボタンのクリックイベント
+            saveYesBtn.addEventListener('click', async () => {
+                // ボタンを無効化
+                saveYesBtn.disabled = true;
+                saveNoBtn.disabled = true;
+                
+                // 保存メッセージを更新
+                if (messageElement) {
+                    messageElement.innerHTML = '📊 学習データに保存中...';
+                    messageElement.style.color = '#007bff';
+                }
+                
+                // データを保存
+                await this.saveProgressData(analysisResult);
+                
+                // 確認ボタンを非表示
+                const confirmationDiv = document.querySelector('.save-confirmation');
+                if (confirmationDiv) {
+                    confirmationDiv.style.display = 'none';
+                }
+            });
+            
+            // 「いいえ」ボタンのクリックイベント
+            saveNoBtn.addEventListener('click', () => {
+                // ボタンを無効化
+                saveYesBtn.disabled = true;
+                saveNoBtn.disabled = true;
+                
+                // 保存しないメッセージを表示
+                if (messageElement) {
+                    messageElement.innerHTML = '❌ 学習データには保存されませんでした';
+                    messageElement.style.color = '#6c757d';
+                }
+                
+                // 確認ボタンを非表示
+                const confirmationDiv = document.querySelector('.save-confirmation');
+                if (confirmationDiv) {
+                    confirmationDiv.style.display = 'none';
+                }
+                
+                console.log('👋 ユーザーが学習データ保存をキャンセルしました');
+            });
+        }
     }
     
     /**
@@ -1447,7 +1508,7 @@ class VoiceSystem {
             // UI更新
             const messageElement = document.getElementById('progress-save-message');
             if (messageElement) {
-                messageElement.innerHTML = '✅ 進捗データを保存しました';
+                messageElement.innerHTML = '✅ 学習データに保存完了しました！';
                 messageElement.style.color = '#28a745';
             }
             

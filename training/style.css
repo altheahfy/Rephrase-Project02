@@ -1277,3 +1277,46 @@ h1 {
 /* =================================================================== */
 /* 🔗 エクセル風タブ連結システム 終了 */
 /* =================================================================== */
+
+/* 学習データ保存確認ボタンのスタイル */
+.save-confirmation {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.save-confirmation p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #333;
+  font-weight: bold;
+}
+
+.save-confirmation button {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+
+.save-confirmation button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.save-confirmation button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#save-yes-btn:hover {
+  background: #218838 !important;
+}
+
+#save-no-btn:hover {
+  background: #5a6268 !important;
+}
