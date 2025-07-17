@@ -127,9 +127,8 @@
   <section>
   </section>
   
-  <!-- 制御パネル表示ボタンと制御パネル -->
+  <!-- 制御パネル表示ボタン -->
   <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
-    <!-- 制御パネル表示ボタン -->
     <button id="toggle-control-panels" style="
       background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
       color: white;
@@ -141,27 +140,30 @@
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: all 0.2s ease;
-      margin-right: 20px;
     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
       📝 制御パネル
     </button>
-    
-    <!-- 音声学習ボタン（制御パネルの右隣） -->
-    <button id="voice-panel-open-btn" style="
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      transition: all 0.2s ease;
-    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-      🎤 音声学習
-    </button>
   </div>
+  
+  <!-- 音声学習ボタン（右上固定） -->
+  <button id="voice-panel-open-btn" style="
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 15500;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    🎤 音声学習
+  </button>
   
   <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
   <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
