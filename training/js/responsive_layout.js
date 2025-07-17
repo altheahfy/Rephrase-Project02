@@ -102,20 +102,25 @@ class ResponsiveLayoutManager {
         const baseSlotWidth = 180; // CSSのmin-width基準
         const baseGap = 12; // CSSのgap値
         
+        console.log(`🔍 デバッグ: 固定値使用 - baseSlotWidth=${baseSlotWidth}px, baseGap=${baseGap}px`);
+        
         // 実際のコンテナ幅とウィンドウ幅を取得
         const containerWidth = this.slotWrapper.offsetWidth;
         const windowWidth = window.innerWidth;
+        const bodyStyle = window.getComputedStyle(document.body);
+        const bodyPaddingLeft = parseInt(bodyStyle.paddingLeft) || 0;
+        const bodyPaddingRight = parseInt(bodyStyle.paddingRight) || 0;
+        const totalBodyPadding = bodyPaddingLeft + bodyPaddingRight;
         
-        // 🎯 実際の利用可能幅を正確に計算
-        // containerWidthとwindowWidthの大きい方を基準にする（十分な余裕を持たせる）
-        const availableWidth = Math.max(containerWidth, windowWidth * 0.9); // ウィンドウ幅の90%を利用可能とする
+        // 利用可能幅の計算（ウィンドウ幅ベース）
+        const availableWidth = windowWidth - totalBodyPadding;
         
-        console.log(`🔍 デバッグ: 固定値使用 - baseSlotWidth=${baseSlotWidth}px, baseGap=${baseGap}px`);
         console.log(`📐 レイアウト調整詳細:`);
         console.log(`   ウィンドウ幅: ${windowWidth}px`);
         console.log(`   コンテナ幅: ${containerWidth}px`);
         console.log(`   基本スロット幅: ${baseSlotWidth}px`);
-        console.log(`   利用可能幅: ${availableWidth}px (ウィンドウ幅の90%基準)`);
+        console.log(`   body padding: ${totalBodyPadding}px`);
+        console.log(`   利用可能幅: ${availableWidth}px`);
         console.log(`   スロット数: ${slotCount}`);
         
         // 🎯 全体スケール調整方式：横一列を維持して全体を縮小
@@ -149,17 +154,14 @@ class ResponsiveLayoutManager {
         // スケール計算
         let globalScale = 1;
         
-        // 🎯 より寛容な閾値：利用可能幅の95%を超える場合のみ縮小
-        const threshold = availableWidth * 0.95;
-        
-        if (idealTotalWidth > threshold) {
-            // コンテンツが閾値を超える場合のみ縮小
-            globalScale = Math.max(0.3, threshold / idealTotalWidth); // 最小スケールを0.3に上げる
-            console.log(`🔍 縮小が必要: ${idealTotalWidth}px > ${threshold.toFixed(0)}px (閾値95%) → スケール${globalScale.toFixed(3)}`);
+        if (idealTotalWidth > availableWidth) {
+            // コンテンツが画面幅を超える場合のみ縮小
+            globalScale = Math.max(0.2, availableWidth / idealTotalWidth);
+            console.log(`🔍 縮小が必要: ${idealTotalWidth}px > ${availableWidth}px → スケール${globalScale.toFixed(3)}`);
         } else {
-            // 閾値内に収まる場合は通常サイズ（1.0）を維持
+            // 画面に収まる場合は通常サイズ（1.0）を維持
             globalScale = 1.0;
-            console.log(`✅ 通常サイズで表示: ${idealTotalWidth}px ≤ ${threshold.toFixed(0)}px (閾値95%)`);
+            console.log(`✅ 通常サイズで表示: ${idealTotalWidth}px ≤ ${availableWidth}px`);
         }
         
         return {
