@@ -593,32 +593,44 @@ h1 {
   visibility: hidden; /* 視覚的にも隠ぁE*/
 }
 
-/* JavaScriptで表示された場合�Eみ有効になるスタイル */
+/* JavaScriptで表示された場合のみ有効になるスタイル */
 [id^="slot-"][id$="-sub"].visible {
   display: flex !important;
-  flex-wrap: wrap; /* サブスロチE��が多すぎる場合に折り返す */
-  gap: 8px; /* サブスロチE��間�E隙間 */
+  flex-direction: row !important; /* 🎯 強制的に横並び */
+  flex-wrap: nowrap !important; /* 🎯 折り返し禁止で横一列維持 */
+  gap: 8px; /* サブスロット間の隙間 */
   visibility: visible !important;
-  align-content: flex-start; /* �E 折り返した行を上詰めで配置し、不要な空間を防ぁE*/
+  align-items: flex-start; /* 上揃え */
+  justify-content: flex-start; /* 左揃え */
+  
+  /* スクロール対応（サブスロットが多い場合） */
+  overflow-x: auto; /* 横スクロール有効 */
+  overflow-y: hidden; /* 縦スクロール無効 */
+  padding-bottom: 5px; /* スクロールバー用余白 */
 }
 
-/* 高さ潰れ�E透�E化�E折り返し不備の対処 */
+/* 高さ潰れ・透明化・折り返し不備の対処 */
 .slot-wrapper {
   min-height: 100px;
   visibility: visible;
-  flex-wrap: nowrap; /* �E 横並びで折り返さなぁE*/
-  flex-direction: row !important; /* 強制皁E��横並びに */
+  flex-wrap: nowrap; /* 横並びで折り返さない */
+  flex-direction: row !important; /* 強制的に横並びに */
   display: flex !important; /* flex表示を強制 */
   align-items: flex-start;
-  justify-content: flex-start; /* 左揁E�� */
-  gap: 12px; /* スロチE��間�E間隔 */
+  justify-content: flex-start; /* 左揃え */
+  gap: 12px; /* スロット間の間隔 */
   
-  /* �E 横スクロール対忁E*/
-  overflow-x: auto; /* 横スクロールを有効匁E*/
+  /* 🎯 全体スケール調整：スクロールではなく縮小で対応 */
+  transform-origin: left top; /* 縮小の起点を左上に */
+  transform: scale(var(--global-scale, 1)); /* 全体スケール変数 */
+  transition: transform 0.3s ease; /* スムーズな縮小アニメーション */
+  
+  /* スクロール制御：必要に応じて表示 */
+  overflow-x: var(--overflow-x, visible); /* 動的制御 */
   overflow-y: hidden; /* 縦スクロールは無効 */
-  padding-bottom: 10px; /* スクロールバ�E用の余白 */
+  padding-bottom: 10px; /* スクロールバー用の余白 */
   
-  /* �E スクロールバ�Eのスタイル改喁E��Eebkit系ブラウザ�E�E*/
+  /* スクロールバーのスタイル改善（Webkit系ブラウザ） */
   scrollbar-width: thin; /* Firefox */
 }
 
