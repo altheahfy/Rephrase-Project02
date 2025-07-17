@@ -6,11 +6,11 @@
 
 class ManualZoomController {
     constructor() {
-        this.currentZoom = 0.8; // 縮小をデフォルトに
-        this.minZoom = 0.4;
-        this.maxZoom = 1.5;
+        this.currentZoom = 1.0;
+        this.minZoom = 0.5;
+        this.maxZoom = 2.0;
         this.zoomStep = 0.1;
-        this.targetSelector = '#main-content';
+        this.targetSelector = '.slot-container';
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
@@ -230,7 +230,7 @@ class ManualZoomController {
             // Ctrl + 0 (リセット)
             if (e.ctrlKey && e.key === '0') {
                 e.preventDefault();
-                this.setZoom(0.8); // 縮小デフォルトに
+                this.setZoom(1.0);
             }
         });
     }
@@ -278,13 +278,15 @@ class ManualZoomController {
             if (element) {
                 console.log(`🔍 要素${index + 1}にズーム適用:`, element.id || element.className);
                 
-                // main-content全体にスケール適用（スロット間隔も含めて）
+                // スロットコンテナごとに個別にスケール適用
                 element.style.transform = `scale(${this.currentZoom})`;
                 element.style.transformOrigin = 'top left'; // 左上を基準点に
                 element.style.transition = 'transform 0.3s ease';
                 
-                // スケール後の高さ調整
-                element.style.minHeight = `${100 * this.currentZoom}vh`;
+                // スケール変更に伴うマージン調整（重複を避ける）
+                const scaleFactor = this.currentZoom;
+                const margin = scaleFactor < 1 ? `${(1 - scaleFactor) * 20}px` : '0px';
+                element.style.marginBottom = margin;
                 
                 appliedCount++;
             }
@@ -346,14 +348,9 @@ class ManualZoomController {
             if (saved) {
                 this.currentZoom = parseFloat(saved);
                 console.log(`💾 保存されたズームレベルを読み込み: ${Math.round(this.currentZoom * 100)}%`);
-            } else {
-                // 初回時は縮小デフォルト
-                this.currentZoom = 0.8;
-                console.log(`🔍 初回起動 - デフォルト縮小レベル: ${Math.round(this.currentZoom * 100)}%`);
             }
         } catch (error) {
             console.warn('ズームレベルの読み込みに失敗:', error);
-            this.currentZoom = 0.8; // エラー時も縮小デフォルト
         }
     }
     
@@ -385,7 +382,7 @@ class ManualZoomController {
      * システムリセット
      */
     reset() {
-        this.setZoom(0.8); // 縮小デフォルトに
+        this.setZoom(1.0);
         this.controlPanel?.classList.remove('collapsed');
     }
 }
