@@ -554,7 +554,13 @@ h1 {
   display: none;
 }
 
-/* ⚠️ 古い.slot-wrapper定義は削除（下部の正しい定義を使用） */
+.slot-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-direction: column; /* 上から下への流れを確俁E*/
+}
 
 /* subslot 表示安定化のための共通構造 */
 .subslot {
