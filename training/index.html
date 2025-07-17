@@ -1072,54 +1072,6 @@
       </script>
 </div> <!-- main-content の終了 -->
 
-    <!-- 音声学習パネル -->
-    <div id="voice-control-panel" style="position: fixed; top: 80px; right: 20px; width: 300px; background-color: rgba(0, 0, 0, 0.9); color: white; padding: 16px; border-radius: 8px; border: 2px solid #4CAF50; z-index: 1000; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); font-family: Arial, sans-serif;">
-        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin: 0; color: #4CAF50; font-size: 16px;">音声学習</h3>
-            <button id="minimize-panel" class="minimize-btn" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer; padding: 4px;">▼</button>
-        </div>
-        <div class="panel-content" id="voice-panel-content">
-            <div class="voice-controls" style="margin-bottom: 12px;">
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <button id="record-btn" class="voice-btn" style="flex: 1; padding: 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🎤 録音</button>
-                    <button id="play-btn" class="voice-btn" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">▶️ 再生</button>
-                </div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <button id="tts-btn" class="voice-btn" style="flex: 1; padding: 8px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🔊 TTS</button>
-                    <button id="analyze-btn" class="voice-btn" style="flex: 1; padding: 8px; background: #9C27B0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🔍 分析</button>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button id="progress-btn" class="voice-btn" style="flex: 1; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 進捗</button>
-                </div>
-            </div>
-            <div class="voice-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px;">
-                <span>ステータス: <span id="recording-status" style="color: #4CAF50;">待機中</span></span>
-                <span>時間: <span id="recording-time">00:00</span></span>
-            </div>
-            <div style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <span style="font-size: 12px;">音量:</span>
-                    <span id="volume-value" style="font-size: 12px;">50</span>
-                </div>
-                <input type="range" id="volume-slider" min="0" max="100" value="50" style="width: 100%;">
-            </div>
-        </div>
-        <div id="analysis-panel" class="analysis-panel" style="display: none; max-height: 150px; overflow-y: auto; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 4px; margin-top: 12px;">
-            <div class="analysis-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="margin: 0; color: #4CAF50; font-size: 14px;">分析結果</h4>
-                <button id="close-analysis" class="close-btn" style="background: none; border: none; color: white; font-size: 14px; cursor: pointer;">×</button>
-            </div>
-            <div id="analysis-results" class="analysis-results" style="font-size: 12px; line-height: 1.4;">
-                分析結果がここに表示されます
-            </div>
-        </div>
-    </div>
-    
-    <!-- 最小化状態の音声パネル -->
-    <div id="voice-panel-minimized" style="display: none; position: fixed; top: 80px; right: 20px; width: 60px; height: 60px; background: rgba(0, 0, 0, 0.9); color: white; border-radius: 50%; border: 2px solid #4CAF50; z-index: 1000; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);">
-        🎤
-    </div>
-
     <!-- 既存のスクリプト -->
 <script type="module">
 import { randomizeAll, randomizeAllWithStateManagement } from './js/randomizer_all.js';
@@ -1892,48 +1844,6 @@ window.clearRandomizeHistory = function() {
     console.error('🎯 重複回避履歴のクリアに失敗:', error);
   }
 };
-
-// 🎤 音声パネル最小化機能
-document.addEventListener('DOMContentLoaded', function() {
-    const voicePanel = document.getElementById('voice-control-panel');
-    const minimizeBtn = document.getElementById('minimize-panel');
-    const minimizedPanel = document.getElementById('voice-panel-minimized');
-    
-    if (minimizeBtn) {
-        minimizeBtn.addEventListener('click', function() {
-            voicePanel.style.display = 'none';
-            minimizedPanel.style.display = 'flex';
-        });
-    }
-    
-    if (minimizedPanel) {
-        minimizedPanel.addEventListener('click', function() {
-            voicePanel.style.display = 'block';
-            minimizedPanel.style.display = 'none';
-        });
-    }
-    
-    // 分析パネルの開閉
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const analysisPanel = document.getElementById('analysis-panel');
-    const closeAnalysisBtn = document.getElementById('close-analysis');
-    
-    if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', function() {
-            if (analysisPanel.style.display === 'none') {
-                analysisPanel.style.display = 'block';
-            } else {
-                analysisPanel.style.display = 'none';
-            }
-        });
-    }
-    
-    if (closeAnalysisBtn) {
-        closeAnalysisBtn.addEventListener('click', function() {
-            analysisPanel.style.display = 'none';
-        });
-    }
-});
 
 
 </script>
