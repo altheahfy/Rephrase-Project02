@@ -1957,11 +1957,13 @@ window.clearRandomizeHistory = function() {
 </script>
 
 <!-- 音声学習システムのスクリプト -->
+<script src="js/voice_system.js"></script>
+<script src="js/voice_progress_tracker.js"></script>
+<script src="js/voice_progress_ui.js"></script>
+
 <script>
 // 🎤 音声パネル制御JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎤 音声パネル制御JavaScript開始');
-    
     // 音声パネルの最小化/復元機能
     const voicePanel = document.getElementById('voice-control-panel');
     const voicePanelBasic = document.getElementById('voice-panel-basic');
@@ -1972,14 +1974,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeExpandedBtn = document.getElementById('voice-panel-close-expanded-btn');
     const analyzeBtn = document.getElementById('voice-analyze-btn');
     
-    // 音声システムの初期化状況を確認
-    console.log('🎤 音声システム変数:', typeof voiceSystem);
-    console.log('🎤 VoiceSystemクラス:', typeof VoiceSystem);
-    
     // 最小化ボタンの機能
     if (minimizeBtn) {
         minimizeBtn.addEventListener('click', function() {
-            console.log('🎤 最小化ボタンクリック');
             voicePanelBasic.style.display = 'none';
             voicePanelMinimized.style.display = 'block';
             if (expandedPanel) {
@@ -1991,7 +1988,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 復元ボタンの機能
     if (restoreBtn) {
         restoreBtn.addEventListener('click', function() {
-            console.log('🎤 復元ボタンクリック');
             voicePanelBasic.style.display = 'block';
             voicePanelMinimized.style.display = 'none';
         });
@@ -2000,7 +1996,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 分析ボタンの機能（拡張パネル表示/非表示）
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', function() {
-            console.log('🎤 分析ボタンクリック');
             if (expandedPanel) {
                 if (expandedPanel.style.display === 'none' || expandedPanel.style.display === '') {
                     expandedPanel.style.display = 'block';
@@ -2014,48 +2009,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 拡張パネル閉じるボタンの機能
     if (closeExpandedBtn) {
         closeExpandedBtn.addEventListener('click', function() {
-            console.log('🎤 拡張パネル閉じるボタンクリック');
             if (expandedPanel) {
                 expandedPanel.style.display = 'none';
             }
         });
     }
-    
-    // 音声ボタンの手動テスト
-    const recordBtn = document.getElementById('voice-record-btn');
-    const playBtn = document.getElementById('voice-play-btn');
-    const ttsBtn = document.getElementById('voice-tts-btn');
-    const progressBtn = document.getElementById('voice-progress-btn');
-    
-    if (recordBtn) {
-        recordBtn.addEventListener('click', function() {
-            console.log('🎤 録音ボタンクリック - 音声システム未初期化のため手動処理');
-            alert('録音機能は音声システム初期化後に利用可能です');
-        });
-    }
-    
-    if (playBtn) {
-        playBtn.addEventListener('click', function() {
-            console.log('🎤 再生ボタンクリック - 音声システム未初期化のため手動処理');
-            alert('再生機能は音声システム初期化後に利用可能です');
-        });
-    }
-    
-    if (ttsBtn) {
-        ttsBtn.addEventListener('click', function() {
-            console.log('🎤 TTSボタンクリック - 音声システム未初期化のため手動処理');
-            alert('TTS機能は音声システム初期化後に利用可能です');
-        });
-    }
-    
-    if (progressBtn) {
-        progressBtn.addEventListener('click', function() {
-            console.log('🎤 学習進捗ボタンクリック');
-            alert('学習進捗機能（テスト）');
-        });
-    }
-    
-    console.log('🎤 音声パネル制御JavaScript完了');
 });
 </script>
 
