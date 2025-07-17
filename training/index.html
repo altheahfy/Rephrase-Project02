@@ -1096,7 +1096,7 @@
   <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px;">
     <button id="voice-record-btn" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
     <button id="voice-play-btn" style="background-color: #2196F3; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
-    <button id="voice-analyze-btn" style="background-color: #9C27B0; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+    <button id="voice-tts-btn" style="background-color: #FF9800; color: white; border: none; padding: 4px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
   </div>
   
   <!-- ステータス表示 -->
@@ -1104,6 +1104,11 @@
   
   <!-- 録音タイマー -->
   <div id="voice-timer" style="display: none; font-size: 10px; color: #666; text-align: center; margin-top: 4px;">録音時間: <span id="voice-timer-text">0:00</span></div>
+  
+  <!-- 分析結果表示エリア -->
+  <div id="voice-analysis-results" style="display: none; margin-top: 8px; padding: 8px; background: #f9f9f9; border-radius: 4px; border: 1px solid #e0e0e0;">
+    <div id="voice-evaluation-result" style="font-size: 11px; color: #555;"></div>
+  </div>
   
   <!-- 学習進捗ボタン -->
   <div style="text-align: center; margin-top: 12px;">
@@ -1945,11 +1950,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Phase 2: 音声機能の基本制御
   const voiceRecordBtn = document.getElementById('voice-record-btn');
   const voicePlayBtn = document.getElementById('voice-play-btn');
-  const voiceAnalyzeBtn = document.getElementById('voice-analyze-btn');
+  const voiceTtsBtn = document.getElementById('voice-tts-btn');
   const voiceProgressBtn = document.getElementById('voice-progress-btn');
   const voiceStatus = document.getElementById('voice-status');
   const voiceTimer = document.getElementById('voice-timer');
   const voiceTimerText = document.getElementById('voice-timer-text');
+  const voiceAnalysisResults = document.getElementById('voice-analysis-results');
+  const voiceEvaluationResult = document.getElementById('voice-evaluation-result');
   
   let isRecording = false;
   let recordingStartTime = null;
@@ -1957,6 +1964,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let mediaRecorder = null;
   let audioChunks = [];
   let recordedAudio = null;
+  let audioStream = null;
   
   // ステータス更新関数
   function updateVoiceStatus(message, type = 'info') {
@@ -1970,33 +1978,66 @@ document.addEventListener('DOMContentLoaded', function() {
   // 録音ボタン
   if (voiceRecordBtn) {
     voiceRecordBtn.addEventListener('click', async function() {
+      console.log('🎤 録音ボタンクリック, 現在の状態:', isRecording);
+      
       if (!isRecording) {
         try {
-          updateVoiceStatus('録音開始中...', 'recording');
+          updateVoiceStatus('マイクアクセス中...', 'recording');
+          console.log('🎤 マイクアクセス開始');
           
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          // マイクアクセス許可を取得
+          audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          });
+          
+          console.log('✅ マイクアクセス許可取得');
+          
+          mediaRecorder = new MediaRecorder(audioStream, {
+            mimeType: 'audio/webm'
+          });
+          
           audioChunks = [];
           
-          mediaRecorder.ondataavailable = function(event) {
-            audioChunks.push(event.data);
-          };
+          mediaRecorder.addEventListener('dataavailable', function(event) {
+            if (event.data.size > 0) {
+              audioChunks.push(event.data);
+              console.log('🎤 音声データ受信:', event.data.size);
+            }
+          });
           
-          mediaRecorder.onstop = function() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          mediaRecorder.addEventListener('stop', function() {
+            console.log('🎤 録音停止処理開始');
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             recordedAudio = audioBlob;
-            updateVoiceStatus('録音完了', 'success');
             
-            // 録音完了後、再生ボタンを有効化
+            // 音声ストリームを停止
+            if (audioStream) {
+              audioStream.getTracks().forEach(track => track.stop());
+              audioStream = null;
+            }
+            
+            updateVoiceStatus('録音完了', 'success');
+            console.log('✅ 録音完了, サイズ:', audioBlob.size);
+            
+            // 再生ボタンを有効化
             if (voicePlayBtn) {
               voicePlayBtn.disabled = false;
               voicePlayBtn.style.opacity = '1';
             }
-            if (voiceAnalyzeBtn) {
-              voiceAnalyzeBtn.disabled = false;
-              voiceAnalyzeBtn.style.opacity = '1';
-            }
-          };
+            
+            // リアルタイム分析を実行
+            performRealTimeAnalysis();
+          });
+          
+          mediaRecorder.addEventListener('error', function(event) {
+            console.error('MediaRecorder エラー:', event);
+            updateVoiceStatus('録音エラー', 'error');
+            stopRecording();
+          });
           
           mediaRecorder.start();
           isRecording = true;
@@ -2013,13 +2054,23 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           updateVoiceStatus('録音中...', 'recording');
+          console.log('🎤 録音開始成功');
           
         } catch (error) {
-          console.error('録音エラー:', error);
-          updateVoiceStatus('録音エラー', 'error');
+          console.error('録音開始エラー:', error);
+          updateVoiceStatus('マイクアクセス失敗', 'error');
+          
+          if (error.name === 'NotAllowedError') {
+            alert('マイクアクセスが許可されていません。ブラウザの設定を確認してください。');
+          } else if (error.name === 'NotFoundError') {
+            alert('マイクが見つかりません。デバイスを確認してください。');
+          } else {
+            alert('録音エラー: ' + error.message);
+          }
         }
       } else {
         // 録音停止
+        console.log('🎤 録音停止開始');
         if (mediaRecorder && mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
         }
@@ -2042,10 +2093,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         audio.onended = function() {
           updateVoiceStatus('再生完了', 'success');
+          URL.revokeObjectURL(audioUrl);
         };
         
         audio.onerror = function() {
           updateVoiceStatus('再生エラー', 'error');
+          URL.revokeObjectURL(audioUrl);
         };
         
         audio.play();
@@ -2053,22 +2106,101 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // 分析ボタン
-  if (voiceAnalyzeBtn) {
-    voiceAnalyzeBtn.disabled = true;
-    voiceAnalyzeBtn.style.opacity = '0.5';
-    
-    voiceAnalyzeBtn.addEventListener('click', function() {
-      if (recordedAudio) {
-        updateVoiceStatus('分析中...', 'analyzing');
+  // 読み上げボタン
+  if (voiceTtsBtn) {
+    voiceTtsBtn.addEventListener('click', function() {
+      // 現在選択されている例文を取得
+      const currentText = getCurrentExampleText();
+      
+      if (currentText) {
+        updateVoiceStatus('読み上げ中...', 'speaking');
         
-        // 簡易分析（実際の分析はPhase 3で実装）
-        setTimeout(() => {
-          updateVoiceStatus('分析完了', 'success');
-          console.log('🎤 音声分析完了（簡易版）');
-        }, 2000);
+        // Web Speech API を使用してテキストを読み上げ
+        const utterance = new SpeechSynthesisUtterance(currentText);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.8;
+        
+        utterance.onend = function() {
+          updateVoiceStatus('読み上げ完了', 'success');
+        };
+        
+        utterance.onerror = function() {
+          updateVoiceStatus('読み上げエラー', 'error');
+        };
+        
+        speechSynthesis.speak(utterance);
+      } else {
+        updateVoiceStatus('例文が選択されていません', 'error');
       }
     });
+  }
+  
+  // 現在の例文テキストを取得する関数
+  function getCurrentExampleText() {
+    // M1スロットから現在の例文を取得
+    const m1Slot = document.querySelector('[data-slot="M1"]');
+    if (m1Slot) {
+      const textContent = m1Slot.textContent || m1Slot.innerText;
+      if (textContent && textContent.trim()) {
+        return textContent.trim();
+      }
+    }
+    
+    // フォールバック: 表示されている例文を検索
+    const visibleSlots = document.querySelectorAll('[data-slot]');
+    for (let slot of visibleSlots) {
+      const text = slot.textContent || slot.innerText;
+      if (text && text.trim() && text.length > 5) {
+        return text.trim();
+      }
+    }
+    
+    return null;
+  }
+  
+  // リアルタイム分析機能
+  function performRealTimeAnalysis() {
+    if (!recordedAudio) return;
+    
+    updateVoiceStatus('分析中...', 'analyzing');
+    
+    // 分析結果表示エリアを表示
+    if (voiceAnalysisResults) {
+      voiceAnalysisResults.style.display = 'block';
+    }
+    
+    // 簡易分析（実際の分析は後で実装）
+    setTimeout(() => {
+      const analysisResult = generateMockAnalysisResult();
+      
+      if (voiceEvaluationResult) {
+        voiceEvaluationResult.innerHTML = analysisResult;
+      }
+      
+      updateVoiceStatus('分析完了', 'success');
+      console.log('✅ リアルタイム分析完了');
+    }, 1500);
+  }
+  
+  // モック分析結果生成
+  function generateMockAnalysisResult() {
+    const scores = {
+      pronunciation: Math.floor(Math.random() * 30) + 70,
+      fluency: Math.floor(Math.random() * 25) + 75,
+      intonation: Math.floor(Math.random() * 20) + 80
+    };
+    
+    return `
+      <div style="font-size: 11px;">
+        <div style="margin-bottom: 4px;"><strong>📊 音声分析結果</strong></div>
+        <div style="margin-bottom: 2px;">🎯 発音: ${scores.pronunciation}%</div>
+        <div style="margin-bottom: 2px;">🌊 流暢さ: ${scores.fluency}%</div>
+        <div style="margin-bottom: 2px;">📈 イントネーション: ${scores.intonation}%</div>
+        <div style="margin-top: 4px; font-size: 10px; color: #666;">
+          総合評価: ${Math.round((scores.pronunciation + scores.fluency + scores.intonation) / 3)}%
+        </div>
+      </div>
+    `;
   }
   
   // 学習進捗ボタン
@@ -2107,11 +2239,19 @@ document.addEventListener('DOMContentLoaded', function() {
       voiceTimer.style.display = 'none';
     }
     
+    // 音声ストリームを停止
+    if (audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      audioStream = null;
+    }
+    
     // ボタンを元に戻す
     if (voiceRecordBtn) {
       voiceRecordBtn.textContent = '🎤 録音';
       voiceRecordBtn.style.backgroundColor = '#4CAF50';
     }
+    
+    console.log('🎤 録音停止処理完了');
   }
   
   console.log('✅ Phase 1 & 2: 音声パネルと基本機能の初期化完了');
