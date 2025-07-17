@@ -12,7 +12,7 @@ class ManualZoomController {
         this.minZoom = 0.5; // 縮小範囲
         this.maxZoom = 1.5; // 拡大範囲
         this.zoomStep = 0.1;
-        this.targetSelector = '.slot-container, .upper-slot, .sub-slot'; // スロット要素のみ対象
+        this.targetSelector = '.slot-container, .subslot-container'; // 正しいスロット要素を対象
         this.storageKey = 'rephrase_zoom_level';
         
         this.isInitialized = false;
