@@ -172,52 +172,27 @@ class ZoomController {
         
         // 🔧 スロットSのサブスロット専用処理
         if (container.id === 'slot-s-sub') {
-          console.log(`🔍 === スロットSサブスロット専用デバッグ ===`);
-          const computedStyle = getComputedStyle(container.element);
-          console.log(`  - 計算されたtransform: "${computedStyle.transform}"`);
-          console.log(`  - 計算されたposition: "${computedStyle.position}"`);
-          console.log(`  - 計算されたtop: "${computedStyle.top}"`);
-          console.log(`  - 計算されたmarginTop: "${computedStyle.marginTop}"`);
-          console.log(`  - 計算されたmarginBottom: "${computedStyle.marginBottom}"`);
+          console.log(`🔍 === スロットSサブスロット位置修正 ===`);
           
-          // 他のサブスロットとの比較
-          const otherSubslot = document.querySelector('.slot-wrapper[id$="-sub"]:not(#slot-s-sub)');
-          if (otherSubslot) {
-            const otherStyle = getComputedStyle(otherSubslot);
-            console.log(`  📊 比較用他サブスロット (${otherSubslot.id}):`);
-            console.log(`    - transform: "${otherStyle.transform}"`);
-            console.log(`    - position: "${otherStyle.position}"`);
-            console.log(`    - top: "${otherStyle.top}"`);
-            console.log(`    - marginTop: "${otherStyle.marginTop}"`);
-            console.log(`    - marginBottom: "${otherStyle.marginBottom}"`);
+          // スロットSサブスロットのみ：上方向に位置調整
+          if (zoomLevel < 1.0) {
+            const upwardAdjustment = (1 - zoomLevel) * 50;
+            container.element.style.setProperty('margin-top', `-${upwardAdjustment}px`, 'important');
+            console.log(`🔧 スロットSサブスロット上方向調整: -${upwardAdjustment}px`);
+          } else {
+            container.element.style.removeProperty('margin-top');
+            console.log(`🔧 スロットSサブスロット位置リセット`);
           }
-          
-          // スロットSサブスロット専用の強制修正
-          console.log(`🔧 スロットSサブスロット強制修正開始...`);
-          container.element.style.removeProperty('transform');
-          container.element.style.removeProperty('margin-top');
-          container.element.style.removeProperty('margin-bottom');
-          container.element.offsetHeight; // reflow trigger
-          
-          container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
-          container.element.style.setProperty('transform-origin', 'top left', 'important');
-          container.element.style.setProperty('margin-top', '0px', 'important');
-          
-          const finalStyle = getComputedStyle(container.element);
-          console.log(`🔧 修正後transform: "${finalStyle.transform}"`);
-          console.log(`🔧 修正後marginTop: "${finalStyle.marginTop}"`);
         }
         
-        // スケール適用時の位置調整（縮小時の空白削減）- スロットSサブスロット以外
-        if (container.id !== 'slot-s-sub') {
-          if (zoomLevel < 1.0) {
-            // 縮小時は要素間の空白を削減
-            const spaceReduction = (1 - zoomLevel) * 50;
-            container.element.style.marginBottom = `-${spaceReduction}px`;
-          } else {
-            // 100%以上の場合はマージンリセット
-            container.element.style.marginBottom = '';
-          }
+        // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット対象に戻す
+        if (zoomLevel < 1.0) {
+          // 縮小時は要素間の空白を削減
+          const spaceReduction = (1 - zoomLevel) * 50;
+          container.element.style.marginBottom = `-${spaceReduction}px`;
+        } else {
+          // 100%以上の場合はマージンリセット
+          container.element.style.marginBottom = '';
         }
       } else {
         console.warn(`  [${index}] ${container.type}(${container.id}): 要素が存在しません`);
