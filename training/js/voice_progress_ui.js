@@ -4,14 +4,9 @@
  */
 class VoiceProgressUI {
     constructor() {
-        console.log('🎯 VoiceProgressUI constructor 開始');
-        console.log('📊 window.voiceProgressTracker:', window.voiceProgressTracker);
-        
         this.progressTracker = window.voiceProgressTracker;
         this.isVisible = false;
         this.currentPeriod = 'week';
-        
-        console.log('📊 this.progressTracker:', this.progressTracker);
         
         this.init();
     }
@@ -20,22 +15,9 @@ class VoiceProgressUI {
      * 初期化
      */
     init() {
-        console.log('🎯 VoiceProgressUI.init() 開始');
-        console.log('📊 progressTracker:', this.progressTracker);
-        console.log('📊 window.voiceProgressTracker:', window.voiceProgressTracker);
-        
-        try {
-            this.createProgressPanel();
-            console.log('✅ 進捗パネル作成完了');
-            
-            this.setupEventListeners();
-            console.log('✅ イベントリスナー設定完了');
-            
-            console.log('✅ 音声進捗表示UI初期化完了');
-        } catch (error) {
-            console.error('❌ VoiceProgressUI初期化エラー:', error);
-            console.error('❌ エラースタック:', error.stack);
-        }
+        this.createProgressPanel();
+        this.setupEventListeners();
+        console.log('✅ 音声進捗表示UI初期化完了');
     }
     
     /**
@@ -219,21 +201,13 @@ class VoiceProgressUI {
      * 進捗パネルを表示
      */
     async showProgressPanel() {
-        console.log('🎯 showProgressPanel() 開始');
         const panel = document.getElementById('voice-progress-panel');
-        console.log('🔍 パネル要素:', panel);
-        
         if (panel) {
-            console.log('✅ パネルが見つかりました - 表示開始');
             panel.style.display = 'block';
             this.isVisible = true;
             
-            console.log('📊 データ読み込み処理開始');
             // データを読み込んで表示
             await this.loadAndDisplayProgress();
-            console.log('✅ showProgressPanel() 完了');
-        } else {
-            console.error('❌ パネルが見つかりません');
         }
     }
     
