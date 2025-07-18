@@ -185,10 +185,10 @@ class ZoomController {
           }
         }
         
-        // スケール適用時の位置調整（縮小時の空白削減）- サブスロット以外のみ
+        // スケール適用時の位置調整（縮小時の空白削減）- サブスロット全体を除外
         if (container.type !== 'subslot') {
           if (zoomLevel < 1.0) {
-            // 縮小時は要素間の空白を削減
+            // 縮小時は要素間の空白を削減（メインセクションのみ）
             const spaceReduction = (1 - zoomLevel) * 50;
             container.element.style.marginBottom = `-${spaceReduction}px`;
           } else {
