@@ -138,18 +138,6 @@ class VoiceProgressUI {
      * イベントリスナーを設定
      */
     setupEventListeners() {
-        // 学習進捗ボタン（メインボタン）
-        const progressBtn = document.getElementById('voice-progress-btn');
-        if (progressBtn) {
-            progressBtn.addEventListener('click', () => {
-                console.log('📊 学習進捗ボタンがクリックされました');
-                this.showProgressPanel();
-            });
-            console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました');
-        } else {
-            console.error('❌ 学習進捗ボタン (voice-progress-btn) が見つかりません');
-        }
-        
         // 閉じるボタン
         const closeBtn = document.getElementById('progress-close-btn');
         if (closeBtn) {
@@ -589,17 +577,5 @@ class VoiceProgressUI {
     }
 }
 
-// グローバルインスタンス - DOMが読み込まれてから初期化
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎯 DOMContentLoaded - VoiceProgressUI初期化開始');
-    window.voiceProgressUI = new VoiceProgressUI();
-});
-
-// フォールバック - すでにDOMが読み込まれている場合
-if (document.readyState === 'loading') {
-    // DOMContentLoadedで初期化
-} else {
-    // すでに読み込み済みの場合は即座に初期化
-    console.log('🎯 DOM既読み込み - VoiceProgressUI即座に初期化');
-    window.voiceProgressUI = new VoiceProgressUI();
-}
+// グローバルインスタンス
+window.voiceProgressUI = new VoiceProgressUI();
