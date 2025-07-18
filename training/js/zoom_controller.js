@@ -215,7 +215,7 @@ class ZoomController {
       const afterTransform = container.style.transform;
       const afterComputed = getComputedStyle(container).transform;
       
-      // スロットSの特別処理：完全リセット＋強制適用
+      // スロットSの特別ログ
       if (slotId === 'slot-s') {
         console.log(`🎯 スロットS変更詳細:`);
         console.log(`  - 適用前style: "${beforeTransform}"`);
@@ -223,27 +223,6 @@ class ZoomController {
         console.log(`  - 適用後style: "${afterTransform}"`);
         console.log(`  - 適用後computed: "${afterComputed}"`);
         console.log(`  - 変更成功: ${beforeComputed !== afterComputed}`);
-        
-        // 🔧 ROOT CAUSE FIX: スロットSの完全リセット＋強制適用
-        console.log(`🔧 スロットS専用修正処理開始...`);
-        
-        // 1. 全transformプロパティを完全リセット
-        container.style.removeProperty('transform');
-        container.style.removeProperty('transform-origin');
-        container.style.removeProperty('scale');
-        container.style.removeProperty('zoom');
-        
-        // 2. 強制的に再計算させる
-        container.offsetHeight; // reflow trigger
-        
-        // 3. 新しい値を強制適用
-        container.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
-        container.style.setProperty('transform-origin', 'top left', 'important');
-        
-        // 4. 結果確認
-        const finalComputed = getComputedStyle(container).transform;
-        console.log(`🔧 スロットS修正後: "${finalComputed}"`);
-        console.log(`🔧 修正成功: ${finalComputed.includes(zoomLevel.toString())}`);
         
         // 追加：親要素のtransformも確認
         const parent = container.parentElement;
