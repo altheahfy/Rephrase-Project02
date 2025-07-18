@@ -78,6 +78,18 @@ class ZoomController {
       });
       console.log('🎯 ズーム対象: スロット領域全体（section要素）');
       
+      // 🆕 スロットSの詳細検証
+      const slotSElement = document.getElementById('slot-s');
+      if (slotSElement) {
+        console.log('🎯 スロットS詳細検証:');
+        console.log(`  - ID: ${slotSElement.id}`);
+        console.log(`  - クラス: ${slotSElement.className}`);
+        console.log(`  - 親要素: ${slotSElement.parentElement?.tagName} (${slotSElement.parentElement?.className})`);
+        console.log(`  - 現在のtransform: ${slotSElement.style.transform}`);
+        console.log(`  - 計算されたposition: ${getComputedStyle(slotSElement).position}`);
+        console.log(`  - 計算されたtransform: ${getComputedStyle(slotSElement).transform}`);
+      }
+      
       // 🆕 追加：展開中のサブスロットも個別に追加して確実性を向上
       const visibleSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
       console.log(`📱 展開中のサブスロット: ${visibleSubslots.length}個`);
@@ -114,6 +126,18 @@ class ZoomController {
         });
         console.log(`🎯 フォールバック時サブスロット追加: ${subslot.id}`);
       });
+    }
+
+    // 🆕 追加：個別スロットコンテナの問題対応 - スロットSの特別処理
+    const problemSlotS = document.getElementById('slot-s');
+    if (problemSlotS) {
+      // スロットSが他の要素に干渉されないよう、個別にも対象として追加
+      this.targetContainers.push({
+        element: problemSlotS,
+        type: 'individual-slot',
+        id: 'slot-s-individual'
+      });
+      console.log('🎯 特別対応: スロットSを個別ターゲットとして追加');
     }
 
     console.log(`🎯 ズーム対象コンテナ: ${this.targetContainers.length}個を特定`);
@@ -156,6 +180,16 @@ class ZoomController {
     
     this.targetContainers.forEach((container, index) => {
       if (container.element) {
+        // 🆕 スロットSの詳細ログ出力
+        const isSlotS = container.element.id === 'slot-s' || container.element.querySelector('#slot-s');
+        if (isSlotS) {
+          console.log(`🎯 スロットS検出: ${container.element.id}`);
+          console.log(`  - 要素タイプ: ${container.element.tagName}`);
+          console.log(`  - クラス: ${container.element.className}`);
+          console.log(`  - 現在のtransform: ${container.element.style.transform}`);
+          console.log(`  - 現在のtransform-origin: ${container.element.style.transformOrigin}`);
+        }
+        
         console.log(`  [${index}] ${container.type}(${container.id}): 適用前transform = ${container.element.style.transform}`);
         
         // transform: scale で縦横比を保ったまま縮小・拡大
@@ -167,6 +201,13 @@ class ZoomController {
         container.element.style.setProperty('width', '100%', 'important');
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
+        
+        // 🆕 スロットSの詳細ログ出力（適用後）
+        if (isSlotS) {
+          console.log(`  - 適用後transform: ${container.element.style.transform}`);
+          console.log(`  - 適用後transform-origin: ${container.element.style.transformOrigin}`);
+          console.log(`  - 計算されたスタイル:`, getComputedStyle(container.element).transform);
+        }
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
         console.log(`  [${index}] 実際のDOM要素:`, container.element);
