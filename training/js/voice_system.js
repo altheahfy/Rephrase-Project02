@@ -2377,17 +2377,37 @@ class VoiceSystem {
     showProgress() {
         console.log('📊 学習進捗表示を開始');
         
-        // VoiceProgressUIが利用可能かチェック
-        if (typeof VoiceProgressUI === 'undefined') {
-            console.error('❌ VoiceProgressUI クラスが読み込まれていません');
-            alert('エラー: 進捗表示システムが読み込まれていません。\nページを再読み込みしてください。');
-            return;
+        // グローバルインスタンスが利用可能かチェック
+        if (!window.voiceProgressUI) {
+            console.error('❌ VoiceProgressUI インスタンスが見つかりません');
+            console.log('⚠️ 再初期化を試行します...');
+            
+            // 再初期化を試行
+            try {
+                if (typeof VoiceProgressUI !== 'undefined') {
+                    window.voiceProgressUI = new VoiceProgressUI();
+                    console.log('✅ VoiceProgressUI インスタンスを再作成しました');
+                } else {
+                    console.error('❌ VoiceProgressUI クラスが読み込まれていません');
+                    alert('エラー: 進捗表示システムが読み込まれていません。\nページを再読み込みしてください。');
+                    return;
+                }
+            } catch (error) {
+                console.error('❌ VoiceProgressUI インスタンス作成失敗:', error);
+                alert('エラー: 進捗表示システムの初期化に失敗しました。\nページを再読み込みしてください。');
+                return;
+            }
         }
         
         try {
-            // VoiceProgressUIのインスタンスを作成して進捗パネルを表示
-            const progressUI = new VoiceProgressUI();
-            progressUI.showProgressPanel();
+            // グローバルインスタンスを使用して進捗パネルを表示
+            window.voiceProgressUI.showProgressPanel();
+            console.log('✅ 進捗パネル表示完了');
+        } catch (error) {
+            console.error('❌ 進捗パネル表示エラー:', error);
+            alert('エラー: 進捗表示に失敗しました。\nページを再読み込みしてください。');
+        }
+    }
             console.log('✅ 学習進捗パネルを表示しました');
         } catch (error) {
             console.error('❌ 進捗表示エラー:', error);
