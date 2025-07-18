@@ -180,22 +180,75 @@ class ZoomController {
           console.log(`  - computed margin-top: "${computedStyle.marginTop}"`);
           console.log(`  - computed margin-left: "${computedStyle.marginLeft}"`);
           console.log(`  - computed position: "${computedStyle.position}"`);
+          console.log(`  - computed top: "${computedStyle.top}"`);
+          console.log(`  - computed left: "${computedStyle.left}"`);
+          console.log(`  - computed transform: "${computedStyle.transform}"`);
           
-          // 他のサブスロットとのクラス比較
-          const otherSubslot = document.querySelector('.slot-wrapper[id$="-sub"]:not(#slot-s-sub)');
-          if (otherSubslot && otherSubslot.style.display !== 'none') {
-            const otherStyle = getComputedStyle(otherSubslot);
-            console.log(`  📊 比較サブスロット ${otherSubslot.id}:`);
-            console.log(`    - クラス: "${otherSubslot.className}"`);
-            console.log(`    - margin-top: "${otherStyle.marginTop}"`);
-            console.log(`    - margin-left: "${otherStyle.marginLeft}"`);
-          }
+          // 🔍 すべてのサブスロットとの包括的比較
+          const allSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+          console.log(`  📊 全サブスロット数: ${allSubslots.length}`);
           
-          // 🔧 根本修正：active-subslot-areaクラスの強制適用
-          if (!container.element.classList.contains('active-subslot-area')) {
-            console.log(`🔧 active-subslot-areaクラスを強制追加`);
-            container.element.classList.add('active-subslot-area');
-          }
+          allSubslots.forEach((subslot, idx) => {
+            if (subslot.id !== 'slot-s-sub') {
+              const subStyle = getComputedStyle(subslot);
+              const isVisible = subslot.style.display !== 'none' && subStyle.display !== 'none';
+              
+              console.log(`  📊 比較サブスロット[${idx}] ${subslot.id} (表示:${isVisible}):`);
+              console.log(`    - クラス: "${subslot.className}"`);
+              console.log(`    - margin-top: "${subStyle.marginTop}"`);
+              console.log(`    - margin-left: "${subStyle.marginLeft}"`);
+              console.log(`    - position: "${subStyle.position}"`);
+              console.log(`    - top: "${subStyle.top}"`);
+              console.log(`    - left: "${subStyle.left}"`);
+              console.log(`    - transform: "${subStyle.transform}"`);
+              console.log(`    - display: "${subslot.style.display}" / computed: "${subStyle.display}"`);
+              
+              // 🎯 主要な差異検出
+              if (isVisible) {
+                console.log(`  🎯 === S vs ${subslot.id} 主要差異 ===`);
+                if (computedStyle.marginTop !== subStyle.marginTop) {
+                  console.log(`    ⚠️ margin-top差異: S(${computedStyle.marginTop}) vs ${subslot.id}(${subStyle.marginTop})`);
+                }
+                if (computedStyle.marginLeft !== subStyle.marginLeft) {
+                  console.log(`    ⚠️ margin-left差異: S(${computedStyle.marginLeft}) vs ${subslot.id}(${subStyle.marginLeft})`);
+                }
+                if (computedStyle.top !== subStyle.top) {
+                  console.log(`    ⚠️ top差異: S(${computedStyle.top}) vs ${subslot.id}(${subStyle.top})`);
+                }
+                if (computedStyle.left !== subStyle.left) {
+                  console.log(`    ⚠️ left差異: S(${computedStyle.left}) vs ${subslot.id}(${subStyle.left})`);
+                }
+                
+                // クラスの詳細比較
+                const sClasses = new Set(container.element.className.split(' ').filter(c => c));
+                const otherClasses = new Set(subslot.className.split(' ').filter(c => c));
+                const sOnly = [...sClasses].filter(c => !otherClasses.has(c));
+                const otherOnly = [...otherClasses].filter(c => !sClasses.has(c));
+                
+                if (sOnly.length > 0) {
+                  console.log(`    � Sのみのクラス: ${sOnly.join(', ')}`);
+                }
+                if (otherOnly.length > 0) {
+                  console.log(`    🔍 ${subslot.id}のみのクラス: ${otherOnly.join(', ')}`);
+                }
+              }
+            }
+          });
+          
+          // 🔧 位置修正テスト
+          console.log(`🔧 === 位置修正テスト開始 ===`);
+          
+          // 現在の境界ボックス取得
+          const rect = container.element.getBoundingClientRect();
+          console.log(`  - 現在のBoundingRect: top=${rect.top}, left=${rect.left}, width=${rect.width}, height=${rect.height}`);
+          
+          // 🔧 試験的修正1: transform-originを調整
+          container.element.style.setProperty('transform-origin', 'top center', 'important');
+          console.log(`  🔧 transform-origin変更: top center`);
+          
+          // 🔧 試験的修正2: 専用のmargin調整
+          container.element.style.setProperty('margin-top', '0px', 'important');
+          console.log(`  🔧 margin-top強制リセット: 0px`);
         }
         
         // スケール適用時の位置調整（縮小時の空白削減）- サブスロット全体を除外
