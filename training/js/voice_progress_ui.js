@@ -123,7 +123,6 @@ class VoiceProgressUI {
                             <div class="data-buttons">
                                 <button id="export-data-btn" class="secondary-btn">📥 ダウンロード</button>
                                 <button id="import-data-btn" class="secondary-btn">📤 アップロード</button>
-                                <button id="clear-data-btn" class="danger-btn">🗑️ 全データクリア</button>
                             </div>
                             <input type="file" id="import-data-input" accept=".json" style="display: none;">
                         </div>
@@ -159,6 +158,8 @@ class VoiceProgressUI {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clearAllData());
         }
+        
+                });
         
         // データエクスポートボタン
         const exportBtn = document.getElementById('export-data-btn');
@@ -514,24 +515,38 @@ class VoiceProgressUI {
      */
     async exportData() {
         try {
-            const data = await this.progressTracker.getAllData();
-            const jsonData = JSON.stringify(data, null, 2);
+            console.log('📥 データエクスポート開始');
             
+            if (!this.progressTracker || !this.progressTracker.db) {
+                throw new Error('データベースが初期化されていません');
+            }
+            
+            // データを取得
+            const data = await this.progressTracker.getAllData();
+            console.log('📊 取得したデータ:', data);
+            
+            // JSONに変換
+            const jsonData = JSON.stringify(data, null, 2);
+            console.log('📄 JSON変換完了');
+            
+            // ファイルダウンロード
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             
             const a = document.createElement('a');
             a.href = url;
             a.download = `voice_progress_${new Date().toISOString().split('T')[0]}.json`;
+            a.style.display = 'none';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             
             URL.revokeObjectURL(url);
+            console.log('✅ ダウンロード完了');
             
         } catch (error) {
             console.error('❌ データエクスポート失敗:', error);
-            alert('❌ データエクスポートに失敗しました');
+            alert('❌ データエクスポートに失敗しました: ' + error.message);
         }
     }
     

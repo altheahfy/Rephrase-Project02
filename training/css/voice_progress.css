@@ -7,7 +7,7 @@
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 800px;
-    max-height: 90vh;
+    max-height: 85vh;
     background: white;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -52,7 +52,7 @@
 }
 
 .progress-panel-content {
-    max-height: calc(90vh - 68px);
+    max-height: calc(85vh - 68px);
     overflow-y: auto;
     padding: 20px;
 }
@@ -202,37 +202,37 @@
 
 /* 最高記録 */
 .best-performance {
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .best-performance h4 {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     color: #495057;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .best-day-card {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
-    padding: 16px;
-    border-radius: 8px;
+    padding: 10px;
+    border-radius: 6px;
     text-align: center;
 }
 
 .best-day-date {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .best-day-level {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .best-day-sessions {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.9;
 }
 
