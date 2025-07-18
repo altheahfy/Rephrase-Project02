@@ -172,16 +172,29 @@ class ZoomController {
         
         // 🔧 スロットSのサブスロット専用処理
         if (container.id === 'slot-s-sub') {
-          console.log(`🔍 === スロットSサブスロット位置修正 ===`);
+          console.log(`🔍 === スロットSサブスロット根本原因調査 ===`);
+          console.log(`  - クラス: "${container.element.className}"`);
+          console.log(`  - スタイル: "${container.element.getAttribute('style')}"`);
           
-          // スロットSサブスロットのみ：上方向に位置調整
-          if (zoomLevel < 1.0) {
-            const upwardAdjustment = (1 - zoomLevel) * 50;
-            container.element.style.setProperty('margin-top', `-${upwardAdjustment}px`, 'important');
-            console.log(`🔧 スロットSサブスロット上方向調整: -${upwardAdjustment}px`);
-          } else {
-            container.element.style.removeProperty('margin-top');
-            console.log(`🔧 スロットSサブスロット位置リセット`);
+          const computedStyle = getComputedStyle(container.element);
+          console.log(`  - computed margin-top: "${computedStyle.marginTop}"`);
+          console.log(`  - computed margin-left: "${computedStyle.marginLeft}"`);
+          console.log(`  - computed position: "${computedStyle.position}"`);
+          
+          // 他のサブスロットとのクラス比較
+          const otherSubslot = document.querySelector('.slot-wrapper[id$="-sub"]:not(#slot-s-sub)');
+          if (otherSubslot && otherSubslot.style.display !== 'none') {
+            const otherStyle = getComputedStyle(otherSubslot);
+            console.log(`  📊 比較サブスロット ${otherSubslot.id}:`);
+            console.log(`    - クラス: "${otherSubslot.className}"`);
+            console.log(`    - margin-top: "${otherStyle.marginTop}"`);
+            console.log(`    - margin-left: "${otherStyle.marginLeft}"`);
+          }
+          
+          // 🔧 根本修正：active-subslot-areaクラスの強制適用
+          if (!container.element.classList.contains('active-subslot-area')) {
+            console.log(`🔧 active-subslot-areaクラスを強制追加`);
+            container.element.classList.add('active-subslot-area');
           }
         }
         
