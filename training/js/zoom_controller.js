@@ -226,20 +226,22 @@ class ZoomController {
 
   /**
    * 保存されたズームレベルの読み込み
+   * 設計仕様：100%(1.0)の値のみ復元、それ以外は強制的に100%にリセット
    */
   loadZoomLevel() {
     try {
       const savedZoom = localStorage.getItem(this.storageKey);
       if (savedZoom) {
         const zoomLevel = parseFloat(savedZoom);
-        // � 修正：有効範囲内であればすべての値を復元（1.0以外も含む）
-        if (zoomLevel >= 0.5 && zoomLevel <= 1.5) {
+        // 設計仕様に従い、1.0(100%)の値のみ復元、それ以外は強制リセット
+        if (zoomLevel === 1.0) {
           this.zoomSlider.value = zoomLevel;
           this.applyZoom(zoomLevel);
           this.updateZoomDisplay(zoomLevel);
-          console.log(`📚 保存されたズームレベル復元: ${Math.round(zoomLevel * 100)}%`);
+          console.log(`📚 100%ズームレベル復元完了`);
         } else {
-          // 範囲外の値の場合はリセット
+          // 1.0以外の値は強制的に100%にリセット
+          console.log(`🔄 非100%ズームレベル検出 (${Math.round(zoomLevel * 100)}%) → 100%にリセット`);
           this.forceDefaultZoom();
         }
       } else {
