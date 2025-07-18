@@ -275,7 +275,7 @@ class ZoomController {
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
-        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftを直接適用（CSS変数に依存しない）
+        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftを直接適用（スケール補正付き）
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
           const originalValue = this.originalMarginValues.get(container.element.id);
           
@@ -283,15 +283,20 @@ class ZoomController {
           console.log(`    ├─ 保存された元値: ${originalValue}px`);
           
           if (originalValue && !isNaN(originalValue)) {
-            const scaledMargin = originalValue * zoomLevel;
+            // 🚨 重要：section全体のscaleの影響を補正
+            // サブスロットはsection内にあるため、section全体のscaleで間接的に縮小される
+            // そのため、margin-leftにはscaleの逆数を適用して補正する
+            const scaleCompensation = 1 / zoomLevel;
+            const scaledMargin = originalValue * scaleCompensation;
             
-            // 🚨 CSS変数を使わず、直接margin-leftを設定
+            // 🚨 CSS変数を使わず、直接margin-leftを設定（スケール補正済み）
             container.element.style.setProperty('margin-left', `${scaledMargin}px`, 'important');
             
             // CSS変数も念のため更新（他のシステムが参照する可能性）
             container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
             
-            console.log(`    └─ ✅ 直接適用: ${originalValue}px × ${zoomLevel} = ${scaledMargin}px`);
+            console.log(`    ├─ スケール補正: ${originalValue}px ÷ ${zoomLevel} = ${scaledMargin}px`);
+            console.log(`    └─ ✅ 補正適用: 実際表示値は約${scaledMargin * zoomLevel}px`);
             
             // 🔄 適用後確認
             setTimeout(() => {
