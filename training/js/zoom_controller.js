@@ -20,6 +20,11 @@ class ZoomController {
     this.currentZoom = 1.0;
     this.storageKey = 'rephrase_zoom_level';
     
+    // 🚫 無限ループ対策用プロパティ
+    this.isObserverPaused = false;
+    this.lastUpdateTime = 0;
+    this.mutationObserver = null;
+    
     this.init();
   }
 
@@ -189,12 +194,11 @@ class ZoomController {
   applyZoom(zoomLevel) {
     this.currentZoom = zoomLevel;
     
-    console.log(`🔍 ズーム適用開始: ${Math.round(zoomLevel * 100)}% - 対象コンテナ数: ${this.targetContainers.length}`);
+    // 🚫 ログ簡素化：基本情報のみ
+    console.log(`🔍 ズーム適用: ${Math.round(zoomLevel * 100)}% (対象数: ${this.targetContainers.length})`);
     
     this.targetContainers.forEach((container, index) => {
       if (container.element) {
-        console.log(`  [${index}] ${container.type}(${container.id}): 適用前transform = ${container.element.style.transform}`);
-        
         // transform: scale で縦横比を保ったまま縮小・拡大
         container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
         container.element.style.setProperty('transform-origin', 'top left', 'important');
@@ -205,15 +209,12 @@ class ZoomController {
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
-        console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
-        
         // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
           const originalValue = this.originalMarginValues.get(container.element.id);
           if (originalValue && !isNaN(originalValue)) {
             const scaledMargin = originalValue * zoomLevel;
             container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
-            console.log(`    ├─ margin-left調整: ${originalValue}px → ${scaledMargin}px`);
           }
         }
         
@@ -226,8 +227,6 @@ class ZoomController {
           // 100%以上の場合はマージンリセット
           container.element.style.marginBottom = '';
         }
-      } else {
-        console.warn(`  [${index}] ${container.type}(${container.id}): 要素が存在しません`);
       }
     });
 
@@ -235,8 +234,6 @@ class ZoomController {
     if (zoomLevel > 1.3) {
       this.showScrollHint(true);
     }
-
-    console.log(`🔍 ズーム適用完了: ${Math.round(zoomLevel * 100)}%`);
   }
 
   /**
@@ -327,25 +324,50 @@ class ZoomController {
 
   /**
    * 動的なサブスロット展開に対応
-   * MutationObserverでサブスロットの表示変更を監視
+   * MutationObserverでサブスロットの表示変更を監視（無限ループ対策付き）
    */
   setupDynamicSubslotObserver() {
+    // 🚫 無限ループ対策：観測を一時的に停止するフラグ
+    this.isObserverPaused = false;
+    this.lastUpdateTime = 0;
+    
     const observer = new MutationObserver((mutations) => {
+      // 🚫 観測が一時停止中の場合はスキップ
+      if (this.isObserverPaused) {
+        return;
+      }
+      
+      // 🚫 短時間での連続実行を防ぐ（デバウンス）
+      const now = Date.now();
+      if (now - this.lastUpdateTime < 500) {
+        return;
+      }
+      
       let needsUpdate = false;
       let subslotChange = false;
 
       mutations.forEach((mutation) => {
-        // 1. スタイル変更の監視（display: none ↔ block）
+        // 🚫 ズーム関連のstyle変更は除外（transform, width, margin等）
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           const target = mutation.target;
           if (target.classList.contains('slot-wrapper') && target.id && target.id.endsWith('-sub')) {
-            console.log(`📱 サブスロット表示変更検出: ${target.id}`);
-            needsUpdate = true;
-            subslotChange = true;
+            // ズーム関連でない表示変更のみ検出（display プロパティのみ）
+            const oldStyle = mutation.oldValue || '';
+            const newStyle = target.getAttribute('style') || '';
+            
+            const oldDisplay = oldStyle.includes('display:') || oldStyle.includes('display ');
+            const newDisplay = newStyle.includes('display:') || newStyle.includes('display ');
+            
+            // displayプロパティの変更のみを対象とする
+            if (oldDisplay !== newDisplay) {
+              console.log(`📱 サブスロット表示変更検出: ${target.id}`);
+              needsUpdate = true;
+              subslotChange = true;
+            }
           }
         }
         
-        // 2. DOM追加・削除の監視
+        // 2. DOM追加・削除の監視（変更なし）
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
@@ -370,25 +392,37 @@ class ZoomController {
       });
 
       if (needsUpdate) {
+        this.lastUpdateTime = now;
+        
+        // 🚫 観測を一時停止してズーム適用
+        this.isObserverPaused = true;
+        
         // サブスロット変更時は少し遅延させて確実に適用
         const delay = subslotChange ? 300 : 100;
         setTimeout(() => {
           console.log('🔄 サブスロット変更によるズーム再適用');
           this.identifyTargetContainers();
           this.applyZoom(this.currentZoom);
+          
+          // 🚫 処理完了後、観測を再開
+          setTimeout(() => {
+            this.isObserverPaused = false;
+          }, 200);
         }, delay);
       }
     });
 
-    // より広範囲を監視
+    // 🚫 監視範囲を限定（attributeOldValueを追加）
     observer.observe(document.body, {
       attributes: true,
       childList: true,
       subtree: true,
-      attributeFilter: ['style', 'class']
+      attributeFilter: ['style', 'class'],
+      attributeOldValue: true  // 古い値も取得して比較可能にする
     });
 
-    console.log('👁️ 強化されたサブスロット動的監視を開始');
+    this.mutationObserver = observer;
+    console.log('👁️ 無限ループ対策付きサブスロット動的監視を開始');
   }
 
   /**
@@ -531,9 +565,26 @@ window.debugZoomController = () => {
     console.log('🔍 ズームコントローラー状態:');
     console.log('- 現在のズーム:', zoomController.getCurrentZoom());
     console.log('- 対象コンテナ数:', zoomController.targetContainers.length);
-    console.log('- 対象コンテナ詳細:', zoomController.targetContainers);
+    console.log('- 観測一時停止:', zoomController.isObserverPaused);
   } else {
     console.log('❌ ズームコントローラーが初期化されていません');
+  }
+};
+
+// 🚫 緊急時：MutationObserver完全停止用関数
+window.stopZoomObserver = () => {
+  if (zoomController && zoomController.mutationObserver) {
+    zoomController.mutationObserver.disconnect();
+    zoomController.isObserverPaused = true;
+    console.log('🚫 MutationObserver完全停止しました');
+  }
+};
+
+// 🔄 MutationObserver再開用関数
+window.restartZoomObserver = () => {
+  if (zoomController) {
+    zoomController.setupDynamicSubslotObserver();
+    console.log('🔄 MutationObserver再開しました');
   }
 };
 
