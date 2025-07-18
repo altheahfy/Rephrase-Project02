@@ -16,6 +16,7 @@ class ZoomController {
     this.zoomValue = null;
     this.zoomResetButton = null;
     this.targetContainers = []; // ズーム対象のコンテナ
+    this.originalMarginValues = new Map(); // 元のmargin-left値を保存
     this.currentZoom = 1.0;
     this.storageKey = 'rephrase_zoom_level';
     
@@ -89,6 +90,17 @@ class ZoomController {
           id: subslot.id
         });
         console.log(`🎯 サブスロット追加: ${subslot.id}`);
+        
+        // 🔧 SUBSLOT FIX: サブスロット内の個別コンテナも処理対象に追加
+        const subslotContainers = subslot.querySelectorAll('.subslot-container');
+        subslotContainers.forEach(container => {
+          this.targetContainers.push({
+            element: container,
+            type: 'subslot-container',
+            id: container.id
+          });
+          console.log(`    ├─ ${container.id} (.subslot-container) を追加`);
+        });
       });
     } else {
       console.warn('⚠️ スロット領域のsection要素が見つかりません');
@@ -113,6 +125,17 @@ class ZoomController {
           id: subslot.id
         });
         console.log(`🎯 フォールバック時サブスロット追加: ${subslot.id}`);
+        
+        // 🔧 SUBSLOT FIX: フォールバック時もサブスロット内の個別コンテナを追加
+        const subslotContainers = subslot.querySelectorAll('.subslot-container');
+        subslotContainers.forEach(container => {
+          this.targetContainers.push({
+            element: container,
+            type: 'subslot-container',
+            id: container.id
+          });
+          console.log(`    ├─ ${container.id} (.subslot-container) をフォールバック追加`);
+        });
       });
     }
 
@@ -169,6 +192,19 @@ class ZoomController {
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
+        
+        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整
+        if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
+          const currentMarginLeft = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
+          if (currentMarginLeft && currentMarginLeft !== '0px') {
+            const baseMarginValue = parseFloat(currentMarginLeft);
+            if (!isNaN(baseMarginValue)) {
+              const scaledMargin = baseMarginValue * zoomLevel;
+              container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
+              console.log(`    ├─ margin-left調整: ${baseMarginValue}px → ${scaledMargin}px`);
+            }
+          }
+        }
         
         // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット共通処理
         if (zoomLevel < 1.0) {
