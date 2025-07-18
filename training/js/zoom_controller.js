@@ -154,6 +154,26 @@ class ZoomController {
     
     console.log(`🔍 ズーム適用開始: ${Math.round(zoomLevel * 100)}% - 対象コンテナ数: ${this.targetContainers.length}`);
     
+    // 🆕 直接的アプローチ: すべての.slot-containerに強制的にズーム適用
+    const allSlotContainers = document.querySelectorAll('.slot-container');
+    console.log(`🎯 検出された全スロットコンテナ数: ${allSlotContainers.length}`);
+    
+    allSlotContainers.forEach((container, index) => {
+      const slotId = container.id || `container-${index}`;
+      console.log(`  [${index}] スロット直接適用: ${slotId}`);
+      
+      // 全スロットコンテナに強制的にズーム適用
+      container.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+      container.style.setProperty('transform-origin', 'top left', 'important');
+      
+      // スロットSの特別ログ
+      if (slotId === 'slot-s') {
+        console.log(`🎯 スロットS直接処理: transform=${container.style.transform}`);
+        console.log(`🎯 スロットS計算値: ${getComputedStyle(container).transform}`);
+      }
+    });
+    
+    // 既存のターゲットコンテナ処理も継続
     this.targetContainers.forEach((container, index) => {
       if (container.element) {
         console.log(`  [${index}] ${container.type}(${container.id}): 適用前transform = ${container.element.style.transform}`);
@@ -169,7 +189,6 @@ class ZoomController {
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
-        console.log(`  [${index}] 実際のDOM要素:`, container.element);
         
         // スケール適用時の位置調整（縮小時の空白削減）
         if (zoomLevel < 1.0) {
