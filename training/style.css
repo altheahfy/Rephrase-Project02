@@ -1449,3 +1449,49 @@ h1 {
   outline: 2px dashed rgba(255, 0, 0, 0.3);
   outline-offset: 2px;
 }
+
+/* =====================================
+   🎯 スロットS ズーム問題修正
+   ===================================== */
+
+/* スロットS特有のズーム適用時の位置・サイズ統一 */
+#slot-s {
+  /* ズーム時の基点を明示的に統一 */
+  transform-origin: top left !important;
+  /* 位置ずれを防ぐための基本設定 */
+  position: relative !important;
+  /* 他のスロットと同じ基本スタイルを強制適用 */
+  display: grid !important;
+  grid-template-rows: 30px 180px 30px 30px 30px 30px !important;
+  grid-template-columns: 1fr !important;
+  gap: 6px !important;
+  align-items: center !important;
+  justify-items: center !important;
+  min-width: 160px !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 380px !important;
+  box-sizing: border-box !important;
+}
+
+/* スロットSのズーム時の transform 継承問題を修正 */
+#slot-s * {
+  /* 子要素のtransformが親のズームに干渉しないように */
+  transform-origin: inherit !important;
+}
+
+/* スロットSがズーム適用時に他のスロットと同じ動作をするように */
+.slot-wrapper:has(#slot-s) {
+  /* スロットSを含むwrapperでも統一されたズーム基点を適用 */
+  transform-origin: top left !important;
+}
+
+/* ズーム適用時のスロットS専用調整 */
+[style*="transform: scale"] #slot-s {
+  /* ズームが適用されている際の追加調整 */
+  position: static !important;
+  margin: 4px 4px 20px 4px !important;
+  padding: 15px !important;
+  border: 1px solid #eee !important;
+}
