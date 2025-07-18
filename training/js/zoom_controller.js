@@ -170,18 +170,32 @@ class ZoomController {
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
         
-        // 🔧 スロットSのサブスロット専用処理（簡潔版）
+        // 🔧 スロットSのサブスロット専用処理
         if (container.id === 'slot-s-sub') {
-          // transform-originの調整でスケール時の位置ずれを修正
-          container.element.style.setProperty('transform-origin', 'top center', 'important');
+          console.log(`🔍 === スロットSサブスロット根本原因調査 ===`);
+          console.log(`  - クラス: "${container.element.className}"`);
+          console.log(`  - スタイル: "${container.element.getAttribute('style')}"`);
           
-          // active-subslot-areaクラスの確保
-          if (!container.element.classList.contains('active-subslot-area')) {
-            container.element.classList.add('active-subslot-area');
+          const computedStyle = getComputedStyle(container.element);
+          console.log(`  - computed margin-top: "${computedStyle.marginTop}"`);
+          console.log(`  - computed margin-left: "${computedStyle.marginLeft}"`);
+          console.log(`  - computed position: "${computedStyle.position}"`);
+          
+          // 他のサブスロットとのクラス比較
+          const otherSubslot = document.querySelector('.slot-wrapper[id$="-sub"]:not(#slot-s-sub)');
+          if (otherSubslot && otherSubslot.style.display !== 'none') {
+            const otherStyle = getComputedStyle(otherSubslot);
+            console.log(`  📊 比較サブスロット ${otherSubslot.id}:`);
+            console.log(`    - クラス: "${otherSubslot.className}"`);
+            console.log(`    - margin-top: "${otherStyle.marginTop}"`);
+            console.log(`    - margin-left: "${otherStyle.marginLeft}"`);
           }
           
-          // margin-topを0にリセットしてズーム時の位置ずれを防止
-          container.element.style.setProperty('margin-top', '0px', 'important');
+          // 🔧 根本修正：active-subslot-areaクラスの強制適用
+          if (!container.element.classList.contains('active-subslot-area')) {
+            console.log(`🔧 active-subslot-areaクラスを強制追加`);
+            container.element.classList.add('active-subslot-area');
+          }
         }
         
         // スケール適用時の位置調整（縮小時の空白削減）- サブスロット全体を除外
@@ -299,45 +313,65 @@ class ZoomController {
    * MutationObserverでサブスロットの表示変更を監視
    */
   setupDynamicSubslotObserver() {
-    let updateTimeout = null; // デバウンス用
-    
     const observer = new MutationObserver((mutations) => {
       let needsUpdate = false;
+      let subslotChange = false;
 
       mutations.forEach((mutation) => {
-        // スタイル変更の監視（display: none ↔ block）
+        // 1. スタイル変更の監視（display: none ↔ block）
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           const target = mutation.target;
           if (target.classList.contains('slot-wrapper') && target.id && target.id.endsWith('-sub')) {
-            // ズーム関連の変更は無視
-            if (!target.style.transform || !target.style.transform.includes('scale')) {
-              needsUpdate = true;
-            }
+            console.log(`📱 サブスロット表示変更検出: ${target.id}`);
+            needsUpdate = true;
+            subslotChange = true;
           }
+        }
+        
+        // 2. DOM追加・削除の監視
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // サブスロット要素の追加
+              if (node.classList && node.classList.contains('slot-wrapper') && 
+                  node.id && node.id.endsWith('-sub')) {
+                console.log(`➕ サブスロット要素追加: ${node.id}`);
+                needsUpdate = true;
+                subslotChange = true;
+              }
+              
+              // サブスロット内の子要素追加
+              const subWrappers = node.querySelectorAll && node.querySelectorAll('.slot-wrapper[id$="-sub"]');
+              if (subWrappers && subWrappers.length > 0) {
+                console.log(`➕ サブスロット子要素追加: ${subWrappers.length}個`);
+                needsUpdate = true;
+                subslotChange = true;
+              }
+            }
+          });
         }
       });
 
-      if (needsUpdate && !updateTimeout) {
-        // デバウンス処理で連続実行を防止
-        updateTimeout = setTimeout(() => {
+      if (needsUpdate) {
+        // サブスロット変更時は少し遅延させて確実に適用
+        const delay = subslotChange ? 300 : 100;
+        setTimeout(() => {
+          console.log('🔄 サブスロット変更によるズーム再適用');
           this.identifyTargetContainers();
           this.applyZoom(this.currentZoom);
-          updateTimeout = null;
-        }, 200);
+        }, delay);
       }
     });
 
-    // 監視範囲を制限
-    const slotContainer = document.querySelector('section');
-    if (slotContainer) {
-      observer.observe(slotContainer, {
-        attributes: true,
-        attributeFilter: ['style'], // styleのみ監視
-        subtree: true
-      });
-    }
+    // より広範囲を監視
+    observer.observe(document.body, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      attributeFilter: ['style', 'class']
+    });
 
-    console.log('👁️ サブスロット動的監視を開始（制限版）');
+    console.log('👁️ 強化されたサブスロット動的監視を開始');
   }
 
   /**
