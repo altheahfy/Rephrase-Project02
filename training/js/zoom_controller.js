@@ -96,11 +96,36 @@ class ZoomController {
         });
         console.log(`🎯 サブスロット追加: ${subslot.id}`);
         
-        // 🔧 MARGIN SAVE: 元のmargin-left値を保存
+        // 🔧 MARGIN SAVE: 元のmargin-left値を保存（詳細デバッグ付き）
         const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
-        if (currentMarginLeft && currentMarginLeft !== '0px') {
-          this.originalMarginValues.set(subslot.id, parseFloat(currentMarginLeft));
-          console.log(`    ├─ 元margin-left保存: ${currentMarginLeft}`);
+        const actualMarginLeft = getComputedStyle(subslot).marginLeft;
+        const inlineMarginLeft = subslot.style.marginLeft;
+        
+        console.log(`    ├─ [${subslot.id}] margin状態:`);
+        console.log(`    │  ├─ CSS変数(--dynamic-margin-left): "${currentMarginLeft}"`);
+        console.log(`    │  ├─ 計算されたmargin-left: "${actualMarginLeft}"`);
+        console.log(`    │  └─ インラインmargin-left: "${inlineMarginLeft}"`);
+        
+        // 保存優先順位: CSS変数 → 計算された値 → インライン値
+        let valueToSave = null;
+        let saveSource = '';
+        
+        if (currentMarginLeft && currentMarginLeft !== '0px' && currentMarginLeft !== 'auto') {
+          valueToSave = parseFloat(currentMarginLeft);
+          saveSource = 'CSS変数';
+        } else if (actualMarginLeft && actualMarginLeft !== '0px' && actualMarginLeft !== 'auto') {
+          valueToSave = parseFloat(actualMarginLeft);
+          saveSource = '計算値';
+        } else if (inlineMarginLeft && inlineMarginLeft !== '0px' && inlineMarginLeft !== 'auto') {
+          valueToSave = parseFloat(inlineMarginLeft);
+          saveSource = 'インライン';
+        }
+        
+        if (valueToSave && !isNaN(valueToSave)) {
+          this.originalMarginValues.set(subslot.id, valueToSave);
+          console.log(`    └─ ✅ 保存完了: ${valueToSave}px (${saveSource})`);
+        } else {
+          console.log(`    └─ ⚠️  保存値なし（すべて0pxまたは無効）`);
         }
         
         // 🔧 SUBSLOT FIX: サブスロット内の個別コンテナも処理対象に追加
@@ -138,11 +163,35 @@ class ZoomController {
         });
         console.log(`🎯 フォールバック時サブスロット追加: ${subslot.id}`);
         
-        // 🔧 MARGIN SAVE: フォールバック時も元のmargin-left値を保存
+        // 🔧 MARGIN SAVE: フォールバック時も元のmargin-left値を保存（詳細デバッグ付き）
         const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
-        if (currentMarginLeft && currentMarginLeft !== '0px') {
-          this.originalMarginValues.set(subslot.id, parseFloat(currentMarginLeft));
-          console.log(`    ├─ 元margin-left保存(FB): ${currentMarginLeft}`);
+        const actualMarginLeft = getComputedStyle(subslot).marginLeft;
+        const inlineMarginLeft = subslot.style.marginLeft;
+        
+        console.log(`    ├─ [FB-${subslot.id}] margin状態:`);
+        console.log(`    │  ├─ CSS変数: "${currentMarginLeft}"`);
+        console.log(`    │  ├─ 計算値: "${actualMarginLeft}"`);
+        console.log(`    │  └─ インライン: "${inlineMarginLeft}"`);
+        
+        let valueToSave = null;
+        let saveSource = '';
+        
+        if (currentMarginLeft && currentMarginLeft !== '0px' && currentMarginLeft !== 'auto') {
+          valueToSave = parseFloat(currentMarginLeft);
+          saveSource = 'CSS変数';
+        } else if (actualMarginLeft && actualMarginLeft !== '0px' && actualMarginLeft !== 'auto') {
+          valueToSave = parseFloat(actualMarginLeft);
+          saveSource = '計算値';
+        } else if (inlineMarginLeft && inlineMarginLeft !== '0px' && inlineMarginLeft !== 'auto') {
+          valueToSave = parseFloat(inlineMarginLeft);
+          saveSource = 'インライン';
+        }
+        
+        if (valueToSave && !isNaN(valueToSave)) {
+          this.originalMarginValues.set(subslot.id, valueToSave);
+          console.log(`    └─ ✅ FB保存完了: ${valueToSave}px (${saveSource})`);
+        } else {
+          console.log(`    └─ ⚠️  FB保存値なし`);
         }
         
         // 🔧 SUBSLOT FIX: フォールバック時もサブスロット内の個別コンテナを追加
@@ -209,12 +258,23 @@ class ZoomController {
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
-        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整
+        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整（詳細ログ付き）
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
           const originalValue = this.originalMarginValues.get(container.element.id);
+          const currentCSSValue = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
+          const currentMarginLeft = getComputedStyle(container.element).marginLeft;
+          
+          console.log(`  📐 [${container.element.id}] margin調整:`);
+          console.log(`    ├─ 保存された元値: ${originalValue}px`);
+          console.log(`    ├─ 現在のCSS変数: "${currentCSSValue}"`);
+          console.log(`    ├─ 現在のmargin-left: "${currentMarginLeft}"`);
+          
           if (originalValue && !isNaN(originalValue)) {
             const scaledMargin = originalValue * zoomLevel;
             container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
+            console.log(`    └─ ✅ 新値適用: ${originalValue}px × ${zoomLevel} = ${scaledMargin}px`);
+          } else {
+            console.log(`    └─ ⚠️  元値なし - margin調整スキップ`);
           }
         }
         
@@ -568,6 +628,53 @@ window.debugZoomController = () => {
     console.log('- 観測一時停止:', zoomController.isObserverPaused);
   } else {
     console.log('❌ ズームコントローラーが初期化されていません');
+  }
+};
+
+// 🔍 margin値診断用関数
+window.debugMarginValues = () => {
+  if (zoomController) {
+    console.log('📐 === MARGIN値診断 ===');
+    console.log('保存されている元値:');
+    
+    for (let [id, value] of zoomController.originalMarginValues) {
+      console.log(`  ${id}: ${value}px`);
+    }
+    
+    console.log('\n現在のDOM状態:');
+    const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+    subslots.forEach(subslot => {
+      const cssVar = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
+      const computed = getComputedStyle(subslot).marginLeft;
+      const inline = subslot.style.marginLeft;
+      
+      console.log(`  ${subslot.id}:`);
+      console.log(`    ├─ --dynamic-margin-left: "${cssVar}"`);
+      console.log(`    ├─ computed marginLeft: "${computed}"`);
+      console.log(`    ├─ inline marginLeft: "${inline}"`);
+      console.log(`    └─ display: "${subslot.style.display}"`);
+    });
+  }
+};
+
+// 🔧 margin値強制リセット用関数
+window.resetAllMargins = () => {
+  if (zoomController) {
+    console.log('🔄 全margin値を強制リセット');
+    
+    // 保存された元値をクリア
+    zoomController.originalMarginValues.clear();
+    
+    // 全サブスロットのmargin関連をリセット
+    const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+    subslots.forEach(subslot => {
+      subslot.style.removeProperty('--dynamic-margin-left');
+      subslot.style.removeProperty('margin-left');
+      console.log(`  ✅ ${subslot.id}: margin値リセット完了`);
+    });
+    
+    // コンテナを再検出
+    zoomController.identifyTargetContainers();
   }
 };
 
