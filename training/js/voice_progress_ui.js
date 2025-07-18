@@ -615,27 +615,17 @@ class VoiceProgressUI {
     }
 }
 
-// グローバルインスタンス - 即座に作成
-console.log('🎯 VoiceProgressUI グローバルインスタンス作成開始');
-window.voiceProgressUI = new VoiceProgressUI();
-console.log('✅ VoiceProgressUI グローバルインスタンス作成完了');
-
-// DOMが読み込まれてから学習進捗ボタンのイベントリスナーを設定
+// グローバルインスタンス - DOMが読み込まれてから初期化
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎯 DOMContentLoaded - 学習進捗ボタンイベントリスナー設定開始');
-    
-    const progressBtn = document.getElementById('voice-progress-btn');
-    if (progressBtn) {
-        progressBtn.addEventListener('click', () => {
-            console.log('📊 学習進捗ボタンがクリックされました (DOMContentLoaded)');
-            if (window.voiceProgressUI) {
-                window.voiceProgressUI.showProgressPanel();
-            } else {
-                console.error('❌ voiceProgressUI インスタンスが見つかりません');
-            }
-        });
-        console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました (DOMContentLoaded)');
-    } else {
-        console.error('❌ 学習進捗ボタン (voice-progress-btn) が見つかりません (DOMContentLoaded)');
-    }
+    console.log('🎯 DOMContentLoaded - VoiceProgressUI初期化開始');
+    window.voiceProgressUI = new VoiceProgressUI();
 });
+
+// フォールバック - すでにDOMが読み込まれている場合
+if (document.readyState === 'loading') {
+    // DOMContentLoadedで初期化
+} else {
+    // すでに読み込み済みの場合は即座に初期化
+    console.log('🎯 DOM既読み込み - VoiceProgressUI即座に初期化');
+    window.voiceProgressUI = new VoiceProgressUI();
+}
