@@ -215,6 +215,13 @@ class ZoomController {
             container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
             console.log(`    ├─ margin-left調整: ${originalValue}px → ${scaledMargin}px`);
           }
+          
+          // 🔧 VERTICAL FIX: タブ連結のmargin-topもズームに合わせて調整
+          if (container.element.classList.contains('active-subslot-area')) {
+            const scaledMarginTop = -2 * zoomLevel; // 元の値 -2px をスケール
+            container.element.style.setProperty('margin-top', `${scaledMarginTop}px`, 'important');
+            console.log(`    ├─ margin-top調整: -2px → ${scaledMarginTop}px`);
+          }
         }
         
         // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット共通処理
