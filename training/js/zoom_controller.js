@@ -3,7 +3,36 @@
  * スピーキング練習時の視認性向上のため、スロット空間全体を縦横比を保ったまま縮小
  * 
  * 機能:
- * - スライダーによるリアルタイムズーム調整（50% - 150%）
+ *       // 🆕 追加：展開中のサブスロットも個別に追加して確実性を向上
+      const visibleSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+      console.log(`📱 展開中のサブスロット: ${visibleSubslots.length}個`);
+      
+      visibleSubslots.forEach(subslot => {
+        this.targetContainers.push({
+          element: subslot,
+          type: 'subslot',
+          id: subslot.id
+        });
+        console.log(`  - ${subslot.id} を追加`);
+        
+        // 🔧 MARGIN SAVE: 元のmargin-left値を保存
+        const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
+        if (currentMarginLeft && currentMarginLeft !== '0px') {
+          this.originalMarginValues.set(subslot.id, parseFloat(currentMarginLeft));
+          console.log(`    ├─ 元margin-left保存: ${currentMarginLeft}`);
+        }
+        
+        // 🔧 SUBSLOT FIX: サブスロット内の個別コンテナも処理対象に追加
+        const subslotContainers = subslot.querySelectorAll('.subslot-container');
+        subslotContainers.forEach(container => {
+          this.targetContainers.push({
+            element: container,
+            type: 'subslot-container',
+            id: container.id
+          });
+          console.log(`    ├─ ${container.id} (.subslot-container) を追加`);
+        });
+      });ルタイムズーム調整（50% - 150%）
  * - 上位スロット・サブスロット全体に適用
  * - 縦横比保持（transform: scale）
  * - 設定の永続化（localStorage）
@@ -16,6 +45,7 @@ class ZoomController {
     this.zoomValue = null;
     this.zoomResetButton = null;
     this.targetContainers = []; // ズーム対象のコンテナ
+    this.originalMarginValues = new Map(); // 元のmargin-left値を保存
     this.currentZoom = 1.0;
     this.storageKey = 'rephrase_zoom_level';
     
@@ -170,6 +200,19 @@ class ZoomController {
         
         console.log(`  [${index}] ${container.type}(${container.id}): 適用後transform = ${container.element.style.transform}`);
         
+        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整
+        if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
+          const currentMarginLeft = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
+          if (currentMarginLeft && currentMarginLeft !== '0px') {
+            const baseMarginValue = parseFloat(currentMarginLeft);
+            if (!isNaN(baseMarginValue)) {
+              const scaledMargin = baseMarginValue * zoomLevel;
+              container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
+              console.log(`    ├─ margin-left調整: ${baseMarginValue}px → ${scaledMargin}px`);
+            }
+          }
+        }
+        
         // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット共通処理
         if (zoomLevel < 1.0) {
           // 縮小時は要素間の空白を削減
@@ -274,6 +317,15 @@ class ZoomController {
     this.applyZoom(defaultZoom);
     this.updateZoomDisplay(defaultZoom);
     this.saveZoomLevel(defaultZoom);
+    
+    // 🔧 MARGIN RESTORE: 元のmargin-left値を復元
+    this.originalMarginValues.forEach((originalValue, elementId) => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.style.setProperty('--dynamic-margin-left', `${originalValue}px`);
+        console.log(`🔄 ${elementId}: margin-left復元 → ${originalValue}px`);
+      }
+    });
     
     console.log('🔄 ズームレベルをリセットしました');
   }

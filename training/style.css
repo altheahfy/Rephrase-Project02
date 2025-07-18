@@ -1132,8 +1132,7 @@ h1 {
 /* 📍 位置調整関連のベース設定 */
 .slot-wrapper[id$="-sub"] {
   /* JavaScriptで設定されるmargin-leftを確実に適用 */
-  /* 🔧 ZOOM DEBUG: margin-leftを一時的に無効化してズーム問題をテスト */
-  /* margin-left: var(--dynamic-margin-left, 0px) !important; */
+  margin-left: var(--dynamic-margin-left, 0px) !important;
 }
 
 /* 🔍 タブ連結エリアが表示されるように強制表示 */
