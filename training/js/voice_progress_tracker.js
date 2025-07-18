@@ -482,6 +482,83 @@ class VoiceProgressTracker {
     }
     
     /**
+     * 全データを取得
+     */
+    async getAllData() {
+        try {
+            const sessions = await this.getAllFromStore('sessions');
+            const dailyStats = await this.getAllFromStore('dailyStats');
+            
+            return {
+                sessions,
+                dailyStats,
+                exportDate: new Date().toISOString()
+            };
+        } catch (error) {
+            console.error('❌ 全データ取得失敗:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * データをインポート
+     */
+    async importData(data) {
+        try {
+            // 既存データをクリア
+            await this.clearStore('sessions');
+            await this.clearStore('dailyStats');
+            
+            // 新しいデータをインポート
+            const sessionsStore = this.db.transaction(['sessions'], 'readwrite').objectStore('sessions');
+            const dailyStatsStore = this.db.transaction(['dailyStats'], 'readwrite').objectStore('dailyStats');
+            
+            // セッションデータを追加
+            for (const session of data.sessions) {
+                await this.addToStore('sessions', session);
+            }
+            
+            // 日別統計を追加
+            for (const stat of data.dailyStats) {
+                await this.addToStore('dailyStats', stat);
+            }
+            
+            console.log('✅ データインポート完了');
+        } catch (error) {
+            console.error('❌ データインポート失敗:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * ストアからすべてのデータを取得
+     */
+    getAllFromStore(storeName) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.getAll();
+            
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    /**
+     * ストアにデータを追加
+     */
+    addToStore(storeName, data) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.add(data);
+            
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    /**
      * ストアをクリア
      */
     clearStore(storeName) {

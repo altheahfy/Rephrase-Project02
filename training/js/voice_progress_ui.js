@@ -37,92 +37,53 @@ class VoiceProgressUI {
         
         panel.innerHTML = `
             <div class="progress-panel-header">
-                <h3>📊 音声学習進捗</h3>
+                <h3>📊 学習データ管理</h3>
                 <button id="progress-close-btn" class="close-btn">×</button>
             </div>
             
             <div class="progress-panel-content">
-                <!-- 期間選択タブ -->
-                <div class="period-tabs">
-                    <button class="period-tab active" data-period="week">1週間</button>
-                    <button class="period-tab" data-period="month">1ヶ月</button>
-                    <button class="period-tab" data-period="quarter">3ヶ月</button>
-                    <button class="period-tab" data-period="year">1年</button>
-                </div>
-                
-                <!-- メイン統計表示 -->
-                <div class="progress-stats-container">
-                    <div class="progress-loading">📊 データを読み込み中...</div>
-                    <div class="progress-stats" style="display: none;">
-                        <!-- 基本統計 -->
-                        <div class="stats-row">
-                            <div class="stat-card">
-                                <div class="stat-label">練習回数</div>
-                                <div class="stat-value" id="total-sessions">-</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">平均レベル</div>
-                                <div class="stat-value" id="average-level">-</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">上達度</div>
-                                <div class="stat-value" id="improvement">-</div>
+                <!-- データ管理セクション -->
+                <div class="data-management-section">
+                    <h4>� データバックアップ・復元</h4>
+                    
+                    <!-- ダウンロード -->
+                    <div class="backup-row">
+                        <div class="backup-info">
+                            <span class="backup-icon">⬇️</span>
+                            <div class="backup-text">
+                                <strong>学習データをダウンロード</strong>
+                                <small>現在の学習進捗をJSONファイルで保存</small>
                             </div>
                         </div>
-                        
-                        <!-- レベル分布 -->
-                        <div class="level-distribution">
-                            <h4>📈 レベル分布</h4>
-                            <div class="level-bars">
-                                <div class="level-bar">
-                                    <span class="level-label">🐌 初心者</span>
-                                    <div class="bar-container">
-                                        <div class="bar beginner" id="bar-beginner"></div>
-                                        <span class="bar-value" id="count-beginner">0</span>
-                                    </div>
-                                </div>
-                                <div class="level-bar">
-                                    <span class="level-label">📈 中級者</span>
-                                    <div class="bar-container">
-                                        <div class="bar intermediate" id="bar-intermediate"></div>
-                                        <span class="bar-value" id="count-intermediate">0</span>
-                                    </div>
-                                </div>
-                                <div class="level-bar">
-                                    <span class="level-label">🚀 上級者</span>
-                                    <div class="bar-container">
-                                        <div class="bar advanced" id="bar-advanced"></div>
-                                        <span class="bar-value" id="count-advanced">0</span>
-                                    </div>
-                                </div>
-                                <div class="level-bar">
-                                    <span class="level-label">⚡ 達人</span>
-                                    <div class="bar-container">
-                                        <div class="bar expert" id="bar-expert"></div>
-                                        <span class="bar-value" id="count-expert">0</span>
-                                    </div>
-                                </div>
+                        <button id="export-data-btn" class="action-btn primary">ダウンロード</button>
+                    </div>
+                    
+                    <!-- アップロード -->
+                    <div class="backup-row">
+                        <div class="backup-info">
+                            <span class="backup-icon">⬆️</span>
+                            <div class="backup-text">
+                                <strong>学習データをアップロード</strong>
+                                <small>保存した学習進捗を復元</small>
                             </div>
                         </div>
-                        
-                        <!-- 進捗チャート -->
-                        <div class="progress-chart-container">
-                            <h4>📉 進捗推移</h4>
-                            <canvas id="progress-chart" width="400" height="200"></canvas>
+                        <div class="upload-container">
+                            <input type="file" id="import-data-input" accept=".json" style="display: none;">
+                            <button id="import-data-btn" class="action-btn secondary">ファイル選択</button>
                         </div>
-                        
-                        <!-- 最高記録 -->
-                        <div class="best-performance">
-                            <h4>🏆 最高記録</h4>
-                            <div id="best-day-info">データなし</div>
-                        </div>
-                        
-                        <!-- データ管理 -->
-                        <div class="data-management">
-                            <h4>🔧 データ管理</h4>
-                            <button id="clear-data-btn" class="danger-btn">全データクリア</button>
-                            <button id="export-data-btn" class="secondary-btn">データエクスポート</button>
-                        </div>
+                    </div>
+                    
+                    <!-- 現在のデータ情報 -->
+                    <div class="current-data-info">
+                        <h5>📈 現在のデータ</h5>
+                        <div id="data-summary">データを読み込み中...</div>
+                    </div>
+                    
+                    <!-- 危険操作 -->
+                    <div class="danger-section">
+                        <h5>⚠️ 危険操作</h5>
+                        <button id="clear-data-btn" class="action-btn danger">全データ削除</button>
+                        <small>※この操作は取り消せません</small>
                     </div>
                 </div>
             </div>
@@ -141,25 +102,33 @@ class VoiceProgressUI {
             closeBtn.addEventListener('click', () => this.hideProgressPanel());
         }
         
-        // 期間選択タブ
-        const periodTabs = document.querySelectorAll('.period-tab');
-        periodTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const period = e.target.dataset.period;
-                this.selectPeriod(period);
-            });
-        });
-        
-        // データクリアボタン
-        const clearBtn = document.getElementById('clear-data-btn');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => this.clearAllData());
-        }
-        
-        // データエクスポートボタン
+        // データエクスポート
         const exportBtn = document.getElementById('export-data-btn');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.exportData());
+        }
+        
+        // データインポート
+        const importBtn = document.getElementById('import-data-btn');
+        const importInput = document.getElementById('import-data-input');
+        
+        if (importBtn && importInput) {
+            importBtn.addEventListener('click', () => {
+                importInput.click();
+            });
+            
+            importInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.importData(file);
+                }
+            });
+        }
+        
+        // 全データクリア
+        const clearBtn = document.getElementById('clear-data-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearAllData());
         }
     }
     
@@ -172,8 +141,8 @@ class VoiceProgressUI {
             panel.style.display = 'block';
             this.isVisible = true;
             
-            // データを読み込んで表示
-            await this.loadAndDisplayProgress();
+            // 現在のデータ情報を表示
+            await this.loadDataSummary();
         }
     }
     
@@ -493,7 +462,7 @@ class VoiceProgressUI {
      */
     async exportData() {
         try {
-            const data = await this.progressTracker.getProgressData('year');
+            const data = await this.progressTracker.getAllData();
             const jsonData = JSON.stringify(data, null, 2);
             
             const blob = new Blob([jsonData], { type: 'application/json' });
@@ -511,6 +480,67 @@ class VoiceProgressUI {
         } catch (error) {
             console.error('❌ データエクスポート失敗:', error);
             alert('❌ データエクスポートに失敗しました');
+        }
+    }
+    
+    /**
+     * データをインポート
+     */
+    async importData(file) {
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            if (!data.sessions || !data.dailyStats) {
+                throw new Error('無効なデータ形式です');
+            }
+            
+            if (confirm(`${data.sessions.length}個のセッションデータを復元しますか？\n現在のデータは上書きされます。`)) {
+                await this.progressTracker.importData(data);
+                alert('✅ データの復元が完了しました');
+                
+                // 概要を更新
+                await this.loadDataSummary();
+            }
+            
+        } catch (error) {
+            console.error('データインポートエラー:', error);
+            alert('❌ データの復元に失敗しました: ' + error.message);
+        }
+    }
+    
+    /**
+     * 現在のデータ概要を表示
+     */
+    async loadDataSummary() {
+        const summaryDiv = document.getElementById('data-summary');
+        if (!summaryDiv) return;
+        
+        try {
+            if (!this.progressTracker || !this.progressTracker.db) {
+                summaryDiv.innerHTML = '❌ データベースが初期化されていません';
+                return;
+            }
+            
+            const allData = await this.progressTracker.getAllData();
+            const sessions = allData.sessions || [];
+            const stats = allData.dailyStats || [];
+            
+            summaryDiv.innerHTML = `
+                <div class="summary-item">
+                    <strong>学習セッション:</strong> ${sessions.length}回
+                </div>
+                <div class="summary-item">
+                    <strong>日別統計:</strong> ${stats.length}日分
+                </div>
+                <div class="summary-item">
+                    <strong>最終更新:</strong> ${sessions.length > 0 ? new Date(sessions[sessions.length - 1].timestamp).toLocaleString() : '未実施'}
+                </div>
+            `;
+            
+        } catch (error) {
+            console.error('データ概要取得エラー:', error);
+            summaryDiv.innerHTML = '❌ データの読み込みに失敗しました';
         }
     }
 }
