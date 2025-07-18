@@ -185,14 +185,16 @@ class ZoomController {
           }
         }
         
-        // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット対象に戻す
-        if (zoomLevel < 1.0) {
-          // 縮小時は要素間の空白を削減
-          const spaceReduction = (1 - zoomLevel) * 50;
-          container.element.style.marginBottom = `-${spaceReduction}px`;
-        } else {
-          // 100%以上の場合はマージンリセット
-          container.element.style.marginBottom = '';
+        // スケール適用時の位置調整（縮小時の空白削減）- サブスロット以外のみ
+        if (container.type !== 'subslot') {
+          if (zoomLevel < 1.0) {
+            // 縮小時は要素間の空白を削減
+            const spaceReduction = (1 - zoomLevel) * 50;
+            container.element.style.marginBottom = `-${spaceReduction}px`;
+          } else {
+            // 100%以上の場合はマージンリセット
+            container.element.style.marginBottom = '';
+          }
         }
       } else {
         console.warn(`  [${index}] ${container.type}(${container.id}): 要素が存在しません`);
