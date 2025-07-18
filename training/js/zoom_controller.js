@@ -265,7 +265,7 @@ class ZoomController {
     
     this.targetContainers.forEach((container, index) => {
       if (container.element) {
-        // 🚨 CRITICAL FIX: section全体のみにscaleを適用、個別サブスロットには適用しない
+        // 🚨 CRITICAL FIX: section全体 + S,C1には個別適用
         if (container.type === 'slot-section') {
           // section全体にのみtransform: scaleを適用
           container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
@@ -278,8 +278,13 @@ class ZoomController {
           container.element.style.setProperty('overflow-y', 'visible', 'important');
           
           console.log(`  🎯 section全体にscale適用: ${zoomLevel}`);
+        } else if (container.type === 'subslot' && (container.id === 'slot-s-sub' || container.id === 'slot-c1-sub')) {
+          // 🆘 S, C1のみ個別にscale適用（section全体のscaleが効かない場合の対策）
+          container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+          container.element.style.setProperty('transform-origin', 'top left', 'important');
+          console.log(`  🆘 S/C1個別scale適用: ${container.id} → ${zoomLevel}`);
         } else {
-          // 🚫 個別サブスロットにはscaleを適用しない（section全体のscaleで十分）
+          // 🚫 その他のサブスロットにはscaleを適用しない（section全体のscaleで十分）
           console.log(`  ⏭️  ${container.type}(${container.id}): scale適用スキップ`);
         }
         
