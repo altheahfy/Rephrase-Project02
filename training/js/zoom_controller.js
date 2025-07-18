@@ -154,47 +154,6 @@ class ZoomController {
     
     console.log(`🔍 ズーム適用開始: ${Math.round(zoomLevel * 100)}% - 対象コンテナ数: ${this.targetContainers.length}`);
     
-    // 🔎 ROOT CAUSE ANALYSIS: スロットSの詳細調査
-    console.log('🔬=== スロットS根本原因分析開始 ===');
-    
-    const slotS = document.getElementById('slot-s');
-    if (slotS) {
-      const computedStyle = getComputedStyle(slotS);
-      const parentElement = slotS.parentElement;
-      
-      console.log('📊 スロットS詳細情報:');
-      console.log(`  - ID: ${slotS.id}`);
-      console.log(`  - クラス: ${slotS.className}`);
-      console.log(`  - 親要素ID: ${parentElement ? parentElement.id : 'なし'}`);
-      console.log(`  - 親要素クラス: ${parentElement ? parentElement.className : 'なし'}`);
-      console.log(`  - 現在のtransform: "${slotS.style.transform}"`);
-      console.log(`  - 計算されたtransform: "${computedStyle.transform}"`);
-      console.log(`  - position: "${computedStyle.position}"`);
-      console.log(`  - top: "${computedStyle.top}"`);
-      console.log(`  - left: "${computedStyle.left}"`);
-      console.log(`  - width: "${computedStyle.width}"`);
-      console.log(`  - height: "${computedStyle.height}"`);
-      console.log(`  - z-index: "${computedStyle.zIndex}"`);
-      
-      // 他のスロットとの比較
-      const slotM1 = document.getElementById('slot-m1');
-      if (slotM1) {
-        const m1Style = getComputedStyle(slotM1);
-        console.log('📊 比較用スロットM1:');
-        console.log(`  - 計算されたtransform: "${m1Style.transform}"`);
-        console.log(`  - position: "${m1Style.position}"`);
-        console.log(`  - width: "${m1Style.width}"`);
-        console.log(`  - height: "${m1Style.height}"`);
-      }
-      
-      // スロットS特有のCSS継承チェック
-      console.log('🎨 スロットS CSS継承チェック:');
-      const relevantProps = ['transform', 'transform-origin', 'scale', 'zoom', 'display', 'visibility'];
-      relevantProps.forEach(prop => {
-        console.log(`  - ${prop}: "${computedStyle.getPropertyValue(prop)}"`);
-      });
-    }
-    
     // 🆕 直接的アプローチ: すべての.slot-containerに強制的にズーム適用
     const allSlotContainers = document.querySelectorAll('.slot-container');
     console.log(`🎯 検出された全スロットコンテナ数: ${allSlotContainers.length}`);
@@ -203,32 +162,14 @@ class ZoomController {
       const slotId = container.id || `container-${index}`;
       console.log(`  [${index}] スロット直接適用: ${slotId}`);
       
-      // ズーム適用前の状態を記録
-      const beforeTransform = container.style.transform;
-      const beforeComputed = getComputedStyle(container).transform;
-      
       // 全スロットコンテナに強制的にズーム適用
       container.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
       container.style.setProperty('transform-origin', 'top left', 'important');
       
-      // ズーム適用後の状態を記録
-      const afterTransform = container.style.transform;
-      const afterComputed = getComputedStyle(container).transform;
-      
       // スロットSの特別ログ
       if (slotId === 'slot-s') {
-        console.log(`🎯 スロットS変更詳細:`);
-        console.log(`  - 適用前style: "${beforeTransform}"`);
-        console.log(`  - 適用前computed: "${beforeComputed}"`);
-        console.log(`  - 適用後style: "${afterTransform}"`);
-        console.log(`  - 適用後computed: "${afterComputed}"`);
-        console.log(`  - 変更成功: ${beforeComputed !== afterComputed}`);
-        
-        // 追加：親要素のtransformも確認
-        const parent = container.parentElement;
-        if (parent) {
-          console.log(`  - 親要素transform: "${getComputedStyle(parent).transform}"`);
-        }
+        console.log(`🎯 スロットS直接処理: transform=${container.style.transform}`);
+        console.log(`🎯 スロットS計算値: ${getComputedStyle(container).transform}`);
       }
     });
     
