@@ -96,7 +96,7 @@ class ZoomController {
         });
         console.log(`🎯 サブスロット追加: ${subslot.id}`);
         
-        // 🔧 MARGIN SAVE: 元のmargin-left値を保存（詳細デバッグ付き）
+        // 🔧 MARGIN SAVE: 元のmargin-left値を保存（真の初期値を確実に取得）
         const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
         const actualMarginLeft = getComputedStyle(subslot).marginLeft;
         const inlineMarginLeft = subslot.style.marginLeft;
@@ -106,26 +106,43 @@ class ZoomController {
         console.log(`    │  ├─ 計算されたmargin-left: "${actualMarginLeft}"`);
         console.log(`    │  └─ インラインmargin-left: "${inlineMarginLeft}"`);
         
-        // 保存優先順位: CSS変数 → 計算された値 → インライン値
-        let valueToSave = null;
-        let saveSource = '';
-        
-        if (currentMarginLeft && currentMarginLeft !== '0px' && currentMarginLeft !== 'auto') {
-          valueToSave = parseFloat(currentMarginLeft);
-          saveSource = 'CSS変数';
-        } else if (actualMarginLeft && actualMarginLeft !== '0px' && actualMarginLeft !== 'auto') {
-          valueToSave = parseFloat(actualMarginLeft);
-          saveSource = '計算値';
-        } else if (inlineMarginLeft && inlineMarginLeft !== '0px' && inlineMarginLeft !== 'auto') {
-          valueToSave = parseFloat(inlineMarginLeft);
-          saveSource = 'インライン';
-        }
-        
-        if (valueToSave && !isNaN(valueToSave)) {
-          this.originalMarginValues.set(subslot.id, valueToSave);
-          console.log(`    └─ ✅ 保存完了: ${valueToSave}px (${saveSource})`);
+        // 🚨 既に保存済みの場合はスキップ（初回のみ保存）
+        if (this.originalMarginValues.has(subslot.id)) {
+          console.log(`    └─ 📋 既に保存済み: ${this.originalMarginValues.get(subslot.id)}px`);
         } else {
-          console.log(`    └─ ⚠️  保存値なし（すべて0pxまたは無効）`);
+          // 保存優先順位: インライン値 → 計算された値（CSS変数は除外）
+          let valueToSave = null;
+          let saveSource = '';
+          
+          if (inlineMarginLeft && inlineMarginLeft !== '0px' && inlineMarginLeft !== 'auto') {
+            valueToSave = parseFloat(inlineMarginLeft);
+            saveSource = 'インライン';
+          } else if (actualMarginLeft && actualMarginLeft !== '0px' && actualMarginLeft !== 'auto') {
+            // CSS変数が設定されている場合は、それを除去して真の値を取得
+            if (currentMarginLeft && currentMarginLeft !== actualMarginLeft) {
+              // 一時的にCSS変数を除去して真の値を取得
+              const tempVar = subslot.style.getPropertyValue('--dynamic-margin-left');
+              subslot.style.removeProperty('--dynamic-margin-left');
+              const trueMarginLeft = getComputedStyle(subslot).marginLeft;
+              // CSS変数を復元
+              if (tempVar) {
+                subslot.style.setProperty('--dynamic-margin-left', tempVar);
+              }
+              valueToSave = parseFloat(trueMarginLeft);
+              saveSource = '真の計算値';
+              console.log(`    │  ├─ 真の計算値（CSS変数除去後）: "${trueMarginLeft}"`);
+            } else {
+              valueToSave = parseFloat(actualMarginLeft);
+              saveSource = '計算値';
+            }
+          }
+          
+          if (valueToSave && !isNaN(valueToSave) && valueToSave > 0) {
+            this.originalMarginValues.set(subslot.id, valueToSave);
+            console.log(`    └─ ✅ 保存完了: ${valueToSave}px (${saveSource})`);
+          } else {
+            console.log(`    └─ ⚠️  保存値なし（すべて0pxまたは無効）`);
+          }
         }
         
         // 🔧 SUBSLOT FIX: サブスロット内の個別コンテナも処理対象に追加
@@ -258,21 +275,30 @@ class ZoomController {
         container.element.style.setProperty('overflow-x', 'visible', 'important');
         container.element.style.setProperty('overflow-y', 'visible', 'important');
         
-        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整（詳細ログ付き）
+        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftを直接適用（CSS変数に依存しない）
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
           const originalValue = this.originalMarginValues.get(container.element.id);
-          const currentCSSValue = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
-          const currentMarginLeft = getComputedStyle(container.element).marginLeft;
           
           console.log(`  📐 [${container.element.id}] margin調整:`);
           console.log(`    ├─ 保存された元値: ${originalValue}px`);
-          console.log(`    ├─ 現在のCSS変数: "${currentCSSValue}"`);
-          console.log(`    ├─ 現在のmargin-left: "${currentMarginLeft}"`);
           
           if (originalValue && !isNaN(originalValue)) {
             const scaledMargin = originalValue * zoomLevel;
+            
+            // 🚨 CSS変数を使わず、直接margin-leftを設定
+            container.element.style.setProperty('margin-left', `${scaledMargin}px`, 'important');
+            
+            // CSS変数も念のため更新（他のシステムが参照する可能性）
             container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
-            console.log(`    └─ ✅ 新値適用: ${originalValue}px × ${zoomLevel} = ${scaledMargin}px`);
+            
+            console.log(`    └─ ✅ 直接適用: ${originalValue}px × ${zoomLevel} = ${scaledMargin}px`);
+            
+            // 🔄 適用後確認
+            setTimeout(() => {
+              const verifyMargin = getComputedStyle(container.element).marginLeft;
+              const verifyCSS = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
+              console.log(`    🔍 適用確認: ${container.element.id} → margin:${verifyMargin}, CSS変数:${verifyCSS}`);
+            }, 50);
           } else {
             console.log(`    └─ ⚠️  元値なし - margin調整スキップ`);
           }
@@ -675,6 +701,21 @@ window.resetAllMargins = () => {
     
     // コンテナを再検出
     zoomController.identifyTargetContainers();
+  }
+};
+
+// 🧪 ズーム強制テスト用関数
+window.testZoomMargin = (zoomLevel = 0.8) => {
+  if (zoomController) {
+    console.log(`🧪 ズーム${Math.round(zoomLevel * 100)}%テスト開始`);
+    
+    // 強制的にズーム適用
+    zoomController.setZoom(zoomLevel);
+    
+    // 少し待ってから結果確認
+    setTimeout(() => {
+      debugMarginValues();
+    }, 100);
   }
 };
 
