@@ -41,11 +41,6 @@ class VoiceProgressUI {
                 <button id="progress-close-btn" class="close-btn">×</button>
             </div>
             
-            <!-- 🔍 診断レポート専用エリア（最上部に固定） -->
-            <div id="diagnostics-container" class="diagnostics-container">
-                <!-- 診断レポートはここに動的に挿入されます -->
-            </div>
-            
             <div class="progress-panel-content">
                 <!-- 期間選択タブ -->
                 <div class="period-tabs">
@@ -523,112 +518,38 @@ class VoiceProgressUI {
     async showProgress() {
         console.log('📊 学習進捗データ表示を開始...');
         
-        try {
-            if (!this.progressTracker) {
-                console.error('❌ 進捗追跡システムが見つかりません');
-                alert('進捗追跡システムが利用できません');
-                return;
-            }
-
-            console.log('🔍 進捗追跡システム確認OK:', this.progressTracker);
-
-            // パネルを表示
-            const panel = document.getElementById('voice-progress-panel');
-            if (panel) {
-                panel.style.display = 'block';
-                this.isVisible = true;
-                console.log('✅ パネル表示完了');
-                
-                // 🔧 診断レポートを先に表示（エラーハンドリング強化）
-                try {
-                    console.log('🔍 診断レポート表示開始...');
-                    await this.showDataDiagnostics();
-                    console.log('✅ 診断レポート表示完了');
-                } catch (diagError) {
-                    console.error('❌ 診断レポート表示失敗:', diagError);
-                    // 診断レポートが失敗しても続行
-                }
-                
-                // その後、進捗データを表示
-                try {
-                    console.log('📊 進捗データ表示開始...');
-                    await this.loadAndDisplayProgress();
-                    console.log('✅ 進捗データ表示完了');
-                } catch (progressError) {
-                    console.error('❌ 進捗データ表示失敗:', progressError);
-                    // 進捗データ表示が失敗しても続行
-                }
-                
-                // 🔧 パネルを最上部にスクロール（診断レポートが見えるように）
-                setTimeout(() => {
-                    panel.scrollTop = 0;
-                    
-                    // 🔧 ページ全体もパネルが見えるようにスクロール
-                    panel.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start',
-                        inline: 'nearest'
-                    });
-                }, 100);
-                
-                console.log('✅ 進捗パネル表示完了（診断レポート付き）');
-            } else {
-                console.error('❌ 進捗パネルが見つかりません');
-                alert('進捗パネルの作成に失敗しました');
-            }
-            
-        } catch (error) {
-            console.error('❌ 進捗表示失敗:', error);
-            alert('進捗データの表示に失敗しました: ' + error.message);
+        // 🔧 データ診断を先に実行
+        await this.showDataDiagnostics();
+        
+        if (!this.progressTracker) {
+            alert('進捗追跡システムが利用できません');
+            return;
         }
-    }
-            console.error('❌ 進捗表示失敗:', error);
-            alert('進捗データの表示に失敗しました: ' + error.message);
-        }
+        
+        // 進捗パネルを表示
+        this.showProgressPanel();
     }
     
     /**
      * 🔍 データ診断機能を表示
      */
     async showDataDiagnostics() {
-        console.log('🔍 データ診断開始 - showDataDiagnostics()');
-        
         try {
             console.log('🔍 データ診断を実行中...');
             
-            // 進捗追跡システムの存在確認
-            if (!this.progressTracker) {
-                console.warn('⚠️ 進捗追跡システムが利用できません');
-                return;
-            }
-            
-            console.log('✅ progressTracker 確認OK');
-
             // データベース健全性チェック
-            console.log('🔍 健全性チェック開始...');
             const healthCheck = await this.progressTracker.checkDatabaseHealth();
-            console.log('✅ 健全性チェック完了:', healthCheck);
             
             // データ喪失レポート取得
-            console.log('🔍 データ喪失レポート取得...');
             const lossReport = this.progressTracker.getDataLossReport();
-            console.log('✅ データ喪失レポート取得完了:', lossReport);
             
             // ストレージ情報取得
-            console.log('🔍 ストレージ情報取得...');
             const storageInfo = await this.progressTracker.estimateDbSize();
-            console.log('✅ ストレージ情報取得完了:', storageInfo);
-            
-            console.log('🔍 診断データ:', { healthCheck, lossReport, storageInfo });
             
             // 診断結果を構築
-            console.log('🔧 診断HTML構築開始...');
             let diagnosticsHtml = `
-                <div class="data-diagnostics" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 2px solid #007bff; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin-top: 0; color: #495057; display: flex; align-items: center; gap: 8px;">
-                        🔍 データ診断レポート 
-                        <span style="font-size: 12px; background: #007bff; color: white; padding: 2px 6px; border-radius: 10px;">リアルタイム</span>
-                    </h4>
+                <div class="data-diagnostics" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                    <h4 style="margin-top: 0; color: #495057;">🔍 データ診断レポート</h4>
             `;
             
             // 健全性チェック結果
@@ -708,36 +629,12 @@ class VoiceProgressUI {
             const emergencyBackup = localStorage.getItem('voiceProgress_emergencyBackup');
             if (emergencyBackup) {
                 const backupTimestamp = localStorage.getItem('voiceProgress_emergencyBackup_timestamp');
-                const backupData = JSON.parse(emergencyBackup);
                 diagnosticsHtml += `
-                    <div style="margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #e7f3ff 0%, #cce7ff 100%); border-left: 4px solid #007bff; border-radius: 0 5px 5px 0;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            🛟 <strong>緊急バックアップ利用可能</strong>
-                            <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">READY</span>
-                        </div>
-                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">
-                            作成日時: ${new Date(backupTimestamp).toLocaleString()}<br>
-                            復旧可能データ: セッション${backupData.sessionCount}件, 統計${backupData.dailyStatsCount}件
-                        </div>
-                        <button id="restore-emergency-backup" style="
-                            padding: 8px 16px; 
-                            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
-                            color: white; 
-                            border: none; 
-                            border-radius: 20px; 
-                            font-size: 12px; 
-                            font-weight: bold;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                            ">
-                            🔄 緊急復旧実行
+                    <div style="margin: 10px 0; padding: 10px; background: #e7f3ff; border-left: 4px solid #007bff;">
+                        🛟 緊急バックアップ利用可能: ${new Date(backupTimestamp).toLocaleString()}
+                        <button id="restore-emergency-backup" style="margin-left: 10px; padding: 4px 8px; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px;">
+                            緊急復旧実行
                         </button>
-                    </div>
-                `;
-            } else {
-                diagnosticsHtml += `
-                    <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
-                        💾 緊急バックアップ: 利用不可（まだ作成されていません）
                     </div>
                 `;
             }
@@ -746,45 +643,22 @@ class VoiceProgressUI {
             
             console.log('📊 診断完了:', { healthCheck, lossReport, storageInfo });
             
-            // 診断結果を専用コンテナに挿入
-            console.log('🔧 診断レポートDOM挿入開始...');
-            const diagnosticsContainer = document.getElementById('diagnostics-container');
-            console.log('🔍 診断コンテナ検索結果:', diagnosticsContainer);
-            
-            if (diagnosticsContainer) {
-                console.log('✅ 診断コンテナが見つかりました');
-                
-                // 既存の診断レポートをクリア
-                diagnosticsContainer.innerHTML = '';
+            // 診断結果をプログレスパネルの先頭に挿入
+            const progressPanel = document.getElementById('voice-progress-panel');
+            if (progressPanel) {
+                const existingDiagnostics = progressPanel.querySelector('.data-diagnostics');
+                if (existingDiagnostics) {
+                    existingDiagnostics.remove();
+                }
                 
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = diagnosticsHtml;
                 
-                console.log('🔧 診断レポートをコンテナに追加...');
-                diagnosticsContainer.appendChild(tempDiv.firstElementChild);
-                console.log('✅ 診断レポート挿入完了');
+                progressPanel.insertBefore(tempDiv.firstElementChild, progressPanel.firstChild);
                 
                 // 緊急復旧ボタンのイベントリスナー
                 const restoreBtn = document.getElementById('restore-emergency-backup');
                 if (restoreBtn) {
-                    console.log('✅ 緊急復旧ボタンのイベントリスナー設定');
-                    restoreBtn.addEventListener('click', async () => {
-                        if (confirm('緊急バックアップからデータを復旧しますか？\n現在のデータは上書きされます。')) {
-                            const success = await this.progressTracker.restoreFromEmergencyBackup();
-                            if (success) {
-                                alert('✅ データ復旧が完了しました');
-                                this.showProgress(); // 表示を更新
-                            } else {
-                                alert('❌ データ復旧に失敗しました');
-                            }
-                console.log('🔧 診断レポートをコンテナに追加...');
-                diagnosticsContainer.appendChild(tempDiv.firstElementChild);
-                console.log('✅ 診断レポート挿入完了');
-                
-                // 緊急復旧ボタンのイベントリスナー
-                const restoreBtn = document.getElementById('restore-emergency-backup');
-                if (restoreBtn) {
-                    console.log('✅ 緊急復旧ボタンのイベントリスナー設定');
                     restoreBtn.addEventListener('click', async () => {
                         if (confirm('緊急バックアップからデータを復旧しますか？\n現在のデータは上書きされます。')) {
                             const success = await this.progressTracker.restoreFromEmergencyBackup();
@@ -797,94 +671,10 @@ class VoiceProgressUI {
                         }
                     });
                 }
-            } else {
-                console.warn('⚠️ 診断コンテナが見つかりません。フォールバック処理を実行...');
-                
-                // フォールバック：プログレスパネルに直接挿入
-                const progressPanel = document.getElementById('voice-progress-panel');
-                console.log('🔍 進捗パネル検索結果:', progressPanel);
-                
-                if (progressPanel) {
-                    console.log('✅ 進捗パネルが見つかりました（フォールバック）');
-                    
-                    const existingDiagnostics = progressPanel.querySelector('.data-diagnostics');
-                    if (existingDiagnostics) {
-                        existingDiagnostics.remove();
-                    }
-                    
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = diagnosticsHtml;
-                    
-                    const contentArea = progressPanel.querySelector('.progress-panel-content');
-                    if (contentArea) {
-                        console.log('🔧 コンテンツエリアに診断レポートを挿入...');
-                        contentArea.insertBefore(tempDiv.firstElementChild, contentArea.firstChild);
-                    } else {
-                        console.log('🔧 パネルの先頭に診断レポートを挿入...');
-                        progressPanel.insertBefore(tempDiv.firstElementChild, progressPanel.firstChild.nextSibling);
-                    }
-                    
-                    console.log('✅ フォールバック挿入完了');
-                } else {
-                    console.error('❌ 進捗パネルも見つかりません');
-                }
             }
             
         } catch (error) {
             console.error('❌ データ診断失敗:', error);
-            console.error('❌ エラースタック:', error.stack);
-            
-            // エラー時でも基本的な診断情報を表示
-            const fallbackDiagnostics = `
-                <div class="data-diagnostics" style="background: #f8d7da; border: 2px solid #dc3545; padding: 15px; margin: 10px 0; border-radius: 8px;">
-                    <h4 style="margin-top: 0; color: #721c24;">❌ 診断エラー</h4>
-                    <div style="color: #721c24; margin: 5px 0;">
-                        診断機能でエラーが発生しました: ${error.message}
-                    </div>
-                    <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
-                        💡 手動確認: 開発者コンソール（F12）でログを確認してください
-                    </div>
-                </div>
-            `;
-            
-            // エラー時のフォールバック表示
-            const diagnosticsContainer = document.getElementById('diagnostics-container');
-            if (diagnosticsContainer) {
-                diagnosticsContainer.innerHTML = fallbackDiagnostics;
-                console.log('✅ エラー時のフォールバック診断を表示');
-            } else {
-                console.warn('⚠️ 診断コンテナが見つからないため、エラー表示をスキップ');
-            }
-        }
-    }
-}
-
-// グローバルインスタンス
-window.voiceProgressUI = new VoiceProgressUI();
-                    }
-                }
-            }
-            
-        } catch (error) {
-            console.error('❌ データ診断失敗:', error);
-            
-            // エラー時でも基本的な診断情報を表示
-            const fallbackDiagnostics = `
-                <div class="data-diagnostics" style="background: #f8d7da; border: 2px solid #dc3545; padding: 15px; margin: 10px 0; border-radius: 8px;">
-                    <h4 style="margin-top: 0; color: #721c24;">❌ 診断エラー</h4>
-                    <div style="color: #721c24; margin: 5px 0;">
-                        診断機能でエラーが発生しました: ${error.message}
-                    </div>
-                    <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
-                        💡 手動確認: 開発者コンソール（F12）でログを確認してください
-                    </div>
-                </div>
-            `;
-            
-            const diagnosticsContainer = document.getElementById('diagnostics-container');
-            if (diagnosticsContainer) {
-                diagnosticsContainer.innerHTML = fallbackDiagnostics;
-            }
         }
     }
 }

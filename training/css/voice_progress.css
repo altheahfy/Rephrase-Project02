@@ -299,56 +299,6 @@
     color: #dc3545;
 }
 
-/* 診断レポート専用スタイル */
-.diagnostics-container {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: white;
-    border-bottom: 1px solid #e9ecef;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.data-diagnostics {
-    margin: 0 !important;
-    border-radius: 0 0 8px 8px !important;
-    border-top: none !important;
-    animation: slideDown 0.3s ease-out;
-}
-
-.data-diagnostics h4 {
-    position: sticky;
-    top: 0;
-    background: inherit;
-    padding: 8px 0;
-    margin: 0 0 10px 0 !important;
-    border-bottom: 1px solid rgba(0,123,255,0.2);
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 緊急復旧ボタンのスタイル強化 */
-#restore-emergency-backup {
-    animation: pulse 2s infinite;
-    box-shadow: 0 2px 4px rgba(0,123,255,0.3) !important;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
     .voice-progress-panel {
