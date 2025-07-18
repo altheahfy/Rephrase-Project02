@@ -447,17 +447,42 @@ class VoiceProgressUI {
      * 全データをクリア
      */
     async clearAllData() {
-        if (!confirm('本当に全ての進捗データを削除しますか？この操作は取り消せません。')) {
+        // 🚨 強化された警告とデータ保護
+        const healthCheck = await this.progressTracker.checkDatabaseHealth();
+        const sessionCount = healthCheck.sessionCount || 0;
+        
+        if (sessionCount === 0) {
+            alert('クリアするデータがありません');
+            return;
+        }
+        
+        const warningMessage = `⚠️ 警告: 学習進捗データの完全削除\n\n` +
+                              `削除されるデータ:\n` +
+                              `• セッション記録: ${sessionCount}件\n` +
+                              `• 日別統計: ${healthCheck.dailyStatsCount || 0}件\n\n` +
+                              `この操作は取り消せません。\n` +
+                              `削除前に自動バックアップが作成されます。\n\n` +
+                              `本当にすべてのデータを削除しますか？`;
+        
+        // 二段階確認
+        if (!confirm(warningMessage)) {
+            return;
+        }
+        
+        if (!confirm('最終確認: 本当にすべての学習進捗を削除しますか？')) {
             return;
         }
         
         try {
+            console.log('🗑️ ユーザーによる進捗データクリア実行...');
+            
             await this.progressTracker.clearAllData();
-            alert('✅ 全データを削除しました');
+            alert(`✅ 全ての進捗データ（${sessionCount}件）をクリアしました\n💾 削除前のバックアップが保存されています`);
             await this.loadAndDisplayProgress();
+            
         } catch (error) {
             console.error('❌ データクリア失敗:', error);
-            alert('❌ データクリアに失敗しました');
+            alert('❌ データクリアに失敗しました\n詳細: ' + error.message);
         }
     }
     
@@ -484,6 +509,172 @@ class VoiceProgressUI {
         } catch (error) {
             console.error('❌ データエクスポート失敗:', error);
             alert('❌ データエクスポートに失敗しました');
+        }
+    }
+    
+    /**
+     * 進捗分析とデータ管理パネルを表示
+     */
+    async showProgress() {
+        console.log('📊 学習進捗データ表示を開始...');
+        
+        // 🔧 データ診断を先に実行
+        await this.showDataDiagnostics();
+        
+        if (!this.progressTracker) {
+            alert('進捗追跡システムが利用できません');
+            return;
+        }
+        
+        // 進捗パネルを表示
+        this.showProgressPanel();
+    }
+    
+    /**
+     * 🔍 データ診断機能を表示
+     */
+    async showDataDiagnostics() {
+        try {
+            console.log('🔍 データ診断を実行中...');
+            
+            // データベース健全性チェック
+            const healthCheck = await this.progressTracker.checkDatabaseHealth();
+            
+            // データ喪失レポート取得
+            const lossReport = this.progressTracker.getDataLossReport();
+            
+            // ストレージ情報取得
+            const storageInfo = await this.progressTracker.estimateDbSize();
+            
+            // 診断結果を構築
+            let diagnosticsHtml = `
+                <div class="data-diagnostics" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                    <h4 style="margin-top: 0; color: #495057;">🔍 データ診断レポート</h4>
+            `;
+            
+            // 健全性チェック結果
+            if (healthCheck.healthy) {
+                diagnosticsHtml += `
+                    <div style="color: #28a745; margin: 5px 0;">
+                        ✅ データベース状態: 正常
+                        <div style="font-size: 12px; color: #6c757d; margin-left: 20px;">
+                            • セッション数: ${healthCheck.sessionCount}件<br>
+                            • 日別統計: ${healthCheck.dailyStatsCount}件<br>
+                            • 直近1週間: ${healthCheck.recentSessionCount}件
+                        </div>
+                    </div>
+                `;
+            } else {
+                diagnosticsHtml += `
+                    <div style="color: #dc3545; margin: 5px 0;">
+                        ❌ データベース問題: ${healthCheck.issue}
+                    </div>
+                `;
+            }
+            
+            // ストレージ情報
+            if (storageInfo) {
+                const usagePercent = ((storageInfo.usage / storageInfo.quota) * 100).toFixed(1);
+                diagnosticsHtml += `
+                    <div style="color: #17a2b8; margin: 5px 0;">
+                        💾 ストレージ使用量: ${storageInfo.usageInMB}MB / ${storageInfo.quotaInMB}MB (${usagePercent}%)
+                    </div>
+                `;
+            }
+            
+            // データ喪失履歴
+            if (lossReport.totalIncidents > 0) {
+                diagnosticsHtml += `
+                    <div style="color: #ffc107; margin: 5px 0;">
+                        ⚠️ データ喪失履歴: ${lossReport.totalIncidents}回（合計${lossReport.totalLostData}件）
+                        <div style="font-size: 12px; color: #6c757d; margin-left: 20px;">
+                            最新インシデント:
+                `;
+                
+                lossReport.incidents.slice(-3).forEach(incident => {
+                    diagnosticsHtml += `
+                        <br>• ${new Date(incident.timestamp).toLocaleString()}: ${incident.lostCount}件喪失
+                    `;
+                });
+                
+                diagnosticsHtml += `</div></div>`;
+            } else {
+                diagnosticsHtml += `
+                    <div style="color: #28a745; margin: 5px 0;">
+                        ✅ データ喪失履歴: なし
+                    </div>
+                `;
+            }
+            
+            // 最後のバックアップ情報
+            const lastBackup = localStorage.getItem('voiceProgress_lastPeriodicBackup');
+            if (lastBackup) {
+                const backupDate = new Date(lastBackup);
+                const hoursSinceBackup = (new Date() - backupDate) / (1000 * 60 * 60);
+                
+                diagnosticsHtml += `
+                    <div style="color: ${hoursSinceBackup < 24 ? '#28a745' : '#ffc107'}; margin: 5px 0;">
+                        💾 最後のバックアップ: ${backupDate.toLocaleString()} (${hoursSinceBackup.toFixed(1)}時間前)
+                    </div>
+                `;
+            } else {
+                diagnosticsHtml += `
+                    <div style="color: #ffc107; margin: 5px 0;">
+                        💾 最後のバックアップ: 未実行
+                    </div>
+                `;
+            }
+            
+            // 復旧オプション
+            const emergencyBackup = localStorage.getItem('voiceProgress_emergencyBackup');
+            if (emergencyBackup) {
+                const backupTimestamp = localStorage.getItem('voiceProgress_emergencyBackup_timestamp');
+                diagnosticsHtml += `
+                    <div style="margin: 10px 0; padding: 10px; background: #e7f3ff; border-left: 4px solid #007bff;">
+                        🛟 緊急バックアップ利用可能: ${new Date(backupTimestamp).toLocaleString()}
+                        <button id="restore-emergency-backup" style="margin-left: 10px; padding: 4px 8px; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px;">
+                            緊急復旧実行
+                        </button>
+                    </div>
+                `;
+            }
+            
+            diagnosticsHtml += `</div>`;
+            
+            console.log('📊 診断完了:', { healthCheck, lossReport, storageInfo });
+            
+            // 診断結果をプログレスパネルの先頭に挿入
+            const progressPanel = document.getElementById('voice-progress-panel');
+            if (progressPanel) {
+                const existingDiagnostics = progressPanel.querySelector('.data-diagnostics');
+                if (existingDiagnostics) {
+                    existingDiagnostics.remove();
+                }
+                
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = diagnosticsHtml;
+                
+                progressPanel.insertBefore(tempDiv.firstElementChild, progressPanel.firstChild);
+                
+                // 緊急復旧ボタンのイベントリスナー
+                const restoreBtn = document.getElementById('restore-emergency-backup');
+                if (restoreBtn) {
+                    restoreBtn.addEventListener('click', async () => {
+                        if (confirm('緊急バックアップからデータを復旧しますか？\n現在のデータは上書きされます。')) {
+                            const success = await this.progressTracker.restoreFromEmergencyBackup();
+                            if (success) {
+                                alert('✅ データ復旧が完了しました');
+                                this.showProgress(); // 表示を更新
+                            } else {
+                                alert('❌ データ復旧に失敗しました');
+                            }
+                        }
+                    });
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ データ診断失敗:', error);
         }
     }
 }
