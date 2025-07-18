@@ -282,6 +282,18 @@ class ZoomController {
           // 🆘 S, C1のみ個別にscale適用（section全体のscaleが効かない場合の対策）
           container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
           container.element.style.setProperty('transform-origin', 'top left', 'important');
+          
+          // 🔧 S, C1の垂直位置補正（下に離れる問題を解決）
+          if (zoomLevel < 1.0) {
+            // 縮小時にS, C1が下に離れる問題を補正
+            const verticalCorrection = (1 - zoomLevel) * 200; // 調整倍率
+            container.element.style.setProperty('margin-top', `-${verticalCorrection}px`, 'important');
+            console.log(`  🔧 S/C1垂直補正: ${container.id} → margin-top: -${verticalCorrection}px`);
+          } else {
+            // 100%以上の場合は垂直補正をリセット
+            container.element.style.removeProperty('margin-top');
+          }
+          
           console.log(`  🆘 S/C1個別scale適用: ${container.id} → ${zoomLevel}`);
         } else {
           // 🚫 その他のサブスロットにはscaleを適用しない（section全体のscaleで十分）
