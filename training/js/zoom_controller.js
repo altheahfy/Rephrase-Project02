@@ -295,8 +295,14 @@ class ZoomController {
           }
           
           console.log(`  🆘 S/C1個別scale適用: ${container.id} → ${zoomLevel}`);
+        } else if (container.type === 'subslot') {
+          // � その他のサブスロット: section全体のscaleに加えて補正適用
+          const scaleCorrection = Math.min(1.2, 1 + (1 - zoomLevel) * 0.3); // 最大20%まで補正
+          container.element.style.setProperty('transform', `scale(${scaleCorrection})`, 'important');
+          container.element.style.setProperty('transform-origin', 'top left', 'important');
+          console.log(`  🔧 その他サブスロット補正: ${container.id} → scale(${scaleCorrection})`);
         } else {
-          // 🚫 その他のサブスロットにはscaleを適用しない（section全体のscaleで十分）
+          // 🚫 その他のコンテナ（subslot-container等）
           console.log(`  ⏭️  ${container.type}(${container.id}): scale適用スキップ`);
         }
         
