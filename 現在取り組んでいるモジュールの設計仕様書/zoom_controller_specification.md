@@ -256,8 +256,74 @@ debugZoomController();
 // サブスロット強制再検出
 forceSubslotDetection();
 
+// 垂直位置診断（位置ズレ調査用）
+debugVerticalPosition();
+
 // 設定完全リセット
 resetZoomSettings();
+```
+
+## サブスロット個別対応手法
+
+### 問題の背景
+スロット種別（S, C1等）によってズーム適用時の挙動が異なり、以下の問題が発生：
+1. **S, C1サブスロット**: section全体のscaleが効かず、縮小されない + 垂直位置が下にズレる
+2. **その他サブスロット**: section全体のscaleのみで縮小されすぎる
+
+### 解決手法
+
+#### 1. スロット種別による個別処理
+```javascript
+// S, C1のみ: 個別スケール適用 + 垂直位置補正
+if (container.type === 'subslot' && (container.id === 'slot-s-sub' || container.id === 'slot-c1-sub')) {
+  // 個別スケール適用
+  container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+  container.element.style.setProperty('transform-origin', 'top left', 'important');
+  
+  // 垂直位置補正（下に離れる問題を解決）
+  if (zoomLevel < 1.0) {
+    const verticalCorrection = (1 - zoomLevel) * 600;
+    container.element.style.setProperty('margin-top', `-${verticalCorrection}px`, 'important');
+  } else {
+    container.element.style.removeProperty('margin-top');
+  }
+}
+```
+
+#### 2. その他サブスロット: スケール補正
+```javascript
+// その他のサブスロット: section全体のscaleに加えて補正適用
+else if (container.type === 'subslot') {
+  const scaleCorrection = Math.min(1.2, 1 + (1 - zoomLevel) * 0.3); // 最大20%まで補正
+  container.element.style.setProperty('transform', `scale(${scaleCorrection})`, 'important');
+  container.element.style.setProperty('transform-origin', 'top left', 'important');
+}
+```
+
+### 補正計算式
+
+#### 垂直位置補正（S, C1専用）
+- **式**: `verticalCorrection = (1 - zoomLevel) * 600`
+- **例**: 60%ズーム時 → `(1 - 0.6) * 600 = 240px` 上方向補正
+
+#### スケール補正（その他サブスロット）
+- **式**: `scaleCorrection = Math.min(1.2, 1 + (1 - zoomLevel) * 0.3)`
+- **例**: 
+  - 60%ズーム時 → `1 + (1 - 0.6) * 0.3 = 1.12` (112%補正)
+  - 80%ズーム時 → `1 + (1 - 0.8) * 0.3 = 1.06` (106%補正)
+  - 100%ズーム時 → `1.0` (補正なし)
+
+### 診断ツール
+```javascript
+// 垂直位置問題の診断
+window.debugVerticalPosition = () => {
+  const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+  subslots.forEach(subslot => {
+    const computed = getComputedStyle(subslot);
+    const rect = subslot.getBoundingClientRect();
+    console.log(`${subslot.id}: top=${rect.top}px, transform="${computed.transform}"`);
+  });
+};
 ```
 
 ## 変更履歴
@@ -268,6 +334,10 @@ resetZoomSettings();
 | | | - 正確なsection要素特定機能 |
 | | | - 位置関係保持機能 |
 | | | - 動的サブスロット対応 |
+| v1.1 | 2025-07-18 | サブスロット個別対応実装 |
+| | | - S, C1の垂直位置補正機能追加 |
+| | | - その他サブスロットのスケール補正追加 |
+| | | - スロット種別による個別処理分岐実装 |
 
 ---
 
