@@ -265,49 +265,26 @@ class ZoomController {
     
     this.targetContainers.forEach((container, index) => {
       if (container.element) {
-        // transform: scale で縦横比を保ったまま縮小・拡大
-        container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
-        container.element.style.setProperty('transform-origin', 'top left', 'important');
-        
-        // 🔍 ズーム時の幅・オーバーフロー制御
-        container.element.style.setProperty('max-width', 'none', 'important');
-        container.element.style.setProperty('width', '100%', 'important');
-        container.element.style.setProperty('overflow-x', 'visible', 'important');
-        container.element.style.setProperty('overflow-y', 'visible', 'important');
-        
-        // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftを直接適用（スケール補正付き）
-        if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
-          const originalValue = this.originalMarginValues.get(container.element.id);
+        // 🚨 CRITICAL FIX: section全体のみにscaleを適用、個別サブスロットには適用しない
+        if (container.type === 'slot-section') {
+          // section全体にのみtransform: scaleを適用
+          container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
+          container.element.style.setProperty('transform-origin', 'top left', 'important');
           
-          console.log(`  📐 [${container.element.id}] margin調整:`);
-          console.log(`    ├─ 保存された元値: ${originalValue}px`);
+          // 🔍 ズーム時の幅・オーバーフロー制御
+          container.element.style.setProperty('max-width', 'none', 'important');
+          container.element.style.setProperty('width', '100%', 'important');
+          container.element.style.setProperty('overflow-x', 'visible', 'important');
+          container.element.style.setProperty('overflow-y', 'visible', 'important');
           
-          if (originalValue && !isNaN(originalValue)) {
-            // 🚨 重要：section全体のscaleの影響を補正
-            // サブスロットはsection内にあるため、section全体のscaleで間接的に縮小される
-            // そのため、margin-leftにはscaleの逆数を適用して補正する
-            const scaleCompensation = 1 / zoomLevel;
-            const scaledMargin = originalValue * scaleCompensation;
-            
-            // 🚨 CSS変数を使わず、直接margin-leftを設定（スケール補正済み）
-            container.element.style.setProperty('margin-left', `${scaledMargin}px`, 'important');
-            
-            // CSS変数も念のため更新（他のシステムが参照する可能性）
-            container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
-            
-            console.log(`    ├─ スケール補正: ${originalValue}px ÷ ${zoomLevel} = ${scaledMargin}px`);
-            console.log(`    └─ ✅ 補正適用: 実際表示値は約${scaledMargin * zoomLevel}px`);
-            
-            // 🔄 適用後確認
-            setTimeout(() => {
-              const verifyMargin = getComputedStyle(container.element).marginLeft;
-              const verifyCSS = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
-              console.log(`    🔍 適用確認: ${container.element.id} → margin:${verifyMargin}, CSS変数:${verifyCSS}`);
-            }, 50);
-          } else {
-            console.log(`    └─ ⚠️  元値なし - margin調整スキップ`);
-          }
+          console.log(`  🎯 section全体にscale適用: ${zoomLevel}`);
+        } else {
+          // 🚫 個別サブスロットにはscaleを適用しない（section全体のscaleで十分）
+          console.log(`  ⏭️  ${container.type}(${container.id}): scale適用スキップ`);
         }
+        
+        // � MARGIN-LEFT処理を削除：垂直位置問題には無関係
+        // (元のmargin-left調整コードを削除)
         
         // スケール適用時の位置調整（縮小時の空白削減）- 全サブスロット共通処理
         if (zoomLevel < 1.0) {
@@ -662,30 +639,44 @@ window.debugZoomController = () => {
   }
 };
 
-// 🔍 margin値診断用関数
-window.debugMarginValues = () => {
-  if (zoomController) {
-    console.log('📐 === MARGIN値診断 ===');
-    console.log('保存されている元値:');
+// 🔍 垂直位置診断用関数（margin-leftではなく実際の位置問題を調査）
+window.debugVerticalPosition = () => {
+  console.log('📏 === 垂直位置診断 ===');
+  const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+  
+  subslots.forEach(subslot => {
+    const computed = getComputedStyle(subslot);
+    const rect = subslot.getBoundingClientRect();
     
-    for (let [id, value] of zoomController.originalMarginValues) {
-      console.log(`  ${id}: ${value}px`);
-    }
+    console.log(`\n📍 ${subslot.id}:`);
+    console.log(`  🔹 位置情報:`);
+    console.log(`    ├─ top: ${rect.top}px`);
+    console.log(`    ├─ left: ${rect.left}px`);
+    console.log(`    ├─ width: ${rect.width}px`);
+    console.log(`    └─ height: ${rect.height}px`);
     
-    console.log('\n現在のDOM状態:');
-    const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
-    subslots.forEach(subslot => {
-      const cssVar = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
-      const computed = getComputedStyle(subslot).marginLeft;
-      const inline = subslot.style.marginLeft;
-      
-      console.log(`  ${subslot.id}:`);
-      console.log(`    ├─ --dynamic-margin-left: "${cssVar}"`);
-      console.log(`    ├─ computed marginLeft: "${computed}"`);
-      console.log(`    ├─ inline marginLeft: "${inline}"`);
-      console.log(`    └─ display: "${subslot.style.display}"`);
-    });
-  }
+    console.log(`  🔹 margin/padding:`);
+    console.log(`    ├─ margin-top: "${computed.marginTop}"`);
+    console.log(`    ├─ margin-bottom: "${computed.marginBottom}"`);
+    console.log(`    ├─ padding-top: "${computed.paddingTop}"`);
+    console.log(`    └─ padding-bottom: "${computed.paddingBottom}"`);
+    
+    console.log(`  🔹 位置設定:`);
+    console.log(`    ├─ position: "${computed.position}"`);
+    console.log(`    ├─ top: "${computed.top}"`);
+    console.log(`    ├─ bottom: "${computed.bottom}"`);
+    console.log(`    └─ z-index: "${computed.zIndex}"`);
+    
+    console.log(`  🔹 transform:`);
+    console.log(`    ├─ transform: "${computed.transform}"`);
+    console.log(`    └─ transform-origin: "${computed.transformOrigin}"`);
+    
+    console.log(`  🔹 flexbox:`);
+    console.log(`    ├─ display: "${computed.display}"`);
+    console.log(`    ├─ align-items: "${computed.alignItems}"`);
+    console.log(`    ├─ align-self: "${computed.alignSelf}"`);
+    console.log(`    └─ justify-content: "${computed.justifyContent}"`);
+  });
 };
 
 // 🔧 margin値強制リセット用関数

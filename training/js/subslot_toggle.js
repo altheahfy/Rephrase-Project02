@@ -472,6 +472,12 @@ function applyTabConnection(parentSlotId, isActive) {
  * @param {string} parentSlotId - 親スロットのID
  */
 function adjustSubslotPosition(parentSlotId) {
+  // ⚡ ズーム中は位置調整をスキップ
+  if (window.isZooming) {
+    console.log(`⚡ ズーム中のため位置調整をスキップ: ${parentSlotId}`);
+    return;
+  }
+  
   const parentSlot = document.getElementById(`slot-${parentSlotId}`);
   const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
   
@@ -560,6 +566,12 @@ function adjustSubslotPosition(parentSlotId) {
  * @param {string} parentSlotId - 親スロットのID
  */
 function adjustSubslotPositionSafe(parentSlotId) {
+  // ⚡ ズーム中は位置調整をスキップ
+  if (window.isZooming) {
+    console.log(`⚡ ズーム中のため安全位置調整をスキップ: ${parentSlotId}`);
+    return;
+  }
+  
   const parentSlot = document.getElementById(`slot-${parentSlotId}`);
   const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
   
