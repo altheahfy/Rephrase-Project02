@@ -248,6 +248,12 @@
     font-size: 16px;
 }
 
+.data-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .danger-btn {
     background: #dc3545;
     color: white;
@@ -256,7 +262,6 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    margin-right: 8px;
     transition: background-color 0.2s;
 }
 
@@ -265,7 +270,7 @@
 }
 
 .secondary-btn {
-    background: #6c757d;
+    background: #667eea;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -276,7 +281,7 @@
 }
 
 .secondary-btn:hover {
-    background: #5a6268;
+    background: #5a6fd8;
 }
 
 /* エラー・データなし表示 */

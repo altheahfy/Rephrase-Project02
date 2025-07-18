@@ -120,8 +120,12 @@ class VoiceProgressUI {
                         <!-- データ管理 -->
                         <div class="data-management">
                             <h4>🔧 データ管理</h4>
-                            <button id="clear-data-btn" class="danger-btn">全データクリア</button>
-                            <button id="export-data-btn" class="secondary-btn">データエクスポート</button>
+                            <div class="data-buttons">
+                                <button id="export-data-btn" class="secondary-btn">📥 ダウンロード</button>
+                                <button id="import-data-btn" class="secondary-btn">📤 アップロード</button>
+                                <button id="clear-data-btn" class="danger-btn">🗑️ 全データクリア</button>
+                            </div>
+                            <input type="file" id="import-data-input" accept=".json" style="display: none;">
                         </div>
                     </div>
                 </div>
@@ -160,6 +164,23 @@ class VoiceProgressUI {
         const exportBtn = document.getElementById('export-data-btn');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.exportData());
+        }
+        
+        // データインポートボタン
+        const importBtn = document.getElementById('import-data-btn');
+        const importInput = document.getElementById('import-data-input');
+        
+        if (importBtn && importInput) {
+            importBtn.addEventListener('click', () => {
+                importInput.click();
+            });
+            
+            importInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.importData(file);
+                }
+            });
         }
     }
     
@@ -493,7 +514,7 @@ class VoiceProgressUI {
      */
     async exportData() {
         try {
-            const data = await this.progressTracker.getProgressData('year');
+            const data = await this.progressTracker.getAllData();
             const jsonData = JSON.stringify(data, null, 2);
             
             const blob = new Blob([jsonData], { type: 'application/json' });
@@ -511,6 +532,32 @@ class VoiceProgressUI {
         } catch (error) {
             console.error('❌ データエクスポート失敗:', error);
             alert('❌ データエクスポートに失敗しました');
+        }
+    }
+    
+    /**
+     * データをインポート
+     */
+    async importData(file) {
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            if (!data.sessions || !data.dailyStats) {
+                throw new Error('無効なデータ形式です');
+            }
+            
+            if (confirm(`${data.sessions.length}個のセッションデータを復元しますか？\n現在のデータは上書きされます。`)) {
+                await this.progressTracker.importData(data);
+                alert('✅ データの復元が完了しました');
+                
+                // 表示を更新
+                await this.loadAndDisplayProgress();
+            }
+            
+        } catch (error) {
+            console.error('データインポートエラー:', error);
+            alert('❌ データの復元に失敗しました: ' + error.message);
         }
     }
 }
