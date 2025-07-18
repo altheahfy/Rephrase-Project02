@@ -8,7 +8,20 @@ class VoiceProgressUI {
         this.isVisible = false;
         this.currentPeriod = 'week';
         
-        this.init();
+        // 初期化のタイミングをずらす
+        if (this.progressTracker) {
+            this.init();
+        } else {
+            // ProgressTrackerが読み込まれるまで待つ
+            setTimeout(() => {
+                this.progressTracker = window.voiceProgressTracker;
+                if (this.progressTracker) {
+                    this.init();
+                } else {
+                    console.error('❌ VoiceProgressTrackerが見つかりません');
+                }
+            }, 1000);
+        }
     }
     
     /**
@@ -489,25 +502,136 @@ class VoiceProgressUI {
      */
     async exportData() {
         try {
+            console.log('📥 データエクスポート開始');
+            
+            if (!this.progressTracker) {
+                throw new Error('進捗追跡システムが初期化されていません');
+            }
+            
             const data = await this.progressTracker.getAllData();
+            console.log('📊 取得されたデータ:', data);
+            
             const jsonData = JSON.stringify(data, null, 2);
+            console.log('📄 JSON文字列長:', jsonData.length);
             
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `voice_progress_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const filename = `voice_progress_${new Date().toISOString().split('T')[0]}.json`;
             
-            URL.revokeObjectURL(url);
+            // 複数の方法でダウンロードを試行
+            if (this.downloadUsingClick(url, filename)) {
+                console.log('✅ クリック方式でダウンロード開始');
+            } else if (this.downloadUsingLocation(url, filename)) {
+                console.log('✅ Location方式でダウンロード開始');
+            } else {
+                // 最後の手段：テキストエリアにデータを表示
+                this.showDataInTextArea(jsonData);
+            }
+            
+            // リソースをクリーンアップ
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 1000);
+            
+            console.log('✅ データエクスポート完了');
             
         } catch (error) {
             console.error('❌ データエクスポート失敗:', error);
-            alert('❌ データエクスポートに失敗しました');
+            alert('❌ データエクスポートに失敗しました: ' + error.message);
         }
+    }
+    
+    /**
+     * クリック方式でダウンロード
+     */
+    downloadUsingClick(url, filename) {
+        try {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            
+            // ユーザーのクリックをシミュレート
+            a.click();
+            
+            setTimeout(() => {
+                if (document.body.contains(a)) {
+                    document.body.removeChild(a);
+                }
+            }, 100);
+            
+            return true;
+        } catch (error) {
+            console.error('クリック方式失敗:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Location方式でダウンロード
+     */
+    downloadUsingLocation(url, filename) {
+        try {
+            // 新しいウィンドウで開く
+            const newWindow = window.open(url, '_blank');
+            if (newWindow) {
+                newWindow.document.title = filename;
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Location方式失敗:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * テキストエリアにデータを表示（最後の手段）
+     */
+    showDataInTextArea(jsonData) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 20000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        `;
+        
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow: auto;
+        `;
+        
+        content.innerHTML = `
+            <h3>📥 学習データ</h3>
+            <p>ブラウザのダウンロードが制限されています。<br>
+            以下のデータをコピーして、テキストファイルとして保存してください。</p>
+            <textarea readonly style="width: 100%; height: 300px; font-family: monospace; font-size: 12px;">${jsonData}</textarea>
+            <br><br>
+            <button onclick="this.parentElement.parentElement.remove()">閉じる</button>
+        `;
+        
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // テキストエリアの内容を選択
+        const textarea = content.querySelector('textarea');
+        textarea.select();
+        
+        console.log('📄 テキストエリアにデータを表示');
     }
     
     /**

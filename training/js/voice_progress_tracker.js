@@ -482,6 +482,151 @@ class VoiceProgressTracker {
     }
     
     /**
+     * 全データを取得（エクスポート用）
+     */
+    async getAllData() {
+        if (!this.db) {
+            throw new Error('データベースが初期化されていません');
+        }
+        
+        try {
+            const sessions = await this.getAllSessions();
+            const dailyStats = await this.getAllDailyStats();
+            
+            return {
+                sessions,
+                dailyStats,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+        } catch (error) {
+            console.error('❌ 全データ取得失敗:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * 全セッションデータを取得
+     */
+    getAllSessions() {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['sessions'], 'readonly');
+            const store = transaction.objectStore('sessions');
+            const request = store.getAll();
+            
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    /**
+     * 全日別統計データを取得
+     */
+    getAllDailyStats() {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['dailyStats'], 'readonly');
+            const store = transaction.objectStore('dailyStats');
+            const request = store.getAll();
+            
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    /**
+     * データをインポート（復元用）
+     */
+    async importData(data) {
+        if (!this.db) {
+            throw new Error('データベースが初期化されていません');
+        }
+        
+        try {
+            // 既存データをクリア
+            await this.clearAllData();
+            
+            // セッションデータを復元
+            if (data.sessions && data.sessions.length > 0) {
+                await this.importSessions(data.sessions);
+            }
+            
+            // 日別統計データを復元
+            if (data.dailyStats && data.dailyStats.length > 0) {
+                await this.importDailyStats(data.dailyStats);
+            }
+            
+            console.log('✅ データインポート完了');
+        } catch (error) {
+            console.error('❌ データインポート失敗:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * セッションデータをインポート
+     */
+    importSessions(sessions) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['sessions'], 'readwrite');
+            const store = transaction.objectStore('sessions');
+            
+            let completed = 0;
+            const total = sessions.length;
+            
+            sessions.forEach(session => {
+                const request = store.add(session);
+                
+                request.onsuccess = () => {
+                    completed++;
+                    if (completed === total) {
+                        resolve();
+                    }
+                };
+                
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+            
+            if (total === 0) {
+                resolve();
+            }
+        });
+    }
+    
+    /**
+     * 日別統計データをインポート
+     */
+    importDailyStats(dailyStats) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['dailyStats'], 'readwrite');
+            const store = transaction.objectStore('dailyStats');
+            
+            let completed = 0;
+            const total = dailyStats.length;
+            
+            dailyStats.forEach(stat => {
+                const request = store.add(stat);
+                
+                request.onsuccess = () => {
+                    completed++;
+                    if (completed === total) {
+                        resolve();
+                    }
+                };
+                
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+            
+            if (total === 0) {
+                resolve();
+            }
+        });
+    }
+    
+    /**
      * ストアをクリア
      */
     clearStore(storeName) {
