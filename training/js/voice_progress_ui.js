@@ -4,9 +4,14 @@
  */
 class VoiceProgressUI {
     constructor() {
+        console.log('🎯 VoiceProgressUI constructor 開始');
+        console.log('📊 window.voiceProgressTracker:', window.voiceProgressTracker);
+        
         this.progressTracker = window.voiceProgressTracker;
         this.isVisible = false;
         this.currentPeriod = 'week';
+        
+        console.log('📊 this.progressTracker:', this.progressTracker);
         
         this.init();
     }
@@ -15,9 +20,22 @@ class VoiceProgressUI {
      * 初期化
      */
     init() {
-        this.createProgressPanel();
-        this.setupEventListeners();
-        console.log('✅ 音声進捗表示UI初期化完了');
+        console.log('🎯 VoiceProgressUI.init() 開始');
+        console.log('📊 progressTracker:', this.progressTracker);
+        console.log('📊 window.voiceProgressTracker:', window.voiceProgressTracker);
+        
+        try {
+            this.createProgressPanel();
+            console.log('✅ 進捗パネル作成完了');
+            
+            this.setupEventListeners();
+            console.log('✅ イベントリスナー設定完了');
+            
+            console.log('✅ 音声進捗表示UI初期化完了');
+        } catch (error) {
+            console.error('❌ VoiceProgressUI初期化エラー:', error);
+            console.error('❌ エラースタック:', error.stack);
+        }
     }
     
     /**
@@ -138,6 +156,18 @@ class VoiceProgressUI {
      * イベントリスナーを設定
      */
     setupEventListeners() {
+        // 学習進捗ボタン（メインボタン）
+        const progressBtn = document.getElementById('voice-progress-btn');
+        if (progressBtn) {
+            progressBtn.addEventListener('click', () => {
+                console.log('📊 学習進捗ボタンがクリックされました');
+                this.showProgressPanel();
+            });
+            console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました');
+        } else {
+            console.error('❌ 学習進捗ボタン (voice-progress-btn) が見つかりません');
+        }
+        
         // 閉じるボタン
         const closeBtn = document.getElementById('progress-close-btn');
         if (closeBtn) {
@@ -189,13 +219,21 @@ class VoiceProgressUI {
      * 進捗パネルを表示
      */
     async showProgressPanel() {
+        console.log('🎯 showProgressPanel() 開始');
         const panel = document.getElementById('voice-progress-panel');
+        console.log('🔍 パネル要素:', panel);
+        
         if (panel) {
+            console.log('✅ パネルが見つかりました - 表示開始');
             panel.style.display = 'block';
             this.isVisible = true;
             
+            console.log('📊 データ読み込み処理開始');
             // データを読み込んで表示
             await this.loadAndDisplayProgress();
+            console.log('✅ showProgressPanel() 完了');
+        } else {
+            console.error('❌ パネルが見つかりません');
         }
     }
     
@@ -577,5 +615,27 @@ class VoiceProgressUI {
     }
 }
 
-// グローバルインスタンス
+// グローバルインスタンス - 即座に作成
+console.log('🎯 VoiceProgressUI グローバルインスタンス作成開始');
 window.voiceProgressUI = new VoiceProgressUI();
+console.log('✅ VoiceProgressUI グローバルインスタンス作成完了');
+
+// DOMが読み込まれてから学習進捗ボタンのイベントリスナーを設定
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎯 DOMContentLoaded - 学習進捗ボタンイベントリスナー設定開始');
+    
+    const progressBtn = document.getElementById('voice-progress-btn');
+    if (progressBtn) {
+        progressBtn.addEventListener('click', () => {
+            console.log('📊 学習進捗ボタンがクリックされました (DOMContentLoaded)');
+            if (window.voiceProgressUI) {
+                window.voiceProgressUI.showProgressPanel();
+            } else {
+                console.error('❌ voiceProgressUI インスタンスが見つかりません');
+            }
+        });
+        console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました (DOMContentLoaded)');
+    } else {
+        console.error('❌ 学習進捗ボタン (voice-progress-btn) が見つかりません (DOMContentLoaded)');
+    }
+});

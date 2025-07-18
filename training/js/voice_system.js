@@ -2377,12 +2377,35 @@ class VoiceSystem {
     showProgress() {
         console.log('📊 学習進捗表示を開始');
         
-        // グローバルインスタンスを使用
-        if (window.voiceProgressUI) {
+        // グローバルインスタンスが利用可能かチェック
+        if (!window.voiceProgressUI) {
+            console.error('❌ VoiceProgressUI インスタンスが見つかりません');
+            console.log('⚠️ 再初期化を試行します...');
+            
+            // 再初期化を試行
+            try {
+                if (typeof VoiceProgressUI !== 'undefined') {
+                    window.voiceProgressUI = new VoiceProgressUI();
+                    console.log('✅ VoiceProgressUI インスタンスを再作成しました');
+                } else {
+                    console.error('❌ VoiceProgressUI クラスが読み込まれていません');
+                    alert('エラー: 進捗表示システムが読み込まれていません。\nページを再読み込みしてください。');
+                    return;
+                }
+            } catch (error) {
+                console.error('❌ VoiceProgressUI インスタンス作成失敗:', error);
+                alert('エラー: 進捗表示システムの初期化に失敗しました。\nページを再読み込みしてください。');
+                return;
+            }
+        }
+        
+        try {
+            // グローバルインスタンスを使用して進捗パネルを表示
             window.voiceProgressUI.showProgressPanel();
-        } else {
-            console.error('❌ VoiceProgressUI が見つかりません');
-            alert('進捗表示システムが初期化されていません。ページを再読み込みしてください。');
+            console.log('✅ 進捗パネル表示完了');
+        } catch (error) {
+            console.error('❌ 進捗パネル表示エラー:', error);
+            alert('エラー: 進捗表示に失敗しました。\nページを再読み込みしてください。');
         }
     }
             console.log('✅ 学習進捗パネルを表示しました');
