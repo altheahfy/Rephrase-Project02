@@ -183,13 +183,13 @@
 
 /* 進捗チャート */
 .progress-chart-container {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .progress-chart-container h4 {
-    margin: 0 0 16px 0;
+    margin: 0 0 12px 0;
     color: #495057;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 #progress-chart {
@@ -201,38 +201,38 @@
 }
 
 /* 最高記録 */
-.best-performance {
-    margin-bottom: 15px;
+.voice-progress-panel .best-performance {
+    margin-bottom: 15px !important;
 }
 
-.best-performance h4 {
-    margin: 0 0 8px 0;
+.voice-progress-panel .best-performance h4 {
+    margin: 0 0 8px 0 !important;
     color: #495057;
-    font-size: 14px;
+    font-size: 14px !important;
 }
 
-.best-day-card {
+.voice-progress-panel .best-day-card {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
-    padding: 8px 12px;
+    padding: 8px 12px !important;
     border-radius: 6px;
     text-align: center;
 }
 
-.best-day-date {
-    font-size: 12px;
+.voice-progress-panel .best-day-date {
+    font-size: 12px !important;
     opacity: 0.9;
-    margin-bottom: 2px;
+    margin-bottom: 2px !important;
 }
 
-.best-day-level {
-    font-size: 14px;
+.voice-progress-panel .best-day-level {
+    font-size: 14px !important;
     font-weight: bold;
-    margin-bottom: 2px;
+    margin-bottom: 2px !important;
 }
 
-.best-day-sessions {
-    font-size: 12px;
+.voice-progress-panel .best-day-sessions {
+    font-size: 12px !important;
     opacity: 0.9;
 }
 

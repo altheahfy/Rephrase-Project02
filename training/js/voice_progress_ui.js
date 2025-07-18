@@ -108,7 +108,7 @@ class VoiceProgressUI {
                         <!-- 進捗チャート -->
                         <div class="progress-chart-container">
                             <h4>📉 進捗推移</h4>
-                            <canvas id="progress-chart" width="400" height="200"></canvas>
+                            <canvas id="progress-chart" width="400" height="150"></canvas>
                         </div>
                         
                         <!-- 最高記録 -->
