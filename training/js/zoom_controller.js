@@ -91,6 +91,13 @@ class ZoomController {
         });
         console.log(`🎯 サブスロット追加: ${subslot.id}`);
         
+        // 🔧 MARGIN SAVE: 元のmargin-left値を保存
+        const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
+        if (currentMarginLeft && currentMarginLeft !== '0px') {
+          this.originalMarginValues.set(subslot.id, parseFloat(currentMarginLeft));
+          console.log(`    ├─ 元margin-left保存: ${currentMarginLeft}`);
+        }
+        
         // 🔧 SUBSLOT FIX: サブスロット内の個別コンテナも処理対象に追加
         const subslotContainers = subslot.querySelectorAll('.subslot-container');
         subslotContainers.forEach(container => {
@@ -125,6 +132,13 @@ class ZoomController {
           id: subslot.id
         });
         console.log(`🎯 フォールバック時サブスロット追加: ${subslot.id}`);
+        
+        // 🔧 MARGIN SAVE: フォールバック時も元のmargin-left値を保存
+        const currentMarginLeft = getComputedStyle(subslot).getPropertyValue('--dynamic-margin-left');
+        if (currentMarginLeft && currentMarginLeft !== '0px') {
+          this.originalMarginValues.set(subslot.id, parseFloat(currentMarginLeft));
+          console.log(`    ├─ 元margin-left保存(FB): ${currentMarginLeft}`);
+        }
         
         // 🔧 SUBSLOT FIX: フォールバック時もサブスロット内の個別コンテナを追加
         const subslotContainers = subslot.querySelectorAll('.subslot-container');
@@ -195,14 +209,11 @@ class ZoomController {
         
         // 🔧 SUBSLOT MARGIN FIX: サブスロットのmargin-leftもズームに合わせて調整
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
-          const currentMarginLeft = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
-          if (currentMarginLeft && currentMarginLeft !== '0px') {
-            const baseMarginValue = parseFloat(currentMarginLeft);
-            if (!isNaN(baseMarginValue)) {
-              const scaledMargin = baseMarginValue * zoomLevel;
-              container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
-              console.log(`    ├─ margin-left調整: ${baseMarginValue}px → ${scaledMargin}px`);
-            }
+          const originalValue = this.originalMarginValues.get(container.element.id);
+          if (originalValue && !isNaN(originalValue)) {
+            const scaledMargin = originalValue * zoomLevel;
+            container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
+            console.log(`    ├─ margin-left調整: ${originalValue}px → ${scaledMargin}px`);
           }
         }
         
