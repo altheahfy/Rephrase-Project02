@@ -77,6 +77,19 @@ class ZoomController {
         id: 'slot-section'
       });
       console.log('🎯 ズーム対象: スロット領域全体（section要素）');
+      
+      // 🆕 追加：展開中のサブスロットも個別に追加して確実性を向上
+      const visibleSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+      console.log(`📱 展開中のサブスロット: ${visibleSubslots.length}個`);
+      
+      visibleSubslots.forEach(subslot => {
+        this.targetContainers.push({
+          element: subslot,
+          type: 'subslot',
+          id: subslot.id
+        });
+        console.log(`🎯 サブスロット追加: ${subslot.id}`);
+      });
     } else {
       console.warn('⚠️ スロット領域のsection要素が見つかりません');
       
@@ -90,6 +103,17 @@ class ZoomController {
         });
         console.log('🎯 フォールバック: メインスロットのみ対象');
       }
+      
+      // フォールバック時も展開中のサブスロットを追加
+      const visibleSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+      visibleSubslots.forEach(subslot => {
+        this.targetContainers.push({
+          element: subslot,
+          type: 'subslot',
+          id: subslot.id
+        });
+        console.log(`🎯 フォールバック時サブスロット追加: ${subslot.id}`);
+      });
     }
 
     console.log(`🎯 ズーム対象コンテナ: ${this.targetContainers.length}個を特定`);
@@ -208,14 +232,14 @@ class ZoomController {
       const savedZoom = localStorage.getItem(this.storageKey);
       if (savedZoom) {
         const zoomLevel = parseFloat(savedZoom);
-        // 🚨 デフォルト1.0を強制：保存値が1.0以外の場合はリセット
-        if (zoomLevel >= 0.5 && zoomLevel <= 1.5 && zoomLevel === 1.0) {
+        // � 修正：有効範囲内であればすべての値を復元（1.0以外も含む）
+        if (zoomLevel >= 0.5 && zoomLevel <= 1.5) {
           this.zoomSlider.value = zoomLevel;
           this.applyZoom(zoomLevel);
           this.updateZoomDisplay(zoomLevel);
           console.log(`📚 保存されたズームレベル復元: ${Math.round(zoomLevel * 100)}%`);
         } else {
-          // 1.0以外の値が保存されている場合は強制リセット
+          // 範囲外の値の場合はリセット
           this.forceDefaultZoom();
         }
       } else {
@@ -361,7 +385,16 @@ class ZoomController {
       console.log(`    - 現在のtransform: "${wrapper.style.transform}"`);
     });
     
+    // 🔧 修正：対象コンテナの再検出と現在のズーム値の取得を確実に実行
     this.identifyTargetContainers();
+    
+    // 現在のズーム値を取得（スライダーから直接取得して確実性を向上）
+    const currentZoomFromSlider = parseFloat(this.zoomSlider.value) || 1.0;
+    this.currentZoom = currentZoomFromSlider;
+    
+    console.log(`🔍 強制検出時のズーム値: スライダー=${currentZoomFromSlider}, currentZoom=${this.currentZoom}`);
+    
+    // ズーム適用
     this.applyZoom(this.currentZoom);
     
     // 検出結果をログ出力
@@ -370,6 +403,25 @@ class ZoomController {
     subslots.forEach(sub => {
       console.log(`  - ${sub.id}: 表示=${sub.element.style.display !== 'none'}`);
     });
+    
+    // 🆕 追加：サブスロット展開直後の追加確認処理
+    setTimeout(() => {
+      console.log('🔄 サブスロット展開後の追加確認処理');
+      const visibleSubslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]:not([style*="display: none"])');
+      console.log(`👁️ 表示中のサブスロット数: ${visibleSubslots.length}`);
+      
+      visibleSubslots.forEach(subslot => {
+        const currentTransform = subslot.style.transform;
+        console.log(`  - ${subslot.id}: transform="${currentTransform}"`);
+        
+        // もしズームが適用されていない場合は再適用
+        if (!currentTransform.includes('scale')) {
+          console.log(`🔧 ${subslot.id} にズームを再適用`);
+          subslot.style.setProperty('transform', `scale(${this.currentZoom})`, 'important');
+          subslot.style.setProperty('transform-origin', 'top left', 'important');
+        }
+      });
+    }, 200);
   }
 
   /**

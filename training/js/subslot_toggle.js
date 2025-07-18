@@ -131,7 +131,24 @@ function toggleExclusiveSubslot(slotId) {
       setTimeout(() => {
         console.log(`🔍 ${slotId} サブスロット展開完了 - ズーム適用`);
         window.forceSubslotDetection();
-      }, 500); // サブスロット生成完了を確実に待つ
+        
+        // 🆕 追加：ズーム適用の即座確認
+        setTimeout(() => {
+          const expandedSubslot = document.getElementById(`slot-${slotId}-sub`);
+          if (expandedSubslot) {
+            const currentTransform = expandedSubslot.style.transform;
+            console.log(`🔍 ${slotId} サブスロット最終確認: transform="${currentTransform}"`);
+            
+            // ズームが適用されていない場合は直接適用
+            if (window.zoomController && !currentTransform.includes('scale')) {
+              const currentZoom = window.zoomController.getCurrentZoom();
+              console.log(`🔧 ${slotId} サブスロットに直接ズーム適用: ${Math.round(currentZoom * 100)}%`);
+              expandedSubslot.style.setProperty('transform', `scale(${currentZoom})`, 'important');
+              expandedSubslot.style.setProperty('transform-origin', 'top left', 'important');
+            }
+          }
+        }, 100);
+      }, 300); // 遅延を300msに短縮してより迅速なズーム適用
     } else {
       console.warn("⚠ ズームコントローラーが利用できません");
     }
