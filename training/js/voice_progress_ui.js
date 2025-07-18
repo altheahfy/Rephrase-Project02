@@ -123,7 +123,6 @@ class VoiceProgressUI {
                             <div class="data-buttons">
                                 <button id="export-data-btn" class="secondary-btn">📥 ダウンロード</button>
                                 <button id="import-data-btn" class="secondary-btn">📤 アップロード</button>
-                                <button id="clear-data-btn" class="danger-btn">🗑️ 全データクリア</button>
                             </div>
                             <input type="file" id="import-data-input" accept=".json" style="display: none;">
                         </div>
@@ -153,12 +152,6 @@ class VoiceProgressUI {
                 this.selectPeriod(period);
             });
         });
-        
-        // データクリアボタン
-        const clearBtn = document.getElementById('clear-data-btn');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => this.clearAllData());
-        }
         
         // データエクスポートボタン
         const exportBtn = document.getElementById('export-data-btn');
@@ -488,24 +481,6 @@ class VoiceProgressUI {
                     <p>${message}</p>
                 </div>
             `;
-        }
-    }
-    
-    /**
-     * 全データをクリア
-     */
-    async clearAllData() {
-        if (!confirm('本当に全ての進捗データを削除しますか？この操作は取り消せません。')) {
-            return;
-        }
-        
-        try {
-            await this.progressTracker.clearAllData();
-            alert('✅ 全データを削除しました');
-            await this.loadAndDisplayProgress();
-        } catch (error) {
-            console.error('❌ データクリア失敗:', error);
-            alert('❌ データクリアに失敗しました');
         }
     }
     
