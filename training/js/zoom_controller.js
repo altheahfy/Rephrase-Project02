@@ -204,11 +204,17 @@ class ZoomController {
         if (container.type === 'subslot' && container.element.id && container.element.id.endsWith('-sub')) {
           const currentMarginLeft = getComputedStyle(container.element).getPropertyValue('--dynamic-margin-left');
           if (currentMarginLeft && currentMarginLeft !== '0px') {
-            const baseMarginValue = parseFloat(currentMarginLeft);
-            if (!isNaN(baseMarginValue)) {
-              const scaledMargin = baseMarginValue * zoomLevel;
-              container.element.style.setProperty('--dynamic-margin-left', `${scaledMargin}px`);
-              console.log(`    ├─ margin-left調整: ${baseMarginValue}px → ${scaledMargin}px`);
+            // ズーム時は位置調整を一時的に無効化（100%時以外）
+            if (zoomLevel !== 1.0) {
+              container.element.style.setProperty('--dynamic-margin-left', '0px');
+              console.log(`    ├─ margin-left一時無効化: ${currentMarginLeft} → 0px (ズーム中)`);
+            } else {
+              // 100%時は元の値を復元
+              const originalValue = this.originalMarginValues.get(container.element.id);
+              if (originalValue) {
+                container.element.style.setProperty('--dynamic-margin-left', `${originalValue}px`);
+                console.log(`    ├─ margin-left復元: 0px → ${originalValue}px (100%)`);
+              }
             }
           }
         }
@@ -318,15 +324,7 @@ class ZoomController {
     this.updateZoomDisplay(defaultZoom);
     this.saveZoomLevel(defaultZoom);
     
-    // 🔧 MARGIN RESTORE: 元のmargin-left値を復元
-    this.originalMarginValues.forEach((originalValue, elementId) => {
-      const element = document.getElementById(elementId);
-      if (element) {
-        element.style.setProperty('--dynamic-margin-left', `${originalValue}px`);
-        console.log(`🔄 ${elementId}: margin-left復元 → ${originalValue}px`);
-      }
-    });
-    
+    // 🔧 MARGIN RESTORE: 元のmargin-left値を復元（100%時は自動復元されるのでスキップ）
     console.log('🔄 ズームレベルをリセットしました');
   }
 
