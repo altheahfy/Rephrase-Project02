@@ -208,28 +208,46 @@ class VoiceProgressUI {
      * 進捗データを読み込んで表示
      */
     async loadAndDisplayProgress() {
-        if (!this.progressTracker || !this.progressTracker.db) {
-            console.error('❌ 進捗追跡システムが初期化されていません');
+        console.log('🎯 loadAndDisplayProgress開始');
+        console.log('📊 progressTracker:', this.progressTracker);
+        console.log('📊 progressTracker.db:', this.progressTracker?.db);
+        
+        if (!this.progressTracker) {
+            console.error('❌ progressTrackerが見つかりません');
+            this.displayError('進捗追跡システムが初期化されていません');
+            return;
+        }
+        
+        if (!this.progressTracker.db) {
+            console.error('❌ データベースが初期化されていません');
+            this.displayError('データベースが初期化されていません');
             return;
         }
         
         try {
+            console.log('✅ ローディング表示開始');
             // ローディング表示
             this.showLoading(true);
             
+            console.log('📊 データ取得開始 - 期間:', this.currentPeriod);
             // データ取得
             const progressData = await this.progressTracker.getProgressData(this.currentPeriod);
+            console.log('📊 取得したデータ:', progressData);
             
             if (progressData) {
+                console.log('✅ データ表示処理開始');
                 this.displayProgressData(progressData);
             } else {
+                console.log('⚠️ データなし - NoData表示');
                 this.displayNoData();
             }
             
         } catch (error) {
             console.error('❌ 進捗データ表示エラー:', error);
+            console.error('❌ エラースタック:', error.stack);
             this.displayError(error.message);
         } finally {
+            console.log('🏁 ローディング非表示');
             this.showLoading(false);
         }
     }
@@ -238,12 +256,21 @@ class VoiceProgressUI {
      * ローディング表示を切り替え
      */
     showLoading(show) {
+        console.log(`🔄 showLoading(${show}) 開始`);
         const loading = document.querySelector('.progress-loading');
         const stats = document.querySelector('.progress-stats');
+        
+        console.log('🔍 loading要素:', loading);
+        console.log('🔍 stats要素:', stats);
         
         if (loading && stats) {
             loading.style.display = show ? 'block' : 'none';
             stats.style.display = show ? 'none' : 'block';
+            console.log(`✅ ローディング${show ? '表示' : '非表示'}完了`);
+        } else {
+            console.error('❌ ローディング要素またはstats要素が見つかりません');
+            if (!loading) console.error('❌ .progress-loading が見つかりません');
+            if (!stats) console.error('❌ .progress-stats が見つかりません');
         }
     }
     
