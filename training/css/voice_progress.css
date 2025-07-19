@@ -52,9 +52,30 @@
 }
 
 .progress-panel-content {
-    max-height: calc(90vh - 60px);
+    height: calc(90vh - 80px);
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* スクロールバーのスタイル */
+.progress-panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.progress-panel-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.progress-panel-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.progress-panel-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* 期間選択タブ */
@@ -313,7 +334,7 @@
     
     .progress-panel-content {
         padding: 12px;
-        max-height: calc(80vh - 56px);
+        height: calc(80vh - 70px);
     }
     
     .period-tabs {
