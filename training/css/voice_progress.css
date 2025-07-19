@@ -13,6 +13,7 @@
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     z-index: 15000;
+    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;
@@ -55,31 +56,10 @@
 }
 
 .progress-panel-content {
-    flex: 1 1 auto;
+    flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
     padding: 16px;
-    height: 0;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* スクロールバーのスタイリング */
-.progress-panel-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.progress-panel-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.progress-panel-content::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-.progress-panel-content::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    min-height: 0;
 }
 
 /* 期間選択タブ */
@@ -115,21 +95,11 @@
 }
 
 /* 統計表示 */
-.progress-stats-container {
-    position: relative;
-    height: 100%;
-}
-
 .progress-loading {
     text-align: center;
     padding: 40px;
     color: #6c757d;
     font-size: 16px;
-}
-
-.progress-stats {
-    height: 100%;
-    overflow: visible;
 }
 
 .stats-row {
