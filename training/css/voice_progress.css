@@ -2,12 +2,11 @@
 
 .voice-progress-panel {
     position: fixed;
-    top: 5vh;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: 95%;
     max-width: 900px;
-    height: 90vh;
     max-height: 90vh;
     background: white;
     border-radius: 12px;
@@ -15,8 +14,6 @@
     z-index: 15000;
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    display: flex;
-    flex-direction: column;
 }
 
 .progress-panel-header {
@@ -26,7 +23,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-shrink: 0;
 }
 
 .progress-panel-header h3 {
@@ -56,10 +52,9 @@
 }
 
 .progress-panel-content {
-    flex: 1;
+    max-height: calc(90vh - 60px);
     overflow-y: auto;
     padding: 16px;
-    min-height: 0;
 }
 
 /* 期間選択タブ */
@@ -338,56 +333,5 @@
     .level-label {
         width: auto;
         text-align: center;
-    }
-}
-
-/* 小さな画面（高さが小さい場合）の対応 */
-@media (max-height: 600px) {
-    .voice-progress-panel {
-        top: 2vh;
-        height: 96vh;
-        max-height: 96vh;
-    }
-    
-    .progress-panel-content {
-        padding: 12px;
-    }
-    
-    .stat-card {
-        padding: 6px;
-    }
-    
-    .chart-container {
-        height: 200px;
-    }
-}
-
-/* 非常に小さな画面の対応 */
-@media (max-height: 400px) {
-    .voice-progress-panel {
-        top: 1vh;
-        height: 98vh;
-        max-height: 98vh;
-    }
-    
-    .progress-panel-header {
-        padding: 8px 12px;
-    }
-    
-    .progress-panel-content {
-        padding: 8px;
-    }
-    
-    .period-tab {
-        padding: 4px 8px;
-        font-size: 11px;
-    }
-    
-    .stat-card {
-        padding: 4px;
-    }
-    
-    .chart-container {
-        height: 150px;
     }
 }
