@@ -97,7 +97,7 @@ def main():
     
     # ファイルパス設定
     current_dir = Path(__file__).parent
-    csv_file = current_dir / "解説入力フォーマット_正版.csv"
+    csv_file = current_dir / "解説入力フォーマット.csv"
     json_file = current_dir / "data" / "V自動詞第1文型.json"
     
     # ファイル存在確認

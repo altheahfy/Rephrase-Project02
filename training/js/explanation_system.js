@@ -243,14 +243,7 @@ class ExplanationSystem {
       'started': 'start'
     };
     
-    let result = baseFormMap[verbText] || verbText.toLowerCase();
-    
-    // もし基本形がまだ解説データにない場合、一般的な解説を提供
-    if (!this.findExplanationByVGroupKey(result)) {
-      console.log('⚠️ 特定の解説がないため、一般解説を使用:', result);
-      result = 'intransitive_verbs'; // 一般的な自動詞解説を使用
-    }
-    
+    const result = baseFormMap[verbText] || verbText.toLowerCase();
     console.log('🎯 推測結果:', verbText, '→', result);
     return result;
   }
@@ -292,10 +285,13 @@ class ExplanationSystem {
 
     const explanation = this.findExplanationByVGroupKey(vGroupKey);
     if (!explanation) {
+      // 元の動詞テキストを取得してカスタムメッセージを表示
+      const originalVerb = this.getOriginalVerbText();
       const debugInfo = `
-        <p>「${vGroupKey}」に対応する解説が見つかりません。</p>
+        <p>「${originalVerb || vGroupKey}」に対応する解説が見つかりません。</p>
         <h4>🔍 デバッグ情報</h4>
         <p><strong>検出されたV_group_key:</strong> ${vGroupKey}</p>
+        <p><strong>元の動詞:</strong> ${originalVerb}</p>
         <p><strong>利用可能な解説:</strong></p>
         <ul>
           ${this.explanationData.map(item => 
@@ -308,6 +304,34 @@ class ExplanationSystem {
     }
 
     this.showExplanation(explanation);
+  }
+
+  // 元の動詞テキストを取得
+  getOriginalVerbText() {
+    try {
+      // 動詞スロット（slot-v）から動詞テキストを取得
+      const vSlot = document.getElementById('slot-v');
+      if (vSlot) {
+        const slotPhrase = vSlot.querySelector('.slot-phrase');
+        if (slotPhrase) {
+          return slotPhrase.textContent.trim();
+        }
+      }
+
+      // 代替方法：全スロットから動詞を探す
+      const allSlotPhrases = document.querySelectorAll('.slot-phrase');
+      for (const phrase of allSlotPhrases) {
+        const text = phrase.textContent.trim();
+        if (text && this.isVerb(text)) {
+          return text;
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('❌ 元動詞テキスト取得エラー:', error);
+      return null;
+    }
   }
 
   // 解説データを表示
