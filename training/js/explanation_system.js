@@ -151,71 +151,29 @@ class ExplanationSystem {
     try {
       console.log('🔍 V_group_key検出開始');
       
-      // 新機能: window.lastSelectedSlotsから現在表示中のV_group_keyを取得
+      // 最優先: window.lastSelectedSlotsから現在表示中のV_group_keyを取得
       if (window.lastSelectedSlots && window.lastSelectedSlots.length > 0) {
+        console.log('📋 window.lastSelectedSlots配列長:', window.lastSelectedSlots.length);
+        
+        // Vスロット（動詞スロット）を探す
         const vSlot = window.lastSelectedSlots.find(slot => slot.Slot === 'V');
         if (vSlot && vSlot.V_group_key) {
-          console.log('✅ window.lastSelectedSlots(Vスロット)から取得:', vSlot.V_group_key);
+          console.log('✅ Vスロットから取得:', vSlot.V_group_key);
           return vSlot.V_group_key;
         }
-        const anySlot = window.lastSelectedSlots.find(slot => slot.V_group_key);
-        if (anySlot && anySlot.V_group_key) {
-          console.log('✅ window.lastSelectedSlotsから取得:', anySlot.V_group_key);
-          return anySlot.V_group_key;
+        
+        // Vスロットがない場合、任意のスロットからV_group_keyを取得
+        const anySlotWithVKey = window.lastSelectedSlots.find(slot => slot.V_group_key);
+        if (anySlotWithVKey && anySlotWithVKey.V_group_key) {
+          console.log('✅ 任意スロットから取得:', anySlotWithVKey.V_group_key);
+          return anySlotWithVKey.V_group_key;
         }
       }
       
-      // 既存のロジック: 現在のランダム化状態からV_group_keyを取得
+      // 次優先: window.currentRandomizedStateから取得
       if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
-        console.log('✅ window.currentRandomizedState.vGroupKeyから取得:', window.currentRandomizedState.vGroupKey);
+        console.log('✅ currentRandomizedStateから取得:', window.currentRandomizedState.vGroupKey);
         return window.currentRandomizedState.vGroupKey;
-      }
-      
-      // フォールバック: メインエリアの全てのスロット要素を検索
-      const slotElements = document.querySelectorAll('.slot-container');
-      console.log('📋 見つかったスロット数:', slotElements.length);
-      
-      for (const slot of slotElements) {
-        console.log('🎯 スロット確認:', slot.id, slot.className);
-        
-        // data-v-group-key属性をチェック
-        const vGroupKey = slot.getAttribute('data-v-group-key');
-        if (vGroupKey) {
-          console.log('🔍 V_group_key検出:', vGroupKey);
-          return vGroupKey;
-        }
-        
-        // 動詞スロット（slot-v）から動詞テキストを取得
-        if (slot.id === 'slot-v') {
-          const slotPhrase = slot.querySelector('.slot-phrase');
-          console.log('🎯 Vスロット発見:', slotPhrase);
-          if (slotPhrase) {
-            const verbText = slotPhrase.textContent.trim();
-            console.log('📝 動詞テキスト:', verbText);
-            if (verbText) {
-              console.log('🔍 動詞スロットから推測:', verbText);
-              const inferredKey = this.inferVGroupKeyFromVerb(verbText);
-              console.log('🎯 推測されたV_group_key:', inferredKey);
-              return inferredKey;
-            }
-          }
-        }
-      }
-
-      // 代替方法：全スロットから動詞を探す
-      console.log('🔍 代替検索開始');
-      const allSlotPhrases = document.querySelectorAll('.slot-phrase');
-      console.log('📋 全slot-phrase数:', allSlotPhrases.length);
-      
-      for (const phrase of allSlotPhrases) {
-        const text = phrase.textContent.trim();
-        console.log('📝 検査中のテキスト:', text);
-        if (text && this.isVerb(text)) {
-          console.log('🔍 全スロット検索から動詞発見:', text);
-          const inferredKey = this.inferVGroupKeyFromVerb(text);
-          console.log('🎯 推測されたV_group_key:', inferredKey);
-          return inferredKey;
-        }
       }
       
       console.log('❓ V_group_keyが見つかりません');
