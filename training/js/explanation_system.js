@@ -65,44 +65,53 @@ class ExplanationSystem {
   }
   
   /**
-   * 例文シャッフルボタンの右横に解説ボタンを追加
+   * 各スロットに解説ボタンを追加
    */
   addExplanationButtons() {
     // 既存の解説ボタンを削除
     document.querySelectorAll('.slot-explanation-btn').forEach(btn => btn.remove());
     
-    // 例文シャッフルボタンを探す
-    const randomizeBtn = document.getElementById('randomizeAll');
-    if (!randomizeBtn) {
-      console.warn('⚠️ 例文シャッフルボタンが見つかりません');
-      return;
-    }
+    // 全スロットコンテナを取得
+    const slotContainers = document.querySelectorAll('.slot-container');
     
-    // 解説ボタンを作成
-    const explanationBtn = document.createElement('button');
-    explanationBtn.className = 'slot-explanation-btn';
-    explanationBtn.textContent = '💡 解説';
-    explanationBtn.title = '現在の例文の解説を表示';
-    explanationBtn.style.marginLeft = '10px';
-    
-    // クリックイベント
-    explanationBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.showCurrentExplanation();
+    slotContainers.forEach(container => {
+      // 既に解説ボタンがある場合はスキップ
+      if (container.querySelector('.slot-explanation-btn')) {
+        return;
+      }
+      
+      // スロットID取得
+      const slotId = container.id;
+      
+      // 解説ボタンを作成
+      const explanationBtn = document.createElement('button');
+      explanationBtn.className = 'slot-explanation-btn';
+      explanationBtn.textContent = '💡 解説';
+      explanationBtn.title = 'この項目の解説を表示';
+      
+      // クリックイベント
+      explanationBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.showExplanationForSlot(slotId);
+      });
+      
+      // スロットコンテナのヘッダー部分に追加
+      const slotHeader = container.querySelector('.slot-header') || container;
+      if (slotHeader) {
+        slotHeader.appendChild(explanationBtn);
+      }
     });
     
-    // シャッフルボタンの右横に追加
-    randomizeBtn.parentNode.insertBefore(explanationBtn, randomizeBtn.nextSibling);
-    
-    console.log('📝 例文シャッフルボタンの右横に解説ボタンを追加しました');
+    console.log(`📝 ${slotContainers.length} 個のスロットに解説ボタンを追加しました`);
   }
   
   /**
-   * 現在の例文の解説を表示
+   * 特定のスロットの解説を表示
+   * @param {string} slotId - スロットID
    */
-  showCurrentExplanation() {
-    console.log('💡 現在の例文の解説を表示');
+  showExplanationForSlot(slotId) {
+    console.log(`💡 スロット ${slotId} の解説を表示`);
     
     // JSONデータが読み込まれているかチェック
     if (!window.loadedJsonData || !Array.isArray(window.loadedJsonData)) {
@@ -111,13 +120,11 @@ class ExplanationSystem {
     }
     
     // 現在のV_group_keyを取得
-    const currentVGroupKey = this.getCurrentVGroupKey();
+    const currentVGroupKey = this.getCurrentVGroupKey(slotId);
     if (!currentVGroupKey) {
-      this.showErrorMessage('現在のV_group_keyが特定できません。先に例文をシャッフルしてください。');
+      this.showErrorMessage('現在のV_group_keyが特定できません。');
       return;
     }
-    
-    console.log(`🔍 V_group_key検索: ${currentVGroupKey}`);
     
     // 解説データを検索
     const explanationData = this.findExplanationData(currentVGroupKey);
@@ -131,70 +138,31 @@ class ExplanationSystem {
   }
   
   /**
-   * 特定のスロットの解説を表示（旧関数）
-   * @param {string} slotId - スロットID
-   */
-  showExplanationForSlot(slotId) {
-    this.showCurrentExplanation();
-  }
-  
-  /**
    * 現在のV_group_keyを取得
-   * @param {string} slotId - スロットID（オプション）
+   * @param {string} slotId - スロットID
    * @returns {string|null} V_group_key
    */
-  getCurrentVGroupKey(slotId = null) {
+  getCurrentVGroupKey(slotId) {
     // ランダマイザの状態から取得
     if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
-      console.log(`✅ V_group_key取得成功（ランダマイザ状態）: ${window.currentRandomizedState.vGroupKey}`);
       return window.currentRandomizedState.vGroupKey;
     }
     
-    // 別のグローバル変数をチェック
-    if (window.lastSelectedVGroupKey) {
-      console.log(`✅ V_group_key取得成功（lastSelected）: ${window.lastSelectedVGroupKey}`);
-      return window.lastSelectedVGroupKey;
-    }
-    
-    // Sスロット（動詞）から推測
-    const sSlot = document.getElementById('slot-s');
-    if (sSlot) {
-      const phraseElement = sSlot.querySelector('.slot-phrase');
+    // スロットのデータから推測
+    const slotContainer = document.getElementById(slotId);
+    if (slotContainer) {
+      const phraseElement = slotContainer.querySelector('.slot-phrase');
       if (phraseElement && phraseElement.textContent.trim()) {
-        const phrase = phraseElement.textContent.trim();
-        console.log(`🔍 Sスロットから動詞を検索: ${phrase}`);
-        
         // JSONデータから該当するV_group_keyを検索
         const matchingData = window.loadedJsonData.find(item => 
-          item.Slot === 'S' && item.SlotPhrase === phrase
+          item.SlotPhrase === phraseElement.textContent.trim()
         );
-        if (matchingData && matchingData.V_group_key) {
-          console.log(`✅ V_group_key取得成功（Sスロット）: ${matchingData.V_group_key}`);
+        if (matchingData) {
           return matchingData.V_group_key;
         }
       }
     }
     
-    // M1スロット（主語）から推測
-    const m1Slot = document.getElementById('slot-m1');
-    if (m1Slot) {
-      const phraseElement = m1Slot.querySelector('.slot-phrase');
-      if (phraseElement && phraseElement.textContent.trim()) {
-        const phrase = phraseElement.textContent.trim();
-        console.log(`🔍 M1スロットから推測: ${phrase}`);
-        
-        // JSONデータから該当するV_group_keyを検索
-        const matchingData = window.loadedJsonData.find(item => 
-          item.Slot === 'M1' && item.SlotPhrase === phrase
-        );
-        if (matchingData && matchingData.V_group_key) {
-          console.log(`✅ V_group_key取得成功（M1スロット）: ${matchingData.V_group_key}`);
-          return matchingData.V_group_key;
-        }
-      }
-    }
-    
-    console.warn('⚠️ V_group_keyの取得に失敗');
     return null;
   }
   
@@ -206,63 +174,30 @@ class ExplanationSystem {
   findExplanationData(vGroupKey) {
     if (!window.loadedJsonData) return null;
     
-    console.log(`🔍 解説データ検索開始: ${vGroupKey}`);
-    
     // 完全一致で検索
     let explanationData = window.loadedJsonData.find(item => 
       item.V_group_key === vGroupKey && 
       item.Slot === 'EXPLANATION'
     );
     
-    if (explanationData) {
-      console.log(`✅ 完全一致で解説データ発見: ${vGroupKey}`);
-      return explanationData;
+    // 見つからない場合は部分一致で検索
+    if (!explanationData) {
+      explanationData = window.loadedJsonData.find(item => 
+        item.V_group_key && 
+        item.V_group_key.includes(vGroupKey) && 
+        item.Slot === 'EXPLANATION'
+      );
     }
     
-    // 動詞の原形で検索（apologizes → apologize）
-    const baseForm = vGroupKey.replace(/s$/, ''); // 単純にsを削除
-    explanationData = window.loadedJsonData.find(item => 
-      item.V_group_key === baseForm && 
-      item.Slot === 'EXPLANATION'
-    );
-    
-    if (explanationData) {
-      console.log(`✅ 動詞原形で解説データ発見: ${baseForm}`);
-      return explanationData;
+    // 一般的な解説を検索（intransitive_verbsなど）
+    if (!explanationData) {
+      explanationData = window.loadedJsonData.find(item => 
+        item.V_group_key === 'intransitive_verbs' && 
+        item.Slot === 'EXPLANATION'
+      );
     }
     
-    // 部分一致で検索
-    explanationData = window.loadedJsonData.find(item => 
-      item.V_group_key && 
-      (item.V_group_key.includes(vGroupKey) || vGroupKey.includes(item.V_group_key)) && 
-      item.Slot === 'EXPLANATION'
-    );
-    
-    if (explanationData) {
-      console.log(`✅ 部分一致で解説データ発見: ${explanationData.V_group_key}`);
-      return explanationData;
-    }
-    
-    // 一般的な自動詞解説を検索
-    explanationData = window.loadedJsonData.find(item => 
-      item.V_group_key === 'intransitive_verbs' && 
-      item.Slot === 'EXPLANATION'
-    );
-    
-    if (explanationData) {
-      console.log(`✅ 一般的な自動詞解説を表示: intransitive_verbs`);
-      return explanationData;
-    }
-    
-    console.warn(`⚠️ 解説データが見つかりません: ${vGroupKey}`);
-    
-    // デバッグ用：利用可能な解説データを表示
-    const availableExplanations = window.loadedJsonData
-      .filter(item => item.Slot === 'EXPLANATION')
-      .map(item => item.V_group_key);
-    console.log('📋 利用可能な解説データ:', availableExplanations);
-    
-    return null;
+    return explanationData;
   }
   
   /**
