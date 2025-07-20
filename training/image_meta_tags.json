@@ -1090,7 +1090,8 @@
     "meta_tags": [
       "fast",
       "faster",
-      "fastest"
+      "fastest",
+      "quickly"
     ],
     "priority": 3,
     "description": "速い"
@@ -2961,7 +2962,8 @@
       "sometime",
       "somewhere",
       "somewhat",
-      "any"
+      "any",
+      "few"
     ],
     "priority": 3,
     "description": "いくつかの、何か"
