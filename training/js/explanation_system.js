@@ -151,13 +151,29 @@ class ExplanationSystem {
     try {
       console.log('🔍 V_group_key検出開始');
       
-      // まず、現在のランダム化状態からV_group_keyを取得
+      // 最優先: window.lastSelectedSlotsから現在表示中のV_group_keyを取得
+      if (window.lastSelectedSlots && window.lastSelectedSlots.length > 0) {
+        // 動詞スロット（Slot: "V"）を探す
+        const vSlot = window.lastSelectedSlots.find(slot => slot.Slot === 'V');
+        if (vSlot && vSlot.V_group_key) {
+          console.log('✅ window.lastSelectedSlotsのVスロットから取得:', vSlot.V_group_key);
+          return vSlot.V_group_key;
+        }
+        // 任意のスロットからV_group_keyを取得（すべて同じV_group_keyのはず）
+        const anySlot = window.lastSelectedSlots.find(slot => slot.V_group_key);
+        if (anySlot && anySlot.V_group_key) {
+          console.log('✅ window.lastSelectedSlotsから取得:', anySlot.V_group_key);
+          return anySlot.V_group_key;
+        }
+      }
+      
+      // フォールバック1: window.currentRandomizedState
       if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
-        console.log('✅ window.currentRandomizedState.vGroupKeyから取得:', window.currentRandomizedState.vGroupKey);
+        console.log('⚠️ フォールバック: window.currentRandomizedState.vGroupKeyから取得:', window.currentRandomizedState.vGroupKey);
         return window.currentRandomizedState.vGroupKey;
       }
       
-      // フォールバック: メインエリアの全てのスロット要素を検索
+      // フォールバック2: メインエリアの全てのスロット要素を検索
       const slotElements = document.querySelectorAll('.slot-container');
       console.log('📋 見つかったスロット数:', slotElements.length);
       
