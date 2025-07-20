@@ -2761,7 +2761,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex085",
     "Slot": "S",
     "SlotPhrase": "she",
@@ -2776,7 +2776,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex085",
     "Slot": "V",
     "SlotPhrase": "apologizes",
@@ -2791,7 +2791,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex085",
     "Slot": "M2",
     "SlotPhrase": "for my behavior",
@@ -2806,7 +2806,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex086",
     "Slot": "S",
     "SlotPhrase": "he",
@@ -2821,7 +2821,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex086",
     "Slot": "V",
     "SlotPhrase": "apologizes",
@@ -2836,7 +2836,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex086",
     "Slot": "M2",
     "SlotPhrase": "for the delay",
@@ -2851,7 +2851,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex087",
     "Slot": "S",
     "SlotPhrase": "the manager",
@@ -2866,7 +2866,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex087",
     "Slot": "V",
     "SlotPhrase": "apologizes",
@@ -2881,7 +2881,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex087",
     "Slot": "M2",
     "SlotPhrase": "for the mistake",
@@ -2896,7 +2896,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex088",
     "Slot": "S",
     "SlotPhrase": "Tom",
@@ -2911,7 +2911,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex088",
     "Slot": "V",
     "SlotPhrase": "apologizes",
@@ -2926,7 +2926,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "apologize",
+    "V_group_key": "apologizes",
     "例文ID": "ex088",
     "Slot": "M2",
     "SlotPhrase": "for the confusion",
