@@ -149,10 +149,15 @@ class ExplanationSystem {
   // 現在のV_group_keyを検出
   getCurrentVGroupKey() {
     try {
+      console.log('🔍 V_group_key検出開始');
+      
       // メインエリアの全てのスロット要素を検索
       const slotElements = document.querySelectorAll('.slot-container');
+      console.log('📋 見つかったスロット数:', slotElements.length);
       
       for (const slot of slotElements) {
+        console.log('🎯 スロット確認:', slot.id, slot.className);
+        
         // data-v-group-key属性をチェック
         const vGroupKey = slot.getAttribute('data-v-group-key');
         if (vGroupKey) {
@@ -163,23 +168,33 @@ class ExplanationSystem {
         // 動詞スロット（slot-v）から動詞テキストを取得
         if (slot.id === 'slot-v') {
           const slotPhrase = slot.querySelector('.slot-phrase');
+          console.log('🎯 Vスロット発見:', slotPhrase);
           if (slotPhrase) {
             const verbText = slotPhrase.textContent.trim();
+            console.log('📝 動詞テキスト:', verbText);
             if (verbText) {
               console.log('🔍 動詞スロットから推測:', verbText);
-              return this.inferVGroupKeyFromVerb(verbText);
+              const inferredKey = this.inferVGroupKeyFromVerb(verbText);
+              console.log('🎯 推測されたV_group_key:', inferredKey);
+              return inferredKey;
             }
           }
         }
       }
 
       // 代替方法：全スロットから動詞を探す
+      console.log('🔍 代替検索開始');
       const allSlotPhrases = document.querySelectorAll('.slot-phrase');
+      console.log('📋 全slot-phrase数:', allSlotPhrases.length);
+      
       for (const phrase of allSlotPhrases) {
         const text = phrase.textContent.trim();
+        console.log('📝 検査中のテキスト:', text);
         if (text && this.isVerb(text)) {
           console.log('🔍 全スロット検索から動詞発見:', text);
-          return this.inferVGroupKeyFromVerb(text);
+          const inferredKey = this.inferVGroupKeyFromVerb(text);
+          console.log('🎯 推測されたV_group_key:', inferredKey);
+          return inferredKey;
         }
       }
       
@@ -194,17 +209,21 @@ class ExplanationSystem {
 
   // 単語が動詞かどうかを簡易判定
   isVerb(word) {
+    console.log('🔍 動詞判定チェック:', word);
     // 簡易的な動詞判定（解説データに存在するV_group_keyと一致するかチェック）
     const verbForms = [
       'recover', 'recovered', 'go', 'goes', 'went', 'pay', 'paid',
       'believe', 'believed', 'lie', 'lay', 'lies', 'apologize', 'apologized',
       'listen', 'listened', 'leave', 'left', 'stand', 'stood', 'mind', 'minded'
     ];
-    return verbForms.includes(word.toLowerCase());
+    const isVerbResult = verbForms.includes(word.toLowerCase());
+    console.log('🎯 動詞判定結果:', word, '→', isVerbResult);
+    return isVerbResult;
   }
 
   // 動詞テキストからV_group_keyを推測
   inferVGroupKeyFromVerb(verbText) {
+    console.log('🔍 V_group_key推測開始:', verbText);
     // 基本形への変換ロジック（簡易版）
     const baseFormMap = {
       'recovered': 'recover',
@@ -221,7 +240,9 @@ class ExplanationSystem {
       'minded': 'mind'
     };
     
-    return baseFormMap[verbText] || verbText.toLowerCase();
+    const result = baseFormMap[verbText] || verbText.toLowerCase();
+    console.log('🎯 推測結果:', verbText, '→', result);
+    return result;
   }
 
   // V_group_keyに対応する解説データを検索
@@ -243,15 +264,36 @@ class ExplanationSystem {
 
   // 現在のコンテキストに基づいて解説を表示
   showContextualExplanation() {
+    console.log('🔍 解説表示開始');
+    
+    // デバッグ: 現在の解説データ一覧を表示
+    console.log('📊 利用可能な解説データ:', this.explanationData.map(item => ({
+      V_group_key: item.V_group_key,
+      title: item.explanation_title
+    })));
+    
     const vGroupKey = this.getCurrentVGroupKey();
+    console.log('🎯 検出されたV_group_key:', vGroupKey);
+    
     if (!vGroupKey) {
-      this.openModal('解説情報なし', '<p>現在表示されている内容に対応する解説が見つかりません。</p>');
+      this.openModal('解説情報なし', '<p>現在表示されている内容に対応する解説が見つかりません。<br>デバッグ情報をコンソールで確認してください。</p>');
       return;
     }
 
     const explanation = this.findExplanationByVGroupKey(vGroupKey);
     if (!explanation) {
-      this.openModal('解説情報なし', `<p>「${vGroupKey}」に対応する解説が見つかりません。</p>`);
+      const debugInfo = `
+        <p>「${vGroupKey}」に対応する解説が見つかりません。</p>
+        <h4>🔍 デバッグ情報</h4>
+        <p><strong>検出されたV_group_key:</strong> ${vGroupKey}</p>
+        <p><strong>利用可能な解説:</strong></p>
+        <ul>
+          ${this.explanationData.map(item => 
+            `<li>${item.V_group_key}: ${item.explanation_title}</li>`
+          ).join('')}
+        </ul>
+      `;
+      this.openModal('解説情報なし', debugInfo);
       return;
     }
 
