@@ -214,7 +214,8 @@ class ExplanationSystem {
     const verbForms = [
       'recover', 'recovered', 'go', 'goes', 'went', 'pay', 'paid',
       'believe', 'believed', 'lie', 'lay', 'lies', 'apologize', 'apologized',
-      'listen', 'listened', 'leave', 'left', 'stand', 'stood', 'mind', 'minded'
+      'listen', 'listened', 'leave', 'left', 'stand', 'stood', 'mind', 'minded',
+      'start', 'starts', 'started'
     ];
     const isVerbResult = verbForms.includes(word.toLowerCase());
     console.log('🎯 動詞判定結果:', word, '→', isVerbResult);
@@ -237,10 +238,19 @@ class ExplanationSystem {
       'listened': 'listen',
       'left': 'leave',
       'stood': 'stand',
-      'minded': 'mind'
+      'minded': 'mind',
+      'starts': 'start',
+      'started': 'start'
     };
     
-    const result = baseFormMap[verbText] || verbText.toLowerCase();
+    let result = baseFormMap[verbText] || verbText.toLowerCase();
+    
+    // もし基本形がまだ解説データにない場合、一般的な解説を提供
+    if (!this.findExplanationByVGroupKey(result)) {
+      console.log('⚠️ 特定の解説がないため、一般解説を使用:', result);
+      result = 'intransitive_verbs'; // 一般的な自動詞解説を使用
+    }
+    
     console.log('🎯 推測結果:', verbText, '→', result);
     return result;
   }
