@@ -408,7 +408,7 @@ class ExplanationSystem {
       const explanationBtn = document.createElement('button');
       explanationBtn.id = 'explanation-btn';
       explanationBtn.className = 'explanation-btn';
-      explanationBtn.textContent = '💡 解説';
+      explanationBtn.textContent = '💡 例文解説';
       explanationBtn.title = '文法解説を表示';
       
       // スタイルを例文シャッフルボタンと調和させる
