@@ -94,8 +94,10 @@ function extractWordsWithStemming(text) {
   const cleanPhrase = normalizedText.replace(/[^\w\s-]/g, ' ').trim();
   if (cleanPhrase) {
     searchWords.add(cleanPhrase);
+    console.log('🔍 cleanPhrase 追加:', cleanPhrase);
   }
   searchWords.add(normalizedText.trim());
+  console.log('🔍 normalizedText 追加:', normalizedText.trim());
   
   for (const word of words) {
     // 元の単語を追加
@@ -132,6 +134,19 @@ function findImageByMetaTag(text) {
   }
   
   const searchWords = extractWordsWithStemming(text);
+  
+  // 🆕 連続する単語の組み合わせを追加生成
+  const words = text.toLowerCase().split(/\s+/).filter(word => word.length >= 2);
+  for (let i = 0; i < words.length; i++) {
+    for (let j = i + 1; j < words.length; j++) {
+      const phrase = words.slice(i, j + 1).join(' ');
+      if (phrase.length > 0 && !searchWords.includes(phrase)) {
+        searchWords.push(phrase);
+        console.log('🔍 部分フレーズ追加:', phrase);
+      }
+    }
+  }
+  
   console.log('🔍 検索単語:', searchWords);
   console.log('🔍 検索対象テキスト:', text);
   console.log('🔍 メタタグデータ件数:', imageMetaTags.length);
