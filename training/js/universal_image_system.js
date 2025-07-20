@@ -136,8 +136,6 @@ function findImageByMetaTag(text) {
   console.log('🔍 検索対象テキスト:', text);
   console.log('🔍 メタタグデータ件数:', imageMetaTags.length);
   
-  let bestMatch = null;
-  let bestPriority = 0;
   let matchDetails = [];
   
   for (const imageData of imageMetaTags) {
@@ -147,19 +145,20 @@ function findImageByMetaTag(text) {
         matchDetails.push({
           image: imageData.image_file,
           metaTag: metaTag,
-          priority: priority
+          priority: priority,
+          imageData: imageData
         });
-        
-        if (priority > bestPriority) {
-          bestMatch = imageData;
-          bestPriority = priority;
-        }
         console.log('🎯 マッチング成功:', metaTag, '→', imageData.image_file, `(優先度: ${priority})`);
       }
     }
   }
   
+  // 優先度でソートし、最高優先度を選択
+  matchDetails.sort((a, b) => b.priority - a.priority);
+  let bestMatch = matchDetails.length > 0 ? matchDetails[0].imageData : null;
+  
   console.log('🔍 全マッチング結果:', matchDetails);
+  console.log('🔍 優先度ソート後:', matchDetails.map(m => `${m.image} (優先度: ${m.priority})`));
   console.log('🔍 最終選択:', bestMatch ? bestMatch.image_file : 'なし');
   
   // 確実にマッチしていることをアラートでも表示（デバッグ用）
