@@ -151,7 +151,13 @@ class ExplanationSystem {
     try {
       console.log('🔍 V_group_key検出開始');
       
-      // メインエリアの全てのスロット要素を検索
+      // まず、現在のランダム化状態からV_group_keyを取得
+      if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
+        console.log('✅ window.currentRandomizedState.vGroupKeyから取得:', window.currentRandomizedState.vGroupKey);
+        return window.currentRandomizedState.vGroupKey;
+      }
+      
+      // フォールバック: メインエリアの全てのスロット要素を検索
       const slotElements = document.querySelectorAll('.slot-container');
       console.log('📋 見つかったスロット数:', slotElements.length);
       
