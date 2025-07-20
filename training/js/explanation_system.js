@@ -71,10 +71,10 @@ class ExplanationSystem {
     // 既存の解説ボタンを削除
     document.querySelectorAll('.slot-explanation-btn').forEach(btn => btn.remove());
     
-    // 例文シャッフルボタンを探す
-    const randomizeBtn = document.getElementById('randomizeAll');
+    // 例文シャッフルボタンを探す（正しいID）
+    const randomizeBtn = document.getElementById('randomize-all');
     if (!randomizeBtn) {
-      console.warn('⚠️ 例文シャッフルボタンが見つかりません');
+      console.warn('⚠️ 例文シャッフルボタンが見つかりません (ID: randomize-all)');
       return;
     }
     
@@ -325,7 +325,19 @@ let explanationSystem = null;
 
 // DOMContentLoadedイベントでシステムを初期化
 document.addEventListener('DOMContentLoaded', () => {
-  explanationSystem = new ExplanationSystem();
+  // 少し遅延してから初期化（他のスクリプトの読み込みを待つ）
+  setTimeout(() => {
+    explanationSystem = new ExplanationSystem();
+  }, 1000);
+});
+
+// ページロード完了後にも再試行
+window.addEventListener('load', () => {
+  if (!explanationSystem) {
+    setTimeout(() => {
+      explanationSystem = new ExplanationSystem();
+    }, 500);
+  }
 });
 
 // JSONデータが更新された時に解説ボタンを再設定
@@ -345,6 +357,21 @@ window.showExplanation = function(vGroupKey) {
       explanationSystem.showErrorMessage(`「${vGroupKey}」の解説が見つかりません。`);
     }
   }
+};
+
+// 手動で解説ボタンを追加する関数
+window.addExplanationButton = function() {
+  if (explanationSystem) {
+    explanationSystem.addExplanationButtons();
+  }
+};
+
+// デバッグ用：解説システムの状態確認
+window.checkExplanationSystem = function() {
+  console.log('🔍 解説システム状態確認');
+  console.log('explanationSystem:', explanationSystem);
+  console.log('randomize-all button:', document.getElementById('randomize-all'));
+  console.log('loadedJsonData:', window.loadedJsonData ? `${window.loadedJsonData.length} items` : 'not loaded');
 };
 
 console.log('📚 解説システムスクリプト読み込み完了');
