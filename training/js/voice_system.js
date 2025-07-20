@@ -2223,8 +2223,9 @@ class VoiceSystem {
             recordBtn.className = isRecording ? 'voice-btn recording' : 'voice-btn';
         }
         
+        // 録音ボタン自体が停止機能を持つため、別の停止ボタンは常に非表示
         if (stopBtn) {
-            stopBtn.style.display = isRecording ? 'inline-block' : 'none';
+            stopBtn.style.display = 'none';
         }
     }
     
