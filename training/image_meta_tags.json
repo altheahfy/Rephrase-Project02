@@ -3884,13 +3884,13 @@
     "description": "空港"
   },
   {
-    "image_file": "new_york.png",
+    "image_file": "new york.png",
     "folder": "common",
     "meta_tags": [
       "new york",
       "newyork"
     ],
-    "priority": 3,
+    "priority": 5,
     "description": "ニューヨーク"
   }
 ]
