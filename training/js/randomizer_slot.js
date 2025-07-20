@@ -12,12 +12,19 @@ function randomizeSingleSlot(slotId, jsonData) {
   }
 
   // 対象スロットのデータだけをフィルタ
-  const slotData = jsonData.filter(item => 
+  let slotData = jsonData.filter(item => 
     item.Slot && item.Slot.toLowerCase() === slotId.toLowerCase() && !item.SubslotID
   );
   
+  // 🆕 現在の V_group_key に制限
+  if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
+    const currentVGroupKey = window.currentRandomizedState.vGroupKey;
+    slotData = slotData.filter(item => item.V_group_key === currentVGroupKey);
+    console.log(`🎯 現在のV_group_key「${currentVGroupKey}」に制限して検索`);
+  }
+  
   if (slotData.length === 0) {
-    console.warn(`スロット ${slotId} のデータがJSONに見つかりません`);
+    console.warn(`スロット ${slotId} のデータがJSONに見つかりません（V_group_key制限後）`);
     return;
   }
   
