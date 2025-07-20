@@ -2958,7 +2958,6 @@
     "meta_tags": [
       "some",
       "something",
-      "someone",
       "sometime",
       "somewhere",
       "somewhat",
@@ -3466,7 +3465,7 @@
     "description": "行く"
   },
   {
-    "image_file": "grocery_store.png",
+    "image_file": "grocery store.png",
     "folder": "common",
     "meta_tags": [
       "grocery store",
@@ -3520,7 +3519,7 @@
     "description": "銀行"
   },
   {
-    "image_file": "amusement_park.png",
+    "image_file": "amusement park.png",
     "folder": "common",
     "meta_tags": [
       "amusement park",
@@ -3693,6 +3692,17 @@
     ],
     "priority": 3,
     "description": "毛布"
+  },
+  {
+    "image_file": "bed.png",
+    "folder": "common",
+    "meta_tags": [
+      "bed",
+      "beds",
+      "bedroom"
+    ],
+    "priority": 3,
+    "description": "ベッド"
   },
   {
     "image_file": "apologize.png",
