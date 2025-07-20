@@ -187,6 +187,7 @@ function findImageByMetaTag(text) {
     }
   }
   
+  console.log('🎯 findImageByMetaTag の最終戻り値:', bestMatch ? bestMatch.image_file : 'null');
   return bestMatch;
 }
 
@@ -320,8 +321,10 @@ function applyImageToSlot(slotId, phraseText, forceRefresh = false) {
   }
   
   // 画像を検索
+  console.log('🔍 findImageByMetaTag を呼び出し中:', phraseText);
   const imageData = findImageByMetaTag(phraseText);
   console.log('🔍 検索結果:', imageData);
+  console.log('🔍 検索結果のファイル名:', imageData ? imageData.image_file : 'null');
   
   if (!imageData) {
     console.log('🔍 マッチする画像が見つかりません:', phraseText);
