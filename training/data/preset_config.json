@@ -11,7 +11,7 @@
       "name": "第4文型と極性活用",
       "file": "data/slot_order_data2.json",
       "description": "1とは逆にシンプルな上位スロット主体のデータセット"
-    }
+    },
     {
       "id": "dataset001",
       "name": "V_自動詞第1文型",
