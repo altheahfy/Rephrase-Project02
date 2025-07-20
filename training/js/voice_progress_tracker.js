@@ -639,6 +639,23 @@ class VoiceProgressTracker {
             request.onerror = () => reject(request.error);
         });
     }
+    
+    /**
+     * 一時的な分析結果データをクリア（保存キャンセル時用）
+     * @param {Object} analysisResult - キャンセルされた分析結果
+     */
+    async clearTemporaryData(analysisResult) {
+        console.log('🚫 一時データクリア処理開始:', analysisResult);
+        
+        // 現在の実装では、IndexedDBに保存されるまでは一時データは存在しないため、
+        // 実際のクリア処理は不要ですが、将来の拡張のためにメソッドを用意
+        
+        // 万が一、一時的にメモリ上に保存された分析結果があれば、それをクリア
+        // （現在の実装では該当しませんが、デバッグ用として）
+        
+        console.log('✅ 一時データクリア完了（現在は実際のクリア処理はありません）');
+        return true;
+    }
 }
 
 // グローバルインスタンス

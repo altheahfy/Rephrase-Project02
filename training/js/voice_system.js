@@ -1461,7 +1461,7 @@ class VoiceSystem {
             });
             
             // 「いいえ」ボタンのクリックイベント
-            saveNoBtn.addEventListener('click', () => {
+            saveNoBtn.addEventListener('click', async () => {
                 // ボタンを無効化
                 saveYesBtn.disabled = true;
                 saveNoBtn.disabled = true;
@@ -1477,6 +1477,9 @@ class VoiceSystem {
                 if (confirmationDiv) {
                     confirmationDiv.style.display = 'none';
                 }
+                
+                // 🚫 一時的な分析結果データをクリア（グラフから除外するため）
+                await this.clearTemporaryAnalysisData(analysisResult);
                 
                 console.log('👋 ユーザーが学習データ保存をキャンセルしました');
             });
@@ -2609,6 +2612,37 @@ class VoiceSystem {
             
             console.log('✅ イベントリスナーを設定しました');
         });
+    }
+    
+    /**
+     * 一時的な分析結果データをクリア（保存キャンセル時）
+     */
+    async clearTemporaryAnalysisData(analysisResult) {
+        try {
+            console.log('🚫 一時的な分析結果データをクリア開始');
+            
+            // 進捗追跡システムが利用可能な場合、一時的に作成された可能性のあるデータをクリア
+            if (window.voiceProgressTracker && window.voiceProgressTracker.clearTemporaryData) {
+                await window.voiceProgressTracker.clearTemporaryData(analysisResult);
+            }
+            
+            // 既に開いている進捗パネルがある場合、データを再読み込みして一時データを除外
+            const progressPanel = document.querySelector('.voice-progress-panel');
+            if (progressPanel && progressPanel.style.display !== 'none') {
+                console.log('🔄 進捗パネルが開いているため、データを再読み込みします');
+                
+                // 進捗パネルのUIインスタンスを取得して再読み込み
+                if (window.currentProgressUI && window.currentProgressUI.loadAndDisplayProgress) {
+                    await window.currentProgressUI.loadAndDisplayProgress();
+                    console.log('✅ 進捗パネルのデータを更新しました');
+                }
+            }
+            
+            console.log('✅ 一時的な分析結果データクリア完了');
+            
+        } catch (error) {
+            console.error('❌ 一時データクリア失敗:', error);
+        }
     }
 }
 

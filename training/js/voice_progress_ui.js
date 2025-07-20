@@ -8,6 +8,9 @@ class VoiceProgressUI {
         this.isVisible = false;
         this.currentPeriod = 'week';
         
+        // グローバルインスタンスとして登録
+        window.currentProgressUI = this;
+        
         // 初期化のタイミングをずらす
         if (this.progressTracker) {
             this.init();
