@@ -1449,3 +1449,139 @@ h1 {
   outline: 2px dashed rgba(255, 0, 0, 0.3);
   outline-offset: 2px;
 }
+
+/* 📚 解説システム用モーダルスタイル */
+.explanation-modal {
+  display: none;
+  position: fixed;
+  z-index: 15000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.explanation-modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+
+.explanation-modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 700px;
+  max-height: 80vh;
+  width: 90%;
+  overflow: hidden;
+  transform: scale(0.7);
+  transition: transform 0.3s ease;
+}
+
+.explanation-modal.show .explanation-modal-content {
+  transform: scale(1);
+}
+
+.explanation-modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.explanation-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.explanation-close {
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.explanation-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.explanation-modal-body {
+  padding: 20px;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.explanation-modal-body h4 {
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 5px;
+}
+
+.explanation-modal-body p {
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.explanation-modal-body ul {
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.explanation-modal-body li {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.explanation-modal-body strong {
+  color: #333;
+  font-weight: bold;
+}
+
+.explanation-modal-body code {
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #d63384;
+}
+
+/* 解説ボタンのスタイル */
+.explanation-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.explanation-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.explanation-btn:active {
+  transform: translateY(0);
+}

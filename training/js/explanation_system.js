@@ -1,0 +1,395 @@
+/**
+ * 📚 解説システム
+ * 段階的実装 - Phase 1: 基本モーダル機能
+ */
+
+class ExplanationSystem {
+  constructor() {
+    this.modal = null;
+    this.explanationData = [];
+    this.isInitialized = false;
+    console.log('🎯 解説システム初期化開始');
+  }
+
+  // 初期化処理
+  async initialize() {
+    try {
+      console.log('📚 解説システム初期化中...');
+      
+      // モーダル要素の取得
+      this.modal = document.getElementById('explanationModal');
+      if (!this.modal) {
+        console.error('❌ 解説モーダルが見つかりません');
+        return false;
+      }
+
+      // モーダルイベントリスナーの設定
+      this.setupModalEvents();
+      
+      // JSONデータの読み込み
+      await this.loadExplanationData();
+      
+      this.isInitialized = true;
+      console.log('✅ 解説システム初期化完了');
+      
+      // 解説ボタンの自動配置を開始
+      this.addExplanationButtons();
+      
+      return true;
+      
+    } catch (error) {
+      console.error('❌ 解説システム初期化エラー:', error);
+      return false;
+    }
+  }
+
+  // JSONデータの読み込み
+  async loadExplanationData() {
+    try {
+      const response = await fetch('data/V自動詞第1文型.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const allData = await response.json();
+      
+      // 解説データのみをフィルタリング
+      this.explanationData = allData.filter(item => item.explanation_title);
+      
+      console.log(`📖 解説データ読み込み完了: ${this.explanationData.length}件`);
+      
+    } catch (error) {
+      console.error('❌ 解説データ読み込みエラー:', error);
+      this.explanationData = [];
+    }
+  }
+
+  // モーダルイベントの設定
+  setupModalEvents() {
+    // 閉じるボタンのイベント
+    const closeBtn = this.modal.querySelector('.explanation-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeModal());
+    }
+
+    // モーダル背景クリックで閉じる
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) {
+        this.closeModal();
+      }
+    });
+
+    // ESCキーで閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isModalOpen()) {
+        this.closeModal();
+      }
+    });
+  }
+
+  // モーダルを開く
+  openModal(title, content) {
+    if (!this.modal) return;
+
+    try {
+      const titleElement = this.modal.querySelector('#explanationTitle');
+      const contentElement = this.modal.querySelector('#explanationContent');
+
+      if (titleElement) titleElement.textContent = title;
+      if (contentElement) contentElement.innerHTML = content;
+
+      this.modal.style.display = 'flex';
+      // アニメーション用の遅延
+      setTimeout(() => {
+        this.modal.classList.add('show');
+      }, 10);
+
+      console.log('📖 解説モーダル開いた:', title);
+      
+    } catch (error) {
+      console.error('❌ モーダル表示エラー:', error);
+    }
+  }
+
+  // モーダルを閉じる
+  closeModal() {
+    if (!this.modal) return;
+
+    this.modal.classList.remove('show');
+    setTimeout(() => {
+      this.modal.style.display = 'none';
+    }, 300);
+
+    console.log('📖 解説モーダル閉じた');
+  }
+
+  // モーダルが開いているかチェック
+  isModalOpen() {
+    return this.modal && this.modal.classList.contains('show');
+  }
+
+  // テスト用の解説表示
+  showTestExplanation() {
+    const testTitle = "解説システムテスト";
+    const testContent = `
+      <h4>✅ システム動作確認</h4>
+      <p>解説モーダルが正常に動作しています。</p>
+      <p><strong>読み込み済み解説データ:</strong> ${this.explanationData.length}件</p>
+      <h4>📚 次のフェーズ</h4>
+      <ul>
+        <li>V_group_key検出機能の実装</li>
+        <li>解説ボタンの自動配置</li>
+        <li>実際の解説内容の表示</li>
+      </ul>
+    `;
+    
+    this.openModal(testTitle, testContent);
+  }
+
+  // 現在のV_group_keyを検出
+  getCurrentVGroupKey() {
+    try {
+      // メインエリアの全てのスロット要素を検索
+      const slotElements = document.querySelectorAll('.slot-container');
+      
+      for (const slot of slotElements) {
+        // data-v-group-key属性をチェック
+        const vGroupKey = slot.getAttribute('data-v-group-key');
+        if (vGroupKey) {
+          console.log('🔍 V_group_key検出:', vGroupKey);
+          return vGroupKey;
+        }
+        
+        // 動詞スロット（slot-v）から動詞テキストを取得
+        if (slot.id === 'slot-v') {
+          const slotPhrase = slot.querySelector('.slot-phrase');
+          if (slotPhrase) {
+            const verbText = slotPhrase.textContent.trim();
+            if (verbText) {
+              console.log('🔍 動詞スロットから推測:', verbText);
+              return this.inferVGroupKeyFromVerb(verbText);
+            }
+          }
+        }
+      }
+
+      // 代替方法：全スロットから動詞を探す
+      const allSlotPhrases = document.querySelectorAll('.slot-phrase');
+      for (const phrase of allSlotPhrases) {
+        const text = phrase.textContent.trim();
+        if (text && this.isVerb(text)) {
+          console.log('🔍 全スロット検索から動詞発見:', text);
+          return this.inferVGroupKeyFromVerb(text);
+        }
+      }
+      
+      console.log('❓ V_group_keyが見つかりません');
+      return null;
+      
+    } catch (error) {
+      console.error('❌ V_group_key検出エラー:', error);
+      return null;
+    }
+  }
+
+  // 単語が動詞かどうかを簡易判定
+  isVerb(word) {
+    // 簡易的な動詞判定（解説データに存在するV_group_keyと一致するかチェック）
+    const verbForms = [
+      'recover', 'recovered', 'go', 'goes', 'went', 'pay', 'paid',
+      'believe', 'believed', 'lie', 'lay', 'lies', 'apologize', 'apologized',
+      'listen', 'listened', 'leave', 'left', 'stand', 'stood', 'mind', 'minded'
+    ];
+    return verbForms.includes(word.toLowerCase());
+  }
+
+  // 動詞テキストからV_group_keyを推測
+  inferVGroupKeyFromVerb(verbText) {
+    // 基本形への変換ロジック（簡易版）
+    const baseFormMap = {
+      'recovered': 'recover',
+      'goes': 'go',
+      'went': 'go',
+      'paid': 'pay',
+      'believed': 'believe',
+      'lay': 'lie',
+      'lies': 'lie',
+      'apologized': 'apologize',
+      'listened': 'listen',
+      'left': 'leave',
+      'stood': 'stand',
+      'minded': 'mind'
+    };
+    
+    return baseFormMap[verbText] || verbText.toLowerCase();
+  }
+
+  // V_group_keyに対応する解説データを検索
+  findExplanationByVGroupKey(vGroupKey) {
+    if (!vGroupKey || !this.explanationData.length) return null;
+    
+    const explanation = this.explanationData.find(item => 
+      item.V_group_key === vGroupKey
+    );
+    
+    if (explanation) {
+      console.log('📖 解説データ発見:', explanation.explanation_title);
+    } else {
+      console.log('❓ 解説データなし:', vGroupKey);
+    }
+    
+    return explanation;
+  }
+
+  // 現在のコンテキストに基づいて解説を表示
+  showContextualExplanation() {
+    const vGroupKey = this.getCurrentVGroupKey();
+    if (!vGroupKey) {
+      this.openModal('解説情報なし', '<p>現在表示されている内容に対応する解説が見つかりません。</p>');
+      return;
+    }
+
+    const explanation = this.findExplanationByVGroupKey(vGroupKey);
+    if (!explanation) {
+      this.openModal('解説情報なし', `<p>「${vGroupKey}」に対応する解説が見つかりません。</p>`);
+      return;
+    }
+
+    this.showExplanation(explanation);
+  }
+
+  // 解説データを表示
+  showExplanation(explanationData) {
+    const title = explanationData.explanation_title || '解説';
+    const content = this.formatExplanationContent(explanationData);
+    this.openModal(title, content);
+  }
+
+  // 解説コンテンツをHTMLフォーマット
+  formatExplanationContent(data) {
+    let html = '';
+    
+    if (data.explanation_content) {
+      html += `<div class="explanation-main">${data.explanation_content}</div>`;
+    }
+    
+    if (data.explanation_examples) {
+      html += `
+        <h4>📝 例文</h4>
+        <div class="explanation-examples">${data.explanation_examples}</div>
+      `;
+    }
+    
+    if (data.explanation_notes) {
+      html += `
+        <h4>💡 補足説明</h4>
+        <div class="explanation-notes">${data.explanation_notes}</div>
+      `;
+    }
+    
+    return html || '<p>解説内容が登録されていません。</p>';
+  }
+
+  // 解説ボタンを例文シャッフルボタンの右横に追加
+  addExplanationButtons() {
+    try {
+      console.log('🔧 解説ボタン配置開始');
+      
+      // 例文シャッフルボタンを検索
+      const shuffleBtn = document.getElementById('randomize-all');
+      if (!shuffleBtn) {
+        console.log('❓ 例文シャッフルボタンが見つかりません');
+        return;
+      }
+
+      // 既存の解説ボタンを削除
+      const existingBtn = document.getElementById('explanation-btn');
+      if (existingBtn) {
+        existingBtn.remove();
+      }
+
+      // 解説ボタンを作成
+      const explanationBtn = document.createElement('button');
+      explanationBtn.id = 'explanation-btn';
+      explanationBtn.className = 'explanation-btn';
+      explanationBtn.textContent = '💡 解説';
+      explanationBtn.title = '文法解説を表示';
+      
+      // スタイルを例文シャッフルボタンと調和させる
+      explanationBtn.style.cssText = `
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
+        margin-left: 10px;
+      `;
+      
+      // ホバーエフェクトを追加
+      explanationBtn.addEventListener('mouseover', () => {
+        explanationBtn.style.transform = 'scale(1.05)';
+      });
+      explanationBtn.addEventListener('mouseout', () => {
+        explanationBtn.style.transform = 'scale(1)';
+      });
+      
+      // クリックイベントを追加
+      explanationBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.showContextualExplanation();
+      });
+
+      // シャッフルボタンの右横に配置
+      shuffleBtn.insertAdjacentElement('afterend', explanationBtn);
+      console.log('✅ 例文シャッフルボタンの右横に解説ボタン追加完了');
+      
+    } catch (error) {
+      console.error('❌ 解説ボタン配置エラー:', error);
+    }
+  }
+
+  // ボタンを更新（データ読み込み後などに呼ぶ）
+  updateExplanationButtons() {
+    if (this.isInitialized) {
+      this.addExplanationButtons();
+    }
+  }
+}
+
+// グローバル変数として解説システムインスタンスを作成
+let explanationSystem = null;
+
+// DOMContentLoaded後に初期化
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    explanationSystem = new ExplanationSystem();
+    await explanationSystem.initialize();
+    
+    // テスト用: コンソールから呼び出し可能にする
+    window.testExplanation = () => {
+      if (explanationSystem && explanationSystem.isInitialized) {
+        explanationSystem.showTestExplanation();
+      } else {
+        console.log('❌ 解説システムが初期化されていません');
+      }
+    };
+
+    // コンテキスト解説テスト用
+    window.showExplanation = () => {
+      if (explanationSystem && explanationSystem.isInitialized) {
+        explanationSystem.showContextualExplanation();
+      } else {
+        console.log('❌ 解説システムが初期化されていません');
+      }
+    };
+    
+  } catch (error) {
+    console.error('❌ 解説システム初期化失敗:', error);
+  }
+});
