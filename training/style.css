@@ -54,11 +54,13 @@
   --text-tertiary: var(--neutral-500);
   --text-inverse: var(--neutral-50);
 
-  /* === シャドウシステム === */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  /* === シャドウシステム（強化版） === */
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 12px -2px rgba(0, 0, 0, 0.15), 0 3px 7px -3px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 16px 24px -4px rgba(0, 0, 0, 0.15), 0 8px 16px -6px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 24px 32px -8px rgba(0, 0, 0, 0.15), 0 16px 24px -10px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
 
   /* === ボーダーシステム === */
   --border-light: 1px solid var(--neutral-200);
@@ -79,7 +81,16 @@ body {
   margin: 0;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background-color: var(--surface-secondary);
+  
+  /* 🎨 教育向け最適化背景 - 目に優しい微細グラデーション */
+  background: linear-gradient(135deg, 
+    #f8fafb 0%, 
+    #f1f4f6 25%, 
+    #eef2f5 75%, 
+    #e8ecf0 100%
+  );
+  background-attachment: fixed; /* スクロール時も背景固定 */
+  
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -95,7 +106,7 @@ body {
   background: var(--surface-primary);
   border: var(--border-light);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg); /* より立体感のあるシャドウ */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -548,7 +559,7 @@ h1 {
   border: var(--border-light); /* 新しいカラーシステムの境界線 */
   border-radius: var(--radius-md); /* 角丸を追加 */
   background: var(--surface-primary); /* 背景色を明確に */
-  box-shadow: var(--shadow-sm); /* 軽いシャドウを追加 */
+  box-shadow: var(--shadow-md); /* より目立つシャドウに変更 */
   padding: 15px; /* パディングも拡大 */
   margin: 4px 4px 20px 4px; /* 下部マ�Eジンを拡大 */
   
@@ -1124,11 +1135,11 @@ h1 {
   line-height: 1.1; /* スロチE��の補助チE��ストと同じ行髁E*/
 }
 
-/* 疑問詞英語テキスチE- Grid衁E */
+/* 疑問詞英語テキスト - Grid位置 */
 #display-top-question-word .question-word-text {
   grid-row: 4;
   font-size: 20px; /* 適度なサイズに調整 */
-  font-weight: 600; /* スロチE��の英語テキストと同じ重み */
+  font-weight: 600; /* スロットの英語テキストと同じ重み */
   color: #222;
   text-align: center;
   width: 100%;
@@ -1137,13 +1148,21 @@ h1 {
   justify-content: center;
   height: 100%;
   margin: 0;
-  padding: 0;
-  line-height: 1.2; /* スロチE��の英語テキストと同じ行髁E*/
+  padding: 2px; /* スロットと同じパディング */
+  line-height: 1.2; /* スロットの英語テキストと同じ行高 */
   
-  /* �E 例文チE��ストエリアを�E確にする薁E��オレンジの背景と黒い緁E*/
-  background-color: #ffd6a5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
+  /* 🎨 新しいデザインシステムに統一 - 例文テキストエリア */
+  background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+  border: var(--border-medium);
+  border-color: var(--warning);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  
+  /* 長いテキスト対応 */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  white-space: normal; /* 改行を許可 */
 }
 
 /* 疑問詞�Eタンプレースホルダー - Grid衁E,6�E�空のスペ�Eス�E�E*/
