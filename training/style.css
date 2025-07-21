@@ -1317,7 +1317,7 @@ h1 {
 
 /* 展開中の上位スロット（親）の基本スタイル */
 .slot-container.active-parent-slot {
-  background: rgba(254, 243, 199, 0.6) !important; /* 🌻 薄い黄色背景 */
+  background: rgba(254, 243, 199, 0.85) !important; /* 🌻 より濃い黄色背景 */
   border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
   border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
@@ -1325,7 +1325,7 @@ h1 {
   z-index: 3 !important; /* サブスロットエリアの上に表示 */
   margin-bottom: 0 !important; /* 下部マージンを除去 */
   transition: all 0.3s ease !important;
-  box-shadow: 0 -2px 8px rgba(245, 158, 11, 0.3) !important; /* 🌻 黄色系上部シャドウで浮遊感 */
+  box-shadow: 0 -2px 8px rgba(245, 158, 11, 0.5) !important; /* 🌻 より濃い黄色系上部シャドウで浮遊感 */
 }
 
 /* 🎨 親スロット用の拡張背景（包み込み効果） */
@@ -1346,7 +1346,7 @@ h1 {
 
 /* 展開中のサブスロットエリア全体のスタイル */
 .slot-wrapper.active-subslot-area {
-  background: rgba(254, 243, 199, 0.4) !important; /* 🌻 親より薄い黄色 */
+  background: rgba(254, 243, 199, 0.65) !important; /* 🌻 親よりやや薄い黄色 */
   border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
   border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
@@ -1356,7 +1356,7 @@ h1 {
   z-index: 2 !important;
   transition: all 0.3s ease !important;
   box-shadow: 
-    0 -2px 4px rgba(245, 158, 11, 0.3),  /* 🌻 黄色系上向きの影で連結感を演出 */
+    0 -2px 4px rgba(245, 158, 11, 0.5),  /* 🌻 より濃い黄色系上向きの影で連結感を演出 */
     0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -1378,8 +1378,8 @@ h1 {
 
 /* サブスロットラベルのタブ風デザイン */
 .subslot-label.tab-style {
-  background: linear-gradient(135deg, #fffbeb, #fef3c7) !important; /* � 白に近い薄い黄色のグラデーション */
-  color: #78716c !important; /* � 薄い黄色背景に温かみのあるブラウン文字 */
+  background: linear-gradient(135deg, #fef3c7, #fde68a) !important; /* 🌻 より濃い黄色のグラデーション */
+  color: #78716c !important; /* 🌻 薄い黄色背景に温かみのあるブラウン文字 */
   font-weight: bold !important;
   padding: 8px 16px !important;
   border-radius: 8px 8px 0 0 !important;
@@ -1420,10 +1420,10 @@ h1 {
 
 /* タブ連結時の制御パネルのスタイル統一 */
 .subslot-control-panel.tab-connected {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.5), rgba(251, 191, 36, 0.3)) !important; /* 🌻 黄色系グラデーション */
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.75), rgba(251, 191, 36, 0.5)) !important; /* 🌻 より濃い黄色系グラデーション */
   border: 1px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2) !important; /* 🌻 黄色系シャドウ */
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4) !important; /* 🌻 より濃い黄色系シャドウ */
 }
 
 /* レスポンシブ対応 */
