@@ -291,8 +291,16 @@
     </div>
 
     <!-- 認証システム読み込み -->
-    <script src="./js/security.js"></script>
-    <script src="./js/auth.js"></script>
+    <script type="module">
+        import { initSecurity } from './js/security.js';
+        // セキュリティ初期化
+        await initSecurity();
+        
+        // セキュリティ初期化完了後にauth.jsを読み込み
+        const authScript = document.createElement('script');
+        authScript.src = './js/auth.js';
+        document.head.appendChild(authScript);
+    </script>
     
     <script>
         // タブ切り替え
@@ -466,8 +474,24 @@
 
         // ページ読み込み時の処理
         document.addEventListener('DOMContentLoaded', async function() {
+            // 認証システムの読み込み完了を待機
+            function waitForAuthSystem() {
+                return new Promise((resolve) => {
+                    function check() {
+                        if (window.authSystem && window.securityUtils) {
+                            resolve();
+                        } else {
+                            setTimeout(check, 100);
+                        }
+                    }
+                    check();
+                });
+            }
+            
+            await waitForAuthSystem();
+            
             // 既にログインしている場合はメイン画面へリダイレクト
-            if (window.authSystem && window.authSystem.isLoggedIn()) {
+            if (window.authSystem.isLoggedIn()) {
                 window.location.href = './index.html';
             }
         });
