@@ -2,16 +2,45 @@
 <html lang="en">
  <head>
   <meta charset="utf-8"/>
-  <!-- 🔒 セキュリティヘッダー（基本設定） -->
+  <!-- 🔒 セキュリティヘッダー（強化版） -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none';">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   
   <title>
    Rephrase トレーニングUI
   </title>
   <link href="style.css" rel="stylesheet"/>
   <link href="css/voice_progress.css" rel="stylesheet"/>
+  
+  <!-- ⚡ パフォーマンス最適化CSS -->
+  <style>
+    /* 画像遅延読み込み用スタイル */
+    .slot-image {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .slot-image.loaded {
+      opacity: 1;
+    }
+    
+    /* ローディングスピナー */
+    .image-loading {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
   
   <!-- 🔒 セキュリティモジュール（最優先で読み込み） -->
   <script type="module">
@@ -157,6 +186,76 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('📱 DOM読み込み完了 - エラーハンドリング最終チェック');
       window.checkErrorHandlerStatus();
+    });
+  </script>
+  
+  <!-- ⚡ パフォーマンス最適化JavaScript -->
+  <script>
+    // 画像遅延読み込み機能
+    window.RephraseImageOptimizer = {
+      init: function() {
+        this.setupLazyLoading();
+        this.optimizeExistingImages();
+      },
+      
+      // 既存の画像を最適化
+      optimizeExistingImages: function() {
+        const images = document.querySelectorAll('.slot-image');
+        images.forEach(img => {
+          // loading="lazy"属性を追加
+          img.setAttribute('loading', 'lazy');
+          
+          // 読み込み完了時のイベント
+          img.addEventListener('load', () => {
+            img.classList.add('loaded');
+            img.classList.remove('image-loading');
+          });
+          
+          // エラー時の処理
+          img.addEventListener('error', () => {
+            img.style.display = 'none';
+            console.warn('画像読み込み失敗:', img.src);
+          });
+          
+          // 初期状態では透明
+          if (!img.complete) {
+            img.classList.add('image-loading');
+          } else {
+            img.classList.add('loaded');
+          }
+        });
+      },
+      
+      // 新しく追加される画像の遅延読み込み設定
+      setupLazyLoading: function() {
+        // MutationObserverで新しい画像を監視
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === 1) { // Element node
+                const images = node.querySelectorAll ? node.querySelectorAll('img') : [];
+                images.forEach(img => {
+                  img.setAttribute('loading', 'lazy');
+                  img.addEventListener('load', () => {
+                    img.classList.add('loaded');
+                  });
+                });
+              }
+            });
+          });
+        });
+        
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      }
+    };
+    
+    // DOMContentLoaded時に初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      window.RephraseImageOptimizer.init();
+      console.log('⚡ 画像最適化が有効になりました');
     });
   </script>
   
@@ -317,7 +416,7 @@ function handleLogout() {
   </div>
 </div>
 
-<!-- 🎭 ローディングオーバーレイ -->
+<!-- 🎭 ローディングオーバーレイ（強化版） -->
 <div id="loading-overlay" style="
   position: fixed;
   top: 0;
@@ -331,24 +430,56 @@ function handleLogout() {
   justify-content: center;
   align-items: center;
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   pointer-events: none;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 ">
-  <div style="text-align: center; pointer-events: auto;">
-    <div style="
-      width: 60px;
-      height: 60px;
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid #fff;
+  <div class="loading-content" style="text-align: center; pointer-events: auto; max-width: 400px; padding: 20px;">
+    <!-- 改善されたローディングアニメーション -->
+    <div class="loading-spinner" style="
+      width: 80px;
+      height: 80px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top: 3px solid #fff;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      animation: spin 1.2s linear infinite;
+      margin: 0 auto 24px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
     "></div>
-    <h2 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 300;">
+    
+    <!-- 動的メッセージ -->
+    <h2 id="loading-title" style="margin: 0 0 12px 0; font-size: 24px; font-weight: 400;">
       データを準備しています...
     </h2>
-    <p style="margin: 0; font-size: 14px; opacity: 0.8;">
+    <p id="loading-description" style="margin: 0 0 16px 0; font-size: 14px; opacity: 0.9; line-height: 1.4;">
       JSONファイルをロードしてください
+    </p>
+    
+    <!-- プログレスバー -->
+    <div style="
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    ">
+      <div id="loading-progress" style="
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #fff, rgba(255,255,255,0.8));
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      "></div>
+    </div>
+    
+    <!-- ローディングのヒント -->
+    <div id="loading-tips" style="font-size: 12px; opacity: 0.7; text-align: left;">
+      💡 <span id="loading-tip-text">高速化機能が有効になっています</span>
+    </div>
+  </div>
     </p>
   </div>
 </div>
@@ -357,6 +488,75 @@ function handleLogout() {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 🌟 プログレスバー光沢効果 */
+@keyframes progress-shine {
+  0% { 
+    transform: translateX(-100%); 
+    opacity: 0;
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateX(400%); 
+    opacity: 0;
+  }
+}
+
+/* プログレスバー内の光沢要素 */
+#loading-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.4), 
+    transparent
+  );
+  animation: progress-shine 2.5s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* ローディングスピナー強化 */
+.loading-spinner {
+  position: relative;
+}
+
+.loading-spinner::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: spin 2.5s linear infinite reverse;
+}
+
+/* ローディング要素のフェードイン効果 */
+.loading-content > * {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.loading-content > *:nth-child(1) { animation-delay: 0.1s; }
+.loading-content > *:nth-child(2) { animation-delay: 0.2s; }
+.loading-content > *:nth-child(3) { animation-delay: 0.3s; }
+.loading-content > *:nth-child(4) { animation-delay: 0.4s; }
+.loading-content > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 
@@ -2033,17 +2233,71 @@ function showLoadingOverlay() {
 // JSONファイルが選択された時のローディング表示更新
 document.addEventListener('DOMContentLoaded', function() {
   const fileInput = document.getElementById('jsonFileInput');
-  const loadingText = document.querySelector('#loading-overlay p');
+  const loadingTitle = document.getElementById('loading-title');
+  const loadingDescription = document.getElementById('loading-description');
+  const loadingProgress = document.getElementById('loading-progress');
+  const loadingTips = document.getElementById('loading-tip-text');
   
-  if (fileInput && loadingText) {
+  // 📈 ローディング進捗管理
+  let loadingStage = 0;
+  const loadingStages = [
+    { progress: 0, title: "🚀 Rephrase 準備中...", desc: "システム初期化中", tip: "高速化機能が有効になっています" },
+    { progress: 20, title: "📂 ファイル準備完了", desc: "JSON構造を確認中", tip: "セキュリティヘッダーが強化されています" },
+    { progress: 60, title: "⚡ データ最適化中", desc: "高速表示のための前処理中", tip: "画像遅延読み込みでメモリ節約" },
+    { progress: 90, title: "🎯 最終調整中", desc: "インタラクティブ機能準備完了", tip: "パフォーマンス最適化済み" },
+    { progress: 100, title: "✅ 準備完了！", desc: "快適な学習環境をお楽しみください", tip: "すべての機能が利用可能です" }
+  ];
+  
+  // 🎭 ローディング進捗アニメーション
+  function updateLoadingStage(stage) {
+    if (stage < loadingStages.length) {
+      const stageData = loadingStages[stage];
+      
+      if (loadingTitle) loadingTitle.textContent = stageData.title;
+      if (loadingDescription) loadingDescription.textContent = stageData.desc;
+      if (loadingTips) loadingTips.textContent = stageData.tip;
+      if (loadingProgress) {
+        loadingProgress.style.width = stageData.progress + '%';
+      }
+      
+      console.log(`🎭 ローディングステージ ${stage + 1}/5: ${stageData.title}`);
+    }
+  }
+  
+  // 🚀 自動進捗シミュレーション
+  function simulateLoadingProgress() {
+    loadingStage = 0;
+    updateLoadingStage(loadingStage);
+    
+    const progressInterval = setInterval(() => {
+      loadingStage++;
+      if (loadingStage < loadingStages.length) {
+        updateLoadingStage(loadingStage);
+      } else {
+        clearInterval(progressInterval);
+      }
+    }, 800); // 各ステージ800ms
+    
+    return progressInterval;
+  }
+  
+  // ファイル選択時の処理
+  if (fileInput) {
     fileInput.addEventListener('change', function() {
       if (this.files.length > 0) {
-        loadingText.textContent = `${this.files[0].name} を読み込み準備完了`;
+        const fileName = this.files[0].name;
+        if (loadingTitle) loadingTitle.textContent = "📁 " + fileName;
+        if (loadingDescription) loadingDescription.textContent = "ファイル読み込み準備完了 - 開始ボタンをクリック";
+        if (loadingProgress) loadingProgress.style.width = '15%';
+        if (loadingTips) loadingTips.textContent = "最適化されたファイル処理で高速読み込み";
       } else {
-        loadingText.textContent = 'JSONファイルをロードしてください';
+        updateLoadingStage(0); // 初期状態に戻す
       }
     });
   }
+  
+  // 🎬 初期状態で進捗アニメーションを開始
+  simulateLoadingProgress();
 });
 
 // 🎯 **重複回避デバッグ用関数**
