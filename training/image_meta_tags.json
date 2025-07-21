@@ -73,16 +73,6 @@
     "description": "午後"
   },
   {
-    "image_file": "evening.png",
-    "folder": "common",
-    "meta_tags": [
-      "evening",
-      "evenings"
-    ],
-    "priority": 3,
-    "description": "夕方、夜"
-  },
-  {
     "image_file": "alarm.png",
     "folder": "common",
     "meta_tags": [
@@ -3491,10 +3481,12 @@
     "meta_tags": [
       "night",
       "nights",
-      "nighttime"
+      "nighttime",
+      "evening",
+      "evenings"
     ],
     "priority": 3,
-    "description": "夜"
+    "description": "夜、夕方"
   },
   {
     "image_file": "hospital.png",
