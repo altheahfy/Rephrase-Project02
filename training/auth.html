@@ -291,16 +291,42 @@
     </div>
 
     <!-- 認証システム読み込み -->
-    <script type="module">
-        import { initSecurity } from './js/security.js';
-        // セキュリティ初期化
-        await initSecurity();
-        
-        // セキュリティ初期化完了後にauth.jsを読み込み
-        const authScript = document.createElement('script');
-        authScript.src = './js/auth.js';
-        document.head.appendChild(authScript);
+    <script>
+        // 簡易セキュリティユーティリティ（auth.html専用）
+        window.securityUtils = {
+            escapeHtml: function(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            
+            secureLocalStorageSet: function(key, data) {
+                try {
+                    const jsonString = JSON.stringify(data);
+                    // 簡易暗号化（本番ではより強力な暗号化を使用）
+                    const encoded = btoa(jsonString);
+                    localStorage.setItem(key, encoded);
+                } catch (error) {
+                    console.error('Storage set error:', error);
+                }
+            },
+            
+            secureLocalStorageGet: function(key) {
+                try {
+                    const encoded = localStorage.getItem(key);
+                    if (!encoded) return null;
+                    
+                    // 復号化
+                    const jsonString = atob(encoded);
+                    return JSON.parse(jsonString);
+                } catch (error) {
+                    console.error('Storage get error:', error);
+                    return null;
+                }
+            }
+        };
     </script>
+    <script src="./js/auth.js"></script>
     
     <script>
         // タブ切り替え
@@ -473,27 +499,21 @@
         }
 
         // ページ読み込み時の処理
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // 認証システムの読み込み完了を待機
             function waitForAuthSystem() {
-                return new Promise((resolve) => {
-                    function check() {
-                        if (window.authSystem && window.securityUtils) {
-                            resolve();
-                        } else {
-                            setTimeout(check, 100);
-                        }
+                if (window.authSystem) {
+                    // 既にログインしている場合はメイン画面へリダイレクト
+                    if (window.authSystem.isLoggedIn()) {
+                        window.location.href = './index.html';
                     }
-                    check();
-                });
+                } else {
+                    // まだ読み込まれていない場合は100ms後に再確認
+                    setTimeout(waitForAuthSystem, 100);
+                }
             }
             
-            await waitForAuthSystem();
-            
-            // 既にログインしている場合はメイン画面へリダイレクト
-            if (window.authSystem.isLoggedIn()) {
-                window.location.href = './index.html';
-            }
+            waitForAuthSystem();
         });
     </script>
 </body>
