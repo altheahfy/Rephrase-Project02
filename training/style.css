@@ -1317,7 +1317,7 @@ h1 {
 
 /* 展開中の上位スロット（親）の基本スタイル */
 .slot-container.active-parent-slot {
-  background: rgba(254, 243, 199, 0.85) !important; /* 🌻 より濃い黄色背景 */
+  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 さらに濃い黄色背景 */
   border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
   border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
@@ -1346,7 +1346,7 @@ h1 {
 
 /* 展開中のサブスロットエリア全体のスタイル */
 .slot-wrapper.active-subslot-area {
-  background: rgba(254, 243, 199, 0.65) !important; /* 🌻 親よりやや薄い黄色 */
+  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 親と同じ濃い黄色背景 */
   border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
   border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
@@ -1378,7 +1378,7 @@ h1 {
 
 /* サブスロットラベルのタブ風デザイン */
 .subslot-label.tab-style {
-  background: linear-gradient(135deg, #fef3c7, #fde68a) !important; /* 🌻 より濃い黄色のグラデーション */
+  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 統一された濃い黄色背景 */
   color: #78716c !important; /* 🌻 薄い黄色背景に温かみのあるブラウン文字 */
   font-weight: bold !important;
   padding: 8px 16px !important;
@@ -1420,7 +1420,7 @@ h1 {
 
 /* タブ連結時の制御パネルのスタイル統一 */
 .subslot-control-panel.tab-connected {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.75), rgba(251, 191, 36, 0.5)) !important; /* 🌻 より濃い黄色系グラデーション */
+  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 統一された濃い黄色背景 */
   border: 1px solid #f59e0b !important; /* 🌻 黄色系境界線 */
   border-radius: 8px !important;
   box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4) !important; /* 🌻 より濃い黄色系シャドウ */
