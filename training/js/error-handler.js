@@ -12,7 +12,14 @@ class ErrorHandler {
         this.sensitivePatterns = this.initializeSensitivePatterns();
         
         this.initializeGlobalErrorHandling();
+        
         console.log('🛡️ エラーハンドリングシステム初期化完了');
+        console.log('📊 環境設定:', {
+            isProduction: this.isProduction,
+            maxLogSize: this.maxLogSize,
+            globalErrorCatch: '有効',
+            userFriendlyModal: this.isProduction ? '有効' : '無効'
+        });
     }
 
     /**
@@ -30,7 +37,20 @@ class ErrorHandler {
         
         // 過半数が true なら本番環境
         const productionScore = productionIndicators.filter(Boolean).length;
-        return productionScore >= 3;
+        const isProduction = productionScore >= 3;
+        
+        // デバッグ情報を出力
+        console.log('🔍 環境検出結果:', {
+            protocol: window.location.protocol,
+            hostname: window.location.hostname,
+            href: window.location.href,
+            hasDebugAttr: document.documentElement.hasAttribute('debug'),
+            productionIndicators,
+            productionScore,
+            isProduction
+        });
+        
+        return isProduction;
     }
 
     /**
@@ -115,8 +135,13 @@ class ErrorHandler {
      * グローバルエラーハンドリングの初期化
      */
     initializeGlobalErrorHandling() {
-        // JavaScript エラーキャッチ
+        // JavaScript エラーキャッチ（重要なもののみ）
         window.addEventListener('error', (event) => {
+            // 小さなエラーは無視
+            if (event.message && event.message.includes('Script error')) {
+                return;
+            }
+            
             this.handleGlobalError('javascript', event.error, {
                 filename: event.filename,
                 lineno: event.lineno,
@@ -125,8 +150,15 @@ class ErrorHandler {
             });
         });
 
-        // Promise リジェクションキャッチ
+        // Promise リジェクションキャッチ（重要なもののみ）
         window.addEventListener('unhandledrejection', (event) => {
+            // ネットワークエラーや小さなPromiseエラーは無視
+            if (event.reason && typeof event.reason === 'string' && 
+                (event.reason.includes('fetch') || event.reason.includes('load'))) {
+                console.warn('軽微なPromiseエラーをスキップ:', event.reason);
+                return;
+            }
+            
             this.handleGlobalError('promise', event.reason, {
                 promise: 'unhandled rejection'
             });
@@ -136,7 +168,14 @@ class ErrorHandler {
         if (!this.isProduction) {
             const originalConsoleError = console.error;
             console.error = (...args) => {
-                this.logError('console', args.join(' '), { level: 'error' });
+                // 軽微なエラーは記録のみ
+                const message = args.join(' ');
+                if (!message.includes('critical') && !message.includes('security')) {
+                    originalConsoleError.apply(console, args);
+                    return;
+                }
+                
+                this.logError('console', message, { level: 'error' });
                 originalConsoleError.apply(console, args);
             };
         }
@@ -157,11 +196,31 @@ class ErrorHandler {
 
         this.logError(type, error, context);
 
-        // 本番環境では詳細エラーを非表示
+        // 開発環境では自動モーダル表示を無効化
+        console.log('🔍 グローバルエラー捕捉:', {
+            type: type,
+            message: error?.message || error,
+            isProduction: this.isProduction,
+            url: window.location.href
+        });
+
+        // 本番環境でのみユーザーにエラー表示
         if (this.isProduction) {
-            this.showUserFriendlyError('system.unknown');
+            // 重要なエラーのみモーダル表示
+            const criticalPatterns = ['security', 'auth', 'critical'];
+            const isCritical = criticalPatterns.some(pattern => 
+                String(error?.message || error).toLowerCase().includes(pattern)
+            );
+            
+            if (isCritical) {
+                this.showUserFriendlyError('system.unknown');
+            }
         } else {
-            console.error('🚨 グローバルエラー:', errorInfo);
+            console.warn('🚨 グローバルエラー（開発環境）- モーダル非表示:', {
+                type: type,
+                message: error?.message || error,
+                context: context
+            });
         }
     }
 
@@ -432,12 +491,17 @@ class ErrorHandler {
     handleError(error, context = {}, userErrorCode = null) {
         this.logError('application', error, context);
 
-        if (userErrorCode) {
-            this.showUserFriendlyError(userErrorCode, error?.message);
+        // 明示的に要求された場合のみモーダル表示
+        if (userErrorCode && context.showModal !== false) {
+            if (userErrorCode) {
+                this.showUserFriendlyError(userErrorCode, error?.message);
+            } else {
+                // エラータイプの自動判定
+                const autoCode = this.detectErrorType(error);
+                this.showUserFriendlyError(autoCode, error?.message);
+            }
         } else {
-            // エラータイプの自動判定
-            const autoCode = this.detectErrorType(error);
-            this.showUserFriendlyError(autoCode, error?.message);
+            console.log('📝 エラーをログに記録（モーダル非表示）:', error?.message || error);
         }
     }
 
@@ -521,4 +585,13 @@ window.showUserError = (errorCode, details) => {
     window.errorHandler.showUserFriendlyError(errorCode, details);
 };
 
+// デバッグ用関数
+window.forceShowErrorModal = (message) => {
+    window.errorHandler.showUserFriendlyError('system.unknown', message || 'テストエラー');
+};
+
 console.log('🛡️ エラーハンドリングシステム準備完了');
+console.log('🔧 デバッグコマンド:');
+console.log('  - window.forceShowErrorModal("テスト") : エラーモーダルの強制表示');
+console.log('  - window.errorHandler.getErrorLog() : エラーログの確認');
+console.log('  - window.errorHandler.getErrorStats() : エラー統計の確認');

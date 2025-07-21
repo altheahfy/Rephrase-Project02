@@ -89,7 +89,15 @@
 
 <!-- 🔐 認証チェックとユーザー情報表示 -->
 <script>
+// 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
+const SKIP_AUTH_FOR_DEVELOPMENT = true;
+
 document.addEventListener('DOMContentLoaded', function() {
+    if (SKIP_AUTH_FOR_DEVELOPMENT) {
+        console.log('🚧 開発モード - 認証チェックをスキップ');
+        return;
+    }
+    
     console.log('🔐 認証チェック開始');
     
     // 認証システムが読み込まれるまで待機
@@ -108,7 +116,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!isLoggedIn) {
                 console.log('未ログイン - auth.htmlにリダイレクト');
-                window.location.href = './auth.html';
+                try {
+                    window.location.href = './auth.html';
+                } catch (error) {
+                    console.warn('リダイレクトエラー:', error);
+                    // リダイレクトに失敗した場合は警告のみ表示
+                    if (window.errorHandler) {
+                        window.errorHandler.handleError(error, { action: 'auth_redirect' }, 'auth.session_expired');
+                    }
+                }
                 return;
             }
             
@@ -138,7 +154,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    waitForAuth();
+    // 認証がスキップされていない場合のみ実行
+    if (!SKIP_AUTH_FOR_DEVELOPMENT) {
+        waitForAuth();
+    }
 });
 
 // ログアウト処理
