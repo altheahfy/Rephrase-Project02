@@ -113,6 +113,46 @@
     console.log('  - window.showUserError("auth.invalid_credentials")');
     console.log('  - window.forceShowErrorModal("テストメッセージ")');
 
+    // 🔐 管理者専用機能の隠しアクセス
+    window.showAdminPanel = function() {
+      const adminPanel = document.getElementById('adminPanel');
+      if (adminPanel) {
+        adminPanel.style.display = 'flex';
+        console.log('🔐 管理者パネルを表示しました');
+        console.log('🛡️ 監視ダッシュボード: rate-limit-dashboard.html');
+        console.log('⚠️ エラーダッシュボード: error-dashboard.html');
+      }
+    };
+
+    window.hideAdminPanel = function() {
+      const adminPanel = document.getElementById('adminPanel');
+      if (adminPanel) {
+        adminPanel.style.display = 'none';
+        console.log('🔐 管理者パネルを非表示にしました');
+      }
+    };
+
+    // キーボードショートカット（Ctrl+Shift+A）で管理者パネルを切り替え
+    document.addEventListener('keydown', function(event) {
+      if (event.ctrlKey && event.shiftKey && event.key === 'A') {
+        event.preventDefault();
+        const adminPanel = document.getElementById('adminPanel');
+        if (adminPanel) {
+          if (adminPanel.style.display === 'none' || !adminPanel.style.display) {
+            window.showAdminPanel();
+          } else {
+            window.hideAdminPanel();
+          }
+        }
+      }
+    });
+
+    // URLパラメータでの管理者パネル表示
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true') {
+      setTimeout(() => window.showAdminPanel(), 1000);
+    }
+
     // エラーハンドリングシステムの読み込み完了を待機
     document.addEventListener('DOMContentLoaded', function() {
       console.log('📱 DOM読み込み完了 - エラーハンドリング最終チェック');
@@ -238,9 +278,13 @@ function handleLogout() {
   <span style="color: #ccc;">|</span>
   <a href="grammar/" style="text-decoration: none; color: #2196F3; font-size: 14px;">📚 文法</a>
   <span style="color: #ccc;">|</span>
-  <a href="rate-limit-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">🛡️ 監視</a>
-  <a href="error-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">⚠️ エラー</a>
-  <span style="color: #ccc;">|</span>
+  
+  <!-- 🔐 管理者専用機能（隠し機能） -->
+  <div id="adminPanel" style="display: none; align-items: center; gap: 8px;">
+    <a href="rate-limit-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">🛡️ 監視</a>
+    <a href="error-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">⚠️ エラー</a>
+    <span style="color: #ccc;">|</span>
+  </div>
   
   <!-- サンプルデータ選択 -->
   <div style="display: flex; align-items: center; gap: 4px;">
