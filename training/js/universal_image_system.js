@@ -58,12 +58,17 @@ async function loadImageMetaTags() {
     console.log('📋 読み込まれたデータ（最初の3件）:', imageMetaTags.slice(0, 3));
     return true;
   } catch (error) {
-    console.error('❌ メタタグデータ読み込み失敗:', error);
-    console.error('🔍 エラー詳細:', {
-      message: error.message,
-      stack: error.stack,
-      currentURL: window.location.href
-    });
+    // セキュアなエラーハンドリング
+    if (window.errorHandler) {
+      window.errorHandler.handleError(error, { action: 'load_image_metadata' }, 'data.load_failed');
+    } else {
+      console.error('❌ メタタグデータ読み込み失敗:', error);
+      console.error('🔍 エラー詳細:', {
+        message: error.message,
+        stack: error.stack,
+        currentURL: window.location.href
+      });
+    }
     return false;
   }
 }

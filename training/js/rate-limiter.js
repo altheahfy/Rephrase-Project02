@@ -73,67 +73,85 @@ class RateLimiter {
      * @returns {Object} - {allowed: boolean, remaining: number, resetTime: number, message?: string}
      */
     checkLimit(action, identifier = 'default') {
-        const config = this.rateLimits[action];
-        if (!config) {
-            console.warn(`未定義のアクション: ${action}`);
-            return { allowed: true, remaining: Infinity, resetTime: 0 };
-        }
+        try {
+            const config = this.rateLimits[action];
+            if (!config) {
+                console.warn(`未定義のアクション: ${action}`);
+                return { allowed: true, remaining: Infinity, resetTime: 0 };
+            }
 
-        const key = `${action}:${identifier}`;
-        const now = Date.now();
+            const key = `${action}:${identifier}`;
+            const now = Date.now();
 
-        // ブロック状態チェック
-        if (this.isBlocked(key)) {
-            const blockInfo = this.blocked.get(key);
-            const remainingBlockTime = Math.ceil((blockInfo.until - now) / 1000);
+            // ブロック状態チェック
+            if (this.isBlocked(key)) {
+                const blockInfo = this.blocked.get(key);
+                const remainingBlockTime = Math.ceil((blockInfo.until - now) / 1000);
+                
+                return {
+                    allowed: false,
+                    remaining: 0,
+                    resetTime: blockInfo.until,
+                    message: `${config.message} (残り${remainingBlockTime}秒)`,
+                    blocked: true
+                };
+            }
+
+            // 要求ログの取得または初期化
+            if (!this.requestLog.has(key)) {
+                this.requestLog.set(key, []);
+            }
+
+            const requests = this.requestLog.get(key);
             
+            // 古い要求を削除（ウィンドウ外）
+            const windowStart = now - config.windowMs;
+            const validRequests = requests.filter(timestamp => timestamp > windowStart);
+            this.requestLog.set(key, validRequests);
+
+            // 制限チェック
+            if (validRequests.length >= config.maxAttempts) {
+                // 制限超過 - ブロック
+                this.blockIdentifier(key, config.blockDurationMs);
+                
+                return {
+                    allowed: false,
+                    remaining: 0,
+                    resetTime: now + config.blockDurationMs,
+                    message: config.message,
+                    blocked: true
+                };
+            }
+
+            // 要求を記録
+            validRequests.push(now);
+            this.requestLog.set(key, validRequests);
+
+            const remaining = config.maxAttempts - validRequests.length;
+            const resetTime = now + config.windowMs;
+
+            return {
+                allowed: true,
+                remaining: remaining,
+                resetTime: resetTime
+            };
+        } catch (error) {
+            // エラーハンドリング - 安全側に倒す
+            if (window.errorHandler) {
+                window.errorHandler.handleError(error, { action, identifier }, 'system.rate_limit_error');
+            } else {
+                console.error('Rate limit check error:', error);
+            }
+            
+            // セキュリティ優先で制限を適用
             return {
                 allowed: false,
                 remaining: 0,
-                resetTime: blockInfo.until,
-                message: `${config.message} (残り${remainingBlockTime}秒)`,
-                blocked: true
+                resetTime: Date.now() + 60000, // 1分間ブロック
+                message: 'システムエラーのため一時的に制限されています',
+                error: true
             };
         }
-
-        // 要求ログの取得または初期化
-        if (!this.requestLog.has(key)) {
-            this.requestLog.set(key, []);
-        }
-
-        const requests = this.requestLog.get(key);
-        
-        // 古い要求を削除（ウィンドウ外）
-        const windowStart = now - config.windowMs;
-        const validRequests = requests.filter(timestamp => timestamp > windowStart);
-        this.requestLog.set(key, validRequests);
-
-        // 制限チェック
-        if (validRequests.length >= config.maxAttempts) {
-            // 制限超過 - ブロック
-            this.blockIdentifier(key, config.blockDurationMs);
-            
-            return {
-                allowed: false,
-                remaining: 0,
-                resetTime: now + config.blockDurationMs,
-                message: config.message,
-                blocked: true
-            };
-        }
-
-        // 要求を記録
-        validRequests.push(now);
-        this.requestLog.set(key, validRequests);
-
-        const remaining = config.maxAttempts - validRequests.length;
-        const resetTime = now + config.windowMs;
-
-        return {
-            allowed: true,
-            remaining: remaining,
-            resetTime: resetTime
-        };
     }
 
     /**

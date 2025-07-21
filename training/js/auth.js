@@ -88,7 +88,12 @@ class AuthSystem {
             return { success: true, message: '登録が完了しました' };
 
         } catch (error) {
-            console.error('Registration error:', error);
+            // セキュアなエラーハンドリング
+            if (window.errorHandler) {
+                window.errorHandler.handleError(error, { action: 'register', username }, 'auth.registration_failed');
+            } else {
+                console.error('Registration error:', error);
+            }
             return { success: false, message: error.message };
         }
     }
@@ -143,7 +148,12 @@ class AuthSystem {
             };
 
         } catch (error) {
-            console.error('Login error:', error);
+            // セキュアなエラーハンドリング
+            if (window.errorHandler) {
+                window.errorHandler.handleError(error, { action: 'login', username }, 'auth.login_failed');
+            } else {
+                console.error('Login error:', error);
+            }
             return { success: false, message: error.message };
         }
     }
@@ -184,7 +194,12 @@ class AuthSystem {
             return false;
             
         } catch (error) {
-            console.error('Session restore error:', error);
+            // セキュアなエラーハンドリング
+            if (window.errorHandler) {
+                window.errorHandler.handleError(error, { action: 'session_restore' }, 'auth.session_error');
+            } else {
+                console.error('Session restore error:', error);
+            }
             this.clearSession();
             return false;
         }

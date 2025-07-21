@@ -718,7 +718,12 @@ class VoiceSystem {
             this.updateStatus('🎤 録音・認識開始...', 'recording');
             
         } catch (error) {
-            console.error('録音開始エラー:', error);
+            // セキュアなエラーハンドリング
+            if (window.errorHandler) {
+                window.errorHandler.handleError(error, { action: 'voice_recording_start' }, 'system.microphone_error');
+            } else {
+                console.error('録音開始エラー:', error);
+            }
             this.updateStatus(`❌ 録音エラー: ${error.message}`, 'error');
         }
     }
