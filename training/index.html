@@ -21,6 +21,39 @@
   </script>
   
   <!-- 🔐 認証システム -->
+  <script>
+    // 簡易セキュリティユーティリティ（index.html用）
+    window.securityUtils = {
+        escapeHtml: function(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        },
+        
+        secureLocalStorageSet: function(key, data) {
+            try {
+                const jsonString = JSON.stringify(data);
+                const encoded = btoa(jsonString);
+                localStorage.setItem(key, encoded);
+            } catch (error) {
+                console.error('Storage set error:', error);
+            }
+        },
+        
+        secureLocalStorageGet: function(key) {
+            try {
+                const encoded = localStorage.getItem(key);
+                if (!encoded) return null;
+                
+                const jsonString = atob(encoded);
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error('Storage get error:', error);
+                return null;
+            }
+        }
+    };
+  </script>
   <script src="js/auth.js"></script>
   
   <script src="js/subslot_toggle.js">
@@ -55,22 +88,37 @@
 <!-- 🔐 認証チェックとユーザー情報表示 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔐 認証チェック開始');
+    
     // 認証システムが読み込まれるまで待機
     function waitForAuth() {
-        if (window.authSystem) {
+        console.log('認証システム確認中...', {
+            authSystem: !!window.authSystem,
+            securityUtils: !!window.securityUtils
+        });
+        
+        if (window.authSystem && window.securityUtils) {
+            console.log('認証システム読み込み完了');
+            
             // ログインチェック
-            if (!window.authSystem.isLoggedIn()) {
-                // 未ログインの場合はログイン画面へリダイレクト
+            const isLoggedIn = window.authSystem.isLoggedIn();
+            console.log('ログイン状態:', isLoggedIn);
+            
+            if (!isLoggedIn) {
+                console.log('未ログイン - auth.htmlにリダイレクト');
                 window.location.href = './auth.html';
                 return;
             }
             
             // ログイン済みの場合はユーザー情報を表示
             const user = window.authSystem.getCurrentUser();
+            console.log('現在のユーザー:', user);
+            
             if (user) {
                 // ナビゲーションにユーザー情報を追加
                 const nav = document.querySelector('div[style*="position: fixed; top: 10px; left: 10px"]');
                 if (nav) {
+                    console.log('ユーザー情報をナビゲーションに追加');
                     const userInfo = document.createElement('div');
                     userInfo.innerHTML = `
                         <span style="color: #ccc;">|</span>
@@ -78,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button onclick="handleLogout()" style="background: #dc3545; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 4px;">ログアウト</button>
                     `;
                     nav.appendChild(userInfo);
+                } else {
+                    console.warn('ナビゲーション要素が見つかりません');
                 }
             }
         } else {
@@ -92,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ログアウト処理
 function handleLogout() {
     if (window.authSystem && confirm('ログアウトしますか？')) {
+        console.log('ログアウト実行');
         window.authSystem.logout();
         window.location.href = './auth.html';
     }
