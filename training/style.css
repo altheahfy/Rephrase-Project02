@@ -82,14 +82,20 @@ body {
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   
-  /* 🎨 教育向け最適化背景 - 目に優しい微細グラデーション */
+  /* 🎨 教育向け最適化背景 - 知的で落ち着いたグラデーション */
   background: linear-gradient(135deg, 
-    #f8fafb 0%, 
-    #f1f4f6 25%, 
-    #eef2f5 75%, 
-    #e8ecf0 100%
+    #f7f9fc 0%,     /* 僅かにブルー系の白 */
+    #f0f4f8 25%,    /* 微細なブルーグレー */
+    #e2e8f0 75%,    /* より明確なブルーグレー */
+    #d1dae6 100%    /* 穏やかなブルーグレー */
   );
   background-attachment: fixed; /* スクロール時も背景固定 */
+  
+  /* 🎓 教育系らしい装飾パターン（オプション） */
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(66, 165, 245, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 152, 0, 0.02) 0%, transparent 50%);
   
   color: var(--text-primary);
   line-height: 1.6;
