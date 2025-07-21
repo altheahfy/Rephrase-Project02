@@ -1318,18 +1318,30 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
           hideLoadingOverlay();
         } catch (error) {
           console.error("プリセットJSONデータの処理に失敗:", error);
-          alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+          if (window.errorHandler) {
+            window.errorHandler.handleError(error, { action: 'preset_json_processing' }, 'data.load_failed');
+          } else {
+            alert(`プリセットJSONデータの処理に失敗しました: ${error.message}`);
+          }
           hideLoadingOverlay();
         }
       })
       .catch(error => {
         console.error(`${selectedPreset}の読み込みに失敗:`, error);
-        alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
+        if (window.errorHandler) {
+          window.errorHandler.handleError(error, { action: 'preset_json_loading', preset: selectedPreset }, 'network.connection_failed');
+        } else {
+          alert(`データセットの読み込みに失敗しました。\nローカルファイルの場合は、ファイル選択から対応するJSONファイルを選択してください。\n\nエラー詳細: ${error.message}`);
+        }
         hideLoadingOverlay();
       });
     return; // 早期リターン
   } else {
-    alert("不明なプリセットが選択されました");
+    if (window.errorHandler) {
+      window.errorHandler.handleError(new Error('Unknown preset selected'), { preset: selectedPreset }, 'data.validation_failed');
+    } else {
+      alert("不明なプリセットが選択されました");
+    }
     hideLoadingOverlay();
     return;
   }
@@ -1339,7 +1351,11 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
 document.getElementById("loadJsonButton").addEventListener("click", () => {
   const fileInput = document.getElementById("jsonFileInput");
   if (fileInput.files.length === 0) {
-    alert("ファイルを選択してください");
+    if (window.errorHandler) {
+      window.errorHandler.handleError(new Error('No file selected'), { action: 'file_selection' }, 'general.invalid_input');
+    } else {
+      alert("ファイルを選択してください");
+    }
     return;
   }
   

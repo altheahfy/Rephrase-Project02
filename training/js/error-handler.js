@@ -50,13 +50,13 @@ class ErrorHandler {
 
             // データエラー
             'data.not_found': '要求されたデータが見つかりません',
-            'data.validation_failed': '入力データが無効です',
+            'data.validation_failed': '入力データが無効です。正しい形式で入力してください',
             'data.save_failed': 'データの保存に失敗しました',
-            'data.load_failed': 'データの読み込みに失敗しました',
+            'data.load_failed': 'データファイルの読み込みに失敗しました。ファイルが存在するか確認してください',
             'data.corrupt': 'データが破損している可能性があります',
 
             // ネットワークエラー
-            'network.connection_failed': 'ネットワーク接続に失敗しました',
+            'network.connection_failed': 'ファイルの読み込みに失敗しました。ファイルパスが正しいか確認してください',
             'network.timeout': '通信がタイムアウトしました',
             'network.server_error': 'サーバーエラーが発生しました',
             'network.service_unavailable': 'サービスが一時的に利用できません',
@@ -70,7 +70,7 @@ class ErrorHandler {
             'system.microphone_error': 'マイクへのアクセスでエラーが発生しました',
 
             // 一般的なエラー
-            'general.invalid_input': '入力内容に問題があります',
+            'general.invalid_input': '選択または入力内容に問題があります',
             'general.operation_failed': '操作に失敗しました',
             'general.try_again': '再度お試しください'
         };
