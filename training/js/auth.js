@@ -48,10 +48,8 @@ class AuthSystem {
      */
     async register(username, password, email) {
         try {
-            // 入力値検証
-            if (!this.validateInput(username, password, email)) {
-                throw new Error('入力値が無効です');
-            }
+            // 入力値検証（詳細なエラーメッセージ付き）
+            this.validateInput(username, password, email);
 
             // 既存ユーザーチェック
             if (this.userExists(username)) {
@@ -182,28 +180,33 @@ class AuthSystem {
     validateInput(username, password, email = null) {
         // ユーザー名検証
         if (!username || username.length < 3 || username.length > 20) {
-            return false;
+            throw new Error('ユーザー名は3文字以上20文字以下で入力してください');
         }
         
         if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-            return false;
+            throw new Error('ユーザー名は英数字とアンダースコアのみ使用可能です');
         }
 
         // パスワード検証
         if (!password || password.length < 8) {
-            return false;
+            throw new Error('パスワードは8文字以上で入力してください');
         }
 
-        // 強いパスワードチェック
-        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-            return false;
+        // パスワード強度チェック（少し緩和）
+        let missingRequirements = [];
+        if (!/[a-z]/.test(password)) missingRequirements.push('小文字');
+        if (!/[A-Z]/.test(password)) missingRequirements.push('大文字');
+        if (!/\d/.test(password)) missingRequirements.push('数字');
+        
+        if (missingRequirements.length > 1) {
+            throw new Error(`パスワードには${missingRequirements.join('、')}を含めてください`);
         }
 
         // メール検証（登録時のみ）
         if (email !== null) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                return false;
+                throw new Error('有効なメールアドレスを入力してください');
             }
         }
 
