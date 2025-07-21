@@ -1,9 +1,87 @@
-/* 基本レイアウト設宁E*/
+/* 🎨 Rephrase カラーシステム (Material Design 3.0風) */
+:root {
+  /* === プライマリカラー (英語学習ブランド) === */
+  --primary-50: #e8f5e8;
+  --primary-100: #c8e6c8;
+  --primary-200: #a5d6a5;
+  --primary-300: #81c784;
+  --primary-400: #66bb6a;
+  --primary-500: #4caf50;  /* メインブランドカラー */
+  --primary-600: #43a047;
+  --primary-700: #388e3c;
+  --primary-800: #2e7d32;
+  --primary-900: #1b5e20;
+
+  /* === セカンダリカラー (アクセント・補助) === */
+  --secondary-50: #e3f2fd;
+  --secondary-100: #bbdefb;
+  --secondary-200: #90caf9;
+  --secondary-300: #64b5f6;
+  --secondary-400: #42a5f5;
+  --secondary-500: #2196f3;  /* セカンダリブランド */
+  --secondary-600: #1e88e5;
+  --secondary-700: #1976d2;
+  --secondary-800: #1565c0;
+  --secondary-900: #0d47a1;
+
+  /* === ニュートラルカラー (グレースケール) === */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #eeeeee;
+  --neutral-300: #e0e0e0;
+  --neutral-400: #bdbdbd;
+  --neutral-500: #9e9e9e;
+  --neutral-600: #757575;
+  --neutral-700: #616161;
+  --neutral-800: #424242;
+  --neutral-900: #212121;
+
+  /* === 機能的カラー === */
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: #2196f3;
+
+  /* === サーフェスカラー === */
+  --surface-primary: #ffffff;
+  --surface-secondary: var(--neutral-50);
+  --surface-tertiary: var(--neutral-100);
+  --surface-inverse: var(--neutral-800);
+
+  /* === テキストカラー === */
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-700);
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-50);
+
+  /* === シャドウシステム === */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* === ボーダーシステム === */
+  --border-light: 1px solid var(--neutral-200);
+  --border-medium: 1px solid var(--neutral-300);
+  --border-strong: 2px solid var(--neutral-400);
+
+  /* === 角丸システム === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+/* 基本レイアウト設定 */
 body {
-  min-height: 100vh; /* ビューポ�Eト�E体�E高さを確俁E*/
+  min-height: 100vh;
   margin: 0;
   padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background-color: var(--surface-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
 /* 🚨 最優先：サブスロチE��制御パネル専用ルール�E�他�Eルールより優先！E*/
@@ -12,42 +90,83 @@ body {
   /* 🎯 チE��スト�E容のみ透�E化、枠�E�背景・墁E��線）�E残す */
 }
 
-/* 右上�Eファイル選択�Eロードエリアのスタイル */
+/* 右上のファイル選択・ロードエリアのスタイル */
 #file-load-area {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--surface-primary);
+  border: var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
   min-width: 180px;
+  padding: 16px;
 }
 
 #file-load-area input[type="file"] {
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 3px;
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#file-load-area input[type="file"]:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+#file-load-area button {
+  background: var(--primary-500);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  padding: 10px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 #file-load-area button:hover {
-  background-color: #1976D2;
+  background-color: var(--primary-600);
+  transform: translateY(-1px);
 }
 
-/* 解答�E斁E��グルボタンのスタイル */
+/* 解答表示エリアトグルボタンのスタイル */
 #toggle-dynamic-area {
-  transition: background-color 0.3s ease;
+  background: var(--secondary-500);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  padding: 12px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 #toggle-dynamic-area:hover {
-  opacity: 0.8;
+  background: var(--secondary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 #toggle-dynamic-area:active {
-  transform: scale(0.95);
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 基本皁E��タイトル要素の余白調整 */
+/* 基本的なタイトル要素の余白調整 */
 h1 {
-  margin-top: 20px;
-  margin-bottom: 15px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 2rem;
+}
 }
 
 /* 🎤 音声学習シスチE��パネルのスタイル */
