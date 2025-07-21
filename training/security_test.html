@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Rephrase セキュリティテスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 3px; cursor: pointer; }
+        .test-btn { background: #007bff; color: white; }
+        .danger-btn { background: #dc3545; color: white; }
+        textarea { width: 100%; height: 100px; margin: 10px 0; }
+        #results { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔒 Rephrase セキュリティテスト</h1>
+    
+    <div class="test-section">
+        <h2>1. 基本セキュリティモジュール動作確認</h2>
+        <button class="test-btn" onclick="testBasicSecurity()">基本機能テスト</button>
+        <div id="basic-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 入力値サニタイゼーションテスト</h2>
+        <textarea id="test-input" placeholder="テスト用の入力値を入れてください（例: <script>alert('XSS')</script>）"></textarea>
+        <button class="test-btn" onclick="testSanitization()">サニタイゼーションテスト</button>
+        <div id="sanitization-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. ファイルアップロード検証テスト</h2>
+        <input type="file" id="test-file" multiple>
+        <button class="test-btn" onclick="testFileValidation()">ファイル検証テスト</button>
+        <div id="file-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. セキュアローカルストレージテスト</h2>
+        <input type="text" id="storage-key" placeholder="キー" value="test_key">
+        <input type="text" id="storage-value" placeholder="値" value="テストデータ123">
+        <button class="test-btn" onclick="testSecureStorage()">暗号化保存テスト</button>
+        <button class="test-btn" onclick="testStorageRetrieval()">暗号化読み込みテスト</button>
+        <div id="storage-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. 攻撃パターンテスト（安全な環境での確認）</h2>
+        <button class="danger-btn" onclick="testXSSPatterns()">XSS攻撃パターンテスト</button>
+        <button class="danger-btn" onclick="testScriptInjection()">スクリプトインジェクションテスト</button>
+        <div id="attack-results"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script type="module">
+        import { 
+            escapeHtml, 
+            safeJsonParse, 
+            validateFileUpload, 
+            secureLocalStorageSet, 
+            secureLocalStorageGet,
+            detectScriptInjection,
+            validateURL
+        } from './js/security.js';
+
+        // グローバルに公開してテスト関数から使用可能にする
+        window.securityUtils = {
+            escapeHtml,
+            safeJsonParse,
+            validateFileUpload,
+            secureLocalStorageSet,
+            secureLocalStorageGet,
+            detectScriptInjection,
+            validateURL
+        };
+
+        window.testBasicSecurity = function() {
+            const results = document.getElementById('basic-results');
+            let html = '<h3>基本機能テスト結果:</h3>';
+            
+            try {
+                // セキュリティユーティリティの存在確認
+                if (window.securityUtils) {
+                    html += '<p class="pass">✅ セキュリティモジュール読み込み成功</p>';
+                } else {
+                    html += '<p class="fail">❌ セキュリティモジュール読み込み失敗</p>';
+                }
+
+                // CSPヘッダーの確認
+                const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (cspMeta) {
+                    html += '<p class="pass">✅ Content Security Policy設定済み</p>';
+                } else {
+                    html += '<p class="warning">⚠️ Content Security Policy未設定</p>';
+                }
+
+                // XFO ヘッダーの確認
+                const xfoMeta = document.querySelector('meta[http-equiv="X-Frame-Options"]');
+                if (xfoMeta) {
+                    html += '<p class="pass">✅ X-Frame-Options設定済み</p>';
+                } else {
+                    html += '<p class="warning">⚠️ X-Frame-Options未設定</p>';
+                }
+
+                // HTTPS チェック
+                if (location.protocol === 'https:') {
+                    html += '<p class="pass">✅ HTTPS通信</p>';
+                } else {
+                    html += '<p class="warning">⚠️ HTTP通信（本番環境ではHTTPS推奨）</p>';
+                }
+
+            } catch (error) {
+                html += `<p class="fail">❌ テストエラー: ${error.message}</p>`;
+            }
+            
+            results.innerHTML = html;
+        };
+
+        window.testSanitization = function() {
+            const input = document.getElementById('test-input').value;
+            const results = document.getElementById('sanitization-results');
+            let html = '<h3>サニタイゼーションテスト結果:</h3>';
+            
+            try {
+                const sanitized = window.securityUtils.escapeHtml(input);
+                html += `<p><strong>元の入力:</strong> ${input}</p>`;
+                html += `<p><strong>サニタイズ後:</strong> ${sanitized}</p>`;
+                
+                if (input !== sanitized) {
+                    html += '<p class="pass">✅ サニタイゼーション正常動作</p>';
+                } else {
+                    html += '<p class="warning">⚠️ 変更なし（安全な入力の可能性）</p>';
+                }
+
+                // スクリプトインジェクション検出テスト
+                const isScript = window.securityUtils.detectScriptInjection(input);
+                if (isScript) {
+                    html += '<p class="warning">⚠️ スクリプトインジェクションパターン検出</p>';
+                } else {
+                    html += '<p class="pass">✅ 安全な入力として判定</p>';
+                }
+
+            } catch (error) {
+                html += `<p class="fail">❌ サニタイゼーションエラー: ${error.message}</p>`;
+            }
+            
+            results.innerHTML = html;
+        };
+
+        window.testFileValidation = function() {
+            const fileInput = document.getElementById('test-file');
+            const results = document.getElementById('file-results');
+            let html = '<h3>ファイル検証テスト結果:</h3>';
+            
+            if (fileInput.files.length === 0) {
+                html += '<p class="warning">⚠️ ファイルが選択されていません</p>';
+            } else {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    const validation = window.securityUtils.validateFileUpload(file);
+                    
+                    html += `<div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">`;
+                    html += `<p><strong>ファイル ${i + 1}:</strong> ${file.name}</p>`;
+                    html += `<p><strong>サイズ:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>`;
+                    html += `<p><strong>タイプ:</strong> ${file.type}</p>`;
+                    
+                    if (validation.valid) {
+                        html += '<p class="pass">✅ 検証成功</p>';
+                    } else {
+                        html += '<p class="fail">❌ 検証失敗</p>';
+                        html += `<p class="fail">エラー: ${validation.errors.join(', ')}</p>`;
+                    }
+                    html += '</div>';
+                }
+            }
+            
+            results.innerHTML = html;
+        };
+
+        window.testSecureStorage = function() {
+            const key = document.getElementById('storage-key').value;
+            const value = document.getElementById('storage-value').value;
+            const results = document.getElementById('storage-results');
+            
+            try {
+                window.securityUtils.secureLocalStorageSet(key, value);
+                results.innerHTML = '<p class="pass">✅ セキュア保存成功</p>';
+            } catch (error) {
+                results.innerHTML = `<p class="fail">❌ 保存エラー: ${error.message}</p>`;
+            }
+        };
+
+        window.testStorageRetrieval = function() {
+            const key = document.getElementById('storage-key').value;
+            const results = document.getElementById('storage-results');
+            
+            try {
+                const retrieved = window.securityUtils.secureLocalStorageGet(key);
+                if (retrieved !== null) {
+                    results.innerHTML += `<p class="pass">✅ セキュア読み込み成功: ${retrieved}</p>`;
+                } else {
+                    results.innerHTML += '<p class="warning">⚠️ データが見つかりません</p>';
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="fail">❌ 読み込みエラー: ${error.message}</p>`;
+            }
+        };
+
+        window.testXSSPatterns = function() {
+            const results = document.getElementById('attack-results');
+            let html = '<h3>XSS攻撃パターンテスト結果:</h3>';
+            
+            const xssPatterns = [
+                '<script>alert("XSS")</script>',
+                'javascript:alert("XSS")',
+                '<img src="x" onerror="alert(\'XSS\')">',
+                '<div onmouseover="alert(\'XSS\')">hover me</div>',
+                '"><script>alert("XSS")</script>',
+                "';alert('XSS');//"
+            ];
+            
+            xssPatterns.forEach((pattern, index) => {
+                const sanitized = window.securityUtils.escapeHtml(pattern);
+                const detected = window.securityUtils.detectScriptInjection(pattern);
+                
+                html += `<div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">`;
+                html += `<p><strong>パターン ${index + 1}:</strong> ${pattern}</p>`;
+                html += `<p><strong>サニタイズ後:</strong> ${sanitized}</p>`;
+                html += detected ? 
+                    '<p class="pass">✅ 攻撃パターンとして正しく検出</p>' : 
+                    '<p class="fail">❌ 攻撃パターンが未検出</p>';
+                html += '</div>';
+            });
+            
+            results.innerHTML = html;
+        };
+
+        window.testScriptInjection = function() {
+            const results = document.getElementById('attack-results');
+            results.innerHTML += '<h3>スクリプトインジェクションテスト:</h3>';
+            
+            const testJson = '{"name": "test<script>alert(123)</script>", "value": "test"}';
+            const parsed = window.securityUtils.safeJsonParse(testJson);
+            
+            if (parsed && parsed.name && !parsed.name.includes('<script>')) {
+                results.innerHTML += '<p class="pass">✅ JSONパース時のXSSが正しく防御されました</p>';
+            } else {
+                results.innerHTML += '<p class="fail">❌ JSONパース時のXSS防御に問題があります</p>';
+            }
+        };
+
+        // ページ読み込み時に基本テストを実行
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                window.testBasicSecurity();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
