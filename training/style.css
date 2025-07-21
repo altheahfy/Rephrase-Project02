@@ -167,9 +167,8 @@ h1 {
   font-weight: 600;
   font-size: 2rem;
 }
-}
 
-/* 🎤 音声学習シスチE��パネルのスタイル */
+/* 🎤 音声学習システムパネルのスタイル */
 .voice-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -545,8 +544,11 @@ h1 {
   justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
   
   /* order属性への対応を追加 */
-  order: 0; /* チE��ォルト値 */
-  border: 1px solid #eee; /* 墁E��線を追加して区別しやすく */
+  order: 0; /* デフォルト値 */
+  border: var(--border-light); /* 新しいカラーシステムの境界線 */
+  border-radius: var(--radius-md); /* 角丸を追加 */
+  background: var(--surface-primary); /* 背景色を明確に */
+  box-shadow: var(--shadow-sm); /* 軽いシャドウを追加 */
   padding: 15px; /* パディングも拡大 */
   margin: 4px 4px 20px 4px; /* 下部マ�Eジンを拡大 */
   
@@ -647,10 +649,12 @@ h1 {
   hyphens: auto;
   white-space: normal; /* 改行を許可 */
   
-  /* �E 例文チE��ストエリアを�E確にする薁E��オレンジの背景と黒い緁E*/
-  background-color: #ffd6a5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
+  /* 例文テキストエリアを明確にする新デザイン */
+  background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+  border: var(--border-medium);
+  border-color: var(--warning);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 /* スロチE��頁E��制御用 - JS側でdata-order属性を設定した場合�E優先度 */
@@ -785,14 +789,23 @@ h1 {
 
 .slot-container .subslot-toggle-button button {
   font-size: 10px;
-  padding: 2px 8px;
+  padding: 4px 12px;
   margin: 0;
-  min-height: 18px;
-  background-color: #4a90e2;
+  min-height: 20px;
+  background: var(--info);
   color: white;
   border: none;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.slot-container .subslot-toggle-button button:hover {
+  background: var(--secondary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* 🎯 Grid衁E: 個別ランダマイズボタン�E�忁E��6番目に配置�E�E 常に表示 */
@@ -810,14 +823,23 @@ h1 {
 
 .slot-container .individual-randomize-button button {
   font-size: 11px;
-  padding: 2px 8px;
+  padding: 4px 12px;
   margin: 0;
-  min-height: 18px;
-  background-color: #ff9800;
+  min-height: 20px;
+  background: var(--warning);
   color: white;
   border: none;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.slot-container .individual-randomize-button button:hover {
+  background: #f57c00;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* 動的記載エリアを横並びに設宁E- 位置の修正 */
