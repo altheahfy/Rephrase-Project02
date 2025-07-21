@@ -82,12 +82,12 @@ body {
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   
-  /* 🎨 教育向け最適化背景 - より明確なグラデーション */
+  /* 🎮 ゲーミング教育プラットフォーム背景 - アグレッシブブルー */
   background: linear-gradient(135deg, 
-    #f8fafc 0%,     /* 明確にブルー系の白 */
-    #e2e8f0 25%,    /* より濃いブルーグレー */
-    #cbd5e1 75%,    /* 確実に見えるブルーグレー */
-    #94a3b8 100%    /* しっかりとしたブルーグレー */
+    #3b82f6 0%,     /* 鮮やかなブルー */
+    #2563eb 25%,    /* より濃いブルー */
+    #1d4ed8 75%,    /* 深いブルー */
+    #1e40af 100%    /* ダークブルー */
   );
   background-attachment: fixed; /* スクロール時も背景固定 */
   
@@ -109,7 +109,7 @@ body {
 
 /* 右上のファイル選択・ロードエリアのスタイル */
 #file-load-area {
-  background: var(--surface-primary);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); /* 🎮 薄い黄色のグラデーション */
   border: var(--border-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg); /* より立体感のあるシャドウ */
@@ -564,8 +564,8 @@ h1 {
   order: 0; /* デフォルト値 */
   border: var(--border-light); /* 新しいカラーシステムの境界線 */
   border-radius: var(--radius-md); /* 角丸を追加 */
-  background: var(--surface-primary); /* 背景色を明確に */
-  box-shadow: var(--shadow-md); /* より目立つシャドウに変更 */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* 🎮 エメラルドグリーンのグラデーション */
+  box-shadow: var(--shadow-lg); /* より目立つシャドウに変更 */
   padding: 15px; /* パディングも拡大 */
   margin: 4px 4px 20px 4px; /* 下部マ�Eジンを拡大 */
   
@@ -595,7 +595,7 @@ h1 {
   height: 100%; /* セル高さを完�Eに使用 */
   font-size: 18px; /* フォントサイズを拡大 */
   font-weight: bold;
-  color: #333;
+  color: #ffffff; /* 🎮 エメラルド背景に白文字 */
   text-align: center;
   margin: 0;
   padding: 0;
@@ -630,9 +630,9 @@ h1 {
   justify-content: center;
   width: 100%;
   height: 100%; /* セル高さを完�Eに使用 */
-  font-size: 11px; /* 日本語補助チE��スト用に小さぁE*/
+  font-size: 11px; /* 日本語補助テキスト用に小さく */
   font-weight: 400;
-  color: #777;
+  color: #ffffff; /* 🎮 エメラルド背景に白文字 */
   text-align: center;
   margin: 0;
   padding: 4px;
@@ -1378,8 +1378,8 @@ h1 {
 
 /* サブスロットラベルのタブ風デザイン */
 .subslot-label.tab-style {
-  background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-  color: white !important;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b) !important; /* 🎮 薄い黄色のグラデーション */
+  color: #000000 !important; /* 🎮 黄色背景に黒文字 */
   font-weight: bold !important;
   padding: 8px 16px !important;
   border-radius: 8px 8px 0 0 !important;
