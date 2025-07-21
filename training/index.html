@@ -57,6 +57,68 @@
   <script src="js/rate-limiter.js"></script>
   <script src="js/error-handler.js"></script>
   <script src="js/auth.js"></script>
+
+  <!-- エラーハンドリング関数の確実な定義 -->
+  <script>
+    // 即座に関数を定義（DOMContentLoadedを待たない）
+    console.log('🔧 エラーハンドリング関数を即座に定義中...');
+    
+    window.showUserError = function(errorCode, details) {
+      console.log('🔧 showUserError called:', errorCode, details);
+      if (window.errorHandler) {
+        window.errorHandler.showUserFriendlyError(errorCode, details);
+      } else {
+        console.error('エラーハンドリングシステムが読み込まれていません');
+        alert(`エラー: ${errorCode} - ${details}`);
+      }
+    };
+
+    window.forceShowErrorModal = function(message) {
+      console.log('🔧 forceShowErrorModal called:', message);
+      if (window.errorHandler) {
+        window.errorHandler.showUserFriendlyError('system.unknown', message || 'テストエラー');
+      } else {
+        console.error('エラーハンドリングシステムが読み込まれていません');
+        alert(`テストエラー: ${message}`);
+      }
+    };
+
+    window.testErrorHandler = function() {
+      console.log('🧪 エラーハンドリングテスト開始');
+      console.log('現在のスクリプト実行タイミング:', document.readyState);
+      console.log('errorHandler:', typeof window.errorHandler);
+      console.log('showUserError:', typeof window.showUserError);
+      console.log('forceShowErrorModal:', typeof window.forceShowErrorModal);
+      
+      // 基本テスト
+      console.log('📝 基本テスト実行中...');
+      window.showUserError('auth.invalid_credentials', 'テスト用認証エラー');
+    };
+
+    window.checkErrorHandlerStatus = function() {
+      console.log('🔍 エラーハンドリングシステム状態:');
+      console.log('  - window.errorHandler:', !!window.errorHandler);
+      console.log('  - errorHandler type:', typeof window.errorHandler);
+      if (window.errorHandler) {
+        console.log('  - getErrorLog:', typeof window.errorHandler.getErrorLog);
+        console.log('  - showUserFriendlyError:', typeof window.errorHandler.showUserFriendlyError);
+        console.log('  - エラーログ件数:', window.errorHandler.getErrorLog(1).length);
+      }
+    };
+
+    console.log('✅ エラーハンドリング関数を即座に定義しました');
+    console.log('🧪 利用可能なコマンド:');
+    console.log('  - window.testErrorHandler()');
+    console.log('  - window.checkErrorHandlerStatus()');
+    console.log('  - window.showUserError("auth.invalid_credentials")');
+    console.log('  - window.forceShowErrorModal("テストメッセージ")');
+
+    // エラーハンドリングシステムの読み込み完了を待機
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📱 DOM読み込み完了 - エラーハンドリング最終チェック');
+      window.checkErrorHandlerStatus();
+    });
+  </script>
   
   <script src="js/subslot_toggle.js">
   </script>
