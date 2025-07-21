@@ -1078,9 +1078,9 @@ h1 {
   min-height: 380px !important; /* 🎯 他�EスロチE��と同じ最小高さ */
   margin: 4px 4px 20px 4px !important; /* 🎯 他�EスロチE��と同じマ�Eジン */
   padding: 15px !important; /* 🎯 他�EスロチE��と同じパディング */
-  border: 1px solid #eee !important; /* スロチE��と同じボ�Eダー */
-  border-radius: 0 !important; /* スロチE��と同じ角丸なぁE*/
-  background-color: white !important; /* 背景色を白に統一 */
+  border: 1px solid #eee !important; /* スロットと同じボーダー */
+  border-radius: 0 !important; /* スロットと同じ角丸なし */
+  background: linear-gradient(180deg, #e8f5e8 0%, #c8e6c8 50%, #a5d6a5 100%) !important; /* 🌱 スロットと同じ薄い緑の縦グラデーション */
   align-items: center;
   justify-items: center;
   box-sizing: border-box !important;
@@ -1101,9 +1101,9 @@ h1 {
 /* 疑問詞ラベル - Grid衁E */
 #display-top-question-word .question-word-label {
   grid-row: 1;
-  font-size: 18px; /* スロチE��ラベルと同じサイズ */
+  font-size: 18px; /* スロットラベルと同じサイズ */
   font-weight: bold;
-  color: #333;
+  color: #2d5a2d; /* 🌱 スロットと同じ濃い緑文字 */
   text-align: center;
   display: flex;
   align-items: center;
