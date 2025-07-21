@@ -1,8 +1,20 @@
 
-// randomizer_controller.js（グローバル関数対応）
+// randomizer_controller.js（グローバル関数対応 + セキュリティ強化）
 import { randomizeAll } from './randomizer_all.js';
+import { validateFileUpload, escapeHtml } from './security.js';
 
 export function handleExcelFileUpload(file) {
+  // 🔒 ファイルアップロードのセキュリティ検証
+  const validation = validateFileUpload(file);
+  if (!validation.valid) {
+    const errorMsg = '🔒 セキュリティエラー:\n' + validation.errors.join('\n');
+    alert(errorMsg);
+    console.error('🔒 ファイルアップロード拒否:', validation.errors);
+    return;
+  }
+  
+  console.log('🔒 ファイルアップロード検証 OK:', file.name);
+  
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
@@ -45,16 +57,23 @@ export function handleExcelFileUpload(file) {
         continue;
       }
 
+      // 🔒 入力値のサニタイゼーション
+      const safeInternal = escapeHtml(String(internal).trim());
+      const safeValue = escapeHtml(String(value).trim());
+
       let slotId = '';
-      if (internal.startsWith('sub_')) {
-        slotId = `slot-o1-sub-${internal.replace('sub_', '')}`;
+      if (safeInternal.startsWith('sub_')) {
+        slotId = `slot-o1-sub-${safeInternal.replace('sub_', '')}`;
       } else {
-        slotId = `slot-${internal}`;
+        slotId = `slot-${safeInternal}`;
       }
-      slotData[slotId] = value;
+      
+      // 🔒 安全な値をスロットデータに格納
+      slotData[slotId] = safeValue;
     }
 
     console.log('📘 構文スロットデータ:', slotData);
+    console.log('🔒 データ処理完了（セキュリティチェック済み）');
     randomizeAll(slotData);
   };
   reader.readAsArrayBuffer(file);

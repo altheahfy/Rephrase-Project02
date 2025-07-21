@@ -2,11 +2,24 @@
 <html lang="en">
  <head>
   <meta charset="utf-8"/>
+  <!-- 🔒 セキュリティヘッダー（基本設定） -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none';">
+  
   <title>
    Rephrase トレーニングUI
   </title>
   <link href="style.css" rel="stylesheet"/>
   <link href="css/voice_progress.css" rel="stylesheet"/>
+  
+  <!-- 🔒 セキュリティモジュール（最優先で読み込み） -->
+  <script type="module">
+    import { initSecurity } from './js/security.js';
+    // DOMContentLoaded前にセキュリティ初期化
+    initSecurity();
+  </script>
+  
   <script src="js/subslot_toggle.js">
   </script>
   <script src="js/randomizer_individual.js">
