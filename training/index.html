@@ -20,6 +20,9 @@
     initSecurity();
   </script>
   
+  <!-- 🔐 認証システム -->
+  <script src="js/auth.js"></script>
+  
   <script src="js/subslot_toggle.js">
   </script>
   <script src="js/randomizer_individual.js">
@@ -48,6 +51,52 @@
   </script>
  </head>
  <body>
+
+<!-- 🔐 認証チェックとユーザー情報表示 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 認証システムが読み込まれるまで待機
+    function waitForAuth() {
+        if (window.authSystem) {
+            // ログインチェック
+            if (!window.authSystem.isLoggedIn()) {
+                // 未ログインの場合はログイン画面へリダイレクト
+                window.location.href = './auth.html';
+                return;
+            }
+            
+            // ログイン済みの場合はユーザー情報を表示
+            const user = window.authSystem.getCurrentUser();
+            if (user) {
+                // ナビゲーションにユーザー情報を追加
+                const nav = document.querySelector('div[style*="position: fixed; top: 10px; left: 10px"]');
+                if (nav) {
+                    const userInfo = document.createElement('div');
+                    userInfo.innerHTML = `
+                        <span style="color: #ccc;">|</span>
+                        <span style="font-size: 12px; color: #333;">👤 ${user.username}</span>
+                        <button onclick="handleLogout()" style="background: #dc3545; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 4px;">ログアウト</button>
+                    `;
+                    nav.appendChild(userInfo);
+                }
+            }
+        } else {
+            // 認証システムがまだ読み込まれていない場合は100ms後に再試行
+            setTimeout(waitForAuth, 100);
+        }
+    }
+    
+    waitForAuth();
+});
+
+// ログアウト処理
+function handleLogout() {
+    if (window.authSystem && confirm('ログアウトしますか？')) {
+        window.authSystem.logout();
+        window.location.href = './auth.html';
+    }
+}
+</script>
 
 <!-- シンプルなナビゲーションリンク -->
 <div style="position: fixed; top: 10px; left: 10px; z-index: 16000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px;">
