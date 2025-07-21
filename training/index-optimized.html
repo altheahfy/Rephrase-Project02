@@ -95,16 +95,8 @@
       <select id="presetSelect" style="width: 150px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
         <option value="">-- データを選択 --</option>
         <option value="data/slot_order_data.json">🎯 メインデータセット</option>
-        <option value="data/slot_order_data2.json">🎯 データセット2</option>
-        <option value="data/V自動詞第1文型.json">📚 V自動詞第1文型</option>
+        <option value="data/simple_test.json">🧪 テストデータ</option>
       </select>
-      <button id="loadPresetButton" class="btn btn-primary btn-small" style="margin-left: 4px;">読み込み</button>
-    </div>
-    
-    <!-- 📁 File upload -->
-    <div style="display: flex; align-items: center; gap: 4px; margin-left: 16px;">
-      <input type="file" id="jsonFileInput" accept=".json" style="font-size: 10px; width: 120px;">
-      <button id="loadJsonButton" class="btn btn-secondary btn-small">ファイル読み込み</button>
     </div>
   </nav>
 
@@ -177,23 +169,13 @@
 
     <!-- 📚 Slot Container -->
     <section id="slotContainer" style="min-height: 400px;">
-      <!-- Loading overlay -->
-      <div id="loadingOverlay" class="loading-screen" style="display: none; position: relative; height: 200px;">
-        <div>
-          <div class="loading-spinner"></div>
-          <p style="margin-top: 16px; color: #666;">データ処理中...</p>
-        </div>
-      </div>
-      
-      <!-- Default state -->
-      <div id="defaultState" class="card">
+      <!-- Slots will be dynamically loaded here -->
+      <div class="card">
         <div class="card-body text-center" style="padding: 48px 24px;">
           <h3 style="color: #666; margin: 0 0 16px 0;">📋 データを選択してください</h3>
           <p style="color: #999; margin: 0;">上部のサンプルデータから選択するか、JSONファイルをアップロードしてください。</p>
         </div>
       </div>
-      
-      <!-- Slot content will be dynamically generated here -->
     </section>
 
   </main>
@@ -306,39 +288,19 @@
     // Enhanced toggleController for this optimized version  
     window.toggleController = window.toggleController || {
       expandAll: function() {
-        console.log('📖 全スロットを展開中...');
-        const allContents = document.querySelectorAll('[id^="content-"]');
-        const allButtons = document.querySelectorAll('.slot-toggle');
-        
-        allContents.forEach(content => {
-          content.style.display = 'block';
+        console.log('📖 Expanding all slots...');
+        const subslots = document.querySelectorAll('[id*="subslot"]');
+        subslots.forEach(slot => {
+          slot.style.display = 'block';
         });
-        
-        allButtons.forEach(button => {
-          if (button.textContent.includes('展開')) {
-            button.textContent = '折り畳み';
-          }
-        });
-        
-        console.log(`📖 ${allContents.length}個のスロットを展開しました`);
       },
       
       collapseAll: function() {
-        console.log('📝 全スロットを折り畳み中...');
-        const allContents = document.querySelectorAll('[id^="content-"]');
-        const allButtons = document.querySelectorAll('.slot-toggle');
-        
-        allContents.forEach(content => {
-          content.style.display = 'none';
+        console.log('📝 Collapsing all slots...');
+        const subslots = document.querySelectorAll('[id*="subslot"]');
+        subslots.forEach(slot => {
+          slot.style.display = 'none';
         });
-        
-        allButtons.forEach(button => {
-          if (button.textContent.includes('折り畳み')) {
-            button.textContent = '展開';
-          }
-        });
-        
-        console.log(`📝 ${allContents.length}個のスロットを折り畳みました`);
       }
     };
     
@@ -353,311 +315,6 @@
         console.log('⏹️ Stopping audio...');
         // Audio stop implementation will be added
       }
-    };
-    
-    // =============================================================================
-    // 📊 DATA LOADING SYSTEM - Complete integration with original functionality
-    // =============================================================================
-    
-    window.dataLoader = {
-      loadedData: null,
-      
-      // Show/hide loading overlay
-      showLoading: function(message = 'データ処理中...') {
-        const overlay = document.getElementById('loadingOverlay');
-        const defaultState = document.getElementById('defaultState');
-        const loadingText = overlay.querySelector('p');
-        
-        if (loadingText) loadingText.textContent = message;
-        if (overlay) overlay.style.display = 'flex';
-        if (defaultState) defaultState.style.display = 'none';
-      },
-      
-      hideLoading: function() {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) overlay.style.display = 'none';
-      },
-      
-      // Load preset data
-      loadPreset: function(presetPath) {
-        if (!presetPath) {
-          alert('データセットを選択してください');
-          return;
-        }
-        
-        this.showLoading(`${presetPath} を読み込み中...`);
-        
-        fetch(presetPath)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('📊 データ読み込み成功:', presetPath);
-            this.processData(data);
-          })
-          .catch(error => {
-            console.error('📊 データ読み込み失敗:', error);
-            if (window.errorHandler) {
-              window.errorHandler.handleError(error, 'データ読み込み失敗');
-            } else {
-              alert(`データの読み込みに失敗しました: ${error.message}`);
-            }
-            this.hideLoading();
-            document.getElementById('defaultState').style.display = 'block';
-          });
-      },
-      
-      // Load file data
-      loadFile: function(file) {
-        if (!file) {
-          alert('ファイルを選択してください');
-          return;
-        }
-        
-        this.showLoading(`${file.name} を処理中...`);
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const data = JSON.parse(e.target.result);
-            console.log('📁 ファイル読み込み成功:', file.name);
-            this.processData(data);
-          } catch (error) {
-            console.error('📁 ファイル解析失敗:', error);
-            if (window.errorHandler) {
-              window.errorHandler.handleError(error, 'ファイル解析失敗');
-            } else {
-              alert(`ファイルの解析に失敗しました: ${error.message}`);
-            }
-            this.hideLoading();
-            document.getElementById('defaultState').style.display = 'block';
-          }
-        };
-        reader.readAsText(file);
-      },
-      
-      // Process and display data
-      processData: function(data) {
-        try {
-          console.log('🔧 データ処理開始...');
-          
-          // Store processed data
-          this.loadedData = Array.isArray(data) ? data : [data];
-          
-          // Build slot structure
-          this.buildSlotStructure(this.loadedData);
-          
-          this.hideLoading();
-          console.log('✅ データ処理完了');
-          
-        } catch (error) {
-          console.error('🔧 データ処理失敗:', error);
-          if (window.errorHandler) {
-            window.errorHandler.handleError(error, 'データ処理失敗');
-          } else {
-            alert(`データの処理に失敗しました: ${error.message}`);
-          }
-          this.hideLoading();
-          document.getElementById('defaultState').style.display = 'block';
-        }
-      },
-      
-      // Build slot structure from data
-      buildSlotStructure: function(data) {
-        const container = document.getElementById('slotContainer');
-        
-        // Clear existing content
-        container.innerHTML = '';
-        
-        // Group data by main slots
-        const slotGroups = {};
-        data.forEach(item => {
-          const slotId = item.Slot || item.slot || 'Unknown';
-          if (!slotGroups[slotId]) {
-            slotGroups[slotId] = [];
-          }
-          slotGroups[slotId].push(item);
-        });
-        
-        // Create slot cards
-        Object.keys(slotGroups).forEach(slotId => {
-          const slotCard = this.createSlotCard(slotId, slotGroups[slotId]);
-          container.appendChild(slotCard);
-        });
-        
-        console.log(`🏗️ ${Object.keys(slotGroups).length}個のスロットを構築しました`);
-      },
-      
-      // Create individual slot card
-      createSlotCard: function(slotId, slotData) {
-        const card = document.createElement('div');
-        card.className = 'slot-container';
-        card.id = `slot-${slotId}`;
-        
-        const headerColor = this.getSlotColor(slotId);
-        
-        card.innerHTML = `
-          <div class="slot-header" style="background: ${headerColor};">
-            <h3 style="margin: 0; font-size: 18px;">${slotId} (${slotData.length}件)</h3>
-            <div style="display: flex; gap: 8px;">
-              <button class="slot-toggle" onclick="dataLoader.toggleSlot('${slotId}')">
-                折り畳み
-              </button>
-              <button class="slot-toggle" onclick="dataLoader.randomizeSlot('${slotId}')">
-                🎲 ランダム化
-              </button>
-            </div>
-          </div>
-          <div class="slot-content" id="content-${slotId}">
-            ${this.createSlotContent(slotData)}
-          </div>
-        `;
-        
-        return card;
-      },
-      
-      // Create slot content
-      createSlotContent: function(slotData) {
-        return slotData.map((item, index) => {
-          const subslotId = item.SubslotID || item.subslotId || index;
-          const englishText = item.English || item.english || 'No English text';
-          const japaneseText = item.Japanese || item.japanese || 'No Japanese text';
-          const imageUrl = item.ImageURL || item.imageUrl || '';
-          const audioUrl = item.AudioURL || item.audioUrl || '';
-          
-          return `
-            <div class="subslot" id="subslot-${subslotId}" style="margin: 8px 0;">
-              <div class="subslot-header">
-                Subslot ${subslotId}
-                ${audioUrl ? `<button class="btn btn-small" onclick="dataLoader.playAudio('${audioUrl}')" style="float: right;">🔊</button>` : ''}
-              </div>
-              <div class="subslot-content">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
-                  <div>
-                    <strong>🇺🇸 English:</strong><br>
-                    <span style="font-size: 16px;">${englishText}</span>
-                  </div>
-                  <div>
-                    <strong>🇯🇵 Japanese:</strong><br>
-                    <span style="font-size: 16px;">${japaneseText}</span>
-                  </div>
-                </div>
-                ${imageUrl ? `
-                  <div class="image-container" style="max-width: 300px;">
-                    <img src="${imageUrl}" alt="Slot image" class="image-slot" 
-                         onerror="this.style.display='none'" 
-                         onload="this.style.opacity='1'">
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
-      },
-      
-      // Get color for different slots
-      getSlotColor: function(slotId) {
-        const colors = {
-          'M1': 'linear-gradient(135deg, #2196F3, #1976d2)',
-          'M2': 'linear-gradient(135deg, #4caf50, #388e3c)',
-          'M3': 'linear-gradient(135deg, #ff9800, #f57c00)',
-          'M4': 'linear-gradient(135deg, #9c27b0, #7b1fa2)',
-          'M5': 'linear-gradient(135deg, #f44336, #d32f2f)'
-        };
-        return colors[slotId] || 'linear-gradient(135deg, #607d8b, #455a64)';
-      },
-      
-      // Toggle slot visibility
-      toggleSlot: function(slotId) {
-        const content = document.getElementById(`content-${slotId}`);
-        const button = document.querySelector(`#slot-${slotId} .slot-toggle`);
-        
-        if (content && button) {
-          const isVisible = content.style.display !== 'none';
-          content.style.display = isVisible ? 'none' : 'block';
-          button.textContent = isVisible ? '展開' : '折り畳み';
-        }
-      },
-      
-      // Randomize slot content
-      randomizeSlot: function(slotId) {
-        console.log(`🎲 ${slotId} をランダム化中...`);
-        // Implementation for randomization will be added
-      },
-      
-      // Play audio
-      playAudio: function(audioUrl) {
-        if (window.audioSystem && window.audioSystem.playAudio) {
-          window.audioSystem.playAudio(audioUrl);
-        } else {
-          console.log('🔊 Audio playing:', audioUrl);
-          // Basic audio play implementation
-          const audio = new Audio(audioUrl);
-          audio.play().catch(error => {
-            console.warn('Audio play failed:', error);
-          });
-        }
-      }
-    };
-    
-    // =============================================================================
-    // 🎮 EVENT LISTENERS - Data loading controls
-    // =============================================================================
-    
-    // Preset selector
-    document.getElementById('loadPresetButton').addEventListener('click', function() {
-      const presetSelect = document.getElementById('presetSelect');
-      const selectedValue = presetSelect.value;
-      
-      if (selectedValue) {
-        window.dataLoader.loadPreset(selectedValue);
-      } else {
-        alert('データセットを選択してください');
-      }
-    });
-    
-    // File input
-    document.getElementById('loadJsonButton').addEventListener('click', function() {
-      const fileInput = document.getElementById('jsonFileInput');
-      const file = fileInput.files[0];
-      
-      if (file) {
-        window.dataLoader.loadFile(file);
-      } else {
-        alert('ファイルを選択してください');
-      }
-    });
-    
-    // Enhanced randomizer system with actual data
-    window.randomizerSystem.randomizeAll = function() {
-      if (!window.dataLoader.loadedData) {
-        alert('まずデータを読み込んでください');
-        return;
-      }
-      
-      console.log('🎲 全スロットをランダム化中...');
-      const slotElements = document.querySelectorAll('[id^="slot-"]');
-      slotElements.forEach(slot => {
-        const slotId = slot.id.replace('slot-', '');
-        window.dataLoader.randomizeSlot(slotId);
-      });
-    };
-    
-    window.randomizerSystem.randomizeVisible = function() {
-      if (!window.dataLoader.loadedData) {
-        alert('まずデータを読み込んでください');
-        return;
-      }
-      
-      console.log('🎲 表示中のスロットをランダム化中...');
-      const visibleSlots = document.querySelectorAll('[id^="content-"]:not([style*="display: none"])');
-      visibleSlots.forEach(content => {
-        const slotId = content.id.replace('content-', '');
-        window.dataLoader.randomizeSlot(slotId);
-      });
     };
     
     // Track component loading
