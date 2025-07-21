@@ -115,8 +115,23 @@ function extractWordsWithStemming(text) {
         searchWords.add('figure');
       }
     }
+    
+    // 🆕 -ing語尾の処理改良：独立した名詞を除外
     if (word.endsWith('ing') && word.length > 4) {
-      searchWords.add(word.slice(0, -3)); // -ing
+      // -ing語尾でも独立した名詞として扱うべき単語のリスト
+      const ingExceptions = [
+        'evening', 'morning', 'nothing', 'something', 'anything', 'everything',
+        'feeling', 'building', 'during', 'spring', 'string', 'ring', 'king',
+        'wing', 'thing', 'bring', 'sing', 'long', 'young', 'among'
+      ];
+      
+      // 例外リストに含まれない場合のみ語幹抽出を実行
+      if (!ingExceptions.includes(word)) {
+        searchWords.add(word.slice(0, -3)); // -ing
+        console.log('🔍 -ing語幹抽出:', word, '→', word.slice(0, -3));
+      } else {
+        console.log('🔍 -ing例外処理:', word, '→ 語幹抽出スキップ');
+      }
     }
   }
   
