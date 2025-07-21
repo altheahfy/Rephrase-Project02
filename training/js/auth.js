@@ -48,6 +48,14 @@ class AuthSystem {
      */
     async register(username, password, email) {
         try {
+            // 率制限チェック
+            const clientId = window.rateLimiter ? window.rateLimiter.getClientIdentifier() : 'default';
+            const rateCheck = window.rateLimiter ? window.rateLimiter.checkLimit('auth.register', clientId) : { allowed: true };
+            
+            if (!rateCheck.allowed) {
+                throw new Error(rateCheck.message || '登録試行回数が制限されています');
+            }
+
             // 入力値検証（詳細なエラーメッセージ付き）
             this.validateInput(username, password, email);
 
@@ -90,6 +98,14 @@ class AuthSystem {
      */
     async login(username, password) {
         try {
+            // 率制限チェック
+            const clientId = window.rateLimiter ? window.rateLimiter.getClientIdentifier() : 'default';
+            const rateCheck = window.rateLimiter ? window.rateLimiter.checkLimit('auth.login', clientId) : { allowed: true };
+            
+            if (!rateCheck.allowed) {
+                throw new Error(rateCheck.message || 'ログイン試行回数が制限されています');
+            }
+
             const user = this.getUser(username);
             
             if (!user) {
