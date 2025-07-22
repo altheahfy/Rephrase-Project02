@@ -3,42 +3,77 @@
 /* =================================================================== */
 /* 注意: このCSSは既存のstyle.cssよりも後に読み込まれるため優先されます    */
 
-/* 🎯 Phase 1: 黄色タブの幅問題修正（最小侵襲アプローチ） */
+/* 🎯 Phase 1: 黄色タブの幅問題修正（10スロット分固定幅対応） */
 @media (max-width: 768px) {
-  /* 黄色タブラベルの幅問題修正 - 最高優先度 */
+  /* 黄色タブラベルの幅問題修正 - 10スロット分の幅を確保 */
   .subslot-label.tab-style {
-    margin-left: -10px !important;  /* -20px → -10px に緩和 */
-    margin-right: -10px !important; /* -20px → -10px に緩和 */
-    width: calc(100% + 20px) !important; /* 確実に幅を確保 */
-    max-width: calc(100vw - 40px) !important; /* ビューポート幅を超えないよう制限 */
+    margin-left: -20px !important;  /* 元の値に戻す（PC同様） */
+    margin-right: -20px !important; /* 元の値に戻す（PC同様） */
+    width: calc(100% + 40px) !important; /* 10スロット分の幅を確保 */
+    min-width: calc(100vw - 20px) !important; /* 画面幅いっぱいまで使用 */
+    max-width: none !important; /* 最大幅制限を解除 */
     box-sizing: border-box !important;
-    overflow: hidden !important; /* はみ出し防止 */
+    overflow: visible !important; /* はみ出しを許可（横スクロール対応） */
     word-wrap: break-word !important; /* 長いテキストの改行 */
     position: relative !important; /* 既存スタイル保持 */
+    white-space: nowrap !important; /* テキストの改行防止 */
   }
 
-  /* サブスロットエリアのはみ出し防止 - 最高優先度 */
+  /* サブスロットエリアの適切なサイズ確保 - 縮小問題解決 */
   .slot-wrapper.active-subslot-area {
     margin-left: 0 !important;
     margin-right: 0 !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important; /* 横スクロール防止 */
+    width: 100% !important; /* max-widthから変更 */
+    min-width: 100% !important; /* 最小幅確保 */
+    overflow-x: auto !important; /* 横スクロール可能に変更 */
     box-sizing: border-box !important; /* ボーダーボックス適用 */
+    padding: 15px !important; /* 適切なパディング確保 */
   }
 
-  /* 親スロットのタブ連結調整 - 最高優先度 */
+  /* 親スロットのタブ連結調整 - 10スロット分対応 */
   .slot-container.active-parent-slot {
     margin-left: 0 !important;
     margin-right: 0 !important;
-    max-width: 100% !important;
+    width: 100% !important; /* max-widthから変更 */
+    min-width: 100% !important; /* 最小幅確保 */
     box-sizing: border-box !important; /* ボーダーボックス適用 */
+    overflow-x: auto !important; /* 横スクロール可能 */
   }
 
-  /* 基本的なコンテナの横はみ出し防止 */
+  /* サブスロット内のスロットコンテナ - 適切なサイズ確保 */
+  .slot-wrapper.active-subslot-area .slot-container {
+    width: auto !important; /* 自動幅調整 */
+    min-width: 150px !important; /* 最小幅確保（1スロット分） */
+    margin-bottom: 10px !important;
+    flex-shrink: 0 !important; /* 縮小防止 */
+  }
+
+  /* メインのスロットエリア全体 - 横スクロール対応 */
+  body {
+    overflow-x: auto !important; /* 横スクロール許可 */
+    min-width: 100vw !important; /* ビューポート幅確保 */
+  }
+
+  /* 基本的なコンテナ - 10スロット表示対応 */
   .slot-container {
-    max-width: 100% !important;
+    min-width: 120px !important; /* 各スロットの最小幅確保 */
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    flex-shrink: 0 !important; /* 縮小防止 */
+  }
+
+  /* 上位スロット行の横スクロール対応 */
+  .slot-wrapper:not(.active-subslot-area) {
+    overflow-x: auto !important; /* 横スクロール可能 */
+    white-space: nowrap !important; /* 改行防止 */
+    padding-bottom: 10px !important; /* スクロールバー用の余白 */
+  }
+
+  /* 上位スロット行のスロットをインライン表示 */
+  .slot-wrapper:not(.active-subslot-area) .slot-container {
+    display: inline-block !important;
+    vertical-align: top !important;
+    white-space: normal !important; /* テキスト内は改行許可 */
+    margin-right: 10px !important; /* スロット間の余白 */
   }
 
   /* 制御パネルのモバイル対応 */
@@ -153,6 +188,32 @@
   #zoomSlider {
     width: 100% !important;
     max-width: 200px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 縦画面（ポートレート）専用対応                                   */
+/* =================================================================== */
+
+@media (max-width: 768px) and (orientation: portrait) {
+  /* 縦画面での黄色タブ調整 */
+  .subslot-label.tab-style {
+    min-width: calc(100vw - 10px) !important; /* 縦画面では画面幅いっぱい */
+    font-size: 13px !important; /* 縦画面では少し小さめのフォント */
+  }
+
+  /* 縦画面でのサブスロットエリア最適化 */
+  .slot-wrapper.active-subslot-area {
+    min-height: auto !important; /* 高さの自動調整 */
+    padding: 10px !important; /* パディング調整 */
+  }
+
+  /* 縦画面でのスロット表示 - グリッドレイアウト */
+  .slot-wrapper.active-subslot-area .slot-container {
+    width: calc(50% - 5px) !important; /* 2列表示 */
+    display: inline-block !important;
+    vertical-align: top !important;
+    margin: 5px !important;
   }
 }
 

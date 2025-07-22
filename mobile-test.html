@@ -76,30 +76,82 @@
   
   <!-- Phase 1: 黄色タブテスト -->
   <div class="test-section">
-    <div class="test-title">🎯 Phase 1: 黄色タブの幅問題テスト</div>
+    <div class="test-title">🎯 Phase 1: 黄色タブの幅問題テスト（10スロット分対応）</div>
     
-    <!-- 親スロットのシミュレーション -->
-    <div class="slot-container active-parent-slot" style="background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-      <div class="slot-text">This is a parent slot with active tab connection</div>
+    <!-- 上位スロット行のシミュレーション（10スロット） -->
+    <div class="slot-wrapper" style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px; overflow-x: auto; white-space: nowrap;">
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">M1</div>
+        <div class="slot-text">This morning</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">S</div>
+        <div class="slot-text">I</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">AUX</div>
+        <div class="slot-text">had</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">V</div>
+        <div class="slot-text">known</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">M2</div>
+        <div class="slot-text">very well</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">O1</div>
+        <div class="slot-text">that he</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">C1</div>
+        <div class="slot-text">was</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">O2</div>
+        <div class="slot-text">lying</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">C2</div>
+        <div class="slot-text">to me</div>
+      </div>
+      
+      <div class="slot-container" style="display: inline-block; background: rgba(254, 243, 199, 0.6); border: 2px solid #f59e0b; padding: 10px; margin: 5px; border-radius: 8px; min-width: 120px; vertical-align: top; white-space: normal;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">M3</div>
+        <div class="slot-text">from the start</div>
+      </div>
     </div>
     
     <!-- サブスロットエリアのシミュレーション -->
-    <div class="slot-wrapper active-subslot-area" style="background: rgba(254, 243, 199, 0.4); border: 2px solid #f59e0b; padding: 15px; border-radius: 8px;">
+    <div class="slot-wrapper active-subslot-area" style="background: rgba(254, 243, 199, 0.4); border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; overflow-x: auto;">
       
       <!-- 黄色タブラベル -->
       <div class="subslot-label tab-style">
-        📂 Subslot Detail View - M1 Modifier Details (長いテキストテスト)
+        📂 Subslot Detail View - M1 Modifier Details (This morning の詳細)
       </div>
       
-      <!-- サブスロットコンテンツ -->
-      <div class="slot-container" style="background: white; padding: 10px; margin: 10px 0; border-radius: 4px;">
-        <div class="slot-text">Sample subslot content text</div>
-        <div class="slot-auxtext">補助テキストの例</div>
-      </div>
-      
-      <div class="slot-container" style="background: white; padding: 10px; margin: 10px 0; border-radius: 4px;">
-        <div class="slot-text">Another subslot item</div>
-        <div class="slot-auxtext">もう一つの補助テキスト</div>
+      <!-- サブスロットコンテンツ（2列表示） -->
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div class="slot-container" style="flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px;">
+          <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-S</div>
+          <div class="slot-text">this</div>
+          <div class="slot-auxtext">この</div>
+        </div>
+        
+        <div class="slot-container" style="flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px;">
+          <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-AUX</div>
+          <div class="slot-text">morning</div>
+          <div class="slot-auxtext">朝</div>
+        </div>
       </div>
       
     </div>
