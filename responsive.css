@@ -46,6 +46,39 @@
     min-width: 150px !important; /* 最小幅確保（1スロット分） */
     margin-bottom: 10px !important;
     flex-shrink: 0 !important; /* 縮小防止 */
+    display: flex !important; /* フレックスボックス表示 */
+    flex-direction: column !important; /* 縦方向配置 */
+    align-items: stretch !important; /* 子要素を伸縮 */
+  }
+  
+  /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど） */
+  .slot-wrapper.active-subslot-area .slot-container .slot-header {
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    margin-bottom: 10px !important;
+    padding: 6px 10px !important;
+    background: #e9ecef !important;
+    border-radius: 4px !important;
+    border: 1px solid #ced4da !important;
+  }
+  
+  /* サブスロット内のテキストコンテンツ */
+  .slot-wrapper.active-subslot-area .slot-container .slot-text,
+  .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
+    text-align: center !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    color: #333 !important;
+    margin: 5px 0 !important;
+    padding: 8px !important;
+    background: #f8f9fa !important;
+    border-radius: 4px !important;
+    min-height: 35px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* メインのスロットエリア全体 - 横スクロール対応 */
@@ -308,6 +341,41 @@
       margin: 0 !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
       border-left: 4px solid #007AFF !important;
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      align-items: stretch !important;
+    }
+    
+    /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど）を適切に表示 */
+    .slot-wrapper.active-subslot-area .slot-container .slot-header {
+      text-align: center !important;
+      font-weight: bold !important;
+      font-size: 16px !important;
+      color: #333 !important;
+      margin-bottom: 15px !important;
+      padding: 8px 12px !important;
+      background: #f8f9fa !important;
+      border-radius: 4px !important;
+      border: 1px solid #dee2e6 !important;
+    }
+    
+    /* サブスロット内のテキストコンテンツ */
+    .slot-wrapper.active-subslot-area .slot-container .slot-text,
+    .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
+      text-align: center !important;
+      font-size: 18px !important;
+      line-height: 1.5 !important;
+      color: #333 !important;
+      margin: 10px 0 !important;
+      padding: 10px !important;
+      background: #f8f9fa !important;
+      border-radius: 6px !important;
+      min-height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
   }
 }
@@ -332,6 +400,40 @@
       border-radius: 6px !important;
       padding: 15px !important;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      align-items: stretch !important;
+    }
+    
+    /* 横画面でのスロットヘッダー */
+    .slot-wrapper.active-subslot-area .slot-container .slot-header {
+      text-align: center !important;
+      font-weight: bold !important;
+      font-size: 14px !important;
+      color: #333 !important;
+      margin-bottom: 10px !important;
+      padding: 6px 10px !important;
+      background: #f8f9fa !important;
+      border-radius: 4px !important;
+      border: 1px solid #dee2e6 !important;
+    }
+    
+    /* 横画面でのテキストコンテンツ */
+    .slot-wrapper.active-subslot-area .slot-container .slot-text,
+    .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
+      text-align: center !important;
+      font-size: 16px !important;
+      line-height: 1.4 !important;
+      color: #333 !important;
+      margin: 8px 0 !important;
+      padding: 8px !important;
+      background: #f8f9fa !important;
+      border-radius: 4px !important;
+      min-height: 30px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
   }
 }
