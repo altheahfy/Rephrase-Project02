@@ -23,72 +23,6 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            max-width: 150px;
-        }
-        
-        /* 強制的にモバイル表示モードにする */
-        .mobile-test-mode {
-            max-width: 400px !important;
-            margin: 0 auto !important;
-            border: 2px solid #ddd !important;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3) !important;
-        }
-        
-        .mobile-test-mode .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
-            display: flex !important;
-            overflow-x: auto !important;
-            scroll-snap-type: x mandatory !important;
-            scroll-behavior: smooth !important;
-            gap: 10px !important;
-            padding: 15px 10px !important;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
-            border-radius: 12px !important;
-            margin: 10px 5px !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-            width: calc(100% - 20px) !important;
-            max-width: calc(100% - 20px) !important;
-            overflow-y: hidden !important;
-        }
-        
-        .mobile-test-mode .mobile-swipe-enabled .slot-wrapper.active-subslot-area .slot-container {
-            min-width: calc(100% - 60px) !important;
-            max-width: calc(100% - 60px) !important;
-            width: calc(100% - 60px) !important;
-            scroll-snap-align: center !important;
-            flex-shrink: 0 !important;
-            background: white !important;
-            border-radius: 8px !important;
-            padding: 20px !important;
-            margin: 0 !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-            border-left: 4px solid #007AFF !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-        }
-        
-        /* 横画面モード用 */
-        .mobile-test-mode.landscape-mode {
-            max-width: 600px !important;
-            max-height: 400px !important;
-        }
-        
-        .mobile-test-mode.landscape-mode .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
-            grid-auto-rows: minmax(120px, auto) !important;
-            gap: 8px !important;
-            padding: 10px !important;
-            max-height: 300px !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-        }
-        
-        .mobile-test-mode.landscape-mode .mobile-swipe-enabled .slot-wrapper.active-subslot-area .slot-container {
-            min-width: auto !important;
-            max-width: 100% !important;
-            width: 100% !important;
-            min-height: 100px !important;
-            padding: 10px !important;
         }
         
         .test-controls button {
@@ -123,7 +57,7 @@
         }
     </style>
 </head>
-<body class="mobile-swipe-enabled mobile-test-mode">
+<body class="mobile-swipe-enabled">
     <!-- テストコントロール -->
     <div class="test-controls">
         <button onclick="toggleSwipeMode()">スワイプ切替</button>
@@ -200,24 +134,54 @@
         }
 
         function simulatePortrait() {
-            document.body.classList.remove('landscape-mode');
-            document.body.style.width = 'auto';
-            document.body.style.height = 'auto';
-            document.getElementById('current-orientation').textContent = '縦画面テストモード';
-            console.log('🔄 縦画面モードに切り替え - カルーセル表示');
+            document.body.style.width = '375px';
+            document.body.style.height = '667px';
+            document.body.style.maxWidth = '375px';
+            // 強制的にportrait扱いにする
+            document.body.setAttribute('data-orientation', 'portrait');
+            document.getElementById('current-orientation').textContent = '縦画面 (375x667)';
             
+            // CSSメディアクエリを強制適用
+            const styleElement = document.createElement('style');
+            styleElement.innerHTML = `
+                body[data-orientation="portrait"] .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
+                    display: flex !important;
+                    overflow-x: auto !important;
+                    grid-template-columns: none !important;
+                }
+            `;
+            document.head.appendChild(styleElement);
+            
+            console.log('🔄 縦画面モードに切り替え - フレックスレイアウト適用');
+            
+            // レイアウト更新を通知
             setTimeout(() => {
                 updateLayoutInfo();
             }, 100);
         }
 
         function simulateLandscape() {
-            document.body.classList.add('landscape-mode');
-            document.body.style.width = 'auto';
-            document.body.style.height = 'auto';
-            document.getElementById('current-orientation').textContent = '横画面テストモード';
-            console.log('🔄 横画面モードに切り替え - グリッド表示');
+            document.body.style.width = '667px';
+            document.body.style.height = '375px';
+            document.body.style.maxWidth = '667px';
+            // 強制的にlandscape扱いにする
+            document.body.setAttribute('data-orientation', 'landscape');
+            document.getElementById('current-orientation').textContent = '横画面 (667x375)';
             
+            // CSSメディアクエリを強制適用
+            const styleElement = document.createElement('style');
+            styleElement.innerHTML = `
+                body[data-orientation="landscape"] .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
+                    display: grid !important;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+                    overflow-x: hidden !important;
+                }
+            `;
+            document.head.appendChild(styleElement);
+            
+            console.log('🔄 横画面モードに切り替え - グリッドレイアウト適用');
+            
+            // レイアウト更新を通知
             setTimeout(() => {
                 updateLayoutInfo();
             }, 100);
