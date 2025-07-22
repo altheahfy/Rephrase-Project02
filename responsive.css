@@ -273,9 +273,8 @@
 /* 📱 新世代スワイプUI - Phase 4: モバイルネイティブ体験             */
 /* =================================================================== */
 
-/* 🎯 スワイプUI: 縦画面でのカルーセル型表示 - ブラウザテスト対応 */
-@media (max-width: 1200px) and (orientation: portrait), 
-       (max-width: 768px) and (orientation: portrait) {
+/* 🎯 スワイプUI: 縦画面でのカルーセル型表示 */
+@media (max-width: 768px) and (orientation: portrait) {
   /* スワイプUI有効化フラグ（テスト用） */
   .mobile-swipe-enabled {
     /* 黄色タブを隠してスワイプナビゲーションに切り替え */
@@ -296,16 +295,16 @@
       margin: 10px 5px !important;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
       /* コンテナのサイズ制御 */
-      width: calc(100% - 20px) !important;
-      max-width: calc(100% - 20px) !important;
+      width: calc(100vw - 20px) !important;
+      max-width: calc(100vw - 20px) !important;
       overflow-y: hidden !important;
     }
     
     /* 各スロットをスワイプページとして設定 */
     .slot-wrapper.active-subslot-area .slot-container {
-      min-width: calc(100% - 60px) !important;
-      max-width: calc(100% - 60px) !important;
-      width: calc(100% - 60px) !important;
+      min-width: calc(100vw - 60px) !important;
+      max-width: calc(100vw - 60px) !important;
+      width: calc(100vw - 60px) !important;
       scroll-snap-align: center !important;
       flex-shrink: 0 !important;
       background: white !important;
@@ -321,9 +320,8 @@
   }
 }
 
-/* 🎯 スワイプUI: 横画面でのアダプティブグリッド表示 - ブラウザテスト対応 */
-@media (max-width: 1200px) and (orientation: landscape), 
-       (max-width: 768px) and (orientation: landscape) {
+/* 🎯 スワイプUI: 横画面でのアダプティブグリッド表示 */
+@media (max-width: 768px) and (orientation: landscape) {
   .mobile-swipe-enabled {
     /* 黄色タブを隠す */
     .subslot-label.tab-style {
@@ -351,8 +349,8 @@
       scroll-behavior: smooth !important;
       scrollbar-width: thin !important;
       /* コンテナのサイズ制御 */
-      width: calc(100% - 20px) !important;
-      max-width: calc(100% - 20px) !important;
+      width: calc(100vw - 20px) !important;
+      max-width: calc(100vw - 20px) !important;
       box-sizing: border-box !important;
     }
     
@@ -419,8 +417,8 @@
   }
 }
 
-/* 🎯 スワイプUI: 視覚的インジケーター - ブラウザテスト対応 */
-@media (max-width: 1200px), (max-width: 768px) {
+/* 🎯 スワイプUI: 視覚的インジケーター */
+@media (max-width: 768px) {
   .mobile-swipe-enabled {
     /* スワイプインジケーター（ドット表示） */
     .swipe-indicator {
