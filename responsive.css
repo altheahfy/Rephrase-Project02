@@ -19,15 +19,19 @@
     white-space: nowrap !important; /* テキストの改行防止 */
   }
 
-  /* サブスロットエリアの適切なサイズ確保 - 縮小問題解決 */
+  /* サブスロットエリアの適切なサイズ確保 - 横スクロール対応 */
   .slot-wrapper.active-subslot-area {
     margin-left: 0 !important;
     margin-right: 0 !important;
-    width: 100% !important; /* max-widthから変更 */
-    min-width: 100% !important; /* 最小幅確保 */
-    overflow-x: auto !important; /* 横スクロール可能に変更 */
-    box-sizing: border-box !important; /* ボーダーボックス適用 */
-    padding: 15px !important; /* 適切なパディング確保 */
+    width: 100% !important;
+    min-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    box-sizing: border-box !important;
+    padding: 15px 10px !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    flex-direction: row !important;
   }
 
   /* 親スロットのタブ連結調整 - 10スロット分対応 */
@@ -40,27 +44,32 @@
     overflow-x: auto !important; /* 横スクロール可能 */
   }
 
-  /* サブスロット内のスロットコンテナ - 適切なサイズ確保 */
+  /* サブスロット内のスロットコンテナ - 横スクロール対応 */
   .slot-wrapper.active-subslot-area .slot-container {
-    width: auto !important; /* 自動幅調整 */
-    min-width: 150px !important; /* 最小幅確保（1スロット分） */
-    margin-bottom: 10px !important;
-    flex-shrink: 0 !important; /* 縮小防止 */
-    display: flex !important; /* フレックスボックス表示 */
-    flex-direction: column !important; /* 縦方向配置 */
-    align-items: stretch !important; /* 子要素を伸縮 */
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+    margin-bottom: 0 !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    white-space: normal !important;
+    height: auto !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
   }
   
   /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど） */
   .slot-wrapper.active-subslot-area .slot-container .slot-header {
     text-align: center !important;
     font-weight: bold !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     color: #333 !important;
-    margin-bottom: 10px !important;
-    padding: 6px 10px !important;
+    margin-bottom: 8px !important;
+    padding: 4px 6px !important;
     background: #e9ecef !important;
-    border-radius: 4px !important;
+    border-radius: 3px !important;
     border: 1px solid #ced4da !important;
   }
   
@@ -68,17 +77,16 @@
   .slot-wrapper.active-subslot-area .slot-container .slot-text,
   .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
     text-align: center !important;
-    font-size: 16px !important;
-    line-height: 1.5 !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
     color: #333 !important;
-    margin: 5px 0 !important;
-    padding: 8px !important;
+    margin: 4px 0 !important;
+    padding: 6px !important;
     background: #f8f9fa !important;
-    border-radius: 4px !important;
-    min-height: 35px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    border-radius: 3px !important;
+    min-height: 25px !important;
+    word-wrap: break-word !important;
+    display: block !important;
   }
 
   /* メインのスロットエリア全体 - 横スクロール対応 */
@@ -318,44 +326,50 @@
     /* スロットコンテナをスワイプ可能なカルーセルに変換 */
     .slot-wrapper.active-subslot-area {
       display: flex !important;
+      flex-direction: row !important;
       overflow-x: auto !important;
+      overflow-y: hidden !important;
       scroll-snap-type: x mandatory !important;
       scroll-behavior: smooth !important;
       gap: 10px !important;
       padding: 15px 10px !important;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
       border-radius: 12px !important;
-      margin: 10px 5px !important;
+      margin: 10px 0 !important;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+      height: auto !important;
+      min-height: 120px !important;
+      white-space: nowrap !important;
     }
     
     /* 各スロットをスワイプページとして設定 */
     .slot-wrapper.active-subslot-area .slot-container {
-      min-width: calc(100vw - 40px) !important;
-      max-width: calc(100vw - 40px) !important;
+      min-width: 200px !important;
+      max-width: 200px !important;
+      width: 200px !important;
       scroll-snap-align: center !important;
       flex-shrink: 0 !important;
       background: white !important;
       border-radius: 8px !important;
-      padding: 20px !important;
+      padding: 15px !important;
       margin: 0 !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
       border-left: 4px solid #007AFF !important;
-      position: relative !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-start !important;
-      align-items: stretch !important;
+      display: inline-block !important;
+      vertical-align: top !important;
+      white-space: normal !important;
+      height: auto !important;
+      min-height: 80px !important;
     }
     
     /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど）を適切に表示 */
     .slot-wrapper.active-subslot-area .slot-container .slot-header {
       text-align: center !important;
       font-weight: bold !important;
-      font-size: 16px !important;
+      font-size: 14px !important;
       color: #333 !important;
-      margin-bottom: 15px !important;
-      padding: 8px 12px !important;
+      margin-bottom: 10px !important;
+      padding: 6px 8px !important;
       background: #f8f9fa !important;
       border-radius: 4px !important;
       border: 1px solid #dee2e6 !important;
@@ -365,17 +379,16 @@
     .slot-wrapper.active-subslot-area .slot-container .slot-text,
     .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
       text-align: center !important;
-      font-size: 18px !important;
-      line-height: 1.5 !important;
+      font-size: 16px !important;
+      line-height: 1.4 !important;
       color: #333 !important;
-      margin: 10px 0 !important;
-      padding: 10px !important;
+      margin: 8px 0 !important;
+      padding: 8px !important;
       background: #f8f9fa !important;
-      border-radius: 6px !important;
-      min-height: 40px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+      border-radius: 4px !important;
+      min-height: 30px !important;
+      display: block !important;
+      word-wrap: break-word !important;
     }
   }
 }
