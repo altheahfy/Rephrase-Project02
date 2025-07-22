@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スワイプUI テスト - Rephrase Mobile</title>
-    <link rel="stylesheet" href="training/style.css">
-    <link rel="stylesheet" href="responsive.css">
+    <title>スワイプUI テスト - Rephrase Mobile v2.1</title>
+    <link rel="stylesheet" href="training/style.css?v=2">
+    <link rel="stylesheet" href="responsive.css?v=2.1"">
     <style>
         /* テストページ専用スタイル */
         body {
@@ -200,11 +200,22 @@
 
         // 初期化
         updateIndicators();
-        console.log('🎯 スワイプUIテストページが読み込まれました');
+        console.log('🎯 スワイプUIテストページが読み込まれました v2.1');
         console.log('📱 モバイルデバイスまたは開発者ツールのデバイスエミュレーションで確認してください');
         console.log('🔍 確認方法：F12→デバイスツールバー→iPhone選択→画面回転テスト');
         console.log('✅ 縦画面：スワイプ可能なカルーセル表示');
         console.log('✅ 横画面：2x2グリッド表示');
+        
+        // CSS適用確認
+        const container = document.querySelector('.slot-wrapper.active-subslot-area');
+        if (container) {
+            const styles = window.getComputedStyle(container);
+            console.log('📊 現在のCSS設定:');
+            console.log('- display:', styles.display);
+            console.log('- overflow-x:', styles.overflowX);
+            console.log('- width:', styles.width);
+            console.log('- max-width:', styles.maxWidth);
+        }
     </script>
 </body>
 </html>
