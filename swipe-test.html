@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スワイプUI テスト - Rephrase Mobile</title>
+    <link rel="stylesheet" href="training/style.css">
+    <link rel="stylesheet" href="responsive.css">
+    <style>
+        /* テストページ専用スタイル */
+        body {
+            padding: 20px;
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .test-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .test-controls button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            background: #007AFF;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .status-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+        }
+        
+        .demo-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body class="mobile-swipe-enabled">
+    <!-- テストコントロール -->
+    <div class="test-controls">
+        <button onclick="toggleSwipeMode()">スワイプ切替</button>
+        <button onclick="simulatePortrait()">縦画面</button>
+        <button onclick="simulateLandscape()">横画面</button>
+        <button onclick="addTestSlots()">スロット追加</button>
+    </div>
+
+    <!-- ステータス情報 -->
+    <div class="status-info">
+        <div><strong>現在のモード:</strong> <span id="current-mode">スワイプUI有効</span></div>
+        <div><strong>画面方向:</strong> <span id="current-orientation">自動検出</span></div>
+        <div><strong>テストスロット数:</strong> <span id="slot-count">3</span></div>
+    </div>
+
+    <!-- メインテストエリア -->
+    <div class="demo-section">
+        <div class="demo-title">📱 スワイプUI デモ - サブスロットエリア</div>
+        
+        <!-- テスト用のスロット構造 -->
+        <div class="slot-wrapper active-subslot-area">
+            <div class="slot-container">
+                <div class="slot-label">S (主語)</div>
+                <div class="slot-text">I</div>
+                <div class="slot-auxtext">私は</div>
+                <div class="slot-image">👤</div>
+            </div>
+            
+            <div class="slot-container">
+                <div class="slot-label">V (動詞)</div>
+                <div class="slot-text">am studying</div>
+                <div class="slot-auxtext">勉強している</div>
+                <div class="slot-image">📚</div>
+            </div>
+            
+            <div class="slot-container">
+                <div class="slot-label">O (目的語)</div>
+                <div class="slot-text">English</div>
+                <div class="slot-auxtext">英語を</div>
+                <div class="slot-image">🇺🇸</div>
+            </div>
+        </div>
+        
+        <!-- スワイプインジケーター -->
+        <div class="swipe-indicator">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <!-- スワイプヒント -->
+        <div class="swipe-hint">← スワイプして他のスロットを見る →</div>
+    </div>
+
+    <!-- 従来のタブ表示（比較用） -->
+    <div class="demo-section">
+        <div class="demo-title">🖥️ 従来のタブ表示（比較用）</div>
+        
+        <div class="subslot-label tab-style" style="background: #FFD700; padding: 8px 15px; margin: 10px 0; border-radius: 4px;">
+            S (主語) | V (動詞) | O (目的語) | C (補語) | M (修飾語) | AUX (助動詞)
+        </div>
+    </div>
+
+    <script>
+        let swipeEnabled = true;
+        let slotCount = 3;
+
+        function toggleSwipeMode() {
+            swipeEnabled = !swipeEnabled;
+            document.body.classList.toggle('mobile-swipe-enabled', swipeEnabled);
+            document.getElementById('current-mode').textContent = swipeEnabled ? 'スワイプUI有効' : '従来のUI';
+            updateIndicators();
+        }
+
+        function simulatePortrait() {
+            document.body.style.width = '375px';
+            document.body.style.height = '667px';
+            document.getElementById('current-orientation').textContent = '縦画面 (375x667)';
+        }
+
+        function simulateLandscape() {
+            document.body.style.width = '667px';
+            document.body.style.height = '375px';
+            document.getElementById('current-orientation').textContent = '横画面 (667x375)';
+        }
+
+        function addTestSlots() {
+            const container = document.querySelector('.slot-wrapper.active-subslot-area');
+            const newSlot = document.createElement('div');
+            newSlot.className = 'slot-container';
+            newSlot.innerHTML = `
+                <div class="slot-label">M${slotCount} (修飾語)</div>
+                <div class="slot-text">very quickly</div>
+                <div class="slot-auxtext">とても素早く</div>
+                <div class="slot-image">⚡</div>
+            `;
+            container.appendChild(newSlot);
+            
+            // インジケーター更新
+            const indicator = document.querySelector('.swipe-indicator');
+            const newDot = document.createElement('div');
+            newDot.className = 'dot';
+            indicator.appendChild(newDot);
+            
+            slotCount++;
+            document.getElementById('slot-count').textContent = slotCount;
+        }
+
+        function updateIndicators() {
+            const dots = document.querySelectorAll('.swipe-indicator .dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === 0);
+            });
+        }
+
+        // 画面回転検出
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                const isPortrait = window.innerHeight > window.innerWidth;
+                document.getElementById('current-orientation').textContent = isPortrait ? '縦画面（検出）' : '横画面（検出）';
+            }, 100);
+        });
+
+        // スワイプインジケーターの動的更新
+        document.querySelector('.slot-wrapper.active-subslot-area').addEventListener('scroll', function(e) {
+            const container = e.target;
+            const scrollLeft = container.scrollLeft;
+            const scrollWidth = container.scrollWidth;
+            const clientWidth = container.clientWidth;
+            const slots = container.children.length;
+            
+            if (slots > 0) {
+                const currentIndex = Math.round(scrollLeft / (scrollWidth / slots));
+                const dots = document.querySelectorAll('.swipe-indicator .dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+        });
+
+        // 初期化
+        updateIndicators();
+        console.log('🎯 スワイプUIテストページが読み込まれました');
+        console.log('📱 モバイルデバイスまたは開発者ツールのデバイスエミュレーションで確認してください');
+    </script>
+</body>
+</html>

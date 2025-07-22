@@ -270,6 +270,108 @@
 }
 
 /* =================================================================== */
+/* 📱 新世代スワイプUI - Phase 4: モバイルネイティブ体験             */
+/* =================================================================== */
+
+/* 🎯 スワイプUI: 縦画面でのカルーセル型表示 */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* スワイプUI有効化フラグ（テスト用） */
+  .mobile-swipe-enabled {
+    /* 黄色タブを隠してスワイプナビゲーションに切り替え */
+    .subslot-label.tab-style {
+      display: none !important;
+    }
+    
+    /* スロットコンテナをスワイプ可能なカルーセルに変換 */
+    .slot-wrapper.active-subslot-area {
+      display: flex !important;
+      overflow-x: auto !important;
+      scroll-snap-type: x mandatory !important;
+      scroll-behavior: smooth !important;
+      gap: 10px !important;
+      padding: 15px 10px !important;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+      border-radius: 12px !important;
+      margin: 10px 5px !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 各スロットをスワイプページとして設定 */
+    .slot-wrapper.active-subslot-area .slot-container {
+      min-width: calc(100vw - 40px) !important;
+      max-width: calc(100vw - 40px) !important;
+      scroll-snap-align: center !important;
+      flex-shrink: 0 !important;
+      background: white !important;
+      border-radius: 8px !important;
+      padding: 20px !important;
+      margin: 0 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+      border-left: 4px solid #007AFF !important;
+    }
+  }
+}
+
+/* 🎯 スワイプUI: 横画面でのグリッド型表示 */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-swipe-enabled {
+    /* 横画面では2x2グリッドレイアウト */
+    .slot-wrapper.active-subslot-area {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 10px !important;
+      padding: 10px !important;
+      max-height: 70vh !important;
+      overflow-y: auto !important;
+    }
+    
+    .slot-wrapper.active-subslot-area .slot-container {
+      min-width: auto !important;
+      max-width: none !important;
+      background: white !important;
+      border-radius: 6px !important;
+      padding: 15px !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+}
+
+/* 🎯 スワイプUI: 視覚的インジケーター */
+@media (max-width: 768px) {
+  .mobile-swipe-enabled {
+    /* スワイプインジケーター（ドット表示） */
+    .swipe-indicator {
+      display: flex !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      padding: 10px !important;
+      margin-top: 5px !important;
+    }
+    
+    .swipe-indicator .dot {
+      width: 8px !important;
+      height: 8px !important;
+      border-radius: 50% !important;
+      background: rgba(0, 122, 255, 0.3) !important;
+      transition: background 0.3s ease !important;
+    }
+    
+    .swipe-indicator .dot.active {
+      background: #007AFF !important;
+    }
+    
+    /* スワイプヒント表示 */
+    .swipe-hint {
+      text-align: center !important;
+      padding: 5px 10px !important;
+      font-size: 12px !important;
+      color: #666 !important;
+      font-style: italic !important;
+    }
+  }
+}
+
+/* =================================================================== */
 /* 📱 デバッグ用スタイル（開発時のみ使用）                           */
 /* =================================================================== */
 
