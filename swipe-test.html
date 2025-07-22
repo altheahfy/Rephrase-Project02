@@ -70,7 +70,6 @@
     <div class="status-info">
         <div><strong>現在のモード:</strong> <span id="current-mode">スワイプUI有効</span></div>
         <div><strong>画面方向:</strong> <span id="current-orientation">自動検出</span></div>
-        <div><strong>現在のレイアウト:</strong> <span id="current-layout">未検出</span></div>
         <div><strong>テストスロット数:</strong> <span id="slot-count">3</span></div>
     </div>
 
@@ -136,66 +135,13 @@
         function simulatePortrait() {
             document.body.style.width = '375px';
             document.body.style.height = '667px';
-            document.body.style.maxWidth = '375px';
-            // 強制的にportrait扱いにする
-            document.body.setAttribute('data-orientation', 'portrait');
             document.getElementById('current-orientation').textContent = '縦画面 (375x667)';
-            
-            // CSSメディアクエリを強制適用
-            const styleElement = document.createElement('style');
-            styleElement.innerHTML = `
-                body[data-orientation="portrait"] .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
-                    display: flex !important;
-                    overflow-x: auto !important;
-                    grid-template-columns: none !important;
-                }
-            `;
-            document.head.appendChild(styleElement);
-            
-            console.log('🔄 縦画面モードに切り替え - フレックスレイアウト適用');
-            
-            // レイアウト更新を通知
-            setTimeout(() => {
-                updateLayoutInfo();
-            }, 100);
         }
 
         function simulateLandscape() {
             document.body.style.width = '667px';
             document.body.style.height = '375px';
-            document.body.style.maxWidth = '667px';
-            // 強制的にlandscape扱いにする
-            document.body.setAttribute('data-orientation', 'landscape');
             document.getElementById('current-orientation').textContent = '横画面 (667x375)';
-            
-            // CSSメディアクエリを強制適用
-            const styleElement = document.createElement('style');
-            styleElement.innerHTML = `
-                body[data-orientation="landscape"] .mobile-swipe-enabled .slot-wrapper.active-subslot-area {
-                    display: grid !important;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-                    overflow-x: hidden !important;
-                }
-            `;
-            document.head.appendChild(styleElement);
-            
-            console.log('🔄 横画面モードに切り替え - グリッドレイアウト適用');
-            
-            // レイアウト更新を通知
-            setTimeout(() => {
-                updateLayoutInfo();
-            }, 100);
-        }
-        
-        function updateLayoutInfo() {
-            const container = document.querySelector('.slot-wrapper.active-subslot-area');
-            if (container) {
-                const styles = window.getComputedStyle(container);
-                const layoutType = styles.display === 'flex' ? 'カルーセル(フレックス)' : 
-                                  styles.display === 'grid' ? 'グリッド' : '不明';
-                document.getElementById('current-layout').textContent = layoutType;
-                console.log('📊 レイアウト更新:', layoutType);
-            }
         }
 
         function addTestSlots() {
@@ -225,17 +171,6 @@
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === 0);
             });
-            
-            // レイアウト情報をリアルタイム表示
-            const container = document.querySelector('.slot-wrapper.active-subslot-area');
-            if (container) {
-                const styles = window.getComputedStyle(container);
-                console.log('📊 現在のレイアウト:');
-                console.log('- display:', styles.display);
-                console.log('- grid-template-columns:', styles.gridTemplateColumns);
-                console.log('- overflow-x:', styles.overflowX);
-                console.log('- 画面サイズ:', window.innerWidth, 'x', window.innerHeight);
-            }
         }
 
         // 画面回転検出
@@ -265,7 +200,6 @@
 
         // 初期化
         updateIndicators();
-        updateLayoutInfo();
         console.log('🎯 スワイプUIテストページが読み込まれました v2.1');
         console.log('📱 モバイルデバイスまたは開発者ツールのデバイスエミュレーションで確認してください');
         console.log('🔍 確認方法：F12→デバイスツールバー→iPhone選択→画面回転テスト');
