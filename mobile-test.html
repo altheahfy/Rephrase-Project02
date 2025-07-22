@@ -132,27 +132,27 @@
     </div>
     
     <!-- サブスロットエリアのシミュレーション -->
-    <div class="slot-wrapper active-subslot-area" style="background: rgba(254, 243, 199, 0.4); border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; overflow-x: auto;">
+    <div class="slot-wrapper active-subslot-area" style="background: rgba(254, 243, 199, 0.4); border: 2px solid #f59e0b; border-radius: 8px;">
       
       <!-- 黄色タブラベル -->
       <div class="subslot-label tab-style">
         📂 Subslot Detail View - M1 Modifier Details (This morning の詳細)
       </div>
       
-      <!-- サブスロットコンテンツ（2列表示） -->
-      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <div class="slot-container" style="flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px;">
-          <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-S</div>
-          <div class="slot-text">this</div>
-          <div class="slot-auxtext">この</div>
-        </div>
-        
-        <div class="slot-container" style="flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px;">
-          <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-AUX</div>
-          <div class="slot-text">morning</div>
-          <div class="slot-auxtext">朝</div>
-        </div>
+      <!-- サブスロットコンテンツ（CSSで制御） -->
+      <div class="slot-container" style="background: white; border-radius: 4px;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-S</div>
+        <div class="slot-text">this</div>
+        <div class="slot-auxtext">この</div>
       </div>
+      
+      <div class="slot-container" style="background: white; border-radius: 4px;">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">SUB-AUX</div>
+        <div class="slot-text">morning</div>
+        <div class="slot-auxtext">朝</div>
+      </div>
+      
+    </div>
       
     </div>
   </div>
