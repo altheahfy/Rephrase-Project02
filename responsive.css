@@ -1,0 +1,226 @@
+/* =================================================================== */
+/* 📱 Rephrase モバイル最適化CSS - Phase 1: 基本表示安定化             */
+/* =================================================================== */
+/* 注意: このCSSは既存のstyle.cssよりも後に読み込まれるため優先されます    */
+
+/* 🎯 Phase 1: 黄色タブの幅問題修正（最小侵襲アプローチ） */
+@media (max-width: 768px) {
+  /* 黄色タブラベルの幅問題修正 - 最高優先度 */
+  .subslot-label.tab-style {
+    margin-left: -10px !important;  /* -20px → -10px に緩和 */
+    margin-right: -10px !important; /* -20px → -10px に緩和 */
+    width: calc(100% + 20px) !important; /* 確実に幅を確保 */
+    max-width: calc(100vw - 40px) !important; /* ビューポート幅を超えないよう制限 */
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* はみ出し防止 */
+    word-wrap: break-word !important; /* 長いテキストの改行 */
+    position: relative !important; /* 既存スタイル保持 */
+  }
+
+  /* サブスロットエリアのはみ出し防止 - 最高優先度 */
+  .slot-wrapper.active-subslot-area {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important; /* 横スクロール防止 */
+    box-sizing: border-box !important; /* ボーダーボックス適用 */
+  }
+
+  /* 親スロットのタブ連結調整 - 最高優先度 */
+  .slot-container.active-parent-slot {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important; /* ボーダーボックス適用 */
+  }
+
+  /* 基本的なコンテナの横はみ出し防止 */
+  .slot-container {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 制御パネルのモバイル対応 */
+  .control-panel {
+    padding: 8px !important;
+    margin: 5px 0 !important;
+    overflow-x: auto !important; /* 横スクロール可能 */
+    white-space: nowrap !important; /* ボタンの改行防止 */
+  }
+
+  /* 全体ランダマイズボタンの調整 */
+  #randomize-all {
+    width: 100% !important;
+    max-width: none !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 Phase 2: タッチ操作最適化（準備）                               */
+/* =================================================================== */
+
+@media (max-width: 768px) {
+  /* ボタンサイズの適正化 */
+  button, .btn {
+    min-height: 44px !important; /* Apple推奨のタッチターゲットサイズ */
+    min-width: 44px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important; /* ズーム防止 */
+  }
+
+  /* タッチターゲット間隔調整 */
+  .control-panel button {
+    margin: 4px !important;
+  }
+
+  /* チェックボックスのタッチ領域拡大 */
+  input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 8px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 Phase 3: UX改善（準備）                                         */
+/* =================================================================== */
+
+@media (max-width: 768px) {
+  /* 縦画面専用レイアウト調整 */
+  .slot-container {
+    margin-bottom: 10px !important;
+    padding: 10px !important;
+  }
+
+  /* 長いコンテンツの分割表示準備 */
+  .slot-text, .slot-auxtext {
+    line-height: 1.6 !important;
+    font-size: 16px !important; /* 読みやすさ向上 */
+  }
+
+  /* アコーディオン式ナビゲーション準備 */
+  .control-panel {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 タブレット対応                                                  */
+/* =================================================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* タブレット専用の調整 */
+  .subslot-label.tab-style {
+    margin-left: -15px !important;
+    margin-right: -15px !important;
+    width: calc(100% + 30px) !important;
+  }
+
+  button, .btn {
+    min-height: 40px !important;
+    min-width: 40px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 スマートフォン小型画面対応                                       */
+/* =================================================================== */
+
+@media (max-width: 480px) {
+  /* より小さい画面での追加調整 */
+  .subslot-label.tab-style {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+  }
+
+  .slot-container {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* テキストサイズ調整 */
+  .slot-text, .slot-auxtext {
+    font-size: 14px !important;
+  }
+
+  /* ズームコントロールのサイズ調整 */
+  #zoomSlider {
+    width: 100% !important;
+    max-width: 200px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 横画面対応                                                      */
+/* =================================================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  /* 横画面での特別な調整 */
+  .control-panel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    padding: 8px !important;
+  }
+
+  /* メインコンテンツの下部余白確保 */
+  body {
+    padding-bottom: 80px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 アクセシビリティ改善                                            */
+/* =================================================================== */
+
+@media (max-width: 768px) {
+  /* 高コントラスト対応 */
+  @media (prefers-contrast: high) {
+    .subslot-label.tab-style {
+      border: 2px solid #000 !important;
+      color: #000 !important;
+    }
+  }
+
+  /* 動きの軽減 */
+  @media (prefers-reduced-motion: reduce) {
+    .slot-container.active-parent-slot,
+    .slot-wrapper.active-subslot-area {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* フォーカス表示の改善 */
+  button:focus, 
+  input:focus,
+  .btn:focus {
+    outline: 3px solid #007AFF !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* =================================================================== */
+/* 📱 デバッグ用スタイル（開発時のみ使用）                           */
+/* =================================================================== */
+
+/* デバッグ時にコメントアウトを外して使用 */
+/*
+@media (max-width: 768px) {
+  * {
+    border: 1px solid red !important;
+  }
+  
+  .subslot-label.tab-style {
+    background: rgba(255, 0, 0, 0.3) !important;
+  }
+}
+*/
