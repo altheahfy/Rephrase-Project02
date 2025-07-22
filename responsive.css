@@ -20,7 +20,7 @@
   }
 
   /* サブスロットエリアの適切なサイズ確保 - 上位スロットと同じ */
-  .slot-wrapper.active-subslot-area {
+  .slot-wrapper[id$="-sub"] {
     margin-left: 0 !important;
     margin-right: 0 !important;
     width: 100% !important;
@@ -80,7 +80,16 @@
     display: inline-block !important;
     vertical-align: top !important;
     white-space: normal !important; /* テキスト内は改行許可 */
-    margin-right: 10px !important; /* スロット間の余白 */
+    margin-right: 5px !important; /* スロット間の余白を縮小 */
+  }
+
+  /* 非表示スロットによる空白を除去 */
+  .slot-wrapper:not(.active-subslot-area) .slot-container[style*="display: none"],
+  .slot-wrapper:not(.active-subslot-area) .slot-container.hidden {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
   }
 
   /* 制御パネルのモバイル対応 */
@@ -220,17 +229,37 @@
 @media (max-width: 768px) and (orientation: landscape) {
   /* 横画面での特別な調整 */
   .control-panel {
-    position: fixed !important;
+    position: sticky !important; /* fixedからstickyに変更してスワイプを妨げない */
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     top: auto !important;
     padding: 8px !important;
+    z-index: 90 !important; /* スワイプより低い優先度 */
   }
 
   /* メインコンテンツの下部余白確保 */
   body {
     padding-bottom: 80px !important;
+  }
+
+  /* 横画面での上位スロット横スクロール対応 */
+  .slot-wrapper:not([id$="-sub"]) {
+    overflow-x: auto !important; /* 横スクロール可能 */
+    white-space: nowrap !important; /* 改行防止 */
+    padding-bottom: 10px !important; /* スクロールバー用の余白 */
+    scroll-behavior: smooth !important; /* スムーズスクロール */
+  }
+
+  /* 横画面での上位スロットをインライン表示 */
+  .slot-wrapper:not([id$="-sub"]) .slot-container {
+    display: inline-block !important;
+    vertical-align: top !important;
+    white-space: normal !important; /* テキスト内は改行許可 */
+    margin-right: 5px !important; /* スロット間の余白 */
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    min-width: 120px !important; /* 最小幅確保 */
   }
 }
 
