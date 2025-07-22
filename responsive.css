@@ -19,14 +19,16 @@
     white-space: nowrap !important; /* テキストの改行防止 */
   }
 
-  /* サブスロットエリアの適切なサイズ確保 - Phase 4で制御 */
+  /* サブスロットエリアの適切なサイズ確保 - 上位スロットと同じ */
   .slot-wrapper.active-subslot-area {
     margin-left: 0 !important;
     margin-right: 0 !important;
     width: 100% !important;
     min-width: 100% !important;
     box-sizing: border-box !important;
-    /* Phase 4のスワイプUIで詳細設定を行うため、ここでは基本設定のみ */
+    overflow-x: auto !important; /* 横スクロール可能 */
+    white-space: nowrap !important; /* 改行防止 */
+    padding-bottom: 10px !important; /* スクロールバー用の余白 */
   }
 
   /* 親スロットのタブ連結調整 - 10スロット分対応 */
@@ -39,11 +41,15 @@
     overflow-x: auto !important; /* 横スクロール可能 */
   }
 
-  /* サブスロット内のスロットコンテナ - Phase 4で制御 */
+  /* サブスロット内のスロットコンテナ - 上位スロットと同じ */
   .slot-wrapper.active-subslot-area .slot-container {
-    /* Phase 4のスワイプUIで詳細設定を行うため、ここでは基本設定のみ */
+    display: inline-block !important;
+    vertical-align: top !important;
+    white-space: normal !important; /* テキスト内は改行許可 */
+    margin-right: 10px !important; /* スロット間の余白 */
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
+    min-width: 120px !important; /* 各スロットの最小幅確保 */
   }
   
   /* サブスロット内のスタイル - Phase 4で制御 */
