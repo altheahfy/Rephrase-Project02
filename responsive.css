@@ -19,19 +19,14 @@
     white-space: nowrap !important; /* テキストの改行防止 */
   }
 
-  /* サブスロットエリアの適切なサイズ確保 - 横スクロール対応 */
+  /* サブスロットエリアの適切なサイズ確保 - Phase 4で制御 */
   .slot-wrapper.active-subslot-area {
     margin-left: 0 !important;
     margin-right: 0 !important;
     width: 100% !important;
     min-width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
     box-sizing: border-box !important;
-    padding: 15px 10px !important;
-    white-space: nowrap !important;
-    display: flex !important;
-    flex-direction: row !important;
+    /* Phase 4のスワイプUIで詳細設定を行うため、ここでは基本設定のみ */
   }
 
   /* 親スロットのタブ連結調整 - 10スロット分対応 */
@@ -44,50 +39,15 @@
     overflow-x: auto !important; /* 横スクロール可能 */
   }
 
-  /* サブスロット内のスロットコンテナ - 横スクロール対応 */
+  /* サブスロット内のスロットコンテナ - Phase 4で制御 */
   .slot-wrapper.active-subslot-area .slot-container {
-    width: 160px !important;
-    min-width: 160px !important;
-    max-width: 160px !important;
-    margin-bottom: 0 !important;
-    margin-right: 10px !important;
-    flex-shrink: 0 !important;
-    display: inline-block !important;
-    vertical-align: top !important;
-    white-space: normal !important;
-    height: auto !important;
-    padding: 10px !important;
+    /* Phase 4のスワイプUIで詳細設定を行うため、ここでは基本設定のみ */
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
   
-  /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど） */
-  .slot-wrapper.active-subslot-area .slot-container .slot-header {
-    text-align: center !important;
-    font-weight: bold !important;
-    font-size: 12px !important;
-    color: #333 !important;
-    margin-bottom: 8px !important;
-    padding: 4px 6px !important;
-    background: #e9ecef !important;
-    border-radius: 3px !important;
-    border: 1px solid #ced4da !important;
-  }
-  
-  /* サブスロット内のテキストコンテンツ */
-  .slot-wrapper.active-subslot-area .slot-container .slot-text,
-  .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
-    text-align: center !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    color: #333 !important;
-    margin: 4px 0 !important;
-    padding: 6px !important;
-    background: #f8f9fa !important;
-    border-radius: 3px !important;
-    min-height: 25px !important;
-    word-wrap: break-word !important;
-    display: block !important;
-  }
+  /* サブスロット内のスタイル - Phase 4で制御 */
+  /* Phase 4のスワイプUIで詳細設定を行います */
 
   /* メインのスロットエリア全体 - 横スクロール対応 */
   body {
@@ -243,19 +203,8 @@
     font-size: 13px !important; /* 縦画面では少し小さめのフォント */
   }
 
-  /* 縦画面でのサブスロットエリア最適化 */
-  .slot-wrapper.active-subslot-area {
-    min-height: auto !important; /* 高さの自動調整 */
-    padding: 10px !important; /* パディング調整 */
-  }
-
-  /* 縦画面でのスロット表示 - グリッドレイアウト */
-  .slot-wrapper.active-subslot-area .slot-container {
-    width: calc(50% - 5px) !important; /* 2列表示 */
-    display: inline-block !important;
-    vertical-align: top !important;
-    margin: 5px !important;
-  }
+  /* 縦画面でのサブスロットエリア最適化 - Phase 4で制御 */
+  /* Phase 4のスワイプUIで詳細設定を行います */
 }
 
 /* =================================================================== */
@@ -316,173 +265,166 @@
 
 /* 🎯 スワイプUI: 縦画面でのカルーセル型表示 */
 @media (max-width: 768px) and (orientation: portrait) {
-  /* スワイプUI有効化フラグ（テスト用） */
-  .mobile-swipe-enabled {
-    /* 黄色タブを隠してスワイプナビゲーションに切り替え */
-    .subslot-label.tab-style {
-      display: none !important;
-    }
-    
-    /* スロットコンテナをスワイプ可能なカルーセルに変換 */
-    .slot-wrapper.active-subslot-area {
-      display: flex !important;
-      flex-direction: row !important;
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-      scroll-snap-type: x mandatory !important;
-      scroll-behavior: smooth !important;
-      gap: 10px !important;
-      padding: 15px 10px !important;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
-      border-radius: 12px !important;
-      margin: 10px 0 !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-      height: auto !important;
-      min-height: 120px !important;
-      white-space: nowrap !important;
-    }
-    
-    /* 各スロットをスワイプページとして設定 */
-    .slot-wrapper.active-subslot-area .slot-container {
-      min-width: 200px !important;
-      max-width: 200px !important;
-      width: 200px !important;
-      scroll-snap-align: center !important;
-      flex-shrink: 0 !important;
-      background: white !important;
-      border-radius: 8px !important;
-      padding: 15px !important;
-      margin: 0 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-      border-left: 4px solid #007AFF !important;
-      display: inline-block !important;
-      vertical-align: top !important;
-      white-space: normal !important;
-      height: auto !important;
-      min-height: 80px !important;
-    }
-    
-    /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど）を適切に表示 */
-    .slot-wrapper.active-subslot-area .slot-container .slot-header {
-      text-align: center !important;
-      font-weight: bold !important;
-      font-size: 14px !important;
-      color: #333 !important;
-      margin-bottom: 10px !important;
-      padding: 6px 8px !important;
-      background: #f8f9fa !important;
-      border-radius: 4px !important;
-      border: 1px solid #dee2e6 !important;
-    }
-    
-    /* サブスロット内のテキストコンテンツ */
-    .slot-wrapper.active-subslot-area .slot-container .slot-text,
-    .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
-      text-align: center !important;
-      font-size: 16px !important;
-      line-height: 1.4 !important;
-      color: #333 !important;
-      margin: 8px 0 !important;
-      padding: 8px !important;
-      background: #f8f9fa !important;
-      border-radius: 4px !important;
-      min-height: 30px !important;
-      display: block !important;
-      word-wrap: break-word !important;
-    }
+  /* 黄色タブを隠してスワイプナビゲーションに切り替え */
+  .subslot-label.tab-style {
+    display: none !important;
+  }
+  
+  /* スロットコンテナをスワイプ可能なカルーセルに変換 */
+  .slot-wrapper.active-subslot-area {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-behavior: smooth !important;
+    gap: 10px !important;
+    padding: 15px 10px !important;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    border-radius: 12px !important;
+    margin: 10px 0 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    height: auto !important;
+    min-height: 120px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* 各スロットをスワイプページとして設定 */
+  .slot-wrapper.active-subslot-area .slot-container {
+    min-width: 200px !important;
+    max-width: 200px !important;
+    width: 200px !important;
+    scroll-snap-align: center !important;
+    flex-shrink: 0 !important;
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    margin: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    border-left: 4px solid #007AFF !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    white-space: normal !important;
+    height: auto !important;
+    min-height: 80px !important;
+  }
+  
+  /* サブスロット内のスロットヘッダー（SUB-S、SUB-AUXなど）を適切に表示 */
+  .slot-wrapper.active-subslot-area .slot-container .slot-header {
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    margin-bottom: 10px !important;
+    padding: 6px 8px !important;
+    background: #f8f9fa !important;
+    border-radius: 4px !important;
+    border: 1px solid #dee2e6 !important;
+  }
+  
+  /* サブスロット内のテキストコンテンツ */
+  .slot-wrapper.active-subslot-area .slot-container .slot-text,
+  .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
+    text-align: center !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+    margin: 8px 0 !important;
+    padding: 8px !important;
+    background: #f8f9fa !important;
+    border-radius: 4px !important;
+    min-height: 30px !important;
+    display: block !important;
+    word-wrap: break-word !important;
   }
 }
 
 /* 🎯 スワイプUI: 横画面でのグリッド型表示 */
 @media (max-width: 768px) and (orientation: landscape) {
-  .mobile-swipe-enabled {
-    /* 横画面では2x2グリッドレイアウト */
-    .slot-wrapper.active-subslot-area {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 10px !important;
-      padding: 10px !important;
-      max-height: 70vh !important;
-      overflow-y: auto !important;
-    }
-    
-    .slot-wrapper.active-subslot-area .slot-container {
-      min-width: auto !important;
-      max-width: none !important;
-      background: white !important;
-      border-radius: 6px !important;
-      padding: 15px !important;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-start !important;
-      align-items: stretch !important;
-    }
-    
-    /* 横画面でのスロットヘッダー */
-    .slot-wrapper.active-subslot-area .slot-container .slot-header {
-      text-align: center !important;
-      font-weight: bold !important;
-      font-size: 14px !important;
-      color: #333 !important;
-      margin-bottom: 10px !important;
-      padding: 6px 10px !important;
-      background: #f8f9fa !important;
-      border-radius: 4px !important;
-      border: 1px solid #dee2e6 !important;
-    }
-    
-    /* 横画面でのテキストコンテンツ */
-    .slot-wrapper.active-subslot-area .slot-container .slot-text,
-    .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
-      text-align: center !important;
-      font-size: 16px !important;
-      line-height: 1.4 !important;
-      color: #333 !important;
-      margin: 8px 0 !important;
-      padding: 8px !important;
-      background: #f8f9fa !important;
-      border-radius: 4px !important;
-      min-height: 30px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
+  /* 横画面では2x2グリッドレイアウト */
+  .slot-wrapper.active-subslot-area {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    padding: 10px !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .slot-wrapper.active-subslot-area .slot-container {
+    min-width: auto !important;
+    max-width: none !important;
+    background: white !important;
+    border-radius: 6px !important;
+    padding: 15px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+  }
+  
+  /* 横画面でのスロットヘッダー */
+  .slot-wrapper.active-subslot-area .slot-container .slot-header {
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    margin-bottom: 10px !important;
+    padding: 6px 10px !important;
+    background: #f8f9fa !important;
+    border-radius: 4px !important;
+    border: 1px solid #dee2e6 !important;
+  }
+  
+  /* 横画面でのテキストコンテンツ */
+  .slot-wrapper.active-subslot-area .slot-container .slot-text,
+  .slot-wrapper.active-subslot-area .slot-container .slot-auxtext {
+    text-align: center !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+    margin: 8px 0 !important;
+    padding: 8px !important;
+    background: #f8f9fa !important;
+    border-radius: 4px !important;
+    min-height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }
 
 /* 🎯 スワイプUI: 視覚的インジケーター */
 @media (max-width: 768px) {
-  .mobile-swipe-enabled {
-    /* スワイプインジケーター（ドット表示） */
-    .swipe-indicator {
-      display: flex !important;
-      justify-content: center !important;
-      gap: 6px !important;
-      padding: 10px !important;
-      margin-top: 5px !important;
-    }
-    
-    .swipe-indicator .dot {
-      width: 8px !important;
-      height: 8px !important;
-      border-radius: 50% !important;
-      background: rgba(0, 122, 255, 0.3) !important;
-      transition: background 0.3s ease !important;
-    }
-    
-    .swipe-indicator .dot.active {
-      background: #007AFF !important;
-    }
-    
-    /* スワイプヒント表示 */
-    .swipe-hint {
-      text-align: center !important;
-      padding: 5px 10px !important;
-      font-size: 12px !important;
-      color: #666 !important;
-      font-style: italic !important;
-    }
+  /* スワイプインジケーター（ドット表示） */
+  .swipe-indicator {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 10px !important;
+    margin-top: 5px !important;
+  }
+  
+  .swipe-indicator .dot {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: rgba(0, 122, 255, 0.3) !important;
+    transition: background 0.3s ease !important;
+  }
+  
+  .swipe-indicator .dot.active {
+    background: #007AFF !important;
+  }
+  
+  /* スワイプヒント表示 */
+  .swipe-hint {
+    text-align: center !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    color: #666 !important;
+    font-style: italic !important;
   }
 }
 
