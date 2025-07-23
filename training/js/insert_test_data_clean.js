@@ -239,13 +239,25 @@ function applyOrderToAllSlots(jsonData) {
     }
   });
   
-  // 親コンテナにflexboxレイアウトを適用（PC版の設定をそのまま維持）
+  // 親コンテナにflexboxレイアウトを適用（モバイル対応考慮版）
   const slotWrapper = document.querySelector('.slot-wrapper');
   if (slotWrapper) {
-    // PC版が完璧に動作しているため、設定を一切変更しない
-    // モバイル対応は外側のCSSコンテナで行い、内部は完全保護
-    console.log("🔒 PC版の完璧な語順制御システムを完全保護");
-    // JavaScriptでの設定変更は行わない（PC版デフォルトを使用）
+    // モバイルデバイスの場合は flex-direction を強制しない
+    const isMobileDevice = document.documentElement.classList.contains('mobile-device');
+    
+    if (isMobileDevice) {
+      // モバイルでもCSS order属性を確実に機能させるためflex設定を明示
+      slotWrapper.style.display = 'flex';
+      slotWrapper.style.flexDirection = 'row'; // 横並び + order属性で語順制御
+      slotWrapper.style.flexWrap = 'nowrap'; // 改行しない
+      console.log("📱 モバイルデバイス: 横並び + CSS order属性で語順制御");
+    } else {
+      // PC版でも横並び（英語は横書き言語）
+      slotWrapper.style.display = 'flex';
+      slotWrapper.style.flexDirection = 'row';
+      slotWrapper.style.flexWrap = 'wrap';
+      console.log("💻 PCデバイス: 横並びflex-directionを適用");
+    }
   }
   
   console.log("✅ 上位スロットの表示順適用完了");
