@@ -8,11 +8,12 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② タイトル帯（白い背景）を狭くする */
+/* ② タイトル帯（白い背景）を音声学習ボタンと同じ高さに */
 .mobile-device h1 {
-  padding: 5px !important; /* 白い背景の余白を狭く */
-  margin: 5px 0 !important;
+  padding: 2px 5px !important; /* 上下の余白を最小に */
+  margin: 2px 0 !important; /* 上下マージンも最小に */
   font-size: 16px !important;
+  line-height: 1.1 !important; /* 行間も詰める */
 }
 
 .mobile-device h2 {
