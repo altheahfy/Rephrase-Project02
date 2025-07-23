@@ -159,14 +159,20 @@
 /* 🔧 動的記載エリア（解答全文）の位置正常化   */
 /* ========================================= */
 
-/* 動的記載エリアを正常位置に配置 */
+/* 動的記載エリアを正常位置に配置 - より包括的なセレクタ */
 .mobile-device #dynamic-content,
 .mobile-device .dynamic-display,
 .mobile-device div[id*="answer"],
-.mobile-device div[id*="result"] {
+.mobile-device div[id*="result"],
+.mobile-device div[style*="margin-top: 30px"],
+.mobile-device section[id*="dynamic"],
+.mobile-device .result-area,
+.mobile-device .answer-area {
   margin-top: 10px !important; /* 適切な上部余白 */
   margin-bottom: 10px !important; /* 適切な下部余白 */
   position: relative !important; /* 位置を正常化 */
+  top: auto !important; /* top位置をリセット */
+  transform: none !important; /* transformをリセット */
 }
 
 /* ========================================= */
