@@ -1,22 +1,9 @@
 /* =================================================================== */
-/* 📱 モバイル上下2分割スワイプシステム - 制約遵守版                  */
+/* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
-/* 🚫 禁止: display:flex/grid, position, flex-*, grid-*, !important */
-/* ✅ 許可: height, width, overflow, touch-action, display:block のみ */
+/* ✅ PC版のスタイルを完全に保持し、モバイルでは最小限の調整のみ      */
 
-/* 📱 基本設定: ピンチは画面全体、上下スクロール禁止 */
-.mobile-device body {
-  touch-action: manipulation;
-  overflow: hidden;
-  height: 100vh;
-}
-
-/* 📱 メインコンテンツ表示 */
-.mobile-device #main-content {
-  display: block;
-}
-
-/* 📱 上エリア: 上位スロット（大きさのみ調整） */
+/* 📱 モバイル版: PC版スタイル完全保持 + 分割エリアサイズ調整のみ */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 50vh;
   overflow-x: auto;
@@ -24,7 +11,6 @@
   touch-action: pan-x;
 }
 
-/* 📱 下エリア: サブスロット（大きさのみ調整） */
 .mobile-device .slot-wrapper[id$="-sub"] {
   height: 50vh;
   overflow-x: auto;
