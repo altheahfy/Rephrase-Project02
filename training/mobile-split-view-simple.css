@@ -167,7 +167,10 @@
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 4px !important; /* 6px → 4px */
   background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
-  transform: none !important; /* transform排除 */
+  /* 🎯 スロット全体を縮小 */
+  transform: scale(0.8) !important;
+  transform-origin: top left !important;
+  width: 125% !important; /* scale(0.8)の逆数で調整 */
 }
 
 /* 🟢 サブスロット表示エリア：サイズ調整（7割） */
@@ -204,55 +207,20 @@
   overflow-y: auto !important;
   border: none !important;
   background: transparent !important;
-  transform: none !important;
+  /* 🎯 サブスロット全体を縮小 */
+  transform: scale(0.7) !important;
+  transform-origin: top left !important;
 }
 
-/* 🔧 スロット内コンテンツのサイズ調整 */
-.mobile-device .slot-wrapper * {
-  font-size: 10px !important; /* 基本フォントサイズ縮小 */
-  line-height: 1.1 !important; /* 行間圧縮 */
-}
-
-/* 🔧 スロット内の各要素調整 */
+/* 🔧 スロット内コンテンツの基本調整のみ */
 .mobile-device .slot-wrapper .slot-container {
-  padding: 3px !important; /* padding縮小 */
-  margin: 2px 0 !important; /* margin縮小 */
+  padding: 4px !important;
+  margin: 3px 0 !important;
 }
 
 .mobile-device .slot-wrapper .slot {
-  padding: 4px !important; /* padding縮小 */
-  margin: 2px !important; /* margin縮小 */
-  font-size: 9px !important; /* さらに小さく */
-}
-
-/* 🖼️ 画像サイズ大幅縮小 */
-.mobile-device .slot-wrapper img {
-  max-width: 50px !important; /* さらに縮小 */
-  max-height: 35px !important; /* さらに縮小 */
-  margin: 1px !important;
-}
-
-/* 🔧 ボタンサイズ調整 */
-.mobile-device .slot-wrapper button {
-  font-size: 8px !important;
-  padding: 2px 3px !important; /* さらに小さく */
-  margin: 1px !important;
-  min-height: 14px !important; /* 高さ縮小 */
-}
-
-/* 🎯 特にサブスロット内はさらに小さく */
-.mobile-device .slot-wrapper[id$="-sub"] * {
-  font-size: 8px !important; /* サブスロットはさらに小さく */
-}
-
-.mobile-device .slot-wrapper[id$="-sub"] img {
-  max-width: 40px !important; /* サブスロットの画像はさらに小さく */
-  max-height: 28px !important;
-}
-
-.mobile-device .slot-wrapper[id$="-sub"] .slot {
-  padding: 2px !important; /* サブスロットのpaddingをさらに縮小 */
-  margin: 1px !important;
+  padding: 5px !important;
+  margin: 3px !important;
 }
 
 /* ========================================= */
