@@ -5,11 +5,6 @@
 
 /* 🔒 PC版完全保護: 一切のスタイル変更禁止 */
 
-/* 📱 メインコンテンツ表示（非表示状態を解除） */
-.mobile-device #main-content {
-  display: block !important;
-}
-
 /* 📱 モバイル専用: 表示領域制限のみ */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   /* 上エリア: 上50vh */
