@@ -123,6 +123,21 @@
   white-space: nowrap !important;
 }
 
+/* ❌ メインの文章構造では語順を保持する必要があります */
+.mobile-device.portrait-mode .slot-wrapper:not(.active-subslot-area) {
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 10px !important;
+  padding-bottom: 10px !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-radius: 8px !important;
+  margin: 5px 0 !important;
+  display: block !important; /* 語順保持のため縦配置を維持 */
+  flex-direction: column !important; /* JavaScriptのSlot_display_order制御を尊重 */
+}
+
 .mobile-device.portrait-mode .slot-wrapper.active-subslot-area .slot-container {
   min-width: 200px !important;
   max-width: 200px !important;
