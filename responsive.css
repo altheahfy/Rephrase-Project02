@@ -44,6 +44,11 @@
   
   /* 🔒 PC版display設定を絶対に上書きしない */
   /* display プロパティは指定しない → JavaScriptのflex制御を尊重 */
+  
+  /* 🎯 モバイルでは水平スクロール優先 */
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
 }
 
 /* PC版のslot-containerも制御ロジック完全保持 */
@@ -65,6 +70,14 @@
   
   /* 🔒 PC版display/order設定を絶対に上書きしない */
   /* display・order プロパティは指定しない → JavaScript制御を尊重 */
+  
+  /* 🎯 モバイル横レイアウト最適化 */
+  flex-shrink: 0 !important;
+  min-width: 120px !important;
+  max-width: 200px !important;
+  display: inline-block !important;
+  vertical-align: top !important;
+  white-space: normal !important;
 }
 
 /* サブスロット展開時もPC版ロジック完全保持 */
