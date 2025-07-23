@@ -51,12 +51,13 @@
   line-height: 1.1 !important;
 }
 
-/* ④ 分割エリア：縦画面に両方表示 */
+/* ④ 分割エリア：縦画面に両方表示 + フロートメニュー対応 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 40vh !important;
   overflow-x: auto;
   overflow-y: hidden;
   touch-action: pan-x;
+  margin-top: 60px !important; /* フロートメニューの下に表示 */
 }
 
 .mobile-device .slot-wrapper[id$="-sub"] {
