@@ -47,6 +47,8 @@
   border-radius: 8px !important;
   padding: 10px !important;
   margin: 5px 0 !important;
+  display: block !important; /* PC側スタイルを確実に上書き */
+  width: 100% !important; /* 幅を100%に設定 */
 }
 
 .mobile-device .slot-wrapper:not(.active-subslot-area) .slot-container {
@@ -62,11 +64,43 @@
   border-radius: 6px !important;
   padding: 8px !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  width: auto !important; /* 幅を自動調整 */
+  max-width: none !important; /* 最大幅制限を解除 */
 }
 
 /* =================================================================== */
 /* 📱 縦画面専用スタイル */
 /* =================================================================== */
+/* 縦画面では上位スロットもモバイル表示を維持（優先度を上げる） */
+.mobile-device.portrait-mode .slot-wrapper:not(.active-subslot-area) {
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 10px !important;
+  padding-bottom: 10px !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-radius: 8px !important;
+  margin: 5px 0 !important;
+  display: block !important; /* 確実にブロック表示 */
+}
+
+.mobile-device.portrait-mode .slot-wrapper:not(.active-subslot-area) .slot-container {
+  display: inline-block !important;
+  vertical-align: top !important;
+  white-space: normal !important;
+  margin-right: 5px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  min-width: 120px !important;
+  scroll-snap-align: start !important;
+  background: white !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  width: auto !important; /* 幅を自動調整 */
+}
+
 .mobile-device.portrait-mode .subslot-label.tab-style {
   display: none !important;
 }
@@ -138,6 +172,36 @@
 /* =================================================================== */
 /* 📱 横画面専用スタイル */
 /* =================================================================== */
+/* 横画面でも上位スロットはモバイル表示を維持（優先度を上げる） */
+.mobile-device.landscape-mode .slot-wrapper:not(.active-subslot-area) {
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 10px !important;
+  padding-bottom: 10px !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-radius: 8px !important;
+  margin: 5px 0 !important;
+  display: block !important; /* 確実にブロック表示 */
+}
+
+.mobile-device.landscape-mode .slot-wrapper:not(.active-subslot-area) .slot-container {
+  display: inline-block !important;
+  vertical-align: top !important;
+  white-space: normal !important;
+  margin-right: 5px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  min-width: 100px !important; /* 横画面では少し小さく */
+  scroll-snap-align: start !important;
+  background: white !important;
+  border-radius: 6px !important;
+  padding: 6px !important; /* 横画面では少し小さく */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  width: auto !important; /* 幅を自動調整 */
+}
+
 .mobile-device.landscape-mode .subslot-label.tab-style {
   display: none !important;
 }
@@ -145,14 +209,14 @@
 .mobile-device.landscape-mode .slot-wrapper.active-subslot-area {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
-  padding: 10px !important;
-  max-height: 70vh !important;
+  gap: 8px !important; /* 少し小さく */
+  padding: 8px !important; /* 少し小さく */
+  max-height: 60vh !important; /* 高さを少し小さく */
   overflow-y: auto !important;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
-  border-radius: 12px !important;
-  margin: 10px 0 !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important; /* 少し小さく */
+  margin: 8px 0 !important; /* 少し小さく */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1) !important; /* 少し小さく */
 }
 
 .mobile-device.landscape-mode .slot-wrapper.active-subslot-area .slot-container {
