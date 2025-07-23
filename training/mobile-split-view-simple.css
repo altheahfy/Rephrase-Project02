@@ -12,9 +12,10 @@
 .mobile-device #main-content {
   height: 100vh;
   overflow: hidden;
+  display: block;
 }
 
-/* 📱 上エリア: 上位スロット（画面上半分） */
+/* 📱 上エリア: 上位スロット（画面上半分・固定位置） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 50vh;
   overflow-x: auto;
@@ -22,8 +23,9 @@
   touch-action: pan-x;
 }
 
-/* 📱 下エリア: サブスロット（画面下半分） */
+/* 📱 下エリア: サブスロット（画面下半分・強制表示・固定位置） */
 .mobile-device .slot-wrapper[id$="-sub"] {
+  display: block !important;
   height: 50vh;
   overflow-x: auto;
   overflow-y: hidden;
