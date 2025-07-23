@@ -164,9 +164,9 @@
   width: 125% !important; /* scale(0.8)の逆数で調整 */
 }
 
-/* スワイプエリアサイズは適切に保持 */
+/* スワイプエリアサイズ調整 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 40vh !important; /* 35vh → 40vh スワイプエリア拡大 */
+  height: 45vh !important; /* 40vh → 45vh スワイプエリア拡大 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
@@ -178,7 +178,7 @@
 }
 
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 40vh !important; /* 35vh → 40vh スワイプエリア拡大 */
+  height: 45vh !important; /* 40vh → 45vh スワイプエリア拡大 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
