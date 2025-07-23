@@ -1,27 +1,9 @@
-/* =======================================// 🔝 PC版上位スロットのクローンを上画面に表示（PC版は保護）
-function cloneUpperSlotsToUpperArea() {
-  const upperArea = document.querySelector('.upper-slot-area');
-  const mainSlotWrapper = document.querySelector('.slot-wrapper');
-  
-  if (!upperArea || !mainSlotWrapper) {
-    console.warn("⚠ 上画面またはslot-wrapperが見つかりません");
-    return;
-  }
-  
-  // PC版の完全なクローンを作成（スタイルと構造を保持）
-  const clonedWrapper = mainSlotWrapper.cloneNode(true);
-  clonedWrapper.classList.add('mobile-slot-clone');
-  
-  // 上画面に追加
-  upperArea.appendChild(clonedWrapper);
-  
-  console.log("🔝 PC版上位スロットクローンを上画面に表示（PC版完全保護）");
-}============ */
+/* =================================================================== */
 /* 📱 モバイル上下2分割レイアウト動的調整システム                      */
 /* =================================================================== */
-/* PC版完全保護 + クローン表示方式 */
+/* PC版完全保護 + 外側コンテナ自動生成方式 */
 
-// モバイル検出時に上下分割コンテナを自動生成してPC版をクローン表示
+// モバイル検出時に上下分割コンテナを自動生成
 function initializeMobileSplitView() {
   if (!document.documentElement.classList.contains('mobile-device')) {
     console.log("💻 PC版: 上下分割システムをスキップ");
@@ -29,6 +11,13 @@ function initializeMobileSplitView() {
   }
   
   console.log("📱 モバイル上下2分割システム初期化開始");
+  
+  // 既存のコンテナを保護したまま外側ラッパーを作成
+  const mainContent = document.getElementById('main-content');
+  if (!mainContent) {
+    console.warn("⚠ main-content が見つかりません");
+    return;
+  }
   
   // 🔝 上画面コンテナを作成
   const upperArea = document.createElement('div');
@@ -49,10 +38,10 @@ function initializeMobileSplitView() {
   document.body.appendChild(lowerArea);
   document.body.appendChild(divider);
   
-  // 🔒 PC版コンテンツのクローンを上画面に表示
-  cloneUpperSlotsToUpperArea();
+  // 🔒 PC版コンテンツを上画面に移動（保護）
+  moveUpperSlotsToUpperArea();
   
-  // 🔒 サブスロットコンテンツの動的クローン設定
+  // 🔒 サブスロットコンテンツの動的配置設定
   setupSubslotAreaControl();
   
   console.log("✅ モバイル上下2分割システム初期化完了");
@@ -94,8 +83,8 @@ function setupSubslotAreaControl() {
     const isVisible = window.getComputedStyle(subslotContainer).display !== 'none';
     
     if (isVisible) {
-      // サブスロットが表示された場合、下画面にクローンを表示
-      cloneSubslotToLowerArea(subslotContainer, slotType);
+      // サブスロットが表示された場合、下画面に移動
+      moveSubslotToLowerArea(subslotContainer, slotType);
     } else {
       // サブスロットが非表示になった場合、下画面をクリア
       clearLowerArea();
@@ -105,12 +94,12 @@ function setupSubslotAreaControl() {
   console.log("🔽 サブスロット下画面制御を設定");
 }
 
-// 📦 特定のサブスロットのクローンを下画面に表示
-function cloneSubslotToLowerArea(subslotContainer, slotType) {
+// 📦 特定のサブスロットを下画面に移動
+function moveSubslotToLowerArea(subslotContainer, slotType) {
   const lowerArea = document.querySelector('.lower-subslot-area');
   if (!lowerArea || !subslotContainer) return;
   
-  // 下画面をクリアして新しいサブスロットクローンを配置
+  // 下画面をクリアして新しいサブスロットを配置
   const existingLabel = lowerArea.querySelector('.area-label');
   lowerArea.innerHTML = '';
   
@@ -118,15 +107,16 @@ function cloneSubslotToLowerArea(subslotContainer, slotType) {
     lowerArea.appendChild(existingLabel);
   }
   
-  // PC版サブスロットの完全なクローンを作成
-  const clonedSubslot = subslotContainer.cloneNode(true);
-  clonedSubslot.classList.add('mobile-slot-clone');
-  clonedSubslot.id = `mobile-${subslotContainer.id}`; // ID重複を避ける
+  // サブスロットコンテナを下画面に移動（PC版制御保護）
+  lowerArea.appendChild(subslotContainer);
   
-  // 下画面に追加
-  lowerArea.appendChild(clonedSubslot);
+  // ラベル更新
+  const label = lowerArea.querySelector('.area-label');
+  if (label) {
+    label.textContent = `🔍 ${slotType.toUpperCase()} 詳細`;
+  }
   
-  console.log(`📦 ${slotType}サブスロットクローンを下画面に表示`);
+  console.log(`📦 ${slotType} サブスロットを下画面に移動`);
 }
 
 // 🧹 下画面をクリア
@@ -152,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // 🔄 ランダマイズ後の再配置
 window.addEventListener('randomize-complete', function() {
   if (document.documentElement.classList.contains('mobile-device')) {
-    // PC版システムは保護、クローンの再作成のみ
-    cloneUpperSlotsToUpperArea();
+    // PC版システムは保護、位置調整のみ
+    moveUpperSlotsToUpperArea();
   }
 });
