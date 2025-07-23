@@ -141,10 +141,10 @@
 }
 
 /* =================================================================== */
-/* 📱 Phase 3: UX改善（準備）                                         */
+/* 📱 Phase 3: UX改善（モバイル専用レイアウト）                        */
 /* =================================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   /* 縦画面専用レイアウト調整 */
   .slot-container {
     margin-bottom: 10px !important;
@@ -255,6 +255,11 @@
     white-space: nowrap !important; /* 改行防止 */
     padding-bottom: 10px !important; /* スクロールバー用の余白 */
     scroll-behavior: smooth !important; /* スムーズスクロール */
+    scroll-snap-type: x mandatory !important; /* スナップスクロール追加 */
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    margin: 5px 0 !important;
   }
 
   /* 横画面での上位スロットをインライン表示 */
@@ -266,6 +271,11 @@
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
     min-width: 120px !important; /* 最小幅確保 */
+    scroll-snap-align: start !important; /* スナップ位置指定 */
+    background: white !important;
+    border-radius: 6px !important;
+    padding: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
   }
 }
 
@@ -382,6 +392,11 @@
 
 /* 🎯 スワイプUI: 横画面でのグリッド型表示 */
 @media (max-height: 500px) and (orientation: landscape) {
+  /* 横画面でも黄色タブを隠してスワイプナビゲーションに切り替え */
+  .subslot-label.tab-style {
+    display: none !important;
+  }
+  
   /* 横画面では2x2グリッドレイアウト */
   .slot-wrapper.active-subslot-area {
     display: grid !important;
@@ -390,6 +405,10 @@
     padding: 10px !important;
     max-height: 70vh !important;
     overflow-y: auto !important;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    border-radius: 12px !important;
+    margin: 10px 0 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   }
   
   .slot-wrapper.active-subslot-area .slot-container {
