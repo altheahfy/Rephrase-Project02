@@ -271,27 +271,7 @@
 }
 
 /* =================================================================== */
-/* 📱 デバッグ用スタイル（動作確認用）                                */
+/* 📱 デバッグ用スタイル（本番では非表示）                           */
 /* =================================================================== */
 
-/* デバッグ用 - モバイルデバイス検出確認 */
-.mobile-device {
-  border: 3px solid green !important;
-}
-
-.mobile-device.portrait-mode {
-  border: 3px solid blue !important;
-}
-
-.mobile-device.landscape-mode {
-  border: 3px solid red !important;
-}
-
-/* デバッグ用 - スロット枠確認 */
-.mobile-device .slot-wrapper:not(.active-subslot-area) {
-  border: 2px dashed orange !important;
-}
-
-.mobile-device .slot-wrapper.active-subslot-area {
-  border: 2px dashed purple !important;
-}
+/* デバッグ用スタイルは削除済み - 本番運用 */

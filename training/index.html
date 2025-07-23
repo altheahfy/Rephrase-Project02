@@ -33,8 +33,7 @@
       console.log('isTouchDevice:', isTouchDevice);
       
       // モバイルデバイスと判定された場合、htmlにクラスを追加
-      // テスト用：常にモバイルクラスを追加
-      if (isMobile || isTouchDevice || true) { // テスト用にtrueを追加
+      if (isMobile || isTouchDevice) {
         console.log('モバイルデバイスと判定されました');
         document.documentElement.classList.add('mobile-device');
         
