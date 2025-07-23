@@ -153,36 +153,15 @@
 }
 
 /* ========================================= */
-/* 🔧 動的記載エリアの位置固定（最重要）      */
-/* ========================================= */
-
-/* margin-top: 30pxを持つ動的記載エリアの位置を強制固定 */
-.mobile-device section[style*="margin-top: 30px"],
-.mobile-device div[style*="margin-top: 30px"] {
-  margin-top: 15px !important; /* 30px → 15px 適度な間隔 */
-  position: relative !important; /* 相対位置指定 */
-  transform: none !important; /* transformリセット */
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  float: none !important;
-  clear: both !important;
-  display: block !important;
-  z-index: 5 !important; /* 適切なレイヤー順序 */
-}
-
-/* ========================================= */
 /* 🎯 スロット領域の最適化（PC版レイアウト保持） */
 /* ========================================= */
 
-/* 🚨 transformを使用せず、font-sizeとpadding調整のみでサイズ縮小 */
+/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
 .mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  /* transform完全排除 - JavaScript位置計算への干渉を回避 */
-  font-size: 12px !important; /* デフォルト16px → 12px (75%縮小) */
-  line-height: 1.1 !important; /* 行間も圧縮 */
-  /* transformとwidthの調整は削除 */
+  transform: scale(0.7) !important; /* 0.8 → 0.7 スロットをさらに縮小 */
+  transform-origin: top left !important;
+  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
 }
 
 /* スワイプエリアサイズ調整 */
@@ -208,24 +187,6 @@
   border: 1px solid #ddd !important;
   border-radius: 4px !important;
   background: rgba(255, 248, 240, 0.8) !important;
-}
-
-/* スロット内の個別要素サイズ調整（transform回避） */
-.mobile-device .slot-wrapper button {
-  font-size: 9px !important; /* ボタンをより小さく */
-  padding: 2px 4px !important;
-  min-height: 16px !important;
-  margin: 1px !important;
-}
-
-.mobile-device .slot-wrapper img {
-  max-width: 60px !important; /* 画像サイズ縮小 */
-  max-height: 45px !important;
-}
-
-.mobile-device .slot-wrapper div {
-  padding: 1px 2px !important; /* スロット内divの余白縮小 */
-  margin: 1px 0 !important;
 }
 
 /* ========================================= */
