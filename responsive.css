@@ -297,6 +297,51 @@
   overflow: hidden !important;
 }
 
+/* 📱 モバイル専用フロートメニュー最適化 */
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] {
+  height: 45px !important;
+  white-space: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  flex-wrap: nowrap !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+.mobile-device div[style*="position: fixed"][style*="top: 10px"]::-webkit-scrollbar {
+  display: none !important; /* Chrome/Safari/WebKit */
+}
+
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] > * {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] a,
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] span,
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] label,
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] button,
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] input,
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] select {
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  font-size: 11px !important;
+}
+
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] div[style*="display: flex"] {
+  gap: 2px !important;
+}
+
+/* モバイルでズームコントロールを簡略化 */
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] #zoomSlider {
+  width: 60px !important;
+}
+
+.mobile-device div[style*="position: fixed"][style*="top: 10px"] #presetSelect {
+  width: 100px !important;
+}
+
 /* =================================================================== */
 /* 📱 デバッグ用スタイル（本番では非表示）                           */
 /* =================================================================== */
