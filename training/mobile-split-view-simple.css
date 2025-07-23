@@ -159,7 +159,7 @@
 /* 🔧 動的記載エリア（解答全文）の位置正常化   */
 /* ========================================= */
 
-/* 動的記載エリアを正常位置に配置 - より包括的なセレクタ */
+/* 動的記載エリアを正常位置に配置 - JavaScript実行前後で位置を固定 */
 .mobile-device #dynamic-content,
 .mobile-device .dynamic-display,
 .mobile-device div[id*="answer"],
@@ -170,25 +170,36 @@
 .mobile-device .answer-area {
   margin-top: 10px !important; /* 適切な上部余白 */
   margin-bottom: 10px !important; /* 適切な下部余白 */
-  position: relative !important; /* 位置を正常化 */
+  position: static !important; /* 通常の文書フローに従う */
   top: auto !important; /* top位置をリセット */
   transform: none !important; /* transformをリセット */
   /* JavaScript実行後も位置を維持 */
   float: none !important;
   clear: both !important;
   display: block !important;
+  /* 追加：位置の強制固定 */
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 10 !important; /* 他要素より前面だが、ボタンより後面 */
+}
+
+/* 動的記載エリアが絶対位置指定された場合の対処 */
+.mobile-device div[style*="position: absolute"] {
+  position: static !important; /* 絶対位置を無効化 */
 }
 
 /* ========================================= */
 /* 🎯 スロット領域の最適化（PC版レイアウト保持） */
 /* ========================================= */
 
-/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
+/* 🚨 PC版のスロット構造を完全保持し、JavaScript干渉を避けるfont-size縮小のみ適用 */
 .mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  transform: scale(0.7) !important; /* スロットを70%に縮小 */
-  transform-origin: top left !important;
-  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
+  /* transformを使用せず、font-sizeで縮小してJavaScript位置計算への干渉を回避 */
+  font-size: 11px !important; /* デフォルト16px → 11px (約70%縮小) */
+  line-height: 1.2 !important; /* 行間も圧縮 */
+  /* width調整は削除 - JavaScript位置計算に干渉しないため */
 }
 
 /* スワイプエリアサイズ調整 */
@@ -214,6 +225,22 @@
   border: 1px solid #ddd !important;
   border-radius: 4px !important;
   background: rgba(255, 248, 240, 0.8) !important;
+}
+
+/* スロット内の全要素をfont-sizeで縮小（JavaScript位置計算に干渉しない） */
+.mobile-device .slot-wrapper * {
+  font-size: 11px !important; /* 統一縮小 */
+}
+
+.mobile-device .slot-wrapper button {
+  font-size: 9px !important; /* ボタンはより小さく */
+  padding: 2px 4px !important;
+  min-height: 16px !important;
+}
+
+.mobile-device .slot-wrapper img {
+  max-width: 80px !important; /* 画像サイズ調整 */
+  max-height: 60px !important;
 }
 
 /* ========================================= */
