@@ -196,6 +196,13 @@
 /* 🚨 PC版レイアウト構造は絶対に変更しない！ */
 /* 横一列レイアウト（ID、イラスト、日本語、英語、詳細、ランダマイズ）を保持 */
 
+/* ボタンのタッチ操作改善 */
+.mobile-device button {
+  touch-action: manipulation !important; /* ボタンタップを優先 */
+  pointer-events: auto !important; /* ボタンクリックを確実に有効化 */
+  z-index: 1000 !important; /* 最前面に表示 */
+}
+
 /* 個別ランダマイズボタンの表示保証 */
 .mobile-device button[onclick*="Individual"],
 .mobile-device .randomize-button {
@@ -205,4 +212,7 @@
   min-width: 15px !important;
   visibility: visible !important;
   display: inline-block !important;
+  touch-action: manipulation !important; /* タップ操作優先 */
+  pointer-events: auto !important;
+  z-index: 1001 !important; /* さらに前面に */
 }
