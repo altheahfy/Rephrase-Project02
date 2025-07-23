@@ -41,39 +41,47 @@
 
 /* 🔝 上エリア: 上位スロット表示（PC版そのまま、位置・サイズのみ調整） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* 位置・サイズ調整のみ（!important削除でPC版スタイル保護） */
-  height: 50vh;
+  /* 位置・サイズ調整のみ */
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 50vh !important;
   
   /* 横スワイプのみ許可 */
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   
   /* 上下移動禁止、横スワイプのみ */
-  touch-action: pan-x;
+  touch-action: pan-x !important;
   
   /* スムーズスクロール */
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
   
-  /* PC版のスタイルは完全保持（!important使用せず） */
-  /* 緑色グラデーション、CSS Grid、全てのレイアウトを保護 */
+  /* PC版のスタイルは完全保持（色・形・レイアウト変更なし） */
+  /* flex設定、order制御、語順システム等は一切変更しない */
 }
 
 /* 🔽 下エリア: サブスロット表示（PC版そのまま、位置・サイズのみ調整） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  /* 位置・サイズ調整のみ（!important削除でPC版スタイル保護） */
-  height: 50vh;
+  /* 位置・サイズ調整のみ */
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 50vh !important;
   
   /* 横スワイプのみ許可 */
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   
   /* 上下移動禁止、横スワイプのみ */
-  touch-action: pan-x;
+  touch-action: pan-x !important;
   
   /* スムーズスクロール */
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
   
   /* PC版のサブスロットスタイルは完全保持 */
   /* 展開・折り畳み制御、個別ランダマイズ等は一切変更しない */
@@ -82,30 +90,30 @@
 /* 📱 スクロールバー最適化（エリア境界の視認性向上） */
 .mobile-device .slot-wrapper::-webkit-scrollbar,
 .mobile-device .slot-wrapper[id$="-sub"]::-webkit-scrollbar {
-  height: 3px;
+  height: 3px !important;
 }
 
 .mobile-device .slot-wrapper::-webkit-scrollbar-thumb,
 .mobile-device .slot-wrapper[id$="-sub"]::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.4);
-  border-radius: 2px;
+  background: rgba(0,0,0,0.4) !important;
+  border-radius: 2px !important;
 }
 
 /* 🚫 上下スクロール完全禁止（横スワイプのみ） */
 .mobile-device .slot-wrapper,
 .mobile-device .slot-wrapper[id$="-sub"] {
-  overscroll-behavior-y: none;
-  -ms-scroll-chaining: none;
+  overscroll-behavior-y: none !important;
+  -ms-scroll-chaining: none !important;
 }
 
 /* 📍 エリア境界線（視認性向上） */
-.mobile-device .slot-wrapper:not([id$="-sub"])::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(0,0,0,0.2);
-  pointer-events: none;
+.mobile-device .slot-wrapper::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 1px !important;
+  background: rgba(0,0,0,0.2) !important;
+  pointer-events: none !important;
 }
