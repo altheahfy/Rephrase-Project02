@@ -3,34 +3,39 @@
 /* =================================================================== */
 /* ✅ PC版のスタイルを完全に保持し、モバイルでは最小限の調整のみ      */
 
-/* ① タッチ操作の改善：画面全体操作可能 */
+/* 🔍 デバッグ：CSSが読み込まれているか確認 */
 .mobile-device body {
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
+  background: yellow !important; /* デバッグ用：背景を黄色に */
 }
 
 /* ② UI要素のサイズ調整（PC版機能はそのまま、サイズのみ調整） */
 .mobile-device h1,
 .mobile-device h2 {
-  font-size: 16px;
-  line-height: 1.2;
-  margin: 5px 0;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+  margin: 5px 0 !important;
+  color: red !important; /* デバッグ用：文字を赤色に */
 }
 
 .mobile-device button {
-  font-size: 12px;
-  padding: 5px 10px;
-  margin: 2px;
-  min-height: 25px;
+  font-size: 12px !important;
+  padding: 5px 10px !important;
+  margin: 2px !important;
+  min-height: 25px !important;
+  background: blue !important; /* デバッグ用：ボタンを青色に */
+  color: white !important;
 }
 
 .mobile-device .slot-container {
-  width: 50%;
-  font-size: 12px;
+  width: 50% !important;
+  font-size: 12px !important;
+  border: 3px solid red !important; /* デバッグ用：赤い枠線 */
 }
 
 .mobile-device .slot-image {
-  width: 60px;
-  height: 60px;
+  width: 60px !important;
+  height: 60px !important;
 }
 
 /* ③ 分割エリア：横スワイプのみ、ピンチは画面全体に委譲 */
