@@ -167,10 +167,13 @@
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 4px !important; /* 6px → 4px */
   background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
-  /* 🎯 スロット全体を縮小 */
+  /* スワイプエリアのサイズは維持 */
+}
+
+/* 🎯 上位スロット内部コンテンツのみ縮小 */
+.mobile-device .slot-wrapper:not([id$="-sub"]) > * {
   transform: scale(0.8) !important;
   transform-origin: top left !important;
-  width: 125% !important; /* scale(0.8)の逆数で調整 */
 }
 
 /* 🟢 サブスロット表示エリア：サイズ調整（7割） */
@@ -207,7 +210,11 @@
   overflow-y: auto !important;
   border: none !important;
   background: transparent !important;
-  /* 🎯 サブスロット全体を縮小 */
+  /* スワイプエリアのサイズは維持 */
+}
+
+/* 🎯 サブスロット内部コンテンツのみ縮小 */
+.mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
   transform: scale(0.7) !important;
   transform-origin: top left !important;
 }
