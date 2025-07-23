@@ -1,0 +1,55 @@
+/* =================================================================== */
+/* 📱 モバイル上下2分割スワイプシステム - 要件定義通り実装              */
+/* =================================================================== */
+/* ①上下2分割、横スワイプのみ、ピンチは画面全体                       */
+/* ②PC版そのまま表示、大きさと位置のみ調整                          */
+/* ③上部エリア確保: 制御パネル、疑問詞表示など                       */
+
+/* 📱 基本設定: ピンチは画面全体、上下スクロール禁止 */
+.mobile-device body {
+  touch-action: manipulation; /* ピンチは画面全体に適用 */
+  overflow: hidden; /* 上下スクロール禁止 */
+  height: 100vh;
+}
+
+/* 📱 メインコンテンツエリア: 縦配置で上部エリア確保 */
+.mobile-device #main-content {
+  display: flex !important;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 📱 上部固定エリア: 制御パネル・疑問詞表示など */
+.mobile-device #display-top-question-word,
+.mobile-device button[id="toggle-control-panels"],
+.mobile-device .control-panel {
+  flex-shrink: 0; /* 固定サイズ */
+}
+
+/* 📱 上エリア: 上位スロット（PC版そのまま、残り空間の上半分） */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  /* 残り空間の50% */
+  flex: 1 1 0;
+  max-height: calc((100vh - 200px) / 2); /* 上部エリア200px確保後の半分 */
+  
+  /* 横スワイプのみ許可 */
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x; /* 横スワイプのみ */
+  
+  /* PC版のスタイル（色・レイアウト・機能）は完全保持 */
+}
+
+/* 📱 下エリア: サブスロット（PC版そのまま、残り空間の下半分） */
+.mobile-device .slot-wrapper[id$="-sub"] {
+  /* 残り空間の50% */
+  flex: 1 1 0;
+  max-height: calc((100vh - 200px) / 2); /* 上部エリア200px確保後の半分 */
+  
+  /* 横スワイプのみ許可 */
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x; /* 横スワイプのみ */
+  
+  /* PC版のスタイル（色・レイアウト・機能）は完全保持 */
+}
