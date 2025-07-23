@@ -1,33 +1,45 @@
 /* =================================================================== */
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保護型               */
 /* =================================================================== */
-/* 戦略: PC版を完全保護し、外側に上下分割スワイプコンテナのみ追加      */
+/* 戦略: PC版は一切変更せず、モバイル時のみ上下分割表示               */
 
-/* 🔒 PC版完全保護: 内部の制御システムは一切変更しない */
+/* 🔒 PC版完全保護: PC版の元コンテンツは一切変更しない */
 /* ✅ 保護対象:
- * - 語順制御システム
+ * - 全てのCSSスタイル
+ * - 語順制御システム  
  * - サブスロット展開・折り畳み
  * - 個別ランダマイズ
  * - JavaScriptのCSS制御
  * - 全てのDOM構造
+ * - 緑色のスロット表示
+ * - 縦レイアウト構造
  */
 
-/* 📱 モバイル専用: 上下2分割スワイプシステム */
+/* 📱 モバイル専用: 上下2分割表示システム */
 .mobile-device {
-  /* 全画面レイアウト制御 */
+  /* 基本レイアウト制御 */
   height: 100vh !important;
   overflow: hidden !important;
 }
 
 .mobile-device body {
-  /* スクロール禁止 */
+  /* スクロール制御 */
   overflow: hidden !important;
   height: 100vh !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-/* 🔝 上画面: 上位スロット専用エリア */
+/* 🔒 PC版コンテンツを完全非表示（モバイル時のみ） */
+.mobile-device .slot-wrapper {
+  display: none !important;
+}
+
+.mobile-device [id^="slot-"][id$="-sub"] {
+  display: none !important;
+}
+
+/* 🔝 上画面: 上位スロット表示エリア */
 .mobile-device .upper-slot-area {
   /* 固定高さ（画面の50%） */
   height: 50vh !important;
@@ -50,9 +62,14 @@
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border-bottom: 2px solid #dee2e6 !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  
+  /* 内部レイアウト */
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px !important;
 }
 
-/* 🔽 下画面: サブスロット専用エリア */
+/* 🔽 下画面: サブスロット表示エリア */
 .mobile-device .lower-subslot-area {
   /* 残り高さ（画面の50%） */
   height: 50vh !important;
@@ -75,38 +92,21 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
   border-top: 2px solid #dee2e6 !important;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.1) !important;
-}
-
-/* 🔒 PC版コンテンツを上画面に配置（完全保護） */
-.mobile-device .upper-slot-area .slot-wrapper {
-  /* PC版の設定を完全保持 */
-  /* 位置調整のみ許可、その他は一切変更禁止 */
   
-  /* 上画面内でのフィット調整 */
-  height: 100% !important;
+  /* 内部レイアウト */
   display: flex !important;
   align-items: center !important;
   padding: 10px !important;
-  
-  /* PC版のflex設定は保護（上書きしない） */
-  /* flex-direction, flex-wrap, order などは完全保持 */
 }
 
-/* 🔒 サブスロットを下画面に配置（完全保護） */
-.mobile-device .lower-subslot-area .slot-wrapper[id$="-sub"] {
-  /* PC版のサブスロット制御を完全保持 */
-  /* 位置調整のみ許可、その他は一切変更禁止 */
-  
-  /* 下画面内でのフィット調整 */
-  height: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  padding: 10px !important;
-  
-  /* PC版のサブスロット制御システムは完全保護 */
+/* � 上下エリア内のスロットクローン表示 */
+.mobile-device .upper-slot-area .mobile-slot-clone,
+.mobile-device .lower-subslot-area .mobile-slot-clone {
+  /* PC版のスタイルを完全模倣 */
+  /* JavaScriptでPC版から動的コピーして作成される */
 }
 
-/* 📱 スクロールバー最適化 */
+/* �📱 スクロールバー最適化 */
 .mobile-device .upper-slot-area::-webkit-scrollbar,
 .mobile-device .lower-subslot-area::-webkit-scrollbar {
   height: 4px !important;
