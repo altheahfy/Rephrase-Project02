@@ -213,7 +213,7 @@
 
 /* 🎯 上位スロットエリア：画面上半分（50%） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 30vh !important; /* 40vh → 30vh さらに縮小してスロット密度向上 */
+  height: 45vh !important; /* 30vh → 45vh スワイプ領域を拡大復元 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
@@ -226,7 +226,7 @@
 
 /* 🎯 サブスロットエリア：画面下半分（50%） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 30vh !important; /* 40vh → 30vh さらに縮小してスロット密度向上 */
+  height: 45vh !important; /* 30vh → 45vh スワイプ領域を拡大復元 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
