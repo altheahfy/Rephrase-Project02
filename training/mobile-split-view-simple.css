@@ -159,7 +159,7 @@
 /* 🔧 スロットサイズ適正化：ボタンが隠れないサイズに */
 .mobile-device .slot-container {
   width: 25% !important; /* 28% → 25% スロット自体をさらに縮小 */
-  height: 55px !important; /* 60px → 55px スロット自体をさらに縮小 */
+  height: 40px !important; /* 55px → 40px ボタン表示のため大幅縮小 */
   font-size: 8px !important;
   margin: 1px !important;
   border-radius: 3px !important;
@@ -178,10 +178,10 @@
 
 .mobile-device .slot-text,
 .mobile-device .slot-phrase {
-  font-size: 7px !important;
-  line-height: 1.0 !important;
-  padding: 1px !important;
-  max-height: 18px !important;
+  font-size: 12px !important; /* 7px → 12px テキストを大幅拡大 */
+  line-height: 1.2 !important; /* 1.0 → 1.2 読みやすさ向上 */
+  padding: 2px !important; /* 1px → 2px */
+  max-height: 35px !important; /* 18px → 35px テキスト表示領域拡大 */
   overflow: hidden !important;
   word-wrap: break-word !important;
 }
