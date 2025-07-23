@@ -160,6 +160,7 @@
 .mobile-device .slot-container {
   width: 25% !important; /* 28% → 25% スロット自体をさらに縮小 */
   height: 40px !important; /* 55px → 40px ボタン表示のため大幅縮小 */
+  max-height: 40px !important; /* 強制的に高さ制限 */
   font-size: 8px !important;
   margin: 1px !important;
   border-radius: 3px !important;
@@ -178,10 +179,10 @@
 
 .mobile-device .slot-text,
 .mobile-device .slot-phrase {
-  font-size: 12px !important; /* 7px → 12px テキストを大幅拡大 */
-  line-height: 1.2 !important; /* 1.0 → 1.2 読みやすさ向上 */
-  padding: 2px !important; /* 1px → 2px */
-  max-height: 35px !important; /* 18px → 35px テキスト表示領域拡大 */
+  font-size: 16px !important; /* 12px → 16px さらに拡大 */
+  line-height: 1.3 !important; /* 1.2 → 1.3 読みやすさ向上 */
+  padding: 3px !important; /* 2px → 3px */
+  max-height: 45px !important; /* 35px → 45px テキスト表示領域拡大 */
   overflow: hidden !important;
   word-wrap: break-word !important;
 }
@@ -212,7 +213,7 @@
 
 /* 🎯 上位スロットエリア：画面上半分（50%） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 40vh !important; /* 45vh → 40vh さらに縮小 */
+  height: 30vh !important; /* 40vh → 30vh さらに縮小してスロット密度向上 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
@@ -225,7 +226,7 @@
 
 /* 🎯 サブスロットエリア：画面下半分（50%） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 40vh !important; /* 45vh → 40vh さらに縮小 */
+  height: 30vh !important; /* 40vh → 30vh さらに縮小してスロット密度向上 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
