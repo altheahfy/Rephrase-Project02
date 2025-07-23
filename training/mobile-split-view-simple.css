@@ -12,7 +12,7 @@
 .mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
   padding: 5px 10px !important; /* 15px → 5px に削減 */
   margin-bottom: 5px !important; /* 15px → 5px に削減 */
-  margin-top: 5px !important; /* 20px → 5px に削減 */
+  margin-top: 50px !important; /* フロートメニューの下に配置 */
 }
 
 .mobile-device h1 {
