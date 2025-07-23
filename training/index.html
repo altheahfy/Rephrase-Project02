@@ -427,38 +427,45 @@ function handleLogout() {
 </script>
 
 <!-- シンプルなナビゲーションリンク -->
-<div style="position: fixed; top: 10px; left: 10px; z-index: 16000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px;">
-  <a href="../" style="text-decoration: none; color: #2196F3; font-size: 14px; font-weight: bold;">🏠 ホーム</a>
-  <span style="color: #ccc;">|</span>
-  <a href="grammar/" style="text-decoration: none; color: #2196F3; font-size: 14px;">📚 文法</a>
-  <span style="color: #ccc;">|</span>
+<div id="navigation-float-menu" style="position: fixed; top: 10px; left: 10px; z-index: 16000; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; height: 45px; white-space: nowrap; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+  <a href="../" style="text-decoration: none; color: #2196F3; font-size: 14px; font-weight: bold; flex-shrink: 0;">🏠 ホーム</a>
+  <span style="color: #ccc; flex-shrink: 0;">|</span>
+  <a href="grammar/" style="text-decoration: none; color: #2196F3; font-size: 14px; flex-shrink: 0;">📚 文法</a>
+  <span style="color: #ccc; flex-shrink: 0;">|</span>
   
   <!-- 🔐 管理者専用機能（隠し機能） -->
-  <div id="adminPanel" style="display: none; align-items: center; gap: 8px;">
-    <a href="rate-limit-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">🛡️ 監視</a>
-    <a href="error-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px;">⚠️ エラー</a>
-    <span style="color: #ccc;">|</span>
+  <div id="adminPanel" style="display: none; align-items: center; gap: 8px; flex-shrink: 0;">
+    <a href="rate-limit-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px; flex-shrink: 0;">🛡️ 監視</a>
+    <a href="error-dashboard.html" style="text-decoration: none; color: #ff6b35; font-size: 14px; flex-shrink: 0;">⚠️ エラー</a>
+    <span style="color: #ccc; flex-shrink: 0;">|</span>
   </div>
   
   <!-- サンプルデータ選択 -->
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <label style="font-size: 12px; font-weight: bold; color: #333;">📋 サンプルデータ</label>
-    <select id="presetSelect" style="width: 150px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-      <option value="">-- データを選択 --</option>
-      <option value="data/slot_order_data.json">🎯 メインデータセット</option>
-      <option value="data/slot_order_data2.json">📚 例文データセット2</option>
+  <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+    <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;">📋 データ</label>
+    <select id="presetSelect" style="width: 120px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px;">
+      <option value="">-- 選択 --</option>
+      <option value="data/slot_order_data.json">🎯 メイン</option>
+      <option value="data/slot_order_data2.json">📚 例文2</option>
     </select>
-    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">読込</button>
+    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold; white-space: nowrap; flex-shrink: 0;">読込</button>
   </div>
   
   <!-- ズームコントローラー -->
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <label style="font-size: 12px; font-weight: bold; color: #333;">🔍 ズーム</label>
-    <input type="range" id="zoomSlider" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 80px; height: 20px; cursor: pointer;">
-    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 35px; text-align: center;">100%</span>
-    <button id="zoomResetButton" style="background-color: #FF9800; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; font-weight: bold;">リセット</button>
+  <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+    <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;">🔍</label>
+    <input type="range" id="zoomSlider" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 60px; height: 20px; cursor: pointer; flex-shrink: 0;">
+    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 30px; text-align: center; white-space: nowrap; flex-shrink: 0;">100%</span>
+    <button id="zoomResetButton" style="background-color: #FF9800; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0;">リセット</button>
   </div>
 </div>
+
+<style>
+/* フロートメニューのスクロールバーを隠す */
+#navigation-float-menu::-webkit-scrollbar {
+  display: none;
+}
+</style>
 
 <!-- 🎭 ローディングオーバーレイ（強化版） -->
 <div id="loading-overlay" style="
