@@ -153,63 +153,41 @@
 }
 
 /* ========================================= */
-/* 🎯 新方針：サブスロット常時表示システム    */
+/* 🎯 スロット領域の最適化（PC版レイアウト保持） */
 /* ========================================= */
 
-/* 🚨 上位スロット：PC版レイアウト完全保持、transformなし */
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* transform完全排除 - 画像歪み回避 */
-  font-size: 12px !important; /* デフォルト16px → 12px (75%縮小) */
-  line-height: 1.2 !important; /* 行間圧縮 */
-  height: 25vh !important; /* 上半分：25vh */
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  margin-top: 3px !important;
-  margin-bottom: 2px !important;
-  border: 1px solid #007bff !important; /* 青色：上位スロット */
-  border-radius: 4px !important;
-  background: rgba(240, 248, 255, 0.9) !important;
-}
-
-/* 🌟 サブスロット：常時表示、下半分に配置 */
+/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
+.mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  /* transform完全排除 - 画像歪み回避 */
-  font-size: 12px !important; /* デフォルト16px → 12px (75%縮小) */
-  line-height: 1.2 !important; /* 行間圧縮 */
-  height: 25vh !important; /* 下半分：25vh */
+  transform: scale(0.7) !important; /* 0.8 → 0.7 スロットをさらに縮小 */
+  transform-origin: top left !important;
+  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
+}
+
+/* スワイプエリアサイズ調整 */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  height: 50vh !important; /* 48vh → 50vh スワイプエリア最終拡大 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  display: block !important; /* 🌟 常時表示 */
-  margin-top: 2px !important;
-  margin-bottom: 3px !important;
-  border: 1px solid #28a745 !important; /* 緑色：サブスロット */
+  margin-top: 5px !important;
+  margin-bottom: 2px !important;
+  border: 1px solid #ddd !important;
   border-radius: 4px !important;
-  background: rgba(248, 255, 248, 0.9) !important;
+  background: rgba(240, 248, 255, 0.8) !important;
 }
 
-/* 🔤 空のサブスロットに説明文表示 */
-.mobile-device .slot-wrapper[id$="-sub"]:empty::before {
-  content: "📂 詳細ボタンを押すとサブスロットが表示されます";
+.mobile-device .slot-wrapper[id$="-sub"] {
+  height: 50vh !important; /* 48vh → 50vh スワイプエリア最終拡大 */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  touch-action: pan-x pan-y !important;
   display: block !important;
-  text-align: center !important;
-  padding: 20px 10px !important;
-  color: #666 !important;
-  font-size: 11px !important;
-  font-style: italic !important;
-  line-height: 1.4 !important;
+  margin-top: 2px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  background: rgba(255, 248, 240, 0.8) !important;
 }
-
-/* 🎨 各スロット専用色分け */
-.mobile-device #slot-m1-sub { border-color: #e74c3c !important; background: rgba(255, 245, 245, 0.9) !important; }
-.mobile-device #slot-s-sub { border-color: #f39c12 !important; background: rgba(255, 250, 240, 0.9) !important; }
-.mobile-device #slot-m2-sub { border-color: #3498db !important; background: rgba(240, 248, 255, 0.9) !important; }
-.mobile-device #slot-c1-sub { border-color: #9b59b6 !important; background: rgba(248, 245, 255, 0.9) !important; }
-.mobile-device #slot-o1-sub { border-color: #1abc9c !important; background: rgba(245, 255, 250, 0.9) !important; }
-.mobile-device #slot-o2-sub { border-color: #e67e22 !important; background: rgba(255, 248, 240, 0.9) !important; }
-.mobile-device #slot-c2-sub { border-color: #34495e !important; background: rgba(248, 250, 252, 0.9) !important; }
-.mobile-device #slot-m3-sub { border-color: #2ecc71 !important; background: rgba(245, 255, 245, 0.9) !important; }
 
 /* ========================================= */
 /* 🔧 ボタン表示の確実な保証                 */
