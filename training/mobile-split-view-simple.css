@@ -3,48 +3,48 @@
 /* =================================================================== */
 /* ✅ PC版のスタイルを完全に保持し、モバイルでは最小限の調整のみ      */
 
-/* ① タッチ操作の改善：画面全体でピンチ可能、スワイプエリア内は横スワイプのみ */
+/* ① タッチ操作の改善：画面全体操作可能 */
 .mobile-device body {
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
 /* ② UI要素のサイズ調整（PC版機能はそのまま、サイズのみ調整） */
-.mobile-device h1 {
-  height: auto;
-  width: auto;
-  overflow: visible;
+.mobile-device h1,
+.mobile-device h2 {
+  font-size: 16px;
+  line-height: 1.2;
+  margin: 5px 0;
 }
 
 .mobile-device button {
-  height: 25px;
-  width: auto;
-  overflow: visible;
+  font-size: 12px;
+  padding: 5px 10px;
+  margin: 2px;
+  min-height: 25px;
 }
 
 .mobile-device .slot-container {
-  height: auto;
   width: 50%;
-  overflow: visible;
+  font-size: 12px;
 }
 
 .mobile-device .slot-image {
-  height: 60px;
   width: 60px;
-  overflow: visible;
+  height: 60px;
 }
 
-/* 📱 分割エリア：横スワイプのみ許可 */
+/* ③ 分割エリア：横スワイプのみ、ピンチは画面全体に委譲 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 50vh;
   overflow-x: auto;
   overflow-y: hidden;
-  touch-action: pan-x; /* スワイプエリア内は横スワイプのみ */
+  touch-action: pan-x; /* 横スワイプのみ、ピンチ・縦ドラッグは画面全体に委譲 */
 }
 
 .mobile-device .slot-wrapper[id$="-sub"] {
   height: 50vh;
   overflow-x: auto;
   overflow-y: hidden;
-  touch-action: pan-x; /* スワイプエリア内は横スワイプのみ */
+  touch-action: pan-x; /* 横スワイプのみ、ピンチ・縦ドラッグは画面全体に委譲 */
   display: block !important; /* サブスロット強制表示 */
 }
