@@ -1,0 +1,116 @@
+/* =================================================================== */
+/* 📱 PC版DOM完全保持型モバイル対応CSS                             */
+/* =================================================================== */
+/* 戦略: 静的HTMLを一切変更せず、外側コンテナでスワイプ機能のみ実現    */
+
+/* 🎯 モバイル専用: PC版をそのまま横スクロールコンテナに封じ込め */
+.mobile-device .main-slot-area {
+  /* PC版の静的DOM構造を完全保持 */
+  /* JavaScriptの語順制御・サブスロット展開・ランダマイズ機能を一切変更しない */
+  
+  /* 外側スワイプコンテナ */
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  white-space: nowrap !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  padding: 10px !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-radius: 8px !important;
+  margin: 5px 0 !important;
+  
+  /* PC版の表示ロジックをそのまま維持 */
+  display: block !important;
+  
+  /* モバイル用のスワイプ最適化 */
+  -webkit-overflow-scrolling: touch !important;
+  scroll-padding: 10px !important;
+}
+
+/* PC版のslot-wrapperは内部構造をそのまま維持 */
+.mobile-device .slot-wrapper {
+  /* 🚫 display: flexを上書きしない */
+  /* 🚫 JavaScriptのorder制御を妨害しない */
+  /* 🚫 静的DOM構造を変更しない */
+  
+  /* 必要最小限のモバイル最適化のみ */
+  width: 100% !important;
+  min-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* PC版のslot-containerも内部ロジックを完全保持 */
+.mobile-device .slot-container {
+  /* PC版の表示・語順制御・サブスロット機能をそのまま維持 */
+  /* JavaScriptによるCSS order属性制御を妨害しない */
+  
+  /* モバイルタッチ最適化のみ追加 */
+  min-height: 44px !important;
+  padding: 12px !important;
+  margin: 4px !important;
+  touch-action: manipulation !important;
+  
+  /* PC版のflex設定を尊重 */
+  /* display設定は一切上書きしない */
+}
+
+/* サブスロット展開時もPC版ロジックを完全保持 */
+.mobile-device .slot-wrapper[id$="-sub"] {
+  /* PC版のサブスロット制御システムをそのまま維持 */
+  /* JavaScriptの動的表示・非表示制御を妨害しない */
+  
+  /* 外側スワイプコンテナ最適化のみ */
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 15px 10px !important;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  border-radius: 12px !important;
+  margin: 10px 0 !important;
+  
+  /* PC版の内部構造は完全保持 */
+  display: block !important;
+}
+
+/* モバイル用タッチ最適化 */
+.mobile-device button,
+.mobile-device .btn {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  padding: 12px 16px !important;
+  font-size: 16px !important;
+  touch-action: manipulation !important;
+}
+
+/* フロートメニューのモバイル最適化 */
+.mobile-device #navigation-float-menu {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.mobile-device #navigation-float-menu::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* =================================================================== */
+/* 📱 重要: PC版の制御システム完全保護                               */
+/* =================================================================== */
+
+/* ✅ 保護対象:
+ * - structure_builder.jsの動的語順制御
+ * - insert_test_data_clean.jsのapplyOrderToAllSlots
+ * - subslot_toggle.jsのサブスロット展開・折り畳み  
+ * - randomizer_individual.jsの個別ランダマイズ
+ * - HTMLの静的DOM構造
+ * - JavaScriptのflex/order CSS制御
+ */
+
+/* 🚫 絶対に上書きしない項目:
+ * - .slot-wrapper の display プロパティ
+ * - .slot-container の order プロパティ  
+ * - .subslot-container の表示・非表示制御
+ * - JavaScript制御のflex設定
+ * - 静的HTMLのDOM階層
+ */
