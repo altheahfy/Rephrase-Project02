@@ -207,53 +207,47 @@ function reorderSubslots(parentSlotId, jsonData) {
   console.log(`✅ ${parentId}内のサブスロットを順序通りに再配置しました`);
 }
 
-// すべての上位スロットを順序付けする関数 - DOM順序直接変更版（モバイル対応）
+// すべての上位スロットを順序付けする関数 - CSSのorder属性を使用する安全版
 function applyOrderToAllSlots(jsonData) {
   if (!jsonData || !Array.isArray(jsonData)) {
     console.warn("⚠ 順序付けに使用するデータが無効です");
     return;
   }
   
-  console.log("🔢 上位スロットの表示順を適用開始（DOM順序変更版）");
+  console.log("🔢 上位スロットの表示順を適用開始");
   
   // 上位スロットのIDとorderマッピングを作成
   const upperSlots = jsonData.filter(item => item.SubslotID === "" && item.PhraseType === "word");
+  const slotOrderMap = new Map();
   
-  // Slot_display_orderで並び替え（structure_builder.jsと同じロジック）
-  upperSlots.sort((a, b) => (a.Slot_display_order || 0) - (b.Slot_display_order || 0));
+  upperSlots.forEach(item => {
+    // order値を取得（display_order、Slot_display_orderまたはorderフィールド）
+    const orderValue = item.display_order || item.Slot_display_order || item.order || 0;
+    slotOrderMap.set(item.Slot.toLowerCase(), orderValue);
+  });
   
-  console.log("📊 並び替え済み上位スロット順序:", upperSlots.map(item => `${item.Slot}(${item.Slot_display_order})`));
+  // マップのエントリを確認
+  console.log("📊 スロット順序マップ:", [...slotOrderMap.entries()]);
   
-  // 親コンテナを取得
-  const slotWrapper = document.querySelector('.slot-wrapper');
-  if (!slotWrapper) {
-    console.warn("⚠ .slot-wrapperが見つかりません");
-    return;
-  }
-  
-  // 現在のDOM順序と理想的な順序を比較
-  const currentSlots = Array.from(slotWrapper.children).filter(child => child.id && child.id.startsWith('slot-'));
-  console.log("📊 現在のDOM順序:", currentSlots.map(slot => slot.id));
-  
-  // 正しい順序でスロットを再配置
-  upperSlots.forEach((slotData, index) => {
-    const slotId = `slot-${slotData.Slot.toLowerCase()}`;
-    const slotElement = document.getElementById(slotId);
-    
-    if (slotElement && slotElement.parentElement === slotWrapper) {
-      // DOM順序を直接変更（CSSのorderではなく実際のDOM操作）
-      slotWrapper.appendChild(slotElement);
-      console.log(`✅ スロット "${slotId}" をDOM順序 ${index + 1} に移動 (Slot_display_order: ${slotData.Slot_display_order})`);
-    } else if (!slotElement) {
-      console.warn(`⚠ スロット "${slotId}" が見つかりません`);
+  // 順序をCSSのorder属性として適用（DOM構造自体は変更しない安全な方法）
+  slotOrderMap.forEach((orderValue, slotId) => {
+    const slotElement = document.getElementById(`slot-${slotId}`);
+    if (slotElement) {
+      // CSSのorder属性を設定
+      slotElement.style.order = orderValue;
+      console.log(`✅ スロット "${slotId}" に表示順 ${orderValue} を適用 (CSS order)`);
     }
   });
   
-  // 最終的なDOM順序を確認
-  const finalSlots = Array.from(slotWrapper.children).filter(child => child.id && child.id.startsWith('slot-'));
-  console.log("📊 最終DOM順序:", finalSlots.map(slot => slot.id));
+  // 親コンテナにflexboxレイアウトを適用（必要な場合）
+  const slotWrapper = document.querySelector('.slot-wrapper');
+  if (slotWrapper) {
+    slotWrapper.style.display = 'flex';
+    slotWrapper.style.flexDirection = 'column';
+    console.log("✅ スロットラッパーにflex表示を適用");
+  }
   
-  console.log("✅ 上位スロットの表示順適用完了（DOM順序変更版）");
+  console.log("✅ 上位スロットの表示順適用完了");
 }
 
 // 動的エリアから静的DOMへの同期関数

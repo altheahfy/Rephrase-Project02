@@ -47,7 +47,8 @@
   border-radius: 8px !important;
   padding: 10px !important;
   margin: 5px 0 !important;
-  display: block !important; /* PC側スタイルを確実に上書き */
+  /* 🔧 語順制御のためJavaScriptのflex設定を尊重 */
+  /* display: block !important; */ /* ← この行が語順制御を破壊していた */
   width: 100% !important; /* 幅を100%に設定 */
 }
 
@@ -82,7 +83,8 @@
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border-radius: 8px !important;
   margin: 5px 0 !important;
-  display: block !important; /* 確実にブロック表示 */
+  /* 🔧 語順制御のためJavaScriptのflex設定を尊重 */
+  /* display: block !important; */ /* ← この行が語順制御を破壊していた */
 }
 
 .mobile-device.portrait-mode .slot-wrapper:not(.active-subslot-area) .slot-container {
@@ -198,7 +200,8 @@
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border-radius: 8px !important;
   margin: 5px 0 !important;
-  display: block !important; /* 確実にブロック表示 */
+  /* 🔧 語順制御のためJavaScriptのflex設定を尊重 */
+  /* display: block !important; */ /* ← この行が語順制御を破壊していた */
 }
 
 .mobile-device.landscape-mode .slot-wrapper:not(.active-subslot-area) .slot-container {
