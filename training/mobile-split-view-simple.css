@@ -150,8 +150,8 @@
   margin: 0 !important;
 }
 
-/* div要素全般の余白圧縮 - 動的記載エリアは除外 */
-.mobile-device div:not([id*="dynamic"]):not([class*="dynamic"]):not([style*="margin-top: 30px"]) {
+/* div要素全般の余白圧縮 */
+.mobile-device div {
   margin: 1px 0 !important;
 }
 
@@ -183,12 +183,12 @@
 /* 🎯 スロット領域の最適化（PC版レイアウト保持） */
 /* ========================================= */
 
-/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
+/* 🚨 PC版のスロット構造を完全保持し、個別サイズ調整のみ適用 */
+/* transform: scale()を完全削除してJavaScript位置計算との干渉を排除 */
 .mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  transform: scale(0.7) !important; /* スロットを70%に縮小 */
-  transform-origin: top left !important;
-  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
+  /* transform削除により動的記載エリアの位置問題を根本解決 */
+  font-size: 0.8em !important; /* 全体的なフォントサイズ縮小 */
 }
 
 /* スワイプエリアサイズ調整 */
