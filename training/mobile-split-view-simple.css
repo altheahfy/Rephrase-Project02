@@ -158,9 +158,9 @@
 
 /* 🔧 スロットサイズ適正化：ボタンが隠れないサイズに */
 .mobile-device .slot-container {
-  width: 28% !important; /* 32% → 28% さらに縮小 */
-  height: 60px !important; /* 70px → 60px さらに縮小 */
-  font-size: 8px !important; /* 9px → 8px */
+  width: 25% !important; /* 28% → 25% スロット自体をさらに縮小 */
+  height: 55px !important; /* 60px → 55px スロット自体をさらに縮小 */
+  font-size: 8px !important;
   margin: 1px !important;
   border-radius: 3px !important;
   overflow: visible !important; /* ボタンが見えるように */
@@ -170,28 +170,28 @@
 }
 
 .mobile-device .slot-image {
-  width: 35px !important; /* 45px → 35px PC版レイアウト内で適正化 */
-  height: 35px !important; /* 45px → 35px PC版レイアウト内で適正化 */
+  width: 50px !important; /* 35px → 50px イラストを大幅拡大 */
+  height: 50px !important; /* 35px → 50px イラストを大幅拡大 */
   object-fit: cover !important;
   border-radius: 2px !important;
 }
 
 .mobile-device .slot-text,
 .mobile-device .slot-phrase {
-  font-size: 7px !important; /* 8px → 7px */
+  font-size: 7px !important;
   line-height: 1.0 !important;
   padding: 1px !important;
-  max-height: 18px !important; /* 20px → 18px */
+  max-height: 18px !important;
   overflow: hidden !important;
   word-wrap: break-word !important;
 }
 
 /* 🔧 詳細ボタン・ランダマイズボタンの表示確保 */
 .mobile-device .slot-container button {
-  font-size: 6px !important; /* 7px → 6px */
+  font-size: 6px !important;
   padding: 1px !important;
   margin: 0px !important;
-  min-height: 10px !important; /* 12px → 10px */
+  min-height: 10px !important;
   border-radius: 1px !important;
   position: relative !important;
   z-index: 100 !important; /* 確実に表示 */
@@ -249,18 +249,18 @@
   background: #ff9800 !important;
   color: white !important;
   font-weight: bold !important;
-  min-width: 15px !important; /* 18px → 15px さらに縮小 */
+  min-width: 15px !important;
   visibility: visible !important;
   display: inline-block !important;
 }
 
 /* ========================================= */
-/* 🖼️ イラスト表示の最適化（レイアウト保持） */
+/* 🖼️ イラスト表示の拡大（レイアウト保持）  */
 /* ========================================= */
 
-/* 複数画像表示の最適化 */
+/* 複数画像表示の拡大 */
 .mobile-device .multi-image-container {
-  max-height: 35px !important; /* 48px → 35px */
+  max-height: 50px !important; /* 35px → 50px イラスト拡大 */
   display: flex !important;
   gap: 1px !important;
   justify-content: center !important;
@@ -268,8 +268,8 @@
 }
 
 .mobile-device .slot-multi-image {
-  height: 32px !important; /* 45px → 32px */
+  height: 47px !important; /* 32px → 47px イラスト拡大 */
   width: auto !important;
-  max-width: 18px !important; /* 20px → 18px */
+  max-width: 25px !important; /* 18px → 25px 拡大 */
   object-fit: cover !important;
 }
