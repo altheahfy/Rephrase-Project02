@@ -156,17 +156,17 @@
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🔵 上位スロットエリア：上半分 */
+/* 🔵 上位スロットエリア：フルサイズ復元 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 25vh !important; /* 上半分エリア */
+  height: 50vh !important; /* 25vh → 50vh フルサイズ復元 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
   margin-top: 5px !important;
   margin-bottom: 2px !important;
-  border: 2px solid #007bff !important; /* 青色：上位スロット識別 */
-  border-radius: 6px !important;
-  background: rgba(240, 248, 255, 0.95) !important;
+  border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
+  border-radius: 4px !important; /* 6px → 4px */
+  background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
   transform: none !important; /* transform排除 */
 }
 

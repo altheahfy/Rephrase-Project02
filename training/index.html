@@ -41,18 +41,6 @@
         console.log('モバイルデバイスと判定されました');
         document.documentElement.classList.add('mobile-device');
         
-        // 🌟 サブスロット強制表示処理
-        function enableSubslotAlwaysVisible() {
-          console.log('🌟 サブスロット常時表示モードを適用中...');
-          const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
-          subslots.forEach(subslot => {
-            // インラインスタイルのdisplay: noneを削除
-            subslot.style.removeProperty('display');
-            subslot.style.display = 'block';
-            console.log(`✅ ${subslot.id} を常時表示に設定`);
-          });
-        }
-        
         // 初期向き設定
         function setOrientation() {
           document.documentElement.classList.remove('portrait-mode', 'landscape-mode');
@@ -68,41 +56,20 @@
         
         // DOMが読み込まれてから実行
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', () => {
-            setOrientation();
-            enableSubslotAlwaysVisible();
-          });
+          document.addEventListener('DOMContentLoaded', setOrientation);
         } else {
           setOrientation();
-          enableSubslotAlwaysVisible();
         }
         
         // 向き変更の監視
         window.addEventListener('orientationchange', function() {
-          setTimeout(() => {
-            setOrientation();
-            enableSubslotAlwaysVisible();
-          }, 100);
+          setTimeout(setOrientation, 100);
         });
         
         // リサイズイベントでも向きを再確認
         window.addEventListener('resize', function() {
-          setTimeout(() => {
-            setOrientation();
-            enableSubslotAlwaysVisible();
-          }, 100);
+          setTimeout(setOrientation, 100);
         });
-        
-        // 🔄 定期的にサブスロット表示状態をチェック
-        setInterval(() => {
-          const subslots = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
-          subslots.forEach(subslot => {
-            if (getComputedStyle(subslot).display === 'none') {
-              subslot.style.display = 'block';
-              console.log(`🔄 ${subslot.id} の表示を復元`);
-            }
-          });
-        }, 1000); // 1秒ごとにチェック
       } else {
         console.log('PCデバイスと判定されました');
       }
