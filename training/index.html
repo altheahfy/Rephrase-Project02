@@ -26,18 +26,14 @@
       console.log('モバイル検出スクリプト開始');
       console.log('User-Agent:', navigator.userAgent);
       
-      // より包括的なモバイル検出
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|Tablet/i.test(navigator.userAgent);
-      const isTouchDevice = 'ontouchstart' in window;
-      const isSmallScreen = window.innerWidth <= 768;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isTouchDevice = 'ontouchstart' in window && /Mobi|Android/i.test(navigator.userAgent);
       
       console.log('isMobile:', isMobile);
       console.log('isTouchDevice:', isTouchDevice);
-      console.log('isSmallScreen:', isSmallScreen);
-      console.log('画面サイズ:', window.innerWidth + 'x' + window.innerHeight);
       
-      // より緩い条件でモバイル判定
-      if (isMobile || isTouchDevice || isSmallScreen) {
+      // モバイルデバイスと判定された場合、htmlにクラスを追加
+      if (isMobile || isTouchDevice) {
         console.log('モバイルデバイスと判定されました');
         document.documentElement.classList.add('mobile-device');
         
