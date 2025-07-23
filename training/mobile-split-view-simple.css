@@ -153,40 +153,53 @@
 }
 
 /* ========================================= */
-/* 🎯 スロット領域の最適化（PC版レイアウト保持） */
+/* 🎯 新方針：サブスロット常時表示システム    */
 /* ========================================= */
 
-/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
-.mobile-device .slot-wrapper:not([id$="-sub"]),
+/* 🌟 モバイルでサブスロットを常時表示（インラインstyle上書き） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  transform: scale(0.7) !important; /* 0.8 → 0.7 スロットをさらに縮小 */
-  transform-origin: top left !important;
-  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
+  display: block !important; /* インラインstyle="display: none"を強制上書き */
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: 25vh !important; /* 下半分エリア */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  touch-action: pan-x pan-y !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+  border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
+  border-radius: 6px !important;
+  background: rgba(248, 255, 248, 0.95) !important;
+  transform: none !important; /* transform排除 */
 }
 
-/* スワイプエリアサイズ調整 */
+/* 🔵 上位スロットエリア調整 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 50vh !important; /* 48vh → 50vh スワイプエリア最終拡大 */
+  height: 25vh !important; /* 上半分エリア */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
   margin-top: 5px !important;
   margin-bottom: 2px !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  background: rgba(240, 248, 255, 0.8) !important;
+  border: 2px solid #007bff !important; /* 青色：上位スロット識別 */
+  border-radius: 6px !important;
+  background: rgba(240, 248, 255, 0.95) !important;
+  transform: none !important; /* transform排除 */
 }
 
-.mobile-device .slot-wrapper[id$="-sub"] {
-  height: 50vh !important; /* 48vh → 50vh スワイプエリア最終拡大 */
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  display: block !important;
-  margin-top: 2px !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  background: rgba(255, 248, 240, 0.8) !important;
+/* 🔤 空のサブスロットに説明文表示 */
+.mobile-device .slot-wrapper[id$="-sub"]:empty::before {
+  content: "📂 詳細ボタンを押すとここにサブスロットが表示されます";
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  text-align: center !important;
+  color: #666 !important;
+  font-size: 11px !important;
+  font-style: italic !important;
+  line-height: 1.4 !important;
+  padding: 10px !important;
 }
 
 /* ========================================= */
