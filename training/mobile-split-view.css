@@ -1,11 +1,11 @@
 /* =================================================================== */
-/* 📱 モバイル上下2分割スワイプシステム - PC版完全保護型               */
+/* 📱 モバイル上下2分割スワイプシステム - PC版そのまま表示型            */
 /* =================================================================== */
-/* 戦略: PC版は一切変更せず、モバイル時のみ上下分割表示               */
+/* 戦略: PC版をそのまま表示、位置・サイズのみ調整                     */
 
-/* 🔒 PC版完全保護: PC版の元コンテンツは一切変更しない */
+/* 🔒 PC版完全保護: 色・形・機能は一切変更しない */
 /* ✅ 保護対象:
- * - 全てのCSSスタイル
+ * - 全てのCSSスタイル（色・形・レイアウト）
  * - 語順制御システム  
  * - サブスロット展開・折り畳み
  * - 個別ランダマイズ
@@ -15,28 +15,46 @@
  * - 縦レイアウト構造
  */
 
-/* 📱 モバイル専用: 上下2分割表示システム */
+/* 📱 モバイル専用: 基本画面制御 */
 .mobile-device {
-  /* 基本レイアウト制御 */
+  /* 全画面制御 */
   height: 100vh !important;
   overflow: hidden !important;
 }
 
 .mobile-device body {
-  /* スクロール制御 */
+  /* 全体スクロール禁止 */
   overflow: hidden !important;
   height: 100vh !important;
   margin: 0 !important;
   padding: 0 !important;
+  /* ピンチ拡大縮小は画面全体に適用 */
+  touch-action: manipulation !important;
 }
 
-/* 🔒 PC版コンテンツを完全非表示（モバイル時のみ） */
+/* 🔝 上エリア: 上位スロット表示（PC版そのまま、位置・サイズのみ調整） */
 .mobile-device .slot-wrapper {
-  display: none !important;
-}
-
-.mobile-device [id^="slot-"][id$="-sub"] {
-  display: none !important;
+  /* 位置・サイズ調整のみ */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 50vh !important;
+  z-index: 100 !important;
+  
+  /* 横スワイプのみ許可 */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  
+  /* 上下移動禁止、横スワイプのみ */
+  touch-action: pan-x !important;
+  
+  /* スムーズスクロール */
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+  
+  /* PC版のスタイルは完全保持（色・形・レイアウト変更なし） */
+  /* flex設定、order制御、語順システム等は一切変更しない */
 }
 
 /* 🔝 上画面: 上位スロット表示エリア */
