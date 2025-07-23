@@ -8,27 +8,54 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② UI要素のサイズ調整（PC版機能はそのまま、サイズのみ調整） */
+/* ② タイトル帯を完全削除 */
 .mobile-device h1 {
-  font-size: 14px !important;
-  line-height: 1.1 !important;
-  margin: 3px 0 !important;
-  padding: 2px 0 !important;
-  height: auto !important;
+  display: none !important; /* タイトル帯を削除 */
 }
 
 .mobile-device h2 {
-  font-size: 12px !important;
-  line-height: 1.1 !important;
-  margin: 2px 0 !important;
+  font-size: 10px !important;
+  line-height: 1.0 !important;
+  margin: 1px 0 !important;
   padding: 1px 0 !important;
 }
 
 .mobile-device button {
-  font-size: 12px !important;
-  padding: 5px 10px !important;
-  margin: 2px !important;
-  min-height: 25px !important;
+  font-size: 8px !important;
+  padding: 2px 4px !important;
+  margin: 1px !important;
+  min-height: 15px !important;
+}
+
+/* ③ スロット内全要素を大幅縮小 */
+.mobile-device .slot-container {
+  width: 45% !important;
+  height: 80px !important; 
+  font-size: 8px !important;
+  margin: 1px !important;
+  padding: 2px !important;
+  overflow: hidden !important;
+}
+
+.mobile-device .slot-image {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.mobile-device .slot-text,
+.mobile-device .slot-phrase {
+  font-size: 6px !important;
+  line-height: 1.0 !important;
+  margin: 1px 0 !important;
+  padding: 1px !important;
+}
+
+.mobile-device .subslot-toggle-button button,
+.mobile-device .individual-randomize-button button {
+  font-size: 6px !important;
+  padding: 1px 2px !important;
+  min-height: 10px !important;
+  margin: 0px !important;
 }
 
 .mobile-device .slot-container {
