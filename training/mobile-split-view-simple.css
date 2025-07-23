@@ -172,7 +172,7 @@
 
 /* 🎯 上位スロット内部コンテンツのみ縮小 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) > * {
-  transform: scale(0.8) !important;
+  transform: scale(0.7) !important; /* 0.8 → 0.7 さらに縮小 */
   transform-origin: top left !important;
 }
 
@@ -215,7 +215,7 @@
 
 /* 🎯 サブスロット内部コンテンツのみ縮小 */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.7) !important;
+  transform: scale(0.6) !important; /* 0.7 → 0.6 さらに縮小 */
   transform-origin: top left !important;
 }
 
@@ -256,4 +256,55 @@
   touch-action: manipulation !important; /* タップ操作優先 */
   pointer-events: auto !important;
   z-index: 1001 !important; /* さらに前面に */
+}
+
+/* 🎯 モバイルでの個別ランダマイズボタン強化表示 */
+.mobile-device button[onclick*="randomizeIndividual"] {
+  background: #ff6600 !important; /* より目立つオレンジ */
+  color: white !important;
+  font-size: 8px !important;
+  padding: 2px 4px !important;
+  margin: 1px !important;
+  border: 1px solid #ff4400 !important;
+  border-radius: 2px !important;
+  min-width: 12px !important;
+  min-height: 12px !important;
+  font-weight: bold !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1002 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+
+/* 🔧 スロット内のすべてのボタン表示強化 */
+.mobile-device .slot-wrapper button,
+.mobile-device .slot button {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+/* 🎯 "R"ボタン（ランダマイズ）の特別強化 */
+.mobile-device button[style*="background-color: orange"],
+.mobile-device button[style*="background: orange"] {
+  background: #ff6600 !important;
+  color: white !important;
+  font-size: 8px !important;
+  padding: 1px 3px !important;
+  margin: 0px 1px !important;
+  min-width: 10px !important;
+  min-height: 10px !important;
+  border: 1px solid #ff4400 !important;
+  border-radius: 1px !important;
+  font-weight: bold !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1003 !important;
 }
