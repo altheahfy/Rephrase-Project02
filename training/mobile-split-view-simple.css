@@ -8,81 +8,56 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② タイトル帯を完全削除 */
+/* ② タイトル帯（白い背景）を狭くする */
 .mobile-device h1 {
-  display: none !important; /* タイトル帯を削除 */
+  padding: 5px !important; /* 白い背景の余白を狭く */
+  margin: 5px 0 !important;
+  font-size: 16px !important;
 }
 
 .mobile-device h2 {
-  font-size: 10px !important;
-  line-height: 1.0 !important;
-  margin: 1px 0 !important;
-  padding: 1px 0 !important;
+  font-size: 12px !important;
+  margin: 3px 0 !important;
 }
 
 .mobile-device button {
-  font-size: 8px !important;
-  padding: 2px 4px !important;
-  margin: 1px !important;
-  min-height: 15px !important;
+  font-size: 12px !important;
+  padding: 5px 10px !important;
+  margin: 2px !important;
+  min-height: 25px !important;
 }
 
-/* ③ スロット内全要素を大幅縮小 */
+/* ③ スロットを小さくする */
 .mobile-device .slot-container {
-  width: 45% !important;
-  height: 80px !important; 
-  font-size: 8px !important;
-  margin: 1px !important;
-  padding: 2px !important;
-  overflow: hidden !important;
+  width: 40% !important;
+  height: 120px !important;
+  font-size: 10px !important;
+  margin: 3px !important;
 }
 
 .mobile-device .slot-image {
-  width: 20px !important;
-  height: 20px !important;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .mobile-device .slot-text,
 .mobile-device .slot-phrase {
-  font-size: 6px !important;
-  line-height: 1.0 !important;
-  margin: 1px 0 !important;
-  padding: 1px !important;
+  font-size: 8px !important;
+  line-height: 1.1 !important;
 }
 
-.mobile-device .subslot-toggle-button button,
-.mobile-device .individual-randomize-button button {
-  font-size: 6px !important;
-  padding: 1px 2px !important;
-  min-height: 10px !important;
-  margin: 0px !important;
-}
-
-.mobile-device .slot-container {
-  width: 45% !important;
-  font-size: 10px !important;
-  margin: 2px !important;
-  height: 80px !important; /* スロットの縦幅を強制的に制限 */
-  overflow: hidden !important;
-}
-
-.mobile-device .slot-image {
-  width: 30px !important;
-  height: 30px !important;
-}
-
-/* ③ 分割エリア：縦画面に両方表示（より小さく） */
+/* ④ 分割エリア：縦画面に両方表示 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 30vh !important; /* 上エリアを30%に削減 */
+  height: 40vh !important;
   overflow-x: auto;
   overflow-y: hidden;
-  touch-action: pan-x; /* 横スワイプのみ、ピンチ・縦ドラッグは画面全体に委譲 */
+  touch-action: pan-x;
 }
 
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 30vh !important; /* 下エリアも30%に削減 */
+  height: 40vh !important;
   overflow-x: auto;
   overflow-y: hidden;
-  touch-action: pan-x; /* 横スワイプのみ、ピンチ・縦ドラッグは画面全体に委譲 */
-  display: block !important; /* サブスロット強制表示 */
+  touch-action: pan-x;
+  display: block !important;
 }
