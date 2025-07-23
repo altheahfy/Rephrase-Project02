@@ -8,15 +8,15 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② 白いタイトル帯を狭くする（実際のHTML要素を対象） */
+/* ② タイトル帯の正確な修正 */
 .mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
-  padding: 3px 8px !important; /* 白い帯の余白を大幅削減 */
-  margin-bottom: 5px !important;
-  margin-top: 5px !important;
+  padding: 5px 10px !important; /* 15px → 5px に削減 */
+  margin-bottom: 5px !important; /* 15px → 5px に削減 */
+  margin-top: 5px !important; /* 20px → 5px に削減 */
 }
 
 .mobile-device h1 {
-  font-size: 14px !important; /* タイトル文字も小さく */
+  font-size: 16px !important; /* 28px → 16px に削減 */
   margin: 0 !important;
 }
 
