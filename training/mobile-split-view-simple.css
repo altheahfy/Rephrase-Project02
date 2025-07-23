@@ -158,34 +158,38 @@
 
 /* 🔧 スロットサイズ適正化：ボタンが隠れないサイズに */
 .mobile-device .slot-container {
-  width: 35% !important; /* 40% → 35% に縮小 */
-  height: 80px !important; /* 120px → 80px に縮小 */
-  font-size: 9px !important; /* 10px → 9px */
-  margin: 2px !important; /* 3px → 2px */
-  border-radius: 4px !important;
+  width: 32% !important; /* 35% → 32% さらに縮小 */
+  height: 70px !important; /* 80px → 70px 縮小 */
+  font-size: 9px !important;
+  margin: 1px !important; /* 2px → 1px */
+  border-radius: 3px !important;
   overflow: visible !important; /* ボタンが見えるように */
+  padding: 1px !important; /* 2px → 1px */
 }
 
 .mobile-device .slot-image {
-  width: 30px !important; /* 40px → 30px */
-  height: 30px !important; /* 40px → 30px */
+  width: 45px !important; /* 30px → 45px 大幅拡大 */
+  height: 45px !important; /* 30px → 45px 大幅拡大 */
+  object-fit: cover !important;
+  border-radius: 2px !important;
 }
 
 .mobile-device .slot-text,
 .mobile-device .slot-phrase {
-  font-size: 7px !important; /* 8px → 7px */
-  line-height: 1.0 !important; /* 1.1 → 1.0 */
-  padding: 1px !important;
-  max-height: 25px !important; /* 高さ制限でボタン領域確保 */
+  font-size: 8px !important; /* 7px → 8px 可読性向上 */
+  line-height: 1.1 !important; /* 1.0 → 1.1 */
+  padding: 1px 2px !important;
+  max-height: 20px !important; /* 25px → 20px */
   overflow: hidden !important;
+  word-wrap: break-word !important;
 }
 
 /* 🔧 詳細ボタン・ランダマイズボタンの表示確保 */
 .mobile-device .slot-container button {
   font-size: 7px !important;
-  padding: 1px 3px !important;
-  margin: 1px !important;
-  min-height: 14px !important;
+  padding: 1px 2px !important;
+  margin: 0px !important; /* 1px → 0px */
+  min-height: 12px !important; /* 14px → 12px */
   border-radius: 2px !important;
   position: relative !important;
   z-index: 100 !important; /* 確実に表示 */
@@ -194,9 +198,10 @@
 /* 🔧 スロットラベル（slot-phrase-label等）の圧縮 */
 .mobile-device .slot-phrase-label,
 .mobile-device .slot-mark {
-  font-size: 6px !important;
+  font-size: 7px !important; /* 6px → 7px 可読性向上 */
   padding: 0px 1px !important;
   margin: 0px !important;
+  font-weight: bold !important;
 }
 
 /* ========================================= */
@@ -205,11 +210,11 @@
 
 /* 🎯 上位スロットエリア：画面上半分（50%） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 45vh !important; /* 40vh → 45vh 画面の約半分 */
+  height: 40vh !important; /* 45vh → 40vh さらに縮小 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
-  margin-top: 32px !important; /* 60px → 32px 上部圧縮効果活用 */
+  margin-top: 5px !important; /* 32px → 5px 「例文」テキスト直下に */
   margin-bottom: 2px !important;
   border: 1px solid #ddd !important; /* 境界を明確化 */
   border-radius: 4px !important;
@@ -218,7 +223,7 @@
 
 /* 🎯 サブスロットエリア：画面下半分（50%） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 45vh !important; /* 40vh → 45vh 画面の約半分 */
+  height: 40vh !important; /* 45vh → 40vh さらに縮小 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
@@ -239,31 +244,40 @@
   flex-direction: column !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 2px !important;
+  padding: 1px !important; /* 2px → 1px */
   box-sizing: border-box !important;
 }
 
-/* 画像エリアの制限 */
+/* 画像エリアの拡大・最適化 */
 .mobile-device .slot-image-container,
 .mobile-device .slot-image {
-  max-height: 25px !important; /* 画像エリア制限 */
+  max-height: 48px !important; /* 25px → 48px 大幅拡大 */
   flex-shrink: 0 !important;
+  margin: 0px !important; /* 余白削除 */
+  display: block !important;
+  text-align: center !important;
 }
 
-/* テキストエリアの制限 */
+/* テキストエリアの最適化 */
 .mobile-device .slot-text-area {
-  max-height: 30px !important; /* テキストエリア制限 */
+  max-height: 18px !important; /* 30px → 18px 圧縮 */
   overflow: hidden !important;
   flex-shrink: 1 !important;
+  width: 100% !important;
+  text-align: center !important;
 }
 
-/* ボタンエリアの確保 */
+/* ボタンエリアの最適化 */
 .mobile-device .slot-buttons,
 .mobile-device .slot-container > button,
 .mobile-device .slot-container > div:last-child {
   margin-top: auto !important; /* 最下部に配置 */
   flex-shrink: 0 !important; /* 縮小禁止 */
-  height: 16px !important; /* 確実にボタン用高さ確保 */
+  height: 12px !important; /* 16px → 12px 圧縮 */
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 1px !important;
 }
 
 /* 個別ランダマイズボタンの表示保証 */
@@ -272,7 +286,27 @@
   background: #ff9800 !important;
   color: white !important;
   font-weight: bold !important;
-  min-width: 20px !important;
+  min-width: 18px !important; /* 20px → 18px */
   visibility: visible !important;
   display: inline-block !important;
+}
+
+/* ========================================= */
+/* 🖼️ イラスト表示の最大化                  */
+/* ========================================= */
+
+/* 複数画像表示の最適化 */
+.mobile-device .multi-image-container {
+  max-height: 48px !important;
+  display: flex !important;
+  gap: 1px !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.mobile-device .slot-multi-image {
+  height: 45px !important; /* 大きく表示 */
+  width: auto !important;
+  max-width: 20px !important;
+  object-fit: cover !important;
 }
