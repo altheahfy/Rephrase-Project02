@@ -5,16 +5,9 @@
 
 /* 🔒 PC版完全保護: 一切のスタイル変更禁止 */
 
-/* 📱 メインコンテンツ表示（非表示状態を解除） - より確実に */
+/* 📱 メインコンテンツ表示（非表示状態を解除） */
 .mobile-device #main-content {
   display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* 🧪 デバッグ用: モバイル検出確認 */
-.mobile-device body {
-  background-color: #ffe6e6 !important; /* デバッグ用ピンク背景 */
 }
 
 /* 📱 モバイル専用: 表示領域制限のみ */
