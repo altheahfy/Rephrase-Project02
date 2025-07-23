@@ -159,14 +159,14 @@
 /* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
 .mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  transform: scale(0.8) !important; /* PC版を80%に縮小 */
+  transform: scale(0.7) !important; /* 0.8 → 0.7 スロットをさらに縮小 */
   transform-origin: top left !important;
-  width: 125% !important; /* scale(0.8)の逆数で調整 */
+  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
 }
 
 /* スワイプエリアサイズ調整 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 45vh !important; /* 40vh → 45vh スワイプエリア拡大 */
+  height: 48vh !important; /* 45vh → 48vh スワイプエリア拡大 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
@@ -178,7 +178,7 @@
 }
 
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 45vh !important; /* 40vh → 45vh スワイプエリア拡大 */
+  height: 48vh !important; /* 45vh → 48vh スワイプエリア拡大 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
