@@ -8,29 +8,153 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② タイトル帯の正確な修正 */
-.mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
-  padding: 5px 10px !important; /* 15px → 5px に削減 */
-  margin-bottom: 5px !important; /* 15px → 5px に削減 */
-  margin-top: 50px !important; /* フロートメニューの下に配置 */
+/* ========================================= */
+/* 🚀 上部エリア超圧縮（スロット領域最大化） */
+/* ========================================= */
+
+/* フロートメニュー圧縮 - gap完全削除、padding最小化 */
+.mobile-device #navigation-float-menu {
+  top: 2px !important;
+  left: 2px !important;
+  padding: 2px 3px !important; /* 4px 6px → 2px 3px */
+  gap: 0px !important; /* 6px → 0px 完全削除 */
+  height: 22px !important; /* 28px → 22px */
+  font-size: 10px !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
 }
 
-.mobile-device h1 {
-  font-size: 16px !important; /* 28px → 16px に削減 */
+/* フロートメニュー内要素間隔削除 */
+.mobile-device #navigation-float-menu a {
+  font-size: 10px !important; /* 14px → 10px */
+  padding: 1px 2px !important;
   margin: 0 !important;
 }
 
+.mobile-device #navigation-float-menu span {
+  font-size: 8px !important; /* 12px → 8px */
+  margin: 0 1px !important;
+}
+
+.mobile-device #navigation-float-menu select {
+  width: 60px !important; /* 120px → 60px */
+  font-size: 8px !important; /* 12px → 8px */
+  height: 16px !important; /* 20px → 16px */
+  padding: 0px 1px !important;
+}
+
+.mobile-device #navigation-float-menu button {
+  font-size: 8px !important; /* 11px → 8px */
+  padding: 1px 3px !important; /* 2px 6px → 1px 3px */
+  height: 16px !important; /* 20px → 16px */
+}
+
+.mobile-device #navigation-float-menu input[type="range"] {
+  width: 40px !important; /* 80px → 40px */
+  height: 14px !important; /* 18px → 14px */
+}
+
+.mobile-device #navigation-float-menu label {
+  font-size: 8px !important; /* 12px → 8px */
+}
+
+/* タイトル帯の超圧縮 */
+.mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
+  padding: 2px 5px !important; /* 15px → 2px 5px */
+  margin-bottom: 2px !important; /* 15px → 2px */
+  margin-top: 26px !important; /* 50px → 26px フロートメニュー直下 */
+  border-radius: 3px !important;
+  box-shadow: none !important; /* シャドウ削除 */
+}
+
+.mobile-device h1 {
+  font-size: 12px !important; /* 28px → 12px */
+  margin: 0 !important;
+  font-weight: 600 !important;
+}
+
+/* ② タイトル帯の正確な修正 */
 .mobile-device h2 {
-  font-size: 12px !important;
-  margin: 3px 0 !important;
+  font-size: 10px !important;
+  margin: 1px 0 !important;
 }
 
 .mobile-device button {
-  font-size: 12px !important;
-  padding: 5px 10px !important;
-  margin: 2px !important;
-  min-height: 25px !important;
+  font-size: 10px !important;
+  padding: 3px 6px !important;
+  margin: 1px !important;
+  min-height: 20px !important;
 }
+
+/* ========================================= */
+/* 🎛️ 制御パネル・ボタン類の圧縮            */
+/* ========================================= */
+
+/* 制御パネル表示ボタンの圧縮 */
+.mobile-device div[style*="justify-content: flex-start"][style*="margin-bottom: 15px"] {
+  margin-bottom: 2px !important; /* 15px → 2px */
+}
+
+.mobile-device #toggle-control-panels {
+  padding: 3px 8px !important;
+  font-size: 10px !important;
+  border-radius: 3px !important;
+}
+
+/* 例文シャッフル等のボタン群圧縮 */
+.mobile-device #randomize-all,
+.mobile-device button[style*="background"] {
+  padding: 3px 6px !important;
+  font-size: 9px !important;
+  margin: 1px 2px !important;
+  min-height: 18px !important;
+  border-radius: 2px !important;
+}
+
+/* 分離疑問詞エリアの圧縮 */
+.mobile-device #display-top-question-word {
+  margin: 1px 0 !important;
+  padding: 2px !important;
+}
+
+/* 音声制御系ボタンの圧縮 */
+.mobile-device .voice-controls button {
+  padding: 2px 4px !important;
+  font-size: 8px !important;
+  min-height: 16px !important;
+  margin: 1px !important;
+}
+
+/* ========================================= */
+/* 📐 全体余白の最小化（スロット領域最大化） */
+/* ========================================= */
+
+/* body全体の余白削除 */
+.mobile-device body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* セクション要素の余白削除 */
+.mobile-device section {
+  margin: 0 !important;
+  padding: 2px !important;
+}
+
+/* main-content の余白削除 */
+.mobile-device #main-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* div要素全般の余白圧縮 */
+.mobile-device div {
+  margin: 1px 0 !important;
+}
+
+/* ========================================= */
+/* 🎯 スロット領域の最大化                   */
+/* ========================================= */
 
 /* ③ スロットを小さくする */
 .mobile-device .slot-container {
