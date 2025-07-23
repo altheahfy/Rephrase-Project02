@@ -12,28 +12,22 @@
 .mobile-device #main-content {
   height: 100vh;
   overflow: hidden;
+  display: block;
 }
 
-/* 📱 上エリア: 上位スロット（画面上半分に固定配置） */
+/* 📱 上エリア: 上位スロット（画面上半分・固定位置） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 50vh;
-  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   touch-action: pan-x;
 }
 
-/* 📱 下エリア: サブスロット（画面下半分に固定配置） */
+/* 📱 下エリア: サブスロット（画面下半分・強制表示・固定位置） */
 .mobile-device .slot-wrapper[id$="-sub"] {
   display: block !important;
   height: 50vh;
-  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   touch-action: pan-x;
-}
-
-/* 📱 サブスロット以外のコンテンツを隠す */
-.mobile-device .slot-wrapper ~ *:not(.slot-wrapper[id$="-sub"]) {
-  display: none;
 }
