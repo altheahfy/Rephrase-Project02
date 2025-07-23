@@ -451,17 +451,6 @@ function handleLogout() {
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">読込</button>
   </div>
   
-  <span style="color: #ccc;">|</span>
-  
-  <!-- ファイル選択 -->
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <label style="font-size: 12px; font-weight: bold; color: #333;">📁 ファイル選択</label>
-    <input type="file" id="jsonFileInput" accept=".json" style="font-size: 11px; padding: 2px; border: 1px solid #ddd; border-radius: 4px; width: 120px;">
-    <button id="loadJsonButton" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); color: #78716c; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; font-weight: bold;">ロード</button>
-  </div>
-  
-  <span style="color: #ccc;">|</span>
-  
   <!-- ズームコントローラー -->
   <div style="display: flex; align-items: center; gap: 4px;">
     <label style="font-size: 12px; font-weight: bold; color: #333;">🔍 ズーム</label>
@@ -1727,91 +1716,6 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   }
 });
 
-// 既存のファイル選択からのロード機能
-document.getElementById("loadJsonButton").addEventListener("click", () => {
-  const fileInput = document.getElementById("jsonFileInput");
-  if (fileInput.files.length === 0) {
-    if (window.errorHandler) {
-      window.errorHandler.handleError(new Error('No file selected'), { action: 'file_selection' }, 'general.invalid_input');
-    } else {
-      alert("ファイルを選択してください");
-    }
-    return;
-  }
-  
-  const file = fileInput.files[0];
-  
-  // 🎭 ローディング画面を表示
-  console.log("🎭 JSONロード開始 - ローディング画面を表示");
-  showLoadingOverlay();
-  
-  // ローディングメッセージを更新
-  const loadingText = document.querySelector('#loading-overlay p');
-  if (loadingText) {
-    loadingText.textContent = `${file.name} を処理中...`;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      // 🔄 JSONロード時にサブスロット表示設定をリセット
-      localStorage.removeItem('rephrase_subslot_visibility_state');
-      console.log('📁 JSONロード時にサブスロット表示設定をリセットしました');
-      
-      loadedJsonData = JSON.parse(e.target.result);
-      window.loadedJsonData = loadedJsonData;  // コンソール確認用
-      console.log("🟢 window.loadedJsonData セット完了:", window.loadedJsonData);
-      
-      // 🎯 **重複回避機能付きランダマイズを実行**
-      const data = randomizeAllWithStateManagement(loadedJsonData);
-      console.log("🎯 重複回避ランダマイズ結果詳細:", JSON.stringify(data, null, 2));
-      validateSlotsModified(data);
-      window.loadedJsonData = data;
-      buildStructure(data);
-      syncDynamicToStatic();
-      
-      // サブスロットの初期化も実行
-      if (typeof initializeSubslots === 'function') {
-        console.log("🔒 JSONロード後にサブスロットを初期化");
-        initializeSubslots();
-      }
-      
-      // 明示的に上位スロットとサブスロットの同期を呼び出す
-      if (typeof syncUpperSlotsFromJson === 'function') {
-        console.log("🔄 JSONロード後の明示的同期呼び出し");
-        syncUpperSlotsFromJson(data);
-        if (typeof syncSubslotsFromJson === 'function') {
-          syncSubslotsFromJson(data);
-        }
-        
-        // 表示順制御機能の呼び出し
-        if (typeof applyOrderToAllSlots === 'function') {
-          console.log("🔢 JSONロード後にスロット表示順適用");
-          applyOrderToAllSlots(data);
-        }
-        
-        if (typeof debugM1Slot === 'function') {
-          console.log("🔍 M1スロットのデバッグ実行");
-          debugM1Slot();
-        }
-      }
-      
-      // 🎭 ローディング完了処理
-      setTimeout(() => {
-        console.log("🎭 JSONデータ処理完了 - ローディングを隠します");
-        hideLoadingOverlay();
-      }, 300); // シンプルな300ms遅延
-      
-    } catch (err) {
-      console.error("❌ JSON パースエラーまたは処理例外", err);
-      alert("無効な JSON ファイルです");
-      console.log("🎭 エラー発生 - ローディング画面を隠します");
-      hideLoadingOverlay(); // エラー時もローディングを隠す
-    }
-  };
-  reader.readAsText(file);
-});
-
 document.getElementById("randomize-all").addEventListener("click", () => {
   if (!loadedJsonData || !Array.isArray(loadedJsonData)) {
     alert("先に正しいJSONデータをロードしてください");
@@ -2285,9 +2189,8 @@ function showLoadingOverlay() {
   }
 }
 
-// JSONファイルが選択された時のローディング表示更新
+// JSONローディング表示管理
 document.addEventListener('DOMContentLoaded', function() {
-  const fileInput = document.getElementById('jsonFileInput');
   const loadingTitle = document.getElementById('loading-title');
   const loadingDescription = document.getElementById('loading-description');
   const loadingProgress = document.getElementById('loading-progress');

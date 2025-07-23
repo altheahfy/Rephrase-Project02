@@ -271,6 +271,33 @@
 }
 
 /* =================================================================== */
+/* 📱 フロートメニュー固定設定                                     */
+/* =================================================================== */
+
+/* フロートメニューを固定サイズ・高さに統一 */
+.control-panel {
+  height: 50px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+}
+
+.control-panel > div {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.control-panel label,
+.control-panel span,
+.control-panel button,
+.control-panel input,
+.control-panel select {
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+}
+
+/* =================================================================== */
 /* 📱 デバッグ用スタイル（本番では非表示）                           */
 /* =================================================================== */
 
