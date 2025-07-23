@@ -156,9 +156,9 @@
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🔵 上位スロットエリア：フルサイズ復元 */
+/* 🔵 上位スロットエリア：サイズ調整（7割） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 50vh !important; /* 25vh → 50vh フルサイズ復元 */
+  height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
@@ -170,9 +170,9 @@
   transform: none !important; /* transform排除 */
 }
 
-/* 🟢 サブスロット表示エリア：下半分（1つのエリアのみ表示用） */
+/* 🟢 サブスロット表示エリア：サイズ調整（7割） */
 .mobile-device #subslot-display-area {
-  height: 25vh !important; /* 下半分エリア */
+  height: 17.5vh !important; /* 25vh → 17.5vh (7割サイズ) */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
