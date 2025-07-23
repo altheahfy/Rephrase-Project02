@@ -1524,7 +1524,7 @@ function handleLogout() {
 </section>
 
 <script>
-  // 動的エリアの生成位置を指定
+  // 動的エリアの生成位置を指定（モバイルでは位置移動を無効化）
   window.addEventListener("DOMContentLoaded", () => {
     const dynamicArea = document.getElementById("dynamic-slot-area");
     const wrapper = document.getElementById("dynamic-slot-area-wrapper");
@@ -1534,11 +1534,17 @@ function handleLogout() {
       // 動的エリアをラッパーに移動
       wrapper.appendChild(dynamicArea);
       
-      // さらに、動的エリアのコンテナを文書の末尾に移動
-      const container = document.getElementById("dynamic-area-container");
-      if (container) {
-        document.body.appendChild(container);
-        console.log("✅ 動的記載エリアコンテナを文書の最後に移動しました");
+      // モバイルデバイスでは位置移動を無効化
+      const isMobileDevice = document.documentElement.classList.contains('mobile-device');
+      if (!isMobileDevice) {
+        // PC版のみ：動的エリアのコンテナを文書の末尾に移動
+        const container = document.getElementById("dynamic-area-container");
+        if (container) {
+          document.body.appendChild(container);
+          console.log("✅ 動的記載エリアコンテナを文書の最後に移動しました（PC版）");
+        }
+      } else {
+        console.log("✅ モバイル版：動的記載エリアは元の位置に固定");
       }
       
       console.log("✅ 動的記載エリアを適切な位置に移動しました");
