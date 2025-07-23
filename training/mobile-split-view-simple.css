@@ -159,12 +159,12 @@
 /* 🎯 スロット領域の最適化（PC版レイアウト保持） */
 /* ========================================= */
 
-/* 🚨 PC版のスロット構造を完全保持し、全体縮小のみ適用 */
+/* 🚨 PC版のスロット構造を完全保持し、個別要素サイズ調整のみ適用 */
+/* transform: scale()を削除してJavaScript干渉を回避 */
 .mobile-device .slot-wrapper:not([id$="-sub"]),
 .mobile-device .slot-wrapper[id$="-sub"] {
-  transform: scale(0.7) !important; /* 0.8 → 0.7 スロットをさらに縮小 */
-  transform-origin: top left !important;
-  width: 143% !important; /* scale(0.7)の逆数で調整（1/0.7≈1.43） */
+  /* transform削除でJavaScript位置計算問題を解決 */
+  font-size: 70% !important; /* 全体的なフォントサイズ縮小 */
 }
 
 /* スワイプエリアサイズ調整 */
