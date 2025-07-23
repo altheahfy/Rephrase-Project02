@@ -8,12 +8,16 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* ② タイトル帯（白い背景）を音声学習ボタンと同じ高さに */
+/* ② 白いタイトル帯を狭くする（実際のHTML要素を対象） */
+.mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
+  padding: 3px 8px !important; /* 白い帯の余白を大幅削減 */
+  margin-bottom: 5px !important;
+  margin-top: 5px !important;
+}
+
 .mobile-device h1 {
-  padding: 1px 3px !important; /* 上下の余白をさらに最小に */
-  margin: 1px 0 !important; /* 上下マージンもさらに最小に */
-  font-size: 14px !important;
-  line-height: 1.0 !important; /* 行間をさらに詰める */
+  font-size: 14px !important; /* タイトル文字も小さく */
+  margin: 0 !important;
 }
 
 .mobile-device h2 {
