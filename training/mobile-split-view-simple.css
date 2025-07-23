@@ -189,11 +189,12 @@
 
 /* 🔧 詳細ボタン・ランダマイズボタンの表示確保 */
 .mobile-device .slot-container button {
-  font-size: 6px !important;
-  padding: 1px !important;
-  margin: 0px !important;
-  min-height: 10px !important;
-  border-radius: 1px !important;
+  font-size: 10px !important; /* 6px → 10px ボタンテキストを拡大 */
+  padding: 2px 4px !important; /* 1px → 2px 4px ボタンサイズ拡大 */
+  margin: 1px !important; /* 0px → 1px */
+  min-height: 16px !important; /* 10px → 16px ボタン高さ拡大 */
+  min-width: 20px !important; /* 最小幅を確保 */
+  border-radius: 2px !important; /* 1px → 2px */
   position: relative !important;
   z-index: 100 !important; /* 確実に表示 */
 }
@@ -213,7 +214,7 @@
 
 /* 🎯 上位スロットエリア：画面上半分（50%） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 45vh !important; /* 30vh → 45vh スワイプ領域を拡大復元 */
+  height: 35vh !important; /* 45vh → 35vh 適正サイズに調整 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
@@ -226,7 +227,7 @@
 
 /* 🎯 サブスロットエリア：画面下半分（50%） */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  height: 45vh !important; /* 30vh → 45vh スワイプ領域を拡大復元 */
+  height: 35vh !important; /* 45vh → 35vh 適正サイズに調整 */
   overflow-x: auto !important;
   overflow-y: auto !important; /* 縦スクロール許可 */
   touch-action: pan-x pan-y !important;
