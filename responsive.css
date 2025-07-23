@@ -1,10 +1,16 @@
 /* =================================================================== */
-/* 📱 Rephrase モバイル最適化CSS - Phase 1: 基本表示安定化             */
+/* 📱 Rephrase モバイル最適化CSS - Phase 1: 基本表示安定化             *  }
+}
+
 /* =================================================================== */
+/* 📱 Phase 3: UX改善（モバイル専用レイアウト）                        */
+/* =================================================================== */
+
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {================================================================= */
 /* 注意: このCSSは既存のstyle.cssよりも後に読み込まれるため優先されます    */
 
 /* 🎯 Phase 1: 黄色タブの幅問題修正（10スロット分固定幅対応） */
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   /* 黄色タブラベルの幅問題修正 - 10スロット分の幅を確保 */
   .subslot-label.tab-style {
     margin-left: -20px !important;  /* 元の値に戻す（PC同様） */
@@ -112,7 +118,7 @@
 /* 📱 Phase 2: タッチ操作最適化（準備）                               */
 /* =================================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   /* ボタンサイズの適正化 */
   button, .btn {
     min-height: 44px !important; /* Apple推奨のタッチターゲットサイズ */
@@ -211,7 +217,7 @@
 /* 📱 縦画面（ポートレート）専用対応                                   */
 /* =================================================================== */
 
-@media (max-width: 768px) and (orientation: portrait) {
+@media ((max-width: 768px) or (pointer: coarse)) and (orientation: portrait) {
   /* 縦画面での黄色タブ調整 */
   .subslot-label.tab-style {
     min-width: calc(100vw - 10px) !important; /* 縦画面では画面幅いっぱい */
@@ -226,7 +232,7 @@
 /* 📱 横画面対応                                                      */
 /* =================================================================== */
 
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-height: 500px) and (orientation: landscape) {
   /* 横画面での特別な調整 */
   .control-panel {
     position: sticky !important; /* fixedからstickyに変更してスワイプを妨げない */
@@ -267,7 +273,7 @@
 /* 📱 アクセシビリティ改善                                            */
 /* =================================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   /* 高コントラスト対応 */
   @media (prefers-contrast: high) {
     .subslot-label.tab-style {
@@ -299,7 +305,7 @@
 /* =================================================================== */
 
 /* 🎯 スワイプUI: 縦画面でのカルーセル型表示 */
-@media (max-width: 768px) and (orientation: portrait) {
+@media ((max-width: 768px) or (pointer: coarse)) and (orientation: portrait) {
   /* 黄色タブを隠してスワイプナビゲーションに切り替え */
   .subslot-label.tab-style {
     display: none !important;
@@ -375,7 +381,7 @@
 }
 
 /* 🎯 スワイプUI: 横画面でのグリッド型表示 */
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-height: 500px) and (orientation: landscape) {
   /* 横画面では2x2グリッドレイアウト */
   .slot-wrapper.active-subslot-area {
     display: grid !important;
@@ -431,7 +437,7 @@
 }
 
 /* 🎯 スワイプUI: 視覚的インジケーター */
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   /* スワイプインジケーター（ドット表示） */
   .swipe-indicator {
     display: flex !important;
@@ -469,7 +475,7 @@
 
 /* デバッグ時にコメントアウトを外して使用 */
 /*
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px), (pointer: coarse) {
   * {
     border: 1px solid red !important;
   }
