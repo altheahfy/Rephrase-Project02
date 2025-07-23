@@ -84,6 +84,9 @@
   padding: 3px 6px !important;
   margin: 1px !important;
   min-height: 20px !important;
+  touch-action: manipulation !important; /* ボタンタップを優先 */
+  pointer-events: auto !important; /* ボタンクリックを確実に有効化 */
+  z-index: 1000 !important; /* 最前面に表示 */
 }
 
 /* ========================================= */
@@ -201,6 +204,27 @@
   touch-action: manipulation !important; /* ボタンタップを優先 */
   pointer-events: auto !important; /* ボタンクリックを確実に有効化 */
   z-index: 1000 !important; /* 最前面に表示 */
+}
+
+/* スロット内ボタンの特別な操作性保証 */
+.mobile-device .slot-wrapper button,
+.mobile-device .slot-container button,
+.mobile-device div[id*="slot"] button {
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+  z-index: 1500 !important; /* より高い優先度 */
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+/* 詳細ボタンの特別保証 */
+.mobile-device button[onclick*="detail"],
+.mobile-device button[onclick*="Detail"] {
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+  z-index: 2000 !important; /* 最高優先度 */
+  position: relative !important;
+  background: rgba(0, 123, 255, 0.8) !important; /* 視覚的確認用 */
 }
 
 /* 個別ランダマイズボタンの表示保証 */
