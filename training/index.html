@@ -27,7 +27,7 @@
       console.log('User-Agent:', navigator.userAgent);
       
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isTouchDevice = 'ontouchstart' in window && /Mobi|Android/i.test(navigator.userAgent);
       
       console.log('isMobile:', isMobile);
       console.log('isTouchDevice:', isTouchDevice);
