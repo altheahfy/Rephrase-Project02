@@ -153,27 +153,10 @@
 }
 
 /* ========================================= */
-/* 🎯 新方針：サブスロット常時表示システム    */
+/* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🌟 モバイルでサブスロットを常時表示（インラインstyle上書き） */
-.mobile-device .slot-wrapper[id$="-sub"] {
-  display: block !important; /* インラインstyle="display: none"を強制上書き */
-  visibility: visible !important;
-  opacity: 1 !important;
-  height: 25vh !important; /* 下半分エリア */
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  margin-top: 2px !important;
-  margin-bottom: 2px !important;
-  border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
-  border-radius: 6px !important;
-  background: rgba(248, 255, 248, 0.95) !important;
-  transform: none !important; /* transform排除 */
-}
-
-/* 🔵 上位スロットエリア調整 */
+/* 🔵 上位スロットエリア：上半分 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 25vh !important; /* 上半分エリア */
   overflow-x: auto !important;
@@ -187,19 +170,41 @@
   transform: none !important; /* transform排除 */
 }
 
-/* 🔤 空のサブスロットに説明文表示 */
-.mobile-device .slot-wrapper[id$="-sub"]:empty::before {
-  content: "📂 詳細ボタンを押すとここにサブスロットが表示されます";
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+/* 🟢 サブスロット表示エリア：下半分（1つのエリアのみ表示用） */
+.mobile-device #subslot-display-area {
+  height: 25vh !important; /* 下半分エリア */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  touch-action: pan-x pan-y !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+  border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
+  border-radius: 6px !important;
+  background: rgba(248, 255, 248, 0.95) !important;
+  display: block !important;
+  position: relative !important;
+}
+
+/* 🚫 全サブスロットをデフォルトで非表示（PC版と同じ動作） */
+.mobile-device .slot-wrapper[id$="-sub"] {
+  display: none !important; /* デフォルトは非表示 */
+}
+
+/* ✅ 選択されたサブスロットのみ表示 */
+.mobile-device .slot-wrapper[id$="-sub"].active-subslot {
+  display: block !important; /* 選択時のみ表示 */
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
   height: 100% !important;
-  text-align: center !important;
-  color: #666 !important;
-  font-size: 11px !important;
-  font-style: italic !important;
-  line-height: 1.4 !important;
-  padding: 10px !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  border: none !important;
+  background: transparent !important;
+  transform: none !important;
 }
 
 /* ========================================= */
