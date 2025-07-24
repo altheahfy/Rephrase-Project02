@@ -612,17 +612,35 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     const maxImageWidth = 120; // 画像1枚の最大幅
     const gap = 6; // 画像間の隙間
     
-    // 🆕 スロット全体の横幅を画像枚数に応じて拡大
-    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
-    const totalGapWidth = (imageCount - 1) * gap;
-    const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
-    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+    // 🆕 モバイル検出
+    const isMobileDevice = document.body.classList.contains('mobile-device');
     
-    // 🆕 スロット全体の横幅を動的に設定
-    slot.style.maxWidth = `${expandedContainerWidth}px`;
-    slot.style.width = 'auto';
+    // 🆕 スロット全体の横幅を画像枚数に応じて拡大（モバイルでは固定幅維持）
+    let expandedContainerWidth, dynamicWidth;
     
-    console.log(`🎯 スロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
+    if (isMobileDevice) {
+        // モバイル時は幅固定、画像サイズのみ調整
+        expandedContainerWidth = baseContainerWidth; // 幅は常に固定
+        const availableWidth = baseContainerWidth - (imageCount - 1) * gap - 20;
+        dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+        
+        // モバイルでは幅拡張を行わない
+        // slot.style.maxWidth は既存のCSSに任せる
+        
+        console.log(`📱 モバイル固定幅: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px(固定), 各画像幅 ${dynamicWidth}px`);
+    } else {
+        // PC時は従来通り幅を拡張
+        expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
+        const totalGapWidth = (imageCount - 1) * gap;
+        const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
+        dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+        
+        // PC時のみスロット全体の横幅を動的に設定
+        slot.style.maxWidth = `${expandedContainerWidth}px`;
+        slot.style.width = 'auto';
+        
+        console.log(`🎯 PC版スロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
+    }
     
     // 複数画像用のスタイル - 動的サイズ適用
     imgElement.style.cssText = `
@@ -1530,17 +1548,35 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     const maxImageWidth = 120; // 上位スロットと同じ最大幅
     const gap = 6; // 上位スロットと同じ隙間
     
-    // 🆕 スロット全体の横幅を画像枚数に応じて拡大（上位スロットと同じロジック）
-    const expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
-    const totalGapWidth = (imageCount - 1) * gap;
-    const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
-    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+    // 🆕 モバイル検出（上位スロットと同じロジック）
+    const isMobileDevice = document.body.classList.contains('mobile-device');
     
-    // 🆕 サブスロット全体の横幅を動的に設定（上位スロットと同じ）
-    subslot.style.maxWidth = `${expandedContainerWidth}px`;
-    subslot.style.width = 'auto';
+    // 🆕 スロット全体の横幅を画像枚数に応じて拡大（モバイルでは固定幅維持）
+    let expandedContainerWidth, dynamicWidth;
     
-    console.log(`🎯 サブスロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
+    if (isMobileDevice) {
+        // モバイル時は幅固定、画像サイズのみ調整
+        expandedContainerWidth = baseContainerWidth; // 幅は常に固定
+        const availableWidth = baseContainerWidth - (imageCount - 1) * gap - 20;
+        dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+        
+        // モバイルでは幅拡張を行わない
+        // subslot.style.maxWidth は既存のCSSに任せる
+        
+        console.log(`📱 モバイルサブスロット固定幅: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px(固定), 各画像幅 ${dynamicWidth}px`);
+    } else {
+        // PC時は従来通り幅を拡張
+        expandedContainerWidth = baseContainerWidth + (imageCount - 1) * 80; // 1枚増えるごとに+80px
+        const totalGapWidth = (imageCount - 1) * gap;
+        const availableWidth = expandedContainerWidth - totalGapWidth - 20; // padding等を考慮
+        dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+        
+        // PC時のみサブスロット全体の横幅を動的に設定
+        subslot.style.maxWidth = `${expandedContainerWidth}px`;
+        subslot.style.width = 'auto';
+        
+        console.log(`🎯 PC版サブスロット拡大: ${imageCount}枚 → 容器幅 ${expandedContainerWidth}px, 各画像幅 ${dynamicWidth}px`);
+    }
     
     // サブスロット用複数画像スタイル - 上位スロットと同じ動的サイズ適用
     imgElement.style.cssText = `

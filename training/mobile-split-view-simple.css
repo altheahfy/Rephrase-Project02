@@ -170,6 +170,20 @@
   row-gap: 0 !important;
 }
 
+/* 📱 モバイル用：複数画像時の幅固定強制（JavaScript動的設定を無効化） */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  width: calc(100vw - 4px) !important; /* 動的幅設定を無効化 */
+  max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
+  min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
+}
+
+.mobile-device #subslot-display-area,
+.mobile-device .slot-wrapper[id$="-sub"] {
+  width: calc(100vw - 4px) !important; /* サブスロットも同様に固定 */
+  max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
+  min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
+}
+
 /* ========================================= */
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
@@ -179,6 +193,7 @@
   height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
   width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
+  min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
@@ -200,6 +215,7 @@
   height: 17.5vh !important; /* 25vh → 17.5vh (7割サイズ) */
   width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
+  min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
