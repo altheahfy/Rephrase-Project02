@@ -193,9 +193,10 @@
   touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
   
   /* スワイプエリア形成のための最小調整 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅のみ設定 */
   height: 35vh !important; /* 上下分割：上部エリア */
-  /* PC版の自動幅調整機能を保持：widthとmax-widthは設定しない */
+  
+  /* 🎯 PC版の自動幅調整を完全保持 */
+  /* min-width は削除：PC版の width: auto システムを阻害しない */
 }
 
 .mobile-device #subslot-display-area,
