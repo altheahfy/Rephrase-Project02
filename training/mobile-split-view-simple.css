@@ -196,10 +196,17 @@
 }
 */
 
-/* 🎯 PC版完全保持テスト：一切の制約なし */
+/* 🎯 PC版完全保持 + 視覚的サイズ調整のみ */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   /* PC版のスタイルに一切介入しない */
   touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
+  
+  /* 🔧 視覚的サイズ調整：機能は一切変更せず、見た目のみ縮小 */
+  transform: scale(0.6) !important; /* 60%サイズに縮小 */
+  transform-origin: top left !important; /* 左上を基準に縮小 */
+  
+  /* 縮小による余白調整 */
+  margin-bottom: -40% !important; /* 縮小分の余白を削除 */
 }
 
 .mobile-device #subslot-display-area,
