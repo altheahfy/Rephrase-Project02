@@ -170,73 +170,43 @@
   row-gap: 0 !important;
 }
 
-/* 📱 モバイル用：複数画像時の幅固定強制（JavaScript動的設定を無効化） */
+/* 📱 モバイル用：PC版完全再現の等間隔システム */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  width: calc(100vw - 4px) !important; /* 動的幅設定を無効化 */
-  max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
+  width: calc((100vw - 20px) / 10) !important; /* 10スロット完全等分割 */
+  max-width: calc((100vw - 20px) / 10) !important; /* 固定幅強制 */
+  min-width: calc((100vw - 20px) / 10) !important; /* 固定幅強制 */
 }
 
 .mobile-device #subslot-display-area,
 .mobile-device .slot-wrapper[id$="-sub"] {
-  width: calc(100vw - 4px) !important; /* サブスロットも同様に固定 */
-  max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
-}
-
-/* 🚫 JavaScript によるスロット幅変更を完全阻止 */
-.mobile-device .slot-wrapper:not([id$="-sub"])[style*="max-width"],
-.mobile-device .slot-wrapper:not([id$="-sub"])[style*="width"] {
-  width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
-  max-width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
-  min-width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
-}
-
-/* 📱 複数画像コンテナの制御（親要素内に収める） */
-.mobile-device .multi-image-container {
-  width: 100% !important; /* 親要素の幅に合わせる */
-  max-width: 100% !important; /* 親要素からはみ出し防止 */
-  overflow: hidden !important; /* はみ出し部分を隠す */
-  display: flex !important; /* フレックス表示維持 */
-  justify-content: center !important; /* 中央寄せ */
-  align-items: center !important; /* 垂直中央寄せ */
-}
-
-/* 📱 複数画像の個別制御（画面サイズに応じて縮小） */
-.mobile-device .slot-multi-image {
-  flex-shrink: 1 !important; /* 必要に応じて縮小 */
-  max-width: calc(25vw - 10px) !important; /* 画面幅の1/4程度まで */
-  min-width: 40px !important; /* 最小サイズ保証 */
-  object-fit: contain !important; /* 比率保持 */
-}
-
-/* 🚨 緊急対応：あらゆる動的幅設定を強制リセット */
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* 既存の設定を再確認・強化 */
-  width: calc(100vw - 4px) !important;
+  width: calc(100vw - 4px) !important; /* サブスロットは従来通り */
   max-width: calc(100vw - 4px) !important;
   min-width: calc(100vw - 4px) !important;
-  /* flex設定の強制リセット */
-  flex: none !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
-  flex-basis: calc(100vw - 4px) !important;
 }
 
 /* ========================================= */
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🔵 上位スロットエリア：サイズ調整（7割） + 横幅拡張 + 隙間最小化 */
+/* 🔵 上位スロットエリア：PC版完全再現配置 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
-  width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
-  max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
+  width: calc((100vw - 20px) / 10) !important; /* 10スロット均等配置 + 全体余白20px */
+  max-width: calc((100vw - 20px) / 10) !important; /* 完全固定幅 */
+  min-width: calc((100vw - 20px) / 10) !important; /* 完全固定幅 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  margin: 1px 2px !important; /* 上下1px、左右2px（隙間最小化） */
+  margin: 1px 1px !important; /* 極小間隔で統一 */
+  border: 1px solid #ddd !important;
+  border-radius: 3px !important;
+  background: rgba(240, 248, 255, 0.8) !important;
+  /* PC版と同じ等間隔配置を強制実現 */
+  flex: none !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: calc((100vw - 20px) / 10) !important;
+}
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 3px !important; /* 4px → 3px さらに控えめに */
   background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
@@ -382,4 +352,19 @@
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 1003 !important;
+}
+
+/* 🚨 最終兵器：PC版等間隔配置の絶対実現 */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  width: calc((100vw - 20px) / 10) !important; /* PC版10等分を絶対実現 */
+  max-width: calc((100vw - 20px) / 10) !important;
+  min-width: calc((100vw - 20px) / 10) !important;
+  flex: 0 0 calc((100vw - 20px) / 10) !important; /* フレックス完全制御 */
+  margin: 1px !important; /* 統一間隔 */
+}
+
+/* 🚫 JavaScript による動的設定を力技で無効化 */
+.mobile-device .slot-wrapper:not([id$="-sub"])[style] {
+  width: calc((100vw - 20px) / 10) !important;
+  max-width: calc((100vw - 20px) / 10) !important;
 }
