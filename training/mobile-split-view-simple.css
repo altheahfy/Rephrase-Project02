@@ -18,350 +18,63 @@
 }
 
 /* ========================================= */
-/* 🚀 上部エリア超圧縮（スロット領域最大化） */
+/* 🚀 最小限の上部エリア圧縮（重要要素のみ）   */
 /* ========================================= */
 
-/* フロートメニュー圧縮 - gap完全削除、padding最小化 */
+/* 🎯 PC版機能破壊回避：重要でない装飾要素のみ圧縮 */
 .mobile-device #navigation-float-menu {
-  top: 2px !important;
-  left: 2px !important;
-  padding: 2px 3px !important; /* 4px 6px → 2px 3px */
-  gap: 0px !important; /* 6px → 0px 完全削除 */
-  height: 22px !important; /* 28px → 22px */
-  font-size: 10px !important;
-  border-radius: 2px !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-}
-
-/* フロートメニュー内要素間隔削除 */
-.mobile-device #navigation-float-menu a {
-  font-size: 10px !important; /* 14px → 10px */
-  padding: 1px 2px !important;
-  margin: 0 !important;
-}
-
-.mobile-device #navigation-float-menu span {
-  font-size: 8px !important; /* 12px → 8px */
-  margin: 0 1px !important;
-}
-
-.mobile-device #navigation-float-menu select {
-  width: 60px !important; /* 120px → 60px */
-  font-size: 8px !important; /* 12px → 8px */
-  height: 16px !important; /* 20px → 16px */
-  padding: 0px 1px !important;
-}
-
-.mobile-device #navigation-float-menu button {
-  font-size: 8px !important; /* 11px → 8px */
-  padding: 1px 3px !important; /* 2px 6px → 1px 3px */
-  height: 16px !important; /* 20px → 16px */
-}
-
-.mobile-device #navigation-float-menu input[type="range"] {
-  width: 40px !important; /* 80px → 40px */
-  height: 14px !important; /* 18px → 14px */
-}
-
-.mobile-device #navigation-float-menu label {
-  font-size: 8px !important; /* 12px → 8px */
-}
-
-/* タイトル帯の超圧縮 */
-.mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
-  padding: 2px 5px !important; /* 15px → 2px 5px */
-  margin-bottom: 2px !important; /* 15px → 2px */
-  margin-top: 26px !important; /* 50px → 26px フロートメニュー直下 */
-  border-radius: 3px !important;
-  box-shadow: none !important; /* シャドウ削除 */
+  font-size: 10px;
+  padding: 2px 3px;
+  height: 22px;
 }
 
 .mobile-device h1 {
-  font-size: 12px !important; /* 28px → 12px */
-  margin: 0 !important;
-  font-weight: 600 !important;
-}
-
-/* ② タイトル帯の正確な修正 */
-.mobile-device h2 {
-  font-size: 10px !important;
-  margin: 1px 0 !important;
-}
-
-.mobile-device button {
-  font-size: 10px !important;
-  padding: 3px 6px !important;
-  margin: 1px !important;
-  min-height: 20px !important;
+  font-size: 12px;
+  margin: 0;
 }
 
 /* ========================================= */
-/* 🎛️ 制御パネル・ボタン類の圧縮            */
+/* 📱 メインスワイプエリア：PC版完全保持        */
 /* ========================================= */
 
-/* 制御パネル表示ボタンの圧縮 */
-.mobile-device div[style*="justify-content: flex-start"][style*="margin-bottom: 15px"] {
-  margin-bottom: 2px !important; /* 15px → 2px */
-}
-
-.mobile-device #toggle-control-panels {
-  padding: 3px 8px !important;
-  font-size: 10px !important;
-  border-radius: 3px !important;
-}
-
-/* 例文シャッフル等のボタン群圧縮 */
-.mobile-device #randomize-all,
-.mobile-device button[style*="background"] {
-  padding: 3px 6px !important;
-  font-size: 9px !important;
-  margin: 1px 2px !important;
-  min-height: 18px !important;
-  border-radius: 2px !important;
-}
-
-/* 分離疑問詞エリアの圧縮 */
-.mobile-device #display-top-question-word {
-  margin: 1px 0 !important;
-  padding: 2px !important;
-}
-
-/* 音声制御系ボタンの圧縮 */
-.mobile-device .voice-controls button {
-  padding: 2px 4px !important;
-  font-size: 8px !important;
-  min-height: 16px !important;
-  margin: 1px !important;
-}
-
-/* ========================================= */
-/* 📐 全体余白の最小化（スロット領域最大化） */
-/* ========================================= */
-
-/* body全体の余白削除 + 横幅最大化 */
-.mobile-device body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100vw !important; /* 画面幅いっぱい */
-  overflow-x: hidden !important; /* 横スクロール防止 */
-}
-
-/* セクション要素の余白削除 + 横幅最大化 */
-.mobile-device section {
-  margin: 0 !important;
-  padding: 0 !important; /* 2px → 0px */
-  width: 100% !important;
-}
-
-/* main-content の余白削除 + 横幅最大化 */
-.mobile-device #main-content {
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
-}
-
-/* div要素全般の余白圧縮 - 隙間最小化 */
-/* 🚨 コメントアウト：動的記載エリア問題の原因
-.mobile-device div {
-  margin: 0 !important;
-}
-*/
-
-/* 📐 スロット間隙間の完全最小化 */
-/* 🚨 コメントアウト：PC版機能破壊の原因
-.mobile-device * {
-  box-sizing: border-box !important;
-}
-*/
-
-/* フレックスコンテナやグリッドのgap削除 */
-/* 🚨 コメントアウト：レイアウト崩壊の原因
-.mobile-device .slot-container,
-.mobile-device [style*="display: flex"],
-.mobile-device [style*="display: grid"] {
-  gap: 0 !important;
-  column-gap: 0 !important;
-  row-gap: 0 !important;
-}
-*/
-
-/* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
+/* 📱 上位スロットエリア：PC版完全保持 + スワイプのみ追加 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* PC版のスタイルは一切変更しない - スワイプ対応のみ追加 */
-  overflow-x: auto !important; /* 横スクロール有効化 */
-  overflow-y: auto !important; /* 縦スクロール有効化 */
-  touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
+  overflow-x: auto;
+  overflow-y: auto;
+  touch-action: pan-x pan-y;
+  height: 35vh;
   
-  /* スワイプエリア形成のための最小調整 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅のみ設定 */
-  height: 35vh !important; /* 上下分割：上部エリア */
-  /* PC版の自動幅調整機能を保持：widthとmax-widthは設定しない */
+  /* 🎯 PC版の自動幅調整を完全保持 */
+  /* width, min-width, max-width は一切指定しない */
+  /* PC版の width: auto, flex: 0 0 auto システムを阻害しない */
 }
 
-.mobile-device #subslot-display-area,
-.mobile-device .slot-wrapper[id$="-sub"] {
-  width: calc(100vw - 4px) !important; /* サブスロットは従来通り */
-  max-width: calc(100vw - 4px) !important;
-  min-width: calc(100vw - 4px) !important;
-}
-
-/* ========================================= */
-/* 🎯 修正：サブスロット選択表示システム      */
-/* ========================================= */
-
-/* 🔵 上位スロットエリア：PC版完全保持 + スワイプのみ追加 */
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* スワイプ対応のみ - PC版レイアウトは完全保持 */
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  /* PC版の height, width, margin, border, background, flex設定はそのまま */
-}
-  border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
-  border-radius: 3px !important; /* 4px → 3px さらに控えめに */
-  background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
-  /* スワイプエリアのサイズは維持 */
-}
-
-/* 🎯 上位スロット内部コンテンツのみ縮小（横幅拡張に合わせて調整） */
-.mobile-device .slot-wrapper:not([id$="-sub"]) > * {
-  transform: scale(0.75) !important; /* 0.7 → 0.75 横幅拡張に合わせて若干大きく */
-  transform-origin: top left !important;
-}
-
-/* 🟢 サブスロット表示エリア：サイズ調整（7割） + 横幅拡張 + 隙間最小化 */
+/* 📱 サブスロット表示エリア：下部分割エリア */
 .mobile-device #subslot-display-area {
-  height: 17.5vh !important; /* 25vh → 17.5vh (7割サイズ) */
-  width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
-  max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  margin: 1px 2px !important; /* 上位スロットと同じ余白設定 */
-  border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
-  border-radius: 4px !important; /* 6px → 4px */
-  background: rgba(248, 255, 248, 0.95) !important;
-  display: block !important;
-  position: relative !important;
+  height: 25vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  touch-action: pan-x pan-y;
+  border: 2px solid #28a745;
+  background: rgba(248, 255, 248, 0.95);
 }
 
-/* 🚫 全サブスロットをデフォルトで非表示（PC版と同じ動作） */
+/* 📱 サブスロット選択表示システム */
 .mobile-device .slot-wrapper[id$="-sub"] {
-  display: none !important; /* デフォルトは非表示 */
+  display: none; /* デフォルトは非表示 */
 }
 
-/* ✅ 選択されたサブスロットのみ表示 */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot {
-  display: block !important; /* 選択時のみ表示 */
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  border: none !important;
-  background: transparent !important;
-  /* スワイプエリアのサイズは維持 */
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  border: none;
+  background: transparent;
 }
-
-/* 🎯 サブスロット内部コンテンツのみ縮小（横幅拡張に合わせて調整） */
-.mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.65) !important; /* 0.6 → 0.65 横幅拡張に合わせて若干大きく */
-  transform-origin: top left !important;
-}
-
-/* 🔧 スロット内コンテンツの基本調整のみ - 隙間最小化 */
-.mobile-device .slot-wrapper .slot-container {
-  padding: 2px !important; /* 4px → 2px */
-  margin: 1px 0 !important; /* 3px 0 → 1px 0 */
-}
-
-.mobile-device .slot-wrapper .slot {
-  padding: 3px !important; /* 5px → 3px */
-  margin: 1px !important; /* 3px → 1px */
-}
-
-/* ========================================= */
-/* 🔧 ボタン表示の確実な保証                 */
-/* ========================================= */
-
-/* 🚨 PC版レイアウト構造は絶対に変更しない！ */
-/* 横一列レイアウト（ID、イラスト、日本語、英語、詳細、ランダマイズ）を保持 */
-
-/* ボタンのタッチ操作改善 */
-.mobile-device button {
-  touch-action: manipulation !important; /* ボタンタップを優先 */
-  pointer-events: auto !important; /* ボタンクリックを確実に有効化 */
-  z-index: 1000 !important; /* 最前面に表示 */
-}
-
-/* 個別ランダマイズボタンの表示保証 */
-.mobile-device button[onclick*="Individual"],
-.mobile-device .randomize-button {
-  background: #ff9800 !important;
-  color: white !important;
-  font-weight: bold !important;
-  min-width: 15px !important;
-  visibility: visible !important;
-  display: inline-block !important;
-  touch-action: manipulation !important; /* タップ操作優先 */
-  pointer-events: auto !important;
-  z-index: 1001 !important; /* さらに前面に */
-}
-
-/* 🎯 モバイルでの個別ランダマイズボタン強化表示 */
-.mobile-device button[onclick*="randomizeIndividual"] {
-  background: #ff6600 !important; /* より目立つオレンジ */
-  color: white !important;
-  font-size: 8px !important;
-  padding: 2px 4px !important;
-  margin: 1px !important;
-  border: 1px solid #ff4400 !important;
-  border-radius: 2px !important;
-  min-width: 12px !important;
-  min-height: 12px !important;
-  font-weight: bold !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1002 !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-}
-
-/* 🔧 スロット内のすべてのボタン表示強化 */
-.mobile-device .slot-wrapper button,
-.mobile-device .slot button {
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 100 !important;
-  position: relative !important;
-}
-
-/* 🎯 "R"ボタン（ランダマイズ）の特別強化 */
-.mobile-device button[style*="background-color: orange"],
-.mobile-device button[style*="background: orange"] {
-  background: #ff6600 !important;
-  color: white !important;
-  font-size: 8px !important;
-  padding: 1px 3px !important;
-  margin: 0px 1px !important;
-  min-width: 10px !important;
-  min-height: 10px !important;
-  border: 1px solid #ff4400 !important;
-  border-radius: 1px !important;
-  font-weight: bold !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 1003 !important;
-}
-
-/* 🎯 モバイル専用：スワイプ機能のみ追加（PC版スタイル完全保持） */
