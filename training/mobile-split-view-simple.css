@@ -197,6 +197,7 @@
   width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
   max-width: calc(100vw - 4px) !important;
   min-width: calc(100vw - 4px) !important;
+  height: 35vh !important; /* 上下分割：上部エリア */
 }
 
 .mobile-device #subslot-display-area,
