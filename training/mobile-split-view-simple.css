@@ -175,10 +175,6 @@
   width: calc(100vw - 4px) !important; /* 動的幅設定を無効化 */
   max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
   min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
-  flex: none !important; /* フレックス伸縮を無効化 */
-  flex-grow: 0 !important; /* 伸長禁止 */
-  flex-shrink: 0 !important; /* 収縮禁止 */
-  flex-basis: calc(100vw - 4px) !important; /* 基本サイズ固定 */
 }
 
 .mobile-device #subslot-display-area,
@@ -186,53 +182,6 @@
   width: calc(100vw - 4px) !important; /* サブスロットも同様に固定 */
   max-width: calc(100vw - 4px) !important; /* 動的max-width設定を無効化 */
   min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
-  flex: none !important; /* フレックス伸縮を無効化 */
-  flex-grow: 0 !important; /* 伸長禁止 */
-  flex-shrink: 0 !important; /* 収縮禁止 */
-  flex-basis: calc(100vw - 4px) !important; /* 基本サイズ固定 */
-}
-
-/* 📱 超強力な幅固定：すべてのスロット要素に適用 */
-.mobile-device .slot-wrapper:not([id$="-sub"]),
-.mobile-device .slot-container,
-.mobile-device .slot {
-  width: calc(100vw - 4px) !important;
-  max-width: calc(100vw - 4px) !important;
-  min-width: calc(100vw - 4px) !important;
-  box-sizing: border-box !important;
-}
-
-/* 📱 複数画像コンテナの幅制限（スロットからはみ出し防止） */
-.mobile-device .multi-image-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: auto !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-/* 📱 複数画像の個別サイズ調整 */
-.mobile-device .slot-multi-image {
-  max-width: calc((100vw - 40px) / 4) !important; /* 4枚まで想定、余白考慮 */
-  min-width: 50px !important;
-  flex-shrink: 1 !important;
-  object-fit: contain !important; /* はみ出し防止 */
-}
-
-/* 📱 レイアウト安定化：ポジション・表示方式の統一 */
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  position: relative !important; /* static以外で配置制御 */
-  display: block !important; /* ブロック表示で幅制御確実化 */
-  float: none !important; /* フロート無効化 */
-  clear: both !important; /* フロートクリア */
-}
-
-/* 📱 親コンテナの制御強化 */
-.mobile-device section,
-.mobile-device #main-content {
-  display: block !important; /* ブロック表示 */
-  width: 100vw !important; /* 確実な全幅 */
-  overflow-x: hidden !important; /* 横スクロール完全防止 */
 }
 
 /* ========================================= */
