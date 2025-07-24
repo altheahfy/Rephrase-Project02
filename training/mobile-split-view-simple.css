@@ -1,6 +1,15 @@
 /* =================================================================== */
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
+
+/* 🚨 重要：設計要件定義（絶対遵守） */
+/* ①スマホ画面を上下に分割（上部パネル・ボタンを考慮した分割比率）      */
+/* ②各エリアは「スワイプエリア」：左右スワイプ + 画面全体ピンチ拡大縮小  */
+/* ③PC版の上位スロット・サブスロットをそのまま表示                    */
+/* ④デザイン・機能（ランダマイズ・イラスト表示・順序制御・分離疑問詞等） */
+/*   は一切変更禁止。位置・大きさ調整のみ許可                        */
+/* ⑤PC版の全機能を完全保持：自動幅調整・高さ調整・レイアウト等         */
+
 /* ✅ PC版のスタイルを完全に保持し、モバイルでは最小限の調整のみ      */
 
 /* ① タッチ操作の改善：画面全体操作可能 */
@@ -170,11 +179,13 @@
   row-gap: 0 !important;
 }
 
-/* 📱 モバイル用：横スクロール可能な適切な幅設定 */
+/* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  width: calc(100vw - 4px) !important; /* スマホ幅いっぱい */
-  max-width: calc(100vw - 4px) !important; /* 横スクロール可能 */
-  min-width: calc(100vw - 4px) !important; /* 固定幅 */
+  /* PC版のスタイルは一切変更しない - スワイプ対応のみ追加 */
+  overflow-x: auto !important; /* 横スクロール有効化 */
+  overflow-y: auto !important; /* 縦スクロール有効化 */
+  touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
+  /* PC版の width, height, margin, border, background はそのまま */
 }
 
 .mobile-device #subslot-display-area,
@@ -188,24 +199,13 @@
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🔵 上位スロットエリア：横スクロール可能な幅設定 */
+/* 🔵 上位スロットエリア：PC版完全保持 + スワイプのみ追加 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
-  width: calc(100vw - 4px) !important; /* スマホ幅いっぱいで横スクロール */
-  max-width: calc(100vw - 4px) !important; /* 横スクロール可能 */
-  min-width: calc(100vw - 4px) !important; /* 固定幅 */
+  /* スワイプ対応のみ - PC版レイアウトは完全保持 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  margin: 1px 1px !important; /* 極小間隔で統一 */
-  border: 1px solid #ddd !important;
-  border-radius: 3px !important;
-  background: rgba(240, 248, 255, 0.8) !important;
-  /* 横スクロール用のフレックス設定 */
-  flex: none !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
-  flex-basis: calc(100vw - 4px) !important;
+  /* PC版の height, width, margin, border, background, flex設定はそのまま */
 }
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 3px !important; /* 4px → 3px さらに控えめに */
@@ -354,17 +354,4 @@
   z-index: 1003 !important;
 }
 
-/* 🚨 最終兵器：横スクロール可能な適切な幅設定 */
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  width: calc(100vw - 4px) !important; /* スマホ幅いっぱい */
-  max-width: calc(100vw - 4px) !important;
-  min-width: calc(100vw - 4px) !important;
-  flex: 0 0 calc(100vw - 4px) !important; /* フレックス完全制御 */
-  margin: 1px !important; /* 統一間隔 */
-}
-
-/* 🚫 JavaScript による動的設定を力技で無効化 */
-.mobile-device .slot-wrapper:not([id$="-sub"])[style] {
-  width: calc(100vw - 4px) !important;
-  max-width: calc(100vw - 4px) !important;
-}
+/* 🎯 モバイル専用：スワイプ機能のみ追加（PC版スタイル完全保持） */
