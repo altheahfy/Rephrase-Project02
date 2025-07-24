@@ -191,13 +191,11 @@
   overflow-x: auto !important; /* 横スクロール有効化 */
   overflow-y: auto !important; /* 縦スクロール有効化 */
   touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
-  /* PC版の width, height, margin, border, background はそのまま */
   
   /* スワイプエリア形成のための最小調整 */
-  width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
-  max-width: calc(100vw - 4px) !important;
-  min-width: calc(100vw - 4px) !important;
+  min-width: calc(100vw - 4px) !important; /* 最小幅のみ設定 */
   height: 35vh !important; /* 上下分割：上部エリア */
+  /* PC版の自動幅調整機能を保持：widthとmax-widthは設定しない */
 }
 
 .mobile-device #subslot-display-area,
