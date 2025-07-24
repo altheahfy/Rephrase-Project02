@@ -179,6 +179,7 @@
   row-gap: 0 !important;
 }
 
+<<<<<<< HEAD
 /* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   /* PC版のスタイルは一切変更しない - スワイプ対応のみ追加 */
@@ -186,6 +187,13 @@
   overflow-y: auto !important; /* 縦スクロール有効化 */
   touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
   /* PC版の width, height, margin, border, background はそのまま */
+=======
+/* 📱 モバイル用：PC版完全再現の等間隔システム */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  width: calc((100vw - 20px) / 10) !important; /* 10スロット完全等分割 */
+  max-width: calc((100vw - 20px) / 10) !important; /* 固定幅強制 */
+  min-width: calc((100vw - 20px) / 10) !important; /* 固定幅強制 */
+>>>>>>> parent of 201ea45 (上位スロット間隔調整６)
 }
 
 .mobile-device #subslot-display-area,
@@ -199,6 +207,7 @@
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
+<<<<<<< HEAD
 /* 🔵 上位スロットエリア：PC版完全保持 + スワイプのみ追加 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   /* スワイプ対応のみ - PC版レイアウトは完全保持 */
@@ -206,6 +215,26 @@
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
   /* PC版の height, width, margin, border, background, flex設定はそのまま */
+=======
+/* 🔵 上位スロットエリア：PC版完全再現配置 */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
+  width: calc((100vw - 20px) / 10) !important; /* 10スロット均等配置 + 全体余白20px */
+  max-width: calc((100vw - 20px) / 10) !important; /* 完全固定幅 */
+  min-width: calc((100vw - 20px) / 10) !important; /* 完全固定幅 */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  touch-action: pan-x pan-y !important;
+  margin: 1px 1px !important; /* 極小間隔で統一 */
+  border: 1px solid #ddd !important;
+  border-radius: 3px !important;
+  background: rgba(240, 248, 255, 0.8) !important;
+  /* PC版と同じ等間隔配置を強制実現 */
+  flex: none !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: calc((100vw - 20px) / 10) !important;
+>>>>>>> parent of 201ea45 (上位スロット間隔調整６)
 }
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 3px !important; /* 4px → 3px さらに控えめに */
@@ -354,4 +383,21 @@
   z-index: 1003 !important;
 }
 
+<<<<<<< HEAD
 /* 🎯 モバイル専用：スワイプ機能のみ追加（PC版スタイル完全保持） */
+=======
+/* 🚨 最終兵器：PC版等間隔配置の絶対実現 */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  width: calc((100vw - 20px) / 10) !important; /* PC版10等分を絶対実現 */
+  max-width: calc((100vw - 20px) / 10) !important;
+  min-width: calc((100vw - 20px) / 10) !important;
+  flex: 0 0 calc((100vw - 20px) / 10) !important; /* フレックス完全制御 */
+  margin: 1px !important; /* 統一間隔 */
+}
+
+/* 🚫 JavaScript による動的設定を力技で無効化 */
+.mobile-device .slot-wrapper:not([id$="-sub"])[style] {
+  width: calc((100vw - 20px) / 10) !important;
+  max-width: calc((100vw - 20px) / 10) !important;
+}
+>>>>>>> parent of 201ea45 (上位スロット間隔調整６)
