@@ -129,22 +129,26 @@
 /* 📐 全体余白の最小化（スロット領域最大化） */
 /* ========================================= */
 
-/* body全体の余白削除 */
+/* body全体の余白削除 + 横幅最大化 */
 .mobile-device body {
   margin: 0 !important;
   padding: 0 !important;
+  width: 100vw !important; /* 画面幅いっぱい */
+  overflow-x: hidden !important; /* 横スクロール防止 */
 }
 
-/* セクション要素の余白削除 */
+/* セクション要素の余白削除 + 横幅最大化 */
 .mobile-device section {
   margin: 0 !important;
-  padding: 2px !important;
+  padding: 0 !important; /* 2px → 0px */
+  width: 100% !important;
 }
 
-/* main-content の余白削除 */
+/* main-content の余白削除 + 横幅最大化 */
 .mobile-device #main-content {
   padding: 0 !important;
   margin: 0 !important;
+  width: 100% !important;
 }
 
 /* div要素全般の余白圧縮 */
@@ -156,34 +160,36 @@
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
 
-/* 🔵 上位スロットエリア：サイズ調整（7割） */
+/* 🔵 上位スロットエリア：サイズ調整（7割） + 横幅拡張 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   height: 35vh !important; /* 50vh → 35vh (7割サイズ) */
+  width: calc(100vw - 8px) !important; /* 横幅を画面幅いっぱいに（余白4px×2） */
+  max-width: calc(100vw - 8px) !important; /* 最大幅も同様に設定 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  margin-top: 5px !important;
-  margin-bottom: 2px !important;
+  margin: 2px 4px !important; /* 上下2px、左右4px（カード的隙間保持） */
   border: 1px solid #ddd !important; /* 2px → 1px 控えめに */
   border-radius: 4px !important; /* 6px → 4px */
   background: rgba(240, 248, 255, 0.8) !important; /* 0.95 → 0.8 */
   /* スワイプエリアのサイズは維持 */
 }
 
-/* 🎯 上位スロット内部コンテンツのみ縮小 */
+/* 🎯 上位スロット内部コンテンツのみ縮小（横幅拡張に合わせて調整） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) > * {
-  transform: scale(0.7) !important; /* 0.8 → 0.7 さらに縮小 */
+  transform: scale(0.75) !important; /* 0.7 → 0.75 横幅拡張に合わせて若干大きく */
   transform-origin: top left !important;
 }
 
-/* 🟢 サブスロット表示エリア：サイズ調整（7割） */
+/* 🟢 サブスロット表示エリア：サイズ調整（7割） + 横幅拡張 */
 .mobile-device #subslot-display-area {
   height: 17.5vh !important; /* 25vh → 17.5vh (7割サイズ) */
+  width: calc(100vw - 8px) !important; /* 横幅を画面幅いっぱいに（余白4px×2） */
+  max-width: calc(100vw - 8px) !important; /* 最大幅も同様に設定 */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  margin-top: 2px !important;
-  margin-bottom: 2px !important;
+  margin: 2px 4px !important; /* 上位スロットと同じ余白設定 */
   border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
   border-radius: 6px !important;
   background: rgba(248, 255, 248, 0.95) !important;
@@ -213,9 +219,9 @@
   /* スワイプエリアのサイズは維持 */
 }
 
-/* 🎯 サブスロット内部コンテンツのみ縮小 */
+/* 🎯 サブスロット内部コンテンツのみ縮小（横幅拡張に合わせて調整） */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.6) !important; /* 0.7 → 0.6 さらに縮小 */
+  transform: scale(0.65) !important; /* 0.6 → 0.65 横幅拡張に合わせて若干大きく */
   transform-origin: top left !important;
 }
 
