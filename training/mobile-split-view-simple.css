@@ -186,17 +186,20 @@
 */
 
 /* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
+/* 🧪 テスト：スワイプエリア設定を一時無効化して折り返し問題を確認 */
+/*
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
-  /* PC版のスタイルは一切変更しない - スワイプ対応のみ追加 */
-  overflow-x: auto !important; /* 横スクロール有効化 */
-  overflow-y: auto !important; /* 縦スクロール有効化 */
-  touch-action: pan-x pan-y !important; /* スワイプ操作有効化 */
-  
-  /* スワイプエリア形成のための最小調整 */
-  height: 35vh !important; /* 上下分割：上部エリア */
-  
-  /* 🎯 PC版の自動幅調整を完全保持 */
-  /* min-width は削除：PC版の width: auto システムを阻害しない */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  touch-action: pan-x pan-y !important;
+  height: 35vh !important;
+}
+*/
+
+/* 🎯 PC版完全保持テスト：一切の制約なし */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  /* PC版のスタイルに一切介入しない */
+  touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
 }
 
 .mobile-device #subslot-display-area,
@@ -279,6 +282,12 @@
 .mobile-device .slot-wrapper .slot-container {
   padding: 2px !important; /* 4px → 2px */
   margin: 1px 0 !important; /* 3px 0 → 1px 0 */
+  
+  /* 🎯 PC版の自動幅調整を強制的に復元 */
+  width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  min-width: 160px !important; /* PC版と同じ最小幅 */
 }
 
 .mobile-device .slot-wrapper .slot {
