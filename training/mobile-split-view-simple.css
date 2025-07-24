@@ -161,16 +161,21 @@
 }
 
 /* div要素全般の余白圧縮 - 隙間最小化 */
+/* 🚨 コメントアウト：動的記載エリア問題の原因
 .mobile-device div {
-  margin: 0 !important; /* 1px 0 → 0 完全削除 */
+  margin: 0 !important;
 }
+*/
 
 /* 📐 スロット間隙間の完全最小化 */
+/* 🚨 コメントアウト：PC版機能破壊の原因
 .mobile-device * {
-  box-sizing: border-box !important; /* ボックスサイズ計算を正確に */
+  box-sizing: border-box !important;
 }
+*/
 
 /* フレックスコンテナやグリッドのgap削除 */
+/* 🚨 コメントアウト：レイアウト崩壊の原因
 .mobile-device .slot-container,
 .mobile-device [style*="display: flex"],
 .mobile-device [style*="display: grid"] {
@@ -178,6 +183,7 @@
   column-gap: 0 !important;
   row-gap: 0 !important;
 }
+*/
 
 <<<<<<< HEAD
 /* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
