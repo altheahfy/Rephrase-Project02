@@ -863,6 +863,39 @@ function initMobileSubslotSwipe() {
     subslotWrapper.addEventListener('click', (e) => {
       console.log(`📱 ${slotId}: click イベント発火（デバッグ用）`);
     }, { passive: true });
+    
+    // 🔧 デバッグ用：全てのタッチイベントをキャッチ
+    ['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(eventType => {
+      subslotWrapper.addEventListener(eventType, (e) => {
+        console.log(`🔧 ${slotId}: ${eventType} 検出! touches=${e.touches?.length || 0}`);
+      }, { passive: true, capture: true });
+    });
+    
+    // 🔧 マウスイベントもテスト（PCでのテスト用）
+    subslotWrapper.addEventListener('mousedown', (e) => {
+      console.log(`🖱️ ${slotId}: mousedown 検出!`);
+      startX = e.clientX;
+      startTime = Date.now();
+    });
+    
+    subslotWrapper.addEventListener('mouseup', (e) => {
+      console.log(`🖱️ ${slotId}: mouseup 検出!`);
+      const endX = e.clientX;
+      const deltaX = endX - startX;
+      const deltaTime = Date.now() - startTime;
+      
+      console.log(`🖱️ ${slotId}: マウス移動 - DeltaX=${deltaX}, DeltaTime=${deltaTime}ms`);
+      
+      // マウスでもスワイプテスト
+      if (Math.abs(deltaX) > 80 && deltaTime < 500) {
+        console.log(`🖱️ ${slotId}: マウススワイプ検出!`);
+        if (deltaX > 0) {
+          switchToPreviousSubslot(slotId);
+        } else {
+          switchToNextSubslot(slotId);
+        }
+      }
+    });
   });
 
   console.log('📱 全スロットへのスワイプリスナー追加完了');
@@ -918,6 +951,18 @@ if (document.readyState === 'loading') {
 } else {
   initMobileSubslotSwipe();
 }
+
+// 🔧 ページ完全読み込み後にも再実行（フォールバック）
+window.addEventListener('load', () => {
+  console.log('📱 ページ完全読み込み後のスワイプ機能再初期化');
+  setTimeout(initMobileSubslotSwipe, 1000); // 1秒後に再実行
+});
+
+// 🧪 デバッグ用：手動で再初期化
+window.reinitSwipe = function() {
+  console.log('🧪 手動スワイプ再初期化');
+  initMobileSubslotSwipe();
+};
 
 // 🧪 デバッグ用：手動スワイプテスト機能
 window.testSwipe = function(slotId, direction) {
