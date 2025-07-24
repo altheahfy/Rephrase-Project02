@@ -184,6 +184,45 @@
   min-width: calc(100vw - 4px) !important; /* 最小幅固定で変動完全防止 */
 }
 
+/* 🚫 JavaScript によるスロット幅変更を完全阻止 */
+.mobile-device .slot-wrapper:not([id$="-sub"])[style*="max-width"],
+.mobile-device .slot-wrapper:not([id$="-sub"])[style*="width"] {
+  width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
+  max-width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
+  min-width: calc(100vw - 4px) !important; /* インライン style 属性を上書き */
+}
+
+/* 📱 複数画像コンテナの制御（親要素内に収める） */
+.mobile-device .multi-image-container {
+  width: 100% !important; /* 親要素の幅に合わせる */
+  max-width: 100% !important; /* 親要素からはみ出し防止 */
+  overflow: hidden !important; /* はみ出し部分を隠す */
+  display: flex !important; /* フレックス表示維持 */
+  justify-content: center !important; /* 中央寄せ */
+  align-items: center !important; /* 垂直中央寄せ */
+}
+
+/* 📱 複数画像の個別制御（画面サイズに応じて縮小） */
+.mobile-device .slot-multi-image {
+  flex-shrink: 1 !important; /* 必要に応じて縮小 */
+  max-width: calc(25vw - 10px) !important; /* 画面幅の1/4程度まで */
+  min-width: 40px !important; /* 最小サイズ保証 */
+  object-fit: contain !important; /* 比率保持 */
+}
+
+/* 🚨 緊急対応：あらゆる動的幅設定を強制リセット */
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  /* 既存の設定を再確認・強化 */
+  width: calc(100vw - 4px) !important;
+  max-width: calc(100vw - 4px) !important;
+  min-width: calc(100vw - 4px) !important;
+  /* flex設定の強制リセット */
+  flex: none !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: calc(100vw - 4px) !important;
+}
+
 /* ========================================= */
 /* 🎯 修正：サブスロット選択表示システム      */
 /* ========================================= */
