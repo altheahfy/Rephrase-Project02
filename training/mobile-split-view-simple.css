@@ -417,3 +417,15 @@
     height: 10vh !important; /* 横向き時のみサブスロットエリアを縮小 */
   }
 }
+
+/* 🎯 縦向き復帰時の設定強制再適用 */
+@media screen and (orientation: portrait) {
+  .mobile-device .slot-wrapper:not([id$="-sub"]) {
+    height: 40vh !important; /* 基本設定を強制再適用 */
+    padding-top: 8px !important; /* 位置調整を強制再適用 */
+    align-items: flex-start !important; /* 上側配置を強制再適用 */
+  }
+  .mobile-device #subslot-display-area {
+    height: 12vh !important; /* 基本設定を強制再適用 */
+  }
+}
