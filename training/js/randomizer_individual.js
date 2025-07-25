@@ -275,16 +275,22 @@ function randomizeSlotSIndividual() {
       console.log("🎨 Sサブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('s');
+      console.log("📏 Sサブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（個別ランダマイズ後）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
       window.refreshAllMultipleImages();
       console.log("🎨 S個別ランダマイズ後の複数画像更新完了");
     }, 300);
-  }
-  
-  console.log("✅ Sスロット個別ランダマイズ完了");
+  }  console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -419,7 +425,15 @@ function randomizeSlotM1Individual() {
       console.log("🎨 M1サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('m1');
+      console.log("📏 M1サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（個別ランダマイズ後）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
@@ -563,16 +577,22 @@ function randomizeSlotM2Individual() {
       console.log("🎨 M2サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('m2');
+      console.log("📏 M2サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（上位スロット用）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
       window.refreshAllMultipleImages();
       console.log("🎨 M2複数画像システム更新完了");
     }, 300);
-  }
-  
-  console.log("✅ M2スロット個別ランダマイズ完了");
+  }  console.log("✅ M2スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -707,7 +727,15 @@ function randomizeSlotC1Individual() {
       console.log("🎨 C1サブスロット画像更新完了");
     }, 200);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('c1');
+      console.log("📏 C1サブスロット幅調整完了");
+    }, 300);
+  }
+
   // 🎨 複数画像システム更新（上位スロット用）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
@@ -851,16 +879,22 @@ function randomizeSlotO1Individual() {
       console.log("🎨 O1サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('o1');
+      console.log("📏 O1サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（個別ランダマイズ後）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
       window.refreshAllMultipleImages();
       console.log("🎨 O1個別ランダマイズ後の複数画像更新完了");
     }, 300);
-  }
-  
-  console.log("✅ O1スロット個別ランダマイズ完了");
+  }  console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -997,16 +1031,22 @@ function randomizeSlotO2Individual() {
       console.log("🎨 O2サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('o2');
+      console.log("📏 O2サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（上位スロット用）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
       window.refreshAllMultipleImages();
       console.log("🎨 O2複数画像システム更新完了");
     }, 300);
-  }
-  
-  console.log("✅ O2スロット個別ランダマイズ完了");
+  }  console.log("✅ O2スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -1143,7 +1183,15 @@ function randomizeSlotC2Individual() {
       console.log("🎨 C2サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('c2');
+      console.log("📏 C2サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（上位スロット用）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
@@ -1289,16 +1337,22 @@ function randomizeSlotM3Individual() {
       console.log("🎨 M3サブスロット画像更新完了");
     }, 150);
   }
-  
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+    setTimeout(() => {
+      window.ensureSubslotWidthForMultipleImages('m3');
+      console.log("📏 M3サブスロット幅調整完了");
+    }, 250);
+  }
+
   // 🎨 複数画像システム更新（上位スロット用）
   if (typeof window.refreshAllMultipleImages === "function") {
     setTimeout(() => {
       window.refreshAllMultipleImages();
       console.log("🎨 M3複数画像システム更新完了");
     }, 300);
-  }
-  
-  console.log("✅ M3スロット個別ランダマイズ完了");
+  }  console.log("✅ M3スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開

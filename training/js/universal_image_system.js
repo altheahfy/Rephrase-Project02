@@ -2043,6 +2043,86 @@ function debugImageDisappearance() {
   }, 1000);
 }
 
+// 🎯 個別ランダマイズ専用：サブスロット幅調整強制実行関数
+function ensureSubslotWidthForMultipleImages(parentSlotId) {
+  console.log(`📏 個別ランダマイズ後のサブスロット幅調整開始: ${parentSlotId}`);
+  
+  if (!parentSlotId) {
+    console.warn('⚠️ parentSlotIdが指定されていません');
+    return;
+  }
+  
+  // サブスロットコンテナの確認
+  const subslotContainer = document.getElementById(`slot-${parentSlotId}-sub`);
+  if (!subslotContainer) {
+    console.warn(`⚠️ サブスロットコンテナが見つかりません: slot-${parentSlotId}-sub`);
+    return;
+  }
+  
+  // 表示中のサブスロットを検索
+  const visibleSubslots = Array.from(subslotContainer.children).filter(child => {
+    return child.id && child.id.includes('sub') && 
+           window.getComputedStyle(child).display !== 'none';
+  });
+  
+  if (visibleSubslots.length === 0) {
+    console.log(`📝 表示中のサブスロットが見つかりません: ${parentSlotId}`);
+    return;
+  }
+  
+  console.log(`🔍 表示中のサブスロット: ${visibleSubslots.length}個`);
+  
+  visibleSubslots.forEach(subslot => {
+    const subslotId = subslot.id;
+    
+    // 複数画像コンテナの確認
+    const multiImageContainer = subslot.querySelector('.multi-image-container');
+    if (!multiImageContainer) {
+      console.log(`📝 ${subslotId}: 複数画像コンテナなし（単一画像表示）`);
+      return;
+    }
+    
+    // 画像枚数を確認
+    const images = multiImageContainer.querySelectorAll('.slot-multi-image');
+    if (images.length <= 1) {
+      console.log(`📝 ${subslotId}: 画像枚数${images.length}枚（幅調整不要）`);
+      return;
+    }
+    
+    console.log(`🎯 ${subslotId}: ${images.length}枚の複数画像 → 幅調整実行`);
+    
+    // 🎯 強制的なスロット幅調整
+    const imageCount = images.length;
+    const largerOptimalImageWidth = 120; // 上位スロットと同じ
+    const gap = 6;
+    const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60;
+    
+    // 現在のサブスロット幅
+    const currentWidth = subslot.offsetWidth || 200;
+    const finalWidth = Math.max(currentWidth, requiredImageWidth);
+    
+    // 強制的にスタイル適用
+    subslot.style.width = finalWidth + 'px';
+    subslot.style.minWidth = finalWidth + 'px';
+    subslot.style.maxWidth = finalWidth + 'px';
+    
+    // 各画像のサイズも再調整
+    const availableWidth = finalWidth - (imageCount - 1) * gap - 40;
+    const dynamicWidth = Math.min(120, Math.max(80, Math.floor(availableWidth / imageCount)));
+    
+    images.forEach((img, index) => {
+      img.style.width = dynamicWidth + 'px';
+      img.style.maxWidth = dynamicWidth + 'px';
+      img.style.minWidth = '80px';
+      console.log(`  🖼️ 画像 ${index + 1}: ${dynamicWidth}px`);
+    });
+    
+    console.log(`📏 ${subslotId}: 幅調整完了 ${currentWidth}px → ${finalWidth}px`);
+  });
+  
+  console.log(`✅ サブスロット幅調整完了: ${parentSlotId}`);
+}
+
 // グローバル公開
 window.forceUpdateSubslotImages = forceUpdateSubslotImages;
 window.updateSubslotImages = updateSubslotImages;
@@ -2051,3 +2131,4 @@ window.applyImageToSubslot = applyImageToSubslot;
 window.getEnglishTextFromSlotPool = getEnglishTextFromSlotPool;
 window.monitorSubslotImageState = monitorSubslotImageState;
 window.debugImageDisappearance = debugImageDisappearance;
+window.ensureSubslotWidthForMultipleImages = ensureSubslotWidthForMultipleImages;
