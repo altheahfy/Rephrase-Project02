@@ -202,7 +202,7 @@
   touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
   
   /* 🎯 上位スロットのサイズを画面内収納に調整 */
-  height: 40vh !important; /* 36vh → 40vh: 上下見切れを完全解消、十分なスワイプエリア確保 */
+  height: 39vh !important; /* 40vh → 39vh: 元のサイズに戻してサブスロットの見切れを防止 */
   
   /* 🎯 横幅をスマホ画面幅いっぱいに拡張 */
   width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
@@ -215,8 +215,9 @@
   
   /* 🔧 無駄な空白を削除 - コンテンツにフィット */
   display: flex !important;
-  align-items: center !important; /* 縦方向中央寄せ */
+  align-items: flex-start !important; /* center → flex-start: コンテンツを上側に配置してIDの見切れを防止 */
   justify-content: flex-start !important; /* 横方向左寄せ */
+  padding-top: 0px !important; /* 1px → 0px: コンテンツを最上部に配置 */
   
   /* 視覚的境界線 */
   border: 2px solid #007bff !important; /* 青色で上位スロット識別 */
@@ -239,7 +240,7 @@
 /* 🎯 上位スロット内部コンテンツは標準サイズで表示 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) > * {
   /* 上位スロットは重要なので自然なサイズで表示 */
-  margin: 2px !important; /* 適度な余白 */
+  margin: 0px !important; /* 2px → 0px: コンテンツを上に移動 */
 }
 
 /* 🟢 サブスロット表示エリア：画面内完全収納サイズに調整 */
@@ -308,7 +309,7 @@
 /* 🔧 スロット内コンテンツの基本調整のみ - 隙間最小化 */
 .mobile-device .slot-wrapper .slot-container {
   padding: 2px !important; /* 4px → 2px */
-  margin: 1px 0 !important; /* 3px 0 → 1px 0 */
+  margin: -8px 0 1px 0 !important; /* -5px → -8px: さらに上に移動 */
   
   /* 🎯 PC版の自動幅調整を強制的に復元 */
   width: auto !important;
