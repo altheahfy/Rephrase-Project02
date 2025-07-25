@@ -756,89 +756,56 @@ console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPos
 /* ================================== */
 
 /**
- * 📱 サブスロットエリアにスワイプ機能を追加（デバッグ強化版）
+ * 📱 サブスロットエリアにスワイプ機能を追加（安全版）
  * PC機能に影響を与えない最小実装
  */
 function initMobileSubslotSwipe() {
-  console.log('📱 スワイプ機能初期化開始');
-  console.log('📱 モバイル検出結果:', document.documentElement.classList.contains('mobile-device'));
-  console.log('📱 User-Agent:', navigator.userAgent);
-  console.log('📱 画面サイズ:', window.innerWidth + 'x' + window.innerHeight);
-  
-  // デバッグ用：強制的にモバイルモードを有効にする（テスト用）
+  // PC環境では実行しない
   if (!document.documentElement.classList.contains('mobile-device')) {
-    console.log('📱 強制的にモバイルモードを有効化します（テスト用）');
-    document.documentElement.classList.add('mobile-device');
+    console.log('📱 PC環境のためスワイプ機能をスキップします');
+    return;
   }
 
-  console.log('📱 モバイルサブスロットスワイプ機能を初期化します（デバッグ版）');
+  console.log('📱 モバイルサブスロットスワイプ機能を初期化します（安全版）');
 
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
-  let isSwipeInProgress = false;
+  let isSwipeInProgress = false; // スワイプ処理中フラグ
   
   subslotIds.forEach(slotId => {
     const subslotWrapper = document.getElementById(`slot-${slotId}-sub`);
-    if (!subslotWrapper) {
-      console.warn(`⚠️ ${slotId} のサブスロットWrapper見つかりません`);
-      return;
-    }
-
-    console.log(`📱 ${slotId} にスワイプリスナーを追加`);
+    if (!subslotWrapper) return;
 
     let startX = 0;
     let startTime = 0;
     
-    // タッチ開始（デバッグ強化）
+    // タッチ開始（シンプル版）
     subslotWrapper.addEventListener('touchstart', (e) => {
-      console.log(`📱 ${slotId}: touchstart イベント発火!`);
-      console.log(`📱 ${slotId}: 表示状態:`, getComputedStyle(subslotWrapper).display);
-      
       // サブスロットが表示されていない場合はスキップ
-      if (getComputedStyle(subslotWrapper).display === 'none') {
-        console.log(`📱 ${slotId}: 非表示のためスキップ`);
-        return;
-      }
-      if (isSwipeInProgress) {
-        console.log(`📱 ${slotId}: 処理中のためスキップ`);
-        return;
-      }
+      if (getComputedStyle(subslotWrapper).display === 'none') return;
+      if (isSwipeInProgress) return; // 処理中は無視
       
       startX = e.touches[0].clientX;
       startTime = Date.now();
       
-      console.log(`📱 ${slotId}: タッチ開始 - X=${startX}, Time=${startTime}`);
+      console.log(`📱 ${slotId}: タッチ開始`);
     }, { passive: true });
 
-    // タッチ終了（デバッグ強化）
+    // タッチ終了（シンプル版）
     subslotWrapper.addEventListener('touchend', (e) => {
-      console.log(`📱 ${slotId}: touchend イベント発火!`);
-      
       // サブスロットが表示されていない場合はスキップ
-      if (getComputedStyle(subslotWrapper).display === 'none') {
-        console.log(`📱 ${slotId}: 非表示のためスキップ`);
-        return;
-      }
-      if (isSwipeInProgress) {
-        console.log(`📱 ${slotId}: 処理中のためスキップ`);
-        return;
-      }
+      if (getComputedStyle(subslotWrapper).display === 'none') return;
+      if (isSwipeInProgress) return; // 処理中は無視
       
       const endX = e.changedTouches[0].clientX;
       const endTime = Date.now();
       const deltaX = endX - startX;
       const deltaTime = endTime - startTime;
       
-      console.log(`📱 ${slotId}: タッチ終了 - EndX=${endX}, DeltaX=${deltaX}, DeltaTime=${deltaTime}ms`);
+      console.log(`📱 ${slotId}: タッチ終了 deltaX=${deltaX}, time=${deltaTime}ms`);
       
-      // スワイプ条件チェック（デバッグ出力付き）
-      const distanceOK = Math.abs(deltaX) > 80;
-      const timeOK = deltaTime < 500;
-      
-      console.log(`📱 ${slotId}: 判定 - 距離OK=${distanceOK}(${Math.abs(deltaX)}px), 時間OK=${timeOK}(${deltaTime}ms)`);
-      
-      if (distanceOK && timeOK) {
-        console.log(`📱 ${slotId}: スワイプ条件クリア！処理開始`);
-        isSwipeInProgress = true;
+      // スワイプ条件：十分な距離 + 十分な速度
+      if (Math.abs(deltaX) > 80 && deltaTime < 500) {
+        isSwipeInProgress = true; // 処理開始
         
         setTimeout(() => {
           if (deltaX > 0) {
@@ -849,23 +816,14 @@ function initMobileSubslotSwipe() {
             switchToNextSubslot(slotId);
           }
           
+          // 処理完了後にフラグリセット
           setTimeout(() => {
             isSwipeInProgress = false;
-            console.log(`📱 ${slotId}: 処理完了`);
           }, 500);
-        }, 100);
-      } else {
-        console.log(`📱 ${slotId}: スワイプ条件未達`);
+        }, 100); // 少し遅延させて安全に処理
       }
     }, { passive: true });
-
-    // デバッグ用：要素をクリックでもテスト
-    subslotWrapper.addEventListener('click', (e) => {
-      console.log(`📱 ${slotId}: click イベント発火（デバッグ用）`);
-    }, { passive: true });
   });
-
-  console.log('📱 全スロットへのスワイプリスナー追加完了');
 }
 
 /**
@@ -918,27 +876,3 @@ if (document.readyState === 'loading') {
 } else {
   initMobileSubslotSwipe();
 }
-
-// 🧪 デバッグ用：手動スワイプテスト機能
-window.testSwipe = function(slotId, direction) {
-  console.log(`🧪 手動スワイプテスト: ${slotId} ${direction}`);
-  if (direction === 'left') {
-    switchToNextSubslot(slotId);
-  } else if (direction === 'right') {
-    switchToPreviousSubslot(slotId);
-  }
-};
-
-// 🧪 デバッグ用：モバイル検出状態確認
-window.checkMobileStatus = function() {
-  console.log('🧪 モバイル検出状態:');
-  console.log('  - mobile-device クラス:', document.documentElement.classList.contains('mobile-device'));
-  console.log('  - User-Agent:', navigator.userAgent);
-  console.log('  - 画面サイズ:', window.innerWidth + 'x' + window.innerHeight);
-  console.log('  - タッチデバイス:', 'ontouchstart' in window);
-};
-
-console.log('🧪 デバッグ機能を追加しました:');
-console.log('  - window.testSwipe("o1", "left") - 手動左スワイプテスト');
-console.log('  - window.testSwipe("o1", "right") - 手動右スワイプテスト'); 
-console.log('  - window.checkMobileStatus() - モバイル検出状態確認');
