@@ -696,10 +696,13 @@ h1 {
 
 .slot-wrapper {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* 折り返しを防ぐ */
   gap: 16px;
   margin-bottom: 16px;
-  flex-direction: column; /* 上から下への流れを確俁E*/
+  flex-direction: row; /* 横並びに変更 */
+  overflow-x: auto; /* 横スクロール有効 */
+  overflow-y: hidden; /* 縦スクロール無効 */
+  max-width: 100%; /* 親要素の幅を超えないように */
 }
 
 /* 🔄 サブスロット横スクロール機能 */
