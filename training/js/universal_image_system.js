@@ -660,8 +660,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       }
     }
     
-    // 複数画像に必要な**最適**幅を計算（最小幅ではなく最適幅基準）
-    const requiredImageWidth = imageCount * optimalImageWidth + (imageCount - 1) * gap + 50; // 余白込み
+    // 複数画像に必要な幅を計算（より大きな画像サイズを想定）
+    const largerOptimalImageWidth = 120; // 100pxから120pxに増加
+    const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60; // 余白込み
     
     // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
     const finalSlotWidth = Math.max(textBasedWidth, requiredImageWidth);
@@ -677,12 +678,12 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     
     console.log(`🎯 改良版統合幅制御: ${imageCount}枚 → スロット幅 ${finalSlotWidth}px, 各画像幅 ${dynamicWidth}px`);
     
-    // 複数画像用のスタイル - 動的サイズ適用
+    // 複数画像用のスタイル - より大きなサイズで表示
     imgElement.style.cssText = `
       height: 160px !important;
       width: ${dynamicWidth}px !important;
       max-width: ${dynamicWidth}px !important;
-      min-width: 50px !important;
+      min-width: 80px !important;
       border-radius: 5px;
       border: 1px solid rgba(40, 167, 69, 0.6);
       object-fit: fill !important;
