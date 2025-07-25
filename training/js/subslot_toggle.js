@@ -1,6 +1,12 @@
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
-  toggleExclusiveSubslot.lock = true;
+  toggleExclusiv    // 🖱️ 横スクロールドラッグ機能を追加
+    console.log(`🖱️ サブスロット ${slotId} に横スクロールドラッグ機能を追加します`);
+    addHorizontalDragToSubslot(target);
+    
+    // 🎯 透明ダミーエリアを追加してスクロール可能にする
+    console.log(`🎯 サブスロット ${slotId} に透明ダミーエリアを追加します`);
+    addDummyScrollArea(target);bslot.lock = true;
   setTimeout(() => { toggleExclusiveSubslot.lock = false; }, 100);
   console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
 
@@ -840,6 +846,56 @@ document.addEventListener('DOMContentLoaded', () => {
   addHorizontalDragToAllSubslots();
 });
 
+/**
+ * 🎯 サブスロット右側に10個分の幅の透明ダミー要素を1個追加してスクロール可能にする
+ * @param {HTMLElement} subslotWrapper - サブスロットWrapper要素 (slot-{id}-sub)
+ */
+function addDummyScrollArea(subslotWrapper) {
+  if (!subslotWrapper || !subslotWrapper.id.endsWith('-sub')) {
+    console.warn('⚠️ ダミースクロールエリア追加：対象はサブスロットWrapper要素である必要があります');
+    return;
+  }
+  
+  console.log(`🎯 ${subslotWrapper.id} に10個分の幅の透明ダミーエリアを追加`);
+  
+  // 既存のダミーエリアを削除（重複防止）
+  const existingDummy = subslotWrapper.querySelector('.dummy-scroll-area');
+  if (existingDummy) {
+    existingDummy.remove();
+    console.log('🗑️ 既存のダミーエリアを削除');
+  }
+  
+  // 10個分の幅の透明ダミーエリアを作成
+  const dummyArea = document.createElement('div');
+  dummyArea.className = 'dummy-scroll-area';
+  
+  // 既存のsubslot-containerと同じ幅を取得
+  const existingSubslot = subslotWrapper.querySelector('.subslot-container');
+  let subslotWidth = 200; // デフォルト値
+  
+  if (existingSubslot) {
+    const computed = getComputedStyle(existingSubslot);
+    subslotWidth = parseInt(computed.width) || 200;
+  }
+  
+  // 10個分の幅で完全に透明にする
+  dummyArea.style.cssText = `
+    width: ${subslotWidth * 10}px;
+    height: 1px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    flex-shrink: 0;
+    background: transparent;
+  `;
+  
+  // サブスロットの最後に追加（右側）
+  subslotWrapper.appendChild(dummyArea);
+  
+  console.log(`✅ ${subslotWrapper.id} に透明ダミーエリア（幅:${subslotWidth * 10}px）を追加完了`);
+}
+
 // グローバル関数として公開
 window.addHorizontalDragToSubslot = addHorizontalDragToSubslot;
 window.addHorizontalDragToAllSubslots = addHorizontalDragToAllSubslots;
+window.addDummyScrollArea = addDummyScrollArea;
