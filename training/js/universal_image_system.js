@@ -475,9 +475,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   // テキストが空の場合は複数画像コンテナを完全削除して通常の単一画像処理に戻す
   if (!phraseText || phraseText.trim() === '') {
     // 複数画像コンテナがあれば削除
-    const existingContainer = slot.querySelector('.multi-image-container');
-    if (existingContainer) {
-      existingContainer.remove();
+    const emptyTextContainer = slot.querySelector('.multi-image-container');
+    if (emptyTextContainer) {
+      emptyTextContainer.remove();
       console.log('🧹 テキストが空のため複数画像コンテナを削除:', slotId);
     }
     
@@ -489,9 +489,11 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット全体の横幅をリセット
-    slot.style.maxWidth = '';
-    slot.style.width = '';
+    // 複数画像コンテナのみクリア（幅は保持）
+    let existingContainer = slot.querySelector('.multi-image-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
     
     // 単一画像にplaceholder.pngを設定（空テキスト処理）
     applyImageToSlot(slotId, phraseText, forceRefresh);
@@ -505,9 +507,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
   // マッチする画像がない場合は複数画像コンテナを完全削除して通常の処理に戻す
   if (imageDataArray.length === 0) {
     // 複数画像コンテナがあれば削除
-    const existingContainer = slot.querySelector('.multi-image-container');
-    if (existingContainer) {
-      existingContainer.remove();
+    let noImageContainer = slot.querySelector('.multi-image-container');
+    if (noImageContainer) {
+      noImageContainer.remove();
       console.log('🧹 マッチなしのため複数画像コンテナを削除:', slotId);
     }
     
@@ -519,9 +521,15 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット全体の横幅をリセット
+    // スロット幅をテキストベースの幅に戻す（画像拡張幅をクリア）
     slot.style.maxWidth = '';
-    slot.style.width = '';
+    
+    // テキスト長による幅調整システムを再実行して適切な幅を設定
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      setTimeout(() => {
+        window.adjustSlotWidthsBasedOnText();
+      }, 50);
+    }
     
     // 単一画像にplaceholder.pngまたはマッチ結果を設定
     applyImageToSlot(slotId, phraseText, forceRefresh);
@@ -545,9 +553,15 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット全体の横幅をリセット
+    // スロット幅をテキストベースの幅に戻す（画像拡張幅をクリア）
     slot.style.maxWidth = '';
-    slot.style.width = '';
+    
+    // テキスト長による幅調整システムを再実行して適切な幅を設定
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      setTimeout(() => {
+        window.adjustSlotWidthsBasedOnText();
+      }, 50);
+    }
     
     // 単一画像にマッチした画像を設定
     applyImageToSlot(slotId, phraseText, forceRefresh);
@@ -605,21 +619,33 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     imgElement.alt = `image ${index + 1} for ${slotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 🎯 画像枚数に応じた動的サイズ調整システム（スロット幅固定版）
+    // 🎯 統合的スロット幅制御システム（テキスト幅 + 画像枚数対応）
     const imageCount = imageDataArray.length;
-    const baseContainerWidth = 390; // 基本スロット幅（常に固定）
-    const minImageWidth = 50; // 画像1枚の最小幅
+    const minImageWidth = 60; // 画像1枚の最小幅（可読性向上）
     const maxImageWidth = 120; // 画像1枚の最大幅
     const gap = 6; // 画像間の隙間
     
-    // 🆕 PC版の美しい配置を保持：スロット幅は常に固定、画像サイズのみ調整
-    const availableWidth = baseContainerWidth - (imageCount - 1) * gap - 20; // padding等を考慮
+    // 現在のテキスト幅を取得（既存のadjustSlotWidthsBasedOnTextシステムとの連携）
+    const currentSlotWidth = slot.offsetWidth || 200;
+    
+    // 複数画像に必要な最小幅を計算
+    const requiredImageWidth = imageCount * minImageWidth + (imageCount - 1) * gap + 40; // 余白込み
+    
+    // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
+    const finalSlotWidth = Math.max(currentSlotWidth, requiredImageWidth);
+    
+    // スロット幅を適用（テキスト幅システムと競合しないよう慎重に設定）
+    if (finalSlotWidth > currentSlotWidth) {
+      slot.style.width = finalSlotWidth + 'px';
+      slot.style.minWidth = finalSlotWidth + 'px';
+      console.log(`📏 スロット幅拡張: ${currentSlotWidth}px → ${finalSlotWidth}px (画像${imageCount}枚に対応)`);
+    }
+    
+    // 画像幅を計算（拡張されたスロット幅を基準）
+    const availableWidth = finalSlotWidth - (imageCount - 1) * gap - 40; // padding等を考慮
     const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
     
-    // 🚫 スロット幅は絶対に変更しない（PC版の整然とした配置を保持）
-    // slot.style.maxWidth や slot.style.width の設定は完全削除
-    
-    console.log(`🎯 固定幅スロット: ${imageCount}枚 → 容器幅 ${baseContainerWidth}px(固定), 各画像幅 ${dynamicWidth}px`);
+    console.log(`🎯 統合幅制御: ${imageCount}枚 → スロット幅 ${finalSlotWidth}px, 各画像幅 ${dynamicWidth}px`);
     
     // 複数画像用のスタイル - 動的サイズ適用
     imgElement.style.cssText = `
@@ -687,9 +713,9 @@ function clearMultiImageContainer(slotId) {
   }
 
   // 複数画像コンテナがあれば削除
-  const existingContainer = slot.querySelector('.multi-image-container');
-  if (existingContainer) {
-    existingContainer.remove();
+  const clearContainer = slot.querySelector('.multi-image-container');
+  if (clearContainer) {
+    clearContainer.remove();
     console.log('🧹 複数画像コンテナを削除しました:', slotId);
   }
   
@@ -702,9 +728,57 @@ function clearMultiImageContainer(slotId) {
     console.log('🧹 単一画像を再表示しました:', slotId);
   }
   
-  // スロット全体の横幅をリセット
-  slot.style.maxWidth = '';
-  slot.style.width = '';
+  // スロット幅を適切に調整（テキスト長システムとの協調）
+  // 完全リセットではなく、テキスト長による最適幅を再計算
+  const phraseElement = slot.querySelector('.slot-phrase');
+  const textElement = slot.querySelector('.slot-text');
+  
+  if (phraseElement || textElement) {
+    // テキスト内容から適切な幅を計算
+    const testText = (phraseElement ? phraseElement.textContent : '') + 
+                     (textElement ? textElement.textContent : '');
+    
+    if (testText.trim()) {
+      // テキスト幅測定用の一時的な要素を作成
+      const tempSpan = document.createElement('span');
+      tempSpan.style.cssText = `
+        visibility: hidden;
+        position: absolute;
+        white-space: nowrap;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+      `;
+      tempSpan.textContent = testText;
+      document.body.appendChild(tempSpan);
+      
+      const textWidth = tempSpan.offsetWidth;
+      document.body.removeChild(tempSpan);
+      
+      // テキスト幅に基づく適切な幅を設定（最小200px）
+      const appropriateWidth = Math.max(200, textWidth + 60);
+      slot.style.width = appropriateWidth + 'px';
+      slot.style.minWidth = appropriateWidth + 'px';
+      
+      console.log(`📏 テキストベース幅調整: ${slotId} → ${appropriateWidth}px`);
+    } else {
+      // テキストがない場合はデフォルト幅
+      slot.style.width = '200px';
+      slot.style.minWidth = '200px';
+    }
+  } else {
+    // 要素が見つからない場合はデフォルト幅
+    slot.style.width = '200px';
+    slot.style.minWidth = '200px';
+  }
+  
+  // テキスト長による幅調整システムを再実行（既存システムとの統合）
+  if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+    setTimeout(() => {
+      window.adjustSlotWidthsBasedOnText();
+      console.log('🔧 テキストベース幅調整を再実行しました:', slotId);
+    }, 50);
+  }
   
   console.log('🧹 複数画像コンテナクリア完了:', slotId);
   return true;
@@ -1405,9 +1479,11 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
       singleImg.style.opacity = '1';
     }
     
-    // スロット全体の横幅をリセット
+    // サブスロット幅をリセット（画像拡張幅をクリア）
     subslot.style.maxWidth = '';
     subslot.style.width = '';
+    
+    // サブスロットの場合はテキスト長調整はしない（上位スロット専用機能のため）
     
     // 単一画像にplaceholder.pngを設定（空テキスト処理）
     applyImageToSubslot(subslotId, phraseText, forceRefresh);
@@ -1520,21 +1596,33 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     imgElement.alt = `image ${index + 1} for ${subslotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 🎯 上位スロットと同じ画像サイズ調整システム
+    // 🎯 サブスロット用統合的幅制御システム（テキスト幅 + 画像枚数対応）
     const imageCount = imageDataArray.length;
-    const baseContainerWidth = 390; // 上位スロットと同じ基本幅
-    const minImageWidth = 50; // 上位スロットと同じ最小幅
-    const maxImageWidth = 120; // 上位スロットと同じ最大幅
-    const gap = 6; // 上位スロットと同じ隙間
+    const minImageWidth = 60; // 画像1枚の最小幅（可読性向上）
+    const maxImageWidth = 120; // 画像1枚の最大幅
+    const gap = 6; // 画像間の隙間
     
-    // 🆕 PC版の美しい配置を保持：サブスロット幅は常に固定、画像サイズのみ調整
-    const availableWidth = baseContainerWidth - (imageCount - 1) * gap - 20; // padding等を考慮
+    // 現在のサブスロット幅を取得
+    const currentSubslotWidth = subslot.offsetWidth || 200;
+    
+    // 複数画像に必要な最小幅を計算
+    const requiredImageWidth = imageCount * minImageWidth + (imageCount - 1) * gap + 40; // 余白込み
+    
+    // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
+    const finalSubslotWidth = Math.max(currentSubslotWidth, requiredImageWidth);
+    
+    // サブスロット幅を適用（必要な場合のみ拡張）
+    if (finalSubslotWidth > currentSubslotWidth) {
+      subslot.style.width = finalSubslotWidth + 'px';
+      subslot.style.minWidth = finalSubslotWidth + 'px';
+      console.log(`📏 サブスロット幅拡張: ${currentSubslotWidth}px → ${finalSubslotWidth}px (画像${imageCount}枚に対応)`);
+    }
+    
+    // 画像幅を計算（拡張されたサブスロット幅を基準）
+    const availableWidth = finalSubslotWidth - (imageCount - 1) * gap - 40; // padding等を考慮
     const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
     
-    // 🚫 サブスロット幅は絶対に変更しない（PC版の整然とした配置を保持）
-    // subslot.style.maxWidth や subslot.style.width の設定は完全削除
-    
-    console.log(`🎯 固定幅サブスロット: ${imageCount}枚 → 容器幅 ${baseContainerWidth}px(固定), 各画像幅 ${dynamicWidth}px`);
+    console.log(`🎯 サブスロット統合幅制御: ${imageCount}枚 → 幅 ${finalSubslotWidth}px, 各画像幅 ${dynamicWidth}px`);
     
     // サブスロット用複数画像スタイル - 上位スロットと同じ動的サイズ適用
     imgElement.style.cssText = `
