@@ -1,6 +1,12 @@
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
-  toggleExclusiveSubslot.lock = true;
+  toggleExclusiv    // 🖱️ 横スクロールドラッグ機能を追加
+    console.log(`🖱️ サブスロット ${slotId} に横スクロールドラッグ機能を追加します`);
+    addHorizontalDragToSubslot(target);
+    
+    // 🎯 透明ダミーエリアを追加してスクロール可能にする
+    console.log(`🎯 サブスロット ${slotId} に透明ダミーエリアを追加します`);
+    addDummyScrollArea(target);bslot.lock = true;
   setTimeout(() => { toggleExclusiveSubslot.lock = false; }, 100);
   console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
 
