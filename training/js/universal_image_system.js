@@ -1475,8 +1475,8 @@ function updateSubslotImages(parentSlotId) {
     
     console.log(`🔍 サブスロット処理中: ${subslotId}, 英語例文: "${englishText}"`);
     
-    // 🎯 サブスロットでも上位スロットと同じ複数画像システムを使用
-    applyMultipleImagesToSlot(subslotId, englishText);
+    // 🎯 サブスロット専用の複数画像適用（英語例文を使用）
+    applyMultipleImagesToSubslot(subslotId, englishText);
     console.log(`✅ サブスロット画像処理完了: ${subslotId} → "${englishText}"`);
   }
   
