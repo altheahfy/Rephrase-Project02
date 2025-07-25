@@ -196,13 +196,13 @@
 }
 */
 
-/* 🎯 PC版完全保持 + 明確なサイズ指定バランス調整 */
+/* 🎯 PC版完全保持 + サイズ最適化（実際のコンテンツにフィット） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
   /* PC版のスタイルに一切介入しない */
   touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
   
-  /* 🎯 明確な高さ指定でバランス調整 */
-  height: 50vh !important; /* 上位スロットを大きく表示 */
+  /* 🎯 実際のコンテンツサイズに合わせた高さ */
+  height: 35vh !important; /* 50vh → 35vh: 実際のコンテンツにフィット */
   
   /* 🎯 横幅をスマホ画面幅いっぱいに拡張 */
   width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
@@ -212,6 +212,11 @@
   /* スワイプ対応追加 */
   overflow-x: auto !important;
   overflow-y: auto !important;
+  
+  /* 🔧 無駄な空白を削除 - コンテンツにフィット */
+  display: flex !important;
+  align-items: center !important; /* 縦方向中央寄せ */
+  justify-content: flex-start !important; /* 横方向左寄せ */
   
   /* 視覚的境界線 */
   border: 2px solid #007bff !important; /* 青色で上位スロット識別 */
@@ -237,19 +242,19 @@
   margin: 2px !important; /* 適度な余白 */
 }
 
-/* 🟢 サブスロット表示エリア：バランス調整で縮小 */
+/* 🟢 サブスロット表示エリア：確実に画面内収納 */
 .mobile-device #subslot-display-area {
-  height: 20vh !important; /* 15vh → 20vh: サブスロット適度な表示領域（上位より小さく） */
+  height: 22vh !important; /* 25vh → 22vh: より確実な画面内収納 */
   width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
   min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
   overflow-x: auto !important;
   overflow-y: auto !important;
   touch-action: pan-x pan-y !important;
-  margin: 1px 2px !important; /* 上位スロットと同じ余白設定 */
-  border: 2px solid #28a745 !important; /* 緑色：サブスロット識別 */
-  border-radius: 4px !important; /* 6px → 4px */
-  background: rgba(248, 255, 248, 0.95) !important;
+  margin: 0px 1px !important; /* 1px 2px → 0px 1px: 余白最小化で画面活用 */
+  border: 1px solid #28a745 !important; /* 2px → 1px: ボーダー縮小 */
+  border-radius: 2px !important; /* 4px → 2px: 角丸縮小 */
+  background: rgba(248, 255, 248, 0.9) !important; /* 透明度上げて軽量化 */
   display: block !important;
   position: relative !important;
 }
@@ -276,9 +281,9 @@
   /* スワイプエリアのサイズは維持 */
 }
 
-/* 🎯 サブスロット内部コンテンツは適度に縮小 */
+/* 🎯 サブスロット内部コンテンツは大幅縮小で画面内収納 */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.8) !important; /* サブスロットは補助的なので適度に縮小 */
+  transform: scale(0.7) !important; /* 0.8 → 0.7: より小さくして画面内確実収納 */
   transform-origin: top left !important;
 }
 
