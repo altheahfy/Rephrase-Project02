@@ -1050,4 +1050,167 @@ debugImageDisappearance();
 
 ---
 
+## 【2025年7月25日完成】個別ランダマイズ対応・サブスロット幅調整システム 🎯
+
+**実装背景**: 個別ランダマイズ実行時にサブスロットの複数画像表示でスロット幅が適切に調整されない問題が発生。初回サブスロット展開時は正常に機能するが、個別ランダマイズによる「動的生成」時に幅調整機能が失われる現象を完全解決。
+
+### 問題の詳細分析
+
+#### 🚨 根本的課題
+1. **動的生成による初期化問題**: 個別ランダマイズ時はサブスロットが再生成され、初期状態にリセット
+2. **タイミング制御不足**: `applyMultipleImagesToSubslot`内の幅調整が確実に実行されない
+3. **専用機構の不在**: 個別ランダマイズ後の強制的な幅調整システムが未実装
+
+#### 📋 症状
+- **初回展開**: ✅ 複数画像時にスロット幅が適切に拡大
+- **個別ランダマイズ後**: ❌ 複数画像が表示されるがスロット幅が狭いまま
+- **結果**: 画像が重なったり、見切れたりして視認性が悪化
+
+### 実装した解決策
+
+#### 🔧 新規実装: `ensureSubslotWidthForMultipleImages`関数
+
+**場所**: `universal_image_system.js`（2025年7月25日追加）
+
+```javascript
+// 🎯 個別ランダマイズ専用：サブスロット幅調整強制実行関数
+function ensureSubslotWidthForMultipleImages(parentSlotId) {
+  // サブスロットコンテナ検証
+  const subslotContainer = document.getElementById(`slot-${parentSlotId}-sub`);
+  
+  // 表示中のサブスロット検索
+  const visibleSubslots = Array.from(subslotContainer.children).filter(child => {
+    return child.id && child.id.includes('sub') && 
+           window.getComputedStyle(child).display !== 'none';
+  });
+  
+  visibleSubslots.forEach(subslot => {
+    const multiImageContainer = subslot.querySelector('.multi-image-container');
+    if (!multiImageContainer) return;
+    
+    const images = multiImageContainer.querySelectorAll('.slot-multi-image');
+    if (images.length <= 1) return;
+    
+    // 🎯 強制的なスロット幅調整（上位スロットと同じロジック）
+    const imageCount = images.length;
+    const largerOptimalImageWidth = 120;
+    const gap = 6;
+    const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60;
+    
+    const currentWidth = subslot.offsetWidth || 200;
+    const finalWidth = Math.max(currentWidth, requiredImageWidth);
+    
+    // 強制的にスタイル適用
+    subslot.style.width = finalWidth + 'px';
+    subslot.style.minWidth = finalWidth + 'px';
+    subslot.style.maxWidth = finalWidth + 'px';
+    
+    // 各画像のサイズも再調整
+    const availableWidth = finalWidth - (imageCount - 1) * gap - 40;
+    const dynamicWidth = Math.min(120, Math.max(80, Math.floor(availableWidth / imageCount)));
+    
+    images.forEach(img => {
+      img.style.width = dynamicWidth + 'px';
+      img.style.maxWidth = dynamicWidth + 'px';
+      img.style.minWidth = '80px';
+    });
+  });
+}
+```
+
+#### 🔄 個別ランダマイズ関数の統合修正
+
+**対象**: 全8つの個別ランダマイズ関数（S, M1, M2, C1, O1, O2, C2, M3）
+
+**修正パターン**:
+```javascript
+// 150ms: サブスロット画像更新
+if (typeof window.updateSubslotImages === "function") {
+  setTimeout(() => {
+    window.updateSubslotImages('[スロット名]');
+    console.log("🎨 [スロット名]サブスロット画像更新完了");
+  }, 150);
+}
+
+// 🆕 250ms: サブスロット幅調整強制実行
+if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  setTimeout(() => {
+    window.ensureSubslotWidthForMultipleImages('[スロット名]');
+    console.log("📏 [スロット名]サブスロット幅調整完了");
+  }, 250);
+}
+
+// 300ms: 複数画像システム更新
+if (typeof window.refreshAllMultipleImages === "function") {
+  setTimeout(() => {
+    window.refreshAllMultipleImages();
+    console.log("🎨 [スロット名]複数画像システム更新完了");
+  }, 300);
+}
+```
+
+### 技術的特徴
+
+#### 🎯 確実性の担保
+- **存在確認**: サブスロットコンテナ、複数画像コンテナの存在を段階的に確認
+- **条件判定**: 複数画像（2枚以上）の場合のみ処理実行
+- **強制適用**: `style`プロパティによる直接的なスタイル適用
+
+#### ⚡ 効率性の追求
+- **必要時のみ実行**: 複数画像表示時のみ幅調整を実行
+- **処理分散**: タイミング制御による負荷分散
+- **統一ロジック**: 上位スロットと同じ計算式で一貫性確保
+
+#### 🛡️ 安全性の確保
+- **エラーハンドリング**: 各段階での適切な検証
+- **既存機能保護**: 単一画像表示、通常動作に影響なし
+- **デバッグ支援**: 詳細なログ出力で動作状況を可視化
+
+### 対応完了スロット
+
+| スロット | 名称 | 個別ランダマイズ関数 | サブスロット幅調整 |
+|----------|------|-------------------|------------------|
+| **S** | 主語 | `randomizeSlotSIndividual` | ✅ 完了 |
+| **M1** | 修飾語1 | `randomizeSlotM1Individual` | ✅ 完了 |
+| **M2** | 修飾語2 | `randomizeSlotM2Individual` | ✅ 完了 |
+| **C1** | 補語1 | `randomizeSlotC1Individual` | ✅ 完了 |
+| **O1** | 目的語1 | `randomizeSlotO1Individual` | ✅ 完了 |
+| **O2** | 目的語2 | `randomizeSlotO2Individual` | ✅ 完了 |
+| **C2** | 補語2 | `randomizeSlotC2Individual` | ✅ 完了 |
+| **M3** | 修飾語3 | `randomizeSlotM3Individual` | ✅ 完了 |
+
+### 動作確認手順
+
+1. **初回サブスロット展開**: 複数画像が適切な幅で表示されることを確認
+2. **個別ランダマイズ実行**: 新しい複数画像表示でも適切な幅が維持されることを確認
+3. **コンソールログ確認**: `📏 [スロット名]サブスロット幅調整完了` の表示を確認
+4. **視覚確認**: 画像の重なりや見切れがないことを確認
+
+### 学習効果への貢献
+
+#### 🎯 視覚的学習体験の向上
+- **見やすさ向上**: 複数画像が適切に配置され、学習者の理解を促進
+- **操作性向上**: 個別ランダマイズ後も一貫した表示品質を維持
+- **集中力維持**: UI不具合による学習阻害要因を完全排除
+
+#### 🚀 システム信頼性の向上
+- **操作予測性**: ランダマイズ機能が常に期待通りの結果を提供
+- **UI一貫性**: 初回展開と個別ランダマイズ後で同じ表示品質
+- **バグ回避**: 視覚的不具合による学習中断を防止
+
+### デバッグ・メンテナンス
+
+#### 🔍 トラブルシューティング
+```javascript
+// ブラウザコンソールでの確認コマンド
+window.ensureSubslotWidthForMultipleImages('c1'); // C1サブスロットの強制幅調整
+```
+
+#### 📊 状態確認方法
+- **コンソールログ**: 各段階の処理状況を詳細に出力
+- **DOM検査**: 開発者ツールでスタイル適用状況を確認
+- **関数テスト**: 個別関数の手動実行による動作確認
+
+---
+
 **🏆 サブスロット画像表示システムは上位スロットと同等の機能を持つ完全なシステムとして完成しました。**
