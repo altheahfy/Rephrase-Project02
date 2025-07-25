@@ -756,8 +756,8 @@ console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPos
 /* ================================== */
 
 /**
- * 📱 サブスロットエリアにスワイプ機能を追加（安全版）
- * PC機能に影響を与えない最小実装
+ * 📱 サブスロットエリアにスワイプ機能を追加（モバイル専用）
+ * PC機能に影響を与えない安全な実装
  */
 function initMobileSubslotSwipe() {
   // PC環境では実行しない
@@ -766,68 +766,74 @@ function initMobileSubslotSwipe() {
     return;
   }
 
-  console.log('📱 モバイルサブスロットスワイプ機能を初期化します（安全版）');
+  console.log('📱 モバイルサブスロットスワイプ機能を初期化します');
 
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
-  let isSwipeInProgress = false; // スワイプ処理中フラグ
   
   subslotIds.forEach(slotId => {
     const subslotWrapper = document.getElementById(`slot-${slotId}-sub`);
     if (!subslotWrapper) return;
 
     let startX = 0;
-    let startTime = 0;
+    let startY = 0;
+    let currentIndex = 0;
     
-    // タッチ開始（シンプル版）
+    // タッチ開始
     subslotWrapper.addEventListener('touchstart', (e) => {
       // サブスロットが表示されていない場合はスキップ
       if (getComputedStyle(subslotWrapper).display === 'none') return;
-      if (isSwipeInProgress) return; // 処理中は無視
       
       startX = e.touches[0].clientX;
-      startTime = Date.now();
+      startY = e.touches[0].clientY;
       
-      console.log(`📱 ${slotId}: タッチ開始`);
+      console.log(`📱 ${slotId}: タッチ開始 (${startX}, ${startY})`);
     }, { passive: true });
 
-    // タッチ終了（シンプル版）
+    // タッチ移動中
+    subslotWrapper.addEventListener('touchmove', (e) => {
+      // サブスロットが表示されていない場合はスキップ
+      if (getComputedStyle(subslotWrapper).display === 'none') return;
+      
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const deltaX = currentX - startX;
+      const deltaY = currentY - startY;
+      
+      // 横方向の移動が縦方向より大きい場合のみ横スワイプとして処理
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+        // 横スワイプ時は縦スクロールを止める
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // タッチ終了
     subslotWrapper.addEventListener('touchend', (e) => {
       // サブスロットが表示されていない場合はスキップ
       if (getComputedStyle(subslotWrapper).display === 'none') return;
-      if (isSwipeInProgress) return; // 処理中は無視
       
       const endX = e.changedTouches[0].clientX;
-      const endTime = Date.now();
+      const endY = e.changedTouches[0].clientY;
       const deltaX = endX - startX;
-      const deltaTime = endTime - startTime;
+      const deltaY = endY - startY;
       
-      console.log(`📱 ${slotId}: タッチ終了 deltaX=${deltaX}, time=${deltaTime}ms`);
+      console.log(`📱 ${slotId}: タッチ終了 deltaX=${deltaX}, deltaY=${deltaY}`);
       
-      // スワイプ条件：十分な距離 + 十分な速度
-      if (Math.abs(deltaX) > 80 && deltaTime < 500) {
-        isSwipeInProgress = true; // 処理開始
-        
-        setTimeout(() => {
-          if (deltaX > 0) {
-            console.log(`📱 ${slotId}: 右スワイプ検出 - 前のスロットへ`);
-            switchToPreviousSubslot(slotId);
-          } else {
-            console.log(`📱 ${slotId}: 左スワイプ検出 - 次のスロットへ`);
-            switchToNextSubslot(slotId);
-          }
-          
-          // 処理完了後にフラグリセット
-          setTimeout(() => {
-            isSwipeInProgress = false;
-          }, 500);
-        }, 100); // 少し遅延させて安全に処理
+      // 横方向のスワイプ距離が十分で、縦方向より大きい場合のみ処理
+      if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0) {
+          console.log(`📱 ${slotId}: 右スワイプ検出 - 前のスロットへ`);
+          switchToPreviousSubslot(slotId);
+        } else {
+          console.log(`📱 ${slotId}: 左スワイプ検出 - 次のスロットへ`);
+          switchToNextSubslot(slotId);
+        }
       }
     }, { passive: true });
   });
 }
 
 /**
- * 📱 前のサブスロットに切り替え（安全版）
+ * 📱 前のサブスロットに切り替え
  */
 function switchToPreviousSubslot(currentSlotId) {
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
@@ -836,20 +842,14 @@ function switchToPreviousSubslot(currentSlotId) {
   if (currentIndex > 0) {
     const previousSlotId = subslotIds[currentIndex - 1];
     console.log(`📱 ${currentSlotId} → ${previousSlotId} に切り替え`);
-    
-    // 安全に切り替え実行
-    try {
-      toggleExclusiveSubslot(previousSlotId);
-    } catch (error) {
-      console.error(`❌ スロット切り替えエラー: ${error}`);
-    }
+    toggleExclusiveSubslot(previousSlotId);
   } else {
     console.log(`📱 ${currentSlotId} は最初のスロットです`);
   }
 }
 
 /**
- * 📱 次のサブスロットに切り替え（安全版）
+ * 📱 次のサブスロットに切り替え
  */
 function switchToNextSubslot(currentSlotId) {
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
@@ -858,13 +858,7 @@ function switchToNextSubslot(currentSlotId) {
   if (currentIndex < subslotIds.length - 1) {
     const nextSlotId = subslotIds[currentIndex + 1];
     console.log(`📱 ${currentSlotId} → ${nextSlotId} に切り替え`);
-    
-    // 安全に切り替え実行
-    try {
-      toggleExclusiveSubslot(nextSlotId);
-    } catch (error) {
-      console.error(`❌ スロット切り替えエラー: ${error}`);
-    }
+    toggleExclusiveSubslot(nextSlotId);
   } else {
     console.log(`📱 ${currentSlotId} は最後のスロットです`);
   }
