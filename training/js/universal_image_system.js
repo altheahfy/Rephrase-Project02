@@ -625,21 +625,50 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     const maxImageWidth = 120; // 画像1枚の最大幅
     const gap = 6; // 画像間の隙間
     
-    // 現在のテキスト幅を取得（既存のadjustSlotWidthsBasedOnTextシステムとの連携）
-    const currentSlotWidth = slot.offsetWidth || 200;
+    // テキスト長による適切な幅を最初に確保
+    let textBasedWidth = 200; // デフォルト最小幅
+    
+    // テキスト内容から適切な幅を計算
+    const phraseElement = slot.querySelector('.slot-phrase');
+    const textElement = slot.querySelector('.slot-text');
+    
+    if (phraseElement || textElement) {
+      const testText = (phraseElement ? phraseElement.textContent : '') + 
+                       (textElement ? textElement.textContent : '');
+      
+      if (testText.trim()) {
+        // テキスト幅測定用の一時的な要素を作成
+        const tempSpan = document.createElement('span');
+        tempSpan.style.cssText = `
+          visibility: hidden;
+          position: absolute;
+          white-space: nowrap;
+          font-family: inherit;
+          font-size: inherit;
+          font-weight: inherit;
+        `;
+        tempSpan.textContent = testText;
+        document.body.appendChild(tempSpan);
+        
+        const textWidth = tempSpan.offsetWidth;
+        document.body.removeChild(tempSpan);
+        
+        // テキスト幅に基づく適切な幅を設定（最小200px、余白60px）
+        textBasedWidth = Math.max(200, textWidth + 60);
+        console.log(`📏 テキストベース幅計算: "${testText}" → ${textBasedWidth}px`);
+      }
+    }
     
     // 複数画像に必要な最小幅を計算
     const requiredImageWidth = imageCount * minImageWidth + (imageCount - 1) * gap + 40; // 余白込み
     
     // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
-    const finalSlotWidth = Math.max(currentSlotWidth, requiredImageWidth);
+    const finalSlotWidth = Math.max(textBasedWidth, requiredImageWidth);
     
-    // スロット幅を適用（テキスト幅システムと競合しないよう慎重に設定）
-    if (finalSlotWidth > currentSlotWidth) {
-      slot.style.width = finalSlotWidth + 'px';
-      slot.style.minWidth = finalSlotWidth + 'px';
-      console.log(`📏 スロット幅拡張: ${currentSlotWidth}px → ${finalSlotWidth}px (画像${imageCount}枚に対応)`);
-    }
+    // スロット幅を適用（確実に設定）
+    slot.style.width = finalSlotWidth + 'px';
+    slot.style.minWidth = finalSlotWidth + 'px';
+    console.log(`📏 統合スロット幅設定: テキスト${textBasedWidth}px + 画像${requiredImageWidth}px → 最終${finalSlotWidth}px (画像${imageCount}枚)`);
     
     // 画像幅を計算（拡張されたスロット幅を基準）
     const availableWidth = finalSlotWidth - (imageCount - 1) * gap - 40; // padding等を考慮
