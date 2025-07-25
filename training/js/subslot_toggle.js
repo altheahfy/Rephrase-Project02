@@ -101,7 +101,11 @@ function toggleExclusiveSubslot(slotId) {
     // 従来の関数も呼び出し
     applyTabConnection(slotId, true);
     
-    // 📍 サブスロット位置を調整（安全な軽微調整版）
+    // �️ 横スクロールドラッグ機能を追加
+    console.log(`🖱️ サブスロット ${slotId} に横スクロールドラッグ機能を追加します`);
+    addHorizontalDragToSubslot(target);
+    
+    // �📍 サブスロット位置を調整（安全な軽微調整版）
     setTimeout(() => {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
@@ -750,3 +754,92 @@ window.testSubslotPosition = function(slotId) {
 };
 
 console.log(`🔧 デバッグ関数を登録しました: window.testSubslotPosition('スロットID')`);
+
+/**
+ * 🖱️ サブスロットに横スクロールドラッグ機能を追加
+ * @param {HTMLElement} subslotWrapper - サブスロットWrapper要素 (slot-{id}-sub)
+ */
+function addHorizontalDragToSubslot(subslotWrapper) {
+  if (!subslotWrapper || !subslotWrapper.id.endsWith('-sub')) {
+    console.warn('⚠️ 横スクロールドラッグ：対象はサブスロットWrapper要素である必要があります');
+    return;
+  }
+  
+  console.log(`🖱️ 横スクロールドラッグ機能を追加中: ${subslotWrapper.id}`);
+  
+  // 既存のドラッグリスナーがあれば削除
+  if (subslotWrapper._dragHandlers) {
+    subslotWrapper.removeEventListener('mousedown', subslotWrapper._dragHandlers.mousedown);
+    document.removeEventListener('mousemove', subslotWrapper._dragHandlers.mousemove);
+    document.removeEventListener('mouseup', subslotWrapper._dragHandlers.mouseup);
+    console.log('🖱️ 既存のドラッグハンドラーを削除しました');
+  }
+  
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
+  
+  const mouseDown = (e) => {
+    isDragging = true;
+    startX = e.pageX - subslotWrapper.offsetLeft;
+    scrollLeft = subslotWrapper.scrollLeft;
+    subslotWrapper.style.cursor = 'grabbing';
+    console.log('🖱️ ドラッグ開始 - scrollLeft:', scrollLeft);
+  };
+  
+  const mouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const x = e.pageX - subslotWrapper.offsetLeft;
+    const walk = (x - startX) * 2; // スクロール感度調整
+    subslotWrapper.scrollLeft = scrollLeft - walk;
+    console.log('🖱️ ドラッグ中 - 新しいscrollLeft:', subslotWrapper.scrollLeft);
+  };
+  
+  const mouseUp = () => {
+    isDragging = false;
+    subslotWrapper.style.cursor = 'grab';
+    console.log('🖱️ ドラッグ終了');
+  };
+  
+  // イベントリスナーを追加
+  subslotWrapper.addEventListener('mousedown', mouseDown);
+  document.addEventListener('mousemove', mouseMove);
+  document.addEventListener('mouseup', mouseUp);
+  
+  // 後で削除できるように保存
+  subslotWrapper._dragHandlers = {
+    mousedown: mouseDown,
+    mousemove: mouseMove,
+    mouseup: mouseUp
+  };
+  
+  // ドラッグ対応のスタイルを確認
+  subslotWrapper.style.cursor = 'grab';
+  subslotWrapper.classList.add('horizontal-drag-enabled');
+  
+  console.log(`✅ ${subslotWrapper.id} に横スクロールドラッグ機能を追加完了`);
+}
+
+/**
+ * 🔄 全てのサブスロットに横スクロールドラッグ機能を適用
+ */
+function addHorizontalDragToAllSubslots() {
+  const subslotWrappers = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+  console.log(`🔄 ${subslotWrappers.length}個のサブスロットに横スクロールドラッグを適用します`);
+  
+  subslotWrappers.forEach(wrapper => {
+    addHorizontalDragToSubslot(wrapper);
+  });
+}
+
+// ページ読み込み完了時に横スクロールドラッグ機能を適用
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('📖 DOMContentLoaded: 横スクロールドラッグ機能を初期化します');
+  addHorizontalDragToAllSubslots();
+});
+
+// グローバル関数として公開
+window.addHorizontalDragToSubslot = addHorizontalDragToSubslot;
+window.addHorizontalDragToAllSubslots = addHorizontalDragToAllSubslots;

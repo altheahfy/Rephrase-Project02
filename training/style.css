@@ -702,6 +702,28 @@ h1 {
   flex-direction: column; /* 上から下への流れを確俁E*/
 }
 
+/* 🔄 サブスロット横スクロール機能 */
+.slot-wrapper[id$="-sub"] {
+  flex-direction: row; /* サブスロットは横並び */
+  flex-wrap: nowrap; /* 折り返しなし */
+  overflow-x: auto; /* 横スクロール有効 */
+  overflow-y: hidden; /* 縦スクロール無効 */
+  white-space: nowrap; /* 要素を横並びに強制 */
+  cursor: grab; /* ドラッグ可能を示唆 */
+  user-select: none; /* テキスト選択を無効化 */
+}
+
+.slot-wrapper[id$="-sub"]:active {
+  cursor: grabbing; /* ドラッグ中のカーソル */
+}
+
+/* サブスロット内の個別コンテナはインライン化 */
+.slot-wrapper[id$="-sub"] .subslot-container {
+  display: inline-grid; /* 横並びのためinline-grid使用 */
+  vertical-align: top; /* 上揃え */
+  white-space: normal; /* コンテナ内部は通常のテキストフロー */
+}
+
 /* subslot 表示安定化のための共通構造 */
 .subslot {
   min-width: 80px;
