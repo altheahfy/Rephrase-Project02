@@ -429,6 +429,8 @@
   .mobile-device .slot-wrapper:not([id$="-sub"]) {
     /* 縦向き時は基本設定を強制再適用 */
     height: 40vh !important;
+    padding-top: 8px !important; /* 上位スロット位置調整を維持 */
+    align-items: flex-start !important; /* 上側配置を維持 */
     position: relative !important;
     box-sizing: border-box !important;
   }
