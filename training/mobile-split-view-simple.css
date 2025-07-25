@@ -17,20 +17,6 @@
   touch-action: manipulation; /* 画面全体でピンチ拡大縮小可能 */
 }
 
-/* 📱 サブスロットスワイプ機能（モバイル専用） */
-.mobile-device .slot-wrapper {
-  overflow-x: hidden; /* 横スクロール非表示 */
-  position: relative;
-  touch-action: pan-y pinch-zoom; /* 縦スクロールとピンチ拡大は許可、横スワイプは制御下に */
-}
-
-/* サブスロット表示時のスワイプ対応 */
-.mobile-device .slot-wrapper[style*="display: flex"],
-.mobile-device .slot-wrapper[style*="display: block"] {
-  touch-action: pan-y pinch-zoom; /* 縦スクロール + ピンチ拡大許可 */
-  user-select: none; /* テキスト選択を無効化してスワイプしやすく */
-}
-
 /* ========================================= */
 /* 🚀 上部エリア超圧縮（スロット領域最大化） */
 /* ========================================= */
