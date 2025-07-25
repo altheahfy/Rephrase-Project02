@@ -704,15 +704,17 @@ h1 {
 
 /* 🔄 サブスロット横スクロール機能 */
 .slot-wrapper[id$="-sub"] {
-  flex-direction: row; /* サブスロットは横並び */
-  flex-wrap: nowrap; /* 折り返しなし */
-  overflow-x: auto; /* 横スクロール有効 */
-  overflow-y: hidden; /* 縦スクロール無効 */
+  flex-direction: row !important; /* サブスロットは横並び */
+  flex-wrap: nowrap !important; /* 折り返しなし */
+  overflow-x: auto !important; /* 横スクロール有効 */
+  overflow-y: hidden !important; /* 縦スクロール無効 */
   white-space: nowrap; /* 要素を横並びに強制 */
   cursor: grab; /* ドラッグ可能を示唆 */
   user-select: none; /* テキスト選択を無効化 */
   max-width: 100%; /* 親要素の幅を超えないように */
   box-sizing: border-box; /* ボーダーとパディングを含める */
+  background-color: rgba(255, 0, 0, 0.1) !important; /* デバッグ用：薄い赤背景 */
+  border: 2px solid red !important; /* デバッグ用：赤い境界線 */
 }
 
 .slot-wrapper[id$="-sub"]:active {
@@ -721,18 +723,23 @@ h1 {
 
 /* サブスロット内の個別コンテナはインライン化 */
 .slot-wrapper[id$="-sub"] .subslot-container {
-  display: inline-grid; /* 横並びのためinline-grid使用 */
+  display: inline-grid !important; /* 横並びのためinline-grid使用 */
   vertical-align: top; /* 上揃え */
   white-space: normal; /* コンテナ内部は通常のテキストフロー */
-  min-width: 200px; /* 最小幅を強制設定 */
-  flex-shrink: 0; /* 縮小を防止 */
-  width: 200px; /* 固定幅設定 */
+  min-width: 250px !important; /* 最小幅を強制設定 */
+  width: 250px !important; /* 固定幅設定を強制 */
+  max-width: 250px !important; /* 最大幅も固定 */
+  flex-shrink: 0 !important; /* 縮小を防止 */
+  flex-grow: 0 !important; /* 拡大を防止 */
+  flex-basis: 250px !important; /* フレックスベースを固定 */
+  background-color: rgba(0, 255, 0, 0.1) !important; /* デバッグ用：薄い緑背景 */
+  border: 2px solid green !important; /* デバッグ用：緑の境界線 */
 }
 
 /* サブスロット全体の幅を広げて横スクロールを強制 */
 .slot-wrapper[id$="-sub"] {
-  min-width: calc(200px * 8 + 16px * 7); /* 8個のサブスロット + gap */
-  width: max-content; /* コンテンツに応じた幅 */
+  min-width: calc(250px * 8 + 16px * 7) !important; /* 8個のサブスロット + gap */
+  width: max-content !important; /* コンテンツに応じた幅 */
 }
 
 /* subslot 表示安定化のための共通構造 */
