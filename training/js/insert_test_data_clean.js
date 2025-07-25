@@ -2351,3 +2351,71 @@ window.debugSubslotPunctuation = function() {
   
   console.log('=== デバッグ終了 ===');
 };
+
+// 🎨 全スロットの複数画像を新しいロジックで再描画する関数
+function refreshAllMultipleImages() {
+  console.log('🎨 全スロット複数画像再描画開始');
+  
+  // 対象スロットの定義
+  const allSlotIds = [
+    'slot-m1', 'slot-s', 'slot-aux', 'slot-m2', 'slot-v', 
+    'slot-c1', 'slot-o1', 'slot-o2', 'slot-c2', 'slot-m3'
+  ];
+  
+  // サブスロットも含める
+  const subSlotIds = [];
+  document.querySelectorAll('.subslot').forEach(subslot => {
+    if (subslot.id) {
+      subSlotIds.push(subslot.id);
+    }
+  });
+  
+  const targetSlots = [...allSlotIds, ...subSlotIds];
+  
+  let refreshCount = 0;
+  
+  targetSlots.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (!slot) return;
+    
+    // 既存の複数画像コンテナがあるかチェック
+    const existingContainer = slot.querySelector('.multi-image-container');
+    
+    if (existingContainer) {
+      // テキスト内容を取得
+      const phraseElement = slot.querySelector('.slot-phrase, .subslot-element');
+      const phraseText = phraseElement ? phraseElement.textContent.trim() : '';
+      
+      if (phraseText) {
+        console.log(`🔄 ${slotId} の複数画像を新しいロジックで再描画: "${phraseText}"`);
+        
+        // 既存コンテナを削除
+        existingContainer.remove();
+        
+        // 新しいロジックで再描画（非同期で実行してパフォーマンス向上）
+        setTimeout(() => {
+          if (typeof window.applyMultipleImagesToSlot === 'function') {
+            window.applyMultipleImagesToSlot(slotId, phraseText, true);
+          }
+        }, refreshCount * 100); // 順次実行で負荷分散
+        
+        refreshCount++;
+      }
+    }
+  });
+  
+  console.log(`🎨 複数画像再描画完了: ${refreshCount}個のスロットを処理`);
+}
+
+// データ書き込み完了後に複数画像を自動再描画
+window.addEventListener('load', function() {
+  // ページ読み込み完了後、少し遅延してから実行
+  setTimeout(() => {
+    if (typeof refreshAllMultipleImages === 'function') {
+      refreshAllMultipleImages();
+    }
+  }, 2000); // 2秒後に実行（全画像読み込み完了を待つ）
+});
+
+// グローバル関数として公開
+window.refreshAllMultipleImages = refreshAllMultipleImages;
