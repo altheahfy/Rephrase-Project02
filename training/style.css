@@ -711,6 +711,8 @@ h1 {
   white-space: nowrap; /* 要素を横並びに強制 */
   cursor: grab; /* ドラッグ可能を示唆 */
   user-select: none; /* テキスト選択を無効化 */
+  max-width: 100%; /* 親要素の幅を超えないように */
+  box-sizing: border-box; /* ボーダーとパディングを含める */
 }
 
 .slot-wrapper[id$="-sub"]:active {
@@ -722,6 +724,15 @@ h1 {
   display: inline-grid; /* 横並びのためinline-grid使用 */
   vertical-align: top; /* 上揃え */
   white-space: normal; /* コンテナ内部は通常のテキストフロー */
+  min-width: 200px; /* 最小幅を強制設定 */
+  flex-shrink: 0; /* 縮小を防止 */
+  width: 200px; /* 固定幅設定 */
+}
+
+/* サブスロット全体の幅を広げて横スクロールを強制 */
+.slot-wrapper[id$="-sub"] {
+  min-width: calc(200px * 8 + 16px * 7); /* 8個のサブスロット + gap */
+  width: max-content; /* コンテンツに応じた幅 */
 }
 
 /* subslot 表示安定化のための共通構造 */
