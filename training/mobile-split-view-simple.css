@@ -201,8 +201,8 @@
   /* PC版のスタイルに一切介入しない */
   touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
   
-  /* 🎯 上位スロットのサイズを適切に調整 */
-  height: 40vh !important; /* 48vh → 40vh: 上下バランスを改善 */
+  /* 🎯 上位スロットのサイズを画面内収納に調整 */
+  height: 32vh !important; /* 35vh → 32vh: 上部見切れを確実に防止 */
   
   /* 🎯 横幅をスマホ画面幅いっぱいに拡張 */
   width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
@@ -242,9 +242,9 @@
   margin: 2px !important; /* 適度な余白 */
 }
 
-/* 🟢 サブスロット表示エリア：適切なサイズで補助的役割を明確化 */
+/* 🟢 サブスロット表示エリア：画面内完全収納サイズに調整 */
 .mobile-device #subslot-display-area {
-  height: 25vh !important; /* 15vh → 25vh: サブスロットエリアを拡大してバランス改善 */
+  height: 16vh !important; /* 20vh → 16vh: さらに縮小して確実に画面内収納 */
   width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
   min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
@@ -258,8 +258,8 @@
   display: block !important;
   position: relative !important;
   
-  /* 🎯 エリア全体のコンテンツ縮小を調整 - 動的生成に対応 */
-  transform: scale(0.9) !important; /* 0.8 → 0.9: 縮小率を緩和してより見やすく */
+  /* 🎯 エリア全体のコンテンツ縮小を強化 - 画面内完全収納 */
+  transform: scale(0.85) !important; /* 0.9 → 0.85: さらに縮小して確実に画面内収納 */
   transform-origin: top left !important; /* 左上基準で縮小 */
 }
 
