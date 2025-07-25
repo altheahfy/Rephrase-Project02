@@ -418,14 +418,31 @@
   }
 }
 
-/* 🎯 縦向き復帰時の設定強制再適用 */
+/* 🎯 縦向き復帰時の設定強制再適用 - ずれ問題完全解決版 */
 @media screen and (orientation: portrait) {
   .mobile-device .slot-wrapper:not([id$="-sub"]) {
     height: 40vh !important; /* 基本設定を強制再適用 */
     padding-top: 8px !important; /* 位置調整を強制再適用 */
     align-items: flex-start !important; /* 上側配置を強制再適用 */
+    
+    /* 🚨 追加：ずれ問題解決のための強制再配置 */
+    display: flex !important; /* フレックス表示を強制再適用 */
+    justify-content: flex-start !important; /* 横方向左寄せを強制再適用 */
+    width: calc(100vw - 4px) !important; /* 横幅を強制再適用 */
+    min-width: calc(100vw - 4px) !important; /* 最小幅を強制再適用 */
+    max-width: calc(100vw - 4px) !important; /* 最大幅を強制再適用 */
+    margin: 2px !important; /* マージンを強制再適用 */
+    border: 2px solid #007bff !important; /* 境界線を強制再適用 */
+    border-radius: 4px !important; /* 角丸を強制再適用 */
+    background: rgba(240, 248, 255, 0.9) !important; /* 背景色を強制再適用 */
+    overflow-x: auto !important; /* 横スクロールを強制再適用 */
+    overflow-y: auto !important; /* 縦スクロールを強制再適用 */
+    touch-action: pan-x pan-y !important; /* タッチ操作を強制再適用 */
   }
   .mobile-device #subslot-display-area {
     height: 12vh !important; /* 基本設定を強制再適用 */
+    width: calc(100vw - 4px) !important; /* 横幅を強制再適用 */
+    max-width: calc(100vw - 4px) !important; /* 最大幅を強制再適用 */
+    min-width: calc(100vw - 4px) !important; /* 最小幅を強制再適用 */
   }
 }
