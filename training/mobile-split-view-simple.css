@@ -215,8 +215,9 @@
   
   /* 🔧 無駄な空白を削除 - コンテンツにフィット */
   display: flex !important;
-  align-items: center !important; /* 縦方向中央寄せ */
+  align-items: flex-start !important; /* center → flex-start: コンテンツを上側に配置 */
   justify-content: flex-start !important; /* 横方向左寄せ */
+  padding-top: 8px !important; /* 0px → 8px: 上位スロットを少し下に移動 */
   
   /* 視覚的境界線 */
   border: 2px solid #007bff !important; /* 青色で上位スロット識別 */
@@ -308,7 +309,7 @@
 /* 🔧 スロット内コンテンツの基本調整のみ - 隙間最小化 */
 .mobile-device .slot-wrapper .slot-container {
   padding: 2px !important; /* 4px → 2px */
-  margin: 1px 0 !important; /* 3px 0 → 1px 0 */
+  margin: -3px 0 1px 0 !important; /* 1px 0 → -3px 0 1px 0: 上位スロットを適切な位置に調整 */
   
   /* 🎯 PC版の自動幅調整を強制的に復元 */
   width: auto !important;
