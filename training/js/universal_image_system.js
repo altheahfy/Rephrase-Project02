@@ -1551,31 +1551,8 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     return;
   }
 
-  // 1個しかマッチしない場合は複数画像コンテナを完全削除して通常の処理に戻す
-  if (imageDataArray.length === 1) {
-    // 複数画像コンテナがあれば削除
-    const existingContainer = subslot.querySelector('.multi-image-container');
-    if (existingContainer) {
-      existingContainer.remove();
-      console.log('🧹 単一マッチのため複数画像コンテナを削除:', subslotId);
-    }
-    
-    // 単一画像を再表示
-    const singleImg = subslot.querySelector('.slot-image');
-    if (singleImg) {
-      singleImg.style.display = 'block';
-      singleImg.style.visibility = 'visible';
-      singleImg.style.opacity = '1';
-    }
-    
-    // スロット全体の横幅をリセット
-    subslot.style.maxWidth = '';
-    subslot.style.width = '';
-    
-    // 単一画像にマッチした画像を設定
-    applyImageToSubslot(subslotId, phraseText, forceRefresh);
-    return;
-  }
+  // 1個の場合も複数画像システムを使用して統一した表示にする
+  // (削除せずにそのまま複数画像コンテナ作成に進む)
 
   // 複数画像対応：画像コンテナを作成
   let imageContainer = subslot.querySelector('.multi-image-container');
@@ -1616,6 +1593,33 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
   // 既存の画像をクリア
   imageContainer.innerHTML = '';
 
+  // 🎯 サブスロット幅調整（画像ループの前に1回だけ実行）
+  const imageCount = imageDataArray.length;
+  const minImageWidth = 80; // 画像1枚の最小幅（上位スロットと統一）
+  const maxImageWidth = 120; // 画像1枚の最大幅
+  const gap = 6; // 画像間の隙間
+  
+  // 現在のサブスロット幅を取得
+  const currentSubslotWidth = subslot.offsetWidth || 200;
+  
+  // 複数画像に必要な幅を計算（上位スロットと同じロジック）
+  const largerOptimalImageWidth = 120; // 上位スロットと同じ
+  const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60; // 余白込み
+  
+  // テキスト幅と画像幅の大きい方を採用
+  const finalSubslotWidth = Math.max(currentSubslotWidth, requiredImageWidth);
+  
+  // サブスロット幅を強制的に適用
+  subslot.style.width = finalSubslotWidth + 'px';
+  subslot.style.minWidth = finalSubslotWidth + 'px';
+  console.log(`📏 サブスロット幅設定: ${currentSubslotWidth}px → ${finalSubslotWidth}px (画像${imageCount}枚対応)`);
+  
+  // 画像幅を計算（拡張されたサブスロット幅を基準）
+  const availableWidth = finalSubslotWidth - (imageCount - 1) * gap - 40; // padding等を考慮
+  const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
+  
+  console.log(`🎯 サブスロット統合幅制御: ${imageCount}枚 → 幅 ${finalSubslotWidth}px, 各画像幅 ${dynamicWidth}px`);
+
   // 各画像を追加
   imageDataArray.forEach((imageData, index) => {
     const imgElement = document.createElement('img');
@@ -1627,35 +1631,7 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
     imgElement.alt = `image ${index + 1} for ${subslotId}: ${imageData.description || phraseText}`;
     imgElement.className = 'slot-multi-image';
     
-    // 🎯 サブスロット用統合的幅制御システム（テキスト幅 + 画像枚数対応）
-    const imageCount = imageDataArray.length;
-    const minImageWidth = 60; // 画像1枚の最小幅（可読性向上）
-    const maxImageWidth = 120; // 画像1枚の最大幅
-    const gap = 6; // 画像間の隙間
-    
-    // 現在のサブスロット幅を取得
-    const currentSubslotWidth = subslot.offsetWidth || 200;
-    
-    // 複数画像に必要な最小幅を計算
-    const requiredImageWidth = imageCount * minImageWidth + (imageCount - 1) * gap + 40; // 余白込み
-    
-    // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
-    const finalSubslotWidth = Math.max(currentSubslotWidth, requiredImageWidth);
-    
-    // サブスロット幅を適用（必要な場合のみ拡張）
-    if (finalSubslotWidth > currentSubslotWidth) {
-      subslot.style.width = finalSubslotWidth + 'px';
-      subslot.style.minWidth = finalSubslotWidth + 'px';
-      console.log(`📏 サブスロット幅拡張: ${currentSubslotWidth}px → ${finalSubslotWidth}px (画像${imageCount}枚に対応)`);
-    }
-    
-    // 画像幅を計算（拡張されたサブスロット幅を基準）
-    const availableWidth = finalSubslotWidth - (imageCount - 1) * gap - 40; // padding等を考慮
-    const dynamicWidth = Math.min(maxImageWidth, Math.max(minImageWidth, Math.floor(availableWidth / imageCount)));
-    
-    console.log(`🎯 サブスロット統合幅制御: ${imageCount}枚 → 幅 ${finalSubslotWidth}px, 各画像幅 ${dynamicWidth}px`);
-    
-    // サブスロット用複数画像スタイル - 上位スロットと同じ動的サイズ適用
+    // サブスロット用複数画像スタイル - 計算済みの動的サイズを適用
     imgElement.style.cssText = `
       height: 150px !important;
       width: ${dynamicWidth}px !important;

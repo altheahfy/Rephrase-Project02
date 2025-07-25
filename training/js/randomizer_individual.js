@@ -276,6 +276,14 @@ function randomizeSlotSIndividual() {
     }, 150);
   }
   
+  // 🎨 複数画像システム更新（個別ランダマイズ後）
+  if (typeof window.refreshAllMultipleImages === "function") {
+    setTimeout(() => {
+      window.refreshAllMultipleImages();
+      console.log("🎨 S個別ランダマイズ後の複数画像更新完了");
+    }, 300);
+  }
+  
   console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
@@ -410,6 +418,14 @@ function randomizeSlotM1Individual() {
       window.updateSubslotImages('m1');
       console.log("🎨 M1サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🎨 複数画像システム更新（個別ランダマイズ後）
+  if (typeof window.refreshAllMultipleImages === "function") {
+    setTimeout(() => {
+      window.refreshAllMultipleImages();
+      console.log("🎨 M1個別ランダマイズ後の複数画像更新完了");
+    }, 300);
   }
   
   console.log("✅ M1スロット個別ランダマイズ完了");
@@ -818,6 +834,14 @@ function randomizeSlotO1Individual() {
       window.updateSubslotImages('o1');
       console.log("🎨 O1サブスロット画像更新完了");
     }, 150);
+  }
+  
+  // 🎨 複数画像システム更新（個別ランダマイズ後）
+  if (typeof window.refreshAllMultipleImages === "function") {
+    setTimeout(() => {
+      window.refreshAllMultipleImages();
+      console.log("🎨 O1個別ランダマイズ後の複数画像更新完了");
+    }, 300);
   }
   
   console.log("✅ O1スロット個別ランダマイズ完了");
