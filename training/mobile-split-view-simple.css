@@ -202,7 +202,7 @@
   touch-action: pan-x pan-y !important; /* タッチ操作のみ追加 */
   
   /* 🎯 上位スロットのサイズを画面内収納に調整 */
-  height: 36vh !important; /* 32vh → 36vh: 上下見切れを防止、スワイプエリア確保 */
+  height: 40vh !important; /* 36vh → 40vh: 上下見切れを完全解消、十分なスワイプエリア確保 */
   
   /* 🎯 横幅をスマホ画面幅いっぱいに拡張 */
   width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
@@ -244,7 +244,7 @@
 
 /* 🟢 サブスロット表示エリア：画面内完全収納サイズに調整 */
 .mobile-device #subslot-display-area {
-  height: 14vh !important; /* 16vh → 14vh: サブスロットエリアを縮小して上位に余裕を与える */
+  height: 12vh !important; /* 14vh → 12vh: サブスロットエリアをさらに縮小、上位により多くの領域を確保 */
   width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
   min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
