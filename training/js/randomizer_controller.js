@@ -70,6 +70,14 @@ export function handleExcelFileUpload(file) {
         console.log("🎨 全体ランダマイズ後の全スロット画像更新完了");
       }, 200);
     }
+    
+    // 🎨 複数画像システムの更新（新しい例文データに対して新しいロジックを適用）
+    if (typeof window.refreshAllMultipleImages === "function") {
+      setTimeout(() => {
+        window.refreshAllMultipleImages();
+        console.log("🎨 全体ランダマイズ後の複数画像更新完了");
+      }, 500); // 画像更新より少し遅延
+    }
   };
 
   reader.readAsArrayBuffer(file);

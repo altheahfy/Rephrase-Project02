@@ -1781,6 +1781,18 @@ window.safeJsonSync = function(data) {
       console.error("❌ 空のスロット非表示処理中にエラーが発生:", hideError.message);
     }
     
+    // 🎨 複数画像システムの更新（ランダマイズ後の新しいテキストに対して新しいロジックを適用）
+    try {
+      if (typeof window.refreshAllMultipleImages === 'function') {
+        setTimeout(() => {
+          window.refreshAllMultipleImages();
+          console.log("🎨 ランダマイズ後の複数画像更新完了");
+        }, 300); // スロット書き込み完了後に実行
+      }
+    } catch (imageError) {
+      console.error("❌ 複数画像更新中にエラーが発生:", imageError.message);
+    }
+    
     // 同期完了
     window.isSyncInProgress = false;
   } catch (err) {
