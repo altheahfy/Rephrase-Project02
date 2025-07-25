@@ -403,31 +403,3 @@
 }
 
 /* 🎯 モバイル専用：スワイプ機能のみ追加（PC版スタイル完全保持） */
-
-/* ========================================= */
-/* 📱 画面回転対応：レイアウト崩れ防止       */
-/* ========================================= */
-
-/* 縦向き（ポートレート）モード */
-@media screen and (orientation: portrait) {
-  .mobile-device .slot-wrapper:not([id$="-sub"]) {
-    height: 40vh !important;
-    width: calc(100vw - 4px) !important;
-  }
-  .mobile-device #subslot-display-area {
-    height: 12vh !important;
-    width: calc(100vw - 4px) !important;
-  }
-}
-
-/* 横向き（ランドスケープ）モード：上部スワイプエリアを拡大 */
-@media screen and (orientation: landscape) {
-  .mobile-device .slot-wrapper:not([id$="-sub"]) {
-    height: 55vh !important; /* 40vh → 55vh: 横向き時は上部エリアを大幅拡大 */
-    width: calc(100vw - 4px) !important;
-  }
-  .mobile-device #subslot-display-area {
-    height: 10vh !important; /* 12vh → 10vh: 横向き時はサブスロットエリアを縮小 */
-    width: calc(100vw - 4px) !important;
-  }
-}
