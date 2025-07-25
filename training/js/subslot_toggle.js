@@ -101,14 +101,11 @@ function toggleExclusiveSubslot(slotId) {
     // 従来の関数も呼び出し
     applyTabConnection(slotId, true);
     
-    // 🖱️ 横スクロールドラッグ機能を追加
+    // �️ 横スクロールドラッグ機能を追加
     console.log(`🖱️ サブスロット ${slotId} に横スクロールドラッグ機能を追加します`);
     addHorizontalDragToSubslot(target);
     
-    // 🎯 右側にダミースロットを追加してスクロール可能にする
-    addDummySlotsForScrolling(target);
-    
-    // 📍 サブスロット位置を調整（安全な軽微調整版）
+    // �📍 サブスロット位置を調整（安全な軽微調整版）
     setTimeout(() => {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
@@ -846,129 +843,3 @@ document.addEventListener('DOMContentLoaded', () => {
 // グローバル関数として公開
 window.addHorizontalDragToSubslot = addHorizontalDragToSubslot;
 window.addHorizontalDragToAllSubslots = addHorizontalDragToAllSubslots;
-
-/**
- * 🎯 サブスロット右側にダミースロットを追加してスクロール可能にする
- * @param {HTMLElement} subslotWrapper - サブスロットWrapper要素 (slot-{id}-sub)
- */
-function addDummySlotsForScrolling(subslotWrapper) {
-  if (!subslotWrapper || !subslotWrapper.id.endsWith('-sub')) {
-    console.warn('⚠️ ダミースロット追加：対象はサブスロットWrapper要素である必要があります');
-    return;
-  }
-  
-  console.log(`🎯 ${subslotWrapper.id} にダミースロットを追加してスクロール機能を実装`);
-  
-  // 既存のダミースロットを削除（重複防止）
-  const existingDummies = subslotWrapper.querySelectorAll('.dummy-slot-for-scroll');
-  existingDummies.forEach(dummy => dummy.remove());
-  console.log(`🗑️ 既存のダミースロット ${existingDummies.length}個を削除`);
-  
-  // 右側に10個のダミースロットを追加
-  const dummyCount = 10;
-  for (let i = 1; i <= dummyCount; i++) {
-    const dummySlot = document.createElement('div');
-    dummySlot.className = 'subslot-container dummy-slot-for-scroll';
-    dummySlot.id = `${subslotWrapper.id}-dummy-${i}`;
-    
-    // 既存のサブスロットと同じ構造を作成（空のコンテンツ）
-    dummySlot.innerHTML = `
-      <label>---</label>
-      <img alt="dummy image" class="slot-image" src="slot_images/common/placeholder.png" style="opacity: 0.3;"/>
-      <div class="slot-text" style="opacity: 0.5; font-style: italic;">右側スクロールエリア ${i}</div>
-      <div class="slot-phrase" style="opacity: 0.3;"></div>
-    `;
-    
-    // ダミー識別用のスタイル
-    dummySlot.style.opacity = '0.6';
-    dummySlot.style.filter = 'grayscale(70%)';
-    dummySlot.style.border = '1px dashed #ccc';
-    
-    // サブスロットの最後に追加
-    subslotWrapper.appendChild(dummySlot);
-    console.log(`➕ ダミースロット ${i} を追加: ${dummySlot.id}`);
-  }
-  
-  // スクロール位置を左端（デフォルト）に設定
-  subslotWrapper.scrollLeft = 0;
-  
-  console.log(`✅ ${subslotWrapper.id} にダミースロット ${dummyCount}個を追加完了`);
-  console.log(`📍 スクロール位置を左端に設定: scrollLeft = ${subslotWrapper.scrollLeft}`);
-  
-  // 視覚的確認のため少し待ってから幅チェック
-  setTimeout(() => {
-    const totalWidth = subslotWrapper.scrollWidth;
-    const visibleWidth = subslotWrapper.clientWidth;
-    const scrollableWidth = totalWidth - visibleWidth;
-    console.log(`📏 ${subslotWrapper.id} スクロール詳細:`);
-    console.log(`  - 全体幅: ${totalWidth}px`);
-    console.log(`  - 表示幅: ${visibleWidth}px`);
-    console.log(`  - スクロール可能幅: ${scrollableWidth}px`);
-  }, 100);
-}
-
-// グローバル関数として公開
-window.addDummySlotsForScrolling = addDummySlotsForScrolling;
-
-/**
- * 🎯 サブスロット右側にダミースロットを追加してスクロール可能にする
- * @param {HTMLElement} subslotWrapper - サブスロットWrapper要素 (slot-{id}-sub)
- */
-function addDummySlotsForScrolling(subslotWrapper) {
-  if (!subslotWrapper || !subslotWrapper.id.endsWith('-sub')) {
-    console.warn('⚠️ ダミースロット追加：対象はサブスロットWrapper要素である必要があります');
-    return;
-  }
-  
-  console.log(`🎯 ${subslotWrapper.id} にダミースロットを追加してスクロール機能を実装`);
-  
-  // 既存のダミースロットを削除（重複防止）
-  const existingDummies = subslotWrapper.querySelectorAll('.dummy-slot-for-scroll');
-  existingDummies.forEach(dummy => dummy.remove());
-  console.log(`🗑️ 既存のダミースロット ${existingDummies.length}個を削除`);
-  
-  // 右側に10個のダミースロットを追加
-  const dummyCount = 10;
-  for (let i = 1; i <= dummyCount; i++) {
-    const dummySlot = document.createElement('div');
-    dummySlot.className = 'subslot-container dummy-slot-for-scroll';
-    dummySlot.id = `${subslotWrapper.id}-dummy-${i}`;
-    
-    // 既存のサブスロットと同じ構造を作成（空のコンテンツ）
-    dummySlot.innerHTML = `
-      <label>---</label>
-      <img alt="dummy image" class="slot-image" src="slot_images/common/placeholder.png" style="opacity: 0.3;"/>
-      <div class="slot-text" style="opacity: 0.5; font-style: italic;">右側スクロールエリア ${i}</div>
-      <div class="slot-phrase" style="opacity: 0.3;"></div>
-    `;
-    
-    // ダミー識別用のスタイル
-    dummySlot.style.opacity = '0.6';
-    dummySlot.style.filter = 'grayscale(70%)';
-    dummySlot.style.border = '1px dashed #ccc';
-    
-    // サブスロットの最後に追加
-    subslotWrapper.appendChild(dummySlot);
-    console.log(`➕ ダミースロット ${i} を追加: ${dummySlot.id}`);
-  }
-  
-  // スクロール位置を左端（デフォルト）に設定
-  subslotWrapper.scrollLeft = 0;
-  
-  console.log(`✅ ${subslotWrapper.id} にダミースロット ${dummyCount}個を追加完了`);
-  console.log(`📍 スクロール位置を左端に設定: scrollLeft = ${subslotWrapper.scrollLeft}`);
-  
-  // 視覚的確認のため少し待ってから幅チェック
-  setTimeout(() => {
-    const totalWidth = subslotWrapper.scrollWidth;
-    const visibleWidth = subslotWrapper.clientWidth;
-    const scrollableWidth = totalWidth - visibleWidth;
-    console.log(`📏 ${subslotWrapper.id} スクロール詳細:`);
-    console.log(`  - 全体幅: ${totalWidth}px`);
-    console.log(`  - 表示幅: ${visibleWidth}px`);
-    console.log(`  - スクロール可能幅: ${scrollableWidth}px`);
-  }, 100);
-}
-
-// グローバル関数として公開
-window.addDummySlotsForScrolling = addDummySlotsForScrolling;
