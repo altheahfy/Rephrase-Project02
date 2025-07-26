@@ -36,7 +36,7 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   
   // DOM要素を取得
   const slotElement = document.getElementById(`slot-${slotKey}`);
-  const className = `hidden-${slotKey}-${elementType}`;
+  const className = `hidden-${elementType}`; // CSSクラス名に合わせて修正
   
   if (slotElement) {
     if (isVisible) {
