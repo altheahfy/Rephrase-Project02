@@ -1696,20 +1696,32 @@ class VoiceSystem {
         
         // 📱 モバイル専用調整
         if (isMobile) {
-            // モバイルでは画面の中央下部に固定
-            const mobileTop = Math.max(50, windowHeight - panelRect.height - 100);
-            const mobileLeft = Math.max(10, (windowWidth - panelRect.width) / 2);
+            // 縦画面と横画面で異なる配置
+            const isPortrait = window.innerHeight > window.innerWidth;
             
             panel.style.position = 'fixed';
-            panel.style.top = `${mobileTop}px`;
-            panel.style.left = `${mobileLeft}px`;
-            panel.style.right = 'auto';
-            panel.style.bottom = 'auto';
             panel.style.zIndex = '9999';
-            panel.style.maxWidth = `${windowWidth - 20}px`; // 画面幅に収める
-            panel.style.maxHeight = `${windowHeight - 100}px`; // 画面高さに収める
             
-            console.log(`📱 モバイル調整: top=${mobileTop}px, left=${mobileLeft}px`);
+            if (isPortrait) {
+                // 縦画面：右下に小さく配置
+                panel.style.top = 'auto';
+                panel.style.bottom = '20px';
+                panel.style.left = 'auto';
+                panel.style.right = '10px';
+                panel.style.maxWidth = '140px';
+                panel.style.maxHeight = '180px';
+                console.log('📱 縦画面調整: right=10px, bottom=20px');
+            } else {
+                // 横画面：音声学習ボタンの下、右端に配置
+                panel.style.top = '110px';
+                panel.style.bottom = 'auto';
+                panel.style.left = 'auto';
+                panel.style.right = '20px';
+                panel.style.maxWidth = '250px';
+                panel.style.maxHeight = `${windowHeight - 150}px`;
+                console.log('📱 横画面調整: top=110px, right=20px');
+            }
+            
             return;
         }
         
@@ -2261,13 +2273,27 @@ class VoiceSystem {
                              window.innerWidth <= 768;
             
             if (isMobile) {
+                // 縦画面と横画面で異なる配置
+                const isPortrait = window.innerHeight > window.innerWidth;
+                
                 panel.style.position = 'fixed';
-                panel.style.top = 'auto';
-                panel.style.bottom = '20px';
-                panel.style.left = '50%';
-                panel.style.right = 'auto';
-                panel.style.transform = 'translateX(-50%)';
                 panel.style.zIndex = '9999';
+                
+                if (isPortrait) {
+                    // 縦画面：右下に小さく配置
+                    panel.style.top = 'auto';
+                    panel.style.bottom = '20px';
+                    panel.style.left = 'auto';
+                    panel.style.right = '10px';
+                    panel.style.transform = 'none';
+                } else {
+                    // 横画面：音声学習ボタンの下、右端に配置
+                    panel.style.top = '110px';
+                    panel.style.bottom = 'auto';
+                    panel.style.left = 'auto';
+                    panel.style.right = '20px';
+                    panel.style.transform = 'none';
+                }
             } else {
                 panel.style.position = 'fixed';
                 panel.style.top = '120px';

@@ -78,17 +78,23 @@
     }
 }
 
-/* 横画面では元の正しい設定を維持 */
+/* 横画面では音声学習ボタンの下（右端）に配置 */
 @media (max-width: 768px) and (orientation: landscape) {
     #voice-control-panel {
-        /* JavaScriptで動的に調整される中央下部配置を許可 */
+        /* 音声学習ボタンの下、右端に固定 */
         position: fixed !important;
+        top: 110px !important;
+        right: 20px !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
         z-index: 15000 !important;
         
-        /* 横画面用サイズ - HTMLの元設定を基準 */
-        min-width: 200px !important;
-        max-width: 300px !important;
-        max-height: calc(100vh - 100px) !important;
+        /* 横画面用サイズ - コンパクトに調整 */
+        width: 250px !important;
+        max-width: 250px !important;
+        min-width: 250px !important;
+        max-height: calc(100vh - 150px) !important;
         overflow-y: auto !important;
         
         /* 横画面用スタイル - HTMLの元設定を維持 */
