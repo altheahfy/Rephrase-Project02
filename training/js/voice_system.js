@@ -25,6 +25,10 @@ class VoiceSystem {
         this.recognizedText = '';
         this.isRecognitionActive = false;
         
+        // 📱 スマホ用診断ログ
+        this.debugLogs = [];
+        this.maxDebugLogs = 50; // 最大50件のログを保持
+        
         this.init();
     }
     
@@ -775,16 +779,28 @@ class VoiceSystem {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
             
-            // 🎤 音声認識も同時開始
-            if (this.recognition && !this.isRecognitionActive) {
-                try {
-                    this.recognition.start();
-                } catch (error) {
-                    console.warn('⚠️ 音声認識開始失敗:', error.message);
-                }
+        // 🎤 音声認識も同時開始
+        if (this.recognition && !this.isRecognitionActive) {
+            try {
+                this.addDebugLog('🎤 音声認識開始を試行中...', 'info');
+                this.addDebugLog(`📱 デバイス: ${navigator.userAgent.substring(0, 50)}...`, 'info');
+                
+                // 認識開始前の状態確認
+                this.addDebugLog(`🔍 認識状態: lang=${this.recognition.lang}, active=${this.isRecognitionActive}`, 'info');
+                
+                this.recognition.start();
+                this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
+                
+            } catch (error) {
+                this.addDebugLog(`❌ 音声認識開始失敗: ${error.message}`, 'error');
+                this.updateStatus(`⚠️ 音声認識開始失敗: ${error.message}`, 'warning');
             }
-            
-            // UI更新
+        } else {
+            console.log('ℹ️ 音声認識スキップ:', {
+                recognitionExists: !!this.recognition,
+                isActive: this.isRecognitionActive
+            });
+        }            // UI更新
             this.updateRecordingUI(true);
             this.startRecordingTimer();
             this.setupVolumeMonitoring(stream);
@@ -1116,10 +1132,33 @@ class VoiceSystem {
             const expectedSentence = this.getCurrentSentence();
             const recognizedText = this.recognizedText.trim();
             
-            console.log('📝 期待文章:', expectedSentence);
+            console.log('� 分析開始 - 基本情報:');
+            console.log('�📝 期待文章:', expectedSentence);
             console.log('🎯 認識結果 (長さ: ' + recognizedText.length + '):', recognizedText);
             console.log('🎯 生の認識結果:', JSON.stringify(this.recognizedText));
             console.log('🎯 認識アクティブ状態:', this.isRecognitionActive);
+            console.log('📱 デバイス情報:', navigator.userAgent.substring(0, 80));
+            console.log('🎤 マイク許可状態:', this.isMicrophoneAllowed);
+            
+            // 🔍 音声認識失敗の詳細診断
+            if (!recognizedText || recognizedText.length === 0) {
+                console.warn('⚠️ 音声認識失敗の詳細診断を開始');
+                console.log('🔍 診断項目:');
+                console.log('  - 音声認識オブジェクト存在:', !!this.recognition);
+                console.log('  - 最終認識状態:', this.isRecognitionActive);
+                console.log('  - 録音データサイズ:', this.recordedBlob ? this.recordedBlob.size : 'なし');
+                console.log('  - 期待文章存在:', !!expectedSentence && expectedSentence.length > 0);
+                console.log('  - ブラウザサポート:', !!(window.SpeechRecognition || window.webkitSpeechRecognition));
+                console.log('  - オンライン状態:', navigator.onLine);
+                console.log('  - プロトコル:', window.location.protocol);
+                
+                if (/Android/i.test(navigator.userAgent)) {
+                    console.log('📱 Android特有の診断:');
+                    console.log('  - Chrome for Android:', /Chrome/i.test(navigator.userAgent));
+                    console.log('  - WebView:', /wv/i.test(navigator.userAgent));
+                    console.log('  - バージョン:', navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || '不明');
+                }
+            }
             
             // 音声品質チェック（最低限のみ）
             const qualityCheck = this.checkAudioQuality(audioBuffer);
@@ -2784,81 +2823,285 @@ class VoiceSystem {
             let finalTranscript = '';
             let interimTranscript = '';
             
-            console.log('🎯 音声認識結果イベント - 結果数:', event.results.length);
-            console.log('📱 デバイス情報:', navigator.userAgent.substring(0, 100));
+            console.log('🎯 音声認識結果イベント発生');
+            console.log('📊 イベント詳細:', {
+                resultLength: event.results.length,
+                resultIndex: event.resultIndex,
+                timeStamp: event.timeStamp,
+                type: event.type
+            });
+            console.log('📱 デバイス:', navigator.userAgent.substring(0, 100));
             
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                const confidence = event.results[i][0].confidence || 'N/A';
-                console.log(`🎯 結果${i} - isFinal:${event.results[i].isFinal} - confidence:${confidence} - transcript:"${transcript}"`);
+            // 全ての結果を詳細にログ出力
+            for (let i = 0; i < event.results.length; i++) {
+                const result = event.results[i];
+                const transcript = result[0].transcript;
+                const confidence = result[0].confidence || 'N/A';
                 
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' ';
-                } else {
-                    interimTranscript += transcript + ' ';
+                console.log(`📋 結果${i}:`, {
+                    isFinal: result.isFinal,
+                    transcript: `"${transcript}"`,
+                    confidence: confidence,
+                    alternatives: result.length
+                });
+                
+                if (i >= event.resultIndex) {
+                    if (result.isFinal) {
+                        finalTranscript += transcript + ' ';
+                        console.log(`✅ 最終結果に追加: "${transcript}"`);
+                    } else {
+                        interimTranscript += transcript + ' ';
+                        console.log(`⏳ 中間結果: "${transcript}"`);
+                    }
                 }
             }
             
             // 最終結果があれば追加
             if (finalTranscript.trim()) {
+                const beforeLength = this.recognizedText.length;
                 this.recognizedText += finalTranscript;
-                console.log('✅ 認識結果追加:', finalTranscript.trim());
-                console.log('📊 累積認識結果 (長さ:' + this.recognizedText.length + '):', this.recognizedText.trim());
+                const afterLength = this.recognizedText.length;
+                
+                console.log('✅ 認識結果追加成功');
+                console.log(`📊 追加内容: "${finalTranscript.trim()}"`);
+                console.log(`📊 文字数変化: ${beforeLength} → ${afterLength}`);
+                console.log(`📊 累積結果: "${this.recognizedText.trim()}"`);
             }
             
             // 📱 Android対応：中間結果も保存（final結果が来ない場合のフォールバック）
             if (interimTranscript.trim() && /Android/i.test(navigator.userAgent)) {
-                console.log('📱 Android: 中間結果を保存:', interimTranscript.trim());
+                console.log('📱 Android: 中間結果も保存');
+                console.log(`📱 中間結果内容: "${interimTranscript.trim()}"`);
+                
                 // final結果がない場合のバックアップとして中間結果も保持
-                this.recognizedText += interimTranscript;
+                if (!finalTranscript.trim()) {
+                    this.recognizedText += interimTranscript;
+                    console.log('📱 Android: 中間結果をメイン結果として採用');
+                }
             } else if (interimTranscript.trim()) {
-                console.log('🎯 中間認識結果:', interimTranscript.trim());
+                console.log(`⏳ 中間認識結果のみ: "${interimTranscript.trim()}"`);
             }
             
+            // 結果が全く無い場合の詳細ログ
             if (!finalTranscript.trim() && !interimTranscript.trim()) {
-                console.log('⚠️ 認識結果が空です');
+                console.warn('⚠️ 認識結果が空です');
+                console.log('🔍 空結果の詳細分析:', {
+                    eventResultsLength: event.results.length,
+                    eventResultIndex: event.resultIndex,
+                    currentRecognizedText: this.recognizedText,
+                    recognitionActive: this.isRecognitionActive
+                });
             }
+            
+            // 現在の累積結果の状態をログ出力
+            this.addDebugLog(`📊 累積認識結果 (長さ:${this.recognizedText.length}): "${this.recognizedText}"`, 'info');
         };
         
         // 認識開始
         this.recognition.onstart = () => {
-            console.log('🎤 音声認識開始');
+            this.addDebugLog('🎤 音声認識開始イベント発生', 'success');
+            this.addDebugLog(`📊 開始時状態: active=${this.isRecognitionActive}, textLen=${this.recognizedText.length}`, 'info');
+            
             this.isRecognitionActive = true;
             this.recognizedText = ''; // 新しい認識セッション開始時にクリア
+            this.addDebugLog('✅ 音声認識状態をアクティブに設定し、認識テキストをクリアしました', 'success');
         };
         
         // 認識終了
         this.recognition.onend = () => {
-            console.log('🔚 音声認識終了 - 最終結果:', this.recognizedText.trim());
+            this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
+            this.addDebugLog(`📊 終了時状態: text="${this.recognizedText.trim()}", len=${this.recognizedText.length}`, 'info');
+            
             this.isRecognitionActive = false;
             
             // 📱 Android対応：認識終了時に最終結果を再確認
-            if (/Android/i.test(navigator.userAgent) && !this.recognizedText.trim()) {
-                console.log('📱 Android: 認識結果が空です。デバイス固有の問題の可能性があります');
+            if (/Android/i.test(navigator.userAgent)) {
+                this.addDebugLog('📱 Android: 認識終了時の特別チェック', 'info');
+                if (!this.recognizedText.trim()) {
+                    this.addDebugLog('📱 Android: 認識結果が空です。マイクの権限や接続を確認してください', 'warning');
+                } else {
+                    this.addDebugLog(`📱 Android: 認識結果取得成功: ${this.recognizedText.trim()}`, 'success');
+                }
             }
+            
+            this.addDebugLog('🔚 音声認識終了処理完了', 'info');
         };
         
         // 認識エラー
         this.recognition.onerror = (event) => {
-            console.warn('⚠️ 音声認識エラー:', event.error);
-            console.warn('⚠️ エラー詳細:', event);
+            this.addDebugLog('❌ 音声認識エラーイベント発生', 'error');
+            this.addDebugLog(`📊 エラー詳細: ${event.error} (${event.message || 'メッセージなし'})`, 'error');
             
             // 📱 Android対応：エラー詳細分析
             if (/Android/i.test(navigator.userAgent)) {
-                if (event.error === 'no-speech') {
-                    console.log('📱 Android: 音声が検出されませんでした');
-                } else if (event.error === 'network') {
-                    console.log('📱 Android: ネットワークエラー（インターネット接続を確認）');
-                } else if (event.error === 'not-allowed') {
-                    console.log('📱 Android: マイクアクセスが拒否されました');
+                this.addDebugLog('📱 Android: エラー詳細分析', 'warning');
+                
+                switch(event.error) {
+                    case 'no-speech':
+                        this.addDebugLog('📱 Android: 音声が検出されませんでした（マイクに向かって話してください）', 'warning');
+                        break;
+                    case 'audio-capture':
+                        this.addDebugLog('📱 Android: 音声キャプチャエラー（マイクが使用できません）', 'error');
+                        break;
+                    case 'not-allowed':
+                        console.log('📱 Android: マイクアクセスが拒否されました（ブラウザ設定を確認）');
+                        break;
+                    case 'network':
+                        console.log('📱 Android: ネットワークエラー（インターネット接続を確認）');
+                        break;
+                    case 'service-not-allowed':
+                        this.addDebugLog('📱 Android: 音声認識サービスが許可されていません', 'error');
+                        break;
+                    case 'bad-grammar':
+                        this.addDebugLog('📱 Android: 音声認識の文法設定エラー', 'error');
+                        break;
+                    case 'language-not-supported':
+                        this.addDebugLog('📱 Android: 言語がサポートされていません', 'error');
+                        break;
+                    default:
+                        this.addDebugLog(`📱 Android: 不明なエラー: ${event.error}`, 'error');
                 }
             }
             
             this.isRecognitionActive = false;
+            this.addDebugLog('❌ 音声認識エラー処理完了 - 状態をリセットしました', 'warning');
         };
         
         console.log('✅ 音声認識初期化完了');
         console.log('📱 デバイス:', /Android/i.test(navigator.userAgent) ? 'Android' : /iPhone|iPad/i.test(navigator.userAgent) ? 'iOS' : 'その他');
+        
+        // 📱 モバイルデバイスでデバッグボタンを表示
+        this.showMobileDebugButton();
+    }
+    
+    /**
+     * 📱 スマホ用デバッグログ機能
+     */
+    addDebugLog(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = {
+            time: timestamp,
+            message: message,
+            type: type
+        };
+        
+        this.debugLogs.push(logEntry);
+        
+        // 最大件数を超えた場合、古いログを削除
+        if (this.debugLogs.length > this.maxDebugLogs) {
+            this.debugLogs.shift();
+        }
+        
+        // コンソールにも出力
+        console.log(`📱 [${timestamp}] ${message}`);
+        
+        // スマホ用診断パネルが表示されている場合、リアルタイム更新
+        this.updateMobileDebugPanel();
+    }
+    
+    /**
+     * 📱 スマホ用診断パネルを表示
+     */
+    showMobileDebugPanel() {
+        // 既存のパネルがあれば削除
+        const existingPanel = document.getElementById('mobile-debug-panel');
+        if (existingPanel) {
+            existingPanel.remove();
+        }
+        
+        const panel = document.createElement('div');
+        panel.id = 'mobile-debug-panel';
+        panel.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            max-height: 50vh;
+            background: rgba(0,0,0,0.9);
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 20000;
+            overflow-y: auto;
+            border: 2px solid #00ff00;
+        `;
+        
+        // ヘッダー
+        const header = document.createElement('div');
+        header.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #00ff00;
+        `;
+        header.innerHTML = `
+            <span>📱 音声認識診断ログ</span>
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                background: #ff0000;
+                color: white;
+                border: none;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-size: 10px;
+            ">✕</button>
+        `;
+        
+        // ログ表示エリア
+        const logArea = document.createElement('div');
+        logArea.id = 'mobile-debug-logs';
+        
+        panel.appendChild(header);
+        panel.appendChild(logArea);
+        document.body.appendChild(panel);
+        
+        // 現在のログを表示
+        this.updateMobileDebugPanel();
+        
+        return panel;
+    }
+    
+    /**
+     * 📱 スマホ用診断パネルを更新
+     */
+    updateMobileDebugPanel() {
+        const logArea = document.getElementById('mobile-debug-logs');
+        if (!logArea) return;
+        
+        const logHtml = this.debugLogs.map(log => {
+            const color = log.type === 'error' ? '#ff0000' : 
+                         log.type === 'warning' ? '#ffff00' : 
+                         log.type === 'success' ? '#00ff00' : '#ffffff';
+            
+            return `<div style="color: ${color}; margin: 2px 0;">
+                [${log.time}] ${log.message}
+            </div>`;
+        }).join('');
+        
+        logArea.innerHTML = logHtml;
+        
+        // 最新ログが見えるようにスクロール
+        logArea.scrollTop = logArea.scrollHeight;
+    }
+    
+    /**
+     * 📱 モバイルデバイスでデバッグボタンを表示
+     */
+    showMobileDebugButton() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                         'ontouchstart' in window ||
+                         window.innerWidth <= 768;
+        
+        if (isMobile) {
+            const debugBtn = document.getElementById('mobile-debug-btn');
+            if (debugBtn) {
+                debugBtn.style.display = 'inline-block';
+                console.log('📱 モバイルデバッグボタンを表示しました');
+            }
+        }
     }
     
     /**
@@ -3270,3 +3513,14 @@ window.debugVoicePanelPosition = function() {
 };
 
 console.log('🔧 音声パネル位置デバッグが利用可能です: window.debugVoicePanelPosition()');
+
+// 📱 スマホ用デバッグパネル表示機能をグローバルに追加
+window.showMobileDebug = function() {
+    if (window.voiceSystem) {
+        window.voiceSystem.showMobileDebugPanel();
+    } else {
+        console.error('VoiceSystemが初期化されていません');
+    }
+};
+
+console.log('📱 スマホ用デバッグパネル表示機能が利用可能です: window.showMobileDebug()');

@@ -849,6 +849,17 @@ function handleLogout() {
       <!-- 進捗表示ボタン -->
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
         <button id="voice-progress-btn" class="voice-btn" style="background-color: #607D8B; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 学習進捗</button>
+        <!-- 📱 スマホ用デバッグボタン -->
+        <button id="mobile-debug-btn" class="voice-btn" style="
+          background-color: #17a2b8; 
+          color: white; 
+          border: none; 
+          padding: 6px 10px; 
+          font-size: 11px; 
+          cursor: pointer; 
+          border-radius: 3px;
+          display: none;
+        " onclick="window.showMobileDebug()">📱 デバッグ</button>
       </div>
     </div>
   </div>
