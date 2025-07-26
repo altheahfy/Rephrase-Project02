@@ -550,11 +550,12 @@ h1 {
   opacity: 1 !important;
 }
 
-/* スロチE��全体�E調整が忁E��な場合に備えた汎用クラス */
-.slot-container {
+/* スロット全体の調整が必要な場合に備えた汎用クラス */
+/* 🎯 上位スロット専用：6行固定レイアウト（詳細・個別ランダマイズボタンあり） */
+.slot-wrapper:not([id$="-sub"]) .slot-container {
   /* 🎯 CSS Gridで完�Eに6行固定レイアウトを実裁E*/
   display: grid;
-  grid-template-rows: 30px 180px 30px 30px; /* 6行 → 4行に短縮（ID、画像、日本語、英語の4行のみ、無駄な5・6行目削除） */
+  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 6行固定（ID、画像、日本語、英語、詳細ボタン、個別ランダマイズボタン） */
   grid-template-columns: 1fr;
   gap: 6px; /* 行間も少し拡大 */
   align-items: center; /* 吁E��ル冁E��の中央揁E�� */
@@ -580,7 +581,41 @@ h1 {
   
   /* �E スロチE��全体�E高さを適刁E��設宁E*/
   height: auto; /* 自動高さ調整 */
-  min-height: 320px; /* 380px → 320px（無駄な5・6行目60px分を削減） */
+  min-height: 380px; /* 6行固定レイアウト用の高さ（詳細ボタン・個別ランダマイズボタン行も含む） */
+  box-sizing: border-box;
+}
+
+/* 🎯 サブスロット専用：4行固定レイアウト（詳細・個別ランダマイズボタンなし） */
+.slot-wrapper[id$="-sub"] .slot-container {
+  /* 🎯 CSS Gridで4行固定レイアウトを実装 */
+  display: grid;
+  grid-template-rows: 30px 180px 30px 30px; /* 4行固定（ID、画像、日本語、英語） */
+  grid-template-columns: 1fr;
+  gap: 6px; /* 行間も少し拡大 */
+  align-items: center; /* セル内の中央揃え */
+  justify-items: center; /* セル内の中央揃え */
+  
+  /* order属性への対応を追加 */
+  order: 0; /* デフォルト値 */
+  border: var(--border-light); /* 新しいカラーシステムの境界線 */
+  border-radius: var(--radius-md); /* 角丸を追加 */
+  background: linear-gradient(180deg, #e8f5e8 0%, #c8e6c8 50%, #a5d6a5 100%); /* 薄い緑の縦グラデーション */
+  box-shadow: var(--shadow-lg); /* より目立つシャドウに変更 */
+  padding: 15px; /* パディングも拡大 */
+  margin: 4px 4px 20px 4px; /* 下部マージンを拡大 */
+  
+  /* 動的幅調整システム - 複数画像対応で大幅拡大 */
+  min-width: 160px; /* 最小幅拡大 */
+  width: auto; /* 自動幅調整 */
+  max-width: none; /* 🎯 ズーム機能のため固定幅制限を撤去 */
+  flex: 0 0 auto; /* flexアイテムとして自動サイズ */
+  
+  /* アニメーション */
+  transition: opacity 0.2s ease-out, width 0.3s ease;
+  
+  /* サブスロット全体の高さを適切に設定 */
+  height: auto; /* 自動高さ調整 */
+  min-height: 320px; /* 4行固定レイアウト用の高さ（詳細ボタン・個別ランダマイズボタン行なし） */
   box-sizing: border-box;
 }
 

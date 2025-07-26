@@ -424,14 +424,14 @@
   .mobile-device .slot-wrapper:not([id$="-sub"]) {
     height: 100vh !important; /* 77vh → 100vh: スワイプエリアを130%に拡大（77×1.3≒100） */
     
-    /* スワイプエリア（窓）は変更しない */
-    width: calc(100vw - 4px) !important;
-    min-width: calc(100vw - 4px) !important;
-    max-width: calc(100vw - 4px) !important;
+    /* 🎯 横画面では画面幅いっぱいに拡張 */
+    width: 100vw !important; /* calc(100vw - 4px) → 100vw: マージン削除で完全に画面幅いっぱい */
+    min-width: 100vw !important;
+    max-width: 100vw !important;
     overflow-x: auto !important; /* 横方向スクロールのみ有効 */
     overflow-y: hidden !important; /* 縦方向スクロールを無効化 */
     touch-action: pan-x manipulation !important; /* 横方向スワイプ、縦方向は画面全体移動 */
-    margin: 2px !important;
+    margin: 0 !important; /* 2px → 0: マージンを削除して画面幅いっぱいに */
     padding-top: 8px !important;
   }
   
