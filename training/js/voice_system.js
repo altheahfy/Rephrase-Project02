@@ -651,8 +651,13 @@ class VoiceSystem {
         // 📱 モバイルデバッグボタン
         const debugBtn = document.getElementById('mobile-debug-btn');
         if (debugBtn) {
-            debugBtn.addEventListener('click', () => this.showMobileDebugPanel());
+            debugBtn.addEventListener('click', () => {
+                alert('デバッグボタンがタップされました！');
+                this.showMobileDebugPanel();
+            });
             console.log('✅ モバイルデバッグボタンのイベントリスナーを設定しました');
+        } else {
+            console.warn('⚠️ モバイルデバッグボタンが見つかりません');
         }
         
         // 📱 ウィンドウリサイズ・画面向き変更時のパネル位置調整
@@ -2728,6 +2733,28 @@ class VoiceSystem {
             statusElement.className = `voice-status ${type}`;
         }
         
+        // 📱 モバイル用状態表示も更新
+        const mobileStatusElement = document.getElementById('mobile-voice-status');
+        if (mobileStatusElement) {
+            mobileStatusElement.textContent = `🎤 ${message}`;
+            mobileStatusElement.style.display = 'block';
+            
+            // タイプに応じて色を変更
+            if (type === 'error') {
+                mobileStatusElement.style.borderColor = '#dc3545';
+                mobileStatusElement.style.backgroundColor = '#f8d7da';
+            } else if (type === 'success') {
+                mobileStatusElement.style.borderColor = '#28a745';
+                mobileStatusElement.style.backgroundColor = '#d4edda';
+            } else if (type === 'recording') {
+                mobileStatusElement.style.borderColor = '#ff6b6b';
+                mobileStatusElement.style.backgroundColor = '#ffe6e6';
+            } else {
+                mobileStatusElement.style.borderColor = '#007bff';
+                mobileStatusElement.style.backgroundColor = '#f8f9fa';
+            }
+        }
+        
         console.log(`🎤 ${message}`);
         
         // 📱 ステータス更新時にパネル位置を調整（特にモバイル）
@@ -2806,6 +2833,7 @@ class VoiceSystem {
      */
     initSpeechRecognition() {
         console.log('🎤 音声認識初期化開始...');
+        this.updateStatus('🎤 音声認識を初期化中...', 'info');
         
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
@@ -2817,11 +2845,13 @@ class VoiceSystem {
                 userAgent: navigator.userAgent.substring(0, 100)
             });
             this.addDebugLog('❌ 音声認識APIが利用できません', 'error');
+            this.updateStatus('❌ 音声認識をサポートしていません', 'error');
             return;
         }
         
         console.log('✅ 音声認識API利用可能:', SpeechRecognition.name);
         this.addDebugLog('✅ 音声認識API利用可能', 'success');
+        this.updateStatus('✅ 音声認識API利用可能', 'success');
         
         this.recognition = new SpeechRecognition();
         this.recognition.lang = 'en-US';
