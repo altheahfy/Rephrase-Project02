@@ -839,19 +839,36 @@ class VoiceSystem {
             this.stopRecordingTimer();
         }
         
-        // 🎤 音声認識も停止（認識結果を受信するため少し時間を与える）
+        // 🎤 音声認識停止（Android対応：認識結果の受信完了を待つ）
         if (this.recognition && this.isRecognitionActive) {
             try {
-                // 認識結果の受信を待つため、少し遅延してから停止
+                console.log('🔚 音声認識停止コマンド送信（Android対応）');
+                
+                // Android対応：認識結果の受信完了を確実に待つ
+                this.recognition.stop();
+                
+                // ⏳ Android向け：認識結果受信の追加待機時間
                 setTimeout(() => {
-                    if (this.recognition && this.isRecognitionActive) {
-                        this.recognition.stop();
+                    if (this.isRecognitionActive) {
+                        console.log('� 音声認識がまだアクティブです。強制終了を実行');
+                        this.isRecognitionActive = false;
                     }
-                }, 500); // 500ms待機
+                    
+                    // 📊 認識結果の最終確認
+                    console.log('🎯 最終認識結果確認:', this.recognizedText.trim());
+                    
+                    if (!this.recognizedText.trim()) {
+                        console.warn('⚠️ 認識結果が空です。デバイス固有の問題の可能性があります');
+                    }
+                }, 2000); // Android対応：2秒の追加待機
+                
             } catch (error) {
-                console.warn('⚠️ 音声認識停止失敗:', error.message);
+                console.warn('⚠️ 音声認識停止エラー:', error);
+                this.isRecognitionActive = false;
             }
         }
+        
+        this.updateStatus('🔄 録音データ準備中...', 'info');
     }
     
     /**
@@ -1084,8 +1101,10 @@ class VoiceSystem {
         try {
             this.updateStatus('📊 分析中...', 'analyzing');
             
-            // 🎤 音声認識結果の最終取得のため少し待機
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // 🎤 音声認識結果の最終取得のため待機（Android対応で時間延長）
+            const waitTime = /Android/i.test(navigator.userAgent) ? 3000 : 1000;
+            console.log(`⏳ 音声認識結果待機中... (${waitTime}ms)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContextClass();
@@ -2753,25 +2772,51 @@ class VoiceSystem {
         this.recognition.interimResults = true; // 中間結果も取得（認識確実性向上）
         this.recognition.maxAlternatives = 1;
         
+        // 📱 Android対応：追加設定
+        if (/Android/i.test(navigator.userAgent)) {
+            console.log('📱 Android端末を検出：音声認識設定を最適化');
+            this.recognition.continuous = false; // Android では false の方が安定する場合がある
+            this.recognition.interimResults = false; // Android では final 結果のみの方が確実
+        }
+        
         // 認識結果を受信
         this.recognition.onresult = (event) => {
             let finalTranscript = '';
+            let interimTranscript = '';
             
             console.log('🎯 音声認識結果イベント - 結果数:', event.results.length);
+            console.log('📱 デバイス情報:', navigator.userAgent.substring(0, 100));
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                console.log('🎯 結果', i, '- isFinal:', event.results[i].isFinal, '- transcript:', event.results[i][0].transcript);
+                const transcript = event.results[i][0].transcript;
+                const confidence = event.results[i][0].confidence || 'N/A';
+                console.log(`🎯 結果${i} - isFinal:${event.results[i].isFinal} - confidence:${confidence} - transcript:"${transcript}"`);
+                
                 if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript + ' ';
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript + ' ';
                 }
             }
             
+            // 最終結果があれば追加
             if (finalTranscript.trim()) {
                 this.recognizedText += finalTranscript;
-                console.log('🎯 認識結果追加:', finalTranscript.trim());
-                console.log('🎯 累積認識結果:', this.recognizedText.trim());
-            } else {
-                console.log('🎯 最終認識結果が空です');
+                console.log('✅ 認識結果追加:', finalTranscript.trim());
+                console.log('📊 累積認識結果 (長さ:' + this.recognizedText.length + '):', this.recognizedText.trim());
+            }
+            
+            // 📱 Android対応：中間結果も保存（final結果が来ない場合のフォールバック）
+            if (interimTranscript.trim() && /Android/i.test(navigator.userAgent)) {
+                console.log('📱 Android: 中間結果を保存:', interimTranscript.trim());
+                // final結果がない場合のバックアップとして中間結果も保持
+                this.recognizedText += interimTranscript;
+            } else if (interimTranscript.trim()) {
+                console.log('🎯 中間認識結果:', interimTranscript.trim());
+            }
+            
+            if (!finalTranscript.trim() && !interimTranscript.trim()) {
+                console.log('⚠️ 認識結果が空です');
             }
         };
         
@@ -2779,21 +2824,41 @@ class VoiceSystem {
         this.recognition.onstart = () => {
             console.log('🎤 音声認識開始');
             this.isRecognitionActive = true;
+            this.recognizedText = ''; // 新しい認識セッション開始時にクリア
         };
         
         // 認識終了
         this.recognition.onend = () => {
-            console.log('🔚 音声認識終了');
+            console.log('🔚 音声認識終了 - 最終結果:', this.recognizedText.trim());
             this.isRecognitionActive = false;
+            
+            // 📱 Android対応：認識終了時に最終結果を再確認
+            if (/Android/i.test(navigator.userAgent) && !this.recognizedText.trim()) {
+                console.log('📱 Android: 認識結果が空です。デバイス固有の問題の可能性があります');
+            }
         };
         
         // 認識エラー
         this.recognition.onerror = (event) => {
             console.warn('⚠️ 音声認識エラー:', event.error);
+            console.warn('⚠️ エラー詳細:', event);
+            
+            // 📱 Android対応：エラー詳細分析
+            if (/Android/i.test(navigator.userAgent)) {
+                if (event.error === 'no-speech') {
+                    console.log('📱 Android: 音声が検出されませんでした');
+                } else if (event.error === 'network') {
+                    console.log('📱 Android: ネットワークエラー（インターネット接続を確認）');
+                } else if (event.error === 'not-allowed') {
+                    console.log('📱 Android: マイクアクセスが拒否されました');
+                }
+            }
+            
             this.isRecognitionActive = false;
         };
         
         console.log('✅ 音声認識初期化完了');
+        console.log('📱 デバイス:', /Android/i.test(navigator.userAgent) ? 'Android' : /iPhone|iPad/i.test(navigator.userAgent) ? 'iOS' : 'その他');
     }
     
     /**
