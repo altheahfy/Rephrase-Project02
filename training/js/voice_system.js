@@ -46,6 +46,14 @@ class VoiceSystem {
         // 分析ボタンを非表示（リアルタイム認識では不要）
         this.hideAnalyzeButton();
         
+        // 📱 初期化時にパネル位置を調整（特にモバイル）
+        setTimeout(() => {
+            const panel = document.getElementById('voice-control-panel');
+            if (panel) {
+                this.adjustPanelPosition();
+            }
+        }, 1000);
+        
         console.log('✅ 音声システム初期化完了');
     }
     
@@ -547,12 +555,51 @@ class VoiceSystem {
      */
     async checkMicrophonePermission() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // 📱 Android対応: 詳細なデバッグ情報を追加
+            console.log('🔍 マイクアクセス許可チェック開始...');
+            console.log('📱 User Agent:', navigator.userAgent);
+            console.log('🌐 Protocol:', window.location.protocol);
+            console.log('🎤 MediaDevices available:', !!navigator.mediaDevices);
+            console.log('🎤 getUserMedia available:', !!navigator.mediaDevices?.getUserMedia);
+            
+            // Permission API で事前確認（対応ブラウザのみ）
+            if ('permissions' in navigator) {
+                try {
+                    const permission = await navigator.permissions.query({ name: 'microphone' });
+                    console.log('🔐 マイク許可状態:', permission.state);
+                } catch (permError) {
+                    console.log('🔐 Permission API利用不可:', permError.message);
+                }
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
             this.isMicrophoneAllowed = true;
             stream.getTracks().forEach(track => track.stop()); // 即座に停止
             console.log('✅ マイクアクセス許可取得済み');
         } catch (error) {
-            console.warn('⚠️ マイクアクセス許可が必要です:', error.message);
+            console.error('❌ マイクアクセス許可エラー:', error);
+            console.error('❌ エラー名:', error.name);
+            console.error('❌ エラーメッセージ:', error.message);
+            
+            // 📱 Android固有の問題を特定
+            if (error.name === 'NotAllowedError') {
+                console.log('🚫 ユーザーがマイクアクセスを拒否、またはHTTPS接続が必要');
+            } else if (error.name === 'NotFoundError') {
+                console.log('🔍 マイクが見つからない、または利用不可');
+            } else if (error.name === 'NotSupportedError') {
+                console.log('💻 ブラウザがgetUserMediaをサポートしていない');
+            } else if (error.name === 'SecurityError') {
+                console.log('🔒 セキュリティエラー: HTTPS接続が必要な可能性');
+            }
+            
             this.isMicrophoneAllowed = false;
         }
     }
@@ -596,6 +643,26 @@ class VoiceSystem {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
         }
+        
+        // 📱 ウィンドウリサイズ・画面向き変更時のパネル位置調整
+        window.addEventListener('resize', () => {
+            const panel = document.getElementById('voice-control-panel');
+            if (panel && panel.style.display === 'block') {
+                setTimeout(() => {
+                    this.adjustPanelPosition();
+                }, 200); // レンダリング完了を待つ
+            }
+        });
+        
+        // 📱 画面向き変更対応
+        window.addEventListener('orientationchange', () => {
+            const panel = document.getElementById('voice-control-panel');
+            if (panel && panel.style.display === 'block') {
+                setTimeout(() => {
+                    this.adjustPanelPosition();
+                }, 500); // 向き変更のアニメーション完了を待つ
+            }
+        });
         
         // 学習進捗ボタン（動的に追加される可能性があるため遅延設定）
         this.setupProgressButtonListener();
@@ -718,13 +785,40 @@ class VoiceSystem {
             this.updateStatus('🎤 録音・認識開始...', 'recording');
             
         } catch (error) {
+            // 📱 Android対応: 詳細エラー診断
+            console.error('❌ 録音開始エラー:', error);
+            console.error('❌ エラー名:', error.name);
+            console.error('❌ エラーメッセージ:', error.message);
+            
+            let userFriendlyMessage = '録音エラーが発生しました';
+            
+            if (error.name === 'NotAllowedError') {
+                userFriendlyMessage = 'マイクアクセスが許可されていません。ブラウザの設定を確認してください。';
+                console.log('🔧 対処法: Chromeの場合、アドレスバーの左のアイコンをタップしてマイクを許可してください');
+                console.log('🔧 または設定 > サイト設定 > マイク でこのサイトを許可してください');
+            } else if (error.name === 'NotFoundError') {
+                userFriendlyMessage = 'マイクが見つかりません。デバイスにマイクが接続されているか確認してください。';
+            } else if (error.name === 'NotSupportedError') {
+                userFriendlyMessage = 'お使いのブラウザは音声録音をサポートしていません。';
+                console.log('🔧 対処法: Chrome、Firefox、Safari等の最新版をお使いください');
+            } else if (error.name === 'SecurityError') {
+                userFriendlyMessage = 'セキュリティエラー: HTTPS接続が必要です。';
+                console.log('🔧 現在のプロトコル:', window.location.protocol);
+                console.log('🔧 対処法: https://でアクセスしてください');
+            } else if (error.name === 'AbortError') {
+                userFriendlyMessage = '録音が中断されました。';
+            }
+            
             // セキュアなエラーハンドリング
             if (window.errorHandler) {
                 window.errorHandler.handleError(error, { action: 'voice_recording_start' }, 'system.microphone_error');
             } else {
                 console.error('録音開始エラー:', error);
             }
-            this.updateStatus(`❌ 録音エラー: ${error.message}`, 'error');
+            this.updateStatus(`❌ ${userFriendlyMessage}`, 'error');
+            
+            // マイクアクセス状態をリセット
+            this.isMicrophoneAllowed = false;
         }
     }
     
@@ -1571,14 +1665,55 @@ class VoiceSystem {
      * 音声パネルの位置を画面内に調整
      * 分析結果表示時に上に突き抜けないようにする
      */
+    /**
+     * 音声パネルの位置を画面内に調整
+     * 📱 モバイル対応: 分析結果表示時に上に突き抜けないようにする
+     */
     adjustPanelPosition() {
         const panel = document.getElementById('voice-control-panel');
         if (!panel) return;
         
-        // パネルの現在のサイズを取得
+        // 📱 モバイルデバイス検出
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         window.innerWidth <= 768;
+        
+        console.log('📱 デバイス判定:', isMobile ? 'モバイル' : 'PC');
+        console.log('🔍 画面サイズ:', window.innerWidth, 'x', window.innerHeight);
+        
+        // パネルの現在のサイズと位置を取得
         const panelRect = panel.getBoundingClientRect();
         const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
         
+        console.log('📊 パネル位置:', {
+            top: panelRect.top,
+            bottom: panelRect.bottom,
+            left: panelRect.left,
+            right: panelRect.right,
+            width: panelRect.width,
+            height: panelRect.height
+        });
+        
+        // 📱 モバイル専用調整
+        if (isMobile) {
+            // モバイルでは画面の中央下部に固定
+            const mobileTop = Math.max(50, windowHeight - panelRect.height - 100);
+            const mobileLeft = Math.max(10, (windowWidth - panelRect.width) / 2);
+            
+            panel.style.position = 'fixed';
+            panel.style.top = `${mobileTop}px`;
+            panel.style.left = `${mobileLeft}px`;
+            panel.style.right = 'auto';
+            panel.style.bottom = 'auto';
+            panel.style.zIndex = '9999';
+            panel.style.maxWidth = `${windowWidth - 20}px`; // 画面幅に収める
+            panel.style.maxHeight = `${windowHeight - 100}px`; // 画面高さに収める
+            
+            console.log(`📱 モバイル調整: top=${mobileTop}px, left=${mobileLeft}px`);
+            return;
+        }
+        
+        // PC版の調整（従来通り）
         // パネルの上端が画面外に出ている場合
         if (panelRect.top < 0) {
             // 上端が0になるよう調整
@@ -1586,16 +1721,29 @@ class VoiceSystem {
             const adjustment = Math.abs(panelRect.top) + 10; // 10px余白
             panel.style.top = `${currentTop + adjustment}px`;
             
-            console.log(`🎯 パネル位置調整: ${currentTop}px → ${currentTop + adjustment}px`);
+            console.log(`🎯 PC調整（上端）: ${currentTop}px → ${currentTop + adjustment}px`);
         }
         
         // パネルの下端が画面外に出ている場合
         if (panelRect.bottom > windowHeight) {
             const currentTop = parseInt(panel.style.top || '120px');
             const adjustment = panelRect.bottom - windowHeight + 10; // 10px余白
-            panel.style.top = `${currentTop - adjustment}px`;
+            const newTop = Math.max(10, currentTop - adjustment);
+            panel.style.top = `${newTop}px`;
             
-            console.log(`🎯 パネル位置調整（下端）: ${currentTop}px → ${currentTop - adjustment}px`);
+            console.log(`🎯 PC調整（下端）: ${currentTop}px → ${newTop}px`);
+        }
+        
+        // パネルの左右端が画面外に出ている場合
+        if (panelRect.left < 0) {
+            panel.style.left = '10px';
+            console.log('🎯 左端調整: 10pxに設定');
+        }
+        
+        if (panelRect.right > windowWidth) {
+            panel.style.right = '10px';
+            panel.style.left = 'auto';
+            console.log('🎯 右端調整: 右端10pxに設定');
         }
     }
 
@@ -2083,11 +2231,16 @@ class VoiceSystem {
         if (panel) {
             panel.style.display = 'block';
             
-            // パネルが表示された後、位置調整を実行
+            // 📱 パネル表示直後の位置調整（より確実に）
             setTimeout(() => {
                 this.adjustPanelPosition();
                 this.setupProgressButtonListener();
-            }, 100);
+            }, 50);
+            
+            // 📱 さらに少し遅れて再調整（レンダリング完了後）
+            setTimeout(() => {
+                this.adjustPanelPosition();
+            }, 200);
         }
     }
     
@@ -2103,9 +2256,27 @@ class VoiceSystem {
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
             }
-            // パネル位置をリセット
-            panel.style.top = '120px';
-            panel.style.right = '20px';
+            // 📱 パネル位置を初期位置にリセット
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                             window.innerWidth <= 768;
+            
+            if (isMobile) {
+                panel.style.position = 'fixed';
+                panel.style.top = 'auto';
+                panel.style.bottom = '20px';
+                panel.style.left = '50%';
+                panel.style.right = 'auto';
+                panel.style.transform = 'translateX(-50%)';
+                panel.style.zIndex = '9999';
+            } else {
+                panel.style.position = 'fixed';
+                panel.style.top = '120px';
+                panel.style.right = '20px';
+                panel.style.left = 'auto';
+                panel.style.bottom = 'auto';
+                panel.style.transform = 'none';
+                panel.style.zIndex = '1000';
+            }
         }
     }
     
@@ -2240,6 +2411,9 @@ class VoiceSystem {
     /**
      * ステータス表示を更新
      */
+    /**
+     * ステータス更新と📱モバイル対応パネル位置調整
+     */
     updateStatus(message, type = 'info') {
         const statusElement = document.getElementById('voice-status');
         if (statusElement) {
@@ -2248,6 +2422,17 @@ class VoiceSystem {
         }
         
         console.log(`🎤 ${message}`);
+        
+        // 📱 ステータス更新時にパネル位置を調整（特にモバイル）
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // モバイルではステータス更新でパネルがずれる可能性があるため調整
+            setTimeout(() => {
+                this.adjustPanelPosition();
+            }, 100);
+        }
     }
     
     /**
@@ -2662,3 +2847,119 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('✅ 音声システムを初期化しました');
     }, 500);
 });
+
+// 📱 Android対応: マイクアクセス診断用ヘルパー関数
+window.diagnoseMicrophoneAccess = async function() {
+    console.log('🔍 マイクアクセス診断開始...');
+    
+    // 基本情報
+    console.log('📱 User Agent:', navigator.userAgent);
+    console.log('🌐 URL:', window.location.href);
+    console.log('🔒 Protocol:', window.location.protocol);
+    console.log('🎤 MediaDevices:', !!navigator.mediaDevices);
+    console.log('🎤 getUserMedia:', !!navigator.mediaDevices?.getUserMedia);
+    
+    // Permission API チェック
+    if ('permissions' in navigator) {
+        try {
+            const micPermission = await navigator.permissions.query({ name: 'microphone' });
+            console.log('🔐 マイク許可状態:', micPermission.state);
+            
+            micPermission.onchange = () => {
+                console.log('🔄 マイク許可状態が変更されました:', micPermission.state);
+            };
+        } catch (e) {
+            console.log('🔐 Permission API利用不可:', e.message);
+        }
+    }
+    
+    // 実際のマイクアクセステスト
+    try {
+        console.log('🧪 マイクアクセステスト開始...');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('✅ マイクアクセス成功');
+        
+        // 利用可能な音声入力デバイス一覧
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter(device => device.kind === 'audioinput');
+        console.log('🎤 音声入力デバイス数:', audioInputs.length);
+        audioInputs.forEach((device, index) => {
+            console.log(`🎤 デバイス${index + 1}:`, device.label || `Unknown Device ${device.deviceId}`);
+        });
+        
+        // ストリームを停止
+        stream.getTracks().forEach(track => track.stop());
+        return { success: true, message: 'マイクアクセス正常' };
+        
+    } catch (error) {
+        console.error('❌ マイクアクセステスト失敗:', error);
+        console.error('❌ エラー詳細:', error.name, error.message);
+        
+        let diagnosis = '';
+        switch (error.name) {
+            case 'NotAllowedError':
+                diagnosis = 'ユーザーがマイクアクセスを拒否しています。ブラウザの設定を確認してください。';
+                break;
+            case 'NotFoundError':
+                diagnosis = 'マイクが見つかりません。デバイスの音声入力設定を確認してください。';
+                break;
+            case 'NotSupportedError':
+                diagnosis = 'ブラウザが音声機能をサポートしていません。';
+                break;
+            case 'SecurityError':
+                diagnosis = 'セキュリティエラー。HTTPS接続が必要な可能性があります。';
+                break;
+            default:
+                diagnosis = `不明なエラー: ${error.message}`;
+        }
+        
+        return { success: false, error: error.name, message: diagnosis };
+    }
+};
+
+console.log('🔧 マイクアクセス診断ツールが利用可能です: window.diagnoseMicrophoneAccess()');
+
+// 📱 音声パネル位置調整デバッグ関数
+window.debugVoicePanelPosition = function() {
+    const panel = document.getElementById('voice-control-panel');
+    if (!panel) {
+        console.log('❌ 音声パネルが見つかりません');
+        return;
+    }
+    
+    const rect = panel.getBoundingClientRect();
+    const styles = window.getComputedStyle(panel);
+    
+    console.log('📱 音声パネル位置情報:');
+    console.log('🔍 BoundingRect:', {
+        top: rect.top,
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+        width: rect.width,
+        height: rect.height
+    });
+    console.log('🎨 CSS Style:', {
+        position: styles.position,
+        top: styles.top,
+        bottom: styles.bottom,
+        left: styles.left,
+        right: styles.right,
+        transform: styles.transform,
+        zIndex: styles.zIndex,
+        display: styles.display
+    });
+    console.log('📺 画面情報:', {
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        orientation: screen.orientation ? screen.orientation.angle : 'unknown'
+    });
+    
+    // 位置調整を手動実行
+    if (window.voiceSystem) {
+        console.log('🔧 位置調整を実行中...');
+        window.voiceSystem.adjustPanelPosition();
+    }
+};
+
+console.log('🔧 音声パネル位置デバッグが利用可能です: window.debugVoicePanelPosition()');
