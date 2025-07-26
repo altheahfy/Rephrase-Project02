@@ -652,7 +652,7 @@ class VoiceSystem {
         const debugBtn = document.getElementById('mobile-debug-btn');
         if (debugBtn) {
             debugBtn.addEventListener('click', () => {
-                alert('デバッグボタンがタップされました！');
+                alert('デバッグボタンv2025.7.27-rollback がタップされました！マイクテスト機能が利用可能です。');
                 this.showMobileDebugPanel();
             });
             console.log('✅ モバイルデバッグボタンのイベントリスナーを設定しました');
