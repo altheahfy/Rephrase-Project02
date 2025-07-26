@@ -1712,14 +1712,23 @@ class VoiceSystem {
                 panel.style.maxHeight = '180px';
                 console.log('📱 縦画面調整: right=10px, bottom=20px');
             } else {
-                // 横画面：音声学習ボタンの下、右端に配置
-                panel.style.top = '110px';
+                // 横画面：音声学習ボタンの下の行に配置
+                panel.style.position = 'fixed';
+                panel.style.top = '130px';     
                 panel.style.bottom = 'auto';
-                panel.style.left = 'auto';
-                panel.style.right = '20px';
+                panel.style.left = 'auto';     
+                panel.style.right = '20px';    
+                panel.style.transform = 'none'; 
                 panel.style.maxWidth = '250px';
-                panel.style.maxHeight = `${windowHeight - 150}px`;
-                console.log('📱 横画面調整: top=110px, right=20px');
+                panel.style.maxHeight = `${windowHeight - 90}px`; // 4割縦に伸ばすため90pxに変更
+                
+                // 強制的にleftを無効化
+                panel.style.removeProperty('left');
+                panel.style.setProperty('right', '20px', 'important');
+                panel.style.setProperty('top', '130px', 'important');
+                panel.style.setProperty('max-height', `${windowHeight - 90}px`, 'important');
+                
+                console.log('📱 横画面調整完了: top=130px, right=20px, height=' + (windowHeight - 90) + 'px');
             }
             
             return;
@@ -2287,11 +2296,11 @@ class VoiceSystem {
                     panel.style.right = '10px';
                     panel.style.transform = 'none';
                 } else {
-                    // 横画面：音声学習ボタンの下、右端に配置
-                    panel.style.top = '110px';
+                    // 横画面：音声学習ボタンの下の行に配置
+                    panel.style.top = '130px';     // 音声学習ボタンの下の行
                     panel.style.bottom = 'auto';
                     panel.style.left = 'auto';
-                    panel.style.right = '20px';
+                    panel.style.right = '20px';    // 音声学習ボタンと同じ右端位置
                     panel.style.transform = 'none';
                 }
             } else {
@@ -2306,6 +2315,63 @@ class VoiceSystem {
         }
     }
     
+    /**
+     * スマホ用デバッグ情報表示
+     */
+    showMobileDebugInfo(panel) {
+        // 既存のデバッグ表示を削除
+        const existingDebug = document.getElementById('mobile-debug-info');
+        if (existingDebug) {
+            existingDebug.remove();
+        }
+        
+        // デバッグ情報を作成
+        const debugDiv = document.createElement('div');
+        debugDiv.id = 'mobile-debug-info';
+        debugDiv.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ff0000;
+            padding: 10px;
+            font-size: 12px;
+            z-index: 99999;
+            max-width: 300px;
+            border-radius: 5px;
+        `;
+        
+        const rect = panel.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(panel);
+        
+        debugDiv.innerHTML = `
+            <div style="font-weight: bold; color: red;">📱 デバッグ情報</div>
+            <div>画面: ${window.innerWidth}x${window.innerHeight}</div>
+            <div>向き: ${window.innerHeight > window.innerWidth ? '縦' : '横'}</div>
+            <div><strong>設定値:</strong></div>
+            <div>・top: ${panel.style.top}</div>
+            <div>・right: ${panel.style.right}</div>
+            <div>・position: ${panel.style.position}</div>
+            <div><strong>実際の位置:</strong></div>
+            <div>・top: ${rect.top}px</div>
+            <div>・right: ${window.innerWidth - rect.right}px</div>
+            <div>・left: ${rect.left}px</div>
+            <div><strong>computed:</strong></div>
+            <div>・top: ${computedStyle.top}</div>
+            <div>・right: ${computedStyle.right}</div>
+            <button onclick="this.parentElement.remove()" style="margin-top: 5px; background: red; color: white; border: none; padding: 3px 6px;">閉じる</button>
+        `;
+        
+        document.body.appendChild(debugDiv);
+        
+        // 5秒後に自動で消す
+        setTimeout(() => {
+            if (debugDiv.parentElement) {
+                debugDiv.remove();
+            }
+        }, 10000);
+    }
+
     /**
      * 音声パネルの表示/非表示を切り替え
      */
