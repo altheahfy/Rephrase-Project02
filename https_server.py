@@ -103,12 +103,18 @@ class HTTPSServer:
             handler = http.server.SimpleHTTPRequestHandler
             httpd = socketserver.TCPServer((self.host, self.port), handler)
             
-            # SSL設定
+            # SSL設定（より寛容な設定）
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
+            context.set_ciphers('ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS')
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
             context.load_cert_chain('cert.pem', 'key.pem')
+            
             httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
             
             print(f"HTTPSサーバーが起動しました: https://{self.host}:{self.port}")
+            print(f"スマートフォンからアクセス: https://192.168.0.154:{self.port}")
             print("Ctrl+C で停止します")
             httpd.serve_forever()
             
