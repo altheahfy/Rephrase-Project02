@@ -417,8 +417,8 @@
     width: calc(100vw - 4px) !important;
     min-width: calc(100vw - 4px) !important;
     max-width: calc(100vw - 4px) !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
+    overflow-x: auto !important; /* 横方向スクロールのみ有効 */
+    overflow-y: hidden !important; /* 縦方向スクロールを無効化 */
     touch-action: pan-x manipulation !important; /* 横方向スワイプ、縦方向は画面全体移動 */
     margin: 2px !important;
     padding-top: 8px !important;
