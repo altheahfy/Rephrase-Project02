@@ -663,7 +663,7 @@ function handleLogout() {
   <button id="voice-panel-open-btn" style="
     position: fixed;
     top: 60px;
-    right: 20px;
+    right: 10px;
     z-index: 15500;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -795,20 +795,22 @@ function handleLogout() {
   <div id="voice-control-panel" style="
     position: fixed !important;
     top: 120px !important;
-    right: 20px !important;
+    right: 10px !important;
     z-index: 15000 !important;
     background: rgba(255, 255, 255, 0.95) !important; 
     padding: 12px !important; 
     border-radius: 8px !important; 
     border: 2px solid #667eea !important; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-    min-width: 200px !important;
-    max-width: 300px !important;
+    min-width: 280px !important;
+    max-width: 320px !important;
     transition: all 0.3s ease !important;
     display: none !important;
     visibility: visible !important;
     opacity: 1 !important;
     min-height: auto !important;
+    max-height: calc(100vh - 140px) !important;
+    overflow-y: auto !important;
   ">
     <!-- 基本パネル（固定サイズ） -->
     <div id="voice-panel-basic" style="position: relative;">

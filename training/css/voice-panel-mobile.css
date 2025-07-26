@@ -1,6 +1,6 @@
 /* 📱 音声パネル モバイル最適化 CSS */
 
-/* モバイル環境でのパネル位置固定 - 縦画面のみ小型化 */
+/* モバイル環境でのパネル位置固定 - 縦画面での拡張版 */
 @media (max-width: 768px) and (orientation: portrait) {
     #voice-control-panel {
         position: fixed !important;
@@ -11,70 +11,70 @@
         transform: none !important;
         z-index: 9999 !important;
         
-        /* 小型パネルサイズ - 横画面の約40%サイズ */
-        width: 140px !important;
-        max-width: 140px !important;
-        min-width: 140px !important;
-        max-height: 180px !important;
+        /* 拡張パネルサイズ - 全コンテンツが見えるように */
+        width: 280px !important;
+        max-width: 320px !important;
+        min-width: 280px !important;
+        max-height: calc(100vh - 120px) !important;
         overflow-y: auto !important;
         
-        /* 横画面と同じスタイルを小型化 */
+        /* 横画面と同じスタイルを維持 */
         background: rgba(255, 255, 255, 0.95) !important;
         border: 2px solid #667eea !important;
         border-radius: 8px !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
         transition: all 0.3s ease !important;
         
-        /* 小型パディング */
-        padding: 6px !important;
+        /* 標準パディング */
+        padding: 12px !important;
     }
     
-    /* 小型ボタンサイズ調整 - 横画面の比例縮小 */
+    /* 標準ボタンサイズ - 読みやすいサイズを維持 */
     #voice-control-panel .voice-btn {
-        padding: 3px 5px !important;
-        font-size: 9px !important;
-        margin: 2px !important;
-        min-height: 22px !important;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        margin: 3px !important;
+        min-height: auto !important;
         border-radius: 3px !important;
     }
     
-    /* 小型ステータス表示エリア */
+    /* 標準ステータス表示エリア */
     #voice-control-panel #voice-status {
-        font-size: 9px !important;
-        padding: 2px 4px !important;
-        border-radius: 6px !important;
-        margin: 4px 0 !important;
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+        border-radius: 12px !important;
+        margin: 8px 0 !important;
         text-align: center !important;
-        line-height: 1.2 !important;
+        line-height: 1.4 !important;
     }
     
-    /* 小型分析結果エリア */
+    /* 標準分析結果エリア */
     #voice-control-panel #voice-analysis-results {
-        font-size: 8px !important;
+        font-size: 11px !important;
         background: rgba(0,0,0,0.05) !important;
-        border-radius: 4px !important;
-        padding: 4px !important;
-        min-height: 20px !important;
-        max-height: 60px !important;
+        border-radius: 6px !important;
+        padding: 8px !important;
+        min-height: 30px !important;
+        max-height: 200px !important;
         overflow-y: auto !important;
         color: #333 !important;
-        margin: 4px 0 !important;
+        margin: 8px 0 !important;
     }
     
-    /* 小型分析結果内のアイテム */
+    /* 標準分析結果内のアイテム */
     #voice-control-panel .analysis-item {
-        margin: 2px 0 !important;
-        padding: 2px !important;
-        line-height: 1.2 !important;
-        font-size: 8px !important;
+        margin: 4px 0 !important;
+        padding: 4px !important;
+        line-height: 1.4 !important;
+        font-size: 11px !important;
     }
     
-    /* 小型保存確認ボタン */
+    /* 標準保存確認ボタン */
     #voice-control-panel .save-confirmation button {
-        padding: 3px 6px !important;
-        font-size: 8px !important;
-        margin: 1px !important;
-        min-height: 20px !important;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        margin: 2px !important;
+        min-height: auto !important;
     }
 }
 
@@ -90,11 +90,11 @@
         transform: none !important;
         z-index: 15000 !important;
         
-        /* 横画面用サイズ - 内容が収まるよう高さを調整 */
-        width: 250px !important;
-        max-width: 250px !important;
-        min-width: 250px !important;
-        max-height: calc(100vh - 90px) !important; /* 4割縦に伸ばすため90pxに変更 */
+        /* 横画面用サイズ - 内容が収まるよう高さを大幅に拡張 */
+        width: 300px !important;
+        max-width: 300px !important;
+        min-width: 300px !important;
+        max-height: calc(100vh - 60px) !important; /* ほぼ全画面の高さを使用 */
         overflow-y: auto !important;
         
         /* 横画面用スタイル - HTMLの元設定を維持 */
@@ -134,7 +134,7 @@
         border-radius: 6px !important;
         padding: 8px !important;
         min-height: 30px !important;
-        max-height: 400px !important;
+        max-height: 300px !important; /* 横画面では高さを増やす */
         overflow-y: auto !important;
         color: #333 !important;
         margin: 8px 0 !important;
@@ -167,24 +167,25 @@
     display: inline-block !important;
 }
 
-/* より小さい画面（iPhone SE等）への対応 - 縦画面のみ */
+/* より小さい画面（iPhone SE等）への対応 - 縦画面でも十分なサイズを確保 */
 @media (max-width: 375px) and (orientation: portrait) {
     #voice-control-panel {
-        width: 120px !important;
-        max-width: 120px !important;
+        width: 260px !important;
+        max-width: 280px !important;
         right: 5px !important;
         bottom: 10px !important;
+        max-height: calc(100vh - 100px) !important;
     }
     
     #voice-control-panel .voice-btn {
-        padding: 3px 4px !important;
-        font-size: 8px !important;
-        margin: 1px !important;
-        min-height: 20px !important;
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        margin: 2px !important;
+        min-height: auto !important;
     }
     
     #voice-panel-open-btn {
-        /* 小画面でも横長を維持、少し小さく */
+        /* 小画面でも読みやすいサイズを維持 */
         padding: 6px 12px !important;
         font-size: 12px !important;
         right: 10px !important;
