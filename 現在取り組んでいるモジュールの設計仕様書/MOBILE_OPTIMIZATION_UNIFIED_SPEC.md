@@ -350,6 +350,130 @@ console.log('CSS applied:', window.getComputedStyle(document.querySelector('.slo
 
 ---
 
+## 🔍 【2025年7月26日発見】重要な技術的知見・デバッグ手法
+
+### 横向きモード上部スワイプエリア拡張の技術的課題と解決
+
+#### 🚨 発見した根本問題：**外側容器制約の見落とし**
+
+##### 問題の症状
+- 上部スワイプエリア（`.slot-wrapper`）の`width: 120vw`設定が無効
+- いくら内側要素の幅を拡張しても1mmも変化しない
+- CSS設定は正しいが視覚的効果が全く現れない
+
+##### 根本原因の発見
+```css
+/* 🚨 問題の構造 */
+.mobile-device body {
+  zoom: 0.7 !important; /* 70%に縮小された外側容器 */
+  /* width指定なし → デフォルト100vw */
+}
+
+.mobile-device .slot-wrapper:not([id$="-sub"]) {
+  width: 120vw !important; /* 内側で120%指定しても... */
+  /* ↑ 親容器が100vwなので、実質的に100vw以下に制限される */
+}
+```
+
+#### 🎯 解決アプローチ：**階層的幅制御**
+
+##### 正しい実装手順
+1. **外側容器（body）の拡張**
+2. **内側要素（slot-wrapper）の拡張**
+3. **両方の連携による効果実現**
+
+```css
+/* ✅ 解決策：外側と内側の連携拡張 */
+@media screen and (orientation: landscape) {
+  /* 🎯 ステップ1: 外側容器を拡張 */
+  .mobile-device body {
+    zoom: 0.7 !important;
+    width: 140vw !important; /* 外側容器を140%に拡張 */
+    overflow-x: auto !important; /* 横スクロール有効 */
+  }
+  
+  /* 🎯 ステップ2: 内側要素も拡張 */
+  .mobile-device .slot-wrapper:not([id$="-sub"]) {
+    width: 140vw !important; /* 内側も140%に拡張 */
+    min-width: 140vw !important;
+    max-width: 140vw !important;
+  }
+}
+```
+
+#### 📚 学んだデバッグ手法
+
+##### 1. **階層構造の見極め**
+- 単一要素の問題と思い込まず、**親子関係の制約**を疑う
+- `Developer Tools`でDOM階層を確認し、制約元を特定
+
+##### 2. **段階的検証アプローチ**
+```css
+/* デバッグ用：段階的に幅を確認 */
+.mobile-device body { background: red; } /* 外側容器の範囲確認 */
+.mobile-device .slot-wrapper { background: blue; } /* 内側要素の範囲確認 */
+```
+
+##### 3. **仮説検証の重要性**
+- **仮説**: 「上部スワイプエリアを包んでいるさらなる入れ物があるのでは？」
+- **検証**: DOM構造とCSS階層の詳細調査
+- **発見**: `body`要素の幅制約が真の原因
+
+#### 🏗️ アーキテクチャ設計への影響
+
+##### 新しい設計原則：**外側制約優先の法則**
+1. **外側から内側へ**: 制約は外側容器から順番に解除する
+2. **階層的デバッグ**: 問題は最も外側の容器から疑う
+3. **連携設計**: 幅拡張は全階層で連携して設定する
+
+#### 🔧 実装完了後の技術仕様
+
+##### 横向きモード専用拡張システム
+```css
+/* 🎯 完成形：140%横幅拡張システム */
+@media screen and (orientation: landscape) {
+  .mobile-device body {
+    zoom: 0.7 !important;
+    width: 140vw !important; /* 画面幅の140% */
+    overflow-x: auto !important;
+  }
+  
+  .mobile-device .slot-wrapper:not([id$="-sub"]) {
+    height: 100vh !important;
+    width: 140vw !important; /* bodyと連携した140% */
+    min-width: 140vw !important;
+    max-width: 140vw !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    touch-action: pan-x manipulation !important;
+    margin: 0 !important;
+    padding-top: 8px !important;
+  }
+}
+```
+
+##### 効果と利点
+- **横向きモード**: 上部スワイプエリアが画面幅の140%に拡張
+- **横スクロール**: 拡張部分へのスムーズなナビゲーション
+- **PC版保護**: 既存機能を完全保持
+- **段階的調整**: 120% → 140%のような柔軟な調整が可能
+
+#### 🎓 今後のデバッグ指針
+
+##### CSS幅問題のチェックリスト
+1. **親容器の制約確認**: `body`, `section`, `main`等の外側要素
+2. **CSS継承確認**: `width`, `max-width`, `overflow`プロパティの継承
+3. **メディアクエリ優先度**: `@media`ルールの適用順序
+4. **!important競合**: 複数の`!important`宣言の衝突
+
+##### 効率的デバッグ手順
+1. **最外側から調査**: `body` → `section` → `div` → `.slot-wrapper`
+2. **視覚的境界確認**: `background`色でエリア範囲を明確化
+3. **段階的変更**: 一つずつ要素を変更して効果を確認
+4. **仮説駆動**: 「なぜ効果がないのか」の仮説を立てて検証
+
+---
+
 ## 🎯 次のステップ
 
 ### 即座に必要な作業
@@ -366,6 +490,12 @@ console.log('CSS applied:', window.getComputedStyle(document.querySelector('.slo
 
 ## 📝 変更履歴
 
+- **v2.2** (2025-07-26): **横向きモード上部スワイプエリア140%拡張完成** 🎉
+  - **重要発見**: 外側容器制約の技術的課題と解決手法を文書化
+  - **階層的幅制御**: body(140vw) + slot-wrapper(140vw) の連携拡張システム実装
+  - **デバッグ手法確立**: 外側制約優先の法則、段階的検証アプローチ
+  - **技術仕様完成**: 横向きモード専用140%拡張システムの完全実装
+  - **レイアウト最適化完了**: スマホ最適化のレイアウト面が完成段階に到達
 - **v2.1** (2025-07-25): PC版サブスロット左右スライド機能実装・仕様書統合完了
   - `responsive.css`によるPC版DOM完全保持型スライド機能
   - スナップスクロール・タッチ最適化実装

@@ -416,18 +416,20 @@
 
 /* 横向き（ランドスケープ）モードのみ：上部スワイプエリア固定 + 真のカメラズームアウト */
 @media screen and (orientation: landscape) {
-  /* 🎯 スマホ画面全体をズームアウト（サブスロット含む全て） */
+  /* 🎯 スマホ画面全体をズームアウト（サブスロット含む全て） + 横幅拡張 */
   .mobile-device body {
     zoom: 0.7 !important; /* 画面全体を70%に縮小 */
+    width: 140vw !important; /* 横幅を140%に拡張（120% + 20%） */
+    overflow-x: auto !important; /* 横スクロール有効 */
   }
   
   .mobile-device .slot-wrapper:not([id$="-sub"]) {
     height: 100vh !important; /* 77vh → 100vh: スワイプエリアを130%に拡大（77×1.3≒100） */
     
-    /* 🎯 横画面では画面幅いっぱいに拡張 */
-    width: 100vw !important; /* calc(100vw - 4px) → 100vw: マージン削除で完全に画面幅いっぱい */
-    min-width: 100vw !important;
-    max-width: 100vw !important;
+    /* 🎯 横画面では画面幅の140%に拡張 */
+    width: 140vw !important; /* 120vw → 140vw: 横幅を画面幅の140%に拡大 */
+    min-width: 140vw !important;
+    max-width: 140vw !important;
     overflow-x: auto !important; /* 横方向スクロールのみ有効 */
     overflow-y: hidden !important; /* 縦方向スクロールを無効化 */
     touch-action: pan-x manipulation !important; /* 横方向スワイプ、縦方向は画面全体移動 */
