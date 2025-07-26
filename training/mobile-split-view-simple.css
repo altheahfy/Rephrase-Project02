@@ -408,13 +408,29 @@
 /* 📱 横向き専用：上部スワイプエリア拡大     */
 /* ========================================= */
 
-/* 横向き（ランドスケープ）モードのみ：上部スワイプエリアを拡大 */
+/* 横向き（ランドスケープ）モードのみ：上部スワイプエリア固定 + 中身をズームアウト */
 @media screen and (orientation: landscape) {
   .mobile-device .slot-wrapper:not([id$="-sub"]) {
-    height: 55vh !important; /* 横向き時のみ上部エリアを拡大 */
+    height: 55vh !important; /* スワイプエリアサイズは適切サイズで固定 */
+    
+    /* スワイプエリア（窓）は変更しない */
+    width: calc(100vw - 4px) !important;
+    min-width: calc(100vw - 4px) !important;
+    max-width: calc(100vw - 4px) !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    touch-action: pan-x pan-y !important;
+    margin: 2px !important;
+    padding-top: 8px !important;
+  }
+  
+  /* 🎯 カメラズームアウト効果：スワイプエリア内のコンテンツ全体を縮小 */
+  .mobile-device .slot-wrapper:not([id$="-sub"]) > * {
+    transform: scale(0.75) !important; /* 75%にズームアウト */
+    transform-origin: top left !important; /* 左上基点で縮小 */
   }
   .mobile-device #subslot-display-area {
-    height: 10vh !important; /* 横向き時のみサブスロットエリアを縮小 */
+    height: 10vh !important; /* 横向き時のサブスロットエリア調整 */
   }
 }
 
