@@ -554,7 +554,7 @@ h1 {
 .slot-container {
   /* 🎯 CSS Gridで完�Eに6行固定レイアウトを実裁E*/
   display: grid;
-  grid-template-rows: 30px 180px 30px 30px 30px 30px; /* 画像以外�E行も拡大して全体�Eバランスを調整 */
+  grid-template-rows: 30px 180px 30px 30px; /* 6行 → 4行に短縮（ID、画像、日本語、英語の4行のみ、無駄な5・6行目削除） */
   grid-template-columns: 1fr;
   gap: 6px; /* 行間も少し拡大 */
   align-items: center; /* 吁E��ル冁E��の中央揁E�� */
@@ -580,7 +580,7 @@ h1 {
   
   /* �E スロチE��全体�E高さを適刁E��設宁E*/
   height: auto; /* 自動高さ調整 */
-  min-height: 380px; /* 全ての要素が確実に表示される最小高さ */
+  min-height: 320px; /* 380px → 320px（無駄な5・6行目60px分を削減） */
   box-sizing: border-box;
 }
 
