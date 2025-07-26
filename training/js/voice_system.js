@@ -729,6 +729,13 @@ class VoiceSystem {
             this.recordedBlob = null;
             this.recognizedText = '';
             
+            // 📏 前回の分析結果をクリアしパネルサイズをリセット
+            const resultsContainer = document.getElementById('voice-analysis-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+            }
+            this.resetPanelSize();
+            
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     sampleRate: 44100,
@@ -1522,6 +1529,9 @@ class VoiceSystem {
         // 🎯 分析結果表示後にパネル位置を調整
         this.adjustPanelPosition();
         
+        // 📏 分析結果表示時にパネルを拡張
+        this.expandPanelForResults();
+        
         // 🎯 保存確認ボタンのイベントリスナーを設定
         this.setupSaveConfirmationButtons(analysis);
         
@@ -1766,6 +1776,90 @@ class VoiceSystem {
             panel.style.left = 'auto';
             console.log('🎯 右端調整: 右端10pxに設定');
         }
+    }
+
+    /**
+     * 📏 分析結果表示時にパネルを拡張
+     * 縦画面では上方向、横画面では下方向に拡張
+     */
+    expandPanelForResults() {
+        const panel = document.getElementById('voice-control-panel');
+        const resultsContainer = document.getElementById('voice-analysis-results');
+        
+        if (!panel || !resultsContainer) return;
+        
+        // 分析結果が表示されているかチェック
+        if (!resultsContainer.innerHTML.trim()) return;
+        
+        // 📱 モバイルデバイス検出
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         window.innerWidth <= 768;
+        
+        if (!isMobile) return; // PC版はスクロールのまま
+        
+        // 少し遅延させてDOMが更新されてから拡張処理を実行
+        setTimeout(() => {
+            const windowHeight = window.innerHeight;
+            const windowWidth = window.innerWidth;
+            const isPortrait = windowHeight > windowWidth;
+            
+            // パネル内のコンテンツの実際の高さを測定（現在のスタイルを一時的にリセットして測定）
+            const originalOverflow = panel.style.overflow;
+            const originalMaxHeight = panel.style.maxHeight;
+            const originalHeight = panel.style.height;
+            
+            // 測定のために一時的にスタイルをリセット
+            panel.style.overflow = 'visible';
+            panel.style.maxHeight = 'none';
+            panel.style.height = 'auto';
+            
+            const panelScrollHeight = panel.scrollHeight;
+            const currentMaxHeight = isPortrait ? 180 : (windowHeight - 90);
+            
+            console.log('📏 パネル拡張チェック:', {
+                scrollHeight: panelScrollHeight,
+                currentMaxHeight: currentMaxHeight,
+                isPortrait: isPortrait,
+                windowHeight: windowHeight
+            });
+            
+            // コンテンツがパネルサイズを超えている場合のみ拡張
+            if (panelScrollHeight > currentMaxHeight) {
+                if (isPortrait) {
+                    // 縦画面：上方向に拡張（top位置を上げる）
+                    const expandedHeight = Math.min(panelScrollHeight + 30, windowHeight * 0.85); // 最大85%、余白30px
+                    const newTop = Math.max(10, windowHeight - expandedHeight - 30); // 下から30px余白
+                    
+                    panel.style.setProperty('position', 'fixed', 'important');
+                    panel.style.setProperty('top', `${newTop}px`, 'important');
+                    panel.style.setProperty('bottom', 'auto', 'important');
+                    panel.style.setProperty('max-height', `${expandedHeight}px`, 'important');
+                    panel.style.setProperty('height', `${expandedHeight}px`, 'important');
+                    panel.style.setProperty('overflow-y', 'auto', 'important');
+                    
+                    console.log('📏 縦画面拡張: top=' + newTop + 'px, height=' + expandedHeight + 'px');
+                } else {
+                    // 横画面：下方向に拡張（max-heightを増やす）
+                    const expandedHeight = Math.min(panelScrollHeight + 30, windowHeight - 130 - 30); // 最大で画面下まで-30px余白
+                    
+                    panel.style.setProperty('position', 'fixed', 'important');
+                    panel.style.setProperty('top', '130px', 'important');
+                    panel.style.setProperty('bottom', 'auto', 'important');
+                    panel.style.setProperty('max-height', `${expandedHeight}px`, 'important');
+                    panel.style.setProperty('height', `${expandedHeight}px`, 'important');
+                    panel.style.setProperty('overflow-y', 'auto', 'important');
+                    
+                    console.log('📏 横画面拡張: height=' + expandedHeight + 'px');
+                }
+            } else {
+                // 拡張不要の場合は元のスタイルを復元
+                panel.style.overflow = originalOverflow;
+                panel.style.maxHeight = originalMaxHeight;
+                panel.style.height = originalHeight;
+                
+                console.log('📏 拡張不要: コンテンツが既に収まっています');
+            }
+        }, 100); // 100ms遅延
     }
 
     /**
@@ -2277,6 +2371,10 @@ class VoiceSystem {
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
             }
+            
+            // 📏 パネルサイズを初期状態にリセット
+            this.resetPanelSize();
+            
             // 📱 パネル位置を初期位置にリセット
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                              window.innerWidth <= 768;
@@ -2313,6 +2411,58 @@ class VoiceSystem {
                 panel.style.zIndex = '1000';
             }
         }
+    }
+
+    /**
+     * 📏 パネルサイズを初期状態にリセット
+     */
+    resetPanelSize() {
+        const panel = document.getElementById('voice-control-panel');
+        if (!panel) return;
+        
+        // 📱 モバイルデバイス検出
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         window.innerWidth <= 768;
+        
+        if (!isMobile) return; // PC版はリセット不要
+        
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+        const isPortrait = windowHeight > windowWidth;
+        
+        console.log('📏 パネルサイズリセット開始');
+        
+        // 全てのカスタムサイズプロパティをリセット
+        panel.style.removeProperty('height');
+        panel.style.removeProperty('min-height');
+        
+        if (isPortrait) {
+            // 縦画面：初期サイズに戻す
+            panel.style.setProperty('position', 'fixed', 'important');
+            panel.style.setProperty('top', 'auto', 'important');
+            panel.style.setProperty('bottom', '20px', 'important');
+            panel.style.setProperty('left', 'auto', 'important');
+            panel.style.setProperty('right', '10px', 'important');
+            panel.style.setProperty('max-width', '140px', 'important');
+            panel.style.setProperty('max-height', '180px', 'important');
+            panel.style.setProperty('overflow-y', 'auto', 'important');
+            
+            console.log('📏 縦画面リセット: bottom=20px, max-height=180px');
+        } else {
+            // 横画面：初期サイズに戻す
+            panel.style.setProperty('position', 'fixed', 'important');
+            panel.style.setProperty('top', '130px', 'important');
+            panel.style.setProperty('bottom', 'auto', 'important');
+            panel.style.setProperty('left', 'auto', 'important');
+            panel.style.setProperty('right', '20px', 'important');
+            panel.style.setProperty('max-width', '250px', 'important');
+            panel.style.setProperty('max-height', `${windowHeight - 90}px`, 'important');
+            panel.style.setProperty('overflow-y', 'auto', 'important');
+            
+            console.log('📏 横画面リセット: top=130px, max-height=' + (windowHeight - 90) + 'px');
+        }
+        
+        console.log('📏 パネルサイズリセット完了');
     }
     
     /**
