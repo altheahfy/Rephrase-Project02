@@ -3120,11 +3120,52 @@ class VoiceSystem {
             ">✕</button>
         `;
         
+        // テスト機能ボタンエリア
+        const testButtons = document.createElement('div');
+        testButtons.style.cssText = `
+            margin-bottom: 10px;
+            padding: 5px;
+            background: rgba(0,255,0,0.1);
+            border-radius: 3px;
+            border: 1px solid #00ff00;
+        `;
+        testButtons.innerHTML = `
+            <div style="margin-bottom: 5px; color: #00ff00; font-size: 11px;">🔧 診断テスト</div>
+            <button onclick="window.voiceSystem.testMicrophonePermission()" style="
+                background: #0066ff;
+                color: white;
+                border: none;
+                padding: 5px 8px;
+                margin: 2px;
+                border-radius: 3px;
+                font-size: 10px;
+            ">🎤 マイク権限テスト</button>
+            <button onclick="window.voiceSystem.testVoiceRecognition()" style="
+                background: #00aa00;
+                color: white;
+                border: none;
+                padding: 5px 8px;
+                margin: 2px;
+                border-radius: 3px;
+                font-size: 10px;
+            ">🗣️ 音声認識テスト</button>
+            <button onclick="window.voiceSystem.clearDebugLogs()" style="
+                background: #666666;
+                color: white;
+                border: none;
+                padding: 5px 8px;
+                margin: 2px;
+                border-radius: 3px;
+                font-size: 10px;
+            ">🗑️ ログクリア</button>
+        `;
+        
         // ログ表示エリア
         const logArea = document.createElement('div');
         logArea.id = 'mobile-debug-logs';
         
         panel.appendChild(header);
+        panel.appendChild(testButtons);
         panel.appendChild(logArea);
         document.body.appendChild(panel);
         
@@ -3453,6 +3494,221 @@ class VoiceSystem {
         } catch (error) {
             console.error('❌ 一時データクリア失敗:', error);
         }
+    }
+    
+    /**
+     * 🎤 マイク権限テスト（Android対応強化版）
+     */
+    testMicrophonePermission() {
+        this.addDebugLog('info', '🎤 マイク権限テストを開始します...');
+        
+        // 権限状態をチェック
+        if (navigator.permissions) {
+            navigator.permissions.query({ name: 'microphone' })
+                .then(permissionStatus => {
+                    this.addDebugLog('info', `📋 マイク権限状態: ${permissionStatus.state}`);
+                    
+                    // 状態変更の監視
+                    permissionStatus.onchange = () => {
+                        this.addDebugLog('info', `📋 マイク権限が変更されました: ${permissionStatus.state}`);
+                    };
+                    
+                    // 実際にマイクアクセスをテスト
+                    this.performMicrophoneTest();
+                })
+                .catch(error => {
+                    this.addDebugLog('warning', `⚠️ 権限クエリエラー: ${error.message}`);
+                    this.performMicrophoneTest();
+                });
+        } else {
+            this.addDebugLog('warning', '⚠️ navigator.permissions API が利用できません');
+            this.performMicrophoneTest();
+        }
+    }
+    
+    /**
+     * 🎤 実際のマイクアクセステスト
+     */
+    performMicrophoneTest() {
+        this.addDebugLog('info', '🔍 getUserMedia APIでマイクアクセスをテスト中...');
+        
+        const constraints = {
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                channelCount: 1,
+                sampleRate: 16000
+            }
+        };
+        
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                this.addDebugLog('success', '✅ マイクアクセス成功！');
+                
+                // オーディオトラック情報を表示
+                const audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    const track = audioTracks[0];
+                    const settings = track.getSettings();
+                    this.addDebugLog('info', `🎵 オーディオトラック: ${track.label || 'Default'}`);
+                    this.addDebugLog('info', `📊 サンプルレート: ${settings.sampleRate}Hz`);
+                    this.addDebugLog('info', `🔊 チャンネル数: ${settings.channelCount}`);
+                }
+                
+                // 音声レベルをテスト
+                this.testAudioLevel(stream);
+                
+                // ストリームを停止
+                setTimeout(() => {
+                    stream.getTracks().forEach(track => track.stop());
+                    this.addDebugLog('info', '🛑 マイクストリームを停止しました');
+                }, 3000);
+            })
+            .catch(error => {
+                this.addDebugLog('error', `❌ マイクアクセス失敗: ${error.name} - ${error.message}`);
+                
+                // 詳細なエラー情報
+                if (error.name === 'NotAllowedError') {
+                    this.addDebugLog('error', '🚫 マイク権限が拒否されています');
+                    this.addDebugLog('info', '💡 ブラウザの設定でマイク権限を許可してください');
+                } else if (error.name === 'NotFoundError') {
+                    this.addDebugLog('error', '🎤 マイクデバイスが見つかりません');
+                } else if (error.name === 'NotReadableError') {
+                    this.addDebugLog('error', '🔒 マイクが他のアプリで使用中です');
+                }
+            });
+    }
+    
+    /**
+     * 🔊 オーディオレベルテスト
+     */
+    testAudioLevel(stream) {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            microphone.connect(analyser);
+            
+            this.addDebugLog('info', '🎵 音声レベル監視を開始...');
+            
+            let maxLevel = 0;
+            const checkLevel = () => {
+                analyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+                maxLevel = Math.max(maxLevel, average);
+            };
+            
+            const interval = setInterval(checkLevel, 100);
+            
+            setTimeout(() => {
+                clearInterval(interval);
+                this.addDebugLog('info', `📊 最大音声レベル: ${maxLevel.toFixed(1)}/255`);
+                if (maxLevel < 10) {
+                    this.addDebugLog('warning', '⚠️ 音声レベルが低いです。マイクが正常に動作していない可能性があります');
+                } else {
+                    this.addDebugLog('success', '✅ 音声レベルが検出されました');
+                }
+                audioContext.close();
+            }, 2500);
+            
+        } catch (error) {
+            this.addDebugLog('error', `❌ オーディオレベルテスト失敗: ${error.message}`);
+        }
+    }
+    
+    /**
+     * 🗣️ 音声認識テスト
+     */
+    testVoiceRecognition() {
+        this.addDebugLog('info', '🗣️ 音声認識テストを開始します...');
+        
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            this.addDebugLog('error', '❌ Web Speech API が利用できません');
+            return;
+        }
+        
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        // Android用設定
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'ja-JP';
+        recognition.maxAlternatives = 1;
+        
+        // タイムアウト設定
+        let timeoutId = setTimeout(() => {
+            recognition.stop();
+            this.addDebugLog('warning', '⏰ 音声認識がタイムアウトしました（10秒）');
+        }, 10000);
+        
+        recognition.onstart = () => {
+            this.addDebugLog('success', '✅ 音声認識が開始されました');
+            this.addDebugLog('info', '🎤 何か話してください（10秒以内）...');
+        };
+        
+        recognition.onresult = (event) => {
+            clearTimeout(timeoutId);
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                const transcript = result[0].transcript;
+                const confidence = result[0].confidence;
+                
+                if (result.isFinal) {
+                    this.addDebugLog('success', `✅ 認識結果（確定）: "${transcript}"`);
+                    this.addDebugLog('info', `📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
+                } else {
+                    this.addDebugLog('info', `🔄 認識結果（途中）: "${transcript}"`);
+                }
+            }
+        };
+        
+        recognition.onerror = (event) => {
+            clearTimeout(timeoutId);
+            this.addDebugLog('error', `❌ 音声認識エラー: ${event.error}`);
+            
+            switch (event.error) {
+                case 'no-speech':
+                    this.addDebugLog('warning', '🔇 音声が検出されませんでした');
+                    break;
+                case 'audio-capture':
+                    this.addDebugLog('error', '🎤 マイクからの音声キャプチャに失敗');
+                    break;
+                case 'not-allowed':
+                    this.addDebugLog('error', '🚫 マイク権限が拒否されています');
+                    break;
+                case 'network':
+                    this.addDebugLog('error', '🌐 ネットワークエラーが発生しました');
+                    break;
+            }
+        };
+        
+        recognition.onend = () => {
+            clearTimeout(timeoutId);
+            this.addDebugLog('info', '🛑 音声認識が終了しました');
+        };
+        
+        try {
+            recognition.start();
+        } catch (error) {
+            this.addDebugLog('error', `❌ 音声認識開始失敗: ${error.message}`);
+        }
+    }
+    
+    /**
+     * 🗑️ デバッグログをクリア
+     */
+    clearDebugLogs() {
+        this.debugLogs = [];
+        this.addDebugLog('info', '🗑️ ログをクリアしました');
+        this.updateMobileDebugPanel();
     }
 }
 
