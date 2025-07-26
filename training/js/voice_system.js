@@ -648,6 +648,13 @@ class VoiceSystem {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
         }
         
+        // 📱 モバイルデバッグボタン
+        const debugBtn = document.getElementById('mobile-debug-btn');
+        if (debugBtn) {
+            debugBtn.addEventListener('click', () => this.showMobileDebugPanel());
+            console.log('✅ モバイルデバッグボタンのイベントリスナーを設定しました');
+        }
+        
         // 📱 ウィンドウリサイズ・画面向き変更時のパネル位置調整
         window.addEventListener('resize', () => {
             const panel = document.getElementById('voice-control-panel');
@@ -2798,12 +2805,23 @@ class VoiceSystem {
      * 音声認識を初期化
      */
     initSpeechRecognition() {
+        console.log('🎤 音声認識初期化開始...');
+        
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
             console.warn('⚠️ このブラウザは音声認識をサポートしていません');
+            console.log('📊 利用可能なAPI:', {
+                SpeechRecognition: !!window.SpeechRecognition,
+                webkitSpeechRecognition: !!window.webkitSpeechRecognition,
+                userAgent: navigator.userAgent.substring(0, 100)
+            });
+            this.addDebugLog('❌ 音声認識APIが利用できません', 'error');
             return;
         }
+        
+        console.log('✅ 音声認識API利用可能:', SpeechRecognition.name);
+        this.addDebugLog('✅ 音声認識API利用可能', 'success');
         
         this.recognition = new SpeechRecognition();
         this.recognition.lang = 'en-US';
@@ -2814,9 +2832,31 @@ class VoiceSystem {
         // 📱 Android対応：追加設定
         if (/Android/i.test(navigator.userAgent)) {
             console.log('📱 Android端末を検出：音声認識設定を最適化');
+            this.addDebugLog('📱 Android端末を検出', 'info');
             this.recognition.continuous = false; // Android では false の方が安定する場合がある
             this.recognition.interimResults = false; // Android では final 結果のみの方が確実
         }
+        
+        // 認識開始イベント
+        this.recognition.onstart = () => {
+            console.log('🎤 音声認識が開始されました');
+            this.addDebugLog('🎤 音声認識開始', 'success');
+            this.isRecognitionActive = true;
+        };
+        
+        // 認識停止イベント
+        this.recognition.onend = () => {
+            console.log('🔚 音声認識が終了しました');
+            this.addDebugLog('🔚 音声認識終了', 'info');
+            this.isRecognitionActive = false;
+        };
+        
+        // エラーイベント
+        this.recognition.onerror = (event) => {
+            console.error('❌ 音声認識エラー:', event.error);
+            this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
+            this.isRecognitionActive = false;
+        };
         
         // 認識結果を受信
         this.recognition.onresult = (event) => {
