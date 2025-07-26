@@ -653,11 +653,24 @@ class VoiceSystem {
         if (debugBtn) {
             debugBtn.addEventListener('click', () => {
                 alert('デバッグボタンv2025.7.27-rollback がタップされました！マイクテスト機能が利用可能です。');
-                this.showMobileDebugPanel();
+                try {
+                    this.showMobileDebugPanel();
+                    alert('デバッグパネル表示を試行しました');
+                } catch (error) {
+                    alert('エラー: ' + error.message);
+                }
             });
             console.log('✅ モバイルデバッグボタンのイベントリスナーを設定しました');
+            
+            // 📱 ボタンが正常に設定されたことを確認するためのテスト
+            debugBtn.style.border = '2px solid red';
+            setTimeout(() => {
+                debugBtn.style.border = '';
+            }, 2000);
+            
         } else {
             console.warn('⚠️ モバイルデバッグボタンが見つかりません');
+            alert('警告: モバイルデバッグボタンが見つかりません');
         }
         
         // 📱 ウィンドウリサイズ・画面向き変更時のパネル位置調整
@@ -3073,106 +3086,125 @@ class VoiceSystem {
      * 📱 スマホ用診断パネルを表示
      */
     showMobileDebugPanel() {
-        // 既存のパネルがあれば削除
-        const existingPanel = document.getElementById('mobile-debug-panel');
-        if (existingPanel) {
-            existingPanel.remove();
+        try {
+            alert('showMobileDebugPanel開始');
+            
+            // 既存のパネルがあれば削除
+            const existingPanel = document.getElementById('mobile-debug-panel');
+            if (existingPanel) {
+                existingPanel.remove();
+                alert('既存パネル削除完了');
+            }
+            
+            alert('新しいパネル作成開始');
+            const panel = document.createElement('div');
+            panel.id = 'mobile-debug-panel';
+            panel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                max-height: 50vh;
+                background: rgba(0,0,0,0.9);
+                color: #00ff00;
+                font-family: monospace;
+                font-size: 12px;
+                padding: 10px;
+                border-radius: 5px;
+                z-index: 20000;
+                overflow-y: auto;
+                border: 2px solid #00ff00;
+            `;
+            
+            alert('パネルスタイル設定完了');
+            
+            // ヘッダー
+            const header = document.createElement('div');
+            header.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #00ff00;
+            `;
+            header.innerHTML = `
+                <span>📱 音声認識診断ログ v2025.7.27</span>
+                <button onclick="this.parentElement.parentElement.remove()" style="
+                    background: #ff0000;
+                    color: white;
+                    border: none;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                ">✕</button>
+            `;
+            
+            alert('ヘッダー作成完了');
+            
+            // テスト機能ボタンエリア
+            const testButtons = document.createElement('div');
+            testButtons.style.cssText = `
+                margin-bottom: 10px;
+                padding: 5px;
+                background: rgba(0,255,0,0.1);
+                border-radius: 3px;
+                border: 1px solid #00ff00;
+            `;
+            testButtons.innerHTML = `
+                <div style="margin-bottom: 5px; color: #00ff00; font-size: 11px;">🔧 診断テスト v2025.7.27</div>
+                <button onclick="alert('マイクテストボタンがタップされました'); window.voiceSystem.testMicrophonePermission();" style="
+                    background: #0066ff;
+                    color: white;
+                    border: none;
+                    padding: 5px 8px;
+                    margin: 2px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                ">🎤 マイク権限テスト</button>
+                <button onclick="alert('音声認識テストボタンがタップされました'); window.voiceSystem.testVoiceRecognition();" style="
+                    background: #00aa00;
+                    color: white;
+                    border: none;
+                    padding: 5px 8px;
+                    margin: 2px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                ">🗣️ 音声認識テスト</button>
+                <button onclick="alert('ログクリアボタンがタップされました'); window.voiceSystem.clearDebugLogs();" style="
+                    background: #666666;
+                    color: white;
+                    border: none;
+                    padding: 5px 8px;
+                    margin: 2px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                ">🗑️ ログクリア</button>
+            `;
+            
+            alert('テストボタン作成完了');
+            
+            // ログ表示エリア
+            const logArea = document.createElement('div');
+            logArea.id = 'mobile-debug-logs';
+            
+            panel.appendChild(header);
+            panel.appendChild(testButtons);
+            panel.appendChild(logArea);
+            document.body.appendChild(panel);
+            
+            alert('パネルDOM追加完了');
+            
+            // 現在のログを表示
+            this.updateMobileDebugPanel();
+            
+            alert('デバッグパネル表示完了');
+            return panel;
+            
+        } catch (error) {
+            alert('showMobileDebugPanelエラー: ' + error.message);
+            throw error;
         }
-        
-        const panel = document.createElement('div');
-        panel.id = 'mobile-debug-panel';
-        panel.style.cssText = `
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            max-height: 50vh;
-            background: rgba(0,0,0,0.9);
-            color: #00ff00;
-            font-family: monospace;
-            font-size: 12px;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 20000;
-            overflow-y: auto;
-            border: 2px solid #00ff00;
-        `;
-        
-        // ヘッダー
-        const header = document.createElement('div');
-        header.style.cssText = `
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #00ff00;
-        `;
-        header.innerHTML = `
-            <span>📱 音声認識診断ログ</span>
-            <button onclick="this.parentElement.parentElement.remove()" style="
-                background: #ff0000;
-                color: white;
-                border: none;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-size: 10px;
-            ">✕</button>
-        `;
-        
-        // テスト機能ボタンエリア
-        const testButtons = document.createElement('div');
-        testButtons.style.cssText = `
-            margin-bottom: 10px;
-            padding: 5px;
-            background: rgba(0,255,0,0.1);
-            border-radius: 3px;
-            border: 1px solid #00ff00;
-        `;
-        testButtons.innerHTML = `
-            <div style="margin-bottom: 5px; color: #00ff00; font-size: 11px;">🔧 診断テスト</div>
-            <button onclick="window.voiceSystem.testMicrophonePermission()" style="
-                background: #0066ff;
-                color: white;
-                border: none;
-                padding: 5px 8px;
-                margin: 2px;
-                border-radius: 3px;
-                font-size: 10px;
-            ">🎤 マイク権限テスト</button>
-            <button onclick="window.voiceSystem.testVoiceRecognition()" style="
-                background: #00aa00;
-                color: white;
-                border: none;
-                padding: 5px 8px;
-                margin: 2px;
-                border-radius: 3px;
-                font-size: 10px;
-            ">🗣️ 音声認識テスト</button>
-            <button onclick="window.voiceSystem.clearDebugLogs()" style="
-                background: #666666;
-                color: white;
-                border: none;
-                padding: 5px 8px;
-                margin: 2px;
-                border-radius: 3px;
-                font-size: 10px;
-            ">🗑️ ログクリア</button>
-        `;
-        
-        // ログ表示エリア
-        const logArea = document.createElement('div');
-        logArea.id = 'mobile-debug-logs';
-        
-        panel.appendChild(header);
-        panel.appendChild(testButtons);
-        panel.appendChild(logArea);
-        document.body.appendChild(panel);
-        
-        // 現在のログを表示
-        this.updateMobileDebugPanel();
-        
-        return panel;
     }
     
     /**
@@ -3720,7 +3752,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // VoiceProgressTrackerが確実に読み込まれるまで少し待機
     setTimeout(() => {
         voiceSystem = new VoiceSystem();
+        window.voiceSystem = voiceSystem;  // グローバルに公開
         console.log('✅ 音声システムを初期化しました');
+        console.log('✅ window.voiceSystemが利用可能です');
     }, 500);
 });
 
