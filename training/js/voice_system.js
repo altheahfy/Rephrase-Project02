@@ -2863,8 +2863,6 @@ class VoiceSystem {
         }
         
         console.log('✅ 音声認識API利用可能:', SpeechRecognition.name);
-        this.addDebugLog('✅ 音声認識API利用可能', 'success');
-        this.updateStatus('✅ 音声認識API利用可能', 'success');
         
         this.recognition = new SpeechRecognition();
         this.recognition.lang = 'en-US';
