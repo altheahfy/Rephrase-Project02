@@ -968,12 +968,20 @@ class VoiceSystem {
                     this.recognizedText = transcript; // 既存のシステムに合わせて保存
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
+                    
+                    // 🚨 Android緊急修正: 確実にrecognizedTextを保存
+                    console.log('🔧 緊急修正: recognizedText確実保存 =', this.recognizedText);
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
                     // Android Chrome: 中間結果も重要
                     if (isAndroid) {
                         this.addDebugLog('📱 Android: 中間結果を記録', 'info');
+                        // 🚨 Android緊急修正: 中間結果も保存（最終結果が来ない場合の対策）
+                        if (!this.recognizedText || this.recognizedText.trim().length === 0) {
+                            this.recognizedText = transcript;
+                            console.log('🔧 緊急修正: Android中間結果保存 =', this.recognizedText);
+                        }
                     }
                 }
             }
@@ -1256,9 +1264,13 @@ class VoiceSystem {
             this.updateStatus('📊 分析中...', 'analyzing');
             
             // 🎤 音声認識結果の最終取得のため待機（Android対応で時間延長）
-            const waitTime = /Android/i.test(navigator.userAgent) ? 3000 : 1000;
+            const waitTime = /Android/i.test(navigator.userAgent) ? 5000 : 1000; // Android: 5秒に延長
             console.log(`⏳ 音声認識結果待機中... (${waitTime}ms)`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
+            
+            // 🚨 Android緊急修正: 待機後の認識結果最終確認
+            console.log('🔧 緊急修正: 待機後認識結果確認 =', JSON.stringify(this.recognizedText));
+            console.log('🔧 緊急修正: 認識結果長さ =', this.recognizedText ? this.recognizedText.length : 0);
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContextClass();
