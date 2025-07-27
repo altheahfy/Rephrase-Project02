@@ -774,14 +774,36 @@ class VoiceSystem {
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
-                    channelCount: 1,
-                    sampleRate: 16000
+                    channelCount: 1
+                    // sampleRateを削除: Android Chromeで問題を起こす可能性
                 }
             });
             
-            this.mediaRecorder = new MediaRecorder(stream, {
-                mimeType: 'audio/webm;codecs=opus'
+            // 🔍 Android診断: stream詳細ログ
+            console.log('🔍 Stream取得成功:', {
+                streamId: stream.id,
+                tracks: stream.getAudioTracks().map(track => ({
+                    id: track.id,
+                    label: track.label,
+                    enabled: track.enabled,
+                    readyState: track.readyState,
+                    settings: track.getSettings()
+                }))
             });
+            
+            this.mediaRecorder = new MediaRecorder(stream, {
+                mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+                    ? 'audio/webm;codecs=opus'
+                    : MediaRecorder.isTypeSupported('audio/webm') 
+                    ? 'audio/webm'
+                    : MediaRecorder.isTypeSupported('audio/mp4') 
+                    ? 'audio/mp4'
+                    : '' // ブラウザのデフォルト
+            });
+            
+            // 🔍 Android診断: MediaRecorder設定確認
+            console.log('🔍 MediaRecorder mimeType:', this.mediaRecorder.mimeType);
+            console.log('🔍 MediaRecorder state:', this.mediaRecorder.state);
             
             // 🔧 新しい録音用のチャンク配列を初期化
             const audioChunks = [];
@@ -803,6 +825,14 @@ class VoiceSystem {
                 
                 // 🎯 録音完了時に即座に分析実行
                 this.analyzeRecording();
+            };
+            
+            // Android Chrome向けエラーハンドリング
+            this.mediaRecorder.onerror = (event) => {
+                console.error('❌ MediaRecorder error:', event.error);
+                this.updateStatus('録音エラーが発生しました', 'error');
+                this.isRecording = false;
+                this.updateRecordingUI(false);
             };
             
             // 録音開始
@@ -860,9 +890,25 @@ class VoiceSystem {
      * 録音停止
      */
     stopRecording() {
+        console.log('stopRecording called, MediaRecorder state:', this.mediaRecorder?.state);
+        
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            // Android Chrome向けにstopイベントリスナーを設定
+            this.mediaRecorder.addEventListener('stop', () => {
+                console.log('✅ MediaRecorder stopped successfully');
+                this.isRecording = false;
+                
+                // ストリームトラックも確実に停止
+                if (this.currentStream) {
+                    this.currentStream.getTracks().forEach(track => {
+                        console.log('Stopping track:', track.kind, track.readyState);
+                        track.stop();
+                    });
+                }
+            }, { once: true });
+            
+            console.log('Stopping MediaRecorder...');
             this.mediaRecorder.stop();
-            this.isRecording = false;
             this.stopRecordingTimer();
         }
         
