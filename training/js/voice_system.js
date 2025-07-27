@@ -779,7 +779,10 @@ class VoiceSystem {
                 }
             });
             
-            // 🔍 Android診断: stream詳細ログ
+            // � ストリーム参照を保存（Android対応）
+            this.currentStream = stream;
+            
+            // �🔍 Android診断: stream詳細ログ
             console.log('🔍 Stream取得成功:', {
                 streamId: stream.id,
                 tracks: stream.getAudioTracks().map(track => ({
@@ -791,19 +794,49 @@ class VoiceSystem {
                 }))
             });
             
-            this.mediaRecorder = new MediaRecorder(stream, {
-                mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+            // 🚨 Android Chrome特化: MediaRecorder設定最適化
+            let mediaRecorderOptions = {};
+            const isAndroidDevice = /Android/i.test(navigator.userAgent);
+            
+            if (isAndroidDevice) {
+                // Android: mimeTypeを指定しない場合の方が安定することがある
+                if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    mediaRecorderOptions.mimeType = 'audio/webm';
+                } else {
+                    console.log('🚨 Android: mimeTypeを指定せずにデフォルトを使用');
+                    // mimeTypeを指定しない
+                }
+            } else {
+                // 他のブラウザ: 従来通り
+                mediaRecorderOptions.mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
                     ? 'audio/webm;codecs=opus'
                     : MediaRecorder.isTypeSupported('audio/webm') 
                     ? 'audio/webm'
                     : MediaRecorder.isTypeSupported('audio/mp4') 
                     ? 'audio/mp4'
-                    : '' // ブラウザのデフォルト
-            });
+                    : undefined;
+            }
+            
+            this.mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
             
             // 🔍 Android診断: MediaRecorder設定確認
             console.log('🔍 MediaRecorder mimeType:', this.mediaRecorder.mimeType);
             console.log('🔍 MediaRecorder state:', this.mediaRecorder.state);
+            
+            // 🚨 Android緊急診断: サポート状況詳細チェック
+            if (isAndroidDevice) {
+                console.log('🚨 Android緊急診断開始:');
+                console.log('  - webm;opus support:', MediaRecorder.isTypeSupported('audio/webm;codecs=opus'));
+                console.log('  - webm support:', MediaRecorder.isTypeSupported('audio/webm'));
+                console.log('  - mp4 support:', MediaRecorder.isTypeSupported('audio/mp4'));
+                console.log('  - mpeg support:', MediaRecorder.isTypeSupported('audio/mpeg'));
+                console.log('  - 最終選択mimeType:', this.mediaRecorder.mimeType);
+                console.log('  - User Agent:', navigator.userAgent.substring(0, 100));
+                
+                // Android向け追加設定
+                console.log('  - Stream active:', stream.active);
+                console.log('  - Track count:', stream.getTracks().length);
+            }
             
             // 🔧 新しい録音用のチャンク配列を初期化
             const audioChunks = [];
@@ -815,9 +848,10 @@ class VoiceSystem {
             };
             
             this.mediaRecorder.onstop = () => {
-                // 🔧 新しいBlobとして確実に上書き
-                this.recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                console.log('🎤 新しい録音データ作成:', this.recordedBlob.size, 'bytes');
+                // 🔧 MediaRecorderと同じmimeTypeでBlobを作成（Android対応）
+                const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+                this.recordedBlob = new Blob(audioChunks, { type: mimeType });
+                console.log('🎤 新しい録音データ作成:', this.recordedBlob.size, 'bytes, type:', mimeType);
                 
                 this.stopVolumeMonitoring();
                 stream.getTracks().forEach(track => track.stop());
@@ -1099,7 +1133,13 @@ class VoiceSystem {
         const audioUrl = URL.createObjectURL(this.recordedBlob);
         this.currentAudio = new Audio(audioUrl);
         
-        console.log('🔊 再生開始:', this.recordedBlob.size, 'bytes');
+        // 🚨 Android Chrome対応: 詳細ログとエラーハンドリング
+        console.log('🔊 再生準備:', {
+            blobSize: this.recordedBlob.size,
+            blobType: this.recordedBlob.type,
+            audioUrl: audioUrl.substring(0, 50) + '...',
+            userAgent: navigator.userAgent.substring(0, 80)
+        });
         
         this.currentAudio.onloadstart = () => this.updateStatus('🔊 録音再生中...', 'playing');
         this.currentAudio.onended = () => {
