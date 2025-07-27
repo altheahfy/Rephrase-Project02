@@ -2862,8 +2862,6 @@ class VoiceSystem {
             return;
         }
         
-        console.log('✅ 音声認識API利用可能:', SpeechRecognition.name);
-        
         this.recognition = new SpeechRecognition();
         this.recognition.lang = 'en-US';
         this.recognition.continuous = true;  // 連続認識
