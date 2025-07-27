@@ -771,9 +771,11 @@ class VoiceSystem {
             
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
-                    sampleRate: 44100,
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
                     channelCount: 1,
-                    volume: 1.0
+                    sampleRate: 16000
                 }
             });
             
