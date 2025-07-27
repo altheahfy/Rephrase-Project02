@@ -20,6 +20,8 @@
   <link href="mobile-split-view-simple.css" rel="stylesheet"/>
   <!-- 📱 音声パネル モバイル最適化CSS -->
   <link href="css/voice-panel-mobile.css" rel="stylesheet"/>
+  <!-- 🚀 モバイル専用音声システム CSS -->
+  <link href="css/mobile_voice_system.css" rel="stylesheet"/>
   
   <!-- 📱 モバイルデバイス検出スクリプト（最優先実行） -->
   <script>
@@ -874,6 +876,26 @@ function handleLogout() {
       ">
         🎤 音声認識状態: 初期化中...
       </div>
+    </div>
+  </div>
+  
+  <!-- 🚀 モバイル専用音声デバッグパネル（フェーズ1: 音声認識のみ） -->
+  <div id="voice-debug-panel" style="
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: 25000 !important;
+    background: white !important;
+    border-radius: 15px !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3) !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    display: none !important;
+  " class="mobile-voice-debug-panel">
+    <!-- モバイル専用システムがここに内容を動的生成 -->
+    <div style="padding: 20px; text-align: center; color: #666;">
+      モバイル専用音声システム読み込み中...
     </div>
   </div>
   
@@ -2347,7 +2369,64 @@ window.clearRandomizeHistory = function() {
 </script>
 
 <!-- 音声学習システムのスクリプト -->
-<script src="js/voice_system.js"></script>
+<!-- 音声システム（デバイス別読み込み） -->
+<script>
+// 🔧 デバイス検出とスクリプト読み込み制御
+(function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    'ontouchstart' in window ||
+                    window.innerWidth <= 768;
+    
+    console.log('🔧 デバイス検出結果:', {
+        isMobile: isMobile,
+        userAgent: navigator.userAgent,
+        screenWidth: window.innerWidth
+    });
+    
+    if (isMobile) {
+        console.log('📱 モバイルデバイス検出: 新しいモバイル専用システムを読み込み');
+        
+        // モバイル専用システム読み込み
+        const mobileScript = document.createElement('script');
+        mobileScript.src = 'js/mobile_voice_system.js';
+        mobileScript.onload = function() {
+            console.log('✅ モバイル専用音声システム読み込み完了');
+            
+            // モバイルデバッグパネル表示（フェーズ1）
+            const debugPanel = document.getElementById('voice-debug-panel');
+            if (debugPanel) {
+                debugPanel.style.display = 'block';
+                console.log('📱 モバイルデバッグパネル表示開始');
+            }
+            
+            // モバイルデバッグボタンをモバイル専用システムに接続
+            const mobileDebugBtn = document.getElementById('mobile-debug-btn');
+            if (mobileDebugBtn) {
+                mobileDebugBtn.onclick = function() {
+                    console.log('📱 モバイルデバッグボタンがタップされました');
+                    const panel = document.getElementById('voice-debug-panel');
+                    if (panel) {
+                        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    }
+                };
+                console.log('🔗 モバイルデバッグボタン接続完了');
+            }
+        };
+        document.head.appendChild(mobileScript);
+        
+        // 既存の音声システムは読み込まない
+        console.log('⚠️ 既存音声システムはスキップされます（モバイル専用システム使用）');
+        
+    } else {
+        console.log('💻 デスクトップデバイス検出: 既存システムを読み込み');
+        
+        // デスクトップでは既存システムを読み込み
+        const desktopScript = document.createElement('script');
+        desktopScript.src = 'js/voice_system.js';
+        document.head.appendChild(desktopScript);
+    }
+})();
+</script>
 <script src="js/voice_progress_tracker.js"></script>
 <script src="js/voice_progress_ui.js"></script>
 
