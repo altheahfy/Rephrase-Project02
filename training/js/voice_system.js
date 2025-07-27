@@ -804,14 +804,38 @@ class VoiceSystem {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
             
-        // 🎤 音声認識も同時開始
+        // 🎤 音声認識も同時開始（デバッグパネル成功機構を移植）
         if (this.recognition && !this.isRecognitionActive) {
             try {
                 this.addDebugLog('🎤 音声認識開始を試行中...', 'info');
                 this.addDebugLog(`📱 デバイス: ${navigator.userAgent.substring(0, 50)}...`, 'info');
                 
+                // Android Chrome最適化設定（デバッグパネルからの移植）
+                const isAndroid = /Android/i.test(navigator.userAgent);
+                if (isAndroid) {
+                    this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'en-US'; // 英語設定
+                    this.recognition.maxAlternatives = 3; // 複数候補
+                } else {
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'ja-JP';
+                    this.recognition.maxAlternatives = 1;
+                }
+                
                 // 認識開始前の状態確認
                 this.addDebugLog(`🔍 認識状態: lang=${this.recognition.lang}, active=${this.isRecognitionActive}`, 'info');
+                
+                // タイムアウト設定（Android用は少し長め）
+                const timeoutDuration = isAndroid ? 15000 : 10000;
+                this.recognitionTimeoutId = setTimeout(() => {
+                    if (this.recognition && this.isRecognitionActive) {
+                        this.recognition.stop();
+                        this.addDebugLog(`⏰ 音声認識がタイムアウトしました（${timeoutDuration/1000}秒）`, 'warning');
+                    }
+                }, timeoutDuration);
                 
                 this.recognition.start();
                 this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
@@ -884,6 +908,12 @@ class VoiceSystem {
         if (this.recognition && this.isRecognitionActive) {
             try {
                 console.log('🔚 音声認識停止コマンド送信（Android対応）');
+                
+                // タイムアウトをクリア（デバッグパネル成功機構からの移植）
+                if (this.recognitionTimeoutId) {
+                    clearTimeout(this.recognitionTimeoutId);
+                    this.recognitionTimeoutId = null;
+                }
                 
                 // Android対応：認識結果の受信完了を確実に待つ
                 this.recognition.stop();
