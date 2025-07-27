@@ -81,7 +81,7 @@ class MobileVoiceSystem {
             <div class="debug-log-area">
                 <h4>📋 デバッグログ:</h4>
                 <div id="mobile-debug-log" class="debug-log-content">
-                    システム準備完了
+                    🔄 システム初期化中...
                 </div>
             </div>
         `;
@@ -96,6 +96,28 @@ class MobileVoiceSystem {
         }
         
         this.addDebugLog('✅ モバイル専用デバッグパネル初期化完了', 'success');
+        
+        // 🚨 修正: JSONデータロード完了を待つ
+        this.waitForSystemReady();
+    }
+    
+    /**
+     * システム準備完了を待機
+     */
+    waitForSystemReady() {
+        // slotDataが読み込まれるまで待機
+        const checkReady = () => {
+            if (window.slotData && Object.keys(window.slotData).length > 0) {
+                this.addDebugLog('✅ JSONデータ読み込み完了 - システム準備完了', 'success');
+                console.log('📱 モバイル音声システム: 完全初期化完了');
+            } else {
+                this.addDebugLog('⏳ JSONデータ読み込み待機中...', 'info');
+                setTimeout(checkReady, 500); // 0.5秒後に再チェック
+            }
+        };
+        
+        // 初回チェック
+        setTimeout(checkReady, 100);
     }
     
     /**

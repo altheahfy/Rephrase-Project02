@@ -2392,12 +2392,8 @@ window.clearRandomizeHistory = function() {
         mobileScript.onload = function() {
             console.log('✅ モバイル専用音声システム読み込み完了');
             
-            // モバイルデバッグパネル表示（フェーズ1）
-            const debugPanel = document.getElementById('voice-debug-panel');
-            if (debugPanel) {
-                debugPanel.style.display = 'block';
-                console.log('📱 モバイルデバッグパネル表示開始');
-            }
+            // 🚨 修正: デバッグパネルは自動表示しない（デバッグボタンでのみ表示）
+            console.log('📱 モバイル専用システム初期化完了（パネルは非表示のまま）');
             
             // モバイルデバッグボタンをモバイル専用システムに接続
             const mobileDebugBtn = document.getElementById('mobile-debug-btn');
@@ -2406,7 +2402,9 @@ window.clearRandomizeHistory = function() {
                     console.log('📱 モバイルデバッグボタンがタップされました');
                     const panel = document.getElementById('voice-debug-panel');
                     if (panel) {
-                        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                        const isVisible = panel.style.display !== 'none';
+                        panel.style.display = isVisible ? 'none' : 'block';
+                        console.log('📱 デバッグパネル:', isVisible ? '非表示' : '表示');
                     }
                 };
                 console.log('🔗 モバイルデバッグボタン接続完了');
