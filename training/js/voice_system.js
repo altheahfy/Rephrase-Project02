@@ -3790,6 +3790,10 @@ class VoiceSystem {
     testVoiceRecognition() {
         this.addDebugLog('🗣️ 音声認識テストを開始します...', 'info');
         
+        // 🔧 追加: 認識テスト開始時にthis.recognizedTextをクリア
+        this.recognizedText = '';
+        this.addDebugLog('🗑️ this.recognizedTextをクリアしました', 'info');
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('❌ Web Speech API が利用できません', 'error');
             return;
@@ -3843,14 +3847,21 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
+                    this.recognizedText = transcript; // 🔧 追加: testも同様にthis.recognizedTextに保存
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
+                    this.addDebugLog(`💾 this.recognizedText保存: "${this.recognizedText}"`, 'success');
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
                     // Android Chrome: 中間結果も重要
                     if (isAndroid) {
                         this.addDebugLog('📱 Android: 中間結果を記録', 'info');
+                        // 🔧 追加: Android中間結果もthis.recognizedTextに保存（録音機能と同様）
+                        if (!this.recognizedText || this.recognizedText.trim().length === 0) {
+                            this.recognizedText = transcript;
+                            this.addDebugLog(`💾 Android中間結果保存: "${this.recognizedText}"`, 'info');
+                        }
                     }
                 }
             }
