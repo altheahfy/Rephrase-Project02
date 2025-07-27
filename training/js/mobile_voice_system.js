@@ -128,13 +128,28 @@ class MobileVoiceSystem {
      * システム準備完了を待機
      */
     waitForSystemReady() {
+        let maxRetries = 20; // 最大10秒間（0.5秒 × 20回）
+        let retryCount = 0;
+        
         // slotDataが読み込まれるまで待機
         const checkReady = () => {
-            if (window.slotData && Object.keys(window.slotData).length > 0) {
+            // より具体的な判定: window.slotDataまたはwindow.allSlotsData
+            const hasSlotData = (window.slotData && Object.keys(window.slotData).length > 0) ||
+                              (window.allSlotsData && Object.keys(window.allSlotsData).length > 0) ||
+                              (window.slotDataLoaded === true);
+            
+            if (hasSlotData) {
                 this.addDebugLog('✅ JSONデータ読み込み完了', 'success');
                 console.log('📱 モバイル音声システム: 完全初期化完了');
+                return; // 🚨 重要: 成功時は処理を終了
             } else {
-                this.addDebugLog('⏳ JSONデータ読み込み待機中...', 'info');
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    this.addDebugLog('⚠️ JSONデータ読み込みタイムアウト（システムは動作可能）', 'warning');
+                    return; // 🚨 重要: タイムアウト時も処理を終了
+                }
+                
+                this.addDebugLog(`⏳ JSONデータ読み込み待機中... (${retryCount}/${maxRetries})`, 'info');
                 setTimeout(checkReady, 500); // 0.5秒後に再チェック
             }
         };
