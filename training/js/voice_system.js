@@ -905,6 +905,7 @@ class VoiceSystem {
     
     /**
      * 🎤 録音用音声認識（testVoiceRecognition成功設定を完全移植）
+     * 🚨 緊急修正: testVoiceRecognitionの完全同期版
      */
     startRecordingVoiceRecognition() {
         this.addDebugLog('🗣️ 録音用音声認識を開始します...', 'info');
@@ -917,7 +918,7 @@ class VoiceSystem {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         this.recordingRecognition = new SpeechRecognition();
         
-        // Android Chrome最適化設定（testVoiceRecognitionから完全移植）
+        // 🚨 緊急修正: testVoiceRecognitionと完全同一設定
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
@@ -934,26 +935,25 @@ class VoiceSystem {
         
         this.addDebugLog(`🔍 認識状態: lang=${this.recordingRecognition.lang}, active=false`, 'info');
         
-        // タイムアウト設定（Android用は少し長め）
+        // 🚨 緊急修正: testVoiceRecognitionと同一タイムアウト
         const timeoutDuration = isAndroid ? 15000 : 10000;
         this.recognitionTimeoutId = setTimeout(() => {
             this.recordingRecognition.stop();
             this.addDebugLog(`⏰ 音声認識がタイムアウトしました（${timeoutDuration/1000}秒）`, 'warning');
         }, timeoutDuration);
         
-        // 認識開始イベント（testVoiceRecognitionから完全移植）
+        // 🚨 緊急修正: testVoiceRecognitionのイベントハンドラーを完全複製
         this.recordingRecognition.onstart = () => {
             this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
             this.addDebugLog('🎤 音声認識開始イベント発生', 'success');
             this.isRecognitionActive = true;
             if (isAndroid) {
-                this.addDebugLog('🎤 何か話してください（10秒以内）...', 'info');
+                this.addDebugLog('🎤 何か話してください（15秒以内）...', 'info');
             } else {
                 this.addDebugLog('🎤 何か話してください（10秒以内）...', 'info');
             }
         };
         
-        // 認識結果イベント（testVoiceRecognitionから完全移植）
         this.recordingRecognition.onresult = (event) => {
             clearTimeout(this.recognitionTimeoutId);
             
@@ -979,7 +979,6 @@ class VoiceSystem {
             }
         };
         
-        // 認識終了イベント（testVoiceRecognitionから完全移植）
         this.recordingRecognition.onend = () => {
             clearTimeout(this.recognitionTimeoutId);
             this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
@@ -992,7 +991,6 @@ class VoiceSystem {
             this.addDebugLog('🔚 音声認識終了処理完了', 'info');
         };
         
-        // エラーハンドリング（testVoiceRecognitionから完全移植）
         this.recordingRecognition.onerror = (event) => {
             clearTimeout(this.recognitionTimeoutId);
             this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
@@ -1018,9 +1016,10 @@ class VoiceSystem {
             }
         };
         
-        // 認識開始（testVoiceRecognitionから完全移植）
+        // 🚨 緊急修正: testVoiceRecognitionと同一の開始処理
         try {
             this.recordingRecognition.start();
+            this.addDebugLog('🚀 録音用音声認識start()実行完了', 'success');
         } catch (error) {
             this.addDebugLog(`❌ 音声認識開始失敗: ${error.message}`, 'error');
         }
