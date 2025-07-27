@@ -808,7 +808,7 @@ class VoiceSystem {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
             
-        // 🎤 音声認識も同時開始（testVoiceRecognition完全移植版）
+        // 🎤 録音専用音声認識を開始（testVoiceRecognition成功設定を移植）
         this.startRecordingVoiceRecognition();            // UI更新
             this.updateRecordingUI(true);
             this.startRecordingTimer();
@@ -902,10 +902,10 @@ class VoiceSystem {
     }
     
     /**
-     * 🎤 録音用音声認識（testVoiceRecognition完全移植版）
+     * 🎤 録音用音声認識（testVoiceRecognition成功設定を完全移植）
      */
     startRecordingVoiceRecognition() {
-        this.addDebugLog('🗣️ 録音用音声認識テストを開始します...', 'info');
+        this.addDebugLog('🗣️ 録音用音声認識を開始します...', 'info');
         
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('❌ Web Speech API が利用できません', 'error');
@@ -963,16 +963,15 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
+                    this.recognizedText = transcript; // 既存のシステムに合わせて保存
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
-                    this.recognizedText += transcript + ' ';
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
                     // Android Chrome: 中間結果も重要
                     if (isAndroid) {
                         this.addDebugLog('📱 Android: 中間結果を記録', 'info');
-                        this.recognizedText += transcript + ' ';
                     }
                 }
             }
@@ -991,7 +990,7 @@ class VoiceSystem {
             this.addDebugLog('🔚 音声認識終了処理完了', 'info');
         };
         
-        // エラーイベント（testVoiceRecognitionから完全移植）
+        // エラーハンドリング（testVoiceRecognitionから完全移植）
         this.recordingRecognition.onerror = (event) => {
             clearTimeout(this.recognitionTimeoutId);
             this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
@@ -1017,7 +1016,7 @@ class VoiceSystem {
             }
         };
         
-        // 認識開始
+        // 認識開始（testVoiceRecognitionから完全移植）
         try {
             this.recordingRecognition.start();
         } catch (error) {
