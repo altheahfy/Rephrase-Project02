@@ -21,6 +21,11 @@ class MobileVoiceSystem {
         this.recognizedText = '';
         this.debugMessages = [];
         
+        // 🚀 フェーズ2: 録音関連プロパティ
+        this.mediaRecorder = null;
+        this.audioChunks = [];
+        this.isRecording = false;
+        
         console.log('📱 モバイル検出結果:', {
             isMobile: this.isMobile,
             isAndroid: this.isAndroid,
@@ -61,8 +66,8 @@ class MobileVoiceSystem {
         // フェーズ1専用のシンプルなUI
         debugPanel.innerHTML = `
             <div class="debug-header">
-                <h3>🎤 モバイル音声学習システム (フェーズ1)</h3>
-                <p>段階的実装: 音声認識機能</p>
+                <h3>🎤 モバイル音声学習システム (フェーズ2)</h3>
+                <p>音声認識 + 録音機能</p>
                 <button id="mobile-close-btn" style="
                     position: absolute;
                     top: 10px;
@@ -83,12 +88,25 @@ class MobileVoiceSystem {
                 <button id="mobile-voice-test-btn" class="voice-test-btn">
                     🎤 音声認識テスト
                 </button>
+                <button id="mobile-record-test-btn" class="voice-test-btn" style="
+                    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+                    margin-top: 8px;
+                ">
+                    🔴 録音テスト
+                </button>
             </div>
             
             <div class="voice-result-area">
                 <h4>🎯 認識結果:</h4>
                 <div id="mobile-voice-result" class="voice-result-text">
                     まだ認識されていません
+                </div>
+            </div>
+            
+            <div class="voice-result-area">
+                <h4>🔴 録音状態:</h4>
+                <div id="mobile-record-status" class="voice-result-text">
+                    録音待機中
                 </div>
             </div>
             
@@ -115,6 +133,15 @@ class MobileVoiceSystem {
             testBtn.addEventListener('click', () => {
                 this.addDebugLog('🔘 音声認識テストボタンがタップされました', 'info');
                 this.startVoiceRecognition();
+            });
+        }
+        
+        // 🚀 フェーズ2: 録音テストボタンのイベントリスナー
+        const recordBtn = document.getElementById('mobile-record-test-btn');
+        if (recordBtn) {
+            recordBtn.addEventListener('click', () => {
+                this.addDebugLog('🔴 録音テストボタンがタップされました', 'info');
+                this.startRecordingTest();
             });
         }
         
@@ -294,6 +321,136 @@ class MobileVoiceSystem {
             if (logItems.length > 20) {
                 logDiv.removeChild(logItems[0]);
             }
+        }
+    }
+    
+    /**
+     * 🚀 フェーズ2: シンプルな録音テスト機能
+     * 段階的実装: まずは録音のみ（音声認識とは独立）
+     */
+    async startRecordingTest() {
+        if (this.isRecording) {
+            this.stopRecording();
+            return;
+        }
+        
+        this.addDebugLog('🎤 マイクアクセス許可を要求中...', 'info');
+        this.updateRecordStatus('🎤 マイクアクセス許可を要求中...');
+        
+        try {
+            // マイクアクセス許可
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                } 
+            });
+            
+            this.addDebugLog('✅ マイクアクセス許可取得完了', 'success');
+            
+            // Android Chrome対応のmimeType設定
+            const mimeTypes = [
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/mp4',
+                'audio/mpeg',
+                ''  // フォールバック
+            ];
+            
+            let selectedMimeType = '';
+            for (const mimeType of mimeTypes) {
+                if (MediaRecorder.isTypeSupported(mimeType)) {
+                    selectedMimeType = mimeType;
+                    this.addDebugLog(`📋 対応mimeType: ${mimeType || 'デフォルト'}`, 'info');
+                    break;
+                }
+            }
+            
+            // MediaRecorder初期化
+            this.mediaRecorder = new MediaRecorder(stream, {
+                mimeType: selectedMimeType
+            });
+            
+            this.audioChunks = [];
+            
+            // イベントハンドラー設定
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.audioChunks.push(event.data);
+                    this.addDebugLog(`📊 音声データ受信: ${event.data.size}バイト`, 'info');
+                }
+            };
+            
+            this.mediaRecorder.onstop = () => {
+                this.addDebugLog('🛑 録音停止完了', 'success');
+                this.updateRecordStatus('✅ 録音完了');
+                
+                // 録音データ処理
+                if (this.audioChunks.length > 0) {
+                    const audioBlob = new Blob(this.audioChunks, { 
+                        type: selectedMimeType || 'audio/webm' 
+                    });
+                    this.addDebugLog(`🎵 録音ファイル作成: ${audioBlob.size}バイト`, 'success');
+                } else {
+                    this.addDebugLog('⚠️ 録音データが空です', 'warning');
+                }
+                
+                // ストリーム停止
+                stream.getTracks().forEach(track => track.stop());
+            };
+            
+            this.mediaRecorder.onerror = (event) => {
+                this.addDebugLog(`❌ 録音エラー: ${event.error}`, 'error');
+                this.updateRecordStatus('❌ 録音エラー');
+                this.isRecording = false;
+            };
+            
+            // 録音開始
+            this.mediaRecorder.start(1000); // 1秒間隔でデータ取得
+            this.isRecording = true;
+            
+            this.addDebugLog('🔴 録音開始', 'success');
+            this.updateRecordStatus('🔴 録音中... (再度タップで停止)');
+            
+            // 自動停止タイマー（10秒）
+            setTimeout(() => {
+                if (this.isRecording) {
+                    this.addDebugLog('⏰ 自動停止タイマー（10秒）', 'info');
+                    this.stopRecording();
+                }
+            }, 10000);
+            
+        } catch (error) {
+            this.addDebugLog(`❌ マイクアクセスエラー: ${error.message}`, 'error');
+            this.updateRecordStatus('❌ マイクアクセス拒否');
+            
+            if (error.name === 'NotAllowedError') {
+                this.addDebugLog('🚫 マイク権限が拒否されました', 'error');
+            } else if (error.name === 'NotFoundError') {
+                this.addDebugLog('🎤 マイクが見つかりません', 'error');
+            }
+        }
+    }
+    
+    /**
+     * 録音停止
+     */
+    stopRecording() {
+        if (this.mediaRecorder && this.isRecording) {
+            this.mediaRecorder.stop();
+            this.isRecording = false;
+            this.addDebugLog('🛑 録音停止要求', 'info');
+        }
+    }
+    
+    /**
+     * 録音状態UI更新
+     */
+    updateRecordStatus(message) {
+        const statusDiv = document.getElementById('mobile-record-status');
+        if (statusDiv) {
+            statusDiv.textContent = message;
         }
     }
 }
