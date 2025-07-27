@@ -1,0 +1,219 @@
+{
+  "rules": [
+    {
+      "condition": "^be not",
+      "guidance": "be動詞否定",
+      "tag": "be動詞否定"
+    },
+    {
+      "condition": "^was",
+      "guidance": "be動詞過去",
+      "tag": "be動詞過去"
+    },
+    {
+      "condition": "^that",
+      "guidance": "あの",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^this",
+      "guidance": "この",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^even though",
+      "guidance": "たとえ～でも",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^how much",
+      "guidance": "どれぐらい～か",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^at the very last",
+      "guidance": "まさにその、最後の",
+      "tag": "時間強調"
+    },
+    {
+      "condition": "^John$|^Mary$",
+      "guidance": "人名",
+      "tag": "固有名詞"
+    },
+    {
+      "condition": "^today",
+      "guidance": "今日の",
+      "tag": "日付表現"
+    },
+    {
+      "condition": "^although",
+      "guidance": "～だが",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^because",
+      "guidance": "～だから",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^it$",
+      "guidance": "指示語「それ」",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^had",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^been trying",
+      "guidance": "進行形",
+      "tag": "時制"
+    },
+    {
+      "condition": "^was still explaining",
+      "guidance": "過去進行形",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^was struggling",
+      "guidance": "過去進行形",
+      "tag": "時制"
+    },
+    {
+      "condition": "^This morning when",
+      "guidance": "この、～のとき",
+      "tag": "時間"
+    },
+    {
+      "condition": "^from a long absence",
+      "guidance": "～から",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^while",
+      "guidance": "～の間",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^during",
+      "guidance": "～の間に",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^for several days",
+      "guidance": "数日間",
+      "tag": "時間"
+    },
+    {
+      "condition": "^it would help her catch up",
+      "guidance": "それが彼女のキャッチアップする助けになるであろうこと",
+      "tag": "内容"
+    },
+    {
+      "condition": "^without\\b",
+      "guidance": "～なしに",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^prior\\b",
+      "guidance": "事前の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "^was\\s+\\w+ing",
+      "guidance": "過去進行形",
+      "tag": "時制"
+    },
+    {
+      "condition": "^was interesting",
+      "guidance": "be動詞＋形容詞",
+      "tag": "文型"
+    },
+    {
+      "condition": "\\bdetailed",
+      "guidance": "詳細な",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\boften\\b",
+      "guidance": "しばしば",
+      "tag": "頻度"
+    },
+    {
+      "condition": "\\bdirect\\b",
+      "guidance": "直接の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\brecently\\b",
+      "guidance": "最近",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bprevious\\b",
+      "guidance": "直前の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\bunexpected\\b",
+      "guidance": "予期せぬ",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "^might have",
+      "guidance": "～したかもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^remained",
+      "guidance": "～のままである",
+      "tag": "動詞"
+    },
+    {
+      "condition": "\\brepeatedly\\b",
+      "guidance": "繰り返し",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bherself\\b",
+      "guidance": "～自身",
+      "tag": "代名詞"
+    },
+    {
+      "condition": "^for years",
+      "guidance": "何年も",
+      "tag": "時間"
+    },
+    {
+      "condition": "^since",
+      "guidance": "～だから",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "\\b\\w+ed\\b",
+      "guidance": "過去形",
+      "tag": "時制"
+    }
+  ]
+}

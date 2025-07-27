@@ -1,0 +1,102 @@
+Rephraseプロジェクト：JSON入力仕様マニュアル（最新版）
+
+【目的】
+
+このドキュメントは、ChatGPTがRephrase構文データベースに対応するJSONファイルを正しく生成するための仕様書である。今後、出力形式に変更が生じた場合、本ドキュメントを随時更新すること。
+
+【基本構造】
+
+JSONは1文例に対して一つのオブジェクトを表現す。
+
+{
+  "構文ID": 5001,
+  "例文ID": "ex001",
+  "V_group_key": "figure out",
+  "V_display": "figured out",
+  "原文": "At the very last second, the thoughtful woman must have figured out that he wanted to avoid confrontation because he feared upsetting her.",
+  "slot_data": [
+    ...
+  ]
+}
+
+【必須項目】
+
+キー
+
+内容
+
+備考
+
+構文ID
+
+文法項目のID (数値)
+
+同一構文の例文は同一IDを持つ
+
+例文ID
+
+個別例文の識別子
+
+"ex001"のように、ex+通し番号の形式
+
+V_group_key
+
+構文代表動詞（句動詞可）
+
+"give"や"figure out"など、構文テンプレートの基準になる
+
+V_display
+
+実際の文中の動詞表現
+
+"figured out"や"gave"など、動詞の形を含む
+
+原文
+
+英文の整文
+
+ビジュアルライズされた検証用の基本文
+
+【slot_dataの構造】
+
+slot_dataは各slotの情報を配列として持つ
+
+各slotは下記情報を持つ
+
+{
+  "slot": "M1",
+  "phrase": "At the very last second",
+  "type": "word",
+  "slot_text": "後の日程で、最終的に"
+}
+
+clause型slotの場合
+
+{
+  "slot": "O1",
+  "phrase": "that he wanted to avoid confrontation",
+  "type": "clause",
+  "subslots": [
+    { "id": "S", "phrase": "he", "subslot_text": "指示語【その】" },
+    { "id": "V", "phrase": "wanted to avoid confrontation", "subslot_text": "" }
+  ]
+}
+
+【作成方針】
+
+ChatGPTは以下の順番でJSONを生成すこと
+
+文法項目に基づく基本例文を考案
+
+V_group_key / V_display / 例文ID / 原文を満たすようメタ情報を手動で入力
+
+文を構文slotに分解し、slot_dataを構築
+
+clause型にはsubslotを正しく含める
+
+【注意事項】
+
+未来的に、追加項目や入れ替えが発生した場合は、本マニュアルをChatGPT側で通知の上、更新すること
+
+更新が経過した場合は、既存JSONデータへの逆換処理が必要になる場合がある
+

@@ -1,0 +1,142 @@
+{
+  "構文ID": 5001,
+  "例文ID": "ex005",
+  "V_group_key": "become",
+  "V_display": "become",
+  "原文": "During the critical moment when silence filled the room, the student who had once lacked all confidence might become the dependable voice everyone had been waiting for although doubt still lingered in her mind because she spoke with unexpected clarity.",
+  "slot_data": [
+    {
+      "slot": "M1",
+      "phrase": "During the critical moment when silence filled the room",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "During the critical moment when"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "the silence"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "filled"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "the room"
+        }
+      ]
+    },
+    {
+      "slot": "S",
+      "phrase": "the student who had once lacked all confidence",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "the student who"
+        },
+        {
+          "slot": "sub-aux",
+          "phrase": "had"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "lacked"
+        },
+        {
+          "slot": "sub-m1",
+          "phrase": "once"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "all confidence"
+        }
+      ]
+    },
+    {
+      "slot": "Aux",
+      "phrase": "might",
+      "type": "word"
+    },
+    {
+      "slot": "V",
+      "phrase": "become",
+      "type": "word"
+    },
+    {
+      "slot": "M2",
+      "phrase": "although doubt still lingered in her mind",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "although"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "doubt"
+        },
+        {
+          "slot": "sub-m2",
+          "phrase": "still"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "lingered"
+        },
+        {
+          "slot": "sub-m3",
+          "phrase": "in her mind"
+        }
+      ]
+    },
+    {
+      "slot": "C1",
+      "phrase": "the dependable voice everyone had been waiting for",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-o1",
+          "phrase": "the dependable voice"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "everyone"
+        },
+        {
+          "slot": "sub-aux",
+          "phrase": "had"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "been waiting for"
+        }
+      ]
+    },
+    {
+      "slot": "M3",
+      "phrase": "because she spoke with unexpected clarity",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "because"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "she"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "spoke"
+        },
+        {
+          "slot": "sub-m2",
+          "phrase": "with unexpected clarity"
+        }
+      ]
+    }
+  ]
+}

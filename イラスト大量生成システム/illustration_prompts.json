@@ -1,0 +1,650 @@
+{
+  "total_words": 124,
+  "platforms": {
+    "chatgpt": {
+      "word_count": 25,
+      "words": [
+        {
+          "word": "chance",
+          "concept": "Visual representation of chance",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of chance. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "every",
+          "concept": "Visual representation of every",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of every. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "cost",
+          "concept": "Visual representation of cost",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of cost. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "cut",
+          "concept": "Visual representation of cut",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of cut. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "form",
+          "concept": "Visual representation of form",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of form. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "call",
+          "concept": "Visual representation of call",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of call. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "family",
+          "concept": "Visual representation of family",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of family. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "field",
+          "concept": "Visual representation of field",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of field. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "choose",
+          "concept": "Visual representation of choose",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of choose. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "great",
+          "concept": "Visual representation of great",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of great. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "describe",
+          "concept": "Visual representation of describe",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of describe. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "could",
+          "concept": "Visual representation of could",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of could. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "help",
+          "concept": "One person helping another",
+          "prompt": "Create a simple black and white line drawing in manga style: One person helping another. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "group",
+          "concept": "Visual representation of group",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of group. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "contain",
+          "concept": "Visual representation of contain",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of contain. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "effect",
+          "concept": "Visual representation of effect",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of effect. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "develop",
+          "concept": "Visual representation of develop",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of develop. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "few",
+          "concept": "Visual representation of few",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of few. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "announce",
+          "concept": "Visual representation of announce",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of announce. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "come",
+          "concept": "Visual representation of come",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of come. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "joined",
+          "concept": "People coming together or connecting",
+          "prompt": "Create a simple black and white line drawing in manga style: People coming together or connecting. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "find",
+          "concept": "Visual representation of find",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of find. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "final",
+          "concept": "Reaching the finish line of a race",
+          "prompt": "Create a simple black and white line drawing in manga style: Reaching the finish line of a race. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "design",
+          "concept": "Visual representation of design",
+          "prompt": "Create a simple black and white line drawing in manga style: Visual representation of design. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "leader",
+          "concept": "A person leading a group",
+          "prompt": "Create a simple black and white line drawing in manga style: A person leading a group. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        }
+      ]
+    },
+    "bing": {
+      "word_count": 25,
+      "words": [
+        {
+          "word": "information",
+          "concept": "Visual representation of information",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of information. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "agreed",
+          "concept": "Visual representation of agreed",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of agreed. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "first",
+          "concept": "Visual representation of first",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of first. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "important",
+          "concept": "Visual representation of important",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of important. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "between",
+          "concept": "Visual representation of between",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of between. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "free",
+          "concept": "Visual representation of free",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of free. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "fact",
+          "concept": "Visual representation of fact",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of fact. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "lacked",
+          "concept": "Someone missing something they need",
+          "prompt": "A simple black and white manga-style line drawing: Someone missing something they need. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "complete",
+          "concept": "Visual representation of complete",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of complete. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "ability",
+          "concept": "Visual representation of ability",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of ability. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "large",
+          "concept": "Visual representation of large",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of large. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "continue",
+          "concept": "Visual representation of continue",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of continue. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "experience",
+          "concept": "Visual representation of experience",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of experience. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "instructor",
+          "concept": "A teacher in front of a classroom",
+          "prompt": "A simple black and white manga-style line drawing: A teacher in front of a classroom. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "created",
+          "concept": "Visual representation of created",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of created. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "instant",
+          "concept": "Something happening in a flash",
+          "prompt": "A simple black and white manga-style line drawing: Something happening in a flash. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "last",
+          "concept": "Visual representation of last",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of last. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "hard",
+          "concept": "Someone struggling with a difficult task",
+          "prompt": "A simple black and white manga-style line drawing: Someone struggling with a difficult task. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "everything",
+          "concept": "Visual representation of everything",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of everything. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "checked",
+          "concept": "Visual representation of checked",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of checked. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "friend",
+          "concept": "Visual representation of friend",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of friend. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "given",
+          "concept": "Someone giving a gift to another person",
+          "prompt": "A simple black and white manga-style line drawing: Someone giving a gift to another person. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "basic",
+          "concept": "Visual representation of basic",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of basic. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "decided",
+          "concept": "Visual representation of decided",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of decided. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "follow",
+          "concept": "Visual representation of follow",
+          "prompt": "A simple black and white manga-style line drawing: Visual representation of follow. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        }
+      ]
+    },
+    "gemini": {
+      "word_count": 25,
+      "words": [
+        {
+          "word": "full",
+          "concept": "A container filled to the brim",
+          "prompt": "Draw a simple black and white manga-style illustration: A container filled to the brim. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "head",
+          "concept": "Visual representation of head",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of head. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "face",
+          "concept": "Visual representation of face",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of face. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "enough",
+          "concept": "Visual representation of enough",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of enough. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "give",
+          "concept": "Visual representation of give",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of give. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "close",
+          "concept": "Visual representation of close",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of close. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "hesitation",
+          "concept": "Someone pausing before making a decision",
+          "prompt": "Draw a simple black and white manga-style illustration: Someone pausing before making a decision. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "during",
+          "concept": "Visual representation of during",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of during. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "below",
+          "concept": "Visual representation of below",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of below. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "clear",
+          "concept": "Visual representation of clear",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of clear. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "flawlessly",
+          "concept": "Perfect execution of a task",
+          "prompt": "Draw a simple black and white manga-style illustration: Perfect execution of a task. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "good",
+          "concept": "Visual representation of good",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of good. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "laboratory",
+          "concept": "A science lab with equipment",
+          "prompt": "Draw a simple black and white manga-style illustration: A science lab with equipment. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "discuss",
+          "concept": "Visual representation of discuss",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of discuss. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "health",
+          "concept": "Visual representation of health",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of health. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "kind",
+          "concept": "Visual representation of kind",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of kind. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "issue",
+          "concept": "Visual representation of issue",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of issue. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "alone",
+          "concept": "Visual representation of alone",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of alone. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "everyone",
+          "concept": "Visual representation of everyone",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of everyone. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "cannot",
+          "concept": "Visual representation of cannot",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of cannot. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "end",
+          "concept": "Visual representation of end",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of end. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "happen",
+          "concept": "Visual representation of happen",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of happen. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "caught",
+          "concept": "Visual representation of caught",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of caught. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "consider",
+          "concept": "Visual representation of consider",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of consider. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "far",
+          "concept": "Visual representation of far",
+          "prompt": "Draw a simple black and white manga-style illustration: Visual representation of far. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        }
+      ]
+    },
+    "ideogram": {
+      "word_count": 25,
+      "words": [
+        {
+          "word": "amazing",
+          "concept": "Visual representation of amazing",
+          "prompt": "Simple black and white manga line art: Visual representation of amazing. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "instead",
+          "concept": "Visual representation of instead",
+          "prompt": "Simple black and white manga line art: Visual representation of instead. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "case",
+          "concept": "Visual representation of case",
+          "prompt": "Simple black and white manga line art: Visual representation of case. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "general",
+          "concept": "Visual representation of general",
+          "prompt": "Simple black and white manga line art: Visual representation of general. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "choice",
+          "concept": "Visual representation of choice",
+          "prompt": "Simple black and white manga line art: Visual representation of choice. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "just",
+          "concept": "Visual representation of just",
+          "prompt": "Simple black and white manga line art: Visual representation of just. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "idea",
+          "concept": "Visual representation of idea",
+          "prompt": "Simple black and white manga line art: Visual representation of idea. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "easy",
+          "concept": "Visual representation of easy",
+          "prompt": "Simple black and white manga line art: Visual representation of easy. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "growth",
+          "concept": "A plant growing from seedling to tree",
+          "prompt": "Simple black and white manga line art: A plant growing from seedling to tree. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "change",
+          "concept": "Visual representation of change",
+          "prompt": "Simple black and white manga line art: Visual representation of change. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "increase",
+          "concept": "Visual representation of increase",
+          "prompt": "Simple black and white manga line art: Visual representation of increase. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "found",
+          "concept": "Visual representation of found",
+          "prompt": "Simple black and white manga line art: Visual representation of found. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "ground",
+          "concept": "Visual representation of ground",
+          "prompt": "Simple black and white manga line art: Visual representation of ground. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "building",
+          "concept": "A tall office building or apartment complex",
+          "prompt": "Simple black and white manga line art: A tall office building or apartment complex. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "government",
+          "concept": "Visual representation of government",
+          "prompt": "Simple black and white manga line art: Visual representation of government. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "job",
+          "concept": "Visual representation of job",
+          "prompt": "Simple black and white manga line art: Visual representation of job. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "known",
+          "concept": "Someone recognized or famous",
+          "prompt": "Simple black and white manga line art: Someone recognized or famous. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "adult",
+          "concept": "A mature person in professional attire",
+          "prompt": "Simple black and white manga line art: A mature person in professional attire. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "chosen",
+          "concept": "Visual representation of chosen",
+          "prompt": "Simple black and white manga line art: Visual representation of chosen. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "however",
+          "concept": "Visual representation of however",
+          "prompt": "Simple black and white manga line art: Visual representation of however. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "begin",
+          "concept": "Visual representation of begin",
+          "prompt": "Simple black and white manga line art: Visual representation of begin. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "escape",
+          "concept": "Visual representation of escape",
+          "prompt": "Simple black and white manga line art: Visual representation of escape. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "control",
+          "concept": "Visual representation of control",
+          "prompt": "Simple black and white manga line art: Visual representation of control. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "become",
+          "concept": "Visual representation of become",
+          "prompt": "Simple black and white manga line art: Visual representation of become. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "available",
+          "concept": "Visual representation of available",
+          "prompt": "Simple black and white manga line art: Visual representation of available. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        }
+      ]
+    },
+    "playground": {
+      "word_count": 24,
+      "words": [
+        {
+          "word": "even",
+          "concept": "Visual representation of even",
+          "prompt": "Black and white manga-style line drawing: Visual representation of even. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "belong",
+          "concept": "Visual representation of belong",
+          "prompt": "Black and white manga-style line drawing: Visual representation of belong. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "enjoy",
+          "concept": "Visual representation of enjoy",
+          "prompt": "Black and white manga-style line drawing: Visual representation of enjoy. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "hand",
+          "concept": "Visual representation of hand",
+          "prompt": "Black and white manga-style line drawing: Visual representation of hand. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "early",
+          "concept": "Visual representation of early",
+          "prompt": "Black and white manga-style line drawing: Visual representation of early. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "difficult",
+          "concept": "Visual representation of difficult",
+          "prompt": "Black and white manga-style line drawing: Visual representation of difficult. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "interest",
+          "concept": "Visual representation of interest",
+          "prompt": "Black and white manga-style line drawing: Visual representation of interest. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "environment",
+          "concept": "Visual representation of environment",
+          "prompt": "Black and white manga-style line drawing: Visual representation of environment. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "feel",
+          "concept": "Visual representation of feel",
+          "prompt": "Black and white manga-style line drawing: Visual representation of feel. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "explain",
+          "concept": "Visual representation of explain",
+          "prompt": "Black and white manga-style line drawing: Visual representation of explain. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "appeared",
+          "concept": "Visual representation of appeared",
+          "prompt": "Black and white manga-style line drawing: Visual representation of appeared. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "keep",
+          "concept": "Visual representation of keep",
+          "prompt": "Black and white manga-style line drawing: Visual representation of keep. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "example",
+          "concept": "Visual representation of example",
+          "prompt": "Black and white manga-style line drawing: Visual representation of example. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "high",
+          "concept": "Visual representation of high",
+          "prompt": "Black and white manga-style line drawing: Visual representation of high. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "avoid",
+          "concept": "Visual representation of avoid",
+          "prompt": "Black and white manga-style line drawing: Visual representation of avoid. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "company",
+          "concept": "Visual representation of company",
+          "prompt": "Black and white manga-style line drawing: Visual representation of company. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "home",
+          "concept": "Visual representation of home",
+          "prompt": "Black and white manga-style line drawing: Visual representation of home. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "ask",
+          "concept": "Visual representation of ask",
+          "prompt": "Black and white manga-style line drawing: Visual representation of ask. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "deep",
+          "concept": "Visual representation of deep",
+          "prompt": "Black and white manga-style line drawing: Visual representation of deep. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "common",
+          "concept": "Visual representation of common",
+          "prompt": "Black and white manga-style line drawing: Visual representation of common. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "certainly",
+          "concept": "Visual representation of certainly",
+          "prompt": "Black and white manga-style line drawing: Visual representation of certainly. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "fast",
+          "concept": "Visual representation of fast",
+          "prompt": "Black and white manga-style line drawing: Visual representation of fast. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "get",
+          "concept": "Visual representation of get",
+          "prompt": "Black and white manga-style line drawing: Visual representation of get. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        },
+        {
+          "word": "include",
+          "concept": "Visual representation of include",
+          "prompt": "Black and white manga-style line drawing: Visual representation of include. Simple black and white manga-style line drawing, clean lines, no shading, educational illustration style"
+        }
+      ]
+    }
+  }
+}

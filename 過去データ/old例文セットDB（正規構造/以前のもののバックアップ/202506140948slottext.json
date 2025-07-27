@@ -1,0 +1,49 @@
+{
+  "rules": [
+    {
+      "condition": "冠詞が a, an, the で始まる",
+      "guidance": "文脈から明示的に【一つの】や【その】と訳出しない場合は空白"
+    },
+    {
+      "condition": "名詞に続く関係詞 (who, that, which など)",
+      "guidance": "空白。意味補足は不要"
+    },
+    {
+      "condition": "代名詞 itなど",
+      "guidance": "【その】など、文脈指示語として簡潔に"
+    },
+    {
+      "condition": "サブスロット内の冒頭が接続詞 (even though, because など)",
+      "guidance": "文脈から【～だが】【～なので】などの語を提示"
+    },
+    {
+      "condition": "サブスロット内の冒頭が疑問詞 (what, how, why など)",
+      "guidance": "【何が】【どうして】【どのように】など、疑問を表す語を提示"
+    },
+    {
+      "condition": "to + 動詞原形",
+      "guidance": "【～するために】などの意図や目的を表す語を提示"
+    },
+    {
+      "condition": "副詞句（例: at that moment, in a hurry）",
+      "guidance": "状況描写的な【そのとき】【急いで】などを提示"
+    },
+    {
+      "condition": "受動態（be + 過去分詞）",
+      "guidance": "【～された】といった受け身表現を補足"
+    },
+    {
+      "condition": "否定語 (not, never, no one など)",
+      "guidance": "【～しない】【決して～ない】などの否定補足を記載"
+    },
+    {
+      "condition": "句動詞（例: figure out, put off など）",
+      "guidance": "【句動詞】と明記"
+    },
+    {
+      "condition": "^at the very last \\w+$",
+      "guidance": "【最後の〇〇に】などの時間的強調を補助。視覚的に曖昧な場合に使用",
+      "condition_type": "regex"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "構文ID": 5001,
+  "V_group_key": "figure out",
+  "A_group_V": "figure",
+  "V_display": "figured out",
+  "slot_data": [
+    {
+      "slot": "M1",
+      "phrase": "At the very last second",
+      "type": "word"
+    },
+    {
+      "slot": "S",
+      "phrase": "the thoughtful woman",
+      "type": "word"
+    },
+    {
+      "slot": "Aux",
+      "phrase": "must have",
+      "type": "word",
+      "slot_text": "～したに違いない"
+    },
+    {
+      "slot": "V",
+      "phrase": "figured out",
+      "type": "word"
+    },
+    {
+      "slot": "O1",
+      "phrase": "that he wanted to avoid confrontation",
+      "type": "clause",
+      "subslots": [
+        {
+          "id": "S",
+          "phrase": "he",
+          "subslot_text": "指示語【その】"
+        },
+        {
+          "id": "V",
+          "phrase": "wanted to avoid confrontation",
+          "subslot_text": ""
+        }
+      ]
+    },
+    {
+      "slot": "M3",
+      "phrase": "because he feared upsetting her",
+      "type": "clause",
+      "subslots": [
+        {
+          "id": "S",
+          "phrase": "he",
+          "subslot_text": "指示語【その】"
+        },
+        {
+          "id": "V",
+          "phrase": "feared upsetting her",
+          "subslot_text": ""
+        }
+      ]
+    }
+  ],
+  "例文ID": "ex001",
+  "原文": "At the very last second, the thoughtful woman must have figured out that he wanted to avoid confrontation because he feared upsetting her."
+}

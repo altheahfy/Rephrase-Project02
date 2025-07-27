@@ -1,0 +1,125 @@
+{
+  "構文ID": 5001,
+  "例文ID": "ex007",
+  "V_group_key": "make",
+  "V_display": "make",
+  "原文": "That afternoon at the crucial point in the presentation, the manager who had recently taken charge of the project had to make the committee responsible for implementation deliver the final proposal flawlessly even though he was under intense pressure so the outcome would reflect their full potential.",
+  "slot_data": [
+    {
+      "slot": "M1",
+      "phrase": "That afternoon at the crucial point in the presentation",
+      "type": "word"
+    },
+    {
+      "slot": "S",
+      "phrase": "the manager who had recently taken charge of the project",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-w",
+          "phrase": "the manager who"
+        },
+        {
+          "slot": "sub-aux",
+          "phrase": "had"
+        },
+        {
+          "slot": "sub-m2",
+          "phrase": "recently"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "taken"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "charge of the project"
+        }
+      ]
+    },
+    {
+      "slot": "Aux",
+      "phrase": "had to",
+      "type": "word"
+    },
+    {
+      "slot": "V",
+      "phrase": "make",
+      "type": "word"
+    },
+    {
+      "slot": "M2",
+      "phrase": "even though he was under intense pressure",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "even though"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "he"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "was"
+        },
+        {
+          "slot": "sub-m2",
+          "phrase": "under intense pressure"
+        }
+      ]
+    },
+    {
+      "slot": "O1",
+      "phrase": "the committee responsible for implementation",
+      "type": "word"
+    },
+    {
+      "slot": "C2",
+      "phrase": "deliver the final proposal flawlessly",
+      "type": "phrase",
+      "subslots": [
+        {
+          "slot": "sub-v",
+          "phrase": "deliver"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "the final proposal"
+        },
+        {
+          "slot": "sub-m3",
+          "phrase": "flawlessly"
+        }
+      ]
+    },
+    {
+      "slot": "M3",
+      "phrase": "so the outcome would reflect their full potential",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "so"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "the outcome"
+        },
+        {
+          "slot": "sub-aux",
+          "phrase": "would"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "reflect"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "their full potential"
+        }
+      ]
+    }
+  ]
+}
