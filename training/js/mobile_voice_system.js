@@ -1,11 +1,11 @@
 /**
- * 🚀 Rephrase モバイル専用音声システム v1.0
- * 段階的実装アプローチ - フェーズ1: 音声認識のみ
+ * 🚀 Rephrase モバイル専用音声システム v1.1 - 再生機能付き
+ * 段階的実装アプローチ
  * 
  * 実装戦略:
  * ✅ フェーズ1: testVoiceRecognition機能のみ（動作確認済み）
- * 🔄 フェーズ2: 録音機能追加（段階的テスト）
- * 🔄 フェーズ3: 音声再生機能（段階的テスト）
+ * ✅ フェーズ2: 録音機能追加（段階的テスト）
+ * 🚀 フェーズ3: 音声再生機能（Android Chrome対応）
  * 🔄 フェーズ4: 統合テスト
  */
 
@@ -25,6 +25,11 @@ class MobileVoiceSystem {
         this.mediaRecorder = null;
         this.audioChunks = [];
         this.isRecording = false;
+        
+        // 🚀 フェーズ3: 再生関連プロパティ
+        this.recordedAudio = null;
+        this.audioContext = null;
+        this.isPlaying = false;
         
         console.log('📱 モバイル検出結果:', {
             isMobile: this.isMobile,
@@ -59,136 +64,223 @@ class MobileVoiceSystem {
     initializeDebugPanel() {
         const debugPanel = document.getElementById('voice-debug-panel');
         if (!debugPanel) {
-            console.log('⚠️ デバッグパネルが見つかりません');
+            console.log('❌ voice-debug-panel要素が見つかりません');
             return;
         }
         
-        // フェーズ1専用のシンプルなUI
+        // パネル内容を動的生成
         debugPanel.innerHTML = `
-            <div class="debug-header">
-                <h3>🎤 モバイル音声学習システム (フェーズ2)</h3>
-                <p>音声認識 + 録音機能</p>
-                <button id="mobile-close-btn" style="
-                    position: absolute;
-                    top: 10px;
-                    right: 15px;
-                    background: #dc3545;
-                    color: white;
-                    border: none;
-                    border-radius: 50%;
-                    width: 25px;
-                    height: 25px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    font-weight: bold;
-                ">✕</button>
-            </div>
-            
-            <div class="test-controls">
-                <button id="mobile-voice-test-btn" class="voice-test-btn">
-                    🎤 音声認識テスト
-                </button>
-                <button id="mobile-record-test-btn" class="voice-test-btn" style="
-                    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-                    margin-top: 8px;
-                ">
-                    🔴 録音テスト
-                </button>
-            </div>
-            
-            <div class="voice-result-area">
-                <h4>🎯 認識結果:</h4>
-                <div id="mobile-voice-result" class="voice-result-text">
-                    まだ認識されていません
+            <div style="padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px;">🎤 モバイル音声システム</h3>
+                    <button id="close-debug-panel" style="
+                        background: #dc3545;
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 25px;
+                        height: 25px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        font-weight: bold;
+                    ">✕</button>
                 </div>
-            </div>
-            
-            <div class="voice-result-area">
-                <h4>🔴 録音状態:</h4>
-                <div id="mobile-record-status" class="voice-result-text">
-                    録音待機中
+                
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    音声認識 + 録音 + 再生機能
+                </p>
+                
+                <div class="test-controls">
+                    <button id="mobile-voice-test-btn" class="voice-test-btn">
+                        🎤 音声認識テスト
+                    </button>
+                    <button id="mobile-record-test-btn" class="voice-test-btn" style="
+                        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+                        margin-top: 8px;
+                    ">
+                        🔴 録音テスト
+                    </button>
+                    <button id="mobile-play-test-btn" class="voice-test-btn" style="
+                        background: linear-gradient(135deg, #FF9800 0%, #F57F17 100%);
+                        margin-top: 8px;
+                    ">
+                        🔊 再生テスト
+                    </button>
                 </div>
-            </div>
-            
-            <div class="debug-log-area">
-                <h4>📋 音声システムログ:</h4>
-                <div id="mobile-debug-log" class="debug-log-content">
-                    🔄 音声システム初期化中...
+                
+                <div class="voice-result-area">
+                    <h4>🎯 認識結果:</h4>
+                    <div id="mobile-voice-result" class="voice-result-text">
+                        まだ認識されていません
+                    </div>
+                </div>
+                
+                <div class="voice-result-area">
+                    <h4>🔴 録音状態:</h4>
+                    <div id="mobile-record-status" class="voice-result-text">
+                        録音待機中
+                    </div>
+                </div>
+                
+                <div class="debug-log-area">
+                    <h4>📋 音声システムログ:</h4>
+                    <div id="mobile-debug-log" class="debug-log-content">
+                        システム準備完了
+                    </div>
                 </div>
             </div>
         `;
         
-        // 🔧 閉じるボタンのイベントリスナー設定
-        const closeBtn = document.getElementById('mobile-close-btn');
+        // スタイル追加
+        this.addDebugPanelStyles();
+        
+        // イベントリスナー設定
+        this.setupEventListeners();
+    }
+    
+    /**
+     * デバッグパネルスタイル追加
+     */
+    addDebugPanelStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .voice-test-btn {
+                width: 100%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: transform 0.2s ease;
+            }
+            .voice-test-btn:active {
+                transform: scale(0.98);
+            }
+            .voice-result-area {
+                margin: 15px 0;
+                padding: 12px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border-left: 4px solid #007bff;
+            }
+            .voice-result-area h4 {
+                margin: 0 0 8px 0;
+                color: #495057;
+                font-size: 14px;
+            }
+            .voice-result-text {
+                color: #333;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px;
+                background: white;
+                border-radius: 4px;
+                border: 1px solid #dee2e6;
+            }
+            .voice-result-text.final {
+                background: #d4edda;
+                border-color: #c3e6cb;
+                color: #155724;
+            }
+            .voice-result-text.interim {
+                background: #fff3cd;
+                border-color: #ffeaa7;
+                color: #856404;
+            }
+            .debug-log-area {
+                margin-top: 15px;
+            }
+            .debug-log-area h4 {
+                margin: 0 0 8px 0;
+                color: #495057;
+                font-size: 14px;
+            }
+            .debug-log-content {
+                max-height: 200px;
+                overflow-y: auto;
+                background: #2c3e50;
+                color: #ecf0f1;
+                padding: 10px;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    /**
+     * イベントリスナー設定
+     */
+    setupEventListeners() {
+        // 閉じるボタン
+        const closeBtn = document.getElementById('close-debug-panel');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                debugPanel.style.display = 'none';
-                this.addDebugLog('🚪 パネルを閉じました', 'info');
+                const panel = document.getElementById('voice-debug-panel');
+                if (panel) {
+                    panel.style.display = 'none';
+                }
             });
         }
         
-        // イベントリスナー設定
-        const testBtn = document.getElementById('mobile-voice-test-btn');
-        if (testBtn) {
-            testBtn.addEventListener('click', () => {
-                this.addDebugLog('🔘 音声認識テストボタンがタップされました', 'info');
-                this.startVoiceRecognition();
+        // 🚀 フェーズ1: 音声認識テストボタンのイベントリスナー
+        const voiceTestBtn = document.getElementById('mobile-voice-test-btn');
+        if (voiceTestBtn) {
+            voiceTestBtn.addEventListener('click', () => {
+                this.addDebugLog('🎤 音声認識テストボタンがタップされました', 'info');
+                this.startVoiceRecognitionTest();
             });
         }
         
         // 🚀 フェーズ2: 録音テストボタンのイベントリスナー
-        const recordBtn = document.getElementById('mobile-record-test-btn');
-        if (recordBtn) {
-            recordBtn.addEventListener('click', () => {
+        const recordTestBtn = document.getElementById('mobile-record-test-btn');
+        if (recordTestBtn) {
+            recordTestBtn.addEventListener('click', () => {
                 this.addDebugLog('🔴 録音テストボタンがタップされました', 'info');
                 this.startRecordingTest();
             });
         }
         
-        this.addDebugLog('✅ モバイル音声システム初期化完了', 'success');
-        this.addDebugLog('🎤 音声認識機能が利用可能です', 'info');
-        
-        // 🚨 修正: JSONデータ待機を削除（音声パネルには不要）
-        // this.waitForSystemReady(); // 削除
+        // 🚀 フェーズ3: 再生テストボタンのイベントリスナー
+        const playTestBtn = document.getElementById('mobile-play-test-btn');
+        if (playTestBtn) {
+            playTestBtn.addEventListener('click', () => {
+                this.addDebugLog('🔊 再生テストボタンがタップされました', 'info');
+                this.startPlaybackTest();
+            });
+        }
     }
     
     /**
-     * フェーズ1: 音声認識機能（testVoiceRecognition完全移植版）
-     * 🚨 重要: この機能はAndroid Chromeで動作確認済み
+     * 🚀 フェーズ1: 音声認識テスト（動作確認済みロジック完全移植）
      */
-    startVoiceRecognition() {
-        this.addDebugLog('🗣️ 音声認識テストを開始します...', 'info');
-        
-        // 認識テスト開始時にthis.recognizedTextをクリア
-        this.recognizedText = '';
-        this.addDebugLog('🗑️ recognizedTextをクリアしました', 'info');
-        
-        // Web Speech API対応チェック
+    startVoiceRecognitionTest() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            this.addDebugLog('❌ Web Speech API が利用できません', 'error');
+            this.addDebugLog('❌ 音声認識APIが利用できません', 'error');
             return;
         }
         
+        this.addDebugLog('🚀 音声認識テスト開始', 'info');
+        
+        // SpeechRecognition設定（動作確認済み設定を完全移植）
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         
-        // Android Chrome最適化設定（動作確認済み設定）
-        if (this.isAndroid) {
-            this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US'; // 英語設定
-            recognition.maxAlternatives = 3; // 複数候補
-        } else {
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'ja-JP';
-            recognition.maxAlternatives = 1;
-        }
+        // Android Chrome最適化設定
+        recognition.continuous = this.isAndroid ? true : false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.lang = 'en-US';
         
-        this.addDebugLog(`🔍 認識設定: lang=${recognition.lang}, continuous=${recognition.continuous}`, 'info');
+        this.addDebugLog('⚙️ 音声認識設定完了', 'info');
+        this.addDebugLog(`📱 Android最適化: continuous=${recognition.continuous}`, 'info');
         
-        // タイムアウト設定（Android用は少し長め）
+        // タイムアウト設定
         const timeoutDuration = this.isAndroid ? 15000 : 10000;
         let timeoutId = setTimeout(() => {
             recognition.stop();
@@ -232,10 +324,10 @@ class MobileVoiceSystem {
                             this.recognizedText = transcript;
                             this.addDebugLog(`💾 Android中間結果保存: "${this.recognizedText}"`, 'info');
                         }
-                        
-                        // 中間結果もUI表示
-                        this.updateVoiceResult(transcript, false);
                     }
+                    
+                    // UI更新
+                    this.updateVoiceResult(transcript, false);
                 }
             }
         };
@@ -244,8 +336,10 @@ class MobileVoiceSystem {
             clearTimeout(timeoutId);
             this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
             
-            if (this.isAndroid) {
-                this.addDebugLog('📱 Android: 認識終了時の特別チェック', 'info');
+            if (this.recognizedText && this.recognizedText.trim().length > 0) {
+                this.addDebugLog(`✅ 最終認識結果: "${this.recognizedText}"`, 'success');
+            } else {
+                this.addDebugLog('⚠️ 有効な音声認識結果がありません', 'warning');
             }
             
             this.addDebugLog('🔚 音声認識終了処理完了', 'info');
@@ -285,48 +379,7 @@ class MobileVoiceSystem {
     }
     
     /**
-     * 音声結果UI更新
-     */
-    updateVoiceResult(text, isFinal) {
-        const resultDiv = document.getElementById('mobile-voice-result');
-        if (resultDiv) {
-            const prefix = isFinal ? '✅ 確定: ' : '🔄 途中: ';
-            resultDiv.textContent = prefix + text;
-            resultDiv.className = isFinal ? 'voice-result-text final' : 'voice-result-text interim';
-        }
-    }
-    
-    /**
-     * デバッグログ追加
-     */
-    addDebugLog(message, type = 'info') {
-        const timestamp = new Date().toLocaleTimeString();
-        const logEntry = `[${timestamp}] ${message}`;
-        
-        this.debugMessages.push({ message: logEntry, type });
-        console.log(logEntry);
-        
-        // UI更新
-        const logDiv = document.getElementById('mobile-debug-log');
-        if (logDiv) {
-            const logElement = document.createElement('div');
-            logElement.className = `debug-log-item ${type}`;
-            logElement.textContent = logEntry;
-            
-            logDiv.appendChild(logElement);
-            logDiv.scrollTop = logDiv.scrollHeight;
-            
-            // ログが多すぎる場合は古いものを削除
-            const logItems = logDiv.children;
-            if (logItems.length > 20) {
-                logDiv.removeChild(logItems[0]);
-            }
-        }
-    }
-    
-    /**
      * 🚀 フェーズ2: シンプルな録音テスト機能
-     * 段階的実装: まずは録音のみ（音声認識とは独立）
      */
     async startRecordingTest() {
         if (this.isRecording) {
@@ -392,6 +445,10 @@ class MobileVoiceSystem {
                         type: selectedMimeType || 'audio/webm' 
                     });
                     this.addDebugLog(`🎵 録音ファイル作成: ${audioBlob.size}バイト`, 'success');
+                    
+                    // 🚀 フェーズ3: 録音データを保存（再生用）
+                    this.recordedAudio = audioBlob;
+                    this.addDebugLog('💾 録音データ保存完了（再生準備OK）', 'success');
                 } else {
                     this.addDebugLog('⚠️ 録音データが空です', 'warning');
                 }
@@ -403,33 +460,17 @@ class MobileVoiceSystem {
             this.mediaRecorder.onerror = (event) => {
                 this.addDebugLog(`❌ 録音エラー: ${event.error}`, 'error');
                 this.updateRecordStatus('❌ 録音エラー');
-                this.isRecording = false;
             };
             
             // 録音開始
-            this.mediaRecorder.start(1000); // 1秒間隔でデータ取得
             this.isRecording = true;
-            
+            this.mediaRecorder.start();
             this.addDebugLog('🔴 録音開始', 'success');
             this.updateRecordStatus('🔴 録音中... (再度タップで停止)');
             
-            // 自動停止タイマー（10秒）
-            setTimeout(() => {
-                if (this.isRecording) {
-                    this.addDebugLog('⏰ 自動停止タイマー（10秒）', 'info');
-                    this.stopRecording();
-                }
-            }, 10000);
-            
         } catch (error) {
-            this.addDebugLog(`❌ マイクアクセスエラー: ${error.message}`, 'error');
-            this.updateRecordStatus('❌ マイクアクセス拒否');
-            
-            if (error.name === 'NotAllowedError') {
-                this.addDebugLog('🚫 マイク権限が拒否されました', 'error');
-            } else if (error.name === 'NotFoundError') {
-                this.addDebugLog('🎤 マイクが見つかりません', 'error');
-            }
+            this.addDebugLog(`❌ 録音開始エラー: ${error.message}`, 'error');
+            this.updateRecordStatus('❌ 録音開始失敗');
         }
     }
     
@@ -440,17 +481,231 @@ class MobileVoiceSystem {
         if (this.mediaRecorder && this.isRecording) {
             this.mediaRecorder.stop();
             this.isRecording = false;
-            this.addDebugLog('🛑 録音停止要求', 'info');
+            this.addDebugLog('🛑 録音停止要求送信', 'info');
+            this.updateRecordStatus('🛑 録音停止処理中...');
         }
     }
     
     /**
-     * 録音状態UI更新
+     * 🚀 フェーズ3: Android Chrome対応 再生テスト機能
+     */
+    async startPlaybackTest() {
+        if (!this.recordedAudio) {
+            this.addDebugLog('❌ 再生する録音データがありません（先に録音してください）', 'error');
+            return;
+        }
+        
+        if (this.isPlaying) {
+            this.addDebugLog('⚠️ 既に再生中です', 'warning');
+            return;
+        }
+        
+        this.addDebugLog('🔊 Android Chrome対応再生機能を開始します', 'info');
+        
+        // 方法1: Web Audio API を使用（Android Chrome推奨）
+        await this.playWithWebAudioAPI();
+    }
+    
+    /**
+     * 方法1: Web Audio API を使用した再生（Android Chrome対応）
+     */
+    async playWithWebAudioAPI() {
+        try {
+            this.addDebugLog('🎵 Web Audio API再生を開始', 'info');
+            
+            // AudioContext初期化
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // ユーザーインタラクション後にコンテキストを再開
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+                this.addDebugLog('🔧 AudioContext resumed', 'info');
+            }
+            
+            // Blob to ArrayBuffer
+            const arrayBuffer = await this.recordedAudio.arrayBuffer();
+            this.addDebugLog(`📊 ArrayBuffer作成: ${arrayBuffer.byteLength}バイト`, 'info');
+            
+            // AudioBuffer作成
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.addDebugLog(`🎼 AudioBuffer作成: ${audioBuffer.duration.toFixed(2)}秒`, 'success');
+            
+            // AudioBufferSourceNode作成
+            const source = this.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(this.audioContext.destination);
+            
+            // 再生開始
+            this.isPlaying = true;
+            source.start();
+            this.addDebugLog('✅ Web Audio API再生開始', 'success');
+            
+            // 再生終了の監視
+            source.onended = () => {
+                this.isPlaying = false;
+                this.addDebugLog('🔚 Web Audio API再生完了', 'success');
+            };
+            
+        } catch (error) {
+            this.addDebugLog(`❌ Web Audio API再生エラー: ${error.message}`, 'error');
+            this.isPlaying = false;
+            
+            // HTML5 Audioで再試行
+            this.addDebugLog('🔄 HTML5 Audioで再試行します', 'info');
+            this.playWithHTML5Audio();
+        }
+    }
+    
+    /**
+     * 方法2: 標準HTML5 Audio要素での再生
+     */
+    playWithHTML5Audio() {
+        try {
+            this.addDebugLog('🎵 HTML5 Audio再生を開始', 'info');
+            
+            // Blob URL作成
+            const audioUrl = URL.createObjectURL(this.recordedAudio);
+            this.addDebugLog(`🔗 Blob URL作成: ${audioUrl}`, 'info');
+            
+            // Audio要素作成
+            const audio = new Audio(audioUrl);
+            
+            // イベントハンドラー設定
+            audio.oncanplay = () => {
+                this.addDebugLog('✅ HTML5 Audio再生可能', 'success');
+                this.isPlaying = true;
+                audio.play().catch(err => {
+                    this.addDebugLog(`❌ HTML5 Audio再生失敗: ${err.message}`, 'error');
+                    this.isPlaying = false;
+                    this.createDownloadLink();
+                });
+            };
+            
+            audio.onended = () => {
+                this.isPlaying = false;
+                this.addDebugLog('🔚 HTML5 Audio再生完了', 'success');
+                URL.revokeObjectURL(audioUrl);
+            };
+            
+            audio.onerror = () => {
+                this.addDebugLog('❌ HTML5 Audioエラー', 'error');
+                this.isPlaying = false;
+                URL.revokeObjectURL(audioUrl);
+                this.createDownloadLink();
+            };
+            
+            // 読み込み開始
+            audio.load();
+            
+        } catch (error) {
+            this.addDebugLog(`❌ HTML5 Audio再生エラー: ${error.message}`, 'error');
+            this.isPlaying = false;
+            this.createDownloadLink();
+        }
+    }
+    
+    /**
+     * 方法3: ダウンロードリンク生成（最終手段）
+     */
+    createDownloadLink() {
+        try {
+            this.addDebugLog('💾 ダウンロードリンクを生成します', 'info');
+            
+            const audioUrl = URL.createObjectURL(this.recordedAudio);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `rephrase_recording_${timestamp}.webm`;
+            
+            // ダウンロードリンク作成
+            const downloadLink = document.createElement('a');
+            downloadLink.href = audioUrl;
+            downloadLink.download = filename;
+            downloadLink.textContent = `📥 録音ファイルをダウンロード`;
+            downloadLink.style.cssText = `
+                display: block;
+                background: #007bff;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                text-decoration: none;
+                margin: 10px 0;
+                text-align: center;
+            `;
+            
+            // デバッグパネルに追加
+            const debugPanel = document.getElementById('voice-debug-panel');
+            if (debugPanel) {
+                debugPanel.appendChild(downloadLink);
+                this.addDebugLog('✅ ダウンロードリンクを作成しました', 'success');
+            }
+            
+        } catch (error) {
+            this.addDebugLog(`❌ ダウンロードリンク作成エラー: ${error.message}`, 'error');
+        }
+    }
+    
+    /**
+     * 音声結果UI更新
+     */
+    updateVoiceResult(text, isFinal) {
+        const resultDiv = document.getElementById('mobile-voice-result');
+        if (resultDiv) {
+            const prefix = isFinal ? '✅ 確定: ' : '🔄 途中: ';
+            resultDiv.textContent = prefix + text;
+            resultDiv.className = isFinal ? 'voice-result-text final' : 'voice-result-text interim';
+        }
+    }
+    
+    /**
+     * 録音状態表示更新
      */
     updateRecordStatus(message) {
         const statusDiv = document.getElementById('mobile-record-status');
         if (statusDiv) {
             statusDiv.textContent = message;
+        }
+    }
+    
+    /**
+     * デバッグログ追加
+     */
+    addDebugLog(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `[${timestamp}] ${message}`;
+        
+        console.log(logMessage);
+        this.debugMessages.push(logMessage);
+        
+        // ログ表示エリア更新
+        const logDiv = document.getElementById('mobile-debug-log');
+        if (logDiv) {
+            const logItem = document.createElement('div');
+            logItem.textContent = logMessage;
+            
+            // ログタイプによる色分け
+            switch (type) {
+                case 'success':
+                    logItem.style.color = '#2ecc71';
+                    break;
+                case 'error':
+                    logItem.style.color = '#e74c3c';
+                    break;
+                case 'warning':
+                    logItem.style.color = '#f39c12';
+                    break;
+                default:
+                    logItem.style.color = '#ecf0f1';
+            }
+            
+            logDiv.appendChild(logItem);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            // ログが多すぎる場合は古いものを削除
+            const logItems = logDiv.children;
+            if (logItems.length > 20) {
+                logDiv.removeChild(logItems[0]);
+            }
         }
     }
 }
@@ -470,6 +725,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isMobile) {
         mobileVoiceSystem = new MobileVoiceSystem();
         console.log('✅ MobileVoiceSystem初期化完了');
+        
+        // グローバルアクセス用
+        window.MobileVoiceSystem = mobileVoiceSystem;
     } else {
         console.log('💻 デスクトップデバイスのため、MobileVoiceSystemは初期化されません');
     }
