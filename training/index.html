@@ -2392,22 +2392,48 @@ window.clearRandomizeHistory = function() {
         mobileScript.onload = function() {
             console.log('✅ モバイル専用音声システム読み込み完了');
             
-            // 🚨 修正: デバッグパネルは自動表示しない（デバッグボタンでのみ表示）
+            // 🚨 修正: デバッグパネルは自動表示しない（ボタンでのみ表示）
             console.log('📱 モバイル専用システム初期化完了（パネルは非表示のまま）');
             
-            // モバイルデバッグボタンをモバイル専用システムに接続
-            const mobileDebugBtn = document.getElementById('mobile-debug-btn');
-            if (mobileDebugBtn) {
-                mobileDebugBtn.onclick = function() {
-                    console.log('📱 モバイルデバッグボタンがタップされました');
+            // 🔧 モバイルでは既存の音声学習パネルを無効化
+            const existingVoicePanel = document.getElementById('voice-control-panel');
+            if (existingVoicePanel) {
+                existingVoicePanel.style.display = 'none !important';
+                console.log('📱 既存音声パネル無効化完了');
+            }
+            
+            // 🎤 音声学習ボタンを新しいシステムに接続
+            const voicePanelBtn = document.getElementById('voice-panel-open-btn');
+            if (voicePanelBtn) {
+                // 既存のイベントリスナーを削除（クローン作成で削除）
+                const newVoicePanelBtn = voicePanelBtn.cloneNode(true);
+                voicePanelBtn.parentNode.replaceChild(newVoicePanelBtn, voicePanelBtn);
+                
+                newVoicePanelBtn.onclick = function() {
+                    console.log('🎤 音声学習ボタンがタップされました（モバイル専用システム）');
                     const panel = document.getElementById('voice-debug-panel');
                     if (panel) {
                         const isVisible = panel.style.display !== 'none';
                         panel.style.display = isVisible ? 'none' : 'block';
-                        console.log('📱 デバッグパネル:', isVisible ? '非表示' : '表示');
+                        console.log('📱 モバイル音声パネル:', isVisible ? '非表示' : '表示');
                     }
                 };
-                console.log('🔗 モバイルデバッグボタン接続完了');
+                console.log('🔗 音声学習ボタン → モバイル専用システム接続完了');
+            }
+            
+            // 📱 デバッグボタンも同様に接続（統一のため）
+            const mobileDebugBtn = document.getElementById('mobile-debug-btn');
+            if (mobileDebugBtn) {
+                mobileDebugBtn.onclick = function() {
+                    console.log('📱 デバッグボタンがタップされました（モバイル専用システム）');
+                    const panel = document.getElementById('voice-debug-panel');
+                    if (panel) {
+                        const isVisible = panel.style.display !== 'none';
+                        panel.style.display = isVisible ? 'none' : 'block';
+                        console.log('📱 モバイル音声パネル:', isVisible ? '非表示' : '表示');
+                    }
+                };
+                console.log('🔗 デバッグボタン → モバイル専用システム接続完了');
             }
         };
         document.head.appendChild(mobileScript);

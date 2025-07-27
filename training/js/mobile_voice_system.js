@@ -61,8 +61,21 @@ class MobileVoiceSystem {
         // フェーズ1専用のシンプルなUI
         debugPanel.innerHTML = `
             <div class="debug-header">
-                <h3>🎤 モバイル音声認識テスト (フェーズ1)</h3>
-                <p>動作確認済みの音声認識機能のみ</p>
+                <h3>🎤 モバイル音声学習システム (フェーズ1)</h3>
+                <p>段階的実装: 音声認識機能</p>
+                <button onclick="document.getElementById('voice-debug-panel').style.display='none'" style="
+                    position: absolute;
+                    top: 10px;
+                    right: 15px;
+                    background: #dc3545;
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 25px;
+                    height: 25px;
+                    cursor: pointer;
+                    font-size: 12px;
+                ">✕</button>
             </div>
             
             <div class="test-controls">
@@ -79,7 +92,7 @@ class MobileVoiceSystem {
             </div>
             
             <div class="debug-log-area">
-                <h4>📋 デバッグログ:</h4>
+                <h4>📋 システムログ:</h4>
                 <div id="mobile-debug-log" class="debug-log-content">
                     🔄 システム初期化中...
                 </div>
