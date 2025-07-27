@@ -894,9 +894,6 @@ function handleLogout() {
     display: none !important;
   " class="mobile-voice-debug-panel">
     <!-- モバイル専用システムがここに内容を動的生成 -->
-    <div style="padding: 20px; text-align: center; color: #666;">
-      モバイル専用音声システム読み込み中...
-    </div>
   </div>
   
   <section>
@@ -2417,9 +2414,9 @@ window.clearRandomizeHistory = function() {
                     console.log('🎤 音声学習ボタンがタップされました（モバイル専用システム）');
                     const panel = document.getElementById('voice-debug-panel');
                     if (panel) {
-                        const isVisible = panel.style.display !== 'none';
-                        panel.style.display = isVisible ? 'none' : 'block';
-                        console.log('📱 モバイル音声パネル:', isVisible ? '非表示' : '表示');
+                        const isCurrentlyHidden = panel.style.display === 'none' || panel.style.display === '';
+                        panel.style.display = isCurrentlyHidden ? 'block' : 'none';
+                        console.log('📱 モバイル音声パネル:', isCurrentlyHidden ? '表示' : '非表示');
                     }
                 };
                 console.log('🔗 音声学習ボタン → モバイル専用システム接続完了');
@@ -2432,9 +2429,9 @@ window.clearRandomizeHistory = function() {
                     console.log('📱 デバッグボタンがタップされました（モバイル専用システム）');
                     const panel = document.getElementById('voice-debug-panel');
                     if (panel) {
-                        const isVisible = panel.style.display !== 'none';
-                        panel.style.display = isVisible ? 'none' : 'block';
-                        console.log('📱 モバイル音声パネル:', isVisible ? '非表示' : '表示');
+                        const isCurrentlyHidden = panel.style.display === 'none' || panel.style.display === '';
+                        panel.style.display = isCurrentlyHidden ? 'block' : 'none';
+                        console.log('📱 モバイル音声パネル:', isCurrentlyHidden ? '表示' : '非表示');
                     }
                 };
                 console.log('🔗 デバッグボタン → モバイル専用システム接続完了');

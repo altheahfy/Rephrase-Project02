@@ -118,7 +118,7 @@ class MobileVoiceSystem {
             });
         }
         
-        this.addDebugLog('✅ モバイル専用デバッグパネル初期化完了', 'success');
+        this.addDebugLog('✅ モバイル音声システム初期化完了', 'success');
         
         // 🚨 修正: JSONデータロード完了を待つ
         this.waitForSystemReady();
@@ -131,7 +131,7 @@ class MobileVoiceSystem {
         // slotDataが読み込まれるまで待機
         const checkReady = () => {
             if (window.slotData && Object.keys(window.slotData).length > 0) {
-                this.addDebugLog('✅ JSONデータ読み込み完了 - システム準備完了', 'success');
+                this.addDebugLog('✅ JSONデータ読み込み完了', 'success');
                 console.log('📱 モバイル音声システム: 完全初期化完了');
             } else {
                 this.addDebugLog('⏳ JSONデータ読み込み待機中...', 'info');
