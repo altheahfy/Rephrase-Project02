@@ -25,6 +25,10 @@ class VoiceSystem {
         this.recognizedText = '';
         this.isRecognitionActive = false;
         
+        // 🎤 録音用音声認識（testVoiceRecognition完全移植版）
+        this.recordingRecognition = null;
+        this.recognitionTimeoutId = null;
+        
         // 📱 スマホ用診断ログ
         this.debugLogs = [];
         this.maxDebugLogs = 50; // 最大50件のログを保持
@@ -804,52 +808,8 @@ class VoiceSystem {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
             
-        // 🎤 音声認識も同時開始（デバッグパネル成功機構を移植）
-        if (this.recognition && !this.isRecognitionActive) {
-            try {
-                this.addDebugLog('🎤 音声認識開始を試行中...', 'info');
-                this.addDebugLog(`📱 デバイス: ${navigator.userAgent.substring(0, 50)}...`, 'info');
-                
-                // Android Chrome最適化設定（デバッグパネルからの移植）
-                const isAndroid = /Android/i.test(navigator.userAgent);
-                if (isAndroid) {
-                    this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
-                    this.recognition.continuous = false;
-                    this.recognition.interimResults = true;
-                    this.recognition.lang = 'en-US'; // 英語設定
-                    this.recognition.maxAlternatives = 3; // 複数候補
-                } else {
-                    this.recognition.continuous = false;
-                    this.recognition.interimResults = true;
-                    this.recognition.lang = 'ja-JP';
-                    this.recognition.maxAlternatives = 1;
-                }
-                
-                // 認識開始前の状態確認
-                this.addDebugLog(`🔍 認識状態: lang=${this.recognition.lang}, active=${this.isRecognitionActive}`, 'info');
-                
-                // タイムアウト設定（Android用は少し長め）
-                const timeoutDuration = isAndroid ? 15000 : 10000;
-                this.recognitionTimeoutId = setTimeout(() => {
-                    if (this.recognition && this.isRecognitionActive) {
-                        this.recognition.stop();
-                        this.addDebugLog(`⏰ 音声認識がタイムアウトしました（${timeoutDuration/1000}秒）`, 'warning');
-                    }
-                }, timeoutDuration);
-                
-                this.recognition.start();
-                this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
-                
-            } catch (error) {
-                this.addDebugLog(`❌ 音声認識開始失敗: ${error.message}`, 'error');
-                this.updateStatus(`⚠️ 音声認識開始失敗: ${error.message}`, 'warning');
-            }
-        } else {
-            console.log('ℹ️ 音声認識スキップ:', {
-                recognitionExists: !!this.recognition,
-                isActive: this.isRecognitionActive
-            });
-        }            // UI更新
+        // 🎤 音声認識も同時開始（testVoiceRecognition完全移植版）
+        this.startRecordingVoiceRecognition();            // UI更新
             this.updateRecordingUI(true);
             this.startRecordingTimer();
             this.setupVolumeMonitoring(stream);
@@ -904,24 +864,23 @@ class VoiceSystem {
             this.stopRecordingTimer();
         }
         
-        // 🎤 音声認識停止（Android対応：認識結果の受信完了を待つ）
-        if (this.recognition && this.isRecognitionActive) {
+        // 🎤 録音用音声認識停止（testVoiceRecognition対応版）
+        if (this.recordingRecognition && this.isRecognitionActive) {
             try {
-                console.log('🔚 音声認識停止コマンド送信（Android対応）');
+                console.log('🔚 録音用音声認識停止コマンド送信');
                 
-                // タイムアウトをクリア（デバッグパネル成功機構からの移植）
+                // タイムアウトをクリア
                 if (this.recognitionTimeoutId) {
                     clearTimeout(this.recognitionTimeoutId);
                     this.recognitionTimeoutId = null;
                 }
                 
-                // Android対応：認識結果の受信完了を確実に待つ
-                this.recognition.stop();
+                this.recordingRecognition.stop();
                 
                 // ⏳ Android向け：認識結果受信の追加待機時間
                 setTimeout(() => {
                     if (this.isRecognitionActive) {
-                        console.log('� 音声認識がまだアクティブです。強制終了を実行');
+                        console.log('🔚 音声認識がまだアクティブです。強制終了を実行');
                         this.isRecognitionActive = false;
                     }
                     
@@ -934,12 +893,136 @@ class VoiceSystem {
                 }, 2000); // Android対応：2秒の追加待機
                 
             } catch (error) {
-                console.warn('⚠️ 音声認識停止エラー:', error);
+                console.warn('⚠️ 録音用音声認識停止エラー:', error);
                 this.isRecognitionActive = false;
             }
         }
         
         this.updateStatus('🔄 録音データ準備中...', 'info');
+    }
+    
+    /**
+     * 🎤 録音用音声認識（testVoiceRecognition完全移植版）
+     */
+    startRecordingVoiceRecognition() {
+        this.addDebugLog('🗣️ 録音用音声認識テストを開始します...', 'info');
+        
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            this.addDebugLog('❌ Web Speech API が利用できません', 'error');
+            return;
+        }
+        
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.recordingRecognition = new SpeechRecognition();
+        
+        // Android Chrome最適化設定（testVoiceRecognitionから完全移植）
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+            this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
+            this.recordingRecognition.continuous = false;
+            this.recordingRecognition.interimResults = true;
+            this.recordingRecognition.lang = 'en-US'; // 英語設定
+            this.recordingRecognition.maxAlternatives = 3; // 複数候補
+        } else {
+            this.recordingRecognition.continuous = false;
+            this.recordingRecognition.interimResults = true;
+            this.recordingRecognition.lang = 'ja-JP';
+            this.recordingRecognition.maxAlternatives = 1;
+        }
+        
+        this.addDebugLog(`🔍 認識状態: lang=${this.recordingRecognition.lang}, active=false`, 'info');
+        
+        // タイムアウト設定（Android用は少し長め）
+        const timeoutDuration = isAndroid ? 15000 : 10000;
+        this.recognitionTimeoutId = setTimeout(() => {
+            this.recordingRecognition.stop();
+            this.addDebugLog(`⏰ 音声認識がタイムアウトしました（${timeoutDuration/1000}秒）`, 'warning');
+        }, timeoutDuration);
+        
+        // 認識開始イベント（testVoiceRecognitionから完全移植）
+        this.recordingRecognition.onstart = () => {
+            this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
+            this.addDebugLog('🎤 音声認識開始イベント発生', 'success');
+            this.isRecognitionActive = true;
+            if (isAndroid) {
+                this.addDebugLog('🎤 何か話してください（10秒以内）...', 'info');
+            } else {
+                this.addDebugLog('🎤 何か話してください（10秒以内）...', 'info');
+            }
+        };
+        
+        // 認識結果イベント（testVoiceRecognitionから完全移植）
+        this.recordingRecognition.onresult = (event) => {
+            clearTimeout(this.recognitionTimeoutId);
+            
+            this.addDebugLog('🎯 音声認識結果イベント発生', 'info');
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                const transcript = result[0].transcript;
+                const confidence = result[0].confidence || 0;
+                
+                if (result.isFinal) {
+                    this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
+                    this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
+                    this.recognizedText += transcript + ' ';
+                } else {
+                    this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
+                    
+                    // Android Chrome: 中間結果も重要
+                    if (isAndroid) {
+                        this.addDebugLog('📱 Android: 中間結果を記録', 'info');
+                        this.recognizedText += transcript + ' ';
+                    }
+                }
+            }
+        };
+        
+        // 認識終了イベント（testVoiceRecognitionから完全移植）
+        this.recordingRecognition.onend = () => {
+            clearTimeout(this.recognitionTimeoutId);
+            this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
+            this.isRecognitionActive = false;
+            
+            if (isAndroid) {
+                this.addDebugLog('📱 Android: 認識終了時の特別チェック', 'info');
+            }
+            
+            this.addDebugLog('🔚 音声認識終了処理完了', 'info');
+        };
+        
+        // エラーイベント（testVoiceRecognitionから完全移植）
+        this.recordingRecognition.onerror = (event) => {
+            clearTimeout(this.recognitionTimeoutId);
+            this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
+            this.isRecognitionActive = false;
+            
+            if (isAndroid) {
+                this.addDebugLog('📱 Android: エラー詳細分析', 'warning');
+            }
+            
+            switch (event.error) {
+                case 'no-speech':
+                    this.addDebugLog('🔇 音声が検出されませんでした', 'warning');
+                    break;
+                case 'audio-capture':
+                    this.addDebugLog('🎤 マイクからの音声キャプチャに失敗', 'error');
+                    break;
+                case 'not-allowed':
+                    this.addDebugLog('🚫 マイク権限が拒否されています', 'error');
+                    break;
+                case 'network':
+                    this.addDebugLog('🌐 ネットワークエラーが発生しました', 'error');
+                    break;
+            }
+        };
+        
+        // 認識開始
+        try {
+            this.recordingRecognition.start();
+        } catch (error) {
+            this.addDebugLog(`❌ 音声認識開始失敗: ${error.message}`, 'error');
+        }
     }
     
     /**
