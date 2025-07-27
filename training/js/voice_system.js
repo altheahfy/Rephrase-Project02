@@ -2746,27 +2746,27 @@ class VoiceSystem {
             statusElement.className = `voice-status ${type}`;
         }
         
-        // 📱 モバイル用状態表示も更新
-        const mobileStatusElement = document.getElementById('mobile-voice-status');
-        if (mobileStatusElement) {
-            mobileStatusElement.textContent = `🎤 ${message}`;
-            mobileStatusElement.style.display = 'block';
-            
-            // タイプに応じて色を変更
-            if (type === 'error') {
-                mobileStatusElement.style.borderColor = '#dc3545';
-                mobileStatusElement.style.backgroundColor = '#f8d7da';
-            } else if (type === 'success') {
-                mobileStatusElement.style.borderColor = '#28a745';
-                mobileStatusElement.style.backgroundColor = '#d4edda';
-            } else if (type === 'recording') {
-                mobileStatusElement.style.borderColor = '#ff6b6b';
-                mobileStatusElement.style.backgroundColor = '#ffe6e6';
-            } else {
-                mobileStatusElement.style.borderColor = '#007bff';
-                mobileStatusElement.style.backgroundColor = '#f8f9fa';
-            }
-        }
+        // 📱 モバイル用状態表示は無効化（重複表示回避）
+        // const mobileStatusElement = document.getElementById('mobile-voice-status');
+        // if (mobileStatusElement) {
+        //     mobileStatusElement.textContent = `🎤 ${message}`;
+        //     mobileStatusElement.style.display = 'block';
+        //     
+        //     // タイプに応じて色を変更
+        //     if (type === 'error') {
+        //         mobileStatusElement.style.borderColor = '#dc3545';
+        //         mobileStatusElement.style.backgroundColor = '#f8d7da';
+        //     } else if (type === 'success') {
+        //         mobileStatusElement.style.borderColor = '#28a745';
+        //         mobileStatusElement.style.backgroundColor = '#d4edda';
+        //     } else if (type === 'recording') {
+        //         mobileStatusElement.style.borderColor = '#ff6b6b';
+        //         mobileStatusElement.style.backgroundColor = '#ffe6e6';
+        //     } else {
+        //         mobileStatusElement.style.borderColor = '#007bff';
+        //         mobileStatusElement.style.backgroundColor = '#f8f9fa';
+        //     }
+        // }
         
         console.log(`🎤 ${message}`);
         
