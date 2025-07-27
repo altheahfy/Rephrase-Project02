@@ -2398,8 +2398,12 @@ window.clearRandomizeHistory = function() {
             // 🔧 モバイルでは既存の音声学習パネルを無効化
             const existingVoicePanel = document.getElementById('voice-control-panel');
             if (existingVoicePanel) {
-                existingVoicePanel.style.display = 'none !important';
-                console.log('📱 既存音声パネル無効化完了');
+                existingVoicePanel.style.display = 'none';
+                existingVoicePanel.style.visibility = 'hidden';
+                existingVoicePanel.style.opacity = '0';
+                existingVoicePanel.style.pointerEvents = 'none';
+                existingVoicePanel.style.zIndex = '-1';
+                console.log('📱 既存音声パネル完全無効化完了');
             }
             
             // 🎤 音声学習ボタンを新しいシステムに接続
@@ -2448,6 +2452,13 @@ window.clearRandomizeHistory = function() {
         const desktopScript = document.createElement('script');
         desktopScript.src = 'js/voice_system.js';
         document.head.appendChild(desktopScript);
+        
+        // 🚨 重要: モバイル専用パネルを無効化
+        const mobilePanel = document.getElementById('voice-debug-panel');
+        if (mobilePanel) {
+            mobilePanel.style.display = 'none';
+            mobilePanel.remove(); // 完全に削除
+        }
     }
 })();
 </script>

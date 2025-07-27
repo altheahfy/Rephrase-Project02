@@ -3,6 +3,17 @@
  * フェーズ1: 音声認識のみ対応
  */
 
+/* 🚨 モバイルデバイスでは既存の音声パネルを強制非表示 */
+@media (max-width: 768px), (pointer: coarse) {
+    #voice-control-panel {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        z-index: -1 !important;
+    }
+}
+
 /* フェーズ1: シンプルなモバイル音声認識パネル */
 .debug-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

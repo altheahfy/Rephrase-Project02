@@ -63,7 +63,7 @@ class MobileVoiceSystem {
             <div class="debug-header">
                 <h3>🎤 モバイル音声学習システム (フェーズ1)</h3>
                 <p>段階的実装: 音声認識機能</p>
-                <button onclick="document.getElementById('voice-debug-panel').style.display='none'" style="
+                <button id="mobile-close-btn" style="
                     position: absolute;
                     top: 10px;
                     right: 15px;
@@ -75,6 +75,7 @@ class MobileVoiceSystem {
                     height: 25px;
                     cursor: pointer;
                     font-size: 12px;
+                    font-weight: bold;
                 ">✕</button>
             </div>
             
@@ -98,6 +99,15 @@ class MobileVoiceSystem {
                 </div>
             </div>
         `;
+        
+        // 🔧 閉じるボタンのイベントリスナー設定
+        const closeBtn = document.getElementById('mobile-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                debugPanel.style.display = 'none';
+                this.addDebugLog('🚪 パネルを閉じました', 'info');
+            });
+        }
         
         // イベントリスナー設定
         const testBtn = document.getElementById('mobile-voice-test-btn');
