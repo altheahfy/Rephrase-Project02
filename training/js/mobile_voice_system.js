@@ -44,6 +44,10 @@ class MobileVoiceSystem {
         this.currentUtterance = null;
         this.availableVoices = [];
         
+        // 🚀 スマホ用デバッグ表示プロパティ
+        this.debugDisplay = null;
+        this.initErrors = [];
+        
         console.log('📱 モバイル検出結果:', {
             isMobile: this.isMobile,
             isAndroid: this.isAndroid,
@@ -63,6 +67,10 @@ class MobileVoiceSystem {
         
         this.initializeDebugPanel();
         this.loadVoices(); // 読み上げ用音声を読み込み
+        
+        // スマホ用: 初期化完了後にデバッグ情報を表示
+        this.showMobileDebugInfo();
+        
         console.log('✅ MobileVoiceSystem初期化完了');
     }
     
@@ -1463,6 +1471,153 @@ class MobileVoiceSystem {
         } catch (error) {
             this.addDebugLog(`❌ DOM構築エラー: ${error.message}`, 'error');
             return '';
+        }
+    }
+    
+    /**
+     * 🚀 スマホ用デバッグ情報表示（コンソール不要版）
+     */
+    showMobileDebugInfo() {
+        this.addMobileDebugInfo('🔧 スマホ用デバッグ表示を開始', 'info');
+        
+        // ブラウザ検出結果
+        this.addMobileDebugInfo(`📱 デバイス検出: ${this.isMobile ? 'モバイル' : 'デスクトップ'}`, this.isMobile ? 'success' : 'warning');
+        this.addMobileDebugInfo(`🌐 ブラウザ: ${this.browserInfo}`, 'info');
+        this.addMobileDebugInfo(`🤖 User Agent: ${navigator.userAgent.substring(0, 80)}...`, 'info');
+        
+        // Android ブラウザ詳細
+        if (this.isAndroid) {
+            this.addMobileDebugInfo('📱 Android詳細:', 'info');
+            this.addMobileDebugInfo(`  🔹 Chrome: ${this.isAndroidChrome ? 'はい' : 'いいえ'}`, this.isAndroidChrome ? 'success' : 'info');
+            this.addMobileDebugInfo(`  🔹 Firefox: ${this.isAndroidFirefox ? 'はい' : 'いいえ'}`, this.isAndroidFirefox ? 'success' : 'info');
+            this.addMobileDebugInfo(`  🔹 Samsung: ${this.isAndroidSamsung ? 'はい' : 'いいえ'}`, this.isAndroidSamsung ? 'success' : 'info');
+            this.addMobileDebugInfo(`  🔹 Edge: ${this.isAndroidEdge ? 'はい' : 'いいえ'}`, this.isAndroidEdge ? 'success' : 'info');
+        }
+        
+        // 重要な要素の検出状況
+        const voiceDebugPanel = document.getElementById('voice-debug-panel');
+        this.addMobileDebugInfo(`🎯 voice-debug-panel要素: ${voiceDebugPanel ? '見つかりました' : '見つかりません'}`, voiceDebugPanel ? 'success' : 'error');
+        
+        if (voiceDebugPanel) {
+            this.addMobileDebugInfo(`  📏 表示状態: ${voiceDebugPanel.style.display || 'デフォルト'}`, 'info');
+            this.addMobileDebugInfo(`  👁️ 可視性: ${voiceDebugPanel.offsetWidth > 0 ? '表示中' : '非表示'}`, voiceDebugPanel.offsetWidth > 0 ? 'success' : 'warning');
+        }
+        
+        // 音声API対応状況
+        this.addMobileDebugInfo('🎤 音声API対応状況:', 'info');
+        const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.addMobileDebugInfo(`  🔹 音声認識: ${speechRecognition ? '対応' : '非対応'}`, speechRecognition ? 'success' : 'error');
+        this.addMobileDebugInfo(`  🔹 音声合成: ${speechSynthesis ? '対応' : '非対応'}`, speechSynthesis ? 'success' : 'error');
+        this.addMobileDebugInfo(`  🔹 MediaDevices: ${navigator.mediaDevices ? '対応' : '非対応'}`, navigator.mediaDevices ? 'success' : 'error');
+        this.addMobileDebugInfo(`  🔹 AudioContext: ${window.AudioContext || window.webkitAudioContext ? '対応' : '非対応'}`, (window.AudioContext || window.webkitAudioContext) ? 'success' : 'error');
+        
+        // 初期化エラーがある場合は表示
+        if (this.initErrors.length > 0) {
+            this.addMobileDebugInfo('⚠️ 初期化エラー:', 'warning');
+            this.initErrors.forEach(error => {
+                this.addMobileDebugInfo(`  ❌ ${error}`, 'error');
+            });
+        } else {
+            this.addMobileDebugInfo('✅ 初期化エラーなし', 'success');
+        }
+        
+        // Firefox特有の問題チェック
+        if (this.isAndroidFirefox) {
+            this.addMobileDebugInfo('🔥 Firefox固有チェック:', 'info');
+            this.addMobileDebugInfo('  🔍 パネル開閉問題の調査を開始', 'warning');
+            
+            // Firefox での voice-debug-panel の状態詳細
+            if (voiceDebugPanel) {
+                const computedStyle = window.getComputedStyle(voiceDebugPanel);
+                this.addMobileDebugInfo(`  📊 z-index: ${computedStyle.zIndex}`, 'info');
+                this.addMobileDebugInfo(`  📊 position: ${computedStyle.position}`, 'info');
+                this.addMobileDebugInfo(`  📊 visibility: ${computedStyle.visibility}`, 'info');
+                this.addMobileDebugInfo(`  📊 opacity: ${computedStyle.opacity}`, 'info');
+            }
+        }
+        
+        this.addMobileDebugInfo('🎉 スマホ用デバッグ表示完了', 'success');
+    }
+    
+    /**
+     * スマホ用デバッグ情報をパネルに追加
+     */
+    addMobileDebugInfo(message, type = 'info') {
+        // デバッグパネルが存在しない場合は、代替表示エリアを作成
+        let debugArea = document.getElementById('mobile-debug-log');
+        
+        if (!debugArea) {
+            // デバッグパネルが見つからない場合、直接body に追加
+            debugArea = document.createElement('div');
+            debugArea.id = 'mobile-debug-info';
+            debugArea.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                max-height: 300px;
+                overflow-y: auto;
+                background: rgba(0,0,0,0.9);
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                z-index: 10000;
+                font-size: 12px;
+                font-family: monospace;
+                line-height: 1.3;
+            `;
+            document.body.appendChild(debugArea);
+            
+            // 閉じるボタンを追加
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '✕';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: red;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                font-size: 10px;
+            `;
+            closeBtn.onclick = () => debugArea.remove();
+            debugArea.appendChild(closeBtn);
+        }
+        
+        // メッセージ追加
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `[${timestamp}] ${message}`;
+        
+        const logItem = document.createElement('div');
+        logItem.textContent = logMessage;
+        logItem.style.marginBottom = '2px';
+        
+        // ログタイプによる色分け
+        switch (type) {
+            case 'success':
+                logItem.style.color = '#2ecc71';
+                break;
+            case 'error':
+                logItem.style.color = '#e74c3c';
+                break;
+            case 'warning':
+                logItem.style.color = '#f39c12';
+                break;
+            default:
+                logItem.style.color = '#ecf0f1';
+        }
+        
+        debugArea.appendChild(logItem);
+        debugArea.scrollTop = debugArea.scrollHeight;
+        
+        // ログが多すぎる場合は古いものを削除
+        const logItems = debugArea.children;
+        if (logItems.length > 30) {
+            debugArea.removeChild(logItems[1]); // 閉じるボタンは保持
         }
     }
 }
