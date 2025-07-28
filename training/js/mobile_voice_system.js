@@ -931,26 +931,65 @@ class MobileVoiceSystem {
      * 統合音声認識開始
      */
     startUnifiedVoiceRecognition() {
+        this.addDebugLog('🔍 統合モード音声認識: API利用可能性チェック開始', 'info');
+        this.addDebugLog('🔍 window.webkitSpeechRecognition: ' + ('webkitSpeechRecognition' in window), 'info');
+        this.addDebugLog('🔍 window.SpeechRecognition: ' + ('SpeechRecognition' in window), 'info');
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            this.addDebugLog('❌ 音声認識APIが利用できません', 'error');
+            this.addDebugLog('❌ 統合モード: 音声認識APIが利用できません', 'error');
+            this.addDebugLog('❌ これは明らかにおかしい！個別テストでは動作するのに！', 'error');
             return;
+        }
+        
+        this.addDebugLog('✅ 統合モード: 音声認識API利用可能確認', 'success');
+        
+        // 既存の音声認識を停止
+        if (this.currentRecognition) {
+            this.addDebugLog('🔍 統合モード: 既存の音声認識インスタンスが存在します', 'warning');
+            this.addDebugLog(`🔍 既存インスタンスの状態: ${typeof this.currentRecognition}`, 'info');
+            try {
+                this.currentRecognition.stop();
+                this.addDebugLog('🛑 統合モード: 既存の音声認識を停止しました', 'info');
+            } catch (error) {
+                this.addDebugLog(`⚠️ 統合モード: 既存認識停止エラー: ${error.message}`, 'warning');
+            }
+            this.currentRecognition = null;
+            this.addDebugLog('✅ 統合モード: 既存音声認識インスタンスをクリアしました', 'info');
+        } else {
+            this.addDebugLog('✅ 統合モード: 既存の音声認識インスタンスはありません', 'info');
         }
         
         // 統合モード専用: 認識結果をクリア
         this.recognizedText = '';
         this.updateVoiceResult('統合モード: 音声認識を開始します...', false);
         
-        this.addDebugLog('🎤 統合モード: 音声認識開始', 'info');
+        this.addDebugLog('🎤 統合モード: 音声認識開始処理', 'info');
         
         // SpeechRecognition設定
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        this.currentRecognition = new SpeechRecognition();
+        this.addDebugLog('🔧 統合モード: SpeechRecognitionコンストラクタ取得', 'info');
+        this.addDebugLog(`🔧 使用するコンストラクタ: ${SpeechRecognition ? SpeechRecognition.name : 'undefined'}`, 'info');
+        
+        try {
+            this.currentRecognition = new SpeechRecognition();
+            this.addDebugLog('✅ 統合モード: SpeechRecognitionインスタンス作成成功', 'success');
+            this.addDebugLog(`🔧 インスタンスの型: ${typeof this.currentRecognition}`, 'info');
+        } catch (error) {
+            this.addDebugLog(`❌ 統合モード: SpeechRecognitionインスタンス作成失敗: ${error.message}`, 'error');
+            this.addDebugLog(`❌ エラーの種類: ${error.name}`, 'error');
+            return;
+        }
         
         // 統合モード最適化設定
         this.currentRecognition.continuous = true;  // 連続認識
         this.currentRecognition.interimResults = true;
         this.currentRecognition.maxAlternatives = 1;
         this.currentRecognition.lang = 'en-US';
+        
+        this.addDebugLog('🔧 統合モード: 音声認識設定完了', 'info');
+        this.addDebugLog(`🔧 continuous: ${this.currentRecognition.continuous}`, 'info');
+        this.addDebugLog(`🔧 interimResults: ${this.currentRecognition.interimResults}`, 'info');
+        this.addDebugLog(`🔧 lang: ${this.currentRecognition.lang}`, 'info');
         
         // タイムアウト設定（統合モードは長め）
         const timeoutDuration = 20000; // 20秒
@@ -960,7 +999,10 @@ class MobileVoiceSystem {
         }, timeoutDuration);
         
         // イベントハンドラー設定
+        this.addDebugLog('🔧 統合モード: イベントハンドラー設定開始', 'info');
+        
         this.currentRecognition.onstart = () => {
+            this.addDebugLog('🎉 統合モード: onstart イベント発生！', 'success');
             this.addDebugLog('✅ 統合モード: 音声認識開始イベント発生', 'success');
             this.addDebugLog('🎯 統合モード実行中: 同時に話してください（20秒以内）...', 'info');
         };
@@ -987,6 +1029,7 @@ class MobileVoiceSystem {
         
         this.currentRecognition.onend = () => {
             clearTimeout(timeoutId);
+            this.addDebugLog('🎉 統合モード: onend イベント発生！', 'info');
             this.addDebugLog('🔚 統合モード: 音声認識終了イベント発生', 'info');
             
             if (this.recognizedText && this.recognizedText.trim().length > 0) {
@@ -998,16 +1041,24 @@ class MobileVoiceSystem {
         
         this.currentRecognition.onerror = (event) => {
             clearTimeout(timeoutId);
+            this.addDebugLog('🎉 統合モード: onerror イベント発生！', 'error');
             this.addDebugLog(`❌ 統合モード: 音声認識エラー: ${event.error}`, 'error');
+            this.addDebugLog(`❌ エラー詳細: ${JSON.stringify(event)}`, 'error');
             this.currentRecognition = null;
         };
         
+        this.addDebugLog('✅ 統合モード: 全イベントハンドラー設定完了', 'success');
+        
         // 音声認識開始
         try {
+            this.addDebugLog('🚀 統合モード: recognition.start()を実行します', 'info');
             this.currentRecognition.start();
-            this.addDebugLog('🚀 統合モード: 音声認識開始実行', 'info');
+            this.addDebugLog('✅ 統合モード: recognition.start()コマンド送信完了', 'success');
+            this.addDebugLog('⏳ 統合モード: onstart イベントを待機中...', 'info');
         } catch (error) {
             this.addDebugLog(`❌ 統合モード: 音声認識開始失敗: ${error.message}`, 'error');
+            this.addDebugLog(`❌ エラーの種類: ${error.name}`, 'error');
+            this.addDebugLog(`❌ エラーの詳細: ${JSON.stringify(error)}`, 'error');
         }
     }
     
