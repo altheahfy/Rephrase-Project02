@@ -685,6 +685,24 @@ function handleLogout() {
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
     🎤 音声学習
   </button>
+
+  <!-- 📱 スマホ用デバッグ表示エリア -->
+  <div id="mobile-debug-display" style="
+    position: fixed !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: 20000 !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: #00ff00 !important;
+    padding: 10px !important;
+    border-radius: 5px !important;
+    font-family: monospace !important;
+    font-size: 11px !important;
+    max-height: 150px !important;
+    overflow-y: auto !important;
+    display: none;
+  "></div>
   
   <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
   <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
@@ -2448,13 +2466,51 @@ function setupVoiceButtonEvents() {
     // 音声パネル開くボタン
     const openBtn = document.getElementById('voice-panel-open-btn');
     if (openBtn) {
-        openBtn.addEventListener('click', function() {
-            console.log('🎤 音声パネル開くボタンがクリックされました');
-            if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                window.voiceSystem.toggleVoicePanel();
-            }
+        // 既存のイベントリスナーを削除（クローン作成で削除）
+        const newVoicePanelBtn = openBtn.cloneNode(true);
+        openBtn.parentNode.replaceChild(newVoicePanelBtn, openBtn);
+        
+        // 複数のイベントリスナーを設定（確実な動作向上）
+        newVoicePanelBtn.onclick = function(event) {
+            console.log('🎤 音声学習ボタンがクリックされました（onclick）', event);
+            handleVoicePanelToggle();
+        };
+        
+        newVoicePanelBtn.addEventListener('click', function(event) {
+            console.log('🎤 音声学習ボタンがクリックされました（addEventListener）', event);
+            handleVoicePanelToggle();
         });
+        
+        newVoicePanelBtn.addEventListener('touchstart', function(event) {
+            console.log('🎤 音声学習ボタンがタッチされました（touchstart）', event);
+            event.preventDefault();
+            handleVoicePanelToggle();
+        });
+        
+        // 音声パネル切り替え処理
+        function handleVoicePanelToggle() {
+            console.log('🎤 音声学習パネル切り替え処理開始');
+            const panel = document.getElementById('voice-debug-panel');
+            console.log('🔍 voice-debug-panel検索結果:', panel ? '見つかりました' : '見つかりません');
+            
+            if (panel) {
+                const isCurrentlyHidden = panel.style.display === 'none' || panel.style.display === '';
+                panel.style.display = isCurrentlyHidden ? 'block' : 'none';
+                console.log('✅ モバイル音声パネル切り替え:', isCurrentlyHidden ? '表示' : '非表示');
+                console.log('📊 パネル状況詳細:', {
+                    display: panel.style.display,
+                    visibility: panel.style.visibility,
+                    opacity: panel.style.opacity
+                });
+            } else {
+                console.error('❌ voice-debug-panel要素が見つかりません');
+                alert('音声パネルが見つかりません。ページを再読み込みしてください。');
+            }
+        }
+        
         console.log('✅ 音声パネル開くボタンのイベント設定完了');
+    } else {
+        console.error('❌ voice-panel-open-btn ボタンが見つかりません');
     }
     
     // 音声パネル閉じるボタン
