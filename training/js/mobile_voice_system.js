@@ -1472,6 +1472,21 @@ class MobileVoiceSystem {
         console.log('📝 現在の例文取得を開始...');
         this.addDebugLog('📝 現在の例文取得を開始...', 'info');
         
+        // 🔍 デバッグ: データソースの詳細確認
+        this.addDebugLog(`🔍 window.loadedJsonData存在: ${!!window.loadedJsonData}`, 'info');
+        this.addDebugLog(`🔍 window.lastSelectedSlots存在: ${!!window.lastSelectedSlots}`, 'info');
+        
+        if (window.loadedJsonData) {
+            this.addDebugLog(`🔍 loadedJsonData型: ${typeof window.loadedJsonData}`, 'info');
+            this.addDebugLog(`🔍 loadedJsonData配列: ${Array.isArray(window.loadedJsonData)}`, 'info');
+            this.addDebugLog(`🔍 loadedJsonData長さ: ${window.loadedJsonData.length || 'N/A'}`, 'info');
+        }
+        
+        if (window.lastSelectedSlots) {
+            this.addDebugLog(`🔍 lastSelectedSlots型: ${typeof window.lastSelectedSlots}`, 'info');
+            this.addDebugLog(`🔍 lastSelectedSlotsキー数: ${Object.keys(window.lastSelectedSlots).length}`, 'info');
+        }
+        
         // 🎯 直接window.loadedJsonDataから順序通りに例文を構築
         if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
             const sentence = this.buildSentenceFromOrderedData();
@@ -1507,32 +1522,41 @@ class MobileVoiceSystem {
      */
     buildSentenceFromOrderedData() {
         try {
+            this.addDebugLog('🔧 順序データ構築を開始', 'info');
             const slots = [];
             
             // 上位スロットから単語を取得
             if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+                this.addDebugLog(`📊 上位スロット処理開始: ${window.loadedJsonData.length}個`, 'info');
                 for (let i = 0; i < window.loadedJsonData.length; i++) {
                     const item = window.loadedJsonData[i];
                     if (item && typeof item === 'object') {
+                        const text = item.text || '';
+                        this.addDebugLog(`  📝 [${i}] "${text}" (${item.type || 'unknown'})`, 'info');
                         slots.push({
                             order: i,
                             level: 'upper',
-                            text: item.text || '',
+                            text: text,
                             type: item.type || ''
                         });
                     }
                 }
+            } else {
+                this.addDebugLog('❌ 上位スロットデータが利用できません', 'warning');
             }
             
             // 下位スロットから単語を取得
             if (window.lastSelectedSlots && typeof window.lastSelectedSlots === 'object') {
-                Object.keys(window.lastSelectedSlots).forEach(key => {
+                const keys = Object.keys(window.lastSelectedSlots);
+                this.addDebugLog(`📊 下位スロット処理開始: ${keys.length}個`, 'info');
+                keys.forEach(key => {
                     const value = window.lastSelectedSlots[key];
                     if (value && typeof value === 'string' && value.trim()) {
                         // キーから順序番号を抽出
                         const orderMatch = key.match(/\d+/);
                         const order = orderMatch ? parseInt(orderMatch[0]) : 999;
                         
+                        this.addDebugLog(`  📝 [${key}→${order}] "${value.trim()}"`, 'info');
                         slots.push({
                             order: order,
                             level: 'sub',
@@ -1541,7 +1565,11 @@ class MobileVoiceSystem {
                         });
                     }
                 });
+            } else {
+                this.addDebugLog('❌ 下位スロットデータが利用できません', 'warning');
             }
+            
+            this.addDebugLog(`📊 合計スロット数: ${slots.length}`, 'info');
             
             // 順序でソート（上位スロット優先、同じ順序なら下位スロット優先）
             slots.sort((a, b) => {
