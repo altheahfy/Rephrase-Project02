@@ -16,6 +16,11 @@ class MobileVoiceSystem {
         // モバイル検出
         this.isMobile = this.detectMobileDevice();
         this.isAndroid = /Android/i.test(navigator.userAgent);
+        this.isAndroidChrome = this.isAndroid && /Chrome/i.test(navigator.userAgent);
+        this.isAndroidFirefox = this.isAndroid && /Firefox/i.test(navigator.userAgent);
+        this.isAndroidSamsung = this.isAndroid && /SamsungBrowser/i.test(navigator.userAgent);
+        this.isAndroidEdge = this.isAndroid && /EdgA/i.test(navigator.userAgent);
+        this.browserInfo = this.detectBrowserInfo();
         
         // 基本プロパティ
         this.recognizedText = '';
@@ -42,6 +47,11 @@ class MobileVoiceSystem {
         console.log('📱 モバイル検出結果:', {
             isMobile: this.isMobile,
             isAndroid: this.isAndroid,
+            isAndroidChrome: this.isAndroidChrome,
+            isAndroidFirefox: this.isAndroidFirefox,
+            isAndroidSamsung: this.isAndroidSamsung,
+            isAndroidEdge: this.isAndroidEdge,
+            browserInfo: this.browserInfo,
             userAgent: navigator.userAgent
         });
         
@@ -66,6 +76,49 @@ class MobileVoiceSystem {
         const isSmallScreen = window.innerWidth <= 768;
         
         return isMobileUA || isTouchDevice || isSmallScreen;
+    }
+    
+    /**
+     * 詳細ブラウザ情報検出
+     */
+    detectBrowserInfo() {
+        const ua = navigator.userAgent;
+        
+        if (this.isAndroid) {
+            if (/Chrome/i.test(ua) && !/Edg/i.test(ua) && !/SamsungBrowser/i.test(ua)) {
+                return 'Android Chrome';
+            } else if (/Firefox/i.test(ua)) {
+                return 'Android Firefox';
+            } else if (/SamsungBrowser/i.test(ua)) {
+                return 'Android Samsung Browser';
+            } else if (/EdgA/i.test(ua)) {
+                return 'Android Edge';
+            } else {
+                return 'Android Other';
+            }
+        } else if (/iPhone|iPad|iPod/i.test(ua)) {
+            if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) {
+                return 'iOS Safari';
+            } else if (/Chrome/i.test(ua)) {
+                return 'iOS Chrome';
+            } else if (/Firefox/i.test(ua)) {
+                return 'iOS Firefox';
+            } else {
+                return 'iOS Other';
+            }
+        } else {
+            if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) {
+                return 'Desktop Chrome';
+            } else if (/Firefox/i.test(ua)) {
+                return 'Desktop Firefox';
+            } else if (/Edg/i.test(ua)) {
+                return 'Desktop Edge';
+            } else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) {
+                return 'Desktop Safari';
+            } else {
+                return 'Desktop Other';
+            }
+        }
     }
     
     /**
@@ -98,7 +151,7 @@ class MobileVoiceSystem {
                 </div>
                 
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                    音声認識 + 録音 + 再生機能
+                    音声認識 + 録音 + 再生機能 (${this.browserInfo})
                 </p>
                 
                 <div class="test-controls">
@@ -118,11 +171,12 @@ class MobileVoiceSystem {
                         🔊 再生テスト
                     </button>
                     <button id="mobile-unified-test-btn" class="voice-test-btn" style="
-                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        background: linear-gradient(135deg, ${this.isAndroidChrome ? '#6c757d 0%, #495057 100%' : '#28a745 0%, #20c997 100%'});
                         margin-top: 8px;
                         font-weight: bold;
+                        ${this.isAndroidChrome ? 'opacity: 0.6;' : ''}
                     ">
-                        🎯 録音+音声認識 統合テスト
+                        ${this.isAndroidChrome ? '🚫 統合テスト (Chrome制限)' : '🎯 録音+音声認識 統合テスト'}
                     </button>
                     <button id="mobile-tts-test-btn" class="voice-test-btn" style="
                         background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
@@ -164,8 +218,15 @@ class MobileVoiceSystem {
         
         // ログ窓にシステム情報を表示
         this.addDebugLog('🚀 MobileVoiceSystem初期化完了', 'success');
-        this.addDebugLog('📱 統合ボタンテスト準備完了', 'info');
-        this.addDebugLog('🎯 「録音+音声認識 統合テスト」ボタンをタップしてください', 'info');
+        this.addDebugLog(`🌐 ブラウザ: ${this.browserInfo}`, 'info');
+        
+        if (this.isAndroidChrome) {
+            this.addDebugLog('⚠️ Android Chrome: 統合機能制限あり', 'warning');
+            this.addDebugLog('📱 録音・音声認識は個別ボタンでテストしてください', 'info');
+        } else {
+            this.addDebugLog('✅ 統合機能テスト可能な環境です', 'success');
+            this.addDebugLog('🎯 「録音+音声認識 統合テスト」ボタンをタップしてください', 'info');
+        }
     }
     
     /**
@@ -322,11 +383,29 @@ class MobileVoiceSystem {
             return;
         }
         
+        // 音声認識結果をクリア（新しい認識のため）
+        this.recognizedText = '';
+        this.updateVoiceResult('音声認識を開始します...', false);
+        
+        // 既存の音声認識を停止
+        if (this.currentRecognition) {
+            try {
+                this.currentRecognition.stop();
+                this.addDebugLog('🛑 既存の音声認識を停止しました', 'info');
+            } catch (error) {
+                this.addDebugLog(`⚠️ 既存認識停止エラー: ${error.message}`, 'warning');
+            }
+            this.currentRecognition = null;
+        }
+        
         this.addDebugLog('🚀 音声認識テスト開始', 'info');
         
         // SpeechRecognition設定（動作確認済み設定を完全移植）
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
+        
+        // 音声認識テスト用のインスタンスとして保存
+        this.currentRecognition = recognition;
         
         // Android Chrome最適化設定
         recognition.continuous = this.isAndroid ? true : false;
@@ -393,6 +472,9 @@ class MobileVoiceSystem {
             clearTimeout(timeoutId);
             this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
             
+            // 認識インスタンスをクリア
+            this.currentRecognition = null;
+            
             if (this.recognizedText && this.recognizedText.trim().length > 0) {
                 this.addDebugLog(`✅ 最終認識結果: "${this.recognizedText}"`, 'success');
             } else {
@@ -404,6 +486,10 @@ class MobileVoiceSystem {
         
         recognition.onerror = (event) => {
             clearTimeout(timeoutId);
+            
+            // 認識インスタンスをクリア
+            this.currentRecognition = null;
+            
             this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
             
             if (this.isAndroid) {
@@ -615,7 +701,7 @@ class MobileVoiceSystem {
     }
     
     /**
-     * 🚀 フェーズ4: 録音+音声認識 統合実行
+     * 🚀 フェーズ4: 録音+音声認識 統合実行（ブラウザ別対応版）
      */
     async startUnifiedRecordingAndRecognition() {
         if (this.isUnifiedMode) {
@@ -623,78 +709,194 @@ class MobileVoiceSystem {
             return;
         }
         
-        this.addDebugLog('🎯 録音+音声認識 統合モード開始', 'info');
+        // ブラウザ種別による処理分岐
+        if (this.isAndroidChrome) {
+            this.addDebugLog('🚫 Android Chrome検出: 統合機能は制限されています', 'warning');
+            this.addDebugLog('💡 Android Chrome ではマイクリソース競合により同時実行できません', 'info');
+            this.addDebugLog('🔄 別々のボタンでテストしてください', 'info');
+            this.updateRecordStatus('❌ Android Chrome: 統合機能制限');
+            return;
+        }
+        
+        this.addDebugLog(`🎯 録音+音声認識 統合モード開始 (${this.browserInfo})`, 'info');
+        this.addDebugLog('🧪 非Android Chrome環境での統合テスト実行', 'info');
         this.isUnifiedMode = true;
         
         try {
-            // 1. 録音開始（Web Audio API）
-            await this.startUnifiedRecording();
+            // マイクアクセス許可を取得
+            this.addDebugLog('🎤 マイクアクセス許可を要求中...', 'info');
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                    sampleRate: 44100
+                } 
+            });
             
-            // 2. 音声認識開始（SpeechRecognition API）
+            this.addDebugLog('✅ マイクアクセス許可取得完了', 'success');
+            
+            // 1. AudioWorklet APIで録音開始
+            await this.startAudioWorkletRecording(stream);
+            
+            // 2. SpeechRecognition APIで音声認識開始
             this.startUnifiedVoiceRecognition();
             
-            this.addDebugLog('✅ 録音+音声認識 同時実行開始成功', 'success');
-            this.updateRecordStatus('🎯 録音+音声認識 同時実行中...');
+            this.addDebugLog(`✅ ${this.browserInfo}: AudioWorklet + SpeechRecognition 同時実行開始成功`, 'success');
+            this.updateRecordStatus(`🎯 ${this.browserInfo}: 録音+音声認識 同時実行中...`);
             
         } catch (error) {
-            this.addDebugLog(`❌ 統合モード開始エラー: ${error.message}`, 'error');
+            this.addDebugLog(`❌ ${this.browserInfo}: 統合モード開始エラー: ${error.message}`, 'error');
+            
+            // Android Chrome 以外でもエラーが発生した場合の詳細ログ
+            if (!this.isAndroidChrome) {
+                this.addDebugLog('⚠️ 予想外のエラー: Android Chrome以外でも統合機能が失敗', 'warning');
+                this.addDebugLog('📊 ブラウザ情報をレポートに含めてください', 'info');
+            }
+            
             this.isUnifiedMode = false;
         }
     }
     
     /**
-     * 統合録音開始（Web Audio API版）
+     * AudioWorklet録音開始（最新API版）
      */
-    async startUnifiedRecording() {
-        this.addDebugLog('🎤 統合モード: Web Audio API録音開始', 'info');
+    async startAudioWorkletRecording(stream) {
+        this.addDebugLog('� AudioWorklet録音セットアップ開始', 'info');
         
-        // AudioContext初期化
-        if (!this.audioContext) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        if (this.audioContext.state === 'suspended') {
-            await this.audioContext.resume();
-        }
-        
-        // マイクアクセス許可
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false,
-                sampleRate: 44100
-            } 
-        });
-        
-        this.addDebugLog('✅ 統合モード: マイクアクセス許可取得完了', 'success');
-        
-        // Web Audio APIで録音処理
-        this.microphoneSource = this.audioContext.createMediaStreamSource(stream);
-        this.recordingProcessor = this.audioContext.createScriptProcessor(4096, 1, 1);
-        this.audioChunks = [];
-        
-        // 録音データ処理
-        this.recordingProcessor.onaudioprocess = (event) => {
-            if (this.isUnifiedMode) {
-                const inputBuffer = event.inputBuffer;
-                const inputData = inputBuffer.getChannelData(0);
-                this.audioChunks.push(new Float32Array(inputData));
-                
-                // 進行表示
-                if (this.audioChunks.length % 10 === 0) {
-                    const totalSamples = this.audioChunks.length * 4096;
-                    const duration = totalSamples / this.audioContext.sampleRate;
-                    this.updateRecordStatus(`🎯 統合実行中... 録音: ${duration.toFixed(1)}秒`);
-                }
+        try {
+            // AudioContext初期化
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
-        };
+            
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+                this.addDebugLog('🔧 AudioContext resumed', 'info');
+            }
+            
+            // AudioWorkletが利用可能かチェック
+            if (!this.audioContext.audioWorklet) {
+                this.addDebugLog('⚠️ AudioWorkletが利用できません。ScriptProcessorNodeを使用します', 'warning');
+                return this.startScriptProcessorRecording(stream);
+            }
+            
+            // AudioWorkletプロセッサーを読み込み（インライン定義）
+            const processorCode = `
+                class AudioRecorderWorklet extends AudioWorkletProcessor {
+                    constructor() {
+                        super();
+                        this.isRecording = false;
+                        this.port.onmessage = (event) => {
+                            if (event.data.command === 'start') {
+                                this.isRecording = true;
+                            } else if (event.data.command === 'stop') {
+                                this.isRecording = false;
+                            }
+                        };
+                    }
+                    
+                    process(inputs, outputs) {
+                        if (this.isRecording && inputs[0].length > 0) {
+                            const input = inputs[0][0]; // モノラル
+                            if (input) {
+                                // 録音データを送信
+                                this.port.postMessage({
+                                    type: 'audioData',
+                                    data: input
+                                });
+                            }
+                        }
+                        return true;
+                    }
+                }
+                
+                registerProcessor('audio-recorder-worklet', AudioRecorderWorklet);
+            `;
+            
+            const blob = new Blob([processorCode], { type: 'application/javascript' });
+            const workletURL = URL.createObjectURL(blob);
+            
+            await this.audioContext.audioWorklet.addModule(workletURL);
+            this.addDebugLog('✅ AudioWorkletプロセッサー読み込み完了', 'success');
+            
+            // AudioWorkletNode作成
+            this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'audio-recorder-worklet');
+            this.audioChunks = [];
+            
+            // 録音データ受信
+            this.audioWorkletNode.port.onmessage = (event) => {
+                if (event.data.type === 'audioData' && this.isRecording) {
+                    this.audioChunks.push(new Float32Array(event.data.data));
+                    
+                    // 録音進行表示
+                    if (this.audioChunks.length % 10 === 0) {
+                        const totalSamples = this.audioChunks.length * 128; // AudioWorkletは128サンプル単位
+                        const duration = totalSamples / this.audioContext.sampleRate;
+                        this.updateRecordStatus(`🎤 AudioWorklet録音中... ${duration.toFixed(1)}秒`);
+                    }
+                }
+            };
+            
+            // MediaStreamSourceを作成してAudioWorkletに接続
+            this.microphoneSource = this.audioContext.createMediaStreamSource(stream);
+            this.microphoneSource.connect(this.audioWorkletNode);
+            
+            // 録音開始
+            this.isRecording = true;
+            this.audioWorkletNode.port.postMessage({ command: 'start' });
+            
+            this.addDebugLog('✅ AudioWorklet録音開始', 'success');
+            
+        } catch (error) {
+            this.addDebugLog(`❌ AudioWorklet録音エラー: ${error.message}`, 'error');
+            // フォールバック: ScriptProcessorNodeを使用
+            this.addDebugLog('🔄 ScriptProcessorNodeへフォールバック', 'info');
+            return this.startScriptProcessorRecording(stream);
+        }
+    }
+    
+    /**
+     * ScriptProcessorNode録音（フォールバック版）
+     */
+    async startScriptProcessorRecording(stream) {
+        this.addDebugLog('🎵 ScriptProcessorNode録音セットアップ開始（フォールバック）', 'info');
         
-        // 接続
-        this.microphoneSource.connect(this.recordingProcessor);
-        this.recordingProcessor.connect(this.audioContext.destination);
-        
-        this.isRecording = true;
+        try {
+            // マイクからの音声をScriptProcessorで処理
+            this.microphoneSource = this.audioContext.createMediaStreamSource(stream);
+            this.recordingProcessor = this.audioContext.createScriptProcessor(4096, 1, 1);
+            this.audioChunks = [];
+            
+            // 録音データ処理
+            this.recordingProcessor.onaudioprocess = (event) => {
+                if (this.isRecording) {
+                    const inputBuffer = event.inputBuffer;
+                    const inputData = inputBuffer.getChannelData(0);
+                    
+                    // Float32Arrayを録音データとして保存
+                    this.audioChunks.push(new Float32Array(inputData));
+                    
+                    // 録音進行表示
+                    if (this.audioChunks.length % 10 === 0) {
+                        const totalSamples = this.audioChunks.length * 4096;
+                        const duration = totalSamples / this.audioContext.sampleRate;
+                        this.updateRecordStatus(`🎤 ScriptProcessor録音中... ${duration.toFixed(1)}秒`);
+                    }
+                }
+            };
+            
+            // マイクからの音声をプロセッサに接続
+            this.microphoneSource.connect(this.recordingProcessor);
+            this.recordingProcessor.connect(this.audioContext.destination);
+            
+            this.isRecording = true;
+            this.addDebugLog('✅ ScriptProcessorNode録音開始', 'success');
+            
+        } catch (error) {
+            this.addDebugLog(`❌ ScriptProcessorNode録音エラー: ${error.message}`, 'error');
+            throw error;
+        }
     }
     
     /**
@@ -705,6 +907,10 @@ class MobileVoiceSystem {
             this.addDebugLog('❌ 音声認識APIが利用できません', 'error');
             return;
         }
+        
+        // 統合モード専用: 認識結果をクリア
+        this.recognizedText = '';
+        this.updateVoiceResult('統合モード: 音声認識を開始します...', false);
         
         this.addDebugLog('🎤 統合モード: 音声認識開始', 'info');
         
@@ -757,12 +963,15 @@ class MobileVoiceSystem {
             
             if (this.recognizedText && this.recognizedText.trim().length > 0) {
                 this.addDebugLog(`✅ 統合モード: 最終認識結果: "${this.recognizedText}"`, 'success');
+            } else {
+                this.addDebugLog('⚠️ 統合モード: 有効な音声認識結果がありません', 'warning');
             }
         };
         
         this.currentRecognition.onerror = (event) => {
             clearTimeout(timeoutId);
             this.addDebugLog(`❌ 統合モード: 音声認識エラー: ${event.error}`, 'error');
+            this.currentRecognition = null;
         };
         
         // 音声認識開始
@@ -775,7 +984,7 @@ class MobileVoiceSystem {
     }
     
     /**
-     * 統合モード停止
+     * 統合モード停止（AudioWorklet対応版）
      */
     stopUnifiedRecordingAndRecognition() {
         this.addDebugLog('🔚 録音+音声認識 統合モード停止開始', 'info');
@@ -786,17 +995,25 @@ class MobileVoiceSystem {
         if (this.isRecording) {
             this.isRecording = false;
             
+            // AudioWorklet停止
+            if (this.audioWorkletNode) {
+                this.audioWorkletNode.port.postMessage({ command: 'stop' });
+                this.audioWorkletNode.disconnect();
+                this.audioWorkletNode = null;
+                this.addDebugLog('✅ 統合モード: AudioWorklet録音停止完了', 'success');
+            }
+            
+            // ScriptProcessorNode停止（フォールバック）
             if (this.recordingProcessor) {
                 this.recordingProcessor.disconnect();
                 this.recordingProcessor = null;
+                this.addDebugLog('✅ 統合モード: ScriptProcessor録音停止完了', 'success');
             }
             
             if (this.microphoneSource) {
                 this.microphoneSource.disconnect();
                 this.microphoneSource = null;
             }
-            
-            this.addDebugLog('✅ 統合モード: Web Audio API録音停止完了', 'success');
         }
         
         // 音声認識停止
@@ -812,7 +1029,8 @@ class MobileVoiceSystem {
         
         // 結果表示
         if (this.audioChunks.length > 0) {
-            const totalSamples = this.audioChunks.length * 4096;
+            const sampleSize = this.audioWorkletNode ? 128 : 4096; // AudioWorkletは128サンプル、ScriptProcessorは4096サンプル
+            const totalSamples = this.audioChunks.length * sampleSize;
             const duration = totalSamples / this.audioContext.sampleRate;
             this.addDebugLog(`🎵 統合モード完了: 録音データ ${duration.toFixed(1)}秒`, 'success');
         }
@@ -822,7 +1040,7 @@ class MobileVoiceSystem {
         }
         
         this.updateRecordStatus('✅ 統合モード完了（録音+音声認識）');
-        this.addDebugLog('🎉 録音+音声認識 統合テスト完了！', 'success');
+        this.addDebugLog('🎉 AudioWorklet版 録音+音声認識 統合テスト完了！', 'success');
     }
     
     /**
