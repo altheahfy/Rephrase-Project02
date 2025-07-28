@@ -1469,23 +1469,32 @@ class MobileVoiceSystem {
      * 現在表示されている例文を取得
      */
     getCurrentSentence() {
+        console.log('📝 現在の例文取得を開始...');
         this.addDebugLog('📝 現在の例文取得を開始...', 'info');
         
-        // 方法1: window.loadedJsonDataから構築
+        // 🎯 直接window.loadedJsonDataから順序通りに例文を構築
         if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
-            const sentence = this.buildSentenceFromData();
+            const sentence = this.buildSentenceFromOrderedData();
             if (sentence && sentence.trim().length > 0) {
+                console.log('✅ データから例文を取得しました:', sentence);
                 this.addDebugLog(`✅ データから例文を取得: "${sentence}"`, 'success');
                 return sentence;
             }
         }
         
-        // 方法2: DOMから直接取得
+        console.warn('⚠️ データからの取得に失敗。フォールバック処理を実行');
+        this.addDebugLog('⚠️ データからの取得に失敗。フォールバック処理を実行', 'warning');
+        
+        // フォールバック: DOMから直接取得
         const domSentence = this.buildSentenceFromDOM();
         if (domSentence && domSentence.trim().length > 0) {
+            console.log('✅ DOMから例文を取得しました:', domSentence);
             this.addDebugLog(`✅ DOMから例文を取得: "${domSentence}"`, 'success');
             return domSentence;
         }
+
+        console.warn('⚠️ どの方法でも例文を取得できませんでした');
+        this.addDebugLog('⚠️ どの方法でも例文を取得できませんでした', 'error');
         
         // 方法3: テスト用のサンプル文
         const testSentence = 'This is a test sentence for speech synthesis.';
@@ -1494,26 +1503,70 @@ class MobileVoiceSystem {
     }
     
     /**
-     * データから例文を構築
+     * 順序データから例文を構築（PC版ロジック移植）
      */
-    buildSentenceFromData() {
+    buildSentenceFromOrderedData() {
         try {
-            const words = [];
+            const slots = [];
             
-            // loadedJsonDataから順序通りに単語を取得
-            if (window.loadedJsonData) {
-                for (const item of window.loadedJsonData) {
-                    if (item.text && item.text.trim()) {
-                        words.push(item.text.trim());
+            // 上位スロットから単語を取得
+            if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+                for (let i = 0; i < window.loadedJsonData.length; i++) {
+                    const item = window.loadedJsonData[i];
+                    if (item && typeof item === 'object') {
+                        slots.push({
+                            order: i,
+                            level: 'upper',
+                            text: item.text || '',
+                            type: item.type || ''
+                        });
                     }
                 }
             }
             
+            // 下位スロットから単語を取得
+            if (window.lastSelectedSlots && typeof window.lastSelectedSlots === 'object') {
+                Object.keys(window.lastSelectedSlots).forEach(key => {
+                    const value = window.lastSelectedSlots[key];
+                    if (value && typeof value === 'string' && value.trim()) {
+                        // キーから順序番号を抽出
+                        const orderMatch = key.match(/\d+/);
+                        const order = orderMatch ? parseInt(orderMatch[0]) : 999;
+                        
+                        slots.push({
+                            order: order,
+                            level: 'sub',
+                            text: value.trim(),
+                            type: 'selected'
+                        });
+                    }
+                });
+            }
+            
+            // 順序でソート（上位スロット優先、同じ順序なら下位スロット優先）
+            slots.sort((a, b) => {
+                if (a.order !== b.order) {
+                    return a.order - b.order;
+                }
+                // 同じ順序の場合、下位スロットを優先
+                return a.level === 'sub' ? -1 : 1;
+            });
+            
+            // テキストを結合
+            const words = [];
+            for (const slot of slots) {
+                if (slot.text && slot.text.trim()) {
+                    words.push(slot.text.trim());
+                }
+            }
+            
             const sentence = words.join(' ');
-            this.addDebugLog(`🔧 データ構築結果: "${sentence}"`, 'info');
+            this.addDebugLog(`🔧 順序データ構築結果: "${sentence}"`, 'info');
+            this.addDebugLog(`📊 使用スロット数: ${slots.length} (上位: ${slots.filter(s => s.level === 'upper').length}, 下位: ${slots.filter(s => s.level === 'sub').length})`, 'info');
+            
             return sentence;
         } catch (error) {
-            this.addDebugLog(`❌ データ構築エラー: ${error.message}`, 'error');
+            this.addDebugLog(`❌ 順序データ構築エラー: ${error.message}`, 'error');
             return '';
         }
     }
