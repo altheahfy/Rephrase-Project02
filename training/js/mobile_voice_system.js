@@ -133,11 +133,31 @@ class MobileVoiceSystem {
      * デバッグパネル初期化
      */
     initializeDebugPanel() {
-        const debugPanel = document.getElementById('voice-debug-panel');
+        let debugPanel = document.getElementById('voice-debug-panel');
         
         if (!debugPanel) {
-            console.log('❌ voice-debug-panel要素が見つかりません');
-            return;
+            console.log('❌ voice-debug-panel要素が見つかりません。新規作成します...');
+            
+            // デバッグパネル要素を動的作成
+            debugPanel = document.createElement('div');
+            debugPanel.id = 'voice-debug-panel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 120px;
+                right: 10px;
+                width: 320px;
+                max-height: 70vh;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+                z-index: 15000;
+                display: none;
+                overflow: hidden;
+            `;
+            document.body.appendChild(debugPanel);
+            console.log('✅ voice-debug-panel要素を作成しました');
+        } else {
+            console.log('✅ voice-debug-panel要素が見つかりました');
         }
         
         // パネル内容を動的生成

@@ -670,14 +670,19 @@ function handleLogout() {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 12px 18px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: all 0.2s ease;
-  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    min-width: 80px;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
     🎤 音声学習
   </button>
   
@@ -2389,6 +2394,47 @@ window.clearRandomizeHistory = function() {
         mobileScript.onload = function() {
             console.log('✅ モバイル専用音声システム読み込み完了');
             
+            // MobileVoiceSystemの初期化を試行
+            try {
+                console.log('🚀 MobileVoiceSystemの初期化を開始...');
+                
+                // voice-debug-panel要素の存在確認
+                const debugPanel = document.getElementById('voice-debug-panel');
+                console.log('🔍 voice-debug-panel要素:', debugPanel ? '存在します' : '存在しません');
+                
+                if (!debugPanel) {
+                    console.error('❌ voice-debug-panel要素が見つかりません。作成します...');
+                    const newDebugPanel = document.createElement('div');
+                    newDebugPanel.id = 'voice-debug-panel';
+                    newDebugPanel.style.cssText = `
+                        position: fixed;
+                        top: 120px;
+                        right: 10px;
+                        width: 320px;
+                        max-height: 70vh;
+                        background: white;
+                        border-radius: 8px;
+                        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+                        z-index: 15000;
+                        display: none;
+                        overflow: hidden;
+                    `;
+                    document.body.appendChild(newDebugPanel);
+                    console.log('✅ voice-debug-panel要素を作成しました');
+                }
+                
+                // MobileVoiceSystemの初期化
+                if (typeof MobileVoiceSystem !== 'undefined') {
+                    window.mobileVoiceSystem = new MobileVoiceSystem();
+                    console.log('✅ MobileVoiceSystem初期化成功');
+                } else {
+                    console.error('❌ MobileVoiceSystemクラスが見つかりません');
+                }
+                
+            } catch (error) {
+                console.error('❌ MobileVoiceSystem初期化エラー:', error);
+            }
+            
             // 🚨 修正: デバッグパネルは自動表示しない（ボタンでのみ表示）
             console.log('📱 モバイル専用システム初期化完了（パネルは非表示のまま）');
             
@@ -2405,21 +2451,62 @@ window.clearRandomizeHistory = function() {
             
             // 🎤 音声学習ボタンを新しいシステムに接続
             const voicePanelBtn = document.getElementById('voice-panel-open-btn');
+            console.log('🔍 音声学習ボタン検索結果:', voicePanelBtn ? '見つかりました' : '見つかりません');
+            
             if (voicePanelBtn) {
+                console.log('📊 音声学習ボタン詳細:', {
+                    id: voicePanelBtn.id,
+                    display: voicePanelBtn.style.display,
+                    visibility: voicePanelBtn.style.visibility,
+                    pointerEvents: voicePanelBtn.style.pointerEvents,
+                    zIndex: voicePanelBtn.style.zIndex
+                });
+                
                 // 既存のイベントリスナーを削除（クローン作成で削除）
                 const newVoicePanelBtn = voicePanelBtn.cloneNode(true);
                 voicePanelBtn.parentNode.replaceChild(newVoicePanelBtn, voicePanelBtn);
                 
-                newVoicePanelBtn.onclick = function() {
-                    console.log('🎤 音声学習ボタンがタップされました（モバイル専用システム）');
+                // 複数のイベントリスナーを設定（確実性向上）
+                newVoicePanelBtn.onclick = function(event) {
+                    console.log('🎤 音声学習ボタンがクリックされました（onclick）', event);
+                    handleVoicePanelToggle();
+                };
+                
+                newVoicePanelBtn.addEventListener('click', function(event) {
+                    console.log('🎤 音声学習ボタンがクリックされました（addEventListener）', event);
+                    handleVoicePanelToggle();
+                });
+                
+                newVoicePanelBtn.addEventListener('touchstart', function(event) {
+                    console.log('🎤 音声学習ボタンがタッチされました（touchstart）', event);
+                    event.preventDefault();
+                    handleVoicePanelToggle();
+                });
+                
+                // 音声パネル切り替え処理
+                function handleVoicePanelToggle() {
+                    console.log('🎤 音声学習パネル切り替え処理開始');
                     const panel = document.getElementById('voice-debug-panel');
+                    console.log('🔍 voice-debug-panel検索結果:', panel ? '見つかりました' : '見つかりません');
+                    
                     if (panel) {
                         const isCurrentlyHidden = panel.style.display === 'none' || panel.style.display === '';
                         panel.style.display = isCurrentlyHidden ? 'block' : 'none';
-                        console.log('📱 モバイル音声パネル:', isCurrentlyHidden ? '表示' : '非表示');
+                        console.log('📱 モバイル音声パネル切り替え:', isCurrentlyHidden ? '表示' : '非表示');
+                        console.log('📊 パネル状態詳細:', {
+                            display: panel.style.display,
+                            visibility: panel.style.visibility,
+                            opacity: panel.style.opacity
+                        });
+                    } else {
+                        console.error('❌ voice-debug-panel要素が見つかりません');
+                        alert('音声パネルが見つかりません。ページを再読み込みしてください。');
                     }
-                };
+                }
+                
                 console.log('🔗 音声学習ボタン → モバイル専用システム接続完了');
+            } else {
+                console.error('❌ voice-panel-open-btn要素が見つかりません');
             }
             
             // 📱 デバッグボタンも同様に接続（統一のため）
