@@ -67,18 +67,12 @@ class MobileVoiceSystem {
      * デバッグパネル初期化
      */
     initializeDebugPanel() {
-        console.log('🔧 initializeDebugPanel開始');
         const debugPanel = document.getElementById('voice-debug-panel');
-        console.log('🔧 voice-debug-panel要素:', debugPanel);
         
         if (!debugPanel) {
             console.log('❌ voice-debug-panel要素が見つかりません');
-            // 緊急用: アラートで確認
-            alert('voice-debug-panel要素が見つかりません。HTMLに要素が存在するか確認してください。');
             return;
         }
-        
-        console.log('🔧 パネル内容を動的生成中...');
         
         // パネル内容を動的生成
         debugPanel.innerHTML = `
@@ -150,15 +144,16 @@ class MobileVoiceSystem {
             </div>
         `;
         
-        console.log('🔧 HTML生成完了、スタイル追加中...');
         // スタイル追加
         this.addDebugPanelStyles();
         
-        console.log('🔧 イベントリスナー設定中...');
         // イベントリスナー設定
         this.setupEventListeners();
         
-        console.log('✅ デバッグパネル初期化完了');
+        // ログ窓にシステム情報を表示
+        this.addDebugLog('🚀 MobileVoiceSystem初期化完了', 'success');
+        this.addDebugLog('📱 統合ボタンテスト準備完了', 'info');
+        this.addDebugLog('🎯 「録音+音声認識 統合テスト」ボタンをタップしてください', 'info');
     }
     
     /**
@@ -280,18 +275,16 @@ class MobileVoiceSystem {
         
         // 🚀 フェーズ4: 統合テストボタンのイベントリスナー
         const unifiedTestBtn = document.getElementById('mobile-unified-test-btn');
-        console.log('🔧 統合テストボタン要素:', unifiedTestBtn);
         
         if (unifiedTestBtn) {
             unifiedTestBtn.addEventListener('click', () => {
-                console.log('🎯 統合テストボタンクリック検出');
                 this.addDebugLog('🎯 録音+音声認識 統合テストボタンがタップされました', 'info');
                 this.startUnifiedRecordingAndRecognition();
             });
-            console.log('✅ 統合テストボタンのイベントリスナー設定完了');
+            this.addDebugLog('✅ 統合テストボタンが正常に配置されました', 'success');
         } else {
-            console.log('❌ 統合テストボタンが見つかりません');
-            alert('統合テストボタン(mobile-unified-test-btn)が見つかりません');
+            this.addDebugLog('❌ 統合テストボタン(mobile-unified-test-btn)が見つかりません', 'error');
+            this.addDebugLog('⚠️ HTML生成で問題が発生した可能性があります', 'warning');
         }
     }
     
