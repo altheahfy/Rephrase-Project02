@@ -41,10 +41,11 @@ class MobileVoiceSystem {
             userAgent: navigator.userAgent
         });
         
-        if (!this.isMobile) {
-            console.log('⚠️ デスクトップデバイスが検出されました。このシステムはモバイル専用です。');
-            return;
-        }
+        // 🔧 デスクトップテスト用: モバイルチェックを一時的に無効化
+        // if (!this.isMobile) {
+        //     console.log('⚠️ デスクトップデバイスが検出されました。このシステムはモバイル専用です。');
+        //     return;
+        // }
         
         this.initializeDebugPanel();
         console.log('✅ MobileVoiceSystem初期化完了');
@@ -66,11 +67,18 @@ class MobileVoiceSystem {
      * デバッグパネル初期化
      */
     initializeDebugPanel() {
+        console.log('🔧 initializeDebugPanel開始');
         const debugPanel = document.getElementById('voice-debug-panel');
+        console.log('🔧 voice-debug-panel要素:', debugPanel);
+        
         if (!debugPanel) {
             console.log('❌ voice-debug-panel要素が見つかりません');
+            // 緊急用: アラートで確認
+            alert('voice-debug-panel要素が見つかりません。HTMLに要素が存在するか確認してください。');
             return;
         }
+        
+        console.log('🔧 パネル内容を動的生成中...');
         
         // パネル内容を動的生成
         debugPanel.innerHTML = `
@@ -142,11 +150,15 @@ class MobileVoiceSystem {
             </div>
         `;
         
+        console.log('🔧 HTML生成完了、スタイル追加中...');
         // スタイル追加
         this.addDebugPanelStyles();
         
+        console.log('🔧 イベントリスナー設定中...');
         // イベントリスナー設定
         this.setupEventListeners();
+        
+        console.log('✅ デバッグパネル初期化完了');
     }
     
     /**
@@ -268,11 +280,18 @@ class MobileVoiceSystem {
         
         // 🚀 フェーズ4: 統合テストボタンのイベントリスナー
         const unifiedTestBtn = document.getElementById('mobile-unified-test-btn');
+        console.log('🔧 統合テストボタン要素:', unifiedTestBtn);
+        
         if (unifiedTestBtn) {
             unifiedTestBtn.addEventListener('click', () => {
+                console.log('🎯 統合テストボタンクリック検出');
                 this.addDebugLog('🎯 録音+音声認識 統合テストボタンがタップされました', 'info');
                 this.startUnifiedRecordingAndRecognition();
             });
+            console.log('✅ 統合テストボタンのイベントリスナー設定完了');
+        } else {
+            console.log('❌ 統合テストボタンが見つかりません');
+            alert('統合テストボタン(mobile-unified-test-btn)が見つかりません');
         }
     }
     
@@ -946,10 +965,11 @@ let mobileVoiceSystem = null;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 MobileVoiceSystem DOM読み込み完了');
     
-    // モバイルデバイスの場合のみ初期化
+    // モバイルデバイスの場合のみ初期化（デスクトップテスト用に一時的に無効化）
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
                     'ontouchstart' in window ||
-                    window.innerWidth <= 768;
+                    window.innerWidth <= 768 ||
+                    true; // 🔧 デスクトップテスト用: 強制的にtrueに設定
     
     if (isMobile) {
         mobileVoiceSystem = new MobileVoiceSystem();
