@@ -35,6 +35,10 @@ class MobileVoiceSystem {
         this.isUnifiedMode = false;
         this.currentRecognition = null;
         
+        // 🚀 フェーズ5: 読み上げ機能プロパティ
+        this.currentUtterance = null;
+        this.availableVoices = [];
+        
         console.log('📱 モバイル検出結果:', {
             isMobile: this.isMobile,
             isAndroid: this.isAndroid,
@@ -48,6 +52,7 @@ class MobileVoiceSystem {
         // }
         
         this.initializeDebugPanel();
+        this.loadVoices(); // 読み上げ用音声を読み込み
         console.log('✅ MobileVoiceSystem初期化完了');
     }
     
@@ -118,6 +123,13 @@ class MobileVoiceSystem {
                         font-weight: bold;
                     ">
                         🎯 録音+音声認識 統合テスト
+                    </button>
+                    <button id="mobile-tts-test-btn" class="voice-test-btn" style="
+                        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+                        margin-top: 8px;
+                        font-weight: bold;
+                    ">
+                        🔊 例文読み上げテスト
                     </button>
                 </div>
                 
@@ -285,6 +297,19 @@ class MobileVoiceSystem {
         } else {
             this.addDebugLog('❌ 統合テストボタン(mobile-unified-test-btn)が見つかりません', 'error');
             this.addDebugLog('⚠️ HTML生成で問題が発生した可能性があります', 'warning');
+        }
+        
+        // 🚀 フェーズ5: 読み上げテストボタンのイベントリスナー
+        const ttsTestBtn = document.getElementById('mobile-tts-test-btn');
+        
+        if (ttsTestBtn) {
+            ttsTestBtn.addEventListener('click', () => {
+                this.addDebugLog('🔊 例文読み上げテストボタンがタップされました', 'info');
+                this.startTextToSpeechTest();
+            });
+            this.addDebugLog('✅ 読み上げテストボタンが正常に配置されました', 'success');
+        } else {
+            this.addDebugLog('❌ 読み上げテストボタン(mobile-tts-test-btn)が見つかりません', 'error');
         }
     }
     
@@ -947,6 +972,279 @@ class MobileVoiceSystem {
             if (logItems.length > 20) {
                 logDiv.removeChild(logItems[0]);
             }
+        }
+    }
+    
+    /**
+     * 🚀 フェーズ5: 例文読み上げテスト機能
+     */
+    async startTextToSpeechTest() {
+        this.addDebugLog('🔊 例文読み上げテスト開始', 'info');
+        
+        // 現在の例文を取得
+        const sentence = this.getCurrentSentence();
+        
+        if (!sentence || sentence.trim().length === 0) {
+            this.addDebugLog('❌ 読み上げる例文がありません', 'error');
+            this.addDebugLog('💡 メインの学習画面で例文を表示してからお試しください', 'info');
+            return;
+        }
+        
+        this.addDebugLog(`📝 読み上げ対象: "${sentence}"`, 'info');
+        
+        // 既存の音声を停止
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            this.addDebugLog('🛑 既存の読み上げを停止しました', 'info');
+        }
+        
+        // 音声リストの確保
+        await this.ensureVoicesLoaded();
+        
+        // 読み上げ実行
+        await this.speakSentence(sentence);
+    }
+    
+    /**
+     * 音声リストの読み込み確保
+     */
+    async ensureVoicesLoaded() {
+        let voices = speechSynthesis.getVoices();
+        
+        if (voices.length === 0) {
+            this.addDebugLog('⏳ 音声リストの読み込みを待機中...', 'info');
+            await new Promise(resolve => {
+                const checkVoices = () => {
+                    voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        this.addDebugLog(`✅ 音声リスト読み込み完了: ${voices.length}個`, 'success');
+                        resolve();
+                    } else {
+                        setTimeout(checkVoices, 100);
+                    }
+                };
+                checkVoices();
+            });
+        } else {
+            this.addDebugLog(`✅ 音声リスト準備済み: ${voices.length}個`, 'success');
+        }
+        
+        this.availableVoices = voices;
+    }
+    
+    /**
+     * 例文を音声で読み上げ
+     */
+    async speakSentence(sentence) {
+        this.addDebugLog('🎤 音声合成を開始します', 'info');
+        
+        // SpeechSynthesisUtterance作成
+        this.currentUtterance = new SpeechSynthesisUtterance(sentence);
+        
+        // 女性の英語音声を優先選択
+        const selectedVoice = this.selectBestVoice();
+        
+        if (selectedVoice) {
+            this.currentUtterance.voice = selectedVoice;
+            this.addDebugLog(`🗣️ 選択された音声: ${selectedVoice.name} (${selectedVoice.lang})`, 'success');
+        } else {
+            this.addDebugLog('⚠️ 適切な音声が見つかりません。デフォルト音声を使用します', 'warning');
+        }
+        
+        // 音声パラメータ設定
+        this.currentUtterance.rate = 0.8;  // 少しゆっくり
+        this.currentUtterance.pitch = 1.0; // 標準ピッチ
+        this.currentUtterance.volume = 1.0; // 最大音量
+        
+        // イベントハンドラー設定
+        this.currentUtterance.onstart = () => {
+            this.addDebugLog(`🔊 読み上げ開始: "${sentence}"`, 'success');
+        };
+        
+        this.currentUtterance.onend = () => {
+            this.addDebugLog('✅ 読み上げ完了', 'success');
+        };
+        
+        this.currentUtterance.onerror = (event) => {
+            this.addDebugLog(`❌ 読み上げエラー: ${event.error}`, 'error');
+        };
+        
+        // 読み上げ実行
+        speechSynthesis.speak(this.currentUtterance);
+        this.addDebugLog('🚀 音声合成を実行しました', 'info');
+    }
+    
+    /**
+     * 最適な音声を選択（女性の英語音声を優先）
+     */
+    selectBestVoice() {
+        const voices = this.availableVoices;
+        
+        if (!voices || voices.length === 0) {
+            this.addDebugLog('❌ 利用可能な音声がありません', 'error');
+            return null;
+        }
+        
+        this.addDebugLog('🔍 最適な音声を選択中...', 'info');
+        
+        // 女性の英語音声を最優先で探す
+        const femaleEnglishVoice = voices.find(voice => 
+            voice.lang.startsWith('en') && 
+            (voice.name.toLowerCase().includes('female') || 
+             voice.name.toLowerCase().includes('woman') ||
+             voice.name.toLowerCase().includes('zira') ||    // Microsoft Zira (女性)
+             voice.name.toLowerCase().includes('hazel') ||   // Microsoft Hazel (女性)
+             voice.name.toLowerCase().includes('samantha') || // macOS Samantha (女性)
+             voice.name.toLowerCase().includes('karen') ||   // macOS Karen (女性)
+             voice.name.toLowerCase().includes('anna') ||    // Anna (女性)
+             voice.name.toLowerCase().includes('linda') ||   // Linda (女性)
+             voice.name.toLowerCase().includes('heather'))   // Heather (女性)
+        );
+        
+        if (femaleEnglishVoice) {
+            this.addDebugLog(`👩 女性英語音声を発見: ${femaleEnglishVoice.name}`, 'success');
+            return femaleEnglishVoice;
+        }
+        
+        // 女性音声が見つからない場合は、一般的な英語音声を選択
+        const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+        
+        if (englishVoice) {
+            this.addDebugLog(`🇺🇸 英語音声を選択: ${englishVoice.name}`, 'success');
+            return englishVoice;
+        }
+        
+        // 英語音声がない場合はデフォルト
+        this.addDebugLog('⚠️ 英語音声が見つかりません。デフォルト音声を使用', 'warning');
+        return voices[0] || null;
+    }
+    
+    /**
+     * 音声リストを読み込み
+     */
+    loadVoices() {
+        const updateVoices = () => {
+            const voices = speechSynthesis.getVoices();
+            this.availableVoices = voices;
+            
+            if (voices.length > 0) {
+                this.addDebugLog(`📢 音声リスト読み込み: ${voices.length}個`, 'success');
+                
+                // 英語音声をチェック
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                if (englishVoices.length > 0) {
+                    this.addDebugLog(`🇺🇸 英語音声: ${englishVoices.length}個見つかりました`, 'success');
+                    
+                    // 女性音声をチェック
+                    const femaleVoices = englishVoices.filter(voice => 
+                        voice.name.toLowerCase().includes('female') || 
+                        voice.name.toLowerCase().includes('woman') ||
+                        voice.name.toLowerCase().includes('zira') ||
+                        voice.name.toLowerCase().includes('hazel') ||
+                        voice.name.toLowerCase().includes('samantha') ||
+                        voice.name.toLowerCase().includes('karen') ||
+                        voice.name.toLowerCase().includes('anna') ||
+                        voice.name.toLowerCase().includes('linda') ||
+                        voice.name.toLowerCase().includes('heather')
+                    );
+                    
+                    if (femaleVoices.length > 0) {
+                        this.addDebugLog(`👩 女性英語音声: ${femaleVoices.length}個利用可能`, 'success');
+                    }
+                } else {
+                    this.addDebugLog('⚠️ 英語音声が見つかりません', 'warning');
+                }
+            }
+        };
+        
+        // 初回実行
+        updateVoices();
+        
+        // 音声リストが更新された時のイベントリスナー
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = updateVoices;
+        }
+    }
+    
+    /**
+     * 現在表示されている例文を取得
+     */
+    getCurrentSentence() {
+        this.addDebugLog('📝 現在の例文取得を開始...', 'info');
+        
+        // 方法1: window.loadedJsonDataから構築
+        if (window.loadedJsonData && Array.isArray(window.loadedJsonData)) {
+            const sentence = this.buildSentenceFromData();
+            if (sentence && sentence.trim().length > 0) {
+                this.addDebugLog(`✅ データから例文を取得: "${sentence}"`, 'success');
+                return sentence;
+            }
+        }
+        
+        // 方法2: DOMから直接取得
+        const domSentence = this.buildSentenceFromDOM();
+        if (domSentence && domSentence.trim().length > 0) {
+            this.addDebugLog(`✅ DOMから例文を取得: "${domSentence}"`, 'success');
+            return domSentence;
+        }
+        
+        // 方法3: テスト用のサンプル文
+        const testSentence = 'This is a test sentence for speech synthesis.';
+        this.addDebugLog(`🧪 テスト例文を使用: "${testSentence}"`, 'info');
+        return testSentence;
+    }
+    
+    /**
+     * データから例文を構築
+     */
+    buildSentenceFromData() {
+        try {
+            const words = [];
+            
+            // loadedJsonDataから順序通りに単語を取得
+            if (window.loadedJsonData) {
+                for (const item of window.loadedJsonData) {
+                    if (item.text && item.text.trim()) {
+                        words.push(item.text.trim());
+                    }
+                }
+            }
+            
+            const sentence = words.join(' ');
+            this.addDebugLog(`🔧 データ構築結果: "${sentence}"`, 'info');
+            return sentence;
+        } catch (error) {
+            this.addDebugLog(`❌ データ構築エラー: ${error.message}`, 'error');
+            return '';
+        }
+    }
+    
+    /**
+     * DOMから例文を構築
+     */
+    buildSentenceFromDOM() {
+        try {
+            const words = [];
+            
+            // メインのスロットエリアから単語を取得
+            const slots = document.querySelectorAll('.slot-content, .subslot-content, [data-slot-text]');
+            
+            slots.forEach(slot => {
+                const text = slot.textContent || slot.innerText || '';
+                if (text.trim() && !text.includes('(') && text !== '...') {
+                    words.push(text.trim());
+                }
+            });
+            
+            // 重複除去と整理
+            const uniqueWords = [...new Set(words)];
+            const sentence = uniqueWords.join(' ');
+            
+            this.addDebugLog(`🔧 DOM構築結果: "${sentence}"`, 'info');
+            return sentence;
+        } catch (error) {
+            this.addDebugLog(`❌ DOM構築エラー: ${error.message}`, 'error');
+            return '';
         }
     }
 }
