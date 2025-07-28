@@ -199,12 +199,12 @@ class MobileVoiceSystem {
                         🔊 再生テスト
                     </button>
                     <button id="mobile-unified-test-btn" class="voice-test-btn" style="
-                        background: linear-gradient(135deg, ${(this.isAndroidChrome && !this.isAndroidEdge) ? '#6c757d 0%, #495057 100%' : '#28a745 0%, #20c997 100%'});
+                        background: linear-gradient(135deg, ${this.isAndroid ? '#6c757d 0%, #495057 100%' : '#28a745 0%, #20c997 100%'});
                         margin-top: 8px;
                         font-weight: bold;
-                        ${(this.isAndroidChrome && !this.isAndroidEdge) ? 'opacity: 0.6;' : ''}
+                        ${this.isAndroid ? 'opacity: 0.6;' : ''}
                     ">
-                        ${(this.isAndroidChrome && !this.isAndroidEdge) ? '🚫 統合テスト (Chrome制限)' : '🎯 録音+音声認識 統合テスト'}
+                        ${this.isAndroid ? '🚫 統合テスト (Android OS制限)' : '🎯 録音+音声認識 統合テスト'}
                     </button>
                     <button id="mobile-tts-test-btn" class="voice-test-btn" style="
                         background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
@@ -248,9 +248,10 @@ class MobileVoiceSystem {
         this.addDebugLog('🚀 MobileVoiceSystem初期化完了', 'success');
         this.addDebugLog(`🌐 ブラウザ: ${this.browserInfo}`, 'info');
         
-        if (this.isAndroidChrome && !this.isAndroidEdge) {
-            this.addDebugLog('⚠️ Android Chrome: 統合機能制限あり', 'warning');
-            this.addDebugLog('📱 録音・音声認識は個別ボタンでテストしてください', 'info');
+        if (this.isAndroid) {
+            this.addDebugLog('⚠️ Android OS: 統合機能制限あり', 'warning');
+            this.addDebugLog('📱 Android OSでは音声リソース競合により統合機能不可', 'info');
+            this.addDebugLog('🔄 録音・音声認識は個別ボタンでテストしてください', 'info');
         } else {
             this.addDebugLog('✅ 統合機能テスト可能な環境です', 'success');
             this.addDebugLog('🎯 「録音+音声認識 統合テスト」ボタンをタップしてください', 'info');
@@ -738,11 +739,12 @@ class MobileVoiceSystem {
         }
         
         // ブラウザ種別による処理分岐
-        if (this.isAndroidChrome && !this.isAndroidEdge) {
-            this.addDebugLog('🚫 Android Chrome検出: 統合機能は制限されています', 'warning');
-            this.addDebugLog('💡 Android Chrome ではマイクリソース競合により同時実行できません', 'info');
-            this.addDebugLog('🔄 別々のボタンでテストしてください', 'info');
-            this.updateRecordStatus('❌ Android Chrome: 統合機能制限');
+        if (this.isAndroid) {
+            this.addDebugLog('🚫 Android OS検出: 統合機能は制限されています', 'warning');
+            this.addDebugLog('💡 Android OSでは音声リソース競合により同時実行できません', 'info');
+            this.addDebugLog('🔄 全てのAndroidブラウザで同じ制限があります', 'info');
+            this.addDebugLog('📱 別々のボタンでテストしてください', 'info');
+            this.updateRecordStatus('❌ Android OS: 統合機能制限');
             return;
         }
         
@@ -776,10 +778,10 @@ class MobileVoiceSystem {
         } catch (error) {
             this.addDebugLog(`❌ ${this.browserInfo}: 統合モード開始エラー: ${error.message}`, 'error');
             
-            // Chrome制限対象外ブラウザでもエラーが発生した場合の詳細ログ
-            if (!(this.isAndroidChrome && !this.isAndroidEdge)) {
-                this.addDebugLog('⚠️ 予想外のエラー: 統合テスト対応ブラウザでも統合機能が失敗', 'warning');
-                this.addDebugLog('📊 ブラウザ情報をレポートに含めてください', 'info');
+            // Android OS制限での詳細ログ
+            if (this.isAndroid) {
+                this.addDebugLog('⚠️ 予想通り: Android OSでは統合機能が制限されています', 'warning');
+                this.addDebugLog('📊 これはOSレベルの音声リソース管理による制限です', 'info');
             }
             
             this.isUnifiedMode = false;
