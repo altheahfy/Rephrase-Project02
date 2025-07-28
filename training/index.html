@@ -2391,10 +2391,6 @@ window.clearRandomizeHistory = function() {
         // � 従来のVoiceSystemを使用
         const mobileScript = document.createElement('script');
         mobileScript.src = 'js/voice_system.js';
-        mobileScript.onload = function() {
-            console.log('📱 モバイル音声システム読み込み完了');
-            initializeVoiceSystem();
-        };
         document.head.appendChild(mobileScript);
         console.log('✅ 従来の音声システムでモバイル対応完了');
         
@@ -2404,111 +2400,9 @@ window.clearRandomizeHistory = function() {
         // デスクトップでは既存システムを読み込み
         const desktopScript = document.createElement('script');
         desktopScript.src = 'js/voice_system.js';
-        desktopScript.onload = function() {
-            console.log('💻 デスクトップ音声システム読み込み完了');
-            initializeVoiceSystem();
-        };
         document.head.appendChild(desktopScript);
     }
 })();
-
-// 音声システム初期化関数
-function initializeVoiceSystem() {
-    console.log('🎤 音声システム初期化開始...');
-    
-    // VoiceSystemクラスが利用可能になるまで待機
-    function waitForVoiceSystem() {
-        if (typeof VoiceSystem !== 'undefined') {
-            console.log('✅ VoiceSystemクラス検出');
-            
-            try {
-                // 音声システムインスタンスを作成
-                window.voiceSystem = new VoiceSystem();
-                console.log('✅ VoiceSystemインスタンス作成完了');
-                
-                // 音声ボタンのイベントリスナーを設定
-                setupVoiceButtonEvents();
-                
-            } catch (error) {
-                console.error('❌ 音声システム初期化エラー:', error);
-            }
-        } else {
-            console.log('⏳ VoiceSystemクラス待機中...');
-            setTimeout(waitForVoiceSystem, 100);
-        }
-    }
-    
-    waitForVoiceSystem();
-}
-
-// 音声ボタンイベント設定関数
-function setupVoiceButtonEvents() {
-    console.log('🔧 音声ボタンイベント設定開始...');
-    
-    // 音声パネル開くボタン
-    const openBtn = document.getElementById('voice-panel-open-btn');
-    if (openBtn) {
-        openBtn.addEventListener('click', function() {
-            console.log('🎤 音声パネル開くボタンがクリックされました');
-            if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                window.voiceSystem.toggleVoicePanel();
-            }
-        });
-        console.log('✅ 音声パネル開くボタンのイベント設定完了');
-    }
-    
-    // 音声パネル閉じるボタン
-    const closeBtn = document.getElementById('voice-panel-close-btn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            console.log('🎤 音声パネル閉じるボタンがクリックされました');
-            if (window.voiceSystem && window.voiceSystem.hideVoicePanel) {
-                window.voiceSystem.hideVoicePanel();
-            }
-        });
-        console.log('✅ 音声パネル閉じるボタンのイベント設定完了');
-    }
-    
-    // 録音ボタン
-    const recordBtn = document.getElementById('voice-record-btn');
-    if (recordBtn) {
-        recordBtn.addEventListener('click', function() {
-            console.log('🎤 録音ボタンがクリックされました');
-            if (window.voiceSystem) {
-                if (window.voiceSystem.isRecording) {
-                    window.voiceSystem.stopRecording();
-                } else {
-                    window.voiceSystem.startRecording();
-                }
-            }
-        });
-        console.log('✅ 録音ボタンのイベント設定完了');
-    }
-    
-    // その他の音声ボタン
-    const buttons = [
-        { id: 'voice-play-btn', action: 'playRecording' },
-        { id: 'voice-tts-btn', action: 'speakSentence' },
-        { id: 'voice-analyze-btn', action: 'analyzeRecording' },
-        { id: 'voice-stop-btn', action: 'stopRecording' },
-        { id: 'voice-progress-btn', action: 'showProgressPanel' }
-    ];
-    
-    buttons.forEach(({ id, action }) => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.addEventListener('click', function() {
-                console.log(`🎤 ${id} がクリックされました`);
-                if (window.voiceSystem && window.voiceSystem[action]) {
-                    window.voiceSystem[action]();
-                }
-            });
-            console.log(`✅ ${id} のイベント設定完了`);
-        }
-    });
-    
-    console.log('🎉 音声ボタンイベント設定完了');
-}
 </script>
 <script src="js/voice_progress_tracker.js"></script>
 <script src="js/voice_progress_ui.js"></script>
