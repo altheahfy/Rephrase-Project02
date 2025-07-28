@@ -2819,14 +2819,32 @@ class VoiceSystem {
     /**
      * 音声パネルの表示/非表示を切り替え
      */
+    /**
+     * 音声パネルの表示/非表示を切り替え
+     * 🤖 Android分岐機能付き: Android端末では専用パネルを表示
+     */
     toggleVoicePanel() {
-        const panel = document.getElementById('voice-control-panel');
-        if (panel) {
-            const isVisible = panel.style.display === 'block';
-            if (isVisible) {
-                this.hideVoicePanel();
+        // 🤖 Android端末判定
+        const isAndroidDevice = /Android/i.test(navigator.userAgent);
+        
+        if (isAndroidDevice) {
+            // Android専用パネルの処理
+            const androidPanel = document.getElementById('android-voice-panel');
+            if (androidPanel) {
+                this.hideAndroidVoicePanel();
             } else {
-                this.showVoicePanel();
+                this.showAndroidVoicePanel();
+            }
+        } else {
+            // PC/iPhone用の通常パネル
+            const panel = document.getElementById('voice-control-panel');
+            if (panel) {
+                const isVisible = panel.style.display === 'block';
+                if (isVisible) {
+                    this.hideVoicePanel();
+                } else {
+                    this.showVoicePanel();
+                }
             }
         }
     }
@@ -4198,3 +4216,139 @@ window.showMobileDebug = function() {
 };
 
 console.log('📱 スマホ用デバッグパネル表示機能が利用可能です: window.showMobileDebug()');
+
+// Android専用パネル機能を追加
+VoiceSystem.prototype.showAndroidVoicePanel = function() {
+    // 既存のパネルが表示されている場合は隠す
+    this.hideVoicePanel();
+    
+    // Android専用パネルを動的に作成（既存パネルのコピー）
+    const androidPanel = document.createElement('div');
+    androidPanel.id = 'android-voice-panel';
+    androidPanel.style.cssText = `
+        position: fixed !important;
+        top: 120px !important;
+        right: 20px !important;
+        z-index: 1000 !important;
+        background: white !important;
+        border: 2px solid #4CAF50 !important;
+        border-radius: 10px !important;
+        padding: 15px !important;
+        max-width: 300px !important;
+        min-width: 250px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        overflow-y: auto !important;
+        max-height: 70vh !important;
+    `;
+    
+    // Android専用パネルのHTML（赤い録音ボタン）
+    androidPanel.innerHTML = `
+        <!-- 基本パネル（固定サイズ） -->
+        <div id="android-voice-panel-basic" style="position: relative;">
+          <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+            <h3 style="margin: 0; color: #333; font-size: 16px; font-weight: bold;">🤖 Android音声システム</h3>
+            <button id="android-voice-panel-close-btn" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
+          </div>
+          
+          <!-- 音声コントロールボタン（Android専用：録音のみ+分析ボタン） -->
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+            <button id="android-voice-record-btn" class="voice-btn" style="background-color: #f44336; color: white; border: none; padding: 8px 12px; font-size: 12px; cursor: pointer; border-radius: 3px;">🎤 録音</button>
+            <button id="android-voice-play-btn" class="voice-btn" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); color: #78716c; border: none; padding: 8px 12px; font-size: 12px; cursor: pointer; border-radius: 3px; opacity: 0.5;" disabled>🔊 再生</button>
+            <button id="android-voice-tts-btn" class="voice-btn" style="background-color: #FF9800; color: white; border: none; padding: 8px 12px; font-size: 12px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
+          </div>
+          
+          <!-- ステータス表示 -->
+          <div id="android-voice-status" class="voice-status info" style="color: #333; font-size: 11px; background: rgba(76, 175, 80, 0.1); padding: 4px 8px; border-radius: 12px; margin: 8px 0; text-align: center;">待機中...</div>
+          
+          <!-- 録音タイマー -->
+          <div style="text-align: center; margin: 8px 0;">
+            <span style="color: #333; font-family: monospace; font-size: 14px; font-weight: bold;" id="android-voice-timer">⏱️ 00:00</span>
+          </div>
+          
+          <!-- 音量バー -->
+          <div style="margin: 8px 0;">
+            <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden;">
+              <div id="android-voice-volume-bar" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722); width: 0%; transition: width 0.1s ease;"></div>
+            </div>
+          </div>
+          
+          <!-- 分析結果表示エリア（基本パネル内） -->
+          <div id="android-voice-results" style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 8px; min-height: 100px; max-height: 200px; overflow-y: auto; color: #333; font-size: 11px; margin: 8px 0;">Android用音声分析結果がここに表示されます</div>
+        </div>
+    `;
+    
+    // パネルをDOMに追加
+    document.body.appendChild(androidPanel);
+    
+    // DOM追加後に少し待機してからイベントリスナーを設定
+    setTimeout(() => {
+        this.setupAndroidPanelEvents();
+    }, 10);
+    
+    console.log('🤖 Android専用音声パネルを表示しました');
+};
+
+VoiceSystem.prototype.hideAndroidVoicePanel = function() {
+    const panel = document.getElementById('android-voice-panel');
+    if (panel) {
+        panel.remove();
+        console.log('🤖 Android専用音声パネルを非表示にしました');
+    }
+};
+
+VoiceSystem.prototype.setupAndroidPanelEvents = function() {
+    console.log('🔧 Android専用パネルのイベント設定開始...');
+    
+    // 録音ボタン
+    const recordBtn = document.getElementById('android-voice-record-btn');
+    if (recordBtn) {
+        recordBtn.addEventListener('click', () => {
+            console.log('🤖 Android録音ボタンがクリックされました');
+            if (this.isRecording) {
+                this.stopRecording();
+            } else {
+                this.startRecording();
+            }
+        });
+        console.log('✅ Android録音ボタンのイベントリスナーを設定');
+    }
+    
+    // 再生ボタン
+    const playBtn = document.getElementById('android-voice-play-btn');
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            this.playRecording();
+        });
+    }
+    
+    // 音声合成ボタン
+    const ttsBtn = document.getElementById('android-voice-tts-btn');
+    if (ttsBtn) {
+        ttsBtn.addEventListener('click', () => {
+            this.speakSentence();
+        });
+    }
+    
+    // 閉じるボタン（最重要）
+    const closeBtn = document.getElementById('android-voice-panel-close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (event) => {
+            console.log('🤖 Android閉じるボタンがクリックされました');
+            event.preventDefault();
+            event.stopPropagation();
+            this.hideAndroidVoicePanel();
+        });
+        
+        // タッチイベント（モバイル対応）
+        closeBtn.addEventListener('touchstart', (event) => {
+            console.log('🤖 Android閉じるボタンがタッチされました');
+            event.preventDefault();
+            this.hideAndroidVoicePanel();
+        });
+        
+        console.log('✅ Android閉じるボタンのイベントリスナーを設定');
+    }
+    
+    console.log('🔧 Android専用パネルのイベント設定完了');
+};
