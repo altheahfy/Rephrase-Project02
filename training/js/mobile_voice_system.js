@@ -16,10 +16,10 @@ class MobileVoiceSystem {
         // モバイル検出
         this.isMobile = this.detectMobileDevice();
         this.isAndroid = /Android/i.test(navigator.userAgent);
-        this.isAndroidChrome = this.isAndroid && /Chrome/i.test(navigator.userAgent);
+        this.isAndroidChrome = this.isAndroid && /Chrome/i.test(navigator.userAgent) && !/Edg/i.test(navigator.userAgent) && !/SamsungBrowser/i.test(navigator.userAgent);
         this.isAndroidFirefox = this.isAndroid && /Firefox/i.test(navigator.userAgent);
         this.isAndroidSamsung = this.isAndroid && /SamsungBrowser/i.test(navigator.userAgent);
-        this.isAndroidEdge = this.isAndroid && /EdgA/i.test(navigator.userAgent);
+        this.isAndroidEdge = this.isAndroid && (/EdgA/i.test(navigator.userAgent) || /Edge/i.test(navigator.userAgent) || /Edg\//i.test(navigator.userAgent));
         this.browserInfo = this.detectBrowserInfo();
         
         // 基本プロパティ
@@ -99,7 +99,7 @@ class MobileVoiceSystem {
                 return 'Android Firefox';
             } else if (/SamsungBrowser/i.test(ua)) {
                 return 'Android Samsung Browser';
-            } else if (/EdgA/i.test(ua)) {
+            } else if (/EdgA/i.test(ua) || /Edge/i.test(ua) || /Edg\//i.test(ua)) {
                 return 'Android Edge';
             } else {
                 return 'Android Other';
@@ -1485,6 +1485,17 @@ class MobileVoiceSystem {
         this.addMobileDebugInfo(`🌐 ブラウザ: ${this.browserInfo}`, 'info');
         this.addMobileDebugInfo(`🤖 User Agent: ${navigator.userAgent.substring(0, 80)}...`, 'info');
         
+        // User Agent詳細検証（Edge検出用）
+        this.addMobileDebugInfo('🔍 User Agent詳細解析:', 'info');
+        const ua = navigator.userAgent;
+        this.addMobileDebugInfo(`  🔸 Contains 'Android': ${/Android/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'Chrome': ${/Chrome/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'Edg': ${/Edg/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'EdgA': ${/EdgA/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'Edge': ${/Edge/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'Firefox': ${/Firefox/i.test(ua)}`, 'info');
+        this.addMobileDebugInfo(`  🔸 Contains 'SamsungBrowser': ${/SamsungBrowser/i.test(ua)}`, 'info');
+        
         // Android ブラウザ詳細
         if (this.isAndroid) {
             this.addMobileDebugInfo('📱 Android詳細:', 'info');
@@ -1492,6 +1503,9 @@ class MobileVoiceSystem {
             this.addMobileDebugInfo(`  🔹 Firefox: ${this.isAndroidFirefox ? 'はい' : 'いいえ'}`, this.isAndroidFirefox ? 'success' : 'info');
             this.addMobileDebugInfo(`  🔹 Samsung: ${this.isAndroidSamsung ? 'はい' : 'いいえ'}`, this.isAndroidSamsung ? 'success' : 'info');
             this.addMobileDebugInfo(`  🔹 Edge: ${this.isAndroidEdge ? 'はい' : 'いいえ'}`, this.isAndroidEdge ? 'success' : 'info');
+            
+            // 統合テスト利用可能性の表示
+            this.addMobileDebugInfo(`  🎯 統合テスト: ${this.isAndroidChrome ? '制限あり (Chrome)' : '利用可能'}`, this.isAndroidChrome ? 'warning' : 'success');
         }
         
         // 重要な要素の検出状況
@@ -1503,13 +1517,29 @@ class MobileVoiceSystem {
             this.addMobileDebugInfo(`  👁️ 可視性: ${voiceDebugPanel.offsetWidth > 0 ? '表示中' : '非表示'}`, voiceDebugPanel.offsetWidth > 0 ? 'success' : 'warning');
         }
         
-        // 音声API対応状況
-        this.addMobileDebugInfo('🎤 音声API対応状況:', 'info');
+        // 音声API対応状況（詳細版）
+        this.addMobileDebugInfo('🎤 音声API詳細対応状況:', 'info');
+        
+        // SpeechRecognition詳細チェック
         const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        this.addMobileDebugInfo(`  🔹 音声認識: ${speechRecognition ? '対応' : '非対応'}`, speechRecognition ? 'success' : 'error');
+        this.addMobileDebugInfo(`  🔹 SpeechRecognition: ${window.SpeechRecognition ? 'あり' : 'なし'}`, window.SpeechRecognition ? 'success' : 'warning');
+        this.addMobileDebugInfo(`  🔹 webkitSpeechRecognition: ${window.webkitSpeechRecognition ? 'あり' : 'なし'}`, window.webkitSpeechRecognition ? 'success' : 'warning');
+        this.addMobileDebugInfo(`  🔹 統合判定: ${speechRecognition ? '利用可能' : '利用不可'}`, speechRecognition ? 'success' : 'error');
+        
+        // その他のAPI
         this.addMobileDebugInfo(`  🔹 音声合成: ${speechSynthesis ? '対応' : '非対応'}`, speechSynthesis ? 'success' : 'error');
         this.addMobileDebugInfo(`  🔹 MediaDevices: ${navigator.mediaDevices ? '対応' : '非対応'}`, navigator.mediaDevices ? 'success' : 'error');
         this.addMobileDebugInfo(`  🔹 AudioContext: ${window.AudioContext || window.webkitAudioContext ? '対応' : '非対応'}`, (window.AudioContext || window.webkitAudioContext) ? 'success' : 'error');
+        
+        // セキュリティ関連チェック
+        this.addMobileDebugInfo('🔒 セキュリティ・接続状況:', 'info');
+        this.addMobileDebugInfo(`  🔹 HTTPS: ${location.protocol === 'https:' ? 'はい' : 'いいえ（HTTPSが必要）'}`, location.protocol === 'https:' ? 'success' : 'error');
+        this.addMobileDebugInfo(`  🔹 Localhost: ${location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'はい' : 'いいえ'}`, (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'success' : 'info');
+        this.addMobileDebugInfo(`  🔹 現在のURL: ${location.href}`, 'info');
+        
+        // ブラウザ機能制限チェック
+        this.addMobileDebugInfo('🚫 ブラウザ制限チェック:', 'info');
+        this.addMobileDebugInfo(`  🔹 プライベートモード: ${this.detectPrivateMode() ? '可能性あり' : '通常モード'}`, this.detectPrivateMode() ? 'warning' : 'success');
         
         // 初期化エラーがある場合は表示
         if (this.initErrors.length > 0) {
@@ -1537,6 +1567,20 @@ class MobileVoiceSystem {
         }
         
         this.addMobileDebugInfo('🎉 スマホ用デバッグ表示完了', 'success');
+    }
+    
+    /**
+     * プライベートモード検出
+     */
+    detectPrivateMode() {
+        try {
+            // localStorage アクセステスト
+            localStorage.setItem('__privatetest', 'test');
+            localStorage.removeItem('__privatetest');
+            return false; // 通常モード
+        } catch (e) {
+            return true; // プライベートモードの可能性
+        }
     }
     
     /**
