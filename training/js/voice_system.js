@@ -1357,12 +1357,6 @@ class VoiceSystem {
         this.stopRecordingTimer();
         this.updateRecordingUI(false);
 
-        // Android専用タイマーをリセット
-        const timerElement = document.getElementById('voice-recording-timer-android');
-        if (timerElement) {
-            timerElement.textContent = '⏱️ 00:00';
-        }
-
         this.addDebugLog('🛑 Web Audio API録音停止完了', 'success');
         this.updateStatus('✅ 録音完了', 'success');
 
@@ -4088,11 +4082,18 @@ class VoiceSystem {
             const elapsed = Math.floor((Date.now() - this.recordingStartTime) / 1000);
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
+            // 通常のタイマー要素を更新
             const timerElement = document.getElementById('voice-recording-timer');
             if (timerElement) {
-                timerElement.textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                timerElement.textContent = timeString;
+            }
+            
+            // 🚀 Android専用タイマー要素も更新
+            const androidTimerElement = document.getElementById('voice-recording-timer-android');
+            if (androidTimerElement) {
+                androidTimerElement.textContent = `⏱️ ${timeString}`;
             }
         }, 1000);
     }
@@ -4106,9 +4107,16 @@ class VoiceSystem {
             this.recordingTimerInterval = null;
         }
         
+        // 通常のタイマー要素をリセット
         const timerElement = document.getElementById('voice-recording-timer');
         if (timerElement) {
             timerElement.textContent = '00:00';
+        }
+        
+        // 🚀 Android専用タイマー要素もリセット
+        const androidTimerElement = document.getElementById('voice-recording-timer-android');
+        if (androidTimerElement) {
+            androidTimerElement.textContent = '⏱️ 00:00';
         }
     }
     
@@ -4122,6 +4130,13 @@ class VoiceSystem {
         if (recordBtn) {
             recordBtn.innerHTML = isRecording ? '⏸️ 停止' : '🎤 録音';
             recordBtn.className = isRecording ? 'voice-btn recording' : 'voice-btn';
+        }
+        
+        // 🚀 Android専用録音ボタンも更新
+        const androidRecordBtn = document.getElementById('voice-record-btn-android');
+        if (androidRecordBtn) {
+            androidRecordBtn.innerHTML = isRecording ? '⏸️ 停止' : '🎤 録音のみ';
+            androidRecordBtn.style.backgroundColor = isRecording ? '#f44336' : '#2196F3';
         }
         
         // 録音ボタン自体が停止機能を持つため、別の停止ボタンは常に非表示
