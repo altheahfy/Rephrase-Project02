@@ -1839,31 +1839,64 @@ class VoiceSystem {
     }
 
     /**
-     * 📊 Android分析結果表示
+     * 📊 Android分析結果表示（PC版と同じ形式）
      */
     displayAndroidAnalysisResults(result) {
-        const resultsContainer = document.getElementById('voice-analysis-results-android');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = `
-                <div style="background: rgba(240,240,240,0.8); padding: 12px; border-radius: 6px; margin-top: 8px;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">🤖 Android音声分析結果</div>
-                    
-                    <div style="margin-bottom: 6px;">
-                        <strong>レベル:</strong> ${result.level}<br>
-                        <small style="color: #666;">${result.levelExplanation}</small>
-                    </div>
-                    
-                    <div style="margin-bottom: 6px;">
-                        <strong>正解率:</strong> ${result.contentAccuracy.toFixed(1)}%<br>
-                        <strong>判定:</strong> ${result.verificationStatus}
-                    </div>
-                    
-                    <div style="font-size: 11px; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.7); border-radius: 3px;">
-                        <div><strong>期待文:</strong> "${result.expectedSentence}"</div>
-                        <div style="margin-top: 3px;"><strong>認識文:</strong> "${result.recognizedText}"</div>
-                    </div>
+        console.log('📊 Android分析結果表示:', result);
+        
+        // PC版と同じ表示ロジック
+        let contentVerificationHtml = '';
+        
+        if (!result.recognizedText) {
+            // 音声認識失敗の場合
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <div class="verification-item poor"><strong>認識失敗:</strong> 音声が認識されませんでした</div>
+                    <div class="verification-item info"><strong>期待文章:</strong> "${result.expectedSentence}"</div>
                 </div>
             `;
+        } else {
+            // 正常認識の場合（PC版と同じ）
+            const accuracyClass = result.contentAccuracy >= 0.6 ? 'good' : 
+                                 result.contentAccuracy >= 0.3 ? 'fair' : 'poor';
+            
+            contentVerificationHtml = `
+                <div class="content-verification">
+                    <div class="verification-item"><strong>期待文章:</strong> "${result.expectedSentence}"</div>
+                    <div class="verification-item"><strong>認識結果:</strong> "${result.recognizedText}"</div>
+                    <div class="verification-item ${accuracyClass}"><strong>一致度:</strong> ${(result.contentAccuracy * 100).toFixed(1)}%</div>
+                </div>
+            `;
+        }
+        
+        // PC版と同じHTML構造
+        const resultsHtml = `
+            <div class="analysis-results">
+                <h4>📊 発話分析結果 (Android)</h4>
+                <div class="analysis-item">⏱️ 録音時間: ${result.duration ? result.duration.toFixed(2) : 'N/A'}秒</div>
+                <div class="analysis-item">💬 単語数: ${result.expectedWordCount || 0} → ${result.actualWordCount || 0}</div>
+                <div class="analysis-item">⚡ 発話速度: ${result.wordsPerMinute ? result.wordsPerMinute.toFixed(0) : 'N/A'} 語/分</div>
+                <div class="analysis-item">🎯 評価: ${result.level} ${result.levelExplanation || ''}</div>
+                ${contentVerificationHtml}
+                <div class="progress-save-status">
+                    <div id="progress-save-message-android">Android分析が完了しました</div>
+                </div>
+            </div>
+        `;
+        
+        // Android用の結果表示エリアに表示
+        const resultsContainer = document.getElementById('voice-analysis-results-android');
+        if (resultsContainer) {
+            resultsContainer.innerHTML = resultsHtml;
+            console.log('✅ Android分析結果をHTML表示完了');
+        } else {
+            console.warn('⚠️ voice-analysis-results-android要素が見つかりません');
+            // フォールバックとして通常の結果エリアに表示
+            const fallbackContainer = document.getElementById('voice-analysis-results');
+            if (fallbackContainer) {
+                fallbackContainer.innerHTML = resultsHtml;
+                console.log('✅ フォールバック: 通常の結果エリアにAndroid分析結果を表示');
+            }
         }
     }
 
