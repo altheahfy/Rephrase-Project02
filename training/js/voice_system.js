@@ -1566,39 +1566,145 @@ class VoiceSystem {
     }
 
     /**
-     * 🤖 Android専用録音分析（基本実装）
+     * 🤖 Android専用録音分析（リアルタイム音声認識版）
      */
     analyzeRecordingAndroid() {
-        if (!this.recordedBlob) {
-            this.updateStatus('❌ 分析する録音がありません', 'error');
+        console.log('🤖 Android: 分析ボタンがクリックされました - リアルタイム音声認識を開始');
+        
+        // 録音データチェックは不要 - リアルタイム音声認識を実行
+        this.updateStatus('🎤 Android音声認識準備中...', 'analyzing');
+        
+        // temp_working_voice_system.jsのtestVoiceRecognition()ベースの音声認識
+        this.startAndroidVoiceRecognition();
+    }
+
+    /**
+     * 🎤 Android用リアルタイム音声認識（temp_working_voice_system.jsから移植）
+     */
+    startAndroidVoiceRecognition() {
+        console.log('🎤 Android音声認識テストを開始します...');
+        
+        // 認識結果をクリア
+        this.recognizedText = '';
+        console.log('🔄 this.recognizedTextをクリアしました');
+        
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            console.log('🚫 Web Speech API が利用できません');
+            this.updateStatus('❌ 音声認識非対応', 'error');
             return;
         }
         
-        this.updateStatus('📊 Android分析中...', 'analyzing');        // 基本的な録音情報を表示
-        const analysisResult = {
-            size: this.recordedBlob.size,
-            type: this.recordedBlob.type,
-            duration: this.recordingStartTime ? Math.floor((Date.now() - this.recordingStartTime) / 1000) : 'Unknown'
-        };
-
-        console.log('🤖 Android録音分析結果:', analysisResult);
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
         
-        // 分析結果表示エリアに簡単な情報を表示
+        // Android Chrome最適化設定
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+            console.log('� Android Chrome用設定を適用');
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US'; // 英語設定
+            recognition.maxAlternatives = 3; // 複数候補
+        } else {
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'ja-JP';
+            recognition.maxAlternatives = 1;
+        }
+        
+        console.log(`🔧 認識準備: lang=${recognition.lang}`);
+        
+        // タイムアウト設定：Android用は少し長め
+        const timeoutDuration = isAndroid ? 15000 : 10000;
+        let timeoutId = setTimeout(() => {
+            recognition.stop();
+            console.log(`⏰ 音声認識がタイムアウトしました (${timeoutDuration/1000}秒)`);
+            this.finishAndroidVoiceRecognition();
+        }, timeoutDuration);
+        
+        recognition.onstart = () => {
+            console.log('✅ 音声認識start()コマンド送信完了');
+            console.log('🎤 音声認識開始イベント発生');
+            this.updateStatus('🎤 話してください...', 'recording');
+        };
+        
+        recognition.onresult = (event) => {
+            clearTimeout(timeoutId);
+            
+            console.log('📝 音声認識結果イベント発生');
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                const transcript = result[0].transcript;
+                const confidence = result[0].confidence || 0;
+                
+                if (result.isFinal) {
+                    this.recognizedText = transcript;
+                    console.log(`✅ 認識結果 (確定): "${transcript}"`);
+                    console.log(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
+                    console.log(`💾 this.recognizedText保存: "${this.recognizedText}"`);
+                } else {
+                    console.log(`🔄 認識結果 (途中): "${transcript}"`);
+                    
+                    // Android Chrome: 中間結果も採用
+                    if (isAndroid) {
+                        console.log('📱 Android: 中間結果を記録');
+                        if (!this.recognizedText || this.recognizedText.trim().length === 0) {
+                            this.recognizedText = transcript;
+                            console.log(`💾 Android中間結果保存: "${this.recognizedText}"`);
+                        }
+                    }
+                }
+            }
+        };
+        
+        recognition.onend = () => {
+            clearTimeout(timeoutId);
+            console.log('🏁 音声認識終了イベント発生');
+            this.finishAndroidVoiceRecognition();
+        };
+        
+        recognition.onerror = (event) => {
+            clearTimeout(timeoutId);
+            console.log(`❌ 音声認識エラー: ${event.error}`);
+            this.updateStatus('❌ 音声認識エラー', 'error');
+            this.finishAndroidVoiceRecognition();
+        };
+        
+        // 音声認識開始
+        try {
+            recognition.start();
+            console.log('🎤 音声認識を開始しました');
+        } catch (error) {
+            console.log(`❌ 音声認識開始エラー: ${error.message}`);
+            this.updateStatus('❌ 音声認識開始失敗', 'error');
+        }
+    }
+
+    /**
+     * 🏁 Android音声認識完了処理
+     */
+    finishAndroidVoiceRecognition() {
+        console.log('🏁 Android音声認識完了 - 結果表示');
+        
+        const recognizedText = this.recognizedText || '認識結果なし';
+        
+        // 分析結果表示エリアに認識結果を表示
         const resultsContainer = document.getElementById('voice-analysis-results-android');
         if (resultsContainer) {
             resultsContainer.innerHTML = `
                 <div style="background: rgba(240,240,240,0.8); padding: 8px; border-radius: 4px; margin-top: 8px;">
-                    <div style="font-weight: bold; margin-bottom: 4px;">🤖 Android録音分析結果</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">🤖 Android音声認識結果</div>
                     <div style="font-size: 11px;">
-                        サイズ: ${Math.round(analysisResult.size / 1024)}KB<br>
-                        形式: ${analysisResult.type}<br>
-                        時間: ${analysisResult.duration}秒
+                        <div style="margin-top: 4px; padding: 4px; background: rgba(255,255,255,0.7); border-radius: 2px;">
+                            🎤 認識結果: "${recognizedText}"
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        this.updateStatus('✅ Android分析完了', 'success');
+        this.updateStatus('✅ Android音声認識完了', 'success');
     }
 
     /**
