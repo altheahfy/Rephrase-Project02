@@ -355,4 +355,21 @@
         width: auto;
         text-align: center;
     }
+    
+    /* モバイル版で閉じるボタンをより大きくタップしやすく */
+    .close-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 28px;
+        touch-action: manipulation;
+    }
+    
+    /* モバイル版でパネルヘッダーを改善 */
+    .progress-panel-header {
+        padding: 16px;
+    }
+    
+    .progress-panel-header h3 {
+        font-size: 16px;
+    }
 }

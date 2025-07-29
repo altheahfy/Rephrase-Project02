@@ -5420,8 +5420,16 @@ class VoiceSystem {
         }
         
         try {
-            // VoiceProgressUIのインスタンスを作成して進捗パネルを表示
-            const progressUI = new VoiceProgressUI();
+            // グローバルインスタンスを使用（既存のものがあれば再利用）
+            let progressUI = window.currentProgressUI;
+            
+            if (!progressUI) {
+                console.log('📊 新しいVoiceProgressUIインスタンスを作成');
+                progressUI = new VoiceProgressUI();
+                window.currentProgressUI = progressUI;
+            }
+            
+            // 進捗パネルを表示
             progressUI.showProgressPanel();
             console.log('✅ 学習進捗パネルを表示しました');
         } catch (error) {

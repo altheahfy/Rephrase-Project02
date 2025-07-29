@@ -160,6 +160,17 @@ class VoiceProgressUI {
             closeBtn.addEventListener('click', () => this.hideProgressPanel());
         }
         
+        // パネル外をクリック/タップで閉じる（モバイル対応）
+        const panel = document.getElementById('voice-progress-panel');
+        if (panel) {
+            panel.addEventListener('click', (e) => {
+                // パネル自体がクリックされた場合は閉じる
+                if (e.target === panel) {
+                    this.hideProgressPanel();
+                }
+            });
+        }
+        
         // 期間選択タブ
         const periodTabs = document.querySelectorAll('.period-tab');
         periodTabs.forEach(tab => {
@@ -202,6 +213,14 @@ class VoiceProgressUI {
             panel.style.display = 'block';
             this.isVisible = true;
             
+            // Escキーで閉じる機能を追加
+            this.handleKeyPress = (e) => {
+                if (e.key === 'Escape' && this.isVisible) {
+                    this.hideProgressPanel();
+                }
+            };
+            document.addEventListener('keydown', this.handleKeyPress);
+            
             // データを読み込んで表示
             await this.loadAndDisplayProgress();
         }
@@ -215,6 +234,12 @@ class VoiceProgressUI {
         if (panel) {
             panel.style.display = 'none';
             this.isVisible = false;
+            
+            // Escキーイベントリスナーを削除
+            if (this.handleKeyPress) {
+                document.removeEventListener('keydown', this.handleKeyPress);
+                this.handleKeyPress = null;
+            }
         }
     }
     
