@@ -662,7 +662,15 @@ function handleLogout() {
   </div>
   
   <!-- 音声学習ボタン（右上固定） -->
-  <button id="voice-panel-open-btn" style="
+  <button id="voice-panel-open-btn" onclick="
+    console.log('🔧 直接onclick: 音声学習ボタンがクリックされました');
+    if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
+      window.voiceSystem.toggleVoicePanel();
+    } else {
+      console.error('❌ window.voiceSystem が見つかりません');
+      alert('VoiceSystemが初期化されていません');
+    }
+  " style="
     position: fixed;
     top: 60px;
     right: 10px;
@@ -685,6 +693,35 @@ function handleLogout() {
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
     🎤 音声学習
   </button>
+  
+  <!-- 🔧 デバッグ用ボタン（スマホ用） -->
+  <div style="position: fixed; top: 120px; right: 10px; z-index: 15600; display: flex; flex-direction: column; gap: 5px;">
+    <button onclick="
+      let result = 'VoiceSystem状態チェック:\\n';
+      result += 'window.voiceSystem: ' + (window.voiceSystem ? '存在' : '未定義') + '\\n';
+      if (window.voiceSystem) {
+        result += 'toggleVoicePanel: ' + (typeof window.voiceSystem.toggleVoicePanel === 'function' ? '関数として存在' : '存在しない') + '\\n';
+      }
+      alert(result);
+    " style="background: #ff6b6b; color: white; border: none; padding: 8px; border-radius: 3px; font-size: 12px;">
+      状態確認
+    </button>
+    
+    <button onclick="
+      try {
+        if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
+          window.voiceSystem.toggleVoicePanel();
+          alert('パネル切り替え実行');
+        } else {
+          alert('VoiceSystemまたはtoggleVoicePanelが見つかりません');
+        }
+      } catch (error) {
+        alert('エラー: ' + error.message);
+      }
+    " style="background: #4ecdc4; color: white; border: none; padding: 8px; border-radius: 3px; font-size: 12px;">
+      直接実行
+    </button>
+  </div>
   
   <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
   <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
