@@ -14,6 +14,12 @@ class VoiceSystem {
         this.isRecording = false;
         this.isMicrophoneAllowed = false;
         
+        // 🚀 Web Audio API録音関連（Android対応）
+        this.microphoneSource = null;
+        this.recordingProcessor = null;
+        this.audioChunks = []; // Float32Array配列として使用
+        this.isPlaying = false;
+        
         // 音声合成関連
         this.currentUtterance = null;
         
@@ -120,29 +126,105 @@ class VoiceSystem {
                     alert('🔴 録音テストを開始します...\n3秒間録音されます。');
                     this.addDebugLog('🔴 録音テスト開始', 'info');
                     
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    const mediaRecorder = new MediaRecorder(stream);
+                    // Android Chrome専用の音声設定
+                    const audioConstraints = {
+                        audio: {
+                            sampleRate: 48000,
+                            channelCount: 1,
+                            volume: 1.0,
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    };
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                    
+                    // Android Chrome対応のMediaRecorderオプション
+                    const recorderOptions = {
+                        mimeType: 'audio/webm;codecs=opus'
+                    };
+                    
+                    // フォールバック設定
+                    if (!MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
+                        recorderOptions.mimeType = 'audio/webm';
+                        this.addDebugLog('⚠️ opus コーデックが利用できません。webmにフォールバック', 'warning');
+                    }
+                    
+                    if (!MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
+                        delete recorderOptions.mimeType;
+                        this.addDebugLog('⚠️ webmも利用できません。デフォルト設定を使用', 'warning');
+                    }
+                    
+                    const mediaRecorder = new MediaRecorder(stream, recorderOptions);
                     const chunks = [];
                     
                     mediaRecorder.ondataavailable = event => {
                         if (event.data.size > 0) {
                             chunks.push(event.data);
+                            this.addDebugLog(`📦 録音データチャンク: ${event.data.size} bytes`, 'info');
                         }
                     };
                     
                     mediaRecorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'audio/webm' });
+                        this.addDebugLog('🔴 録音停止完了', 'info');
+                        
+                        if (chunks.length === 0) {
+                            alert('❌ 録音データが取得できませんでした');
+                            this.addDebugLog('❌ 録音データチャンクが空です', 'error');
+                            stream.getTracks().forEach(track => track.stop());
+                            return;
+                        }
+                        
+                        const mimeType = recorderOptions.mimeType || 'audio/webm';
+                        const blob = new Blob(chunks, { type: mimeType });
+                        this.addDebugLog(`📦 録音Blob作成: ${blob.size} bytes, type: ${blob.type}`, 'info');
+                        
                         const url = URL.createObjectURL(blob);
                         const audio = new Audio(url);
-                        audio.play();
-                        alert('✅ 録音テスト完了！\n録音した音声を再生中です。');
-                        this.addDebugLog('✅ 録音テスト完了', 'success');
+                        
+                        audio.oncanplay = () => {
+                            this.addDebugLog('🔊 音声ファイル再生準備完了', 'success');
+                            audio.play().then(() => {
+                                alert('✅ 録音テスト完了！\n録音した音声を再生中です。');
+                                this.addDebugLog('✅ 録音テスト完了・再生開始', 'success');
+                            }).catch(error => {
+                                alert(`❌ 再生エラー: ${error.message}`);
+                                this.addDebugLog(`❌ 再生エラー: ${error.message}`, 'error');
+                            });
+                        };
+                        
+                        audio.onerror = (error) => {
+                            alert(`❌ 音声ファイルエラー: ${error.message}`);
+                            this.addDebugLog(`❌ 音声ファイルエラー: ${error.message}`, 'error');
+                        };
+                        
+                        audio.onended = () => {
+                            URL.revokeObjectURL(url);
+                            this.addDebugLog('🔊 録音テスト再生完了', 'info');
+                        };
+                        
+                        // 音声読み込み開始
+                        audio.load();
+                        
                         stream.getTracks().forEach(track => track.stop());
                     };
                     
-                    mediaRecorder.start();
+                    mediaRecorder.onerror = (event) => {
+                        alert(`❌ 録音エラー: ${event.error.message}`);
+                        this.addDebugLog(`❌ MediaRecorderエラー: ${event.error.message}`, 'error');
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    // 録音開始
+                    mediaRecorder.start(100); // 100ms間隔でデータを取得
+                    this.addDebugLog('🔴 MediaRecorder.start() 実行', 'info');
+                    
                     setTimeout(() => {
-                        mediaRecorder.stop();
+                        if (mediaRecorder.state === 'recording') {
+                            mediaRecorder.stop();
+                            this.addDebugLog('⏱️ 3秒経過：録音停止', 'info');
+                        }
                     }, 3000);
                     
                 } catch (error) {
@@ -1143,272 +1225,324 @@ class VoiceSystem {
     }
     
     /**
-     * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）- 動作していた実装を移植
+     * 🚀 Android専用録音開始/停止（Web Audio API版）- 動作していた実装を完全移植
      */
     async toggleRecordingAndroid() {
-        this.addDebugLog('🔥 DEBUG: toggleRecordingAndroid メソッド呼び出されました', 'info');
-        console.log('🔥 DEBUG: this.isRecording =', this.isRecording);
-        console.log('🤖 Android: 録音のみモード実行');
+        this.addDebugLog('� Web Audio API録音開始/停止', 'info');
         
         if (this.isRecording) {
-            console.log('🔥 DEBUG: 録音停止を実行');
-            this.stopRecordingAndroid();
+            this.stopRecordingAndroidWebAudio();
         } else {
-            console.log('🔥 DEBUG: 録音開始を実行');
-            await this.startRecordingAndroid();
+            await this.startRecordingAndroidWebAudio();
         }
     }
-    
+
     /**
-     * 🤖 Android専用録音開始（音声認識を除外）- 動作していた実装を移植
+     * 🚀 Web Audio API録音開始（Android Chrome完全対応版）
      */
-    async startRecordingAndroid() {
-        console.log('🤖 Android: 録音のみ開始');
-        
-        if (!this.isMicrophoneAllowed) {
-            await this.checkMicrophonePermission();
-            if (!this.isMicrophoneAllowed) {
-                this.updateStatus('❌ マイクアクセスが許可されていません', 'error');
-                return;
-            }
+    async startRecordingAndroidWebAudio() {
+        if (this.isRecording) {
+            this.addDebugLog('⚠️ 既に録音中です', 'warning');
+            return;
         }
-        
+
+        this.addDebugLog('🎤 Web Audio API録音を開始します', 'info');
+        this.updateStatus('🎤 マイクアクセス許可を要求中...', 'info');
+
         try {
-            // 🔧 前回の録音データをクリア
-            this.recordedBlob = null;
-            
-            // 📏 前回の分析結果をクリアしパネルサイズをリセット
-            const resultsContainer = document.getElementById('voice-analysis-results');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
+            // AudioContext初期化
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.addDebugLog(`✅ AudioContext作成: sampleRate=${this.audioContext.sampleRate}Hz`, 'success');
             }
-            this.resetPanelSize();
-            
+
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+                this.addDebugLog('🔧 AudioContext resumed', 'info');
+            }
+
+            // マイクアクセス許可（Web Audio API用）
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    channelCount: 1
-                }
+                    echoCancellation: false,  // 録音品質重視
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    sampleRate: 44100
+                } 
             });
-            
+
+            this.addDebugLog('✅ Web Audio API マイクアクセス許可取得完了', 'success');
             this.currentStream = stream;
-            
-            // Android Chrome特化: MediaRecorder設定最適化
-            let mediaRecorderOptions = {};
-            if (MediaRecorder.isTypeSupported('audio/webm')) {
-                mediaRecorderOptions.mimeType = 'audio/webm';
-            }
-            
-            this.mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
-            
-            const audioChunks = [];
-            
-            this.mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    audioChunks.push(event.data);
+
+            // Web Audio APIで録音処理
+            this.microphoneSource = this.audioContext.createMediaStreamSource(stream);
+            this.recordingProcessor = this.audioContext.createScriptProcessor(4096, 1, 1);
+            this.audioChunks = [];  // Float32Array配列として使用
+
+            // 録音データ処理
+            this.recordingProcessor.onaudioprocess = (event) => {
+                if (this.isRecording) {
+                    const inputBuffer = event.inputBuffer;
+                    const inputData = inputBuffer.getChannelData(0);
+
+                    // Float32Arrayを録音データとして保存
+                    this.audioChunks.push(new Float32Array(inputData));
+
+                    // 録音進行表示
+                    if (this.audioChunks.length % 10 === 0) {
+                        const totalSamples = this.audioChunks.length * 4096;
+                        const duration = totalSamples / this.audioContext.sampleRate;
+                        this.updateStatus(`🎤 録音中... ${duration.toFixed(1)}秒`, 'recording');
+                    }
                 }
             };
-            
-            this.mediaRecorder.onstop = () => {
-                const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
-                this.recordedBlob = new Blob(audioChunks, { type: mimeType });
-                console.log('🤖 Android録音のみ完了', this.recordedBlob.size, 'bytes');
-                
-                this.stopVolumeMonitoring();
-                stream.getTracks().forEach(track => track.stop());
-                this.updateRecordingUI(false);
-                
-                this.updateStatus('✅ 録音完了（Android録音のみモード）', 'success');
-            };
-            
-            this.mediaRecorder.onerror = (event) => {
-                console.error('❌ Android録音エラー:', event.error);
-                this.updateStatus('録音エラーが発生しました', 'error');
-                this.isRecording = false;
-                this.updateRecordingUI(false);
-            };
-            
-            // 録音開始（音声認識なし）
-            this.mediaRecorder.start();
+
+            // マイクからの音声をプロセッサに接続
+            this.microphoneSource.connect(this.recordingProcessor);
+            this.recordingProcessor.connect(this.audioContext.destination);
+
             this.isRecording = true;
             this.recordingStartTime = Date.now();
-            
             this.updateRecordingUI(true);
             this.startRecordingTimer();
             this.setupVolumeMonitoring(stream);
             
-            this.updateStatus('🎤 録音中...（Android録音のみモード）', 'recording');
-            
+            this.updateStatus('🎤 Web Audio API録音中... 0.0秒', 'recording');
+            this.addDebugLog('✅ Web Audio API録音開始', 'success');
+
         } catch (error) {
-            console.error('❌ Android録音のみエラー:', error);
-            this.updateStatus('❌ 録音エラーが発生しました', 'error');
-            this.isMicrophoneAllowed = false;
+            this.addDebugLog(`❌ Web Audio API録音開始エラー: ${error.message}`, 'error');
+            this.updateStatus('❌ 録音開始失敗', 'error');
+            this.isRecording = false;
         }
     }
 
     /**
-     * 🤖 Android専用録音停止 - 動作していた実装を移植
+     * 🚀 Web Audio API録音停止
      */
-    stopRecordingAndroid() {
-        console.log('🤖 Android: 録音のみ停止');
+    stopRecordingAndroidWebAudio() {
+        if (!this.isRecording) {
+            this.addDebugLog('⚠️ 録音していません', 'warning');
+            return;
+        }
+
+        this.isRecording = false;
+
+        // Web Audio API録音停止
+        if (this.recordingProcessor) {
+            this.recordingProcessor.disconnect();
+            this.recordingProcessor = null;
+        }
+
+        if (this.microphoneSource) {
+            this.microphoneSource.disconnect();
+            this.microphoneSource = null;
+        }
+
+        // ストリーム停止
+        if (this.currentStream) {
+            this.currentStream.getTracks().forEach(track => track.stop());
+            this.currentStream = null;
+        }
+
+        this.stopVolumeMonitoring();
+        this.stopRecordingTimer();
+        this.updateRecordingUI(false);
+
+        this.addDebugLog('🛑 Web Audio API録音停止完了', 'success');
+        this.updateStatus('✅ 録音完了', 'success');
+
+        // 録音データ処理
+        if (this.audioChunks.length > 0) {
+            const totalSamples = this.audioChunks.length * 4096;
+            const duration = totalSamples / this.audioContext.sampleRate;
+            this.addDebugLog(`🎵 録音データ保存: ${duration.toFixed(1)}秒`, 'success');
+            this.addDebugLog('💾 録音データ保存完了（再生準備OK）', 'success');
+        } else {
+            this.addDebugLog('⚠️ 録音データが空です', 'warning');
+        }
+    }
+
+    /**
+     * 🚀 Web Audio API録音データ再生機能（Android完全対応版）
+     */
+    async playRecordingAndroid() {
+        this.addDebugLog('� Web Audio API録音データ再生開始', 'info');
         
-        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.mediaRecorder.addEventListener('stop', () => {
-                console.log('✅ Android録音のみ停止完了');
-                this.isRecording = false;
-                
-                if (this.currentStream) {
-                    this.currentStream.getTracks().forEach(track => track.stop());
-                }
-            }, { once: true });
-            
-            this.mediaRecorder.stop();
-            this.stopRecordingTimer();
-        }
-    }
-
-    /**
-     * 🤖 Android専用ステータス更新
-     */
-    updateStatusAndroid(message, type = 'info') {
-        const statusElement = document.getElementById('voice-status-android');
-        if (statusElement) {
-            statusElement.textContent = message;
-            statusElement.className = `voice-status-android ${type}`;
-        }
-        console.log(`🤖 Android: ${message}`);
-    }
-
-    /**
-     * 🤖 Android専用録音UI更新
-     */
-    updateRecordingUIAndroid(isRecording) {
-        const recordBtn = document.getElementById('voice-record-btn-android');
-        if (recordBtn) {
-            recordBtn.innerHTML = isRecording ? '⏸️ 停止' : '🎤 録音のみ';
-            recordBtn.style.backgroundColor = isRecording ? '#f44336' : '#2196F3';
-        }
-    }
-
-    /**
-     * 🤖 Android専用録音タイマー開始
-     */
-    startRecordingTimerAndroid() {
-        this.recordingTimerInterval = setInterval(() => {
-            if (this.recordingStartTime) {
-                const elapsed = Math.floor((Date.now() - this.recordingStartTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                const timerElement = document.getElementById('voice-recording-timer-android');
-                if (timerElement) {
-                    timerElement.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }
-            }
-        }, 1000);
-    }
-
-    /**
-     * 🤖 Android専用録音タイマー停止
-     */
-    stopRecordingTimerAndroid() {
-        if (this.recordingTimerInterval) {
-            clearInterval(this.recordingTimerInterval);
-            this.recordingTimerInterval = null;
-        }
-    }
-
-    /**
-     * 🤖 Android専用音量モニタリング設定
-     */
-    setupVolumeMonitoringAndroid(stream) {
-        try {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            this.analyser = this.audioContext.createAnalyser();
-            const source = this.audioContext.createMediaStreamSource(stream);
-            source.connect(this.analyser);
-            
-            this.analyser.fftSize = 256;
-            const bufferLength = this.analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            const updateVolume = () => {
-                if (this.isRecording) {
-                    this.analyser.getByteFrequencyData(dataArray);
-                    const average = dataArray.reduce((a, b) => a + b) / bufferLength;
-                    const volumePercent = (average / 255) * 100;
-                    
-                    const volumeBar = document.getElementById('voice-volume-bar-android');
-                    if (volumeBar) {
-                        volumeBar.style.width = `${volumePercent}%`;
-                    }
-                    
-                    requestAnimationFrame(updateVolume);
-                }
-            };
-            updateVolume();
-        } catch (error) {
-            console.error('🤖 Android音量モニタリング設定エラー:', error);
-        }
-    }
-
-    /**
-     * 🤖 Android専用音量モニタリング停止
-     */
-    stopVolumeMonitoringAndroid() {
-        if (this.audioContext) {
-            this.audioContext.close();
-            this.audioContext = null;
-        }
-    }
-
-    /**
-     * 🤖 Android専用録音再生（動作していた実装を移植）
-     */
-    playRecordingAndroid() {
-        this.addDebugLog('🔥 playRecordingAndroidメソッドが呼び出されました', 'info');
-        console.log(`📁 録音データ存在確認: ${this.recordedBlob ? 'あり' : 'なし'}`);
-        
-        if (!this.recordedBlob) {
-            console.log('❌ 録音データがありません');
+        if (!this.audioChunks || this.audioChunks.length === 0) {
+            this.addDebugLog('❌ 再生する録音データがありません（先に録音してください）', 'error');
             this.updateStatus('❌ 再生する録音がありません', 'error');
             return;
         }
 
-        // 🔧 前回の再生を停止（既存のAudioオブジェクトをクリア）
-        if (this.currentAudio) {
-            this.currentAudio.pause();
-            this.currentAudio.currentTime = 0;
-            this.currentAudio = null;
+        if (this.isPlaying) {
+            this.addDebugLog('⚠️ 既に再生中です', 'warning');
+            return;
         }
 
-        // 🔧 新しいBlobURLを作成（動作していた実装のまま）
-        const audioUrl = URL.createObjectURL(this.recordedBlob);
-        this.currentAudio = new Audio(audioUrl);
+        this.addDebugLog('🔊 Web Audio API録音データ再生開始', 'info');
+        await this.playWithWebAudioAPI();
+    }
 
-        // 🤖 Android Chrome対応: 詳細ログとエラーハンドリング（動作していた実装）
-        console.log('🤖 再生準備:', {
-            blobSize: this.recordedBlob.size,
-            blobType: this.recordedBlob.type,
-            audioUrl: audioUrl.substring(0, 50) + '...',
-            userAgent: navigator.userAgent.substring(0, 80)
+    /**
+     * 🚀 Web Audio API録音データの再生
+     */
+    async playWithWebAudioAPI() {
+        try {
+            this.addDebugLog('🎵 Web Audio API再生を開始', 'info');
+
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // ユーザーインタラクション後にコンテキストを再開
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+                this.addDebugLog('🔧 AudioContext resumed', 'info');
+            }
+
+            // Float32Array録音データをAudioBufferに変換
+            const totalSamples = this.audioChunks.length * 4096;
+            const audioBuffer = this.audioContext.createBuffer(
+                1, // モノラル
+                totalSamples,
+                this.audioContext.sampleRate
+            );
+
+            const channelData = audioBuffer.getChannelData(0);
+            let offset = 0;
+
+            // Float32Arrayデータを結合
+            this.audioChunks.forEach(chunk => {
+                channelData.set(chunk, offset);
+                offset += chunk.length;
+            });
+
+            this.addDebugLog(`🎼 AudioBuffer作成: ${audioBuffer.duration.toFixed(2)}秒`, 'success');
+
+            // AudioBufferSourceNode作成
+            const source = this.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(this.audioContext.destination);
+
+            this.isPlaying = true;
+            this.updateStatus('🔊 Web Audio API再生中...', 'playing');
+
+            source.onended = () => {
+                this.isPlaying = false;
+                this.updateStatus('✅ 再生完了', 'success');
+                this.addDebugLog('� Web Audio API再生完了', 'success');
+            };
+
+            source.start(0);
+            this.addDebugLog('🎵 Web Audio API再生開始', 'success');
+
+        } catch (error) {
+            this.addDebugLog(`❌ Web Audio API再生エラー: ${error.message}`, 'error');
+            this.isPlaying = false;
+            this.updateStatus('❌ 再生エラー', 'error');
+            
+            // フォールバック: WAVダウンロード
+            this.addDebugLog('� ダウンロードリンクを生成します', 'info');
+            this.createDownloadLink();
+        }
+    }
+
+    /**
+     * 🚀 Float32ArrayをWAVファイルに変換してダウンロード（フォールバック）
+     */
+    createDownloadLink() {
+        try {
+            this.addDebugLog('💾 ダウンロードリンクを生成します', 'info');
+
+            if (!this.audioChunks || this.audioChunks.length === 0) {
+                this.addDebugLog('❌ 録音データがありません', 'error');
+                return;
+            }
+
+            // Float32ArrayをWAVファイルに変換
+            const wavBlob = this.float32ArrayToWav(this.audioChunks, this.audioContext.sampleRate);
+            const audioUrl = URL.createObjectURL(wavBlob);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `rephrase_recording_${timestamp}.wav`;
+
+            // ダウンロードリンク作成
+            const downloadLink = document.createElement('a');
+            downloadLink.href = audioUrl;
+            downloadLink.download = filename;
+            downloadLink.textContent = `📁 録音をダウンロード (${filename})`;
+            downloadLink.style.cssText = `
+                display: block;
+                margin: 10px 0;
+                padding: 10px;
+                background: #2196F3;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                text-align: center;
+            `;
+
+            // デバッグパネルに追加
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugPanel) {
+                debugPanel.appendChild(downloadLink);
+            }
+
+            this.addDebugLog(`💾 ダウンロードリンク作成完了: ${filename}`, 'success');
+
+        } catch (error) {
+            this.addDebugLog(`❌ ダウンロードリンク作成エラー: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * 🚀 Float32ArrayをWAVファイルに変換
+     */
+    float32ArrayToWav(audioChunks, sampleRate) {
+        // Float32Arrayデータを結合
+        const totalSamples = audioChunks.length * 4096;
+        const buffer = new Float32Array(totalSamples);
+        let offset = 0;
+        
+        audioChunks.forEach(chunk => {
+            buffer.set(chunk, offset);
+            offset += chunk.length;
         });
 
-        this.currentAudio.onloadstart = () => this.updateStatus('🤖 録音再生中...', 'playing');
-        this.currentAudio.onended = () => {
-            this.updateStatus('✅ 再生完了', 'success');
-            // 🔧 再生完了後にBlobURLを解放
-            URL.revokeObjectURL(audioUrl);
-            this.currentAudio = null;
+        const length = buffer.length;
+        const arrayBuffer = new ArrayBuffer(44 + length * 2);
+        const view = new DataView(arrayBuffer);
+        
+        // WAVヘッダー書き込み
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
         };
-        this.currentAudio.onerror = () => {
-            this.updateStatus('❌ 再生エラー', 'error');
-            URL.revokeObjectURL(audioUrl);
-            this.currentAudio = null;
-        };
-
-        this.currentAudio.play();
+        
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length * 2, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, 'data');
+        view.setUint32(40, length * 2, true);
+        
+        // 音声データ書き込み（Float32を16bit integerに変換）
+        let offset2 = 44;
+        for (let i = 0; i < length; i++) {
+            const sample = Math.max(-1, Math.min(1, buffer[i]));
+            view.setInt16(offset2, sample * 0x7FFF, true);
+            offset2 += 2;
+        }
+        
+        return new Blob([arrayBuffer], { type: 'audio/wav' });
     }
 
     /**
@@ -1428,13 +1562,11 @@ class VoiceSystem {
      */
     analyzeRecordingAndroid() {
         if (!this.recordedBlob) {
-            this.updateStatusAndroid('❌ 分析する録音がありません', 'error');
+            this.updateStatus('❌ 分析する録音がありません', 'error');
             return;
         }
-
-        this.updateStatusAndroid('📊 Android分析中...', 'analyzing');
         
-        // 基本的な録音情報を表示
+        this.updateStatus('📊 Android分析中...', 'analyzing');        // 基本的な録音情報を表示
         const analysisResult = {
             size: this.recordedBlob.size,
             type: this.recordedBlob.type,
@@ -1458,7 +1590,7 @@ class VoiceSystem {
             `;
         }
 
-        this.updateStatusAndroid('✅ Android分析完了', 'success');
+        this.updateStatus('✅ Android分析完了', 'success');
     }
 
     /**
