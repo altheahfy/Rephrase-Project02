@@ -887,8 +887,14 @@ class VoiceSystem {
         if (stopBtn) {
             stopBtn.addEventListener('click', () => this.stopAll());
         }
+    }
+    
+    /**
+     * 共通イベントリスナー設定
+     */
+    setupCommonEventListeners() {
         
-        // パネル開くボタン（トグル機能）
+        // 🎤 音声学習パネル開くボタン（トグル機能）- 全デバイス共通
         const openBtn = document.getElementById('voice-panel-open-btn');
         if (openBtn) {
             // 🤖 Android用: ボタンの詳細情報をデバッグ表示
@@ -903,7 +909,9 @@ class VoiceSystem {
                 this.showAndroidClickFeedback('🔧 音声学習ボタンが検出されました', 'info');
             }
             
-            openBtn.addEventListener('click', () => {
+            openBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('🔘 音声パネル開くボタンがクリックされました');
                 
                 // 🤖 Android用: 視覚的フィードバック
@@ -917,13 +925,20 @@ class VoiceSystem {
             // 🤖 Android用: touchイベントも追加
             if (this.isAndroid) {
                 openBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
                     console.log('👆 音声学習ボタン - touchstart');
                     this.showAndroidClickFeedback('👆 touchstart検出', 'info');
                 });
                 
                 openBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
                     console.log('👆 音声学習ボタン - touchend');
                     this.showAndroidClickFeedback('👆 touchend検出', 'info');
+                    
+                    // touchendでも直接呼び出し
+                    setTimeout(() => {
+                        this.toggleVoicePanel();
+                    }, 100);
                 });
             }
             
@@ -937,10 +952,11 @@ class VoiceSystem {
             }
         }
         
-        // パネル閉じるボタン（通常版）
+        // 🎤 パネル閉じるボタン（通常版）
         const closeBtn = document.getElementById('voice-panel-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
+            console.log('✅ 通常パネル閉じるボタンのイベントリスナーを設定しました');
         }
         
         // 🤖 Android専用パネル閉じるボタン
@@ -949,12 +965,6 @@ class VoiceSystem {
             closeBtnAndroid.addEventListener('click', () => this.hideVoicePanel());
             console.log('✅ Android専用パネル閉じるボタンのイベントリスナーを設定しました');
         }
-    }
-    
-    /**
-     * 共通イベントリスナー設定
-     */
-    setupCommonEventListeners() {
         
         // 📱 モバイルデバッグボタン
         const debugBtn = document.getElementById('mobile-debug-btn');
@@ -3265,6 +3275,11 @@ class VoiceSystem {
             panel.style.setProperty('display', 'block', 'important');
             panel.style.setProperty('visibility', 'visible', 'important');
             panel.style.setProperty('opacity', '1', 'important');
+            
+            // さらに強制的に表示させるため、cssTextで直接書き換え
+            if (this.isAndroid) {
+                panel.style.cssText = panel.style.cssText.replace(/display\s*:\s*none\s*!important/gi, 'display: block !important');
+            }
             
             // 📱 表示状態を更新
             this.isPanelVisible = true;
