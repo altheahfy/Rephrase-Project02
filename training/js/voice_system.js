@@ -2109,25 +2109,33 @@ class VoiceSystem {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         this.recordingRecognition = new SpeechRecognition();
         
-        // 🚨 緊急修正: testVoiceRecognitionと完全同一設定
+        // 🚨 緊急修正: testVoiceRecognitionと完全同一設定 + 速い話し方対応
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
-            this.recordingRecognition.continuous = false;
+            this.recordingRecognition.continuous = true; // 連続認識で速い話し方に対応
             this.recordingRecognition.interimResults = true;
-            this.recordingRecognition.lang = recognitionLang; // 🔧 ユーザー設定を適用
-            this.recordingRecognition.maxAlternatives = 3; // 複数候補
+            this.recordingRecognition.lang = recognitionLang;
+            this.recordingRecognition.maxAlternatives = 5; // 候補数を増やして精度向上
         } else {
-            this.recordingRecognition.continuous = false;
+            this.recordingRecognition.continuous = true; // PC版も連続認識に変更
             this.recordingRecognition.interimResults = true;
-            this.recordingRecognition.lang = recognitionLang; // 🔧 ユーザー設定を適用
-            this.recordingRecognition.maxAlternatives = 1;
+            this.recordingRecognition.lang = recognitionLang;
+            this.recordingRecognition.maxAlternatives = 3; // PC版も候補数を増加
         }
+        
+        // 📈 速い話し方対応のログ
+        console.log('� 高速音声認識設定:', {
+            continuous: this.recordingRecognition.continuous,
+            interimResults: this.recordingRecognition.interimResults,
+            maxAlternatives: this.recordingRecognition.maxAlternatives,
+            lang: this.recordingRecognition.lang
+        });
         
         this.addDebugLog(`🔍 認識状態: lang=${this.recordingRecognition.lang}, active=false`, 'info');
         
-        // 🚨 緊急修正: testVoiceRecognitionと同一タイムアウト
-        const timeoutDuration = isAndroid ? 15000 : 10000;
+        // 🚨 タイムアウト設定: 速い話し方に対応
+        const timeoutDuration = isAndroid ? 20000 : 15000; // Android: 20秒、PC: 15秒に延長
         this.recognitionTimeoutId = setTimeout(() => {
             this.recordingRecognition.stop();
             this.addDebugLog(`⏰ 音声認識がタイムアウトしました（${timeoutDuration/1000}秒）`, 'warning');
