@@ -42,12 +42,12 @@ class VoiceSystem {
     }
     
     async init() {
-        this.addDebugLog('🎤 音声システム初期化開始...', 'info');
-        
-        // 📱 緊急デバッグ: アラートで初期化確認
-        if (typeof alert !== 'undefined') {
-            alert('🔧 VoiceSystem.init()メソッド開始');
+        // 📱 デバッグログ配列の初期化を最初に実行
+        if (!this.debugLogs) {
+            this.debugLogs = [];
         }
+        
+        this.addDebugLog('🎤 音声システム初期化開始...', 'info');
         
         // 🤖 Android検出とパネル選択
         this.isAndroid = this.detectAndroid();
@@ -841,12 +841,6 @@ class VoiceSystem {
      */
     setupAndroidEventListeners() {
         this.addDebugLog('🤖 Android専用イベントリスナーを設定中...', 'info');
-        
-        // 📱 緊急デバッグ: アラートでAndroidパネル状態確認
-        const androidPanel = document.getElementById('voice-control-panel-android');
-        if (typeof alert !== 'undefined') {
-            alert(`🔧 Androidパネル状態\n存在: ${!!androidPanel}\n表示: ${androidPanel ? androidPanel.style.display : 'N/A'}\nクラス: ${androidPanel ? androidPanel.className : 'N/A'}`);
-        }
         
         // DOM全体をデバッグ情報として出力
         this.addDebugLog(`🔍 DOM読み込み状態: ${document.readyState}`, 'info');
@@ -4306,6 +4300,11 @@ class VoiceSystem {
             type: type
         };
         
+        // 📱 デバッグログ配列の初期化確認
+        if (!this.debugLogs) {
+            this.debugLogs = [];
+        }
+        
         this.debugLogs.push(logEntry);
         
         // 最大件数を超えた場合、古いログを削除
@@ -4313,11 +4312,15 @@ class VoiceSystem {
             this.debugLogs.shift();
         }
         
-        // コンソールにも出力
+        // コンソールにも出力（確実に表示）
         console.log(`📱 [${timestamp}] ${message}`);
         
-        // スマホ用診断パネルが表示されている場合、リアルタイム更新
-        this.updateMobileDebugPanel();
+        // 🔧 デバッグパネル更新を試行（エラーでも続行）
+        try {
+            this.updateMobileDebugPanel();
+        } catch (error) {
+            console.log(`🔧 デバッグパネル更新エラー: ${error.message} - ログは保存済み`);
+        }
     }
     
     /**
@@ -4450,7 +4453,17 @@ class VoiceSystem {
      */
     updateMobileDebugPanel() {
         const logArea = document.getElementById('mobile-debug-logs');
-        if (!logArea) return;
+        if (!logArea) {
+            // デバッグパネルが見つからない場合はコンソールにログ出力
+            console.log('🔧 mobile-debug-logs要素が見つかりません - デバッグパネルが開かれていない可能性');
+            return;
+        }
+        
+        // 📱 デバッグログ配列の存在確認
+        if (!this.debugLogs || !Array.isArray(this.debugLogs)) {
+            console.log('🔧 debugLogs配列が存在しません');
+            return;
+        }
         
         const logHtml = this.debugLogs.map(log => {
             const color = log.type === 'error' ? '#ff0000' : 
