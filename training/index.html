@@ -2471,19 +2471,31 @@ window.clearRandomizeHistory = function() {
             // DOM読み込み完了を確実に待つ
             function initVoiceSystem() {
                 console.log(`📄 DOM状態: ${document.readyState}`);
+                
+                // 📱 緊急デバッグ: アラートで初期化状況を確認
+                alert(`🔧 デバッグ: VoiceSystem初期化開始\nDOM状態: ${document.readyState}\n時刻: ${new Date().toLocaleTimeString()}`);
+                
                 window.voiceSystem = new VoiceSystem();
                 console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
+                
+                // アラートで初期化完了を確認
+                alert('🔧 デバッグ: VoiceSystemインスタンス作成完了');
+                
                 window.voiceSystem.init().then(() => {
                     console.log('✅ VoiceSystem初期化完了');
+                    alert('🔧 デバッグ: VoiceSystem初期化完了');
                 }).catch(error => {
                     console.error('❌ VoiceSystem初期化エラー:', error);
+                    alert(`🔧 デバッグ: 初期化エラー\n${error.message}`);
                 });
             }
             
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initVoiceSystem);
+                alert('🔧 デバッグ: DOMContentLoadedイベント待機中');
             } else {
                 // DOM既に読み込み済み
+                alert('🔧 デバッグ: DOM既に読み込み済み - 100ms後に初期化');
                 setTimeout(initVoiceSystem, 100); // 少し待機してから実行
             }
         };

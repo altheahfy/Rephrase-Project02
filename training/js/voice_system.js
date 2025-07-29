@@ -36,11 +36,18 @@ class VoiceSystem {
         // 🤖 パネル表示状態管理
         this.isPanelVisible = false;
         
-        this.init();
+        // 📱 緊急デバッグ: コンストラクタ完了確認
+        console.log('🔧 VoiceSystemコンストラクタ完了');
+        // this.init(); // 手動で呼び出すため削除
     }
     
     async init() {
         this.addDebugLog('🎤 音声システム初期化開始...', 'info');
+        
+        // 📱 緊急デバッグ: アラートで初期化確認
+        if (typeof alert !== 'undefined') {
+            alert('🔧 VoiceSystem.init()メソッド開始');
+        }
         
         // 🤖 Android検出とパネル選択
         this.isAndroid = this.detectAndroid();
@@ -834,6 +841,12 @@ class VoiceSystem {
      */
     setupAndroidEventListeners() {
         this.addDebugLog('🤖 Android専用イベントリスナーを設定中...', 'info');
+        
+        // 📱 緊急デバッグ: アラートでAndroidパネル状態確認
+        const androidPanel = document.getElementById('voice-control-panel-android');
+        if (typeof alert !== 'undefined') {
+            alert(`🔧 Androidパネル状態\n存在: ${!!androidPanel}\n表示: ${androidPanel ? androidPanel.style.display : 'N/A'}\nクラス: ${androidPanel ? androidPanel.className : 'N/A'}`);
+        }
         
         // DOM全体をデバッグ情報として出力
         this.addDebugLog(`🔍 DOM読み込み状態: ${document.readyState}`, 'info');
