@@ -1288,11 +1288,19 @@ class VoiceSystem {
                     // Float32Arrayを録音データとして保存
                     this.audioChunks.push(new Float32Array(inputData));
 
-                    // 録音進行表示
-                    if (this.audioChunks.length % 10 === 0) {
+                    // 録音進行表示（より頻繁に更新）
+                    if (this.audioChunks.length % 5 === 0) {
                         const totalSamples = this.audioChunks.length * 4096;
                         const duration = totalSamples / this.audioContext.sampleRate;
                         this.updateStatus(`🎤 録音中... ${duration.toFixed(1)}秒`, 'recording');
+                        
+                        // Android専用タイマーも更新
+                        const timerElement = document.getElementById('voice-recording-timer-android');
+                        if (timerElement) {
+                            const minutes = Math.floor(duration / 60);
+                            const seconds = Math.floor(duration % 60);
+                            timerElement.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        }
                     }
                 }
             };
@@ -1348,6 +1356,12 @@ class VoiceSystem {
         this.stopVolumeMonitoring();
         this.stopRecordingTimer();
         this.updateRecordingUI(false);
+
+        // Android専用タイマーをリセット
+        const timerElement = document.getElementById('voice-recording-timer-android');
+        if (timerElement) {
+            timerElement.textContent = '⏱️ 00:00';
+        }
 
         this.addDebugLog('🛑 Web Audio API録音停止完了', 'success');
         this.updateStatus('✅ 録音完了', 'success');
@@ -1426,7 +1440,7 @@ class VoiceSystem {
             source.connect(this.audioContext.destination);
 
             this.isPlaying = true;
-            this.updateStatus('🔊 Web Audio API再生中...', 'playing');
+            this.updateStatus(`🔊 再生中... (${audioBuffer.duration.toFixed(1)}秒)`, 'playing');
 
             source.onended = () => {
                 this.isPlaying = false;
@@ -4127,6 +4141,50 @@ class VoiceSystem {
         if (statusElement) {
             statusElement.textContent = message;
             statusElement.className = `voice-status ${type}`;
+        }
+        
+        // 🚀 Android専用ステータス表示も更新
+        const androidStatusElement = document.getElementById('voice-status-android');
+        if (androidStatusElement) {
+            androidStatusElement.textContent = message;
+            androidStatusElement.className = `voice-status-android ${type}`;
+            
+            // タイプに応じて背景色とテキスト色を変更
+            let backgroundColor = 'rgba(200, 200, 200, 0.3)';
+            let textColor = '#333';
+            
+            switch (type) {
+                case 'recording':
+                    backgroundColor = 'rgba(255, 107, 107, 0.2)';
+                    textColor = '#d32f2f';
+                    break;
+                case 'playing':
+                    backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    textColor = '#388e3c';
+                    break;
+                case 'success':
+                    backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    textColor = '#2e7d32';
+                    break;
+                case 'error':
+                    backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    textColor = '#c62828';
+                    break;
+                case 'analyzing':
+                    backgroundColor = 'rgba(233, 30, 99, 0.2)';
+                    textColor = '#ad1457';
+                    break;
+                case 'speaking':
+                    backgroundColor = 'rgba(156, 39, 176, 0.2)';
+                    textColor = '#7b1fa2';
+                    break;
+                default:
+                    backgroundColor = 'rgba(200, 200, 200, 0.3)';
+                    textColor = '#333';
+            }
+            
+            androidStatusElement.style.backgroundColor = backgroundColor;
+            androidStatusElement.style.color = textColor;
         }
         
         // 📱 モバイル用状態表示は無効化（重複表示回避）
