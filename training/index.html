@@ -699,28 +699,12 @@ function handleLogout() {
     <button onclick="
       let result = 'VoiceSystem状態チェック:\\n';
       result += 'window.voiceSystem: ' + (window.voiceSystem ? '存在' : '未定義') + '\\n';
-      result += 'VoiceSystemクラス: ' + (typeof VoiceSystem !== 'undefined' ? '存在' : '未定義') + '\\n';
       if (window.voiceSystem) {
         result += 'toggleVoicePanel: ' + (typeof window.voiceSystem.toggleVoicePanel === 'function' ? '関数として存在' : '存在しない') + '\\n';
       }
       alert(result);
     " style="background: #ff6b6b; color: white; border: none; padding: 8px; border-radius: 3px; font-size: 12px;">
       状態確認
-    </button>
-    
-    <button onclick="
-      if (typeof VoiceSystem !== 'undefined') {
-        if (!window.voiceSystem) {
-          window.voiceSystem = new VoiceSystem();
-          alert('VoiceSystem を強制初期化しました');
-        } else {
-          alert('VoiceSystem は既に初期化済みです');
-        }
-      } else {
-        alert('VoiceSystemクラスが見つかりません');
-      }
-    " style="background: #ffa726; color: white; border: none; padding: 8px; border-radius: 3px; font-size: 12px;">
-      強制初期化
     </button>
     
     <button onclick="
@@ -2513,131 +2497,76 @@ window.clearRandomizeHistory = function() {
     });
     
     if (isMobile) {
-        console.log('📱 モバイルデバイス検出: VoiceSystemを初期化');
+        console.log('📱 モバイルデバイス検出: 従来の音声システムを使用');
         
-        // VoiceSystemが既に読み込まれているかチェック
-        if (typeof VoiceSystem !== 'undefined') {
-            console.log('✅ VoiceSystemクラスが既に利用可能');
+        // 従来のVoiceSystemを使用
+        const mobileScript = document.createElement('script');
+        mobileScript.src = 'js/voice_system.js';
+        mobileScript.onload = function() {
+            console.log('✅ voice_system.js 読み込み完了');
+            // スクリプト読み込み後に少し待ってからVoiceSystemを初期化
             setTimeout(() => {
-                if (!window.voiceSystem) {
+                if (typeof VoiceSystem !== 'undefined') {
                     window.voiceSystem = new VoiceSystem();
                     console.log('✅ VoiceSystem初期化完了');
+                    
+                    // 🔧 緊急テスト: 直接音声学習ボタンをテスト
+                    setTimeout(() => {
+                        const testBtn = document.getElementById('voice-panel-open-btn');
+                        if (testBtn) {
+                            console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
+                            testBtn.onclick = function() {
+                                console.log('🔧 緊急テスト: ボタンクリック検出！');
+                                if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
+                                    window.voiceSystem.toggleVoicePanel();
+                                } else {
+                                    console.error('❌ VoiceSystem or toggleVoicePanel not found');
+                                }
+                            };
+                        }
+                    }, 500);
+                } else {
+                    console.error('❌ VoiceSystemが見つかりません');
                 }
-                
-                // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                setTimeout(() => {
-                    const testBtn = document.getElementById('voice-panel-open-btn');
-                    if (testBtn) {
-                        console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                        testBtn.onclick = function() {
-                            console.log('🔧 緊急テスト: ボタンクリック検出！');
-                            if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                window.voiceSystem.toggleVoicePanel();
-                            } else {
-                                alert('❌ VoiceSystem or toggleVoicePanel not found');
-                            }
-                        };
-                    }
-                }, 500);
             }, 100);
-        } else {
-            // VoiceSystemが読み込まれていない場合は動的に読み込み
-            console.log('📥 VoiceSystemを動的に読み込み中...');
-            const mobileScript = document.createElement('script');
-            mobileScript.src = 'js/voice_system.js';
-            mobileScript.onload = function() {
-                console.log('✅ voice_system.js 読み込み完了');
-                setTimeout(() => {
-                    if (typeof VoiceSystem !== 'undefined') {
-                        window.voiceSystem = new VoiceSystem();
-                        console.log('✅ VoiceSystem初期化完了');
-                        
-                        // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                        setTimeout(() => {
-                            const testBtn = document.getElementById('voice-panel-open-btn');
-                            if (testBtn) {
-                                console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                                testBtn.onclick = function() {
-                                    console.log('🔧 緊急テスト: ボタンクリック検出！');
-                                    if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                        window.voiceSystem.toggleVoicePanel();
-                                    } else {
-                                        alert('❌ VoiceSystem or toggleVoicePanel not found');
-                                    }
-                                };
-                            }
-                        }, 500);
-                    } else {
-                        alert('❌ VoiceSystemが見つかりません');
-                    }
-                }, 100);
-            };
-            document.head.appendChild(mobileScript);
-        }
+        };
+        document.head.appendChild(mobileScript);
         console.log('✅ 従来の音声システムでモバイル対応完了');
         
     } else {
-        console.log('💻 デスクトップデバイス検出: VoiceSystemを初期化');
+        console.log('💻 デスクトップデバイス検出: 既存システムを読み込み');
         
-        // VoiceSystemが既に読み込まれているかチェック
-        if (typeof VoiceSystem !== 'undefined') {
-            console.log('✅ VoiceSystemクラスが既に利用可能');
+        // デスクトップでは既存システムを読み込み
+        const desktopScript = document.createElement('script');
+        desktopScript.src = 'js/voice_system.js';
+        desktopScript.onload = function() {
+            console.log('✅ voice_system.js 読み込み完了');
             setTimeout(() => {
-                if (!window.voiceSystem) {
+                if (typeof VoiceSystem !== 'undefined') {
                     window.voiceSystem = new VoiceSystem();
                     console.log('✅ VoiceSystem初期化完了');
+                    
+                    // 🔧 緊急テスト: 直接音声学習ボタンをテスト
+                    setTimeout(() => {
+                        const testBtn = document.getElementById('voice-panel-open-btn');
+                        if (testBtn) {
+                            console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
+                            testBtn.onclick = function() {
+                                console.log('🔧 緊急テスト: ボタンクリック検出！');
+                                if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
+                                    window.voiceSystem.toggleVoicePanel();
+                                } else {
+                                    console.error('❌ VoiceSystem or toggleVoicePanel not found');
+                                }
+                            };
+                        }
+                    }, 500);
+                } else {
+                    console.error('❌ VoiceSystemが見つかりません');
                 }
-                
-                // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                setTimeout(() => {
-                    const testBtn = document.getElementById('voice-panel-open-btn');
-                    if (testBtn) {
-                        console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                        testBtn.onclick = function() {
-                            console.log('🔧 緊急テスト: ボタンクリック検出！');
-                            if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                window.voiceSystem.toggleVoicePanel();
-                            } else {
-                                alert('❌ VoiceSystem or toggleVoicePanel not found');
-                            }
-                        };
-                    }
-                }, 500);
             }, 100);
-        } else {
-            // VoiceSystemが読み込まれていない場合は動的に読み込み
-            console.log('📥 VoiceSystemを動的に読み込み中...');
-            const desktopScript = document.createElement('script');
-            desktopScript.src = 'js/voice_system.js';
-            desktopScript.onload = function() {
-                console.log('✅ voice_system.js 読み込み完了');
-                setTimeout(() => {
-                    if (typeof VoiceSystem !== 'undefined') {
-                        window.voiceSystem = new VoiceSystem();
-                        console.log('✅ VoiceSystem初期化完了');
-                        
-                        // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                        setTimeout(() => {
-                            const testBtn = document.getElementById('voice-panel-open-btn');
-                            if (testBtn) {
-                                    console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                                testBtn.onclick = function() {
-                                    console.log('🔧 緊急テスト: ボタンクリック検出！');
-                                    if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                        window.voiceSystem.toggleVoicePanel();
-                                    } else {
-                                        alert('❌ VoiceSystem or toggleVoicePanel not found');
-                                    }
-                                };
-                            }
-                        }, 500);
-                    } else {
-                        alert('❌ VoiceSystemが見つかりません');
-                    }
-                }, 100);
-            };
-            document.head.appendChild(desktopScript);
-        }
+        };
+        document.head.appendChild(desktopScript);
     }
 })();
 </script>
