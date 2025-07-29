@@ -4,35 +4,48 @@
  */
 class VoiceProgressUI {
     constructor() {
+        console.log('🏗️ VoiceProgressUI コンストラクター開始');
         this.progressTracker = window.voiceProgressTracker;
         this.isVisible = false;
         this.currentPeriod = 'week';
         
+        console.log('🔍 progressTracker:', this.progressTracker);
+        console.log('🔍 window.currentProgressUI (設定前):', window.currentProgressUI);
+        
         // グローバルインスタンスとして登録
         window.currentProgressUI = this;
+        console.log('✅ グローバルインスタンスとして登録完了');
         
         // 初期化のタイミングをずらす
         if (this.progressTracker) {
+            console.log('📊 progressTracker が存在 - 即座に初期化');
             this.init();
         } else {
+            console.log('⏳ progressTracker が未読み込み - 1秒後に再チェック');
             // ProgressTrackerが読み込まれるまで待つ
             setTimeout(() => {
                 this.progressTracker = window.voiceProgressTracker;
+                console.log('🔍 再チェック後のprogressTracker:', this.progressTracker);
                 if (this.progressTracker) {
+                    console.log('✅ progressTracker発見 - 初期化開始');
                     this.init();
                 } else {
                     console.error('❌ VoiceProgressTrackerが見つかりません');
                 }
             }, 1000);
         }
+        console.log('🏗️ VoiceProgressUI コンストラクター完了');
     }
     
     /**
      * 初期化
      */
     init() {
+        console.log('🔧 VoiceProgressUI.init() 開始');
         this.createProgressPanel();
+        console.log('✅ createProgressPanel() 完了');
         this.setupEventListeners();
+        console.log('✅ setupEventListeners() 完了');
         console.log('✅ 音声進捗表示UI初期化完了');
     }
     
@@ -208,10 +221,15 @@ class VoiceProgressUI {
      * 進捗パネルを表示
      */
     async showProgressPanel() {
+        console.log('📊 showProgressPanel() が呼び出されました');
         const panel = document.getElementById('voice-progress-panel');
+        console.log('🔍 パネル要素:', panel);
+        
         if (panel) {
+            console.log('✅ パネル要素が見つかりました - 表示します');
             panel.style.display = 'block';
             this.isVisible = true;
+            console.log('📊 isVisible を true に設定');
             
             // Escキーで閉じる機能を追加
             this.handleKeyPress = (e) => {
@@ -220,9 +238,14 @@ class VoiceProgressUI {
                 }
             };
             document.addEventListener('keydown', this.handleKeyPress);
+            console.log('⌨️ Escキーイベントリスナーを追加');
             
             // データを読み込んで表示
+            console.log('📊 loadAndDisplayProgress() を呼び出します');
             await this.loadAndDisplayProgress();
+            console.log('✅ showProgressPanel() 完了');
+        } else {
+            console.error('❌ パネル要素が見つかりません - voice-progress-panel');
         }
     }
     
