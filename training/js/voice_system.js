@@ -39,6 +39,11 @@ class VoiceSystem {
     async init() {
         console.log('🎤 音声システム初期化開始...');
         
+        // 🤖 Android検出とパネル選択
+        this.isAndroid = this.detectAndroid();
+        this.currentPanel = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
+        console.log(`📱 デバイス検出: ${this.isAndroid ? 'Android' : 'その他'} - パネル: ${this.currentPanel}`);
+        
         // 音声リストを読み込み
         this.loadVoices();
         
@@ -46,7 +51,7 @@ class VoiceSystem {
         await this.checkMicrophonePermission();
         
         // 音声認識を初期化
-        this.initSpeechRecognition();
+        await this.initSpeechRecognition();
         
         // イベントリスナーを設定
         this.setupEventListeners();
@@ -56,13 +61,31 @@ class VoiceSystem {
         
         // 📱 初期化時にパネル位置を調整（特にモバイル）
         setTimeout(() => {
-            const panel = document.getElementById('voice-control-panel');
+            const panel = document.getElementById(this.currentPanel);
             if (panel) {
                 this.adjustPanelPosition();
             }
         }, 1000);
         
         console.log('✅ 音声システム初期化完了');
+    }
+    
+    /**
+     * 🤖 Android デバイス検出
+     */
+    detectAndroid() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isAndroid = /android/i.test(userAgent);
+        
+        console.log(`🔍 User Agent: ${navigator.userAgent.substring(0, 100)}...`);
+        console.log(`🤖 Android検出結果: ${isAndroid}`);
+        
+        if (isAndroid) {
+            console.log('🤖 Android専用音声システムを起動します');
+            // Android専用の初期設定があればここに追加
+        }
+        
+        return isAndroid;
     }
     
     /**
@@ -616,6 +639,72 @@ class VoiceSystem {
      * イベントリスナーを設定
      */
     setupEventListeners() {
+        // 🤖 Android専用ボタンのイベントリスナー
+        if (this.isAndroid) {
+            this.setupAndroidEventListeners();
+        } else {
+            this.setupStandardEventListeners();
+        }
+        
+        // 共通のイベントリスナー
+        this.setupCommonEventListeners();
+    }
+    
+    /**
+     * 🤖 Android専用イベントリスナー設定
+     */
+    setupAndroidEventListeners() {
+        console.log('🤖 Android専用イベントリスナーを設定中...');
+        
+        // Android専用録音ボタン（録音のみ）
+        const recordBtnAndroid = document.getElementById('voice-record-btn-android');
+        if (recordBtnAndroid) {
+            recordBtnAndroid.addEventListener('click', () => this.toggleRecordingAndroid());
+            console.log('✅ Android専用録音ボタンのイベントリスナーを設定');
+        }
+        
+        // Android専用再生ボタン
+        const playBtnAndroid = document.getElementById('voice-play-btn-android');
+        if (playBtnAndroid) {
+            playBtnAndroid.addEventListener('click', () => this.playRecordingAndroid());
+            console.log('✅ Android専用再生ボタンのイベントリスナーを設定');
+        }
+        
+        // Android専用音声合成ボタン（現行機能を使用）
+        const ttsBtnAndroid = document.getElementById('voice-tts-btn-android');
+        if (ttsBtnAndroid) {
+            ttsBtnAndroid.addEventListener('click', () => this.speakSentence());
+            console.log('✅ Android専用音声合成ボタンのイベントリスナーを設定');
+        }
+        
+        // Android専用分析ボタン
+        const analyzeBtnAndroid = document.getElementById('voice-analyze-btn-android');
+        if (analyzeBtnAndroid) {
+            analyzeBtnAndroid.addEventListener('click', () => this.analyzeRecordingAndroid());
+            console.log('✅ Android専用分析ボタンのイベントリスナーを設定');
+        }
+        
+        // Android専用パネル制御ボタン
+        const closeBtnAndroid = document.getElementById('voice-panel-close-btn-android');
+        if (closeBtnAndroid) {
+            closeBtnAndroid.addEventListener('click', () => this.hideVoicePanelAndroid());
+            console.log('✅ Android専用パネル閉じるボタンのイベントリスナーを設定');
+        }
+        
+        // Android専用進捗ボタン
+        const progressBtnAndroid = document.getElementById('voice-progress-btn-android');
+        if (progressBtnAndroid) {
+            progressBtnAndroid.addEventListener('click', () => this.showProgress());
+            console.log('✅ Android専用進捗ボタンのイベントリスナーを設定');
+        }
+    }
+    
+    /**
+     * 💻 標準版イベントリスナー設定
+     */
+    setupStandardEventListeners() {
+        console.log('💻 標準版イベントリスナーを設定中...');
+        
         // 録音ボタン
         const recordBtn = document.getElementById('voice-record-btn');
         if (recordBtn) {
@@ -651,6 +740,12 @@ class VoiceSystem {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
         }
+    }
+    
+    /**
+     * 共通イベントリスナー設定
+     */
+    setupCommonEventListeners() {
         
         // 📱 モバイルデバッグボタン
         const debugBtn = document.getElementById('mobile-debug-btn');
@@ -702,6 +797,137 @@ class VoiceSystem {
         
         // 🔧 音声認識言語設定ボタン（動的に追加される可能性があるため遅延設定）
         this.setupVoiceLanguageButtonListener();
+    }
+    
+    /**
+     * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）
+     */
+    async toggleRecordingAndroid() {
+        if (this.isRecording) {
+            this.stopRecordingAndroid();
+        } else {
+            await this.startRecordingAndroid();
+        }
+    }
+    
+    /**
+     * 🤖 Android専用録音開始（音声認識を除外）
+     */
+    async startRecordingAndroid() {
+        console.log('🤖 Android専用録音開始...');
+        
+        if (!this.isMicrophoneAllowed) {
+            await this.checkMicrophonePermission();
+            if (!this.isMicrophoneAllowed) {
+                this.updateStatusAndroid('❌ マイクアクセスが許可されていません', 'error');
+                return;
+            }
+        }
+        
+        try {
+            // 🔧 前回の録音データをクリア
+            this.recordedBlob = null;
+            
+            // 📏 前回の分析結果をクリアしパネルサイズをリセット
+            const resultsContainer = document.getElementById('voice-analysis-results-android');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = 'Android分析結果がここに表示されます';
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                    channelCount: 1
+                }
+            });
+            
+            // ストリーム参照を保存（Android対応）
+            this.currentStream = stream;
+            
+            console.log('🤖 Android: MediaRecorder設定開始');
+            
+            // Android Chrome特化: MediaRecorder設定最適化
+            let mediaRecorderOptions = {};
+            if (MediaRecorder.isTypeSupported('audio/webm')) {
+                mediaRecorderOptions.mimeType = 'audio/webm';
+            } else {
+                console.log('🤖 Android: mimeTypeを指定せずにデフォルトを使用');
+            }
+            
+            this.mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
+            
+            console.log('🤖 Android MediaRecorder mimeType:', this.mediaRecorder.mimeType);
+            
+            // 🔧 新しい録音用のチャンク配列を初期化
+            const audioChunks = [];
+            
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            this.mediaRecorder.onstop = () => {
+                const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+                this.recordedBlob = new Blob(audioChunks, { type: mimeType });
+                console.log('🤖 Android録音データ作成:', this.recordedBlob.size, 'bytes, type:', mimeType);
+                
+                this.stopVolumeMonitoringAndroid();
+                stream.getTracks().forEach(track => track.stop());
+                this.updateRecordingUIAndroid(false);
+            };
+            
+            this.mediaRecorder.onerror = (event) => {
+                console.error('🤖 Android MediaRecorder error:', event.error);
+                this.updateStatusAndroid('録音エラーが発生しました', 'error');
+                this.isRecording = false;
+                this.updateRecordingUIAndroid(false);
+            };
+            
+            // 録音開始
+            this.mediaRecorder.start();
+            this.isRecording = true;
+            this.recordingStartTime = Date.now();
+            
+            // UI更新
+            this.updateRecordingUIAndroid(true);
+            this.startRecordingTimerAndroid();
+            this.setupVolumeMonitoringAndroid(stream);
+            
+            this.updateStatusAndroid('🤖 Android録音中...', 'recording');
+            
+        } catch (error) {
+            console.error('🤖 Android録音開始エラー:', error);
+            this.updateStatusAndroid(`❌ Android録音エラー: ${error.message}`, 'error');
+            this.isMicrophoneAllowed = false;
+        }
+    }
+    
+    /**
+     * 🤖 Android専用録音停止
+     */
+    stopRecordingAndroid() {
+        console.log('🤖 Android録音停止中...');
+        
+        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            this.mediaRecorder.addEventListener('stop', () => {
+                console.log('🤖 Android MediaRecorder停止完了');
+                this.isRecording = false;
+                
+                if (this.currentStream) {
+                    this.currentStream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
+            }, { once: true });
+            
+            this.mediaRecorder.stop();
+            this.stopRecordingTimerAndroid();
+        }
+        
+        this.updateStatusAndroid('🤖 Android録音データ準備中...', 'info');
     }
     
     /**
@@ -2804,11 +3030,15 @@ class VoiceSystem {
     }
     
     /**
-     * 音声パネルを表示
+     * 音声パネルを表示（Android対応版）
      */
     showVoicePanel() {
-        const panel = document.getElementById('voice-control-panel');
+        // 🤖 Android検出に基づいてパネルを選択
+        const panelId = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
+        const panel = document.getElementById(panelId);
+        
         if (panel) {
+            console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネルを表示: ${panelId}`);
             panel.style.display = 'block';
             
             // 📱 パネル表示直後の位置調整（より確実に）
@@ -2821,18 +3051,26 @@ class VoiceSystem {
             setTimeout(() => {
                 this.adjustPanelPosition();
             }, 200);
+        } else {
+            console.error(`❌ パネルが見つかりません: ${panelId}`);
         }
     }
     
     /**
-     * 音声パネルを非表示
+     * 音声パネルを非表示（Android対応版）
      */
     hideVoicePanel() {
-        const panel = document.getElementById('voice-control-panel');
+        // 🤖 Android検出に基づいてパネルを選択
+        const panelId = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
+        const panel = document.getElementById(panelId);
+        
         if (panel) {
+            console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネルを非表示: ${panelId}`);
             panel.style.display = 'none';
-            // 分析結果もクリア
-            const resultsContainer = document.getElementById('voice-analysis-results');
+            
+            // 分析結果もクリア（Android対応）
+            const resultsContainerId = this.isAndroid ? 'voice-analysis-results-android' : 'voice-analysis-results';
+            const resultsContainer = document.getElementById(resultsContainerId);
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
             }
@@ -2988,17 +3226,24 @@ class VoiceSystem {
     }
 
     /**
-     * 音声パネルの表示/非表示を切り替え
+     * 音声パネルの表示/非表示を切り替え（Android対応版）
      */
     toggleVoicePanel() {
-        const panel = document.getElementById('voice-control-panel');
+        // 🤖 Android検出に基づいてパネルを選択
+        const panelId = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
+        const panel = document.getElementById(panelId);
+        
         if (panel) {
             const isVisible = panel.style.display === 'block';
+            console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネル切り替え: ${isVisible ? '非表示' : '表示'}`);
+            
             if (isVisible) {
                 this.hideVoicePanel();
             } else {
                 this.showVoicePanel();
             }
+        } else {
+            console.error(`❌ パネルが見つかりません: ${panelId}`);
         }
     }
     

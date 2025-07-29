@@ -798,7 +798,80 @@ function handleLogout() {
     </div>
   </div>
   
-  <!-- 🎤 音声学習パネル（右上フロート） -->
+  <!-- 🤖 Android専用音声パネル -->
+  <div id="voice-control-panel-android" style="
+    position: fixed !important;
+    top: 120px !important;
+    right: 10px !important;
+    z-index: 15000 !important;
+    background: rgba(76, 175, 80, 0.95) !important; 
+    padding: 12px !important; 
+    border-radius: 8px !important; 
+    border: 2px solid #4CAF50 !important; 
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
+    min-width: 280px !important;
+    max-width: 320px !important;
+    transition: all 0.3s ease !important;
+    display: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: auto !important;
+    max-height: calc(100vh - 140px) !important;
+    overflow-y: auto !important;
+  ">
+    <!-- Android基本パネル（固定サイズ） -->
+    <div id="voice-panel-basic-android" style="position: relative;">
+      <div style="display: flex; gap: 8px; align-items: center; font-size: 12px;">
+        <h3 style="margin: 0; color: #fff; font-size: 16px; font-weight: bold;">🤖 Android音声学習システム</h3>
+        <button id="voice-panel-close-btn-android" style="background-color: #f44336; color: white; border: none; padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: auto;">✕</button>
+      </div>
+      
+      <!-- Android専用音声コントロールボタン -->
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+        <button id="voice-record-btn-android" class="voice-btn-android" style="background-color: #2196F3; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🎤 録音のみ</button>
+        <button id="voice-play-btn-android" class="voice-btn-android" style="background-color: #FF9800; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+        <button id="voice-tts-btn-android" class="voice-btn-android" style="background-color: #9C27B0; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
+        <button id="voice-analyze-btn-android" class="voice-btn-android" style="background-color: #E91E63; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 分析</button>
+      </div>
+      
+      <!-- Android専用ステータス表示 -->
+      <div id="voice-status-android" class="voice-status-android info" style="color: #fff; font-size: 11px; background: rgba(255, 255, 255, 0.2); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: center;">Android待機中...</div>
+      
+      <!-- Android専用録音タイマー -->
+      <div style="text-align: center; margin: 8px 0;">
+        <span style="color: #fff; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer-android">⏱️ 00:00</span>
+      </div>
+      
+      <!-- Android専用音量バー -->
+      <div style="margin: 8px 0;">
+        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden;">
+          <div id="voice-volume-bar-android" style="height: 100%; background: #fff; width: 0%; transition: width 0.1s;"></div>
+        </div>
+      </div>
+      
+      <!-- Android専用分析結果表示エリア -->
+      <div id="voice-analysis-results-android" style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; min-height: 30px; max-height: 400px; overflow-y: auto; color: #fff; font-size: 11px; margin: 8px 0;">Android分析結果がここに表示されます</div>
+      
+      <!-- Android専用進捗表示ボタン -->
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+        <button id="voice-progress-btn-android" class="voice-btn-android" style="background-color: #607D8B; color: white; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; border-radius: 3px;">📈 学習進捗</button>
+      </div>
+      
+      <!-- Android専用音声認識状態表示 -->
+      <div id="mobile-voice-status-android" style="
+        border-left: 4px solid #fff;
+        background: rgba(255,255,255,0.1);
+        padding: 6px;
+        margin: 8px 0;
+        border-radius: 3px;
+        color: #fff;
+        font-size: 10px;
+        display: none;
+      ">Android音声認識状態</div>
+    </div>
+  </div>
+
+  <!-- 💻 通常版音声パネル -->
   <div id="voice-control-panel" style="
     position: fixed !important;
     top: 120px !important;
