@@ -1009,7 +1009,7 @@ class VoiceSystem {
         } else {
             this.recordingRecognition.continuous = false;
             this.recordingRecognition.interimResults = true;
-            this.recordingRecognition.lang = 'ja-JP';
+            this.recordingRecognition.lang = 'en-US'; // 🔧 PC版も英語設定に修正
             this.recordingRecognition.maxAlternatives = 1;
         }
         
@@ -3899,7 +3899,7 @@ class VoiceSystem {
         } else {
             recognition.continuous = false;
             recognition.interimResults = true;
-            recognition.lang = 'ja-JP';
+            recognition.lang = 'en-US'; // 🔧 PC版も英語設定に修正
             recognition.maxAlternatives = 1;
         }
         
