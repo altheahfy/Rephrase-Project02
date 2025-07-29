@@ -1075,7 +1075,7 @@ class VoiceSystem {
         if (!this.isMicrophoneAllowed) {
             await this.checkMicrophonePermission();
             if (!this.isMicrophoneAllowed) {
-                this.updateStatusAndroid('❌ マイクアクセスが許可されていません', 'error');
+                this.updateStatus('❌ マイクアクセスが許可されていません', 'error');
                 return;
             }
         }
@@ -1085,7 +1085,7 @@ class VoiceSystem {
             this.recordedBlob = null;
             
             // 📏 前回の分析結果をクリアしパネルサイズをリセット
-            const resultsContainer = document.getElementById('voice-analysis-results-android');
+            const resultsContainer = document.getElementById('voice-analysis-results');
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
             }
@@ -1154,48 +1154,7 @@ class VoiceSystem {
             this.isMicrophoneAllowed = false;
         }
     }
-            
-            this.mediaRecorder.onstop = () => {
-                const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
-                this.recordedBlob = new Blob(audioChunks, { type: mimeType });
-                console.log('🔥 Android録音データ作成完了:', {
-                    blobSize: this.recordedBlob.size,
-                    blobType: this.recordedBlob.type,
-                    chunks: audioChunks.length,
-                    recordedBlob: this.recordedBlob
-                });
-                
-                this.stopVolumeMonitoringAndroid();
-                stream.getTracks().forEach(track => track.stop());
-                this.updateRecordingUIAndroid(false);
-            };
-            
-            this.mediaRecorder.onerror = (event) => {
-                console.error('🤖 Android MediaRecorder error:', event.error);
-                this.updateStatusAndroid('録音エラーが発生しました', 'error');
-                this.isRecording = false;
-                this.updateRecordingUIAndroid(false);
-            };
-            
-            // 録音開始
-            this.mediaRecorder.start();
-            this.isRecording = true;
-            this.recordingStartTime = Date.now();
-            
-            // UI更新
-            this.updateRecordingUIAndroid(true);
-            this.startRecordingTimerAndroid();
-            this.setupVolumeMonitoringAndroid(stream);
-            
-            this.updateStatusAndroid('🤖 Android録音中...', 'recording');
-            
-        } catch (error) {
-            console.error('🤖 Android録音開始エラー:', error);
-            this.updateStatusAndroid(`❌ Android録音エラー: ${error.message}`, 'error');
-            this.isMicrophoneAllowed = false;
-        }
-    }
-    
+
     /**
      * 🤖 Android専用録音停止
      */
