@@ -5411,8 +5411,6 @@ class VoiceSystem {
      */
     showProgress() {
         console.log('📊 学習進捗表示を開始');
-        console.log('🔍 VoiceProgressUI type:', typeof VoiceProgressUI);
-        console.log('🔍 window.currentProgressUI:', window.currentProgressUI);
         
         // VoiceProgressUIが利用可能かチェック
         if (typeof VoiceProgressUI === 'undefined') {
@@ -5424,22 +5422,18 @@ class VoiceSystem {
         try {
             // グローバルインスタンスを使用（既存のものがあれば再利用）
             let progressUI = window.currentProgressUI;
-            console.log('🔍 既存のprogressUI:', progressUI);
             
             if (!progressUI) {
                 console.log('📊 新しいVoiceProgressUIインスタンスを作成');
                 progressUI = new VoiceProgressUI();
                 window.currentProgressUI = progressUI;
-                console.log('✅ 新しいインスタンスを作成しました:', progressUI);
             }
             
-            console.log('📊 showProgressPanel()を呼び出します');
             // 進捗パネルを表示
             progressUI.showProgressPanel();
             console.log('✅ 学習進捗パネルを表示しました');
         } catch (error) {
             console.error('❌ 進捗表示エラー:', error);
-            console.error('❌ エラースタック:', error.stack);
             alert('進捗表示でエラーが発生しました: ' + error.message);
         }
     }
