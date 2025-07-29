@@ -44,6 +44,25 @@ class VoiceSystem {
         this.currentPanel = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
         console.log(`📱 デバイス検出: ${this.isAndroid ? 'Android' : 'その他'} - パネル: ${this.currentPanel}`);
         
+        // 🔍 パネル存在確認
+        const panel = document.getElementById(this.currentPanel);
+        if (!panel) {
+            console.error(`❌ 指定されたパネルが見つかりません: ${this.currentPanel}`);
+            console.log('🔍 利用可能なパネルを検索中...');
+            
+            // フォールバック：利用可能なパネルを検索
+            const fallbackPanel = document.getElementById(this.isAndroid ? 'voice-control-panel' : 'voice-control-panel-android');
+            if (fallbackPanel) {
+                console.log(`🔄 フォールバックパネルを使用: ${fallbackPanel.id}`);
+                this.currentPanel = fallbackPanel.id;
+                this.isAndroid = !this.isAndroid; // フラグも反転
+            } else {
+                console.error('❌ 音声パネルが全く見つかりません');
+            }
+        } else {
+            console.log(`✅ パネル確認完了: ${this.currentPanel}`);
+        }
+        
         // 音声リストを読み込み
         this.loadVoices();
         
@@ -82,7 +101,24 @@ class VoiceSystem {
         
         if (isAndroid) {
             console.log('🤖 Android専用音声システムを起動します');
-            // Android専用の初期設定があればここに追加
+            
+            // Android専用パネルの存在確認
+            const androidPanel = document.getElementById('voice-control-panel-android');
+            if (androidPanel) {
+                console.log('✅ Android専用パネルが見つかりました');
+            } else {
+                console.error('❌ Android専用パネルが見つかりません！HTMLにパネルが存在しない可能性があります');
+            }
+        } else {
+            console.log('💻 通常デバイス用音声システムを起動します');
+            
+            // 通常パネルの存在確認
+            const normalPanel = document.getElementById('voice-control-panel');
+            if (normalPanel) {
+                console.log('✅ 通常パネルが見つかりました');
+            } else {
+                console.error('❌ 通常パネルが見つかりません！');
+            }
         }
         
         return isAndroid;
@@ -735,10 +771,17 @@ class VoiceSystem {
             openBtn.addEventListener('click', () => this.toggleVoicePanel());
         }
         
-        // パネル閉じるボタン
+        // パネル閉じるボタン（通常版）
         const closeBtn = document.getElementById('voice-panel-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideVoicePanel());
+        }
+        
+        // 🤖 Android専用パネル閉じるボタン
+        const closeBtnAndroid = document.getElementById('voice-panel-close-btn-android');
+        if (closeBtnAndroid) {
+            closeBtnAndroid.addEventListener('click', () => this.hideVoicePanel());
+            console.log('✅ Android専用パネル閉じるボタンのイベントリスナーを設定しました');
         }
     }
     
@@ -3229,13 +3272,21 @@ class VoiceSystem {
      * 音声パネルの表示/非表示を切り替え（Android対応版）
      */
     toggleVoicePanel() {
+        console.log('🔄 toggleVoicePanel が呼び出されました');
+        console.log(`📱 現在のデバイス: ${this.isAndroid ? 'Android' : 'その他'}`);
+        console.log(`📱 現在のパネルID: ${this.currentPanel}`);
+        
         // 🤖 Android検出に基づいてパネルを選択
         const panelId = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
         const panel = document.getElementById(panelId);
         
+        console.log(`🔍 取得しようとするパネル: ${panelId}`);
+        console.log(`🔍 パネル要素の存在: ${panel ? 'あり' : 'なし'}`);
+        
         if (panel) {
             const isVisible = panel.style.display === 'block';
             console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネル切り替え: ${isVisible ? '非表示' : '表示'}`);
+            console.log(`📱 現在の表示状態: ${panel.style.display}`);
             
             if (isVisible) {
                 this.hideVoicePanel();
@@ -3244,6 +3295,16 @@ class VoiceSystem {
             }
         } else {
             console.error(`❌ パネルが見つかりません: ${panelId}`);
+            
+            // 🔍 詳細なデバッグ情報
+            console.log('🔍 HTMLに存在するパネル要素を確認中...');
+            const allPanels = document.querySelectorAll('[id*="voice-control-panel"]');
+            if (allPanels.length > 0) {
+                console.log(`🔍 見つかったパネル要素 (${allPanels.length}個):`);
+                allPanels.forEach(p => console.log(`  - ${p.id} (display: ${p.style.display})`));
+            } else {
+                console.error('❌ 音声パネル要素が一つも見つかりません！');
+            }
         }
     }
     
