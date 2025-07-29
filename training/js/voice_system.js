@@ -1895,6 +1895,9 @@ class VoiceSystem {
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     audioChunks.push(event.data);
+                    console.log(`📦 PC版録音データチャンク受信: ${event.data.size} bytes, 合計: ${audioChunks.length}個`);
+                } else {
+                    console.warn('⚠️ PC版録音: 空のデータチャンクを受信');
                 }
             };
             
@@ -1902,7 +1905,25 @@ class VoiceSystem {
                 // 🔧 MediaRecorderと同じmimeTypeでBlobを作成（Android対応）
                 const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
                 this.recordedBlob = new Blob(audioChunks, { type: mimeType });
-                console.log('🎤 新しい録音データ作成:', this.recordedBlob.size, 'bytes, type:', mimeType);
+                
+                console.log('🎤 PC版録音データ作成:', {
+                    blobSize: this.recordedBlob.size,
+                    blobType: this.recordedBlob.type,
+                    chunksCount: audioChunks.length,
+                    chunksDetails: audioChunks.map((chunk, index) => ({
+                        index,
+                        size: chunk.size,
+                        type: chunk.type
+                    }))
+                });
+                
+                if (this.recordedBlob.size === 0) {
+                    console.error('❌ PC版録音失敗: Blobサイズが0です');
+                    this.updateStatus('❌ 録音データが空です', 'error');
+                } else {
+                    console.log('✅ PC版録音成功: 再生準備完了');
+                    this.updateStatus('✅ 録音完了', 'success');
+                }
                 
                 this.stopVolumeMonitoring();
                 stream.getTracks().forEach(track => track.stop());
@@ -2185,8 +2206,24 @@ class VoiceSystem {
      * 録音再生
      */
     playRecording() {
+        // 📊 詳細デバッグ情報を表示
+        console.log('🔍 PC版再生デバッグ情報:', {
+            recordedBlob: this.recordedBlob,
+            blobSize: this.recordedBlob ? this.recordedBlob.size : 'null',
+            blobType: this.recordedBlob ? this.recordedBlob.type : 'null',
+            audioChunks: this.audioChunks ? this.audioChunks.length : 'null',
+            isAndroid: /Android/i.test(navigator.userAgent)
+        });
+        
         if (!this.recordedBlob) {
             this.updateStatus('❌ 再生する録音がありません', 'error');
+            console.log('❌ PC版再生失敗: recordedBlobが存在しません');
+            return;
+        }
+        
+        if (this.recordedBlob.size === 0) {
+            this.updateStatus('❌ 録音データが空です', 'error');
+            console.log('❌ PC版再生失敗: recordedBlobのサイズが0です');
             return;
         }
         
@@ -2201,28 +2238,61 @@ class VoiceSystem {
         const audioUrl = URL.createObjectURL(this.recordedBlob);
         this.currentAudio = new Audio(audioUrl);
         
-        // 🚨 Android Chrome対応: 詳細ログとエラーハンドリング
-        console.log('🔊 再生準備:', {
+        // 🚨 PC版対応: 詳細ログとエラーハンドリング
+        console.log('🔊 PC版再生準備:', {
             blobSize: this.recordedBlob.size,
             blobType: this.recordedBlob.type,
             audioUrl: audioUrl.substring(0, 50) + '...',
             userAgent: navigator.userAgent.substring(0, 80)
         });
         
-        this.currentAudio.onloadstart = () => this.updateStatus('🔊 録音再生中...', 'playing');
+        this.currentAudio.onloadstart = () => {
+            this.updateStatus('🔊 録音再生中...', 'playing');
+            console.log('✅ PC版音声読み込み開始');
+        };
+        
+        this.currentAudio.oncanplay = () => {
+            console.log('✅ PC版音声再生準備完了');
+        };
+        
+        this.currentAudio.onplaying = () => {
+            console.log('✅ PC版音声再生開始');
+        };
+        
         this.currentAudio.onended = () => {
             this.updateStatus('✅ 再生完了', 'success');
+            console.log('✅ PC版音声再生完了');
             // 🔧 再生完了後にBlobURLを解放
             URL.revokeObjectURL(audioUrl);
             this.currentAudio = null;
         };
-        this.currentAudio.onerror = () => {
+        
+        this.currentAudio.onerror = (error) => {
             this.updateStatus('❌ 再生エラー', 'error');
+            console.error('❌ PC版音声再生エラー:', error);
+            console.error('❌ エラー詳細:', {
+                error: error,
+                audioElement: this.currentAudio,
+                audioUrl: audioUrl,
+                blobInfo: {
+                    size: this.recordedBlob.size,
+                    type: this.recordedBlob.type
+                }
+            });
             URL.revokeObjectURL(audioUrl);
             this.currentAudio = null;
         };
         
-        this.currentAudio.play();
+        // 音声読み込み開始
+        this.currentAudio.load();
+        
+        // 再生開始
+        this.currentAudio.play().then(() => {
+            console.log('✅ PC版音声再生開始成功');
+        }).catch(error => {
+            console.error('❌ PC版音声再生開始失敗:', error);
+            this.updateStatus('❌ 再生開始失敗', 'error');
+        });
     }
     
     /**
