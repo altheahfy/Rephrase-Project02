@@ -1884,7 +1884,7 @@ class VoiceSystem {
             `;
         }
         
-        // PC版と同じHTML構造
+        // PC版と同じHTML構造（保存確認機能付き）
         const resultsHtml = `
             <div class="analysis-results">
                 <h4>📊 発話分析結果 (Android)</h4>
@@ -1895,6 +1895,13 @@ class VoiceSystem {
                 ${contentVerificationHtml}
                 <div class="progress-save-status">
                     <div id="progress-save-message-android">Android分析が完了しました</div>
+                    <div class="save-confirmation-android" style="margin-top: 10px;">
+                        <p style="margin: 5px 0; font-size: 12px; color: #555;">この結果を学習データに保存しますか？</p>
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <button id="save-yes-btn-android" class="voice-btn" style="background: #28a745; color: white; font-size: 11px; padding: 4px 12px;">✅ はい</button>
+                            <button id="save-no-btn-android" class="voice-btn" style="background: #6c757d; color: white; font-size: 11px; padding: 4px 12px;">❌ いいえ</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -1904,6 +1911,9 @@ class VoiceSystem {
         if (resultsContainer) {
             resultsContainer.innerHTML = resultsHtml;
             console.log('✅ Android分析結果をHTML表示完了');
+            
+            // Android用保存確認ボタンのイベントリスナーを設定
+            this.setupAndroidSaveConfirmationButtons(result);
         } else {
             console.warn('⚠️ voice-analysis-results-android要素が見つかりません');
             // フォールバックとして通常の結果エリアに表示
@@ -1911,7 +1921,75 @@ class VoiceSystem {
             if (fallbackContainer) {
                 fallbackContainer.innerHTML = resultsHtml;
                 console.log('✅ フォールバック: 通常の結果エリアにAndroid分析結果を表示');
+                
+                // フォールバック時もイベントリスナーを設定
+                this.setupAndroidSaveConfirmationButtons(result);
             }
+        }
+    }
+
+    /**
+     * 📱 Android用保存確認ボタンのイベントリスナーを設定
+     */
+    setupAndroidSaveConfirmationButtons(analysisResult) {
+        const saveYesBtn = document.getElementById('save-yes-btn-android');
+        const saveNoBtn = document.getElementById('save-no-btn-android');
+        const messageElement = document.getElementById('progress-save-message-android');
+        
+        if (saveYesBtn && saveNoBtn) {
+            console.log('📱 Android保存確認ボタンのイベントリスナーを設定');
+            
+            // 「はい」ボタンのクリックイベント
+            saveYesBtn.addEventListener('click', async () => {
+                console.log('✅ Android: 学習データ保存を選択');
+                
+                // ボタンを無効化
+                saveYesBtn.disabled = true;
+                saveNoBtn.disabled = true;
+                
+                // 保存メッセージを更新
+                if (messageElement) {
+                    messageElement.innerHTML = '📊 Android学習データに保存中...';
+                    messageElement.style.color = '#007bff';
+                }
+                
+                // データを保存（PC版と同じメソッドを使用）
+                await this.saveProgressData(analysisResult);
+                
+                // 確認ボタンを非表示
+                const confirmationDiv = document.querySelector('.save-confirmation-android');
+                if (confirmationDiv) {
+                    confirmationDiv.style.display = 'none';
+                }
+            });
+            
+            // 「いいえ」ボタンのクリックイベント
+            saveNoBtn.addEventListener('click', async () => {
+                console.log('❌ Android: 学習データ保存をキャンセル');
+                
+                // ボタンを無効化
+                saveYesBtn.disabled = true;
+                saveNoBtn.disabled = true;
+                
+                // 保存しないメッセージを表示
+                if (messageElement) {
+                    messageElement.innerHTML = '❌ Android学習データには保存されませんでした';
+                    messageElement.style.color = '#6c757d';
+                }
+                
+                // 確認ボタンを非表示
+                const confirmationDiv = document.querySelector('.save-confirmation-android');
+                if (confirmationDiv) {
+                    confirmationDiv.style.display = 'none';
+                }
+                
+                // 🚫 一時的な分析結果データをクリア（PC版と同じ処理）
+                await this.clearTemporaryAnalysisData(analysisResult);
+                
+                console.log('👋 Android: ユーザーが学習データ保存をキャンセルしました');
+            });
+        } else {
+            console.warn('⚠️ Android保存確認ボタンが見つかりません');
         }
     }
 
