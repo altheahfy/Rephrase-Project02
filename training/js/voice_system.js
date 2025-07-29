@@ -1156,28 +1156,24 @@ class VoiceSystem {
     }
 
     /**
-     * 🤖 Android専用録音停止
+     * 🤖 Android専用録音停止 - 動作していた実装を移植
      */
     stopRecordingAndroid() {
-        console.log('🤖 Android録音停止中...');
+        console.log('🤖 Android: 録音のみ停止');
         
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
             this.mediaRecorder.addEventListener('stop', () => {
-                console.log('🤖 Android MediaRecorder停止完了');
+                console.log('✅ Android録音のみ停止完了');
                 this.isRecording = false;
                 
                 if (this.currentStream) {
-                    this.currentStream.getTracks().forEach(track => {
-                        track.stop();
-                    });
+                    this.currentStream.getTracks().forEach(track => track.stop());
                 }
             }, { once: true });
             
             this.mediaRecorder.stop();
-            this.stopRecordingTimerAndroid();
+            this.stopRecordingTimer();
         }
-        
-        this.updateStatusAndroid('🤖 Android録音データ準備中...', 'info');
     }
 
     /**
