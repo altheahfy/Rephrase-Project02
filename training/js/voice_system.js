@@ -5171,5 +5171,3 @@ if (document.readyState === 'loading') {
         }
     }, 200);
 }
-
-console.log('✅ voice_system.js の読み込みが完了しました');
