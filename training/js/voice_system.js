@@ -1173,7 +1173,192 @@ class VoiceSystem {
         
         this.updateStatusAndroid('🤖 Android録音データ準備中...', 'info');
     }
-    
+
+    /**
+     * 🤖 Android専用ステータス更新
+     */
+    updateStatusAndroid(message, type = 'info') {
+        const statusElement = document.getElementById('voice-status-android');
+        if (statusElement) {
+            statusElement.textContent = message;
+            statusElement.className = `voice-status-android ${type}`;
+        }
+        console.log(`🤖 Android: ${message}`);
+    }
+
+    /**
+     * 🤖 Android専用録音UI更新
+     */
+    updateRecordingUIAndroid(isRecording) {
+        const recordBtn = document.getElementById('voice-record-btn-android');
+        if (recordBtn) {
+            recordBtn.innerHTML = isRecording ? '⏸️ 停止' : '🎤 録音のみ';
+            recordBtn.style.backgroundColor = isRecording ? '#f44336' : '#2196F3';
+        }
+    }
+
+    /**
+     * 🤖 Android専用録音タイマー開始
+     */
+    startRecordingTimerAndroid() {
+        this.recordingTimerInterval = setInterval(() => {
+            if (this.recordingStartTime) {
+                const elapsed = Math.floor((Date.now() - this.recordingStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                const timerElement = document.getElementById('voice-recording-timer-android');
+                if (timerElement) {
+                    timerElement.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+        }, 1000);
+    }
+
+    /**
+     * 🤖 Android専用録音タイマー停止
+     */
+    stopRecordingTimerAndroid() {
+        if (this.recordingTimerInterval) {
+            clearInterval(this.recordingTimerInterval);
+            this.recordingTimerInterval = null;
+        }
+    }
+
+    /**
+     * 🤖 Android専用音量モニタリング設定
+     */
+    setupVolumeMonitoringAndroid(stream) {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioContext.createAnalyser();
+            const source = this.audioContext.createMediaStreamSource(stream);
+            source.connect(this.analyser);
+            
+            this.analyser.fftSize = 256;
+            const bufferLength = this.analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            const updateVolume = () => {
+                if (this.isRecording) {
+                    this.analyser.getByteFrequencyData(dataArray);
+                    const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+                    const volumePercent = (average / 255) * 100;
+                    
+                    const volumeBar = document.getElementById('voice-volume-bar-android');
+                    if (volumeBar) {
+                        volumeBar.style.width = `${volumePercent}%`;
+                    }
+                    
+                    requestAnimationFrame(updateVolume);
+                }
+            };
+            updateVolume();
+        } catch (error) {
+            console.error('🤖 Android音量モニタリング設定エラー:', error);
+        }
+    }
+
+    /**
+     * 🤖 Android専用音量モニタリング停止
+     */
+    stopVolumeMonitoringAndroid() {
+        if (this.audioContext) {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
+    }
+
+    /**
+     * 🤖 Android専用録音再生
+     */
+    playRecordingAndroid() {
+        if (!this.recordedBlob) {
+            this.updateStatusAndroid('❌ 再生する録音がありません', 'error');
+            return;
+        }
+
+        // 🔧 前回の再生を停止（既存のAudioオブジェクトをクリア）
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
+
+        // 🔧 新しいBlobURLを作成
+        const audioUrl = URL.createObjectURL(this.recordedBlob);
+        this.currentAudio = new Audio(audioUrl);
+
+        console.log('🤖 Android再生準備:', {
+            blobSize: this.recordedBlob.size,
+            blobType: this.recordedBlob.type,
+            audioUrl: audioUrl.substring(0, 50) + '...'
+        });
+
+        this.currentAudio.onloadstart = () => this.updateStatusAndroid('🔊 Android録音再生中...', 'playing');
+        this.currentAudio.onended = () => {
+            this.updateStatusAndroid('✅ Android再生完了', 'success');
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        };
+        this.currentAudio.onerror = () => {
+            this.updateStatusAndroid('❌ Android再生エラー', 'error');
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        };
+
+        this.currentAudio.play();
+    }
+
+    /**
+     * 🤖 Android専用パネル非表示
+     */
+    hideVoicePanelAndroid() {
+        const panel = document.getElementById('voice-control-panel-android');
+        if (panel) {
+            panel.style.setProperty('display', 'none', 'important');
+            this.isPanelVisible = false;
+            console.log('🤖 Android音声パネルを非表示にしました');
+        }
+    }
+
+    /**
+     * 🤖 Android専用録音分析（基本実装）
+     */
+    analyzeRecordingAndroid() {
+        if (!this.recordedBlob) {
+            this.updateStatusAndroid('❌ 分析する録音がありません', 'error');
+            return;
+        }
+
+        this.updateStatusAndroid('📊 Android分析中...', 'analyzing');
+        
+        // 基本的な録音情報を表示
+        const analysisResult = {
+            size: this.recordedBlob.size,
+            type: this.recordedBlob.type,
+            duration: this.recordingStartTime ? Math.floor((Date.now() - this.recordingStartTime) / 1000) : 'Unknown'
+        };
+
+        console.log('🤖 Android録音分析結果:', analysisResult);
+        
+        // 分析結果表示エリアに簡単な情報を表示
+        const resultsContainer = document.getElementById('voice-analysis-results-android');
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
+                <div style="background: rgba(240,240,240,0.8); padding: 8px; border-radius: 4px; margin-top: 8px;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">🤖 Android録音分析結果</div>
+                    <div style="font-size: 11px;">
+                        サイズ: ${Math.round(analysisResult.size / 1024)}KB<br>
+                        形式: ${analysisResult.type}<br>
+                        時間: ${analysisResult.duration}秒
+                    </div>
+                </div>
+            `;
+        }
+
+        this.updateStatusAndroid('✅ Android分析完了', 'success');
+    }
+
     /**
      * 進捗ボタンのイベントリスナーを設定（動的対応）
      */
