@@ -833,15 +833,25 @@ class VoiceSystem {
         // Android専用録音ボタン（録音のみ）
         const recordBtnAndroid = document.getElementById('voice-record-btn-android');
         if (recordBtnAndroid) {
-            recordBtnAndroid.addEventListener('click', () => this.toggleRecordingAndroid());
+            recordBtnAndroid.addEventListener('click', () => {
+                console.log('🔥 Android録音ボタンがクリックされました');
+                this.toggleRecordingAndroid();
+            });
             console.log('✅ Android専用録音ボタンのイベントリスナーを設定');
+        } else {
+            console.error('❌ voice-record-btn-android要素が見つかりません');
         }
         
         // Android専用再生ボタン
         const playBtnAndroid = document.getElementById('voice-play-btn-android');
         if (playBtnAndroid) {
-            playBtnAndroid.addEventListener('click', () => this.playRecordingAndroid());
+            playBtnAndroid.addEventListener('click', () => {
+                console.log('🔥 Android再生ボタンがクリックされました');
+                this.playRecordingAndroid();
+            });
             console.log('✅ Android専用再生ボタンのイベントリスナーを設定');
+        } else {
+            console.error('❌ voice-play-btn-android要素が見つかりません');
         }
         
         // Android専用音声合成ボタン（現行機能を使用）
@@ -1047,9 +1057,14 @@ class VoiceSystem {
      * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）
      */
     async toggleRecordingAndroid() {
+        console.log('🔥 toggleRecordingAndroidメソッドが呼び出されました');
+        console.log(`📱 現在の録音状態: ${this.isRecording}`);
+        
         if (this.isRecording) {
+            console.log('🛑 録音停止を実行中...');
             this.stopRecordingAndroid();
         } else {
+            console.log('🎤 録音開始を実行中...');
             await this.startRecordingAndroid();
         }
     }
@@ -1272,7 +1287,11 @@ class VoiceSystem {
      * 🤖 Android専用録音再生
      */
     playRecordingAndroid() {
+        console.log('🔥 playRecordingAndroidメソッドが呼び出されました');
+        console.log(`📁 録音データ存在確認: ${this.recordedBlob ? 'あり' : 'なし'}`);
+        
         if (!this.recordedBlob) {
+            console.log('❌ 録音データがありません');
             this.updateStatusAndroid('❌ 再生する録音がありません', 'error');
             return;
         }
