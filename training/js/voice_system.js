@@ -103,6 +103,53 @@ class VoiceSystem {
             showPanel: () => this.showVoicePanel(),
             hidePanel: () => this.hideVoicePanel(),
             togglePanel: () => this.toggleVoicePanel(),
+            testMicrophonePermission: async () => {
+                try {
+                    alert('🎤 マイク権限確認を開始します...');
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    alert('✅ マイクアクセス許可: 成功！\n録音機能が利用できます。');
+                    stream.getTracks().forEach(track => track.stop());
+                    this.addDebugLog('✅ マイク権限確認成功', 'success');
+                } catch (error) {
+                    alert(`❌ マイクアクセス許可: 失敗\nエラー: ${error.message}\n\nブラウザの設定でマイクアクセスを許可してください。`);
+                    this.addDebugLog(`❌ マイク権限確認失敗: ${error.message}`, 'error');
+                }
+            },
+            testRecording: async () => {
+                try {
+                    alert('🔴 録音テストを開始します...\n3秒間録音されます。');
+                    this.addDebugLog('🔴 録音テスト開始', 'info');
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const chunks = [];
+                    
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            chunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'audio/webm' });
+                        const url = URL.createObjectURL(blob);
+                        const audio = new Audio(url);
+                        audio.play();
+                        alert('✅ 録音テスト完了！\n録音した音声を再生中です。');
+                        this.addDebugLog('✅ 録音テスト完了', 'success');
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    mediaRecorder.start();
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                    }, 3000);
+                    
+                } catch (error) {
+                    alert(`❌ 録音テスト失敗\nエラー: ${error.message}`);
+                    this.addDebugLog(`❌ 録音テスト失敗: ${error.message}`, 'error');
+                }
+            },
             checkPanels: () => {
                 console.log('🔍 パネル状況確認:');
                 console.log(`  - Android検出: ${this.isAndroid}`);
@@ -173,7 +220,17 @@ class VoiceSystem {
             <div style="margin-bottom: 4px;">🎛️ 通常パネル: ${normalPanel ? `<span style="color: #00ff00">✅存在</span> (表示: ${normalPanelVisible ? '○' : '✕'})` : '<span style="color: #ff0000">❌不在</span>'}</div>
             <div style="margin-bottom: 4px;">🔘 開くボタン: ${openBtn ? '<span style="color: #00ff00">✅存在</span>' : '<span style="color: #ff0000">❌不在</span>'}</div>
             <div style="margin-bottom: 8px;">📐 画面サイズ: ${window.innerWidth}×${window.innerHeight}</div>
-            <div style="display: flex; gap: 5px; margin-top: 8px;">
+            <div style="display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap;">
+                <button onclick="window.voiceSystemDebug.testMicrophonePermission()" style="
+                    background: #ff6b35; color: white; border: none; padding: 4px 6px;
+                    border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold;">
+                    🎤 権限確認
+                </button>
+                <button onclick="window.voiceSystemDebug.testRecording()" style="
+                    background: #e74c3c; color: white; border: none; padding: 4px 6px;
+                    border-radius: 3px; font-size: 10px; cursor: pointer;">
+                    🔴 録音テスト
+                </button>
                 <button onclick="window.voiceSystemDebug.showPanel()" style="
                     background: #007bff; color: white; border: none; padding: 4px 6px;
                     border-radius: 3px; font-size: 10px; cursor: pointer;">
@@ -182,7 +239,7 @@ class VoiceSystem {
                 <button onclick="window.voiceSystemDebug.togglePanel()" style="
                     background: #28a745; color: white; border: none; padding: 4px 6px;
                     border-radius: 3px; font-size: 10px; cursor: pointer;">
-                    � 切り替えテスト
+                    🔄 切り替えテスト
                 </button>
                 <button onclick="document.getElementById('android-debug-info').remove()" style="
                     background: #dc3545; color: white; border: none; padding: 4px 6px;
