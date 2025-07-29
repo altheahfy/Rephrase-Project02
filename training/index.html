@@ -2462,21 +2462,9 @@ window.clearRandomizeHistory = function() {
     if (isMobile) {
         console.log('📱 モバイルデバイス検出: 従来の音声システムを使用');
         
-        // 従来のVoiceSystemを使用
+        // � 従来のVoiceSystemを使用
         const mobileScript = document.createElement('script');
         mobileScript.src = 'js/voice_system.js';
-        mobileScript.onload = function() {
-            console.log('✅ voice_system.js 読み込み完了');
-            // スクリプト読み込み後に少し待ってからVoiceSystemを初期化
-            setTimeout(() => {
-                if (typeof VoiceSystem !== 'undefined') {
-                    window.voiceSystem = new VoiceSystem();
-                    console.log('✅ VoiceSystem初期化完了');
-                } else {
-                    console.error('❌ VoiceSystemが見つかりません');
-                }
-            }, 100);
-        };
         document.head.appendChild(mobileScript);
         console.log('✅ 従来の音声システムでモバイル対応完了');
         
@@ -2486,17 +2474,6 @@ window.clearRandomizeHistory = function() {
         // デスクトップでは既存システムを読み込み
         const desktopScript = document.createElement('script');
         desktopScript.src = 'js/voice_system.js';
-        desktopScript.onload = function() {
-            console.log('✅ voice_system.js 読み込み完了');
-            setTimeout(() => {
-                if (typeof VoiceSystem !== 'undefined') {
-                    window.voiceSystem = new VoiceSystem();
-                    console.log('✅ VoiceSystem初期化完了');
-                } else {
-                    console.error('❌ VoiceSystemが見つかりません');
-                }
-            }, 100);
-        };
         document.head.appendChild(desktopScript);
     }
 })();

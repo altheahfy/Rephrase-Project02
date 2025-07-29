@@ -961,33 +961,6 @@ class VoiceSystem {
             console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました');
         } else {
             console.error('❌ 音声パネル開くボタンが見つかりません (voice-panel-open-btn)');
-            
-            // 🔄 DOM要素が見つからない場合は少し待って再試行
-            console.log('⏳ 1秒後に音声学習ボタンの再検索を試行します...');
-            setTimeout(() => {
-                const retryBtn = document.getElementById('voice-panel-open-btn');
-                if (retryBtn) {
-                    console.log('✅ 再試行で音声学習ボタンが見つかりました');
-                    retryBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('🔘 音声パネル開くボタンがクリックされました（再試行）');
-                        this.toggleVoicePanel();
-                    });
-                    
-                    if (this.isAndroid) {
-                        retryBtn.addEventListener('touchend', (e) => {
-                            e.preventDefault();
-                            setTimeout(() => {
-                                this.toggleVoicePanel();
-                            }, 100);
-                        });
-                    }
-                    console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました（再試行）');
-                } else {
-                    console.error('❌ 再試行でも音声学習ボタンが見つかりませんでした');
-                }
-            }, 1000);
         }
         }
         
@@ -5190,24 +5163,3 @@ window.showMobileDebug = function() {
 };
 
 console.log('📱 スマホ用デバッグパネル表示機能が利用可能です: window.showMobileDebug()');
-
-// 🚀 VoiceSystemの自動初期化
-// DOMContentLoadedイベント後に確実に初期化
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            if (!window.voiceSystem) {
-                console.log('🚀 VoiceSystemを自動初期化します');
-                window.voiceSystem = new VoiceSystem();
-            }
-        }, 200);
-    });
-} else {
-    // すでにDOMが読み込まれている場合
-    setTimeout(() => {
-        if (!window.voiceSystem) {
-            console.log('🚀 VoiceSystemを自動初期化します（即座に）');
-            window.voiceSystem = new VoiceSystem();
-        }
-    }, 200);
-}
