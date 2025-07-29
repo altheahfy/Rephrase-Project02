@@ -2466,14 +2466,26 @@ window.clearRandomizeHistory = function() {
         const mobileScript = document.createElement('script');
         mobileScript.src = 'js/voice_system.js';
         mobileScript.onload = function() {
-            console.log('🎤 VoiceSystemスクリプト読み込み完了 - インスタンス作成中...');
-            window.voiceSystem = new VoiceSystem();
-            console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
-            window.voiceSystem.init().then(() => {
-                console.log('✅ VoiceSystem初期化完了');
-            }).catch(error => {
-                console.error('❌ VoiceSystem初期化エラー:', error);
-            });
+            console.log('🎤 VoiceSystemスクリプト読み込み完了 - DOM準備待機中...');
+            
+            // DOM読み込み完了を確実に待つ
+            function initVoiceSystem() {
+                console.log(`📄 DOM状態: ${document.readyState}`);
+                window.voiceSystem = new VoiceSystem();
+                console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
+                window.voiceSystem.init().then(() => {
+                    console.log('✅ VoiceSystem初期化完了');
+                }).catch(error => {
+                    console.error('❌ VoiceSystem初期化エラー:', error);
+                });
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initVoiceSystem);
+            } else {
+                // DOM既に読み込み済み
+                setTimeout(initVoiceSystem, 100); // 少し待機してから実行
+            }
         };
         document.head.appendChild(mobileScript);
         console.log('✅ 従来の音声システムでモバイル対応完了');
@@ -2485,14 +2497,26 @@ window.clearRandomizeHistory = function() {
         const desktopScript = document.createElement('script');
         desktopScript.src = 'js/voice_system.js';
         desktopScript.onload = function() {
-            console.log('🎤 VoiceSystemスクリプト読み込み完了 - インスタンス作成中...');
-            window.voiceSystem = new VoiceSystem();
-            console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
-            window.voiceSystem.init().then(() => {
-                console.log('✅ VoiceSystem初期化完了');
-            }).catch(error => {
-                console.error('❌ VoiceSystem初期化エラー:', error);
-            });
+            console.log('🎤 VoiceSystemスクリプト読み込み完了 - DOM準備待機中...');
+            
+            // DOM読み込み完了を確実に待つ
+            function initVoiceSystem() {
+                console.log(`📄 DOM状態: ${document.readyState}`);
+                window.voiceSystem = new VoiceSystem();
+                console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
+                window.voiceSystem.init().then(() => {
+                    console.log('✅ VoiceSystem初期化完了');
+                }).catch(error => {
+                    console.error('❌ VoiceSystem初期化エラー:', error);
+                });
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initVoiceSystem);
+            } else {
+                // DOM既に読み込み済み
+                setTimeout(initVoiceSystem, 100); // 少し待機してから実行
+            }
         };
         document.head.appendChild(desktopScript);
     }

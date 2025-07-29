@@ -835,8 +835,13 @@ class VoiceSystem {
     setupAndroidEventListeners() {
         this.addDebugLog('🤖 Android専用イベントリスナーを設定中...', 'info');
         
+        // DOM全体をデバッグ情報として出力
+        this.addDebugLog(`🔍 DOM読み込み状態: ${document.readyState}`, 'info');
+        this.addDebugLog(`🔍 voice-control-panel-android存在: ${!!document.getElementById('voice-control-panel-android')}`, 'info');
+        
         // Android専用録音ボタン（録音のみ）
         const recordBtnAndroid = document.getElementById('voice-record-btn-android');
+        this.addDebugLog(`🔍 録音ボタン検索結果: ${recordBtnAndroid ? '見つかりました' : '見つかりません'}`, recordBtnAndroid ? 'success' : 'error');
         if (recordBtnAndroid) {
             recordBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔥 Android録音ボタンがクリックされました', 'info');
@@ -845,10 +850,19 @@ class VoiceSystem {
             this.addDebugLog('✅ Android専用録音ボタンのイベントリスナーを設定', 'success');
         } else {
             this.addDebugLog('❌ voice-record-btn-android要素が見つかりません', 'error');
+            // 全てのボタン要素を検索してデバッグ
+            const allButtons = document.querySelectorAll('button');
+            this.addDebugLog(`🔍 ページ内の全ボタン数: ${allButtons.length}`, 'info');
+            allButtons.forEach((btn, index) => {
+                if (btn.id) {
+                    this.addDebugLog(`  ボタン${index}: id="${btn.id}"`, 'info');
+                }
+            });
         }
         
         // Android専用再生ボタン
         const playBtnAndroid = document.getElementById('voice-play-btn-android');
+        this.addDebugLog(`🔍 再生ボタン検索結果: ${playBtnAndroid ? '見つかりました' : '見つかりません'}`, playBtnAndroid ? 'success' : 'error');
         if (playBtnAndroid) {
             playBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔥 Android再生ボタンがクリックされました', 'info');
@@ -889,13 +903,19 @@ class VoiceSystem {
         
         // 🔧 Android専用デバッグボタン
         const debugBtnAndroid = document.getElementById('android-debug-btn');
+        this.addDebugLog(`🔍 デバッグボタン検索結果: ${debugBtnAndroid ? '見つかりました' : '見つかりません'}`, debugBtnAndroid ? 'success' : 'warning');
         if (debugBtnAndroid) {
             debugBtnAndroid.addEventListener('click', () => {
-                console.log('🔧 Android デバッグボタンがクリックされました');
+                this.addDebugLog('🔧 Android デバッグボタンがクリックされました', 'info');
+                this.addDebugLog('🔍 テスト: ボタンクリックイベント正常動作', 'success');
                 this.showAndroidDebugInfo();
             });
-            console.log('✅ Android専用デバッグボタンのイベントリスナーを設定');
+            this.addDebugLog('✅ Android専用デバッグボタンのイベントリスナーを設定', 'success');
         }
+        
+        // 📱 イベントリスナー設定完了テスト
+        this.addDebugLog('🧪 テスト: setupAndroidEventListeners完了', 'info');
+        this.addDebugLog(`🔍 現在時刻: ${new Date().toLocaleTimeString()}`, 'info');
     }
     
     /**
