@@ -2658,11 +2658,30 @@ class VoiceSystem {
             } else {
                 // 正常に認識された場合の分析
                 const similarity = this.calculateTextSimilarity(expectedSentence, recognizedText);
-                const duration = audioBuffer.duration;
+                
+                // 🎯 実際の発話時間を計算（無音部分を除外）
+                const speechDuration = this.calculateActualSpeechDuration(audioBuffer);
+                const totalDuration = audioBuffer.duration; // 録音全体時間（比較用）
+                
+                console.log('🎯 発話時間分析:', {
+                    totalRecordingTime: totalDuration.toFixed(2) + '秒',
+                    actualSpeechTime: speechDuration.toFixed(2) + '秒',
+                    silenceRatio: ((totalDuration - speechDuration) / totalDuration * 100).toFixed(1) + '%'
+                });
+                
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
-                const wordsPerSecond = actualWordCount / duration;
+                
+                // 🚀 実際の発話時間で語数/分を計算
+                const wordsPerSecond = actualWordCount / speechDuration;
                 const wordsPerMinute = wordsPerSecond * 60;
+                
+                console.log('📊 発話速度分析:', {
+                    expectedWords: expectedWordCount,
+                    actualWords: actualWordCount,
+                    speechDuration: speechDuration.toFixed(2) + '秒',
+                    wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分'
+                });
                 
                 let level, levelExplanation, verificationStatus;
                 
@@ -2693,7 +2712,8 @@ class VoiceSystem {
                 }
                 
                 analysisResult = {
-                    duration,
+                    duration: speechDuration, // 実際の発話時間
+                    totalRecordingDuration: totalDuration, // 録音全体時間（参考用）
                     expectedWordCount,
                     actualWordCount,
                     wordsPerSecond,
@@ -2896,6 +2916,66 @@ class VoiceSystem {
         return {
             isAcceptable: true
         };
+    }
+    
+    /**
+     * 🎯 実際の発話時間を計算（無音部分を除外）
+     * 録音開始/終了時の無音を除いて、実際に話している時間のみを測定
+     */
+    calculateActualSpeechDuration(audioBuffer) {
+        const channelData = audioBuffer.getChannelData(0);
+        const sampleRate = audioBuffer.sampleRate;
+        const totalSamples = channelData.length;
+        
+        // 音声検出の閾値（実験的に調整）
+        const silenceThreshold = 0.01; // 無音判定の閾値
+        const windowSize = Math.floor(sampleRate * 0.1); // 100msのウィンドウ
+        
+        // 開始点を検出（最初に音声が始まる点）
+        let speechStart = 0;
+        for (let i = 0; i < totalSamples - windowSize; i += windowSize) {
+            let windowEnergy = 0;
+            for (let j = i; j < i + windowSize; j++) {
+                windowEnergy += Math.abs(channelData[j]);
+            }
+            const avgEnergy = windowEnergy / windowSize;
+            
+            if (avgEnergy > silenceThreshold) {
+                speechStart = i;
+                break;
+            }
+        }
+        
+        // 終了点を検出（最後に音声が終わる点）
+        let speechEnd = totalSamples;
+        for (let i = totalSamples - windowSize; i >= 0; i -= windowSize) {
+            let windowEnergy = 0;
+            for (let j = i; j < i + windowSize && j < totalSamples; j++) {
+                windowEnergy += Math.abs(channelData[j]);
+            }
+            const avgEnergy = windowEnergy / windowSize;
+            
+            if (avgEnergy > silenceThreshold) {
+                speechEnd = i + windowSize;
+                break;
+            }
+        }
+        
+        // 実際の発話時間を計算
+        const speechSamples = Math.max(0, speechEnd - speechStart);
+        const speechDuration = speechSamples / sampleRate;
+        
+        console.log('🎯 発話時間検出詳細:', {
+            totalDuration: (totalSamples / sampleRate).toFixed(2) + '秒',
+            speechStart: (speechStart / sampleRate).toFixed(2) + '秒',
+            speechEnd: (speechEnd / sampleRate).toFixed(2) + '秒',
+            speechDuration: speechDuration.toFixed(2) + '秒',
+            silenceThreshold: silenceThreshold
+        });
+        
+        // 最小発話時間の保証（極端に短い場合は録音全体時間の30%を使用）
+        const minDuration = (totalSamples / sampleRate) * 0.3;
+        return Math.max(speechDuration, minDuration);
     }
     
     /**
