@@ -42,6 +42,11 @@ class VoiceSystem {
         // 🤖 パネル表示状態管理
         this.isPanelVisible = false;
         
+        // 🤖 Android音声認識用状態変数
+        this.isAndroidAnalyzing = false;      // Android分析中フラグ
+        this.androidRecognition = null;       // Android音声認識インスタンス
+        this.androidTimeoutId = null;         // Android音声認識タイムアウトID
+        
         // 📱 緊急デバッグ: コンストラクタ完了確認
         console.log('🔧 VoiceSystemコンストラクタ完了');
         // this.init(); // 手動で呼び出すため削除
@@ -1566,12 +1571,19 @@ class VoiceSystem {
     }
 
     /**
-     * 🤖 Android専用録音分析（リアルタイム音声認識版）
+     * 🤖 Android専用録音分析（リアルタイム音声認識版・押し直し停止対応）
      */
     analyzeRecordingAndroid() {
-        console.log('🤖 Android: 分析ボタンがクリックされました - リアルタイム音声認識を開始');
+        console.log('🤖 Android: 分析ボタンがクリックされました');
         
-        // 録音データチェックは不要 - リアルタイム音声認識を実行
+        // 🔄 押し直し停止機能：すでに認識中の場合は停止
+        if (this.isAndroidAnalyzing) {
+            console.log('🛑 Android音声認識を停止します');
+            this.stopAndroidVoiceRecognition();
+            return;
+        }
+        
+        console.log('🎤 リアルタイム音声認識を開始');
         this.updateStatus('🎤 Android音声認識準備中...', 'analyzing');
         
         // temp_working_voice_system.jsのtestVoiceRecognition()ベースの音声認識
@@ -1584,6 +1596,9 @@ class VoiceSystem {
     startAndroidVoiceRecognition() {
         console.log('🎤 Android音声認識テストを開始します...');
         
+        // 認識状態をセット
+        this.isAndroidAnalyzing = true;
+        
         // 認識結果をクリア
         this.recognizedText = '';
         console.log('🔄 this.recognizedTextをクリアしました');
@@ -1591,11 +1606,15 @@ class VoiceSystem {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             console.log('🚫 Web Speech API が利用できません');
             this.updateStatus('❌ 音声認識非対応', 'error');
+            this.isAndroidAnalyzing = false;
             return;
         }
         
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
+        
+        // 認識インスタンスを保存（停止用）
+        this.androidRecognition = recognition;
         
         // Android Chrome最適化設定
         const isAndroid = /Android/i.test(navigator.userAgent);
@@ -1616,7 +1635,7 @@ class VoiceSystem {
         
         // タイムアウト設定：Android用は少し長め
         const timeoutDuration = isAndroid ? 15000 : 10000;
-        let timeoutId = setTimeout(() => {
+        this.androidTimeoutId = setTimeout(() => {
             recognition.stop();
             console.log(`⏰ 音声認識がタイムアウトしました (${timeoutDuration/1000}秒)`);
             this.finishAndroidVoiceRecognition();
@@ -1625,11 +1644,13 @@ class VoiceSystem {
         recognition.onstart = () => {
             console.log('✅ 音声認識start()コマンド送信完了');
             console.log('🎤 音声認識開始イベント発生');
-            this.updateStatus('🎤 話してください...', 'recording');
+            this.updateStatus('🎤 話してください...（もう一度押すと停止）', 'recording');
         };
         
         recognition.onresult = (event) => {
-            clearTimeout(timeoutId);
+            if (this.androidTimeoutId) {
+                clearTimeout(this.androidTimeoutId);
+            }
             
             console.log('📝 音声認識結果イベント発生');
             
@@ -1659,13 +1680,17 @@ class VoiceSystem {
         };
         
         recognition.onend = () => {
-            clearTimeout(timeoutId);
+            if (this.androidTimeoutId) {
+                clearTimeout(this.androidTimeoutId);
+            }
             console.log('🏁 音声認識終了イベント発生');
             this.finishAndroidVoiceRecognition();
         };
         
         recognition.onerror = (event) => {
-            clearTimeout(timeoutId);
+            if (this.androidTimeoutId) {
+                clearTimeout(this.androidTimeoutId);
+            }
             console.log(`❌ 音声認識エラー: ${event.error}`);
             this.updateStatus('❌ 音声認識エラー', 'error');
             this.finishAndroidVoiceRecognition();
@@ -1678,15 +1703,48 @@ class VoiceSystem {
         } catch (error) {
             console.log(`❌ 音声認識開始エラー: ${error.message}`);
             this.updateStatus('❌ 音声認識開始失敗', 'error');
+            this.isAndroidAnalyzing = false;
         }
     }
 
     /**
-     * 🏁 Android音声認識完了処理 + 評価分析
+     * 🛑 Android音声認識を強制停止
+     */
+    stopAndroidVoiceRecognition() {
+        console.log('🛑 Android音声認識を手動停止中...');
+        this.isAndroidAnalyzing = false;
+        
+        if (this.androidTimeoutId) {
+            clearTimeout(this.androidTimeoutId);
+            this.androidTimeoutId = null;
+        }
+        
+        if (this.androidRecognition) {
+            try {
+                this.androidRecognition.stop();
+                console.log('✅ 音声認識停止コマンド送信完了');
+            } catch (error) {
+                console.log('⚠️ 音声認識停止エラー:', error.message);
+            }
+        }
+        
+        this.updateStatus('🛑 音声認識を停止しました', 'stopped');
+        
+        // 停止後はボタンリセット
+        setTimeout(() => {
+            this.updateStatus('準備完了', 'idle');
+        }, 2000);
+    }
+
+    /**
+     * 🏁 Android音声認識完了処理 + 評価分析（PC版と同じロジック）
      */
     finishAndroidVoiceRecognition() {
         console.log('🏁 Android音声認識完了 - 評価分析開始');
         this.updateStatus('📊 分析中...', 'analyzing');
+        
+        // 認識状態をリセット
+        this.isAndroidAnalyzing = false;
         
         try {
             // 期待される文章を取得
@@ -1710,36 +1768,63 @@ class VoiceSystem {
                     verificationStatus: '音声認識失敗'
                 };
             } else {
-                // 正常に認識された場合の分析
+                // 正常に認識された場合の分析（PC版と同じロジック）
                 const similarity = this.calculateTextSimilarity(expectedSentence, recognizedText);
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // レベル判定
-                let level, levelExplanation;
-                if (similarity >= 90) {
-                    level = '🌟 Expert';
-                    levelExplanation = 'ほぼ完璧です！';
-                } else if (similarity >= 70) {
-                    level = '🎯 Advanced';
-                    levelExplanation = '上級レベルです';
-                } else if (similarity >= 50) {
-                    level = '📚 Intermediate';
-                    levelExplanation = '中級レベルです';
+                // ⚠️ Android版では発話時間測定ができないため、推定値を使用
+                const estimatedSpeechDuration = actualWordCount / 2.0; // 平均2語/秒と仮定
+                const wordsPerSecond = actualWordCount / estimatedSpeechDuration;
+                const wordsPerMinute = wordsPerSecond * 60;
+                
+                console.log('📊 Android発話速度分析（推定値）:', {
+                    expectedWords: expectedWordCount,
+                    actualWords: actualWordCount,
+                    estimatedDuration: estimatedSpeechDuration.toFixed(2) + '秒',
+                    wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分'
+                });
+                
+                let level, levelExplanation, verificationStatus;
+                
+                if (similarity < 0.3) {
+                    level = '❌ 内容不一致';
+                    levelExplanation = '発話内容が大きく異なります';
+                    verificationStatus = '内容要確認';
+                } else if (similarity < 0.6) {
+                    level = '⚠️ 内容要改善';
+                    levelExplanation = '発話内容に改善の余地があります';
+                    verificationStatus = '部分的一致';
                 } else {
-                    level = '🌱 Beginner';
-                    levelExplanation = '初級レベルです';
+                    // 内容が正しい場合のレベル評価（PC版と同じ基準）
+                    if (wordsPerSecond < 1.33) {
+                        level = '� 初心者レベル';
+                        levelExplanation = '(80語/分以下)';
+                    } else if (wordsPerSecond < 2.17) {
+                        level = '📈 中級者レベル';
+                        levelExplanation = '(130語/分以下)';
+                    } else if (wordsPerSecond < 2.5) {
+                        level = '🚀 上級者レベル';
+                        levelExplanation = '(150語/分以下)';
+                    } else {
+                        level = '⚡ 達人レベル';
+                        levelExplanation = '(150語/分超)';
+                    }
+                    verificationStatus = '内容一致確認';
                 }
                 
                 analysisResult = {
+                    duration: estimatedSpeechDuration, // 推定発話時間
+                    expectedWordCount,
+                    actualWordCount,
+                    wordsPerSecond,
+                    wordsPerMinute,
                     level,
                     levelExplanation,
                     expectedSentence,
                     recognizedText,
                     contentAccuracy: similarity,
-                    verificationStatus: similarity >= 70 ? '✅ 合格' : '📝 要練習',
-                    expectedWordCount,
-                    actualWordCount
+                    verificationStatus
                 };
             }
             
