@@ -33,6 +33,9 @@ class VoiceSystem {
         this.debugLogs = [];
         this.maxDebugLogs = 50; // 最大50件のログを保持
         
+        // 🤖 パネル表示状態管理
+        this.isPanelVisible = false;
+        
         this.init();
     }
     
@@ -888,6 +891,18 @@ class VoiceSystem {
         // パネル開くボタン（トグル機能）
         const openBtn = document.getElementById('voice-panel-open-btn');
         if (openBtn) {
+            // 🤖 Android用: ボタンの詳細情報をデバッグ表示
+            if (this.isAndroid) {
+                console.log('🤖 Android用デバッグ - 音声学習ボタン情報:');
+                console.log(`  - ボタン要素: ${openBtn ? '存在' : '不在'}`);
+                console.log(`  - ボタンのスタイル: ${openBtn.style.cssText}`);
+                console.log(`  - ボタンのrect:`, openBtn.getBoundingClientRect());
+                console.log(`  - ボタンのtouchAction: ${openBtn.style.touchAction}`);
+                console.log(`  - ボタンのpointerEvents: ${openBtn.style.pointerEvents}`);
+                
+                this.showAndroidClickFeedback('🔧 音声学習ボタンが検出されました', 'info');
+            }
+            
             openBtn.addEventListener('click', () => {
                 console.log('🔘 音声パネル開くボタンがクリックされました');
                 
@@ -898,6 +913,20 @@ class VoiceSystem {
                 
                 this.toggleVoicePanel();
             });
+            
+            // 🤖 Android用: touchイベントも追加
+            if (this.isAndroid) {
+                openBtn.addEventListener('touchstart', (e) => {
+                    console.log('👆 音声学習ボタン - touchstart');
+                    this.showAndroidClickFeedback('👆 touchstart検出', 'info');
+                });
+                
+                openBtn.addEventListener('touchend', (e) => {
+                    console.log('👆 音声学習ボタン - touchend');
+                    this.showAndroidClickFeedback('👆 touchend検出', 'info');
+                });
+            }
+            
             console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました');
         } else {
             console.error('❌ 音声パネル開くボタンが見つかりません (voice-panel-open-btn)');
@@ -3237,9 +3266,13 @@ class VoiceSystem {
             panel.style.setProperty('visibility', 'visible', 'important');
             panel.style.setProperty('opacity', '1', 'important');
             
+            // 📱 表示状態を更新
+            this.isPanelVisible = true;
+            
             console.log(`📱 表示後のstyle.display: "${panel.style.display}"`);
             console.log(`📱 表示後のvisibility: "${panel.style.visibility}"`);
             console.log(`📱 表示後のopacity: "${panel.style.opacity}"`);
+            console.log(`📱 パネル状態管理フラグ: ${this.isPanelVisible}`);
             
             // 🤖 Android用成功フィードバック
             if (this.isAndroid) {
@@ -3304,6 +3337,10 @@ class VoiceSystem {
         if (panel) {
             console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネルを非表示: ${panelId}`);
             panel.style.setProperty('display', 'none', 'important');
+            
+            // 📱 表示状態を更新
+            this.isPanelVisible = false;
+            console.log(`📱 パネル状態管理フラグ: ${this.isPanelVisible}`);
             
             // 分析結果もクリア（Android対応）
             const resultsContainerId = this.isAndroid ? 'voice-analysis-results-android' : 'voice-analysis-results';
@@ -3478,11 +3515,16 @@ class VoiceSystem {
         console.log(`🔍 パネル要素の存在: ${panel ? 'あり' : 'なし'}`);
         
         if (panel) {
-            const isVisible = panel.style.display === 'block';
-            console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネル切り替え: ${isVisible ? '非表示' : '表示'}`);
-            console.log(`📱 現在の表示状態: ${panel.style.display}`);
+            // パネル表示状態を状態管理フラグで確認
+            console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネル切り替え: ${this.isPanelVisible ? '非表示' : '表示'}`);
+            console.log(`📱 パネル状態管理フラグ: ${this.isPanelVisible}`);
             
-            if (isVisible) {
+            // コンピューテッドスタイルでも確認（デバッグ用）
+            const computedStyle = window.getComputedStyle(panel);
+            console.log(`📱 実際の表示状態 (computed): ${computedStyle.display}`);
+            console.log(`📱 実際の表示状態 (style): ${panel.style.display}`);
+            
+            if (this.isPanelVisible) {
                 this.hideVoicePanel();
             } else {
                 this.showVoicePanel();
