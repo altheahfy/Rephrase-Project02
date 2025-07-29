@@ -1682,29 +1682,104 @@ class VoiceSystem {
     }
 
     /**
-     * 🏁 Android音声認識完了処理
+     * 🏁 Android音声認識完了処理 + 評価分析
      */
     finishAndroidVoiceRecognition() {
-        console.log('🏁 Android音声認識完了 - 結果表示');
+        console.log('🏁 Android音声認識完了 - 評価分析開始');
+        this.updateStatus('📊 分析中...', 'analyzing');
         
-        const recognizedText = this.recognizedText || '認識結果なし';
-        
-        // 分析結果表示エリアに認識結果を表示
+        try {
+            // 期待される文章を取得
+            const expectedSentence = this.getCurrentSentence();
+            const recognizedText = this.recognizedText || '';
+            
+            console.log('🤖 Android分析開始:');
+            console.log('  期待文:', expectedSentence);
+            console.log('  認識文:', recognizedText);
+            
+            let analysisResult;
+            
+            if (!recognizedText || recognizedText.length === 0) {
+                // 音声認識結果がない場合
+                analysisResult = {
+                    level: '❌ 音声未検出',
+                    levelExplanation: '音声が認識されませんでした',
+                    expectedSentence,
+                    recognizedText: '',
+                    contentAccuracy: 0,
+                    verificationStatus: '音声認識失敗'
+                };
+            } else {
+                // 正常に認識された場合の分析
+                const similarity = this.calculateTextSimilarity(expectedSentence, recognizedText);
+                const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
+                const actualWordCount = recognizedText.split(/\s+/).length;
+                
+                // レベル判定
+                let level, levelExplanation;
+                if (similarity >= 90) {
+                    level = '🌟 Expert';
+                    levelExplanation = 'ほぼ完璧です！';
+                } else if (similarity >= 70) {
+                    level = '🎯 Advanced';
+                    levelExplanation = '上級レベルです';
+                } else if (similarity >= 50) {
+                    level = '📚 Intermediate';
+                    levelExplanation = '中級レベルです';
+                } else {
+                    level = '🌱 Beginner';
+                    levelExplanation = '初級レベルです';
+                }
+                
+                analysisResult = {
+                    level,
+                    levelExplanation,
+                    expectedSentence,
+                    recognizedText,
+                    contentAccuracy: similarity,
+                    verificationStatus: similarity >= 70 ? '✅ 合格' : '📝 要練習',
+                    expectedWordCount,
+                    actualWordCount
+                };
+            }
+            
+            // 結果表示
+            this.displayAndroidAnalysisResults(analysisResult);
+            this.updateStatus('✅ Android分析完了', 'success');
+            
+        } catch (error) {
+            console.error('🤖 Android分析エラー:', error);
+            this.updateStatus(`❌ 分析エラー: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * 📊 Android分析結果表示
+     */
+    displayAndroidAnalysisResults(result) {
         const resultsContainer = document.getElementById('voice-analysis-results-android');
         if (resultsContainer) {
             resultsContainer.innerHTML = `
-                <div style="background: rgba(240,240,240,0.8); padding: 8px; border-radius: 4px; margin-top: 8px;">
-                    <div style="font-weight: bold; margin-bottom: 4px;">🤖 Android音声認識結果</div>
-                    <div style="font-size: 11px;">
-                        <div style="margin-top: 4px; padding: 4px; background: rgba(255,255,255,0.7); border-radius: 2px;">
-                            🎤 認識結果: "${recognizedText}"
-                        </div>
+                <div style="background: rgba(240,240,240,0.8); padding: 12px; border-radius: 6px; margin-top: 8px;">
+                    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">🤖 Android音声分析結果</div>
+                    
+                    <div style="margin-bottom: 6px;">
+                        <strong>レベル:</strong> ${result.level}<br>
+                        <small style="color: #666;">${result.levelExplanation}</small>
+                    </div>
+                    
+                    <div style="margin-bottom: 6px;">
+                        <strong>正解率:</strong> ${result.contentAccuracy.toFixed(1)}%<br>
+                        <strong>判定:</strong> ${result.verificationStatus}
+                    </div>
+                    
+                    <div style="font-size: 11px; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.7); border-radius: 3px;">
+                        <div><strong>期待文:</strong> "${result.expectedSentence}"</div>
+                        <div style="margin-top: 3px;"><strong>認識文:</strong> "${result.recognizedText}"</div>
                     </div>
                 </div>
             `;
         }
-
-        this.updateStatus('✅ Android音声認識完了', 'success');
     }
 
     /**
