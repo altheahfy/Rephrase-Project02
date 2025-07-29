@@ -922,27 +922,67 @@ class VoiceSystem {
         // 🎤 音声学習パネル開くボタン（トグル機能）- 全デバイス共通
         const openBtn = document.getElementById('voice-panel-open-btn');
         if (openBtn) {
-            console.log('✅ 音声学習ボタンが見つかりました');
+            // 🤖 Android用: ボタンの詳細情報をデバッグ表示
+            if (this.isAndroid) {
+                console.log('🤖 Android用デバッグ - 音声学習ボタン情報:');
+                console.log(`  - ボタン要素: ${openBtn ? '存在' : '不在'}`);
+                console.log(`  - ボタンのスタイル: ${openBtn.style.cssText}`);
+                console.log(`  - ボタンのrect:`, openBtn.getBoundingClientRect());
+                console.log(`  - ボタンのtouchAction: ${openBtn.style.touchAction}`);
+                console.log(`  - ボタンのpointerEvents: ${openBtn.style.pointerEvents}`);
+            }
             
-            // シンプルなクリックイベント
             openBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('🔘 音声パネル開くボタンがクリックされました');
+                
                 this.toggleVoicePanel();
             });
+            
+            // 🤖 Android用: touchイベントも追加
+            if (this.isAndroid) {
+                openBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    console.log('👆 音声学習ボタン - touchstart');
+                });
+                
+                openBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    console.log('👆 音声学習ボタン - touchend');
+                    
+                    // touchendでも直接呼び出し
+                    setTimeout(() => {
+                        this.toggleVoicePanel();
+                    }, 100);
+                });
+            }
             
             console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました');
         } else {
             console.error('❌ 音声パネル開くボタンが見つかりません (voice-panel-open-btn)');
             
-            // DOM要素が見つからない場合は少し待って再試行
+            // 🔄 DOM要素が見つからない場合は少し待って再試行
+            console.log('⏳ 1秒後に音声学習ボタンの再検索を試行します...');
             setTimeout(() => {
                 const retryBtn = document.getElementById('voice-panel-open-btn');
                 if (retryBtn) {
                     console.log('✅ 再試行で音声学習ボタンが見つかりました');
                     retryBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('🔘 音声パネル開くボタンがクリックされました（再試行）');
                         this.toggleVoicePanel();
                     });
+                    
+                    if (this.isAndroid) {
+                        retryBtn.addEventListener('touchend', (e) => {
+                            e.preventDefault();
+                            setTimeout(() => {
+                                this.toggleVoicePanel();
+                            }, 100);
+                        });
+                    }
                     console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました（再試行）');
                 } else {
                     console.error('❌ 再試行でも音声学習ボタンが見つかりませんでした');

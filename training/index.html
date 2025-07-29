@@ -2472,22 +2472,6 @@ window.clearRandomizeHistory = function() {
                 if (typeof VoiceSystem !== 'undefined') {
                     window.voiceSystem = new VoiceSystem();
                     console.log('✅ VoiceSystem初期化完了');
-                    
-                    // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                    setTimeout(() => {
-                        const testBtn = document.getElementById('voice-panel-open-btn');
-                        if (testBtn) {
-                            console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                            testBtn.onclick = function() {
-                                console.log('🔧 緊急テスト: ボタンクリック検出！');
-                                if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                    window.voiceSystem.toggleVoicePanel();
-                                } else {
-                                    console.error('❌ VoiceSystem or toggleVoicePanel not found');
-                                }
-                            };
-                        }
-                    }, 500);
                 } else {
                     console.error('❌ VoiceSystemが見つかりません');
                 }
@@ -2508,22 +2492,6 @@ window.clearRandomizeHistory = function() {
                 if (typeof VoiceSystem !== 'undefined') {
                     window.voiceSystem = new VoiceSystem();
                     console.log('✅ VoiceSystem初期化完了');
-                    
-                    // 🔧 緊急テスト: 直接音声学習ボタンをテスト
-                    setTimeout(() => {
-                        const testBtn = document.getElementById('voice-panel-open-btn');
-                        if (testBtn) {
-                            console.log('🔧 緊急テスト: 音声学習ボタン直接設定');
-                            testBtn.onclick = function() {
-                                console.log('🔧 緊急テスト: ボタンクリック検出！');
-                                if (window.voiceSystem && window.voiceSystem.toggleVoicePanel) {
-                                    window.voiceSystem.toggleVoicePanel();
-                                } else {
-                                    console.error('❌ VoiceSystem or toggleVoicePanel not found');
-                                }
-                            };
-                        }
-                    }, 500);
                 } else {
                     console.error('❌ VoiceSystemが見つかりません');
                 }
