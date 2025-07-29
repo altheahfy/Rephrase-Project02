@@ -91,11 +91,6 @@ class VoiceSystem {
         
         console.log('✅ 音声システム初期化完了');
         
-        // 🤖 Android用: 画面上にデバッグ情報を表示
-        if (this.isAndroid) {
-            this.showAndroidDebugInfo();
-        }
-        
         // 🔧 デバッグ用: グローバルアクセス可能にする
         window.voiceSystemDebug = {
             showPanel: () => this.showVoicePanel(),
@@ -130,44 +125,64 @@ class VoiceSystem {
      * 🤖 Android用デバッグ情報を画面に表示
      */
     showAndroidDebugInfo() {
+        // 既存のデバッグパネルを削除
+        const existingDebug = document.getElementById('android-debug-info');
+        if (existingDebug) {
+            existingDebug.remove();
+        }
+        
         const debugInfo = document.createElement('div');
         debugInfo.id = 'android-debug-info';
         debugInfo.style.cssText = `
             position: fixed;
             bottom: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: #00ff00;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             font-family: monospace;
-            font-size: 12px;
-            z-index: 20000;
-            max-width: 300px;
-            border: 1px solid #00ff00;
+            font-size: 11px;
+            z-index: 25000;
+            max-width: 350px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 4px 15px rgba(0,255,0,0.3);
         `;
         
         const androidPanel = document.getElementById('voice-control-panel-android');
         const normalPanel = document.getElementById('voice-control-panel');
         const openBtn = document.getElementById('voice-panel-open-btn');
         
+        // より詳細な状態情報を取得
+        const androidPanelVisible = androidPanel ? window.getComputedStyle(androidPanel).display !== 'none' : false;
+        const normalPanelVisible = normalPanel ? window.getComputedStyle(normalPanel).display !== 'none' : false;
+        
         debugInfo.innerHTML = `
-            <div style="color: #ffff00; font-weight: bold;">🤖 Android デバッグ情報</div>
-            <div>✅ Android検出: ${this.isAndroid ? 'はい' : 'いいえ'}</div>
-            <div>📱 現在のパネル: ${this.currentPanel}</div>
-            <div>🎛️ Android専用パネル: ${androidPanel ? '✅存在' : '❌不在'}</div>
-            <div>🎛️ 通常パネル: ${normalPanel ? '✅存在' : '❌不在'}</div>
-            <div>🔘 開くボタン: ${openBtn ? '✅存在' : '❌不在'}</div>
-            <button onclick="window.voiceSystemDebug.showPanel()" style="
-                background: #007bff; color: white; border: none; padding: 5px 8px;
-                margin: 5px 2px; border-radius: 3px; font-size: 10px;">
-                🔧 パネル表示テスト
-            </button>
-            <button onclick="document.getElementById('android-debug-info').remove()" style="
-                background: #dc3545; color: white; border: none; padding: 5px 8px;
-                margin: 5px 2px; border-radius: 3px; font-size: 10px;">
-                ❌ 閉じる
-            </button>
+            <div style="color: #ffff00; font-weight: bold; margin-bottom: 8px;">🤖 Android デバッグ情報</div>
+            <div style="margin-bottom: 4px;">✅ Android検出: <span style="color: ${this.isAndroid ? '#00ff00' : '#ff0000'}">${this.isAndroid ? 'はい' : 'いいえ'}</span></div>
+            <div style="margin-bottom: 4px;">📱 現在のパネル: <span style="color: #00ffff">${this.currentPanel}</span></div>
+            <div style="margin-bottom: 4px;">📊 パネル表示状態: <span style="color: ${this.isPanelVisible ? '#00ff00' : '#ff0000'}">${this.isPanelVisible ? '表示中' : '非表示'}</span></div>
+            <div style="margin-bottom: 4px;">🎛️ Android専用パネル: ${androidPanel ? `<span style="color: #00ff00">✅存在</span> (表示: ${androidPanelVisible ? '○' : '✕'})` : '<span style="color: #ff0000">❌不在</span>'}</div>
+            <div style="margin-bottom: 4px;">🎛️ 通常パネル: ${normalPanel ? `<span style="color: #00ff00">✅存在</span> (表示: ${normalPanelVisible ? '○' : '✕'})` : '<span style="color: #ff0000">❌不在</span>'}</div>
+            <div style="margin-bottom: 4px;">🔘 開くボタン: ${openBtn ? '<span style="color: #00ff00">✅存在</span>' : '<span style="color: #ff0000">❌不在</span>'}</div>
+            <div style="margin-bottom: 8px;">📐 画面サイズ: ${window.innerWidth}×${window.innerHeight}</div>
+            <div style="display: flex; gap: 5px; margin-top: 8px;">
+                <button onclick="window.voiceSystemDebug.showPanel()" style="
+                    background: #007bff; color: white; border: none; padding: 4px 6px;
+                    border-radius: 3px; font-size: 10px; cursor: pointer;">
+                    🔧 パネル表示テスト
+                </button>
+                <button onclick="window.voiceSystemDebug.togglePanel()" style="
+                    background: #28a745; color: white; border: none; padding: 4px 6px;
+                    border-radius: 3px; font-size: 10px; cursor: pointer;">
+                    � 切り替えテスト
+                </button>
+                <button onclick="document.getElementById('android-debug-info').remove()" style="
+                    background: #dc3545; color: white; border: none; padding: 4px 6px;
+                    border-radius: 3px; font-size: 10px; cursor: pointer;">
+                    ❌ 閉じる
+                </button>
+            </div>
         `;
         
         document.body.appendChild(debugInfo);
@@ -855,6 +870,16 @@ class VoiceSystem {
         if (progressBtnAndroid) {
             progressBtnAndroid.addEventListener('click', () => this.showProgress());
             console.log('✅ Android専用進捗ボタンのイベントリスナーを設定');
+        }
+        
+        // 🔧 Android専用デバッグボタン
+        const debugBtnAndroid = document.getElementById('android-debug-btn');
+        if (debugBtnAndroid) {
+            debugBtnAndroid.addEventListener('click', () => {
+                console.log('🔧 Android デバッグボタンがクリックされました');
+                this.showAndroidDebugInfo();
+            });
+            console.log('✅ Android専用デバッグボタンのイベントリスナーを設定');
         }
     }
     

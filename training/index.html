@@ -801,7 +801,7 @@ function handleLogout() {
   <!-- 🤖 Android専用音声パネル -->
   <div id="voice-control-panel-android" style="
     position: fixed !important;
-    top: 120px !important;
+    bottom: 20px !important;
     right: 10px !important;
     z-index: 15000 !important;
     background: rgba(76, 175, 80, 0.95) !important; 
@@ -816,7 +816,7 @@ function handleLogout() {
     visibility: visible !important;
     opacity: 1 !important;
     min-height: auto !important;
-    max-height: calc(100vh - 140px) !important;
+    max-height: calc(100vh - 40px) !important;
     overflow-y: auto !important;
   ">
     <!-- Android基本パネル（固定サイズ） -->
@@ -855,6 +855,7 @@ function handleLogout() {
       <!-- Android専用進捗表示ボタン -->
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
         <button id="voice-progress-btn-android" class="voice-btn-android" style="background-color: #607D8B; color: white; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; border-radius: 3px;">📈 学習進捗</button>
+        <button id="android-debug-btn" class="voice-btn-android" style="background-color: #795548; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🔧 デバッグ</button>
       </div>
       
       <!-- Android専用音声認識状態表示 -->
