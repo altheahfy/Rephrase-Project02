@@ -2468,7 +2468,12 @@ window.clearRandomizeHistory = function() {
         mobileScript.onload = function() {
             console.log('🎤 VoiceSystemスクリプト読み込み完了 - インスタンス作成中...');
             window.voiceSystem = new VoiceSystem();
-            console.log('✅ VoiceSystemインスタンス作成完了');
+            console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
+            window.voiceSystem.init().then(() => {
+                console.log('✅ VoiceSystem初期化完了');
+            }).catch(error => {
+                console.error('❌ VoiceSystem初期化エラー:', error);
+            });
         };
         document.head.appendChild(mobileScript);
         console.log('✅ 従来の音声システムでモバイル対応完了');
@@ -2482,7 +2487,12 @@ window.clearRandomizeHistory = function() {
         desktopScript.onload = function() {
             console.log('🎤 VoiceSystemスクリプト読み込み完了 - インスタンス作成中...');
             window.voiceSystem = new VoiceSystem();
-            console.log('✅ VoiceSystemインスタンス作成完了');
+            console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
+            window.voiceSystem.init().then(() => {
+                console.log('✅ VoiceSystem初期化完了');
+            }).catch(error => {
+                console.error('❌ VoiceSystem初期化エラー:', error);
+            });
         };
         document.head.appendChild(desktopScript);
     }

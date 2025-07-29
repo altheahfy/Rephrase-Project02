@@ -40,12 +40,12 @@ class VoiceSystem {
     }
     
     async init() {
-        console.log('🎤 音声システム初期化開始...');
+        this.addDebugLog('🎤 音声システム初期化開始...', 'info');
         
         // 🤖 Android検出とパネル選択
         this.isAndroid = this.detectAndroid();
         this.currentPanel = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
-        console.log(`📱 デバイス検出: ${this.isAndroid ? 'Android' : 'その他'} - パネル: ${this.currentPanel}`);
+        this.addDebugLog(`📱 デバイス検出: ${this.isAndroid ? 'Android' : 'その他'} - パネル: ${this.currentPanel}`, 'info');
         
         // 🔍 パネル存在確認
         const panel = document.getElementById(this.currentPanel);
@@ -813,45 +813,50 @@ class VoiceSystem {
      * イベントリスナーを設定
      */
     setupEventListeners() {
+        this.addDebugLog('⚙️ イベントリスナー設定開始...', 'info');
         // 🤖 Android専用ボタンのイベントリスナー
         if (this.isAndroid) {
+            this.addDebugLog('📱 Androidイベントリスナー設定中...', 'info');
             this.setupAndroidEventListeners();
         } else {
+            this.addDebugLog('💻 標準イベントリスナー設定中...', 'info');
             this.setupStandardEventListeners();
         }
         
         // 共通のイベントリスナー
+        this.addDebugLog('🔗 共通イベントリスナー設定中...', 'info');
         this.setupCommonEventListeners();
+        this.addDebugLog('✅ 全イベントリスナー設定完了', 'success');
     }
     
     /**
      * 🤖 Android専用イベントリスナー設定
      */
     setupAndroidEventListeners() {
-        console.log('🤖 Android専用イベントリスナーを設定中...');
+        this.addDebugLog('🤖 Android専用イベントリスナーを設定中...', 'info');
         
         // Android専用録音ボタン（録音のみ）
         const recordBtnAndroid = document.getElementById('voice-record-btn-android');
         if (recordBtnAndroid) {
             recordBtnAndroid.addEventListener('click', () => {
-                console.log('🔥 Android録音ボタンがクリックされました');
+                this.addDebugLog('🔥 Android録音ボタンがクリックされました', 'info');
                 this.toggleRecordingAndroid();
             });
-            console.log('✅ Android専用録音ボタンのイベントリスナーを設定');
+            this.addDebugLog('✅ Android専用録音ボタンのイベントリスナーを設定', 'success');
         } else {
-            console.error('❌ voice-record-btn-android要素が見つかりません');
+            this.addDebugLog('❌ voice-record-btn-android要素が見つかりません', 'error');
         }
         
         // Android専用再生ボタン
         const playBtnAndroid = document.getElementById('voice-play-btn-android');
         if (playBtnAndroid) {
             playBtnAndroid.addEventListener('click', () => {
-                console.log('🔥 Android再生ボタンがクリックされました');
+                this.addDebugLog('🔥 Android再生ボタンがクリックされました', 'info');
                 this.playRecordingAndroid();
             });
-            console.log('✅ Android専用再生ボタンのイベントリスナーを設定');
+            this.addDebugLog('✅ Android専用再生ボタンのイベントリスナーを設定', 'success');
         } else {
-            console.error('❌ voice-play-btn-android要素が見つかりません');
+            this.addDebugLog('❌ voice-play-btn-android要素が見つかりません', 'error');
         }
         
         // Android専用音声合成ボタン（現行機能を使用）
@@ -1057,11 +1062,15 @@ class VoiceSystem {
      * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）- 動作していた実装を移植
      */
     async toggleRecordingAndroid() {
+        this.addDebugLog('🔥 DEBUG: toggleRecordingAndroid メソッド呼び出されました', 'info');
+        console.log('🔥 DEBUG: this.isRecording =', this.isRecording);
         console.log('🤖 Android: 録音のみモード実行');
         
         if (this.isRecording) {
+            console.log('🔥 DEBUG: 録音停止を実行');
             this.stopRecordingAndroid();
         } else {
+            console.log('🔥 DEBUG: 録音開始を実行');
             await this.startRecordingAndroid();
         }
     }
@@ -1274,7 +1283,7 @@ class VoiceSystem {
      * 🤖 Android専用録音再生（動作していた実装を移植）
      */
     playRecordingAndroid() {
-        console.log('🔥 playRecordingAndroidメソッドが呼び出されました');
+        this.addDebugLog('🔥 playRecordingAndroidメソッドが呼び出されました', 'info');
         console.log(`📁 録音データ存在確認: ${this.recordedBlob ? 'あり' : 'なし'}`);
         
         if (!this.recordedBlob) {
