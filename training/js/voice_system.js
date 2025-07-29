@@ -1054,26 +1054,23 @@ class VoiceSystem {
     }
     
     /**
-     * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）
+     * 🤖 Android専用録音開始/停止（録音のみ、音声認識なし）- 動作していた実装を移植
      */
     async toggleRecordingAndroid() {
-        console.log('🔥 toggleRecordingAndroidメソッドが呼び出されました');
-        console.log(`📱 現在の録音状態: ${this.isRecording}`);
+        console.log('🤖 Android: 録音のみモード実行');
         
         if (this.isRecording) {
-            console.log('🛑 録音停止を実行中...');
             this.stopRecordingAndroid();
         } else {
-            console.log('🎤 録音開始を実行中...');
             await this.startRecordingAndroid();
         }
     }
     
     /**
-     * 🤖 Android専用録音開始（音声認識を除外）
+     * 🤖 Android専用録音開始（音声認識を除外）- 動作していた実装を移植
      */
     async startRecordingAndroid() {
-        console.log('🤖 Android専用録音開始...');
+        console.log('🤖 Android: 録音のみ開始');
         
         if (!this.isMicrophoneAllowed) {
             await this.checkMicrophonePermission();
@@ -1090,8 +1087,9 @@ class VoiceSystem {
             // 📏 前回の分析結果をクリアしパネルサイズをリセット
             const resultsContainer = document.getElementById('voice-analysis-results-android');
             if (resultsContainer) {
-                resultsContainer.innerHTML = 'Android分析結果がここに表示されます';
+                resultsContainer.innerHTML = '';
             }
+            this.resetPanelSize();
             
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -1102,24 +1100,16 @@ class VoiceSystem {
                 }
             });
             
-            // ストリーム参照を保存（Android対応）
             this.currentStream = stream;
-            
-            console.log('🤖 Android: MediaRecorder設定開始');
             
             // Android Chrome特化: MediaRecorder設定最適化
             let mediaRecorderOptions = {};
             if (MediaRecorder.isTypeSupported('audio/webm')) {
                 mediaRecorderOptions.mimeType = 'audio/webm';
-            } else {
-                console.log('🤖 Android: mimeTypeを指定せずにデフォルトを使用');
             }
             
             this.mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
             
-            console.log('🤖 Android MediaRecorder mimeType:', this.mediaRecorder.mimeType);
-            
-            // 🔧 新しい録音用のチャンク配列を初期化
             const audioChunks = [];
             
             this.mediaRecorder.ondataavailable = (event) => {
@@ -1131,7 +1121,49 @@ class VoiceSystem {
             this.mediaRecorder.onstop = () => {
                 const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
                 this.recordedBlob = new Blob(audioChunks, { type: mimeType });
-                console.log('🤖 Android録音データ作成:', this.recordedBlob.size, 'bytes, type:', mimeType);
+                console.log('🤖 Android録音のみ完了', this.recordedBlob.size, 'bytes');
+                
+                this.stopVolumeMonitoring();
+                stream.getTracks().forEach(track => track.stop());
+                this.updateRecordingUI(false);
+                
+                this.updateStatus('✅ 録音完了（Android録音のみモード）', 'success');
+            };
+            
+            this.mediaRecorder.onerror = (event) => {
+                console.error('❌ Android録音エラー:', event.error);
+                this.updateStatus('録音エラーが発生しました', 'error');
+                this.isRecording = false;
+                this.updateRecordingUI(false);
+            };
+            
+            // 録音開始（音声認識なし）
+            this.mediaRecorder.start();
+            this.isRecording = true;
+            this.recordingStartTime = Date.now();
+            
+            this.updateRecordingUI(true);
+            this.startRecordingTimer();
+            this.setupVolumeMonitoring(stream);
+            
+            this.updateStatus('🎤 録音中...（Android録音のみモード）', 'recording');
+            
+        } catch (error) {
+            console.error('❌ Android録音のみエラー:', error);
+            this.updateStatus('❌ 録音エラーが発生しました', 'error');
+            this.isMicrophoneAllowed = false;
+        }
+    }
+            
+            this.mediaRecorder.onstop = () => {
+                const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+                this.recordedBlob = new Blob(audioChunks, { type: mimeType });
+                console.log('🔥 Android録音データ作成完了:', {
+                    blobSize: this.recordedBlob.size,
+                    blobType: this.recordedBlob.type,
+                    chunks: audioChunks.length,
+                    recordedBlob: this.recordedBlob
+                });
                 
                 this.stopVolumeMonitoringAndroid();
                 stream.getTracks().forEach(track => track.stop());
@@ -1284,7 +1316,7 @@ class VoiceSystem {
     }
 
     /**
-     * 🤖 Android専用録音再生
+     * 🤖 Android専用録音再生（動作していた実装を移植）
      */
     playRecordingAndroid() {
         console.log('🔥 playRecordingAndroidメソッドが呼び出されました');
@@ -1292,7 +1324,7 @@ class VoiceSystem {
         
         if (!this.recordedBlob) {
             console.log('❌ 録音データがありません');
-            this.updateStatusAndroid('❌ 再生する録音がありません', 'error');
+            this.updateStatus('❌ 再生する録音がありません', 'error');
             return;
         }
 
@@ -1303,24 +1335,27 @@ class VoiceSystem {
             this.currentAudio = null;
         }
 
-        // 🔧 新しいBlobURLを作成
+        // 🔧 新しいBlobURLを作成（動作していた実装のまま）
         const audioUrl = URL.createObjectURL(this.recordedBlob);
         this.currentAudio = new Audio(audioUrl);
 
-        console.log('🤖 Android再生準備:', {
+        // 🤖 Android Chrome対応: 詳細ログとエラーハンドリング（動作していた実装）
+        console.log('🤖 再生準備:', {
             blobSize: this.recordedBlob.size,
             blobType: this.recordedBlob.type,
-            audioUrl: audioUrl.substring(0, 50) + '...'
+            audioUrl: audioUrl.substring(0, 50) + '...',
+            userAgent: navigator.userAgent.substring(0, 80)
         });
 
-        this.currentAudio.onloadstart = () => this.updateStatusAndroid('🔊 Android録音再生中...', 'playing');
+        this.currentAudio.onloadstart = () => this.updateStatus('🤖 録音再生中...', 'playing');
         this.currentAudio.onended = () => {
-            this.updateStatusAndroid('✅ Android再生完了', 'success');
+            this.updateStatus('✅ 再生完了', 'success');
+            // 🔧 再生完了後にBlobURLを解放
             URL.revokeObjectURL(audioUrl);
             this.currentAudio = null;
         };
         this.currentAudio.onerror = () => {
-            this.updateStatusAndroid('❌ Android再生エラー', 'error');
+            this.updateStatus('❌ 再生エラー', 'error');
             URL.revokeObjectURL(audioUrl);
             this.currentAudio = null;
         };
