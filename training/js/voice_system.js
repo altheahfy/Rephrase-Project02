@@ -87,6 +87,126 @@ class VoiceSystem {
         }, 1000);
         
         console.log('✅ 音声システム初期化完了');
+        
+        // 🤖 Android用: 画面上にデバッグ情報を表示
+        if (this.isAndroid) {
+            this.showAndroidDebugInfo();
+        }
+        
+        // 🔧 デバッグ用: グローバルアクセス可能にする
+        window.voiceSystemDebug = {
+            showPanel: () => this.showVoicePanel(),
+            hidePanel: () => this.hideVoicePanel(),
+            togglePanel: () => this.toggleVoicePanel(),
+            checkPanels: () => {
+                console.log('🔍 パネル状況確認:');
+                console.log(`  - Android検出: ${this.isAndroid}`);
+                console.log(`  - 現在のパネル: ${this.currentPanel}`);
+                
+                const androidPanel = document.getElementById('voice-control-panel-android');
+                const normalPanel = document.getElementById('voice-control-panel');
+                
+                console.log(`  - Android専用パネル: ${androidPanel ? '存在' : '不在'}`);
+                console.log(`  - 通常パネル: ${normalPanel ? '存在' : '不在'}`);
+                
+                if (androidPanel) {
+                    console.log(`    Android表示状態: ${androidPanel.style.display}`);
+                }
+                if (normalPanel) {
+                    console.log(`    通常表示状態: ${normalPanel.style.display}`);
+                }
+                
+                return { androidPanel, normalPanel, isAndroid: this.isAndroid };
+            }
+        };
+        
+        console.log('🔧 デバッグコマンド利用可能: window.voiceSystemDebug.checkPanels()');
+    }
+    
+    /**
+     * 🤖 Android用デバッグ情報を画面に表示
+     */
+    showAndroidDebugInfo() {
+        const debugInfo = document.createElement('div');
+        debugInfo.id = 'android-debug-info';
+        debugInfo.style.cssText = `
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 20000;
+            max-width: 300px;
+            border: 1px solid #00ff00;
+        `;
+        
+        const androidPanel = document.getElementById('voice-control-panel-android');
+        const normalPanel = document.getElementById('voice-control-panel');
+        const openBtn = document.getElementById('voice-panel-open-btn');
+        
+        debugInfo.innerHTML = `
+            <div style="color: #ffff00; font-weight: bold;">🤖 Android デバッグ情報</div>
+            <div>✅ Android検出: ${this.isAndroid ? 'はい' : 'いいえ'}</div>
+            <div>📱 現在のパネル: ${this.currentPanel}</div>
+            <div>🎛️ Android専用パネル: ${androidPanel ? '✅存在' : '❌不在'}</div>
+            <div>🎛️ 通常パネル: ${normalPanel ? '✅存在' : '❌不在'}</div>
+            <div>🔘 開くボタン: ${openBtn ? '✅存在' : '❌不在'}</div>
+            <button onclick="window.voiceSystemDebug.showPanel()" style="
+                background: #007bff; color: white; border: none; padding: 5px 8px;
+                margin: 5px 2px; border-radius: 3px; font-size: 10px;">
+                🔧 パネル表示テスト
+            </button>
+            <button onclick="document.getElementById('android-debug-info').remove()" style="
+                background: #dc3545; color: white; border: none; padding: 5px 8px;
+                margin: 5px 2px; border-radius: 3px; font-size: 10px;">
+                ❌ 閉じる
+            </button>
+        `;
+        
+        document.body.appendChild(debugInfo);
+        
+        // 10秒後に自動で非表示（手動で閉じることもできる）
+        setTimeout(() => {
+            if (debugInfo.parentElement) {
+                debugInfo.style.opacity = '0.5';
+            }
+        }, 10000);
+    }
+    
+    /**
+     * 🤖 Android用クリックフィードバック表示
+     */
+    showAndroidClickFeedback(message, type = 'info') {
+        const feedback = document.createElement('div');
+        feedback.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: ${type === 'error' ? 'rgba(220, 53, 69, 0.9)' : 'rgba(40, 167, 69, 0.9)'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 25000;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        `;
+        feedback.textContent = message;
+        
+        document.body.appendChild(feedback);
+        
+        // 2秒後に自動削除
+        setTimeout(() => {
+            if (feedback.parentElement) {
+                feedback.remove();
+            }
+        }, 2000);
     }
     
     /**
@@ -768,7 +888,24 @@ class VoiceSystem {
         // パネル開くボタン（トグル機能）
         const openBtn = document.getElementById('voice-panel-open-btn');
         if (openBtn) {
-            openBtn.addEventListener('click', () => this.toggleVoicePanel());
+            openBtn.addEventListener('click', () => {
+                console.log('🔘 音声パネル開くボタンがクリックされました');
+                
+                // 🤖 Android用: 視覚的フィードバック
+                if (this.isAndroid) {
+                    this.showAndroidClickFeedback('🔘 パネル開くボタンがクリックされました');
+                }
+                
+                this.toggleVoicePanel();
+            });
+            console.log('✅ 音声パネル開くボタンのイベントリスナーを設定しました');
+        } else {
+            console.error('❌ 音声パネル開くボタンが見つかりません (voice-panel-open-btn)');
+            
+            // 🤖 Android用: エラー表示
+            if (this.isAndroid) {
+                this.showAndroidClickFeedback('❌ 開くボタンが見つかりません', 'error');
+            }
         }
         
         // パネル閉じるボタン（通常版）
@@ -3076,13 +3213,48 @@ class VoiceSystem {
      * 音声パネルを表示（Android対応版）
      */
     showVoicePanel() {
+        console.log('🔄 showVoicePanel が呼び出されました');
+        
+        // 🤖 Android用の視覚的フィードバック
+        if (this.isAndroid) {
+            this.showAndroidClickFeedback('音声パネルを開いています...', 'info');
+        }
+        
         // 🤖 Android検出に基づいてパネルを選択
         const panelId = this.isAndroid ? 'voice-control-panel-android' : 'voice-control-panel';
         const panel = document.getElementById(panelId);
         
+        console.log(`📱 Android検出: ${this.isAndroid}`);
+        console.log(`📱 選択されたパネルID: ${panelId}`);
+        console.log(`📱 パネル要素取得結果: ${panel ? '成功' : '失敗'}`);
+        
         if (panel) {
             console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネルを表示: ${panelId}`);
-            panel.style.display = 'block';
+            console.log(`📱 表示前のstyle.display: "${panel.style.display}"`);
+            
+            // 強制的にスタイルをリセット（!importantを上書き）
+            panel.style.setProperty('display', 'block', 'important');
+            panel.style.setProperty('visibility', 'visible', 'important');
+            panel.style.setProperty('opacity', '1', 'important');
+            
+            console.log(`📱 表示後のstyle.display: "${panel.style.display}"`);
+            console.log(`📱 表示後のvisibility: "${panel.style.visibility}"`);
+            console.log(`📱 表示後のopacity: "${panel.style.opacity}"`);
+            
+            // 🤖 Android用成功フィードバック
+            if (this.isAndroid) {
+                this.showAndroidClickFeedback('Android音声パネルが開きました！', 'info');
+            }
+            
+            // パネルの位置情報もログ出力
+            const rect = panel.getBoundingClientRect();
+            console.log(`📱 パネル位置情報:`, {
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                height: rect.height,
+                visible: rect.width > 0 && rect.height > 0
+            });
             
             // 📱 パネル表示直後の位置調整（より確実に）
             setTimeout(() => {
@@ -3096,6 +3268,28 @@ class VoiceSystem {
             }, 200);
         } else {
             console.error(`❌ パネルが見つかりません: ${panelId}`);
+            
+            // 🤖 Android用エラーフィードバック
+            if (this.isAndroid) {
+                this.showAndroidClickFeedback('音声パネルが見つかりません！', 'error');
+            }
+            
+            // フォールバック: すべてのパネル要素を確認
+            console.log('🔍 利用可能なパネル要素を確認中...');
+            const allElements = document.querySelectorAll('[id*="voice-control-panel"]');
+            if (allElements.length > 0) {
+                console.log(`🔍 見つかった要素 (${allElements.length}個):`);
+                allElements.forEach(el => {
+                    console.log(`  - ${el.id}: display="${el.style.display}", class="${el.className}"`);
+                });
+            } else {
+                console.error('❌ パネル要素が一つも見つかりません！');
+                
+                // 🤖 Android用重大エラーフィードバック
+                if (this.isAndroid) {
+                    this.showAndroidClickFeedback('パネル要素が見つかりません！', 'error');
+                }
+            }
         }
     }
     
@@ -3109,7 +3303,7 @@ class VoiceSystem {
         
         if (panel) {
             console.log(`📱 ${this.isAndroid ? 'Android' : '通常'}パネルを非表示: ${panelId}`);
-            panel.style.display = 'none';
+            panel.style.setProperty('display', 'none', 'important');
             
             // 分析結果もクリア（Android対応）
             const resultsContainerId = this.isAndroid ? 'voice-analysis-results-android' : 'voice-analysis-results';
