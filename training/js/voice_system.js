@@ -383,13 +383,26 @@ class VoiceSystem {
      */
     detectAndroid() {
         const userAgent = navigator.userAgent.toLowerCase();
-        const isAndroid = /android/i.test(userAgent);
+        
+        // HTMLのモバイル検出と同じロジックを使用
+        const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+        const isTouchDevice = 'ontouchstart' in window;
+        const isSmallScreen = window.innerWidth <= 768;
+        const hasMobileClass = document.documentElement.classList.contains('mobile-device');
+        
+        // Android検出 + モバイル判定の組み合わせ
+        const isAndroid = /android/i.test(userAgent) || isMobile || isTouchDevice || isSmallScreen || hasMobileClass;
         
         console.log(`🔍 User Agent: ${navigator.userAgent.substring(0, 100)}...`);
-        console.log(`🤖 Android検出結果: ${isAndroid}`);
+        console.log(`🔍 画面サイズ: ${window.innerWidth}x${window.innerHeight}`);
+        console.log(`🔍 isMobile: ${isMobile}`);
+        console.log(`🔍 isTouchDevice: ${isTouchDevice}`);
+        console.log(`🔍 isSmallScreen: ${isSmallScreen}`);
+        console.log(`🔍 hasMobileClass: ${hasMobileClass}`);
+        console.log(`🤖 総合Android検出結果: ${isAndroid}`);
         
         if (isAndroid) {
-            console.log('🤖 Android専用音声システムを起動します');
+            console.log('🤖 Android/モバイル専用音声システムを起動します');
             
             // Android専用パネルの存在確認
             const androidPanel = document.getElementById('voice-control-panel-android');
@@ -1047,9 +1060,19 @@ class VoiceSystem {
         
         // Android専用進捗ボタン
         const progressBtnAndroid = document.getElementById('voice-progress-btn-android');
+        this.addDebugLog(`🔍 Android進捗ボタン検索結果: ${progressBtnAndroid ? '見つかりました' : '見つかりません'}`, progressBtnAndroid ? 'success' : 'error');
+        
         if (progressBtnAndroid) {
-            progressBtnAndroid.addEventListener('click', () => this.showProgress());
+            progressBtnAndroid.addEventListener('click', () => {
+                this.addDebugLog('🎯 Android進捗ボタンがクリックされました！', 'info');
+                console.log('🎯 Android進捗ボタンクリック - showProgress()を呼び出します');
+                this.showProgress();
+            });
             console.log('✅ Android専用進捗ボタンのイベントリスナーを設定');
+            this.addDebugLog('✅ Android専用進捗ボタンのイベントリスナーを設定', 'success');
+        } else {
+            console.error('❌ Android専用進捗ボタンが見つかりません');
+            this.addDebugLog('❌ Android専用進捗ボタンが見つかりません', 'error');
         }
         
         // 🔧 Android専用デバッグボタン
