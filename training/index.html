@@ -5,7 +5,7 @@
   <!-- 🔒 セキュリティヘッダー（強化版） -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob:; media-src 'self' blob:; object-src 'none'; frame-src 'none';">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -828,8 +828,8 @@ function handleLogout() {
       
       <!-- Android専用音声コントロールボタン -->
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
-        <button id="voice-record-btn-android" class="voice-btn-android" style="background-color: #2196F3; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🎤 録音のみ</button>
-        <button id="voice-play-btn-android" class="voice-btn-android" style="background-color: #FF9800; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
+        <button id="voice-record-btn-android" class="voice-btn-android" onclick="alert('録音ボタンがクリックされました！')" style="background-color: #2196F3; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🎤 録音のみ</button>
+        <button id="voice-play-btn-android" class="voice-btn-android" onclick="alert('再生ボタンがクリックされました！')" style="background-color: #FF9800; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🔊 再生</button>
         <button id="voice-tts-btn-android" class="voice-btn-android" style="background-color: #9C27B0; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">🗣️ 読み上げ</button>
         <button id="voice-analyze-btn-android" class="voice-btn-android" style="background-color: #E91E63; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px;">📊 分析</button>
       </div>
@@ -2460,35 +2460,23 @@ window.clearRandomizeHistory = function() {
     });
     
     if (isMobile) {
-        console.log('📱 モバイルデバイス検出: 従来の音声システムを使用');
+        console.log('📱 モバイルデバイス検出: VoiceSystemを使用');
         
-        // � 従来のVoiceSystemを使用
+        // 📱 モバイルでもVoiceSystemを使用（Web Audio API対応）
         const mobileScript = document.createElement('script');
         mobileScript.src = 'js/voice_system.js';
         mobileScript.onload = function() {
-            console.log('🎤 VoiceSystemスクリプト読み込み完了 - DOM準備待機中...');
-            
-            // DOM読み込み完了を確実に待つ
-            function initVoiceSystem() {
-                console.log(`📄 DOM状態: ${document.readyState}`);
+            console.log('✅ モバイル用VoiceSystemスクリプト読み込み完了');
+            // VoiceSystemを初期化
+            if (typeof VoiceSystem !== 'undefined') {
                 window.voiceSystem = new VoiceSystem();
-                console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
-                window.voiceSystem.init().then(() => {
-                    console.log('✅ VoiceSystem初期化完了');
-                }).catch(error => {
-                    console.error('❌ VoiceSystem初期化エラー:', error);
-                });
-            }
-            
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initVoiceSystem);
-            } else {
-                // DOM既に読み込み済み
-                setTimeout(initVoiceSystem, 100); // 少し待機してから実行
+                window.voiceSystem.init();
             }
         };
+        mobileScript.onerror = function() {
+            console.error('❌ VoiceSystemスクリプト読み込み失敗');
+        };
         document.head.appendChild(mobileScript);
-        console.log('✅ 従来の音声システムでモバイル対応完了');
         
     } else {
         console.log('💻 デスクトップデバイス検出: 既存システムを読み込み');

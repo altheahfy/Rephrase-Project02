@@ -2040,6 +2040,11 @@ class VoiceSystem {
         if (this.recordingRecognition && this.isRecognitionActive) {
             try {
                 console.log('🔚 録音用音声認識停止コマンド送信');
+                console.log('🔍 停止前状態確認:', {
+                    isRecognitionActive: this.isRecognitionActive,
+                    recognizedText: this.recognizedText,
+                    recognitionState: this.recordingRecognition ? 'exists' : 'null'
+                });
                 
                 // タイムアウトをクリア
                 if (this.recognitionTimeoutId) {
@@ -2049,7 +2054,11 @@ class VoiceSystem {
                 
                 this.recordingRecognition.stop();
                 
-                // ⏳ Android向け：認識結果受信の追加待機時間
+                // ⏳ プラットフォーム別待機時間を設定
+                const isAndroid = /Android/i.test(navigator.userAgent);
+                const waitTime = isAndroid ? 3000 : 1500; // Android: 3秒、PC: 1.5秒
+                console.log(`⏳ ${isAndroid ? 'Android' : 'PC'}用認識結果待機: ${waitTime}ms`);
+                
                 setTimeout(() => {
                     if (this.isRecognitionActive) {
                         console.log('🔚 音声認識がまだアクティブです。強制終了を実行');
@@ -2057,12 +2066,25 @@ class VoiceSystem {
                     }
                     
                     // 📊 認識結果の最終確認
-                    console.log('🎯 最終認識結果確認:', this.recognizedText.trim());
+                    console.log('🎯 最終認識結果確認:', {
+                        raw: this.recognizedText,
+                        trimmed: this.recognizedText.trim(),
+                        length: this.recognizedText ? this.recognizedText.length : 0,
+                        isAndroid: isAndroid
+                    });
                     
                     if (!this.recognizedText.trim()) {
-                        console.warn('⚠️ 認識結果が空です。デバイス固有の問題の可能性があります');
+                        console.warn('⚠️ 認識結果が空です。', {
+                            platform: isAndroid ? 'Android' : 'PC',
+                            possible_causes: [
+                                'マイクに音声が届いていない',
+                                '音声認識サービスの問題',
+                                'ブラウザの音声認識設定',
+                                '言語設定の不一致'
+                            ]
+                        });
                     }
-                }, 2000); // Android対応：2秒の追加待機
+                }, waitTime);
                 
             } catch (error) {
                 console.warn('⚠️ 録音用音声認識停止エラー:', error);
@@ -2145,29 +2167,50 @@ class VoiceSystem {
             clearTimeout(this.recognitionTimeoutId);
             
             this.addDebugLog('🎯 音声認識結果イベント発生', 'info');
+            console.log('🔍 認識結果イベント詳細:', {
+                resultIndex: event.resultIndex,
+                resultsLength: event.results.length,
+                currentRecognizedText: this.recognizedText
+            });
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const result = event.results[i];
                 const transcript = result[0].transcript;
                 const confidence = result[0].confidence || 0;
                 
+                console.log(`🔍 結果[${i}]:`, {
+                    transcript: transcript,
+                    confidence: confidence,
+                    isFinal: result.isFinal
+                });
+                
                 if (result.isFinal) {
                     this.recognizedText = transcript; // 既存のシステムに合わせて保存
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
                     
-                    // 🚨 Android緊急修正: 確実にrecognizedTextを保存
-                    console.log('🔧 緊急修正: recognizedText確実保存 =', this.recognizedText);
+                    // 🚨 PC版強化: 確定結果を確実に保存
+                    console.log('✅ 確定結果保存:', {
+                        transcript: transcript,
+                        confidence: confidence,
+                        savedText: this.recognizedText
+                    });
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
-                    // Android Chrome: 中間結果も重要
+                    // プラットフォーム別の中間結果処理
                     if (isAndroid) {
                         this.addDebugLog('📱 Android: 中間結果を記録', 'info');
-                        // 🚨 Android緊急修正: 中間結果も保存（最終結果が来ない場合の対策）
+                        // Android: 中間結果も保存（最終結果が来ない場合の対策）
                         if (!this.recognizedText || this.recognizedText.trim().length === 0) {
                             this.recognizedText = transcript;
-                            console.log('🔧 緊急修正: Android中間結果保存 =', this.recognizedText);
+                            console.log('� Android中間結果保存:', this.recognizedText);
+                        }
+                    } else {
+                        // PC: 中間結果も一時的に保存（最終結果で上書きされる）
+                        if (!this.recognizedText || this.recognizedText.trim().length === 0) {
+                            this.recognizedText = transcript;
+                            console.log('💻 PC中間結果保存:', this.recognizedText);
                         }
                     }
                 }
@@ -2558,14 +2601,27 @@ class VoiceSystem {
         try {
             this.updateStatus('📊 分析中...', 'analyzing');
             
-            // 🎤 音声認識結果の最終取得のため待機（Android対応で時間延長）
-            const waitTime = /Android/i.test(navigator.userAgent) ? 5000 : 1000; // Android: 5秒に延長
-            console.log(`⏳ 音声認識結果待機中... (${waitTime}ms)`);
+            // 🎤 音声認識結果の最終取得のため待機（プラットフォーム別に最適化）
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const waitTime = isAndroid ? 4000 : 1500; // Android: 4秒、PC: 1.5秒
+            console.log(`⏳ ${isAndroid ? 'Android' : 'PC'}版音声認識結果待機中... (${waitTime}ms)`);
+            
+            // 待機前の状態確認
+            console.log('🔍 待機前認識状態:', {
+                recognizedText: this.recognizedText,
+                isRecognitionActive: this.isRecognitionActive,
+                platform: isAndroid ? 'Android' : 'PC'
+            });
+            
             await new Promise(resolve => setTimeout(resolve, waitTime));
             
-            // 🚨 Android緊急修正: 待機後の認識結果最終確認
-            console.log('🔧 緊急修正: 待機後認識結果確認 =', JSON.stringify(this.recognizedText));
-            console.log('🔧 緊急修正: 認識結果長さ =', this.recognizedText ? this.recognizedText.length : 0);
+            // 🚨 待機後の認識結果最終確認（プラットフォーム別ログ）
+            console.log(`🔧 ${isAndroid ? 'Android' : 'PC'}版待機後認識結果:`, {
+                raw: JSON.stringify(this.recognizedText),
+                trimmed: this.recognizedText ? this.recognizedText.trim() : '',
+                length: this.recognizedText ? this.recognizedText.length : 0,
+                isActive: this.isRecognitionActive
+            });
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContextClass();
@@ -2587,11 +2643,22 @@ class VoiceSystem {
             
             // 🔍 音声認識失敗の詳細診断
             if (!recognizedText || recognizedText.length === 0) {
-                console.warn('⚠️ 音声認識失敗の詳細診断を開始');
-                console.log('🔍 診断項目:');
-                console.log('  - 音声認識オブジェクト存在:', !!this.recognition);
-                console.log('  - 最終認識状態:', this.isRecognitionActive);
-                console.log('  - 録音データサイズ:', this.recordedBlob ? this.recordedBlob.size : 'なし');
+                const platform = isAndroid ? 'Android' : 'PC';
+                console.warn(`⚠️ ${platform}版音声認識失敗の詳細診断`);
+                console.log('🔍 診断結果:', {
+                    platform: platform,
+                    recognitionExists: !!this.recordingRecognition,
+                    isActive: this.isRecognitionActive,
+                    blobSize: this.recordedBlob ? this.recordedBlob.size : 0,
+                    micAllowed: this.isMicrophoneAllowed,
+                    audioDuration: audioBuffer.duration
+                });
+                
+                // 音声レベル簡易チェック
+                const channelData = audioBuffer.getChannelData(0);
+                const maxVolume = Math.max(...channelData.map(Math.abs));
+                console.log('🔊 音声レベル:', { maxVolume, isSilent: maxVolume < 0.01 });
+            }
                 console.log('  - 期待文章存在:', !!expectedSentence && expectedSentence.length > 0);
                 console.log('  - ブラウザサポート:', !!(window.SpeechRecognition || window.webkitSpeechRecognition));
                 console.log('  - オンライン状態:', navigator.onLine);
