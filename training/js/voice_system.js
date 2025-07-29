@@ -1619,13 +1619,13 @@ class VoiceSystem {
         // Android Chrome最適化設定
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
-            console.log('� Android Chrome用設定を適用');
-            recognition.continuous = false;
+            console.log('📱 Android Chrome用設定を適用');
+            recognition.continuous = true;   // 継続的な認識（手動停止まで継続）
             recognition.interimResults = true;
             recognition.lang = 'en-US'; // 英語設定
             recognition.maxAlternatives = 3; // 複数候補
         } else {
-            recognition.continuous = false;
+            recognition.continuous = true;   // 継続的な認識（手動停止まで継続）
             recognition.interimResults = true;
             recognition.lang = 'ja-JP';
             recognition.maxAlternatives = 1;
@@ -1633,12 +1633,13 @@ class VoiceSystem {
         
         console.log(`🔧 認識準備: lang=${recognition.lang}`);
         
-        // タイムアウト設定：Android用は少し長め
-        const timeoutDuration = isAndroid ? 15000 : 10000;
+        // タイムアウト設定：継続的認識なので長めに設定
+        const timeoutDuration = isAndroid ? 30000 : 25000; // 25-30秒
         this.androidTimeoutId = setTimeout(() => {
-            recognition.stop();
             console.log(`⏰ 音声認識がタイムアウトしました (${timeoutDuration/1000}秒)`);
-            this.finishAndroidVoiceRecognition();
+            console.log('🔄 分析ボタンを再度押して停止してください');
+            // タイムアウト時は自動停止せず、ユーザーに停止を促す
+            this.updateStatus('⏰ 長時間認識中... 分析ボタンを押して停止', 'recording');
         }, timeoutDuration);
         
         recognition.onstart = () => {
@@ -1684,7 +1685,24 @@ class VoiceSystem {
                 clearTimeout(this.androidTimeoutId);
             }
             console.log('🏁 音声認識終了イベント発生');
-            this.finishAndroidVoiceRecognition();
+            
+            // 手動停止でない場合は再開（継続的な認識のため）
+            if (this.isAndroidAnalyzing) {
+                console.log('🔄 音声認識を自動再開中...');
+                try {
+                    setTimeout(() => {
+                        if (this.isAndroidAnalyzing) {
+                            recognition.start();
+                        }
+                    }, 100); // 100ms後に再開
+                } catch (error) {
+                    console.log('⚠️ 音声認識再開エラー:', error.message);
+                    this.finishAndroidVoiceRecognition();
+                }
+            } else {
+                // 手動停止の場合のみ終了処理
+                this.finishAndroidVoiceRecognition();
+            }
         };
         
         recognition.onerror = (event) => {
@@ -1708,7 +1726,7 @@ class VoiceSystem {
     }
 
     /**
-     * 🛑 Android音声認識を強制停止
+     * 🛑 Android音声認識を強制停止（即座に分析実行）
      */
     stopAndroidVoiceRecognition() {
         console.log('🛑 Android音声認識を手動停止中...');
@@ -1728,12 +1746,9 @@ class VoiceSystem {
             }
         }
         
-        this.updateStatus('🛑 音声認識を停止しました', 'stopped');
-        
-        // 停止後はボタンリセット
-        setTimeout(() => {
-            this.updateStatus('準備完了', 'idle');
-        }, 2000);
+        // 停止時に即座に分析を実行
+        console.log('📊 手動停止時の分析を開始...');
+        this.finishAndroidVoiceRecognition();
     }
 
     /**
