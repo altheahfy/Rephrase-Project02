@@ -1858,14 +1858,32 @@ class VoiceSystem {
                     // mimeTypeを指定しない
                 }
             } else {
-                // 他のブラウザ: 従来通り
-                mediaRecorderOptions.mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
-                    ? 'audio/webm;codecs=opus'
-                    : MediaRecorder.isTypeSupported('audio/webm') 
-                    ? 'audio/webm'
-                    : MediaRecorder.isTypeSupported('audio/mp4') 
-                    ? 'audio/mp4'
-                    : undefined;
+                // PC/其他ブラウザ: より詳細なサポート診断
+                console.log('🔍 PC版サポート状況診断:');
+                const supportedTypes = [
+                    'audio/webm;codecs=opus',
+                    'audio/webm;codecs=vp8,opus',
+                    'audio/webm',
+                    'audio/mp4',
+                    'audio/mpeg',
+                    'audio/ogg;codecs=opus'
+                ];
+                
+                supportedTypes.forEach(type => {
+                    console.log(`  - ${type}: ${MediaRecorder.isTypeSupported(type)}`);
+                });
+                
+                // 優先順位でmimeTypeを選択
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mediaRecorderOptions.mimeType = 'audio/webm;codecs=opus';
+                } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    mediaRecorderOptions.mimeType = 'audio/webm';
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    mediaRecorderOptions.mimeType = 'audio/mp4';
+                } else {
+                    console.warn('⚠️ PC版: 適切なmimeTypeが見つかりません');
+                    // mimeTypeを指定しない
+                }
             }
             
             this.mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
@@ -2238,6 +2256,33 @@ class VoiceSystem {
         const audioUrl = URL.createObjectURL(this.recordedBlob);
         this.currentAudio = new Audio(audioUrl);
         
+        // 🚨 PC版対応: Blobの内容詳細検証
+        console.log('🔊 PC版Blob詳細検証:', {
+            blobSize: this.recordedBlob.size,
+            blobType: this.recordedBlob.type,
+            audioUrl: audioUrl,
+            userAgent: navigator.userAgent.substring(0, 80),
+            supportedTypes: {
+                webm: this.currentAudio.canPlayType('audio/webm'),
+                webmOpus: this.currentAudio.canPlayType('audio/webm;codecs=opus'),
+                ogg: this.currentAudio.canPlayType('audio/ogg'),
+                mp4: this.currentAudio.canPlayType('audio/mp4')
+            }
+        });
+        
+        // 🔧 Blob URLの有効性テスト
+        fetch(audioUrl).then(response => {
+            return response.arrayBuffer();
+        }).then(arrayBuffer => {
+            console.log('✅ Blob URL読み込み成功:', {
+                contentType: this.recordedBlob.type,
+                dataSize: arrayBuffer.byteLength,
+                firstBytes: new Uint8Array(arrayBuffer.slice(0, 16))
+            });
+        }).catch(error => {
+            console.error('❌ Blob URL読み込み失敗:', error);
+        });
+        
         // 🚨 PC版対応: 詳細ログとエラーハンドリング
         console.log('🔊 PC版再生準備:', {
             blobSize: this.recordedBlob.size,
@@ -2251,12 +2296,38 @@ class VoiceSystem {
             console.log('✅ PC版音声読み込み開始');
         };
         
+        this.currentAudio.onloadedmetadata = () => {
+            console.log('✅ PC版音声メタデータ読み込み完了:', {
+                duration: this.currentAudio.duration,
+                readyState: this.currentAudio.readyState
+            });
+        };
+        
         this.currentAudio.oncanplay = () => {
-            console.log('✅ PC版音声再生準備完了');
+            console.log('✅ PC版音声再生準備完了', {
+                readyState: this.currentAudio.readyState,
+                networkState: this.currentAudio.networkState
+            });
+        };
+        
+        this.currentAudio.oncanplaythrough = () => {
+            console.log('✅ PC版音声完全読み込み完了');
         };
         
         this.currentAudio.onplaying = () => {
             console.log('✅ PC版音声再生開始');
+        };
+        
+        this.currentAudio.onsuspend = () => {
+            console.warn('⚠️ PC版音声読み込み一時停止');
+        };
+        
+        this.currentAudio.onstalled = () => {
+            console.warn('⚠️ PC版音声読み込み停止');
+        };
+        
+        this.currentAudio.onabort = () => {
+            console.warn('⚠️ PC版音声読み込み中断');
         };
         
         this.currentAudio.onended = () => {
