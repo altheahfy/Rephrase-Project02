@@ -1141,6 +1141,8 @@ class VoiceSystem {
     async startRecordingAndroidWebAudio() {
         if (this.isRecording) {
             this.addDebugLog('⚠️ 既に録音中です', 'warning');
+            // 📱 透過モード解除（既に録音中の場合）
+            this.setVoicePanelTransparency(false);
             return;
         }
 
@@ -1484,6 +1486,8 @@ class VoiceSystem {
         if (this.isAndroidAnalyzing) {
             console.log('🛑 Android音声認識を停止します');
             this.stopAndroidVoiceRecognition();
+            // 📱 透過モード解除（認識停止時）
+            this.setVoicePanelTransparency(false);
             return;
         }
         
@@ -2748,6 +2752,8 @@ class VoiceSystem {
         
         if (!sentence) {
             this.updateStatus('❌ 読み上げる例文がありません', 'error');
+            // 📱 透過モード解除（例文がない場合）
+            this.setVoicePanelTransparency(false);
             return;
         }
         
