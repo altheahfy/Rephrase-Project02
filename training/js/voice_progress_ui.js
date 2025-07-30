@@ -148,6 +148,9 @@ class VoiceProgressUI {
         `;
         
         document.body.appendChild(panel);
+        
+        // パネル作成後にイベントリスナーを設定
+        this.setupEventListeners();
     }
     
     /**
