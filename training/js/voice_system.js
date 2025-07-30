@@ -1783,16 +1783,30 @@ class VoiceSystem {
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // ⚠️ Android版では発話時間測定ができないため、推定値を使用
-                const estimatedSpeechDuration = actualWordCount / 2.0; // 平均2語/秒と仮定
-                const wordsPerSecond = actualWordCount / estimatedSpeechDuration;
+                // 🕒 発話時間計算：タイムスタンプベース（利用可能時）→ 推定値（フォールバック）
+                let speechDuration, calculationMethod;
+                
+                if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
+                    // ⏱️ タイムスタンプベースの正確な発話時間計算
+                    speechDuration = Math.max(0.1, (this.lastWordTime - this.firstWordTime) / 1000);
+                    calculationMethod = 'タイムスタンプベース';
+                    this.addDebugLog(`⏱️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒 (最初の語〜最後の語)`, 'info');
+                } else {
+                    // 🔄 フォールバック：従来の推定値計算
+                    speechDuration = actualWordCount / 2.0; // 平均2語/秒と仮定
+                    calculationMethod = '推定値（フォールバック）';
+                    this.addDebugLog(`⚠️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒`, 'warning');
+                }
+                
+                const wordsPerSecond = actualWordCount / speechDuration;
                 const wordsPerMinute = wordsPerSecond * 60;
                 
-                console.log('📊 Android発話速度分析（推定値）:', {
+                console.log(`📊 Android発話速度分析（${calculationMethod}）:`, {
                     expectedWords: expectedWordCount,
                     actualWords: actualWordCount,
-                    estimatedDuration: estimatedSpeechDuration.toFixed(2) + '秒',
-                    wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分'
+                    speechDuration: speechDuration.toFixed(2) + '秒',
+                    wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分',
+                    method: calculationMethod
                 });
                 
                 let level, levelExplanation, verificationStatus;
@@ -1824,7 +1838,9 @@ class VoiceSystem {
                 }
                 
                 analysisResult = {
-                    duration: estimatedSpeechDuration, // 推定発話時間
+                    duration: speechDuration, // タイムスタンプベースまたは推定発話時間
+                    calculationMethod, // 計算方法の記録
+                    speechTimestamps: this.speechTimestamps, // タイムスタンプ詳細（デバッグ用）
                     expectedWordCount,
                     actualWordCount,
                     wordsPerSecond,
