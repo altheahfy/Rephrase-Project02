@@ -5442,6 +5442,27 @@ class VoiceSystem {
             // 進捗パネルを表示
             progressUI.showProgressPanel();
             console.log('✅ 学習進捗パネルを表示しました');
+            
+            // 🚨 緊急テスト: パネルの存在と表示状態を確認
+            setTimeout(() => {
+                const panel = document.getElementById('voice-progress-panel');
+                console.log('🔍 緊急テスト - パネル要素:', panel);
+                if (panel) {
+                    console.log('🔍 パネルのdisplay:', panel.style.display);
+                    console.log('🔍 パネルのz-index:', panel.style.zIndex || getComputedStyle(panel).zIndex);
+                    console.log('🔍 パネルの可視性:', panel.offsetWidth, 'x', panel.offsetHeight);
+                    
+                    // 強制的にパネルを目立たせる
+                    panel.style.display = 'block';
+                    panel.style.zIndex = '99999';
+                    panel.style.background = 'red';
+                    panel.style.border = '5px solid yellow';
+                    console.log('🚨 緊急テスト: パネルを赤色で強制表示しました');
+                } else {
+                    console.error('❌ 緊急テスト: voice-progress-panel要素が見つかりません');
+                }
+            }, 100);
+            
         } catch (error) {
             console.error('❌ 進捗表示エラー:', error);
             alert('進捗表示でエラーが発生しました: ' + error.message);
