@@ -1621,21 +1621,13 @@ class VoiceSystem {
                     // ⏱️ 最初の語と最後の語のタイムスタンプを更新
                     if (this.firstWordTime === null) {
                         this.firstWordTime = resultTime;
-                        const elapsedTime = this.recognitionStartTime ? 
-                            ((resultTime - this.recognitionStartTime) / 1000).toFixed(2) : 
-                            'N/A';
-                        this.addDebugLog(`⏱️ 最初の語認識: ${transcript} (${elapsedTime}秒後)`, 'info');
+                        this.addDebugLog(`⏱️ 最初の語認識: ${transcript} (${((resultTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後)`, 'info');
                     }
                     this.lastWordTime = resultTime;
-                    
-                    // タイムスタンプ記録の安全性チェック
-                    const relativeTime = this.recognitionStartTime ? 
-                        (resultTime - this.recognitionStartTime) / 1000 : 0;
-                    
                     this.speechTimestamps.push({
                         text: transcript,
                         time: resultTime,
-                        relativeTime: relativeTime
+                        relativeTime: (resultTime - this.recognitionStartTime) / 1000
                     });
                     
                     // 高度な重複チェック：文章レベルでの重複を検出
@@ -1805,46 +1797,26 @@ class VoiceSystem {
                 let actualSpeechDuration;
                 if (this.firstWordTime && this.lastWordTime) {
                     // ⏱️ 最初の語から最後の語までの実際の発話時間
-                    actualSpeechDuration = Math.max(0.1, (this.lastWordTime - this.firstWordTime) / 1000); // 最小0.1秒
+                    actualSpeechDuration = (this.lastWordTime - this.firstWordTime) / 1000;
                     this.addDebugLog(`⏱️ タイムスタンプベース発話時間: ${actualSpeechDuration.toFixed(2)}秒 (最初の語〜最後の語)`, 'info');
-                    
-                    // 安全性チェック付きのタイムスタンプ詳細ログ
-                    if (this.recognitionStartTime) {
-                        const firstWordDelay = ((this.firstWordTime - this.recognitionStartTime) / 1000).toFixed(2);
-                        const lastWordDelay = ((this.lastWordTime - this.recognitionStartTime) / 1000).toFixed(2);
-                        this.addDebugLog(`⏱️ タイムスタンプ詳細: 最初の語=${firstWordDelay}秒後, 最後の語=${lastWordDelay}秒後`, 'info');
-                    }
+                    this.addDebugLog(`⏱️ タイムスタンプ詳細: 最初の語=${((this.firstWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後, 最後の語=${((this.lastWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
                 } else {
                     // フォールバック: 推定値を使用
-                    try {
-                        actualSpeechDuration = this.calculateAndroidSpeechDuration(actualWordCount, totalRecognitionTime);
-                        this.addDebugLog(`⏱️ フォールバック: 推定発話時間=${actualSpeechDuration.toFixed(2)}秒`, 'warning');
-                    } catch (error) {
-                        this.addDebugLog(`❌ 発話時間計算エラー: ${error.message}`, 'error');
-                        // 最終フォールバック: 総認識時間の70%を使用
-                        actualSpeechDuration = totalRecognitionTime * 0.7;
-                        this.addDebugLog(`⚠️ 最終フォールバック: ${actualSpeechDuration.toFixed(2)}秒 (総時間の70%)`, 'warning');
-                    }
+                    actualSpeechDuration = this.calculateAndroidSpeechDuration(actualWordCount, totalRecognitionTime);
+                    this.addDebugLog(`⏱️ フォールバック: 推定発話時間=${actualSpeechDuration.toFixed(2)}秒`, 'warning');
                 }
                 
                 // デバッグ情報を追加
                 this.addDebugLog(`⏱️ 発話時間比較: 総認識時間=${totalRecognitionTime.toFixed(2)}秒, 実際発話時間=${actualSpeechDuration.toFixed(2)}秒`, 'info');
                 
-                // 🚀 実際の発話時間で語数/分を計算（安全性チェック付き）
-                const safeActualSpeechDuration = Math.max(0.1, actualSpeechDuration); // 最小0.1秒
-                const wordsPerSecond = actualWordCount / safeActualSpeechDuration;
+                // 🚀 実際の発話時間で語数/分を計算（PC版の無音除去相当）
+                const wordsPerSecond = actualWordCount / actualSpeechDuration;
                 const wordsPerMinute = wordsPerSecond * 60;
                 
-                // 異常値チェック
-                if (wordsPerMinute > 600) { // 600語/分を超える場合は異常値
-                    this.addDebugLog(`⚠️ 異常な発話速度検出: ${wordsPerMinute.toFixed(1)}語/分`, 'warning');
-                }
-                
-                console.log('📊 Android発話速度分析（タイムスタンプベース）:', {
+                console.log('📊 Android発話速度分析（実測値）:', {
                     expectedWords: expectedWordCount,
                     actualWords: actualWordCount,
-                    totalTime: totalRecognitionTime.toFixed(2) + '秒',
-                    speechTime: actualSpeechDuration.toFixed(2) + '秒',
+                    actualDuration: actualSpeechDuration.toFixed(2) + '秒',
                     wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分'
                 });
                 
