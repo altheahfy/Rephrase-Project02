@@ -3,6 +3,17 @@ function toggleExclusiveSubslot(slotId) {
   toggleExclusiveSubslot.lock = true;
   setTimeout(() => { toggleExclusiveSubslot.lock = false; }, 100);
   console.log(`🔑 toggleExclusiveSubslot called for slot-${slotId}-sub`);
+  
+  // 🎤 音声認識システムへの影響を調査
+  if (window.voiceSystem) {
+    const isAnalyzing = window.voiceSystem.isAndroidAnalyzing;
+    if (isAnalyzing) {
+      console.log(`⚠️ 詳細ボタンクリック中に音声認識が動作中: ${slotId}`);
+      window.voiceSystem.addDebugLog(`⚠️ 詳細ボタンクリック中に音声認識が動作中: ${slotId}`, 'warning');
+    } else {
+      console.log(`✅ 詳細ボタンクリック時、音声認識は停止中: ${slotId}`);
+    }
+  }
 
   const subslotIds = ["o1", "c1", "o2", "m1", "s", "m2", "c2", "m3"];
   const target = document.getElementById(`slot-${slotId}-sub`);

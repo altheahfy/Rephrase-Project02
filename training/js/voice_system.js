@@ -1749,7 +1749,7 @@ class VoiceSystem {
      * 🛑 Android音声認識を強制停止（即座に分析実行）
      */
     stopAndroidVoiceRecognition() {
-        console.log('🛑 Android音声認識を手動停止中...');
+        this.addDebugLog('🛑 Android音声認識を手動停止中...', 'warning');
         this.isAndroidAnalyzing = false;
         
         if (this.androidTimeoutId) {
@@ -1760,14 +1760,14 @@ class VoiceSystem {
         if (this.androidRecognition) {
             try {
                 this.androidRecognition.stop();
-                console.log('✅ 音声認識停止コマンド送信完了');
+                this.addDebugLog('✅ 音声認識停止コマンド送信完了', 'info');
             } catch (error) {
-                console.log('⚠️ 音声認識停止エラー:', error.message);
+                this.addDebugLog(`⚠️ 音声認識停止エラー: ${error.message}`, 'error');
             }
         }
         
         // 停止時に即座に分析を実行
-        console.log('📊 手動停止時の分析を開始...');
+        this.addDebugLog('📊 手動停止時の分析を開始...', 'info');
         this.finishAndroidVoiceRecognition();
     }
 
