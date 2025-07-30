@@ -1237,32 +1237,40 @@ class VoiceSystem {
         }
 
         this.isRecording = false;
+        this.addDebugLog('📱 録音フラグをfalseに設定', 'info');
 
         // Web Audio API録音停止
         if (this.recordingProcessor) {
             this.recordingProcessor.disconnect();
             this.recordingProcessor = null;
+            this.addDebugLog('📱 recordingProcessor停止完了', 'info');
         }
 
         if (this.microphoneSource) {
             this.microphoneSource.disconnect();
             this.microphoneSource = null;
+            this.addDebugLog('📱 microphoneSource停止完了', 'info');
         }
 
         // ストリーム停止
         if (this.currentStream) {
             this.currentStream.getTracks().forEach(track => track.stop());
             this.currentStream = null;
+            this.addDebugLog('📱 currentStream停止完了', 'info');
         }
 
+        this.addDebugLog('📱 stopVolumeMonitoring開始', 'info');
         this.stopVolumeMonitoring();
+        this.addDebugLog('📱 stopRecordingTimer開始', 'info');
         this.stopRecordingTimer();
+        this.addDebugLog('📱 updateRecordingUI開始', 'info');
         this.updateRecordingUI(false);
 
         this.addDebugLog('🛑 Web Audio API録音停止完了', 'success');
         this.updateStatus('✅ 録音完了', 'success');
 
         // 録音データ処理
+        this.addDebugLog('📱 録音データ処理開始', 'info');
         if (this.audioChunks.length > 0) {
             const totalSamples = this.audioChunks.length * 4096;
             const duration = totalSamples / this.audioContext.sampleRate;
@@ -1271,6 +1279,7 @@ class VoiceSystem {
         } else {
             this.addDebugLog('⚠️ 録音データが空です', 'warning');
         }
+        this.addDebugLog('📱 録音データ処理完了', 'success');
         
         // 📱 透過モード解除（録音終了）
         this.addDebugLog('📱 録音停止 - 透過モード解除開始', 'info');
