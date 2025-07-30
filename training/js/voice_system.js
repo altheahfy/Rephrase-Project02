@@ -1609,17 +1609,17 @@ class VoiceSystem {
      * 🎤 Android用リアルタイム音声認識（temp_working_voice_system.jsから移植）
      */
     startAndroidVoiceRecognition() {
-        console.log('🎤 Android音声認識テストを開始します...');
+        this.addDebugLog('🎤 Android音声認識テストを開始します...', 'info');
         
         // 認識状態をセット
         this.isAndroidAnalyzing = true;
         
         // 認識結果をクリア
         this.recognizedText = '';
-        console.log('🔄 this.recognizedTextをクリアしました');
+        this.addDebugLog('🔄 this.recognizedTextをクリアしました', 'info');
         
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            console.log('🚫 Web Speech API が利用できません');
+            this.addDebugLog('🚫 Web Speech API が利用できません', 'error');
             this.updateStatus('❌ 音声認識非対応', 'error');
             this.isAndroidAnalyzing = false;
             return;
@@ -1634,33 +1634,33 @@ class VoiceSystem {
         // Android Chrome最適化設定
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
-            console.log('📱 Android Chrome用設定を適用');
+            this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
             recognition.continuous = false;  // 1回認識に変更
             recognition.interimResults = false;
             recognition.lang = 'en-US'; // 英語設定
             recognition.maxAlternatives = 3; // 複数候補
         } else {
-            console.log('💻 PC/iPhone用設定を適用');
+            this.addDebugLog('💻 PC/iPhone用設定を適用', 'info');
             recognition.continuous = false;  // 1回認識に変更
             recognition.interimResults = false;
             recognition.lang = 'ja-JP';
             recognition.maxAlternatives = 1;
         }
         
-        console.log(`🔧 認識準備: lang=${recognition.lang}`);
+        this.addDebugLog(`🔧 認識準備: lang=${recognition.lang}`, 'info');
         
         // タイムアウト設定：継続的認識なので長めに設定
         const timeoutDuration = isAndroid ? 30000 : 25000; // 25-30秒
         this.androidTimeoutId = setTimeout(() => {
-            console.log(`⏰ 音声認識がタイムアウトしました (${timeoutDuration/1000}秒)`);
-            console.log('🔄 分析ボタンを再度押して停止してください');
+            this.addDebugLog(`⏰ 音声認識がタイムアウトしました (${timeoutDuration/1000}秒)`, 'warning');
+            this.addDebugLog('🔄 分析ボタンを再度押して停止してください', 'info');
             // タイムアウト時は自動停止せず、ユーザーに停止を促す
             this.updateStatus('⏰ 長時間認識中... 分析ボタンを押して停止', 'recording');
         }, timeoutDuration);
         
         recognition.onstart = () => {
-            console.log('✅ 音声認識start()コマンド送信完了');
-            console.log('🎤 音声認識開始イベント発生');
+            this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
+            this.addDebugLog('🎤 音声認識開始イベント発生', 'info');
             this.updateStatus('🎤 話してください...（もう一度押すと停止）', 'recording');
         };
         
@@ -1669,7 +1669,7 @@ class VoiceSystem {
                 clearTimeout(this.androidTimeoutId);
             }
             
-            console.log('📝 音声認識結果イベント発生');
+            this.addDebugLog('📝 音声認識結果イベント発生', 'info');
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const result = event.results[i];
@@ -1683,7 +1683,7 @@ class VoiceSystem {
                     if (currentText.length === 0) {
                         // 初回の場合はそのまま設定
                         this.recognizedText = transcript;
-                        console.log(`✅ 初回認識結果: "${transcript}"`);
+                        this.addDebugLog(`✅ 初回認識結果: "${transcript}"`, 'success');
                     } else {
                         // 既存のテキストと新しいテキストの重複部分を検出
                         let overlap = this.findTextOverlap(currentText, transcript);
@@ -1698,15 +1698,15 @@ class VoiceSystem {
                             const newPart = transcript.substring(overlap.length).trim();
                             if (newPart.length > 0) {
                                 this.recognizedText += ' ' + newPart;
-                                console.log(`✅ 重複除去後追加: "${newPart}"`);
-                                console.log(`🔍 検出された重複: "${overlap}"`);
+                                this.addDebugLog(`✅ 重複除去後追加: "${newPart}"`, 'success');
+                                this.addDebugLog(`🔍 検出された重複: "${overlap}"`, 'info');
                             } else {
-                                console.log(`⚠️ 完全重複のためスキップ: "${transcript}"`);
+                                this.addDebugLog(`⚠️ 完全重複のためスキップ: "${transcript}"`, 'warning');
                             }
                         } else {
                             // 重複がない場合は通常の追加
                             this.recognizedText += ' ' + transcript;
-                            console.log(`✅ 新規追加: "${transcript}"`);
+                            this.addDebugLog(`✅ 新規追加: "${transcript}"`, 'success');
                         }
                     }
                 } else {
@@ -1719,7 +1719,7 @@ class VoiceSystem {
             if (this.androidTimeoutId) {
                 clearTimeout(this.androidTimeoutId);
             }
-            console.log('🏁 音声認識終了イベント発生');
+            this.addDebugLog('🏁 音声認識終了イベント発生', 'warning');
             
             // 1回認識なので、終了時は必ず分析完了処理を実行
             this.finishAndroidVoiceRecognition();
@@ -1729,7 +1729,7 @@ class VoiceSystem {
             if (this.androidTimeoutId) {
                 clearTimeout(this.androidTimeoutId);
             }
-            console.log(`❌ 音声認識エラー: ${event.error}`);
+            this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
             this.updateStatus('❌ 音声認識エラー', 'error');
             this.finishAndroidVoiceRecognition();
         };
@@ -1737,9 +1737,9 @@ class VoiceSystem {
         // 音声認識開始
         try {
             recognition.start();
-            console.log('🎤 音声認識を開始しました');
+            this.addDebugLog('🎤 音声認識を開始しました', 'info');
         } catch (error) {
-            console.log(`❌ 音声認識開始エラー: ${error.message}`);
+            this.addDebugLog(`❌ 音声認識開始エラー: ${error.message}`, 'error');
             this.updateStatus('❌ 音声認識開始失敗', 'error');
             this.isAndroidAnalyzing = false;
         }
@@ -1775,7 +1775,7 @@ class VoiceSystem {
      * 🏁 Android音声認識完了処理 + 評価分析（PC版と同じロジック）
      */
     finishAndroidVoiceRecognition() {
-        console.log('🏁 Android音声認識完了 - 評価分析開始');
+        this.addDebugLog('🏁 Android音声認識完了 - 評価分析開始', 'info');
         this.updateStatus('📊 分析中...', 'analyzing');
         
         // 認識状態をリセット
