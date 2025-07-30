@@ -1276,16 +1276,20 @@ class VoiceSystem {
      * 🚀 Web Audio API録音データ再生機能（Android完全対応版）
      */
     async playRecordingAndroid() {
-        this.addDebugLog('� Web Audio API録音データ再生開始', 'info');
+        this.addDebugLog('🔊 Web Audio API録音データ再生開始', 'info');
         
         if (!this.audioChunks || this.audioChunks.length === 0) {
             this.addDebugLog('❌ 再生する録音データがありません（先に録音してください）', 'error');
             this.updateStatus('❌ 再生する録音がありません', 'error');
+            // 🔧 録音データがない場合も透明度をリセット
+            this.setVoicePanelTransparency(false);
             return;
         }
 
         if (this.isPlaying) {
             this.addDebugLog('⚠️ 既に再生中です', 'warning');
+            // 🔧 既に再生中の場合も透明度をリセット
+            this.setVoicePanelTransparency(false);
             return;
         }
 
@@ -1340,7 +1344,9 @@ class VoiceSystem {
             source.onended = () => {
                 this.isPlaying = false;
                 this.updateStatus('✅ 再生完了', 'success');
-                this.addDebugLog('� Web Audio API再生完了', 'success');
+                this.addDebugLog('🔊 Web Audio API再生完了', 'success');
+                // 🔧 再生完了時に透明度をリセット
+                this.setVoicePanelTransparency(false);
             };
 
             source.start(0);
@@ -1350,9 +1356,11 @@ class VoiceSystem {
             this.addDebugLog(`❌ Web Audio API再生エラー: ${error.message}`, 'error');
             this.isPlaying = false;
             this.updateStatus('❌ 再生エラー', 'error');
+            // 🔧 再生エラー時も透明度をリセット
+            this.setVoicePanelTransparency(false);
             
             // フォールバック: WAVダウンロード
-            this.addDebugLog('� ダウンロードリンクを生成します', 'info');
+            this.addDebugLog('💾 ダウンロードリンクを生成します', 'info');
             this.createDownloadLink();
         }
     }
@@ -2872,6 +2880,8 @@ class VoiceSystem {
         
         this.currentUtterance.onerror = (event) => {
             this.updateStatus(`❌ 読み上げエラー: ${event.error}`, 'error');
+            // 📱 透過モード解除（読み上げエラー時）
+            this.setVoicePanelTransparency(false);
         };
         
         speechSynthesis.speak(this.currentUtterance);
@@ -2907,6 +2917,9 @@ class VoiceSystem {
         
         // ボリュームモニタリング停止
         this.stopVolumeMonitoring();
+        
+        // 📱 透過モード解除（すべて停止時）
+        this.setVoicePanelTransparency(false);
         
         this.updateStatus('⏹️ すべて停止', 'stopped');
     }
