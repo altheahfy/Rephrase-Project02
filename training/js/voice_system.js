@@ -1635,13 +1635,14 @@ class VoiceSystem {
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             console.log('📱 Android Chrome用設定を適用');
-            recognition.continuous = true;   // 継続的な認識（手動停止まで継続）
-            recognition.interimResults = true;
+            recognition.continuous = false;  // 1回認識に変更
+            recognition.interimResults = false;
             recognition.lang = 'en-US'; // 英語設定
             recognition.maxAlternatives = 3; // 複数候補
         } else {
-            recognition.continuous = true;   // 継続的な認識（手動停止まで継続）
-            recognition.interimResults = true;
+            console.log('💻 PC/iPhone用設定を適用');
+            recognition.continuous = false;  // 1回認識に変更
+            recognition.interimResults = false;
             recognition.lang = 'ja-JP';
             recognition.maxAlternatives = 1;
         }
@@ -1685,7 +1686,12 @@ class VoiceSystem {
                         console.log(`✅ 初回認識結果: "${transcript}"`);
                     } else {
                         // 既存のテキストと新しいテキストの重複部分を検出
-                        const overlap = this.findTextOverlap(currentText, transcript);
+                        let overlap = this.findTextOverlap(currentText, transcript);
+                        
+                        // 末尾先頭重複がない場合、フレーズ全体重複をチェック
+                        if (overlap.length === 0) {
+                            overlap = this.findCompleteOverlap(currentText, transcript);
+                        }
                         
                         if (overlap.length > 0) {
                             // 重複部分を除いた新しい部分のみを追加
@@ -1715,23 +1721,8 @@ class VoiceSystem {
             }
             console.log('🏁 音声認識終了イベント発生');
             
-            // 手動停止でない場合は再開（継続的な認識のため）
-            if (this.isAndroidAnalyzing) {
-                console.log('🔄 音声認識を自動再開中...');
-                try {
-                    setTimeout(() => {
-                        if (this.isAndroidAnalyzing) {
-                            recognition.start();
-                        }
-                    }, 500); // 500ms後に再開（重複を減らすため長めに設定）
-                } catch (error) {
-                    console.log('⚠️ 音声認識再開エラー:', error.message);
-                    this.finishAndroidVoiceRecognition();
-                }
-            } else {
-                // 手動停止の場合のみ終了処理
-                this.finishAndroidVoiceRecognition();
-            }
+            // 1回認識なので、終了時は必ず分析完了処理を実行
+            this.finishAndroidVoiceRecognition();
         };
         
         recognition.onerror = (event) => {
@@ -5601,6 +5592,39 @@ class VoiceSystem {
             if (existingTail.join(' ') === newHead.join(' ')) {
                 // 重複部分を元の大文字小文字で返す
                 return newText.split(' ').slice(0, i).join(' ');
+            }
+        }
+        
+        return ''; // 重複なし
+    }
+
+    /**
+     * 📝 フレーズ全体の重複を検出する追加メソッド
+     */
+    findCompleteOverlap(existingText, newText) {
+        const existingWords = existingText.toLowerCase().split(' ').filter(w => w.trim());
+        const newWords = newText.toLowerCase().split(' ').filter(w => w.trim());
+        
+        // 新しいテキストが既存テキストの一部と完全に重複しているかチェック
+        const existingStr = existingWords.join(' ');
+        const newStr = newWords.join(' ');
+        
+        // 既存テキストの中に新しいテキストが含まれているかチェック
+        if (existingStr.includes(newStr)) {
+            console.log(`🔍 完全重複検出: "${newText}" は既存テキスト内に存在`);
+            return newText; // 全体が重複
+        }
+        
+        // 3単語以上の連続する重複を検索
+        for (let startIdx = 0; startIdx <= existingWords.length - 3; startIdx++) {
+            for (let length = Math.min(existingWords.length - startIdx, newWords.length); length >= 3; length--) {
+                const existingPhrase = existingWords.slice(startIdx, startIdx + length).join(' ');
+                const newPhrase = newWords.slice(0, length).join(' ');
+                
+                if (existingPhrase === newPhrase) {
+                    console.log(`🔍 長いフレーズ重複検出: "${newPhrase}"`);
+                    return newText.split(' ').slice(0, length).join(' ');
+                }
             }
         }
         
