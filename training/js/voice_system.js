@@ -263,122 +263,6 @@ class VoiceSystem {
     }
     
     /**
-     * 🤖 Android用デバッグ情報を画面に表示
-     */
-    showAndroidDebugInfo() {
-        // 既存のデバッグパネルを削除
-        const existingDebug = document.getElementById('android-debug-info');
-        if (existingDebug) {
-            existingDebug.remove();
-        }
-        
-        const debugInfo = document.createElement('div');
-        debugInfo.id = 'android-debug-info';
-        debugInfo.style.cssText = `
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            color: #00ff00;
-            padding: 12px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 11px;
-            z-index: 25000;
-            max-width: 350px;
-            border: 2px solid #00ff00;
-            box-shadow: 0 4px 15px rgba(0,255,0,0.3);
-        `;
-        
-        const androidPanel = document.getElementById('voice-control-panel-android');
-        const normalPanel = document.getElementById('voice-control-panel');
-        const openBtn = document.getElementById('voice-panel-open-btn');
-        
-        // より詳細な状態情報を取得
-        const androidPanelVisible = androidPanel ? window.getComputedStyle(androidPanel).display !== 'none' : false;
-        const normalPanelVisible = normalPanel ? window.getComputedStyle(normalPanel).display !== 'none' : false;
-        
-        debugInfo.innerHTML = `
-            <div style="color: #ffff00; font-weight: bold; margin-bottom: 8px;">🤖 Android デバッグ情報</div>
-            <div style="margin-bottom: 4px;">✅ Android検出: <span style="color: ${this.isAndroid ? '#00ff00' : '#ff0000'}">${this.isAndroid ? 'はい' : 'いいえ'}</span></div>
-            <div style="margin-bottom: 4px;">📱 現在のパネル: <span style="color: #00ffff">${this.currentPanel}</span></div>
-            <div style="margin-bottom: 4px;">📊 パネル表示状態: <span style="color: ${this.isPanelVisible ? '#00ff00' : '#ff0000'}">${this.isPanelVisible ? '表示中' : '非表示'}</span></div>
-            <div style="margin-bottom: 4px;">🎛️ Android専用パネル: ${androidPanel ? `<span style="color: #00ff00">✅存在</span> (表示: ${androidPanelVisible ? '○' : '✕'})` : '<span style="color: #ff0000">❌不在</span>'}</div>
-            <div style="margin-bottom: 4px;">🎛️ 通常パネル: ${normalPanel ? `<span style="color: #00ff00">✅存在</span> (表示: ${normalPanelVisible ? '○' : '✕'})` : '<span style="color: #ff0000">❌不在</span>'}</div>
-            <div style="margin-bottom: 4px;">🔘 開くボタン: ${openBtn ? '<span style="color: #00ff00">✅存在</span>' : '<span style="color: #ff0000">❌不在</span>'}</div>
-            <div style="margin-bottom: 8px;">📐 画面サイズ: ${window.innerWidth}×${window.innerHeight}</div>
-            <div style="display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap;">
-                <button onclick="window.voiceSystemDebug.testMicrophonePermission()" style="
-                    background: #ff6b35; color: white; border: none; padding: 4px 6px;
-                    border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold;">
-                    🎤 権限確認
-                </button>
-                <button onclick="window.voiceSystemDebug.testRecording()" style="
-                    background: #e74c3c; color: white; border: none; padding: 4px 6px;
-                    border-radius: 3px; font-size: 10px; cursor: pointer;">
-                    🔴 録音テスト
-                </button>
-                <button onclick="window.voiceSystemDebug.showPanel()" style="
-                    background: #007bff; color: white; border: none; padding: 4px 6px;
-                    border-radius: 3px; font-size: 10px; cursor: pointer;">
-                    🔧 パネル表示テスト
-                </button>
-                <button onclick="window.voiceSystemDebug.togglePanel()" style="
-                    background: #28a745; color: white; border: none; padding: 4px 6px;
-                    border-radius: 3px; font-size: 10px; cursor: pointer;">
-                    🔄 切り替えテスト
-                </button>
-                <button onclick="document.getElementById('android-debug-info').remove()" style="
-                    background: #dc3545; color: white; border: none; padding: 4px 6px;
-                    border-radius: 3px; font-size: 10px; cursor: pointer;">
-                    ❌ 閉じる
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(debugInfo);
-        
-        // 10秒後に自動で非表示（手動で閉じることもできる）
-        setTimeout(() => {
-            if (debugInfo.parentElement) {
-                debugInfo.style.opacity = '0.5';
-            }
-        }, 10000);
-    }
-    
-    /**
-     * 🤖 Android用クリックフィードバック表示
-     */
-    showAndroidClickFeedback(message, type = 'info') {
-        const feedback = document.createElement('div');
-        feedback.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: ${type === 'error' ? 'rgba(220, 53, 69, 0.9)' : 'rgba(40, 167, 69, 0.9)'};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            z-index: 25000;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        `;
-        feedback.textContent = message;
-        
-        document.body.appendChild(feedback);
-        
-        // 2秒後に自動削除
-        setTimeout(() => {
-            if (feedback.parentElement) {
-                feedback.remove();
-            }
-        }, 2000);
-    }
-    
-    /**
      * 🤖 Android デバイス検出
      */
     detectAndroid() {
@@ -1199,25 +1083,16 @@ class VoiceSystem {
         const debugBtn = document.getElementById('mobile-debug-btn');
         if (debugBtn) {
             debugBtn.addEventListener('click', () => {
-                alert('デバッグボタンv2025.7.27-rollback がタップされました！マイクテスト機能が利用可能です。');
                 try {
                     this.showMobileDebugPanel();
-                    alert('デバッグパネル表示を試行しました');
                 } catch (error) {
-                    alert('エラー: ' + error.message);
+                    console.error('デバッグパネル表示エラー:', error.message);
                 }
             });
             console.log('✅ モバイルデバッグボタンのイベントリスナーを設定しました');
             
-            // 📱 ボタンが正常に設定されたことを確認するためのテスト
-            debugBtn.style.border = '2px solid red';
-            setTimeout(() => {
-                debugBtn.style.border = '';
-            }, 2000);
-            
         } else {
             console.warn('⚠️ モバイルデバッグボタンが見つかりません');
-            alert('警告: モバイルデバッグボタンが見つかりません');
         }
         
         // 📱 ウィンドウリサイズ・画面向き変更時のパネル位置調整
@@ -5281,16 +5156,12 @@ class VoiceSystem {
      */
     showMobileDebugPanel() {
         try {
-            alert('showMobileDebugPanel開始');
-            
             // 既存のパネルがあれば削除
             const existingPanel = document.getElementById('mobile-debug-panel');
             if (existingPanel) {
                 existingPanel.remove();
-                alert('既存パネル削除完了');
             }
             
-            alert('新しいパネル作成開始');
             const panel = document.createElement('div');
             panel.id = 'mobile-debug-panel';
             panel.style.cssText = `
@@ -5309,8 +5180,6 @@ class VoiceSystem {
                 overflow-y: auto;
                 border: 2px solid #00ff00;
             `;
-            
-            alert('パネルスタイル設定完了');
             
             // ヘッダー
             const header = document.createElement('div');
@@ -5333,8 +5202,6 @@ class VoiceSystem {
                     font-size: 10px;
                 ">✕</button>
             `;
-            
-            alert('ヘッダー作成完了');
             
             // テスト機能ボタンエリア
             const testButtons = document.createElement('div');
@@ -5376,8 +5243,6 @@ class VoiceSystem {
                 ">🗑️ ログクリア</button>
             `;
             
-            alert('テストボタン作成完了');
-            
             // ログ表示エリア
             const logArea = document.createElement('div');
             logArea.id = 'mobile-debug-logs';
@@ -5387,16 +5252,13 @@ class VoiceSystem {
             panel.appendChild(logArea);
             document.body.appendChild(panel);
             
-            alert('パネルDOM追加完了');
-            
             // 現在のログを表示
             this.updateMobileDebugPanel();
             
-            alert('デバッグパネル表示完了');
             return panel;
             
         } catch (error) {
-            alert('showMobileDebugPanelエラー: ' + error.message);
+            console.error('showMobileDebugPanelエラー:', error.message);
             throw error;
         }
     }
