@@ -996,6 +996,8 @@ class VoiceSystem {
         if (recordBtnAndroid) {
             recordBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔥 Android録音ボタンがクリックされました', 'info');
+                // 📱 透過モード有効化（スロット表示確保）
+                this.setVoicePanelTransparency(true);
                 this.toggleRecordingAndroid();
             });
             this.addDebugLog('✅ Android専用録音ボタンのイベントリスナーを設定', 'success');
@@ -1017,6 +1019,8 @@ class VoiceSystem {
         if (playBtnAndroid) {
             playBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔥 Android再生ボタンがクリックされました', 'info');
+                // 📱 透過モード有効化（スロット表示確保）
+                this.setVoicePanelTransparency(true);
                 this.playRecordingAndroid();
             });
             this.addDebugLog('✅ Android専用再生ボタンのイベントリスナーを設定', 'success');
@@ -1027,14 +1031,22 @@ class VoiceSystem {
         // Android専用音声合成ボタン（現行機能を使用）
         const ttsBtnAndroid = document.getElementById('voice-tts-btn-android');
         if (ttsBtnAndroid) {
-            ttsBtnAndroid.addEventListener('click', () => this.speakSentence());
+            ttsBtnAndroid.addEventListener('click', () => {
+                // 📱 透過モード有効化（スロット表示確保）
+                this.setVoicePanelTransparency(true);
+                this.speakSentence();
+            });
             console.log('✅ Android専用音声合成ボタンのイベントリスナーを設定');
         }
         
         // Android専用分析ボタン
         const analyzeBtnAndroid = document.getElementById('voice-analyze-btn-android');
         if (analyzeBtnAndroid) {
-            analyzeBtnAndroid.addEventListener('click', () => this.analyzeRecordingAndroid());
+            analyzeBtnAndroid.addEventListener('click', () => {
+                // 📱 透過モード有効化（スロット表示確保）
+                this.setVoicePanelTransparency(true);
+                this.analyzeRecordingAndroid();
+            });
             console.log('✅ Android専用分析ボタンのイベントリスナーを設定');
         }
         
@@ -1374,6 +1386,9 @@ class VoiceSystem {
         } else {
             this.addDebugLog('⚠️ 録音データが空です', 'warning');
         }
+        
+        // 📱 透過モード解除（録音終了）
+        this.setVoicePanelTransparency(false);
     }
 
     /**
@@ -1926,6 +1941,9 @@ class VoiceSystem {
                 this.setupAndroidSaveConfirmationButtons(result);
             }
         }
+        
+        // 📱 透過モード解除（分析終了）
+        this.setVoicePanelTransparency(false);
     }
 
     /**
@@ -2923,6 +2941,8 @@ class VoiceSystem {
         
         this.currentUtterance.onend = () => {
             this.updateStatus('✅ 読み上げ完了', 'success');
+            // 📱 透過モード解除（読み上げ終了）
+            this.setVoicePanelTransparency(false);
         };
         
         this.currentUtterance.onerror = (event) => {
@@ -5511,6 +5531,31 @@ class VoiceSystem {
         console.log(`  dynamic疑問詞: "${questionWordDynamic ? questionWordDynamic.textContent.trim() : 'なし'}"`);
         
         console.log('🔍 ===== 比較デバッグ終了 =====');
+    }
+
+    /**
+     * 📱 スマホ版音声パネル透過制御（スロット表示を確保）
+     */
+    setVoicePanelTransparency(transparent = true) {
+        const panel = document.getElementById('voice-control-panel-android');
+        if (panel) {
+            if (transparent) {
+                // 70%透過（30%不透明）でスロットが見えるように
+                panel.style.opacity = '0.3';
+                panel.style.pointerEvents = 'none'; // タッチ操作を下の要素に通す
+                console.log('📱 音声パネルを透過モードに設定（30%不透明）');
+                
+                // 3秒後に自動的に通常モードに戻す
+                setTimeout(() => {
+                    this.setVoicePanelTransparency(false);
+                }, 3000);
+            } else {
+                // 通常の不透明度に戻す
+                panel.style.opacity = '1';
+                panel.style.pointerEvents = 'auto';
+                console.log('📱 音声パネルを通常モードに戻しました');
+            }
+        }
     }
 
     /**
