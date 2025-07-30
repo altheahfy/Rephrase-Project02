@@ -1544,6 +1544,11 @@ class VoiceSystem {
         this.recognizedText = '';
         this.addDebugLog('🔄 this.recognizedTextをクリアしました', 'info');
         
+        // ⏱️ タイムスタンプ記録をリセット（実験的機能）
+        this.speechTimestamps = [];
+        this.firstWordTime = null;
+        this.lastWordTime = null;
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('🚫 Web Speech API が利用できません', 'error');
             this.updateStatus('❌ 音声認識非対応', 'error');
