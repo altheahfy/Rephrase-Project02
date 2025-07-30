@@ -1231,6 +1231,8 @@ class VoiceSystem {
     stopRecordingAndroidWebAudio() {
         if (!this.isRecording) {
             this.addDebugLog('⚠️ 録音していません', 'warning');
+            // 📱 透過モード解除（録音していない場合）
+            this.setVoicePanelTransparency(false);
             return;
         }
 
@@ -1271,7 +1273,9 @@ class VoiceSystem {
         }
         
         // 📱 透過モード解除（録音終了）
+        this.addDebugLog('📱 録音停止 - 透過モード解除開始', 'info');
         this.setVoicePanelTransparency(false);
+        this.addDebugLog('📱 録音停止 - 透過モード解除完了', 'success');
     }
 
     /**
@@ -5474,6 +5478,8 @@ class VoiceSystem {
      * 📱 スマホ版音声パネル透過制御（スロット表示を確保）
      */
     setVoicePanelTransparency(transparent = true) {
+        this.addDebugLog(`📱 透過モード変更要求: ${transparent ? '透過ON' : '透過OFF'}`, 'info');
+        
         const panel = document.getElementById('voice-control-panel-android');
         if (panel) {
             if (transparent) {
@@ -5482,13 +5488,17 @@ class VoiceSystem {
                 panel.style.pointerEvents = 'none'; // タッチ操作を下の要素に通す
                 this.isVoicePanelTransparent = true; // 透過状態を追跡
                 console.log('📱 音声パネルを透過モードに設定（30%不透明）');
+                this.addDebugLog('📱 透過モード設定完了', 'success');
             } else {
                 // 通常の不透明度に戻す
                 panel.style.opacity = '1';
                 panel.style.pointerEvents = 'auto';
                 this.isVoicePanelTransparent = false; // 透過状態を解除
                 console.log('📱 音声パネルを通常モードに戻しました');
+                this.addDebugLog('📱 通常モード復帰完了', 'success');
             }
+        } else {
+            this.addDebugLog('❌ voice-control-panel-android要素が見つかりません', 'error');
         }
     }
 
