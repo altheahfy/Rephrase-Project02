@@ -1676,31 +1676,32 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal && transcript.length > 0) {
-                    // 重複チェック：既存のテキストに含まれていない場合のみ追加
+                    // 高度な重複チェック：文章レベルでの重複を検出
                     const currentText = this.recognizedText || '';
-                    const words = transcript.split(' ');
-                    const currentWords = currentText.split(' ');
                     
-                    // 新しい単語のみを抽出（重複を避ける）
-                    const newWords = words.filter(word => {
-                        if (!word.trim()) return false;
-                        // 最後の5単語以内に同じ単語がある場合はスキップ
-                        const recentWords = currentWords.slice(-5);
-                        return !recentWords.includes(word);
-                    });
-                    
-                    if (newWords.length > 0) {
-                        const newText = newWords.join(' ');
-                        if (!currentText || currentText.trim().length === 0) {
-                            this.recognizedText = newText;
-                        } else {
-                            this.recognizedText += ' ' + newText;
-                        }
-                        console.log(`✅ 認識結果 (確定・新規): "${newText}"`);
-                        console.log(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
-                        console.log(`💾 蓄積された全体テキスト: "${this.recognizedText}"`);
+                    if (currentText.length === 0) {
+                        // 初回の場合はそのまま設定
+                        this.recognizedText = transcript;
+                        console.log(`✅ 初回認識結果: "${transcript}"`);
                     } else {
-                        console.log(`⚠️ 重複のためスキップ: "${transcript}"`);
+                        // 既存のテキストと新しいテキストの重複部分を検出
+                        const overlap = this.findTextOverlap(currentText, transcript);
+                        
+                        if (overlap.length > 0) {
+                            // 重複部分を除いた新しい部分のみを追加
+                            const newPart = transcript.substring(overlap.length).trim();
+                            if (newPart.length > 0) {
+                                this.recognizedText += ' ' + newPart;
+                                console.log(`✅ 重複除去後追加: "${newPart}"`);
+                                console.log(`🔍 検出された重複: "${overlap}"`);
+                            } else {
+                                console.log(`⚠️ 完全重複のためスキップ: "${transcript}"`);
+                            }
+                        } else {
+                            // 重複がない場合は通常の追加
+                            this.recognizedText += ' ' + transcript;
+                            console.log(`✅ 新規追加: "${transcript}"`);
+                        }
                     }
                 } else {
                     console.log(`� 認識結果 (途中): "${transcript}"`);
@@ -5584,7 +5585,30 @@ class VoiceSystem {
     }
 
     /**
-     * 🚨 音声認識言語警告ダイアログを表示
+     * � テキストの重複部分を検出するヘルパーメソッド
+     */
+    findTextOverlap(existingText, newText) {
+        const existingWords = existingText.toLowerCase().split(' ');
+        const newWords = newText.toLowerCase().split(' ');
+        
+        // 既存テキストの末尾と新しいテキストの先頭で重複を検索
+        let maxOverlap = Math.min(existingWords.length, newWords.length);
+        
+        for (let i = maxOverlap; i > 0; i--) {
+            const existingTail = existingWords.slice(-i);
+            const newHead = newWords.slice(0, i);
+            
+            if (existingTail.join(' ') === newHead.join(' ')) {
+                // 重複部分を元の大文字小文字で返す
+                return newText.split(' ').slice(0, i).join(' ');
+            }
+        }
+        
+        return ''; // 重複なし
+    }
+
+    /**
+     * �🚨 音声認識言語警告ダイアログを表示
      */
     showRecognitionLanguageWarningDialog() {
         console.log('🚨 showRecognitionLanguageWarningDialog() を呼び出しました');
