@@ -5562,7 +5562,8 @@ class VoiceSystem {
                 console.log('📱 音声パネルを透過モードに設定（30%不透明）');
                 
                 // 自動復元がtrueの場合のみタイマーを設定
-                if (autoRestore) {
+                // ただし、分析モード中は自動復元しない
+                if (autoRestore && !this.isAndroidAnalyzing) {
                     // 既存のタイマーをクリア
                     if (this.transparencyTimer) {
                         clearTimeout(this.transparencyTimer);
@@ -5571,6 +5572,9 @@ class VoiceSystem {
                     this.transparencyTimer = setTimeout(() => {
                         this.setVoicePanelTransparency(false, false);
                     }, 5000);
+                    console.log('📱 透過自動復元タイマー開始（5秒後）');
+                } else if (this.isAndroidAnalyzing) {
+                    console.log('📱 分析モード中のため自動復元タイマーは設定しません');
                 }
             } else {
                 // 通常の不透明度に戻す
