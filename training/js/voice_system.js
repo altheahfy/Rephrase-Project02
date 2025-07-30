@@ -1788,12 +1788,31 @@ class VoiceSystem {
                 
                 if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
                     // ⏱️ タイムスタンプベースの正確な発話時間計算
-                    speechDuration = Math.max(0.1, (this.lastWordTime - this.firstWordTime) / 1000);
+                    const rawTimeDiff = (this.lastWordTime - this.firstWordTime) / 1000;
+                    speechDuration = Math.max(0.1, rawTimeDiff);
                     calculationMethod = 'タイムスタンプベース';
-                    this.addDebugLog(`⏱️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒 (最初の語〜最後の語)`, 'info');
+                    
+                    // 詳細デバッグ情報
+                    this.addDebugLog(`⏱️ タイムスタンプ詳細分析:`, 'info');
+                    this.addDebugLog(`  - 認識回数: ${this.speechTimestamps.length}回`, 'info');
+                    this.addDebugLog(`  - 最初の語時刻: ${((this.firstWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
+                    this.addDebugLog(`  - 最後の語時刻: ${((this.lastWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
+                    this.addDebugLog(`  - 計算された発話時間: ${speechDuration.toFixed(2)}秒`, 'info');
+                    this.addDebugLog(`  - 語数: ${actualWordCount}語`, 'info');
+                    this.addDebugLog(`  - 計算結果: ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
+                    
+                    // 異常値検出とフォールバック処理
+                    if (speechDuration < 1.0 && actualWordCount > 10) {
+                        this.addDebugLog(`⚠️ 異常に短い発話時間検出: ${speechDuration.toFixed(2)}秒で${actualWordCount}語`, 'warning');
+                        // 異常値の場合は推定値を使用
+                        const fallbackDuration = actualWordCount / 3.0; // 平均3語/秒（より現実的）
+                        this.addDebugLog(`🔄 フォールバックに切り替え: ${fallbackDuration.toFixed(2)}秒`, 'warning');
+                        speechDuration = fallbackDuration;
+                        calculationMethod = 'タイムスタンプベース→フォールバック';
+                    }
                 } else {
                     // 🔄 フォールバック：従来の推定値計算
-                    speechDuration = actualWordCount / 2.0; // 平均2語/秒と仮定
+                    speechDuration = actualWordCount / 3.0; // 平均3語/秒に修正（より現実的）
                     calculationMethod = '推定値（フォールバック）';
                     this.addDebugLog(`⚠️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒`, 'warning');
                 }
