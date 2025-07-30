@@ -208,8 +208,20 @@ class VoiceProgressUI {
      * 進捗パネルを表示
      */
     async showProgressPanel() {
-        const panel = document.getElementById('voice-progress-panel');
+        console.log('📊 showProgressPanel() が呼び出されました');
+        let panel = document.getElementById('voice-progress-panel');
+        console.log('🔍 パネル要素:', panel);
+        
+        // パネルが存在しない場合は作成
+        if (!panel) {
+            console.log('⚠️ パネルが存在しないため新規作成します');
+            this.createProgressPanel();
+            panel = document.getElementById('voice-progress-panel');
+            console.log('🔍 作成後のパネル要素:', panel);
+        }
+        
         if (panel) {
+            console.log('✅ パネル要素が見つかりました - 表示します');
             panel.style.display = 'block';
             this.isVisible = true;
             
@@ -223,6 +235,8 @@ class VoiceProgressUI {
             
             // データを読み込んで表示
             await this.loadAndDisplayProgress();
+        } else {
+            console.error('❌ パネル要素の作成に失敗しました');
         }
     }
     
