@@ -1603,6 +1603,9 @@ class VoiceSystem {
                 clearTimeout(this.androidTimeoutId);
             }
             
+            // ⏱️ 認識結果タイムスタンプ記録（実験的・既存処理に影響なし）
+            const resultTime = Date.now();
+            
             this.addDebugLog('📝 音声認識結果イベント発生', 'info');
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1643,6 +1646,17 @@ class VoiceSystem {
                             this.addDebugLog(`✅ 新規追加: "${transcript}"`, 'success');
                         }
                     }
+                    
+                    // ⏱️ タイムスタンプ記録（実験的・既存処理完了後に安全に追加）
+                    if (this.firstWordTime === null) {
+                        this.firstWordTime = resultTime;
+                    }
+                    this.lastWordTime = resultTime;
+                    this.speechTimestamps.push({
+                        text: transcript,
+                        time: resultTime,
+                        relativeTime: this.recognitionStartTime ? (resultTime - this.recognitionStartTime) / 1000 : 0
+                    });
                 } else {
                     console.log(`� 認識結果 (途中): "${transcript}"`);
                 }
