@@ -344,7 +344,7 @@
         /* モバイルでのスクロール改善 */
         overscroll-behavior: contain;
         /* 最下部まで確実にスクロールできるようにパディングを追加 */
-        padding-bottom: 60px;
+        padding-bottom: 80px;
     }
     
     .period-tabs {
@@ -407,20 +407,24 @@
         background: #f8f9fa;
         border-radius: 8px;
         /* 最下部に十分な余白を確保 */
-        margin-bottom: 40px;
+        margin-bottom: 20px;
     }
     
     .data-management-buttons {
         display: flex;
-        flex-direction: column;
-        gap: 12px;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: space-between;
     }
     
     .secondary-btn {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
+        flex: 1;
+        padding: 12px 8px;
+        font-size: 14px;
         /* タップしやすいサイズに調整 */
         min-height: 48px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
