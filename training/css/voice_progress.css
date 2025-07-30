@@ -335,13 +335,11 @@
     }
     
     .progress-panel-content {
-        padding: 12px;
+        padding: 12px 12px 120px 12px;
         height: calc(90vh - 60px);
-        max-height: none;
         overflow-y: scroll;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior: auto;
     }
     
     .period-tabs {
@@ -395,7 +393,7 @@
         margin-bottom: 32px;
     }
     
-    .data-management-buttons {
+    .data-buttons {
         display: flex;
         flex-direction: row;
         gap: 8px;
