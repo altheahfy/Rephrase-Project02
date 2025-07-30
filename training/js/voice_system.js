@@ -1999,11 +1999,21 @@ class VoiceSystem {
     setupProgressButtonListener() {
         const setupButton = () => {
             const progressBtn = document.getElementById('voice-progress-btn');
+            this.addDebugLog(`🔍 PC進捗ボタン検索結果: ${progressBtn ? '見つかりました' : '見つかりません'}`, progressBtn ? 'success' : 'error');
+            
             if (progressBtn && !progressBtn.hasAttribute('data-listener-added')) {
-                progressBtn.addEventListener('click', () => this.showProgress());
+                progressBtn.addEventListener('click', () => {
+                    this.addDebugLog('🎯 PC進捗ボタンがクリックされました！', 'info');
+                    console.log('🎯 PC進捗ボタンクリック - showProgress()を呼び出します');
+                    this.showProgress();
+                });
                 progressBtn.setAttribute('data-listener-added', 'true');
                 console.log('✅ 学習進捗ボタンのイベントリスナーを設定しました');
+                this.addDebugLog('✅ PC学習進捗ボタンのイベントリスナーを設定', 'success');
                 return true;
+            } else if (progressBtn && progressBtn.hasAttribute('data-listener-added')) {
+                console.log('⚠️ PC進捗ボタンは既にイベントリスナーが設定済み');
+                this.addDebugLog('⚠️ PC進捗ボタンは既にイベントリスナーが設定済み', 'warning');
             }
             return false;
         };

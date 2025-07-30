@@ -2502,6 +2502,20 @@ window.clearRandomizeHistory = function() {
             // DOM読み込み完了を確実に待つ
             function initVoiceSystem() {
                 console.log(`📄 DOM状態: ${document.readyState}`);
+                
+                // 🚨 緊急テスト: PC進捗ボタンに直接イベントリスナーを追加
+                const testProgressBtnPC = document.getElementById('voice-progress-btn');
+                if (testProgressBtnPC) {
+                    console.log('🎯 緊急テスト: PC進捗ボタンが見つかりました');
+                    testProgressBtnPC.addEventListener('click', function() {
+                        console.log('🚨 緊急テスト: PC進捗ボタンがクリックされました！');
+                        alert('PC進捗ボタンクリック成功！');
+                    });
+                    console.log('✅ 緊急テスト用イベントリスナー追加完了 (PC版)');
+                } else {
+                    console.error('❌ 緊急テスト: PC進捗ボタンが見つかりません');
+                }
+                
                 window.voiceSystem = new VoiceSystem();
                 console.log('✅ VoiceSystemインスタンス作成完了 - 初期化開始...');
                 window.voiceSystem.init().then(() => {
