@@ -1516,10 +1516,12 @@ class VoiceSystem {
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
-            recognition.continuous = false;  // 1回認識に変更
-            recognition.interimResults = false;
+            // 🔧 実験的修正: 無音による自動停止を回避するため継続的認識を使用
+            recognition.continuous = true;  // 無音自動停止回避のため継続的認識
+            recognition.interimResults = true; // 途中結果も取得
             recognition.lang = 'en-US'; // 英語設定
             recognition.maxAlternatives = 3; // 複数候補
+            this.addDebugLog('🔧 実験的設定: 無音自動停止回避のため継続的認識を使用', 'warning');
         } else {
             this.addDebugLog('💻 PC/iPhone用設定を適用', 'info');
             recognition.continuous = false;  // 1回認識に変更
@@ -1540,6 +1542,7 @@ class VoiceSystem {
         }, timeoutDuration);
         
         recognition.onstart = () => {
+            this.recognitionStartTime = Date.now(); // 開始時刻を記録
             this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
             this.addDebugLog('🎤 音声認識開始イベント発生', 'info');
             this.updateStatus('🎤 話してください...（もう一度押すと停止）', 'recording');
@@ -1599,11 +1602,38 @@ class VoiceSystem {
         recognition.onend = () => {
             if (this.androidTimeoutId) {
                 clearTimeout(this.androidTimeoutId);
+                this.addDebugLog('🏁 音声認識終了イベント発生（タイムアウト前）', 'warning');
+                this.addDebugLog('🔍 停止理由: Web Speech API内部の無音検出または発話終了判定', 'warning');
+            } else {
+                this.addDebugLog('🏁 音声認識終了イベント発生（タイムアウト後）', 'warning');
+                this.addDebugLog('🔍 停止理由: 手動停止またはタイムアウト', 'info');
             }
-            this.addDebugLog('🏁 音声認識終了イベント発生', 'warning');
             
-            // 1回認識なので、終了時は必ず分析完了処理を実行
-            this.finishAndroidVoiceRecognition();
+            // 経過時間を計算
+            const startTime = this.recognitionStartTime || Date.now();
+            const endTime = Date.now();
+            const elapsedSeconds = ((endTime - startTime) / 1000).toFixed(1);
+            this.addDebugLog(`⏱️ 認識実行時間: ${elapsedSeconds}秒`, 'info');
+            
+            // 🔧 継続的認識の場合、手動停止以外は再開を試行
+            if (isAndroid && this.isAndroidAnalyzing) {
+                this.addDebugLog('🔄 継続的認識: 再開を試行', 'info');
+                // 分析が継続中なら認識を再開
+                setTimeout(() => {
+                    if (this.isAndroidAnalyzing && this.androidRecognition) {
+                        try {
+                            this.androidRecognition.start();
+                            this.addDebugLog('🔄 音声認識を再開しました', 'info');
+                        } catch (error) {
+                            this.addDebugLog(`❌ 再開エラー: ${error.message}`, 'error');
+                            this.finishAndroidVoiceRecognition();
+                        }
+                    }
+                }, 100);
+            } else {
+                // 1回認識なので、終了時は必ず分析完了処理を実行
+                this.finishAndroidVoiceRecognition();
+            }
         };
         
         recognition.onerror = (event) => {
