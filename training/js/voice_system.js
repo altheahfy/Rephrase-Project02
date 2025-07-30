@@ -1676,20 +1676,21 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
-                    this.recognizedText = transcript;
+                    // 確定結果は蓄積する（上書きしない）
+                    if (!this.recognizedText || this.recognizedText.trim().length === 0) {
+                        this.recognizedText = transcript;
+                    } else {
+                        this.recognizedText += ' ' + transcript;
+                    }
                     console.log(`✅ 認識結果 (確定): "${transcript}"`);
                     console.log(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
-                    console.log(`💾 this.recognizedText保存: "${this.recognizedText}"`);
+                    console.log(`💾 蓄積された全体テキスト: "${this.recognizedText}"`);
                 } else {
                     console.log(`🔄 認識結果 (途中): "${transcript}"`);
                     
-                    // Android Chrome: 中間結果も採用
+                    // Android Chrome: 中間結果は表示のみ（蓄積しない）
                     if (isAndroid) {
-                        console.log('📱 Android: 中間結果を記録');
-                        if (!this.recognizedText || this.recognizedText.trim().length === 0) {
-                            this.recognizedText = transcript;
-                            console.log(`💾 Android中間結果保存: "${this.recognizedText}"`);
-                        }
+                        console.log('📱 Android: 中間結果（表示のみ）');
                     }
                 }
             }
