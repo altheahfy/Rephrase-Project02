@@ -1267,7 +1267,14 @@ class VoiceSystem {
         this.updateRecordingUI(false);
 
         this.addDebugLog('🛑 Web Audio API録音停止完了', 'success');
-        this.updateStatus('✅ 録音完了', 'success');
+        
+        // updateStatusをtry-catchで囲んで、エラーがあっても継続
+        try {
+            this.updateStatus('✅ 録音完了', 'success');
+            this.addDebugLog('📱 updateStatus呼び出し成功', 'success');
+        } catch (error) {
+            this.addDebugLog(`❌ updateStatusエラー: ${error.message}`, 'error');
+        }
 
         // 録音データ処理
         this.addDebugLog('📱 録音データ処理開始', 'info');
