@@ -1071,7 +1071,13 @@ class VoiceSystem {
             debugBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔧 Android デバッグボタンがクリックされました', 'info');
                 this.addDebugLog('🔍 テスト: ボタンクリックイベント正常動作', 'success');
-                this.showAndroidDebugInfo();
+                // 音声認識のデバッグログを表示するため、showMobileDebugPanel()を呼び出し
+                try {
+                    this.showMobileDebugPanel();
+                    this.addDebugLog('📱 デバッグパネル表示成功', 'success');
+                } catch (error) {
+                    this.addDebugLog(`❌ デバッグパネル表示エラー: ${error.message}`, 'error');
+                }
             });
             this.addDebugLog('✅ Android専用デバッグボタンのイベントリスナーを設定', 'success');
         }
