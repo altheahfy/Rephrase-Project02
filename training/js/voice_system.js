@@ -47,6 +47,11 @@ class VoiceSystem {
         this.androidRecognition = null;       // Android音声認識インスタンス
         this.androidTimeoutId = null;         // Android音声認識タイムアウトID
         
+        // ⏱️ 音声認識タイムスタンプ記録
+        this.speechTimestamps = [];           // 認識結果のタイムスタンプ配列
+        this.firstWordTime = null;            // 最初の語の認識時刻
+        this.lastWordTime = null;             // 最後の語の認識時刻
+        
         // 📱 緊急デバッグ: コンストラクタ完了確認
         console.log('🔧 VoiceSystemコンストラクタ完了');
         // this.init(); // 手動で呼び出すため削除
@@ -1539,6 +1544,15 @@ class VoiceSystem {
         this.recognizedText = '';
         this.addDebugLog('🔄 this.recognizedTextをクリアしました', 'info');
         
+        // ⏱️ タイムスタンプ記録をリセット
+        this.speechTimestamps = [];
+        this.firstWordTime = null;
+        this.lastWordTime = null;
+        this.addDebugLog('🔄 音声認識タイムスタンプをリセットしました', 'info');
+        
+        // 🎙️ Android版でも録音を並行実行（PC版と同じ精度のため）
+        this.startAndroidRecording();
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('🚫 Web Speech API が利用できません', 'error');
             this.updateStatus('❌ 音声認識非対応', 'error');
@@ -1593,6 +1607,9 @@ class VoiceSystem {
                 clearTimeout(this.androidTimeoutId);
             }
             
+            // ⏱️ 認識結果のタイムスタンプを記録
+            const resultTime = Date.now();
+            
             this.addDebugLog('📝 音声認識結果イベント発生', 'info');
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1601,6 +1618,18 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal && transcript.length > 0) {
+                    // ⏱️ 最初の語と最後の語のタイムスタンプを更新
+                    if (this.firstWordTime === null) {
+                        this.firstWordTime = resultTime;
+                        this.addDebugLog(`⏱️ 最初の語認識: ${transcript} (${((resultTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後)`, 'info');
+                    }
+                    this.lastWordTime = resultTime;
+                    this.speechTimestamps.push({
+                        text: transcript,
+                        time: resultTime,
+                        relativeTime: (resultTime - this.recognitionStartTime) / 1000
+                    });
+                    
                     // 高度な重複チェック：文章レベルでの重複を検出
                     const currentText = this.recognizedText || '';
                     
@@ -1729,6 +1758,9 @@ class VoiceSystem {
         this.addDebugLog('🏁 Android音声認識完了 - 評価分析開始', 'info');
         this.updateStatus('📊 分析中...', 'analyzing');
         
+        // 認識終了時刻を記録
+        const recognitionEndTime = Date.now();
+        
         // 認識状態をリセット
         this.isAndroidAnalyzing = false;
         
@@ -1759,15 +1791,32 @@ class VoiceSystem {
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // ⚠️ Android版では発話時間測定ができないため、推定値を使用
-                const estimatedSpeechDuration = actualWordCount / 2.0; // 平均2語/秒と仮定
-                const wordsPerSecond = actualWordCount / estimatedSpeechDuration;
+                // 🕒 Web Speech APIタイムスタンプベースの正確な発話時間計算
+                const totalRecognitionTime = (recognitionEndTime - (this.recognitionStartTime || recognitionEndTime)) / 1000;
+                
+                let actualSpeechDuration;
+                if (this.firstWordTime && this.lastWordTime) {
+                    // ⏱️ 最初の語から最後の語までの実際の発話時間
+                    actualSpeechDuration = (this.lastWordTime - this.firstWordTime) / 1000;
+                    this.addDebugLog(`⏱️ タイムスタンプベース発話時間: ${actualSpeechDuration.toFixed(2)}秒 (最初の語〜最後の語)`, 'info');
+                    this.addDebugLog(`⏱️ タイムスタンプ詳細: 最初の語=${((this.firstWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後, 最後の語=${((this.lastWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
+                } else {
+                    // フォールバック: 推定値を使用
+                    actualSpeechDuration = this.calculateAndroidSpeechDuration(actualWordCount, totalRecognitionTime);
+                    this.addDebugLog(`⏱️ フォールバック: 推定発話時間=${actualSpeechDuration.toFixed(2)}秒`, 'warning');
+                }
+                
+                // デバッグ情報を追加
+                this.addDebugLog(`⏱️ 発話時間比較: 総認識時間=${totalRecognitionTime.toFixed(2)}秒, 実際発話時間=${actualSpeechDuration.toFixed(2)}秒`, 'info');
+                
+                // 🚀 実際の発話時間で語数/分を計算（PC版の無音除去相当）
+                const wordsPerSecond = actualWordCount / actualSpeechDuration;
                 const wordsPerMinute = wordsPerSecond * 60;
                 
-                console.log('📊 Android発話速度分析（推定値）:', {
+                console.log('📊 Android発話速度分析（実測値）:', {
                     expectedWords: expectedWordCount,
                     actualWords: actualWordCount,
-                    estimatedDuration: estimatedSpeechDuration.toFixed(2) + '秒',
+                    actualDuration: actualSpeechDuration.toFixed(2) + '秒',
                     wordsPerMinute: wordsPerMinute.toFixed(1) + '語/分'
                 });
                 
@@ -1800,7 +1849,9 @@ class VoiceSystem {
                 }
                 
                 analysisResult = {
-                    duration: estimatedSpeechDuration, // 推定発話時間
+                    duration: actualSpeechDuration, // タイムスタンプベース実際発話時間（無音除去相当）
+                    totalRecognitionDuration: totalRecognitionTime, // 認識全体時間（参考用）
+                    speechTimestamps: this.speechTimestamps, // 認識タイムスタンプ詳細（デバッグ用）
                     expectedWordCount,
                     actualWordCount,
                     wordsPerSecond,
@@ -1855,11 +1906,24 @@ class VoiceSystem {
             `;
         }
         
+        // Android版表示用の録音時間情報（タイムスタンプ詳細付き）
+        let durationDisplay;
+        if (result.totalRecognitionDuration) {
+            durationDisplay = `${result.duration ? result.duration.toFixed(2) : 'N/A'}秒 (総認識: ${result.totalRecognitionDuration.toFixed(2)}秒)`;
+            if (result.speechTimestamps && result.speechTimestamps.length > 0) {
+                const firstWord = result.speechTimestamps[0];
+                const lastWord = result.speechTimestamps[result.speechTimestamps.length - 1];
+                durationDisplay += `<br><small style="color: #666;">🎯 認識範囲: ${firstWord.relativeTime.toFixed(2)}秒〜${lastWord.relativeTime.toFixed(2)}秒</small>`;
+            }
+        } else {
+            durationDisplay = `${result.duration ? result.duration.toFixed(2) : 'N/A'}秒`;
+        }
+        
         // PC版と同じHTML構造（保存確認機能付き）
         const resultsHtml = `
             <div class="analysis-results">
                 <h4>📊 発話分析結果 (Android)</h4>
-                <div class="analysis-item">⏱️ 録音時間: ${result.duration ? result.duration.toFixed(2) : 'N/A'}秒</div>
+                <div class="analysis-item">⏱️ 発話時間: ${durationDisplay}</div>
                 <div class="analysis-item">💬 単語数: ${result.expectedWordCount || 0} → ${result.actualWordCount || 0}</div>
                 <div class="analysis-item">⚡ 発話速度: ${result.wordsPerMinute ? result.wordsPerMinute.toFixed(0) : 'N/A'} 語/分</div>
                 <div class="analysis-item">🎯 評価: ${result.level} ${result.levelExplanation || ''}</div>
@@ -6425,3 +6489,43 @@ window.showMobileDebug = function() {
 };
 
 console.log('📱 スマホ用デバッグパネル表示機能が利用可能です: window.showMobileDebug()');
+
+/**
+ * 🤖 Android版発話時間推定（無音除去相当処理）
+ * PC版のような録音データ解析ができないため、語数と認識時間から推定
+ */
+VoiceSystem.prototype.calculateAndroidSpeechDuration = function(wordCount, totalTime) {
+    // 🎯 実用的な発話時間推定アルゴリズム
+    
+    // 1. 語数ベースの最小発話時間（速話でも物理的限界がある）
+    const minWordsPerSecond = 5.0; // 最高速（300語/分相当）
+    const minRequiredTime = wordCount / minWordsPerSecond;
+    
+    // 2. 一般的な発話効率（無音・ポーズを考慮）
+    const speechEfficiencyRatio = 0.7; // 70%が実際の発話
+    const estimatedFromEfficiency = totalTime * speechEfficiencyRatio;
+    
+    // 3. 語数ベースの推定（平均3語/秒として）
+    const averageWordsPerSecond = 3.0;
+    const estimatedFromWordCount = wordCount / averageWordsPerSecond;
+    
+    // 4. 最も妥当な値を選択
+    const candidates = [
+        Math.max(minRequiredTime, estimatedFromEfficiency), // 効率ベース（但し物理的最小値以上）
+        estimatedFromWordCount, // 語数ベース
+        totalTime * 0.5 // 最低でも総時間の50%
+    ];
+    
+    const estimatedDuration = Math.min(...candidates); // 最も保守的な値を採用
+    
+    console.log('🤖 Android発話時間推定詳細:', {
+        wordCount,
+        totalTime: totalTime.toFixed(2) + '秒',
+        minRequiredTime: minRequiredTime.toFixed(2) + '秒',
+        efficiencyBased: estimatedFromEfficiency.toFixed(2) + '秒',
+        wordCountBased: estimatedFromWordCount.toFixed(2) + '秒',
+        finalEstimate: estimatedDuration.toFixed(2) + '秒'
+    });
+    
+    return estimatedDuration;
+};
