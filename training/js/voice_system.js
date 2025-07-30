@@ -47,6 +47,11 @@ class VoiceSystem {
         this.androidRecognition = null;       // Android音声認識インスタンス
         this.androidTimeoutId = null;         // Android音声認識タイムアウトID
         
+        // ⏱️ 音声認識タイムスタンプ記録（発話速度改善用・実験的）
+        this.speechTimestamps = [];           // 認識結果のタイムスタンプ配列
+        this.firstWordTime = null;            // 最初の語の認識時刻
+        this.lastWordTime = null;             // 最後の語の認識時刻
+        
         // 📱 緊急デバッグ: コンストラクタ完了確認
         console.log('🔧 VoiceSystemコンストラクタ完了');
         // this.init(); // 手動で呼び出すため削除
