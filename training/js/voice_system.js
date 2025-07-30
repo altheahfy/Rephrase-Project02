@@ -1672,26 +1672,38 @@ class VoiceSystem {
             
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const result = event.results[i];
-                const transcript = result[0].transcript;
+                const transcript = result[0].transcript.trim();
                 const confidence = result[0].confidence || 0;
                 
-                if (result.isFinal) {
-                    // 確定結果は蓄積する（上書きしない）
-                    if (!this.recognizedText || this.recognizedText.trim().length === 0) {
-                        this.recognizedText = transcript;
-                    } else {
-                        this.recognizedText += ' ' + transcript;
-                    }
-                    console.log(`✅ 認識結果 (確定): "${transcript}"`);
-                    console.log(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
-                    console.log(`💾 蓄積された全体テキスト: "${this.recognizedText}"`);
-                } else {
-                    console.log(`🔄 認識結果 (途中): "${transcript}"`);
+                if (result.isFinal && transcript.length > 0) {
+                    // 重複チェック：既存のテキストに含まれていない場合のみ追加
+                    const currentText = this.recognizedText || '';
+                    const words = transcript.split(' ');
+                    const currentWords = currentText.split(' ');
                     
-                    // Android Chrome: 中間結果は表示のみ（蓄積しない）
-                    if (isAndroid) {
-                        console.log('📱 Android: 中間結果（表示のみ）');
+                    // 新しい単語のみを抽出（重複を避ける）
+                    const newWords = words.filter(word => {
+                        if (!word.trim()) return false;
+                        // 最後の5単語以内に同じ単語がある場合はスキップ
+                        const recentWords = currentWords.slice(-5);
+                        return !recentWords.includes(word);
+                    });
+                    
+                    if (newWords.length > 0) {
+                        const newText = newWords.join(' ');
+                        if (!currentText || currentText.trim().length === 0) {
+                            this.recognizedText = newText;
+                        } else {
+                            this.recognizedText += ' ' + newText;
+                        }
+                        console.log(`✅ 認識結果 (確定・新規): "${newText}"`);
+                        console.log(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`);
+                        console.log(`💾 蓄積された全体テキスト: "${this.recognizedText}"`);
+                    } else {
+                        console.log(`⚠️ 重複のためスキップ: "${transcript}"`);
                     }
+                } else {
+                    console.log(`� 認識結果 (途中): "${transcript}"`);
                 }
             }
         };
@@ -1710,7 +1722,7 @@ class VoiceSystem {
                         if (this.isAndroidAnalyzing) {
                             recognition.start();
                         }
-                    }, 100); // 100ms後に再開
+                    }, 500); // 500ms後に再開（重複を減らすため長めに設定）
                 } catch (error) {
                     console.log('⚠️ 音声認識再開エラー:', error.message);
                     this.finishAndroidVoiceRecognition();
