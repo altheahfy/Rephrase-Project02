@@ -1942,8 +1942,17 @@ class VoiceSystem {
             }
         }
         
-        // 📱 透過モード解除（分析終了）
-        this.setVoicePanelTransparency(false);
+        // 📱 透過モード制御（分析モード継続中は透過を維持）
+        const analyzeBtn = document.getElementById('voice-analyze-btn-android');
+        const isAnalyzeMode = analyzeBtn && analyzeBtn.textContent === '停止';
+        
+        if (!isAnalyzeMode) {
+            // 分析モードが終了した場合のみ透過解除
+            this.setVoicePanelTransparency(false);
+            console.log('📱 分析モード終了 - 透過解除');
+        } else {
+            console.log('📱 分析モード継続中 - 透過維持');
+        }
     }
 
     /**
@@ -4391,7 +4400,13 @@ class VoiceSystem {
             // 強制的にスタイルをリセット（!importantを上書き）
             panel.style.setProperty('display', 'block', 'important');
             panel.style.setProperty('visibility', 'visible', 'important');
-            panel.style.setProperty('opacity', '1', 'important');
+            
+            // 📱 透過状態の場合はopacityを変更しない
+            if (!this.isVoicePanelTransparent) {
+                panel.style.setProperty('opacity', '1', 'important');
+            } else {
+                console.log('📱 透過状態のためopacityは維持');
+            }
             
             // さらに強制的に表示させるため、cssTextで直接書き換え
             if (this.isAndroid) {
@@ -5536,24 +5551,39 @@ class VoiceSystem {
     /**
      * 📱 スマホ版音声パネル透過制御（スロット表示を確保）
      */
-    setVoicePanelTransparency(transparent = true) {
+    setVoicePanelTransparency(transparent = true, autoRestore = true) {
         const panel = document.getElementById('voice-control-panel-android');
         if (panel) {
             if (transparent) {
                 // 70%透過（30%不透明）でスロットが見えるように
                 panel.style.opacity = '0.3';
                 panel.style.pointerEvents = 'none'; // タッチ操作を下の要素に通す
+                this.isVoicePanelTransparent = true; // 透過状態を追跡
                 console.log('📱 音声パネルを透過モードに設定（30%不透明）');
                 
-                // 3秒後に自動的に通常モードに戻す
-                setTimeout(() => {
-                    this.setVoicePanelTransparency(false);
-                }, 3000);
+                // 自動復元がtrueの場合のみタイマーを設定
+                if (autoRestore) {
+                    // 既存のタイマーをクリア
+                    if (this.transparencyTimer) {
+                        clearTimeout(this.transparencyTimer);
+                    }
+                    // 5秒後に自動的に通常モードに戻す（時間を延長）
+                    this.transparencyTimer = setTimeout(() => {
+                        this.setVoicePanelTransparency(false, false);
+                    }, 5000);
+                }
             } else {
                 // 通常の不透明度に戻す
                 panel.style.opacity = '1';
                 panel.style.pointerEvents = 'auto';
+                this.isVoicePanelTransparent = false; // 透過状態を解除
                 console.log('📱 音声パネルを通常モードに戻しました');
+                
+                // タイマーをクリア
+                if (this.transparencyTimer) {
+                    clearTimeout(this.transparencyTimer);
+                    this.transparencyTimer = null;
+                }
             }
         }
     }
