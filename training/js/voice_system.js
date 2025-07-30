@@ -880,8 +880,16 @@ class VoiceSystem {
         if (recordBtnAndroid) {
             recordBtnAndroid.addEventListener('click', () => {
                 this.addDebugLog('🔥 Android録音ボタンがクリックされました', 'info');
-                // 📱 透過モード有効化（スロット表示確保）
-                this.setVoicePanelTransparency(true);
+                
+                // 📱 シンプルな透過制御：録音中なら透過解除、そうでなければ透過有効
+                if (this.isRecording) {
+                    this.addDebugLog('📱 録音中なので透過解除します', 'info');
+                    this.setVoicePanelTransparency(false);
+                } else {
+                    this.addDebugLog('📱 録音開始なので透過有効化します', 'info');
+                    this.setVoicePanelTransparency(true);
+                }
+                
                 this.toggleRecordingAndroid();
             });
             this.addDebugLog('✅ Android専用録音ボタンのイベントリスナーを設定', 'success');
@@ -1292,6 +1300,12 @@ class VoiceSystem {
         this.addDebugLog('📱 録音停止 - 透過モード解除開始', 'info');
         this.setVoicePanelTransparency(false);
         this.addDebugLog('📱 録音停止 - 透過モード解除完了', 'success');
+        
+        // 📱 追加の強制リセット（100ms後に再実行）
+        setTimeout(() => {
+            this.addDebugLog('📱 強制透過リセット実行', 'info');
+            this.setVoicePanelTransparency(false);
+        }, 100);
     }
 
     /**
