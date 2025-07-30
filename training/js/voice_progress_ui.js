@@ -46,6 +46,26 @@ class VoiceProgressUI {
             existingPanel.remove();
         }
         
+        // 既存のオーバーレイがあれば削除
+        const existingOverlay = document.getElementById('progress-panel-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        // オーバーレイを作成（モバイルでのタップ操作改善）
+        const overlay = document.createElement('div');
+        overlay.id = 'progress-panel-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 14999;
+            display: none;
+        `;
+        
         const panel = document.createElement('div');
         panel.id = 'voice-progress-panel';
         panel.className = 'voice-progress-panel';
@@ -147,6 +167,7 @@ class VoiceProgressUI {
             </div>
         `;
         
+        document.body.appendChild(overlay);
         document.body.appendChild(panel);
         
         // パネル作成後にイベントリスナーを設定
@@ -160,7 +181,21 @@ class VoiceProgressUI {
         // 閉じるボタン
         const closeBtn = document.getElementById('progress-close-btn');
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.hideProgressPanel());
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideProgressPanel();
+            });
+        }
+        
+        // オーバーレイをクリック/タップで閉じる（モバイル対応）
+        const overlay = document.getElementById('progress-panel-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideProgressPanel();
+            });
         }
         
         // パネル外をクリック/タップで閉じる（モバイル対応）
@@ -225,6 +260,13 @@ class VoiceProgressUI {
         
         if (panel) {
             console.log('✅ パネル要素が見つかりました - 表示します');
+            
+            // オーバーレイも表示
+            const overlay = document.getElementById('progress-panel-overlay');
+            if (overlay) {
+                overlay.style.display = 'block';
+            }
+            
             panel.style.display = 'block';
             this.isVisible = true;
             
@@ -248,15 +290,22 @@ class VoiceProgressUI {
      */
     hideProgressPanel() {
         const panel = document.getElementById('voice-progress-panel');
+        const overlay = document.getElementById('progress-panel-overlay');
+        
         if (panel) {
             panel.style.display = 'none';
-            this.isVisible = false;
-            
-            // Escキーイベントリスナーを削除
-            if (this.handleKeyPress) {
-                document.removeEventListener('keydown', this.handleKeyPress);
-                this.handleKeyPress = null;
-            }
+        }
+        
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        
+        this.isVisible = false;
+        
+        // Escキーイベントリスナーを削除
+        if (this.handleKeyPress) {
+            document.removeEventListener('keydown', this.handleKeyPress);
+            this.handleKeyPress = null;
         }
     }
     

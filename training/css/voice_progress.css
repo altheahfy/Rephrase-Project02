@@ -328,17 +328,34 @@
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
     .voice-progress-panel {
-        width: 95%;
-        max-height: 80vh;
+        width: 98%;
+        max-height: 95vh;
+        top: 2.5vh;
+        transform: translateX(-50%);
     }
     
     .progress-panel-content {
         padding: 12px;
-        height: calc(80vh - 70px);
+        height: calc(95vh - 70px);
+        max-height: calc(95vh - 70px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        /* モバイルでのスクロール改善 */
+        overscroll-behavior: contain;
+        /* 最下部まで確実にスクロールできるようにパディングを追加 */
+        padding-bottom: 60px;
     }
     
     .period-tabs {
         flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin: -12px -12px 12px -12px;
+        padding: 12px;
+        border-bottom: 1px solid #e9ecef;
     }
     
     .stats-row {
@@ -358,18 +375,52 @@
     
     /* モバイル版で閉じるボタンをより大きくタップしやすく */
     .close-btn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         font-size: 28px;
         touch-action: manipulation;
+        /* タップ領域を確実にする */
+        min-width: 44px;
+        min-height: 44px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
     }
     
     /* モバイル版でパネルヘッダーを改善 */
     .progress-panel-header {
-        padding: 16px;
+        padding: 12px 16px;
+        /* ヘッダーを固定してスクロール時も見えるように */
+        position: sticky;
+        top: 0;
+        z-index: 20;
     }
     
     .progress-panel-header h3 {
         font-size: 16px;
+    }
+    
+    /* データエクスポート/インポートエリアの改善 */
+    .data-management {
+        margin-top: 24px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        /* 最下部に十分な余白を確保 */
+        margin-bottom: 40px;
+    }
+    
+    .data-management-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .secondary-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        /* タップしやすいサイズに調整 */
+        min-height: 48px;
     }
 }
