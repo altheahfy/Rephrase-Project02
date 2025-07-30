@@ -5551,7 +5551,7 @@ class VoiceSystem {
     /**
      * 📱 スマホ版音声パネル透過制御（スロット表示を確保）
      */
-    setVoicePanelTransparency(transparent = true, autoRestore = true) {
+    setVoicePanelTransparency(transparent = true) {
         const panel = document.getElementById('voice-control-panel-android');
         if (panel) {
             if (transparent) {
@@ -5560,34 +5560,12 @@ class VoiceSystem {
                 panel.style.pointerEvents = 'none'; // タッチ操作を下の要素に通す
                 this.isVoicePanelTransparent = true; // 透過状態を追跡
                 console.log('📱 音声パネルを透過モードに設定（30%不透明）');
-                
-                // 自動復元がtrueの場合のみタイマーを設定
-                // ただし、分析モード中は自動復元しない
-                if (autoRestore && !this.isAndroidAnalyzing) {
-                    // 既存のタイマーをクリア
-                    if (this.transparencyTimer) {
-                        clearTimeout(this.transparencyTimer);
-                    }
-                    // 5秒後に自動的に通常モードに戻す（時間を延長）
-                    this.transparencyTimer = setTimeout(() => {
-                        this.setVoicePanelTransparency(false, false);
-                    }, 5000);
-                    console.log('📱 透過自動復元タイマー開始（5秒後）');
-                } else if (this.isAndroidAnalyzing) {
-                    console.log('📱 分析モード中のため自動復元タイマーは設定しません');
-                }
             } else {
                 // 通常の不透明度に戻す
                 panel.style.opacity = '1';
                 panel.style.pointerEvents = 'auto';
                 this.isVoicePanelTransparent = false; // 透過状態を解除
                 console.log('📱 音声パネルを通常モードに戻しました');
-                
-                // タイマーをクリア
-                if (this.transparencyTimer) {
-                    clearTimeout(this.transparencyTimer);
-                    this.transparencyTimer = null;
-                }
             }
         }
     }
