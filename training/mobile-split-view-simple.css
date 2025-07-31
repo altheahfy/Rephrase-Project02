@@ -232,10 +232,10 @@
 /* 例文シャッフル等のボタン群圧縮 */
 .mobile-device #randomize-all,
 .mobile-device button[style*="background"] {
-  padding: 4px 8px !important; /* var(--mobile-padding-medium) 6px → 4px 8px */
-  font-size: 10px !important; /* 9px → 10px */
+  padding: 4px 8px; /* var(--mobile-padding-medium) 6px → 4px 8px */
+  font-size: 10px; /* 9px → 10px */
   margin: var(--mobile-padding-small) var(--mobile-margin);
-  min-height: 22px !important; /* var(--mobile-height-button) → 22px */
+  min-height: 22px; /* var(--mobile-height-button) → 22px */
   border-radius: var(--mobile-margin);
 }
 
@@ -349,8 +349,8 @@
 /* 🎯 上位スロット内部コンテンツは標準サイズで表示 */
 .mobile-device .slot-wrapper:not([id$="-sub"]) > * {
   /* 上位スロットは重要なので自然なサイズで表示 */
-  margin: var(--mobile-margin) !important; /* 適度な余白 */
-  zoom: 0.95 !important; /* 0.9 → 0.95: カメラズームアウト縮小幅を調整（5%縮小） */
+  margin: var(--mobile-margin); /* 適度な余白 */
+  zoom: 0.95; /* 0.9 → 0.95: カメラズームアウト縮小幅を調整（5%縮小） */
 }
 
 /* 🟢 サブスロット表示エリア：画面内完全収納サイズに調整 */
@@ -398,56 +398,56 @@
 
 /* 🎯 サブスロット内部コンテンツは大幅縮小で画面内収納 */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.7) !important; /* 0.8 → 0.7: より小さくして画面内確実収納 */
-  transform-origin: top left !important;
+  transform: scale(0.7); /* 0.8 → 0.7: より小さくして画面内確実収納 */
+  transform-origin: top left;
 }
 
 /* 🎯 サブスロット表示エリア内の全コンテンツ強制縮小（動的生成対応） */
 .mobile-device #subslot-display-area * {
-  font-size: 85% !important; /* フォントサイズも縮小 */
+  font-size: 85%; /* フォントサイズも縮小 */
 }
 
 /* 🎯 サブスロット表示エリア内のボタン・画像も縮小 */
 .mobile-device #subslot-display-area button {
-  transform: scale(var(--mobile-transform-scale-small)) !important; /* 0.8 → var(--mobile-transform-scale-small) */
+  transform: scale(var(--mobile-transform-scale-small)); /* 0.8 → var(--mobile-transform-scale-small) */
 }
 
 /* 🎯 モバイル専用：サブスロット画像の適切なサイズ制限 */
 .mobile-device #subslot-display-area img,
 .mobile-device .slot-wrapper[id$="-sub"] img,
 .mobile-device .slot-multi-image {
-  max-width: 140px !important; /* 横幅制限：元の160pxから軽減 */
-  max-height: 130px !important; /* 高さ制限：120px→130px 少し大きく */
-  min-height: 100px !important; /* 最小高さ確保：視認性向上 */
-  object-fit: contain !important; /* 縦横比保持：fillをcontainに変更 */
-  width: auto !important; /* 自動幅調整 */
-  height: auto !important; /* 自動高さ調整 */
+  max-width: 140px; /* 横幅制限：元の160pxから軽減 */
+  max-height: 130px; /* 高さ制限：120px→130px 少し大きく */
+  min-height: 100px; /* 最小高さ確保：視認性向上 */
+  object-fit: contain; /* 縦横比保持：fillをcontainに変更 */
+  width: auto; /* 自動幅調整 */
+  height: auto; /* 自動高さ調整 */
 }
 
 /* 🎯 モバイル専用：複数画像コンテナの適切なサイズ設定 */
 .mobile-device .multi-image-container {
-  max-width: var(--mobile-width) !important; /* コンテナ幅制限 */
-  min-height: 140px !important; /* 最小高さ確保：単一画像と同等の視認性 */
-  height: 150px !important; /* 適切な高さ設定 */
-  overflow-x: auto !important; /* 横スクロール許可 */
-  overflow-y: hidden !important; /* 縦スクロール禁止 */
+  max-width: var(--mobile-width); /* コンテナ幅制限 */
+  min-height: 140px; /* 最小高さ確保：単一画像と同等の視認性 */
+  height: 150px; /* 適切な高さ設定 */
+  overflow-x: auto; /* 横スクロール許可 */
+  overflow-y: hidden; /* 縦スクロール禁止 */
 }
 
 /* 🔧 スロット内コンテンツの基本調整のみ - 隙間最小化 */
 .mobile-device .slot-wrapper .slot-container {
-  padding: 2px !important; /* 4px → 2px */
-  margin: -3px 0 1px 0 !important; /* 1px 0 → -3px 0 1px 0: 上位スロットを適切な位置に調整 */
+  padding: 2px; /* 4px → 2px */
+  margin: -3px 0 1px 0; /* 1px 0 → -3px 0 1px 0: 上位スロットを適切な位置に調整 */
   
   /* 🎯 PC版の自動幅調整を強制的に復元 */
-  width: auto !important;
-  max-width: none !important;
-  flex: 0 0 auto !important;
-  min-width: 160px !important; /* PC版と同じ最小幅 */
+  width: auto;
+  max-width: none;
+  flex: 0 0 auto;
+  min-width: 160px; /* PC版と同じ最小幅 */
 }
 
 .mobile-device .slot-wrapper .slot {
-  padding: 3px !important; /* 5px → 3px */
-  margin: 1px !important; /* 3px → 1px */
+  padding: 3px; /* 5px → 3px */
+  margin: 1px; /* 3px → 1px */
 }
 
 /* ========================================= */
@@ -502,12 +502,12 @@
 /* 🔧 スロット内のすべてのボタン表示強化 */
 .mobile-device .slot-wrapper button,
 .mobile-device .slot button {
-  display: inline-block !important;
-  visibility: visible !important;
+  display: inline-block;
+  visibility: visible;
   opacity: 1;
-  pointer-events: auto !important;
-  z-index: 100 !important;
-  position: relative !important;
+  pointer-events: auto;
+  z-index: 100;
+  position: relative;
 }
 
 /* 🎯 "R"ボタン（ランダマイズ）の特別強化 */
