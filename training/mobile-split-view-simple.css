@@ -77,33 +77,36 @@
 
 /* フロートメニュー圧縮 - gap完全削除、padding最小化 */
 .mobile-device #navigation-float-menu {
-  top: 2px !important;
-  left: 2px !important;
+  top: 2px;
+  left: 2px;
   padding: 2px 3px !important; /* 4px 6px → 2px 3px */
   gap: 0px !important; /* 6px → 0px 完全削除 */
   height: var(--mobile-height-control) !important; /* 22px → var(--mobile-height-control) */
   font-size: var(--mobile-font-size-base) !important;
   border-radius: var(--mobile-margin) !important;
   box-shadow: 0 1px 2px var(--mobile-bg-shadow) !important; /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
+  /* 🎨 金属的シルバーグラデーション背景 */
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 25%, #c8c8c8 50%, #d0d0d0 75%, #e8e8e8 100%) !important;
+  border: 1px solid #b0b0b0 !important; /* シルバーボーダー追加 */
 }
 
 /* フロートメニュー内要素間隔削除 */
 .mobile-device #navigation-float-menu a {
   font-size: var(--mobile-font-size-base) !important; /* 14px → 10px */
   padding: var(--mobile-padding-small) var(--mobile-margin) !important;
-  margin: 0 !important;
+  margin: 0;
 }
 
 .mobile-device #navigation-float-menu span {
   font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
-  margin: 0 var(--mobile-padding-small) !important;
+  margin: 0 var(--mobile-padding-small);
 }
 
 .mobile-device #navigation-float-menu select {
   width: var(--mobile-width-medium) !important; /* 60px → var(--mobile-width-medium) */
   font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
   height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
-  padding: 0px var(--mobile-padding-small) !important;
+  padding: 0px var(--mobile-padding-small);
 }
 
 .mobile-device #navigation-float-menu button {
@@ -253,7 +256,7 @@
   padding: var(--mobile-margin) var(--mobile-border-radius) !important;
   font-size: var(--mobile-font-size-small) !important;
   min-height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
-  margin: var(--mobile-padding-small) !important;
+  margin: var(--mobile-padding-small);
 }
 
 /* ========================================= */
