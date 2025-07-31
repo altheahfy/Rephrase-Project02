@@ -2588,10 +2588,6 @@ class VoiceSystem {
     async startRecordingVoiceRecognition() {
         this.addDebugLog('🗣️ 録音用音声認識を開始します...', 'info');
         
-        // 🔧 連続認識対応: 前回の認識結果をクリア
-        this.recognizedText = '';
-        console.log('🧹 認識結果クリア完了');
-        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('❌ Web Speech API が利用できません', 'error');
             return;
@@ -2673,18 +2669,12 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
-                    // 🔧 連続認識対応: 既存結果に追加する
-                    if (this.recognizedText && this.recognizedText.trim()) {
-                        this.recognizedText += ' ' + transcript;
-                    } else {
-                        this.recognizedText = transcript;
-                    }
+                    this.recognizedText = transcript; // 既存のシステムに合わせて保存
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
-                    this.addDebugLog(`📝 累積認識結果: "${this.recognizedText}"`, 'success');
                     
                     // 確定結果を確実に保存
-                    console.log('✅ 累積認識結果保存:', this.recognizedText);
+                    console.log('✅ 確定結果保存:', transcript);
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
