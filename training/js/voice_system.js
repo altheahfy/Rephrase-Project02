@@ -1621,17 +1621,6 @@ class VoiceSystem {
                         // 初回の場合はそのまま設定
                         this.recognizedText = transcript;
                         this.addDebugLog(`✅ 初回認識結果: "${transcript}"`, 'success');
-                        
-                        // ⏱️ 初回認識時のタイムスタンプ記録
-                        if (this.firstWordTime === null) {
-                            this.firstWordTime = resultTime;
-                        }
-                        this.lastWordTime = resultTime;
-                        this.speechTimestamps.push({
-                            text: transcript,
-                            time: resultTime,
-                            relativeTime: this.recognitionStartTime ? (resultTime - this.recognitionStartTime) / 1000 : 0
-                        });
                     } else {
                         // 既存のテキストと新しいテキストの重複部分を検出
                         let overlap = this.findTextOverlap(currentText, transcript);
@@ -1648,32 +1637,26 @@ class VoiceSystem {
                                 this.recognizedText += ' ' + newPart;
                                 this.addDebugLog(`✅ 重複除去後追加: "${newPart}"`, 'success');
                                 this.addDebugLog(`🔍 検出された重複: "${overlap}"`, 'info');
-                                
-                                // ⏱️ 新しい内容が追加された場合のみタイムスタンプ更新
-                                this.lastWordTime = resultTime;
-                                this.speechTimestamps.push({
-                                    text: newPart,
-                                    time: resultTime,
-                                    relativeTime: this.recognitionStartTime ? (resultTime - this.recognitionStartTime) / 1000 : 0
-                                });
                             } else {
                                 this.addDebugLog(`⚠️ 完全重複のためスキップ: "${transcript}"`, 'warning');
-                                // 重複スキップ時はタイムスタンプを更新しない
                             }
                         } else {
                             // 重複がない場合は通常の追加
                             this.recognizedText += ' ' + transcript;
                             this.addDebugLog(`✅ 新規追加: "${transcript}"`, 'success');
-                            
-                            // ⏱️ 新規追加時のタイムスタンプ更新
-                            this.lastWordTime = resultTime;
-                            this.speechTimestamps.push({
-                                text: transcript,
-                                time: resultTime,
-                                relativeTime: this.recognitionStartTime ? (resultTime - this.recognitionStartTime) / 1000 : 0
-                            });
                         }
                     }
+                    
+                    // ⏱️ タイムスタンプ記録（実験的・既存処理完了後に安全に追加）
+                    if (this.firstWordTime === null) {
+                        this.firstWordTime = resultTime;
+                    }
+                    this.lastWordTime = resultTime;
+                    this.speechTimestamps.push({
+                        text: transcript,
+                        time: resultTime,
+                        relativeTime: this.recognitionStartTime ? (resultTime - this.recognitionStartTime) / 1000 : 0
+                    });
                 } else {
                     console.log(`� 認識結果 (途中): "${transcript}"`);
                 }
@@ -1770,9 +1753,6 @@ class VoiceSystem {
         this.addDebugLog('🏁 Android音声認識完了 - 評価分析開始', 'info');
         this.updateStatus('📊 分析中...', 'analyzing');
         
-        // 🕒 認識終了時刻を正確に記録
-        const recognitionEndTime = Date.now();
-        
         // 認識状態をリセット
         this.isAndroidAnalyzing = false;
         
@@ -1803,27 +1783,8 @@ class VoiceSystem {
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // 🕒 正確な発話時間測定：認識開始〜終了の全体時間ベース
-                const totalRecognitionTime = (recognitionEndTime - (this.recognitionStartTime || recognitionEndTime)) / 1000;
-                
-                // 📊 発話効率による実際の発話時間推定
-                // 一般的に、音声認識中の実際の発話は全体時間の70-80%程度
-                const speechEfficiencyRatio = 0.75; // 75%が実発話時間
-                const estimatedSpeechDuration = Math.max(0.5, totalRecognitionTime * speechEfficiencyRatio);
-                
-                let speechDuration = estimatedSpeechDuration;
-                let calculationMethod = '全体時間ベース（発話効率75%）';
-                
-                // タイムスタンプがある場合は参考情報として記録（メイン計算には使用しない）
-                if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
-                    const timestampDuration = (this.lastWordTime - this.firstWordTime) / 1000;
-                    this.addDebugLog(`📊 参考：タイムスタンプ範囲 ${timestampDuration.toFixed(2)}秒 vs 全体時間ベース ${speechDuration.toFixed(2)}秒`, 'info');
-                }
-                
-                this.addDebugLog(`⏱️ 発話時間測定詳細:`, 'info');
-                this.addDebugLog(`  - 総認識時間: ${totalRecognitionTime.toFixed(2)}秒`, 'info');
-                this.addDebugLog(`  - 推定実発話時間: ${speechDuration.toFixed(2)}秒 (効率${(speechEfficiencyRatio*100)}%)`, 'info');
-                this.addDebugLog(`  - 語数: ${actualWordCount}語`, 'info');
+                // 🕒 発話時間計算：タイムスタンプベース（利用可能時）→ 推定値（フォールバック）
+                let speechDuration, calculationMethod;
                 
                 if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
                     // ⏱️ タイムスタンプベースの正確な発話時間計算
