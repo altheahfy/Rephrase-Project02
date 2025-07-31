@@ -82,7 +82,6 @@
   padding: 2px 3px !important; /* 4px 6px → 2px 3px */
   gap: 0px !important; /* 6px → 0px 完全削除 */
   height: var(--mobile-height-control) !important; /* 22px → var(--mobile-height-control) */
-  font-size: var(--mobile-font-size-base) !important;
   border-radius: var(--mobile-margin);
   box-shadow: 0 1px 2px var(--mobile-bg-shadow); /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
   /* 🎨 金属的シルバーグラデーション背景 */
@@ -92,25 +91,21 @@
 
 /* フロートメニュー内要素間隔削除 */
 .mobile-device #navigation-float-menu a {
-  font-size: var(--mobile-font-size-base) !important; /* 14px → 10px */
   padding: var(--mobile-padding-small) var(--mobile-margin) !important;
   margin: 0;
 }
 
 .mobile-device #navigation-float-menu span {
-  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
   margin: 0 var(--mobile-padding-small);
 }
 
 .mobile-device #navigation-float-menu select {
   width: var(--mobile-width-medium) !important; /* 60px → var(--mobile-width-medium) */
-  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
   height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
   padding: 0px var(--mobile-padding-small);
 }
 
 .mobile-device #navigation-float-menu button {
-  font-size: var(--mobile-font-size-small) !important; /* 11px → 8px */
   padding: var(--mobile-padding-small) var(--mobile-padding-medium) !important; /* 2px 6px → 1px 3px */
   height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
 }
@@ -118,10 +113,6 @@
 .mobile-device #navigation-float-menu input[type="range"] {
   width: var(--mobile-width-small) !important; /* 40px → var(--mobile-width-small) */
   height: var(--mobile-height-input) !important; /* 14px → var(--mobile-height-input) */
-}
-
-.mobile-device #navigation-float-menu label {
-  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
 }
 
 /* タイトル帯の超圧縮 */
@@ -134,19 +125,16 @@
 }
 
 .mobile-device h1 {
-  font-size: 12px !important; /* 28px → 12px */
   margin: 0 !important;
   font-weight: 600;
 }
 
 /* ② タイトル帯の正確な修正 */
 .mobile-device h2 {
-  font-size: var(--mobile-font-size-base) !important;
   margin: var(--mobile-padding-small) 0 !important;
 }
 
 .mobile-device button {
-  font-size: var(--mobile-font-size-base) !important;
   padding: var(--mobile-padding-medium) 6px !important;
   margin: var(--mobile-padding-small) !important;
   min-height: var(--mobile-height-large) !important; /* 20px → var(--mobile-height-large) */
@@ -163,7 +151,6 @@
 
 .mobile-device #toggle-control-panels {
   padding: var(--mobile-padding-medium) 8px !important;
-  font-size: var(--mobile-font-size-base) !important;
   border-radius: var(--mobile-padding-medium);
 }
 
@@ -185,7 +172,6 @@
 
 #visibility-control-panel-inline .slot-control-group div:first-child {
   font-weight: bold;
-  font-size: 11px !important;
   margin-bottom: 2px !important;
   color: #444;
   text-align: center;
@@ -195,7 +181,6 @@
   display: flex !important;
   flex-direction: column !important;
   gap: var(--mobile-margin) !important;
-  font-size: var(--mobile-font-size-base) !important;
 }
 
 /* 🎯 サブスロットの実際のボタンデザインを完全コピペ */
@@ -207,7 +192,6 @@
   border: var(--mobile-padding-small) solid #ddd !important;
   border-radius: var(--mobile-padding-medium);
   cursor: pointer;
-  font-size: var(--mobile-font-size-base) !important;
   transition: all var(--mobile-transition-fast); /* 0.2s → var(--mobile-transition-fast) */
   /* サブスロットの薄いグリーン背景をデフォルトに */
   background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
@@ -254,7 +238,6 @@
 /* 音声制御系ボタンの圧縮 */
 .mobile-device .voice-controls button {
   padding: var(--mobile-margin) var(--mobile-border-radius);
-  font-size: var(--mobile-font-size-small);
   min-height: var(--mobile-height-medium); /* 16px → var(--mobile-height-medium) */
   margin: var(--mobile-padding-small);
 }

@@ -75,6 +75,47 @@
   --radius-full: 9999px;
 }
 
+/* ========================================= */
+/* 📱 モバイル専用フォントサイズ設定          */
+/* ========================================= */
+
+/* モバイルデバイスのフォントサイズを小さく設定 */
+.mobile-device h1 {
+  font-size: 12px;
+}
+
+.mobile-device h2 {
+  font-size: 10px;
+}
+
+.mobile-device #navigation-float-menu {
+  font-size: 10px;
+}
+
+.mobile-device #navigation-float-menu a {
+  font-size: 10px;
+}
+
+.mobile-device #navigation-float-menu span {
+  font-size: 8px;
+}
+
+.mobile-device #navigation-float-menu select {
+  font-size: 8px;
+}
+
+.mobile-device #navigation-float-menu button {
+  font-size: 8px;
+}
+
+.mobile-device #navigation-float-menu label {
+  font-size: 8px;
+}
+
+.mobile-device button {
+  font-size: 10px;
+}
+
 /* 基本レイアウト設定 */
 body {
   min-height: 100vh;
