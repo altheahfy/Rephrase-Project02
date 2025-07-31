@@ -174,57 +174,57 @@
 }
 
 #visibility-control-panel-inline .slot-control-group {
-  padding: 4px !important;
-  border: 1px solid #f0f0f0 !important;
+  padding: 4px;
+  border: 1px solid #f0f0f0;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.7);
 }
 
 #visibility-control-panel-inline .slot-control-group div:first-child {
   font-weight: bold;
-  margin-bottom: 2px !important;
+  margin-bottom: 2px;
   color: #444;
   text-align: center;
 }
 
 #visibility-control-panel-inline .slot-control-group div:last-child {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: var(--mobile-margin) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mobile-margin);
 }
 
 /* 🎯 サブスロットの実際のボタンデザインを完全コピペ */
 #visibility-control-panel-inline .slot-control-group label {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--mobile-padding-medium) !important;
-  padding: var(--mobile-padding-medium) 6px !important;
-  border: var(--mobile-padding-small) solid #ddd !important;
+  display: flex;
+  align-items: center;
+  gap: var(--mobile-padding-medium);
+  padding: var(--mobile-padding-medium) 6px;
+  border: var(--mobile-padding-small) solid #ddd;
   border-radius: var(--mobile-padding-medium);
   cursor: pointer;
   transition: all var(--mobile-transition-fast); /* 0.2s → var(--mobile-transition-fast) */
   /* サブスロットの薄いグリーン背景をデフォルトに */
-  background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
-  border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
+  background-color: var(--mobile-bg-control-active); /* #e8f5e8 → var(--mobile-bg-control-active) */
+  border-color: var(--mobile-border-primary); /* #4CAF50 → var(--mobile-border-primary) */
   color: #2e7d32;
 }
 
 /* チェックボックスを完全に非表示（サブスロットにはチェックボックスがない） */
 #visibility-control-panel-inline .slot-control-group input[type="checkbox"] {
-  display: none !important;
+  display: none;
 }
 
 /* チェック状態（選択状態）でのサブスロットスタイル維持 */
 #visibility-control-panel-inline .slot-control-group label:has(input:checked) {
-  background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
-  border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
+  background-color: var(--mobile-bg-control-active); /* #e8f5e8 → var(--mobile-bg-control-active) */
+  border-color: var(--mobile-border-primary); /* #4CAF50 → var(--mobile-border-primary) */
   color: #2e7d32;
 }
 
 /* 非チェック状態（非選択状態）はサブスロットの非表示スタイル */
 #visibility-control-panel-inline .slot-control-group label:has(input:not(:checked)) {
-  background-color: var(--mobile-bg-control-inactive) !important; /* #ffebee → var(--mobile-bg-control-inactive) */
-  border-color: var(--mobile-border-secondary) !important; /* #f44336 → var(--mobile-border-secondary) */
+  background-color: var(--mobile-bg-control-inactive); /* #ffebee → var(--mobile-bg-control-inactive) */
+  border-color: var(--mobile-border-secondary); /* #f44336 → var(--mobile-border-secondary) */
   color: #c62828;
   opacity: 0.8;
 }
@@ -242,7 +242,7 @@
 /* 分離疑問詞エリアの圧縮 */
 .mobile-device #display-top-question-word {
   margin: var(--mobile-padding-small) 0;
-  padding: var(--mobile-margin) !important;
+  padding: var(--mobile-margin);
 }
 
 /* 音声制御系ボタンの圧縮 */
