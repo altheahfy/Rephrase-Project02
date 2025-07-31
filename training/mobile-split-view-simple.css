@@ -84,10 +84,10 @@
 
 /* タイトル帯の超圧縮 */
 .mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
-  padding: 2px 5px !important; /* 15px → 2px 5px */
-  margin-bottom: 2px !important; /* 15px → 2px */
+  padding: var(--mobile-margin) 5px !important; /* 15px → 2px 5px */
+  margin-bottom: var(--mobile-margin) !important; /* 15px → 2px */
   margin-top: 26px !important; /* 50px → 26px フロートメニュー直下 */
-  border-radius: 3px !important;
+  border-radius: var(--mobile-padding-medium) !important;
   box-shadow: none !important; /* シャドウ削除 */
 }
 
@@ -99,14 +99,14 @@
 
 /* ② タイトル帯の正確な修正 */
 .mobile-device h2 {
-  font-size: 10px !important;
-  margin: 1px 0 !important;
+  font-size: var(--mobile-font-size-base) !important;
+  margin: var(--mobile-padding-small) 0 !important;
 }
 
 .mobile-device button {
-  font-size: 10px !important;
-  padding: 3px 6px !important;
-  margin: 1px !important;
+  font-size: var(--mobile-font-size-base) !important;
+  padding: var(--mobile-padding-medium) 6px !important;
+  margin: var(--mobile-padding-small) !important;
   min-height: 20px !important;
 }
 
@@ -116,13 +116,13 @@
 
 /* 制御パネル表示ボタンの圧縮 */
 .mobile-device div[style*="justify-content: flex-start"][style*="margin-bottom: 15px"] {
-  margin-bottom: 2px !important; /* 15px → 2px */
+  margin-bottom: var(--mobile-margin) !important; /* 15px → 2px */
 }
 
 .mobile-device #toggle-control-panels {
-  padding: 3px 8px !important;
-  font-size: 10px !important;
-  border-radius: 3px !important;
+  padding: var(--mobile-padding-medium) 8px !important;
+  font-size: var(--mobile-font-size-base) !important;
+  border-radius: var(--mobile-padding-medium) !important;
 }
 
 /* 🎯 上位スロット制御パネルをサブスロットと完全同一デザインに（PC版・スマホ版共通） */
@@ -152,20 +152,20 @@
 #visibility-control-panel-inline .slot-control-group div:last-child {
   display: flex !important;
   flex-direction: column !important;
-  gap: 2px !important;
-  font-size: 10px !important;
+  gap: var(--mobile-margin) !important;
+  font-size: var(--mobile-font-size-base) !important;
 }
 
 /* 🎯 サブスロットの実際のボタンデザインを完全コピペ */
 #visibility-control-panel-inline .slot-control-group label {
   display: flex !important;
   align-items: center !important;
-  gap: 3px !important;
-  padding: 3px 6px !important;
-  border: 1px solid #ddd !important;
-  border-radius: 3px !important;
+  gap: var(--mobile-padding-medium) !important;
+  padding: var(--mobile-padding-medium) 6px !important;
+  border: var(--mobile-padding-small) solid #ddd !important;
+  border-radius: var(--mobile-padding-medium) !important;
   cursor: pointer !important;
-  font-size: 10px !important;
+  font-size: var(--mobile-font-size-base) !important;
   transition: all 0.2s !important;
   /* サブスロットの薄いグリーン背景をデフォルトに */
   background-color: #e8f5e8 !important;
@@ -196,25 +196,25 @@
 /* 例文シャッフル等のボタン群圧縮 */
 .mobile-device #randomize-all,
 .mobile-device button[style*="background"] {
-  padding: 3px 6px !important;
+  padding: var(--mobile-padding-medium) 6px !important;
   font-size: 9px !important;
-  margin: 1px 2px !important;
+  margin: var(--mobile-padding-small) var(--mobile-margin) !important;
   min-height: 18px !important;
-  border-radius: 2px !important;
+  border-radius: var(--mobile-margin) !important;
 }
 
 /* 分離疑問詞エリアの圧縮 */
 .mobile-device #display-top-question-word {
-  margin: 1px 0 !important;
-  padding: 2px !important;
+  margin: var(--mobile-padding-small) 0 !important;
+  padding: var(--mobile-margin) !important;
 }
 
 /* 音声制御系ボタンの圧縮 */
 .mobile-device .voice-controls button {
-  padding: 2px 4px !important;
-  font-size: 8px !important;
+  padding: var(--mobile-margin) var(--mobile-border-radius) !important;
+  font-size: var(--mobile-font-size-small) !important;
   min-height: 16px !important;
-  margin: 1px !important;
+  margin: var(--mobile-padding-small) !important;
 }
 
 /* ========================================= */
