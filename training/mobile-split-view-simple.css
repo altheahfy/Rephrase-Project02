@@ -398,8 +398,9 @@
 
 /* 🎯 サブスロット内部コンテンツは大幅縮小で画面内収納 */
 .mobile-device .slot-wrapper[id$="-sub"].active-subslot > * {
-  transform: scale(0.7); /* 0.8 → 0.7: より小さくして画面内確実収納 */
-  transform-origin: top left;
+  transform: scale(0.7) !important; /* 0.8 → 0.7: より小さくして画面内確実収納 */
+  transform-origin: top left !important;
+  max-width: calc(var(--mobile-width) / 0.7) !important; /* スケール縮小を考慮した最大幅制限 */
 }
 
 /* 🎯 サブスロット表示エリア内の全コンテンツ強制縮小（動的生成対応） */
@@ -416,21 +417,21 @@
 .mobile-device #subslot-display-area img,
 .mobile-device .slot-wrapper[id$="-sub"] img,
 .mobile-device .slot-multi-image {
-  max-width: 140px; /* 横幅制限：元の160pxから軽減 */
-  max-height: 130px; /* 高さ制限：120px→130px 少し大きく */
-  min-height: 100px; /* 最小高さ確保：視認性向上 */
-  object-fit: contain; /* 縦横比保持：fillをcontainに変更 */
-  width: auto; /* 自動幅調整 */
-  height: auto; /* 自動高さ調整 */
+  max-width: 140px !important; /* 横幅制限：元の160pxから軽減 */
+  max-height: 130px !important; /* 高さ制限：120px→130px 少し大きく */
+  min-height: 100px !important; /* 最小高さ確保：視認性向上 */
+  object-fit: contain !important; /* 縦横比保持：fillをcontainに変更 */
+  width: auto !important; /* 自動幅調整 */
+  height: auto !important; /* 自動高さ調整 */
 }
 
 /* 🎯 モバイル専用：複数画像コンテナの適切なサイズ設定 */
 .mobile-device .multi-image-container {
-  max-width: var(--mobile-width); /* コンテナ幅制限 */
-  min-height: 140px; /* 最小高さ確保：単一画像と同等の視認性 */
-  height: 150px; /* 適切な高さ設定 */
-  overflow-x: auto; /* 横スクロール許可 */
-  overflow-y: hidden; /* 縦スクロール禁止 */
+  max-width: var(--mobile-width) !important; /* コンテナ幅制限 */
+  min-height: 140px !important; /* 最小高さ確保：単一画像と同等の視認性 */
+  height: 150px !important; /* 適切な高さ設定 */
+  overflow-x: auto !important; /* 横スクロール許可 */
+  overflow-y: hidden !important; /* 縦スクロール禁止 */
 }
 
 /* 🔧 スロット内コンテンツの基本調整のみ - 隙間最小化 */
