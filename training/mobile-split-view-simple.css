@@ -83,11 +83,11 @@
   gap: 0px !important; /* 6px → 0px 完全削除 */
   height: var(--mobile-height-control) !important; /* 22px → var(--mobile-height-control) */
   font-size: var(--mobile-font-size-base) !important;
-  border-radius: var(--mobile-margin) !important;
-  box-shadow: 0 1px 2px var(--mobile-bg-shadow) !important; /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
+  border-radius: var(--mobile-margin);
+  box-shadow: 0 1px 2px var(--mobile-bg-shadow); /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
   /* 🎨 金属的シルバーグラデーション背景 */
-  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 25%, #c8c8c8 50%, #d0d0d0 75%, #e8e8e8 100%) !important;
-  border: 1px solid #b0b0b0 !important; /* シルバーボーダー追加 */
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 25%, #c8c8c8 50%, #d0d0d0 75%, #e8e8e8 100%);
+  border: 1px solid #b0b0b0; /* シルバーボーダー追加 */
 }
 
 /* フロートメニュー内要素間隔削除 */
@@ -129,14 +129,14 @@
   padding: var(--mobile-margin) 5px !important; /* 15px → 2px 5px */
   margin-bottom: var(--mobile-margin) !important; /* 15px → 2px */
   margin-top: 26px !important; /* 50px → 26px フロートメニュー直下 */
-  border-radius: var(--mobile-padding-medium) !important;
-  box-shadow: none !important; /* シャドウ削除 */
+  border-radius: var(--mobile-padding-medium);
+  box-shadow: none; /* シャドウ削除 */
 }
 
 .mobile-device h1 {
   font-size: 12px !important; /* 28px → 12px */
   margin: 0 !important;
-  font-weight: 600 !important;
+  font-weight: 600;
 }
 
 /* ② タイトル帯の正確な修正 */
@@ -164,7 +164,7 @@
 .mobile-device #toggle-control-panels {
   padding: var(--mobile-padding-medium) 8px !important;
   font-size: var(--mobile-font-size-base) !important;
-  border-radius: var(--mobile-padding-medium) !important;
+  border-radius: var(--mobile-padding-medium);
 }
 
 /* 🎯 上位スロット制御パネルをサブスロットと完全同一デザインに（PC版・スマホ版共通） */
@@ -179,16 +179,16 @@
 #visibility-control-panel-inline .slot-control-group {
   padding: 4px !important;
   border: 1px solid #f0f0f0 !important;
-  border-radius: 3px !important;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.7) !important;
 }
 
 #visibility-control-panel-inline .slot-control-group div:first-child {
-  font-weight: bold !important;
+  font-weight: bold;
   font-size: 11px !important;
   margin-bottom: 2px !important;
-  color: #444 !important;
-  text-align: center !important;
+  color: #444;
+  text-align: center;
 }
 
 #visibility-control-panel-inline .slot-control-group div:last-child {
@@ -205,14 +205,14 @@
   gap: var(--mobile-padding-medium) !important;
   padding: var(--mobile-padding-medium) 6px !important;
   border: var(--mobile-padding-small) solid #ddd !important;
-  border-radius: var(--mobile-padding-medium) !important;
-  cursor: pointer !important;
+  border-radius: var(--mobile-padding-medium);
+  cursor: pointer;
   font-size: var(--mobile-font-size-base) !important;
-  transition: all var(--mobile-transition-fast) !important; /* 0.2s → var(--mobile-transition-fast) */
+  transition: all var(--mobile-transition-fast); /* 0.2s → var(--mobile-transition-fast) */
   /* サブスロットの薄いグリーン背景をデフォルトに */
   background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
   border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
-  color: #2e7d32 !important;
+  color: #2e7d32;
 }
 
 /* チェックボックスを完全に非表示（サブスロットにはチェックボックスがない） */
@@ -224,15 +224,15 @@
 #visibility-control-panel-inline .slot-control-group label:has(input:checked) {
   background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
   border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
-  color: #2e7d32 !important;
+  color: #2e7d32;
 }
 
 /* 非チェック状態（非選択状態）はサブスロットの非表示スタイル */
 #visibility-control-panel-inline .slot-control-group label:has(input:not(:checked)) {
   background-color: var(--mobile-bg-control-inactive) !important; /* #ffebee → var(--mobile-bg-control-inactive) */
   border-color: var(--mobile-border-secondary) !important; /* #f44336 → var(--mobile-border-secondary) */
-  color: #c62828 !important;
-  opacity: 0.8 !important;
+  color: #c62828;
+  opacity: 0.8;
 }
 
 /* 例文シャッフル等のボタン群圧縮 */
@@ -337,7 +337,7 @@
   
   /* 視覚的境界線 */
   border: 2px solid var(--mobile-color-primary) !important; /* #007bff → var(--mobile-color-primary) */
-  border-radius: var(--mobile-border-radius) !important;
+  border-radius: var(--mobile-border-radius);
   background: var(--mobile-bg-primary) !important; /* rgba(240, 248, 255, 0.9) → var(--mobile-bg-primary) */
   margin: var(--mobile-margin) !important;
 }
@@ -371,7 +371,7 @@
   touch-action: pan-x pan-y !important;
   margin: 0px 1px !important; /* 1px 2px → 0px 1px: 余白最小化で画面活用 */
   border: 1px solid var(--mobile-color-secondary) !important; /* #28a745 → var(--mobile-color-secondary) */
-  border-radius: 2px !important; /* 4px → 2px: 角丸縮小 */
+  border-radius: 2px; /* 4px → 2px: 角丸縮小 */
   background: var(--mobile-bg-secondary) !important; /* rgba(248, 255, 248, 0.9) → var(--mobile-bg-secondary) */
   display: block !important;
   position: relative !important;
@@ -475,8 +475,8 @@
 .mobile-device button[onclick*="Individual"],
 .mobile-device .randomize-button {
   background: #ff9800 !important;
-  color: white !important;
-  font-weight: bold !important;
+  color: white;
+  font-weight: bold;
   min-width: 15px !important;
   visibility: visible !important;
   display: inline-block !important;
@@ -488,18 +488,18 @@
 /* 🎯 モバイルでの個別ランダマイズボタン強化表示 */
 .mobile-device button[onclick*="randomizeIndividual"] {
   background: var(--mobile-color-orange) !important; /* #ff6600 → var(--mobile-color-orange) */
-  color: white !important;
+  color: white;
   font-size: 8px !important;
   padding: 2px 4px !important;
   margin: 1px !important;
   border: 1px solid var(--mobile-border-orange) !important; /* #ff4400 → var(--mobile-border-orange) */
-  border-radius: 2px !important;
+  border-radius: 2px;
   min-width: 12px !important;
   min-height: 12px !important;
-  font-weight: bold !important;
+  font-weight: bold;
   display: inline-block !important;
   visibility: visible !important;
-  opacity: 1 !important;
+  opacity: 1;
   position: relative !important;
   z-index: 1002 !important;
   pointer-events: auto !important;
@@ -511,7 +511,7 @@
 .mobile-device .slot button {
   display: inline-block !important;
   visibility: visible !important;
-  opacity: 1 !important;
+  opacity: 1;
   pointer-events: auto !important;
   z-index: 100 !important;
   position: relative !important;
@@ -521,18 +521,18 @@
 .mobile-device button[style*="background-color: orange"],
 .mobile-device button[style*="background: orange"] {
   background: var(--mobile-color-orange) !important; /* #ff6600 → var(--mobile-color-orange) */
-  color: white !important;
+  color: white;
   font-size: 8px !important;
   padding: 1px 3px !important;
   margin: 0px 1px !important;
   min-width: 10px !important;
   min-height: 10px !important;
   border: 1px solid var(--mobile-border-orange) !important; /* #ff4400 → var(--mobile-border-orange) */
-  border-radius: 1px !important;
-  font-weight: bold !important;
+  border-radius: 1px;
+  font-weight: bold;
   display: inline-block !important;
   visibility: visible !important;
-  opacity: 1 !important;
+  opacity: 1;
   z-index: 1003 !important;
 }
 
@@ -595,7 +595,7 @@
     max-width: var(--mobile-width) !important; /* 最大幅を強制再適用 */
     margin: var(--mobile-margin) !important; /* マージンを強制再適用 */
     border: 2px solid var(--mobile-color-primary) !important; /* 境界線を強制再適用 */
-    border-radius: var(--mobile-border-radius) !important; /* 角丸を強制再適用 */
+    border-radius: var(--mobile-border-radius); /* 角丸を強制再適用 */
     background: var(--mobile-bg-primary) !important; /* 背景色を強制再適用 */
     overflow-x: auto !important; /* 横スクロールを強制再適用 */
     overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止を強制再適用 */
