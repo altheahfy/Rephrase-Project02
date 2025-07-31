@@ -6,23 +6,23 @@
 :root {
   --mobile-width: calc(100vw - 4px);
   --mobile-margin: 2px;
-  --mobile-border-radius: 4px;
+  --mobile-border-radius: 3px;
   
   /* フォントサイズ変数 */
-  --mobile-font-size-base: 10px;
+  --mobile-font-size-base: 9px;
   --mobile-font-size-small: 8px;
   
   /* レイアウト変数 */
   --mobile-padding-small: 1px;
-  --mobile-padding-medium: 3px;
+  --mobile-padding-medium: 2px;
   
   /* 高さ系変数 */
   --mobile-height-small: 12px;
-  --mobile-height-medium: 16px;
-  --mobile-height-input: 14px;
-  --mobile-height-large: 20px;
-  --mobile-height-control: 22px;
-  --mobile-height-button: 18px;
+  --mobile-height-medium: 14px;
+  --mobile-height-input: 12px;
+  --mobile-height-large: 16px;
+  --mobile-height-control: 18px;
+  --mobile-height-button: 14px;
   
   /* 幅系変数 */
   --mobile-width-small: 40px;
@@ -79,47 +79,52 @@
 .mobile-device #navigation-float-menu {
   top: 2px;
   left: 2px;
-  padding: 2px 3px !important; /* 4px 6px → 2px 3px */
+  padding: 2px 3px !important; /* 適度なサイズに調整 */
   gap: 0px !important; /* 6px → 0px 完全削除 */
-  height: var(--mobile-height-control) !important; /* 22px → var(--mobile-height-control) */
+  height: var(--mobile-height-control) !important; /* 18px に調整 */
   border-radius: var(--mobile-margin);
   box-shadow: 0 1px 2px var(--mobile-bg-shadow); /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
   /* 🎨 金属的シルバーグラデーション背景 */
   background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 25%, #c8c8c8 50%, #d0d0d0 75%, #e8e8e8 100%);
   border: 1px solid #b0b0b0; /* シルバーボーダー追加 */
+  font-size: 8px !important; /* 適度なフォントサイズ */
 }
 
 /* フロートメニュー内要素間隔削除 */
 .mobile-device #navigation-float-menu a {
   padding: var(--mobile-padding-small) var(--mobile-margin) !important;
   margin: 0;
+  font-size: 7px !important; /* 適度なフォントサイズ */
 }
 
 .mobile-device #navigation-float-menu span {
   margin: 0 var(--mobile-padding-small);
+  font-size: 7px !important; /* 適度なフォントサイズ */
 }
 
 .mobile-device #navigation-float-menu select {
-  width: var(--mobile-width-medium) !important; /* 60px → var(--mobile-width-medium) */
-  height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
+  width: 50px !important; /* 45px → 50px 少し大きく */
+  height: var(--mobile-height-medium) !important; /* 14px */
   padding: 0px var(--mobile-padding-small);
+  font-size: 7px !important; /* 適度なフォントサイズ */
 }
 
 .mobile-device #navigation-float-menu button {
-  padding: var(--mobile-padding-small) var(--mobile-padding-medium) !important; /* 2px 6px → 1px 3px */
-  height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
+  padding: var(--mobile-padding-small) var(--mobile-padding-medium) !important; /* 1px 2px */
+  height: var(--mobile-height-medium) !important; /* 14px */
+  font-size: 7px !important; /* 適度なフォントサイズ */
 }
 
 .mobile-device #navigation-float-menu input[type="range"] {
-  width: var(--mobile-width-small) !important; /* 40px → var(--mobile-width-small) */
-  height: var(--mobile-height-input) !important; /* 14px → var(--mobile-height-input) */
+  width: 35px !important; /* 30px → 35px 少し大きく */
+  height: var(--mobile-height-input) !important; /* 12px */
 }
 
 /* タイトル帯の超圧縮 */
 .mobile-device div[style*="background: rgba(255,255,255,0.95)"] {
-  padding: var(--mobile-margin) 5px !important; /* 15px → 2px 5px */
-  margin-bottom: var(--mobile-margin) !important; /* 15px → 2px */
-  margin-top: 26px !important; /* 50px → 26px フロートメニュー直下 */
+  padding: var(--mobile-margin) 4px !important; /* 1px 3px → 2px 4px */
+  margin-bottom: var(--mobile-margin) !important; /* 1px → 2px */
+  margin-top: 22px !important; /* 18px → 22px フロートメニューとの間隔 */
   border-radius: var(--mobile-padding-medium);
   box-shadow: none; /* シャドウ削除 */
 }
@@ -127,17 +132,20 @@
 .mobile-device h1 {
   margin: 0 !important;
   font-weight: 600;
+  font-size: 14px !important; /* 12px → 14px 適度なサイズ */
 }
 
 /* ② タイトル帯の正確な修正 */
 .mobile-device h2 {
   margin: var(--mobile-padding-small) 0 !important;
+  font-size: 11px !important; /* 10px → 11px 適度なサイズ */
 }
 
 .mobile-device button {
-  padding: var(--mobile-padding-medium) 6px !important;
+  padding: var(--mobile-padding-medium) 5px !important; /* 4px → 5px */
   margin: var(--mobile-padding-small) !important;
-  min-height: var(--mobile-height-large) !important; /* 20px → var(--mobile-height-large) */
+  min-height: var(--mobile-height-large) !important; /* 16px */
+  font-size: 8px !important; /* 7px → 8px 適度なサイズ */
 }
 
 /* ========================================= */
@@ -150,8 +158,10 @@
 }
 
 .mobile-device #toggle-control-panels {
-  padding: var(--mobile-padding-medium) 8px !important;
+  padding: 4px 12px !important; /* var(--mobile-padding-medium) 8px → 4px 12px */
   border-radius: var(--mobile-padding-medium);
+  font-size: 10px !important; /* フォントサイズ追加 */
+  min-height: 24px !important; /* 高さ確保 */
 }
 
 /* 🎯 上位スロット制御パネルをサブスロットと完全同一デザインに（PC版・スマホ版共通） */
@@ -222,10 +232,10 @@
 /* 例文シャッフル等のボタン群圧縮 */
 .mobile-device #randomize-all,
 .mobile-device button[style*="background"] {
-  padding: var(--mobile-padding-medium) 6px;
-  font-size: 9px;
+  padding: 4px 8px !important; /* var(--mobile-padding-medium) 6px → 4px 8px */
+  font-size: 10px !important; /* 9px → 10px */
   margin: var(--mobile-padding-small) var(--mobile-margin);
-  min-height: var(--mobile-height-button); /* 18px → var(--mobile-height-button) */
+  min-height: 22px !important; /* var(--mobile-height-button) → 22px */
   border-radius: var(--mobile-margin);
 }
 
