@@ -169,11 +169,11 @@
 
 /* 🎯 上位スロット制御パネルをサブスロットと完全同一デザインに（PC版・スマホ版共通） */
 #visibility-control-panel-inline > div[style*="display: flex"] {
-  display: flex !important;
-  gap: 8px !important;
-  align-items: center !important;
-  font-size: 12px !important;
-  flex-wrap: wrap !important;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  flex-wrap: wrap;
 }
 
 #visibility-control-panel-inline .slot-control-group {
@@ -238,7 +238,7 @@
 /* 例文シャッフル等のボタン群圧縮 */
 .mobile-device #randomize-all,
 .mobile-device button[style*="background"] {
-  padding: var(--mobile-padding-medium) 6px !important;
+  padding: var(--mobile-padding-medium) 6px;
   font-size: 9px !important;
   margin: var(--mobile-padding-small) var(--mobile-margin) !important;
   min-height: var(--mobile-height-button) !important; /* 18px → var(--mobile-height-button) */
