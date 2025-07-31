@@ -303,9 +303,9 @@
 
 .mobile-device #subslot-display-area,
 .mobile-device .slot-wrapper[id$="-sub"] {
-  width: calc(100vw - 4px) !important; /* サブスロットは従来通り */
-  max-width: calc(100vw - 4px) !important;
-  min-width: calc(100vw - 4px) !important;
+  width: var(--mobile-width) !important; /* サブスロットは従来通り */
+  max-width: var(--mobile-width) !important;
+  min-width: var(--mobile-width) !important;
 }
 
 /* ========================================= */
@@ -322,9 +322,9 @@
 /* 🟢 サブスロット表示エリア：画面内完全収納サイズに調整 */
 .mobile-device #subslot-display-area {
   height: 12vh !important; /* 14vh → 12vh: サブスロットエリアをさらに縮小、上位により多くの領域を確保 */
-  width: calc(100vw - 4px) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
-  max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
-  min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
+  width: var(--mobile-width) !important; /* 横幅をほぼ画面幅いっぱいに（余白2px×2） */
+  max-width: var(--mobile-width) !important; /* 最大幅も同様に設定 */
+  min-width: var(--mobile-width) !important; /* 最小幅も固定（複数画像時の変動防止） */
   overflow-x: auto !important;
   overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止 */
   touch-action: pan-x pan-y !important;
@@ -532,9 +532,9 @@
     /* 🚨 追加：ずれ問題解決のための強制再配置 */
     display: flex !important; /* フレックス表示を強制再適用 */
     justify-content: flex-start !important; /* 横方向左寄せを強制再適用 */
-    width: calc(100vw - 4px) !important; /* 横幅を強制再適用 */
-    min-width: calc(100vw - 4px) !important; /* 最小幅を強制再適用 */
-    max-width: calc(100vw - 4px) !important; /* 最大幅を強制再適用 */
+    width: var(--mobile-width) !important; /* 横幅を強制再適用 */
+    min-width: var(--mobile-width) !important; /* 最小幅を強制再適用 */
+    max-width: var(--mobile-width) !important; /* 最大幅を強制再適用 */
     margin: 2px !important; /* マージンを強制再適用 */
     border: 2px solid #007bff !important; /* 境界線を強制再適用 */
     border-radius: 4px !important; /* 角丸を強制再適用 */
@@ -545,8 +545,8 @@
   }
   .mobile-device #subslot-display-area {
     height: 12vh !important; /* 基本設定を強制再適用 */
-    width: calc(100vw - 4px) !important; /* 横幅を強制再適用 */
-    max-width: calc(100vw - 4px) !important; /* 最大幅を強制再適用 */
-    min-width: calc(100vw - 4px) !important; /* 最小幅を強制再適用 */
+    width: var(--mobile-width) !important; /* 横幅を強制再適用 */
+    max-width: var(--mobile-width) !important; /* 最大幅を強制再適用 */
+    min-width: var(--mobile-width) !important; /* 最小幅を強制再適用 */
   }
 }
