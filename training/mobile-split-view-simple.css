@@ -261,15 +261,6 @@
 */
 
 /* 📱 モバイル用：PC版完全保持 + スワイプ対応のみ追加 */
-/* 🧪 テスト：スワイプエリア設定を一時無効化して折り返し問題を確認 */
-/*
-.mobile-device .slot-wrapper:not([id$="-sub"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  touch-action: pan-x pan-y !important;
-  height: 35vh !important;
-}
-*/
 
 /* 🎯 PC版完全保持 + サイズ最適化（実際のコンテンツにフィット） */
 .mobile-device .slot-wrapper:not([id$="-sub"]) {
