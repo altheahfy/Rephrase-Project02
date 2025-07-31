@@ -277,9 +277,9 @@
   min-width: calc(100vw - 4px) !important; /* 最小幅固定 */
   max-width: calc(100vw - 4px) !important; /* 最大幅固定 */
   
-  /* スワイプ対応追加 */
+  /* スワイプ対応追加：横スワイプのみ有効、縦スクロール無効 */
   overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important;
   
   /* 🔧 無駄な空白を削除 - コンテンツにフィット */
   display: flex !important;
@@ -319,7 +319,7 @@
   max-width: calc(100vw - 4px) !important; /* 最大幅も同様に設定 */
   min-width: calc(100vw - 4px) !important; /* 最小幅も固定（複数画像時の変動防止） */
   overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止 */
   touch-action: pan-x pan-y !important;
   margin: 0px 1px !important; /* 1px 2px → 0px 1px: 余白最小化で画面活用 */
   border: 1px solid #28a745 !important; /* 2px → 1px: ボーダー縮小 */
@@ -349,7 +349,7 @@
   width: 100% !important;
   height: 100% !important;
   overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止 */
   border: none !important;
   background: transparent !important;
   /* スワイプエリアのサイズは維持 */
@@ -533,7 +533,7 @@
     border-radius: 4px !important; /* 角丸を強制再適用 */
     background: rgba(240, 248, 255, 0.9) !important; /* 背景色を強制再適用 */
     overflow-x: auto !important; /* 横スクロールを強制再適用 */
-    overflow-y: auto !important; /* 縦スクロールを強制再適用 */
+    overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止を強制再適用 */
     touch-action: pan-x pan-y !important; /* タッチ操作を強制再適用 */
   }
   .mobile-device #subslot-display-area {
