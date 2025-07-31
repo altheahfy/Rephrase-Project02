@@ -2,7 +2,7 @@
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
 
-/* 🎨 CSS変数定義（リファクタリング第2段階） */
+/* 🎨 CSS変数定義（リファクタリング第3段階 - 高さ・幅値追加） */
 :root {
   --mobile-width: calc(100vw - 4px);
   --mobile-margin: 2px;
@@ -15,6 +15,38 @@
   /* レイアウト変数 */
   --mobile-padding-small: 1px;
   --mobile-padding-medium: 3px;
+  
+  /* 高さ系変数 */
+  --mobile-height-small: 12px;
+  --mobile-height-medium: 16px;
+  --mobile-height-input: 14px;
+  --mobile-height-large: 20px;
+  --mobile-height-control: 22px;
+  --mobile-height-button: 18px;
+  
+  /* 幅系変数 */
+  --mobile-width-small: 40px;
+  --mobile-width-medium: 60px;
+  --mobile-width-button: 15px;
+  --mobile-width-range: 80px;
+  
+  /* カラーシステム変数 */
+  --mobile-color-primary: #007bff;
+  --mobile-color-secondary: #28a745;
+  --mobile-color-accent: #ff9800;
+  --mobile-color-orange: #ff6600;
+  
+  /* 背景系変数 */
+  --mobile-bg-primary: rgba(240, 248, 255, 0.9);
+  --mobile-bg-secondary: rgba(248, 255, 248, 0.9);
+  --mobile-bg-control-active: #e8f5e8;
+  --mobile-bg-control-inactive: #ffebee;
+  --mobile-bg-shadow: rgba(0,0,0,0.1);
+  
+  /* ボーダー系変数 */
+  --mobile-border-primary: #4CAF50;
+  --mobile-border-secondary: #f44336;
+  --mobile-border-orange: #ff4400;
 }
 
 /* 🚨 重要：設計要件定義（絶対遵守） */
@@ -42,10 +74,10 @@
   left: 2px !important;
   padding: 2px 3px !important; /* 4px 6px → 2px 3px */
   gap: 0px !important; /* 6px → 0px 完全削除 */
-  height: 22px !important; /* 28px → 22px */
+  height: var(--mobile-height-control) !important; /* 22px → var(--mobile-height-control) */
   font-size: var(--mobile-font-size-base) !important;
   border-radius: var(--mobile-margin) !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 1px 2px var(--mobile-bg-shadow) !important; /* rgba(0,0,0,0.1) → var(--mobile-bg-shadow) */
 }
 
 /* フロートメニュー内要素間隔削除 */
@@ -61,21 +93,21 @@
 }
 
 .mobile-device #navigation-float-menu select {
-  width: 60px !important; /* 120px → 60px */
+  width: var(--mobile-width-medium) !important; /* 60px → var(--mobile-width-medium) */
   font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
-  height: 16px !important; /* 20px → 16px */
+  height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
   padding: 0px var(--mobile-padding-small) !important;
 }
 
 .mobile-device #navigation-float-menu button {
   font-size: var(--mobile-font-size-small) !important; /* 11px → 8px */
   padding: var(--mobile-padding-small) var(--mobile-padding-medium) !important; /* 2px 6px → 1px 3px */
-  height: 16px !important; /* 20px → 16px */
+  height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
 }
 
 .mobile-device #navigation-float-menu input[type="range"] {
-  width: 40px !important; /* 80px → 40px */
-  height: 14px !important; /* 18px → 14px */
+  width: var(--mobile-width-small) !important; /* 40px → var(--mobile-width-small) */
+  height: var(--mobile-height-input) !important; /* 14px → var(--mobile-height-input) */
 }
 
 .mobile-device #navigation-float-menu label {
@@ -107,7 +139,7 @@
   font-size: var(--mobile-font-size-base) !important;
   padding: var(--mobile-padding-medium) 6px !important;
   margin: var(--mobile-padding-small) !important;
-  min-height: 20px !important;
+  min-height: var(--mobile-height-large) !important; /* 20px → var(--mobile-height-large) */
 }
 
 /* ========================================= */
@@ -168,8 +200,8 @@
   font-size: var(--mobile-font-size-base) !important;
   transition: all 0.2s !important;
   /* サブスロットの薄いグリーン背景をデフォルトに */
-  background-color: #e8f5e8 !important;
-  border-color: #4CAF50 !important;
+  background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
+  border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
   color: #2e7d32 !important;
 }
 
@@ -180,15 +212,15 @@
 
 /* チェック状態（選択状態）でのサブスロットスタイル維持 */
 #visibility-control-panel-inline .slot-control-group label:has(input:checked) {
-  background-color: #e8f5e8 !important;
-  border-color: #4CAF50 !important;
+  background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
+  border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
   color: #2e7d32 !important;
 }
 
 /* 非チェック状態（非選択状態）はサブスロットの非表示スタイル */
 #visibility-control-panel-inline .slot-control-group label:has(input:not(:checked)) {
-  background-color: #ffebee !important;
-  border-color: #f44336 !important;
+  background-color: var(--mobile-bg-control-inactive) !important; /* #ffebee → var(--mobile-bg-control-inactive) */
+  border-color: var(--mobile-border-secondary) !important; /* #f44336 → var(--mobile-border-secondary) */
   color: #c62828 !important;
   opacity: 0.8 !important;
 }
@@ -199,7 +231,7 @@
   padding: var(--mobile-padding-medium) 6px !important;
   font-size: 9px !important;
   margin: var(--mobile-padding-small) var(--mobile-margin) !important;
-  min-height: 18px !important;
+  min-height: var(--mobile-height-button) !important; /* 18px → var(--mobile-height-button) */
   border-radius: var(--mobile-margin) !important;
 }
 
@@ -213,7 +245,7 @@
 .mobile-device .voice-controls button {
   padding: var(--mobile-margin) var(--mobile-border-radius) !important;
   font-size: var(--mobile-font-size-small) !important;
-  min-height: 16px !important;
+  min-height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
   margin: var(--mobile-padding-small) !important;
 }
 
@@ -294,9 +326,9 @@
   padding-top: 8px !important; /* 0px → 8px: 上位スロットを少し下に移動 */
   
   /* 視覚的境界線 */
-  border: 2px solid #007bff !important; /* 青色で上位スロット識別 */
+  border: 2px solid var(--mobile-color-primary) !important; /* #007bff → var(--mobile-color-primary) */
   border-radius: var(--mobile-border-radius) !important;
-  background: rgba(240, 248, 255, 0.9) !important;
+  background: var(--mobile-bg-primary) !important; /* rgba(240, 248, 255, 0.9) → var(--mobile-bg-primary) */
   margin: var(--mobile-margin) !important;
 }
 
@@ -328,9 +360,9 @@
   overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止 */
   touch-action: pan-x pan-y !important;
   margin: 0px 1px !important; /* 1px 2px → 0px 1px: 余白最小化で画面活用 */
-  border: 1px solid #28a745 !important; /* 2px → 1px: ボーダー縮小 */
+  border: 1px solid var(--mobile-color-secondary) !important; /* #28a745 → var(--mobile-color-secondary) */
   border-radius: 2px !important; /* 4px → 2px: 角丸縮小 */
-  background: rgba(248, 255, 248, 0.9) !important; /* 透明度上げて軽量化 */
+  background: var(--mobile-bg-secondary) !important; /* rgba(248, 255, 248, 0.9) → var(--mobile-bg-secondary) */
   display: block !important;
   position: relative !important;
   
@@ -445,12 +477,12 @@
 
 /* 🎯 モバイルでの個別ランダマイズボタン強化表示 */
 .mobile-device button[onclick*="randomizeIndividual"] {
-  background: #ff6600 !important; /* より目立つオレンジ */
+  background: var(--mobile-color-orange) !important; /* #ff6600 → var(--mobile-color-orange) */
   color: white !important;
   font-size: 8px !important;
   padding: 2px 4px !important;
   margin: 1px !important;
-  border: 1px solid #ff4400 !important;
+  border: 1px solid var(--mobile-border-orange) !important; /* #ff4400 → var(--mobile-border-orange) */
   border-radius: 2px !important;
   min-width: 12px !important;
   min-height: 12px !important;
@@ -478,14 +510,14 @@
 /* 🎯 "R"ボタン（ランダマイズ）の特別強化 */
 .mobile-device button[style*="background-color: orange"],
 .mobile-device button[style*="background: orange"] {
-  background: #ff6600 !important;
+  background: var(--mobile-color-orange) !important; /* #ff6600 → var(--mobile-color-orange) */
   color: white !important;
   font-size: 8px !important;
   padding: 1px 3px !important;
   margin: 0px 1px !important;
   min-width: 10px !important;
   min-height: 10px !important;
-  border: 1px solid #ff4400 !important;
+  border: 1px solid var(--mobile-border-orange) !important; /* #ff4400 → var(--mobile-border-orange) */
   border-radius: 1px !important;
   font-weight: bold !important;
   display: inline-block !important;
@@ -552,9 +584,9 @@
     min-width: var(--mobile-width) !important; /* 最小幅を強制再適用 */
     max-width: var(--mobile-width) !important; /* 最大幅を強制再適用 */
     margin: var(--mobile-margin) !important; /* マージンを強制再適用 */
-    border: 2px solid #007bff !important; /* 境界線を強制再適用 */
+    border: 2px solid var(--mobile-color-primary) !important; /* 境界線を強制再適用 */
     border-radius: var(--mobile-border-radius) !important; /* 角丸を強制再適用 */
-    background: rgba(240, 248, 255, 0.9) !important; /* 背景色を強制再適用 */
+    background: var(--mobile-bg-primary) !important; /* 背景色を強制再適用 */
     overflow-x: auto !important; /* 横スクロールを強制再適用 */
     overflow-y: hidden !important; /* 縦スクロール無効化：見切れ防止を強制再適用 */
     touch-action: pan-x pan-y !important; /* タッチ操作を強制再適用 */
