@@ -95,8 +95,14 @@ class VoiceSystem {
         // マイクアクセス許可を確認
         await this.checkMicrophonePermission();
         
-        // 音声認識を初期化
-        await this.initSpeechRecognition();
+        // 🔧 デバイス別音声認識初期化
+        if (this.isAndroid) {
+            this.addDebugLog('📱 Android専用音声認識：既存システム使用', 'info');
+            // Android専用システムは既に startAndroidVoiceRecognition() で初期化
+        } else {
+            this.addDebugLog('💻 PC専用音声認識を初期化', 'info');
+            await this.initPCSpeechRecognition();
+        }
         
         // イベントリスナーを設定
         this.setupEventListeners();
@@ -1562,6 +1568,10 @@ class VoiceSystem {
         // 認識インスタンスを保存（停止用）
         this.androidRecognition = recognition;
         
+        // 🔧 Android専用音声認識言語設定
+        let androidLang = localStorage.getItem('voiceRecognitionLanguage_Android') || 'en-US';
+        console.log(`🔍 Android専用音声認識言語設定: ${androidLang}`);
+        
         // Android Chrome最適化設定
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
@@ -1569,14 +1579,15 @@ class VoiceSystem {
             // 🔧 実験的修正: 無音による自動停止を回避するため継続的認識を使用
             recognition.continuous = true;  // 無音自動停止回避のため継続的認識
             recognition.interimResults = true; // 途中結果も取得
-            recognition.lang = 'en-US'; // 英語設定
+            recognition.lang = androidLang; // Android専用言語設定
             recognition.maxAlternatives = 3; // 複数候補
             this.addDebugLog('🔧 実験的設定: 無音自動停止回避のため継続的認識を使用', 'warning');
+            this.addDebugLog(`🔧 Android専用言語設定: ${androidLang}`, 'info');
         } else {
             this.addDebugLog('💻 PC/iPhone用設定を適用', 'info');
             recognition.continuous = false;  // 1回認識に変更
             recognition.interimResults = false;
-            recognition.lang = 'ja-JP';
+            recognition.lang = 'en-US'; // PC版は別系統で管理
             recognition.maxAlternatives = 1;
         }
         
@@ -2129,7 +2140,12 @@ class VoiceSystem {
         if (shouldChange) {
             // 設定変更が確認されたら、システムを再初期化
             console.log('🔄 音声システムを再初期化します');
-            await this.initSpeechRecognition();
+            // 🔧 デバイス別音声認識再初期化
+            if (this.isAndroid) {
+                console.log('📱 Android用音声認識：再初期化はstartAndroidVoiceRecognitionで実行');
+            } else {
+                await this.initPCSpeechRecognition();
+            }
             this.loadVoices();
         }
     }
@@ -2537,9 +2553,11 @@ class VoiceSystem {
             return;
         }
         
-        // 🔍 保存された音声認識言語設定を確認
-        let recognitionLang = localStorage.getItem('voiceRecognitionLanguage') || 'en-US';
-        console.log(`🔍 保存された音声認識言語: ${recognitionLang}`);
+        // 🔍 デバイス別音声認識言語設定を確認
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const storageKey = isAndroid ? 'voiceRecognitionLanguage_Android' : 'voiceRecognitionLanguage_PC';
+        let recognitionLang = localStorage.getItem(storageKey) || 'en-US';
+        console.log(`🔍 保存された${isAndroid ? 'Android' : 'PC'}音声認識言語: ${recognitionLang}`);
         
         // 🚨 日本語設定が保存されている場合の警告
         if (recognitionLang.startsWith('ja')) {
@@ -2547,8 +2565,8 @@ class VoiceSystem {
             const shouldSwitchToEnglish = await this.showRecognitionLanguageWarningDialog();
             if (shouldSwitchToEnglish) {
                 recognitionLang = 'en-US';
-                localStorage.setItem('voiceRecognitionLanguage', 'en-US');
-                console.log('✅ 音声認識を英語に変更しました');
+                localStorage.setItem(storageKey, 'en-US');
+                console.log(`✅ ${isAndroid ? 'Android' : 'PC'}音声認識を英語に変更しました`);
             } else {
                 console.log('👌 日本語音声認識を継続します');
             }
@@ -2558,7 +2576,6 @@ class VoiceSystem {
         this.recordingRecognition = new SpeechRecognition();
         
         // 🚨 緊急修正: testVoiceRecognitionと完全同一設定 + 速い話し方対応
-        const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
             this.recordingRecognition.continuous = true; // 連続認識で速い話し方に対応
@@ -5006,9 +5023,12 @@ class VoiceSystem {
     /**
      * 音声認識を初期化
      */
-    async initSpeechRecognition() {
-        console.log('🎤 音声認識初期化開始...');
-        this.updateStatus('🎤 音声認識を初期化中...', 'info');
+    /**
+     * 💻 PC専用音声認識初期化（Android設定の影響を受けない独立システム）
+     */
+    async initPCSpeechRecognition() {
+        console.log('💻 PC専用音声認識初期化開始...');
+        this.updateStatus('🎤 PC用音声認識を初期化中...', 'info');
         
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
@@ -5024,9 +5044,9 @@ class VoiceSystem {
             return;
         }
         
-        // 🔍 音声認識言語設定の確認
-        let recognitionLang = localStorage.getItem('voiceRecognitionLanguage');
-        console.log(`🔍 保存された音声認識言語設定: ${recognitionLang || 'なし'}`);
+        // 🔍 PC専用音声認識言語設定の確認
+        let recognitionLang = localStorage.getItem('voiceRecognitionLanguage_PC');
+        console.log(`🔍 保存されたPC音声認識言語設定: ${recognitionLang || 'なし'}`);
         
         // 初回利用時や日本語設定の場合の確認
         if (!recognitionLang) {
@@ -5042,58 +5062,46 @@ class VoiceSystem {
                 recognitionLang = 'en-US'; // デフォルトは英語
             }
             
-            localStorage.setItem('voiceRecognitionLanguage', recognitionLang);
-            console.log(`💾 音声認識言語設定を保存: ${recognitionLang}`);
+            localStorage.setItem('voiceRecognitionLanguage_PC', recognitionLang);
+            console.log(`💾 PC音声認識言語設定を保存: ${recognitionLang}`);
         } else if (recognitionLang.startsWith('ja')) {
             // 既に日本語が保存されている場合の確認
             console.log('🚨 日本語音声認識が設定されています！警告ダイアログを表示します');
             const shouldSwitchToEnglish = await this.showRecognitionLanguageWarningDialog();
             if (shouldSwitchToEnglish) {
                 recognitionLang = 'en-US';
-                localStorage.setItem('voiceRecognitionLanguage', 'en-US');
-                console.log('✅ 音声認識を英語に変更しました');
+                localStorage.setItem('voiceRecognitionLanguage_PC', 'en-US');
+                console.log('✅ PC音声認識を英語に変更しました');
             }
         }
         
         this.recognition = new SpeechRecognition();
-        this.recognition.lang = recognitionLang; // 🔧 ユーザー設定を適用
-        this.recognition.continuous = true;  // 連続認識
+        this.recognition.lang = recognitionLang; // 🔧 PC専用設定を適用
+        this.recognition.continuous = false;  // PC版：1回認識（重複問題解決済み設定）
         this.recognition.interimResults = true; // 中間結果も取得（認識確実性向上）
         this.recognition.maxAlternatives = 1;
         
-        console.log(`🔧 音声認識言語設定完了: ${recognitionLang}`);
-        
-        // 📱 Android対応：追加設定
-        if (/Android/i.test(navigator.userAgent)) {
-            console.log('📱 Android端末を検出：音声認識設定を最適化');
-            this.addDebugLog('📱 Android端末を検出', 'info');
-            this.recognition.continuous = false; // Android では false の方が安定
-            this.recognition.interimResults = true; // 中間結果も取得（Android対応）
-            this.recognition.maxAlternatives = 3; // 複数候補で精度向上
-            
-            // Android Chrome特有の設定
-            console.log('📱 Android Chrome最適化設定適用');
-            this.addDebugLog('📱 Android Chrome最適化設定適用', 'info');
-        }
+        console.log(`🔧 PC専用音声認識言語設定完了: ${recognitionLang}`);
+        console.log(`� PC専用設定: continuous=false, interimResults=true`);
         
         // 認識開始イベント
         this.recognition.onstart = () => {
-            console.log('🎤 音声認識が開始されました');
-            this.addDebugLog('🎤 音声認識開始', 'success');
+            console.log('🎤 PC音声認識が開始されました');
+            this.addDebugLog('🎤 PC音声認識開始', 'success');
             this.isRecognitionActive = true;
         };
         
         // 認識停止イベント
         this.recognition.onend = () => {
-            console.log('🔚 音声認識が終了しました');
-            this.addDebugLog('🔚 音声認識終了', 'info');
+            console.log('🔚 PC音声認識が終了しました');
+            this.addDebugLog('🔚 PC音声認識終了', 'info');
             this.isRecognitionActive = false;
         };
         
         // エラーイベント
         this.recognition.onerror = (event) => {
-            console.error('❌ 音声認識エラー:', event.error);
-            this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
+            console.error('❌ PC音声認識エラー:', event.error);
+            this.addDebugLog(`❌ PC音声認識エラー: ${event.error}`, 'error');
             this.isRecognitionActive = false;
         };
         
@@ -6178,18 +6186,22 @@ class VoiceSystem {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         
-        // Android Chrome最適化設定
+        // デバイス別設定（分離された言語設定を使用）
         const isAndroid = /Android/i.test(navigator.userAgent);
+        const storageKey = isAndroid ? 'voiceRecognitionLanguage_Android' : 'voiceRecognitionLanguage_PC';
+        const deviceLang = localStorage.getItem(storageKey) || 'en-US';
+        
         if (isAndroid) {
             this.addDebugLog('📱 Android Chrome用設定を適用', 'info');
             recognition.continuous = false;
             recognition.interimResults = true;
-            recognition.lang = 'en-US'; // 英語設定
+            recognition.lang = deviceLang; // Android専用言語設定
             recognition.maxAlternatives = 3; // 複数候補
         } else {
+            this.addDebugLog('💻 PC用設定を適用', 'info');
             recognition.continuous = false;
             recognition.interimResults = true;
-            recognition.lang = 'en-US'; // 🔧 PC版も英語設定に修正
+            recognition.lang = deviceLang; // PC専用言語設定
             recognition.maxAlternatives = 1;
         }
         
