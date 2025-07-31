@@ -239,10 +239,10 @@
 .mobile-device #randomize-all,
 .mobile-device button[style*="background"] {
   padding: var(--mobile-padding-medium) 6px;
-  font-size: 9px !important;
-  margin: var(--mobile-padding-small) var(--mobile-margin) !important;
-  min-height: var(--mobile-height-button) !important; /* 18px → var(--mobile-height-button) */
-  border-radius: var(--mobile-margin) !important;
+  font-size: 9px;
+  margin: var(--mobile-padding-small) var(--mobile-margin);
+  min-height: var(--mobile-height-button); /* 18px → var(--mobile-height-button) */
+  border-radius: var(--mobile-margin);
 }
 
 /* 分離疑問詞エリアの圧縮 */
