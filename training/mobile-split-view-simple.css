@@ -2,11 +2,19 @@
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
 
-/* 🎨 CSS変数定義（リファクタリング第1段階） */
+/* 🎨 CSS変数定義（リファクタリング第2段階） */
 :root {
   --mobile-width: calc(100vw - 4px);
   --mobile-margin: 2px;
   --mobile-border-radius: 4px;
+  
+  /* フォントサイズ変数 */
+  --mobile-font-size-base: 10px;
+  --mobile-font-size-small: 8px;
+  
+  /* レイアウト変数 */
+  --mobile-padding-small: 1px;
+  --mobile-padding-medium: 3px;
 }
 
 /* 🚨 重要：設計要件定義（絶対遵守） */
@@ -35,33 +43,33 @@
   padding: 2px 3px !important; /* 4px 6px → 2px 3px */
   gap: 0px !important; /* 6px → 0px 完全削除 */
   height: 22px !important; /* 28px → 22px */
-  font-size: 10px !important;
-  border-radius: 2px !important;
+  font-size: var(--mobile-font-size-base) !important;
+  border-radius: var(--mobile-margin) !important;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
 }
 
 /* フロートメニュー内要素間隔削除 */
 .mobile-device #navigation-float-menu a {
-  font-size: 10px !important; /* 14px → 10px */
-  padding: 1px 2px !important;
+  font-size: var(--mobile-font-size-base) !important; /* 14px → 10px */
+  padding: var(--mobile-padding-small) var(--mobile-margin) !important;
   margin: 0 !important;
 }
 
 .mobile-device #navigation-float-menu span {
-  font-size: 8px !important; /* 12px → 8px */
-  margin: 0 1px !important;
+  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
+  margin: 0 var(--mobile-padding-small) !important;
 }
 
 .mobile-device #navigation-float-menu select {
   width: 60px !important; /* 120px → 60px */
-  font-size: 8px !important; /* 12px → 8px */
+  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
   height: 16px !important; /* 20px → 16px */
-  padding: 0px 1px !important;
+  padding: 0px var(--mobile-padding-small) !important;
 }
 
 .mobile-device #navigation-float-menu button {
-  font-size: 8px !important; /* 11px → 8px */
-  padding: 1px 3px !important; /* 2px 6px → 1px 3px */
+  font-size: var(--mobile-font-size-small) !important; /* 11px → 8px */
+  padding: var(--mobile-padding-small) var(--mobile-padding-medium) !important; /* 2px 6px → 1px 3px */
   height: 16px !important; /* 20px → 16px */
 }
 
@@ -71,7 +79,7 @@
 }
 
 .mobile-device #navigation-float-menu label {
-  font-size: 8px !important; /* 12px → 8px */
+  font-size: var(--mobile-font-size-small) !important; /* 12px → 8px */
 }
 
 /* タイトル帯の超圧縮 */
