@@ -52,7 +52,11 @@ class VoiceSystem {
         this.firstWordTime = null;            // 最初の語の認識時刻
         this.lastWordTime = null;             // 最後の語の認識時刻
         
-        // 📱 緊急デバッグ: コンストラクタ完了確認
+        // � サブスロット展開対応：短時間重複フィルタリング用変数
+        this.lastRecognitionTime = null;      // 最後の認識時刻
+        this.lastRecognizedPhrase = '';       // 最後に認識されたフレーズ
+        
+        // �📱 緊急デバッグ: コンストラクタ完了確認
         console.log('🔧 VoiceSystemコンストラクタ完了');
         // this.init(); // 手動で呼び出すため削除
     }
@@ -1555,6 +1559,10 @@ class VoiceSystem {
         this.firstWordTime = null;
         this.lastWordTime = null;
         
+        // 🔧 サブスロット展開対応：重複フィルタリング変数もリセット
+        this.lastRecognitionTime = null;
+        this.lastRecognizedPhrase = '';
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('🚫 Web Speech API が利用できません', 'error');
             this.updateStatus('❌ 音声認識非対応', 'error');
@@ -1625,6 +1633,19 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal && transcript.length > 0) {
+                    // 🔧 サブスロット展開対応：短時間重複フィルタリング
+                    const now = Date.now();
+                    const timeSinceLastRecognition = this.lastRecognitionTime ? (now - this.lastRecognitionTime) : 1000;
+                    
+                    // 500ms以内の連続認識で同じ内容の場合はスキップ（サブスロット展開時の間対策）
+                    if (timeSinceLastRecognition < 500 && this.lastRecognizedPhrase === transcript) {
+                        this.addDebugLog(`⚠️ サブスロット展開短時間重複をスキップ: "${transcript}" (${timeSinceLastRecognition}ms前)`, 'warning');
+                        return;
+                    }
+                    
+                    this.lastRecognitionTime = now;
+                    this.lastRecognizedPhrase = transcript;
+                    
                     // 高度な重複チェック：文章レベルでの重複を検出
                     const currentText = this.recognizedText || '';
                     
@@ -5077,9 +5098,9 @@ class VoiceSystem {
         
         this.recognition = new SpeechRecognition();
         this.recognition.lang = recognitionLang; // 🔧 PC専用設定を適用
-        this.recognition.continuous = false;  // PC版：1回認識（重複問題解決済み設定）
+        this.recognition.continuous = true;  // PC版：継続認識に復帰（サブスロット展開対応）
         this.recognition.interimResults = true; // 中間結果も取得（認識確実性向上）
-        this.recognition.maxAlternatives = 1;
+        this.recognition.maxAlternatives = 3; // 複数候補で精度向上（Android同様）
         
         console.log(`🔧 PC専用音声認識言語設定完了: ${recognitionLang}`);
         console.log(`� PC専用設定: continuous=false, interimResults=true`);
@@ -5598,22 +5619,39 @@ class VoiceSystem {
     }
 
     /**
-     * � テキストの重複部分を検出するヘルパーメソッド
+     * 🔧 テキストの重複部分を検出するヘルパーメソッド（サブスロット展開対応版）
      */
     findTextOverlap(existingText, newText) {
-        const existingWords = existingText.toLowerCase().split(' ');
-        const newWords = newText.toLowerCase().split(' ');
+        const existingWords = existingText.toLowerCase().split(' ').filter(w => w.trim());
+        const newWords = newText.toLowerCase().split(' ').filter(w => w.trim());
         
-        // 既存テキストの末尾と新しいテキストの先頭で重複を検索
+        // 🔧 サブスロット展開対応：より柔軟な重複検出
         let maxOverlap = Math.min(existingWords.length, newWords.length);
         
+        // 1. 既存テキストの末尾と新しいテキストの先頭で重複を検索
         for (let i = maxOverlap; i > 0; i--) {
             const existingTail = existingWords.slice(-i);
             const newHead = newWords.slice(0, i);
             
             if (existingTail.join(' ') === newHead.join(' ')) {
                 // 重複部分を元の大文字小文字で返す
+                console.log(`🔍 末尾先頭重複検出（${i}語）: "${newText.split(' ').slice(0, i).join(' ')}"`);
                 return newText.split(' ').slice(0, i).join(' ');
+            }
+        }
+        
+        // 2. サブスロット展開時の中断・再開パターン対応
+        // 新しいテキストが既存テキストの任意の位置から始まる場合を検出
+        for (let startIdx = 0; startIdx < existingWords.length; startIdx++) {
+            const maxLength = Math.min(existingWords.length - startIdx, newWords.length);
+            for (let length = maxLength; length >= 2; length--) { // 2語以上の重複を検出
+                const existingSegment = existingWords.slice(startIdx, startIdx + length);
+                const newSegment = newWords.slice(0, length);
+                
+                if (existingSegment.join(' ') === newSegment.join(' ')) {
+                    console.log(`🔍 中断再開重複検出（${length}語、位置${startIdx}）: "${newText.split(' ').slice(0, length).join(' ')}"`);
+                    return newText.split(' ').slice(0, length).join(' ');
+                }
             }
         }
         
