@@ -2,7 +2,7 @@
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
 
-/* 🎨 CSS変数定義（リファクタリング第3段階 - 高さ・幅値追加） */
+/* 🎨 CSS変数定義（リファクタリング Phase1-5完了版） */
 :root {
   --mobile-width: calc(100vw - 4px);
   --mobile-margin: 2px;
@@ -47,6 +47,13 @@
   --mobile-border-primary: #4CAF50;
   --mobile-border-secondary: #f44336;
   --mobile-border-orange: #ff4400;
+  
+  /* アニメーション・トランジション変数 */
+  --mobile-transition-fast: 0.2s;
+  --mobile-transition-normal: 0.3s;
+  --mobile-animation-duration: 1.5s;
+  --mobile-transform-scale-hover: 1.05;
+  --mobile-transform-scale-small: 0.8;
 }
 
 /* 🚨 重要：設計要件定義（絶対遵守） */
@@ -198,7 +205,7 @@
   border-radius: var(--mobile-padding-medium) !important;
   cursor: pointer !important;
   font-size: var(--mobile-font-size-base) !important;
-  transition: all 0.2s !important;
+  transition: all var(--mobile-transition-fast) !important; /* 0.2s → var(--mobile-transition-fast) */
   /* サブスロットの薄いグリーン背景をデフォルトに */
   background-color: var(--mobile-bg-control-active) !important; /* #e8f5e8 → var(--mobile-bg-control-active) */
   border-color: var(--mobile-border-primary) !important; /* #4CAF50 → var(--mobile-border-primary) */
@@ -406,7 +413,7 @@
 
 /* 🎯 サブスロット表示エリア内のボタン・画像も縮小 */
 .mobile-device #subslot-display-area button {
-  transform: scale(0.8) !important; /* ボタンも80%に縮小 */
+  transform: scale(var(--mobile-transform-scale-small)) !important; /* 0.8 → var(--mobile-transform-scale-small) */
 }
 
 /* 🎯 モバイル専用：サブスロット画像の適切なサイズ制限 */
