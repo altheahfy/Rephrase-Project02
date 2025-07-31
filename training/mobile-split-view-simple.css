@@ -247,7 +247,7 @@
 
 /* 分離疑問詞エリアの圧縮 */
 .mobile-device #display-top-question-word {
-  margin: var(--mobile-padding-small) 0 !important;
+  margin: var(--mobile-padding-small) 0;
   padding: var(--mobile-margin) !important;
 }
 
