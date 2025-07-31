@@ -104,8 +104,8 @@ class VoiceSystem {
             this.addDebugLog('📱 Android専用音声認識：既存システム使用', 'info');
             // Android専用システムは既に startAndroidVoiceRecognition() で初期化
         } else {
-            this.addDebugLog('💻 PC専用音声認識を初期化', 'info');
-            await this.initPCSpeechRecognition();
+            this.addDebugLog('💻 PC用音声認識システム初期化（Android互換用this.recognition含む）', 'info');
+            await this.initPCSpeechRecognition(); // NOTE: this.recognitionはAndroid互換用、PCでは実際はrecordingRecognitionを使用
         }
         
         // イベントリスナーを設定
@@ -2588,6 +2588,10 @@ class VoiceSystem {
     async startRecordingVoiceRecognition() {
         this.addDebugLog('🗣️ 録音用音声認識を開始します...', 'info');
         
+        // 🔧 連続認識対応: 前回の認識結果をクリア
+        this.recognizedText = '';
+        console.log('🧹 認識結果クリア完了');
+        
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             this.addDebugLog('❌ Web Speech API が利用できません', 'error');
             return;
@@ -2669,12 +2673,18 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
-                    this.recognizedText = transcript; // 既存のシステムに合わせて保存
+                    // 🔧 連続認識対応: 既存結果に追加する
+                    if (this.recognizedText && this.recognizedText.trim()) {
+                        this.recognizedText += ' ' + transcript;
+                    } else {
+                        this.recognizedText = transcript;
+                    }
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
+                    this.addDebugLog(`📝 累積認識結果: "${this.recognizedText}"`, 'success');
                     
                     // 確定結果を確実に保存
-                    console.log('✅ 確定結果保存:', transcript);
+                    console.log('✅ 累積認識結果保存:', this.recognizedText);
                 } else {
                     this.addDebugLog(`🔄 認識結果（途中）: "${transcript}"`, 'info');
                     
@@ -5067,7 +5077,8 @@ class VoiceSystem {
      * 💻 PC専用音声認識初期化（Android設定の影響を受けない独立システム）
      */
     async initPCSpeechRecognition() {
-        console.log('💻 PC専用音声認識初期化開始...');
+        console.log('💻 PC音声認識初期化開始...');
+        console.log('⚠️ NOTE: this.recognitionはAndroid互換用。PCの録音ボタンではrecordingRecognitionを使用');
         this.updateStatus('🎤 PC用音声認識を初期化中...', 'info');
         
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -5116,6 +5127,7 @@ class VoiceSystem {
         }
         
         this.recognition = new SpeechRecognition();
+        // ⚠️ NOTE: this.recognitionは主にAndroid用。PCの録音ボタンではrecordingRecognitionを使用
         this.recognition.lang = recognitionLang; // 🔧 PC専用設定を適用
         this.recognition.continuous = true;  // PC版：継続認識に復帰（サブスロット展開対応）
         this.recognition.interimResults = true; // 中間結果も取得（認識確実性向上）
