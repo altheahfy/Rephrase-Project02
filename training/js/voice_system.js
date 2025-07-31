@@ -1815,40 +1815,59 @@ class VoiceSystem {
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // 🕒 発話時間計算：タイムスタンプベース（利用可能時）→ 推定値（フォールバック）
+                // 🕒 発話時間計算：継続認識対応版（PC版専用）
                 let speechDuration, calculationMethod;
                 
                 if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
-                    // ⏱️ タイムスタンプベースの正確な発話時間計算
+                    // 🔧 継続認識対応：実際の発話時間推定（認識結果間の無音時間を考慮）
                     const rawTimeDiff = (this.lastWordTime - this.firstWordTime) / 1000;
-                    speechDuration = Math.max(0.1, rawTimeDiff);
-                    calculationMethod = 'タイムスタンプベース';
+                    
+                    // 継続認識の場合、認識結果間の間隔から実際の発話時間を推定
+                    let actualSpeechTime = 0;
+                    const speechGaps = [];
+                    
+                    for (let i = 1; i < this.speechTimestamps.length; i++) {
+                        const prevTime = this.speechTimestamps[i-1].time;
+                        const currentTime = this.speechTimestamps[i].time;
+                        const gap = (currentTime - prevTime) / 1000;
+                        speechGaps.push(gap);
+                        
+                        // 1秒以上の間隔は無音とみなし、0.5秒に短縮（発話の自然な間）
+                        const adjustedGap = gap > 1.0 ? 0.5 : gap;
+                        actualSpeechTime += adjustedGap;
+                    }
+                    
+                    // 最初の認識結果の時間も追加（語数に比例）
+                    const firstWordEstimate = Math.max(0.5, actualWordCount * 0.2); // 1語あたり0.2秒
+                    actualSpeechTime += firstWordEstimate;
+                    
+                    speechDuration = Math.max(1.0, actualSpeechTime); // 最低1秒
+                    calculationMethod = '継続認識対応版（無音間隔調整）';
                     
                     // 詳細デバッグ情報
-                    this.addDebugLog(`⏱️ タイムスタンプ詳細分析:`, 'info');
+                    this.addDebugLog(`⏱️ 継続認識発話時間分析:`, 'info');
                     this.addDebugLog(`  - 認識回数: ${this.speechTimestamps.length}回`, 'info');
-                    this.addDebugLog(`  - 最初の語時刻: ${((this.firstWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
-                    this.addDebugLog(`  - 最後の語時刻: ${((this.lastWordTime - this.recognitionStartTime) / 1000).toFixed(2)}秒後`, 'info');
-                    this.addDebugLog(`  - 計算された発話時間: ${speechDuration.toFixed(2)}秒`, 'info');
+                    this.addDebugLog(`  - 生の時間差: ${rawTimeDiff.toFixed(2)}秒`, 'info');
+                    this.addDebugLog(`  - 調整された発話時間: ${speechDuration.toFixed(2)}秒`, 'info');
+                    this.addDebugLog(`  - 認識間隔: [${speechGaps.map(g => g.toFixed(1)).join(', ')}]秒`, 'info');
                     this.addDebugLog(`  - 語数: ${actualWordCount}語`, 'info');
                     this.addDebugLog(`  - 計算結果: ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
                     
-                    // 異常値検出とフォールバック処理（改善版）
+                    // 異常値検出（継続認識版）
                     const preliminaryWordsPerMinute = (actualWordCount / speechDuration) * 60;
-                    const isAbnormallyFast = preliminaryWordsPerMinute > 300; // 300語/分を超える場合は異常
-                    const isAbnormallyShort = speechDuration < 0.5 && actualWordCount > 5; // 0.5秒未満で5語以上も異常
+                    const isAbnormallyFast = preliminaryWordsPerMinute > 400; // 継続認識では少し高めに設定
+                    const isAbnormallySlow = preliminaryWordsPerMinute < 60;   // 60語/分未満も異常
                     
-                    if (isAbnormallyFast || isAbnormallyShort) {
-                        this.addDebugLog(`⚠️ 異常値検出: ${preliminaryWordsPerMinute.toFixed(1)}語/分 (${speechDuration.toFixed(2)}秒で${actualWordCount}語)`, 'warning');
-                        // 異常値の場合は推定値を使用
-                        const fallbackDuration = actualWordCount / 3.0; // 平均3語/秒（より現実的）
-                        this.addDebugLog(`🔄 フォールバックに切り替え: ${fallbackDuration.toFixed(2)}秒 → ${(actualWordCount / fallbackDuration * 60).toFixed(1)}語/分`, 'warning');
-                        speechDuration = fallbackDuration;
-                        calculationMethod = 'タイムスタンプベース→フォールバック（異常値検出）';
+                    if (isAbnormallyFast || isAbnormallySlow) {
+                        this.addDebugLog(`⚠️ 異常値検出: ${preliminaryWordsPerMinute.toFixed(1)}語/分`, 'warning');
+                        // 異常値の場合は標準的な発話速度で推定
+                        speechDuration = actualWordCount / 3.5; // 平均3.5語/秒（210語/分）
+                        calculationMethod = '継続認識→標準推定（異常値検出）';
+                        this.addDebugLog(`🔄 標準推定に切り替え: ${speechDuration.toFixed(2)}秒 → ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
                     }
                 } else {
                     // 🔄 フォールバック：従来の推定値計算
-                    speechDuration = actualWordCount / 3.0; // 平均3語/秒に修正（より現実的）
+                    speechDuration = actualWordCount / 3.5; // 平均3.5語/秒（210語/分）
                     calculationMethod = '推定値（フォールバック）';
                     this.addDebugLog(`⚠️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒`, 'warning');
                 }
