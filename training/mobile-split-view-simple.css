@@ -253,9 +253,9 @@
 
 /* 音声制御系ボタンの圧縮 */
 .mobile-device .voice-controls button {
-  padding: var(--mobile-margin) var(--mobile-border-radius) !important;
-  font-size: var(--mobile-font-size-small) !important;
-  min-height: var(--mobile-height-medium) !important; /* 16px → var(--mobile-height-medium) */
+  padding: var(--mobile-margin) var(--mobile-border-radius);
+  font-size: var(--mobile-font-size-small);
+  min-height: var(--mobile-height-medium); /* 16px → var(--mobile-height-medium) */
   margin: var(--mobile-padding-small);
 }
 
