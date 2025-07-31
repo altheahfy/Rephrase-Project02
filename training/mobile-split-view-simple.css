@@ -2,6 +2,13 @@
 /* 📱 モバイル上下2分割スワイプシステム - PC版完全保持版               */
 /* =================================================================== */
 
+/* 🎨 CSS変数定義（リファクタリング第1段階） */
+:root {
+  --mobile-width: calc(100vw - 4px);
+  --mobile-margin: 2px;
+  --mobile-border-radius: 4px;
+}
+
 /* 🚨 重要：設計要件定義（絶対遵守） */
 /* ①スマホ画面を上下に分割（上部パネル・ボタンを考慮した分割比率）      */
 /* ②各エリアは「スワイプエリア」：左右スワイプ + 画面全体ピンチ拡大縮小  */
@@ -273,9 +280,9 @@
   height: 38vh !important; /* 36vh → 38vh: 縮小幅を調整（元40vhから5%縮小） */
   
   /* 🎯 横幅をスマホ画面幅いっぱいに拡張 */
-  width: calc(100vw - 4px) !important; /* 画面幅いっぱい */
-  min-width: calc(100vw - 4px) !important; /* 最小幅固定 */
-  max-width: calc(100vw - 4px) !important; /* 最大幅固定 */
+  width: var(--mobile-width) !important; /* 画面幅いっぱい */
+  min-width: var(--mobile-width) !important; /* 最小幅固定 */
+  max-width: var(--mobile-width) !important; /* 最大幅固定 */
   
   /* スワイプ対応追加：横スワイプのみ有効、縦スクロール無効 */
   overflow-x: auto !important;
