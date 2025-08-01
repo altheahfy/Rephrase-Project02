@@ -227,6 +227,8 @@ class RephraseStateManager {
    */
   syncToLocalStorage(path, value) {
     try {
+      console.log(`[RephraseStateManager] syncToLocalStorage開始: ${path} = ${value}`);
+      
       // 既存のlocalStorageキー命名規則に合わせる
       let storageKey;
       
@@ -242,37 +244,59 @@ class RephraseStateManager {
         storageKey = `rephrase_${path.replace(/\./g, '_')}`;
       }
       
+      console.log(`[RephraseStateManager] 使用するstorageKey: ${storageKey}`);
+      
       // 既存データを取得して部分更新
       let existingData = {};
       try {
-        existingData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        const rawData = localStorage.getItem(storageKey);
+        console.log(`[RephraseStateManager] 既存localStorage (raw): ${rawData}`);
+        existingData = JSON.parse(rawData || '{}');
+        console.log(`[RephraseStateManager] 既存localStorage (parsed):`, existingData);
       } catch (e) {
+        console.log(`[RephraseStateManager] localStorage解析エラー、空オブジェクトで初期化:`, e);
         existingData = {};
       }
       
       // パスに応じた部分更新
       const pathParts = path.split('.').slice(1); // 'visibility'などのプレフィックスを除去
+      console.log(`[RephraseStateManager] パス分割結果:`, pathParts);
+      
       let current = existingData;
       
       // 深いパス構造を安全に作成
       for (let i = 0; i < pathParts.length - 1; i++) {
         const key = pathParts[i];
+        console.log(`[RephraseStateManager] パス作成中: ${key}, 現在のcurrent:`, current);
+        
         if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+          console.log(`[RephraseStateManager] 新しいオブジェクト作成: ${key}`);
           current[key] = {};
         }
         current = current[key];
+        console.log(`[RephraseStateManager] 移動後のcurrent:`, current);
       }
       
       // 最終キーに値を設定
       if (pathParts.length > 0) {
         const finalKey = pathParts[pathParts.length - 1];
+        console.log(`[RephraseStateManager] 最終キー設定: ${finalKey} = ${value}`);
         current[finalKey] = value;
+        console.log(`[RephraseStateManager] 設定後のcurrent:`, current);
       } else {
         // パスがトップレベルの場合は全体を置換
+        console.log(`[RephraseStateManager] トップレベル設定`);
         existingData = value;
       }
       
-      localStorage.setItem(storageKey, JSON.stringify(existingData));
+      console.log(`[RephraseStateManager] 最終的なexistingData:`, existingData);
+      
+      const finalDataString = JSON.stringify(existingData);
+      localStorage.setItem(storageKey, finalDataString);
+      
+      // 確認のため再読み込み
+      const verification = localStorage.getItem(storageKey);
+      console.log(`[RephraseStateManager] localStorage保存確認: ${verification}`);
       
       console.log(`[RephraseStateManager] localStorage同期完了: ${storageKey}`, existingData);
       
