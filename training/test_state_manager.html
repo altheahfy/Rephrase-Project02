@@ -191,25 +191,41 @@
       try {
         // localStorage初期化
         localStorage.removeItem('rephrase_visibility_state');
+        console.log('localStorage初期化完了');
         
-        // 同期対象の状態更新
+        // 同期対象の状態更新（詳細ログ付き）
+        console.log('=== localStorage同期テスト開始 ===');
+        console.log('状態更新前のlocalStorage:', localStorage.getItem('rephrase_visibility_state'));
+        
         window.RephraseState.setState('visibility.slots.v.text', false);
+        console.log('v.text = false 設定完了');
+        console.log('設定後のlocalStorage:', localStorage.getItem('rephrase_visibility_state'));
+        
         window.RephraseState.setState('visibility.slots.v.auxtext', true);
+        console.log('v.auxtext = true 設定完了');
+        console.log('最終的なlocalStorage:', localStorage.getItem('rephrase_visibility_state'));
+        
+        // 同期確認のため、RephraseStateの内部状態も確認
+        const internalState = window.RephraseState.getState('visibility.slots.v');
+        console.log('RephraseState内部状態:', internalState);
         
         // 少し待ってからlocalStorage確認
         setTimeout(() => {
           try {
             const savedData = localStorage.getItem('rephrase_visibility_state');
+            console.log('最終チェック - localStorage raw:', savedData);
+            
             if (!savedData) {
               throw new Error('localStorageに保存されませんでした');
             }
             
             const parsedData = JSON.parse(savedData);
-            console.log('localStorage保存データ:', parsedData);
+            console.log('localStorage保存データ（パース済み）:', parsedData);
+            console.log('データのキー一覧:', Object.keys(parsedData));
             
             // データ構造を安全にチェック
             if (!parsedData.v) {
-              throw new Error('vスロットのデータが保存されていません');
+              throw new Error(`vスロットのデータが保存されていません。保存済みキー: ${Object.keys(parsedData).join(', ')}`);
             }
             
             if (parsedData.v.text !== false || parsedData.v.auxtext !== true) {
@@ -217,17 +233,20 @@
             }
             
             const result = logResult('localStorage同期', true, 'localStorage同期が正常に動作', {
-              savedData: parsedData
+              savedData: parsedData,
+              internalState: internalState
             });
             displayResult('localstorage-result', result);
             
           } catch (parseError) {
+            console.error('localStorage同期テストエラー:', parseError);
             const result = logResult('localStorage同期', false, parseError.message);
             displayResult('localstorage-result', result);
           }
-        }, 300); // 少し長めに待つ
+        }, 500); // さらに長めに待つ
         
       } catch (error) {
+        console.error('localStorage同期テスト初期化エラー:', error);
         const result = logResult('localStorage同期', false, error.message);
         displayResult('localstorage-result', result);
       }

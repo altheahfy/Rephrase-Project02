@@ -114,6 +114,8 @@ class RephraseStateManager {
       return;
     }
     
+    console.log(`[RephraseStateManager] setState開始: ${path} = ${value}`);
+    
     const keys = path.split('.');
     let current = this.state;
     
@@ -131,9 +133,15 @@ class RephraseStateManager {
     const oldValue = current[finalKey];
     current[finalKey] = value;
     
+    console.log(`[RephraseStateManager] 内部状態更新完了: ${path}`);
+    console.log('[RephraseStateManager] 更新後の該当部分:', this.getState(path));
+    
     // localStorage同期
     if (this.shouldSync(path)) {
+      console.log(`[RephraseStateManager] localStorage同期対象: ${path}`);
       this.syncToLocalStorage(path, value);
+    } else {
+      console.log(`[RephraseStateManager] localStorage同期対象外: ${path}`);
     }
     
     // リスナー通知
@@ -141,7 +149,7 @@ class RephraseStateManager {
       this.notifyListeners(path, value, oldValue);
     }
     
-    console.log(`[RephraseStateManager] 状態更新: ${path}`, value);
+    console.log(`[RephraseStateManager] setState完了: ${path}`, value);
   }
   
   /**
