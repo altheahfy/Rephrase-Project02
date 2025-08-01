@@ -243,6 +243,19 @@
 .mobile-device #display-top-question-word {
   margin: var(--mobile-padding-small) 0;
   padding: var(--mobile-margin);
+  margin-top: -20px; /* エリア全体を上に移動して他のスロットと行を合わせる */
+  height: 25px; /* エリアの高さを制限して他のスロットと行を合わせる */
+  line-height: 1.1; /* 行の高さを調整 */
+  overflow: hidden; /* はみ出し部分を非表示 */
+}
+
+/* 分離疑問詞エリア内のすべての要素を強制調整 */
+.mobile-device #display-top-question-word *,
+.mobile-device [id*="question"] *,
+.mobile-device [class*="question"] * {
+  margin-top: -35px !important;
+  padding-top: 0px !important;
+  line-height: 1.0 !important;
 }
 
 /* 音声制御系ボタンの圧縮 */
