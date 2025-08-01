@@ -1214,3 +1214,81 @@ window.ensureSubslotWidthForMultipleImages('c1'); // C1サブスロットの強�
 ---
 
 **🏆 サブスロット画像表示システムは上位スロットと同等の機能を持つ完全なシステムとして完成しました。**
+
+---
+
+## 📐 スロット幅制御システム詳細仕様
+
+### 2025-08-01 重要修正：M1スロット幅問題解決
+
+#### 問題概要
+M1スロットが画像枚数に関係なく異常に幅広になる問題が発生。特にモバイル環境で顕著に現れ、2枚時は正常だが4枚時に507px幅になる現象。
+
+#### 根本原因分析
+1. **モバイル判定失敗**: `mobile-device`クラスベースの判定が開発環境で機能せず
+2. **変数スコープエラー**: `isMobile`変数が条件分岐内でのみ定義され、後続処理でエラー発生
+3. **テキスト幅上限不適切**: PC版600px上限が高すぎて2枚時にアンバランス
+
+#### 解決策実装
+
+##### 1. 堅牢なモバイル判定システム
+```javascript
+// 3重判定による確実なモバイル検出
+const isMobile = document.body.classList.contains('mobile-device') || 
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                window.innerWidth <= 768;
+```
+
+##### 2. デバイス別幅制御パラメータ
+```javascript
+// テキスト幅上限
+const maxTextWidth = isMobile ? 350 : 400; // モバイル350px、PC400px
+
+// 画像サイズ
+const largerOptimalImageWidth = isMobile ? 80 : 120; // モバイル80px、PC120px
+```
+
+##### 3. スロット幅計算ロジック
+```javascript
+// 最終幅決定式
+const finalSlotWidth = Math.max(textBasedWidth, requiredImageWidth);
+
+// 画像必要幅計算
+const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60;
+```
+
+#### 最終仕様
+- **モバイル環境**
+  - テキスト幅上限: 350px
+  - 画像幅: 80px
+  - 2枚時想定幅: max(350px, 228px) = 350px
+  - 4枚時想定幅: max(350px, 404px) = 404px
+
+- **PC環境**
+  - テキスト幅上限: 400px  
+  - 画像幅: 120px
+  - 2枚時想定幅: max(400px, 308px) = 400px
+  - 4枚時想定幅: max(400px, 564px) = 564px
+
+#### 重要な実装上の注意点
+1. **変数スコープ**: `isMobile`は必ず関数上位スコープで定義する
+2. **モバイル判定**: 単一条件ではなく3条件のOR結合で実装する
+3. **デバッグ時**: 画面サイズ変更後は必ずページリロードで確認する
+4. **将来の調整**: 上限値変更時は画像枚数との関係を考慮する
+
+#### トラブルシューティング
+```javascript
+// デバッグ用確認コマンド
+const isMobile = document.body.classList.contains('mobile-device') || 
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                window.innerWidth <= 768;
+console.log('モバイル判定:', isMobile);
+console.log('画面幅:', window.innerWidth);
+
+// M1スロット状態確認
+const m1 = document.getElementById('slot-m1');
+console.log('M1幅:', m1.offsetWidth, 'px');
+console.log('M1画像数:', m1.querySelectorAll('img').length);
+```
+
+この修正により、M1スロットを含む全スロットで画像枚数に応じた適切な幅制御が実現されました。
