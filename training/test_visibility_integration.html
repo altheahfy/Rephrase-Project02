@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisibilityManager統合テスト</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+    .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    
+    .slot-demo { 
+      margin: 20px 0; 
+      padding: 15px; 
+      border: 2px solid #ddd; 
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    
+    .slot-phrase {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin: 10px 0;
+    }
+    
+    .hidden-text .slot-phrase {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .hidden-auxtext {
+      background-color: #ffcccc;
+    }
+    
+    .controls {
+      margin: 10px 0;
+    }
+    
+    .controls button {
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔄 VisibilityManager RephraseStateManager統合テスト</h1>
+  
+  <div id="test-results"></div>
+  
+  <h2>📱 動作デモ</h2>
+  
+  <!-- テスト用スロット要素 -->
+  <div class="slot-demo" id="slot-v">
+    <h3>Vスロット (動詞)</h3>
+    <div class="slot-phrase">eat</div>
+    <div class="aux-text">食べる</div>
+  </div>
+  
+  <div class="slot-demo" id="slot-s">
+    <h3>Sスロット (主語)</h3>
+    <div class="slot-phrase">I</div>
+    <div class="aux-text">私は</div>
+  </div>
+  
+  <div class="controls">
+    <h3>表示制御テスト</h3>
+    <button onclick="testToggleText()">英語テキスト表示/非表示</button>
+    <button onclick="testToggleAuxtext()">補助テキスト表示/非表示</button>
+    <button onclick="testGlobalCompatibility()">グローバル関数テスト</button>
+    <button onclick="testStateAccess()">状態アクセステスト</button>
+    <button onclick="dumpStates()">状態ダンプ</button>
+  </div>
+
+  <!-- RephraseStateManager読み込み -->
+  <script src="js/core/state-manager.js"></script>
+  
+  <!-- VisibilityManager読み込み -->
+  <script src="js/modules/visibility-manager.js"></script>
+
+  <script>
+    let testCount = 0;
+    let passCount = 0;
+    
+    function addTestResult(testName, passed, message, details = '') {
+      testCount++;
+      if (passed) passCount++;
+      
+      const resultsDiv = document.getElementById('test-results');
+      const resultDiv = document.createElement('div');
+      resultDiv.className = `test-result ${passed ? 'success' : 'fail'}`;
+      resultDiv.innerHTML = `
+        <strong>${passed ? '✅' : '❌'} [TEST ${passed ? 'PASS' : 'FAIL'}] ${testName}</strong><br>
+        ${message}
+        ${details ? `<br><small>${details}</small>` : ''}
+      `;
+      resultsDiv.appendChild(resultDiv);
+      
+      console.log(`[TEST ${passed ? 'PASS' : 'FAIL'}] ${testName}: ${message}`);
+    }
+    
+    function runTests() {
+      console.log('🧪 VisibilityManager統合テスト開始');
+      
+      // テスト1: RephraseStateManagerとの連携確認
+      try {
+        const stateManager = window.RephraseState;
+        const visibilityManager = window.VisibilityManager;
+        
+        const hasStateManager = !!stateManager;
+        const hasVisibilityManager = !!visibilityManager;
+        
+        addTestResult(
+          'インスタンス初期化',
+          hasStateManager && hasVisibilityManager,
+          `RephraseStateManager: ${hasStateManager}, VisibilityManager: ${hasVisibilityManager}`
+        );
+      } catch (error) {
+        addTestResult('インスタンス初期化', false, `エラー: ${error.message}`);
+      }
+      
+      // テスト2: 状態設定・取得テスト
+      try {
+        const manager = window.VisibilityManager;
+        
+        // 状態設定
+        manager.toggleSlotElementVisibility('v', 'text', false);
+        
+        // RephraseStateManagerから直接確認
+        const stateValue = window.RephraseState.getState('visibility.slots.v.text');
+        
+        addTestResult(
+          '状態設定・取得',
+          stateValue === false,
+          `設定値: false, 取得値: ${stateValue}`
+        );
+      } catch (error) {
+        addTestResult('状態設定・取得', false, `エラー: ${error.message}`);
+      }
+      
+      // テスト3: グローバル関数互換性テスト
+      try {
+        // グローバル関数が存在するかチェック
+        const hasToggleFunction = typeof window.toggleSlotElementVisibility === 'function';
+        const hasInitFunction = typeof window.initializeVisibilityState === 'function';
+        const hasApplyFunction = typeof window.applyVisibilityState === 'function';
+        
+        addTestResult(
+          'グローバル関数互換性',
+          hasToggleFunction && hasInitFunction && hasApplyFunction,
+          `toggle: ${hasToggleFunction}, init: ${hasInitFunction}, apply: ${hasApplyFunction}`
+        );
+      } catch (error) {
+        addTestResult('グローバル関数互換性', false, `エラー: ${error.message}`);
+      }
+      
+      // テスト4: グローバル変数互換性テスト
+      try {
+        // グローバルvisibilityStateアクセステスト
+        const globalState = window.visibilityState;
+        const hasVSlot = globalState && globalState.v;
+        const hasCorrectStructure = hasVSlot && 
+                                  typeof globalState.v.text === 'boolean' && 
+                                  typeof globalState.v.auxtext === 'boolean';
+        
+        addTestResult(
+          'グローバル変数互換性',
+          hasCorrectStructure,
+          `visibilityState構造: ${hasCorrectStructure}`,
+          JSON.stringify(globalState?.v || {})
+        );
+      } catch (error) {
+        addTestResult('グローバル変数互換性', false, `エラー: ${error.message}`);
+      }
+      
+      // テスト5: localStorage同期テスト
+      try {
+        // 状態変更
+        window.VisibilityManager.toggleSlotElementVisibility('s', 'auxtext', false);
+        
+        // localStorage確認
+        const saved = localStorage.getItem('rephrase_visibility_state');
+        const parsedData = JSON.parse(saved || '{}');
+        const savedValue = parsedData.s?.auxtext;
+        
+        addTestResult(
+          'localStorage同期',
+          savedValue === false,
+          `保存値: ${savedValue}`,
+          `localStorage内容: ${saved}`
+        );
+      } catch (error) {
+        addTestResult('localStorage同期', false, `エラー: ${error.message}`);
+      }
+      
+      // テスト6: DOM操作テスト
+      try {
+        // DOM要素の状態確認
+        const vSlot = document.getElementById('slot-v');
+        const hasHiddenClass = vSlot?.classList.contains('hidden-text');
+        
+        // 状態復元テスト
+        window.VisibilityManager.toggleSlotElementVisibility('v', 'text', true);
+        const afterToggle = !vSlot?.classList.contains('hidden-text');
+        
+        addTestResult(
+          'DOM操作',
+          afterToggle,
+          `hidden-textクラス制御: ${hasHiddenClass} → ${!afterToggle}`,
+          `DOM要素: ${!!vSlot}`
+        );
+      } catch (error) {
+        addTestResult('DOM操作', false, `エラー: ${error.message}`);
+      }
+      
+      // 最終結果表示
+      const finalDiv = document.createElement('div');
+      finalDiv.className = 'test-result info';
+      finalDiv.innerHTML = `
+        <strong>🏆 テスト完了: ${passCount}/${testCount} 成功</strong><br>
+        ${passCount === testCount ? '✅ 全テスト成功！VisibilityManager統合完了' : '⚠️ 一部テスト失敗 - 修正が必要'}
+      `;
+      document.getElementById('test-results').appendChild(finalDiv);
+    }
+    
+    // 動作デモ関数
+    function testToggleText() {
+      const currentState = window.VisibilityManager.getVisibilityState('v', 'text');
+      window.toggleSlotElementVisibility('v', 'text', !currentState);
+      console.log(`Vスロットテキスト: ${!currentState ? '表示' : '非表示'}`);
+    }
+    
+    function testToggleAuxtext() {
+      const currentState = window.VisibilityManager.getVisibilityState('s', 'auxtext');
+      window.toggleSlotElementVisibility('s', 'auxtext', !currentState);
+      console.log(`Sスロット補助テキスト: ${!currentState ? '表示' : '非表示'}`);
+    }
+    
+    function testGlobalCompatibility() {
+      console.log('グローバル関数テスト実行中...');
+      window.initializeVisibilityState();
+      window.applyVisibilityState();
+      console.log('グローバル関数テスト完了');
+    }
+    
+    function testStateAccess() {
+      console.log('状態アクセステスト:');
+      console.log('visibilityState:', window.visibilityState);
+      console.log('RephraseState:', window.RephraseState.getState('visibility.slots'));
+    }
+    
+    function dumpStates() {
+      console.log('=== 状態ダンプ ===');
+      console.log('1. visibilityState:', window.visibilityState);
+      console.log('2. RephraseState visibility:', window.RephraseState.getState('visibility'));
+      console.log('3. localStorage:', localStorage.getItem('rephrase_visibility_state'));
+      window.RephraseState.dumpState();
+    }
+    
+    // ページ読み込み後にテスト実行
+    window.addEventListener('load', () => {
+      setTimeout(runTests, 500); // RephraseStateManagerの初期化を待つ
+    });
+  </script>
+</body>
+</html>
