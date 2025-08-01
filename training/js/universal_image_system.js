@@ -654,14 +654,25 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
         const textWidth = tempSpan.offsetWidth;
         document.body.removeChild(tempSpan);
         
-        // テキスト幅に基づく適切な幅を設定（最小200px、余白60px）
-        textBasedWidth = Math.max(200, textWidth + 60);
-        console.log(`📏 テキストベース幅計算: "${testText}" → ${textBasedWidth}px`);
+        // モバイルデバイスでのテキスト幅上限を設定（より確実な判定）
+        const isMobile = document.body.classList.contains('mobile-device') || 
+                        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                        window.innerWidth <= 768;
+        const maxTextWidth = isMobile ? 350 : 400; // モバイルは350px、PCは400pxまで
+        
+        // テキスト幅に基づく適切な幅を設定（最小200px、余白60px、上限適用）
+        textBasedWidth = Math.max(200, Math.min(textWidth + 60, maxTextWidth));
+        console.log(`📏 テキストベース幅計算: "${testText}" → ${textBasedWidth}px (上限: ${maxTextWidth}px, モバイル: ${isMobile})`);
       }
     }
     
-    // 複数画像に必要な幅を計算（より大きな画像サイズを想定）
-    const largerOptimalImageWidth = 120; // 100pxから120pxに増加
+    // モバイル判定（スコープを拡張）
+    const isMobile = document.body.classList.contains('mobile-device') || 
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    window.innerWidth <= 768;
+    
+    // 複数画像に必要な幅を計算（モバイル対応）
+    const largerOptimalImageWidth = isMobile ? 80 : 120; // モバイルは80px、PCは120px
     const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60; // 余白込み
     
     // テキスト幅と画像幅の大きい方を採用（両方のニーズに対応）
