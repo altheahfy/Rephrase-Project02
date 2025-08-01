@@ -258,9 +258,39 @@ class RephraseStateManager {
         existingData = {};
       }
       
-      // パスに応じた部分更新
-      const pathParts = path.split('.').slice(1); // 'visibility'などのプレフィックスを除去
-      console.log(`[RephraseStateManager] パス分割結果:`, pathParts);
+      // パスに応じた部分更新 - storageKey別に処理分岐
+      let pathParts;
+      
+      if (storageKey === 'rephrase_visibility_state') {
+        // visibility.slots.* の場合、slotsから始まるパス構造
+        if (path.startsWith('visibility.slots.')) {
+          pathParts = path.split('.').slice(2); // ['visibility', 'slots'] を除去
+          console.log(`[RephraseStateManager] visibility.slots用パス分割:`, pathParts);
+        } else {
+          pathParts = [];
+        }
+      } else if (storageKey === 'rephrase_subslot_visibility_state') {
+        // visibility.subslots.* の場合
+        if (path.startsWith('visibility.subslots.')) {
+          pathParts = path.split('.').slice(2); // ['visibility', 'subslots'] を除去
+        } else if (path.startsWith('ui.controlPanelsVisible')) {
+          pathParts = ['global_control_panels_visible']; // 既存キー名に合わせる
+        } else {
+          pathParts = [];
+        }
+      } else if (storageKey === 'rephrase_question_word_visibility') {
+        // visibility.questionWord.* の場合
+        if (path.startsWith('visibility.questionWord.')) {
+          pathParts = path.split('.').slice(2); // ['visibility', 'questionWord'] を除去
+        } else {
+          pathParts = [];
+        }
+      } else {
+        // その他のカスタムキーの場合、フルパスを使用
+        pathParts = path.split('.');
+      }
+      
+      console.log(`[RephraseStateManager] 最終パス分割結果:`, pathParts);
       
       let current = existingData;
       
