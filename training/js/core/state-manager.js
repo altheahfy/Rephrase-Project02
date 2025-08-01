@@ -246,19 +246,27 @@ class RephraseStateManager {
       const pathParts = path.split('.').slice(1); // 'visibility'などのプレフィックスを除去
       let current = existingData;
       
+      // 深いパス構造を安全に作成
       for (let i = 0; i < pathParts.length - 1; i++) {
         const key = pathParts[i];
-        if (!(key in current)) current[key] = {};
+        if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+          current[key] = {};
+        }
         current = current[key];
       }
       
+      // 最終キーに値を設定
       if (pathParts.length > 0) {
-        current[pathParts[pathParts.length - 1]] = value;
+        const finalKey = pathParts[pathParts.length - 1];
+        current[finalKey] = value;
       } else {
+        // パスがトップレベルの場合は全体を置換
         existingData = value;
       }
       
       localStorage.setItem(storageKey, JSON.stringify(existingData));
+      
+      console.log(`[RephraseStateManager] localStorage同期完了: ${storageKey}`, existingData);
       
     } catch (error) {
       console.error('[RephraseStateManager] localStorage同期エラー:', error);

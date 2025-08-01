@@ -196,21 +196,36 @@
         window.RephraseState.setState('visibility.slots.v.text', false);
         window.RephraseState.setState('visibility.slots.v.auxtext', true);
         
-        // localStorage確認
-        const savedData = localStorage.getItem('rephrase_visibility_state');
-        if (!savedData) {
-          throw new Error('localStorageに保存されませんでした');
-        }
-        
-        const parsedData = JSON.parse(savedData);
-        if (parsedData.v.text !== false || parsedData.v.auxtext !== true) {
-          throw new Error('localStorage保存データが不正です');
-        }
-        
-        const result = logResult('localStorage同期', true, 'localStorage同期が正常に動作', {
-          savedData: parsedData
-        });
-        displayResult('localstorage-result', result);
+        // 少し待ってからlocalStorage確認
+        setTimeout(() => {
+          try {
+            const savedData = localStorage.getItem('rephrase_visibility_state');
+            if (!savedData) {
+              throw new Error('localStorageに保存されませんでした');
+            }
+            
+            const parsedData = JSON.parse(savedData);
+            console.log('localStorage保存データ:', parsedData);
+            
+            // データ構造を安全にチェック
+            if (!parsedData.v) {
+              throw new Error('vスロットのデータが保存されていません');
+            }
+            
+            if (parsedData.v.text !== false || parsedData.v.auxtext !== true) {
+              throw new Error(`localStorage保存データが不正です: text=${parsedData.v.text}, auxtext=${parsedData.v.auxtext}`);
+            }
+            
+            const result = logResult('localStorage同期', true, 'localStorage同期が正常に動作', {
+              savedData: parsedData
+            });
+            displayResult('localstorage-result', result);
+            
+          } catch (parseError) {
+            const result = logResult('localStorage同期', false, parseError.message);
+            displayResult('localstorage-result', result);
+          }
+        }, 300); // 少し長めに待つ
         
       } catch (error) {
         const result = logResult('localStorage同期', false, error.message);
