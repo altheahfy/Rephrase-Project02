@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RephraseStateManager テスト</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .test-section { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .test-section h3 { margin-top: 0; color: #333; }
+    .success { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+    button { margin: 5px; padding: 8px 15px; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🔧 RephraseStateManager 単体テスト</h1>
+  
+  <div class="test-section">
+    <h3>1. 基本状態管理テスト</h3>
+    <button onclick="testBasicState()">基本状態テスト実行</button>
+    <div id="basic-test-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h3>2. 深いパス操作テスト</h3>
+    <button onclick="testDeepPath()">深いパステスト実行</button>
+    <div id="deep-path-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h3>3. リスナーシステムテスト</h3>
+    <button onclick="testListeners()">リスナーテスト実行</button>
+    <div id="listener-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h3>4. localStorage同期テスト</h3>
+    <button onclick="testLocalStorage()">localStorage テスト実行</button>
+    <div id="localstorage-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h3>5. 既存システム互換性テスト</h3>
+    <button onclick="testCompatibility()">互換性テスト実行</button>
+    <div id="compatibility-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h3>6. 現在の状態確認</h3>
+    <button onclick="dumpCurrentState()">状態ダンプ</button>
+    <div id="state-dump"></div>
+  </div>
+
+  <!-- RephraseStateManager読み込み -->
+  <script src="js/core/state-manager.js"></script>
+  
+  <script>
+    let testResults = [];
+    
+    function logResult(testName, success, message, details = null) {
+      const result = { testName, success, message, details, timestamp: new Date() };
+      testResults.push(result);
+      console.log(`[TEST ${success ? 'PASS' : 'FAIL'}] ${testName}: ${message}`, details);
+      return result;
+    }
+    
+    function displayResult(elementId, result) {
+      const element = document.getElementById(elementId);
+      const className = result.success ? 'success' : 'error';
+      element.innerHTML = `
+        <div class="${className}">${result.success ? '✅' : '❌'} ${result.message}</div>
+        ${result.details ? `<pre>${JSON.stringify(result.details, null, 2)}</pre>` : ''}
+      `;
+    }
+    
+    // 1. 基本状態管理テスト
+    function testBasicState() {
+      try {
+        // 状態確認
+        if (!window.RephraseState) {
+          throw new Error('RephraseStateManagerが初期化されていません');
+        }
+        
+        // 初期状態確認
+        const initialState = window.RephraseState.getState();
+        if (!initialState.visibility || !initialState.audio || !initialState.ui) {
+          throw new Error('初期状態構造が不正です');
+        }
+        
+        // 単純な状態更新テスト
+        window.RephraseState.setState('ui.zoom', 1.5);
+        const zoom = window.RephraseState.getState('ui.zoom');
+        
+        if (zoom !== 1.5) {
+          throw new Error(`状態更新が失敗: 期待値 1.5, 実際の値 ${zoom}`);
+        }
+        
+        const result = logResult('基本状態管理', true, '基本的な状態の取得・更新が正常に動作', {
+          zoom,
+          stateKeys: Object.keys(initialState)
+        });
+        displayResult('basic-test-result', result);
+        
+      } catch (error) {
+        const result = logResult('基本状態管理', false, error.message);
+        displayResult('basic-test-result', result);
+      }
+    }
+    
+    // 2. 深いパス操作テスト
+    function testDeepPath() {
+      try {
+        // 深いパスでの状態設定
+        window.RephraseState.setState('visibility.slots.s.text', false);
+        window.RephraseState.setState('visibility.slots.s.auxtext', true);
+        
+        // 深いパスでの状態取得
+        const sText = window.RephraseState.getState('visibility.slots.s.text');
+        const sAuxtext = window.RephraseState.getState('visibility.slots.s.auxtext');
+        
+        if (sText !== false || sAuxtext !== true) {
+          throw new Error('深いパスの状態更新が失敗');
+        }
+        
+        // 存在しないパスのテスト
+        const nonExistent = window.RephraseState.getState('non.existent.path');
+        if (nonExistent !== undefined) {
+          throw new Error('存在しないパスで undefined が返されませんでした');
+        }
+        
+        const result = logResult('深いパス操作', true, '深いパスでの状態操作が正常に動作', {
+          sText,
+          sAuxtext,
+          nonExistent
+        });
+        displayResult('deep-path-result', result);
+        
+      } catch (error) {
+        const result = logResult('深いパス操作', false, error.message);
+        displayResult('deep-path-result', result);
+      }
+    }
+    
+    // 3. リスナーシステムテスト
+    function testListeners() {
+      try {
+        let listenerCalled = false;
+        let receivedValue = null;
+        
+        // リスナー登録
+        const listenerId = window.RephraseState.addListener('ui.zoom', (newValue, oldValue, path) => {
+          listenerCalled = true;
+          receivedValue = newValue;
+        });
+        
+        // 状態変更
+        window.RephraseState.setState('ui.zoom', 2.0);
+        
+        // リスナーが呼ばれたか確認
+        if (!listenerCalled || receivedValue !== 2.0) {
+          throw new Error('リスナーが正常に呼ばれませんでした');
+        }
+        
+        // リスナー削除
+        window.RephraseState.removeListener('ui.zoom', listenerId);
+        
+        // 削除後は呼ばれないことを確認
+        listenerCalled = false;
+        window.RephraseState.setState('ui.zoom', 3.0);
+        
+        if (listenerCalled) {
+          throw new Error('削除されたリスナーが呼ばれました');
+        }
+        
+        const result = logResult('リスナーシステム', true, 'リスナーの登録・削除・通知が正常に動作', {
+          receivedValue,
+          finalZoom: window.RephraseState.getState('ui.zoom')
+        });
+        displayResult('listener-result', result);
+        
+      } catch (error) {
+        const result = logResult('リスナーシステム', false, error.message);
+        displayResult('listener-result', result);
+      }
+    }
+    
+    // 4. localStorage同期テスト
+    function testLocalStorage() {
+      try {
+        // localStorage初期化
+        localStorage.removeItem('rephrase_visibility_state');
+        
+        // 同期対象の状態更新
+        window.RephraseState.setState('visibility.slots.v.text', false);
+        window.RephraseState.setState('visibility.slots.v.auxtext', true);
+        
+        // localStorage確認
+        const savedData = localStorage.getItem('rephrase_visibility_state');
+        if (!savedData) {
+          throw new Error('localStorageに保存されませんでした');
+        }
+        
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.v.text !== false || parsedData.v.auxtext !== true) {
+          throw new Error('localStorage保存データが不正です');
+        }
+        
+        const result = logResult('localStorage同期', true, 'localStorage同期が正常に動作', {
+          savedData: parsedData
+        });
+        displayResult('localstorage-result', result);
+        
+      } catch (error) {
+        const result = logResult('localStorage同期', false, error.message);
+        displayResult('localstorage-result', result);
+      }
+    }
+    
+    // 5. 既存システム互換性テスト
+    function testCompatibility() {
+      try {
+        // 互換性ヘルパー関数テスト
+        window.RephraseState.setVisibilityState('m1', 'text', false);
+        window.RephraseState.setVisibilityState('m1', 'auxtext', true);
+        
+        const m1Text = window.RephraseState.getVisibilityState('m1', 'text');
+        const m1Auxtext = window.RephraseState.getVisibilityState('m1', 'auxtext');
+        
+        if (m1Text !== false || m1Auxtext !== true) {
+          throw new Error('visibility互換性ヘルパーが動作しません');
+        }
+        
+        // 疑問詞表示互換性テスト
+        window.RephraseState.setQuestionWordVisibility('text', false);
+        const questionText = window.RephraseState.getQuestionWordVisibility('text');
+        
+        if (questionText !== false) {
+          throw new Error('疑問詞表示互換性ヘルパーが動作しません');
+        }
+        
+        const result = logResult('既存システム互換性', true, '既存システムとの互換性ヘルパーが正常に動作', {
+          m1Text,
+          m1Auxtext,
+          questionText
+        });
+        displayResult('compatibility-result', result);
+        
+      } catch (error) {
+        const result = logResult('既存システム互換性', false, error.message);
+        displayResult('compatibility-result', result);
+      }
+    }
+    
+    // 6. 現在の状態確認
+    function dumpCurrentState() {
+      try {
+        const state = window.RephraseState.dumpState();
+        document.getElementById('state-dump').innerHTML = `
+          <div class="success">✅ 現在の状態</div>
+          <pre>${JSON.stringify(state, null, 2)}</pre>
+        `;
+      } catch (error) {
+        document.getElementById('state-dump').innerHTML = `
+          <div class="error">❌ 状態ダンプエラー: ${error.message}</div>
+        `;
+      }
+    }
+    
+    // ページ読み込み時の自動テスト
+    window.addEventListener('load', () => {
+      console.log('RephraseStateManager テストページ読み込み完了');
+      console.log('利用可能なテスト関数:', {
+        testBasicState,
+        testDeepPath,
+        testListeners,
+        testLocalStorage,
+        testCompatibility,
+        dumpCurrentState
+      });
+    });
+  </script>
+</body>
+</html>
