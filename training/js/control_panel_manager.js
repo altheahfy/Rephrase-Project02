@@ -6,6 +6,19 @@ window.controlPanelsVisible = false;
 
 // 🔄 制御パネルの表示状態を取得
 function getControlPanelsVisibility() {
+  // 🎯 **追加：state-manager経由で状態読み込み**
+  try {
+    if (window.RephraseState) {
+      const subslotState = window.RephraseState.getState('visibility.subslots');
+      if (subslotState && subslotState.hasOwnProperty('global_control_panels_visible')) {
+        window.controlPanelsVisible = subslotState['global_control_panels_visible'];
+        console.log(`📂 state-manager経由で制御パネル状態を読み込み: ${window.controlPanelsVisible}`);
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ 制御パネル状態読み込みエラー:', error);
+  }
+  
   // ボタンのテキストからも状態を確認
   const toggleBtn = document.getElementById('toggle-control-panels');
   if (toggleBtn && toggleBtn.textContent.includes('表示中')) {
@@ -19,6 +32,19 @@ function getControlPanelsVisibility() {
 // 🔄 制御パネルの表示状態を設定
 function setControlPanelsVisibility(isVisible) {
   window.controlPanelsVisible = isVisible;
+  
+  // 🎯 **追加：state-manager経由で状態保存**
+  try {
+    if (window.RephraseState) {
+      window.RephraseState.setState('visibility.subslots.global_control_panels_visible', isVisible);
+      console.log(`💾 制御パネル表示状態をstate-manager経由で保存: ${isVisible ? '表示' : '非表示'}`);
+    } else {
+      console.log(`📝 state-manager未利用のため、メモリのみに保存: ${isVisible ? '表示' : '非表示'}`);
+    }
+  } catch (error) {
+    console.error('❌ 制御パネル状態の保存に失敗:', error);
+  }
+  
   console.log(`🎛️ 制御パネル表示状態を設定: ${isVisible ? '表示' : '非表示'}`);
 }
 
@@ -63,24 +89,37 @@ function toggleAllControlPanels() {
 // 🎛️ サブスロット制御パネルの表示を現在の状態に合わせる
 function syncSubslotControlPanelVisibility(panelElement) {
   if (panelElement && panelElement.classList.contains('subslot-visibility-panel')) {
-    // localStorageから最新の状態を取得
+    // 🎯 **修正：state-manager経由で状態取得**
     let isVisible = false;
     try {
-      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        if (state.hasOwnProperty('global_control_panels_visible')) {
-          isVisible = state['global_control_panels_visible'];
+      if (window.RephraseState) {
+        const subslotState = window.RephraseState.getState('visibility.subslots');
+        if (subslotState && subslotState.hasOwnProperty('global_control_panels_visible')) {
+          isVisible = subslotState['global_control_panels_visible'];
+          console.log('📂 state-manager経由でパネル表示状態を取得しました');
+        } else {
+          console.log('📝 state-managerにパネル表示状態がないため、フォールバック');
+          isVisible = window.controlPanelsVisible;
         }
+      } else {
+        // フォールバック：直接localStorage読み込み
+        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+        if (saved) {
+          const state = JSON.parse(saved);
+          if (state.hasOwnProperty('global_control_panels_visible')) {
+            isVisible = state['global_control_panels_visible'];
+          }
+        }
+        console.log('📂 直接localStorageからパネル表示状態を取得しました（state-manager未利用）');
       }
     } catch (error) {
-      console.warn('⚠️ localStorage読み込みエラー:', error);
+      console.warn('⚠️ パネル表示状態読み込みエラー:', error);
       // フォールバック: window.controlPanelsVisibleを使用
       isVisible = window.controlPanelsVisible;
     }
     
     panelElement.style.display = isVisible ? 'block' : 'none';
-    console.log(`🔄 サブスロット制御パネルの表示を同期: ${isVisible ? '表示' : '非表示'} (localStorage: ${isVisible})`);
+    console.log(`🔄 サブスロット制御パネルの表示を同期: ${isVisible ? '表示' : '非表示'} (state: ${isVisible})`);
   }
 }
 
