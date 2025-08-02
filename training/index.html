@@ -349,6 +349,8 @@
   </script>
   <script src="js/explanation_system.js">
   </script>
+  <script src="js/modules/explanation-manager.js">
+  </script>
   <script src="js/zoom_controller.js">
   </script>
  </head>
@@ -2554,31 +2556,35 @@ window.clearRandomizeHistory = function() {
   </div>
 </div>
 
-<!-- 🧪 ExplanationSystem テスト用初期化 -->
+<!-- 🎯 ExplanationManager統合初期化 -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🧪 ExplanationSystemテスト用初期化開始');
-  
-  // state-managerの確認
-  if (typeof window.RephraseStateManager !== 'undefined') {
-    console.log('✅ RephraseStateManager利用可能');
+// ExplanationManager初期化
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    console.log('🎯 ExplanationManager統合初期化開始...');
     
-    // ExplanationSystemの初期化
-    if (typeof ExplanationSystem !== 'undefined') {
-      console.log('✅ ExplanationSystemクラス利用可能');
-      window.explanationSystem = new ExplanationSystem();
-      window.explanationSystem.initialize().then(success => {
-        if (success) {
-          console.log('✅ ExplanationSystem初期化成功');
-        } else {
-          console.error('❌ ExplanationSystem初期化失敗');
-        }
-      });
-    } else {
-      console.error('❌ ExplanationSystemクラスが見つかりません');
+    // RephraseStateManagerの確認
+    if (typeof window.RephraseStateManager === 'undefined') {
+      console.error('❌ RephraseStateManagerが見つかりません');
+      return;
     }
-  } else {
-    console.error('❌ RephraseStateManagerが見つかりません');
+    
+    // ExplanationManagerインスタンスを作成
+    window.explanationManager = new ExplanationManager();
+    await window.explanationManager.initialize();
+    
+    // 後方互換性: グローバル変数の設定
+    explanationSystem = window.explanationManager;
+    
+    console.log('✅ ExplanationManager統合完了');
+    console.log('🧪 テスト関数: window.testExplanation(), window.showExplanation()');
+    
+    // テスト関数の提供
+    window.testExplanation = () => window.explanationManager.test();
+    window.showExplanation = () => window.explanationManager.showExplanation();
+    
+  } catch (error) {
+    console.error('❌ ExplanationManager初期化エラー:', error);
   }
 });
 </script>
