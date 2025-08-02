@@ -197,10 +197,11 @@ class ExplanationSystem {
   // テスト用の解説表示
   showTestExplanation() {
     const testTitle = "解説システムテスト";
+    const explanationDataLength = (this.stateManager.getState(this.STATE_PATHS.EXPLANATION_DATA) || []).length;
     const testContent = `
       <h4>✅ システム動作確認</h4>
       <p>解説モーダルが正常に動作しています。</p>
-      <p><strong>読み込み済み解説データ:</strong> ${this.explanationData.length}件</p>
+      <p><strong>読み込み済み解説データ:</strong> ${explanationDataLength}件</p>
       <h4>📚 次のフェーズ</h4>
       <ul>
         <li>V_group_key検出機能の実装</li>
@@ -361,8 +362,11 @@ class ExplanationSystem {
   showContextualExplanation() {
     console.log('🔍 解説表示開始');
     
+    // state-managerから解説データを取得
+    const explanationData = this.stateManager.getState(this.STATE_PATHS.EXPLANATION_DATA) || [];
+    
     // デバッグ: 現在の解説データ一覧を表示
-    console.log('📊 利用可能な解説データ:', this.explanationData.map(item => ({
+    console.log('📊 利用可能な解説データ:', explanationData.map(item => ({
       V_group_key: item.V_group_key,
       title: item.explanation_title
     })));
@@ -379,6 +383,7 @@ class ExplanationSystem {
     if (!explanation) {
       // 元の動詞テキストを取得してカスタムメッセージを表示
       const originalVerb = this.getOriginalVerbText();
+      const explanationData = this.stateManager.getState(this.STATE_PATHS.EXPLANATION_DATA) || [];
       const debugInfo = `
         <p>「${originalVerb || vGroupKey}」に対応する解説が見つかりません。</p>
         <h4>🔍 デバッグ情報</h4>
@@ -386,7 +391,7 @@ class ExplanationSystem {
         <p><strong>元の動詞:</strong> ${originalVerb}</p>
         <p><strong>利用可能な解説:</strong></p>
         <ul>
-          ${this.explanationData.map(item => 
+          ${explanationData.map(item => 
             `<li>${item.V_group_key}: ${item.explanation_title}</li>`
           ).join('')}
         </ul>
