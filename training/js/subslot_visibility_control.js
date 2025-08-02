@@ -609,8 +609,19 @@ function hideAllEnglishInSubslots(parentSlot) {
     }
   });
   
-  // localStorageに保存
-  localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+  // 🎯 **修正：state-manager経由で状態保存**
+  try {
+    if (window.RephraseState) {
+      window.RephraseState.setState('visibility.subslots', visibilityState);
+      console.log(`💾 ${parentSlot}のサブスロット英文状態をstate-manager経由で保存`);
+    } else {
+      // フォールバック：直接localStorage保存
+      localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+      console.log(`💾 ${parentSlot}のサブスロット英文状態を直接localStorageに保存（state-manager未利用）`);
+    }
+  } catch (error) {
+    console.error(`❌ ${parentSlot}のサブスロット英文状態保存に失敗:`, error);
+  }
   
   // サブスロット制御パネルのボタン状態を更新
   const controlPanel = document.getElementById(`subslot-visibility-panel-${parentSlot}`);
