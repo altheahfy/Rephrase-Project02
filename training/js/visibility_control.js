@@ -454,6 +454,9 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   // 状態を更新
   questionWordVisibilityState[elementType] = isVisible;
   
+  // 🆕 グローバル変数を確実に同期（insert_test_data_clean.jsとの連携のため）
+  window.questionWordVisibilityState = questionWordVisibilityState;
+  
   // DOM要素を制御
   const questionWordArea = document.getElementById('display-top-question-word');
   if (questionWordArea) {
@@ -481,7 +484,10 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
 // 📁 疑問詞表示状態をstate-manager経由で保存
 function saveQuestionWordVisibilityState() {
   try {
-    // 🎯 **修正：state-manager経由で状態保存**
+    // � グローバル変数を確実に更新（insert_test_data_clean.jsとの連携のため）
+    window.questionWordVisibilityState = questionWordVisibilityState;
+    
+    // �🎯 **修正：state-manager経由で状態保存**
     if (window.RephraseState) {
       window.RephraseState.setState('visibility.questionWord', questionWordVisibilityState);
       console.log("💾 疑問詞表示状態をstate-manager経由で保存しました:", questionWordVisibilityState);
@@ -515,6 +521,11 @@ function loadQuestionWordVisibilityState() {
         console.log("📂 直接localStorageから疑問詞表示状態を読み込みました:", questionWordVisibilityState);
       }
     }
+    
+    // 🆕 グローバル変数を確実に更新（insert_test_data_clean.jsとの連携のため）
+    window.questionWordVisibilityState = questionWordVisibilityState;
+    console.log("🔄 グローバル疑問詞状態を同期しました:", window.questionWordVisibilityState);
+    
   } catch (error) {
     console.error("❌ 疑問詞表示状態の読み込みに失敗:", error);
   }
@@ -524,6 +535,9 @@ function loadQuestionWordVisibilityState() {
 function resetQuestionWordVisibility() {
   questionWordVisibilityState.text = true;
   questionWordVisibilityState.auxtext = true;
+  
+  // 🆕 グローバル変数を確実に同期（insert_test_data_clean.jsとの連携のため）
+  window.questionWordVisibilityState = questionWordVisibilityState;
   
   toggleQuestionWordVisibility('text', true);
   toggleQuestionWordVisibility('auxtext', true);
@@ -613,6 +627,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 🆕 疑問詞状態も読み込み
   loadQuestionWordVisibilityState();
+  
+  // 🆕 グローバル変数を確実に初期化（insert_test_data_clean.jsとの連携のため）
+  window.questionWordVisibilityState = questionWordVisibilityState;
+  console.log("🔄 グローバル疑問詞状態を初期化しました:", window.questionWordVisibilityState);
   
   // UI設定は少し遅らせて実行（DOM構築完了を確実にするため）
   setTimeout(() => {
