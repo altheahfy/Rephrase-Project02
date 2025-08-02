@@ -9,12 +9,14 @@
 
 class ExplanationSystem {
   constructor() {
-    // RephraseStateManagerのインスタンスを取得または作成
-    this.stateManager = window.stateManager || new window.RephraseStateManager();
+    // RephraseStateManagerのインスタンスを取得（既存のwindow.RephraseStateを使用）
+    this.stateManager = window.RephraseState;
     
-    // グローバルにインスタンスを保存（他のマネージャーとの共用）
-    if (!window.stateManager) {
-      window.stateManager = this.stateManager;
+    // デバッグ用ログ
+    if (!this.stateManager) {
+      console.error('RephraseState not found. Make sure state-manager.js is loaded.');
+    } else {
+      console.log('ExplanationSystem: Connected to RephraseState:', this.stateManager);
     }
     
     this.modal = null;
