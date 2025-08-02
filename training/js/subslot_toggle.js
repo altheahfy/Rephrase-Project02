@@ -69,6 +69,17 @@ function toggleExclusiveSubslot(slotId) {
     target.style.visibility = "visible";
     target.style.minHeight = "100px";
     
+    // 🎯 Android横画面時のサブスロットエリア幅を動的設定
+    if (window.matchMedia && window.matchMedia('(orientation: landscape)').matches) {
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobile) {
+        console.log(`🎯 横画面開放: サブスロットエリア幅を140vwに設定`);
+        target.style.setProperty('width', '140vw', 'important');
+        target.style.setProperty('min-width', '140vw', 'important');
+        target.style.setProperty('max-width', '140vw', 'important');
+      }
+    }
+    
     console.log(`✅ slot-${slotId}-sub opened, display: ${getComputedStyle(target).display}`);
     console.log(`🔍 位置確認: marginLeft=${target.style.marginLeft}, maxWidth=${target.style.maxWidth}`);
 
@@ -904,3 +915,36 @@ function addDummyScrollArea(subslotWrapper) {
 window.addHorizontalDragToSubslot = addHorizontalDragToSubslot;
 window.addHorizontalDragToAllSubslots = addHorizontalDragToAllSubslots;
 window.addDummyScrollArea = addDummyScrollArea;
+
+// 🎯 画面回転時のサブスロットエリア幅調整
+function adjustSubslotAreaWidth() {
+  const subslotWrappers = document.querySelectorAll('.slot-wrapper[id$="-sub"]');
+  if (subslotWrappers.length === 0) return;
+  
+  const isLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  subslotWrappers.forEach(wrapper => {
+    if (isMobile && isLandscape) {
+      console.log(`🎯 横画面: ${wrapper.id} 幅を140vwに設定`);
+      wrapper.style.setProperty('width', '140vw', 'important');
+      wrapper.style.setProperty('min-width', '140vw', 'important');
+      wrapper.style.setProperty('max-width', '140vw', 'important');
+    } else if (isMobile) {
+      console.log(`🎯 縦画面: ${wrapper.id} 幅をリセット`);
+      wrapper.style.removeProperty('width');
+      wrapper.style.removeProperty('min-width');
+      wrapper.style.removeProperty('max-width');
+    }
+  });
+}
+
+// 画面回転イベントリスナー
+if (window.addEventListener) {
+  window.addEventListener('orientationchange', function() {
+    setTimeout(adjustSubslotAreaWidth, 100); // 回転完了後に実行
+  });
+  
+  // 初期化時にも実行
+  window.addEventListener('DOMContentLoaded', adjustSubslotAreaWidth);
+}
