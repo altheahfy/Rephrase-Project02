@@ -15,6 +15,34 @@
 ### Script Tag システム（従来型）
 グローバルスコープで動作し、DOMイベントやユーザーインタラクションを直接処理。
 
+## 🔄 状態管理統一アーキテクチャ（2025年8月2日更新）
+
+### 中央集権的状態管理
+全てのlocalStorage操作が`state-manager.js`を経由する統一アーキテクチャ。
+
+#### 統一前（問題があった状態）
+```javascript
+// 各ファイルが独自にlocalStorage操作
+localStorage.setItem('rephrase_visibility_state', JSON.stringify(data));
+localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(data));
+// → 競合、不整合、デバッグ困難
+```
+
+#### 統一後（現在の状態）
+```javascript
+// 全て統一されたインターフェース
+window.RephraseState.setState('visibility.main', data);
+window.RephraseState.setState('visibility.subslots', data);
+window.RephraseState.setState('visibility.questionWord', data);
+// → 一貫性、デバッグ容易、拡張性
+```
+
+#### メリット
+- **データ整合性**: 単一の管理ポイントで競合を排除
+- **デバッグ効率**: 統一されたログ出力で問題特定が容易
+- **拡張性**: 新機能追加時の一貫したパターン
+- **保守性**: 状態管理ロジックの一元化
+
 ## 📁 ファイル一覧と役割
 
 ### 🔒 セキュリティ・認証システム
@@ -69,34 +97,51 @@
 - **使用場所**: `training/index.html`
 - **依存関係**: なし
 
-#### `insert_test_data_clean.js`
+#### `insert_test_data_clean.js` ★state-manager連携強化
 - **役割**: 動的記載エリア監視・同期システム
 - **機能**: 
   - `dynamic-slot-area`の変更監視（MutationObserver使用）
   - `window.loadedJsonData`から例文データを読み取り
   - 動的記載エリアから静的DOMへのデータ同期
   - サブスロット順序制御、DisplayAtTop処理
+  - 疑問詞状態復元（state-manager経由）
+- **状態管理**: 疑問詞表示状態の復元ロジック追加
 - **使用場所**: `training/index.html`
-- **依存関係**: `window.loadedJsonData` (グローバル変数)
+- **依存関係**: `window.loadedJsonData` (グローバル変数), `state-manager.js` (疑問詞状態管理)
 - **提供**: 処理完了シグナル (image_auto_hide.jsが待機)
 
 ### 🎛️ UI制御システム
-#### `control_panel_manager.js`
+#### `state-manager.js` ★NEW
+- **役割**: 中央集権的状態管理システム
+- **機能**: 全システムのlocalStorage操作を統一管理、状態変更リスナー、ディープマージ
+- **Export**: `RephraseState` (グローバルオブジェクト)
+- **使用場所**: `training/index.html` (最初に読み込み)
+- **依存関係**: なし
+- **提供**: `RephraseState.getState()`, `RephraseState.setState()`
+
+#### `control_panel_manager.js` ★state-manager統合済み
 - **役割**: コントロールパネル管理
 - **機能**: 設定パネル、ユーザーインターフェース制御
+- **状態管理**: RephraseState.getState/setState経由 (15箇所で使用)
 - **使用場所**: `training/index.html`
-- **依存関係**: なし
+- **依存関係**: `state-manager.js`
 
-#### `visibility_control.js`
+#### `visibility_control.js` ★state-manager統合済み
 - **役割**: 要素表示制御
-- **機能**: スロット・要素の表示/非表示切り替え、`questionWordVisibilityState`宣言
+- **機能**: スロット・要素の表示/非表示切り替え、疑問詞表示状態管理
+- **状態管理**: RephraseState.getState/setState経由での統一管理
+- **localStorage**: `visibility.main`, `visibility.questionWord`
 - **使用場所**: `training/index.html`
-- **依存関係**: なし
-- **提供**: `questionWordVisibilityState` (グローバル変数)
+- **依存関係**: `state-manager.js`
+- **提供**: `questionWordVisibilityState` (グローバル変数、state-manager同期)
 
-#### `subslot_visibility_control.js`
+#### `subslot_visibility_control.js` ★state-manager統合済み
 - **役割**: サブスロット表示制御
 - **機能**: 詳細レベルのサブスロット表示管理
+- **状態管理**: RephraseState.getState/setState経由 (19箇所で使用)
+- **localStorage**: `visibility.subslots`
+- **使用場所**: `training/index.html`
+- **依存関係**: `state-manager.js`
 - **使用場所**: `training/index.html`
 - **依存関係**: なし
 
@@ -270,6 +315,11 @@ MutationObserver監視 (insert_test_data_clean.js)
 
 ## 🔄 更新履歴
 
+- **2025-08-02**: state-manager統合対応アーキテクチャ更新
+  - **状態管理統一**: localStorage操作を全てstate-manager.js経由に統一
+  - **影響ファイル**: `visibility_control.js`, `subslot_visibility_control.js`, `control_panel_manager.js`, `insert_test_data_clean.js`
+  - **変更内容**: RephraseState.getState/setState経由での状態管理に変更
+  - **メリット**: データ整合性向上、デバッグ効率化、将来拡張性向上
 - **2025-08-01**: 初版作成、未使用ファイル整理完了
 - **対象バージョン**: Rephrase English Learning System v2025.07.27-1
 
