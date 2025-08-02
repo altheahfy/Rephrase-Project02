@@ -6453,23 +6453,30 @@ class VoiceSystem {
      * 音声認識の重要状態変更時に呼び出される
      */
     syncRecognitionStateToManager() {
+        console.log('[VoiceSystem] 🔄 状態同期開始');
+        
         if (window.RephraseState) {
             try {
+                console.log('[VoiceSystem] RephraseStateManagerが存在、状態同期実行中...');
+                
                 // 重要な音声認識状態をリアルタイム同期
                 window.RephraseState.setState('audio.recognition.isActive', this.isRecognitionActive);
                 window.RephraseState.setState('audio.recognition.recognizedText', this.recognizedText || '');
                 window.RephraseState.setState('audio.recognition.isRecording', this.isRecording);
                 window.RephraseState.setState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
                 
-                console.log('[VoiceSystem] 音声認識状態同期完了:', {
+                console.log('[VoiceSystem] ✅ 音声認識状態同期完了:', {
                     isActive: this.isRecognitionActive,
                     hasText: !!this.recognizedText,
                     isRecording: this.isRecording,
                     isAnalyzing: this.isAndroidAnalyzing
                 });
             } catch (error) {
-                console.warn('[VoiceSystem] 音声認識状態同期エラー:', error);
+                console.warn('[VoiceSystem] ❌ 音声認識状態同期エラー:', error);
+                console.error('[VoiceSystem] エラー詳細:', error.stack);
             }
+        } else {
+            console.warn('[VoiceSystem] ⚠️ RephraseStateManagerが存在しません、状態同期をスキップ');
         }
     }
 }
