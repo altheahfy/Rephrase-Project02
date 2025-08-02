@@ -1739,6 +1739,21 @@ window.safeJsonSync = function(data) {
       if (typeof displayTopQuestionWord === 'function') {
         displayTopQuestionWord();
         console.log("✅ 分離疑問詞表示の更新が完了");
+        
+        // 🆕 疑問詞の表示状態を復元
+        if (typeof window.toggleQuestionWordVisibility === 'function' && 
+            typeof window.questionWordVisibilityState === 'object') {
+          
+          ['text', 'auxtext'].forEach(elementType => {
+            const isVisible = window.questionWordVisibilityState[elementType] ?? true;
+            window.toggleQuestionWordVisibility(elementType, isVisible);
+            console.log(`🔄 疑問詞${elementType}状態を復元: ${isVisible}`);
+          });
+          
+          console.log("✅ 疑問詞表示状態の復元が完了");
+        } else {
+          console.warn("⚠ 疑問詞表示状態復元関数が見つかりません");
+        }
       }
     } catch (displayError) {
       console.error("❌ 分離疑問詞表示更新中にエラーが発生:", displayError.message);
