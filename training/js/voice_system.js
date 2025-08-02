@@ -124,7 +124,19 @@ class VoiceSystem {
         
         console.log('✅ 音声システム初期化完了');
         
-        // 🔧 デバッグ用: グローバルアクセス可能にする
+        // � RephraseStateManager統合: マネージャー登録
+        if (window.rephraseStateManager) {
+            try {
+                window.rephraseStateManager.registerManager('voice', this);
+                console.log('[VoiceSystem] RephraseStateManagerに登録完了');
+            } catch (error) {
+                console.warn('[VoiceSystem] RephraseStateManager登録エラー:', error);
+            }
+        } else {
+            console.log('[VoiceSystem] RephraseStateManagerが見つかりません（単体動作モード）');
+        }
+        
+        // �🔧 デバッグ用: グローバルアクセス可能にする
         window.voiceSystemDebug = {
             showPanel: () => this.showVoicePanel(),
             hidePanel: () => this.hideVoicePanel(),
