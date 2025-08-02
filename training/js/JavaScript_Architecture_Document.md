@@ -113,13 +113,22 @@ window.RephraseState.setState('explanation.data.explanationData', data);
 - **提供**: 処理完了シグナル (image_auto_hide.jsが待機)
 
 ### 🎛️ UI制御システム
-#### `state-manager.js` ★NEW
-- **役割**: 中央集権的状態管理システム
-- **機能**: 全システムのlocalStorage操作を統一管理、状態変更リスナー、ディープマージ
-- **Export**: `RephraseState` (グローバルオブジェクト)
+#### `state-manager.js` ★CORE SYSTEM
+- **役割**: 中央集権的状態管理システム + マネージャー統合
+- **機能**: 
+  - 全システムのlocalStorage操作を統一管理
+  - 状態変更リスナー、ディープマージ
+  - **NEW**: マネージャーインスタンス統合機能
+  - **NEW**: ZoomControllerManager自動初期化
+- **Export**: 
+  - `RephraseState` (グローバルオブジェクト)
+  - `RephraseStateManager` (クラス)
 - **使用場所**: `training/index.html` (最初に読み込み)
 - **依存関係**: なし
-- **提供**: `RephraseState.getState()`, `RephraseState.setState()`
+- **提供**: 
+  - `RephraseState.getState()`, `RephraseState.setState()`
+  - `RephraseState.registerManager()`, `RephraseState.getManager()`
+  - `window.getRephraseManagers()` (デバッグ用)
 
 #### `control_panel_manager.js` ★state-manager統合済み
 - **役割**: コントロールパネル管理
@@ -153,11 +162,27 @@ window.RephraseState.setState('explanation.data.explanationData', data);
 - **使用場所**: `training/index.html`
 - **依存関係**: なし
 
-#### `zoom_controller.js`
-- **役割**: ズーム機能制御
-- **機能**: 画面拡大縮小、モバイル対応ズーム
+#### `zoom_controller.js` ❌DEPRECATED
+- **状態**: 廃止予定（modules/zoom-controller-manager.js に統合）
+- **役割**: 従来のズーム機能制御
+- **使用場所**: 使用停止
+
+#### ZoomControllerManager (`modules/zoom-controller-manager.js`) ★NEW
+- **役割**: 手動ズーム・縮小機構（モジュール化）
+- **機能**: 
+  - リアルタイムズーム調整（50%〜150%）
+  - 縦横比保持（CSS transform: scale）
+  - S/C1スロット特別処理（垂直位置補正）
+  - 動的サブスロット対応（MutationObserver）
+  - 設定永続化（localStorage）
+- **設計仕様**: `設計仕様書/zoom_controller_specification.md` に準拠
+- **状態管理**: RephraseStateManager統合
 - **使用場所**: `training/index.html`
-- **依存関係**: なし
+- **依存関係**: 
+  - `state-manager.js` (RephraseStateManager)
+  - DOM要素: `zoomSlider`, `zoomValue`, `zoomResetButton`
+- **提供**: `window.zoomController` (グローバルAPI)
+- **テストファイル**: `modules/zoom-controller-manager-test.js`
 
 ### � 例文解説システム
 #### `explanation_system.js` ★state-manager統合済み

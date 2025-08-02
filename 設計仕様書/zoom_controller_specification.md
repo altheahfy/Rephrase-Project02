@@ -4,42 +4,57 @@
 
 Rephraseトレーニングシステムにおけるスピーキング練習時の視認性向上のため、スロット空間全体を縦横比を保ったまま拡大・縮小する機構。
 
+**実装状況**: ✅ 完了（2025年8月2日）
+- **実装ファイル**: `training/js/modules/zoom-controller-manager.js`
+- **統合システム**: RephraseStateManager連携
+- **テストファイル**: `training/js/modules/zoom-controller-manager-test.js`
+
 ## 機能要件
 
 ### 主要機能
-- **リアルタイムズーム調整**: スライダーによる50%〜150%の範囲でのズーム制御
-- **縦横比保持**: CSS `transform: scale()` を使用した比率保持ズーム
-- **位置関係維持**: 上位スロットとサブスロットの相対位置を完全保持
-- **設定永続化**: ローカルストレージによるズームレベル保存
-- **動的対応**: サブスロット展開時の自動ズーム適用
+- **リアルタイムズーム調整**: スライダーによる50%〜150%の範囲でのズーム制御 ✅
+- **縦横比保持**: CSS `transform: scale()` を使用した比率保持ズーム ✅
+- **位置関係維持**: 上位スロットとサブスロットの相対位置を完全保持 ✅
+- **設定永続化**: ローカルストレージによるズームレベル保存 ✅
+- **動的対応**: サブスロット展開時の自動ズーム適用 ✅
+- **S/C1特別処理**: 垂直位置補正機能 ✅
+- **RephraseStateManager統合**: 状態管理統一 ✅
 
 ### 対象要素
-- **スロット領域全体**: 例文シャッフルボタンとスロットコンテナを含む `<section>` 要素
-- **上位スロット**: M1, S, AUX, M2, O1等のメインスロット
-- **サブスロット**: 各スロットの詳細展開エリア（`[id$="-sub"]`）
+- **スロット領域全体**: 例文シャッフルボタンとスロットコンテナを含む `<section>` 要素 ✅
+- **上位スロット**: M1, S, AUX, M2, O1等のメインスロット ✅
+- **サブスロット**: 各スロットの詳細展開エリア（`[id$="-sub"]`） ✅
 
 ## 技術仕様
 
-### クラス構造
+### クラス構造（ZoomControllerManager）
 
 ```javascript
-class ZoomController {
-  constructor()
-  init()
-  identifyTargetContainers()
-  setupEventListeners()
-  applyZoom(zoomLevel)
-  updateZoomDisplay(zoomLevel)
-  saveZoomLevel(zoomLevel)
-  loadZoomLevel()
-  forceDefaultZoom()
-  resetZoom()
-  setupDynamicSubslotObserver()
-  setZoom(zoomLevel)
-  getCurrentZoom()
-  forceSubslotDetection()
-  createScrollHint()
-  showScrollHint(show)
+class ZoomControllerManager {
+  constructor()                    // RephraseStateManager統合
+  initializeState()               // 状態初期化
+  init()                          // メイン初期化
+  acquireDOMElements()            // DOM要素取得
+  scheduleDelayedInit()           // 遅延初期化
+  identifyTargetContainers()      // ズーム対象特定
+  saveOriginalMarginValue()       // margin値保存
+  setupEventListeners()           // イベント設定
+  applyZoom(zoomLevel)           // ズーム適用（S/C1特別処理含む）
+  updateZoomDisplay(zoomLevel)    // 表示更新
+  saveZoomLevel(zoomLevel)       // 設定保存
+  loadZoomLevel()                // 設定読み込み
+  forceDefaultZoom()             // 強制100%設定
+  resetZoom()                    // リセット
+  setupDynamicSubslotObserver()  // 動的監視
+  setZoom(zoomLevel)             // 外部API
+  getCurrentZoom()               // 現在値取得
+  forceSubslotDetection()        // 強制検出
+  createScrollHint()             // ヒント作成
+  showScrollHint(show)           // ヒント表示
+  debugInfo()                    // デバッグ情報
+  debugVerticalPosition()        // 位置診断
+  resetSettings()                // 設定リセット
+  destroy()                      // 破棄
 }
 ```
 
@@ -47,6 +62,7 @@ class ZoomController {
 
 | プロパティ | 型 | 説明 |
 |------------|-----|------|
+| `stateManager` | RephraseStateManager | 状態管理インスタンス |
 | `zoomSlider` | HTMLElement | ズームスライダー要素 |
 | `zoomValue` | HTMLElement | ズーム値表示要素 |
 | `zoomResetButton` | HTMLElement | リセットボタン要素 |
@@ -329,6 +345,46 @@ window.debugVerticalPosition = () => {
 ## 変更履歴
 
 | バージョン | 日付 | 変更内容 |
+|------------|------|----------|
+| 1.0 | 2025年7月 | 初版作成 |
+| 1.1 | 2025年8月2日 | **実装完了・モジュール化対応** |
+
+## 実装完了状況（2025年8月2日）
+
+### ✅ 完了機能
+- **ZoomControllerManager**: 完全実装（770行）
+- **RephraseStateManager統合**: 状態管理統一
+- **S/C1垂直位置補正**: 垂直補正計算式 `(1 - zoomLevel) * 600` 適用
+- **動的サブスロット対応**: MutationObserver実装
+- **設定永続化**: localStorage連携
+- **無限ループ対策**: デバウンス機能付きMutationObserver
+- **テストシステム**: 包括的テストスイート（500行）
+
+### 🎯 動作確認済み
+- ズームスライダー操作: 50%〜150%のリアルタイムズーム
+- S/C1特別処理: 垂直位置補正が正確に機能
+- サブスロット動的対応: 開閉時の自動ズーム適用
+- 状態管理統合: RephraseStateManagerとの連携
+
+### 📁 関連ファイル
+- **実装**: `training/js/modules/zoom-controller-manager.js`
+- **テスト**: `training/js/modules/zoom-controller-manager-test.js`  
+- **統合**: `training/js/core/state-manager.js`
+- **HTML統合**: `training/index.html`
+
+### 🔗 API
+```javascript
+// グローバルAPI
+window.zoomController          // ZoomControllerManagerインスタンス
+window.setZoom(1.2)           // ズーム設定
+window.resetZoom()            // リセット
+window.getCurrentZoom()       // 現在値取得
+window.forceSubslotDetection() // 強制検出
+window.debugZoomController()   // デバッグ情報
+window.debugVerticalPosition() // 位置診断
+```
+
+**設計仕様書に基づく正確な実装が完了しました。** 🎉
 |------------|------|----------|
 | v1.0 | 2025-07-18 | 初期実装完了 |
 | | | - 正確なsection要素特定機能 |
