@@ -129,6 +129,9 @@ class VoiceSystem {
             try {
                 window.RephraseState.registerManager('voice', this);
                 console.log('[VoiceSystem] RephraseStateManagerに登録完了');
+                
+                // 🚀 音声認識状態の初期化
+                this.initializeVoiceStateWithManager();
             } catch (error) {
                 console.warn('[VoiceSystem] RephraseStateManager登録エラー:', error);
             }
@@ -1252,6 +1255,9 @@ class VoiceSystem {
             this.startRecordingTimer();
             this.setupVolumeMonitoring(stream);
             
+            // 🔄 RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
+            
             this.updateStatus('🎤 Web Audio API録音中... 0.0秒', 'recording');
             this.addDebugLog('✅ Web Audio API録音開始', 'success');
 
@@ -1259,6 +1265,9 @@ class VoiceSystem {
             this.addDebugLog(`❌ Web Audio API録音開始エラー: ${error.message}`, 'error');
             this.updateStatus('❌ 録音開始失敗', 'error');
             this.isRecording = false;
+            
+            // 🔄 RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
         }
     }
 
@@ -5225,6 +5234,9 @@ class VoiceSystem {
                 console.log(`📊 追加内容: "${finalTranscript.trim()}"`);
                 console.log(`📊 文字数変化: ${beforeLength} → ${afterLength}`);
                 console.log(`📊 累積結果: "${this.recognizedText.trim()}"`);
+                
+                // 🔄 RephraseStateManagerに状態同期
+                this.syncRecognitionStateToManager();
             }
             
             // 📱 Android対応：中間結果も積極的に保存（final結果が来ない場合の対策）
@@ -5238,6 +5250,9 @@ class VoiceSystem {
                     this.recognizedText += interimTranscript;
                     console.log('📱 Android: 中間結果をメイン結果として採用');
                     this.addDebugLog(`📱 中間結果採用: "${interimTranscript.trim()}"`, 'success');
+                    
+                    // 🔄 RephraseStateManagerに状態同期
+                    this.syncRecognitionStateToManager();
                 } else if (interimTranscript.trim()) {
                     console.log('📱 Android: 中間結果を補助として保存');
                 }
@@ -5268,6 +5283,9 @@ class VoiceSystem {
             this.isRecognitionActive = true;
             this.recognizedText = ''; // 新しい認識セッション開始時にクリア
             this.addDebugLog('✅ 音声認識状態をアクティブに設定し、認識テキストをクリアしました', 'success');
+            
+            // 🔄 RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
         };
         
         // 認識終了
@@ -5277,7 +5295,10 @@ class VoiceSystem {
             
             this.isRecognitionActive = false;
             
-            // 📱 Android対応：認識終了時に最終結果を再確認
+            // � RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
+            
+            // �📱 Android対応：認識終了時に最終結果を再確認
             if (/Android/i.test(navigator.userAgent)) {
                 this.addDebugLog('📱 Android: 認識終了時の特別チェック', 'info');
                 if (!this.recognizedText.trim()) {
@@ -6398,6 +6419,58 @@ class VoiceSystem {
         this.debugLogs = [];
         this.addDebugLog('🗑️ ログをクリアしました', 'info');
         this.updateMobileDebugPanel();
+    }
+
+    /**
+     * 🔗 RephraseStateManagerとの音声認識状態統合
+     * 音声認識状態をRephraseStateManagerに同期する
+     */
+    initializeVoiceStateWithManager() {
+        console.log('[VoiceSystem] 音声認識状態の初期化開始');
+        
+        // RephraseStateManagerに音声認識の初期状態を設定
+        if (window.RephraseState) {
+            try {
+                // 音声認識状態の初期化
+                window.RephraseState.updateState('audio.recognition.isActive', this.isRecognitionActive);
+                window.RephraseState.updateState('audio.recognition.recognizedText', this.recognizedText || '');
+                window.RephraseState.updateState('audio.recognition.isRecording', this.isRecording);
+                window.RephraseState.updateState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
+                
+                console.log('[VoiceSystem] 音声認識状態をRephraseStateManagerに初期化完了');
+                console.log('- isRecognitionActive:', this.isRecognitionActive);
+                console.log('- recognizedText:', this.recognizedText || '(空)');
+                console.log('- isRecording:', this.isRecording);
+                console.log('- isAndroidAnalyzing:', this.isAndroidAnalyzing);
+            } catch (error) {
+                console.warn('[VoiceSystem] 音声認識状態初期化エラー:', error);
+            }
+        }
+    }
+
+    /**
+     * 🔄 音声認識状態をRephraseStateManagerに同期
+     * 音声認識の重要状態変更時に呼び出される
+     */
+    syncRecognitionStateToManager() {
+        if (window.RephraseState) {
+            try {
+                // 重要な音声認識状態をリアルタイム同期
+                window.RephraseState.updateState('audio.recognition.isActive', this.isRecognitionActive);
+                window.RephraseState.updateState('audio.recognition.recognizedText', this.recognizedText || '');
+                window.RephraseState.updateState('audio.recognition.isRecording', this.isRecording);
+                window.RephraseState.updateState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
+                
+                console.log('[VoiceSystem] 音声認識状態同期完了:', {
+                    isActive: this.isRecognitionActive,
+                    hasText: !!this.recognizedText,
+                    isRecording: this.isRecording,
+                    isAnalyzing: this.isAndroidAnalyzing
+                });
+            } catch (error) {
+                console.warn('[VoiceSystem] 音声認識状態同期エラー:', error);
+            }
+        }
     }
 }
 
