@@ -526,6 +526,9 @@ class RephraseStateManager {
   }
 }
 
+// クラスをグローバルにエクスポート
+window.RephraseStateManager = RephraseStateManager;
+
 // グローバルインスタンス作成
 window.RephraseState = new RephraseStateManager();
 

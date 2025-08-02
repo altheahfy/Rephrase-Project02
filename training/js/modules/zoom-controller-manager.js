@@ -18,11 +18,21 @@
 
 class ZoomControllerManager {
   constructor() {
-    // RephraseStateManagerのインスタンスを取得または作成（ExplanationManagerパターン適用）
-    this.stateManager = window.stateManager || new window.RephraseStateManager();
+    // RephraseStateManagerのインスタンスを取得（既存のwindow.RephraseStateを使用）
+    this.stateManager = window.RephraseState || window.stateManager;
+    
+    // stateManagerが存在しない場合のフォールバック
+    if (!this.stateManager) {
+      console.warn('⚠️ RephraseStateManagerが見つかりません。基本機能のみで動作します。');
+      this.stateManager = {
+        setState: () => {},
+        getState: () => undefined,
+        registerManager: () => {}
+      };
+    }
     
     // グローバルにインスタンスを保存（他のマネージャーとの共有用）
-    if (!window.stateManager) {
+    if (!window.stateManager && this.stateManager !== window.RephraseState) {
       window.stateManager = this.stateManager;
     }
     
