@@ -1549,42 +1549,17 @@ function hideEmptyQuestionWordArea(jsonData) {
   const displayAtTopItem = jsonData?.find(d => d.DisplayAtTop && d.DisplayText && d.DisplayText.trim() !== "");
   
   if (displayAtTopItem) {
-    // DisplayAtTopアイテムがある場合は基本表示設定
-    questionWordArea.style.display = "";
-    questionWordArea.classList.remove("empty-slot-hidden", "hidden");
-    questionWordArea.classList.add("visible"); // Grid表示を有効化
-    console.log(`👁 分離疑問詞エリアを表示: ${displayAtTopItem.DisplayText}`);
+    // DisplayAtTopアイテムがある場合は、エリア自体は表示可能状態にする（但し、制御パネルの設定は尊重）
+    questionWordArea.classList.remove("empty-slot-hidden");
+    console.log(`✅ 分離疑問詞エリアにデータあり: ${displayAtTopItem.DisplayText} (制御パネル設定は維持)`);
     
-    // 🆕 制御パネルの表示状態を再適用（状態復元処理を尊重）
-    if (typeof window.toggleQuestionWordVisibility === 'function' && 
-        typeof window.questionWordVisibilityState === 'object') {
-      
-      ['text', 'auxtext'].forEach(elementType => {
-        const isVisible = window.questionWordVisibilityState[elementType] ?? true;
-        // 制御パネルで設定された状態を再適用（DOM操作のみ、状態保存はしない）
-        const questionWordArea = document.getElementById('display-top-question-word');
-        if (questionWordArea) {
-          if (elementType === 'text') {
-            const textElements = questionWordArea.querySelectorAll('.question-word-text');
-            textElements.forEach(element => {
-              element.style.display = isVisible ? 'inline' : 'none';
-            });
-          } else if (elementType === 'auxtext') {
-            const auxtextElements = questionWordArea.querySelectorAll('.question-word-auxtext');
-            auxtextElements.forEach(element => {
-              element.style.display = isVisible ? 'inline' : 'none';
-            });
-          }
-        }
-        console.log(`🔄 制御パネル状態を再適用: ${elementType} = ${isVisible}`);
-      });
-    }
+    // 🔹 制御パネルの設定は一切変更しない - 既に復元処理で適切に設定済み
     
   } else {
-    // DisplayAtTopアイテムがない場合は非表示
+    // DisplayAtTopアイテムがない場合のみ非表示
     questionWordArea.style.display = "none";
     questionWordArea.classList.add("empty-slot-hidden", "hidden");
-    questionWordArea.classList.remove("visible"); // visibleクラスを削除
+    questionWordArea.classList.remove("visible");
     console.log("🙈 分離疑問詞エリアを非表示 (DisplayAtTopデータなし)");
   }
 }
