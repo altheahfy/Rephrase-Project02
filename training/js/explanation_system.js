@@ -109,9 +109,10 @@ class ExplanationSystem {
       
       const allData = await response.json();
       
-      // 解説データのみをフィルタリング
+      // 解説データのみをフィルタリング（explanation_titleとexplanation_contentを持つアイテム）
       const explanationData = allData.filter(item => 
-        item.explanation && item.explanation.trim() !== ""
+        item.explanation_title && item.explanation_title.trim() !== "" && 
+        item.explanation_content && item.explanation_content.trim() !== ""
       );
       
       // state-managerに解説データを保存
