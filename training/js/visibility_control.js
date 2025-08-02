@@ -475,23 +475,42 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
   saveQuestionWordVisibilityState();
 }
 
-// 📁 疑問詞表示状態をlocalStorageに保存
+// 📁 疑問詞表示状態をstate-manager経由で保存
 function saveQuestionWordVisibilityState() {
   try {
-    localStorage.setItem('rephrase_question_word_visibility', JSON.stringify(questionWordVisibilityState));
-    console.log("💾 疑問詞表示状態を保存しました:", questionWordVisibilityState);
+    // 🎯 **修正：state-manager経由で状態保存**
+    if (window.RephraseState) {
+      window.RephraseState.setState('visibility.questionWord', questionWordVisibilityState);
+      console.log("💾 疑問詞表示状態をstate-manager経由で保存しました:", questionWordVisibilityState);
+    } else {
+      // フォールバック：直接localStorage保存
+      localStorage.setItem('rephrase_question_word_visibility', JSON.stringify(questionWordVisibilityState));
+      console.log("💾 疑問詞表示状態を直接localStorageに保存しました（state-manager未利用）");
+    }
   } catch (error) {
     console.error("❌ 疑問詞表示状態の保存に失敗:", error);
   }
 }
 
-// 📂 疑問詞表示状態をlocalStorageから読み込み
+// 📂 疑問詞表示状態をstate-manager経由で読み込み
 function loadQuestionWordVisibilityState() {
   try {
-    const saved = localStorage.getItem('rephrase_question_word_visibility');
-    if (saved) {
-      questionWordVisibilityState = { ...questionWordVisibilityState, ...JSON.parse(saved) };
-      console.log("📂 保存された疑問詞表示状態を読み込みました:", questionWordVisibilityState);
+    // 🎯 **修正：state-manager経由で状態読み込み**
+    if (window.RephraseState) {
+      const savedState = window.RephraseState.getState('visibility.questionWord');
+      if (savedState && Object.keys(savedState).length > 0) {
+        questionWordVisibilityState = { ...questionWordVisibilityState, ...savedState };
+        console.log("📂 state-manager経由で疑問詞表示状態を読み込みました:", questionWordVisibilityState);
+      } else {
+        console.log("📝 state-managerに疑問詞状態がないため、デフォルト値を使用");
+      }
+    } else {
+      // フォールバック：直接localStorage読み込み
+      const saved = localStorage.getItem('rephrase_question_word_visibility');
+      if (saved) {
+        questionWordVisibilityState = { ...questionWordVisibilityState, ...JSON.parse(saved) };
+        console.log("📂 直接localStorageから疑問詞表示状態を読み込みました:", questionWordVisibilityState);
+      }
     }
   } catch (error) {
     console.error("❌ 疑問詞表示状態の読み込みに失敗:", error);
@@ -578,6 +597,9 @@ window.questionWordVisibilityState = questionWordVisibilityState;
 document.addEventListener('DOMContentLoaded', function() {
   console.log("🔄 3要素表示制御システムを初期化中...");
   loadVisibilityState();
+  
+  // 🆕 疑問詞状態も読み込み
+  loadQuestionWordVisibilityState();
   
   // UI設定は少し遅らせて実行（DOM構築完了を確実にするため）
   setTimeout(() => {
