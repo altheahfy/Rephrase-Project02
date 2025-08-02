@@ -1549,11 +1549,37 @@ function hideEmptyQuestionWordArea(jsonData) {
   const displayAtTopItem = jsonData?.find(d => d.DisplayAtTop && d.DisplayText && d.DisplayText.trim() !== "");
   
   if (displayAtTopItem) {
-    // DisplayAtTopアイテムがある場合は表示
+    // DisplayAtTopアイテムがある場合は基本表示設定
     questionWordArea.style.display = "";
     questionWordArea.classList.remove("empty-slot-hidden", "hidden");
     questionWordArea.classList.add("visible"); // Grid表示を有効化
     console.log(`👁 分離疑問詞エリアを表示: ${displayAtTopItem.DisplayText}`);
+    
+    // 🆕 制御パネルの表示状態を再適用（状態復元処理を尊重）
+    if (typeof window.toggleQuestionWordVisibility === 'function' && 
+        typeof window.questionWordVisibilityState === 'object') {
+      
+      ['text', 'auxtext'].forEach(elementType => {
+        const isVisible = window.questionWordVisibilityState[elementType] ?? true;
+        // 制御パネルで設定された状態を再適用（DOM操作のみ、状態保存はしない）
+        const questionWordArea = document.getElementById('display-top-question-word');
+        if (questionWordArea) {
+          if (elementType === 'text') {
+            const textElements = questionWordArea.querySelectorAll('.question-word-text');
+            textElements.forEach(element => {
+              element.style.display = isVisible ? 'inline' : 'none';
+            });
+          } else if (elementType === 'auxtext') {
+            const auxtextElements = questionWordArea.querySelectorAll('.question-word-auxtext');
+            auxtextElements.forEach(element => {
+              element.style.display = isVisible ? 'inline' : 'none';
+            });
+          }
+        }
+        console.log(`🔄 制御パネル状態を再適用: ${elementType} = ${isVisible}`);
+      });
+    }
+    
   } else {
     // DisplayAtTopアイテムがない場合は非表示
     questionWordArea.style.display = "none";
