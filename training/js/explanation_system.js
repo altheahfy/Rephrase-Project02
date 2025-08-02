@@ -1,14 +1,65 @@
 /**
- * 📚 解説システム
- * 段階的実装 - Phase 1: 基本モーダル機能
+ * 📚 解説システム - state-manager.js統合版
+ * RephraseStateManagerとの統合
+ * - explanation.modal.visible: モーダル表示状態
+ * - explanation.data.explanationData: 解説データ配列
+ * - explanation.ui.buttons.explanation: 解説ボタン表示状態
+ * - explanation.context.currentVGroupKey: 現在のV_group_key
  */
 
 class ExplanationSystem {
   constructor() {
+    // RephraseStateManagerのインスタンスを取得または作成
+    this.stateManager = window.stateManager || new window.RephraseStateManager();
+    
+    // グローバルにインスタンスを保存（他のマネージャーとの共用）
+    if (!window.stateManager) {
+      window.stateManager = this.stateManager;
+    }
+    
     this.modal = null;
-    this.explanationData = [];
     this.isInitialized = false;
-    console.log('🎯 解説システム初期化開始');
+    
+    // State paths for RephraseStateManager
+    this.STATE_PATHS = {
+      MODAL_VISIBLE: 'explanation.modal.visible',
+      EXPLANATION_DATA: 'explanation.data.explanationData',
+      BUTTON_VISIBLE: 'explanation.ui.buttons.explanation',
+      CURRENT_V_GROUP_KEY: 'explanation.context.currentVGroupKey',
+      INITIALIZATION_STATUS: 'explanation.system.isInitialized'
+    };
+    
+    console.log('🎯 ExplanationSystem初期化開始');
+    this.initializeState();
+  }
+
+  // 初期状態の設定
+  initializeState() {
+    const defaultState = {
+      explanation: {
+        modal: {
+          visible: false
+        },
+        data: {
+          explanationData: []
+        },
+        ui: {
+          buttons: {
+            explanation: true
+          }
+        },
+        context: {
+          currentVGroupKey: null
+        },
+        system: {
+          isInitialized: false
+        }
+      }
+    };
+    
+    // デフォルト状態をstate-managerに設定
+    this.stateManager.setState('explanation', defaultState.explanation);
+    console.log('✅ ExplanationSystem初期状態設定完了');
   }
 
   // 初期化処理
@@ -29,6 +80,8 @@ class ExplanationSystem {
       // JSONデータの読み込み
       await this.loadExplanationData();
       
+      // 初期化完了をstate-managerに記録
+      this.stateManager.setState(this.STATE_PATHS.INITIALIZATION_STATUS, true);
       this.isInitialized = true;
       console.log('✅ 解説システム初期化完了');
       
@@ -39,6 +92,7 @@ class ExplanationSystem {
       
     } catch (error) {
       console.error('❌ 解説システム初期化エラー:', error);
+      this.stateManager.setState(this.STATE_PATHS.INITIALIZATION_STATUS, false);
       return false;
     }
   }
@@ -54,13 +108,18 @@ class ExplanationSystem {
       const allData = await response.json();
       
       // 解説データのみをフィルタリング
-      this.explanationData = allData.filter(item => item.explanation_title);
+      const explanationData = allData.filter(item => 
+        item.explanation && item.explanation.trim() !== ""
+      );
       
-      console.log(`📖 解説データ読み込み完了: ${this.explanationData.length}件`);
+      // state-managerに解説データを保存
+      this.stateManager.setState(this.STATE_PATHS.EXPLANATION_DATA, explanationData);
+      console.log(`✅ 解説データ読み込み完了: ${explanationData.length}件`);
       
     } catch (error) {
       console.error('❌ 解説データ読み込みエラー:', error);
-      this.explanationData = [];
+      // エラー時は空配列をstate-managerに設定
+      this.stateManager.setState(this.STATE_PATHS.EXPLANATION_DATA, []);
     }
   }
 
@@ -104,6 +163,8 @@ class ExplanationSystem {
         this.modal.classList.add('show');
       }, 10);
 
+      // state-managerにモーダル表示状態を記録
+      this.stateManager.setState(this.STATE_PATHS.MODAL_VISIBLE, true);
       console.log('📖 解説モーダル開いた:', title);
       
     } catch (error) {
@@ -120,12 +181,15 @@ class ExplanationSystem {
       this.modal.style.display = 'none';
     }, 300);
 
+    // state-managerにモーダル非表示状態を記録
+    this.stateManager.setState(this.STATE_PATHS.MODAL_VISIBLE, false);
     console.log('📖 解説モーダル閉じた');
   }
 
   // モーダルが開いているかチェック
   isModalOpen() {
-    return this.modal && this.modal.classList.contains('show');
+    // state-managerから状態を取得
+    return this.stateManager.getState(this.STATE_PATHS.MODAL_VISIBLE) || false;
   }
 
   // テスト用の解説表示
@@ -270,14 +334,20 @@ class ExplanationSystem {
 
   // V_group_keyに対応する解説データを検索
   findExplanationByVGroupKey(vGroupKey) {
-    if (!vGroupKey || !this.explanationData.length) return null;
+    if (!vGroupKey) return null;
     
-    const explanation = this.explanationData.find(item => 
+    // state-managerから解説データを取得
+    const explanationData = this.stateManager.getState(this.STATE_PATHS.EXPLANATION_DATA) || [];
+    if (!explanationData.length) return null;
+    
+    const explanation = explanationData.find(item => 
       item.V_group_key === vGroupKey
     );
     
     if (explanation) {
       console.log('📖 解説データ発見:', explanation.explanation_title);
+      // 現在のV_group_keyをstate-managerに記録
+      this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, vGroupKey);
     } else {
       console.log('❓ 解説データなし:', vGroupKey);
     }

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State Manager 統合テスト</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+    .success { background-color: #d4edda; border-color: #c3e6cb; }
+    .error { background-color: #f8d7da; border-color: #f5c6cb; }
+    button { margin: 5px; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .log { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h1>🔧 State Manager 統合テスト</h1>
+  
+  <div class="test-section">
+    <h2>📋 Step 1: State Manager 基本動作確認</h2>
+    <button onclick="testStateManager()">State Manager テスト</button>
+    <div id="state-manager-result" class="log"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>📚 Step 2: ExplanationSystem 統合テスト</h2>
+    <button onclick="testExplanationSystem()">ExplanationSystem テスト</button>
+    <div id="explanation-result" class="log"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>🎯 Step 3: 統合動作テスト</h2>
+    <button onclick="testIntegration()">統合テスト実行</button>
+    <div id="integration-result" class="log"></div>
+  </div>
+
+  <!-- 必要なスクリプトを読み込み -->
+  <script src="js/core/state-manager.js"></script>
+  <script src="js/explanation_system.js"></script>
+
+  <script>
+    // Step 1: State Manager 基本動作テスト
+    function testStateManager() {
+      const result = document.getElementById('state-manager-result');
+      result.textContent = '';
+      
+      try {
+        // State Manager インスタンス作成
+        const stateManager = new RephraseStateManager();
+        result.textContent += '✅ RephraseStateManager インスタンス作成成功\n';
+        
+        // 基本的な状態設定テスト
+        stateManager.setState('test.value', 'hello world');
+        const value = stateManager.getState('test.value');
+        
+        if (value === 'hello world') {
+          result.textContent += '✅ setState/getState 動作確認\n';
+        } else {
+          result.textContent += '❌ setState/getState 動作異常\n';
+        }
+        
+        // localStorage 同期テスト
+        const stored = localStorage.getItem('rephrase_state');
+        if (stored && JSON.parse(stored).test?.value === 'hello world') {
+          result.textContent += '✅ localStorage 同期動作確認\n';
+        } else {
+          result.textContent += '❌ localStorage 同期異常\n';
+        }
+        
+        // グローバル変数設定
+        window.stateManager = stateManager;
+        result.textContent += '✅ グローバル変数設定完了\n';
+        
+        result.parentElement.className = 'test-section success';
+        
+      } catch (error) {
+        result.textContent += `❌ エラー: ${error.message}\n`;
+        result.parentElement.className = 'test-section error';
+      }
+    }
+
+    // Step 2: ExplanationSystem テスト
+    function testExplanationSystem() {
+      const result = document.getElementById('explanation-result');
+      result.textContent = '';
+      
+      try {
+        if (!window.stateManager) {
+          result.textContent += '⚠️ State Manager が未初期化です。Step 1を先に実行してください。\n';
+          return;
+        }
+        
+        // ExplanationSystem インスタンス作成
+        const explanationSystem = new ExplanationSystem();
+        result.textContent += '✅ ExplanationSystem インスタンス作成成功\n';
+        
+        // state-manager 連携確認
+        if (explanationSystem.stateManager === window.stateManager) {
+          result.textContent += '✅ state-manager 連携確認\n';
+        } else {
+          result.textContent += '❌ state-manager 連携異常\n';
+        }
+        
+        // 初期状態確認
+        const initStatus = explanationSystem.stateManager.getState('explanation.system.isInitialized');
+        if (initStatus === false) {
+          result.textContent += '✅ 初期状態設定確認\n';
+        } else {
+          result.textContent += '❌ 初期状態設定異常\n';
+        }
+        
+        // グローバル変数設定
+        window.testExplanationSystem = explanationSystem;
+        result.textContent += '✅ テスト用グローバル変数設定完了\n';
+        
+        result.parentElement.className = 'test-section success';
+        
+      } catch (error) {
+        result.textContent += `❌ エラー: ${error.message}\n`;
+        result.parentElement.className = 'test-section error';
+      }
+    }
+
+    // Step 3: 統合動作テスト
+    function testIntegration() {
+      const result = document.getElementById('integration-result');
+      result.textContent = '';
+      
+      try {
+        if (!window.stateManager || !window.testExplanationSystem) {
+          result.textContent += '⚠️ Step 1, 2を先に実行してください。\n';
+          return;
+        }
+        
+        const stateManager = window.stateManager;
+        const explanationSystem = window.testExplanationSystem;
+        
+        // 状態変更テスト
+        result.textContent += '🔄 説明システム状態変更テスト...\n';
+        
+        // モーダル状態変更
+        stateManager.setState('explanation.modal.visible', true);
+        const modalState = stateManager.getState('explanation.modal.visible');
+        if (modalState === true) {
+          result.textContent += '✅ モーダル状態管理動作確認\n';
+        } else {
+          result.textContent += '❌ モーダル状態管理異常\n';
+        }
+        
+        // 解説データ設定
+        const testData = [{ V_group_key: 'test', explanation_title: 'テスト解説' }];
+        stateManager.setState('explanation.data.explanationData', testData);
+        const dataState = stateManager.getState('explanation.data.explanationData');
+        if (Array.isArray(dataState) && dataState.length === 1) {
+          result.textContent += '✅ 解説データ状態管理動作確認\n';
+        } else {
+          result.textContent += '❌ 解説データ状態管理異常\n';
+        }
+        
+        // localStorage 永続化確認
+        const stored = JSON.parse(localStorage.getItem('rephrase_state'));
+        if (stored.explanation?.modal?.visible === true) {
+          result.textContent += '✅ localStorage 永続化動作確認\n';
+        } else {
+          result.textContent += '❌ localStorage 永続化異常\n';
+        }
+        
+        result.textContent += '\n🎉 統合テスト完了！\n';
+        result.parentElement.className = 'test-section success';
+        
+      } catch (error) {
+        result.textContent += `❌ エラー: ${error.message}\n`;
+        result.parentElement.className = 'test-section error';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -152,8 +152,6 @@
   
   <!-- 🎯 状態管理システム（最優先読み込み） -->
   <script src="js/core/state-manager.js"></script>
-  <!-- 🎯 状態管理システム（最優先読み込み） -->
-  <script src="js/core/state-manager.js"></script>
 
   <!-- エラーハンドリング関数の確実な定義 -->
   <script>
@@ -2555,6 +2553,35 @@ window.clearRandomizeHistory = function() {
     </div>
   </div>
 </div>
+
+<!-- 🧪 ExplanationSystem テスト用初期化 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🧪 ExplanationSystemテスト用初期化開始');
+  
+  // state-managerの確認
+  if (typeof window.RephraseStateManager !== 'undefined') {
+    console.log('✅ RephraseStateManager利用可能');
+    
+    // ExplanationSystemの初期化
+    if (typeof ExplanationSystem !== 'undefined') {
+      console.log('✅ ExplanationSystemクラス利用可能');
+      window.explanationSystem = new ExplanationSystem();
+      window.explanationSystem.initialize().then(success => {
+        if (success) {
+          console.log('✅ ExplanationSystem初期化成功');
+        } else {
+          console.error('❌ ExplanationSystem初期化失敗');
+        }
+      });
+    } else {
+      console.error('❌ ExplanationSystemクラスが見つかりません');
+    }
+  } else {
+    console.error('❌ RephraseStateManagerが見つかりません');
+  }
+});
+</script>
 
 </body>
 </html>
