@@ -1840,6 +1840,24 @@ window.safeJsonSync = function(data) {
       console.error("❌ 複数画像更新中にエラーが発生:", imageError.message);
     }
     
+    // 🎛️ 制御パネル状態の初期化（JSONロード完了後）
+    try {
+      // 制御パネルは初期状態では非表示にする
+      if (typeof setControlPanelsVisibility === 'function') {
+        setControlPanelsVisibility(false);
+        console.log("🎛️ JSONロード完了後：制御パネルを初期状態（非表示）に設定");
+      }
+      
+      // 既存のサブスロット制御パネルも非表示にする
+      const existingSubslotPanels = document.querySelectorAll('.subslot-visibility-panel');
+      existingSubslotPanels.forEach(panel => {
+        panel.style.display = 'none';
+        console.log(`🎛️ 既存サブスロット制御パネル ${panel.id} を非表示に設定`);
+      });
+    } catch (controlPanelError) {
+      console.error("❌ 制御パネル初期化中にエラーが発生:", controlPanelError.message);
+    }
+    
     // 同期完了
     window.isSyncInProgress = false;
   } catch (err) {
