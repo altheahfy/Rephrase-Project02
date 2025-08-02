@@ -349,8 +349,6 @@
   </script>
   <script src="js/explanation_system.js">
   </script>
-  <script src="js/modules/explanation-manager.js">
-  </script>
   <script src="js/zoom_controller.js">
   </script>
  </head>
@@ -2556,35 +2554,32 @@ window.clearRandomizeHistory = function() {
   </div>
 </div>
 
-<!-- 🎯 ExplanationManager統合初期化 -->
+<!-- 🧪 ExplanationSystem 従来版初期化 -->
 <script>
-// ExplanationManager初期化
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    console.log('🎯 ExplanationManager統合初期化開始...');
-    
-    // RephraseStateManagerの確認
-    if (typeof window.RephraseStateManager === 'undefined') {
-      console.error('❌ RephraseStateManagerが見つかりません');
-      return;
-    }
-    
-    // ExplanationManagerインスタンスを作成
-    window.explanationManager = new ExplanationManager();
-    await window.explanationManager.initialize();
-    
-    // 後方互換性: グローバル変数の設定
-    explanationSystem = window.explanationManager;
-    
-    console.log('✅ ExplanationManager統合完了');
-    console.log('🧪 テスト関数: window.testExplanation(), window.showExplanation()');
-    
-    // テスト関数の提供
-    window.testExplanation = () => window.explanationManager.test();
-    window.showExplanation = () => window.explanationManager.showExplanation();
-    
-  } catch (error) {
-    console.error('❌ ExplanationManager初期化エラー:', error);
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🧪 ExplanationSystem従来版初期化開始');
+  
+  // RephraseStateManagerの確認
+  if (typeof window.RephraseState !== 'undefined') {
+    console.log('✅ RephraseState利用可能');
+    console.log('デバッグ:', window.RephraseState);
+  } else {
+    console.error('❌ RephraseStateが見つかりません');
+  }
+  
+  // ExplanationSystemの初期化
+  if (typeof ExplanationSystem !== 'undefined') {
+    console.log('✅ ExplanationSystemクラス利用可能');
+    window.explanationSystem = new ExplanationSystem();
+    window.explanationSystem.initialize().then(success => {
+      if (success) {
+        console.log('✅ ExplanationSystem初期化成功');
+      } else {
+        console.error('❌ ExplanationSystem初期化失敗');
+      }
+    });
+  } else {
+    console.error('❌ ExplanationSystemクラスが見つかりません');
   }
 });
 </script>
