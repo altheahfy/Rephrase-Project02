@@ -484,10 +484,10 @@ function toggleQuestionWordVisibility(elementType, isVisible) {
 // 📁 疑問詞表示状態をstate-manager経由で保存
 function saveQuestionWordVisibilityState() {
   try {
-    // � グローバル変数を確実に更新（insert_test_data_clean.jsとの連携のため）
+    // 🆕 グローバル変数を確実に更新（insert_test_data_clean.jsとの連携のため）
     window.questionWordVisibilityState = questionWordVisibilityState;
     
-    // �🎯 **修正：state-manager経由で状態保存**
+    // 🎯 **修正：state-manager経由で状態保存**
     if (window.RephraseState) {
       window.RephraseState.setState('visibility.questionWord', questionWordVisibilityState);
       console.log("💾 疑問詞表示状態をstate-manager経由で保存しました:", questionWordVisibilityState);
