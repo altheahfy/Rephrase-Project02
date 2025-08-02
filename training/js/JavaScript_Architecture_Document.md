@@ -34,6 +34,8 @@ localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(data));
 window.RephraseState.setState('visibility.main', data);
 window.RephraseState.setState('visibility.subslots', data);
 window.RephraseState.setState('visibility.questionWord', data);
+window.RephraseState.setState('explanation.modal.visible', true);
+window.RephraseState.setState('explanation.data.explanationData', data);
 // → 一貫性、デバッグ容易、拡張性
 ```
 
@@ -157,7 +159,32 @@ window.RephraseState.setState('visibility.questionWord', data);
 - **使用場所**: `training/index.html`
 - **依存関係**: なし
 
-### 🖼️ 画像・メディア系システム
+### � 例文解説システム
+#### `explanation_system.js` ★state-manager統合済み
+- **役割**: 例文解説モーダルシステム
+- **機能**: 
+  - V_group_keyに基づく文法解説の表示
+  - 動的解説ボタンの自動配置（例文シャッフルボタン付近）
+  - モーダルウィンドウでの解説内容表示
+  - JSONデータからの解説データ読み込み
+- **データ処理**: 
+  - `V自動詞第1文型.json`から解説データを抽出
+  - `explanation_title`と`explanation_content`フィールドを使用
+  - フィルタリング条件: 両フィールドが空でないアイテム
+- **状態管理**: 
+  - `explanation.modal.visible`: モーダル表示状態
+  - `explanation.data.explanationData`: 解説データ配列
+  - `explanation.ui.buttons.explanation`: 解説ボタン表示状態
+  - `explanation.context.currentVGroupKey`: 現在のV_group_key
+- **UI統合**: 
+  - `randomize-all`ボタン付近に解説ボタンを自動配置
+  - モーダル表示でレスポンシブ対応
+  - 閉じるボタン、オーバーレイクリックでの閉じる機能
+- **使用場所**: `training/index.html`
+- **依存関係**: `state-manager.js`
+- **データソース**: `training/data/V自動詞第1文型.json`
+
+### �🖼️ 画像・メディア系システム
 #### `universal_image_system.js`
 - **役割**: 汎用画像管理システム
 - **機能**: 画像表示、遅延読み込み、エラーハンドリング
