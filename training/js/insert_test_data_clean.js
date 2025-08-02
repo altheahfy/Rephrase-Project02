@@ -8,6 +8,51 @@
 // - 読み取り専用でのみ使用可能
 // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
+// 🎯 データ挿入時のスムーズレンダリング制御を有効化
+let isDataInsertionInProgress = false;
+
+/**
+ * 🎯 データ挿入開始：視覚的ちらつき制御を開始
+ */
+function startSmoothDataInsertion() {
+  console.log('🎯 スムーズデータ挿入開始');
+  isDataInsertionInProgress = true;
+  
+  // SmoothRenderControllerが利用可能な場合のみ使用
+  if (window.smoothRenderController && typeof window.smoothRenderController.startBatchUpdate === 'function') {
+    window.smoothRenderController.startBatchUpdate();
+  } else {
+    console.warn('⚠️ SmoothRenderController未利用可能 - 基本的な非表示制御を実行');
+    // フォールバック：基本的な非表示制御
+    const mainContainer = document.querySelector('.slot-wrapper');
+    if (mainContainer) {
+      mainContainer.style.visibility = 'hidden';
+    }
+  }
+}
+
+/**
+ * 🎯 データ挿入完了：視覚的ちらつき制御を終了
+ */
+function completeSmoothDataInsertion() {
+  console.log('🎯 スムーズデータ挿入完了');
+  isDataInsertionInProgress = false;
+  
+  // 遅延して表示復元（DOM更新の完了を確実に待つ）
+  setTimeout(() => {
+    if (window.smoothRenderController && typeof window.smoothRenderController.completeBatchUpdate === 'function') {
+      window.smoothRenderController.completeBatchUpdate();
+    } else {
+      console.warn('⚠️ SmoothRenderController未利用可能 - 基本的な表示復元を実行');
+      // フォールバック：基本的な表示復元
+      const mainContainer = document.querySelector('.slot-wrapper');
+      if (mainContainer) {
+        mainContainer.style.visibility = 'visible';
+      }
+    }
+  }, 100); // 100ms後に表示復元
+}
+
 // 🎯 メタレベル制御：サブスロット表示設定管理（localStorage版）
 function setSubslotVisibility(slotType, isVisible) {
   const storageKey = `subslot_visibility_${slotType}`;
@@ -369,6 +414,10 @@ function syncDynamicToStatic() {
   }
 
   console.log("🔄 抽出データの処理開始");
+  
+  // 🎯 スムーズレンダリング制御開始
+  startSmoothDataInsertion();
+  
   data.forEach(item => {
     console.log(`🔄 処理項目: ${JSON.stringify(item)}`);
     if (item.SubslotID === "" && item.PhraseType === "word") {
@@ -521,6 +570,9 @@ function syncDynamicToStatic() {
       console.warn(`❌ サブスロット text要素取得失敗: ${item.Slot}`);
     }
   });
+  
+  // 🎯 スムーズレンダリング制御完了
+  completeSmoothDataInsertion();
   
   // 🔢 サブスロット順序修正：window.loadedJsonDataを使用して正しい順序で再書き込み
   console.log("🔢 サブスロット順序修正処理を実行...");
@@ -699,6 +751,9 @@ function syncUpperSlotsFromJson(data) {
   
   const upperSlotCount = data.filter(item => item.SubslotID === "" && item.PhraseType === "word").length;
   console.log(`🔄 上位スロット同期: ${upperSlotCount}件の対象を処理`);
+  
+  // 🎯 スムーズレンダリング制御開始
+  startSmoothDataInsertion();
   
   // 詳細ログはデバッグが必要な時だけ出す
   if (window.DEBUG_SYNC) {
@@ -895,6 +950,9 @@ function syncUpperSlotsFromJson(data) {
       console.log(`⚠ ${slotId}が見つかりません`);
     }
   });
+  
+  // 🎯 スムーズレンダリング制御完了
+  completeSmoothDataInsertion();
   
   // 🖼 画像処理：上位スロット同期完了後に画像の自動非表示処理を実行
   // 注意：この処理は最終的にラベル復元後に統合実行されるため、ここでは削除
