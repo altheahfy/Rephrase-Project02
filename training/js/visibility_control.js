@@ -96,30 +96,50 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   saveVisibilityState();
 }
 
-// 📁 表示状態をlocalStorageに保存
+// 📁 表示状態をstate-manager経由で保存
 function saveVisibilityState() {
   try {
-    localStorage.setItem('rephrase_visibility_state', JSON.stringify(visibilityState));
-    console.log("💾 表示状態を保存しました");
+    // 🎯 **修正：state-manager経由で状態保存**
+    if (window.RephraseState) {
+      window.RephraseState.setState('visibility.slots', visibilityState);
+      console.log("💾 表示状態をstate-manager経由で保存しました");
+    } else {
+      // フォールバック：直接localStorage保存
+      localStorage.setItem('rephrase_visibility_state', JSON.stringify(visibilityState));
+      console.log("💾 表示状態を直接localStorageに保存しました（state-manager未利用）");
+    }
   } catch (error) {
     console.error("❌ 表示状態の保存に失敗:", error);
   }
 }
 
-// 📂 表示状態をlocalStorageから読み込み
+// 📂 表示状態をstate-manager経由で読み込み
 function loadVisibilityState() {
   try {
-    const saved = localStorage.getItem('rephrase_visibility_state');
-    if (saved) {
-      visibilityState = JSON.parse(saved);
-      console.log("📂 保存された表示状態を読み込みました:", visibilityState);
-      
-      // 読み込んだ状態をDOMに適用
-      applyVisibilityState();
+    // 🎯 **修正：state-manager経由で状態読み込み**
+    if (window.RephraseState) {
+      const savedState = window.RephraseState.getState('visibility.slots');
+      if (savedState && Object.keys(savedState).length > 0) {
+        visibilityState = savedState;
+        console.log("📂 state-manager経由で表示状態を読み込みました:", visibilityState);
+      } else {
+        console.log("📝 state-managerに保存された状態がないため、初期化します");
+        initializeVisibilityState();
+      }
     } else {
-      console.log("📝 保存された表示状態がないため、初期化します");
-      initializeVisibilityState();
+      // フォールバック：直接localStorage読み込み
+      const saved = localStorage.getItem('rephrase_visibility_state');
+      if (saved) {
+        visibilityState = JSON.parse(saved);
+        console.log("📂 直接localStorageから表示状態を読み込みました:", visibilityState);
+      } else {
+        console.log("📝 保存された表示状態がないため、初期化します");
+        initializeVisibilityState();
+      }
     }
+    
+    // 読み込んだ状態をDOMに適用
+    applyVisibilityState();
   } catch (error) {
     console.error("❌ 表示状態の読み込みに失敗:", error);
     initializeVisibilityState();
