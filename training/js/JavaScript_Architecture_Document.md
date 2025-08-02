@@ -39,15 +39,20 @@ window.RephraseState.setState('explanation.data.explanationData', data);
 window.RephraseState.setState('audio.recognition.isActive', true);        // VoiceSystem統合
 window.RephraseState.setState('audio.recognition.recognizedText', text);  // 音声認識結果
 window.RephraseState.setState('audio.recognition.isRecording', false);    // 録音状態
+window.RephraseState.setState('image.metaTags.cache', metaTagsArray);     // 画像システム統合
+window.RephraseState.setState('randomizer.sentencePositionInfo', posInfo); // ランダマイザー統合
 // → 一貫性、デバッグ容易、拡張性
 ```
 
-#### 統合完了ファイル (2025年8月2日時点)
+#### 統合完了ファイル (2025年8月2日 16:00更新)
 - ✅ **state-manager.js**: 中央状態管理システム
 - ✅ **visibility-control.js**: UI表示制御
 - ✅ **explanation-manager.js**: 解説システム
 - ✅ **zoom-controller-manager.js**: ズーム制御
 - ✅ **voice_system.js**: 音声認識システム (6700+行・最重要統合完了)
+- ✅ **universal_image_system.js**: 汎用画像管理システム (2146行・統合完了)
+- ✅ **randomizer_all.js**: 全体ランダマイズシステム (統合完了)
+- ✅ **randomizer_individual.js**: 個別ランダマイズシステム (統合完了)
 
 #### メリット
 - **データ整合性**: 単一の管理ポイントで競合を排除

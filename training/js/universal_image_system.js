@@ -1,11 +1,33 @@
 // 汎用イラスト表示システム
 // すべての上位スロットに対応したメタタグマッチング機能
 
-// 🎯 メタタグデータのキャッシュ
-let imageMetaTags = [];
+// 🎯 RephraseStateManager統合による状態管理
+// imageMetaTagsキャッシュをRephraseState経由で管理
 
-// デバッグ用：グローバルに公開
-window.imageMetaTags = imageMetaTags;
+// メタタグデータ取得関数（RephraseState経由）
+function getImageMetaTags() {
+  if (!window.RephraseState) {
+    console.warn('⚠️ RephraseState未初期化、フォールバック配列を使用');
+    return [];
+  }
+  return window.RephraseState.getState('image.metaTags.cache') || [];
+}
+
+// メタタグデータ設定関数（RephraseState経由）
+function setImageMetaTags(data) {
+  if (!window.RephraseState) {
+    console.warn('⚠️ RephraseState未初期化、設定をスキップ');
+    return;
+  }
+  window.RephraseState.setState('image.metaTags.cache', data);
+  console.log('✅ メタタグデータをRephraseStateに保存:', data.length, '件');
+}
+
+// 後方互換性のため、グローバルアクセスを提供
+Object.defineProperty(window, 'imageMetaTags', {
+  get: () => getImageMetaTags(),
+  set: (value) => setImageMetaTags(value)
+});
 
 // 🎯 対象となる上位スロット一覧
 const UPPER_SLOTS = [
@@ -33,7 +55,7 @@ const SUBSLOT_MAPPING = {
   'm3': ['slot-m3-sub-m1', 'slot-m3-sub-s', 'slot-m3-sub-aux', 'slot-m3-sub-m2', 'slot-m3-sub-v', 'slot-m3-sub-c1', 'slot-m3-sub-o1', 'slot-m3-sub-o2', 'slot-m3-sub-c2', 'slot-m3-sub-m3']
 };
 
-// 🔧 メタタグデータの読み込み
+// 🔧 メタタグデータの読み込み（RephraseState統合版）
 async function loadImageMetaTags() {
   console.log('🔄 メタタグデータ読み込み開始...');
   console.log('📍 読み込み予定URL:', window.location.origin + '/image_meta_tags.json');
@@ -49,13 +71,12 @@ async function loadImageMetaTags() {
     }
     
     const data = await response.json();
-    imageMetaTags = data;
     
-    // グローバルに公開（デバッグ用）
-    window.imageMetaTags = imageMetaTags;
+    // RephraseState経由でデータを保存
+    setImageMetaTags(data);
     
-    console.log('✅ メタタグデータ読み込み成功:', imageMetaTags.length, '件');
-    console.log('📋 読み込まれたデータ（最初の3件）:', imageMetaTags.slice(0, 3));
+    console.log('✅ メタタグデータ読み込み成功:', data.length, '件');
+    console.log('📋 読み込まれたデータ（最初の3件）:', data.slice(0, 3));
     return true;
   } catch (error) {
     // セキュアなエラーハンドリング
@@ -146,8 +167,10 @@ function extractWordsWithStemming(text) {
   return result;
 }
 
-// 🔍 テキストにマッチする画像を検索
+// 🔍 テキストにマッチする画像を検索（RephraseState統合版）
 function findImageByMetaTag(text) {
+  const imageMetaTags = getImageMetaTags();
+  
   if (!text || !imageMetaTags.length) {
     console.log('🔍 検索条件不足:', { text, metaTagsLength: imageMetaTags.length });
     return null;
@@ -226,10 +249,12 @@ function findImageByMetaTag(text) {
   return bestMatch;
 }
 
-// 🔍 テキストにマッチする全ての画像を検索（複数画像対応）
+// 🔍 テキストにマッチする全ての画像を検索（複数画像対応）（RephraseState統合版）
 function findAllImagesByMetaTag(text) {
   console.log('🔍 ===== 複数画像検索開始 =====');
   console.log('🔍 検索対象テキスト:', text);
+  
+  const imageMetaTags = getImageMetaTags();
   
   if (!text || !imageMetaTags.length) {
     console.log('🔍 検索条件不足:', { text, metaTagsLength: imageMetaTags.length });

@@ -249,7 +249,7 @@ export function randomizeAll(slotData) {
     firstMainSlotIndex = selectedSlots.findIndex(s => !s.SubslotID && (s.Slot_display_order || 0) === firstOrder);
   }
 
-  // 個別ランダマイズ用の位置情報をLocalStorageに保存
+  // 個別ランダマイズ用の位置情報をRephraseStateに保存
   if (mainSlots.length > 0) {
     const sentencePositionInfo = {
       firstSlot: mainSlots.find(s => (s.Slot_display_order || 0) === Math.min(...mainSlots.map(s => s.Slot_display_order || 0))).Slot,
@@ -257,8 +257,16 @@ export function randomizeAll(slotData) {
       isQuestionSentence: isQuestionSentence,
       timestamp: Date.now()
     };
-    localStorage.setItem('sentencePositionInfo', JSON.stringify(sentencePositionInfo));
-    console.log('💾 個別ランダマイズ用位置情報を保存:', sentencePositionInfo);
+    
+    // RephraseState統合：localStorage操作を状態管理経由に変更
+    if (window.RephraseState) {
+      window.RephraseState.setState('randomizer.sentencePositionInfo', sentencePositionInfo);
+      console.log('💾 個別ランダマイズ用位置情報をRephraseStateに保存:', sentencePositionInfo);
+    } else {
+      // フォールバック：RephraseState未初期化時
+      localStorage.setItem('sentencePositionInfo', JSON.stringify(sentencePositionInfo));
+      console.log('💾 個別ランダマイズ用位置情報を保存（フォールバック）:', sentencePositionInfo);
+    }
   }
 
   return selectedSlots.map((slot, idx) => {

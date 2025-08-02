@@ -48,12 +48,24 @@ function applyPunctuationAndCapitalization(selectedSlots) {
     const firstSlot = selectedSlots[firstMainSlotIndex];
     const lastSlot = selectedSlots[lastMainSlotIndex];
     
-    // 全体ランダマイズから位置情報を取得
-    const storedPositionInfo = localStorage.getItem('sentencePositionInfo');
+    // 全体ランダマイズから位置情報を取得（RephraseState統合版）
+    let storedPositionInfo = null;
     let sentencePositionInfo = null;
     
+    if (window.RephraseState) {
+      storedPositionInfo = window.RephraseState.getState('randomizer.sentencePositionInfo');
+      console.log('📖 RephraseStateから位置情報を取得:', storedPositionInfo);
+    } else {
+      // フォールバック：RephraseState未初期化時
+      const storedData = localStorage.getItem('sentencePositionInfo');
+      if (storedData) {
+        storedPositionInfo = JSON.parse(storedData);
+        console.log('📖 localStorageから位置情報を取得（フォールバック）:', storedPositionInfo);
+      }
+    }
+    
     if (storedPositionInfo) {
-      sentencePositionInfo = JSON.parse(storedPositionInfo);
+      sentencePositionInfo = storedPositionInfo;
       console.log('📖 全体ランダマイズからの位置情報を取得:', sentencePositionInfo);
     } else {
       // フォールバック：個別ランダマイズでも最低限の情報を生成
