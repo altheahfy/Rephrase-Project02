@@ -410,8 +410,8 @@ class ZoomControllerManager {
     }
 
     // 状態管理システムに反映
-    if (this.stateManager) {
-      this.stateManager.updateState('zoomLevel', zoomLevel);
+    if (this.stateManager && this.stateManager.setState) {
+      this.stateManager.setState('ui.zoom', zoomLevel);
     }
   }
 
