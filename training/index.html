@@ -335,7 +335,8 @@
   </script>
   <script src="js/subslot_visibility_control.js">
   </script>
-  <script src="js/image_auto_hide.js">
+  <!-- ImageAutoHideManager モジュール -->
+  <script src="js/modules/image-auto-hide-manager.js">
   </script>
   <script src="js/universal_image_system.js">
   </script>
@@ -347,7 +348,8 @@
   </script>
   <script src="js/voice_progress_ui.js">
   </script>
-  <script src="js/explanation_system.js">
+  <!-- ExplanationManager モジュール -->
+  <script src="js/modules/explanation-manager.js">
   </script>
   <!-- ZoomControllerManager モジュール -->
   <script src="js/modules/zoom-controller-manager.js">
@@ -2557,10 +2559,10 @@ window.clearRandomizeHistory = function() {
   </div>
 </div>
 
-<!-- 🧪 ExplanationSystem 従来版初期化 -->
+<!-- 🧪 ExplanationManager 統合版初期化 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🧪 ExplanationSystem従来版初期化開始');
+  console.log('🧪 ExplanationManager統合版初期化開始');
   
   // RephraseStateManagerの確認
   if (typeof window.RephraseState !== 'undefined') {
@@ -2570,19 +2572,19 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('❌ RephraseStateが見つかりません');
   }
   
-  // ExplanationSystemの初期化
-  if (typeof ExplanationSystem !== 'undefined') {
-    console.log('✅ ExplanationSystemクラス利用可能');
-    window.explanationSystem = new ExplanationSystem();
-    window.explanationSystem.initialize().then(success => {
+  // ExplanationManagerの初期化
+  if (typeof ExplanationManager !== 'undefined') {
+    console.log('✅ ExplanationManagerクラス利用可能');
+    window.explanationManager = new ExplanationManager();
+    window.explanationManager.initialize().then(success => {
       if (success) {
-        console.log('✅ ExplanationSystem初期化成功');
+        console.log('✅ ExplanationManager初期化成功');
       } else {
-        console.error('❌ ExplanationSystem初期化失敗');
+        console.error('❌ ExplanationManager初期化失敗');
       }
     });
   } else {
-    console.error('❌ ExplanationSystemクラスが見つかりません');
+    console.error('❌ ExplanationManagerクラスが見つかりません');
   }
 });
 </script>
