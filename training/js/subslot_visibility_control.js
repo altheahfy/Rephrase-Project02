@@ -349,24 +349,32 @@ function updateToggleButtonStyle(button, isVisible) {
   }
 }
 
-// 🔍 サブスロット要素の表示状態を取得
+// 🔍 サブスロット要素の表示状態をstate-manager経由で取得
 function getSubslotElementVisibility(subslotId, elementType) {
-  // まず、localStorageから永続化された状態を取得
+  // 🎯 **修正：state-manager経由で状態取得**
   try {
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (saved) {
-      const state = JSON.parse(saved);
-      const key = `${subslotId}_${elementType}`;
-      if (state.hasOwnProperty(key)) {
-        console.log(`🔍 localStorageから取得: ${key} = ${state[key]}`);
-        return state[key];
+    if (window.RephraseState) {
+      const state = window.RephraseState.getState('visibility.subslots');
+      if (state && state[subslotId] && state[subslotId].hasOwnProperty(elementType)) {
+        console.log(`🔍 state-manager経由で取得: ${subslotId}.${elementType} = ${state[subslotId][elementType]}`);
+        return state[subslotId][elementType];
+      }
+    } else {
+      // フォールバック：直接localStorage読み込み
+      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+      if (saved) {
+        const state = JSON.parse(saved);
+        if (state[subslotId] && state[subslotId].hasOwnProperty(elementType)) {
+          console.log(`🔍 直接localStorageから取得: ${subslotId}.${elementType} = ${state[subslotId][elementType]}（state-manager未利用）`);
+          return state[subslotId][elementType];
+        }
       }
     }
   } catch (error) {
-    console.warn('⚠ localStorage読み取りエラー:', error);
+    console.warn('⚠ サブスロット状態読み取りエラー:', error);
   }
   
-  // localStorageにない場合は、DOM要素から現在の状態を取得
+  // 保存された状態がない場合は、DOM要素から現在の状態を取得
   const subslotElement = document.getElementById(subslotId);
   if (subslotElement) {
     const className = `hidden-subslot-${elementType}`;
@@ -421,21 +429,37 @@ function toggleSubslotElementVisibility(subslotId, elementType, isVisible) {
     console.warn(`⚠ ${elementType}要素が見つかりません in ${subslotId}`);
   }
   
-  // 🆕 サブスロット表示状態をlocalStorageに保存
+  // 🆕 サブスロット表示状態をstate-manager経由で保存
   try {
-    let subslotVisibilityState = {};
-    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-    if (saved) {
-      subslotVisibilityState = JSON.parse(saved);
+    // 🎯 **修正：state-manager経由で状態保存**
+    if (window.RephraseState) {
+      // 現在の状態を取得
+      let subslotVisibilityState = window.RephraseState.getState('visibility.subslots') || {};
+      
+      if (!subslotVisibilityState[subslotId]) {
+        subslotVisibilityState[subslotId] = {};
+      }
+      subslotVisibilityState[subslotId][elementType] = isVisible;
+      
+      // state-manager経由で保存
+      window.RephraseState.setState('visibility.subslots', subslotVisibilityState);
+      console.log(`💾 state-manager経由で${subslotId}の${elementType}状態を保存しました: ${isVisible}`);
+    } else {
+      // フォールバック：直接localStorage保存
+      let subslotVisibilityState = {};
+      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+      if (saved) {
+        subslotVisibilityState = JSON.parse(saved);
+      }
+      
+      if (!subslotVisibilityState[subslotId]) {
+        subslotVisibilityState[subslotId] = {};
+      }
+      subslotVisibilityState[subslotId][elementType] = isVisible;
+      
+      localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
+      console.log(`💾 直接localStorage経由で${subslotId}の${elementType}状態を保存しました: ${isVisible}（state-manager未利用）`);
     }
-    
-    if (!subslotVisibilityState[subslotId]) {
-      subslotVisibilityState[subslotId] = {};
-    }
-    subslotVisibilityState[subslotId][elementType] = isVisible;
-    
-    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(subslotVisibilityState));
-    console.log(`💾 ${subslotId}の${elementType}状態を保存しました: ${isVisible}`);
   } catch (error) {
     console.error("❌ サブスロット表示状態の保存に失敗:", error);
   }
