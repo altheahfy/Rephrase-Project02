@@ -2684,6 +2684,10 @@ class VoiceSystem {
             this.addDebugLog('✅ 音声認識start()コマンド送信完了', 'success');
             this.addDebugLog('🎤 音声認識開始イベント発生', 'success');
             this.isRecognitionActive = true;
+            
+            // 🔄 RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
+            
             if (isAndroid) {
                 this.addDebugLog('🎤 何か話してください（15秒以内）...', 'info');
             } else {
@@ -2711,6 +2715,9 @@ class VoiceSystem {
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
                     this.addDebugLog(`📝 累積認識結果: "${this.recognizedText}"`, 'success');
+                    
+                    // 🔄 RephraseStateManagerに状態同期
+                    this.syncRecognitionStateToManager();
                     
                     // 確定結果を確実に保存
                     console.log('✅ 累積認識結果保存:', this.recognizedText);
@@ -2741,6 +2748,9 @@ class VoiceSystem {
             this.addDebugLog('🔚 音声認識終了イベント発生', 'info');
             this.isRecognitionActive = false;
             
+            // 🔄 RephraseStateManagerに状態同期
+            this.syncRecognitionStateToManager();
+            
             if (isAndroid) {
                 this.addDebugLog('📱 Android: 認識終了時の特別チェック', 'info');
             }
@@ -2752,6 +2762,9 @@ class VoiceSystem {
             clearTimeout(this.recognitionTimeoutId);
             this.addDebugLog(`❌ 音声認識エラー: ${event.error}`, 'error');
             this.isRecognitionActive = false;
+            
+            // 🔄 RephraseStateManagerに状態同期（エラー時も状態更新）
+            this.syncRecognitionStateToManager();
             
             if (isAndroid) {
                 this.addDebugLog('📱 Android: エラー詳細分析', 'warning');
