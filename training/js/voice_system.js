@@ -125,12 +125,20 @@ class VoiceSystem {
         console.log('✅ 音声システム初期化完了');
         
         // � RephraseStateManager統合: マネージャー登録
-        if (window.rephraseStateManager) {
+        if (window.RephraseState) {
             try {
-                window.rephraseStateManager.registerManager('voice', this);
+                window.RephraseState.registerManager('voice', this);
                 console.log('[VoiceSystem] RephraseStateManagerに登録完了');
             } catch (error) {
                 console.warn('[VoiceSystem] RephraseStateManager登録エラー:', error);
+            }
+        } else if (window.rephraseStateManager) {
+            // フォールバック: 古い名前でも確認
+            try {
+                window.rephraseStateManager.registerManager('voice', this);
+                console.log('[VoiceSystem] RephraseStateManagerに登録完了（フォールバック）');
+            } catch (error) {
+                console.warn('[VoiceSystem] RephraseStateManager登録エラー（フォールバック）:', error);
             }
         } else {
             console.log('[VoiceSystem] RephraseStateManagerが見つかりません（単体動作モード）');
