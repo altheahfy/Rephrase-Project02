@@ -36,14 +36,25 @@ window.RephraseState.setState('visibility.subslots', data);
 window.RephraseState.setState('visibility.questionWord', data);
 window.RephraseState.setState('explanation.modal.visible', true);
 window.RephraseState.setState('explanation.data.explanationData', data);
+window.RephraseState.setState('audio.recognition.isActive', true);        // VoiceSystem統合
+window.RephraseState.setState('audio.recognition.recognizedText', text);  // 音声認識結果
+window.RephraseState.setState('audio.recognition.isRecording', false);    // 録音状態
 // → 一貫性、デバッグ容易、拡張性
 ```
+
+#### 統合完了ファイル (2025年8月2日時点)
+- ✅ **state-manager.js**: 中央状態管理システム
+- ✅ **visibility-control.js**: UI表示制御
+- ✅ **explanation-manager.js**: 解説システム
+- ✅ **zoom-controller-manager.js**: ズーム制御
+- ✅ **voice_system.js**: 音声認識システム (6700+行・最重要統合完了)
 
 #### メリット
 - **データ整合性**: 単一の管理ポイントで競合を排除
 - **デバッグ効率**: 統一されたログ出力で問題特定が容易
 - **拡張性**: 新機能追加時の一貫したパターン
 - **保守性**: 状態管理ロジックの一元化
+- **音声学習基盤**: リアルタイム音声認識+例文比較評点システムの技術基盤完成
 
 ## 📁 ファイル一覧と役割
 
@@ -223,11 +234,21 @@ window.RephraseState.setState('explanation.data.explanationData', data);
 - **依存関係**: `insert_test_data_clean.js`の処理完了を待機
 
 ### 🔊 音声システム
-#### `voice_system.js`
-- **役割**: 音声認識・再生システム
-- **機能**: 音声入力、TTS、プラットフォーム別対応
+#### `voice_system.js` ★RephraseStateManager統合完了
+- **役割**: 音声認識・再生システム (6700+行の大規模システム)
+- **機能**: 音声入力、TTS、プラットフォーム別対応、リアルタイム音声認識
+- **状態管理統合**: ✅ 完了 (2025年8月2日)
+  - `audio.recognition.isActive`: 音声認識状態
+  - `audio.recognition.recognizedText`: 認識結果テキスト  
+  - `audio.recognition.isRecording`: 録音状態
+  - `audio.recognition.isAndroidAnalyzing`: Android分析状態
+- **アーキテクチャ特徴**:
+  - Android/PC プラットフォーム別状態管理
+  - リアルタイム状態同期機能
+  - デバッグパネル統合（📊 状態確認ボタン）
 - **使用場所**: `training/index.html`
-- **依存関係**: なし
+- **依存関係**: `window.RephraseState` (state-manager.js)
+- **技術的価値**: 「リアルタイム音声認識 + 例文比較評点」システムの技術基盤
 
 #### `voice_progress_tracker.js`
 - **役割**: 音声進捗追跡
