@@ -47,11 +47,21 @@ class RephraseStateManager {
       security: {
         rateLimitData: {},
         authStatus: false
+      },
+      
+      // マネージャー統合状態
+      managers: {
+        zoom: { initialized: false, instance: null },
+        explanation: { initialized: false, instance: null },
+        voice: { initialized: false, instance: null }
       }
     };
     
     // 状態変更リスナー
     this.listeners = new Map();
+    
+    // マネージャーインスタンス管理
+    this.managerInstances = new Map();
     
     // localStorage同期設定
     this.syncKeys = [
@@ -473,12 +483,61 @@ class RephraseStateManager {
   setQuestionWordVisibility(elementType, visible) {
     this.setState(`visibility.questionWord.${elementType}`, visible);
   }
+  
+  /**
+   * マネージャー登録機能
+   */
+  registerManager(name, instance) {
+    this.managerInstances.set(name, instance);
+    this.setState(`managers.${name}.initialized`, true);
+    this.setState(`managers.${name}.instance`, instance);
+    console.log(`[RephraseStateManager] マネージャー登録: ${name}`);
+  }
+  
+  getManager(name) {
+    return this.managerInstances.get(name);
+  }
+  
+  getAllManagers() {
+    return Array.from(this.managerInstances.entries()).map(([name, instance]) => ({
+      name,
+      instance,
+      initialized: this.getState(`managers.${name}.initialized`)
+    }));
+  }
+  
+  /**
+   * マネージャー統合初期化
+   */
+  initializeManagers() {
+    console.log('[RephraseStateManager] マネージャー統合初期化開始');
+    
+    // ZoomControllerManagerの初期化
+    if (window.ZoomControllerManager && !this.getManager('zoom')) {
+      try {
+        const zoomManager = new window.ZoomControllerManager();
+        this.registerManager('zoom', zoomManager);
+      } catch (error) {
+        console.error('[RephraseStateManager] ZoomControllerManager初期化失敗:', error);
+      }
+    }
+    
+    console.log('[RephraseStateManager] マネージャー統合初期化完了');
+  }
 }
 
 // グローバルインスタンス作成
 window.RephraseState = new RephraseStateManager();
 
+// マネージャー統合初期化（DOM完了後）
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    window.RephraseState.initializeManagers();
+  }, 500);
+});
+
 // デバッグ用関数をグローバルに公開
 window.checkRephraseState = () => window.RephraseState.dumpState();
+window.getRephraseManagers = () => window.RephraseState.getAllManagers();
 
 console.log('[RephraseStateManager] 状態管理システム初期化完了');
