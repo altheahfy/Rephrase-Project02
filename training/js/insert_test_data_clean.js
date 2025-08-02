@@ -2233,11 +2233,51 @@ function forceHideEmptySlots() {
   });
 }
 
-// 🆕 テキスト長に応じたスロット幅動的調整システム（改良版）
+// 🆕 テキスト長に応じたスロット幅動的調整システム（パフォーマンス最適化版）
+
+// デバウンス機能：連続する調整要求を統合
+let adjustWidthsTimeout = null;
+let adjustWidthsPending = false;
+
+function debounceAdjustSlotWidths() {
+  if (adjustWidthsTimeout) {
+    clearTimeout(adjustWidthsTimeout);
+  }
+  
+  if (adjustWidthsPending) {
+    return; // 既に実行待ちの場合はスキップ
+  }
+  
+  adjustWidthsPending = true;
+  adjustWidthsTimeout = setTimeout(() => {
+    adjustSlotWidthsBasedOnTextOptimized();
+    adjustWidthsPending = false;
+    adjustWidthsTimeout = null;
+  }, 50); // 50ms後に実行（バッチ処理）
+}
+
 function adjustSlotWidthsBasedOnText() {
-  console.log("🔧 スロット幅の動的調整を開始");
+  // デバウンス版を呼び出し
+  debounceAdjustSlotWidths();
+}
+
+function adjustSlotWidthsBasedOnTextOptimized() {
+  console.log("🔧 スロット幅の動的調整を開始（最適化版）");
+  
+  // DOM操作をバッチ処理するため、全体を非表示にしてから一括更新
+  const mainContainer = document.querySelector('.slots-container') || document.body;
+  const originalVisibility = mainContainer.style.visibility;
+  
+  // 視覚的なちらつきを防ぐ
+  mainContainer.style.visibility = 'hidden';
   
   const slotContainers = document.querySelectorAll('.slot-container');
+  const measurements = []; // 測定結果をバッチ処理
+  
+  // Step 1: 全ての測定を一括実行（DOM操作を最小化）
+  const tempContainer = document.createElement('div');
+  tempContainer.style.cssText = 'position: absolute; visibility: hidden; top: -9999px; left: -9999px;';
+  document.body.appendChild(tempContainer);
   
   slotContainers.forEach(container => {
     // 分離疑問詞エリアは幅調整から除外（単一単語のため）
@@ -2257,28 +2297,24 @@ function adjustSlotWidthsBasedOnText() {
     
     let maxTextWidth = 0;
     
-    // 英語テキスト（phraseElement）の表示幅を計算
+    // 英語テキスト（phraseElement）の表示幅を計算（バッチ処理）
     if (phraseText && phraseElement) {
       const tempSpan = document.createElement('span');
       tempSpan.style.font = window.getComputedStyle(phraseElement).font;
-      tempSpan.style.visibility = 'hidden';
-      tempSpan.style.position = 'absolute';
       tempSpan.textContent = phraseText;
-      document.body.appendChild(tempSpan);
+      tempContainer.appendChild(tempSpan);
       maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
-      document.body.removeChild(tempSpan);
+      tempContainer.removeChild(tempSpan);
     }
     
-    // 補助テキスト（textElement）の表示幅を計算
+    // 補助テキスト（textElement）の表示幅を計算（バッチ処理）
     if (auxText && textElement) {
       const tempSpan = document.createElement('span');
       tempSpan.style.font = window.getComputedStyle(textElement).font;
-      tempSpan.style.visibility = 'hidden';
-      tempSpan.style.position = 'absolute';
       tempSpan.textContent = auxText;
-      document.body.appendChild(tempSpan);
+      tempContainer.appendChild(tempSpan);
       maxTextWidth = Math.max(maxTextWidth, tempSpan.offsetWidth);
-      document.body.removeChild(tempSpan);
+      tempContainer.removeChild(tempSpan);
     }
     
     // 実際の表示幅 + パディング + マージンを考慮して適切な幅を設定
@@ -2294,14 +2330,32 @@ function adjustSlotWidthsBasedOnText() {
     const maxWidth = Math.min(800, window.innerWidth * 0.8);
     targetWidth = Math.min(targetWidth, maxWidth);
     
-    // 幅を適用
-    container.style.width = targetWidth + 'px';
-    container.style.minWidth = targetWidth + 'px';
-    
-    console.log(`📏 ${container.id}: 英語テキスト幅=${phraseText ? maxTextWidth : 0}px, 補助テキスト幅=${auxText ? 'calculated' : 0}px, 最大幅=${maxTextWidth}px, 適用幅=${targetWidth}px`);
+    // 測定結果を保存（まだ適用しない）
+    measurements.push({
+      container,
+      targetWidth,
+      maxTextWidth,
+      phraseText,
+      auxText,
+      containerId: container.id
+    });
   });
   
-  console.log("✅ スロット幅調整完了");
+  // Step 2: 測定用コンテナを削除
+  document.body.removeChild(tempContainer);
+  
+  // Step 3: 全ての幅を一括適用（レイアウト計算を一度だけ実行）
+  measurements.forEach(measurement => {
+    measurement.container.style.width = measurement.targetWidth + 'px';
+    measurement.container.style.minWidth = measurement.targetWidth + 'px';
+    
+    console.log(`📏 ${measurement.containerId}: 英語テキスト幅=${measurement.phraseText ? measurement.maxTextWidth : 0}px, 補助テキスト幅=${measurement.auxText ? 'calculated' : 0}px, 最大幅=${measurement.maxTextWidth}px, 適用幅=${measurement.targetWidth}px`);
+  });
+  
+  // Step 4: 可視性を復元（全ての調整完了後）
+  mainContainer.style.visibility = originalVisibility;
+  
+  console.log(`✅ スロット幅調整完了（${measurements.length}個のスロットを最適化処理）`);
 }
 
 /**
