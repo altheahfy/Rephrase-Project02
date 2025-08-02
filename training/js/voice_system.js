@@ -6479,13 +6479,13 @@ let voiceSystem = null;
 
 // DOMロード後に初期化
 document.addEventListener('DOMContentLoaded', () => {
-    // VoiceProgressTrackerが確実に読み込まれるまで少し待機
+    // RephraseStateManagerの初期化を待ってからVoiceSystemを初期化
     setTimeout(() => {
         voiceSystem = new VoiceSystem();
         window.voiceSystem = voiceSystem;  // グローバルに公開
         console.log('✅ 音声システムを初期化しました');
         console.log('✅ window.voiceSystemが利用可能です');
-    }, 500);
+    }, 700); // RephraseStateManager(500ms)より遅く初期化
 });
 
 // 📱 Android対応: マイクアクセス診断用ヘルパー関数

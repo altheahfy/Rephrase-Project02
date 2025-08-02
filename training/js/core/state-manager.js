@@ -536,7 +536,7 @@ window.RephraseState = new RephraseStateManager();
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     window.RephraseState.initializeManagers();
-  }, 500);
+  }, 100); // 早期初期化でVoiceSystemより先に実行
 });
 
 // デバッグ用関数をグローバルに公開
