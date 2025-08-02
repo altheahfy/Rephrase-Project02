@@ -6432,10 +6432,10 @@ class VoiceSystem {
         if (window.RephraseState) {
             try {
                 // 音声認識状態の初期化
-                window.RephraseState.updateState('audio.recognition.isActive', this.isRecognitionActive);
-                window.RephraseState.updateState('audio.recognition.recognizedText', this.recognizedText || '');
-                window.RephraseState.updateState('audio.recognition.isRecording', this.isRecording);
-                window.RephraseState.updateState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
+                window.RephraseState.setState('audio.recognition.isActive', this.isRecognitionActive);
+                window.RephraseState.setState('audio.recognition.recognizedText', this.recognizedText || '');
+                window.RephraseState.setState('audio.recognition.isRecording', this.isRecording);
+                window.RephraseState.setState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
                 
                 console.log('[VoiceSystem] 音声認識状態をRephraseStateManagerに初期化完了');
                 console.log('- isRecognitionActive:', this.isRecognitionActive);
@@ -6456,10 +6456,10 @@ class VoiceSystem {
         if (window.RephraseState) {
             try {
                 // 重要な音声認識状態をリアルタイム同期
-                window.RephraseState.updateState('audio.recognition.isActive', this.isRecognitionActive);
-                window.RephraseState.updateState('audio.recognition.recognizedText', this.recognizedText || '');
-                window.RephraseState.updateState('audio.recognition.isRecording', this.isRecording);
-                window.RephraseState.updateState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
+                window.RephraseState.setState('audio.recognition.isActive', this.isRecognitionActive);
+                window.RephraseState.setState('audio.recognition.recognizedText', this.recognizedText || '');
+                window.RephraseState.setState('audio.recognition.isRecording', this.isRecording);
+                window.RephraseState.setState('audio.recognition.isAndroidAnalyzing', this.isAndroidAnalyzing);
                 
                 console.log('[VoiceSystem] 音声認識状態同期完了:', {
                     isActive: this.isRecognitionActive,
