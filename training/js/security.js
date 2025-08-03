@@ -376,3 +376,6 @@ window.RephraseSecurityUtils = {
   detectScriptInjection,
   validateURL
 };
+
+// auth.js互換性のため
+window.securityUtils = window.RephraseSecurityUtils;
