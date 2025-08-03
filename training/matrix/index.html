@@ -165,10 +165,20 @@
     
     .matrix-cell a {
       text-decoration: none;
-      color: var(--text-color);
+      color: var(--primary-color);
       font-weight: bold;
-      display: block;
-      padding: 10px;
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+    
+    .matrix-cell a:hover {
+      color: white;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
     }
     
     .matrix-cell.test-cell a {
@@ -268,7 +278,7 @@
             <tr>
               <td class="chunk-header">名詞チャンク</td>
               <td class="matrix-cell">
-                <a href="../explanation/"></a>冠詞・定冠詞の付け方</a><br>
+                <a href="../explanation/">冠詞・定冠詞の付け方</a><br>
                 代名詞や指示語を用いる場合は新旧情報の法則に留意<br>
                 無生物主語
               </td>
