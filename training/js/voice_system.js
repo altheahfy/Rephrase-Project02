@@ -2098,6 +2098,12 @@ class VoiceSystem {
                 // データを保存（PC版と同じメソッドを使用）
                 await this.saveProgressData(analysisResult);
                 
+                // 🔧 Android版: 保存完了メッセージを表示
+                if (messageElement) {
+                    messageElement.innerHTML = '✅ 学習データに保存しました！';
+                    messageElement.style.color = '#28a745';
+                }
+                
                 // 確認ボタンを非表示
                 const confirmationDiv = document.querySelector('.save-confirmation-android');
                 if (confirmationDiv) {
