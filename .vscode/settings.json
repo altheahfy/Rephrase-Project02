@@ -3,7 +3,7 @@
     "liveServer.settings.host": "0.0.0.0",
     "liveServer.settings.useLocalIp": true,
     "liveServer.settings.https": {
-        "enable": true,
+        "enable": false,
         "cert": "",
         "key": "",
         "passphrase": ""
