@@ -386,43 +386,48 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.authSystem && window.securityUtils) {
             console.log('認証システム読み込み完了');
             
-            // ログインチェック
-            const isLoggedIn = window.authSystem.isLoggedIn();
-            console.log('ログイン状態:', isLoggedIn);
-            
-            if (!isLoggedIn) {
-                console.log('未ログイン - auth.htmlにリダイレクト');
-                try {
-                    window.location.href = 'auth.html';
-                } catch (error) {
-                    console.warn('リダイレクトエラー:', error);
-                    // リダイレクトに失敗した場合は警告のみ表示
-                    if (window.errorHandler) {
-                        window.errorHandler.handleError(error, { action: 'auth_redirect' }, 'auth.session_expired');
+            try {
+                // ログインチェック
+                const isLoggedIn = window.authSystem.isLoggedIn();
+                console.log('ログイン状態:', isLoggedIn);
+                
+                if (!isLoggedIn) {
+                    console.log('未ログイン - auth.htmlにリダイレクト');
+                    try {
+                        window.location.href = 'auth.html';
+                    } catch (error) {
+                        console.warn('リダイレクトエラー:', error);
+                        // リダイレクトに失敗した場合は警告のみ表示
+                        if (window.errorHandler) {
+                            window.errorHandler.handleError(error, { action: 'auth_redirect' }, 'auth.session_expired');
+                        }
+                    }
+                    return;
+                }
+                
+                // ログイン済みの場合はユーザー情報を表示
+                const user = window.authSystem.getCurrentUser();
+                console.log('現在のユーザー:', user);
+                
+                if (user) {
+                    // ナビゲーションにユーザー情報を追加
+                    const nav = document.querySelector('div[style*="position: fixed; top: 10px; left: 10px"]');
+                    if (nav) {
+                        console.log('ユーザー情報をナビゲーションに追加');
+                        const userInfo = document.createElement('div');
+                        userInfo.innerHTML = `
+                            <span style="color: #ccc;">|</span>
+                            <span style="font-size: 12px; color: #333;">👤 ${user.username}</span>
+                            <button onclick="handleLogout()" style="background: #dc3545; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 4px;">ログアウト</button>
+                        `;
+                        nav.appendChild(userInfo);
+                    } else {
+                        console.warn('ナビゲーション要素が見つかりません');
                     }
                 }
-                return;
-            }
-            
-            // ログイン済みの場合はユーザー情報を表示
-            const user = window.authSystem.getCurrentUser();
-            console.log('現在のユーザー:', user);
-            
-            if (user) {
-                // ナビゲーションにユーザー情報を追加
-                const nav = document.querySelector('div[style*="position: fixed; top: 10px; left: 10px"]');
-                if (nav) {
-                    console.log('ユーザー情報をナビゲーションに追加');
-                    const userInfo = document.createElement('div');
-                    userInfo.innerHTML = `
-                        <span style="color: #ccc;">|</span>
-                        <span style="font-size: 12px; color: #333;">👤 ${user.username}</span>
-                        <button onclick="handleLogout()" style="background: #dc3545; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 4px;">ログアウト</button>
-                    `;
-                    nav.appendChild(userInfo);
-                } else {
-                    console.warn('ナビゲーション要素が見つかりません');
-                }
+            } catch (error) {
+                console.error('認証チェック中にエラーが発生:', error);
+                console.log('エラーのため認証をスキップして処理を続行');
             }
         } else {
             // 認証システムがまだ読み込まれていない場合は100ms後に再試行
