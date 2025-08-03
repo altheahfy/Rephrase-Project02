@@ -371,7 +371,13 @@
                         // redirectパラメータがあればそこへ、なければトレーニングUIのindex.htmlへ
                         const urlParams = new URLSearchParams(window.location.search);
                         const redirectUrl = urlParams.get('redirect') || 'index.html';
-                        window.location.href = redirectUrl;
+                        
+                        // 認証トークンを付与
+                        const finalUrl = redirectUrl.includes('?') 
+                            ? `${redirectUrl}&auth=verified` 
+                            : `${redirectUrl}?auth=verified`;
+                        
+                        window.location.href = finalUrl;
                     }, 2000);
                 } else {
                     showMessage('login-message', result.message, 'error');
@@ -513,7 +519,13 @@
                         // redirectパラメータがあればそこへ、なければトレーニングUIのindex.htmlへ
                         const urlParams = new URLSearchParams(window.location.search);
                         const redirectUrl = urlParams.get('redirect') || 'index.html';
-                        window.location.href = redirectUrl;
+                        
+                        // 認証トークンを付与
+                        const finalUrl = redirectUrl.includes('?') 
+                            ? `${redirectUrl}&auth=verified` 
+                            : `${redirectUrl}?auth=verified`;
+                        
+                        window.location.href = finalUrl;
                     }
                 } else {
                     // まだ読み込まれていない場合は100ms後に再確認
