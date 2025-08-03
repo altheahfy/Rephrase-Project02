@@ -137,15 +137,27 @@
             
             if (isLoggedIn && currentUser) {
               console.log('✅ 認証済み確認 - トレーニングUIへリダイレクト');
-              // 認証済みの場合はトレーニングUIへ
+              // 認証済みの場合はトレーニングUIへ（パラメータを転送）
               setTimeout(() => {
-                window.location.href = 'index.html';
+                const currentParams = new URLSearchParams(window.location.search);
+                const grammarParam = currentParams.get('grammar');
+                if (grammarParam) {
+                  window.location.href = `index.html?grammar=${encodeURIComponent(grammarParam)}`;
+                } else {
+                  window.location.href = 'index.html';
+                }
               }, 1000);
             } else {
               console.log('❌ 未認証または無効セッション - 認証ページへリダイレクト');
               // 未認証の場合は認証ページへ（リダイレクト先を指定）
               setTimeout(() => {
-                const redirectUrl = `auth.html?redirect=${encodeURIComponent('index.html')}`;
+                const currentParams = new URLSearchParams(window.location.search);
+                const grammarParam = currentParams.get('grammar');
+                let redirectTarget = 'index.html';
+                if (grammarParam) {
+                  redirectTarget = `index.html?grammar=${encodeURIComponent(grammarParam)}`;
+                }
+                const redirectUrl = `auth.html?redirect=${encodeURIComponent(redirectTarget)}`;
                 window.location.href = redirectUrl;
               }, 1000);
             }

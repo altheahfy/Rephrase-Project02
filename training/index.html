@@ -501,6 +501,7 @@ function handleLogout() {
       <option value="">-- 選択 --</option>
       <option value="data/slot_order_data.json">🎯 メイン</option>
       <option value="data/slot_order_data2.json">📚 例文2</option>
+      <option value="data/V自動詞第1文型.json">📝 冠詞・定冠詞の付け方</option>
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 20px;">読込</button>
   </div>
@@ -2623,6 +2624,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   } else {
     console.error('❌ ExplanationManagerクラスが見つかりません');
+  }
+  
+  // 🎯 文法項目自動選択システム：URLパラメータから自動JSON読み込み
+  const urlParams = new URLSearchParams(window.location.search);
+  const grammarParam = urlParams.get('grammar');
+  
+  if (grammarParam) {
+    console.log('🎯 文法項目自動選択検出:', grammarParam);
+    
+    // 文法項目とJSONファイルのマッピング
+    const grammarToJsonMap = {
+      '冠詞・定冠詞の付け方': 'data/V自動詞第1文型.json'
+    };
+    
+    const jsonFile = grammarToJsonMap[grammarParam];
+    
+    if (jsonFile) {
+      console.log('✅ 対応するJSONファイル発見:', jsonFile);
+      
+      // プリセット選択を自動設定
+      setTimeout(() => {
+        const presetSelect = document.getElementById('presetSelect');
+        if (presetSelect) {
+          presetSelect.value = jsonFile;
+          console.log('🎯 プリセット選択を自動設定:', jsonFile);
+          
+          // 自動的にJSON読み込みを実行
+          const loadButton = document.getElementById('loadPresetButton');
+          if (loadButton) {
+            loadButton.click();
+            console.log('🚀 文法項目JSONを自動読み込み開始');
+          }
+        }
+      }, 500);
+    } else {
+      console.warn('⚠️ 未対応の文法項目:', grammarParam);
+    }
   }
 });
 </script>
