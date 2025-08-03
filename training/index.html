@@ -366,7 +366,7 @@
 <!-- 🔐 認証チェックとユーザー情報表示 -->
 <script>
 // 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
-const SKIP_AUTH_FOR_DEVELOPMENT = false; // ダミーページ経由になったので無効化
+const SKIP_AUTH_FOR_DEVELOPMENT = true; // 認証ループ問題のため一時的に有効化
 
 // 🔍 デバッグログを永続化
 function debugLog(message, data = null) {
