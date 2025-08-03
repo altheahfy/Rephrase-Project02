@@ -366,7 +366,29 @@
 <!-- 🔐 認証チェックとユーザー情報表示 -->
 <script>
 // 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
-const SKIP_AUTH_FOR_DEVELOPMENT = true; // 認証ループ問題のため一時的に有効化
+const SKIP_AUTH_FOR_DEVELOPMENT = false; // セキュリティのため無効化
+
+// 🔒 正規ルート経由の認証済みアクセスかチェック
+function isAuthorizedAccess() {
+    // referrer（前のページ）をチェック
+    const referrer = document.referrer;
+    const isFromAuthCheck = referrer.includes('auth-check.html');
+    const isFromAuth = referrer.includes('auth.html');
+    
+    // クエリパラメータで認証済みフラグをチェック
+    const urlParams = new URLSearchParams(window.location.search);
+    const authToken = urlParams.get('auth');
+    
+    console.log('🔒 アクセス権限チェック:', {
+        referrer: referrer,
+        isFromAuthCheck: isFromAuthCheck,
+        isFromAuth: isFromAuth,
+        authToken: authToken
+    });
+    
+    // 正規ルートからのアクセスまたは認証済みの場合
+    return isFromAuthCheck || isFromAuth || authToken === 'verified';
+}
 
 // 🔍 デバッグログを永続化
 function debugLog(message, data = null) {
@@ -416,6 +438,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('  - window.clearDebugLogs() : デバッグログをクリア');
         return;
     }
+    
+    // 🔒 正規ルート経由かチェック
+    if (!isAuthorizedAccess()) {
+        debugLog('🚫 不正アクセス検知 - 認証チェックページにリダイレクト');
+        console.log('🚫 不正なアクセスです。認証が必要です。');
+        window.location.href = 'auth-check.html';
+        return;
+    }
+    
+    debugLog('✅ 正規ルート経由のアクセス確認');
+    console.log('✅ 正規ルート経由のアクセスが確認されました');
     
     debugLog('認証チェック開始');
     console.log('🔐 認証チェック開始');
