@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isLoggedIn) {
                 console.log('未ログイン - auth.htmlにリダイレクト');
                 try {
-                    window.location.href = './auth.html';
+                    window.location.href = 'auth.html';
                 } catch (error) {
                     console.warn('リダイレクトエラー:', error);
                     // リダイレクトに失敗した場合は警告のみ表示
@@ -441,7 +441,7 @@ function handleLogout() {
     if (window.authSystem && confirm('ログアウトしますか？')) {
         console.log('ログアウト実行');
         window.authSystem.logout();
-        window.location.href = './auth.html';
+        window.location.href = 'auth.html';
     }
 }
 </script>
