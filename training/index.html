@@ -501,7 +501,7 @@ function handleLogout() {
       <option value="">-- 選択 --</option>
       <option value="data/slot_order_data.json">🎯 メイン</option>
       <option value="data/slot_order_data2.json">📚 例文2</option>
-      <option value="data/V自動詞第1文型.json">📝 冠詞・定冠詞の付け方</option>
+      <option value="data/V自動詞第1文型.json">📝 自動詞第1文型</option>
     </select>
     <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 20px;">読込</button>
   </div>
@@ -2635,7 +2635,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 文法項目とJSONファイルのマッピング
     const grammarToJsonMap = {
-      '冠詞・定冠詞の付け方': 'data/V自動詞第1文型.json'
+      '自動詞第1文型': 'data/V自動詞第1文型.json'
     };
     
     const jsonFile = grammarToJsonMap[grammarParam];
