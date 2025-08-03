@@ -366,59 +366,120 @@
 <!-- 🔐 認証チェックとユーザー情報表示 -->
 <script>
 // 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
-const SKIP_AUTH_FOR_DEVELOPMENT = false;
+const SKIP_AUTH_FOR_DEVELOPMENT = false; // ダミーページ経由になったので無効化
+
+// 🔍 デバッグログを永続化
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] ${message}${data ? ': ' + JSON.stringify(data) : ''}`;
+    console.log(logEntry);
+    
+    // localStorageに保存（最大50件まで）
+    try {
+        const logs = JSON.parse(localStorage.getItem('rephrase_debug_logs') || '[]');
+        logs.push(logEntry);
+        if (logs.length > 50) logs.shift(); // 古いログを削除
+        localStorage.setItem('rephrase_debug_logs', JSON.stringify(logs));
+    } catch (error) {
+        console.warn('デバッグログ保存失敗:', error);
+    }
+}
+
+// 🔍 デバッグログを表示する関数
+window.showDebugLogs = function() {
+    try {
+        const logs = JSON.parse(localStorage.getItem('rephrase_debug_logs') || '[]');
+        console.log('=== Rephrase デバッグログ ===');
+        logs.forEach(log => console.log(log));
+        console.log('=== ログ終了 ===');
+        return logs;
+    } catch (error) {
+        console.error('ログ表示エラー:', error);
+        return [];
+    }
+};
+
+// 🔍 デバッグログをクリアする関数
+window.clearDebugLogs = function() {
+    localStorage.removeItem('rephrase_debug_logs');
+    console.log('デバッグログをクリアしました');
+};
 
 document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOM読み込み完了');
+    
     if (SKIP_AUTH_FOR_DEVELOPMENT) {
+        debugLog('開発モード - 認証チェックをスキップ');
         console.log('🚧 開発モード - 認証チェックをスキップ');
+        console.log('📋 利用可能なデバッグコマンド:');
+        console.log('  - window.showDebugLogs() : デバッグログを表示');
+        console.log('  - window.clearDebugLogs() : デバッグログをクリア');
         return;
     }
     
+    debugLog('認証チェック開始');
     console.log('🔐 認証チェック開始');
     
     // 認証システムが読み込まれるまで待機
     function waitForAuth() {
-        console.log('🔍 認証システム確認中...', {
+        const authStatus = {
             authSystem: !!window.authSystem,
             securityUtils: !!window.securityUtils,
             localStorage: !!window.localStorage
-        });
+        };
+        
+        debugLog('認証システム確認中', authStatus);
+        console.log('🔍 認証システム確認中...', authStatus);
         
         if (window.authSystem && window.securityUtils) {
+            debugLog('認証システム読み込み完了');
             console.log('✅ 認証システム読み込み完了');
             
             try {
                 // 手動でlocalStorageをチェックして問題がないか確認
-                console.log('📊 現在のlocalStorage状態:', {
+                const storageStatus = {
                     userSession: !!localStorage.getItem('userSession'),
                     rephrase_session: !!localStorage.getItem('rephrase_session')
-                });
+                };
+                
+                debugLog('localStorage状態', storageStatus);
+                console.log('📊 現在のlocalStorage状態:', storageStatus);
                 
                 // ログインチェック
                 const isLoggedIn = window.authSystem.isLoggedIn();
+                debugLog('ログイン状態確認結果', isLoggedIn);
                 console.log('🔐 ログイン状態確認結果:', isLoggedIn);
                 
                 // 詳細なデバッグ情報を追加
                 if (!isLoggedIn) {
-                    console.log('❓ ログイン失敗の詳細調査:');
-                    console.log('  - authSystem:', !!window.authSystem);
-                    console.log('  - currentUser:', window.authSystem.getCurrentUser());
-                    console.log('  - localStorage userSession:', localStorage.getItem('userSession'));
-                    console.log('  - localStorage rephrase_session:', localStorage.getItem('rephrase_session'));
+                    const debugInfo = {
+                        authSystem: !!window.authSystem,
+                        currentUser: window.authSystem.getCurrentUser(),
+                        userSessionRaw: localStorage.getItem('userSession'),
+                        rephraseSessionRaw: localStorage.getItem('rephrase_session')
+                    };
+                    
+                    debugLog('ログイン失敗の詳細調査', debugInfo);
+                    console.log('❓ ログイン失敗の詳細調査:', debugInfo);
                     
                     // もう一度ログインチェックを試行
+                    debugLog('再度ログインチェックを実行');
                     console.log('🔄 再度ログインチェックを実行...');
                     setTimeout(() => {
                         const retryCheck = window.authSystem.isLoggedIn();
+                        debugLog('再試行結果', retryCheck);
                         console.log('🔄 再試行結果:', retryCheck);
                         
                         if (!retryCheck) {
+                            debugLog('再試行でも未ログイン - auth.htmlにリダイレクト');
                             console.log('❌ 再試行でも未ログイン - auth.htmlにリダイレクト');
                             const currentPage = window.location.href;
                             const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentPage)}`;
+                            debugLog('リダイレクト先', redirectUrl);
                             console.log('🔀 リダイレクト先:', redirectUrl);
                             window.location.href = redirectUrl;
                         } else {
+                            debugLog('再試行で認証成功 - 処理を続行');
                             console.log('✅ 再試行で認証成功 - 処理を続行');
                         }
                     }, 500);
