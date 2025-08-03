@@ -20,7 +20,7 @@ class AuthSystem {
     }
 
     /**
-     * パスワードのハッシュ化（簡易版）
+     * パスワードのハッシュ化（HTTPフォールバック対応）
      * 本番環境では bcrypt や Argon2 を使用推奨
      */
     async hashPassword(password, salt = null) {
@@ -28,16 +28,55 @@ class AuthSystem {
             salt = this.generateSalt();
         }
         
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password + salt);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        // 🔧 HTTP環境(Live Server)でのフォールバック
+        if (!window.crypto || !window.crypto.subtle) {
+            console.warn('🔒 HTTP環境: 簡易ハッシュを使用（開発用）');
+            // 簡易ハッシュ関数（開発環境用）
+            return this.fallbackHash(password, salt);
+        }
         
-        return { hash: hashHex, salt: salt };
+        // HTTPS環境: 安全なcrypto.subtleを使用
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + salt);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            return { hash: hashHex, salt: salt };
+        } catch (error) {
+            console.warn('🔒 crypto.subtle失敗、フォールバックを使用:', error);
+            return this.fallbackHash(password, salt);
+        }
+    }
+
+    /**
+     * HTTP環境用の簡易ハッシュ関数
+     */
+    fallbackHash(password, salt) {
+        // 簡易的なハッシュ（開発環境用）
+        let hash = 0;
+        const input = password + salt;
+        for (let i = 0; i < input.length; i++) {
+            const char = input.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // 32bit整数に変換
+        }
+        return { 
+            hash: Math.abs(hash).toString(16).padStart(8, '0'), 
+            salt: salt 
+        };
     }
 
     generateSalt() {
+        // 🔧 HTTP環境でのフォールバック
+        if (!window.crypto || !window.crypto.getRandomValues) {
+            console.warn('🔒 HTTP環境: 簡易ソルト生成（開発用）');
+            // 簡易ソルト生成
+            return Math.random().toString(36).substring(2, 18);
+        }
+        
+        // HTTPS環境: 安全な乱数生成
         const array = new Uint8Array(16);
         crypto.getRandomValues(array);
         return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
