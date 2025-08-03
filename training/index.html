@@ -378,25 +378,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 認証システムが読み込まれるまで待機
     function waitForAuth() {
-        console.log('認証システム確認中...', {
+        console.log('🔍 認証システム確認中...', {
             authSystem: !!window.authSystem,
-            securityUtils: !!window.securityUtils
+            securityUtils: !!window.securityUtils,
+            localStorage: !!window.localStorage
         });
         
         if (window.authSystem && window.securityUtils) {
-            console.log('認証システム読み込み完了');
+            console.log('✅ 認証システム読み込み完了');
             
             try {
+                // 手動でlocalStorageをチェックして問題がないか確認
+                console.log('📊 現在のlocalStorage状態:', {
+                    userSession: !!localStorage.getItem('userSession'),
+                    rephrase_session: !!localStorage.getItem('rephrase_session')
+                });
+                
                 // ログインチェック
                 const isLoggedIn = window.authSystem.isLoggedIn();
-                console.log('ログイン状態:', isLoggedIn);
+                console.log('🔐 ログイン状態確認結果:', isLoggedIn);
                 
                 if (!isLoggedIn) {
-                    console.log('未ログイン - auth.htmlにリダイレクト');
+                    console.log('❌ 未ログイン状態 - auth.htmlにリダイレクト');
                     try {
-                        window.location.href = 'auth.html';
+                        // 現在のページを記録してリダイレクト後に戻れるようにする
+                        const currentPage = window.location.href;
+                        const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentPage)}`;
+                        console.log('🔀 リダイレクト先:', redirectUrl);
+                        window.location.href = redirectUrl;
                     } catch (error) {
-                        console.warn('リダイレクトエラー:', error);
+                        console.warn('⚠️ リダイレクトエラー:', error);
                         // リダイレクトに失敗した場合は警告のみ表示
                         if (window.errorHandler) {
                             window.errorHandler.handleError(error, { action: 'auth_redirect' }, 'auth.session_expired');
