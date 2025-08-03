@@ -2722,12 +2722,44 @@ class VoiceSystem {
                 const confidence = result[0].confidence || 0;
                 
                 if (result.isFinal) {
-                    // 🔧 連続認識対応: 既存結果に追加する
-                    if (this.recognizedText && this.recognizedText.trim()) {
-                        this.recognizedText += ' ' + transcript;
-                    } else {
-                        this.recognizedText = transcript;
+                    // 🔧 重複検出・除去システム: 冒頭単語の重複を防止
+                    let cleanTranscript = transcript.trim();
+                    
+                    // 📌 STEP 1: 同一認識結果内での冒頭単語重複をチェック
+                    const words = cleanTranscript.split(/\s+/);
+                    if (words.length >= 2 && words[0].toLowerCase() === words[1].toLowerCase()) {
+                        // 冒頭の同じ単語が連続している場合、最初の1つを除去
+                        words.shift();
+                        cleanTranscript = words.join(' ');
+                        this.addDebugLog(`🔧 冒頭単語重複除去: "${words[0]}" (同一認識結果内)`, 'info');
                     }
+                    
+                    if (this.recognizedText && this.recognizedText.trim()) {
+                        // 📌 STEP 2: 既存テキストとの境界での重複検出
+                        const existingWords = this.recognizedText.trim().split(/\s+/);
+                        const newWords = cleanTranscript.split(/\s+/);
+                        
+                        // 最初の単語が既存の最後の単語と同じ場合は除去
+                        if (newWords.length > 0 && existingWords.length > 0) {
+                            const lastExistingWord = existingWords[existingWords.length - 1].toLowerCase();
+                            const firstNewWord = newWords[0].toLowerCase();
+                            
+                            if (lastExistingWord === firstNewWord) {
+                                // 重複を検出：最初の単語を除去
+                                newWords.shift();
+                                cleanTranscript = newWords.join(' ');
+                                this.addDebugLog(`🔧 境界重複除去: "${firstNewWord}" を除去`, 'info');
+                            }
+                        }
+                        
+                        // クリーンなテキストを追加
+                        if (cleanTranscript.trim()) {
+                            this.recognizedText += ' ' + cleanTranscript;
+                        }
+                    } else {
+                        this.recognizedText = cleanTranscript;
+                    }
+                    
                     this.addDebugLog(`✅ 認識結果（確定）: "${transcript}"`, 'success');
                     this.addDebugLog(`📊 信頼度: ${(confidence * 100).toFixed(1)}%`, 'info');
                     this.addDebugLog(`📝 累積認識結果: "${this.recognizedText}"`, 'success');
@@ -2751,7 +2783,15 @@ class VoiceSystem {
                     } else {
                         // PC: 中間結果も一時保存
                         if (!this.recognizedText || this.recognizedText.trim().length === 0) {
-                            this.recognizedText = transcript;
+                            // 🔧 PC版でも冒頭単語重複をチェック
+                            let cleanTranscript = transcript.trim();
+                            const words = cleanTranscript.split(/\s+/);
+                            if (words.length >= 2 && words[0].toLowerCase() === words[1].toLowerCase()) {
+                                words.shift();
+                                cleanTranscript = words.join(' ');
+                                this.addDebugLog(`🔧 PC冒頭重複除去: "${words[0]}"`, 'info');
+                            }
+                            this.recognizedText = cleanTranscript;
                             console.log('💻 PC中間結果保存:', this.recognizedText);
                         }
                     }
