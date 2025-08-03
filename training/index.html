@@ -398,21 +398,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 const isLoggedIn = window.authSystem.isLoggedIn();
                 console.log('🔐 ログイン状態確認結果:', isLoggedIn);
                 
+                // 詳細なデバッグ情報を追加
                 if (!isLoggedIn) {
-                    console.log('❌ 未ログイン状態 - auth.htmlにリダイレクト');
-                    try {
-                        // 現在のページを記録してリダイレクト後に戻れるようにする
-                        const currentPage = window.location.href;
-                        const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentPage)}`;
-                        console.log('🔀 リダイレクト先:', redirectUrl);
-                        window.location.href = redirectUrl;
-                    } catch (error) {
-                        console.warn('⚠️ リダイレクトエラー:', error);
-                        // リダイレクトに失敗した場合は警告のみ表示
-                        if (window.errorHandler) {
-                            window.errorHandler.handleError(error, { action: 'auth_redirect' }, 'auth.session_expired');
+                    console.log('❓ ログイン失敗の詳細調査:');
+                    console.log('  - authSystem:', !!window.authSystem);
+                    console.log('  - currentUser:', window.authSystem.getCurrentUser());
+                    console.log('  - localStorage userSession:', localStorage.getItem('userSession'));
+                    console.log('  - localStorage rephrase_session:', localStorage.getItem('rephrase_session'));
+                    
+                    // もう一度ログインチェックを試行
+                    console.log('🔄 再度ログインチェックを実行...');
+                    setTimeout(() => {
+                        const retryCheck = window.authSystem.isLoggedIn();
+                        console.log('🔄 再試行結果:', retryCheck);
+                        
+                        if (!retryCheck) {
+                            console.log('❌ 再試行でも未ログイン - auth.htmlにリダイレクト');
+                            const currentPage = window.location.href;
+                            const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentPage)}`;
+                            console.log('🔀 リダイレクト先:', redirectUrl);
+                            window.location.href = redirectUrl;
+                        } else {
+                            console.log('✅ 再試行で認証成功 - 処理を続行');
                         }
-                    }
+                    }, 500);
                     return;
                 }
                 
