@@ -213,19 +213,23 @@ class AuthSystem {
     }
 
     /**
-     * セッション復元
+     * セッション復元（シンプル版）
      */
     async restoreSession() {
         try {
-            const sessionData = window.securityUtils.secureLocalStorageGet('userSession');
+            const sessionData = localStorage.getItem('userSession');
             
-            if (sessionData && sessionData.expires > Date.now()) {
-                const user = this.getUser(sessionData.username);
-                if (user && user.isActive) {
-                    this.currentUser = user;
-                    this.extendSession();
-                    console.log('セッション復元成功:', user.username);
-                    return true;
+            if (sessionData) {
+                const session = JSON.parse(sessionData);
+                
+                if (session.expires > Date.now()) {
+                    const user = this.getUser(session.username);
+                    if (user && user.isActive) {
+                        this.currentUser = user;
+                        this.extendSession();
+                        console.log('🔐 セッション復元成功:', user.username);
+                        return true;
+                    }
                 }
             }
             
@@ -233,12 +237,7 @@ class AuthSystem {
             return false;
             
         } catch (error) {
-            // セキュアなエラーハンドリング
-            if (window.errorHandler) {
-                window.errorHandler.handleError(error, { action: 'session_restore' }, 'auth.session_error');
-            } else {
-                console.error('Session restore error:', error);
-            }
+            console.error('🔐 セッション復元エラー:', error);
             this.clearSession();
             return false;
         }
@@ -372,7 +371,7 @@ class AuthSystem {
     }
 
     /**
-     * セッション作成
+     * セッション作成（シンプル版）
      */
     createSession(user) {
         const sessionData = {
@@ -381,7 +380,8 @@ class AuthSystem {
             expires: Date.now() + this.sessionTimeout
         };
         
-        window.securityUtils.secureLocalStorageSet('userSession', sessionData);
+        localStorage.setItem('userSession', JSON.stringify(sessionData));
+        console.log('🔐 セッション作成:', sessionData);
     }
 
     /**
@@ -394,21 +394,41 @@ class AuthSystem {
     }
 
     /**
-     * セッションクリア
+     * セッションクリア（シンプル版）
      */
     clearSession() {
-        localStorage.removeItem('userSession');
+        try {
+            // ローカルストレージから直接削除
+            localStorage.removeItem('userSession');
+            localStorage.removeItem('rephrase_session');
+            this.currentUser = null;
+            console.log('🔐 セッションデータをクリア');
+        } catch (error) {
+            console.warn('🔐 セッションクリア中にエラー:', error);
+            // エラーが発生してもcurrentUserはnullにする
+            this.currentUser = null;
+        }
     }
 
     /**
-     * セッションタイムアウト設定
+     * セッションタイムアウト設定（シンプル版）
      */
     setupSessionTimeout() {
         // 定期的にセッション確認
         this.sessionCheckInterval = setInterval(() => {
-            const sessionData = window.securityUtils.secureLocalStorageGet('userSession');
-            
-            if (!sessionData || sessionData.expires <= Date.now()) {
+            try {
+                const sessionData = localStorage.getItem('userSession');
+                if (!sessionData) {
+                    this.logout();
+                    return;
+                }
+                
+                const session = JSON.parse(sessionData);
+                if (session.expires <= Date.now()) {
+                    this.logout();
+                }
+            } catch (error) {
+                console.warn('🔐 セッションチェック中にエラー:', error);
                 this.logout();
             }
         }, 60000); // 1分ごとにチェック
@@ -431,10 +451,41 @@ class AuthSystem {
     }
 
     /**
-     * ログイン状態確認
+     * ログイン状態確認（シンプル版）
      */
     isLoggedIn() {
-        return this.currentUser !== null;
+        // currentUserが存在するかの基本チェック
+        if (!this.currentUser) {
+            console.log('🔐 currentUser が存在しません');
+            return false;
+        }
+        
+        try {
+            // ローカルストレージから直接セッションチェック
+            const sessionData = localStorage.getItem('userSession');
+            if (!sessionData) {
+                console.log('🔐 セッションデータが存在しません');
+                this.currentUser = null;
+                return false;
+            }
+            
+            const session = JSON.parse(sessionData);
+            if (session.expires <= Date.now()) {
+                console.log('🔐 セッション期限切れ');
+                this.currentUser = null;
+                this.clearSession();
+                return false;
+            }
+            
+            console.log('✅ 有効なセッション確認済み');
+            return true;
+            
+        } catch (error) {
+            console.log('🔐 ログイン状態確認中にエラー:', error);
+            this.currentUser = null;
+            this.clearSession();
+            return false;
+        }
     }
 
     /**

@@ -366,9 +366,9 @@
                 if (result.success) {
                     showMessage('login-message', result.message, 'success');
                     
-                    // 成功時は2秒後にトップページへ
+                    // 成功時は2秒後にトレーニングUIへ
                     setTimeout(() => {
-                        window.location.href = '../index.html';
+                        window.location.href = 'index.html';
                     }, 2000);
                 } else {
                     showMessage('login-message', result.message, 'error');
@@ -505,9 +505,9 @@
             // 認証システムの読み込み完了を待機
             function waitForAuthSystem() {
                 if (window.authSystem) {
-                    // 既にログインしている場合はトップページへリダイレクト
+                    // 既にログインしている場合はトレーニングUIへリダイレクト
                     if (window.authSystem.isLoggedIn()) {
-                        window.location.href = '../index.html';
+                        window.location.href = 'index.html';
                     }
                 } else {
                     // まだ読み込まれていない場合は100ms後に再確認
