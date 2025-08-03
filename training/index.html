@@ -368,26 +368,30 @@
 // 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
 const SKIP_AUTH_FOR_DEVELOPMENT = false; // セキュリティのため無効化
 
-// 🔒 正規ルート経由の認証済みアクセスかチェック
-function isAuthorizedAccess() {
-    // referrer（前のページ）をチェック
-    const referrer = document.referrer;
-    const isFromAuthCheck = referrer.includes('auth-check.html');
-    const isFromAuth = referrer.includes('auth.html');
-    
-    // クエリパラメータで認証済みフラグをチェック
-    const urlParams = new URLSearchParams(window.location.search);
-    const authToken = urlParams.get('auth');
-    
-    console.log('🔒 アクセス権限チェック:', {
-        referrer: referrer,
-        isFromAuthCheck: isFromAuthCheck,
-        isFromAuth: isFromAuth,
-        authToken: authToken
-    });
-    
-    // 正規ルートからのアクセスまたは認証済みの場合
-    return isFromAuthCheck || isFromAuth || authToken === 'verified';
+// 🔒 セッションベースの認証チェック（シンプル版）
+function isAuthenticatedUser() {
+    try {
+        // 認証システムが利用可能かチェック
+        if (!window.authSystem || !window.securityUtils) {
+            console.log('🔍 認証システム未読み込み');
+            return false;
+        }
+        
+        // 実際のログイン状態をチェック
+        const isLoggedIn = window.authSystem.isLoggedIn();
+        const currentUser = window.authSystem.getCurrentUser();
+        
+        console.log('🔐 認証状態確認:', {
+            isLoggedIn: isLoggedIn,
+            hasUser: !!currentUser,
+            user: currentUser
+        });
+        
+        return isLoggedIn && currentUser;
+    } catch (error) {
+        console.error('❌ 認証チェックエラー:', error);
+        return false;
+    }
 }
 
 // 🔍 デバッグログを永続化
@@ -439,109 +443,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // 🔒 正規ルート経由かチェック
-    if (!isAuthorizedAccess()) {
-        debugLog('🚫 不正アクセス検知 - 認証チェックページにリダイレクト');
-        console.log('🚫 不正なアクセスです。認証が必要です。');
-        window.location.href = 'auth-check.html';
-        return;
-    }
-    
-    debugLog('✅ 正規ルート経由のアクセス確認');
-    console.log('✅ 正規ルート経由のアクセスが確認されました');
-    
-    debugLog('認証チェック開始');
     console.log('🔐 認証チェック開始');
     
     // 認証システムが読み込まれるまで待機
     function waitForAuth() {
-        const authStatus = {
-            authSystem: !!window.authSystem,
-            securityUtils: !!window.securityUtils,
-            localStorage: !!window.localStorage
-        };
-        
-        debugLog('認証システム確認中', authStatus);
-        console.log('🔍 認証システム確認中...', authStatus);
-        
         if (window.authSystem && window.securityUtils) {
-            debugLog('認証システム読み込み完了');
             console.log('✅ 認証システム読み込み完了');
             
-            try {
-                // 手動でlocalStorageをチェックして問題がないか確認
-                const storageStatus = {
-                    userSession: !!localStorage.getItem('userSession'),
-                    rephrase_session: !!localStorage.getItem('rephrase_session')
-                };
-                
-                debugLog('localStorage状態', storageStatus);
-                console.log('📊 現在のlocalStorage状態:', storageStatus);
-                
-                // ログインチェック
-                const isLoggedIn = window.authSystem.isLoggedIn();
-                debugLog('ログイン状態確認結果', isLoggedIn);
-                console.log('🔐 ログイン状態確認結果:', isLoggedIn);
-                
-                // 詳細なデバッグ情報を追加
-                if (!isLoggedIn) {
-                    const debugInfo = {
-                        authSystem: !!window.authSystem,
-                        currentUser: window.authSystem.getCurrentUser(),
-                        userSessionRaw: localStorage.getItem('userSession'),
-                        rephraseSessionRaw: localStorage.getItem('rephrase_session')
-                    };
-                    
-                    debugLog('ログイン失敗の詳細調査', debugInfo);
-                    console.log('❓ ログイン失敗の詳細調査:', debugInfo);
-                    
-                    // もう一度ログインチェックを試行
-                    debugLog('再度ログインチェックを実行');
-                    console.log('🔄 再度ログインチェックを実行...');
-                    setTimeout(() => {
-                        const retryCheck = window.authSystem.isLoggedIn();
-                        debugLog('再試行結果', retryCheck);
-                        console.log('🔄 再試行結果:', retryCheck);
-                        
-                        if (!retryCheck) {
-                            debugLog('再試行でも未ログイン - auth.htmlにリダイレクト');
-                            console.log('❌ 再試行でも未ログイン - auth.htmlにリダイレクト');
-                            const currentPage = window.location.href;
-                            const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentPage)}`;
-                            debugLog('リダイレクト先', redirectUrl);
-                            console.log('🔀 リダイレクト先:', redirectUrl);
-                            window.location.href = redirectUrl;
-                        } else {
-                            debugLog('再試行で認証成功 - 処理を続行');
-                            console.log('✅ 再試行で認証成功 - 処理を続行');
-                        }
-                    }, 500);
-                    return;
-                }
-                
-                // ログイン済みの場合はユーザー情報を表示
-                const user = window.authSystem.getCurrentUser();
-                console.log('現在のユーザー:', user);
-                
-                if (user) {
-                    // ナビゲーションにユーザー情報を追加
-                    const nav = document.querySelector('div[style*="position: fixed; top: 10px; left: 10px"]');
-                    if (nav) {
-                        console.log('ユーザー情報をナビゲーションに追加');
-                        const userInfo = document.createElement('div');
-                        userInfo.innerHTML = `
-                            <span style="color: #ccc;">|</span>
-                            <span style="font-size: 12px; color: #333;">👤 ${user.username}</span>
-                            <button onclick="handleLogout()" style="background: #dc3545; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 4px;">ログアウト</button>
-                        `;
-                        nav.appendChild(userInfo);
-                    } else {
-                        console.warn('ナビゲーション要素が見つかりません');
-                    }
-                }
-            } catch (error) {
-                console.error('認証チェック中にエラーが発生:', error);
-                console.log('エラーのため認証をスキップして処理を続行');
+            // シンプルな認証チェック
+            if (isAuthenticatedUser()) {
+                console.log('✅ 認証済みユーザー - トレーニングUI開始');
+                // 認証済みの場合は何もしない（UIを表示）
+                return;
+            } else {
+                console.log('❌ 未認証 - 認証チェックページにリダイレクト');
+                // 未認証の場合は認証チェックページへ
+                window.location.href = 'auth-check.html';
+                return;
             }
         } else {
             // 認証システムがまだ読み込まれていない場合は100ms後に再試行
@@ -549,10 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 認証がスキップされていない場合のみ実行
-    if (!SKIP_AUTH_FOR_DEVELOPMENT) {
-        waitForAuth();
-    }
+    waitForAuth();
 });
 
 // ログアウト処理
