@@ -3,21 +3,291 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>文法説明 - Rephrase 英語学習システム</title>
+  <title>Rephraseとは - 革新的英語学習システム</title>
   <link href="../../assets/styles/main.css" rel="stylesheet">
   <link href="../../assets/styles/grammar.css" rel="stylesheet">
   <!-- 📱 モバイル最適化CSS -->
   <link href="../../responsive.css" rel="stylesheet">
   <style>
-    /* 緊急用CSS - CSSファイルが読み込まれない場合の対応 */
-    :root {
-      --primary-color: #2196F3;
-      --secondary-color: #FF9800;
-      --accent-color: #4CAF50;
-      --text-color: #333;
-      --light-gray: #f5f5f5;
-      --border-color: #e0e0e0;
-      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+    /* Rephraseとは ページ専用CSS */
+    .rephrase-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .rephrase-hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .rephrase-hero .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .rephrase-hero .catchphrase {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+
+    .problem-section {
+      background: #fff3f3;
+      padding: 3rem 2rem;
+      margin: 3rem 0;
+      border-left: 5px solid #ff6b6b;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .problem-section h2 {
+      color: #d63031;
+      margin-bottom: 1.5rem;
+    }
+
+    .problem-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .problem-list li {
+      background: white;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: relative;
+      padding-left: 3rem;
+    }
+
+    .problem-list li::before {
+      content: "😰";
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #f0f0f0;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+
+    .feature-card h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-number {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .feature-image {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin: 1rem 0;
+      background: #f8f9fa;
+      padding: 1rem;
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      border-radius: 15px;
+      margin: 3rem 0;
+    }
+
+    .cta-button {
+      background: white;
+      color: #4CAF50;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+      .rephrase-hero h1 {
+        font-size: 2rem;
+      }
+      
+      .rephrase-hero .catchphrase {
+        font-size: 1.2rem;
+        padding: 0.8rem 1.5rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .feature-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ヒーローセクション -->
+  <section class="rephrase-hero">
+    <h1>🔄 Rephrase</h1>
+    <p class="subtitle">英語の「なぜ？」を「わかった！」に変える革新的学習システム</p>
+    <div class="catchphrase">
+      「丸暗記から理解へ」文法を見える化する新体験
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- 問題提起セクション -->
+    <section class="problem-section">
+      <h2>📚 こんな英語学習の悩み、ありませんか？</h2>
+      <ul class="problem-list">
+        <li><strong>「文法ルールは覚えたけど、実際に使えない...」</strong><br>
+        理論は分かるのに、実践で活用できずにもどかしい思いをしている</li>
+        
+        <li><strong>「長い文章になると、どこが主語かわからなくなる」</strong><br>
+        複雑な文構造を前に、文法の基本を見失ってしまう</li>
+        
+        <li><strong>「なんとなく理解したつもりだけど、確信が持てない」</strong><br>
+        曖昧な理解のまま進んで、基礎が不安定になっている</li>
+        
+        <li><strong>「単調な文法学習に飽きてしまった」</strong><br>
+        同じパターンの練習ばかりで、モチベーションが続かない</li>
+      </ul>
+    </section>
+
+    <!-- Rephraseの解決方法 -->
+    <section>
+      <h2 style="text-align: center; color: #2c3e50; margin: 3rem 0 2rem;">✨ Rephraseが解決する5つの革新機能</h2>
+      
+      <div class="features-grid">
+        <!-- ①文法のアウトプット練習 -->
+        <div class="feature-card">
+          <h3>
+            <span class="feature-number">①</span>
+            文法のアウトプット練習
+          </h3>
+          <img src="../../assets/images/features/output-practice.png" alt="アウトプット練習画面" class="feature-image">
+          <p><strong>「覚える」から「使える」へ</strong></p>
+          <p>受動的な暗記ではなく、実際に文構造を組み立てる能動的な練習で、文法を身体で覚えます。頭で理解したことを手と目で確認することで、確実な定着を図ります。</p>
+        </div>
+
+        <!-- ②文を「箱」に分解 -->
+        <div class="feature-card">
+          <h3>
+            <span class="feature-number">②</span>
+            文を「箱」に分解
+          </h3>
+          <img src="../../assets/images/features/box-structure.png" alt="箱構造分解画面" class="feature-image">
+          <p><strong>複雑な文も一目瞭然</strong></p>
+          <p>長い文章も主語・動詞・目的語・修飾語などの「箱」に視覚的に分解。文法要素の役割と関係性が色分けで明確になり、構造の理解が格段に深まります。</p>
+        </div>
+
+        <!-- ③箱の中身をシャッフル -->
+        <div class="feature-card">
+          <h3>
+            <span class="feature-number">③</span>
+            箱の中身をシャッフル
+          </h3>
+          <img src="../../assets/images/features/shuffle-function.png" alt="シャッフル機能画面" class="feature-image">
+          <p><strong>無限のパターンで飽きない学習</strong></p>
+          <p>同じ文法構造でも単語をランダムに変更。多様な例文パターンで練習することで、特定の文章に依存しない真の文法理解を身につけます。</p>
+        </div>
+
+        <!-- ④イメージ画像表示と英語非表示 -->
+        <div class="feature-card">
+          <h3>
+            <span class="feature-number">④</span>
+            イメージ画像表示と英語非表示
+          </h3>
+          <img src="../../assets/images/features/image-hints.png" alt="画像ヒント機能画面" class="feature-image">
+          <p><strong>日本語に頼らない英語脳育成</strong></p>
+          <p>画像ヒントで単語の意味を推測し、日本語に依存しない学習環境を実現。視覚的な理解で記憶定着率を向上させ、自然な英語思考を育てます。</p>
+        </div>
+
+        <!-- ⑤音声解答認識機能 -->
+        <div class="feature-card">
+          <h3>
+            <span class="feature-number">⑤</span>
+            音声解答認識機能
+          </h3>
+          <img src="../../assets/images/features/voice-recognition.png" alt="音声認識機能画面" class="feature-image">
+          <p><strong>話す練習で実践力アップ</strong></p>
+          <p>構築した文章を実際に発話して確認。音声認識技術で発音チェックも行い、「読む・書く・聞く・話す」の4技能を統合的に伸ばします。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA（行動喚起）セクション -->
+    <section class="cta-section">
+      <h2>🚀 新しい英語学習を今すぐ体験</h2>
+      <p>Rephraseで「わかったつもり」を「確実な理解」に変えませんか？<br>
+      文法の基礎から応用まで、段階的にスキルアップできます。</p>
+      <a href="../matrix/" class="cta-button">文法マトリックスで学習開始 →</a>
+    </section>
+
+    <!-- ナビゲーション -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="../../" style="color: #667eea; text-decoration: none; font-weight: 500;">
+        ← トップページに戻る
+      </a>
+    </div>
+  </div>
+</body>
+</html>
       --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
