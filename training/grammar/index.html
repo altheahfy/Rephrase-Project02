@@ -79,55 +79,77 @@
     }
 
     .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
       margin: 3rem 0;
     }
 
     .feature-card {
       background: white;
-      border-radius: 15px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 1px solid #f0f0f0;
+      border: 2px solid #f0f0f0;
+      width: 100%;
+      max-width: none;
     }
 
     .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
     }
 
     .feature-card h3 {
       color: #2c3e50;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 1rem;
+      font-size: 2rem;
     }
 
     .feature-number {
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      width: 2rem;
-      height: 2rem;
+      width: 3rem;
+      height: 3rem;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 1.5rem;
+    }
+
+    .feature-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .feature-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .feature-images {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .feature-image {
       width: 100%;
-      height: 200px;
+      height: auto;
+      min-height: 250px;
       object-fit: contain;
-      border-radius: 10px;
-      margin: 1rem 0;
+      border-radius: 15px;
       background: #f8f9fa;
       padding: 1rem;
+      border: 2px solid #e9ecef;
     }
 
     .cta-section {
@@ -169,13 +191,23 @@
         padding: 0.8rem 1.5rem;
       }
       
-      .features-grid {
+      .feature-content {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
       }
       
       .feature-card {
-        padding: 1.5rem;
+        padding: 2rem;
+      }
+      
+      .feature-card h3 {
+        font-size: 1.5rem;
+      }
+      
+      .feature-number {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.2rem;
       }
     }
   </style>
@@ -220,9 +252,18 @@
             <span class="feature-number">①</span>
             文法のアウトプット練習
           </h3>
-          <img src="../../assets/images/features/output-practice.png" alt="アウトプット練習画面" class="feature-image">
-          <p><strong>「覚える」から「使える」へ</strong></p>
-          <p>受動的な暗記ではなく、実際に文構造を組み立てる能動的な練習で、文法を身体で覚えます。頭で理解したことを手と目で確認することで、確実な定着を図ります。</p>
+          <div class="feature-content">
+            <div class="feature-text">
+              <p><strong>「覚える」から「使える」へ</strong></p>
+              <p>受動的な暗記ではなく、実際に文構造を組み立てる能動的な練習で、文法を身体で覚えます。</p>
+              <p>スポーツのように反復練習することで、頭で理解したことを手と目で確認し、確実な定着を図ります。</p>
+              <p>テニスのスイングを何度も練習するように、英語の文法も「練習」で身につけることができます。</p>
+            </div>
+            <div class="feature-images">
+              <img src="../../assets/images/features/tennis-woman.png" alt="テニスを練習する女性" class="feature-image">
+              <img src="../../assets/images/features/output-practice.png" alt="アウトプット練習画面" class="feature-image">
+            </div>
+          </div>
         </div>
 
         <!-- ②文を「箱」に分解 -->
@@ -285,266 +326,5 @@
         ← トップページに戻る
       </a>
     </div>
-  </div>
-</body>
-</html>
-      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Arial', 'Helvetica', sans-serif;
-      line-height: 1.6;
-      color: var(--text-color);
-      background-color: #fff;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    
-    .page-header {
-      background: var(--gradient);
-      color: white;
-      padding: 60px 0;
-      text-align: center;
-    }
-    
-    .breadcrumb {
-      margin-bottom: 20px;
-      font-size: 1rem;
-    }
-    
-    .breadcrumb a {
-      color: rgba(255, 255, 255, 0.9);
-      text-decoration: none;
-    }
-    
-    .breadcrumb a:hover {
-      color: white;
-    }
-    
-    .main-content {
-      padding: 40px 0;
-    }
-    
-    .footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 20px 0;
-    }
-  </style>
-</head>
-<body>
-  <header class="page-header">
-    <div class="container">
-      <nav class="breadcrumb">
-        <a href="../../">🏠 ホーム</a>
-        <span>></span>
-        <span>文法説明</span>
-        <span style="margin-left: 20px;"> | </span>
-        <a href="../" style="text-decoration: none; color: #2196F3;">🎯 トレーニング</a>
-      </nav>
-      <h1>📚 Rephrase 文法システム</h1>
-      <p class="page-subtitle">構文分析による英語学習の基本概念</p>
-    </div>
-  </header>
-
-  <main class="main-content">
-    <div class="container">
-      <section class="intro-section">
-        <h2>Rephraseシステムとは</h2>
-        <div class="intro-content">
-          <p>
-            Rephraseは、英語の文章を構文要素（スロット）に分解して学習する革新的なシステムです。
-            従来の文法学習とは異なり、文章の構造を視覚的に表現することで、より直感的な理解を促進します。
-          </p>
-          <div class="highlight-box">
-            <h3>🎯 学習の特徴</h3>
-            <ul>
-              <li>文章をスロット（構文要素）に分解</li>
-              <li>各スロットの役割を色分けで表示</li>
-              <li>ランダマイズ機能で多様な例文練習</li>
-              <li>画像表示による理解促進</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="slots-section">
-        <h2>スロットシステム</h2>
-        <div class="slots-grid">
-          <div class="slot-card slot-s">
-            <div class="slot-label">S</div>
-            <h3>主語 (Subject)</h3>
-            <p>文章の主体となる人や物を表します。「誰が」「何が」にあたる部分です。</p>
-            <div class="example">
-              <strong>例:</strong> <span class="slot-highlight-s">She</span> speaks English.
-            </div>
-          </div>
-
-          <div class="slot-card slot-v">
-            <div class="slot-label">V</div>
-            <h3>動詞 (Verb)</h3>
-            <p>動作や状態を表す語です。文章の核となる要素です。</p>
-            <div class="example">
-              <strong>例:</strong> She <span class="slot-highlight-v">speaks</span> English.
-            </div>
-          </div>
-
-          <div class="slot-card slot-o">
-            <div class="slot-label">O</div>
-            <h3>目的語 (Object)</h3>
-            <p>動作の対象となる語です。「何を」「誰を」にあたる部分です。</p>
-            <div class="example">
-              <strong>例:</strong> She speaks <span class="slot-highlight-o">English</span>.
-            </div>
-          </div>
-
-          <div class="slot-card slot-c">
-            <div class="slot-label">C</div>
-            <h3>補語 (Complement)</h3>
-            <p>主語や目的語の状態や性質を説明する語です。</p>
-            <div class="example">
-              <strong>例:</strong> She is <span class="slot-highlight-c">happy</span>.
-            </div>
-          </div>
-
-          <div class="slot-card slot-m">
-            <div class="slot-label">M</div>
-            <h3>修飾語 (Modifier)</h3>
-            <p>他の語句を修飾して、より詳しい情報を提供する語です。</p>
-            <div class="example">
-              <strong>例:</strong> <span class="slot-highlight-m">Yesterday</span> she spoke English.
-            </div>
-          </div>
-
-          <div class="slot-card slot-aux">
-            <div class="slot-label">AUX</div>
-            <h3>助動詞 (Auxiliary)</h3>
-            <p>動詞を補助して、時制や態、法を表す語です。</p>
-            <div class="example">
-              <strong>例:</strong> She <span class="slot-highlight-aux">will</span> speak English.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="example-section">
-        <h2>実践例</h2>
-        <div class="example-container">
-          <h3>例文の構文分析</h3>
-          <div class="sentence-analysis">
-            <div class="original-sentence">
-              "Yesterday, she will carefully study English grammar."
-            </div>
-            <div class="analyzed-sentence">
-              <span class="slot-highlight-m">Yesterday</span>,
-              <span class="slot-highlight-s">she</span>
-              <span class="slot-highlight-aux">will</span>
-              <span class="slot-highlight-m">carefully</span>
-              <span class="slot-highlight-v">study</span>
-              <span class="slot-highlight-o">English grammar</span>.
-            </div>
-            <div class="analysis-breakdown">
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-m">M</span>
-                <span>Yesterday</span>
-                <span class="description">時間の修飾語</span>
-              </div>
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-s">S</span>
-                <span>she</span>
-                <span class="description">主語</span>
-              </div>
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-aux">AUX</span>
-                <span>will</span>
-                <span class="description">未来を表す助動詞</span>
-              </div>
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-m">M</span>
-                <span>carefully</span>
-                <span class="description">方法の修飾語</span>
-              </div>
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-v">V</span>
-                <span>study</span>
-                <span class="description">動詞</span>
-              </div>
-              <div class="breakdown-item">
-                <span class="slot-label-small slot-o">O</span>
-                <span>English grammar</span>
-                <span class="description">目的語</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="features-detail-section">
-        <h2>学習機能</h2>
-        <div class="features-detail-grid">
-          <div class="feature-detail-card">
-            <div class="feature-icon">🎲</div>
-            <h3>ランダマイズ機能</h3>
-            <p>
-              同じ構文パターンの異なる例文を自動的に生成します。
-              多様な文章パターンに触れることで、構文理解を深めることができます。
-            </p>
-          </div>
-          
-          <div class="feature-detail-card">
-            <div class="feature-icon">🔍</div>
-            <h3>スロット展開</h3>
-            <p>
-              各スロットをクリックすると、詳細な構文要素が表示されます。
-              複雑な文章でも段階的に理解を深めることができます。
-            </p>
-          </div>
-          
-          <div class="feature-detail-card">
-            <div class="feature-icon">🖼️</div>
-            <h3>画像表示</h3>
-            <p>
-              単語に対応した画像が自動的に表示されます。
-              視覚的な情報により、語彙の理解と記憶を促進します。
-            </p>
-          </div>
-          
-          <div class="feature-detail-card">
-            <div class="feature-icon">📊</div>
-            <h3>構文可視化</h3>
-            <p>
-              文章の構造を色分けと配置で視覚的に表現します。
-              抽象的な文法概念を具体的に理解できます。
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="cta-section">
-        <div class="cta-content">
-          <h2>さあ、トレーニングを始めましょう！</h2>
-          <p>基本概念を理解したら、実際のトレーニングで練習してみましょう。</p>
-          <a href="../matrix/" class="btn btn-primary btn-large">🎯 トレーニング開始</a>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 Rephrase 英語学習システム. All rights reserved.</p>
-    </div>
-  </footer>
 </body>
 </html>
