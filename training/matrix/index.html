@@ -159,6 +159,84 @@
       border: 2px solid var(--accent-color);
     }
     
+    /* 文法分類別の色分け */
+    
+    /* 名詞の行 - 赤系 */
+    .noun-header {
+      background: #d32f2f !important;
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    .noun-level1 {
+      background: #ffebee !important;
+    }
+    
+    .noun-level2 {
+      background: #ffcdd2 !important;
+    }
+    
+    .noun-level3 {
+      background: #ef9a9a !important;
+    }
+    
+    /* 動詞の行 - 青系 */
+    .verb-header {
+      background: #1976d2 !important;
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    .verb-level1 {
+      background: #e3f2fd !important;
+    }
+    
+    .verb-level2 {
+      background: #bbdefb !important;
+    }
+    
+    .verb-level3 {
+      background: #90caf9 !important;
+    }
+    
+    /* 形容詞の行 - 緑系 */
+    .adjective-header {
+      background: #388e3c !important;
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    .adjective-level1 {
+      background: #e8f5e8 !important;
+    }
+    
+    .adjective-level2 {
+      background: #c8e6c9 !important;
+    }
+    
+    .adjective-level3 {
+      background: #a5d6a7 !important;
+    }
+    
+    /* 副詞の行 - オレンジ系 */
+    .adverb-header {
+      background: #f57c00 !important;
+      color: white !important;
+      font-weight: bold;
+    }
+    
+    .adverb-level1 {
+      background: #fff3e0 !important;
+    }
+    
+    .adverb-level2 {
+      background: #ffe0b2 !important;
+    }
+    
+    .adverb-level3 {
+      background: #ffcc80 !important;
+    }
+    
     .matrix-cell.test-cell:hover {
       background: #d4edda;
     }
@@ -262,13 +340,13 @@
       <section class="matrix-container">
         <div class="matrix-header">
           <h2>文法マトリクス表</h2>
-          <p>チャンク分類（縦軸）× 複雑度（横軸）</p>
+          <p>文法分類（縦軸）× 複雑度（横軸）</p>
         </div>
         
         <table class="matrix-table">
           <thead>
             <tr>
-              <th>チャンク分類</th>
+              <th>文法分類</th>
               <th class="level-header">レベル1（基本文型）</th>
               <th class="level-header">レベル2（準複文）</th>
               <th class="level-header">レベル3（複文）</th>
@@ -276,75 +354,114 @@
           </thead>
           <tbody>
             <tr>
-              <td class="chunk-header">名詞チャンク</td>
-              <td class="matrix-cell">
-                <a href="../explanation/index.html" style="color: #333; text-decoration: none; display: block; width: 100%; height: 100%;">
-                  冠詞・定冠詞の付け方<br>
-                  代名詞や指示語を用いる場合は新旧情報の法則に留意<br>
-                  無生物主語
-                </a>
+              <td class="chunk-header noun-header">名詞</td>
+              <td class="matrix-cell noun-level1">
+                <div style="color: #333; text-align: left; padding: 10px; line-height: 1.4;">
+                  <span style="color: #666;">１．冠詞・定冠詞の付け方</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<a href="../explanation/index.html" style="color: #2196F3; text-decoration: underline;">（１）可算名詞と不可算名詞</a><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）冠詞「a」とはどのようなニュアンスか</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（３）aを例外的に「１つの」として使うケース</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（４）「イメージできる可算」の判断が少々難しいケースのa</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（５）「総称」のa</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（６）初登場でもtheをつけるケース</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（７）反復の無冠詞、対句の無冠詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（８）呼びかけの無冠詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（９）手段のbyの後の無冠詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">※　その他の詳細知識と例文</span><br>
+                  <span style="color: #999;">２．「総称」はa, theをつけない可算名詞複数形と不可算名詞で表現</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）「総称」の複数形</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）不可算名詞は「総称」</span><br>
+                  <span style="color: #999;">３．代名詞や指示語を用いる場合は新旧情報の法則に留意</span><br>
+                  <span style="color: #999;">４．無生物主語を使う場合</span><br>
+                  <span style="color: #999;">５．名詞構文とは</span><br>
+                  <span style="color: #999;">６．We, You, Theyのどれを使うべきか</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）対比概念に基づくWeとYouの使い分け</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）日本語に訳出しないWe, You, Theyの使い分け</span><br>
+                  <span style="color: #999;">７．it, this, that, oneのどれを使うべきか</span><br>
+                  <span style="color: #999;">８．each otherは名詞～使い方の留意点</span><br>
+                  <span style="color: #999;">９．再帰代名詞を使う場合</span><br>
+                  <span style="color: #999;">１０．その他の名詞</span>
+                </div>
               </td>
-              <td class="matrix-cell">
-                動詞を名詞化して用いる場合<br>
-                仮主語it
+              <td class="matrix-cell noun-level2">
+                <div style="color: #333; text-align: left; padding: 10px; line-height: 1.4;">
+                  <span style="color: #999;">１１．動詞を名詞化して用いる場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）不定詞の名詞的用法と動名詞の違い</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）疑問詞と不定詞を一体化させて「～すべきか」という名詞にする用法</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（３）句動詞（「be動詞＋形容詞」の形）の目的語に不定詞の名詞的用法を用いる場合</span><br>
+                  <span style="color: #999;">１２．「抽象名詞」と「howを使った口語的名詞節」の使い分け</span><br>
+                  <span style="color: #999;">１３．仮主語のitを用いる場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）補語のルール</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）意味上の主語として不定詞の名詞的用法を用いるかthat節を用いるか</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（３）仮定法現在との関連</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">※　その他の詳細知識と例文</span>
+                </div>
               </td>
-              <td class="matrix-cell">
-                that節<br>
-                間接話法<br>
-                関係代名詞
+              <td class="matrix-cell noun-level3">
+                <div style="color: #333; text-align: left; padding: 10px; line-height: 1.4;">
+                  <span style="color: #999;">１４．that節を使う場合のルール</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）形式目的語itを受けるthat節とそのまま目的語になるthat節</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）仮主語itを受けるthat節</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（３）他のものとの対比を強調したい場合・・・It is ～ that…の強調構文</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（４）間接話法を用いる場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（５）that節なのか第5文型なのか紛らわしいケース</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（６）句動詞（「be動詞＋形容詞」の形）の目的語にthat節を用いる場合</span><br>
+                  <span style="color: #999;">１５．間接疑問文と関係代名詞what、複合関係詞を用いる場合（～ever）</span><br>
+                  <span style="color: #999;">１６．その他の名詞</span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td class="chunk-header">動詞チャンク</td>
-              <td class="matrix-cell">
+              <td class="chunk-header verb-header">動詞</td>
+              <td class="matrix-cell verb-level1">
                 <a href="../explanation/v-intransitive-type1.html" style="color: #333; text-decoration: none; display: block; width: 100%; height: 100%;">
                   基本5文型<br>
                   時制の基本<br>
                   助動詞の基本用法
                 </a>
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell verb-level2">
                 完了時制<br>
                 受動態<br>
                 分詞構文
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell verb-level3">
                 仮定法<br>
                 複雑な時制<br>
                 使役動詞
               </td>
             </tr>
             <tr>
-              <td class="chunk-header">形容詞チャンク</td>
-              <td class="matrix-cell">
+              <td class="chunk-header adjective-header">形容詞</td>
+              <td class="matrix-cell adjective-level1">
                 基本的な形容詞<br>
                 比較級・最上級<br>
                 所有格
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell adjective-level2">
                 分詞の形容詞的用法<br>
                 複合形容詞<br>
                 形容詞句
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell adjective-level3">
                 関係形容詞<br>
                 複雑な比較構文<br>
                 形容詞節
               </td>
             </tr>
             <tr>
-              <td class="chunk-header">副詞チャンク</td>
-              <td class="matrix-cell">
+              <td class="chunk-header adverb-header">副詞</td>
+              <td class="matrix-cell adverb-level1">
                 基本的な副詞<br>
                 頻度・程度の副詞<br>
                 場所・時間の副詞
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell adverb-level2">
                 副詞句<br>
                 前置詞句<br>
                 副詞の位置
               </td>
-              <td class="matrix-cell">
+              <td class="matrix-cell adverb-level3">
                 関係副詞<br>
                 副詞節<br>
                 複雑な修飾構造
