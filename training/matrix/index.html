@@ -34,9 +34,9 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1600px; /* マトリクス専用：横幅拡張 */
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 15px; /* 左右の余白を少し縮小 */
     }
     
     .page-header {
@@ -117,15 +117,18 @@
     
     .matrix-table th,
     .matrix-table td {
-      padding: 15px;
-      text-align: center;
+      padding: 12px 8px; /* セル内の余白を調整 */
+      text-align: left; /* 左寄せで読みやすく */
       border: 1px solid var(--border-color);
+      font-size: 0.9rem; /* フォントサイズを少し小さく */
+      line-height: 1.4; /* 行間を調整 */
     }
     
     .matrix-table th {
       background: var(--light-gray);
       font-weight: bold;
       color: var(--primary-color);
+      text-align: center; /* ヘッダーは中央寄せ */
     }
     
     .chunk-header {
@@ -180,23 +183,23 @@
       background: #ef9a9a !important;
     }
     
-    /* 動詞の行 - 青系 */
+    /* 動詞の行 - グレー系 */
     .verb-header {
-      background: #1976d2 !important;
+      background: #616161 !important;
       color: white !important;
       font-weight: bold;
     }
     
     .verb-level1 {
-      background: #e3f2fd !important;
+      background: #f5f5f5 !important;
     }
     
     .verb-level2 {
-      background: #bbdefb !important;
+      background: #e0e0e0 !important;
     }
     
     .verb-level3 {
-      background: #90caf9 !important;
+      background: #bdbdbd !important;
     }
     
     /* 形容詞の行 - 緑系 */
@@ -296,6 +299,47 @@
       padding: 15px 40px;
       font-size: 1.1rem;
     }
+    
+    /* 詳細項目スタイル */
+    .detail-item {
+      margin: 8px 0;
+      font-size: 0.85rem;
+      line-height: 1.3;
+    }
+    
+    .detail-subitem {
+      margin: 4px 0 4px 15px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    .sub-level {
+      font-weight: normal;
+      color: #555;
+    }
+    
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        padding: 0 10px;
+      }
+      
+      .matrix-table th,
+      .matrix-table td {
+        padding: 8px 4px;
+        font-size: 0.75rem;
+      }
+      
+      .detail-item {
+        font-size: 0.7rem;
+      }
+      
+      .detail-subitem {
+        font-size: 0.65rem;
+        margin-left: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -382,6 +426,17 @@
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（４）「イメージできる可算」の判断が少々難しいケースのa</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（５）「総称」のa</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（６）初登場でもtheをつけるケース</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">①「唯一のもの」につける</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">②状況から一つに決まる場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">③付加されている形容詞自体の意味合いから一つに決まる場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">④同格の形容詞節がついている場合</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑤環境を表す名詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑥対比関係が存在する名詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑦特定の集団を指す複数名詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑧mostやalmostとのセット</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑨総称のthe</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑩the＋普通名詞＝抽象名詞</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑪theが付く固有名詞、付かない固有名詞</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（７）反復の無冠詞、対句の無冠詞</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（８）呼びかけの無冠詞</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（９）手段のbyの後の無冠詞</span><br>
@@ -395,6 +450,14 @@
                   <span style="color: #999;">６．We, You, Theyのどれを使うべきか</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（１）対比概念に基づくWeとYouの使い分け</span><br>
                   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">（２）日本語に訳出しないWe, You, Theyの使い分け</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">①一般的真理を述べる際はyou</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">②質問を受ける側が住んでいる地域のことを尋ねる際はyou</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">③質問を受ける側が属している組織等のことを尋ねる際はyou</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">④質問をする側も受ける側も関係ない地域について尋ねる際はthey</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑤政府などの官公庁、組織の責任者、会社の経営陣などを念頭に言う場合はthey</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑥話し手がその地域に住んでいてその地域のことを述べる際はwe</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="detail-subitem">⑦話し手が政府などの官公庁、組織の責任者、会社の経営陣などでありその団体のことを述べる際はwe</span><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #999;">※　その他の詳細知識と例文</span><br>
                   <span style="color: #999;">７．it, this, that, oneのどれを使うべきか</span><br>
                   <span style="color: #999;">８．each otherは名詞～使い方の留意点</span><br>
                   <span style="color: #999;">９．再帰代名詞を使う場合</span><br>
