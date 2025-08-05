@@ -1,0 +1,104 @@
+{
+  "構文ID": 5001,
+  "例文ID": "ex005",
+  "V_group_key": "offer",
+  "V_display": "offered",
+  "原文": "During the intense morning meeting, the manager who often avoided direct suggestions offered the new employee who had recently joined a detailed plan she had prepared the previous day because the team was facing unexpected challenges without prior notice.",
+  "slot_data": [
+    {
+      "slot": "M1",
+      "phrase": "During the intense morning meeting",
+      "type": "word"
+    },
+    {
+      "slot": "S",
+      "phrase": "the manager who often avoided direct suggestions",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "the manager who"
+        },
+        {
+          "slot": "sub-m1",
+          "phrase": "often"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "avoided"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "direct suggestions"
+        }
+      ]
+    },
+    {
+      "slot": "V",
+      "phrase": "offered",
+      "type": "word"
+    },
+    {
+      "slot": "O1",
+      "phrase": "the new employee who had recently joined",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "the new employee who"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "had recently joined"
+        }
+      ]
+    },
+    {
+      "slot": "O2",
+      "phrase": "a detailed plan she had prepared the previous day",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "a detailed plan she"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "had prepared"
+        },
+        {
+          "slot": "sub-m1",
+          "phrase": "the previous day"
+        }
+      ]
+    },
+    {
+      "slot": "M2",
+      "phrase": "because the team was facing unexpected challenges",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "because"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "the team"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "was facing"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "unexpected challenges"
+        }
+      ]
+    },
+    {
+      "slot": "M3",
+      "phrase": "without prior notice",
+      "type": "word"
+    }
+  ]
+}
