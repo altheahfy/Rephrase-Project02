@@ -4,50 +4,119 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>自動詞第1文型 - Rephrase 英語学習システム</title>
-  <link href="../style.css" rel="stylesheet">
+  <link href="../../assets/styles/main.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
+    /* 文法説明専用CSS */
+    :root {
+      --primary-color: #2196F3;
+      --secondary-color: #FF9800;
+      --accent-color: #4CAF50;
+      --text-color: #333;
+      --light-gray: #f5f5f5;
+      --border-color: #e0e0e0;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    * {
       margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      line-height: 1.8;
+      color: var(--text-color);
+      background-color: #fff;
     }
     
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 0 20px;
     }
     
-    .header {
+    .page-header {
+      background: var(--gradient);
+      color: white;
+      padding: 60px 0;
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 3px solid #667eea;
     }
     
-    .back-link {
-      display: inline-block;
+    .breadcrumb {
       margin-bottom: 20px;
-      color: #667eea;
-      text-decoration: none;
-      font-weight: bold;
+      font-size: 1rem;
     }
     
-    .back-link:hover {
-      text-decoration: underline;
+    .breadcrumb a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      color: white;
+    }
+    
+    .main-content {
+      padding: 40px 0;
+    }
+    
+    .content-section {
+      background: white;
+      padding: 40px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    
+    .content-section h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .content-section h3 {
+      color: var(--secondary-color);
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    
+    .content-section p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    
+    .key-point {
+      background: #e8f5e8;
+      border-left: 4px solid var(--accent-color);
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .key-point h4 {
+      color: var(--accent-color);
+      margin-bottom: 10px;
     }
     
     .example-box {
       background: #f8f9ff;
-      border-left: 4px solid #667eea;
-      padding: 15px;
+      border-left: 4px solid var(--primary-color);
+      padding: 20px;
       margin: 20px 0;
       border-radius: 5px;
+    }
+    
+    .example-box h4 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    .example-sentence {
+      font-style: italic;
+      color: #555;
+      margin: 10px 0;
     }
     
     .training-section {
