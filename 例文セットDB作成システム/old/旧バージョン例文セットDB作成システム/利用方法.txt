@@ -1,8 +1,0 @@
-このフォルダの中を右クリックしてPowershellを起動
-
-python batch.py 001.json DB_know_ex001.xlsx
-
-コマンド元ファイルのDB_know_ex001.xlsxは上書きされず、updatedが新規作成される。
-ログテキストも生成される。
-
-※補助テキストがうまくいかない場合、必ずChatGPTに相談しslottext.jsonに追加して進化させる。
