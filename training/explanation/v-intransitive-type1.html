@@ -166,6 +166,42 @@
       font-size: 18px;
       margin-bottom: 30px;
     }
+    
+    .cta-section {
+      text-align: center;
+      padding: 40px 0;
+      background: var(--light-gray);
+      margin-top: 40px;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+      margin: 0 10px;
+    }
+    
+    .btn:hover {
+      background: #1976D2;
+    }
+    
+    .btn-large {
+      padding: 15px 40px;
+      font-size: 1.1rem;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary-color);
+    }
+    
+    .btn-secondary:hover {
+      background: #e68900;
+    }
   </style>
 </head>
 <body>
@@ -249,7 +285,13 @@
           <p><small>前者が自動詞で後者が他動詞。</small></p>
         </div>
       </section>
-      
+
+      <section class="cta-section">
+        <h2>学習を続けましょう</h2>
+        <p>文法の基本概念を理解したら、実際のトレーニングで練習してみましょう。</p>
+        <a href="../matrix/" class="btn btn-secondary">📊 マトリクスに戻る</a>
+        <a href="../auth-check.html?grammar=自動詞第1文型" class="btn btn-large">🎯 トレーニング開始</a>
+      </section>
     </div>
   </main>
 
