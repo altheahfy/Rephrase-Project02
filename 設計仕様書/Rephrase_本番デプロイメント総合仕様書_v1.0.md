@@ -40,15 +40,15 @@
 
 ### 2.1 基本メタタグ
 ```html
-<meta name="description" content="Rephrase - 構文分析とスロットベースの革新的英語学習システム。文法を直感的に理解し、効率的にスキルアップ">
-<meta name="keywords" content="英語学習,構文分析,スロット,文法,Rephrase,音声認識,トレーニング">
+<meta name="description" content="Rephrase - シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能でパターンプラクティスから英作文まで自由自在">
+<meta name="keywords" content="英語学習,シャッフル,イラスト,音声認識,パターンプラクティス,英作文,Rephrase,トレーニング">
 <meta name="author" content="Rephrase Team">
 ```
 
 ### 2.2 Open Graph設定
 ```html
 <meta property="og:title" content="Rephrase 英語学習システム">
-<meta property="og:description" content="革新的な構文分析とスロットベースの英語学習で、文法を直感的に理解">
+<meta property="og:description" content="シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能で、パターンプラクティスから英作文まで自由自在">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://altheahfy.github.io/Rephrase-Project02/">
 <meta property="og:site_name" content="Rephrase">
@@ -58,7 +58,7 @@
 ```html
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Rephrase 英語学習システム">
-<meta name="twitter:description" content="構文分析とスロットベースの学習で、英語の文法を直感的に理解">
+<meta name="twitter:description" content="シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能で、パターンプラクティスから英作文まで自由自在">
 ```
 
 ### 2.4 検索エンジン対応
@@ -75,7 +75,7 @@
 {
   "name": "Rephrase 英語学習システム",
   "short_name": "Rephrase",
-  "description": "構文分析とスロットベースの革新的英語学習システム",
+  "description": "シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能で自由自在な英語学習",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

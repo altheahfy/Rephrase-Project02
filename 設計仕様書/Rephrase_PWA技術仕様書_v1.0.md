@@ -46,7 +46,7 @@ const urlsToCache = [
 {
   "name": "Rephrase 英語学習システム",
   "short_name": "Rephrase",
-  "description": "構文分析とスロットベースの革新的英語学習システム",
+  "description": "シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能で自由自在な英語学習",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
