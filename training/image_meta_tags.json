@@ -3894,5 +3894,136 @@
     ],
     "priority": 5,
     "description": "ニューヨーク"
+  },
+  {
+    "image_file": "vitality.png",
+    "folder": "common",
+    "meta_tags": [
+      "vitality",
+      "vital",
+      "vigor",
+      "vigorous",
+      "energetic",
+      "lively",
+      "vibrant"
+    ],
+    "priority": 4,
+    "description": "活力、生命力"
+  },
+  {
+    "image_file": "old.png",
+    "folder": "common",
+    "meta_tags": [
+      "old",
+      "older",
+      "oldest",
+      "elderly",
+      "aged",
+      "ancient",
+      "senior"
+    ],
+    "priority": 5,
+    "description": "年老いた、古い"
+  },
+  {
+    "image_file": "man.png",
+    "folder": "common",
+    "meta_tags": [
+      "man",
+      "men",
+      "male",
+      "gentleman",
+      "guy",
+      "fellow"
+    ],
+    "priority": 5,
+    "description": "男性、男の人"
+  },
+  {
+    "image_file": "stamina.png",
+    "folder": "common",
+    "meta_tags": [
+      "stamina",
+      "endurance",
+      "persistence",
+      "staying power",
+      "resilience",
+      "durability"
+    ],
+    "priority": 4,
+    "description": "持久力、スタミナ"
+  },
+  {
+    "image_file": "energy.png",
+    "folder": "common",
+    "meta_tags": [
+      "energy",
+      "energies",
+      "power",
+      "force",
+      "vigor",
+      "dynamism",
+      "vitality"
+    ],
+    "priority": 5,
+    "description": "エネルギー、活力"
+  },
+  {
+    "image_file": "boy.png",
+    "folder": "common",
+    "meta_tags": [
+      "boy",
+      "boys",
+      "lad",
+      "youth",
+      "young man",
+      "kid",
+      "child"
+    ],
+    "priority": 5,
+    "description": "少年、男の子"
+  },
+  {
+    "image_file": "strength.png",
+    "folder": "common",
+    "meta_tags": [
+      "strength",
+      "strong",
+      "stronger",
+      "strongest",
+      "power",
+      "might",
+      "force",
+      "muscle"
+    ],
+    "priority": 5,
+    "description": "力、強さ"
+  },
+  {
+    "image_file": "men.png",
+    "folder": "common",
+    "meta_tags": [
+      "men",
+      "man",
+      "males",
+      "gentlemen",
+      "guys",
+      "fellows"
+    ],
+    "priority": 5,
+    "description": "男性たち、男の人々"
+  },
+  {
+    "image_file": "island.png",
+    "folder": "common",
+    "meta_tags": [
+      "island",
+      "islands",
+      "isle",
+      "islet",
+      "archipelago"
+    ],
+    "priority": 4,
+    "description": "島"
   }
 ]
