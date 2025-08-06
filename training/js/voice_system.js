@@ -2132,32 +2132,42 @@ class VoiceSystem {
         // - Android版では語数推定よりもボタン押下時間を優先
         // - ユーザーに「押したらすぐ話す、話し終えたらすぐ止める」を促す
         
-        // 🔧 固定調整値（秒）
-        const startDelay = 0.5;  // ボタン押下から発話開始までの平均遅延
-        const endDelay = 0.3;    // 発話終了からボタン停止までの平均遅延
-        const totalAdjustment = startDelay + endDelay; // 合計0.8秒調整
+        // 🎯 実際の録音時間ベースの発話速度測定（キャップ撤廃版）
         
-        // 📊 基準発話速度（学習者上級レベル）
-        const standardWordsPerSecond = 3.0; // 180語/分（自然な会話速度）
+        // 📊 基準発話速度（推定用）
+        const standardWordsPerSecond = 3.0; // 180語/分（推定ベースライン）
         
-        // 🎯 基本発話時間計算
+        // 🎯 基本発話時間計算（フォールバック用）
         const estimatedSpeechTime = wordCount / standardWordsPerSecond;
         
-        // 📏 現実的な範囲制限（最短0.8秒、最長は語数×1.5秒）
-        const minDuration = Math.max(0.8, wordCount * 0.3); // 最高200語/分
-        const maxDuration = wordCount * 1.5; // 最低40語/分
+        // 📏 実際の録音時間ベースの計算（キャップ撤廃）
+        // 実際の録音時間を取得
+        const actualRecordingTime = this.recordingDuration || estimatedSpeechTime;
         
-        const finalDuration = Math.max(minDuration, Math.min(estimatedSpeechTime, maxDuration));
+        // 操作遅延を差し引いた実発話時間
+        const totalAdjustment = 0.5; // 開始・終了遅延の合計
+        const adjustedSpeechTime = Math.max(0.3, actualRecordingTime - totalAdjustment);
+        
+        // 極端に非現実的な値のみ制限（400語/分上限、30語/分下限）
+        const maxWordsPerSecond = 6.67; // 400語/分
+        const minWordsPerSecond = 0.5;   // 30語/分
+        const minDuration = wordCount / maxWordsPerSecond; // 最短時間
+        const maxDuration = wordCount / minWordsPerSecond; // 最長時間
+        
+        const finalDuration = Math.max(minDuration, Math.min(adjustedSpeechTime, maxDuration));
         
         // 🔍 デバッグ情報
-        const estimatedWPM = (wordCount / finalDuration) * 60;
-        console.log(`📱 Android発話時間測定（実用版）:`, {
+        const calculatedWPM = (wordCount / finalDuration) * 60;
+        const actualRecordingWPM = this.recordingDuration ? (wordCount / this.recordingDuration) * 60 : 0;
+        console.log(`📱 Android発話時間測定（実測版・キャップ撤廃）:`, {
             wordCount,
-            standardWPS: standardWordsPerSecond,
+            actualRecordingTime: this.recordingDuration,
             estimatedTime: estimatedSpeechTime,
+            adjustedSpeechTime,
             finalDuration,
-            estimatedWPM: Math.round(estimatedWPM),
-            note: 'ボタン操作ベース（調整値込み）'
+            calculatedWPM: Math.round(calculatedWPM),
+            actualRecordingWPM: Math.round(actualRecordingWPM),
+            note: '実測時間ベース（400語/分上限・180語/分キャップ撤廃）'
         });
         
         return finalDuration;
