@@ -1,7 +1,7 @@
 {
   "name": "Rephrase 英語学習システム",
   "short_name": "Rephrase",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "シャッフル＋イラスト表示＋英語非表示＋音声認識の４機能で自由自在な英語学習",
   "start_url": "/",
   "display": "standalone",

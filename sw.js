@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rephrase-v1.0.1-android-speech-fix';
+const CACHE_NAME = 'rephrase-v1.0.2-android-speed-uncapped';
 const urlsToCache = [
   '/',
   '/index.html',
