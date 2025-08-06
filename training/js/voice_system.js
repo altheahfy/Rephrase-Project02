@@ -1860,62 +1860,19 @@ class VoiceSystem {
                 const expectedWordCount = expectedSentence ? expectedSentence.trim().split(/\s+/).length : 0;
                 const actualWordCount = recognizedText.split(/\s+/).length;
                 
-                // 🕒 発話時間計算：タイムスタンプベース（利用可能時）→ 推定値（フォールバック）
+                // 🕒 Android版改良発話時間計算：語数ベース推定（高精度版）
                 let speechDuration, calculationMethod;
                 
-                if (this.firstWordTime && this.lastWordTime && this.speechTimestamps.length > 0) {
-                    // ⏱️ 継続認識対応：実際の発話時間推定（認識間隔から無音時間を除外）
-                    const rawTimeDiff = (this.lastWordTime - this.firstWordTime) / 1000;
-                    
-                    // 🔧 継続認識の場合：認識結果間の長い間隔を調整して実際の発話時間を推定
-                    let adjustedSpeechTime = 0;
-                    const recognitionGaps = [];
-                    
-                    // 認識結果間の間隔を分析
-                    for (let i = 1; i < this.speechTimestamps.length; i++) {
-                        const gap = (this.speechTimestamps[i].time - this.speechTimestamps[i-1].time) / 1000;
-                        recognitionGaps.push(gap);
-                        
-                        // 1.5秒以上の間隔は無音期間として0.3秒に短縮（自然な発話間隔）
-                        const adjustedGap = gap > 1.5 ? 0.3 : gap;
-                        adjustedSpeechTime += adjustedGap;
-                    }
-                    
-                    // 最初の認識結果分の時間を語数に応じて追加
-                    const firstSegmentTime = Math.max(0.5, actualWordCount * 0.15); // 1語あたり0.15秒
-                    adjustedSpeechTime += firstSegmentTime;
-                    
-                    // 最終的な発話時間（最低1秒、最大で生の時間差の70%）
-                    speechDuration = Math.max(1.0, Math.min(adjustedSpeechTime, rawTimeDiff * 0.7));
-                    calculationMethod = '継続認識対応（間隔調整版）';
-                    
-                    // 詳細デバッグ情報
-                    this.addDebugLog(`⏱️ 継続認識発話時間分析:`, 'info');
-                    this.addDebugLog(`  - 認識回数: ${this.speechTimestamps.length}回`, 'info');
-                    this.addDebugLog(`  - 生の時間差: ${rawTimeDiff.toFixed(2)}秒`, 'info');
-                    this.addDebugLog(`  - 調整後発話時間: ${speechDuration.toFixed(2)}秒`, 'info');
-                    this.addDebugLog(`  - 認識間隔: [${recognitionGaps.map(g => g.toFixed(1)).join(', ')}]秒`, 'info');
-                    this.addDebugLog(`  - 語数: ${actualWordCount}語`, 'info');
-                    this.addDebugLog(`  - 計算結果: ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
-                    
-                    // 異常値検出（継続認識対応版）
-                    const preliminaryWordsPerMinute = (actualWordCount / speechDuration) * 60;
-                    const isAbnormallyFast = preliminaryWordsPerMinute > 350; // 継続認識では少し高めに設定
-                    const isAbnormallySlow = preliminaryWordsPerMinute < 80;   // 80語/分未満も異常
-                    
-                    if (isAbnormallyFast || isAbnormallySlow) {
-                        this.addDebugLog(`⚠️ 異常値検出: ${preliminaryWordsPerMinute.toFixed(1)}語/分`, 'warning');
-                        // 異常値の場合は標準的な発話速度で推定（210語/分）
-                        speechDuration = actualWordCount / 3.5; // 平均3.5語/秒（210語/分）
-                        calculationMethod = '継続認識→標準推定（異常値補正）';
-                        this.addDebugLog(`🔄 標準推定: ${speechDuration.toFixed(2)}秒 → ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
-                    }
-                } else {
-                    // 🔄 フォールバック：標準的な発話速度で推定
-                    speechDuration = actualWordCount / 3.5; // 平均3.5語/秒（210語/分）
-                    calculationMethod = '推定値（標準速度）';
-                    this.addDebugLog(`⚠️ ${calculationMethod}: ${speechDuration.toFixed(2)}秒`, 'warning');
-                }
+                // Android版は単発認識のため、語数ベースの現実的な推定を使用
+                // タイムスタンプベースの計算は音声認識応答遅延の影響で不正確
+                speechDuration = this.calculateAndroidSpeechDuration(actualWordCount);
+                calculationMethod = 'Android語数ベース推定（改良版）';
+                
+                this.addDebugLog(`⏱️ Android発話時間計算（改良版）:`, 'info');
+                this.addDebugLog(`  - 語数: ${actualWordCount}語`, 'info');
+                this.addDebugLog(`  - 推定発話時間: ${speechDuration.toFixed(2)}秒`, 'info');
+                this.addDebugLog(`  - 推定速度: ${(actualWordCount / speechDuration * 60).toFixed(1)}語/分`, 'info');
+                this.addDebugLog(`  - 計算方式: ${calculationMethod}`, 'info');
                 
                 const wordsPerSecond = actualWordCount / speechDuration;
                 const wordsPerMinute = wordsPerSecond * 60;
@@ -2139,6 +2096,59 @@ class VoiceSystem {
         } else {
             console.warn('⚠️ Android保存確認ボタンが見つかりません');
         }
+    }
+
+    /**
+     * 🤖 Android版専用：語数ベース発話時間推定（現実的高精度版）
+     * - Android単発認識特性に最適化
+     * - タイムスタンプの遅延問題を解決
+     * - 実際の発話速度分布に基づく現実的推定
+     */
+    calculateAndroidSpeechDuration(wordCount) {
+        if (!wordCount || wordCount <= 0) return 1.0;
+        
+        // 📊 現実的な発話速度パラメータ
+        // - 一般的な英語発話速度: 130-180語/分（平均150語/分）
+        // - 学習者の場合: やや遅め（120-160語/分、平均140語/分）
+        // - 短文の場合: 若干遅くなる傾向（語数が少ないほど丁寧に発話）
+        
+        const baseWordsPerSecond = 2.3; // 138語/分（学習者の現実的平均）
+        
+        // 📈 語数による発話速度調整（短文効果）
+        let wordCountAdjustment = 1.0;
+        if (wordCount <= 3) {
+            wordCountAdjustment = 0.85; // 3語以下：15%遅く（丁寧発話）
+        } else if (wordCount <= 6) {
+            wordCountAdjustment = 0.92; // 4-6語：8%遅く
+        } else if (wordCount <= 10) {
+            wordCountAdjustment = 0.96; // 7-10語：4%遅く
+        }
+        // 11語以上は標準速度
+        
+        // 🎯 最終発話時間計算
+        const adjustedWordsPerSecond = baseWordsPerSecond * wordCountAdjustment;
+        const speechDuration = wordCount / adjustedWordsPerSecond;
+        
+        // 📏 現実的な範囲制限
+        // - 最短: 1語でも最低0.8秒（自然な発話）
+        // - 最長: 極端に遅い速度を防止
+        const minDuration = Math.max(0.8, wordCount * 0.4); // 1語あたり最低0.4秒
+        const maxDuration = wordCount * 1.2; // 1語あたり最大1.2秒（50語/分）
+        
+        const finalDuration = Math.max(minDuration, Math.min(speechDuration, maxDuration));
+        
+        // 🔍 デバッグ情報
+        const estimatedWPM = (wordCount / finalDuration) * 60;
+        console.log(`📱 Android発話時間推定（改良版）:`, {
+            wordCount,
+            baseWPS: baseWordsPerSecond,
+            adjustment: wordCountAdjustment,
+            rawDuration: speechDuration,
+            finalDuration,
+            estimatedWPM: Math.round(estimatedWPM)
+        });
+        
+        return finalDuration;
     }
 
     /**
