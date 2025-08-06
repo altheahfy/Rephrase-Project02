@@ -1,0 +1,1284 @@
+{
+  "rules": [
+    {
+      "condition": "^had to",
+      "guidance": "～しなければならなかった",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^had",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "\\bat\\b",
+      "guidance": "～の時点・地点で",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "^be not",
+      "guidance": "be動詞否定",
+      "tag": "be動詞否定"
+    },
+    {
+      "condition": "^was",
+      "guidance": "be動詞過去",
+      "tag": "be動詞過去"
+    },
+    {
+      "condition": "^that(?!\\s+(he|she|it|they|we|I|you)\\b)",
+      "guidance": "あの",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^this",
+      "guidance": "この",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^even though",
+      "guidance": "たとえ～でも",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^how much",
+      "guidance": "どれぐらい～か",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^who",
+      "guidance": "誰？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^at the very last",
+      "guidance": "まさにその、最後の",
+      "tag": "時間強調"
+    },
+    {
+      "condition": "^John$|^Mary$",
+      "guidance": "人名",
+      "tag": "固有名詞"
+    },
+    {
+      "condition": "^Tom$",
+      "guidance": "人名トム",
+      "tag": "固有名詞"
+    },
+    {
+      "condition": "^Emily$",
+      "guidance": "人名エミリー",
+      "tag": "固有名詞"
+    },
+    {
+      "condition": "^today",
+      "guidance": "今日の",
+      "tag": "日付表現"
+    },
+    {
+      "condition": "^yesterday",
+      "guidance": "昨日",
+      "tag": "日付表現"
+    },
+    {
+      "condition": "^although",
+      "guidance": "～だが",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^because",
+      "guidance": "～だから",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "\\bit\\b",
+      "guidance": "指示語「それ」/ 天候の主語",
+      "tag": "指示語"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had\\s+\\w+ed",
+      "guidance": "過去完了",
+      "tag": "時制"
+    },
+    {
+      "condition": "^This morning when",
+      "guidance": "この、～のとき",
+      "tag": "時間"
+    },
+    {
+      "condition": "^from",
+      "guidance": "～から",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^while",
+      "guidance": "～の間",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^during",
+      "guidance": "～の間に",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^for several days",
+      "guidance": "数日間",
+      "tag": "時間"
+    },
+    {
+      "condition": "^it would help her catch up",
+      "guidance": "それが彼女のキャッチアップする助けになるであろうこと",
+      "tag": "内容"
+    },
+    {
+      "condition": "^without\\b",
+      "guidance": "～なしに",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^prior\\b",
+      "guidance": "事前の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "^was interesting",
+      "guidance": "be動詞＋形容詞",
+      "tag": "文型"
+    },
+    {
+      "condition": "\\bdetailed",
+      "guidance": "詳細な",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\boften\\b",
+      "guidance": "しばしば",
+      "tag": "頻度"
+    },
+    {
+      "condition": "\\bdirect\\b",
+      "guidance": "直接の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\brecently\\b",
+      "guidance": "最近",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bunexpected\\b",
+      "guidance": "予期せぬ",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "^might have",
+      "guidance": "～したかもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^remained",
+      "guidance": "～のままである",
+      "tag": "動詞"
+    },
+    {
+      "condition": "\\brepeatedly\\b",
+      "guidance": "繰り返し",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bherself\\b",
+      "guidance": "～自身",
+      "tag": "代名詞"
+    },
+    {
+      "condition": "^for years",
+      "guidance": "何年も",
+      "tag": "時間"
+    },
+    {
+      "condition": "^since",
+      "guidance": "～だから",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "\\b\\w+ed\\b",
+      "guidance": "過去形",
+      "tag": "時制"
+    },
+    {
+      "condition": "\\ball\\b",
+      "guidance": "全ての",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\bin\\b",
+      "guidance": "～の中に、～の中で",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bonce\\b",
+      "guidance": "かつて",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bstill\\b",
+      "guidance": "まだ",
+      "tag": "副詞"
+    },
+    {
+      "condition": "with\\s+\\w+ed",
+      "guidance": "～の状態で",
+      "tag": "状態"
+    },
+    {
+      "condition": "^might\\b",
+      "guidance": "かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "\\bamid\\b",
+      "guidance": "～の真ん中で",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bhis\\b",
+      "guidance": "彼の",
+      "tag": "代名詞"
+    },
+    {
+      "condition": "\\bown\\b",
+      "guidance": "自身の",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\btheir\\b",
+      "guidance": "彼らの",
+      "tag": "代名詞"
+    },
+    {
+      "condition": "\\bfor\\b",
+      "guidance": "～のために",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bwith\\b",
+      "guidance": "～を保持して",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bunder\\b",
+      "guidance": "～の下・元で",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bso\\b",
+      "guidance": "だから",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "\\bwould\\b",
+      "guidance": "過去から未来を推量",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^What",
+      "guidance": "疑問詞【何？】",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^what",
+      "guidance": "何？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^where",
+      "guidance": "どこ？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^didn't",
+      "guidance": "過去否定",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^did",
+      "guidance": "過去疑問",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^do$|^does$",
+      "guidance": "疑問文のdo, does",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^is$",
+      "guidance": "be動詞",
+      "tag": "be動詞"
+    },
+    {
+      "condition": "^is$|^are$|^was$|^were$",
+      "guidance": "進行形のbe動詞",
+      "tag": "時制"
+    },
+    {
+      "condition": "^have been$|^has been$",
+      "guidance": "現在完了進行",
+      "tag": "時制"
+    },
+    {
+      "condition": "^had been$",
+      "guidance": "過去完了進行",
+      "tag": "時制"
+    },
+    {
+      "condition": "\\bthrough\\b",
+      "guidance": "～を通して",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bnever\\b",
+      "guidance": "決して",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bmuch\\b",
+      "guidance": "多くの",
+      "tag": "形容詞"
+    },
+    {
+      "condition": "\\btoday\\b",
+      "guidance": "今日",
+      "tag": "時間表現"
+    },
+    {
+      "condition": "^must have",
+      "guidance": "～したに違いない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "\\bbeen\\b",
+      "guidance": "be動詞",
+      "tag": "be動詞"
+    },
+    {
+      "condition": "\\btoo\\b",
+      "guidance": "～すぎる",
+      "tag": "副詞"
+    },
+    {
+      "condition": "^will be",
+      "guidance": "～であろう（未来）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^will have",
+      "guidance": "～したことになるだろう（未来完了）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^will",
+      "guidance": "～するだろう（未来）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^would be",
+      "guidance": "～であろう（過去未来・仮定）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^would have",
+      "guidance": "～していただろう（仮定法過去完了）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^would",
+      "guidance": "～であろう（過去未来・丁寧）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^should be",
+      "guidance": "～であるべき",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^should have",
+      "guidance": "～すべきだった",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^should",
+      "guidance": "～すべき",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^could be",
+      "guidance": "～かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^could have",
+      "guidance": "～することができた",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^could",
+      "guidance": "～することができた",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^might be",
+      "guidance": "～かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^might have",
+      "guidance": "～したかもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^might",
+      "guidance": "～かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^may be",
+      "guidance": "～かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^may have",
+      "guidance": "～したかもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^may",
+      "guidance": "～かもしれない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^can be",
+      "guidance": "～することができる",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^can",
+      "guidance": "～することができる",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^must be",
+      "guidance": "～に違いない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^must",
+      "guidance": "～しなければならない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^have to",
+      "guidance": "～しなければならない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^has to",
+      "guidance": "～しなければならない",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^had better",
+      "guidance": "～した方がよい",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^ought to",
+      "guidance": "～すべきである",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^used to",
+      "guidance": "～していた（過去の習慣）",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^be going to",
+      "guidance": "～するつもり",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^going to",
+      "guidance": "～するつもり",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^be able to",
+      "guidance": "～することができる",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^able to",
+      "guidance": "～することができる",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^be supposed to",
+      "guidance": "～することになっている",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "^supposed to",
+      "guidance": "～することになっている",
+      "tag": "助動詞"
+    },
+    {
+      "condition": "\\bon\\b",
+      "guidance": "～の上に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bin\\b",
+      "guidance": "～の中に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bunder\\b",
+      "guidance": "～の下に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bover\\b",
+      "guidance": "～の上に（覆って）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\babove\\b",
+      "guidance": "～の上に（接触なし）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bbelow\\b",
+      "guidance": "～の下に（接触なし）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bbehind\\b",
+      "guidance": "～の後ろに",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bin front of\\b",
+      "guidance": "～の前に",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bnext to\\b",
+      "guidance": "～の隣に",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bnear\\b",
+      "guidance": "～の近くに",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bfar from\\b",
+      "guidance": "～から遠く",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bbetween\\b",
+      "guidance": "～の間に（2つの間）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bamong\\b",
+      "guidance": "～の間に（3つ以上の間）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\binto\\b",
+      "guidance": "～の中へ（動作）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bout of\\b",
+      "guidance": "～から外へ",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bonto\\b",
+      "guidance": "～の上へ（動作）",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bfrom\\b",
+      "guidance": "～から",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bto\\b",
+      "guidance": "～へ",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\btoward\\b",
+      "guidance": "～の方向へ",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\btowards\\b",
+      "guidance": "～の方向へ",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bthrough\\b",
+      "guidance": "～を通って",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bacross\\b",
+      "guidance": "～を横切って",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\balong\\b",
+      "guidance": "～に沿って",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\baround\\b",
+      "guidance": "～の周りに",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bby\\b",
+      "guidance": "～によって / ～のそばに",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bwith\\b",
+      "guidance": "～と一緒に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bwithin\\b",
+      "guidance": "～以内に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bfor\\b",
+      "guidance": "～のために / ～へ向かって",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bagainst\\b",
+      "guidance": "～に対して",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\babout\\b",
+      "guidance": "～について",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bof\\b",
+      "guidance": "～の",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\boff\\b",
+      "guidance": "～から離れて",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bup\\b",
+      "guidance": "～の上へ",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bdown\\b",
+      "guidance": "～の下へ",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bduring\\b",
+      "guidance": "～の間に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bafter\\b",
+      "guidance": "～の後で",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bbefore\\b",
+      "guidance": "～の前に",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bsince\\b",
+      "guidance": "～以来",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\buntil\\b",
+      "guidance": "～まで",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\btill\\b",
+      "guidance": "～まで",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\binstead of\\b",
+      "guidance": "～の代わりに",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bbecause of\\b",
+      "guidance": "～のために（理由）",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bin spite of\\b",
+      "guidance": "～にもかかわらず",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bdespite\\b",
+      "guidance": "～にもかかわらず",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\baccording to\\b",
+      "guidance": "～によると",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bdue to\\b",
+      "guidance": "～のために（原因）",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bthanks to\\b",
+      "guidance": "～のおかげで",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bas for\\b",
+      "guidance": "～に関しては",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bas to\\b",
+      "guidance": "～に関して",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bbut for\\b",
+      "guidance": "～がなければ",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bexcept for\\b",
+      "guidance": "～を除いて",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "\\bapart from\\b",
+      "guidance": "～は別として",
+      "tag": "前置詞句"
+    },
+    {
+      "condition": "^if\\b",
+      "guidance": "もし～ならば",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^unless\\b",
+      "guidance": "～でなければ",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^when\\b",
+      "guidance": "～のとき",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^whenever\\b",
+      "guidance": "～するときはいつでも",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^wherever\\b",
+      "guidance": "～するところはどこでも",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^however\\b",
+      "guidance": "しかしながら",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^whatever\\b",
+      "guidance": "何が～でも",
+      "tag": "接続詞"
+    },
+    {
+      "condition": "^as soon as\\b",
+      "guidance": "～するとすぐに",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^as long as\\b",
+      "guidance": "～する限り",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^so that\\b",
+      "guidance": "～するために",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^in order that\\b",
+      "guidance": "～するために",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^now that\\b",
+      "guidance": "今や～なので",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^provided that\\b",
+      "guidance": "～という条件で",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "^in case\\b",
+      "guidance": "～の場合に備えて",
+      "tag": "接続詞句"
+    },
+    {
+      "condition": "\\balways\\b",
+      "guidance": "いつも",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\busually\\b",
+      "guidance": "普通は",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\boften\\b",
+      "guidance": "しばしば",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bsometimes\\b",
+      "guidance": "時々",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\brarely\\b",
+      "guidance": "めったに～ない",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bseldom\\b",
+      "guidance": "めったに～ない",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bhardly\\b",
+      "guidance": "ほとんど～ない",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bscarcely\\b",
+      "guidance": "ほとんど～ない",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\balready\\b",
+      "guidance": "もう、すでに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\byet\\b",
+      "guidance": "まだ、もう",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bstill\\b",
+      "guidance": "まだ、それでもなお",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bjust\\b",
+      "guidance": "ちょうど、たった今",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bonly\\b",
+      "guidance": "ただ～だけ",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\beven\\b",
+      "guidance": "～さえ",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bquite\\b",
+      "guidance": "かなり",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bvery\\b",
+      "guidance": "とても",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bextremely\\b",
+      "guidance": "極めて",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\brather\\b",
+      "guidance": "むしろ、かなり",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bpretty\\b",
+      "guidance": "かなり",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bfairly\\b",
+      "guidance": "かなり",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bcompletely\\b",
+      "guidance": "完全に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\btotally\\b",
+      "guidance": "完全に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\babsolutely\\b",
+      "guidance": "絶対に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bperfectly\\b",
+      "guidance": "完璧に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bentirely\\b",
+      "guidance": "完全に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bpartly\\b",
+      "guidance": "部分的に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bmostly\\b",
+      "guidance": "主に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bmainly\\b",
+      "guidance": "主に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bespecially\\b",
+      "guidance": "特に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bparticularly\\b",
+      "guidance": "特に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bespecially\\b",
+      "guidance": "特に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bprobably\\b",
+      "guidance": "おそらく",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bpossibly\\b",
+      "guidance": "もしかすると",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bcertainly\\b",
+      "guidance": "確かに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bdefinitely\\b",
+      "guidance": "間違いなく",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bobviously\\b",
+      "guidance": "明らかに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bclearly\\b",
+      "guidance": "明らかに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bapparently\\b",
+      "guidance": "見たところ",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bfortunately\\b",
+      "guidance": "幸運にも",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bunfortunately\\b",
+      "guidance": "不幸にも",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bsuddenly\\b",
+      "guidance": "突然",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bgradually\\b",
+      "guidance": "だんだんと",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bimmediately\\b",
+      "guidance": "すぐに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\binstantly\\b",
+      "guidance": "瞬時に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bquickly\\b",
+      "guidance": "すばやく",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bslowly\\b",
+      "guidance": "ゆっくりと",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bcarefully\\b",
+      "guidance": "注意深く",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\beasily\\b",
+      "guidance": "簡単に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bdifficultly\\b",
+      "guidance": "困難に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "^what\\b",
+      "guidance": "何？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^where\\b",
+      "guidance": "どこ？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^when\\b",
+      "guidance": "いつ？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^why\\b",
+      "guidance": "なぜ？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^how\\b",
+      "guidance": "どのように？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^which\\b",
+      "guidance": "どちら？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^whose\\b",
+      "guidance": "誰の？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^whom\\b",
+      "guidance": "誰を？",
+      "tag": "疑問詞"
+    },
+    {
+      "condition": "^how many\\b",
+      "guidance": "いくつ？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^how often\\b",
+      "guidance": "どのくらい頻繁に？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^how long\\b",
+      "guidance": "どのくらい長く？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^how far\\b",
+      "guidance": "どのくらい遠く？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^how old\\b",
+      "guidance": "何歳？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^what time\\b",
+      "guidance": "何時？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^what kind of\\b",
+      "guidance": "どんな種類の？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "^what sort of\\b",
+      "guidance": "どんな種類の？",
+      "tag": "疑問詞句"
+    },
+    {
+      "condition": "\\balmost\\b",
+      "guidance": "ほとんど",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\beight\\b",
+      "guidance": "8",
+      "tag": "数詞"
+    },
+    {
+      "condition": "\\bseven thirty\\b",
+      "guidance": "7時30分",
+      "tag": "時刻"
+    },
+    {
+      "condition": "\\bexactly\\b",
+      "guidance": "まさに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bas\\b",
+      "guidance": "～に沿って",
+      "tag": "前置詞"
+    },
+    {
+      "condition": "\\bsharp\\b",
+      "guidance": "ぴったりに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bslightly\\b",
+      "guidance": "わずかに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bheavily\\b",
+      "guidance": "大いに、重く",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bMonday\\b",
+      "guidance": "月曜日",
+      "tag": "曜日"
+    },
+    {
+      "condition": "\\bhere\\b",
+      "guidance": "ここに",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\bnobody\\b",
+      "guidance": "誰も～ない",
+      "tag": "代名詞"
+    },
+    {
+      "condition": "\\bSunday\\b",
+      "guidance": "日曜日",
+      "tag": "曜日"
+    },
+    {
+      "condition": "\\bjane\\b",
+      "guidance": "人名「ジェーン」",
+      "tag": "固有名詞"
+    },
+    {
+      "condition": "\\bago\\b",
+      "guidance": "～前に",
+      "tag": "副詞"
+    },
+    {
+      "condition": "\\ban hour\\b",
+      "guidance": "1時間",
+      "tag": "時間表現"
+    },
+    {
+      "condition": "\\bsomeone\\b",
+      "guidance": "誰か",
+      "tag": "代名詞"
+    }
+  ]
+}
