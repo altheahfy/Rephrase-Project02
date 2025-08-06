@@ -1,0 +1,146 @@
+{
+  "構文ID": 5001,
+  "example_id": "ex003",
+  "V_group_key": "give",
+  "V_display": "given",
+  "original": "This morning when the request became urgent, the teacher who had just returned from a long absence, while the principal was still explaining the policy, might have given the student who had been absent for several days a summary of the content she had missed because he believed it would help her catch up.",
+  "slot_data": [
+    {
+      "slot": "M1",
+      "phrase": "This morning when the request became urgent",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "This morning"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "the request"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "became"
+        },
+        {
+          "slot": "sub-c1",
+          "phrase": "urgent"
+        }
+      ]
+    },
+    {
+      "slot": "S",
+      "phrase": "the teacher who had just returned from a long absence",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "the teacher who"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "had just returned"
+        },
+        {
+          "slot": "sub-m1",
+          "phrase": "from a long absence"
+        }
+      ]
+    },
+    {
+      "slot": "M2",
+      "phrase": "while the principal was still explaining the policy",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "while"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "the principal"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "was still explaining"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "the policy"
+        }
+      ]
+    },
+    {
+      "slot": "Aux",
+      "phrase": "might have",
+      "type": "word",
+      "slot_text": "～したかもしれない"
+    },
+    {
+      "slot": "V",
+      "phrase": "given",
+      "type": "word"
+    },
+    {
+      "slot": "O1",
+      "phrase": "the student who had been absent for several days",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-s",
+          "phrase": "the student who"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "had been absent"
+        },
+        {
+          "slot": "sub-m1",
+          "phrase": "for several days"
+        }
+      ]
+    },
+    {
+      "slot": "O2",
+      "phrase": "a summary of the content she had missed",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-o1",
+          "phrase": "a summary of the content"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "she"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "had missed"
+        }
+      ]
+    },
+    {
+      "slot": "M3",
+      "phrase": "because he believed it would help her catch up",
+      "type": "clause",
+      "subslots": [
+        {
+          "slot": "sub-m1",
+          "phrase": "because"
+        },
+        {
+          "slot": "sub-s",
+          "phrase": "he"
+        },
+        {
+          "slot": "sub-v",
+          "phrase": "believed"
+        },
+        {
+          "slot": "sub-o1",
+          "phrase": "it would help her catch up"
+        }
+      ]
+    }
+  ]
+}
