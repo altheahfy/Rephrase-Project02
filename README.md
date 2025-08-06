@@ -125,3 +125,4 @@ Rephrase-Project/
 ---
 
 © 2025 Rephrase 英語学習システム. All rights reserved.
+
