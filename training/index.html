@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
  <head>
   <meta charset="utf-8"/>
@@ -510,7 +510,7 @@ function handleLogout() {
   <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
     <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;">🔍 ズーム</label>
     <input type="range" id="zoomSlider" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 80px; height: 18px; cursor: pointer; flex-shrink: 0;">
-    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 35px; text-align: center; white-space: nowrap; flex-shrink: 0;">100%</span>
+    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 35px; text-align: left; white-space: nowrap; flex-shrink: 0;">100%</span>
     <button id="zoomResetButton" style="background-color: #FF9800; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 18px;">リセット</button>
   </div>
 </div>
@@ -540,7 +540,7 @@ function handleLogout() {
   pointer-events: none;
   transition: opacity 0.5s ease, visibility 0.5s ease;
 ">
-  <div class="loading-content" style="text-align: center; pointer-events: auto; max-width: 400px; padding: 20px;">
+  <div class="loading-content" style="text-align: left; pointer-events: auto; max-width: 400px; padding: 20px;">
     <!-- 改善されたローディングアニメーション -->
     <div class="loading-spinner" style="
       width: 80px;
@@ -739,7 +739,7 @@ function handleLogout() {
         
         <!-- 疑問詞 スロット -->
         <div class="slot-control-group" data-slot="question-word" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">疑問詞</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">疑問詞</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="question-word" data-type="text" checked> 📄英文</label>
@@ -748,7 +748,7 @@ function handleLogout() {
         
         <!-- M1 スロット -->
         <div class="slot-control-group" data-slot="m1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M1</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">M1</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m1" data-type="text" checked> 📄英文</label>
@@ -757,7 +757,7 @@ function handleLogout() {
         
         <!-- S スロット -->
         <div class="slot-control-group" data-slot="s" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">S</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">S</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="s" data-type="text" checked> 📄英文</label>
@@ -766,7 +766,7 @@ function handleLogout() {
         
         <!-- Aux スロット -->
         <div class="slot-control-group" data-slot="aux" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">Aux</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">Aux</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="aux" data-type="text" checked> 📄英文</label>
@@ -775,7 +775,7 @@ function handleLogout() {
         
         <!-- M2 スロット -->
         <div class="slot-control-group" data-slot="m2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M2</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">M2</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m2" data-type="text" checked> 📄英文</label>
@@ -784,7 +784,7 @@ function handleLogout() {
         
         <!-- V スロット -->
         <div class="slot-control-group" data-slot="v" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">V</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">V</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="v" data-type="text" checked> 📄英文</label>
@@ -793,7 +793,7 @@ function handleLogout() {
         
         <!-- C1 スロット -->
         <div class="slot-control-group" data-slot="c1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C1</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">C1</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c1" data-type="text" checked> 📄英文</label>
@@ -802,7 +802,7 @@ function handleLogout() {
         
         <!-- O1 スロット -->
         <div class="slot-control-group" data-slot="o1" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O1</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">O1</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o1" data-type="text" checked> 📄英文</label>
@@ -811,7 +811,7 @@ function handleLogout() {
         
         <!-- O2 スロット -->
         <div class="slot-control-group" data-slot="o2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">O2</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">O2</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="o2" data-type="text" checked> 📄英文</label>
@@ -820,7 +820,7 @@ function handleLogout() {
         
         <!-- C2 スロット -->
         <div class="slot-control-group" data-slot="c2" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">C2</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">C2</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="c2" data-type="text" checked> 📄英文</label>
@@ -829,7 +829,7 @@ function handleLogout() {
         
         <!-- M3 スロット -->
         <div class="slot-control-group" data-slot="m3" style="padding: 4px; border: 1px solid #f0f0f0; border-radius: 3px;">
-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: center;">M3</div>
+          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #444; text-align: left;">M3</div>
           <div style="display: flex; flex-direction: column; gap: 2px; font-size: 10px;">
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="auxtext" checked> 📝補助</label>
             <label style="display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="visibility-checkbox" data-slot="m3" data-type="text" checked> 📄英文</label>
@@ -874,8 +874,8 @@ function handleLogout() {
       </div>
       
       <!-- 📱 Android操作ガイド（分析ボタン専用） -->
-      <div style="background: #E3F2FD; border-radius: 4px; padding: 4px 6px; margin: 6px 0; color: #1976D2; font-size: 9px; text-align: center;">
-        � <strong>分析ボタン：押してすぐ言う。終わってすぐ押す</strong>
+      <div style="background: #E3F2FD; border-radius: 4px; padding: 4px 6px; margin: 6px 0; color: #1976D2; font-size: 9px;">
+        <strong><span style="color: transparent;">　　　　　　</span>押してすぐ言う、終わってすぐ押す ↓</strong>
       </div>
       
       <!-- Android専用音声コントロールボタン -->
@@ -887,10 +887,10 @@ function handleLogout() {
       </div>
       
       <!-- Android専用ステータス表示 -->
-      <div id="voice-status-android" class="voice-status-android info" style="color: #333; font-size: 11px; background: rgba(200, 200, 200, 0.3); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: center;">Android待機中...</div>
+      <div id="voice-status-android" class="voice-status-android info" style="color: #333; font-size: 11px; background: rgba(200, 200, 200, 0.3); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: left;">Android待機中...</div>
       
       <!-- Android専用録音タイマー -->
-      <div style="text-align: center; margin: 8px 0;">
+      <div style="text-align: left; margin: 8px 0;">
         <span style="color: #333; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer-android">⏱️ 00:00</span>
       </div>
       
@@ -962,10 +962,10 @@ function handleLogout() {
       </div>
       
       <!-- ステータス表示 -->
-      <div id="voice-status" class="voice-status info" style="color: #333; font-size: 11px; background: rgba(76, 175, 80, 0.1); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: center;">待機中...</div>
+      <div id="voice-status" class="voice-status info" style="color: #333; font-size: 11px; background: rgba(76, 175, 80, 0.1); padding: 3px 6px; border-radius: 12px; margin: 8px 0; text-align: left;">待機中...</div>
       
       <!-- 録音タイマー -->
-      <div style="text-align: center; margin: 8px 0;">
+      <div style="text-align: left; margin: 8px 0;">
         <span style="color: #333; font-family: monospace; font-size: 14px; font-weight: bold;" id="voice-recording-timer">⏱️ 00:00</span>
       </div>
       
