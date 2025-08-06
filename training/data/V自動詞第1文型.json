@@ -3361,7 +3361,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex097",
     "Slot": "S",
     "SlotPhrase": "he",
@@ -3376,7 +3376,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex097",
     "Slot": "Aux",
     "SlotPhrase": "has",
@@ -3391,7 +3391,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex097",
     "Slot": "M2",
     "SlotPhrase": "fully",
@@ -3406,7 +3406,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex097",
     "Slot": "V",
     "SlotPhrase": "recovered",
@@ -3421,7 +3421,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex097",
     "Slot": "O1",
     "SlotPhrase": "his strength",
@@ -3436,7 +3436,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex098",
     "Slot": "S",
     "SlotPhrase": "the boy",
@@ -3451,7 +3451,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex098",
     "Slot": "Aux",
     "SlotPhrase": "has",
@@ -3466,7 +3466,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex098",
     "Slot": "M2",
     "SlotPhrase": "quickly",
@@ -3481,7 +3481,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex098",
     "Slot": "V",
     "SlotPhrase": "recovered",
@@ -3496,7 +3496,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex098",
     "Slot": "O1",
     "SlotPhrase": "his energy",
@@ -3511,7 +3511,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex099",
     "Slot": "S",
     "SlotPhrase": "the injured player",
@@ -3526,7 +3526,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex099",
     "Slot": "Aux",
     "SlotPhrase": "has",
@@ -3541,7 +3541,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex099",
     "Slot": "M2",
     "SlotPhrase": "finally",
@@ -3556,7 +3556,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex099",
     "Slot": "V",
     "SlotPhrase": "recovered",
@@ -3571,7 +3571,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex099",
     "Slot": "O1",
     "SlotPhrase": "his stamina",
@@ -3586,7 +3586,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex100",
     "Slot": "S",
     "SlotPhrase": "the old man",
@@ -3601,7 +3601,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex100",
     "Slot": "Aux",
     "SlotPhrase": "has",
@@ -3616,7 +3616,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex100",
     "Slot": "M2",
     "SlotPhrase": "steadily",
@@ -3631,7 +3631,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex100",
     "Slot": "V",
     "SlotPhrase": "recovered",
@@ -3646,7 +3646,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "recovered2",
+    "V_group_key": "recover2",
     "例文ID": "ex100",
     "Slot": "O1",
     "SlotPhrase": "his former vitality",

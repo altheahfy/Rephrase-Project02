@@ -232,91 +232,37 @@ class ExplanationManager {
     try {
       console.log('🔍 V_group_key検出開始');
       
-      // 状態管理されたデータをまず確認
-      const cachedKey = this.stateManager.getState(this.STATE_PATHS.CURRENT_V_GROUP_KEY);
-      if (cachedKey) {
-        console.log('✅ 状態管理から取得:', cachedKey);
-        return cachedKey;
-      }
-      
-      // 新機能: window.lastSelectedSlotsから現在表示中のV_group_keyを取得
+      // 最優先: window.lastSelectedSlotsから現在表示中のV_group_keyを取得（リアルタイム）
       if (window.lastSelectedSlots && window.lastSelectedSlots.length > 0) {
-        const vSlot = window.lastSelectedSlots.find(slot => slot.Slot === 'V');
-        if (vSlot && vSlot.V_group_key) {
-          console.log('✅ window.lastSelectedSlots(Vスロット)から取得:', vSlot.V_group_key);
-          this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, vSlot.V_group_key);
-          return vSlot.V_group_key;
-        }
-        const anySlot = window.lastSelectedSlots.find(slot => slot.V_group_key);
-        if (anySlot && anySlot.V_group_key) {
-          console.log('✅ window.lastSelectedSlotsから取得:', anySlot.V_group_key);
-          this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, anySlot.V_group_key);
-          return anySlot.V_group_key;
+        // 最初に見つかったスロットのV_group_keyを使用（全スロットが同じV_group_keyを持つ）
+        const slotWithVGroupKey = window.lastSelectedSlots.find(slot => slot.V_group_key);
+        if (slotWithVGroupKey && slotWithVGroupKey.V_group_key) {
+          console.log('✅ window.lastSelectedSlotsから取得:', slotWithVGroupKey.V_group_key);
+          // 状態管理にも保存（キャッシュ更新）
+          this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, slotWithVGroupKey.V_group_key);
+          return slotWithVGroupKey.V_group_key;
         }
       }
       
-      // 既存のロジック: 現在のランダム化状態からV_group_keyを取得
+      // フォールバック: window.currentRandomizedStateから取得
       if (window.currentRandomizedState && window.currentRandomizedState.vGroupKey) {
         console.log('✅ window.currentRandomizedState.vGroupKeyから取得:', window.currentRandomizedState.vGroupKey);
         this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, window.currentRandomizedState.vGroupKey);
         return window.currentRandomizedState.vGroupKey;
       }
       
-      // フォールバック: メインエリアの全てのスロット要素を検索
-      const slotElements = document.querySelectorAll('.slot-container');
-      console.log('📋 見つかったスロット数:', slotElements.length);
-      
-      for (const slot of slotElements) {
-        console.log('🎯 スロット確認:', slot.id, slot.className);
-        
-        // data-v-group-key属性をチェック
-        const vGroupKey = slot.getAttribute('data-v-group-key');
-        if (vGroupKey) {
-          console.log('🔍 V_group_key検出:', vGroupKey);
-          this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, vGroupKey);
-          return vGroupKey;
-        }
-        
-        // 動詞スロット（slot-v）から動詞テキストを取得
-        if (slot.id === 'slot-v') {
-          const slotPhrase = slot.querySelector('.slot-phrase');
-          console.log('🎯 Vスロット発見:', slotPhrase);
-          if (slotPhrase) {
-            const verbText = slotPhrase.textContent.trim();
-            console.log('📝 動詞テキスト:', verbText);
-            if (verbText) {
-              console.log('🔍 動詞スロットから推測:', verbText);
-              const inferredKey = this.inferVGroupKeyFromVerb(verbText);
-              console.log('🎯 推測されたV_group_key:', inferredKey);
-              if (inferredKey) {
-                this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, inferredKey);
-              }
-              return inferredKey;
-            }
-          }
-        }
-      }
-
-      // 代替方法：全スロットから動詞を探す
-      console.log('🔍 代替検索開始');
-      const allSlotPhrases = document.querySelectorAll('.slot-phrase');
-      console.log('📋 全slot-phrase数:', allSlotPhrases.length);
-      
-      for (const phrase of allSlotPhrases) {
-        const text = phrase.textContent.trim();
-        console.log('📝 検査中のテキスト:', text);
-        if (text && this.isVerb(text)) {
-          console.log('🔍 全スロット検索から動詞発見:', text);
-          const inferredKey = this.inferVGroupKeyFromVerb(text);
-          console.log('🎯 推測されたV_group_key:', inferredKey);
-          if (inferredKey) {
-            this.stateManager.setState(this.STATE_PATHS.CURRENT_V_GROUP_KEY, inferredKey);
-          }
-          return inferredKey;
-        }
+      // 最後の手段: 状態管理のキャッシュから取得（古い可能性があるが完全に空よりは良い）
+      const cachedKey = this.stateManager.getState(this.STATE_PATHS.CURRENT_V_GROUP_KEY);
+      if (cachedKey) {
+        console.log('⚠️ 状態管理キャッシュから取得（古い可能性あり）:', cachedKey);
+        return cachedKey;
       }
       
       console.log('❓ V_group_keyが見つかりません');
+      console.log('📊 デバッグ情報:');
+      console.log('  - window.lastSelectedSlots:', window.lastSelectedSlots);
+      console.log('  - window.currentRandomizedState:', window.currentRandomizedState);
+      
       return null;
       
     } catch (error) {
@@ -325,64 +271,37 @@ class ExplanationManager {
     }
   }
 
-  // 単語が動詞かどうかを簡易判定
-  isVerb(word) {
-    console.log('🔍 動詞判定チェック:', word);
-    // 簡易的な動詞判定（解説データに存在するV_group_keyと一致するかチェック）
-    const verbForms = [
-      'recover', 'recovered', 'go', 'goes', 'went', 'pay', 'paid',
-      'believe', 'believed', 'lie', 'lay', 'lies', 'apologize', 'apologized',
-      'listen', 'listened', 'leave', 'left', 'stand', 'stood', 'mind', 'minded',
-      'start', 'starts', 'started'
-    ];
-    const isVerbResult = verbForms.includes(word.toLowerCase());
-    console.log('🎯 動詞判定結果:', word, '→', isVerbResult);
-    return isVerbResult;
-  }
-
-  // 動詞テキストからV_group_keyを推測
-  inferVGroupKeyFromVerb(verbText) {
-    console.log('🔍 V_group_key推測開始:', verbText);
-    // 基本形への変換ロジック（簡易版）
-    const baseFormMap = {
-      'recovered': 'recover',
-      'goes': 'go',
-      'went': 'go',
-      'paid': 'pay',
-      'believed': 'believe',
-      'lay': 'lie',
-      'lies': 'lie',
-      'apologized': 'apologize',
-      'listened': 'listen',
-      'left': 'leave',
-      'stood': 'stand',
-      'minded': 'mind',
-      'starts': 'start',
-      'started': 'start'
-    };
-    
-    const result = baseFormMap[verbText] || verbText.toLowerCase();
-    console.log('🎯 推測結果:', verbText, '→', result);
-    return result;
-  }
-
   // V_group_keyに対応する解説データを検索
   findExplanationByVGroupKey(vGroupKey) {
     if (!vGroupKey) return null;
     
     const explanationData = this.stateManager.getState(this.STATE_PATHS.EXPLANATION_DATA) || [];
     
-    const explanation = explanationData.find(item => 
+    // 完全一致を最優先で検索
+    let explanation = explanationData.find(item => 
       item.V_group_key === vGroupKey
     );
     
     if (explanation) {
-      console.log('📖 解説データ発見:', explanation.explanation_title);
-    } else {
-      console.log('❓ 解説データなし:', vGroupKey);
+      console.log('📖 解説データ発見（完全一致）:', explanation.explanation_title);
+      return explanation;
     }
     
-    return explanation;
+    // 完全一致がない場合、V_group_keyの基本形（数字やサフィックスを除去）で検索
+    const baseVGroupKey = vGroupKey.replace(/\d+$/, ''); // 末尾の数字を除去
+    if (baseVGroupKey !== vGroupKey) {
+      explanation = explanationData.find(item => 
+        item.V_group_key === baseVGroupKey
+      );
+      
+      if (explanation) {
+        console.log(`📖 解説データ発見（基本形一致）: ${vGroupKey} → ${baseVGroupKey} → ${explanation.explanation_title}`);
+        return explanation;
+      }
+    }
+    
+    console.log('❓ 解説データなし:', vGroupKey);
+    return null;
   }
 
   // 現在のコンテキストに基づいて解説を表示
@@ -428,10 +347,18 @@ class ExplanationManager {
     this.showExplanation(explanation);
   }
 
-  // 元の動詞テキストを取得
+  // 元の動詞テキストを取得（デバッグ用）
   getOriginalVerbText() {
     try {
-      // 動詞スロット（slot-v）から動詞テキストを取得
+      // 現在表示中のデータから動詞情報を取得
+      if (window.lastSelectedSlots && window.lastSelectedSlots.length > 0) {
+        const vSlot = window.lastSelectedSlots.find(slot => slot.Slot === 'V');
+        if (vSlot && vSlot.SlotPhrase) {
+          return vSlot.SlotPhrase;
+        }
+      }
+
+      // フォールバック: DOM要素から取得
       const vSlot = document.getElementById('slot-v');
       if (vSlot) {
         const slotPhrase = vSlot.querySelector('.slot-phrase');
@@ -440,19 +367,10 @@ class ExplanationManager {
         }
       }
 
-      // 代替方法：全スロットから動詞を探す
-      const allSlotPhrases = document.querySelectorAll('.slot-phrase');
-      for (const phrase of allSlotPhrases) {
-        const text = phrase.textContent.trim();
-        if (text && this.isVerb(text)) {
-          return text;
-        }
-      }
-      
-      return null;
+      return 'N/A';
     } catch (error) {
-      console.error('❌ 元動詞テキスト取得エラー:', error);
-      return null;
+      console.error('動詞テキスト取得エラー:', error);
+      return 'N/A';
     }
   }
 
