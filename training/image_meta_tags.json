@@ -3961,8 +3961,7 @@
       "power",
       "force",
       "vigor",
-      "dynamism",
-      "vitality"
+      "dynamism"
     ],
     "priority": 5,
     "description": "エネルギー、活力"
