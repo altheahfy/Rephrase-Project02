@@ -30,11 +30,32 @@ Rephraseプロジェクトにおける音声学習機能の統合設計仕様書
 
 ---
 
-## ✅ 実装完了ステータス（2025年7月28日更新）
+## ✅ 実装完了ステータス（2025年8月6日更新）
 
-**🎉 2025年7月28日重大アップデート - プラットフォーム完全分離システム実装完了：**
+**🎉 2025年8月6日重大アップデート - Android音声速度180語/分キャップ撤廃：**
 
-### 🚀 革新的プラットフォーム分離アーキテクチャ
+### 🎯 Android音声速度測定システム大幅改良
+
+#### 180語/分キャップ問題の解決 🆕
+- ✅ **問題解決**: 従来の固定制限値（180-200語/分キャップ）を完全撤廃
+- ✅ **実測ベース**: `recordingDuration`を使用した実際の録音時間での計算
+- ✅ **上限拡張**: 400語/分上限設定（プロレベル対応）
+- ✅ **精密補正**: 操作遅延0.5秒調整による正確な実発話時間算出
+- ✅ **自然測定**: 高速発話（250-350語/分）の正確な測定を実現
+
+#### calculateAndroidSpeechDuration()関数改良点
+```javascript
+// 【改良前】固定基準速度による制限
+const standardWordsPerSecond = 3.0; // 180語/分固定
+const minDuration = Math.max(0.8, wordCount * 0.3); // 200語/分上限
+
+// 【改良後】実測時間ベース・キャップ撤廃
+const actualRecordingTime = this.recordingDuration || estimatedSpeechTime;
+const maxWordsPerSecond = 6.67; // 400語/分上限
+const minWordsPerSecond = 0.5;   // 30語/分下限
+```
+
+### 🚀 革新的プラットフォーム分離アーキテクチャ（7月28日実装完了）
 
 #### Android/PC完全独立音声認識システム 🆕
 - ✅ **Android専用システム**: `this.recognition` を使用した単発認識、リトライ機能付き
@@ -43,11 +64,11 @@ Rephraseプロジェクトにおける音声学習機能の統合設計仕様書
 - ✅ **音声認識安定化**: プラットフォーム別最適化、認識精度向上
 - ✅ **透過化システム**: Android認識中のUI透過、PC版通常表示
 
-#### 高精度発話時間計算システム 🆕
-- ✅ **Android版**: タイムスタンプベース実発話時間計算（無音期間除外）
+#### 高精度発話時間計算システム 🆕（2025.8.6大幅改良）
+- ✅ **Android版**: 実測録音時間ベース計算（180語/分キャップ撤廃・400語/分上限設定）
 - ✅ **PC版**: 文字数ベース推定時間計算（連続認識対応）
-- ✅ **Gap正規化**: 1.5秒以上の無音を0.3秒に正規化する自然発話間隔システム
-- ✅ **精度向上**: 従来比80%以上の発話時間計算精度向上
+- ✅ **操作遅延補正**: 0.5秒調整による精密な実発話時間算出
+- ✅ **精度向上**: キャップ撤廃により自然な高速発話（200-400語/分）を正確測定
 
 #### 重複検出・除去システム 🆕
 - ✅ **高精度重複検出**: 80%以上の類似度で重複判定
@@ -692,15 +713,35 @@ async analyzeRecording() {
   });
 }
 
-// Android専用発話時間計算
-calculateAndroidSpeechDuration() {
-  let adjustedSpeechTime = 0;
-  for (let i = 1; i < this.speechTimestamps.length; i++) {
-    const gap = this.speechTimestamps[i] - this.speechTimestamps[i - 1];
-    const adjustedGap = gap > 1.5 ? 0.3 : gap; // 自然発話間隔正規化
-    adjustedSpeechTime += adjustedGap;
-  }
-  return adjustedSpeechTime / 1000; // ミリ秒を秒に変換
+// Android専用発話時間計算（2025.8.6改良版）
+calculateAndroidSpeechDuration(wordCount) {
+  if (!wordCount || wordCount <= 0) return 1.0;
+  
+  // 🎯 実際の録音時間ベースの発話速度測定（キャップ撤廃版）
+  
+  // 📊 基準発話速度（推定用）
+  const standardWordsPerSecond = 3.0; // 180語/分（推定ベースライン）
+  
+  // 🎯 基本発話時間計算（フォールバック用）
+  const estimatedSpeechTime = wordCount / standardWordsPerSecond;
+  
+  // 📏 実際の録音時間ベースの計算（キャップ撤廃）
+  // 実際の録音時間を取得
+  const actualRecordingTime = this.recordingDuration || estimatedSpeechTime;
+  
+  // 操作遅延を差し引いた実発話時間
+  const totalAdjustment = 0.5; // 開始・終了遅延の合計
+  const adjustedSpeechTime = Math.max(0.3, actualRecordingTime - totalAdjustment);
+  
+  // 極端に非現実的な値のみ制限（400語/分上限、30語/分下限）
+  const maxWordsPerSecond = 6.67; // 400語/分
+  const minWordsPerSecond = 0.5;   // 30語/分
+  const minDuration = wordCount / maxWordsPerSecond; // 最短時間
+  const maxDuration = wordCount / minWordsPerSecond; // 最長時間
+  
+  const finalDuration = Math.max(minDuration, Math.min(adjustedSpeechTime, maxDuration));
+  
+  return finalDuration;
 }
 
 // PC専用発話時間計算
@@ -2253,5 +2294,5 @@ voiceSystem.addEventListener('pcContinuousRecognition', (event) => {
 
 ---
 
-*最終更新: 2025年7月28日*  
+*最終更新: 2025年8月6日*  
 *音声機構システム設計仕様書 v3.0 - プラットフォーム分離完全実装版*
