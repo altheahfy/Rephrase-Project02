@@ -789,6 +789,25 @@
                     Object.entries(mapping).forEach(([key, value]) => {
                         logMessage(`  ${key} → ${value}`, 'info');
                     });
+                    
+                    // リンク情報の詳細をログに出力
+                    logMessage('--- 生成されたマトリクスリンク詳細 ---', 'info');
+                    links.forEach((link, index) => {
+                        logMessage(`  ${index + 1}. 表示名: ${link.displayName}`, 'info');
+                        logMessage(`     ファイル: ${link.href}`, 'info');
+                        logMessage(`     マトリクス表示: ${link.display}`, 'info');
+                        logMessage(`     カテゴリ: ${link.category}`, 'info');
+                        logMessage(`     優先度: ${link.priority}`, 'info');
+                        logMessage('', 'info'); // 空行
+                    });
+                    
+                    // HTMLリンクコードも生成して表示
+                    logMessage('--- マトリクス用HTMLリンクコード ---', 'info');
+                    links.forEach((link) => {
+                        const htmlCode = `<a href="${link.href}" style="color: #2196F3; text-decoration: underline;">${link.display}</a>`;
+                        logMessage(`  ${htmlCode}`, 'info');
+                    });
+                    
                 } else {
                     logMessage('❌ マッピング生成に失敗しました', 'error');
                 }
