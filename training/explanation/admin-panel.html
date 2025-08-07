@@ -1298,6 +1298,9 @@
                     }
                 };
                 
+                // preset_config.jsonも自動更新
+                await updatePresetConfig(editorData);
+                
                 // JSON出力（ダウンロード）
                 const blob = new Blob([JSON.stringify(metadata, null, 2)], { 
                     type: 'application/json; charset=utf-8' 
@@ -1320,6 +1323,78 @@
                 
             } catch (error) {
                 logMessage(`メタデータ保存エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // preset_config.json自動更新機能
+        async function updatePresetConfig(editorData) {
+            try {
+                logMessage('🔧 preset_config.json自動更新開始...', 'info');
+                
+                // 現在のpreset_config.jsonを読み込み
+                const response = await fetch('../data/preset_config.json');
+                let presetConfig;
+                
+                if (response.ok) {
+                    presetConfig = await response.json();
+                    logMessage('✅ 現在のpreset_config.json読み込み成功', 'success');
+                } else {
+                    // ファイルが存在しない場合は新規作成
+                    presetConfig = {
+                        presets: [],
+                        instructions: {
+                            title: "🔧 新規例文セットJSONの追加方法",
+                            steps: [
+                                "1. 新しいJSONファイルを data/ フォルダに配置",
+                                "2. 上記の presets 配列に新しいオブジェクトを追加:",
+                                "3. ブラウザでページを再読み込み"
+                            ],
+                            note: "この方法により、HTMLファイルを編集することなく新しいデータセットを追加できます。"
+                        }
+                    };
+                    logMessage('💡 preset_config.jsonを新規作成します', 'info');
+                }
+                
+                // 新しいプリセット項目を生成
+                const jsonFileName = editorData.jsonFile.endsWith('.json') ? editorData.jsonFile : editorData.jsonFile + '.json';
+                const newPreset = {
+                    id: `dataset_${Date.now()}`, // ユニークなID生成
+                    name: editorData.displayName,
+                    file: `data/${jsonFileName}`,
+                    description: editorData.description || `${editorData.displayName}の学習データセット`
+                };
+                
+                // 既存項目をチェック（重複防止）
+                const existingPreset = presetConfig.presets.find(preset => 
+                    preset.name === newPreset.name || preset.file === newPreset.file
+                );
+                
+                if (existingPreset) {
+                    logMessage(`⚠️ 既存項目発見: ${existingPreset.name} - スキップします`, 'info');
+                } else {
+                    // 新しいプリセットを追加
+                    presetConfig.presets.push(newPreset);
+                    logMessage(`✅ 新しいプリセット追加: ${newPreset.name}`, 'success');
+                    
+                    // 更新されたpreset_config.jsonをダウンロード
+                    const presetBlob = new Blob([JSON.stringify(presetConfig, null, 2)], { 
+                        type: 'application/json; charset=utf-8' 
+                    });
+                    const presetUrl = URL.createObjectURL(presetBlob);
+                    const presetLink = document.createElement('a');
+                    presetLink.href = presetUrl;
+                    presetLink.download = 'preset_config.json';
+                    document.body.appendChild(presetLink);
+                    presetLink.click();
+                    document.body.removeChild(presetLink);
+                    URL.revokeObjectURL(presetUrl);
+                    
+                    logMessage('📁 更新されたpreset_config.jsonをダウンロードしました', 'success');
+                    logMessage('💡 data/フォルダに新しいpreset_config.jsonを保存してください', 'info');
+                }
+                
+            } catch (error) {
+                logMessage(`preset_config.json更新エラー: ${error.message}`, 'error');
             }
         }
 

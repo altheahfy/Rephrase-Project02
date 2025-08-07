@@ -2638,34 +2638,102 @@ document.addEventListener('DOMContentLoaded', function() {
   if (grammarParam) {
     console.log('🎯 文法項目自動選択検出:', grammarParam);
     
-    // 文法項目とJSONファイルのマッピング
-    const grammarToJsonMap = {
-      '自動詞第1文型': 'data/V自動詞第1文型.json'
-    };
-    
-    const jsonFile = grammarToJsonMap[grammarParam];
-    
-    if (jsonFile) {
-      console.log('✅ 対応するJSONファイル発見:', jsonFile);
-      
-      // プリセット選択を自動設定
-      setTimeout(() => {
-        const presetSelect = document.getElementById('presetSelect');
-        if (presetSelect) {
-          presetSelect.value = jsonFile;
-          console.log('🎯 プリセット選択を自動設定:', jsonFile);
+    // メタデータから動的にマッピングを生成
+    async function loadGrammarMetadata() {
+      try {
+        const response = await fetch('explanation/grammar-metadata.json');
+        if (response.ok) {
+          const metadata = await response.json();
+          console.log('📋 文法メタデータ読み込み成功:', metadata);
           
-          // 自動的にJSON読み込みを実行
-          const loadButton = document.getElementById('loadPresetButton');
-          if (loadButton) {
-            loadButton.click();
-            console.log('🚀 文法項目JSONを自動読み込み開始');
+          // 指定された文法項目を検索
+          let targetJsonFile = null;
+          
+          for (const [key, data] of Object.entries(metadata)) {
+            if (data.grammarKey === grammarParam || data.displayName === grammarParam) {
+              // jsonFileからdata/を付けて完全パスを生成
+              targetJsonFile = `data/${data.jsonFile}`;
+              if (!targetJsonFile.endsWith('.json')) {
+                targetJsonFile += '.json';
+              }
+              console.log('✅ マッチする文法項目発見:', {
+                key: key,
+                displayName: data.displayName,
+                grammarKey: data.grammarKey,
+                jsonFile: targetJsonFile
+              });
+              break;
+            }
           }
+          
+          if (targetJsonFile) {
+            console.log('✅ 対応するJSONファイル発見:', targetJsonFile);
+            
+            // プリセット選択を自動設定
+            setTimeout(() => {
+              const presetSelect = document.getElementById('presetSelect');
+              if (presetSelect) {
+                presetSelect.value = targetJsonFile;
+                console.log('🎯 プリセット選択を自動設定:', targetJsonFile);
+                
+                // 自動的にJSON読み込みを実行
+                const loadButton = document.getElementById('loadPresetButton');
+                if (loadButton) {
+                  loadButton.click();
+                  console.log('🚀 文法項目JSONを自動読み込み開始');
+                }
+              }
+            }, 500);
+          } else {
+            console.warn('⚠️ 未対応の文法項目:', grammarParam);
+          }
+        } else {
+          console.error('❌ 文法メタデータ読み込み失敗:', response.status);
+          // フォールバック：手動マッピング
+          fallbackMapping();
         }
-      }, 500);
-    } else {
-      console.warn('⚠️ 未対応の文法項目:', grammarParam);
+      } catch (error) {
+        console.error('❌ 文法メタデータ読み込みエラー:', error);
+        // フォールバック：手動マッピング
+        fallbackMapping();
+      }
     }
+    
+    // フォールバック用手動マッピング
+    function fallbackMapping() {
+      console.log('💡 フォールバックマッピングを使用');
+      const grammarToJsonMap = {
+        '自動詞第1文型': 'data/V自動詞第1文型.json',
+        '他動詞第3,4文型': 'data/第3,4文型.json'
+      };
+      
+      const jsonFile = grammarToJsonMap[grammarParam];
+      
+      if (jsonFile) {
+        console.log('✅ フォールバックで対応するJSONファイル発見:', jsonFile);
+        
+        // プリセット選択を自動設定
+        setTimeout(() => {
+          const presetSelect = document.getElementById('presetSelect');
+          if (presetSelect) {
+            presetSelect.value = jsonFile;
+            console.log('🎯 プリセット選択を自動設定:', jsonFile);
+            
+            // 自動的にJSON読み込みを実行
+            const loadButton = document.getElementById('loadPresetButton');
+            if (loadButton) {
+              loadButton.click();
+              console.log('🚀 文法項目JSONを自動読み込み開始');
+            }
+          }
+        }, 500);
+      } else {
+        console.warn('⚠️ 未対応の文法項目:', grammarParam);
+      }
+    }
+    
+    // メタデータ読み込み開始
+    loadGrammarMetadata();
   }
 });
 </script>

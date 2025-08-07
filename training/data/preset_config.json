@@ -17,6 +17,12 @@
       "name": "V_自動詞第1文型",
       "file": "data/V自動詞第1文型.json",
       "description": "V自動詞第1文型"
+    },
+    {
+      "id": "dataset002",
+      "name": "他動詞第3,4文型",
+      "file": "data/第3,4文型.json",
+      "description": "第3文型、第4文型を作る「他動詞」の学習データセット"
     }
   ],
   "instructions": {
