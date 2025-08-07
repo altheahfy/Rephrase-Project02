@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
 
+# 管理パネルを検索エンジンから除外
+Disallow: /training/explanation/admin-panel.html
+Disallow: /training/explanation/generator.js
+
 # Sitemap location
 Sitemap: https://altheahfy.github.io/Rephrase-Project02/sitemap.xml
 
