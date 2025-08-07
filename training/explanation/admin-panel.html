@@ -342,6 +342,31 @@
             border-color: #ccc;
         }
 
+        .btn-auto-format {
+            background: #4CAF50 !important;
+            color: white !important;
+            border-color: #4CAF50 !important;
+            font-weight: 600;
+        }
+
+        .btn-auto-format:hover {
+            background: #45a049 !important;
+            border-color: #45a049 !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            background: #f44336 !important;
+            color: white !important;
+            border-color: #f44336 !important;
+        }
+
+        .btn-delete:hover {
+            background: #d32f2f !important;
+            border-color: #d32f2f !important;
+            transform: translateY(-1px);
+        }
+
         .preview-content {
             background: white;
             padding: 30px;
@@ -499,6 +524,7 @@
 この文型では、動詞は目的語を必要としません。"></textarea>
                 </div>
                 <div class="editor-toolbar">
+                    <button class="btn-small btn-auto-format" onclick="autoFormatContent()" title="生の文章を自動的に整形します">📝 自動整形</button>
                     <button class="btn-small" onclick="insertMarkdown('## ', '')" title="見出し2">H2</button>
                     <button class="btn-small" onclick="insertMarkdown('### ', '')" title="見出し3">H3</button>
                     <button class="btn-small" onclick="insertMarkdown('**', '**')" title="太字">B</button>
@@ -861,6 +887,7 @@
                             </div>
                             <div style="display: flex; gap: 10px;">
                                 <button onclick="event.stopPropagation(); loadToEditor('${key}')" class="btn-small" title="編集">✏️</button>
+                                <button onclick="event.stopPropagation(); deleteGrammarItem('${key}')" class="btn-small btn-delete" title="削除">🗑️</button>
                                 <div onclick="event.stopPropagation();">👁️</div>
                             </div>
                         </div>
@@ -988,6 +1015,131 @@
             textarea.value = textarea.value.substring(0, cursorPos) + pointText + textarea.value.substring(cursorPos);
             textarea.focus();
             textarea.setSelectionRange(cursorPos + 7, cursorPos + pointText.length - 3);
+        }
+
+        // 自動整形機能
+        function autoFormatContent() {
+            const textarea = document.getElementById('contentEditor');
+            const rawContent = textarea.value.trim();
+            
+            if (!rawContent) {
+                logMessage('❌ 整形する本文がありません', 'error');
+                return;
+            }
+            
+            logMessage('🚀 自動整形開始...', 'info');
+            
+            try {
+                // インテリジェント整形処理
+                const formattedContent = ContentFormatter.autoFormat(rawContent);
+                
+                // テキストエリアに反映
+                textarea.value = formattedContent;
+                
+                // 自動的にライブプレビューも実行
+                livePreview();
+                
+                logMessage('✅ 自動整形完了！ライブプレビューで確認してください', 'success');
+                
+            } catch (error) {
+                logMessage(`自動整形エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // インテリジェント整形処理クラス
+        class ContentFormatter {
+            static autoFormat(content) {
+                let formatted = content;
+                
+                // 1. 段落分離とタイトル検出
+                const lines = formatted.split('\n').map(line => line.trim()).filter(line => line);
+                const result = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const nextLine = lines[i + 1];
+                    
+                    // メイン見出し検出（短い行で、次に説明が続く）
+                    if (this.isMainHeading(line, nextLine)) {
+                        result.push(`## ${line}`);
+                        result.push('');
+                    }
+                    // サブ見出し検出（「基本構造」「例文」「使い方」等のキーワード）
+                    else if (this.isSubHeading(line)) {
+                        result.push(`### ${line}`);
+                        result.push('');
+                    }
+                    // 例文検出
+                    else if (this.isExampleSentence(line)) {
+                        result.push(`[[例文: ${line}]]`);
+                        result.push('');
+                    }
+                    // 重要ポイント検出
+                    else if (this.isKeyPoint(line)) {
+                        result.push(`[[重要: ${line}]]`);
+                        result.push('');
+                    }
+                    // リスト項目検出
+                    else if (this.isListItem(line)) {
+                        result.push(`- ${line.replace(/^[-•*]\s*/, '')}`);
+                    }
+                    // 通常の段落
+                    else {
+                        result.push(line);
+                        result.push('');
+                    }
+                }
+                
+                return result.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+            }
+            
+            static isMainHeading(line, nextLine) {
+                // 短い行で、疑問系やタイトル系のパターン
+                const titlePatterns = [
+                    /とは$/, /について$/, /の特徴$/, /の基本$/, /の概要$/,
+                    /^第\d+/, /^[\d一二三四五]+\./, /^Chapter/, /^第.*章/
+                ];
+                
+                return line.length < 30 && 
+                       nextLine && nextLine.length > line.length &&
+                       titlePatterns.some(pattern => pattern.test(line));
+            }
+            
+            static isSubHeading(line) {
+                const subPatterns = [
+                    /^基本構造$/, /^構造$/, /^例文$/, /^使い方$/, /^特徴$/,
+                    /^ポイント$/, /^注意点$/, /^応用$/, /^まとめ$/,
+                    /^種類$/, /^分類$/, /^形式$/, /^パターン$/
+                ];
+                
+                return line.length < 20 && subPatterns.some(pattern => pattern.test(line));
+            }
+            
+            static isExampleSentence(line) {
+                // 英語を含む文や、明らかな例文パターン
+                const examplePatterns = [
+                    /[A-Z][a-z]+.*\./,  // 英語文
+                    /\(.+?\)$/,         // 日本語訳が末尾にある
+                    /^I\s/, /^She\s/, /^He\s/, /^They\s/, /^We\s/,  // 典型的な例文開始
+                ];
+                
+                return examplePatterns.some(pattern => pattern.test(line)) ||
+                       (line.includes('(') && line.includes(')') && line.length < 100);
+            }
+            
+            static isKeyPoint(line) {
+                const keyPatterns = [
+                    /^重要/, /^ポイント/, /^注意/, /^覚えて/, /^大切/,
+                    /ことが重要/, /に注意/, /がポイント/
+                ];
+                
+                return keyPatterns.some(pattern => pattern.test(line));
+            }
+            
+            static isListItem(line) {
+                return /^[-•*]\s/.test(line) || 
+                       (line.length < 80 && /^[\d一二三四五]+\./.test(line));
+            }
         }
 
         // ライブプレビュー機能
@@ -1165,6 +1317,64 @@
                 
                 editorData = null;
                 logMessage('エディタをクリアしました', 'info');
+            }
+        }
+
+        // 文法項目削除機能
+        async function deleteGrammarItem(grammarKey) {
+            if (!currentMetadata || !currentMetadata[grammarKey]) {
+                logMessage('❌ 削除対象の項目が見つかりません', 'error');
+                return;
+            }
+            
+            const pageData = currentMetadata[grammarKey];
+            const confirmMessage = `「${pageData.displayName}」を削除しますか？\n\n⚠️ この操作は取り消せません。\n削除後、新しいメタデータファイルをダウンロードして保存してください。`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            try {
+                updateSystemStatus('working');
+                logMessage(`文法項目削除開始: ${pageData.displayName}`, 'info');
+                
+                // メタデータから削除
+                const updatedMetadata = { ...currentMetadata };
+                delete updatedMetadata[grammarKey];
+                
+                // priorityを再採番
+                let priority = 1;
+                Object.values(updatedMetadata).forEach(item => {
+                    item.priority = priority++;
+                });
+                
+                // JSON出力（ダウンロード）
+                const blob = new Blob([JSON.stringify(updatedMetadata, null, 2)], { 
+                    type: 'application/json; charset=utf-8' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'grammar-metadata.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // システム情報更新
+                currentMetadata = updatedMetadata;
+                await loadSystemInfo();
+                await refreshGrammarList();
+                
+                logMessage(`✅ ${pageData.displayName} を削除しました`, 'success');
+                logMessage('📁 更新されたメタデータファイルをダウンロードしました', 'info');
+                logMessage('💡 新しいメタデータファイルを保存してください', 'info');
+                
+                updateSystemStatus('ready');
+                
+            } catch (error) {
+                logMessage(`削除エラー: ${error.message}`, 'error');
+                updateSystemStatus('error');
             }
         }
 
