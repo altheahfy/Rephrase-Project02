@@ -35,11 +35,22 @@
             opacity: 0.9;
         }
 
+        /* プレビュー機能 */
         .control-section {
             margin: 30px 0;
             padding: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
+        }
+
+        .warning-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 0.95em;
         }
 
         .control-section h2 {
@@ -273,9 +284,10 @@
         <!-- 生成操作 -->
         <div class="control-section">
             <h2>⚡ 生成操作</h2>
+            <p class="warning-note">⚠️ <strong>運用方針:</strong> コンテンツは段階的公開のため、完成したページのみ個別生成を推奨</p>
             <div class="button-group">
-                <button class="action-button btn-primary" onclick="generateAllPages()">
-                    📄 全ページ生成
+                <button class="action-button btn-primary" onclick="generateSinglePage()" disabled>
+                    📄 選択ページ生成 (プレビューから選択)
                 </button>
                 <button class="action-button btn-success" onclick="generateMapping()">
                     🔗 マッピング生成
@@ -287,6 +299,15 @@
                     🧪 完全テスト
                 </button>
             </div>
+            <details style="margin-top: 20px;">
+                <summary style="cursor: pointer; color: #666; font-size: 0.9em;">⚠️ 一括生成機能（非推奨）</summary>
+                <div style="padding: 15px; background: #fff3cd; border-radius: 5px; margin-top: 10px;">
+                    <p><strong>注意:</strong> 全ページ一括生成は開発・テスト用途のみ</p>
+                    <button class="action-button btn-warning" onclick="generateAllPages()" style="margin-top: 10px;">
+                        ⚠️ 全ページ生成（開発用）
+                    </button>
+                </div>
+            </details></div>
             <div class="output-container">
                 <pre id="outputLog">操作ログがここに表示されます...</pre>
             </div>
@@ -294,7 +315,8 @@
 
         <!-- プレビュー機能 -->
         <div class="control-section">
-            <h2>👀 ページプレビュー</h2>
+            <h2>👀 ページプレビュー＆個別生成</h2>
+            <p>完成したコンテンツを選択してプレビュー確認後、個別に生成できます。</p>
             <div class="grammar-list" id="grammarList">
                 <p>文法項目を読み込み中...</p>
             </div>
@@ -302,9 +324,15 @@
                 <button class="action-button btn-info" onclick="refreshGrammarList()">
                     🔄 リスト更新
                 </button>
+                <button class="action-button btn-primary" id="generateSelectedBtn" onclick="generateSelectedPage()" disabled>
+                    ✨ 選択ページ生成
+                </button>
                 <button class="action-button btn-warning" onclick="closePreview()">
                     ❌ プレビュー閉じる
                 </button>
+            </div>
+            <div id="selectedPageInfo" style="display: none; background: #e8f5e8; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                <p><strong>選択中:</strong> <span id="selectedPageName">-</span></p>
             </div>
             <iframe class="preview-frame" id="previewFrame" style="display: none;"></iframe>
         </div>
@@ -343,6 +371,7 @@
         let generator = null;
         let tester = null;
         let currentMetadata = null;
+        let selectedGrammarKey = null;
 
         // システム初期化
         async function initializeSystem() {
@@ -589,6 +618,13 @@
                 if (result) {
                     previewFrame.src = result.url;
                     previewFrame.style.display = 'block';
+                    
+                    // 選択状態を更新
+                    selectedGrammarKey = grammarKey;
+                    document.getElementById('selectedPageInfo').style.display = 'block';
+                    document.getElementById('selectedPageName').textContent = result.displayName;
+                    document.getElementById('generateSelectedBtn').disabled = false;
+                    
                     logMessage(`✅ プレビュー生成完了: ${result.displayName}`, 'success');
                 } else {
                     logMessage('❌ プレビュー生成に失敗しました', 'error');
@@ -602,11 +638,53 @@
             }
         }
 
+        // 選択されたページの個別生成
+        async function generateSelectedPage() {
+            if (!selectedGrammarKey) {
+                logMessage('❌ 生成対象ページが選択されていません', 'error');
+                return;
+            }
+
+            updateSystemStatus('working');
+            const pageData = currentMetadata[selectedGrammarKey];
+            logMessage(`個別ページ生成開始: ${pageData.displayName}`, 'info');
+            
+            try {
+                const template = await generator.loadTemplate();
+                const html = generator.generatePage(template, pageData);
+                
+                // 生成されたHTMLをダウンロード可能にする
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${pageData.filename}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                logMessage(`✅ ${pageData.displayName} 生成完了・ダウンロード開始`, 'success');
+                logMessage(`📁 ファイル名: ${pageData.filename}.html`, 'info');
+                updateSystemStatus('ready');
+                
+            } catch (error) {
+                logMessage(`個別生成エラー: ${error.message}`, 'error');
+                updateSystemStatus('error');
+            }
+        }
+
         // プレビュー閉じる
         function closePreview() {
             const previewFrame = document.getElementById('previewFrame');
             previewFrame.style.display = 'none';
             previewFrame.src = '';
+            
+            // 選択状態をリセット
+            selectedGrammarKey = null;
+            document.getElementById('selectedPageInfo').style.display = 'none';
+            document.getElementById('generateSelectedBtn').disabled = true;
+            
             logMessage('プレビューを閉じました', 'info');
         }
 
