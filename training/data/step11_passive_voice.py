@@ -122,7 +122,7 @@ class Step11RuleEngine:
                     # 簡単な過去分詞パターン（-ed, -en, 不規則動詞）
                     if (next_word.endswith('ed') or 
                         next_word.endswith('en') or 
-                        next_word in ['done', 'gone', 'seen', 'been', 'taken', 'made', 'said', 'come']):
+                        next_word in ['done', 'gone', 'seen', 'been', 'taken', 'made', 'said', 'come', 'finished']):
                         results.append({
                             'position': i,
                             'slot': 'Aux',
@@ -131,6 +131,18 @@ class Step11RuleEngine:
                             'rule_id': 'aux-have',
                             'priority': 10,
                             'note': f'完了形助動詞（後続：{next_word}）',
+                            'pattern': 'perfect'
+                        })
+                        
+                        # 過去分詞も動詞スロットに配置
+                        results.append({
+                            'position': i + 1,
+                            'slot': 'V',
+                            'value': words[i + 1],
+                            'type': 'word',
+                            'rule_id': 'perfect-past-participle',
+                            'priority': 10,
+                            'note': f'完了形過去分詞（{next_word}）',
                             'pattern': 'perfect'
                         })
         return results
@@ -314,7 +326,20 @@ class Step11RuleEngine:
                             'type': 'word',
                             'rule_id': 'be-progressive-aux',
                             'priority': 9,
-                            'note': f'進行形助動詞（後続：{next_word}）'
+                            'note': f'進行形助動詞（後続：{next_word}）',
+                            'pattern': 'progressive'
+                        })
+                        
+                        # -ing動詞も動詞スロットに配置
+                        results.append({
+                            'position': i + 1,
+                            'slot': 'V',
+                            'value': next_word,
+                            'type': 'word',
+                            'rule_id': 'progressive-verb',
+                            'priority': 9,
+                            'note': f'進行形動詞（{next_word.lower()}）',
+                            'pattern': 'progressive'
                         })
         
         return results
@@ -713,9 +738,9 @@ class Step11RuleEngine:
         results = []
         
         # become型連結動詞のリスト
-        copular_verbs = ['become', 'became', 'seem', 'seemed', 'appear', 'appeared', 
-                        'remain', 'remained', 'sound', 'sounded', 'taste', 'tasted',
-                        'look', 'looked', 'feel', 'felt', 'grow', 'grew', 'turn', 'turned']
+        copular_verbs = ['become', 'becomes', 'became', 'seem', 'seems', 'seemed', 'appear', 'appears', 'appeared', 
+                        'remain', 'remains', 'remained', 'sound', 'sounds', 'sounded', 'taste', 'tastes', 'tasted',
+                        'look', 'looks', 'looked', 'feel', 'feels', 'felt', 'grow', 'grows', 'grew', 'turn', 'turns', 'turned']
         
         for i, word in enumerate(words):
             if word.lower() in copular_verbs:

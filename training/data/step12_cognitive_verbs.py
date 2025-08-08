@@ -20,10 +20,19 @@ class RephraseIntegrationStep12(Step11RuleEngine):
     def rule_cognition_verb_that_clause(self, words):
         """認知動詞 + that節処理（S V O1[that-clause]）"""
         results = []
-        cognition_verbs = ['think', 'believe', 'know', 'realize', 'figure']
+        # 語形変化対応
+        cognition_verbs = {
+            'think': 'think', 'thinks': 'think', 'thought': 'think',
+            'believe': 'believe', 'believes': 'believe', 'believed': 'believe', 
+            'know': 'know', 'knows': 'know', 'knew': 'know', 'known': 'know',
+            'realize': 'realize', 'realizes': 'realize', 'realized': 'realize',
+            'figure': 'figure', 'figures': 'figure', 'figured': 'figure'
+        }
         
         for i, word in enumerate(words):
             if word.lower() in cognition_verbs:
+                base_form = cognition_verbs[word.lower()]
+                
                 # that節を探す
                 that_start = -1
                 for j in range(i + 1, len(words)):
@@ -52,7 +61,7 @@ class RephraseIntegrationStep12(Step11RuleEngine):
                         'type': 'word',
                         'rule_id': 'cognition-verb',
                         'priority': 25,
-                        'note': f'認知動詞（{word.lower()}）',
+                        'note': f'認知動詞（{base_form}）',
                         'pattern': 'cognitive'
                     })
                     
