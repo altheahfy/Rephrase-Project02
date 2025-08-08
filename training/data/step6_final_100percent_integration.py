@@ -1,7 +1,18 @@
 """
 最終統合版 - Step 6実装（100%達成！）
-Step 5に加えて残り5個の特殊動詞ルールを追加統合
-"""
+Step 5に加えて残り5個の特殊動詞ルー        # Step 6の最終特殊ルール
+        self.final_special_rules = [
+            self.rule_v_recover_intrans,      # recover from病気
+            self.rule_v_leave_intrans,        # leave for東京
+            self.rule_v_pay_intrans,          # pay for本
+            self.rule_v_apologize_intrans,    # apologize to/for
+            self.rule_v_rain_weather,         # It rains
+        ]
+        
+        # Step 7の第4文型ルール（100%への道）
+        self.ditransitive_rules = [
+            self.rule_ditransitive_give,      # S V O1 O2 (give系)
+        ]"""
 
 import re
 from datetime import datetime
@@ -15,6 +26,7 @@ class FinalRuleEngine:
         self.complex_rules = []
         self.verb_pattern_rules = []
         self.final_special_rules = []
+        self.ditransitive_rules = []  # Step 7追加
         self.init_all_rules()
     
     def init_all_rules(self):
@@ -400,6 +412,62 @@ class FinalRuleEngine:
         return result
 
     # ======================
+    # Step 7: 第4文型ルール（100%への道）
+    # ======================
+    def rule_ditransitive_give(self, words):
+        """第4文型 give系（S V O1 O2）"""
+        result = {}
+        text = ' '.join(words)
+        
+        # give系動詞の検出
+        give_verbs = ['give', 'gives', 'gave', 'given', 'giving',
+                     'show', 'shows', 'showed', 'shown', 'showing',
+                     'tell', 'tells', 'told', 'telling']
+        
+        # 動詞検出
+        found_verb = None
+        for word in words:
+            if word.lower() in give_verbs:
+                result['V'] = result.get('V', []) + [word]
+                found_verb = word.lower()
+                break
+        
+        if found_verb:
+            # 第4文型パターン判定
+            # 簡易版: 動詞の後に2つの目的語があるかチェック
+            verb_index = -1
+            for i, word in enumerate(words):
+                if word.lower() == found_verb:
+                    verb_index = i
+                    break
+            
+            if verb_index >= 0 and verb_index + 2 < len(words):
+                # O1 (recipient - 受益者)
+                o1_candidate = words[verb_index + 1]
+                if not o1_candidate.lower() in ['the', 'a', 'an']:
+                    result['O1'] = result.get('O1', []) + [o1_candidate]
+                
+                # O2 (theme - 与えるもの)  
+                o2_start = verb_index + 2
+                o2_candidates = []
+                for i in range(o2_start, len(words)):
+                    word = words[i]
+                    # 前置詞で終了
+                    if word.lower() in ['to', 'for', 'from', 'at', 'in', 'on']:
+                        break
+                    o2_candidates.append(word)
+                
+                if o2_candidates:
+                    if len(o2_candidates) == 1:
+                        result['O2'] = result.get('O2', []) + o2_candidates
+                    else:
+                        # 複数語の場合は句として処理
+                        o2_phrase = ' '.join(o2_candidates)
+                        result['O2'] = result.get('O2', []) + [o2_phrase]
+                        
+        return result
+
+    # ======================
     # メイン処理関数
     # ======================
     def analyze_sentence(self, sentence):
@@ -436,6 +504,12 @@ class FinalRuleEngine:
             rule_result = rule(words)
             for slot, values in rule_result.items():
                 result[slot] = result.get(slot, []) + values
+                
+        # Step 7: 第4文型ルール
+        for rule in self.ditransitive_rules:
+            rule_result = rule(words)
+            for slot, values in rule_result.items():
+                result[slot] = result.get(slot, []) + values
         
         # 従来処理（未分類要素）- 特殊ルールで処理済みの要素をスキップ
         used_words = set()
@@ -468,19 +542,24 @@ class FinalRuleEngine:
         return result
 
     def run_test(self):
-        """100%統合テスト実行"""
-        print("🎉 最終統合版ルール統合テスト開始 (Step 6 - 100%達成！)")
+        """Step 7統合テスト実行（第4文型対応版）"""
+        print("� Step 7統合版ルール統合テスト開始 (第4文型対応！)")
         print("=" * 60)
         
         test_sentences = [
-            # Step 6の新規テスト例文
+            # Step 7の新規テスト例文（第4文型）
+            "I give you a book.",
+            "She showed me the picture.",
+            "He told them the truth.",
+            
+            # Step 6の従来例文
             "He recovered from the illness.",
             "She left for Tokyo yesterday.",
             "I paid for the book.",
             "Tom apologized to Mary.",
             "It rains heavily.",
             
-            # 従来の検証例文
+            # Step 2-5の従来例文
             "I go to school every day.",
             "She listens to music.",
             "We believe in God.",
@@ -489,8 +568,8 @@ class FinalRuleEngine:
             "Why do you go to work?"
         ]
         
-        total_rules = 21
-        integrated_rules = total_rules  # 100%達成！
+        total_rules = 34
+        integrated_rules = 22  # Step 7で1個追加: 22/34 = 64.7%
         
         for sentence in test_sentences:
             print(f"\n📝 例文: {sentence}")
@@ -499,13 +578,27 @@ class FinalRuleEngine:
             # ルール適用状況の詳細表示
             words = sentence.split()
             
-            # Step 6の新規ルール検出表示
+            # Step 7の新規ルール検出表示
+            for rule in self.ditransitive_rules:
+                rule_result = rule(words)
+                if rule_result:
+                    for slot, values in rule_result.items():
+                        for value in values:
+                            if ' ' in value:
+                                print(f"   🎯 第4文型: '{value}' → {slot}(phrase)")
+                            else:
+                                print(f"   🎯 第4文型: '{value}' → {slot}(word)")
+            
+            # Step 6の最終ルール検出表示
             for rule in self.final_special_rules:
                 rule_result = rule(words)
                 if rule_result:
                     for slot, values in rule_result.items():
                         for value in values:
-                            print(f"   🌟 最終ルール: '{value}' → {slot}(word)")
+                            if ' ' in value:
+                                print(f"   🌟 最終ルール: '{value}' → {slot}(phrase)")
+                            else:
+                                print(f"   🌟 最終ルール: '{value}' → {slot}(word)")
             
             # その他のルール表示（Step 2-5）
             for rule in self.simple_rules:
@@ -555,10 +648,10 @@ class FinalRuleEngine:
             
             print(f"   📊 検出結果: {result}")
         
-        print(f"\n🎊 統合完了！")
-        print(f"📈 統合率: {integrated_rules}/{total_rules} = 100.0% ✅")
-        print(f"🏆 ChatGPTルール辞書の完全統合達成！")
-        print(f"⚡ 16,000文処理への準備完了！")
+        print(f"\n🎊 Step 7完了！")
+        print(f"📈 統合率: {integrated_rules}/{total_rules} = {integrated_rules/total_rules*100:.1f}% ✅")
+        print(f"� 新機能: 第4文型（S V O1 O2）対応！")
+        print(f"⚡ 次回: Step 8で更なる統合拡大！")
 
 def main():
     engine = FinalRuleEngine()
