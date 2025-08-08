@@ -525,24 +525,77 @@ class RephraseParsingEngine:
         return None
     
     def detect_basic_svo_pattern(self, words):
-        """基本的なSVOパターンを検出"""
+        """基本的なSV(O)パターンを検出（自動詞・他動詞を考慮）"""
         if len(words) < 2:
             return None
             
         # 最初の語を主語、2番目を動詞と仮定
         subject = words[0]
         verb = words[1]
-        object_part = " ".join(words[2:]) if len(words) > 2 else ""
+        remaining_words = words[2:] if len(words) > 2 else []
         
         result = {
-            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'basic-svo'}],
-            'V': [{'value': verb, 'type': 'verb', 'rule_id': 'basic-svo'}]
+            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'basic-sv'}],
+            'V': [{'value': verb, 'type': 'verb', 'rule_id': 'basic-sv'}]
         }
         
-        if object_part:
-            result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'basic-svo'}]
+        if remaining_words:
+            # 自動詞かどうかを判定
+            if self.is_intransitive_verb(verb.lower()):
+                # 自動詞の場合：残りは修飾語として分類
+                modifiers = self.extract_modifiers_from_words(remaining_words)
+                result.update(modifiers)
+            else:
+                # 他動詞の場合：残りをまず目的語候補として、必要に応じて修飾語を分離
+                remaining_text = " ".join(remaining_words)
+                
+                # 前置詞句がある場合は分離
+                if any(word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since'] 
+                       for word in remaining_words):
+                    # 前置詞句以前を目的語、前置詞句を修飾語として分離
+                    object_part, modifiers = self.separate_object_and_modifiers(remaining_words)
+                    if object_part:
+                        result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'basic-svo'}]
+                    result.update(modifiers)
+                else:
+                    # 前置詞句がない場合は全て目的語
+                    result['O1'] = [{'value': remaining_text, 'type': 'object', 'rule_id': 'basic-svo'}]
             
         return result
+    
+    def is_intransitive_verb(self, verb):
+        """動詞が自動詞かどうかを判定"""
+        # 主要な自動詞リスト
+        intransitive_verbs = [
+            'lie', 'sit', 'stand', 'sleep', 'die', 'come', 'go', 'arrive', 'depart', 
+            'exist', 'happen', 'occur', 'appear', 'disappear', 'remain', 'stay',
+            'rise', 'fall', 'fly', 'swim', 'dance', 'sing', 'laugh', 'cry', 'smile'
+        ]
+        
+        return verb in intransitive_verbs
+    
+    def separate_object_and_modifiers(self, words):
+        """他動詞文で目的語と修飾語を分離"""
+        object_words = []
+        modifier_start = -1
+        
+        # 前置詞を探して分離点を特定
+        for i, word in enumerate(words):
+            if word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since']:
+                modifier_start = i
+                break
+        
+        if modifier_start >= 0:
+            object_words = words[:modifier_start]
+            modifier_words = words[modifier_start:]
+            
+            object_part = " ".join(object_words) if object_words else ""
+            modifiers = self.extract_modifiers_from_words(modifier_words)
+            
+            return object_part, modifiers
+        else:
+            # 前置詞句が見つからない場合は全て目的語
+            return " ".join(words), {}
     
     def extract_modifiers_from_words(self, words):
         """単語リストから修飾語を抽出してスロットに分類"""

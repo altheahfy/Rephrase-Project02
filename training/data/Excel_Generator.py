@@ -265,16 +265,49 @@ class ExcelGeneratorV2:
         return None
     
     def determine_phrase_type(self, candidate):
-        """PhraseTypeを判定"""
+        """PhraseTypeを判定（Rephrase定義に基づく）"""
         value = candidate['value'].strip()
         word_count = len(value.split())
         
+        # 1単語はword
         if word_count == 1:
             return 'word'
-        elif 'subslots' in candidate and candidate['subslots']:
+        
+        # サブスロットがある場合はclause（SVを含む節）
+        if 'subslots' in candidate and candidate['subslots']:
             return 'clause'
-        else:
+        
+        # 動詞を含むかチェック（phrase判定）
+        if self.contains_verb(value):
             return 'phrase'
+        
+        # 動詞もSVもない複数語はword扱い（前置詞句など）
+        return 'word'
+    
+    def contains_verb(self, text):
+        """テキストに動詞が含まれているかチェック"""
+        words = text.lower().split()
+        
+        # 不定詞パターン（to + 動詞）
+        for i, word in enumerate(words):
+            if word == 'to' and i + 1 < len(words):
+                return True  # to play, to study など
+        
+        # 動名詞パターン（-ing形）
+        if any(word.endswith('ing') for word in words):
+            # ただし、形容詞的用法は除外
+            ing_words = [word for word in words if word.endswith('ing')]
+            for ing_word in ing_words:
+                if ing_word not in ['morning', 'evening', 'nothing', 'something', 'anything']:
+                    return True
+        
+        # 過去分詞パターン（-ed形、不規則変化も含む）
+        past_participles = ['done', 'gone', 'taken', 'made', 'written', 'spoken', 'broken']
+        ed_or_irregular = [word for word in words if word.endswith('ed') or word in past_participles]
+        if ed_or_irregular:
+            return True
+            
+        return False
     
     def get_question_type(self, phrase):
         """QuestionTypeを判定（wh-word識別）"""
