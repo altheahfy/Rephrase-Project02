@@ -13,14 +13,76 @@ class ExcelGenerator:
         self.results = []
         self.current_sentence_id = 1
         self.current_construction_id = 1000
-        self.slot_display_orders = {
-            'M1': 1, 'M2': 2, 'M3': 3,
-            'S': 5, 'Aux': 6, 'V': 7, 
-            'O1': 8, 'O2': 9, 'O3': 10,
-            'C': 11, 'M4': 12
-        }
+        
+        # V_group_keyごとの例文データを保持
+        self.vgroup_data = {}  # {v_group_key: [sentence_data, ...]}
+        
+        # 従来の固定順序は削除（動的計算に変更）
+        # self.slot_display_orders = {...} ← 削除
     
-    def analyze_and_add_sentence(self, sentence, v_group_key=None):
+    def calculate_slot_display_orders(self, v_group_key):
+        """V_group_key内の全例文からSlot_display_orderを動的計算"""
+        if v_group_key not in self.vgroup_data:
+            return {}
+            
+        vgroup_sentences = self.vgroup_data[v_group_key]
+        
+        # Step 1: 全例文から語順を収集
+        word_positions = []  # [(position, slot, word), ...]
+        
+        for sentence_data in vgroup_sentences:
+            sentence = sentence_data['sentence']
+            slots = sentence_data['slots']
+            words = sentence.split()
+            
+            current_pos = 0
+            for slot, candidates in slots.items():
+                if not candidates:
+                    continue
+                    
+                candidate = candidates[0]
+                slot_phrase = candidate['value']
+                
+                # 文中での語句の位置を特定
+                phrase_words = slot_phrase.split()
+                
+                # 文中での開始位置を探索
+                found_pos = self.find_phrase_position(words, phrase_words, current_pos)
+                if found_pos >= 0:
+                    word_positions.append((found_pos, slot, slot_phrase))
+                    current_pos = found_pos + len(phrase_words)
+        
+        # Step 2: 語順でソートしてSlot種類を整理
+        word_positions.sort(key=lambda x: x[0])  # 位置順でソート
+        
+        # Step 3: Slot種類ごとに連番を割り当て
+        seen_slots = []
+        slot_orders = {}
+        order = 1
+        
+        for pos, slot, phrase in word_positions:
+            if slot not in seen_slots:
+                seen_slots.append(slot)
+                slot_orders[slot] = order
+                order += 1
+        
+        return slot_orders
+    
+    def find_phrase_position(self, words, phrase_words, start_pos=0):
+        """文中でのフレーズの位置を検索"""
+        if not phrase_words:
+            return -1
+            
+        for i in range(start_pos, len(words) - len(phrase_words) + 1):
+            # 完全一致チェック
+            if words[i:i+len(phrase_words)] == phrase_words:
+                return i
+            
+            # 部分一致チェック（大文字小文字無視）
+            if all(w1.lower() == w2.lower() for w1, w2 in zip(words[i:i+len(phrase_words)], phrase_words)):
+                return i
+        
+        return -1  # 見つからない場合
         """文を解析してExcelデータに追加"""
         sentence = sentence.strip()
         if not sentence:
