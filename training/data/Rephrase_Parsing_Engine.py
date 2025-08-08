@@ -256,6 +256,46 @@ class RephraseParsingEngine:
         
         return phrase, ''
     
+    def extract_phrasal_verb(self, words):
+        """句動詞を抽出して、動詞部分と残りの部分を分離"""
+        if not words:
+            return '', ''
+        
+        # 句動詞パターンの定義
+        phrasal_verbs = {
+            'sit': ['down', 'up'],
+            'stand': ['up', 'down'],
+            'wake': ['up'],
+            'get': ['up', 'down', 'in', 'out', 'on', 'off'],
+            'come': ['in', 'out', 'up', 'down', 'back'],
+            'go': ['out', 'in', 'up', 'down', 'away', 'back'],
+            'put': ['on', 'off', 'down', 'up'],
+            'take': ['off', 'on', 'out', 'up', 'down'],
+            'turn': ['on', 'off', 'up', 'down'],
+            'pick': ['up', 'out'],
+            'look': ['up', 'down', 'out', 'in']
+        }
+        
+        verb = words[0]
+        verb_lower = verb.lower()
+        
+        # 句動詞パターンをチェック
+        if len(words) >= 2 and verb_lower in phrasal_verbs:
+            particle_candidate = words[1].rstrip('?!.')  # 句読点を除去して比較
+            particle_lower = particle_candidate.lower()
+            
+            if particle_lower in phrasal_verbs[verb_lower]:
+                # 句動詞として結合
+                phrasal_verb = verb + " " + particle_candidate
+                remaining_words = words[2:] if len(words) > 2 else []
+                remaining_text = " ".join(remaining_words)
+                return phrasal_verb, remaining_text
+        
+        # 句動詞でない場合は通常の動詞
+        remaining_words = words[1:] if len(words) > 1 else []
+        remaining_text = " ".join(remaining_words)
+        return verb, remaining_text
+    
     def classify_verb_complement(self, verb, complement_text):
         """動詞の補語を適切に分類（句動詞の粒子、方向副詞等を考慮）"""
         complement_text = complement_text.strip().rstrip('?')
@@ -457,7 +497,7 @@ class RephraseParsingEngine:
             if remaining_text:
                 main_part, please_part = self.separate_please_from_phrase(remaining_text)
                 if main_part:
-                    result['O1'] = [{'value': main_part, 'type': 'object', 'rule_id': 'modal-question'}]
+                    result['O1'] = [{'value': main_part.rstrip('?'), 'type': 'object', 'rule_id': 'modal-question'}]
                 if please_part:
                     if 'M3' not in result:
                         result['M3'] = [{'value': please_part, 'type': 'polite_expression', 'rule_id': 'modal-question'}]
@@ -480,7 +520,7 @@ class RephraseParsingEngine:
                 
                 # メイン部分を目的語として追加
                 if main_part:
-                    result['O1'] = [{'value': main_part, 'type': 'object', 'rule_id': 'modal-question'}]
+                    result['O1'] = [{'value': main_part.rstrip('?'), 'type': 'object', 'rule_id': 'modal-question'}]
                 
                 # please部分があれば追加
                 if please_part:
