@@ -213,11 +213,11 @@ def interactive_mode():
 def bulk_file_mode():
     """一括ファイル処理モード"""
     print("=== 一括ファイル処理モード ===")
-    print("テキストファイルから英文を一括読み込みして処理します")
+    print("テキストファイル(.txt)またはExcelファイル(.xlsx)から英文を一括読み込みして処理します")
     
     # ファイル名入力
     while True:
-        filename = input("\n英文リストファイル名を入力 (例: sentences.txt): ").strip()
+        filename = input("\n英文リストファイル名を入力 (例: sentences.txt または 例文入力元.xlsx): ").strip()
         if not filename:
             print("ファイル名を入力してください")
             continue
@@ -258,15 +258,31 @@ Who wrote this book?"""
     
     # ファイル読み込み・処理
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        
-        # 英文抽出（コメントと空行を除外）
-        sentences = []
-        for line_num, line in enumerate(lines, 1):
-            line = line.strip()
-            if line and not line.startswith('#'):
-                sentences.append((line_num, line))
+        # ファイル拡張子で処理方法を判定
+        if filename.lower().endswith(('.xlsx', '.xls')):
+            # Excelファイルの場合
+            print(f"📊 Excelファイルを読み込み中: {filename}")
+            df = pd.read_excel(filename)
+            
+            # '原文'列から英文を抽出
+            if '原文' in df.columns:
+                excel_sentences = df['原文'].dropna().unique()
+                sentences = [(i+1, sent) for i, sent in enumerate(excel_sentences) if sent.strip()]
+            else:
+                print("❌ Excelファイルに '原文' 列が見つかりません")
+                print("利用可能な列:", df.columns.tolist())
+                return
+        else:
+            # テキストファイルの場合
+            with open(filename, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            # 英文抽出（コメントと空行を除外）
+            sentences = []
+            for line_num, line in enumerate(lines, 1):
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    sentences.append((line_num, line))
         
         if not sentences:
             print(f"❌ {filename} に有効な英文が見つかりません")
