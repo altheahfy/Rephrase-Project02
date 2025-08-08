@@ -125,7 +125,7 @@ class ExcelGeneratorV2:
         return slot_orders
     
     def find_phrase_position(self, words, phrase_words, start_pos=0):
-        """文中でのフレーズの位置を検索"""
+        """文中でのフレーズの位置を検索（改良版）"""
         if not phrase_words:
             return -1
             
@@ -134,8 +134,23 @@ class ExcelGeneratorV2:
             if words[i:i+len(phrase_words)] == phrase_words:
                 return i
             
-            # 部分一致チェック（大文字小文字無視）
-            if all(w1.lower() == w2.lower() for w1, w2 in zip(words[i:i+len(phrase_words)], phrase_words)):
+            # 部分一致チェック（大文字小文字無視、句読点除去）
+            normalized_words = [w.lower().rstrip('.,!?:;') for w in words[i:i+len(phrase_words)]]
+            normalized_phrase = [w.lower().rstrip('.,!?:;') for w in phrase_words]
+            
+            if normalized_words == normalized_phrase:
+                return i
+                
+            # 単語の一部が一致する場合（"information?"と"information"など）
+            if all(w1.lower().rstrip('.,!?:;').startswith(w2.lower().rstrip('.,!?:;')) or 
+                   w2.lower().rstrip('.,!?:;').startswith(w1.lower().rstrip('.,!?:;'))
+                   for w1, w2 in zip(words[i:i+len(phrase_words)], phrase_words)):
+                return i
+        
+        # どうしても見つからない場合、単語単位で検索
+        target_word = phrase_words[0].lower().rstrip('.,!?:;')
+        for i, word in enumerate(words):
+            if word.lower().rstrip('.,!?:;') == target_word:
                 return i
         
         return -1  # 見つからない場合
@@ -315,6 +330,87 @@ class ExcelGeneratorV2:
             df = pd.DataFrame(self.results)
             print(f"総行数: {len(df)}行")
             print(f"例文数: {self.current_sentence_id - 1}文")
+    
+    def load_from_excel(self, input_filename):
+        """Excelファイルから例文を読み込み"""
+        try:
+            print(f"\n=== Excel読み込み開始: {input_filename} ===")
+            
+            # Excelファイル読み込み
+            df = pd.read_excel(input_filename)
+            
+            print(f"📁 読み込み完了: {len(df)}行")
+            print(f"📋 カラム: {list(df.columns)}")
+            
+            # 例文カラムを特定（複数パターンに対応）
+            sentence_column = None
+            possible_columns = ['原文', '例文', 'sentence', 'Sentence', '文', 'text', 'Text']
+            
+            for col in possible_columns:
+                if col in df.columns:
+                    sentence_column = col
+                    break
+            
+            if sentence_column is None:
+                # 最初のカラムを使用
+                sentence_column = df.columns[0]
+                print(f"⚠️ 例文カラム不明。'{sentence_column}'を使用")
+            else:
+                print(f"✅ 例文カラム: '{sentence_column}'")
+            
+            # 各行を処理
+            loaded_count = 0
+            processed_sentences = set()  # 重複チェック用
+            
+            for index, row in df.iterrows():
+                sentence = str(row[sentence_column]).strip()
+                
+                # 空文字やNaNをスキップ
+                if sentence and sentence != 'nan' and len(sentence) > 1:
+                    # 重複チェック
+                    if sentence not in processed_sentences:
+                        self.analyze_and_add_sentence(sentence)
+                        processed_sentences.add(sentence)
+                        loaded_count += 1
+                    # else:
+                    #     print(f"⚠️ 重複スキップ（行{index+1}): '{sentence}'")
+                else:
+                    print(f"⚠️ スキップ（行{index+1}): '{sentence}'")
+            
+            print(f"✅ Excel読み込み完了: {loaded_count}文を処理")
+            return loaded_count
+            
+        except FileNotFoundError:
+            print(f"❌ ファイルが見つかりません: {input_filename}")
+            return 0
+        except Exception as e:
+            print(f"❌ Excel読み込みエラー: {e}")
+            return 0
+
+
+def test_from_excel():
+    """例文入力元.xlsxから読み込んでテスト"""
+    print("=== Excel Generator v2.0 - 例文入力元.xlsxテスト ===")
+    
+    generator = ExcelGeneratorV2()
+    
+    # Excel読み込み
+    loaded_count = generator.load_from_excel("例文入力元.xlsx")
+    
+    if loaded_count > 0:
+        # Excel データ生成
+        generator.generate_excel_data()
+        
+        # サマリー表示
+        generator.show_summary()
+        
+        # Excel保存（入力ファイル名ベースで出力名生成）
+        output_name = "例文入力元_分解結果_v2.xlsx"
+        generator.save_to_excel(output_name)
+        
+        print(f"\n🎉 完了! 出力ファイル: {output_name}")
+    else:
+        print("❌ Excelファイルから例文を読み込めませんでした")
 
 
 def test_v2():
@@ -346,4 +442,15 @@ def test_v2():
 
 
 if __name__ == "__main__":
-    test_v2()
+    import sys
+    
+    # まず例文入力元.xlsxが存在するかチェック
+    if os.path.exists("例文入力元.xlsx"):
+        print("📁 例文入力元.xlsxを発見！自動読み込みします。")
+        test_from_excel()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--excel":
+        # python Excel_Generator_v2.py --excel で例文入力元.xlsxを処理
+        test_from_excel()
+    else:
+        # 通常のテスト
+        test_v2()
