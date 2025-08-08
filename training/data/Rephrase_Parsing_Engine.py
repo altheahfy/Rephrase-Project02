@@ -40,11 +40,230 @@ class RephraseParsingEngine:
         if not sentence:
             return {}
             
+        # 疑問文チェックを最優先
+        if self.is_question(sentence):
+            return self.analyze_question(sentence)
+            
         # 複文の場合、サブクローズ分解を試行
         if self.contains_subclause(sentence):
             return self.analyze_complex_sentence(sentence)
         else:
             return self.analyze_simple_sentence(sentence)
+    
+    def is_question(self, sentence):
+        """疑問文かどうかを判定"""
+        sentence = sentence.strip()
+        
+        # 疑問符で終わる
+        if sentence.endswith('?'):
+            return True
+            
+        # 疑問詞で始まる
+        wh_words = ['what', 'who', 'where', 'when', 'why', 'how', 'which']
+        first_word = sentence.split()[0].lower() if sentence.split() else ""
+        if first_word in wh_words:
+            return True
+            
+        # 助動詞で始まる (Do, Does, Did, Can, Will等)
+        auxiliary_starts = ['do', 'does', 'did', 'can', 'could', 'will', 'would', 'should', 'may', 'might', 'must', 'am', 'is', 'are', 'was', 'were']
+        if first_word in auxiliary_starts:
+            return True
+            
+        return False
+    
+    def analyze_question(self, sentence):
+        """疑問文を解析"""
+        words = sentence.split()
+        if not words:
+            return {}
+            
+        first_word = words[0].lower()
+        
+        # wh疑問文の処理
+        if first_word in ['what', 'who', 'where', 'when', 'why', 'how', 'which']:
+            return self.analyze_wh_question(words)
+            
+        # yes/no疑問文の処理 (Do, Does, Did等で始まる)
+        if first_word in ['do', 'does', 'did']:
+            return self.analyze_do_question(words)
+            
+        # be動詞疑問文の処理 (Are, Is等で始まる)  
+        if first_word in ['am', 'is', 'are', 'was', 'were']:
+            return self.analyze_be_question(words)
+            
+        # modal疑問文の処理 (Can, Will等で始まる)
+        modal_verbs = ['can', 'could', 'will', 'would', 'should', 'may', 'might', 'must']
+        if first_word in modal_verbs:
+            return self.analyze_modal_question(words)
+            
+        # その他は通常解析にフォールバック
+        return self.analyze_simple_sentence(sentence)
+    
+    def analyze_do_question(self, words):
+        """Do/Does/Did疑問文を解析"""
+        if len(words) < 3:
+            return {}
+            
+        aux = words[0]  # Do/Does/Did
+        subject = words[1]  # you/he/she等
+        
+        # 動詞とその他を分離
+        rest = words[2:]
+        main_verb = rest[0] if rest else ""
+        remaining_text = " ".join(rest[1:]) if len(rest) > 1 else ""
+        
+        result = {
+            'Aux': [{'value': aux, 'type': 'auxiliary', 'rule_id': 'do-question'}],
+            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'do-question'}]
+        }
+        
+        if main_verb:
+            result['V'] = [{'value': main_verb, 'type': 'verb', 'rule_id': 'do-question'}]
+            
+        # 残りのテキストを解析して適切なスロットに分類
+        if remaining_text:
+            slot_info = self.classify_remaining_phrase(remaining_text)
+            result[slot_info['slot']] = [{'value': slot_info['value'], 'type': slot_info['type'], 'rule_id': 'do-question'}]
+            
+        return result
+    
+    def classify_remaining_phrase(self, phrase):
+        """フレーズを適切なスロット（O1, M1, M2, M3等）に分類"""
+        phrase = phrase.strip().rstrip('?')  # 疑問符を除去
+        
+        # 時間表現のパターン
+        time_patterns = [
+            'every day', 'every morning', 'every evening', 'every week', 'every month', 'every year',
+            'yesterday', 'today', 'tomorrow', 'now', 'then', 'always', 'never', 'often', 'sometimes',
+            'usually', 'frequently', 'rarely', 'daily', 'weekly', 'monthly', 'yearly'
+        ]
+        
+        # 場所表現のパターン  
+        place_patterns = [
+            'at home', 'at school', 'at work', 'in the park', 'in the city', 'there', 'here',
+            'downtown', 'upstairs', 'downstairs', 'outside', 'inside'
+        ]
+        
+        # 方法・手段表現のパターン
+        manner_patterns = [
+            'quickly', 'slowly', 'carefully', 'well', 'fast', 'hard', 'softly', 'loudly',
+            'by car', 'by train', 'by bus', 'on foot'
+        ]
+        
+        phrase_lower = phrase.lower()
+        
+        # 時間表現チェック
+        for time_expr in time_patterns:
+            if time_expr in phrase_lower:
+                return {'slot': 'M3', 'value': phrase, 'type': 'time_adverb'}
+                
+        # 場所表現チェック
+        for place_expr in place_patterns:
+            if place_expr in phrase_lower:
+                return {'slot': 'M2', 'value': phrase, 'type': 'place_adverb'}
+                
+        # 方法表現チェック  
+        for manner_expr in manner_patterns:
+            if manner_expr in phrase_lower:
+                return {'slot': 'M1', 'value': phrase, 'type': 'manner_adverb'}
+        
+        # 頻度・程度副詞の判定
+        if any(word in phrase_lower for word in ['very', 'quite', 'really', 'extremely', 'totally']):
+            return {'slot': 'M1', 'value': phrase, 'type': 'degree_adverb'}
+        
+        # デフォルトは目的語として扱う
+        return {'slot': 'O1', 'value': phrase, 'type': 'object'}
+    
+    def analyze_wh_question(self, words):
+        """wh疑問文を解析"""
+        if len(words) < 2:
+            return {}
+            
+        wh_word = words[0]
+        rest = words[1:]
+        
+        # wh-wordの後がdo/did/doesの場合
+        if rest and rest[0].lower() in ['do', 'does', 'did']:
+            if len(rest) >= 3:
+                aux = rest[0]
+                subject = rest[1] 
+                verb = rest[2]
+                objects = " ".join(rest[3:]) if len(rest) > 3 else ""
+                
+                result = {
+                    'Aux': [{'value': aux, 'type': 'auxiliary', 'rule_id': 'wh-question'}],
+                    'S': [{'value': subject, 'type': 'subject', 'rule_id': 'wh-question'}],
+                    'V': [{'value': verb, 'type': 'verb', 'rule_id': 'wh-question'}]
+                }
+                
+                # wh-wordがどのスロットに対応するかを判定
+                wh_slot = self.determine_wh_slot(wh_word.lower())
+                result[wh_slot] = [{'value': wh_word, 'type': 'wh-word', 'rule_id': 'wh-question'}]
+                
+                if objects:
+                    # wh-wordが目的語でない場合のみO1を追加
+                    if wh_slot not in ['O1', 'O2']:
+                        result['O1'] = [{'value': objects, 'type': 'object', 'rule_id': 'wh-question'}]
+                        
+                return result
+        
+        # その他の場合は基本解析
+        return self.analyze_simple_sentence(" ".join(words))
+    
+    def determine_wh_slot(self, wh_word):
+        """wh-wordがどのスロットに対応するかを判定"""
+        wh_slot_map = {
+            'what': 'O1',
+            'who': 'S', 
+            'where': 'M1',
+            'when': 'M1',
+            'why': 'M1',
+            'how': 'M1',
+            'which': 'O1'
+        }
+        return wh_slot_map.get(wh_word, 'O1')
+    
+    def analyze_be_question(self, words):
+        """be動詞疑問文を解析"""
+        if len(words) < 3:
+            return {}
+            
+        be_verb = words[0]
+        subject = words[1]
+        complement = " ".join(words[2:])
+        
+        return {
+            'Aux': [{'value': be_verb, 'type': 'be_auxiliary', 'rule_id': 'be-question'}],
+            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'be-question'}],
+            'C': [{'value': complement, 'type': 'complement', 'rule_id': 'be-question'}] if complement else []
+        }
+    
+    def analyze_modal_question(self, words):
+        """modal動詞疑問文を解析"""
+        if len(words) < 3:
+            return {}
+            
+        modal = words[0]
+        subject = words[1]
+        verb_and_rest = " ".join(words[2:])
+        
+        # 動詞部分を分離
+        rest_words = words[2:]
+        main_verb = rest_words[0] if rest_words else ""
+        objects = " ".join(rest_words[1:]) if len(rest_words) > 1 else ""
+        
+        result = {
+            'Aux': [{'value': modal, 'type': 'modal', 'rule_id': 'modal-question'}],
+            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'modal-question'}]
+        }
+        
+        if main_verb:
+            result['V'] = [{'value': main_verb, 'type': 'verb', 'rule_id': 'modal-question'}]
+            
+        if objects:
+            result['O1'] = [{'value': objects, 'type': 'object', 'rule_id': 'modal-question'}]
+            
+        return result
     
     def contains_subclause(self, sentence):
         """サブクローズ（複文）を含むかチェック"""
