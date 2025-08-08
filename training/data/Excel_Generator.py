@@ -1,12 +1,12 @@
-# ===== Rephrase Excel Generator =====
-# 英文を解析してExcel形式で出力（batch.py用）
+# ===== Rephrase Excel Generator v2.0 =====
+# 動的Slot_display_order対応版
 
 import pandas as pd
 import os
 from Rephrase_Parsing_Engine import RephraseParsingEngine
 
-class ExcelGenerator:
-    """Rephrase解析結果をExcel形式で出力"""
+class ExcelGeneratorV2:
+    """Rephrase解析結果をExcel形式で出力（動的絶対順序対応）"""
     
     def __init__(self):
         self.engine = RephraseParsingEngine()
@@ -16,9 +16,65 @@ class ExcelGenerator:
         
         # V_group_keyごとの例文データを保持
         self.vgroup_data = {}  # {v_group_key: [sentence_data, ...]}
+    
+    def analyze_and_add_sentence(self, sentence, v_group_key=None):
+        """文を解析してV_group_keyデータに蓄積（Step 1）"""
+        sentence = sentence.strip()
+        if not sentence:
+            return
+            
+        print(f"\n=== Step 1 解析中: {sentence} ===")
         
-        # 従来の固定順序は削除（動的計算に変更）
-        # self.slot_display_orders = {...} ← 削除
+        # 品詞分解実行
+        slots = self.engine.analyze_sentence(sentence)
+        
+        if not slots:
+            print(f"❌ 解析失敗: {sentence}")
+            return
+            
+        # V_group_key生成
+        if not v_group_key:
+            verb = self.extract_main_verb(slots)
+            v_group_key = verb if verb else f"unknown_{self.current_sentence_id}"
+            
+        # V_group_keyデータに蓄積
+        if v_group_key not in self.vgroup_data:
+            self.vgroup_data[v_group_key] = []
+            
+        sentence_data = {
+            'sentence': sentence,
+            'slots': slots,
+            'example_id': f"ex{self.current_sentence_id:03d}",
+            'construction_id': self.current_construction_id
+        }
+        
+        self.vgroup_data[v_group_key].append(sentence_data)
+        
+        print(f"✅ Step 1完了: V_group_key='{v_group_key}' に蓄積")
+        for slot, candidates in slots.items():
+            if candidates:
+                candidate = candidates[0]
+                print(f"  {slot}: {candidate['value']}")
+        
+        self.current_sentence_id += 1
+        self.current_construction_id += 1
+    
+    def generate_excel_data(self):
+        """V_group_keyデータからExcelデータを生成（Step 2）"""
+        print(f"\n=== Step 2: Excel データ生成開始 ===")
+        
+        for v_group_key, sentences in self.vgroup_data.items():
+            print(f"\n--- V_group_key: '{v_group_key}' 処理中 ---")
+            
+            # この V_group_key の絶対順序を計算
+            slot_orders = self.calculate_slot_display_orders(v_group_key)
+            print(f"絶対順序: {slot_orders}")
+            
+            # 各例文をExcelデータに変換
+            for sentence_data in sentences:
+                self.convert_to_excel_rows(sentence_data, v_group_key, slot_orders)
+        
+        print(f"\n✅ Step 2完了: 総 {len(self.results)} 行生成")
     
     def calculate_slot_display_orders(self, v_group_key):
         """V_group_key内の全例文からSlot_display_orderを動的計算"""
@@ -69,7 +125,7 @@ class ExcelGenerator:
         return slot_orders
     
     def find_phrase_position(self, words, phrase_words, start_pos=0):
-        """文中でのフレーズの位置を検索"""
+        """文中でのフレーズの位置を検索（改良版）"""
         if not phrase_words:
             return -1
             
@@ -78,33 +134,34 @@ class ExcelGenerator:
             if words[i:i+len(phrase_words)] == phrase_words:
                 return i
             
-            # 部分一致チェック（大文字小文字無視）
-            if all(w1.lower() == w2.lower() for w1, w2 in zip(words[i:i+len(phrase_words)], phrase_words)):
+            # 部分一致チェック（大文字小文字無視、句読点除去）
+            normalized_words = [w.lower().rstrip('.,!?:;') for w in words[i:i+len(phrase_words)]]
+            normalized_phrase = [w.lower().rstrip('.,!?:;') for w in phrase_words]
+            
+            if normalized_words == normalized_phrase:
+                return i
+                
+            # 単語の一部が一致する場合（"information?"と"information"など）
+            if all(w1.lower().rstrip('.,!?:;').startswith(w2.lower().rstrip('.,!?:;')) or 
+                   w2.lower().rstrip('.,!?:;').startswith(w1.lower().rstrip('.,!?:;'))
+                   for w1, w2 in zip(words[i:i+len(phrase_words)], phrase_words)):
+                return i
+        
+        # どうしても見つからない場合、単語単位で検索
+        target_word = phrase_words[0].lower().rstrip('.,!?:;')
+        for i, word in enumerate(words):
+            if word.lower().rstrip('.,!?:;') == target_word:
                 return i
         
         return -1  # 見つからない場合
-        """文を解析してExcelデータに追加"""
-        sentence = sentence.strip()
-        if not sentence:
-            return
-            
-        print(f"\n=== 解析中: {sentence} ===")
+    
+    def convert_to_excel_rows(self, sentence_data, v_group_key, slot_orders):
+        """1つの例文をExcel行データに変換"""
+        sentence = sentence_data['sentence']
+        slots = sentence_data['slots']
+        example_id = sentence_data['example_id']
+        construction_id = sentence_data['construction_id']
         
-        # 品詞分解実行
-        slots = self.engine.analyze_sentence(sentence)
-        
-        if not slots:
-            print(f"❌ 解析失敗: {sentence}")
-            return
-            
-        # 例文IDとV_group_key生成
-        example_id = f"ex{self.current_sentence_id:03d}"
-        if not v_group_key:
-            # 動詞から推測
-            verb = self.extract_main_verb(slots)
-            v_group_key = verb if verb else "unknown"
-            
-        # 各スロットをExcel行に変換
         row_count = 0
         for slot, candidates in slots.items():
             if not candidates:
@@ -114,9 +171,12 @@ class ExcelGenerator:
             slot_phrase = candidate['value']
             phrase_type = self.determine_phrase_type(candidate)
             
+            # 絶対順序を取得
+            slot_display_order = slot_orders.get(slot, 99)  # 見つからない場合は99
+            
             # メインスロット行
             main_row = {
-                '構文ID': self.current_construction_id,
+                '構文ID': construction_id,
                 '例文ID': example_id,
                 'V_group_key': v_group_key,
                 '原文': sentence if row_count == 0 else None,
@@ -125,7 +185,7 @@ class ExcelGenerator:
                 'PhraseType': phrase_type,
                 'SubslotID': None,
                 'SubslotElement': None,
-                'Slot_display_order': self.slot_display_orders.get(slot, 10),
+                'Slot_display_order': slot_display_order,
                 'display_order': 0,
                 'QuestionType': self.get_question_type(slot_phrase)
             }
@@ -133,44 +193,75 @@ class ExcelGenerator:
             self.results.append(main_row)
             row_count += 1
             
-            # サブスロット処理（複文の場合）
+            # サブスロット処理
             if 'subslots' in candidate and candidate['subslots']:
                 for sub_slot, sub_value in candidate['subslots'].items():
                     sub_row = {
-                        '構文ID': self.current_construction_id,
+                        '構文ID': construction_id,
                         '例文ID': example_id,
                         'V_group_key': v_group_key,
                         '原文': None,
-                        'Slot': slot,  # 親スロットと同じ
-                        'SlotPhrase': slot_phrase,  # 親と同じ
+                        'Slot': slot,
+                        'SlotPhrase': slot_phrase,
                         'PhraseType': 'clause',
                         'SubslotID': sub_slot,
                         'SubslotElement': sub_value,
-                        'Slot_display_order': self.slot_display_orders.get(slot, 10),
+                        'Slot_display_order': slot_display_order,
                         'display_order': 0,
                         'QuestionType': None
                     }
                     
                     self.results.append(sub_row)
                     row_count += 1
-        
-        # 結果表示
-        print(f"✅ 解析完了: {row_count}行追加")
-        for slot, candidates in slots.items():
-            if candidates:
-                candidate = candidates[0]
-                print(f"  {slot}: {candidate['value']}")
-                if 'subslots' in candidate and candidate['subslots']:
-                    for sub_slot, sub_value in candidate['subslots'].items():
-                        print(f"    └─ {sub_slot}: {sub_value}")
-        
-        self.current_sentence_id += 1
-        self.current_construction_id += 1
     
     def extract_main_verb(self, slots):
-        """メイン動詞を抽出"""
+        """メイン動詞を抽出（改良版）"""
+        
+        # 1. まず通常のVスロットをチェック
         if 'V' in slots and slots['V']:
-            return slots['V'][0]['value']
+            verb_candidate = slots['V'][0]['value']
+            
+            # 動詞らしい単語かチェック
+            if self.looks_like_verb(verb_candidate):
+                return verb_candidate
+        
+        # 2. Auxスロットもチェック（助動詞の後に動詞がある可能性）
+        if 'Aux' in slots and slots['Aux']:
+            aux_candidate = slots['Aux'][0]['value']
+            if self.looks_like_verb(aux_candidate):
+                return aux_candidate
+        
+        # 3. O1から動詞を探す（解析ミスの場合）
+        if 'O1' in slots and slots['O1']:
+            o1_text = slots['O1'][0]['value']
+            verb_from_o1 = self.extract_verb_from_text(o1_text)
+            if verb_from_o1:
+                return verb_from_o1
+        
+        # 4. 全文から動詞を探す（最後の手段）
+        return None
+    
+    def looks_like_verb(self, word):
+        """動詞らしい単語かチェック"""
+        # 明らかに動詞でない単語を除外
+        non_verbs = ['do', 'you', 'i', 'he', 'she', 'they', 'we', 'what', 'where', 'when', 'why', 'how', 'who']
+        if word.lower() in non_verbs:
+            return False
+            
+        # 一般的な動詞パターン
+        common_verbs = ['run', 'walk', 'think', 'believe', 'know', 'go', 'come', 'give', 'take', 'make', 'see', 'hear']
+        if word.lower() in common_verbs:
+            return True
+            
+        # その他は基本的にTrueとする（保守的アプローチ）
+        return True
+    
+    def extract_verb_from_text(self, text):
+        """テキストから動詞を抽出"""
+        words = text.split()
+        for word in words:
+            if self.looks_like_verb(word):
+                return word
         return None
     
     def determine_phrase_type(self, candidate):
@@ -194,7 +285,7 @@ class ExcelGenerator:
             return 'wh-word'
         return None
     
-    def save_to_excel(self, output_filename="新規例文入力元.xlsx"):
+    def save_to_excel(self, output_filename="新規例文入力元_v2.xlsx"):
         """Excel形式で保存"""
         if not self.results:
             print("❌ 保存するデータがありません")
@@ -203,7 +294,7 @@ class ExcelGenerator:
         # DataFrameに変換
         df = pd.DataFrame(self.results)
         
-        # 列順序を調整（既存フォーマットに合わせる）
+        # 列順序を調整
         column_order = [
             '構文ID', '例文ID', 'V_group_key', '原文', 'Slot', 'SlotPhrase', 
             'PhraseType', 'SubslotID', 'SubslotElement', 'Slot_display_order', 
@@ -224,212 +315,142 @@ class ExcelGenerator:
             print(f"✅ Excel保存完了: {output_filename}")
             print(f"📊 総行数: {len(df)}行")
             print(f"📝 例文数: {self.current_sentence_id - 1}文")
+            print(f"🔗 V_group数: {len(self.vgroup_data)}個")
         except Exception as e:
             print(f"❌ Excel保存エラー: {e}")
     
     def show_summary(self):
         """解析結果サマリー表示"""
-        if not self.results:
-            print("解析データがありません")
-            return
-            
-        df = pd.DataFrame(self.results)
-        
         print("\n=== 解析結果サマリー ===")
-        print(f"総行数: {len(df)}行")
-        print(f"例文数: {self.current_sentence_id - 1}文")
-        print(f"スロット種類: {df['Slot'].nunique()}種類")
-        print("スロット分布:")
-        print(df['Slot'].value_counts().to_string())
-
-
-def interactive_mode():
-    """対話式モード"""
-    print("=== Rephrase Excel Generator ===")
-    print("英文を入力すると品詞分解してExcel形式で蓄積します")
-    print("'save'でExcel保存、'quit'で終了")
-    
-    generator = ExcelGenerator()
-    
-    while True:
-        user_input = input("\n英文を入力: ").strip()
-        
-        if user_input.lower() == 'quit':
-            break
-        elif user_input.lower() == 'save':
-            generator.save_to_excel()
-        elif user_input.lower() == 'summary':
-            generator.show_summary()
-        elif user_input:
-            generator.analyze_and_add_sentence(user_input)
-        else:
-            print("英文を入力してください")
-    
-    # 終了時に自動保存確認
-    if generator.results:
-        save_confirm = input("\n終了前にExcelファイルを保存しますか？ (y/N): ")
-        if save_confirm.lower() == 'y':
-            generator.save_to_excel()
-
-
-def bulk_file_mode():
-    """一括ファイル処理モード"""
-    print("=== 一括ファイル処理モード ===")
-    print("テキストファイル(.txt)またはExcelファイル(.xlsx)から英文を一括読み込みして処理します")
-    
-    # ファイル名入力
-    while True:
-        filename = input("\n英文リストファイル名を入力 (例: sentences.txt または 例文入力元.xlsx): ").strip()
-        if not filename:
-            print("ファイル名を入力してください")
-            continue
+        print(f"V_group数: {len(self.vgroup_data)}個")
+        for v_key, sentences in self.vgroup_data.items():
+            print(f"  {v_key}: {len(sentences)}文")
             
-        if not os.path.exists(filename):
-            print(f"❌ ファイルが見つかりません: {filename}")
-            
-            # 新規作成確認
-            create_confirm = input(f"新規ファイル '{filename}' を作成しますか？ (y/N): ")
-            if create_confirm.lower() == 'y':
-                sample_content = """# 英文リスト（1行1文）
-# '#'で始まる行はコメントとして無視されます
-# 空行も無視されます
-
-I run fast.
-She is happy.
-I will go tomorrow.
-I could have done it better.
-The book is written by John.
-I think that he is smart.
-She believes that we are ready.
-What did you buy yesterday?
-Where did she go?
-Who wrote this book?"""
-                
-                try:
-                    with open(filename, 'w', encoding='utf-8') as f:
-                        f.write(sample_content)
-                    print(f"✅ サンプルファイルを作成しました: {filename}")
-                    print("ファイルを編集してから再実行してください")
-                    return
-                except Exception as e:
-                    print(f"❌ ファイル作成エラー: {e}")
-                    return
-            continue
-        else:
-            break
+        if self.results:
+            df = pd.DataFrame(self.results)
+            print(f"総行数: {len(df)}行")
+            print(f"例文数: {self.current_sentence_id - 1}文")
     
-    # ファイル読み込み・処理
-    try:
-        # ファイル拡張子で処理方法を判定
-        if filename.lower().endswith(('.xlsx', '.xls')):
-            # Excelファイルの場合
-            print(f"📊 Excelファイルを読み込み中: {filename}")
-            df = pd.read_excel(filename)
+    def load_from_excel(self, input_filename):
+        """Excelファイルから例文を読み込み"""
+        try:
+            print(f"\n=== Excel読み込み開始: {input_filename} ===")
             
-            # '原文'列から英文を抽出
-            if '原文' in df.columns:
-                excel_sentences = df['原文'].dropna().unique()
-                sentences = [(i+1, sent) for i, sent in enumerate(excel_sentences) if sent.strip()]
+            # Excelファイル読み込み
+            df = pd.read_excel(input_filename)
+            
+            print(f"📁 読み込み完了: {len(df)}行")
+            print(f"📋 カラム: {list(df.columns)}")
+            
+            # 例文カラムを特定（複数パターンに対応）
+            sentence_column = None
+            possible_columns = ['原文', '例文', 'sentence', 'Sentence', '文', 'text', 'Text']
+            
+            for col in possible_columns:
+                if col in df.columns:
+                    sentence_column = col
+                    break
+            
+            if sentence_column is None:
+                # 最初のカラムを使用
+                sentence_column = df.columns[0]
+                print(f"⚠️ 例文カラム不明。'{sentence_column}'を使用")
             else:
-                print("❌ Excelファイルに '原文' 列が見つかりません")
-                print("利用可能な列:", df.columns.tolist())
-                return
-        else:
-            # テキストファイルの場合
-            with open(filename, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
+                print(f"✅ 例文カラム: '{sentence_column}'")
             
-            # 英文抽出（コメントと空行を除外）
-            sentences = []
-            for line_num, line in enumerate(lines, 1):
-                line = line.strip()
-                if line and not line.startswith('#'):
-                    sentences.append((line_num, line))
-        
-        if not sentences:
-            print(f"❌ {filename} に有効な英文が見つかりません")
-            return
+            # 各行を処理
+            loaded_count = 0
+            processed_sentences = set()  # 重複チェック用
             
-        print(f"\n📖 {len(sentences)}個の英文を発見しました:")
-        for i, (line_num, sentence) in enumerate(sentences[:5], 1):
-            print(f"  {i}. {sentence}")
-        if len(sentences) > 5:
-            print(f"  ... 他{len(sentences) - 5}個")
-        
-        # 処理確認
-        process_confirm = input(f"\n{len(sentences)}個の英文を一括処理しますか？ (y/N): ")
-        if process_confirm.lower() != 'y':
-            print("処理をキャンセルしました")
-            return
-        
-        # 一括処理実行
-        generator = ExcelGenerator()
-        
-        print(f"\n=== 一括処理開始 ===")
-        success_count = 0
-        error_count = 0
-        
-        for line_num, sentence in sentences:
-            try:
-                print(f"\n[{success_count + error_count + 1}/{len(sentences)}] Line {line_num}: {sentence}")
-                generator.analyze_and_add_sentence(sentence)
-                success_count += 1
-            except Exception as e:
-                print(f"❌ エラー (Line {line_num}): {e}")
-                error_count += 1
-        
-        # 結果サマリー
-        print(f"\n=== 処理完了 ===")
-        print(f"✅ 成功: {success_count}個")
-        print(f"❌ エラー: {error_count}個")
-        
-        if success_count > 0:
-            generator.show_summary()
+            for index, row in df.iterrows():
+                sentence = str(row[sentence_column]).strip()
+                
+                # 空文字やNaNをスキップ
+                if sentence and sentence != 'nan' and len(sentence) > 1:
+                    # 重複チェック
+                    if sentence not in processed_sentences:
+                        self.analyze_and_add_sentence(sentence)
+                        processed_sentences.add(sentence)
+                        loaded_count += 1
+                    # else:
+                    #     print(f"⚠️ 重複スキップ（行{index+1}): '{sentence}'")
+                else:
+                    print(f"⚠️ スキップ（行{index+1}): '{sentence}'")
             
-            # 自動保存
-            output_filename = f"一括処理_{filename.replace('.txt', '')}_結果.xlsx"
-            generator.save_to_excel(output_filename)
-        
-    except Exception as e:
-        print(f"❌ ファイル処理エラー: {e}")
+            print(f"✅ Excel読み込み完了: {loaded_count}文を処理")
+            return loaded_count
+            
+        except FileNotFoundError:
+            print(f"❌ ファイルが見つかりません: {input_filename}")
+            return 0
+        except Exception as e:
+            print(f"❌ Excel読み込みエラー: {e}")
+            return 0
 
 
-def batch_mode():
-    """バッチ処理モード（テスト用）"""
+def test_from_excel():
+    """例文入力元.xlsxから読み込んでテスト"""
+    print("=== Excel Generator v2.0 - 例文入力元.xlsxテスト ===")
+    
+    generator = ExcelGeneratorV2()
+    
+    # Excel読み込み
+    loaded_count = generator.load_from_excel("例文入力元.xlsx")
+    
+    if loaded_count > 0:
+        # Excel データ生成
+        generator.generate_excel_data()
+        
+        # サマリー表示
+        generator.show_summary()
+        
+        # Excel保存（入力ファイル名ベースで出力名生成）
+        output_name = "例文入力元_分解結果_v2.xlsx"
+        generator.save_to_excel(output_name)
+        
+        print(f"\n🎉 完了! 出力ファイル: {output_name}")
+    else:
+        print("❌ Excelファイルから例文を読み込めませんでした")
+
+
+def test_v2():
+    """バージョン2テスト"""
+    print("=== Excel Generator v2.0 テスト ===")
+    
+    generator = ExcelGeneratorV2()
+    
+    # テストデータ
     test_sentences = [
         "I run fast",
-        "She is happy", 
-        "I will go",
-        "I could have done it",
-        "The book is written by John",
+        "Do you run every day?",
         "I think that he is smart",
-        "She believes that we are ready",
-        "I know what he thinks",
-        "What did you buy?",
-        "Where did she go?"
+        "What did you buy?"
     ]
     
-    generator = ExcelGenerator()
-    
-    print("=== バッチ処理モード ===")
+    # Step 1: 全例文を解析・蓄積
     for sentence in test_sentences:
         generator.analyze_and_add_sentence(sentence)
     
+    # Step 2: Excel データ生成
+    generator.generate_excel_data()
+    
+    # サマリー表示
     generator.show_summary()
-    generator.save_to_excel("テスト用例文入力元.xlsx")
+    
+    # Excel保存
+    generator.save_to_excel("テスト_v2_絶対順序対応.xlsx")
 
 
 if __name__ == "__main__":
-    print("モードを選択してください:")
-    print("1: 対話式モード（英文を手動入力）")
-    print("2: バッチ処理モード（テストデータで自動実行）")
-    print("3: 一括ファイル処理モード（txtファイルから84個でも一気に処理）★推奨")
+    import sys
     
-    mode = input("モード番号 (1, 2, or 3): ").strip()
-    
-    if mode == "2":
-        batch_mode()
-    elif mode == "3":
-        bulk_file_mode()
+    # まず例文入力元.xlsxが存在するかチェック
+    if os.path.exists("例文入力元.xlsx"):
+        print("📁 例文入力元.xlsxを発見！自動読み込みします。")
+        test_from_excel()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--excel":
+        # python Excel_Generator_v2.py --excel で例文入力元.xlsxを処理
+        test_from_excel()
     else:
-        interactive_mode()
+        # 通常のテスト
+        test_v2()

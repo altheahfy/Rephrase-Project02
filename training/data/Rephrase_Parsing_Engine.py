@@ -161,6 +161,10 @@ class RephraseParsingEngine:
         for place_expr in place_patterns:
             if place_expr in phrase_lower:
                 return {'slot': 'M2', 'value': phrase, 'type': 'place_adverb'}
+        
+        # 前置詞句による起点・方向・場所表現のチェック
+        if phrase_lower.startswith(('from ', 'to ', 'in ', 'at ', 'on ', 'into ', 'onto ', 'toward ', 'towards ')):
+            return {'slot': 'M2', 'value': phrase, 'type': 'prepositional_phrase'}
                 
         # 方法表現チェック  
         for manner_expr in manner_patterns:
@@ -388,6 +392,12 @@ class RephraseParsingEngine:
         if modal_result:
             slots.update(modal_result)
             return slots
+        
+        # 現在時制完了パターンの検出
+        perfect_result = self.detect_perfect_pattern(words)
+        if perfect_result:
+            slots.update(perfect_result)
+            return slots
             
         # 受動態パターンの検出  
         passive_result = self.detect_passive_pattern(words)
@@ -431,6 +441,34 @@ class RephraseParsingEngine:
                         'Aux': [{'value': word, 'type': 'modal_verb', 'rule_id': 'modal-basic'}],
                         'V': [{'value': words[i+1], 'type': 'base_verb', 'rule_id': 'modal-basic'}]
                     }
+        
+        return None
+    
+    def detect_perfect_pattern(self, words):
+        """現在時制完了パターンを検出 (has/have + past participle)"""
+        have_verbs = ["have", "has", "had"]
+        
+        for i, word in enumerate(words):
+            if word.lower() in have_verbs and i + 1 < len(words):
+                # have/has + past participle パターンを検出
+                next_word = words[i+1]
+                if self.looks_like_past_participle(next_word):
+                    subject = " ".join(words[:i]) if i > 0 else "I"
+                    
+                    # 残りの部分を解析して修飾語を分離
+                    remaining_words = words[i+2:]
+                    modifiers = self.extract_modifiers_from_words(remaining_words)
+                    
+                    result = {
+                        'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
+                        'Aux': [{'value': word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
+                        'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
+                    }
+                    
+                    # 修飾語を追加
+                    result.update(modifiers)
+                    
+                    return result
         
         return None
     
@@ -505,6 +543,63 @@ class RephraseParsingEngine:
             result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'basic-svo'}]
             
         return result
+    
+    def extract_modifiers_from_words(self, words):
+        """単語リストから修飾語を抽出してスロットに分類"""
+        if not words:
+            return {}
+            
+        modifiers = {}
+        remaining_phrase = " ".join(words)
+        
+        # 複数の修飾語が含まれている可能性を考慮して分析
+        phrases_to_classify = []
+        current_phrase = []
+        
+        i = 0
+        while i < len(words):
+            word = words[i]
+            current_phrase.append(word)
+            
+            # 前置詞句の開始を検出 (from, to, in, at, on, etc.)
+            if word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since']:
+                # 前置詞句の終わりを探す（次の前置詞や文末まで）
+                phrase_end = i + 1
+                while phrase_end < len(words) and words[phrase_end].lower() not in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since']:
+                    phrase_end += 1
+                
+                # 前置詞句全体を取得
+                prep_phrase = " ".join(words[i:phrase_end])
+                phrases_to_classify.append(prep_phrase)
+                current_phrase = []
+                i = phrase_end
+                continue
+                
+            # 副詞の検出
+            elif word.lower() in ['quickly', 'slowly', 'carefully', 'quietly', 'loudly', 'well', 'badly', 'fast', 'hard', 'early', 'late']:
+                phrases_to_classify.append(word)
+                current_phrase = []
+                
+            i += 1
+        
+        # 残りの語句があれば追加
+        if current_phrase:
+            phrases_to_classify.append(" ".join(current_phrase))
+        
+        # 各フレーズを分類
+        for phrase in phrases_to_classify:
+            if phrase.strip():
+                slot_info = self.classify_remaining_phrase(phrase.strip())
+                slot = slot_info['slot']
+                if slot not in modifiers:
+                    modifiers[slot] = []
+                modifiers[slot].append({
+                    'value': slot_info['value'],
+                    'type': slot_info['type'],
+                    'rule_id': 'present-perfect-modifier'
+                })
+        
+        return modifiers
 
 
 def test_parsing_engine():
