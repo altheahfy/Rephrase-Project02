@@ -227,14 +227,99 @@ class RephraseParsingEngine:
             
         # 残りのテキストを解析して適切なスロットに分類
         if remaining_text:
-            slot_info = self.classify_remaining_phrase(remaining_text)
-            result[slot_info['slot']] = [{'value': slot_info['value'], 'type': slot_info['type'], 'rule_id': 'do-question'}]
+            # please分離処理
+            main_part, please_part = self.separate_please_from_phrase(remaining_text)
+            
+            # メイン部分を分類
+            if main_part:
+                slot_info = self.classify_remaining_phrase(main_part)
+                result[slot_info['slot']] = [{'value': slot_info['value'], 'type': slot_info['type'], 'rule_id': 'do-question'}]
+            
+            # please部分があれば追加
+            if please_part:
+                result['M3'] = [{'value': please_part, 'type': 'polite_expression', 'rule_id': 'do-question'}]
             
         return result
+    
+    def separate_please_from_phrase(self, phrase):
+        """フレーズからpleaseを分離"""
+        phrase = phrase.strip()
+        phrase_lower = phrase.lower()
+        
+        # 文末のpleaseを検出
+        if phrase_lower.endswith(' please?') or phrase_lower.endswith(' please'):
+            please_pos = phrase_lower.rfind(' please')
+            main_part = phrase[:please_pos].strip()
+            return main_part, 'please'
+        elif phrase_lower == 'please' or phrase_lower == 'please?':
+            return '', 'please'
+        
+        return phrase, ''
+    
+    def classify_verb_complement(self, verb, complement_text):
+        """動詞の補語を適切に分類（句動詞の粒子、方向副詞等を考慮）"""
+        complement_text = complement_text.strip().rstrip('?')
+        complement_words = complement_text.split()
+        
+        if not complement_words:
+            return {'slot': '', 'value': '', 'type': ''}
+        
+        # 方向副詞のリスト
+        directional_adverbs = [
+            'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'away', 'back',
+            'forward', 'backward', 'upward', 'downward', 'inside', 'outside', 
+            'upstairs', 'downstairs', 'ahead', 'behind', 'here', 'there'
+        ]
+        
+        # 単一の方向副詞の場合
+        if len(complement_words) == 1 and complement_words[0].lower() in directional_adverbs:
+            return {'slot': 'M2', 'value': complement_text, 'type': 'directional_adverb'}
+        
+        # 句動詞パターン（verb + particle）の判定
+        phrasal_verbs = {
+            'sit': ['down', 'up'],
+            'stand': ['up', 'down'],
+            'wake': ['up'],
+            'get': ['up', 'down', 'in', 'out', 'on', 'off'],
+            'come': ['in', 'out', 'up', 'down', 'back'],
+            'go': ['out', 'in', 'up', 'down', 'away', 'back'],
+            'put': ['on', 'off', 'down', 'up'],
+            'take': ['off', 'on', 'out', 'up', 'down'],
+            'turn': ['on', 'off', 'up', 'down'],
+            'pick': ['up', 'out'],
+            'look': ['up', 'down', 'out', 'in']
+        }
+        
+        verb_lower = verb.lower()
+        first_word = complement_words[0].lower()
+        
+        # 句動詞+目的語パターン（例：turn on the light）
+        if (verb_lower in phrasal_verbs and 
+            first_word in phrasal_verbs[verb_lower] and 
+            len(complement_words) > 1):
+            particle = complement_words[0]
+            object_part = " ".join(complement_words[1:])
+            return {
+                'slot': 'compound',  # 複合要素を示すフラグ
+                'particle': {'slot': 'M2', 'value': particle, 'type': 'phrasal_verb_particle'},
+                'object': {'slot': 'O1', 'value': object_part, 'type': 'object'}
+            }
+        
+        # 単純な句動詞粒子
+        if verb_lower in phrasal_verbs and first_word in phrasal_verbs[verb_lower] and len(complement_words) == 1:
+            return {'slot': 'M2', 'value': complement_text, 'type': 'phrasal_verb_particle'}
+        
+        # 前置詞句の場合
+        if any(complement_text.lower().startswith(prep + ' ') for prep in ['to', 'from', 'in', 'at', 'by', 'with', 'for']):
+            return {'slot': 'M2', 'value': complement_text, 'type': 'prepositional_phrase'}
+        
+        # デフォルトは目的語
+        return {'slot': 'O1', 'value': complement_text, 'type': 'object'}
     
     def classify_remaining_phrase(self, phrase):
         """フレーズを適切なスロット（O1, M1, M2, M3等）に分類"""
         phrase = phrase.strip().rstrip('?')  # 疑問符を除去
+        phrase_lower = phrase.lower()
         
         # 時間表現のパターン
         time_patterns = [
@@ -354,23 +439,52 @@ class RephraseParsingEngine:
             
         modal = words[0]
         subject = words[1]
-        verb_and_rest = " ".join(words[2:])
         
         # 動詞部分を分離
         rest_words = words[2:]
-        main_verb = rest_words[0] if rest_words else ""
-        objects = " ".join(rest_words[1:]) if len(rest_words) > 1 else ""
         
-        result = {
-            'Aux': [{'value': modal, 'type': 'modal', 'rule_id': 'modal-question'}],
-            'S': [{'value': subject, 'type': 'subject', 'rule_id': 'modal-question'}]
-        }
-        
-        if main_verb:
-            result['V'] = [{'value': main_verb, 'type': 'verb', 'rule_id': 'modal-question'}]
+        # "Would you please verb..." パターンの処理
+        if rest_words and rest_words[0].lower() == 'please' and len(rest_words) > 1:
+            verb_part, remaining_text = self.extract_phrasal_verb(rest_words[1:])
             
-        if objects:
-            result['O1'] = [{'value': objects, 'type': 'object', 'rule_id': 'modal-question'}]
+            result = {
+                'Aux': [{'value': modal, 'type': 'modal', 'rule_id': 'modal-question'}],
+                'S': [{'value': subject, 'type': 'subject', 'rule_id': 'modal-question'}],
+                'M3': [{'value': 'please', 'type': 'polite_expression', 'rule_id': 'modal-question'}],
+                'V': [{'value': verb_part, 'type': 'verb', 'rule_id': 'modal-question'}]
+            }
+            
+            if remaining_text:
+                main_part, please_part = self.separate_please_from_phrase(remaining_text)
+                if main_part:
+                    result['O1'] = [{'value': main_part, 'type': 'object', 'rule_id': 'modal-question'}]
+                if please_part:
+                    if 'M3' not in result:
+                        result['M3'] = [{'value': please_part, 'type': 'polite_expression', 'rule_id': 'modal-question'}]
+                
+        else:
+            # 通常の "modal subject verb object please" パターン
+            verb_part, remaining_text = self.extract_phrasal_verb(rest_words)
+            
+            result = {
+                'Aux': [{'value': modal, 'type': 'modal', 'rule_id': 'modal-question'}],
+                'S': [{'value': subject, 'type': 'subject', 'rule_id': 'modal-question'}]
+            }
+            
+            if verb_part:
+                result['V'] = [{'value': verb_part, 'type': 'verb', 'rule_id': 'modal-question'}]
+                
+            if remaining_text:
+                # please分離処理
+                main_part, please_part = self.separate_please_from_phrase(remaining_text)
+                
+                # メイン部分を目的語として追加
+                if main_part:
+                    result['O1'] = [{'value': main_part, 'type': 'object', 'rule_id': 'modal-question'}]
+                
+                # please部分があれば追加
+                if please_part:
+                    result['M3'] = [{'value': please_part, 'type': 'polite_expression', 'rule_id': 'modal-question'}]
             
         return result
     
@@ -709,6 +823,19 @@ class RephraseParsingEngine:
             
         modifiers = {}
         remaining_phrase = " ".join(words)
+        
+        # pleaseの分離処理（文末または句読点の前にある場合）
+        please_extracted = False
+        if words and words[-1].lower().rstrip('?!.') == 'please':
+            # 文末のplease
+            modifiers['M3'] = [{'value': 'please', 'type': 'polite_expression'}]
+            words = words[:-1]  # pleaseを除外
+            please_extracted = True
+        elif len(words) >= 2 and words[-2].lower() == 'please' and words[-1] in ['?', '!', '.']:
+            # 句読点の前のplease
+            modifiers['M3'] = [{'value': 'please', 'type': 'polite_expression'}]
+            words = words[:-2] + [words[-1]]  # pleaseのみ除外
+            please_extracted = True
         
         # 複数の修飾語が含まれている可能性を考慮して分析
         phrases_to_classify = []
