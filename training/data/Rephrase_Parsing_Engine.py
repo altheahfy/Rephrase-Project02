@@ -44,6 +44,10 @@ class RephraseParsingEngine:
         if self.is_question(sentence):
             return self.analyze_question(sentence)
             
+        # 命令文・呼びかけパターンの検出
+        if self.is_imperative_with_vocative(sentence):
+            return self.analyze_imperative_with_vocative(sentence)
+            
         # 複文の場合、サブクローズ分解を試行
         if self.contains_subclause(sentence):
             return self.analyze_complex_sentence(sentence)
@@ -70,6 +74,107 @@ class RephraseParsingEngine:
             return True
             
         return False
+    
+    def is_imperative_with_vocative(self, sentence):
+        """呼びかけ+命令文かどうかを判定"""
+        words = sentence.split()
+        if len(words) < 2:
+            return False
+            
+        # "You,"で始まる場合（呼びかけのパターン）
+        if words[0].lower().rstrip(',') == 'you' and words[0].endswith(','):
+            return True
+            
+        # その他の呼びかけパターン: "Name,"
+        if words[0].endswith(','):
+            return True
+            
+        return False
+    
+    def analyze_imperative_with_vocative(self, sentence):
+        """呼びかけ+命令文を解析"""
+        words = sentence.split()
+        
+        # 呼びかけ部分を抽出
+        vocative = words[0]  # "You,", "John," など
+        command_words = words[1:]  # 命令文部分
+        
+        if len(command_words) < 1:
+            return {}
+        
+        # 命令文部分を解析
+        verb = command_words[0]  # give
+        remaining = command_words[1:] if len(command_words) > 1 else []
+        
+        result = {
+            'M1': [{'value': vocative, 'type': 'vocative', 'rule_id': 'imperative-vocative'}],
+            'V': [{'value': verb, 'type': 'imperative_verb', 'rule_id': 'imperative-vocative'}]
+        }
+        
+        # 残りの語句を分析
+        if remaining:
+            objects_and_modifiers = self.parse_imperative_objects_modifiers(remaining)
+            result.update(objects_and_modifiers)
+        
+        return result
+    
+    def parse_imperative_objects_modifiers(self, words):
+        """命令文の目的語と修飾語を分析"""
+        result = {}
+        
+        if not words:
+            return result
+        
+        # "it to me straight"のようなパターンを分析
+        i = 0
+        
+        # 最初の語は通常直接目的語
+        if i < len(words):
+            result['O1'] = [{'value': words[i], 'type': 'direct_object', 'rule_id': 'imperative-object'}]
+            i += 1
+        
+        # 残りの語句を修飾語として分析
+        remaining_words = words[i:]
+        modifiers = self.extract_imperative_modifiers(remaining_words)
+        result.update(modifiers)
+        
+        return result
+    
+    def extract_imperative_modifiers(self, words):
+        """命令文の修飾語を抽出（to me straight を分離）"""
+        modifiers = {}
+        
+        if not words:
+            return modifiers
+        
+        i = 0
+        while i < len(words):
+            # 前置詞句の検出（to me, from him など）
+            if words[i].lower() in ['to', 'from', 'for', 'with', 'in', 'at', 'on']:
+                if i + 1 < len(words):
+                    prep_phrase = f"{words[i]} {words[i+1]}"
+                    modifiers['M2'] = [{'value': prep_phrase, 'type': 'prepositional_phrase', 'rule_id': 'imperative-modifier'}]
+                    i += 2
+                    continue
+            
+            # 単独の副詞（straight, quickly など）
+            if self.is_manner_adverb(words[i].rstrip('.,!?')):
+                modifiers['M3'] = [{'value': words[i].rstrip('.,!?'), 'type': 'manner_adverb', 'rule_id': 'imperative-modifier'}]
+                i += 1
+                continue
+                
+            i += 1
+        
+        return modifiers
+    
+    def is_manner_adverb(self, word):
+        """様態副詞かどうかを判定"""
+        manner_adverbs = [
+            'straight', 'quickly', 'slowly', 'carefully', 'well', 'badly', 
+            'fast', 'hard', 'softly', 'loudly', 'quietly', 'clearly',
+            'directly', 'honestly', 'simply', 'easily', 'perfectly'
+        ]
+        return word.lower() in manner_adverbs
     
     def analyze_question(self, sentence):
         """疑問文を解析"""
