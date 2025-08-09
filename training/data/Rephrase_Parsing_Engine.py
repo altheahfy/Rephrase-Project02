@@ -405,7 +405,7 @@ class RephraseParsingEngine:
                 return {'slot': 'M2', 'value': phrase, 'type': 'place_adverb'}
         
         # 前置詞句による起点・方向・場所表現のチェック
-        if phrase_lower.startswith(('from ', 'to ', 'in ', 'at ', 'on ', 'into ', 'onto ', 'toward ', 'towards ')):
+        if phrase_lower.startswith(('from ', 'to ', 'in ', 'at ', 'on ', 'for ', 'with ', 'by ', 'into ', 'onto ', 'toward ', 'towards ', 'during ', 'since ')):
             return {'slot': 'M2', 'value': phrase, 'type': 'prepositional_phrase'}
                 
         # 方法表現チェック  
@@ -718,8 +718,15 @@ class RephraseParsingEngine:
     def detect_perfect_pattern(self, words):
         """現在時制完了パターンを検出 (has/have + past participle)"""
         have_verbs = ["have", "has", "had"]
+        # 短縮形も追加
+        contraction_map = {
+            "haven't": "have",
+            "hasn't": "has", 
+            "hadn't": "had"
+        }
         
         for i, word in enumerate(words):
+            # 通常形のチェック
             if word.lower() in have_verbs and i + 1 < len(words):
                 # have/has + past participle パターンを検出
                 next_word = words[i+1]
@@ -734,6 +741,28 @@ class RephraseParsingEngine:
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
                         'Aux': [{'value': word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
                         'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
+                    }
+                    
+                    # 修飾語を追加
+                    result.update(modifiers)
+                    
+                    return result
+            
+            # 短縮形のチェック
+            elif word.lower() in contraction_map and i + 1 < len(words):
+                next_word = words[i+1]
+                if self.looks_like_past_participle(next_word):
+                    subject = " ".join(words[:i]) if i > 0 else "I"
+                    base_aux = contraction_map[word.lower()]
+                    
+                    # 残りの部分を解析して修飾語を分離
+                    remaining_words = words[i+2:]
+                    modifiers = self.extract_modifiers_from_words(remaining_words)
+                    
+                    result = {
+                        'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect-negative'}],
+                        'Aux': [{'value': f"{base_aux} not", 'type': 'auxiliary_negative', 'rule_id': 'present-perfect-negative'}],
+                        'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect-negative'}]
                     }
                     
                     # 修飾語を追加
