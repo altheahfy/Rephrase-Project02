@@ -23,9 +23,10 @@ def test_phrase_classification():
             
             for slot_name, slot_candidates in main_slots.items():
                 for candidate in slot_candidates:
-                    if candidate.get('label') == 'phrase':
+                    if candidate.get('label') == 'phrase' or candidate.get('is_phrase'):
                         phrase_found = True
-                        print(f'⚠️ phrase検出 [{slot_name}]: "{candidate.get("text", "")}"')
+                        text = candidate.get('value', candidate.get('text', ''))
+                        print(f'⚠️ phrase検出 [{slot_name}]: "{text}"')
             
             if not phrase_found:
                 print('✅ phrase検出なし（期待通り）')

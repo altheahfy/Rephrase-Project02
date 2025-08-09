@@ -469,6 +469,22 @@ class CompleteRephraseParsingEngine:
                 if value:
                     slot = assignment.get('slot', '')
                     if slot in slots:
+                        # 不定詞の名詞的用法をチェック
+                        if rule_id == 'to-direction-M2' and self._is_infinitive_as_noun(value, doc):
+                            # 不定詞の名詞的用法の場合はO1のphrase候補として追加
+                            print(f"🔄 不定詞の名詞的用法検出: '{value}' → O1 phraseに変更")
+                            if 'O1' not in slots:
+                                slots['O1'] = []
+                            slots['O1'].append({
+                                'value': value,
+                                'rule_id': rule_id,
+                                'confidence': 0.95,
+                                'is_phrase': True,
+                                'label': 'phrase'
+                            })
+                            print(f"    ✅ O1に'{value}'をphraseとして設定")
+                            return True
+                        
                         # 動詞を含む句のみを「phrase」として扱う
                         is_verb_phrase = self._contains_verb(value, doc)
                         
@@ -559,13 +575,33 @@ class CompleteRephraseParsingEngine:
                 value = match.group()
         
         if value and slot in slots:
-            slots[slot].append({
-                'value': value,
-                'rule_id': rule_id,
-                'confidence': 0.9,
-                'pattern_based': True
-            })
-            print(f"    ✅ {slot}に'{value}'を設定")
+            # 不定詞の名詞的用法をチェック
+            if rule_id == 'to-direction-M2' and self._is_infinitive_as_noun(value, doc):
+                # 不定詞の名詞的用法の場合はO1のphrase候補として追加
+                print(f"🔄 不定詞の名詞的用法検出: '{value}' → O1 phraseに変更")
+                if 'O1' not in slots:
+                    slots['O1'] = []
+                slots['O1'].append({
+                    'value': value,
+                    'rule_id': rule_id,
+                    'confidence': 0.95,
+                    'pattern_based': True,
+                    'is_phrase': True,
+                    'label': 'phrase'
+                })
+                print(f"    ✅ O1に'{value}'をphraseとして設定")
+            else:
+                # 通常の前置詞句として処理
+                is_phrase = self._contains_verb(value, doc)
+                slots[slot].append({
+                    'value': value,
+                    'rule_id': rule_id,
+                    'confidence': 0.9,
+                    'pattern_based': True,
+                    'is_phrase': is_phrase,
+                    'label': 'phrase' if is_phrase else 'word'
+                })
+                print(f"    ✅ {slot}に'{value}'を設定")
     
     def _find_word_in_sentence(self, target_word: str, doc) -> str:
         """文中から指定された単語を検索"""
@@ -974,6 +1010,7 @@ class CompleteRephraseParsingEngine:
             return None
         
         for token in doc:
+            # 前置詞句の処理
             if (token.pos_ == "ADP" and 
                 token.text.lower() == target_prep and
                 token.dep_ == "prep"):
@@ -983,6 +1020,33 @@ class CompleteRephraseParsingEngine:
                     if child.dep_ == "pobj":
                         prep_object = self._get_complete_noun_phrase(child)
                         return f"{token.text} {prep_object}"
+            
+            # 不定詞句の処理（to の場合のみ）
+            elif (rule_id == 'to-direction-M2' and 
+                  token.pos_ == "PART" and 
+                  token.text.lower() == "to" and
+                  token.head and token.head.pos_ == "VERB"):
+                
+                # 不定詞句全体を構築
+                infinitive_verb = token.head
+                infinitive_phrase = f"to {infinitive_verb.text}"
+                
+                # 動詞の目的語や修飾語があれば追加
+                objects = []
+                for child in infinitive_verb.children:
+                    if child.dep_ in ["dobj", "pobj"]:
+                        objects.append(self._get_complete_noun_phrase(child))
+                    elif child.dep_ in ["prep"]:
+                        # 前置詞句も含める
+                        for prep_child in child.children:
+                            if prep_child.dep_ == "pobj":
+                                prep_phrase = f"{child.text} {self._get_complete_noun_phrase(prep_child)}"
+                                objects.append(prep_phrase)
+                
+                if objects:
+                    infinitive_phrase += " " + " ".join(objects)
+                
+                return infinitive_phrase
         
         return None
     
@@ -1022,6 +1086,41 @@ class CompleteRephraseParsingEngine:
                 if (token.text.lower() == word.lower() and 
                     token.pos_ in ['VERB', 'AUX'] and 
                     token.dep_ not in ['aux', 'auxpass']):  # 助動詞は除外
+                    return True
+        
+        return False
+    
+    def _is_infinitive_as_noun(self, phrase: str, doc) -> bool:
+        """不定詞の名詞的用法かどうかを判定"""
+        
+        # "to + 動詞" パターンのチェック
+        if not phrase.lower().startswith('to '):
+            return False
+            
+        words = phrase.split()
+        if len(words) < 2:
+            return False
+            
+        # 文中でこの不定詞句の文法的役割をチェック
+        for token in doc:
+            if (token.pos_ == 'PART' and token.text.lower() == 'to' and 
+                token.head and token.head.pos_ == 'VERB'):
+                
+                # 不定詞句の依存関係をチェック
+                infinitive_verb = token.head
+                
+                # 名詞的用法の典型的な依存関係
+                if infinitive_verb.dep_ in ['dobj', 'nsubj', 'pcomp', 'ccomp']:
+                    return True
+                    
+                # 主語として機能している場合
+                if (infinitive_verb.dep_ == 'csubj' or 
+                    (infinitive_verb.dep_ == 'acl' and infinitive_verb.head.dep_ == 'nsubj')):
+                    return True
+                    
+                # want, like, need などの動詞の目的語として機能
+                if (infinitive_verb.dep_ == 'xcomp' and 
+                    infinitive_verb.head.lemma_ in ['want', 'like', 'need', 'plan', 'try', 'decide']):
                     return True
         
         return False
