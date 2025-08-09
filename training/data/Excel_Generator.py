@@ -194,7 +194,13 @@ class ExcelGeneratorV2:
                 
             candidate = candidates[0]
             slot_phrase = candidate['value']
-            phrase_type = self.determine_phrase_type(candidate)
+            
+            # パーサーが提供するtype情報を優先使用
+            if 'type' in candidate:
+                phrase_type = 'word' if candidate['type'] == 'word' else 'phrase'
+            else:
+                # fallback: 従来の判定ロジック
+                phrase_type = self.determine_phrase_type(candidate)
             
             # 絶対順序を取得
             slot_display_order = slot_orders.get(slot, 99)  # 見つからない場合は99
