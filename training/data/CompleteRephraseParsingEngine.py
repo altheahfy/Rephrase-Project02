@@ -92,8 +92,10 @@ class CompleteRephraseParsingEngine:
             sentence_pattern = self._determine_sentence_pattern(rephrase_slots, sub_structures)
             
             return {
+                'slots': rephrase_slots,
                 'main_slots': rephrase_slots,
                 'sub_structures': sub_structures,
+                'sentence_pattern': sentence_pattern,
                 'sentence_type': sentence_pattern,
                 'metadata': {
                     'engine': self.engine_name,
@@ -344,6 +346,17 @@ class CompleteRephraseParsingEngine:
                     'confidence': 0.8
                 })
                 print(f"✅ 汎用前置詞句検出: {generic_prep}")
+        
+        # 汎用的な補語検出（C1）- be動詞やbecome等の後の名詞句・形容詞句
+        if not slots['C1']:
+            generic_complement = self._extract_generic_complement(doc)
+            if generic_complement:
+                slots['C1'].append({
+                    'value': generic_complement,
+                    'rule_id': 'generic-complement',
+                    'confidence': 0.8
+                })
+                print(f"✅ 汎用補語検出: {generic_complement}")
         
         return slots
     
@@ -1239,5 +1252,34 @@ class CompleteRephraseParsingEngine:
                         return phrase
         
         return None
+    
+    def _extract_generic_complement(self, doc) -> Optional[str]:
+        """汎用補語抽出（be動詞、become、seem等の後の補語）"""
+        
+        # 補語をとる動詞のリスト
+        complement_verbs = ['be', 'become', 'seem', 'appear', 'remain', 'stay', 'turn', 'get', 'grow', 'feel', 'look', 'sound', 'smell', 'taste']
+        
+        for token in doc:
+            # 補語をとる動詞を探す
+            if token.lemma_ in complement_verbs and token.pos_ == "VERB":
+                # attr（属性補語）を探す
+                for child in token.children:
+                    if child.dep_ == "attr":
+                        return self._get_complete_noun_phrase(child)
+                
+                # acomp（形容詞補語）を探す  
+                for child in token.children:
+                    if child.dep_ == "acomp":
+                        return child.text
+                
+                # pcomp（前置詞補語）を探す
+                for child in token.children:
+                    if child.dep_ == "prep":
+                        for grandchild in child.children:
+                            if grandchild.dep_ == "pobj":
+                                return f"{child.text} {self._get_complete_noun_phrase(grandchild)}"
+        
+        return None
+        
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
     def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
