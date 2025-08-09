@@ -256,6 +256,57 @@ class RephraseParsingEngine:
         
         return phrase, ''
     
+    def separate_object_and_time_modifier(self, words):
+        """現在完了の残り部分から目的語と時間修飾語を分離"""
+        if not words:
+            return '', ''
+        
+        text = " ".join(words)
+        
+        # 時間表現のパターン（現在完了でよく使われるもの）
+        time_patterns = [
+            'for a long time', 'for a while', 'for years', 'for months', 'for weeks', 'for days',
+            'since yesterday', 'since last week', 'since last month', 'since last year',
+            'since morning', 'since then', 'recently', 'lately', 'just now', 'already',
+            'yet', 'ever', 'never', 'before', 'so far'
+        ]
+        
+        # 長いパターンから順にチェック
+        sorted_patterns = sorted(time_patterns, key=len, reverse=True)
+        
+        for pattern in sorted_patterns:
+            if pattern in text.lower():
+                # 時間表現を除去して目的語部分を取得
+                pattern_start = text.lower().find(pattern)
+                object_part = text[:pattern_start].strip()
+                
+                # 時間表現の前後を考慮して正確に抽出
+                time_part = text[pattern_start:pattern_start+len(pattern)]
+                remaining = text[pattern_start+len(pattern):].strip()
+                
+                # 時間表現の後に何かあれば結合
+                if remaining:
+                    time_part += " " + remaining
+                
+                return object_part.rstrip(',').strip(), time_part.strip()
+        
+        # 前置詞句で時間を表現する場合（for, since で始まる）
+        if text.lower().startswith('for ') or text.lower().startswith('since '):
+            # 全体を時間修飾語として扱う
+            return '', text
+        
+        # 前置詞句が混在する場合の分離
+        words_list = words
+        for i, word in enumerate(words_list):
+            if word.lower() in ['for', 'since'] and i > 0:
+                # forやsinceより前を目的語、以降を時間修飾語として分離
+                object_part = " ".join(words_list[:i]).strip()
+                time_part = " ".join(words_list[i:]).strip()
+                return object_part, time_part
+        
+        # 時間表現が見つからない場合は全て目的語とする
+        return text, ''
+    
     def extract_phrasal_verb(self, words):
         """句動詞を抽出して、動詞部分と残りの部分を分離"""
         if not words:
@@ -704,30 +755,105 @@ class RephraseParsingEngine:
         return None
     
     def detect_perfect_pattern(self, words):
-        """現在時制完了パターンを検出 (has/have + past participle)"""
+        """現在時制完了パターンを検出 (has/have + past participle, 縮約形含む)"""
         have_verbs = ["have", "has", "had"]
+        contractions = ["haven't", "hasn't", "hadn't"]  # 縮約形
         
+        # 縮約形の処理
         for i, word in enumerate(words):
-            if word.lower() in have_verbs and i + 1 < len(words):
-                # have/has + past participle パターンを検出
-                next_word = words[i+1]
-                if self.looks_like_past_participle(next_word):
-                    subject = " ".join(words[:i]) if i > 0 else "I"
+            word_lower = word.lower()
+            if word_lower in contractions:
+                # 縮約形を分解
+                if word_lower == "haven't":
+                    aux_word = "have not"
+                elif word_lower == "hasn't":
+                    aux_word = "has not"
+                elif word_lower == "hadn't":
+                    aux_word = "had not"
+                
+                # 次の語が過去分詞かチェック
+                if i + 1 < len(words):
+                    next_word = words[i+1]
+                    if self.looks_like_past_participle(next_word):
+                        subject = " ".join(words[:i]) if i > 0 else "I"
+                        
+                        # 残りの部分から目的語と修飾語を分離
+                        remaining_words = words[i+2:]
+                        object_part, time_modifier = self.separate_object_and_time_modifier(remaining_words)
+                        
+                        result = {
+                            'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
+                            'Aux': [{'value': aux_word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
+                            'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
+                        }
+                        
+                        # 目的語がある場合
+                        if object_part:
+                            result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'present-perfect'}]
+                        
+                        # 時間修飾語がある場合
+                        if time_modifier:
+                            result['M3'] = [{'value': time_modifier, 'type': 'time_expression', 'rule_id': 'present-perfect'}]
+                        
+                        return result
+        
+        # 通常形の処理（have not seenパターンも含む）
+        for i, word in enumerate(words):
+            if word.lower() in have_verbs:
+                # have + not + past participle パターン
+                if (i + 2 < len(words) and 
+                    words[i+1].lower() == 'not' and 
+                    self.looks_like_past_participle(words[i+2])):
                     
-                    # 残りの部分を解析して修飾語を分離
-                    remaining_words = words[i+2:]
-                    modifiers = self.extract_modifiers_from_words(remaining_words)
+                    subject = " ".join(words[:i]) if i > 0 else "I"
+                    aux_word = word + " not"
+                    past_participle = words[i+2]
+                    
+                    # 残りの部分から目的語と修飾語を分離
+                    remaining_words = words[i+3:]
+                    object_part, time_modifier = self.separate_object_and_time_modifier(remaining_words)
                     
                     result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
-                        'Aux': [{'value': word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
-                        'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
+                        'Aux': [{'value': aux_word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
+                        'V': [{'value': past_participle, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
                     }
                     
-                    # 修飾語を追加
-                    result.update(modifiers)
+                    # 目的語がある場合
+                    if object_part:
+                        result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'present-perfect'}]
+                    
+                    # 時間修飾語がある場合
+                    if time_modifier:
+                        result['M3'] = [{'value': time_modifier, 'type': 'time_expression', 'rule_id': 'present-perfect'}]
                     
                     return result
+                
+                # 通常の have + past participle パターン
+                elif i + 1 < len(words):
+                    next_word = words[i+1]
+                    if self.looks_like_past_participle(next_word):
+                        subject = " ".join(words[:i]) if i > 0 else "I"
+                        
+                        # 残りの部分から目的語と修飾語を分離
+                        remaining_words = words[i+2:]
+                        object_part, time_modifier = self.separate_object_and_time_modifier(remaining_words)
+                        
+                        result = {
+                            'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
+                            'Aux': [{'value': word, 'type': 'auxiliary', 'rule_id': 'present-perfect'}],
+                            'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
+                        }
+                        
+                        # 目的語がある場合
+                        if object_part:
+                            result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'present-perfect'}]
+                        
+                        # 時間修飾語がある場合
+                        if time_modifier:
+                            result['M3'] = [{'value': time_modifier, 'type': 'time_expression', 'rule_id': 'present-perfect'}]
+                        
+                        return result
         
         return None
     
