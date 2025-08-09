@@ -137,11 +137,167 @@ class RephraseParsingEngine:
         # 句読点を除去
         return text.translate(str.maketrans('', '', string.punctuation))
 
+    def analyze_sentence_with_spacy(self, sentence):
+        """spaCyを使用した包括的な文解析"""
+        if not self.nlp:
+            return None
+            
+        doc = self.nlp(sentence)
+        
+        # デバッグ情報を出力
+        print(f"🔍 spaCy解析: '{sentence}'")
+        for token in doc:
+            print(f"  {token.text:10} | POS: {token.pos_:6} | DEP: {token.dep_:10} | HEAD: {token.head.text}")
+        
+        result = {}
+        
+        # 各トークンを処理してスロットに分類
+        for token in doc:
+            # 主語の検出 (nsubj, nsubjpass)
+            if token.dep_ in ["nsubj", "nsubjpass"]:
+                subject_phrase = self.get_spacy_noun_phrase(token)
+                result['S'] = [{'value': self.clean_punctuation(subject_phrase), 'type': 'subject', 'rule_id': 'spacy-analysis'}]
+            
+            # 動詞の検出 (ROOT)
+            elif token.dep_ == "ROOT" and token.pos_ == "VERB":
+                result['V'] = [{'value': self.clean_punctuation(token.text), 'type': 'main_verb', 'rule_id': 'spacy-analysis'}]
+            
+            # 助動詞の検出 (aux)
+            elif token.dep_ == "aux":
+                result['Aux'] = [{'value': self.clean_punctuation(token.text), 'type': 'auxiliary', 'rule_id': 'spacy-analysis'}]
+            
+            # 直接目的語の検出 (dobj)
+            elif token.dep_ == "dobj":
+                object_phrase = self.get_spacy_noun_phrase(token)
+                result['O1'] = [{'value': self.clean_punctuation(object_phrase), 'type': 'direct_object', 'rule_id': 'spacy-analysis'}]
+            
+            # 時間修飾語の検出 (temporal modifier)
+            elif token.dep_ in ["npadvmod", "advmod"] and self.is_temporal_expression(token):
+                temporal_phrase = self.get_spacy_temporal_phrase(token)
+                result['M3'] = result.get('M3', [])
+                result['M3'].append({'value': self.clean_punctuation(temporal_phrase), 'type': 'temporal_modifier', 'rule_id': 'spacy-temporal'})
+            
+            # 前置詞句の検出 (prep)
+            elif token.dep_ == "prep":
+                prep_phrase = self.get_spacy_prepositional_phrase(token)
+                # 前置詞句の種類によってスロットを決定
+                slot_type = self.classify_prepositional_phrase(token.text.lower())
+                if slot_type not in result:
+                    result[slot_type] = []
+                result[slot_type].append({'value': self.clean_punctuation(prep_phrase), 'type': 'prepositional_phrase', 'rule_id': 'spacy-prep'})
+        
+        # エンティティ認識による時間表現の検出
+        for ent in doc.ents:
+            if ent.label_ in ["DATE", "TIME"]:
+                # 既に検出された時間修飾語と重複しないかチェック
+                if 'M3' not in result or not any(ent.text in item['value'] for item in result['M3']):
+                    if 'M3' not in result:
+                        result['M3'] = []
+                    result['M3'].append({'value': self.clean_punctuation(ent.text), 'type': 'temporal_entity', 'rule_id': 'spacy-ner'})
+        
+        return result if result else None
+
+    def get_spacy_noun_phrase(self, noun_token):
+        """spaCyトークンから名詞句を構築"""
+        # 代名詞の場合は単独で返す
+        if noun_token.pos_ == "PRON":
+            return noun_token.text
+            
+        # 名詞句の構成要素を収集
+        phrase_parts = []
+        
+        # 子要素を確認（限定詞、形容詞など）
+        for child in noun_token.children:
+            if child.dep_ in ["det", "amod", "poss", "nummod", "compound"]:
+                phrase_parts.append((child.i, child.text))
+        
+        # 中心の名詞
+        phrase_parts.append((noun_token.i, noun_token.text))
+        
+        # 語順でソート
+        phrase_parts.sort()
+        return ' '.join([part[1] for part in phrase_parts])
+
+    def is_temporal_expression(self, token):
+        """トークンが時間表現かどうかを判定"""
+        temporal_words = [
+            'ago', 'yesterday', 'today', 'tomorrow', 'now', 'then', 'soon',
+            'morning', 'afternoon', 'evening', 'night', 'week', 'month', 'year',
+            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december'
+        ]
+        
+        # トークン自体が時間単語の場合
+        if token.text.lower() in temporal_words:
+            return True
+            
+        # 子要素に時間単語が含まれる場合
+        for child in token.children:
+            if child.text.lower() in temporal_words:
+                return True
+                
+        # 親要素が時間表現の場合
+        if token.head.text.lower() in temporal_words:
+            return True
+            
+        return False
+
+    def get_spacy_temporal_phrase(self, token):
+        """時間修飾語句を構築"""
+        phrase_parts = []
+        
+        # 時間修飾語の範囲を決定
+        temporal_tokens = [token]
+        
+        # 子要素を追加
+        for child in token.children:
+            temporal_tokens.append(child)
+            
+        # 兄弟要素で時間関連のものを追加
+        for sibling in token.head.children:
+            if sibling != token and self.is_temporal_expression(sibling):
+                temporal_tokens.append(sibling)
+                
+        # ソートして句を構築
+        temporal_tokens.sort(key=lambda t: t.i)
+        return ' '.join([t.text for t in temporal_tokens])
+
+    def get_spacy_prepositional_phrase(self, prep_token):
+        """前置詞句を構築"""
+        phrase_parts = [prep_token.text]
+        
+        # 前置詞の目的語を取得
+        for child in prep_token.children:
+            if child.dep_ == "pobj":
+                obj_phrase = self.get_spacy_noun_phrase(child)
+                phrase_parts.append(obj_phrase)
+                
+        return ' '.join(phrase_parts)
+
+    def classify_prepositional_phrase(self, preposition):
+        """前置詞に基づいてスロットタイプを決定"""
+        if preposition in ['in', 'on', 'at', 'during', 'for', 'since', 'until']:
+            return 'M3'  # 時間・場所修飾語
+        elif preposition in ['to', 'from', 'with', 'by']:
+            return 'M2'  # 方法・手段修飾語
+        else:
+            return 'M1'  # その他の修飾語
+
     def analyze_sentence(self, sentence):
-        """文を解析してスロットに分解"""
+        """文を解析してスロットに分解（spaCy優先版）"""
         sentence = sentence.strip()
         if not sentence:
             return {}
+        
+        # まずspaCyによる包括解析を試行
+        if self.nlp:
+            spacy_result = self.analyze_sentence_with_spacy(sentence)
+            if spacy_result:
+                print("✅ spaCy解析成功")
+                return spacy_result
+        
+        print("⚠️ spaCy解析失敗、従来方式にフォールバック")
             
         # 疑問文チェックを最優先
         if self.is_question(sentence):
@@ -859,7 +1015,6 @@ class RephraseParsingEngine:
                 if i + 1 < len(words):
                     verb_word = self.clean_punctuation(words[i+1])
                     remaining_words = words[i+2:] if i + 2 < len(words) else []
-                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
                     
                     result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'modal-basic'}],
@@ -867,16 +1022,20 @@ class RephraseParsingEngine:
                         'V': [{'value': verb_word, 'type': 'base_verb', 'rule_id': 'modal-basic'}]
                     }
                     
-                    # 目的語と修飾語を追加（句読点をクリーンアップ）
-                    cleaned_modifiers = {}
-                    for key, value_list in object_and_modifiers.items():
-                        cleaned_list = []
-                        for item in value_list:
-                            cleaned_item = item.copy()
-                            cleaned_item['value'] = self.clean_punctuation(item['value'])
-                            cleaned_list.append(cleaned_item)
-                        cleaned_modifiers[key] = cleaned_list
-                    result.update(cleaned_modifiers)
+                    # 残りの単語から目的語と修飾語を分離
+                    if remaining_words:
+                        object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
+                        
+                        # 目的語と修飾語を追加（句読点をクリーンアップ）
+                        cleaned_modifiers = {}
+                        for key, value_list in object_and_modifiers.items():
+                            cleaned_list = []
+                            for item in value_list:
+                                cleaned_item = item.copy()
+                                cleaned_item['value'] = self.clean_punctuation(item['value'])
+                                cleaned_list.append(cleaned_item)
+                            cleaned_modifiers[key] = cleaned_list
+                        result.update(cleaned_modifiers)
                     
                     return result
             
@@ -888,7 +1047,6 @@ class RephraseParsingEngine:
                 if i + 1 < len(words):
                     verb_word = self.clean_punctuation(words[i+1])
                     remaining_words = words[i+2:] if i + 2 < len(words) else []
-                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
                     
                     result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'modal-negative'}],
@@ -896,16 +1054,20 @@ class RephraseParsingEngine:
                         'V': [{'value': verb_word, 'type': 'base_verb', 'rule_id': 'modal-negative'}]
                     }
                     
-                    # 目的語と修飾語を追加（句読点をクリーンアップ）
-                    cleaned_modifiers = {}
-                    for key, value_list in object_and_modifiers.items():
-                        cleaned_list = []
-                        for item in value_list:
-                            cleaned_item = item.copy()
-                            cleaned_item['value'] = self.clean_punctuation(item['value'])
-                            cleaned_list.append(cleaned_item)
-                        cleaned_modifiers[key] = cleaned_list
-                    result.update(cleaned_modifiers)
+                    # 残りの単語から目的語と修飾語を分離
+                    if remaining_words:
+                        object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
+                        
+                        # 目的語と修飾語を追加（句読点をクリーンアップ）
+                        cleaned_modifiers = {}
+                        for key, value_list in object_and_modifiers.items():
+                            cleaned_list = []
+                            for item in value_list:
+                                cleaned_item = item.copy()
+                                cleaned_item['value'] = self.clean_punctuation(item['value'])
+                                cleaned_list.append(cleaned_item)
+                            cleaned_modifiers[key] = cleaned_list
+                        result.update(cleaned_modifiers)
                     
                     return result
                 
@@ -1052,16 +1214,23 @@ class RephraseParsingEngine:
                 # 他動詞の場合：残りをまず目的語候補として、必要に応じて修飾語を分離
                 remaining_text = " ".join(remaining_words)
                 
-                # 前置詞句がある場合は分離
-                if any(word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since'] 
-                       for word in remaining_words):
-                    # 前置詞句以前を目的語、前置詞句を修飾語として分離
+                # 時間修飾語または前置詞句がある場合は分離
+                has_time_or_prep = (
+                    any(word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since'] 
+                        for word in remaining_words) or
+                    self.has_time_expression(remaining_text)
+                )
+                
+                if has_time_or_prep:
+                    # 時間修飾語・前置詞句以前を目的語、時間修飾語・前置詞句を修飾語として分離
                     object_part, modifiers = self.separate_object_and_modifiers(remaining_words)
                     if object_part:
+                        object_part = self.clean_punctuation(object_part)
                         result['O1'] = [{'value': object_part, 'type': 'object', 'rule_id': 'basic-svo'}]
                     result.update(modifiers)
                 else:
-                    # 前置詞句がない場合は全て目的語
+                    # 時間修飾語・前置詞句がない場合は全て目的語
+                    remaining_text = self.clean_punctuation(remaining_text)
                     result['O1'] = [{'value': remaining_text, 'type': 'object', 'rule_id': 'basic-svo'}]
             
         return result
@@ -1077,28 +1246,92 @@ class RephraseParsingEngine:
         
         return verb in intransitive_verbs
     
+    def has_time_expression(self, text):
+        """テキストに時間修飾語が含まれているかチェック"""
+        import re
+        time_expressions = [
+            r'\b(a few|several|many) (days?|weeks?|months?|years?) ago\b',
+            r'\b(yesterday|today|tomorrow)\b',
+            r'\b(last|next) (week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b',
+            r'\b(this|that) (morning|afternoon|evening|night)\b',
+            r'\b(in|at) \d+:\d+\b',
+            r'\b(at) (dawn|noon|midnight)\b',
+            r'\b(during|throughout) (the )?(day|night|week|month|year)\b',
+            r'\b(now|then|soon|recently|lately)\b',
+            r'\b\d+ (minutes?|hours?|days?|weeks?|months?|years?) ago\b',
+            r'\b(two|three|four|five) (days?|weeks?|months?|years?) ago\b'
+        ]
+        
+        for pattern in time_expressions:
+            if re.search(pattern, text, re.IGNORECASE):
+                return True
+        return False
+    
     def separate_object_and_modifiers(self, words):
-        """他動詞文で目的語と修飾語を分離"""
+        """他動詞文で目的語と修飾語を分離（時間修飾語対応版）"""
+        import re
+        
+        # 時間修飾語パターンを検出
+        text = " ".join(words)
+        time_expressions = [
+            r'\b(a few|several|many) (days?|weeks?|months?|years?) ago\b',
+            r'\b(yesterday|today|tomorrow)\b',
+            r'\b(last|next) (week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b',
+            r'\b(this|that) (morning|afternoon|evening|night)\b',
+            r'\b(in|at) \d+:\d+\b',
+            r'\b(at) (dawn|noon|midnight)\b',
+            r'\b(during|throughout) (the )?(day|night|week|month|year)\b',
+            r'\b(now|then|soon|recently|lately)\b',
+            r'\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+) (minutes?|hours?|days?|weeks?|months?|years?) ago\b',
+            r'\bnext (week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b',
+            r'\blast (week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b'
+        ]
+        
+        time_modifier = None
+        object_text = text
+        
+        # 時間修飾語を検出・除去
+        for pattern in time_expressions:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                time_modifier = match.group(0)
+                # 時間修飾語を除去してオブジェクト部分を取得
+                object_text = re.sub(pattern, '', text, flags=re.IGNORECASE).strip()
+                # 複数の空白を単一の空白に変換し、先頭・末尾の空白を除去
+                object_text = re.sub(r'\s+', ' ', object_text).strip()
+                break
+        
+        # その他の前置詞句による分離も処理
         object_words = []
         modifier_start = -1
+        remaining_words = object_text.split() if object_text else []
         
         # 前置詞を探して分離点を特定
-        for i, word in enumerate(words):
+        for i, word in enumerate(remaining_words):
             if word.lower() in ['from', 'to', 'in', 'at', 'on', 'by', 'with', 'for', 'during', 'since']:
                 modifier_start = i
                 break
         
+        modifiers = {}
+        
         if modifier_start >= 0:
-            object_words = words[:modifier_start]
-            modifier_words = words[modifier_start:]
+            object_words = remaining_words[:modifier_start]
+            modifier_words = remaining_words[modifier_start:]
             
             object_part = " ".join(object_words) if object_words else ""
-            modifiers = self.extract_modifiers_from_words(modifier_words)
-            
-            return object_part, modifiers
+            prep_modifiers = self.extract_modifiers_from_words(modifier_words)
+            modifiers.update(prep_modifiers)
         else:
-            # 前置詞句が見つからない場合は全て目的語
-            return " ".join(words), {}
+            # 前置詞句が見つからない場合、残りのテキストが目的語
+            object_part = object_text
+        
+        # 時間修飾語をM3に追加
+        if time_modifier:
+            if 'M3' not in modifiers:
+                modifiers['M3'] = []
+            modifiers['M3'].append({'value': time_modifier, 'type': 'time_expression', 'rule_id': 'time-modifier'})
+        
+        return object_part, modifiers
     
     def extract_object_and_modifiers(self, words):
         """目的語と修飾語を分離（現在完了用）"""
@@ -1144,23 +1377,56 @@ class RephraseParsingEngine:
         return result
 
     def extract_modifiers_from_words(self, words):
-        """単語リストから修飾語を抽出してスロットに分類"""
+        """単語リストから修飾語を抽出してスロットに分類（時間修飾語対応版）"""
         if not words:
             return {}
             
         modifiers = {}
         remaining_phrase = " ".join(words)
         
+        # 時間修飾語パターンの検出（最優先）
+        time_expressions = [
+            r'\b(a few|several|many) (days?|weeks?|months?|years?) ago\b',
+            r'\b(yesterday|today|tomorrow)\b',
+            r'\b(last|next) (week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b',
+            r'\b(this|that) (morning|afternoon|evening|night)\b',
+            r'\b(in|at) \d+:\d+\b',
+            r'\b(at) (dawn|noon|midnight)\b',
+            r'\b(during|throughout) (the )?(day|night|week|month|year)\b',
+            r'\b(now|then|soon|recently|lately)\b',
+            r'\b\d+ (minutes?|hours?|days?|weeks?|months?|years?) ago\b',
+            r'\b(two|three|four|five) (days?|weeks?|months?|years?) ago\b'
+        ]
+        
+        import re
+        for pattern in time_expressions:
+            match = re.search(pattern, remaining_phrase, re.IGNORECASE)
+            if match:
+                time_phrase = match.group(0)
+                # 検出した時間修飾語を除去
+                remaining_phrase = re.sub(pattern, '', remaining_phrase, flags=re.IGNORECASE).strip()
+                words = remaining_phrase.split() if remaining_phrase else []
+                
+                # M3スロットに時間修飾語を追加
+                if 'M3' not in modifiers:
+                    modifiers['M3'] = []
+                modifiers['M3'].append({'value': time_phrase, 'type': 'time_expression', 'rule_id': 'time-modifier'})
+                break
+        
         # pleaseの分離処理（文末または句読点の前にある場合）
         please_extracted = False
         if words and words[-1].lower().rstrip('?!.') == 'please':
             # 文末のplease
-            modifiers['M3'] = [{'value': 'please', 'type': 'polite_expression'}]
+            if 'M3' not in modifiers:
+                modifiers['M3'] = []
+            modifiers['M3'].append({'value': 'please', 'type': 'polite_expression', 'rule_id': 'polite-please'})
             words = words[:-1]  # pleaseを除外
             please_extracted = True
         elif len(words) >= 2 and words[-2].lower() == 'please' and words[-1] in ['?', '!', '.']:
             # 句読点の前のplease
-            modifiers['M3'] = [{'value': 'please', 'type': 'polite_expression'}]
+            if 'M3' not in modifiers:
+                modifiers['M3'] = []
+            modifiers['M3'].append({'value': 'please', 'type': 'polite_expression', 'rule_id': 'polite-please'})
             words = words[:-2] + [words[-1]]  # pleaseのみ除外
             please_extracted = True
         
