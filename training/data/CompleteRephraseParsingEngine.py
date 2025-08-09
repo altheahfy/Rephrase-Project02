@@ -469,21 +469,43 @@ class CompleteRephraseParsingEngine:
                 if value:
                     slot = assignment.get('slot', '')
                     if slot in slots:
-                        # 不定詞の名詞的用法をチェック
-                        if rule_id == 'to-direction-M2' and self._is_infinitive_as_noun(value, doc):
-                            # 不定詞の名詞的用法の場合はO1のphrase候補として追加
-                            print(f"🔄 不定詞の名詞的用法検出: '{value}' → O1 phraseに変更")
-                            if 'O1' not in slots:
-                                slots['O1'] = []
-                            slots['O1'].append({
-                                'value': value,
-                                'rule_id': rule_id,
-                                'confidence': 0.95,
-                                'is_phrase': True,
-                                'label': 'phrase'
-                            })
-                            print(f"    ✅ O1に'{value}'をphraseとして設定")
-                            return True
+                        # 不定詞の用法別処理
+                        if rule_id == 'to-direction-M2' and self._contains_verb(value, doc):
+                            # 不定詞の名詞的用法をチェック
+                            if self._is_infinitive_as_noun(value, doc):
+                                # 不定詞の名詞的用法の場合はO1のphrase候補として追加
+                                print(f"🔄 不定詞の名詞的用法検出: '{value}' → O1 phraseに変更")
+                                if 'O1' not in slots:
+                                    slots['O1'] = []
+                                slots['O1'].append({
+                                    'value': value,
+                                    'rule_id': rule_id,
+                                    'confidence': 0.95,
+                                    'is_phrase': True,
+                                    'label': 'phrase'
+                                })
+                                print(f"    ✅ O1に'{value}'をphraseとして設定")
+                                return True
+                            
+                            # 不定詞の形容詞的用法をチェック
+                            elif self._is_infinitive_as_adjective(value, doc):
+                                # 形容詞的用法の場合は元の名詞句に統合（M2に追加しない）
+                                print(f"🔄 不定詞の形容詞的用法検出: '{value}' → 名詞句に統合（M2から除外）")
+                                return True  # 処理済みとしてM2には追加しない
+                            
+                            # 不定詞の副詞的用法をチェック
+                            elif self._is_infinitive_as_adverb(value, doc):
+                                # 副詞的用法の場合はM2のphraseとして処理
+                                print(f"🔄 不定詞の副詞的用法検出: '{value}' → M2 phraseとして処理")
+                                slots[slot].append({
+                                    'value': value,
+                                    'rule_id': rule_id,
+                                    'confidence': 0.9,
+                                    'is_phrase': True,
+                                    'label': 'phrase'
+                                })
+                                print(f"    ✅ M2に'{value}'をphraseとして設定")
+                                return True
                         
                         # 動詞を含む句のみを「phrase」として扱う
                         is_verb_phrase = self._contains_verb(value, doc)
@@ -738,8 +760,30 @@ class CompleteRephraseParsingEngine:
         # 関係詞節がある場合は含める
         for child in token.children:
             if child.dep_ == 'relcl':
-                rel_phrase = self._get_relative_clause_phrase(child)
-                return f"{' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))} {rel_phrase}"
+                # 関係詞節の処理
+                if child.pos_ == 'VERB':
+                    # 不定詞の形容詞的用法（to + 動詞）かチェック
+                    infinitive_part = None
+                    for inf_child in child.children:
+                        if inf_child.pos_ == 'PART' and inf_child.text.lower() == 'to':
+                            infinitive_part = inf_child
+                            break
+                    
+                    if infinitive_part:
+                        # 不定詞句を構築
+                        infinitive_phrase = f"to {child.text}"
+                        # 動詞の目的語があれば追加
+                        for verb_child in child.children:
+                            if verb_child.dep_ in ['dobj', 'pobj'] and verb_child != infinitive_part:
+                                infinitive_phrase += f" {self._get_complete_noun_phrase(verb_child)}"
+                        
+                        phrase_text = ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
+                        return f"{phrase_text} {infinitive_phrase}"
+                    else:
+                        # 通常の関係詞節
+                        rel_phrase = self._get_relative_clause_phrase(child)
+                        phrase_text = ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
+                        return f"{phrase_text} {rel_phrase}"
         
         return ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
     
@@ -1121,6 +1165,61 @@ class CompleteRephraseParsingEngine:
                 # want, like, need などの動詞の目的語として機能
                 if (infinitive_verb.dep_ == 'xcomp' and 
                     infinitive_verb.head.lemma_ in ['want', 'like', 'need', 'plan', 'try', 'decide']):
+                    return True
+        
+        return False
+    
+    def _is_infinitive_as_adjective(self, phrase: str, doc) -> bool:
+        """不定詞の形容詞的用法かどうかを判定（名詞を修飾）"""
+        
+        # "to + 動詞" パターンのチェック
+        if not phrase.lower().startswith('to '):
+            return False
+            
+        words = phrase.split()
+        if len(words) < 2:
+            return False
+            
+        # 文中でこの不定詞句の文法的役割をチェック
+        for token in doc:
+            if (token.pos_ == 'PART' and token.text.lower() == 'to' and 
+                token.head and token.head.pos_ == 'VERB'):
+                
+                infinitive_verb = token.head
+                
+                # 形容詞的用法の典型的な依存関係
+                if infinitive_verb.dep_ in ['relcl', 'acl']:
+                    # 名詞を修飾している場合
+                    if infinitive_verb.head.pos_ in ['NOUN', 'PRON']:
+                        return True
+        
+        return False
+    
+    def _is_infinitive_as_adverb(self, phrase: str, doc) -> bool:
+        """不定詞の副詞的用法かどうかを判定（目的・結果）"""
+        
+        # "to + 動詞" パターンのチェック
+        if not phrase.lower().startswith('to '):
+            return False
+            
+        words = phrase.split()
+        if len(words) < 2:
+            return False
+            
+        # 文中でこの不定詞句の文法的役割をチェック
+        for token in doc:
+            if (token.pos_ == 'PART' and token.text.lower() == 'to' and 
+                token.head and token.head.pos_ == 'VERB'):
+                
+                infinitive_verb = token.head
+                
+                # 副詞的用法の典型的な依存関係
+                if infinitive_verb.dep_ in ['advcl', 'purpcl']:
+                    return True
+                    
+                # go, come などの移動動詞の目的として機能
+                if (infinitive_verb.dep_ == 'xcomp' and 
+                    infinitive_verb.head.lemma_ in ['go', 'come', 'run', 'walk', 'drive']):
                     return True
         
         return False
