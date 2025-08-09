@@ -71,7 +71,7 @@ class RephraseParsingEngine:
         return phrasal_verbs
     
     def extract_phrasal_verb_components(self, sentence, phrasal_verbs):
-        """句動詞の成分を抽出してスロットに分配"""
+        """句動詞の成分を抽出してスロットに分配（デバッグ版）"""
         if not phrasal_verbs:
             return {}
             
@@ -85,7 +85,7 @@ class RephraseParsingEngine:
             # 動詞をV スロットに
             result['V'] = [{'value': verb_token.text, 'type': 'phrasal_verb', 'rule_id': 'spacy-phrasal-verb'}]
             
-            # パーティクルをM2スロットに（あなたの提案通り）
+            # パーティクルをM2スロットに
             result['M2'] = result.get('M2', [])
             result['M2'].append({
                 'value': particle_token.text, 
@@ -93,31 +93,30 @@ class RephraseParsingEngine:
                 'rule_id': 'spacy-phrasal-verb-particle'
             })
             
-            # 目的語の検出（改善版）
-            direct_objects = []
+            # 全てのトークンを調べて依存関係を抽出
             for token in doc:
-                if token.dep_ == "dobj" and token.head == verb_token:
-                    # 冠詞も含めて目的語として取得
-                    obj_phrase = self.get_noun_phrase(token)
-                    direct_objects.append(obj_phrase)
-            
-            if direct_objects:
-                result['O1'] = [{'value': ' '.join(direct_objects), 'type': 'direct_object', 'rule_id': 'spacy-phrasal-verb-object'}]
-            
-            # 主語の検出（疑問文対応）
-            subject_tokens = []
-            for token in doc:
-                if token.dep_ == "nsubj" and token.head == verb_token:
+                # 主語の検出
+                if token.dep_ == "nsubj" and token.head.i == verb_token.i:
                     subject_phrase = self.get_noun_phrase(token)
-                    subject_tokens.append(subject_phrase)
-            
-            if subject_tokens:
-                result['S'] = [{'value': ' '.join(subject_tokens), 'type': 'subject', 'rule_id': 'spacy-phrasal-verb-subject'}]
+                    result['S'] = [{'value': subject_phrase, 'type': 'subject', 'rule_id': 'spacy-phrasal-verb-subject'}]
+                
+                # 目的語の検出
+                elif token.dep_ == "dobj" and token.head.i == verb_token.i:
+                    object_phrase = self.get_noun_phrase(token)
+                    result['O1'] = [{'value': object_phrase, 'type': 'direct_object', 'rule_id': 'spacy-phrasal-verb-object'}]
+                
+                # 助動詞の検出（モーダル疑問文でない場合）
+                elif token.dep_ == "aux" and token.head.i == verb_token.i and 'Aux' not in result:
+                    result['Aux'] = [{'value': token.text, 'type': 'auxiliary', 'rule_id': 'spacy-phrasal-verb-aux'}]
         
         return result
     
     def get_noun_phrase(self, noun_token):
-        """名詞句を冠詞・修飾語と一緒に抽出"""
+        """名詞句を冠詞・修飾語と一緒に抽出（代名詞対応版）"""
+        # 代名詞の場合は単独で返す
+        if noun_token.pos_ == "PRON":
+            return noun_token.text
+            
         phrase_parts = []
         
         # 冠詞・修飾語を含む句を構築
@@ -598,14 +597,15 @@ class RephraseParsingEngine:
             return {}
         
         sentence = ' '.join(words)
+        modal = words[0]
         
         # 句動詞検出を最優先で試行
         phrasal_verbs = self.detect_phrasal_verbs_with_spacy(sentence)
         if phrasal_verbs:
             result = self.extract_phrasal_verb_components(sentence, phrasal_verbs)
-            # モーダル動詞を追加
-            modal = words[0]
-            result['Aux'] = [{'value': modal, 'type': 'modal', 'rule_id': 'modal-phrasal-question'}]
+            # モーダル動詞を上書きではなく、なければ追加
+            if 'Aux' not in result:
+                result['Aux'] = [{'value': modal, 'type': 'modal', 'rule_id': 'modal-phrasal-question'}]
             return result
             
         modal = words[0]
