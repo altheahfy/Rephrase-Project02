@@ -285,7 +285,13 @@ class RephraseParsingEngine:
             'take': ['off', 'on', 'out', 'up', 'down'],
             'turn': ['on', 'off', 'up', 'down'],
             'pick': ['up', 'out'],
-            'look': ['up', 'down', 'out', 'in']
+            'look': ['up', 'down', 'out', 'in'],
+            'write': ['down', 'up', 'out'],
+            'fill': ['in', 'out', 'up'],
+            'work': ['out', 'up'],
+            'give': ['up', 'out', 'back', 'away'],
+            'bring': ['up', 'back', 'out'],
+            'call': ['up', 'back', 'off', 'out']
         }
         
         verb = words[0]
