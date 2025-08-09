@@ -21,7 +21,7 @@ class ExcelGeneratorV2:
         """文を解析してV_group_keyデータに蓄積（Step 1）"""
         sentence = sentence.strip()
         if not sentence:
-            return
+            return False
             
         print(f"\n=== Step 1 解析中: {sentence} ===")
         
@@ -30,7 +30,7 @@ class ExcelGeneratorV2:
         
         if not slots:
             print(f"❌ 解析失敗: {sentence}")
-            return
+            return False
             
         # V_group_key生成
         if not v_group_key:
@@ -58,6 +58,7 @@ class ExcelGeneratorV2:
         
         self.current_sentence_id += 1
         self.current_construction_id += 1
+        return True  # 成功を明示的に返す
     
     def generate_excel_data(self):
         """V_group_keyデータからExcelデータを生成（Step 2）"""
@@ -433,9 +434,10 @@ class ExcelGeneratorV2:
                 if sentence and sentence != 'nan' and len(sentence) > 1:
                     # 重複チェック
                     if sentence not in processed_sentences:
-                        self.analyze_and_add_sentence(sentence)
-                        processed_sentences.add(sentence)
-                        loaded_count += 1
+                        success = self.analyze_and_add_sentence(sentence)
+                        if success:
+                            processed_sentences.add(sentence)
+                            loaded_count += 1
                     # else:
                     #     print(f"⚠️ 重複スキップ（行{index+1}): '{sentence}'")
                 else:
