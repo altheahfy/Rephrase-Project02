@@ -3,13 +3,13 @@
 
 import pandas as pd
 import os
-from Rephrase_Parsing_Engine import RephraseParsingEngine
+from CompleteRephraseParsingEngine import CompleteRephraseParsingEngine
 
 class ExcelGeneratorV2:
     """Rephrase解析結果をExcel形式で出力（動的絶対順序対応）"""
     
     def __init__(self):
-        self.engine = RephraseParsingEngine()
+        self.engine = CompleteRephraseParsingEngine()
         self.results = []
         self.current_sentence_id = 1
         self.current_construction_id = 1000
