@@ -355,6 +355,18 @@ class CompleteRephraseParsingEngine:
         
         print(f"🔍 ルール判定: {rule_id}")
         
+        # パターンルールの場合は特別処理
+        if 'patterns' in rule:
+            patterns = rule['patterns']
+            print(f"  パターンルール検出: {len(patterns)}個のパターン")
+            for pattern_obj in patterns:
+                pattern_text = pattern_obj.get('pattern', '')
+                if re.search(pattern_text, doc.text, re.IGNORECASE):
+                    print(f"  ✅ パターンマッチ: {pattern_text}")
+                    return True
+            print(f"  ❌ パターン非マッチ")
+            return False
+        
         # tokenトリガーの確認
         if 'token' in trigger:
             target_token = trigger['token']
@@ -390,6 +402,29 @@ class CompleteRephraseParsingEngine:
             if not pattern_match:
                 return False
         
+        # positionトリガーの確認（高度な条件）
+        if 'position' in trigger:
+            position = trigger['position']
+            print(f"  位置条件: {position}")
+            # 実装例：'before_first_main_verb' など
+            if position == 'before_first_main_verb':
+                main_verbs = [token for token in doc if token.pos_ == 'VERB' and token.dep_ in ['ROOT', 'ccomp']]
+                if main_verbs:
+                    first_verb_idx = main_verbs[0].i
+                    # ここで位置関係を確認する具体的なロジックを実装
+                    print(f"    主動詞位置: {first_verb_idx}")
+        
+        # senseトリガーの確認（意味的条件）
+        if 'sense' in trigger:
+            sense = trigger['sense']
+            print(f"  意味条件: {sense}")
+            # 実装例：'exist_locative' など
+            if sense == 'exist_locative':
+                # 場所的存在を表す文脈かどうかを判定
+                prep_tokens = [token for token in doc if token.pos_ == 'ADP']
+                location_preps = any(token.text.lower() in ['in', 'on', 'at', 'by'] for token in prep_tokens)
+                print(f"    場所的前置詞: {location_preps}")
+        
         print(f"  → ルール適用対象: {rule_id}")
         return True
     
@@ -397,6 +432,12 @@ class CompleteRephraseParsingEngine:
         """単一ルールの適用"""
         
         rule_id = rule.get('id', '')
+        
+        # パターンルールの場合は特別処理
+        if 'patterns' in rule:
+            return self._apply_pattern_rule(rule, doc, hierarchy, slots)
+        
+        # 通常のルール処理
         assignment = rule.get('assign', {})
         
         if isinstance(assignment, list):
@@ -407,6 +448,76 @@ class CompleteRephraseParsingEngine:
         else:
             # 単一割り当ての場合
             return self._execute_assignment(assignment, doc, hierarchy, slots, rule_id)
+    
+    def _apply_pattern_rule(self, rule: Dict[str, Any], doc, hierarchy, slots: Dict[str, List]) -> bool:
+        """パターンルールの適用"""
+        
+        rule_id = rule.get('id', '')
+        patterns = rule.get('patterns', [])
+        
+        print(f"📝 パターンルール適用: {rule_id}")
+        
+        for pattern_obj in patterns:
+            pattern_text = pattern_obj.get('pattern', '')
+            assign_data = pattern_obj.get('assign', {})
+            
+            match = re.search(pattern_text, doc.text, re.IGNORECASE)
+            if match:
+                print(f"  ✅ パターンマッチ: {pattern_text}")
+                print(f"  📌 マッチ部分: '{match.group()}'")
+                
+                # パターンに基づく割り当て実行
+                if isinstance(assign_data, list):
+                    for assign_item in assign_data:
+                        self._execute_pattern_assignment(assign_item, match, doc, slots, rule_id)
+                else:
+                    self._execute_pattern_assignment(assign_data, match, doc, slots, rule_id)
+                return True
+        
+        return False
+    
+    def _execute_pattern_assignment(self, assignment: Dict[str, Any], match, doc, slots: Dict[str, List], rule_id: str):
+        """パターンベースの割り当て実行"""
+        
+        slot = assignment.get('slot', '')
+        value_type = assignment.get('type', 'word')
+        value_spec = assignment.get('value', '')
+        
+        print(f"    🎯 スロット: {slot}, タイプ: {value_type}, 値指定: {value_spec}")
+        
+        # 実際の値を決定
+        if value_type == 'group':
+            # 正規表現グループから値を取得
+            group_num = assignment.get('group', 1)
+            if group_num <= len(match.groups()):
+                value = match.group(group_num)
+            else:
+                value = match.group()
+        elif value_type == 'word':
+            # 指定された単語から値を取得
+            value = self._find_word_in_sentence(value_spec, doc)
+        elif value_type == 'phrase':
+            # 指定されたフレーズから値を取得
+            value = value_spec
+        else:
+            # デフォルトはマッチした全体
+            value = match.group()
+        
+        if value and slot in slots:
+            slots[slot].append({
+                'value': value,
+                'rule_id': rule_id,
+                'confidence': 0.9,
+                'pattern_based': True
+            })
+            print(f"    ✅ {slot}に'{value}'を設定")
+    
+    def _find_word_in_sentence(self, target_word: str, doc) -> str:
+        """文中から指定された単語を検索"""
+        for token in doc:
+            if token.text.lower() == target_word.lower() or token.lemma_.lower() == target_word.lower():
+                return token.text
+        return target_word
     
     def _execute_assignment(self, assignment: Dict[str, Any], doc, hierarchy, slots: Dict[str, List], rule_id: str) -> bool:
         """割り当ての実行"""
