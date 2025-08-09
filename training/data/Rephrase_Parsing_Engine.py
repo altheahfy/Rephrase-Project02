@@ -165,7 +165,7 @@ class RephraseParsingEngine:
             if words[i].lower() in ['to', 'from', 'for', 'with', 'in', 'at', 'on']:
                 if i + 1 < len(words):
                     prep_phrase = f"{words[i]} {words[i+1]}"
-                    modifiers['M2'] = [{'value': prep_phrase, 'type': 'prepositional_phrase', 'rule_id': 'imperative-modifier'}]
+                    modifiers['M2'] = [{'value': prep_phrase, 'type': 'word', 'rule_id': 'imperative-modifier'}]
                     i += 2
                     continue
             

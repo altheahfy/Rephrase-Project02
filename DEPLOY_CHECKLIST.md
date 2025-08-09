@@ -126,66 +126,146 @@ chmod 644 .htaccess
 
 ## 🗑️ デプロイ時削除対象ファイル・フォルダ
 
-### 必須削除項目（本番環境には不要）
+### ⚠️ セキュリティリスク高：必須削除項目
 
-#### 開発・デバッグ用ファイル
+#### 1. 設計・開発ドキュメント（機密情報含む）
+```
+設計仕様書/                     ❌ 全フォルダ削除必須
+├── 認証システム設計仕様書_v2.0.md    ❌ 認証情報漏洩リスク
+├── SECURITY_PERFORMANCE_IMPROVEMENTS_2025-07-21.md ❌ セキュリティ情報
+├── Rephrase_本番デプロイメント総合仕様書_v1.0.md ❌ インフラ情報
+└── その他すべての設計書            ❌ システム構造暴露リスク
+```
+
+#### 2. 商用・運用情報（機密）
+```
+commercial/                     ❌ 全フォルダ削除必須
+├── サクラインターネット運用手順書.md   ❌ サーバー接続情報
+├── 課金システム実装ガイド.md         ❌ 決済システム情報
+├── サクラインターネット商用展開計画.md  ❌ ビジネス機密
+└── 明日からの商用展開実行計画_2025年8月3日開始.md ❌ 戦略情報
+```
+
+#### 3. 管理者専用ツール
+```
+training/explanation/
+├── admin-panel.html           ❌ 管理者パネル（重大セキュリティリスク）
+├── generator.js              ❌ 文法解説生成システム
+└── template.html             ❌ テンプレート編集機能
+```
+
+#### 4. データベース作成システム
 ```
 training/data/
-├── analyze_code.py          ❌ コード分析スクリプト
-├── debug_spacy.py          ❌ spaCyデバッグ用
-├── quality_verification.py ❌ 品質検証用
-├── rule_analysis.py        ❌ ルール分析用
-├── test_coverage.py        ❌ テストカバレッジ検証
-├── test_parsing.py         ❌ パース機能テスト
-├── test_revert.py          ❌ リバート機能テスト
-├── test_simple.py          ❌ シンプルテスト
-├── test_spacy_vocab.py     ❌ spaCy語彙テスト
-└── __pycache__/            ❌ Pythonキャッシュフォルダ
+├── Excel_Generator.py         ❌ DB作成システム（外部公開禁止）
+├── Rephrase_Parsing_Engine.py ❌ 構文解析エンジン（ソースコード）
+├── 例文入力元.xlsx           ❌ 元データファイル（編集用）
+├── 例文入力元_分解結果_v2.xlsx ❌ 開発用データ
+├── 新規例文セット追加方法.md    ❌ 管理者向けマニュアル
+└── rephrase_rules_v1.0.json  ❌ ルール辞書（編集可能版）
 ```
 
-#### Git関連一時ファイル
+#### 5. 開発・Git関連ファイル
 ```
-.git-rewrite/               ❌ Git操作一時ファイル
-```
-
-#### 重複・古いバージョンファイル
-```
-training/js/
-└── subslot_visibility_control.js  ❌ 古いバージョン
-    (※ subslot_visibility_control_clean.js が正式版)
+.git/                         ❌ Git履歴（全削除）
+.github/                      ❌ GitHub設定
+.gitignore                    ❌ Git設定ファイル
+.vscode/                      ❌ VS Code設定
+README.md                     ❌ 開発者向け説明
+DEPLOY_CHECKLIST.md           ❌ このファイル自体も削除
+DEPLOYMENT_SPEC.md            ❌ デプロイ仕様書
 ```
 
 ### 削除実行コマンド（デプロイ前実行）
 ```powershell
-# training/dataフォルダのデバッグファイル削除
-Remove-Item -Path "training/data/analyze_code.py", "training/data/debug_spacy.py", "training/data/quality_verification.py", "training/data/rule_analysis.py", "training/data/test_coverage.py", "training/data/test_parsing.py", "training/data/test_revert.py", "training/data/test_simple.py", "training/data/test_spacy_vocab.py" -Force
+# 【重要】必ずバックアップを取ってから実行
 
-# キャッシュフォルダ削除
-Remove-Item -Path "training/data/__pycache__" -Recurse -Force
+# 1. 設計書フォルダ削除（機密情報）
+Remove-Item -Path "設計仕様書" -Recurse -Force
 
-# Git一時ファイル削除
-Remove-Item -Path ".git-rewrite" -Recurse -Force
+# 2. 商用情報フォルダ削除（機密）
+Remove-Item -Path "commercial" -Recurse -Force
+
+# 3. 管理者ツール削除
+Remove-Item -Path "training/explanation/admin-panel.html" -Force
+Remove-Item -Path "training/explanation/generator.js" -Force
+Remove-Item -Path "training/explanation/template.html" -Force
+
+# 4. データベース作成システム削除
+Remove-Item -Path "training/data/Excel_Generator.py" -Force
+Remove-Item -Path "training/data/Rephrase_Parsing_Engine.py" -Force
+Remove-Item -Path "training/data/例文入力元.xlsx" -Force
+Remove-Item -Path "training/data/例文入力元_分解結果_v2.xlsx" -Force
+Remove-Item -Path "training/data/新規例文セット追加方法.md" -Force
+Remove-Item -Path "training/data/rephrase_rules_v1.0.json" -Force
+
+# 5. 開発関連ファイル削除
+Remove-Item -Path ".git" -Recurse -Force
+Remove-Item -Path ".github" -Recurse -Force
+Remove-Item -Path ".gitignore" -Force
+Remove-Item -Path ".vscode" -Recurse -Force
+Remove-Item -Path "README.md" -Force
+Remove-Item -Path "DEPLOY_CHECKLIST.md" -Force
+Remove-Item -Path "DEPLOYMENT_SPEC.md" -Force
 ```
 
-### 本番環境保持ファイル（重要）
+### 本番環境最小構成（セキュア版）
 ```
-training/data/
-├── Excel_Generator.py           ✅ Excel生成エンジン
-├── Rephrase_Parsing_Engine.py   ✅ メイン構文解析エンジン
-├── preset_config.json           ✅ プリセット設定
-├── slot_order_data.json         ✅ スロット順序データ
-├── rephrase_rules_v1.0.json    ✅ ルール辞書
-├── V自動詞第1文型.json         ✅ 例文データ
-├── 第3,4文型.json              ✅ 例文データ
-├── 例文入力元.xlsx             ✅ 元データ
-├── 例文入力元_分解結果_v2.xlsx ✅ 分解済みデータ
-└── 新規例文セット追加方法.md    ✅ ドキュメント
+Rephrase-Project/
+├── .htaccess                    ✅ セキュリティ設定
+├── index.html                   ✅ メインページ
+├── manifest.json                ✅ PWA設定
+├── sw.js                       ✅ Service Worker
+├── robots.txt                  ✅ SEO設定
+├── sitemap.xml                 ✅ SEO設定
+├── 404.html                    ✅ エラーページ
+├── assets/                     ✅ CSS・画像リソース
+└── training/                   ✅ メイン機能
+    ├── index.html              ✅ トレーニングUI
+    ├── auth.html               ✅ 認証ページ
+    ├── auth-check.html         ✅ 認証チェック
+    ├── style.css               ✅ メインスタイル
+    ├── mobile-split-view-simple.css ✅ モバイル対応
+    ├── js/                     ✅ JavaScript機能（認証・UI制御）
+    ├── css/                    ✅ 詳細スタイル
+    ├── data/                   ✅ 例文JSONデータのみ
+    │   ├── preset_config.json
+    │   ├── slot_order_data.json
+    │   ├── V自動詞第1文型.json
+    │   └── 第3,4文型.json
+    ├── explanation/            ✅ 文法解説ページ（表示のみ）
+    │   ├── articles-definite.html
+    │   ├── v-intransitive-type1.html
+    │   └── 他動詞第3,4文型.html
+    ├── grammar/                ✅ 文法学習機能
+    ├── matrix/                 ✅ マトリックス機能
+    └── slot_images/           ✅ 学習用画像
 ```
 
-### ⚠️ 削除前注意事項
-1. **必ずバックアップを取る**: `.zip`ファイルで全体をアーカイブ保存
-2. **段階的削除**: 一度にすべて削除せず、動作確認しながら実行
-3. **本番テスト**: 削除後に必ずローカル環境で動作テスト実行
+### ⚠️ セキュリティ警告
+1. **admin-panel.html**: 管理者パネルへのアクセスは重大なセキュリティ違反
+2. **設計仕様書フォルダ**: システム構造・認証情報の暴露リスク
+3. **commercialフォルダ**: サーバー接続情報・ビジネス機密の漏洩リスク
+4. **Excel_Generator.py等**: ソースコードへの直接アクセスでシステム解析可能
+5. **Git履歴**: コミット履歴から開発過程・機密情報が判明する危険性
+
+### 段階的削除推奨手順
+```
+【Phase 1】機密情報削除
+→ 設計仕様書/, commercial/, .git/ 削除
+
+【Phase 2】管理者ツール削除  
+→ admin-panel.html, generator.js, template.html削除
+
+【Phase 3】データベース作成システム削除
+→ Python scripts, 元データExcel削除
+
+【Phase 4】動作テスト
+→ ユーザー機能のみでの動作確認
+
+【Phase 5】最終クリーンアップ
+→ 開発用ファイル(.gitignore, README.md等)削除
+```
 
 ---
 
