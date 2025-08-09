@@ -286,31 +286,75 @@ class CompleteRephraseParsingEngine:
                 print(f"⚠️ ルール適用エラー {rule_id}: {e}")
         
         print(f"📊 適用されたルール数: {len(applied_rules)}/21")
+        
+        # 汎用的な動詞検出（ルールで捕獲されなかった場合）
+        if not slots['V']:
+            generic_verb = self._extract_generic_verb(doc, hierarchy)
+            if generic_verb:
+                slots['V'].append({
+                    'value': generic_verb,
+                    'rule_id': 'generic-verb',
+                    'confidence': 0.7
+                })
+                print(f"✅ 汎用動詞検出: {generic_verb}")
+        
+        # 汎用的な目的語検出（ルールで捕獲されなかった場合）
+        if not slots['O1']:
+            generic_object = self._extract_generic_object(doc, hierarchy)
+            if generic_object:
+                slots['O1'].append({
+                    'value': generic_object,
+                    'rule_id': 'generic-object',
+                    'confidence': 0.7
+                })
+                print(f"✅ 汎用目的語検出: {generic_object}")
+        
         return slots
     
     def _should_apply_rule(self, rule: Dict[str, Any], doc, hierarchy) -> bool:
         """ルールを適用すべきかどうかの判定"""
         
+        rule_id = rule.get('id', 'unknown')
         trigger = rule.get('trigger', {})
+        
+        print(f"🔍 ルール判定: {rule_id}")
+        
+        # tokenトリガーの確認
+        if 'token' in trigger:
+            target_token = trigger['token']
+            doc_tokens = [token.text for token in doc]
+            token_match = target_token in doc_tokens
+            print(f"  tokenトリガー: '{target_token}' → 文書内: {doc_tokens} → マッチ: {token_match}")
+            if not token_match:
+                return False
         
         # lemmaトリガーの確認
         if 'lemma' in trigger:
             lemmas = trigger['lemma'] if isinstance(trigger['lemma'], list) else [trigger['lemma']]
-            if not any(token.lemma_ in lemmas for token in doc):
+            doc_lemmas = [token.lemma_ for token in doc]
+            lemma_match = any(token.lemma_ in lemmas for token in doc)
+            print(f"  lemmaトリガー: {lemmas} → 文書内: {doc_lemmas} → マッチ: {lemma_match}")
+            if not lemma_match:
                 return False
         
         # posトリガーの確認
         if 'pos' in trigger:
             pos_tags = trigger['pos'] if isinstance(trigger['pos'], list) else [trigger['pos']]
-            if not any(token.pos_ in pos_tags for token in doc):
+            doc_pos = [token.pos_ for token in doc]
+            pos_match = any(token.pos_ in pos_tags for token in doc)
+            print(f"  POSトリガー: {pos_tags} → 文書内: {doc_pos} → マッチ: {pos_match}")
+            if not pos_match:
                 return False
         
         # patternトリガーの確認
         if 'pattern' in trigger:
             pattern = trigger['pattern']
-            if not re.search(pattern, doc.text):
+            pattern_match = bool(re.search(pattern, doc.text))
+            print(f"  パターントリガー: {pattern} → マッチ: {pattern_match}")
+            if not pattern_match:
                 return False
         
+        print(f"  → ルール適用対象: {rule_id}")
         return True
     
     def _apply_single_rule(self, rule: Dict[str, Any], doc, hierarchy, slots: Dict[str, List]) -> bool:
@@ -395,13 +439,17 @@ class CompleteRephraseParsingEngine:
         return sub_structures
     
     def _determine_sentence_pattern(self, main_slots: Dict[str, List], sub_structures: List) -> str:
-        """5文型の判定"""
+        """5文型の正確な判定"""
         
         has_s = bool(main_slots.get('S'))
         has_v = bool(main_slots.get('V'))
         has_o1 = bool(main_slots.get('O1'))
         has_o2 = bool(main_slots.get('O2'))
         has_c1 = bool(main_slots.get('C1'))
+        has_aux = bool(main_slots.get('Aux'))
+        
+        # デバッグ出力
+        print(f"🔍 文型判定: S={has_s}, V={has_v}, O1={has_o1}, O2={has_o2}, C1={has_c1}, Aux={has_aux}")
         
         if has_s and has_v:
             if has_o1 and has_o2:
@@ -414,8 +462,10 @@ class CompleteRephraseParsingEngine:
                 return "第2文型 (SVC)"
             else:
                 return "第1文型 (SV)"
+        elif has_v:
+            return "命令文または特殊構造"
         
-        return "特殊構造または不完全"
+        return "不完全な文構造"
     
     # ヘルパーメソッド群
     def _find_clause_marker(self, verb_token) -> Optional[str]:
@@ -498,14 +548,308 @@ class CompleteRephraseParsingEngine:
         
         return base_score
     
-    # 実装省略のメソッド群（実際には詳細実装が必要）
+    # === Step 1: 基本抽出メソッドの実装 ===
+    
+    def _extract_subject_value(self, doc, hierarchy) -> Optional[str]:
+        """主語の正確な抽出 - Rephraseルール対応"""
+        
+        # 主節の主語を優先
+        main_subject = hierarchy.get('main_clause', {}).get('subject')
+        
+        if main_subject and main_subject['type'] == 'complex':
+            # 複雑な主語（関係詞節付き）の処理
+            return main_subject['full_phrase']
+        elif main_subject:
+            # 単純な主語
+            return main_subject['full_phrase']
+        
+        # フォールバック: spaCyから直接抽出
+        for token in doc:
+            if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
+                return self._get_complete_noun_phrase(token)
+        
+        return None
+    
+    def _extract_verb_value(self, doc, hierarchy, rule_id: str) -> Optional[str]:
+        """動詞の正確な抽出 - ルール別処理"""
+        
+        print(f"🔍 動詞抽出開始 - ルール: {rule_id}")
+        print(f"  階層データ: {hierarchy.keys()}")
+        
+        main_verb = hierarchy.get('main_clause', {}).get('verb')
+        print(f"  階層から取得した動詞: {main_verb}")
+        
+        if main_verb:
+            # 基本動詞の抽出
+            verb_text = main_verb.text
+            print(f"  → 動詞テキスト: '{verb_text}'")
+            
+            # 特定のルールに基づく調整
+            if 'progressive' in rule_id:
+                # 進行形の処理
+                for child in main_verb.children:
+                    if child.dep_ == "aux" and child.lemma_ == "be":
+                        return f"{child.text} {verb_text}"
+            
+            elif 'perfect' in rule_id:
+                # 完了形の処理
+                for child in main_verb.children:
+                    if child.dep_ == "aux" and child.lemma_ == "have":
+                        return f"{child.text} {verb_text}"
+            
+            return verb_text
+        
+        # フォールバック: ROOT動詞を探す
+        print(f"  フォールバック: ROOT動詞を検索")
+        for token in doc:
+            if token.dep_ == "ROOT" and token.pos_ == "VERB":
+                print(f"  → ROOT動詞発見: '{token.text}' (pos: {token.pos_}, dep: {token.dep_})")
+                return token.text
+        
+        print(f"  → 動詞見つからず")
+        return None
+    
+    def _extract_generic_verb(self, doc, hierarchy) -> Optional[str]:
+        """汎用的な動詞検出（ルールで捕獲されなかった場合のフォールバック）"""
+        
+        # ROOT動詞を最優先
+        for token in doc:
+            if token.dep_ == "ROOT" and token.pos_ == "VERB":
+                return token.text
+        
+        # 他の動詞を検索
+        for token in doc:
+            if token.pos_ == "VERB":
+                return token.text
+                
+        return None
+    
+    def _extract_generic_object(self, doc, hierarchy) -> Optional[str]:
+        """汎用的な目的語検出（ルールで捕獲されなかった場合のフォールバック）"""
+        
+        # 直接目的語（dobj）を最優先
+        for token in doc:
+            if token.dep_ == "dobj":
+                return self._get_complete_noun_phrase(token)
+        
+        # 間接目的語（iobj）
+        for token in doc:
+            if token.dep_ == "iobj":
+                return self._get_complete_noun_phrase(token)
+                
+        # 補語（attr, pcomp）
+        for token in doc:
+            if token.dep_ in ["attr", "pcomp"]:
+                return self._get_complete_noun_phrase(token)
+                
+        return None
+    
+    def _extract_auxiliary_value(self, doc, hierarchy) -> Optional[str]:
+        """助動詞の正確な抽出 - 縮約形対応"""
+        
+        main_verb = hierarchy.get('main_clause', {}).get('verb')
+        if not main_verb:
+            return None
+        
+        auxiliaries = []
+        
+        # 助動詞の収集
+        for child in main_verb.children:
+            if child.dep_ == "aux":
+                aux_text = child.text
+                
+                # 縮約形の修正
+                if aux_text == "ca" and child.i < len(doc) - 1:
+                    next_token = doc[child.i + 1]
+                    if next_token.text == "n't":
+                        aux_text = "cannot"  # can't -> cannot
+                elif aux_text == "wo" and child.i < len(doc) - 1:
+                    next_token = doc[child.i + 1]
+                    if next_token.text == "n't":
+                        aux_text = "will not"  # won't -> will not
+                
+                auxiliaries.append({
+                    'text': aux_text,
+                    'position': child.i
+                })
+        
+        # 位置順でソート
+        auxiliaries.sort(key=lambda x: x['position'])
+        
+        if auxiliaries:
+            return ' '.join([aux['text'] for aux in auxiliaries])
+        
+        return None
+    
+    def _extract_temporal_value(self, doc, hierarchy) -> Optional[str]:
+        """時間表現の抽出 - Rephraseルール対応"""
+        
+        temporal_expressions = []
+        
+        # npadvmod時間表現
+        for token in doc:
+            if token.dep_ == "npadvmod" and self._is_temporal_word(token.text):
+                temporal_expressions.append({
+                    'text': self._get_complete_noun_phrase(token),
+                    'position': token.i,
+                    'type': 'npadvmod'
+                })
+        
+        # 固有表現（時間）
+        for ent in doc.ents:
+            if ent.label_ in ['TIME', 'DATE']:
+                temporal_expressions.append({
+                    'text': ent.text,
+                    'position': ent.start,
+                    'type': 'named_entity'
+                })
+        
+        # "ago"構造の特別処理
+        for i, token in enumerate(doc):
+            if token.text.lower() == "ago" and i >= 2:
+                # "a few days ago" のような構造
+                phrase_tokens = []
+                j = i - 1
+                while j >= 0 and doc[j].dep_ in ['det', 'amod', 'nummod', 'noun']:
+                    phrase_tokens.insert(0, doc[j])
+                    j -= 1
+                    if len(phrase_tokens) >= 4:  # 安全制限
+                        break
+                
+                if phrase_tokens:
+                    phrase_tokens.append(token)  # "ago"を追加
+                    full_phrase = ' '.join([t.text for t in phrase_tokens])
+                    temporal_expressions.append({
+                        'text': full_phrase,
+                        'position': phrase_tokens[0].i,
+                        'type': 'ago_structure'
+                    })
+        
+        # 最も適切な時間表現を選択（文頭に近いものを優先）
+        if temporal_expressions:
+            temporal_expressions.sort(key=lambda x: x['position'])
+            return temporal_expressions[0]['text']
+        
+        return None
+    
+    def _is_temporal_word(self, word: str) -> bool:
+        """時間を表す単語かどうか判定 - 拡張版"""
+        temporal_words = {
+            # 時間帯
+            'morning', 'afternoon', 'evening', 'night', 'midnight', 'noon',
+            # 日
+            'today', 'yesterday', 'tomorrow',
+            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+            # 月
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december',
+            # 期間
+            'week', 'month', 'year', 'day', 'hour', 'minute', 'second',
+            'weekend', 'weekday',
+            # 頻度
+            'always', 'never', 'often', 'sometimes', 'usually', 'rarely',
+            'daily', 'weekly', 'monthly', 'yearly',
+            # その他
+            'now', 'then', 'soon', 'late', 'early', 'recently', 'lately'
+        }
+        
+        return word.lower() in temporal_words
+    
+    # 実装予定のメソッド群
     def _extract_noun_phrases(self, doc): return []
     def _extract_verb_phrases(self, doc): return []
     def _extract_prep_phrases(self, doc): return []
-    def _extract_auxiliary_value(self, doc, hierarchy): return None
-    def _extract_verb_value(self, doc, hierarchy, rule_id): return None
-    def _extract_temporal_value(self, doc, hierarchy): return None
-    def _extract_subject_value(self, doc, hierarchy): return None
-    def _extract_generic_value(self, assignment, doc, hierarchy): return None
+    def _extract_generic_value(self, assignment: Dict[str, Any], doc, hierarchy) -> Optional[str]:
+        """汎用的な値抽出 - ルール辞書対応"""
+        
+        slot = assignment.get('slot', '')
+        
+        # スロット別の抽出ロジック
+        if slot == 'S':
+            return self._extract_subject_value(doc, hierarchy)
+        elif slot == 'V':
+            return self._extract_verb_value(doc, hierarchy, 'generic')
+        elif slot == 'Aux':
+            return self._extract_auxiliary_value(doc, hierarchy)
+        elif slot == 'O1':
+            return self._extract_direct_object_value(doc, hierarchy)
+        elif slot == 'O2':
+            return self._extract_indirect_object_value(doc, hierarchy)
+        elif slot == 'M3':
+            return self._extract_temporal_value(doc, hierarchy)
+        elif slot in ['M1', 'M2']:
+            return self._extract_modifier_value(doc, hierarchy, slot)
+        
+        return None
+    
+    def _extract_direct_object_value(self, doc, hierarchy) -> Optional[str]:
+        """直接目的語の抽出"""
+        
+        main_verb = hierarchy.get('main_clause', {}).get('verb')
+        if not main_verb:
+            return None
+        
+        # 直接目的語を探す
+        for token in doc:
+            if token.dep_ == "dobj" and token.head == main_verb:
+                return self._get_complete_noun_phrase(token)
+        
+        return None
+    
+    def _extract_indirect_object_value(self, doc, hierarchy) -> Optional[str]:
+        """間接目的語の抽出"""
+        
+        main_verb = hierarchy.get('main_clause', {}).get('verb')
+        if not main_verb:
+            return None
+        
+        # 間接目的語を探す
+        for token in doc:
+            if token.dep_ in ["iobj", "dative"] and token.head == main_verb:
+                return self._get_complete_noun_phrase(token)
+        
+        return None
+    
+    def _extract_modifier_value(self, doc, hierarchy, slot: str) -> Optional[str]:
+        """修飾語の抽出 - M1/M2/M3分類"""
+        
+        if slot == 'M1':
+            # 場所・状況修飾語
+            return self._extract_locative_modifier(doc)
+        elif slot == 'M2':
+            # 方法・手段修飾語
+            return self._extract_manner_modifier(doc)
+        elif slot == 'M3':
+            # 時間・頻度修飾語
+            return self._extract_temporal_value(doc, hierarchy)
+        
+        return None
+    
+    def _extract_locative_modifier(self, doc) -> Optional[str]:
+        """場所修飾語の抽出"""
+        
+        for token in doc:
+            if token.pos_ == "ADP" and token.text.lower() in ['at', 'in', 'on', 'near', 'by']:
+                # 前置詞句の場合
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        # 時間表現でないことを確認
+                        if not self._is_temporal_word(child.text):
+                            phrase = f"{token.text} {self._get_complete_noun_phrase(child)}"
+                            return phrase
+        
+        return None
+    
+    def _extract_manner_modifier(self, doc) -> Optional[str]:
+        """方法・手段修飾語の抽出"""
+        
+        for token in doc:
+            if token.pos_ == "ADP" and token.text.lower() in ['with', 'by', 'through']:
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        phrase = f"{token.text} {self._get_complete_noun_phrase(child)}"
+                        return phrase
+        
+        return None
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
     def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
