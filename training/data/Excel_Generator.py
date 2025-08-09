@@ -51,10 +51,25 @@ class ExcelGeneratorV2:
         self.vgroup_data[v_group_key].append(sentence_data)
         
         print(f"✅ Step 1完了: V_group_key='{v_group_key}' に蓄積")
-        for slot, candidates in slots.items():
-            if candidates:
-                candidate = candidates[0]
-                print(f"  {slot}: {candidate['value']}")
+        # メインslotsデータを表示
+        if 'main_slots' in slots:
+            main_slots = slots['main_slots']
+            for slot, candidates in main_slots.items():
+                if isinstance(candidates, list) and len(candidates) > 0:
+                    candidate = candidates[0]
+                    if isinstance(candidate, dict) and 'value' in candidate:
+                        print(f"  {slot}: {candidate['value']}")
+                elif candidates:
+                    print(f"  {slot}: {candidates}")
+        elif 'slots' in slots:
+            main_slots = slots['slots']
+            for slot, candidates in main_slots.items():
+                if isinstance(candidates, list) and len(candidates) > 0:
+                    candidate = candidates[0]
+                    if isinstance(candidate, dict) and 'value' in candidate:
+                        print(f"  {slot}: {candidate['value']}")
+                elif candidates:
+                    print(f"  {slot}: {candidates}")
         
         self.current_sentence_id += 1
         self.current_construction_id += 1
@@ -90,10 +105,24 @@ class ExcelGeneratorV2:
         
         for sentence_data in vgroup_sentences:
             slots = sentence_data['slots']
-            for slot, candidates in slots.items():
-                if not candidates:
+            
+            # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
+            main_slots = slots.get('main_slots') or slots.get('slots', {})
+            
+            for slot, candidates in main_slots.items():
+                if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
                     continue
-                candidate = candidates[0]
+                
+                # candidatesがリストの場合は最初の要素を取得
+                if isinstance(candidates, list):
+                    candidate = candidates[0]
+                else:
+                    candidate = candidates
+                    
+                # valueが存在するかチェック
+                if not isinstance(candidate, dict):
+                    continue
+                
                 if 'order' in candidate:
                     order_info_available = True
                     slot_orders_from_analysis[slot] = candidate['order']
@@ -112,14 +141,27 @@ class ExcelGeneratorV2:
         for sentence_data in vgroup_sentences:
             sentence = sentence_data['sentence']
             slots = sentence_data['slots']
+            
+            # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
+            main_slots = slots.get('main_slots') or slots.get('slots', {})
+            
             words = sentence.split()
             
             current_pos = 0
-            for slot, candidates in slots.items():
-                if not candidates:
+            for slot, candidates in main_slots.items():
+                if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
+                    continue
+                
+                # candidatesがリストの場合は最初の要素を取得
+                if isinstance(candidates, list):
+                    candidate = candidates[0]
+                else:
+                    candidate = candidates
+                    
+                # valueが存在するかチェック
+                if not isinstance(candidate, dict) or 'value' not in candidate:
                     continue
                     
-                candidate = candidates[0]
                 slot_phrase = candidate['value']
                 
                 # 文中での語句の位置を特定
@@ -185,15 +227,28 @@ class ExcelGeneratorV2:
         example_id = sentence_data['example_id']
         construction_id = sentence_data['construction_id']
         
+        # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
+        main_slots = slots.get('main_slots') or slots.get('slots', {})
+        
         # Slot_display_order順序でスロットを処理
-        sorted_slots = sorted(slots.items(), key=lambda x: slot_orders.get(x[0], 99))
+        sorted_slots = sorted(main_slots.items(), key=lambda x: slot_orders.get(x[0], 99))
         
         row_count = 0
         for slot, candidates in sorted_slots:
-            if not candidates:
+            if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
+                continue
+            
+            # candidatesがリストの場合は最初の要素を取得
+            if isinstance(candidates, list):
+                candidate = candidates[0]
+            else:
+                # 直接辞書の場合
+                candidate = candidates
+                
+            # valueが存在するかチェック
+            if not isinstance(candidate, dict) or 'value' not in candidate:
                 continue
                 
-            candidate = candidates[0]
             slot_phrase = candidate['value']
             
             # Rephraseの分類基準に従った判定
@@ -245,26 +300,35 @@ class ExcelGeneratorV2:
     def extract_main_verb(self, slots):
         """メイン動詞を抽出（改良版）"""
         
+        # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
+        main_slots = slots.get('main_slots') or slots.get('slots', {})
+        
         # 1. まず通常のVスロットをチェック
-        if 'V' in slots and slots['V']:
-            verb_candidate = slots['V'][0]['value']
-            
-            # 動詞らしい単語かチェック
-            if self.looks_like_verb(verb_candidate):
-                return verb_candidate
+        if 'V' in main_slots and main_slots['V']:
+            v_candidates = main_slots['V']
+            if isinstance(v_candidates, list) and len(v_candidates) > 0:
+                verb_candidate = v_candidates[0].get('value', '')
+                
+                # 動詞らしい単語かチェック
+                if self.looks_like_verb(verb_candidate):
+                    return verb_candidate
         
         # 2. Auxスロットもチェック（助動詞の後に動詞がある可能性）
-        if 'Aux' in slots and slots['Aux']:
-            aux_candidate = slots['Aux'][0]['value']
-            if self.looks_like_verb(aux_candidate):
-                return aux_candidate
+        if 'Aux' in main_slots and main_slots['Aux']:
+            aux_candidates = main_slots['Aux']
+            if isinstance(aux_candidates, list) and len(aux_candidates) > 0:
+                aux_candidate = aux_candidates[0].get('value', '')
+                if self.looks_like_verb(aux_candidate):
+                    return aux_candidate
         
         # 3. O1から動詞を探す（解析ミスの場合）
-        if 'O1' in slots and slots['O1']:
-            o1_text = slots['O1'][0]['value']
-            verb_from_o1 = self.extract_verb_from_text(o1_text)
-            if verb_from_o1:
-                return verb_from_o1
+        if 'O1' in main_slots and main_slots['O1']:
+            o1_candidates = main_slots['O1']
+            if isinstance(o1_candidates, list) and len(o1_candidates) > 0:
+                o1_text = o1_candidates[0].get('value', '')
+                verb_from_o1 = self.extract_verb_from_text(o1_text)
+                if verb_from_o1:
+                    return verb_from_o1
         
         # 4. 全文から動詞を探す（最後の手段）
         return None
@@ -429,17 +493,25 @@ class ExcelGeneratorV2:
             
             for index, row in df.iterrows():
                 sentence = str(row[sentence_column]).strip()
+                print(f"🔍 行{index+1}: '{sentence}' (長さ: {len(sentence)})")
                 
                 # 空文字やNaNをスキップ
                 if sentence and sentence != 'nan' and len(sentence) > 1:
                     # 重複チェック
                     if sentence not in processed_sentences:
-                        success = self.analyze_and_add_sentence(sentence)
+                        print(f"📝 処理開始: '{sentence}'")
+                        try:
+                            success = self.analyze_and_add_sentence(sentence)
+                            print(f"📊 処理結果: success={success}")
+                        except Exception as e:
+                            print(f"❌ 処理中エラー: {e}")
+                            success = False
                         if success:
                             processed_sentences.add(sentence)
                             loaded_count += 1
-                    # else:
-                    #     print(f"⚠️ 重複スキップ（行{index+1}): '{sentence}'")
+                            print(f"✅ loaded_count = {loaded_count}")
+                    else:
+                        print(f"⚠️ 重複スキップ（行{index+1}): '{sentence}'")
                 else:
                     print(f"⚠️ スキップ（行{index+1}): '{sentence}'")
             
