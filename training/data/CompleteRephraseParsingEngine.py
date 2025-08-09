@@ -426,6 +426,27 @@ class CompleteRephraseParsingEngine:
                     first_verb_idx = main_verbs[0].i
                     # ここで位置関係を確認する具体的なロジックを実装
                     print(f"    主動詞位置: {first_verb_idx}")
+            elif position == 'after_V':
+                # 動詞の後に来る副詞をチェック
+                main_verbs = [token for token in doc if token.pos_ == 'VERB' and token.dep_ in ['ROOT', 'ccomp']]
+                if main_verbs:
+                    main_verb = main_verbs[0]
+                    # 主動詞の後にある副詞を探す
+                    pos_check_passed = False
+                    if 'pos' in trigger:
+                        target_pos = trigger['pos']
+                        adverbs_after_verb = [token for token in doc if token.pos_ in target_pos and token.i > main_verb.i]
+                        if adverbs_after_verb:
+                            pos_check_passed = True
+                            print(f"    動詞後の{target_pos}: {[token.text for token in adverbs_after_verb]}")
+                        else:
+                            print(f"    動詞後に{target_pos}が見つからない")
+                            return False
+                    else:
+                        pos_check_passed = True
+                    
+                    if not pos_check_passed:
+                        return False
         
         # senseトリガーの確認（意味的条件）
         if 'sense' in trigger:
@@ -666,6 +687,8 @@ class CompleteRephraseParsingEngine:
             return self._extract_temporal_value(doc, hierarchy)
         elif rule_id.startswith('subject-'):
             return self._extract_subject_value(doc, hierarchy)
+        elif rule_id == 'manner-degree-M2':
+            return self._extract_adverb_value(doc)
         else:
             # 汎用的な値抽出
             return self._extract_generic_value(assignment, doc, hierarchy)
@@ -1605,6 +1628,20 @@ class CompleteRephraseParsingEngine:
                                 return f"{child.text} {self._get_complete_noun_phrase(grandchild)}"
         
         return None
+    
+    def _extract_adverb_value(self, doc) -> Optional[str]:
+        """副詞を抽出（M2スロット用）"""
+        adverbs = []
+        
+        for token in doc:
+            # 副詞（ADV）で、動詞を修飾している場合
+            if token.pos_ == "ADV" and token.dep_ in ["advmod", "prep"]:
+                # 前置詞句でない単語の副詞を優先
+                if not any(child.dep_ == "pobj" for child in token.children):
+                    adverbs.append(token.text)
+        
+        # 最初の副詞を返す（複数ある場合は最初のもの）
+        return adverbs[0] if adverbs else None
         
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
     def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
