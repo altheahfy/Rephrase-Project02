@@ -5,14 +5,15 @@ import pandas as pd
 import os
 from Rephrase_Parsing_Engine import RephraseParsingEngine
 
-class ExcelGeneratorV2:
-    """Rephrase解析結果をExcel形式で出力（動的絶対順序対応）"""
+class ExcelGeneratorV3:
+    """spaCy統合版Rephrase解析結果をExcel形式で出力"""
     
-    def __init__(self):
+    def __init__(self, use_spacy_grammar=True):
         self.engine = RephraseParsingEngine()
         self.results = []
         self.current_sentence_id = 1
         self.current_construction_id = 1000
+        self.use_spacy_grammar = use_spacy_grammar  # spaCy文法解析の使用フラグ
         
         # V_group_keyごとの例文データを保持
         self.vgroup_data = {}  # {v_group_key: [sentence_data, ...]}
@@ -25,8 +26,8 @@ class ExcelGeneratorV2:
             
         print(f"\n=== Step 1 解析中: {sentence} ===")
         
-        # 品詞分解実行
-        slots = self.engine.analyze_sentence(sentence)
+        # 品詞分解実行（spaCy統合または従来手法）
+        slots = self.analyze_sentence_enhanced(sentence)
         
         if not slots:
             print(f"❌ 解析失敗: {sentence}")
@@ -58,6 +59,15 @@ class ExcelGeneratorV2:
         
         self.current_sentence_id += 1
         self.current_construction_id += 1
+        
+    def analyze_sentence_enhanced(self, sentence):
+        """spaCy統合解析または従来解析を選択実行"""
+        if self.use_spacy_grammar and self.engine.spacy_available:
+            # spaCy統合文法解析を使用
+            return self.engine.analyze_sentence_with_spacy_grammar(sentence)
+        else:
+            # 従来の解析手法を使用
+            return self.engine.analyze_sentence(sentence)
     
     def generate_excel_data(self):
         """V_group_keyデータからExcelデータを生成（Step 2）"""
@@ -448,9 +458,9 @@ class ExcelGeneratorV2:
 
 def test_from_excel():
     """例文入力元.xlsxから読み込んでテスト"""
-    print("=== Excel Generator v2.0 - 例文入力元.xlsxテスト ===")
+    print("=== Excel Generator v3.0 (spaCy統合) - 例文入力元.xlsxテスト ===")
     
-    generator = ExcelGeneratorV2()
+    generator = ExcelGeneratorV3(use_spacy_grammar=True)  # spaCy統合版を使用
     
     # Excel読み込み
     loaded_count = generator.load_from_excel("例文入力元.xlsx")
@@ -463,7 +473,7 @@ def test_from_excel():
         generator.show_summary()
         
         # Excel保存（入力ファイル名ベースで出力名生成）
-        output_name = "例文入力元_分解結果_v2.xlsx"
+        output_name = "例文入力元_分解結果_v3_spaCy統合.xlsx"
         generator.save_to_excel(output_name)
         
         print(f"\n🎉 完了! 出力ファイル: {output_name}")
@@ -471,19 +481,24 @@ def test_from_excel():
         print("❌ Excelファイルから例文を読み込めませんでした")
 
 
-def test_v2():
-    """バージョン2テスト"""
-    print("=== Excel Generator v2.0 テスト ===")
+def test_v3():
+    """spaCy統合版テスト"""
+    print("=== Excel Generator v3.0 (spaCy統合) テスト ===")
     
-    generator = ExcelGeneratorV2()
+    generator = ExcelGeneratorV3(use_spacy_grammar=True)
     
-    # テストデータ
+    # テストデータ（従来問題があったパターン）
     test_sentences = [
-        "I run fast",
-        "Do you run every day?",
-        "I think that he is smart",
-        "What did you buy?"
+        "Where do you live?",  # 疑問詞順序問題
+        "What did you buy yesterday?",  # 疑問詞構文
+        "I haven't seen him recently.",  # Present Perfect
+        "She has been studying linguistics for three years.",  # 完了進行形
+        "The sophisticated analysis demonstrates comprehensive understanding.",  # 語彙制限
+        "Running quickly, he caught the butterfly.",  # 分詞構文
+        "If I were rich, I would travel around the world.",  # 仮定法
     ]
+    
+    print(f"📝 spaCy統合テスト（{len(test_sentences)}文）")
     
     # Step 1: 全例文を解析・蓄積
     for sentence in test_sentences:
@@ -495,8 +510,19 @@ def test_v2():
     # サマリー表示
     generator.show_summary()
     
+    # spaCy統合統計表示
+    if hasattr(generator.engine, 'stats'):
+        stats = generator.engine.stats
+        if stats['total_analyzed'] > 0:
+            print(f"\n🔧 spaCy統合エンジン統計:")
+            print(f"  総語彙処理: {stats['total_analyzed']}")
+            print(f"  spaCy文法解析: {stats['spacy_grammar_success']}")
+            print(f"  形態素ルール: {stats['morphology_success']}")
+            print(f"  spaCy補完: {stats['spacy_success']}")
+            print(f"  フォールバック: {stats['fallback_used']}")
+    
     # Excel保存
-    generator.save_to_excel("テスト_v2_絶対順序対応.xlsx")
+    generator.save_to_excel("テスト_v3_spaCy統合版.xlsx")
 
 
 if __name__ == "__main__":
@@ -507,8 +533,8 @@ if __name__ == "__main__":
         print("📁 例文入力元.xlsxを発見！自動読み込みします。")
         test_from_excel()
     elif len(sys.argv) > 1 and sys.argv[1] == "--excel":
-        # python Excel_Generator_v2.py --excel で例文入力元.xlsxを処理
+        # python Excel_Generator.py --excel で例文入力元.xlsxを処理
         test_from_excel()
     else:
-        # 通常のテスト
-        test_v2()
+        # 通常のテスト（spaCy統合版）
+        test_v3()
