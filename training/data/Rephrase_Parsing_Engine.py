@@ -425,19 +425,19 @@ class RephraseParsingEngine:
                 objects = " ".join(rest[3:]) if len(rest) > 3 else ""
                 
                 result = {
-                    'Aux': [{'value': aux, 'type': 'auxiliary', 'rule_id': 'wh-question'}],
-                    'S': [{'value': subject, 'type': 'subject', 'rule_id': 'wh-question'}],
-                    'V': [{'value': verb, 'type': 'verb', 'rule_id': 'wh-question'}]
+                    'Aux': [{'value': aux, 'type': 'auxiliary', 'rule_id': 'wh-question', 'order': 2}],
+                    'S': [{'value': subject, 'type': 'subject', 'rule_id': 'wh-question', 'order': 3}],
+                    'V': [{'value': verb, 'type': 'verb', 'rule_id': 'wh-question', 'order': 4}]
                 }
                 
                 # wh-wordがどのスロットに対応するかを判定
                 wh_slot = self.determine_wh_slot(wh_word.lower())
-                result[wh_slot] = [{'value': wh_word, 'type': 'wh-word', 'rule_id': 'wh-question'}]
+                result[wh_slot] = [{'value': wh_word, 'type': 'wh-word', 'rule_id': 'wh-question', 'order': 1}]
                 
                 if objects:
                     # wh-wordが目的語でない場合のみO1を追加
                     if wh_slot not in ['O1', 'O2']:
-                        result['O1'] = [{'value': objects, 'type': 'object', 'rule_id': 'wh-question'}]
+                        result['O1'] = [{'value': objects.rstrip('?'), 'type': 'object', 'rule_id': 'wh-question', 'order': 5}]
                         
                 return result
         

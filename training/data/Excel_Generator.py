@@ -83,6 +83,28 @@ class ExcelGeneratorV2:
             
         vgroup_sentences = self.vgroup_data[v_group_key]
         
+        # まず、解析結果のorder情報を確認
+        order_info_available = False
+        slot_orders_from_analysis = {}
+        
+        for sentence_data in vgroup_sentences:
+            slots = sentence_data['slots']
+            for slot, candidates in slots.items():
+                if not candidates:
+                    continue
+                candidate = candidates[0]
+                if 'order' in candidate:
+                    order_info_available = True
+                    slot_orders_from_analysis[slot] = candidate['order']
+        
+        # order情報がある場合はそれを使用
+        if order_info_available:
+            print(f"解析結果のorder情報を使用: {slot_orders_from_analysis}")
+            return slot_orders_from_analysis
+        
+        # order情報がない場合は従来の位置ベース計算を使用
+        print("位置ベースの順序計算を使用")
+        
         # Step 1: 全例文から語順を収集
         word_positions = []  # [(position, slot, word), ...]
         
@@ -156,14 +178,17 @@ class ExcelGeneratorV2:
         return -1  # 見つからない場合
     
     def convert_to_excel_rows(self, sentence_data, v_group_key, slot_orders):
-        """1つの例文をExcel行データに変換"""
+        """1つの例文をExcel行データに変換（Slot_display_order順序で処理）"""
         sentence = sentence_data['sentence']
         slots = sentence_data['slots']
         example_id = sentence_data['example_id']
         construction_id = sentence_data['construction_id']
         
+        # Slot_display_order順序でスロットを処理
+        sorted_slots = sorted(slots.items(), key=lambda x: slot_orders.get(x[0], 99))
+        
         row_count = 0
-        for slot, candidates in slots.items():
+        for slot, candidates in sorted_slots:
             if not candidates:
                 continue
                 
