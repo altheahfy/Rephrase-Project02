@@ -369,41 +369,16 @@ class ExcelGeneratorV2:
         if 'subslots' in candidate and candidate['subslots']:
             return 'clause'
         
-        # 動詞を含むかチェック（phrase判定）
-        if self.contains_verb(value):
+        # エンジンからのphrase判定をチェック
+        if candidate.get('label') == 'phrase' or candidate.get('is_phrase') == True:
+            return 'phrase'
+        
+        # candidateのtypeフィールドをチェック
+        if candidate.get('type') == 'phrase':
             return 'phrase'
         
         # 動詞もSVもない複数語はword扱い（前置詞句など）
         return 'word'
-    
-    def contains_verb(self, text):
-        """テキストに動詞が含まれているかチェック"""
-        words = text.lower().split()
-        
-        # 不定詞パターン（to + 動詞）
-        for i, word in enumerate(words):
-            if word == 'to' and i + 1 < len(words):
-                next_word = words[i + 1]
-                # 代名詞は除外（to me, to him, to her, to them, to us など）
-                pronouns = ['me', 'him', 'her', 'them', 'us', 'you', 'it']
-                if next_word not in pronouns:
-                    return True  # to play, to study など
-        
-        # 動名詞パターン（-ing形）
-        if any(word.endswith('ing') for word in words):
-            # ただし、形容詞的用法は除外
-            ing_words = [word for word in words if word.endswith('ing')]
-            for ing_word in ing_words:
-                if ing_word not in ['morning', 'evening', 'nothing', 'something', 'anything']:
-                    return True
-        
-        # 過去分詞パターン（-ed形、不規則変化も含む）
-        past_participles = ['done', 'gone', 'taken', 'made', 'written', 'spoken', 'broken']
-        ed_or_irregular = [word for word in words if word.endswith('ed') or word in past_participles]
-        if ed_or_irregular:
-            return True
-            
-        return False
     
     def get_question_type(self, phrase):
         """QuestionTypeを判定（wh-word識別）"""
