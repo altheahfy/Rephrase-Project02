@@ -46,6 +46,92 @@ class RephraseParsingEngine:
             "ditransitive_verbs": ["give", "tell", "show", "send", "teach", "buy", "make", "get"]
         }
     
+    def detect_phrasal_verbs_with_spacy(self, sentence):
+        """spaCyを使用した句動詞の自動検出"""
+        if not self.nlp:
+            return {}
+            
+        doc = self.nlp(sentence)
+        phrasal_verbs = {}
+        
+        # prt (particle) 依存関係を探す
+        for token in doc:
+            if token.dep_ == "prt" and token.head.pos_ == "VERB":
+                verb_text = token.head.text.lower()
+                particle_text = token.text.lower()
+                
+                # 句動詞の組み合わせを記録
+                phrasal_verbs[verb_text] = {
+                    'particle': particle_text,
+                    'verb_token': token.head,
+                    'particle_token': token,
+                    'separated': token.i > token.head.i + 1  # 分離されているか
+                }
+        
+        return phrasal_verbs
+    
+    def extract_phrasal_verb_components(self, sentence, phrasal_verbs):
+        """句動詞の成分を抽出してスロットに分配"""
+        if not phrasal_verbs:
+            return {}
+            
+        doc = self.nlp(sentence)
+        result = {}
+        
+        for verb, pv_info in phrasal_verbs.items():
+            verb_token = pv_info['verb_token']
+            particle_token = pv_info['particle_token']
+            
+            # 動詞をV スロットに
+            result['V'] = [{'value': verb_token.text, 'type': 'phrasal_verb', 'rule_id': 'spacy-phrasal-verb'}]
+            
+            # パーティクルをM2スロットに（あなたの提案通り）
+            result['M2'] = result.get('M2', [])
+            result['M2'].append({
+                'value': particle_token.text, 
+                'type': 'phrasal_verb_particle', 
+                'rule_id': 'spacy-phrasal-verb-particle'
+            })
+            
+            # 目的語の検出（改善版）
+            direct_objects = []
+            for token in doc:
+                if token.dep_ == "dobj" and token.head == verb_token:
+                    # 冠詞も含めて目的語として取得
+                    obj_phrase = self.get_noun_phrase(token)
+                    direct_objects.append(obj_phrase)
+            
+            if direct_objects:
+                result['O1'] = [{'value': ' '.join(direct_objects), 'type': 'direct_object', 'rule_id': 'spacy-phrasal-verb-object'}]
+            
+            # 主語の検出（疑問文対応）
+            subject_tokens = []
+            for token in doc:
+                if token.dep_ == "nsubj" and token.head == verb_token:
+                    subject_phrase = self.get_noun_phrase(token)
+                    subject_tokens.append(subject_phrase)
+            
+            if subject_tokens:
+                result['S'] = [{'value': ' '.join(subject_tokens), 'type': 'subject', 'rule_id': 'spacy-phrasal-verb-subject'}]
+        
+        return result
+    
+    def get_noun_phrase(self, noun_token):
+        """名詞句を冠詞・修飾語と一緒に抽出"""
+        phrase_parts = []
+        
+        # 冠詞・修飾語を含む句を構築
+        for child in noun_token.children:
+            if child.dep_ in ["det", "amod", "poss"]:
+                phrase_parts.append((child.i, child.text))
+        
+        # 中心の名詞
+        phrase_parts.append((noun_token.i, noun_token.text))
+        
+        # 語順でソート
+        phrase_parts.sort()
+        return ' '.join([part[1] for part in phrase_parts])
+
     def analyze_sentence(self, sentence):
         """文を解析してスロットに分解"""
         sentence = sentence.strip()
@@ -104,7 +190,23 @@ class RephraseParsingEngine:
         return False
     
     def analyze_imperative_with_vocative(self, sentence):
-        """呼びかけ+命令文を解析"""
+        """呼びかけ+命令文を解析（句動詞対応版）"""
+        # 最初にspaCyで句動詞検出を試行
+        phrasal_verbs = self.detect_phrasal_verbs_with_spacy(sentence)
+        
+        if phrasal_verbs:
+            # 句動詞が検出された場合
+            result = self.extract_phrasal_verb_components(sentence, phrasal_verbs)
+            
+            # 呼びかけ部分を追加
+            words = sentence.split()
+            if words and words[0].endswith(','):
+                vocative = words[0]
+                result['M1'] = [{'value': vocative, 'type': 'vocative', 'rule_id': 'imperative-vocative'}]
+            
+            return result
+        
+        # 従来のロジック（句動詞が検出されない場合）
         words = sentence.split()
         
         # 呼びかけ部分を抽出
@@ -491,9 +593,20 @@ class RephraseParsingEngine:
         }
     
     def analyze_modal_question(self, words):
-        """modal動詞疑問文を解析"""
+        """modal動詞疑問文を解析（句動詞対応版）"""
         if len(words) < 3:
             return {}
+        
+        sentence = ' '.join(words)
+        
+        # 句動詞検出を最優先で試行
+        phrasal_verbs = self.detect_phrasal_verbs_with_spacy(sentence)
+        if phrasal_verbs:
+            result = self.extract_phrasal_verb_components(sentence, phrasal_verbs)
+            # モーダル動詞を追加
+            modal = words[0]
+            result['Aux'] = [{'value': modal, 'type': 'modal', 'rule_id': 'modal-phrasal-question'}]
+            return result
             
         modal = words[0]
         subject = words[1]
@@ -660,9 +773,17 @@ class RephraseParsingEngine:
         return subslots
     
     def analyze_simple_sentence(self, sentence):
-        """単文を解析"""
+        """単文を解析（句動詞対応版）"""
         slots = {}
         words = sentence.split()
+        
+        # 句動詞パターンの検出（最優先）
+        phrasal_verbs = self.detect_phrasal_verbs_with_spacy(sentence)
+        if phrasal_verbs:
+            phrasal_result = self.extract_phrasal_verb_components(sentence, phrasal_verbs)
+            if phrasal_result:
+                slots.update(phrasal_result)
+                return slots
         
         # 助動詞パターンの検出
         modal_result = self.detect_modal_pattern(words)
