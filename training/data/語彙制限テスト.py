@@ -48,5 +48,5 @@ print("\n=== 語尾判定テスト ===")
 test_words = ["completed", "accomplished", "investigated", "studied", "worked"]
 
 for word in test_words:
-    is_pp = engine.looks_like_past_participle(word)
+    is_pp = engine.is_past_participle(word)
     print(f"{word}: {'✅ 過去分詞' if is_pp else '❌ 認識失敗'}")
