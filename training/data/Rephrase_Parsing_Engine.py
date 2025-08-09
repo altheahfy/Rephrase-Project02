@@ -131,6 +131,12 @@ class RephraseParsingEngine:
         phrase_parts.sort()
         return ' '.join([part[1] for part in phrase_parts])
 
+    def clean_punctuation(self, text):
+        """句読点を除去"""
+        import string
+        # 句読点を除去
+        return text.translate(str.maketrans('', '', string.punctuation))
+
     def analyze_sentence(self, sentence):
         """文を解析してスロットに分解"""
         sentence = sentence.strip()
@@ -817,11 +823,28 @@ class RephraseParsingEngine:
         return slots
     
     def detect_modal_pattern(self, words):
-        """助動詞パターンを検出"""
+        """助動詞パターンを検出（縮約形対応版）"""
         modal_verbs = self.rules_data.get("modal_verbs", ["will", "would", "can", "could"])
         
+        # 縮約形の助動詞マッピング
+        modal_contractions = {
+            "can't": "can",
+            "won't": "will", 
+            "wouldn't": "would",
+            "couldn't": "could",
+            "shouldn't": "should",
+            "mustn't": "must",
+            "mightn't": "might"
+        }
+        
+        # 全ての助動詞候補（通常形 + 縮約形）
+        all_modals = modal_verbs + list(modal_contractions.keys())
+        
         for i, word in enumerate(words):
-            if word.lower() in modal_verbs:
+            word_lower = word.lower()
+            
+            # 通常の助動詞チェック
+            if word_lower in modal_verbs:
                 subject = " ".join(words[:i]) if i > 0 else "I"
                 
                 # modal + have + past participle パターン
@@ -834,10 +857,63 @@ class RephraseParsingEngine:
                 
                 # 基本的な modal + verb パターン
                 if i + 1 < len(words):
-                    return {
+                    verb_word = self.clean_punctuation(words[i+1])
+                    remaining_words = words[i+2:] if i + 2 < len(words) else []
+                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
+                    
+                    result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'modal-basic'}],
                         'Aux': [{'value': word, 'type': 'modal_verb', 'rule_id': 'modal-basic'}],
-                        'V': [{'value': words[i+1], 'type': 'base_verb', 'rule_id': 'modal-basic'}]
+                        'V': [{'value': verb_word, 'type': 'base_verb', 'rule_id': 'modal-basic'}]
+                    }
+                    
+                    # 目的語と修飾語を追加（句読点をクリーンアップ）
+                    cleaned_modifiers = {}
+                    for key, value_list in object_and_modifiers.items():
+                        cleaned_list = []
+                        for item in value_list:
+                            cleaned_item = item.copy()
+                            cleaned_item['value'] = self.clean_punctuation(item['value'])
+                            cleaned_list.append(cleaned_item)
+                        cleaned_modifiers[key] = cleaned_list
+                    result.update(cleaned_modifiers)
+                    
+                    return result
+            
+            # 縮約形の助動詞チェック
+            elif word_lower in modal_contractions:
+                subject = " ".join(words[:i]) if i > 0 else "I"
+                
+                # 基本的な modal contraction + verb パターン
+                if i + 1 < len(words):
+                    verb_word = self.clean_punctuation(words[i+1])
+                    remaining_words = words[i+2:] if i + 2 < len(words) else []
+                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
+                    
+                    result = {
+                        'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'modal-negative'}],
+                        'Aux': [{'value': word, 'type': 'modal_negative', 'rule_id': 'modal-negative'}],
+                        'V': [{'value': verb_word, 'type': 'base_verb', 'rule_id': 'modal-negative'}]
+                    }
+                    
+                    # 目的語と修飾語を追加（句読点をクリーンアップ）
+                    cleaned_modifiers = {}
+                    for key, value_list in object_and_modifiers.items():
+                        cleaned_list = []
+                        for item in value_list:
+                            cleaned_item = item.copy()
+                            cleaned_item['value'] = self.clean_punctuation(item['value'])
+                            cleaned_list.append(cleaned_item)
+                        cleaned_modifiers[key] = cleaned_list
+                    result.update(cleaned_modifiers)
+                    
+                    return result
+                
+                # modal contraction単体の場合（動詞がない場合）
+                else:
+                    return {
+                        'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'modal-negative-no-verb'}],
+                        'Aux': [{'value': word, 'type': 'modal_negative', 'rule_id': 'modal-negative-no-verb'}]
                     }
         
         return None
@@ -1044,7 +1120,8 @@ class RephraseParsingEngine:
             # 目的語部分（前置詞の前まで）
             object_words = words[:prep_index]
             if object_words:
-                result['O1'] = [{'value': ' '.join(object_words), 'type': 'object', 'rule_id': 'present-perfect-object'}]
+                object_text = self.clean_punctuation(' '.join(object_words))
+                result['O1'] = [{'value': object_text, 'type': 'object', 'rule_id': 'present-perfect-object'}]
             
             # 修飾語部分（前置詞句）
             modifier_words = words[prep_index:]
@@ -1060,7 +1137,9 @@ class RephraseParsingEngine:
         else:
             # 前置詞句がない場合は全て目的語
             if words:
-                result['O1'] = [{'value': ' '.join(words), 'type': 'object', 'rule_id': 'present-perfect-object'}]
+                # 句読点を除去してから目的語として設定
+                object_text = self.clean_punctuation(' '.join(words))
+                result['O1'] = [{'value': object_text, 'type': 'object', 'rule_id': 'present-perfect-object'}]
                 
         return result
 
