@@ -952,28 +952,45 @@ class RephraseParsingEngine:
             if token.is_punct:
                 continue
                 
+            # is_oovの代替判定ロジック
+            has_pos = token.pos_ != 'X'  # 品詞が特定されている
+            is_alpha = token.is_alpha    # 英字のみ
+            is_recognized = has_pos and is_alpha
+            
             word_info = {
                 'text': token.text,
                 'lemma': token.lemma_,
                 'pos': token.pos_,
-                'is_known': not token.is_oov,  # Out Of Vocabulary check
+                'is_known': is_recognized,  # 代替判定を使用
                 'is_alpha': token.is_alpha,
-                'confidence': 0.95 if not token.is_oov else 0.7
+                'confidence': 0.95 if is_recognized else 0.7
             }
             enhanced_words[token.text.lower()] = word_info
             
         return enhanced_words
     
     def is_word_recognized(self, word):
-        """単語が認識可能かチェック"""
+        """単語が認識可能かチェック（is_oovの代替実装）"""
         if not self.nlp:
             return self.is_known_word_traditional(word)  # 従来方式
             
-        doc = self.nlp(word)
-        if len(doc) == 1:
-            token = doc[0]
-            return not token.is_oov  # Out Of Vocabularyでなければ認識済み
-        return False
+        try:
+            doc = self.nlp(word)
+            if len(doc) == 1:
+                token = doc[0]
+                # is_oovが正常に動作しない場合の代替判定
+                # 1. POS（品詞）が特定されている
+                # 2. lemma（語幹）が取得できている
+                # 3. 単語が英字のみで構成されている
+                has_pos = token.pos_ != 'X'  # Xは未知品詞
+                has_lemma = token.lemma_ != word.lower()  # 語幹が変化している
+                is_alpha = token.is_alpha
+                
+                return has_pos and is_alpha  # POS特定＋英字なら認識済み
+        except Exception:
+            pass
+            
+        return self.is_known_word_traditional(word)  # エラー時は従来方式
     
     def is_known_word_traditional(self, word):
         """従来の形態素ルールによる語彙認識"""
