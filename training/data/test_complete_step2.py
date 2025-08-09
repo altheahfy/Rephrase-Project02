@@ -55,12 +55,12 @@ def test_step2_improvements():
         {
             "id": 4,
             "sentence": "She teaches English to students every morning.",
-            "focus": "複雑なSVOO + 時間・場所修飾",
+            "focus": "SVO + 前置詞句（副詞）+ 時間修飾",
             "expected": {
                 "S": "She",
                 "V": "teaches",
                 "O1": "English",         # 直接目的語
-                "O2": "to students",     # 間接目的語（前置詞付き）
+                "M2": "to students",     # 副詞的修飾語（前置詞句）
                 "M3": "every morning"    # 時間修飾語
             }
         }

@@ -334,6 +334,17 @@ class CompleteRephraseParsingEngine:
                 })
                 print(f"✅ 汎用助動詞検出: {generic_aux}")
         
+        # 汎用的な前置詞句検出（副詞的修飾語として）
+        if not slots['M2']:
+            generic_prep = self._extract_generic_prepositional_phrase(doc)
+            if generic_prep:
+                slots['M2'].append({
+                    'value': generic_prep,
+                    'rule_id': 'generic-prep-phrase',
+                    'confidence': 0.8
+                })
+                print(f"✅ 汎用前置詞句検出: {generic_prep}")
+        
         return slots
     
     def _should_apply_rule(self, rule: Dict[str, Any], doc, hierarchy) -> bool:
@@ -744,6 +755,26 @@ class CompleteRephraseParsingEngine:
                 
         return None
     
+    def _extract_generic_prepositional_phrase(self, doc) -> Optional[str]:
+        """汎用的な前置詞句検出（副詞的修飾語として）"""
+        
+        # 方向・対象を示す前置詞句を検出
+        target_preps = ['to', 'for', 'with', 'by', 'from', 'about', 'on', 'in']
+        
+        for token in doc:
+            if token.pos_ == "ADP" and token.text.lower() in target_preps:
+                # 前置詞の目的語を取得
+                prep_object = None
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        prep_object = self._get_complete_noun_phrase(child)
+                        break
+                
+                if prep_object:
+                    return f"{token.text} {prep_object}"
+        
+        return None
+    
     def _get_complete_adverb_phrase(self, token) -> str:
         """完全な副詞句の取得"""
         phrase_tokens = []
@@ -762,55 +793,133 @@ class CompleteRephraseParsingEngine:
         return " ".join([t.text for t in phrase_tokens])
     
     def _extract_ditransitive_objects(self, doc, slots: Dict[str, List]):
-        """SVOO構造の間接目的語と直接目的語の適切な分離"""
+        """真のSVOO構造（名詞+名詞のみ）の検出"""
         
         # すでにO1が検出されている場合のみ処理
         if not slots.get('O1'):
             return
             
-        # 間接目的語（iobj）の検出
+        # 真のSVOO: 両方とも名詞句である場合のみ
         indirect_obj = None
         direct_obj = None
         
+        # 依存関係による目的語の特定
         for token in doc:
-            if token.dep_ == "iobj":
+            if token.dep_ == "iobj" and token.pos_ in ["PRON", "NOUN", "PROPN"]:
                 indirect_obj = self._get_complete_noun_phrase(token)
-            elif token.dep_ == "dobj":
+                print(f"📍 間接目的語検出: {indirect_obj} (iobj)")
+            elif token.dep_ == "dative" and token.pos_ in ["PRON", "NOUN", "PROPN"]:
+                indirect_obj = self._get_complete_noun_phrase(token)
+                print(f"📍 間接目的語検出: {indirect_obj} (dative)")
+            elif token.dep_ == "dobj" and token.pos_ in ["NOUN", "PROPN"]:
                 direct_obj = self._get_complete_noun_phrase(token)
+                print(f"📍 直接目的語検出: {direct_obj} (dobj)")
         
-        # SVOO構造の場合、適切にスロットを割り当て
+        # 真のSVOO構造の場合のみスロット割り当て
         if indirect_obj and direct_obj:
-            # O1を間接目的語に、O2を直接目的語に
             slots['O1'] = [{
                 'value': indirect_obj,
-                'rule_id': 'ditransitive-iobj',
-                'confidence': 0.9
+                'rule_id': 'svoo-indirect',
+                'confidence': 0.95
             }]
             slots['O2'] = [{
                 'value': direct_obj,
-                'rule_id': 'ditransitive-dobj', 
-                'confidence': 0.9
+                'rule_id': 'svoo-direct', 
+                'confidence': 0.95
             }]
-            print(f"✅ SVOO構造検出: O1={indirect_obj}, O2={direct_obj}")
+            print(f"✅ 真のSVOO構造検出: O1={indirect_obj}, O2={direct_obj}")
+        else:
+            print(f"🔍 真のSVOO構造なし: indirect={indirect_obj}, direct={direct_obj}")
+            # 前置詞句は副詞として別途処理される
+        """二重目的語動詞の特別処理 (give, tell, show, teach等)"""
+        
+        # 二重目的語動詞のリスト
+        ditransitive_verbs = {
+            'give', 'gave', 'given',
+            'tell', 'told', 
+            'show', 'showed', 'shown',
+            'teach', 'taught',
+            'send', 'sent',
+            'buy', 'bought',
+            'make', 'made',
+            'get', 'got'
+        }
+        
+        # 現在の動詞をチェック
+        main_verb = None
+        for token in doc:
+            if token.dep_ == "ROOT" and token.pos_ == "VERB":
+                main_verb = token
+                break
+        
+        if not main_verb or main_verb.lemma_.lower() not in ditransitive_verbs:
+            return
             
-        # 前置詞句による間接目的語の検出
-        elif not indirect_obj:
+        print(f"📍 二重目的語動詞検出: {main_verb.text} ({main_verb.lemma_})")
+        
+        # 動詞の周辺にある目的語候補を収集
+        objects = []
+        for token in doc:
+            if token.dep_ in ["dobj", "iobj"] or (token.dep_ == "pobj" and token.head.dep_ == "prep"):
+                objects.append({
+                    'token': token,
+                    'phrase': self._get_complete_noun_phrase(token),
+                    'position': token.i,
+                    'dep': token.dep_
+                })
+        
+        # 位置順にソート（文中の順序）
+        objects.sort(key=lambda x: x['position'])
+        
+        if len(objects) >= 2:
+            # 2つの目的語がある場合
+            obj1, obj2 = objects[0], objects[1]
+            
+            # give型の場合: 最初が間接目的語、次が直接目的語
+            if main_verb.lemma_ in ['give', 'tell', 'show', 'send']:
+                slots['O1'] = [{
+                    'value': obj1['phrase'],
+                    'rule_id': f'ditrans-{main_verb.lemma_}-iobj',
+                    'confidence': 0.95
+                }]
+                slots['O2'] = [{
+                    'value': obj2['phrase'], 
+                    'rule_id': f'ditrans-{main_verb.lemma_}-dobj',
+                    'confidence': 0.95
+                }]
+                print(f"✅ {main_verb.lemma_}型SVOO: O1={obj1['phrase']}, O2={obj2['phrase']}")
+            
+            # teach型の場合: 最初が直接目的語、次が間接目的語（前置詞句）
+            elif main_verb.lemma_ in ['teach', 'buy']:
+                slots['O1'] = [{
+                    'value': obj1['phrase'],
+                    'rule_id': f'ditrans-{main_verb.lemma_}-dobj',
+                    'confidence': 0.95
+                }]
+                if obj2['dep'] == 'pobj':  # 前置詞句の場合
+                    prep = obj2['token'].head.text if obj2['token'].head.dep_ == 'prep' else 'to'
+                    slots['O2'] = [{
+                        'value': f"{prep} {obj2['phrase']}",
+                        'rule_id': f'ditrans-{main_verb.lemma_}-prep',
+                        'confidence': 0.95
+                    }]
+                    print(f"✅ {main_verb.lemma_}型SVOO: O1={obj1['phrase']}, O2={prep} {obj2['phrase']}")
+        
+        elif len(objects) == 1 and not slots.get('O2'):
+            # 1つの目的語しかない場合、前置詞句を探す
+            obj = objects[0]
             for token in doc:
-                if token.dep_ == "prep" and token.text.lower() == "to":
-                    prep_obj = None
+                if token.dep_ == "prep" and token.text.lower() in ["to", "for"]:
                     for child in token.children:
                         if child.dep_ == "pobj":
-                            prep_obj = self._get_complete_noun_phrase(child)
+                            prep_phrase = self._get_complete_noun_phrase(child)
+                            slots['O2'] = [{
+                                'value': f"{token.text} {prep_phrase}",
+                                'rule_id': f'ditrans-{main_verb.lemma_}-prep-supplement',
+                                'confidence': 0.9
+                            }]
+                            print(f"✅ {main_verb.lemma_}型前置詞句補完: O2={token.text} {prep_phrase}")
                             break
-                    
-                    if prep_obj and direct_obj:
-                        # 前置詞句を間接目的語として処理
-                        slots['O2'] = [{
-                            'value': f"to {prep_obj}",
-                            'rule_id': 'prepositional-iobj',
-                            'confidence': 0.8
-                        }]
-                        print(f"✅ 前置詞句間接目的語検出: O2=to {prep_obj}")
     
     def _extract_auxiliary_value(self, doc, hierarchy) -> Optional[str]:
         """助動詞の正確な抽出 - 縮約形対応"""
