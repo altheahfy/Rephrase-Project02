@@ -309,6 +309,31 @@ class CompleteRephraseParsingEngine:
                 })
                 print(f"✅ 汎用目的語検出: {generic_object}")
         
+        # SVOO構造の検出（間接目的語と直接目的語の分離）
+        self._extract_ditransitive_objects(doc, slots)
+        
+        # 汎用的な時間表現検出（ルールで捕獲されなかった場合）
+        if not slots['M3']:
+            generic_time = self._extract_generic_time_expression(doc)
+            if generic_time:
+                slots['M3'].append({
+                    'value': generic_time,
+                    'rule_id': 'generic-time',
+                    'confidence': 0.8
+                })
+                print(f"✅ 汎用時間表現検出: {generic_time}")
+        
+        # 汎用的な助動詞検出（縮約形対応）
+        if not slots['Aux']:
+            generic_aux = self._extract_generic_auxiliary(doc)
+            if generic_aux:
+                slots['Aux'].append({
+                    'value': generic_aux,
+                    'rule_id': 'generic-aux',
+                    'confidence': 0.8
+                })
+                print(f"✅ 汎用助動詞検出: {generic_aux}")
+        
         return slots
     
     def _should_apply_rule(self, rule: Dict[str, Any], doc, hierarchy) -> bool:
@@ -643,6 +668,149 @@ class CompleteRephraseParsingEngine:
                 return self._get_complete_noun_phrase(token)
                 
         return None
+    
+    def _extract_generic_time_expression(self, doc) -> Optional[str]:
+        """汎用的な時間表現検出"""
+        
+        # 明確な時間パターン
+        time_patterns = [
+            r'\b(today|tomorrow|yesterday)\b',
+            r'\b(last|this|next)\s+(week|month|year|morning|afternoon|evening|night)\b',
+            r'\b(every|each)\s+(day|week|month|morning|afternoon|evening)\b',
+            r'\b(a\s+few|several|many)\s+(days?|weeks?|months?|years?)\s+ago\b',
+            r'\b(that|this)\s+(morning|afternoon|evening|night)\b',
+            r'\b\d+\s*(am|pm)\b',
+            r'\b(at|on|in)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b'
+        ]
+        
+        text = doc.text
+        for pattern in time_patterns:
+            import re
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                return match.group(0)
+        
+        # spaCyの時間エンティティ
+        for ent in doc.ents:
+            if ent.label_ in ["TIME", "DATE"]:
+                return ent.text
+        
+        # 副詞句（時間表現の可能性）
+        time_advs = []
+        for token in doc:
+            if token.pos_ == "ADV" and token.dep_ in ["advmod", "npadvmod"]:
+                # 時間を示唆するキーワードをチェック
+                if any(keyword in token.text.lower() for keyword in ['day', 'morning', 'afternoon', 'evening', 'night', 'today', 'ago']):
+                    return self._get_complete_adverb_phrase(token)
+        
+        return None
+    
+    def _extract_generic_auxiliary(self, doc) -> Optional[str]:
+        """汎用的な助動詞検出（縮約形対応）"""
+        
+        # spaCyが解析した縮約形を確認
+        for token in doc:
+            if token.text.lower() == "ca" and token.pos_ == "AUX":
+                # "ca"は"can"の縮約形の一部
+                for next_token in doc:
+                    if next_token.i == token.i + 1 and next_token.text in ["n't", "not"]:
+                        return "cannot"
+                        
+        # 完全な縮約形マッピング
+        contractions = {
+            "can't": "cannot",
+            "won't": "will not", 
+            "shouldn't": "should not",
+            "wouldn't": "would not",
+            "couldn't": "could not",
+            "mustn't": "must not",
+            "needn't": "need not"
+        }
+        
+        # 元の文から縮約形の検出
+        text_lower = doc.text.lower()
+        for contraction, expansion in contractions.items():
+            if contraction in text_lower:
+                return expansion
+        
+        # AUX品詞の検出
+        for token in doc:
+            if token.pos_ == "AUX" and token.dep_ == "aux":
+                # 否定の場合
+                for child in token.children:
+                    if child.dep_ == "neg" or child.text in ["n't", "not"]:
+                        return f"{token.lemma_} not"
+                return token.text
+                
+        return None
+    
+    def _get_complete_adverb_phrase(self, token) -> str:
+        """完全な副詞句の取得"""
+        phrase_tokens = []
+        
+        # 依存関係を持つ子要素を含める
+        def collect_phrase(tok):
+            phrase_tokens.append(tok)
+            for child in tok.children:
+                if child.dep_ in ["det", "amod", "compound", "nummod"]:
+                    collect_phrase(child)
+        
+        collect_phrase(token)
+        
+        # 位置順にソート
+        phrase_tokens.sort(key=lambda t: t.i)
+        return " ".join([t.text for t in phrase_tokens])
+    
+    def _extract_ditransitive_objects(self, doc, slots: Dict[str, List]):
+        """SVOO構造の間接目的語と直接目的語の適切な分離"""
+        
+        # すでにO1が検出されている場合のみ処理
+        if not slots.get('O1'):
+            return
+            
+        # 間接目的語（iobj）の検出
+        indirect_obj = None
+        direct_obj = None
+        
+        for token in doc:
+            if token.dep_ == "iobj":
+                indirect_obj = self._get_complete_noun_phrase(token)
+            elif token.dep_ == "dobj":
+                direct_obj = self._get_complete_noun_phrase(token)
+        
+        # SVOO構造の場合、適切にスロットを割り当て
+        if indirect_obj and direct_obj:
+            # O1を間接目的語に、O2を直接目的語に
+            slots['O1'] = [{
+                'value': indirect_obj,
+                'rule_id': 'ditransitive-iobj',
+                'confidence': 0.9
+            }]
+            slots['O2'] = [{
+                'value': direct_obj,
+                'rule_id': 'ditransitive-dobj', 
+                'confidence': 0.9
+            }]
+            print(f"✅ SVOO構造検出: O1={indirect_obj}, O2={direct_obj}")
+            
+        # 前置詞句による間接目的語の検出
+        elif not indirect_obj:
+            for token in doc:
+                if token.dep_ == "prep" and token.text.lower() == "to":
+                    prep_obj = None
+                    for child in token.children:
+                        if child.dep_ == "pobj":
+                            prep_obj = self._get_complete_noun_phrase(child)
+                            break
+                    
+                    if prep_obj and direct_obj:
+                        # 前置詞句を間接目的語として処理
+                        slots['O2'] = [{
+                            'value': f"to {prep_obj}",
+                            'rule_id': 'prepositional-iobj',
+                            'confidence': 0.8
+                        }]
+                        print(f"✅ 前置詞句間接目的語検出: O2=to {prep_obj}")
     
     def _extract_auxiliary_value(self, doc, hierarchy) -> Optional[str]:
         """助動詞の正確な抽出 - 縮約形対応"""
