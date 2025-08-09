@@ -970,27 +970,22 @@ class RephraseParsingEngine:
         return enhanced_words
     
     def is_word_recognized(self, word):
-        """単語が認識可能かチェック（is_oovの代替実装）"""
+        """単語が認識可能かチェック（spaCy専用）"""
         if not self.nlp:
-            return self.is_known_word_traditional(word)  # 従来方式
+            return False  # spaCy未使用時は認識不可
             
         try:
             doc = self.nlp(word)
             if len(doc) == 1:
                 token = doc[0]
-                # is_oovが正常に動作しない場合の代替判定
-                # 1. POS（品詞）が特定されている
-                # 2. lemma（語幹）が取得できている
-                # 3. 単語が英字のみで構成されている
+                # POS（品詞）が特定され、英字のみの場合は認識済み
                 has_pos = token.pos_ != 'X'  # Xは未知品詞
-                has_lemma = token.lemma_ != word.lower()  # 語幹が変化している
                 is_alpha = token.is_alpha
-                
-                return has_pos and is_alpha  # POS特定＋英字なら認識済み
+                return has_pos and is_alpha
         except Exception:
-            pass
+            return False
             
-        return self.is_known_word_traditional(word)  # エラー時は従来方式
+        return False
     
     def is_known_word_traditional(self, word):
         """従来の形態素ルールによる語彙認識"""
