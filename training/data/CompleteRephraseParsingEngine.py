@@ -445,14 +445,41 @@ class CompleteRephraseParsingEngine:
         """単一ルールの適用"""
         
         rule_id = rule.get('id', '')
-        
-        # パターンルールの場合は特別処理
-        if 'patterns' in rule:
-            return self._apply_pattern_rule(rule, doc, hierarchy, slots)
-        
-        # 通常のルール処理
         assignment = rule.get('assign', {})
         
+        # パターントリガーの場合は特別処理
+        trigger = rule.get('trigger', {})
+        if 'pattern' in trigger:
+            # パターンベースの値抽出
+            pattern = trigger['pattern']
+            match = re.search(pattern, doc.text, re.IGNORECASE)
+            if match:
+                # 実際の値を決定
+                if rule_id == 'place-M3':
+                    value = self._extract_place_prepositional_phrase(doc)
+                elif rule_id == 'to-direction-M2':
+                    value = self._extract_direction_prepositional_phrase(doc, rule_id)
+                elif rule_id == 'for-purpose-M2':
+                    value = self._extract_direction_prepositional_phrase(doc, rule_id)
+                elif rule_id == 'from-source-M3':
+                    value = self._extract_from_prepositional_phrase(doc)
+                else:
+                    value = match.group()
+                
+                if value:
+                    slot = assignment.get('slot', '')
+                    if slot in slots:
+                        slots[slot].append({
+                            'value': value,
+                            'rule_id': rule_id,
+                            'confidence': 0.9,
+                            'pattern_based': True
+                        })
+                        print(f"📝 パターンルール適用: {rule_id} → {slot}: '{value}'")
+                        return True
+            return False
+        
+        # 通常のルール処理
         if isinstance(assignment, list):
             # 複数割り当ての場合
             for assign_item in assignment:
@@ -513,8 +540,13 @@ class CompleteRephraseParsingEngine:
             # 指定されたフレーズから値を取得
             value = value_spec
         else:
-            # デフォルトはマッチした全体
-            value = match.group()
+            # デフォルト: パターンに基づく前置詞句抽出
+            if rule_id == 'place-M3':
+                value = self._extract_place_prepositional_phrase(doc)
+            elif rule_id in ['to-direction-M2', 'for-purpose-M2']:
+                value = self._extract_direction_prepositional_phrase(doc, rule_id)
+            else:
+                value = match.group()
         
         if value and slot in slots:
             slots[slot].append({
@@ -880,13 +912,13 @@ class CompleteRephraseParsingEngine:
         return None
     
     def _extract_generic_prepositional_phrase(self, doc) -> Optional[str]:
-        """汎用的な前置詞句検出（副詞的修飾語として）"""
+        """汎用的な前置詞句検出（方向・対象のM2のみ）"""
         
-        # 方向・対象を示す前置詞句を検出
-        target_preps = ['to', 'for', 'with', 'by', 'from', 'about', 'on', 'in']
+        # M2に属する方向・対象を示す前置詞のみ
+        m2_preps = ['to', 'for', 'with', 'about']  # 'on', 'in', 'by', 'from' は除外（M3やその他の可能性）
         
         for token in doc:
-            if token.pos_ == "ADP" and token.text.lower() in target_preps:
+            if token.pos_ == "ADP" and token.text.lower() in m2_preps:
                 # 前置詞の目的語を取得
                 prep_object = None
                 for child in token.children:
@@ -895,7 +927,68 @@ class CompleteRephraseParsingEngine:
                         break
                 
                 if prep_object:
-                    return f"{token.text} {prep_object}"
+                    # 動詞に直接依存している前置詞句のみをM2とする
+                    if token.dep_ == "prep" and token.head.pos_ == "VERB":
+                        return f"{token.text} {prep_object}"
+        
+        return None
+    
+    def _extract_place_prepositional_phrase(self, doc) -> Optional[str]:
+        """場所を表す前置詞句の抽出（M3用）"""
+        
+        # 場所を表す前置詞
+        place_preps = ['on', 'in', 'under', 'by', 'at']
+        
+        for token in doc:
+            if (token.pos_ == "ADP" and 
+                token.text.lower() in place_preps and
+                token.dep_ == "prep"):
+                
+                # 前置詞の目的語を取得
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        prep_object = self._get_complete_noun_phrase(child)
+                        return f"{token.text} {prep_object}"
+        
+        return None
+    
+    def _extract_direction_prepositional_phrase(self, doc, rule_id: str) -> Optional[str]:
+        """方向・目的を表す前置詞句の抽出（M2用）"""
+        
+        # ルールに応じた前置詞を特定
+        if rule_id == 'to-direction-M2':
+            target_prep = 'to'
+        elif rule_id == 'for-purpose-M2':
+            target_prep = 'for'
+        else:
+            return None
+        
+        for token in doc:
+            if (token.pos_ == "ADP" and 
+                token.text.lower() == target_prep and
+                token.dep_ == "prep"):
+                
+                # 前置詞の目的語を取得
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        prep_object = self._get_complete_noun_phrase(child)
+                        return f"{token.text} {prep_object}"
+        
+        return None
+    
+    def _extract_from_prepositional_phrase(self, doc) -> Optional[str]:
+        """from句の抽出（M3用）"""
+        
+        for token in doc:
+            if (token.pos_ == "ADP" and 
+                token.text.lower() == 'from' and
+                token.dep_ == "prep"):
+                
+                # 前置詞の目的語を取得
+                for child in token.children:
+                    if child.dep_ == "pobj":
+                        prep_object = self._get_complete_noun_phrase(child)
+                        return f"{token.text} {prep_object}"
         
         return None
     

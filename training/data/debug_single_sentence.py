@@ -7,7 +7,7 @@ def test_single_sentence():
     generator = ExcelGeneratorV2()
     
     # 1つの文をテスト
-    test_sentence = "He has recovered quickly from a serious injury."
+    test_sentence = "I saw the building."
     print(f"テスト文: {test_sentence}")
     
     try:
@@ -18,6 +18,11 @@ def test_single_sentence():
             print("✅ 処理成功")
         else:
             print("❌ 処理失敗")
+            
+    except Exception as e:
+        print(f"❌ エラー発生: {e}")
+        import traceback
+        traceback.print_exc()
             
     except Exception as e:
         print(f"例外発生: {e}")
