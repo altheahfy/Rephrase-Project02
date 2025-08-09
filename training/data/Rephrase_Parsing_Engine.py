@@ -10,8 +10,118 @@ class RephraseParsingEngine:
     """完全統合版Rephrase品詞分解エンジン"""
     
     def __init__(self):
-        self.engine_name = "Rephrase Parsing Engine v1.0"
+        self.engine_name = "Rephrase Parsing Engine v2.0 (Hybrid Enhanced)"
         self.rules_data = self.load_rules()
+        
+        # 形態素ルール拡張を追加
+        self.morphology_rules = self.get_morphology_rules()
+        
+        # spaCyハイブリッド機能追加
+        self.spacy_available = self._initialize_spacy()
+        
+        # 統計情報（デバッグ用）
+        self.stats = {
+            'morphology_success': 0,
+            'spacy_success': 0,
+            'fallback_used': 0,
+            'total_analyzed': 0
+        }
+        
+    def get_morphology_rules(self):
+        """形態素ルール辞書（語彙制限解決用）"""
+        return {
+            # 動詞関連
+            'ed': 'VERB_PAST',
+            'ing': 'VERB_ING',
+            's': 'VERB_3SG_OR_NOUN_PLURAL',  # 曖昧
+            
+            # 名詞関連  
+            'tion': 'NOUN',
+            'sion': 'NOUN',
+            'ment': 'NOUN',
+            'ness': 'NOUN',
+            'ity': 'NOUN',
+            'er': 'NOUN_OR_ADJ',  # teacher, bigger
+            'or': 'NOUN',
+            'ist': 'NOUN',
+            
+            # 形容詞関連
+            'ful': 'ADJ',
+            'less': 'ADJ',
+            'able': 'ADJ',
+            'ible': 'ADJ',
+            'ous': 'ADJ',
+            'ive': 'ADJ',
+            'al': 'ADJ',
+            'ic': 'ADJ',
+            
+            # 副詞関連
+            'ly': 'ADV',
+        }
+        
+    def _initialize_spacy(self):
+        """spaCy初期化（警告抑制）"""
+        try:
+            import warnings
+            warnings.filterwarnings("ignore")
+            import spacy
+            self.nlp = spacy.load("en_core_web_sm")
+            return True
+        except Exception:
+            return False
+        
+    def analyze_word_hybrid(self, word, context=""):
+        """ハイブリッド解析: 形態素ルール優先 → spaCy補完"""
+        self.stats['total_analyzed'] += 1
+        
+        # Step 1: 形態素ルール解析
+        morph_result = self.analyze_word_morphology(word, context)
+        
+        # 形態素ルールで確実に判定できた場合
+        if (morph_result['pos'] not in ['UNKNOWN', 'VERB_3SG_OR_NOUN_PLURAL', 'NOUN_OR_ADJ']
+            and morph_result['confidence'] > 0.8):
+            self.stats['morphology_success'] += 1
+            morph_result['method'] = 'morphology_primary'
+            return morph_result
+        
+        # Step 2: spaCy補完解析
+        if self.spacy_available:
+            try:
+                # 文脈解析
+                if context and word in context:
+                    doc = self.nlp(context)
+                    for token in doc:
+                        if token.text.lower() == word.lower():
+                            self.stats['spacy_success'] += 1
+                            return {
+                                'word': word,
+                                'pos': token.pos_,
+                                'tag': token.tag_,
+                                'lemma': token.lemma_,
+                                'confidence': 0.95,
+                                'method': 'spacy_context'
+                            }
+                
+                # 単独解析
+                doc = self.nlp(word)
+                if doc:
+                    token = doc[0]
+                    self.stats['spacy_success'] += 1
+                    return {
+                        'word': word,
+                        'pos': token.pos_,
+                        'tag': token.tag_,
+                        'lemma': token.lemma_,
+                        'confidence': 0.90,
+                        'method': 'spacy_single'
+                    }
+            except:
+                pass
+        
+        # Step 3: フォールバック（形態素ルール結果）
+        self.stats['fallback_used'] += 1
+        morph_result['method'] = 'morphology_fallback'
+        return morph_result
         
     def load_rules(self):
         """文法ルールデータを読み込み"""
@@ -877,7 +987,7 @@ class RephraseParsingEngine:
         return None
     
     def looks_like_past_participle(self, word):
-        """過去分詞らしい語かチェック（簡易版）"""
+        """過去分詞らしい語かチェック（形態素ルール拡張版）"""
         word = word.lower()
         
         # 規則変化 (-ed)
@@ -891,6 +1001,47 @@ class RephraseParsingEngine:
         ]
         
         return word in irregular_past_participles
+    
+    def analyze_word_morphology(self, word, context=""):
+        """形態素ルール拡張による語彙解析"""
+        word_clean = word.lower().rstrip('.,!?')
+        
+        # 1. 基本語彙チェック（高速）
+        basic_vocab = {
+            'the': 'DET', 'a': 'DET', 'an': 'DET',
+            'is': 'BE_VERB', 'are': 'BE_VERB', 'was': 'BE_VERB', 'were': 'BE_VERB',
+            'have': 'AUX_VERB', 'has': 'AUX_VERB', 'had': 'AUX_VERB',
+            'do': 'AUX_VERB', 'does': 'AUX_VERB', 'did': 'AUX_VERB',
+            'will': 'MODAL', 'would': 'MODAL', 'can': 'MODAL', 'could': 'MODAL',
+            'i': 'PRON', 'you': 'PRON', 'he': 'PRON', 'she': 'PRON', 'it': 'PRON',
+            'we': 'PRON', 'they': 'PRON', 'me': 'PRON', 'him': 'PRON', 'her': 'PRON'
+        }
+        
+        if word_clean in basic_vocab:
+            return {
+                'word': word,
+                'pos': basic_vocab[word_clean],
+                'confidence': 0.95,
+                'method': 'basic_vocab'
+            }
+        
+        # 2. 形態素ルール適用
+        for suffix, pos in self.morphology_rules.items():
+            if word_clean.endswith(suffix):
+                return {
+                    'word': word,
+                    'pos': pos,
+                    'confidence': 0.75,
+                    'method': f'morphology_{suffix}'
+                }
+        
+        # 3. 文脈推定（フォールバック）
+        return {
+            'word': word,
+            'pos': 'UNKNOWN',
+            'confidence': 0.30,
+            'method': 'unknown'
+        }
     
     def detect_be_verb_pattern(self, words):
         """be動詞パターンを検出"""
