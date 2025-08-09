@@ -8,12 +8,12 @@ from Rephrase_Parsing_Engine import RephraseParsingEngine
 class ExcelGeneratorV3:
     """spaCy統合版Rephrase解析結果をExcel形式で出力"""
     
-    def __init__(self, use_spacy_grammar=False):  # 🔥 緊急修正: spaCy統合を無効化
+    def __init__(self, use_spacy_grammar=True):
         self.engine = RephraseParsingEngine()
         self.results = []
         self.current_sentence_id = 1
         self.current_construction_id = 1000
-        self.use_spacy_grammar = use_spacy_grammar  # spaCy文法解析の使用フラグ（デフォルトFalse）
+        self.use_spacy_grammar = use_spacy_grammar  # spaCy文法解析の使用フラグ
         
         # V_group_keyごとの例文データを保持
         self.vgroup_data = {}  # {v_group_key: [sentence_data, ...]}
