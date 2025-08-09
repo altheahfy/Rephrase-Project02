@@ -1,17 +1,29 @@
 # ===== Rephrase Parsing Engine =====
-# 完全統合版: ChatGPT 34ルール + サブクローズ分解エンジン
+# 完全統合版: ChatGPT 34ルール + サブクローズ分解エンジン + spaCy語彙認識
 # 目標: すべての英文法ルールに対応した品詞分解システム
 
 import json
 import re
 import os
 
+# spaCy語彙認識（オプション）
+try:
+    import spacy
+    nlp = spacy.load("en_core_web_sm")
+    SPACY_AVAILABLE = True
+    print("✅ spaCy語彙認識エンジン初期化完了")
+except ImportError:
+    SPACY_AVAILABLE = False
+    nlp = None
+    print("⚠️ spaCy未使用（従来の形態素ルールのみ）")
+
 class RephraseParsingEngine:
     """完全統合版Rephrase品詞分解エンジン"""
     
     def __init__(self):
-        self.engine_name = "Rephrase Parsing Engine v1.0"
+        self.engine_name = "Rephrase Parsing Engine v1.1 + spaCy語彙認識"
         self.rules_data = self.load_rules()
+        self.nlp = nlp if SPACY_AVAILABLE else None  # spaCyエンジン
         
     def load_rules(self):
         """文法ルールデータを読み込み"""
@@ -984,6 +996,60 @@ def test_parsing_engine():
             print(f"  ❌ エラー: {e}")
             import traceback
             traceback.print_exc()
+
+    # ===== spaCy語彙認識機能 =====
+    
+    def enhance_word_recognition(self, text):
+        """spaCyを使用して語彙認識を強化（解析ロジックは変更しない）"""
+        if not self.nlp:
+            return None  # spaCy未使用時はNoneを返す
+            
+        doc = self.nlp(text)
+        enhanced_words = {}
+        
+        for token in doc:
+            if token.is_punct:
+                continue
+                
+            word_info = {
+                'text': token.text,
+                'lemma': token.lemma_,
+                'pos': token.pos_,
+                'is_known': not token.is_oov,  # Out Of Vocabulary check
+                'is_alpha': token.is_alpha,
+                'confidence': 0.95 if not token.is_oov else 0.7
+            }
+            enhanced_words[token.text.lower()] = word_info
+            
+        return enhanced_words
+    
+    def is_word_recognized(self, word):
+        """単語が認識可能かチェック"""
+        if not self.nlp:
+            return self.is_known_word_traditional(word)  # 従来方式
+            
+        doc = self.nlp(word)
+        if len(doc) == 1:
+            token = doc[0]
+            return not token.is_oov  # Out Of Vocabularyでなければ認識済み
+        return False
+    
+    def is_known_word_traditional(self, word):
+        """従来の形態素ルールによる語彙認識"""
+        word_lower = word.lower()
+        
+        # 基本語彙チェック
+        basic_words = [
+            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+            'of', 'with', 'by', 'from', 'about', 'into', 'through', 'during',
+            'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over',
+            'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when',
+            'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
+            'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+            'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'should'
+        ]
+        
+        return word_lower in basic_words
 
 
 if __name__ == "__main__":
