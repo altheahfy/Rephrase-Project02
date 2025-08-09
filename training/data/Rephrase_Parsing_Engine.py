@@ -733,9 +733,9 @@ class RephraseParsingEngine:
                 if self.looks_like_past_participle(next_word):
                     subject = " ".join(words[:i]) if i > 0 else "I"
                     
-                    # 残りの部分を解析して修飾語を分離
+                    # 残りの部分から目的語と修飾語を分離
                     remaining_words = words[i+2:]
-                    modifiers = self.extract_modifiers_from_words(remaining_words)
+                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
                     
                     result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect'}],
@@ -743,8 +743,8 @@ class RephraseParsingEngine:
                         'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect'}]
                     }
                     
-                    # 修飾語を追加
-                    result.update(modifiers)
+                    # 目的語と修飾語を追加
+                    result.update(object_and_modifiers)
                     
                     return result
             
@@ -755,18 +755,18 @@ class RephraseParsingEngine:
                     subject = " ".join(words[:i]) if i > 0 else "I"
                     base_aux = contraction_map[word.lower()]
                     
-                    # 残りの部分を解析して修飾語を分離
+                    # 残りの部分から目的語と修飾語を分離
                     remaining_words = words[i+2:]
-                    modifiers = self.extract_modifiers_from_words(remaining_words)
+                    object_and_modifiers = self.extract_object_and_modifiers(remaining_words)
                     
                     result = {
                         'S': [{'value': subject.strip(), 'type': 'subject', 'rule_id': 'present-perfect-negative'}],
-                        'Aux': [{'value': f"{base_aux} not", 'type': 'auxiliary_negative', 'rule_id': 'present-perfect-negative'}],
+                        'Aux': [{'value': word, 'type': 'auxiliary_negative', 'rule_id': 'present-perfect-negative'}],
                         'V': [{'value': next_word, 'type': 'past_participle', 'rule_id': 'present-perfect-negative'}]
                     }
                     
-                    # 修飾語を追加
-                    result.update(modifiers)
+                    # 目的語と修飾語を追加
+                    result.update(object_and_modifiers)
                     
                     return result
         
@@ -897,6 +897,46 @@ class RephraseParsingEngine:
             # 前置詞句が見つからない場合は全て目的語
             return " ".join(words), {}
     
+    def extract_object_and_modifiers(self, words):
+        """目的語と修飾語を分離（現在完了用）"""
+        if not words:
+            return {}
+            
+        result = {}
+        
+        # 前置詞の位置を探す
+        preposition_words = ['for', 'to', 'from', 'in', 'at', 'on', 'by', 'with', 'during', 'since']
+        prep_index = -1
+        
+        for i, word in enumerate(words):
+            if word.lower() in preposition_words:
+                prep_index = i
+                break
+        
+        if prep_index > 0:
+            # 目的語部分（前置詞の前まで）
+            object_words = words[:prep_index]
+            if object_words:
+                result['O1'] = [{'value': ' '.join(object_words), 'type': 'object', 'rule_id': 'present-perfect-object'}]
+            
+            # 修飾語部分（前置詞句）
+            modifier_words = words[prep_index:]
+            if modifier_words:
+                modifiers = self.extract_modifiers_from_words(modifier_words)
+                result.update(modifiers)
+                
+        elif prep_index == 0:
+            # 最初から前置詞句（目的語なし）
+            modifiers = self.extract_modifiers_from_words(words)
+            result.update(modifiers)
+            
+        else:
+            # 前置詞句がない場合は全て目的語
+            if words:
+                result['O1'] = [{'value': ' '.join(words), 'type': 'object', 'rule_id': 'present-perfect-object'}]
+                
+        return result
+
     def extract_modifiers_from_words(self, words):
         """単語リストから修飾語を抽出してスロットに分類"""
         if not words:
