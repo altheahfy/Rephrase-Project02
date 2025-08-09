@@ -469,13 +469,23 @@ class CompleteRephraseParsingEngine:
                 if value:
                     slot = assignment.get('slot', '')
                     if slot in slots:
-                        slots[slot].append({
+                        # 動詞を含む句のみを「phrase」として扱う
+                        is_verb_phrase = self._contains_verb(value, doc)
+                        
+                        candidate_data = {
                             'value': value,
                             'rule_id': rule_id,
-                            'confidence': 0.9,
-                            'pattern_based': True
-                        })
-                        print(f"📝 パターンルール適用: {rule_id} → {slot}: '{value}'")
+                            'confidence': 0.9
+                        }
+                        
+                        # 動詞を含む句の場合のみphraseフラグを設定
+                        if is_verb_phrase:
+                            candidate_data['is_phrase'] = True
+                            print(f"📝 動詞句ルール適用: {rule_id} → {slot}: '{value}' (phrase)")
+                        else:
+                            print(f"📝 パターンルール適用: {rule_id} → {slot}: '{value}' (word)")
+                        
+                        slots[slot].append(candidate_data)
                         return True
             return False
         
@@ -991,6 +1001,30 @@ class CompleteRephraseParsingEngine:
                         return f"{token.text} {prep_object}"
         
         return None
+    
+    def _contains_verb(self, phrase: str, doc) -> bool:
+        """フレーズが動詞を含むかどうかを判定（真のphraseかどうか）"""
+        
+        # to + 動詞の不定詞句をチェック
+        if phrase.lower().startswith('to '):
+            words = phrase.split()
+            if len(words) >= 2:
+                # spaCyで動詞かどうかを確認
+                verb_word = words[1]
+                for token in doc:
+                    if token.text.lower() == verb_word.lower() and token.pos_ == 'VERB':
+                        return True
+        
+        # 他の動詞句パターンをチェック
+        words = phrase.split()
+        for word in words:
+            for token in doc:
+                if (token.text.lower() == word.lower() and 
+                    token.pos_ in ['VERB', 'AUX'] and 
+                    token.dep_ not in ['aux', 'auxpass']):  # 助動詞は除外
+                    return True
+        
+        return False
     
     def _get_complete_adverb_phrase(self, token) -> str:
         """完全な副詞句の取得"""
