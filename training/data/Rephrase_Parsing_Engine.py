@@ -10,7 +10,7 @@ class RephraseParsingEngine:
     """完全統合版Rephrase品詞分解エンジン"""
     
     def __init__(self):
-        self.engine_name = "Rephrase Parsing Engine v3.0 (spaCy Grammar Integrated)"
+        self.engine_name = "Rephrase Parsing Engine v2.0 (Hybrid Enhanced)"
         self.rules_data = self.load_rules()
         
         # 形態素ルール拡張を追加
@@ -23,7 +23,6 @@ class RephraseParsingEngine:
         self.stats = {
             'morphology_success': 0,
             'spacy_success': 0,
-            'spacy_grammar_success': 0,  # 新機能
             'fallback_used': 0,
             'total_analyzed': 0
         }
@@ -123,135 +122,6 @@ class RephraseParsingEngine:
         self.stats['fallback_used'] += 1
         morph_result['method'] = 'morphology_fallback'
         return morph_result
-        
-    def analyze_sentence_with_spacy_grammar(self, sentence):
-        """spaCy文法解析統合版のメイン解析メソッド"""
-        if not self.spacy_available:
-            print("⚠️ spaCy利用不可。従来手法にフォールバック")
-            return self.analyze_sentence(sentence)
-        
-        print(f"\n=== spaCy統合文法分解: {sentence} ===")
-        
-        # Step 1: spaCyで品詞・依存関係解析
-        doc = self.nlp(sentence)
-        tokens_info = self._extract_tokens_info(doc)
-        
-        # Step 2: 品詞情報を活用したスロット分類
-        slots = self._classify_slots_with_spacy(tokens_info, sentence)
-        
-        # Step 3: 既存ルールとの統合・補完
-        enhanced_slots = self._enhance_slots_with_traditional_rules(slots, sentence)
-        
-        self.stats['spacy_grammar_success'] += len(enhanced_slots)
-        return enhanced_slots
-    
-    def _extract_tokens_info(self, doc):
-        """spaCy解析結果からトークン情報を抽出"""
-        tokens_info = []
-        
-        for token in doc:
-            if token.is_punct:
-                continue
-                
-            token_info = {
-                'text': token.text,
-                'pos': token.pos_,
-                'tag': token.tag_,
-                'lemma': token.lemma_,
-                'dep': token.dep_,
-                'head': token.head.text if token.head != token else 'ROOT',
-                'is_stop': token.is_stop,
-                'children': [child.text for child in token.children]
-            }
-            tokens_info.append(token_info)
-        
-        return tokens_info
-    
-    def _classify_slots_with_spacy(self, tokens_info, sentence):
-        """spaCy品詞・依存関係情報を活用したスロット分類"""
-        slots = {}
-        
-        # 主語の特定（nsubj, nsubjpass）
-        subjects = [t for t in tokens_info if t['dep'] in ['nsubj', 'nsubjpass'] and t['pos'] in ['NOUN', 'PRON']]
-        
-        # 動詞の特定（ROOT + VERB）
-        main_verbs = [t for t in tokens_info if t['dep'] == 'ROOT' and t['pos'] == 'VERB']
-        
-        # 助動詞の特定（AUX）
-        auxiliaries = [t for t in tokens_info if t['pos'] == 'AUX']
-        
-        # 目的語の特定（dobj, pobj）
-        objects = [t for t in tokens_info if t['dep'] in ['dobj', 'pobj'] and t['pos'] in ['NOUN', 'PRON']]
-        
-        # 補語の特定（acomp, attr）
-        complements = [t for t in tokens_info if t['dep'] in ['acomp', 'attr']]
-        
-        # 修飾語の特定（advmod, amod, npadvmod）
-        modifiers_adv = [t for t in tokens_info if t['dep'] in ['advmod', 'npadvmod'] and t['pos'] == 'ADV']
-        modifiers_adj = [t for t in tokens_info if t['dep'] == 'amod' and t['pos'] == 'ADJ']
-        
-        # 疑問詞の特定（品詞タグベース）
-        question_words = [t for t in tokens_info if t['tag'] in ['WP', 'WDT', 'WRB'] or 
-                         t['text'].lower() in ['what', 'where', 'when', 'who', 'why', 'how']]
-        
-        # スロット割り当て
-        if subjects:
-            # 複数主語の場合は結合
-            subject_text = ' '.join([s['text'] for s in subjects])
-            slots['S'] = [{'value': subject_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 1}]
-        
-        if auxiliaries:
-            aux_text = ' '.join([a['text'] for a in auxiliaries])
-            slots['Aux'] = [{'value': aux_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 2}]
-        
-        if main_verbs:
-            verb_text = ' '.join([v['text'] for v in main_verbs])
-            slots['V'] = [{'value': verb_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 3}]
-        
-        if objects:
-            obj_text = ' '.join([o['text'] for o in objects])
-            slots['O1'] = [{'value': obj_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 4}]
-        
-        if complements:
-            comp_text = ' '.join([c['text'] for c in complements])
-            slots['C'] = [{'value': comp_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 5}]
-        
-        if modifiers_adv:
-            adv_text = ' '.join([m['text'] for m in modifiers_adv])
-            slots['M3'] = [{'value': adv_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 6}]
-        
-        if modifiers_adj:
-            adj_text = ' '.join([m['text'] for m in modifiers_adj])
-            slots['M2'] = [{'value': adj_text, 'confidence': 0.95, 'method': 'spacy_grammar', 'order': 7}]
-        
-        # 疑問詞の特別処理
-        if question_words:
-            q_word = question_words[0]
-            q_text = q_word['text']
-            
-            if q_text.lower() in ['what', 'who']:
-                slots['O1'] = [{'value': q_text, 'confidence': 0.98, 'method': 'spacy_question', 'order': 1}]
-            elif q_text.lower() in ['where', 'when', 'why', 'how']:
-                slots['M1'] = [{'value': q_text, 'confidence': 0.98, 'method': 'spacy_question', 'order': 1}]
-        
-        return slots
-    
-    def _enhance_slots_with_traditional_rules(self, spacy_slots, sentence):
-        """spaCy解析結果を既存ルールで補強"""
-        # 既存ルールでの解析も実行
-        traditional_slots = self.analyze_sentence(sentence)
-        
-        enhanced_slots = spacy_slots.copy()
-        
-        # 既存ルールで補完可能な情報を追加
-        for slot, candidates in traditional_slots.items():
-            if slot not in enhanced_slots and candidates:
-                # spaCyで検出されなかった要素を補完
-                enhanced_slots[slot] = candidates
-                for candidate in candidates:
-                    candidate['method'] = 'traditional_complement'
-        
-        return enhanced_slots
         
     def load_rules(self):
         """文法ルールデータを読み込み"""
