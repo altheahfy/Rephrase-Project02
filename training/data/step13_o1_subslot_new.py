@@ -48,6 +48,36 @@ class O1SubslotGenerator:
         """O1 Phraseサブスロット抽出"""
         subslots = {}
         
+        # 最初にnoun-verb phrase統合検出 (完全カバレッジの原則)
+        # "students studying" のような名詞+動詞を統合してsub-vとして処理
+        root_tokens = [token for token in doc if token.dep_ == "ROOT" and token.pos_ in ["NOUN", "PROPN"]]
+        if root_tokens:
+            root_token = root_tokens[0]
+            # ROOT名詞に対してacl(adjectival clause)やrelcl(relative clause)で動詞が修飾している場合
+            verb_children = [child for child in root_token.children if child.pos_ == "VERB" and child.dep_ in ["acl", "relcl"]]
+            if verb_children:
+                # 名詞+動詞の統合処理 (完全カバレッジのため)
+                verb_token = verb_children[0]
+                
+                # 冠詞・定冠詞は必ず名詞とセット（100%のルール）
+                root_det_tokens = [child for child in root_token.children if child.dep_ == "det"]
+                if root_det_tokens:
+                    combined_tokens = root_det_tokens + [root_token, verb_token]
+                    combined_tokens.sort(key=lambda x: x.i)
+                    combined_text = ' '.join([t.text for t in combined_tokens])
+                    combined_indices = [t.i for t in combined_tokens]
+                else:
+                    combined_tokens = [root_token, verb_token]
+                    combined_text = f"{root_token.text} {verb_token.text}"
+                    combined_indices = [root_token.i, verb_token.i]
+                
+                subslots['sub-v'] = {
+                    'text': combined_text,
+                    'tokens': [t.text for t in combined_tokens],
+                    'token_indices': combined_indices
+                }
+                print(f"✅ sub-vとして統合処理: '{combined_text}' (名詞+動詞統合) - indices: {combined_indices}")
+        
         # 関係代名詞の検出（より柔軟な条件）
         rel_pronouns = ["who", "whom", "whose", "which", "that"]
         rel_pronoun_token = None
@@ -61,54 +91,94 @@ class O1SubslotGenerator:
         
         if rel_pronoun_token:
             subslots.update(self._extract_relative_clause_subslots(doc, rel_pronoun_token))
+            print(f"🔍 関係代名詞処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
         # 不定詞主語の処理: "To learn English is important"
-        elif doc[0].text.lower() == "to" and doc[0].pos_ == "PART":
+        if doc[0].text.lower() == "to" and doc[0].pos_ == "PART":
             subslots.update(self._extract_infinitive_subject_subslots(doc))
+            print(f"🔍 不定詞主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
         # 動名詞主語の処理: "Reading books is fun"
+        gerund_tokens = [token for token in doc if token.pos_ == "VERB" and token.tag_ == "VBG"]
+        if gerund_tokens and 'sub-v' not in subslots:
+            # 既存のsub-vがない場合のみ動名詞処理を実行
+            subslots.update(self._extract_gerund_subject_subslots(doc, gerund_tokens[0]))
+            print(f"🔍 動名詞主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
+        elif gerund_tokens:
+            print(f"🔍 動名詞処理スキップ: 既存sub-v保護 '{subslots.get('sub-v', {}).get('text', 'なし')}'")
         else:
-            gerund_tokens = [token for token in doc if token.pos_ == "VERB" and token.tag_ == "VBG"]
-            if gerund_tokens:
-                subslots.update(self._extract_gerund_subject_subslots(doc, gerund_tokens[0]))
+            print(f"🔍 動名詞主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
         # 複合主語の処理: "John and Mary are here"
         and_tokens = [token for token in doc if token.text.lower() == "and" and token.dep_ == "cc"]
         if and_tokens:
             subslots.update(self._extract_compound_subject_subslots(doc))
+            print(f"🔍 複合主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
         # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3） - 既に使用されたトークンを除く
+        print(f"🔍 修飾語割り当て前sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         modifier_subslots = self._assign_modifiers_by_position(doc, subslots)
         subslots.update(modifier_subslots)
         
-        # 不定詞「to + 動詞」の統合処理
-        to_verb_tokens = []
+        # 通常のROOT主語検出 (noun-verb統合されなかった場合のフォールバック)
+        root_tokens = [token for token in doc if token.dep_ == "ROOT" and token.pos_ in ["NOUN", "PROPN"]]
+        if not subslots.get('sub-v') and root_tokens and 'sub-s' not in subslots:
+            root_token = root_tokens[0]
+            # 冠詞・定冠詞は必ず名詞とセット（100%のルール）
+            root_det_tokens = [child for child in root_token.children if child.dep_ == "det"]
+            if root_det_tokens:
+                s_tokens = root_det_tokens + [root_token]
+                s_tokens.sort(key=lambda x: x.i)  # 位置順にソート
+                s_text = ' '.join([t.text for t in s_tokens])
+                s_token_indices = [t.i for t in s_tokens]
+            else:
+                s_tokens = [root_token]
+                s_text = root_token.text
+                s_token_indices = [root_token.i]
+            
+            subslots['sub-s'] = {
+                'text': s_text,
+                'tokens': [t.text for t in s_tokens],
+                'token_indices': s_token_indices
+            }
+            print(f"✅ sub-sとして処理: '{s_text}' (ROOT主語+冠詞)")
+        
+        # 不定詞「to + 動詞」の統合処理 (既存sub-vを尊重)
         to_token = None
         main_verb_token = None
         
-        for token in doc:
-            if token.text.lower() == "to" and token.pos_ == "PART":
-                to_token = token
-            elif token.pos_ == "VERB" and token.dep_ in ["ROOT", "xcomp", "ccomp"]:
-                main_verb_token = token
-                break
-        
-        if to_token and main_verb_token:
-            # sub-v: "to + 動詞" として統合
-            subslots['sub-v'] = {
-                'text': f"{to_token.text} {main_verb_token.text}",
-                'tokens': [to_token.text, main_verb_token.text],
-                'token_indices': [to_token.i, main_verb_token.i]
-            }
-            print(f"✅ sub-vとして処理: '{to_token.text} {main_verb_token.text}' (不定詞統合)")
-        elif main_verb_token:
-            # 動詞のみ
-            subslots['sub-v'] = {
-                'text': main_verb_token.text,
-                'tokens': [main_verb_token.text],
-                'token_indices': [main_verb_token.i]
-            }
-            print(f"✅ sub-vとして処理: '{main_verb_token.text}'")
+        if 'sub-v' not in subslots:
+            to_verb_tokens = []
+            
+            for token in doc:
+                if token.text.lower() == "to" and token.pos_ == "PART":
+                    to_token = token
+                elif token.pos_ == "VERB" and token.dep_ in ["ROOT", "xcomp", "ccomp"]:
+                    main_verb_token = token
+                    break
+            
+            if to_token and main_verb_token:
+                # sub-v: "to + 動詞" として統合
+                subslots['sub-v'] = {
+                    'text': f"{to_token.text} {main_verb_token.text}",
+                    'tokens': [to_token.text, main_verb_token.text],
+                    'token_indices': [to_token.i, main_verb_token.i]
+                }
+                print(f"✅ sub-vとして処理: '{to_token.text} {main_verb_token.text}' (不定詞統合) - 上書き警告!")
+            elif main_verb_token:
+                # 動詞のみ
+                subslots['sub-v'] = {
+                    'text': main_verb_token.text,
+                    'tokens': [main_verb_token.text],
+                    'token_indices': [main_verb_token.i]
+                }
+                print(f"✅ sub-vとして処理: '{main_verb_token.text}' - 上書き警告!")
+        else:
+            # 既存sub-vがある場合も、main_verb_tokenを探す
+            for token in doc:
+                if token.pos_ == "VERB" and token.dep_ in ["ROOT", "xcomp", "ccomp"]:
+                    main_verb_token = token
+                    break
         
         # sub-aux: 助動詞検出 (aux, auxpass) - ただし不定詞toは除外
         aux_tokens = [token for token in doc if token.dep_ in ["aux", "auxpass"] and not (token.text.lower() == "to" and token.pos_ == "PART")]
@@ -209,6 +279,11 @@ class O1SubslotGenerator:
         # TODO: 完全な10個サブスロット検出を実装予定
         # complete_subslots = self._detect_all_subslots(doc)
         # subslots.update(complete_subslots)
+        
+        # デバッグ: 最終結果確認
+        if 'sub-v' in subslots:
+            print(f"🔍 最終sub-v: '{subslots['sub-v']['text']}' indices: {subslots['sub-v']['token_indices']}")
+        print(f"🔍 最終全subslots: {[(k, v['text']) for k, v in subslots.items()]}")
         
         return subslots
     
@@ -471,15 +546,18 @@ class O1SubslotGenerator:
         return subslots
     
     def _extract_gerund_subject_subslots(self, doc, gerund_token):
-        """動名詞主語のサブスロット抽出"""
+        """動名詞主語のサブスロット抽出 (既存sub-vを尊重)"""
         subslots = {}
         
-        # sub-v: 動名詞 (読む動作なので動詞として処理)
+        # sub-v: 動名詞 (読む動作なので動詞として処理) - ただし既存sub-vがない場合のみ
+        # 既存のnoun-verb統合（例：students studying）を保護
+        print(f"🚨 動名詞処理警告: gerund='{gerund_token.text}' - sub-v上書きを試行")
         subslots['sub-v'] = {
             'text': gerund_token.text,
             'tokens': [gerund_token.text],
             'token_indices': [gerund_token.i]
         }
+        print(f"✅ sub-v上書き実行: '{gerund_token.text}'")
         
         # sub-o1: 動名詞の目的語
         objects = [child for child in gerund_token.children if child.dep_ == "dobj"]
@@ -590,6 +668,7 @@ class O1SubslotGenerator:
 
     def _detect_all_subslots(self, doc):
         """完全な10個サブスロット検出エンジン"""
+        print(f"🔍 _detect_all_subslots 実行開始")
         subslots = {}
         
         for token in doc:
@@ -734,12 +813,13 @@ class O1SubslotGenerator:
             
             # 動詞で未分類のもの
             elif token.pos_ == "VERB" and 'sub-v' not in subslots:
+                print(f"🚨 残余動詞上書き警告: '{token.text}' - 既存sub-v確認: {'sub-v' in subslots}")
                 subslots['sub-v'] = {
                     'text': token.text,
                     'tokens': [token.text],
                     'token_indices': [token.i]
                 }
-                print(f"🔍 sub-v(残余)検出: '{token.text}' (pos: {token.pos_})")
+                print(f"🔍 sub-v(残余)検出: '{token.text}' (pos: {token.pos_}) - 上書き実行!")
             
             # 時間副詞の処理（yesterday, today, etc）
             elif token.pos_ in ["NOUN", "ADV"] and token.text.lower() in ["yesterday", "today", "tomorrow", "year", "time"]:
@@ -826,6 +906,29 @@ class O1SubslotGenerator:
                 'type': 'advmod'
             })
         
+        # npadvmod（名詞的副詞修飾語） - "this year" のような時間表現
+        npadvmod_tokens = [token for token in doc if token.dep_ == "npadvmod" and token.i not in used_indices]
+        for token in npadvmod_tokens:
+            npadvmod_phrase_tokens = [token]
+            npadvmod_phrase_text = token.text
+            
+            # 冠詞・定冠詞は必ず名詞とセット（100%のルール）
+            det_tokens = [child for child in token.children if child.dep_ == "det" and child.i not in used_indices]
+            if det_tokens:
+                # 冠詞 + 名詞の統合
+                det_noun_tokens = det_tokens + [token]
+                det_noun_tokens.sort(key=lambda x: x.i)
+                npadvmod_phrase_tokens = det_noun_tokens
+                npadvmod_phrase_text = " ".join([t.text for t in det_noun_tokens])
+            
+            modifier_candidates.append({
+                'tokens': npadvmod_phrase_tokens,
+                'text': npadvmod_phrase_text,
+                'position': token.i,
+                'type': 'npadvmod'
+            })
+            print(f"🔍 npadvmod検出: '{npadvmod_phrase_text}' tokens: {[t.text for t in npadvmod_phrase_tokens]}")
+        
         # 前置詞句 (prep + pobj) - 既に使用されていないもの
         prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"] and token.i not in used_indices]
         for prep_token in prep_tokens:
@@ -911,6 +1014,9 @@ class O1SubslotGenerator:
                 }
             
             print(f"✅ {slot_name}として割り当て: '{modifier['text']}' (位置: {relative_pos:.2f}, {modifier['type']})")
+        
+        # デバッグ: 修飾語割り当て後の結果確認
+        print(f"🔍 修飾語割り当て結果: {list(subslots.keys())}")
         
         return subslots
 
