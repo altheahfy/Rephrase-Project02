@@ -517,8 +517,10 @@ def test_from_excel():
         # サマリー表示
         generator.show_summary()
         
-        # Excel保存（入力ファイル名ベースで出力名生成）
-        output_name = "例文入力元_分解結果_v2.xlsx"
+        # Excel保存（タイムスタンプ付きで競合回避）
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_name = f"例文入力元_分解結果_v2_{timestamp}.xlsx"
         generator.save_to_excel(output_name)
         
         print(f"\n🎉 完了! 出力ファイル: {output_name}")

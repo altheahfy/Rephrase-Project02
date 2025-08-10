@@ -90,7 +90,8 @@
       },
       "assign": {
         "slot": "M3",
-        "value": "where_M3_1",
+        "value": "where",
+        "order": 1,
         "type": "word",
         "meta": {
           "QuestionType": "wh-word"
@@ -110,7 +111,8 @@
       },
       "assign": {
         "slot": "S",
-        "type": "word"
+        "type": "word",
+        "order": 3
       }
     },
     {

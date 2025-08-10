@@ -296,7 +296,8 @@ class CompleteRephraseParsingEngine:
                 slots['V'].append({
                     'value': generic_verb,
                     'rule_id': 'generic-verb',
-                    'confidence': 0.7
+                    'confidence': 0.7,
+                    'order': 4
                 })
                 print(f"✅ 汎用動詞検出: {generic_verb}")
         
@@ -307,7 +308,8 @@ class CompleteRephraseParsingEngine:
                 slots['O1'].append({
                     'value': generic_object,
                     'rule_id': 'generic-object',
-                    'confidence': 0.7
+                    'confidence': 0.7,
+                    'order': 5
                 })
                 print(f"✅ 汎用目的語検出: {generic_object}")
         
@@ -321,7 +323,8 @@ class CompleteRephraseParsingEngine:
                 slots['M3'].append({
                     'value': generic_time,
                     'rule_id': 'generic-time',
-                    'confidence': 0.8
+                    'confidence': 0.8,
+                    'order': 6
                 })
                 print(f"✅ 汎用時間表現検出: {generic_time}")
         
@@ -332,7 +335,8 @@ class CompleteRephraseParsingEngine:
                 slots['Aux'].append({
                     'value': generic_aux,
                     'rule_id': 'generic-aux',
-                    'confidence': 0.8
+                    'confidence': 0.8,
+                    'order': 2
                 })
                 print(f"✅ 汎用助動詞検出: {generic_aux}")
         
@@ -343,7 +347,8 @@ class CompleteRephraseParsingEngine:
                 slots['M2'].append({
                     'value': generic_prep,
                     'rule_id': 'generic-prep-phrase',
-                    'confidence': 0.8
+                    'confidence': 0.8,
+                    'order': 99
                 })
                 print(f"✅ 汎用前置詞句検出: {generic_prep}")
         
@@ -354,7 +359,8 @@ class CompleteRephraseParsingEngine:
                 slots['C1'].append({
                     'value': generic_complement,
                     'rule_id': 'generic-complement',
-                    'confidence': 0.8
+                    'confidence': 0.8,
+                    'order': 99
                 })
                 print(f"✅ 汎用補語検出: {generic_complement}")
         
@@ -541,6 +547,11 @@ class CompleteRephraseParsingEngine:
                             'confidence': 0.9
                         }
                         
+                        # assignフィールドからorder情報を取得
+                        assignment = rule.get('assign', {})
+                        if 'order' in assignment:
+                            candidate_data['order'] = assignment['order']
+                        
                         # 動詞を含む句の場合のみphraseフラグを設定
                         if is_verb_phrase:
                             candidate_data['is_phrase'] = True
@@ -670,11 +681,17 @@ class CompleteRephraseParsingEngine:
         value = self._determine_assignment_value(assignment, doc, hierarchy, rule_id)
         
         if value:
-            slots[slot].append({
+            candidate_data = {
                 'value': value,
                 'type': assign_type,
                 'rule_id': rule_id
-            })
+            }
+            
+            # assignフィールドからorder情報を取得
+            if 'order' in assignment:
+                candidate_data['order'] = assignment['order']
+                
+            slots[slot].append(candidate_data)
             return True
             
         return False
