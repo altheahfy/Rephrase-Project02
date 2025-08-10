@@ -83,6 +83,21 @@
       }
     },
     {
+      "id": "wh-where-front", 
+      "priority": 5,
+      "trigger": {
+        "pattern": "(?i)^where\\b"
+      },
+      "assign": {
+        "slot": "M3",
+        "value": "where_M3_1",
+        "type": "word",
+        "meta": {
+          "QuestionType": "wh-word"
+        }
+      }
+    },
+    {
       "id": "subject-pronoun-np-front",
       "priority": 20,
       "trigger": {

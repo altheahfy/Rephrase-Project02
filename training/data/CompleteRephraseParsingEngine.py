@@ -475,8 +475,12 @@ class CompleteRephraseParsingEngine:
             pattern = trigger['pattern']
             match = re.search(pattern, doc.text, re.IGNORECASE)
             if match:
+                # assignフィールドでvalueが指定されている場合はそれを優先
+                assignment = rule.get('assign', {})
+                if 'value' in assignment:
+                    value = assignment['value']
                 # 実際の値を決定
-                if rule_id == 'place-M3':
+                elif rule_id == 'place-M3':
                     value = self._extract_place_prepositional_phrase(doc)
                 elif rule_id == 'to-direction-M2':
                     value = self._extract_direction_prepositional_phrase(doc, rule_id)
@@ -689,6 +693,8 @@ class CompleteRephraseParsingEngine:
             return self._extract_subject_value(doc, hierarchy)
         elif rule_id == 'manner-degree-M2':
             return self._extract_adverb_value(doc)
+        elif rule_id == 'wh-where-front':
+            return self._extract_wh_where_value(doc)
         else:
             # 汎用的な値抽出
             return self._extract_generic_value(assignment, doc, hierarchy)
@@ -1642,6 +1648,13 @@ class CompleteRephraseParsingEngine:
         
         # 最初の副詞を返す（複数ある場合は最初のもの）
         return adverbs[0] if adverbs else None
+    
+    def _extract_wh_where_value(self, doc) -> Optional[str]:
+        """Wh疑問詞whereを抽出（M3スロット用）"""
+        for token in doc:
+            if token.text.lower() == "where":
+                return "where_M3_1"
+        return None
         
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
     def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
