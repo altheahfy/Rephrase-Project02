@@ -835,8 +835,18 @@ class O1SubslotGenerator:
             # 前置詞句の目的語も含める（使用済みでないもの）
             for child in prep_token.children:
                 if child.dep_ == "pobj" and child.i not in used_indices:
-                    prep_phrase_tokens.append(child)
-                    prep_phrase_text += " " + child.text
+                    # 冠詞・定冠詞は必ず名詞とセット（100%のルール）
+                    # 前置詞句の目的語の冠詞も統合
+                    pobj_det_tokens = [grandchild for grandchild in child.children if grandchild.dep_ == "det" and grandchild.i not in used_indices]
+                    if pobj_det_tokens:
+                        # 冠詞 + 名詞の順番で統合
+                        det_noun_tokens = pobj_det_tokens + [child]
+                        det_noun_tokens.sort(key=lambda x: x.i)
+                        prep_phrase_tokens.extend(det_noun_tokens)
+                        prep_phrase_text += " " + " ".join([t.text for t in det_noun_tokens])
+                    else:
+                        prep_phrase_tokens.append(child)
+                        prep_phrase_text += " " + child.text
             
             # 前置詞句が有効な場合のみ追加
             if len(prep_phrase_tokens) > 1 or prep_token.i not in used_indices:
