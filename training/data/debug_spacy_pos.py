@@ -18,9 +18,8 @@ def debug_spacy_parsing(text):
 
 if __name__ == "__main__":
     test_phrases = [
-        "happy that you came",
-        "confident that he will succeed", 
-        "sure that it works"
+        "The fact that he came",
+        "The idea that we discussed"
     ]
     
     for phrase in test_phrases:

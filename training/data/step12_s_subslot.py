@@ -98,8 +98,8 @@ class SSubslotGenerator:
         that_token = None
         for token in doc:
             if token.text.lower() == "that":
-                # that節の検出条件を改善
-                if token.dep_ in ["acl", "ccomp"] or (token.pos_ == "SCONJ"):
+                # that節の検出条件を広げる
+                if token.dep_ in ["acl", "ccomp", "mark", "dobj"] or (token.pos_ == "SCONJ"):
                     that_token = token
                     break
         
@@ -287,34 +287,56 @@ class SSubslotGenerator:
         """同格that節のサブスロット抽出"""
         subslots = {}
         
-        # that節の前の名詞句を特定
+        # that節の前の名詞句を特定（冠詞も含める）
+        noun_phrase_tokens = []
         main_noun = None
         for token in doc:
-            if token.i < that_token.i and token.pos_ in ["NOUN", "PROPN"]:
-                main_noun = token
+            if token.i < that_token.i:
+                if token.pos_ in ["NOUN", "PROPN"]:
+                    main_noun = token
+                elif token.pos_ == "DET" and not noun_phrase_tokens:
+                    # 冠詞から名詞句の開始
+                    noun_phrase_tokens.append(token)
+        
+        if main_noun:
+            # 冠詞がある場合は含める
+            if noun_phrase_tokens:
+                noun_phrase_tokens.append(main_noun)
+            else:
+                noun_phrase_tokens = [main_noun]
         
         # that節内の主語を特定
         that_clause_subj = None
+        that_clause_verb = None
+        
+        # まず動詞を見つけて、その主語を探す
         for token in doc:
-            if token.i > that_token.i and token.dep_ == "nsubj":
-                that_clause_subj = token
+            if token.i > that_token.i and token.pos_ == "VERB":
+                that_clause_verb = token
+                # その動詞の主語を探す
+                subjects = [child for child in token.children if child.dep_ == "nsubj"]
+                if subjects:
+                    that_clause_subj = subjects[0]
                 break
         
-        if main_noun and that_clause_subj:
-            # sub-s: 名詞 + that + 主語 (Rephraseルール: 同格節統合)
+        if noun_phrase_tokens and that_clause_subj:
+            # sub-s: 名詞句 + that + 主語 (Rephraseルール: 同格節統合)
+            noun_phrase_text = ' '.join([t.text for t in noun_phrase_tokens])
             subslots['sub-s'] = {
-                'text': f"{main_noun.text} that {that_clause_subj.text}",
-                'tokens': [main_noun.text, that_token.text, that_clause_subj.text],
-                'token_indices': [main_noun.i, that_token.i, that_clause_subj.i]
+                'text': f"{noun_phrase_text} that {that_clause_subj.text}",
+                'tokens': [t.text for t in noun_phrase_tokens] + [that_token.text, that_clause_subj.text],
+                'token_indices': [t.i for t in noun_phrase_tokens] + [that_token.i, that_clause_subj.i]
+            }
+        elif noun_phrase_tokens and not that_clause_subj:
+            # 主語が見つからない場合はthatまでを含める
+            noun_phrase_text = ' '.join([t.text for t in noun_phrase_tokens])
+            subslots['sub-s'] = {
+                'text': f"{noun_phrase_text} that",
+                'tokens': [t.text for t in noun_phrase_tokens] + [that_token.text],
+                'token_indices': [t.i for t in noun_phrase_tokens] + [that_token.i]
             }
             
-            # that節内の動詞を処理
-            that_clause_verb = None
-            for token in doc:
-                if token.i > that_clause_subj.i and token.pos_ == "VERB":
-                    that_clause_verb = token
-                    break
-            
+            # that節内の動詞を処理（既に見つけ済み）
             if that_clause_verb:
                 # sub-v: that節内動詞
                 subslots['sub-v'] = {
