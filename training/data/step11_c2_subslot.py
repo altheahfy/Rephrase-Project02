@@ -268,7 +268,11 @@ def test_c2_subslot_generator():
         # Clause examples (that節等)
         ("confident that he will succeed", "clause"),
         ("sure that it works", "clause"),
-        ("happy that you came", "clause")
+        ("happy that you came", "clause"),
+        
+        # 共通課題テスト
+        ("eager to go home", "phrase"),  # homeカバレッジテスト
+        ("sure what you said", "clause")   # 疑問詞節テスト
     ]
     
     print("=== C2サブスロット生成テスト ===")
