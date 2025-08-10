@@ -116,8 +116,48 @@
     }
   },
   
+  "separated_interrogative_rules": {
+    "description": "分離疑問詞・感嘆詞の処理ルール（文頭移動パターン）",
+    "discovery_source": "analyze_question_patterns.py results - ex009, ex010",
+    
+    "pattern_types": {
+      "wh_question": {
+        "example": "What do you think it is?",
+        "structure": [
+          "order:1 O1: 'what' (文頭移動部分)",
+          "order:2 Aux: 'do'",
+          "order:3 S: 'you'", 
+          "order:4 V: 'think'",
+          "order:5 O1: 'it is' (本来の位置)"
+        ],
+        "technical_note": "同一スロット(O1)内で要素が分離、orderで制御"
+      },
+      "exclamatory": {
+        "example": "What cruelty people are capable of!",
+        "structure": [
+          "order:1 O1: 'what cruelty' (文頭移動部分)",
+          "order:2 S: 'people'",
+          "order:3 V: 'are capable of'"
+        ]
+      }
+    },
+    
+    "spacy_implementation": {
+      "detection_method": "sentence.startswith(interrogative_words)",
+      "interrogative_markers": ["What", "How", "When", "Where", "Why", "Which", "Who"],
+      "processing_logic": [
+        "1. 文頭疑問詞を検出",
+        "2. 対応する本来のスロット位置を特定",
+        "3. 同一スロット内での分離として処理",
+        "4. order値による表示制御"
+      ]
+    },
+    
+    "integration_note": "上位スロットのorderで制御するため、基本スロット処理の後段で実装"
+  },
+  
   "anti_duplication_rules": {
-    "description": "ago/for重複問題の解決ルール",
+    "description_anti_dup": "ago/for重複問題の解決ルール",
     "problem_case": {
       "input": "I met him a few days ago",
       "current_output": {

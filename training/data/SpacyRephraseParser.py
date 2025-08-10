@@ -86,7 +86,10 @@ class SpacyRephraseParser:
             elif slot_info.phrase_type == 'phrase':
                 slot_info.subslots = self._generate_subslots_for_phrase(slot_info, doc)
         
-        # Step 3: 重複排除処理
+        # Step 3: 分離疑問詞処理（5文型フルセット ex009, ex010 対応）
+        main_slots = self._process_separated_interrogatives(main_slots, doc)
+        
+        # Step 4: 重複排除処理
         main_slots = self._resolve_duplications(main_slots)
         
         return main_slots
@@ -164,6 +167,43 @@ class SpacyRephraseParser:
         # 重複語彙の検出と排除
         
         return slots
+    
+    def _process_separated_interrogatives(self, slots: Dict[str, SlotInfo], doc) -> Dict[str, SlotInfo]:
+        """
+        分離疑問詞・感嘆詞の処理
+        
+        【発見パターン】（analyze_question_patterns.py より）
+        ex009: "What do you think it is?"
+        → order:1 O1: "what" (文頭移動) + order:5 O1: "it is" (本来位置)
+        
+        ex010: "What cruelty people are capable of!" 
+        → order:1 O1: "what cruelty" (文頭移動)
+        
+        Args:
+            slots: 基本スロット辞書
+            doc: spaCy Doc オブジェクト
+            
+        Returns:
+            分離疑問詞処理済みスロット辞書
+        """
+        text = doc.text
+        
+        # 疑問詞で始まるかチェック
+        interrogative_words = ["What", "How", "When", "Where", "Why", "Which", "Who"]
+        starts_with_question = any(text.startswith(word) for word in interrogative_words)
+        
+        if not starts_with_question:
+            return slots
+        
+        # TODO: 実装が必要
+        # 1. 文頭疑問詞の特定
+        # 2. 対応する本来のスロット位置の検出
+        # 3. 同一スロット内での分離処理
+        # 4. order値による表示制御
+        
+        print(f"DEBUG: 分離疑問詞検出 - {text[:50]}...")
+        
+        return slots
 
 # ================================================================
 # サブスロット生成専用モジュール
@@ -212,7 +252,9 @@ if __name__ == "__main__":
     test_sentences = [
         "The manager who had recently taken charge of the project had to make the committee deliver the proposal flawlessly.",
         "Even though he was under intense pressure, so the outcome would reflect their potential.",
-        "I met him a few days ago."  # 重複問題テスト
+        "I met him a few days ago.",  # 重複問題テスト
+        "What do you think it is?",  # 分離疑問詞テスト (ex009)
+        "What cruelty people are capable of!"  # 感嘆文分離疑問詞テスト (ex010)
     ]
     
     print("=== SpaCy Rephrase Parser v2.0 テスト ===")
