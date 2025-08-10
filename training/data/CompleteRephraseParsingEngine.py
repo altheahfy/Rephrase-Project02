@@ -865,9 +865,9 @@ class CompleteRephraseParsingEngine:
         """完全な名詞句を取得"""
         phrase_tokens = [token]
         
-        # 左側の修飾語
+        # 左側の修飾語（所有格代名詞を含む）
         for child in token.children:
-            if child.i < token.i and child.dep_ in ['det', 'amod', 'compound', 'nummod']:
+            if child.i < token.i and child.dep_ in ['det', 'amod', 'compound', 'nummod', 'poss']:
                 phrase_tokens.append(child)
         
         # 右側の修飾語（前置詞句は除く）
