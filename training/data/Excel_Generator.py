@@ -82,75 +82,109 @@ class ExcelGeneratorV2:
         for v_group_key, sentences in self.vgroup_data.items():
             print(f"\n--- V_group_key: '{v_group_key}' 処理中 ---")
             
-            # この V_group_key の絶対順序を計算
-            slot_orders = self.calculate_slot_display_orders(v_group_key)
-            print(f"絶対順序: {slot_orders}")
-            
-            # 各例文をExcelデータに変換
+            # 各例文をExcelデータに変換（例文ごとにorder計算）
             for sentence_data in sentences:
-                self.convert_to_excel_rows(sentence_data, v_group_key, slot_orders)
+                self.convert_to_excel_rows(sentence_data, v_group_key, {})
         
         print(f"\n✅ Step 2完了: 総 {len(self.results)} 行生成")
     
     def calculate_slot_display_orders(self, v_group_key):
-        """V_group_key内の全例文からSlot_display_orderを連続順序で動的計算"""
-        if v_group_key not in self.vgroup_data:
-            return {}
-            
-        # Step 1: グループ内の全スロットを収集
-        all_slots_in_group = set()
-        vgroup_sentences = self.vgroup_data[v_group_key]
+        """V_group_key内で例文ごとに正しいSlot_display_orderを計算"""
+        return {}  # この関数は各例文レベルで処理するため、グループレベルでは空を返す
+    
+    def calculate_sentence_slot_orders(self, sentence_data):
+        """単一例文のSlot_display_orderを文中位置ベースで計算"""
+        slots = sentence_data['slots']
+        main_slots = slots.get('main_slots') or slots.get('slots', {})
+        sentence = sentence_data.get('sentence', '')
         
-        for sentence_data in vgroup_sentences:
-            slots = sentence_data['slots']
-            main_slots = slots.get('main_slots') or slots.get('slots', {})
-            
-            for slot, candidates in main_slots.items():
-                if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
-                    continue
-                all_slots_in_group.add(slot)
+        # 文中位置を基にしたスロット順序計算
+        slot_positions = {}
+        words = sentence.split()
         
-        # Step 2: 文法的優先順序を定義（疑問詞M3は先頭、通常M3は後方）
-        slot_priority = {
-            'M3': (1, 10),  # 疑問詞なら1、通常なら10
-            'M1': 2,
-            'Aux': 3,
-            'S': 4,
-            'V': 5,
-            'O1': 6,
-            'O2': 7,
-            'C1': 8,
-            'M2': 9,
-            'C2': 11
+        for slot, candidates in main_slots.items():
+            if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
+                continue
+                
+            # candidateから値を取得
+            if isinstance(candidates, list):
+                candidate = candidates[0] if candidates else {}
+            else:
+                candidate = candidates
+                
+            if isinstance(candidate, dict) and 'value' in candidate:
+                slot_text = candidate['value']
+            else:
+                slot_text = str(candidate)
+            
+            # 短縮形を元に戻す処理
+            slot_text = self.restore_contractions(slot_text, sentence)
+            
+            # 文中での位置を検索
+            position = self.find_slot_position_in_sentence(sentence, slot_text)
+            slot_positions[slot] = position
+        
+        # 位置順にソートしてorder値を割り当て
+        sorted_slots = sorted(slot_positions.items(), key=lambda x: x[1])
+        slot_orders = {}
+        
+        for order_counter, (slot_name, position) in enumerate(sorted_slots, 1):
+            slot_orders[slot_name] = order_counter
+            
+        return slot_orders
+    
+    def find_slot_position_in_sentence(self, sentence, slot_text):
+        """文中でのスロット位置を検索"""
+        sentence_lower = sentence.lower()
+        slot_text_lower = slot_text.lower()
+        
+        # 基本的な位置検索
+        position = sentence_lower.find(slot_text_lower)
+        if position != -1:
+            return position
+            
+        # 単語境界での検索
+        words = sentence.split()
+        slot_words = slot_text.split()
+        
+        for i in range(len(words) - len(slot_words) + 1):
+            if all(words[i+j].lower().rstrip('.,!?:;').startswith(slot_words[j].lower().rstrip('.,!?:;')) 
+                   for j in range(len(slot_words))):
+                return i * 10  # 単語位置を10倍して文字位置に近似
+                
+        # 見つからない場合は999を返す（最後に配置）
+        return 999
+    
+    def restore_contractions(self, slot_text, original_sentence):
+        """展開された短縮形を元の形に戻す"""
+        # 短縮形マッピング
+        contraction_map = {
+            'can not': "can't",
+            'cannot': "can't",
+            'could not': "couldn't",
+            'will not': "won't",
+            'would not': "wouldn't",
+            'have not': "haven't",
+            'has not': "hasn't",
+            'had not': "hadn't",
+            'is not': "isn't",
+            'are not': "aren't",
+            'was not': "wasn't",
+            'were not': "weren't",
+            'do not': "don't",
+            'does not': "doesn't",
+            'did not': "didn't"
         }
         
-        # Step 3: グループ内スロットを文法的優先順序でソート
-        present_slots = []
-        for slot in all_slots_in_group:
-            if slot == 'M3':
-                # M3の位置判定: グループ内でWhere等疑問詞があるかチェック
-                is_question_m3 = self.is_question_m3_in_group(v_group_key)
-                if is_question_m3:
-                    present_slots.append(('M3', 1))  # 疑問詞M3は最前位置
-                else:
-                    present_slots.append(('M3', 10))  # 通常M3は後方
-            else:
-                priority = slot_priority.get(slot, 999)
-                present_slots.append((slot, priority))
+        # 元の文に短縮形が含まれている場合、それを使用
+        original_lower = original_sentence.lower()
+        slot_lower = slot_text.lower()
         
-        # 優先順序でソート
-        present_slots.sort(key=lambda x: x[1])
-        
-        # Step 4: 連続した順序を割り当て（欠番なし）
-        slot_orders = {}
-        order_counter = 1
-        
-        for slot_name, priority in present_slots:
-            slot_orders[slot_name] = order_counter
-            order_counter += 1
-        
-        print(f"グループ内連続順序({v_group_key}): {slot_orders}")
-        return slot_orders
+        for expanded, contracted in contraction_map.items():
+            if slot_lower == expanded and contracted in original_lower:
+                return contracted
+                
+        return slot_text
     
     def is_question_m3_in_group(self, v_group_key):
         """グループ内にWhere等の疑問詞M3が存在するかチェック"""
@@ -211,7 +245,7 @@ class ExcelGeneratorV2:
         return -1  # 見つからない場合
     
     def convert_to_excel_rows(self, sentence_data, v_group_key, slot_orders):
-        """1つの例文をExcel行データに変換（Slot_display_order順序で処理）"""
+        """1つの例文をExcel行データに変換（文中位置順序で処理）"""
         sentence = sentence_data['sentence']
         slots = sentence_data['slots']
         example_id = sentence_data['example_id']
@@ -220,8 +254,11 @@ class ExcelGeneratorV2:
         # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
         main_slots = slots.get('main_slots') or slots.get('slots', {})
         
-        # Slot_display_order順序でスロットを処理
-        sorted_slots = sorted(main_slots.items(), key=lambda x: slot_orders.get(x[0], 99))
+        # 各例文ごとに正しいorder値を計算
+        correct_slot_orders = self.calculate_sentence_slot_orders(sentence_data)
+        
+        # 正しいorder順序でスロットを処理
+        sorted_slots = sorted(main_slots.items(), key=lambda x: correct_slot_orders.get(x[0], 99))
         
         row_count = 0
         for slot, candidates in sorted_slots:
@@ -238,14 +275,22 @@ class ExcelGeneratorV2:
             # valueが存在するかチェック
             if not isinstance(candidate, dict) or 'value' not in candidate:
                 continue
+            
+            if isinstance(candidate, dict) and 'value' in candidate:
+                slot_text = candidate['value']
+            else:
+                slot_text = str(candidate)
+            
+            # 短縮形を元に戻す処理
+            slot_text = self.restore_contractions(slot_text, sentence)
                 
-            slot_phrase = candidate['value']
+            slot_phrase = slot_text
             
             # Rephraseの分類基準に従った判定
             phrase_type = self.determine_phrase_type(candidate)
             
-            # 絶対順序を取得
-            slot_display_order = slot_orders.get(slot, 99)  # 見つからない場合は99
+            # 正しいorder値を取得
+            slot_display_order = correct_slot_orders.get(slot, 99)  # 見つからない場合は99
             
             # メインスロット行
             main_row = {
