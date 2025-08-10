@@ -348,7 +348,7 @@ class CompleteRephraseParsingEngine:
                     'value': generic_prep,
                     'rule_id': 'generic-prep-phrase',
                     'confidence': 0.8,
-                    'order': 99
+                    'order': 7
                 })
                 print(f"✅ 汎用前置詞句検出: {generic_prep}")
         
@@ -360,7 +360,7 @@ class CompleteRephraseParsingEngine:
                     'value': generic_complement,
                     'rule_id': 'generic-complement',
                     'confidence': 0.8,
-                    'order': 99
+                    'order': 8
                 })
                 print(f"✅ 汎用補語検出: {generic_complement}")
         
