@@ -93,102 +93,92 @@ class ExcelGeneratorV2:
         print(f"\n✅ Step 2完了: 総 {len(self.results)} 行生成")
     
     def calculate_slot_display_orders(self, v_group_key):
-        """V_group_key内の全例文からSlot_display_orderを動的計算"""
+        """V_group_key内の全例文からSlot_display_orderを連続順序で動的計算"""
         if v_group_key not in self.vgroup_data:
             return {}
             
+        # Step 1: グループ内の全スロットを収集
+        all_slots_in_group = set()
         vgroup_sentences = self.vgroup_data[v_group_key]
         
-        # まず、解析結果のorder情報を確認
-        order_info_available = False
-        slot_orders_from_analysis = {}
-        
         for sentence_data in vgroup_sentences:
             slots = sentence_data['slots']
-            
-            # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
             main_slots = slots.get('main_slots') or slots.get('slots', {})
             
             for slot, candidates in main_slots.items():
                 if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
                     continue
-                
-                # candidatesがリストの場合は最初の要素を取得
-                if isinstance(candidates, list):
-                    candidate = candidates[0]
+                all_slots_in_group.add(slot)
+        
+        # Step 2: 文法的優先順序を定義（疑問詞M3は先頭、通常M3は後方）
+        slot_priority = {
+            'M3': (1, 10),  # 疑問詞なら1、通常なら10
+            'M1': 2,
+            'Aux': 3,
+            'S': 4,
+            'V': 5,
+            'O1': 6,
+            'O2': 7,
+            'C1': 8,
+            'M2': 9,
+            'C2': 11
+        }
+        
+        # Step 3: グループ内スロットを文法的優先順序でソート
+        present_slots = []
+        for slot in all_slots_in_group:
+            if slot == 'M3':
+                # M3の位置判定: グループ内でWhere等疑問詞があるかチェック
+                is_question_m3 = self.is_question_m3_in_group(v_group_key)
+                if is_question_m3:
+                    present_slots.append(('M3', 1))  # 疑問詞M3は最前位置
                 else:
-                    candidate = candidates
-                    
-                # valueが存在するかチェック
-                if not isinstance(candidate, dict):
-                    continue
-                
-                if 'order' in candidate:
-                    order_info_available = True
-                    slot_orders_from_analysis[slot] = candidate['order']
+                    present_slots.append(('M3', 10))  # 通常M3は後方
+            else:
+                priority = slot_priority.get(slot, 999)
+                present_slots.append((slot, priority))
         
-        # order情報がある場合はそれを使用
-        if order_info_available:
-            print(f"解析結果のorder情報を使用: {slot_orders_from_analysis}")
-            return slot_orders_from_analysis
+        # 優先順序でソート
+        present_slots.sort(key=lambda x: x[1])
         
-        # order情報がない場合は従来の位置ベース計算を使用
-        print("位置ベースの順序計算を使用")
-        
-        # Step 1: 全例文から語順を収集
-        word_positions = []  # [(position, slot, word), ...]
-        
-        for sentence_data in vgroup_sentences:
-            sentence = sentence_data['sentence']
-            slots = sentence_data['slots']
-            
-            # 新しいデータ構造に対応: main_slotsまたはslotsからデータを取得
-            main_slots = slots.get('main_slots') or slots.get('slots', {})
-            
-            words = sentence.split()
-            
-            current_pos = 0
-            for slot, candidates in main_slots.items():
-                if not candidates or (isinstance(candidates, list) and len(candidates) == 0):
-                    continue
-                
-                # candidatesがリストの場合は最初の要素を取得
-                if isinstance(candidates, list):
-                    candidate = candidates[0]
-                else:
-                    candidate = candidates
-                    
-                # valueが存在するかチェック
-                if not isinstance(candidate, dict) or 'value' not in candidate:
-                    continue
-                    
-                slot_phrase = candidate['value']
-                
-                # 文中での語句の位置を特定
-                phrase_words = slot_phrase.split()
-                
-                # 文中での開始位置を探索
-                found_pos = self.find_phrase_position(words, phrase_words, current_pos)
-                if found_pos >= 0:
-                    word_positions.append((found_pos, slot, slot_phrase))
-                    current_pos = found_pos + len(phrase_words)
-        
-        # Step 2: 語順でソートしてSlot種類を整理
-        word_positions.sort(key=lambda x: x[0])  # 位置順でソート
-        
-        # Step 3: Slot種類ごとに連番を割り当て
-        seen_slots = []
+        # Step 4: 連続した順序を割り当て（欠番なし）
         slot_orders = {}
-        order = 1
+        order_counter = 1
         
-        for pos, slot, phrase in word_positions:
-            if slot not in seen_slots:
-                seen_slots.append(slot)
-                slot_orders[slot] = order
-                order += 1
+        for slot_name, priority in present_slots:
+            slot_orders[slot_name] = order_counter
+            order_counter += 1
         
+        print(f"グループ内連続順序({v_group_key}): {slot_orders}")
         return slot_orders
     
+    def is_question_m3_in_group(self, v_group_key):
+        """グループ内にWhere等の疑問詞M3が存在するかチェック"""
+        vgroup_sentences = self.vgroup_data[v_group_key]
+        
+        for sentence_data in vgroup_sentences:
+            sentence = sentence_data.get('sentence', '')
+            if sentence.lower().startswith(('where', 'when', 'why', 'how', 'what', 'which', 'who')):
+                return True
+                
+            # M3スロットの内容もチェック
+            slots = sentence_data['slots']
+            main_slots = slots.get('main_slots') or slots.get('slots', {})
+            
+            if 'M3' in main_slots:
+                m3_candidates = main_slots['M3']
+                if isinstance(m3_candidates, list):
+                    m3_candidate = m3_candidates[0] if m3_candidates else {}
+                else:
+                    m3_candidate = m3_candidates
+                
+                if isinstance(m3_candidate, dict) and 'value' in m3_candidate:
+                    m3_value = m3_candidate['value'].lower()
+                    if m3_value.startswith(('where', 'when', 'why', 'how', 'what', 'which', 'who')):
+                        return True
+        
+        return False
+        
     def find_phrase_position(self, words, phrase_words, start_pos=0):
         """文中でのフレーズの位置を検索（改良版）"""
         if not phrase_words:
