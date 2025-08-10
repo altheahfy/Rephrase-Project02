@@ -502,6 +502,37 @@ class CompleteRephraseParsingEngine:
                             print(f"    文末位置確認失敗: 最終語は '{last_content_token.lemma_}' (期待: '{target_lemma}')")
                             return False
         
+        # 句動詞粒子の特別な条件チェック
+        if 'conditions' in trigger:
+            phrasal_conditions = trigger['conditions']
+            if 'follows_verb' in phrasal_conditions and phrasal_conditions['follows_verb']:
+                # 動詞の後に続く粒子かどうかをチェック
+                verb_found = False
+                particle_found = False
+                
+                verbs = [token for token in doc if token.pos_ == 'VERB']
+                if verbs:
+                    main_verb = verbs[0]  # 最初の動詞を主動詞として扱う
+                    
+                    # 動詞の直後または近くに粒子があるかチェック
+                    for token in doc:
+                        if (token.pos_ == 'ADP' and 
+                            token.dep_ in ['prt', 'prep'] and
+                            token.i > main_verb.i and 
+                            token.i - main_verb.i <= 3):  # 動詞から3トークン以内
+                            
+                            # 句動詞粒子リストのチェック
+                            if 'phrasal_verb_particle' in phrasal_conditions:
+                                particle_list = phrasal_conditions['phrasal_verb_particle']
+                                if token.text.lower() in particle_list:
+                                    particle_found = True
+                                    print(f"    句動詞粒子確認: '{main_verb.text}' + '{token.text}' (dep: {token.dep_})")
+                                    break
+                
+                if not particle_found:
+                    print(f"    句動詞粒子条件失敗: 動詞後の適切な粒子が見つからない")
+                    return False
+
         print(f"  → ルール適用対象: {rule_id}")
         return True
     
@@ -747,6 +778,8 @@ class CompleteRephraseParsingEngine:
             return self._extract_subject_value(doc, hierarchy)
         elif rule_id == 'manner-degree-M2':
             return self._extract_adverb_value(doc)
+        elif rule_id == 'phrasal-verb-particle-M2':
+            return self._extract_phrasal_verb_particle(doc)
         elif rule_id == 'wh-where-front':
             return self._extract_wh_where_value(doc)
         elif rule_id == 'please-interjection-M3':
@@ -1044,6 +1077,37 @@ class CompleteRephraseParsingEngine:
                 # 時間を示唆するキーワードをチェック
                 if any(keyword in token.text.lower() for keyword in ['day', 'morning', 'afternoon', 'evening', 'night', 'today', 'ago']):
                     return self._get_complete_adverb_phrase(token)
+        
+        return None
+    
+    def _extract_phrasal_verb_particle(self, doc) -> Optional[str]:
+        """句動詞粒子の抽出"""
+        
+        # 句動詞の粒子リスト
+        phrasal_particles = [
+            "off", "on", "up", "down", "out", "in", "away", "back", 
+            "over", "after", "through", "into", "onto", "across", 
+            "along", "around", "aside", "apart", "ahead", "behind", 
+            "beyond", "beneath", "between", "toward", "towards", "underneath"
+        ]
+        
+        # 動詞を最初に見つける
+        verbs = [token for token in doc if token.pos_ == 'VERB']
+        if not verbs:
+            return None
+        
+        main_verb = verbs[0]  # 最初の動詞を主動詞とみなす
+        
+        # 動詞の後に続く粒子を探す
+        for token in doc:
+            if (token.pos_ == 'ADP' and 
+                token.dep_ in ['prt', 'prep'] and
+                token.i > main_verb.i and 
+                token.i - main_verb.i <= 3 and  # 動詞から3トークン以内
+                token.text.lower() in phrasal_particles):
+                
+                print(f"  ✅ 句動詞粒子検出: '{main_verb.text}' + '{token.text}' (依存関係: {token.dep_})")
+                return token.text
         
         return None
     

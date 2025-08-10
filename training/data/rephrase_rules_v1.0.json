@@ -113,6 +113,23 @@
       "description": "文末の感嘆詞「please」をM3スロットに割り当て"
     },
     {
+      "id": "phrasal-verb-particle-M2",
+      "priority": 12,
+      "trigger": {
+        "pos": ["ADP"],
+        "dep": ["prt", "prep"],
+        "conditions": {
+          "follows_verb": true,
+          "phrasal_verb_particle": ["off", "on", "up", "down", "out", "in", "away", "back", "over", "after", "through", "into", "onto", "across", "along", "around", "aside", "apart", "ahead", "behind", "beyond", "beneath", "between", "toward", "towards", "underneath"]
+        }
+      },
+      "assign": {
+        "slot": "M2",
+        "type": "word"
+      },
+      "description": "句動詞の粒子（off/on/up等）をM2スロットに割り当て"
+    },
+    {
       "id": "wh-where-front", 
       "priority": 5,
       "trigger": {
