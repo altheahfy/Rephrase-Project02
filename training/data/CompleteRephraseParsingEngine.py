@@ -898,67 +898,89 @@ class CompleteRephraseParsingEngine:
         return None
     
     def _get_complete_noun_phrase(self, token) -> str:
-        """完全な名詞句を取得"""
-        phrase_tokens = [token]
+        """完全な名詞句を取得（関係詞節を含む）"""
+        # 基本的な名詞句の範囲を決定
+        start_i = token.i
+        end_i = token.i + 1
         
-        # 左側の修飾語（所有格代名詞を含む）
+        # 左側の修飾語を探索（冠詞、形容詞、所有格など）
         for child in token.children:
-            if child.i < token.i and child.dep_ in ['det', 'amod', 'compound', 'nummod', 'poss']:
-                phrase_tokens.append(child)
+            if child.dep_ in ['det', 'amod', 'nmod', 'compound', 'nummod', 'poss'] and child.i < token.i:
+                start_i = min(start_i, child.i)
         
-        # 右側の修飾語（前置詞句は除く）
-        for child in token.children:
-            if child.i > token.i and child.dep_ in ['amod', 'compound']:
-                phrase_tokens.append(child)
-        
-        # 関係詞節がある場合は含める
+        # 右側の関係詞節があるかチェック - 関係詞節全体を含める
         for child in token.children:
             if child.dep_ == 'relcl':
-                # 関係詞節の処理
-                if child.pos_ == 'VERB':
-                    # 不定詞の形容詞的用法（to + 動詞）かチェック
-                    infinitive_part = None
-                    for inf_child in child.children:
-                        if inf_child.pos_ == 'PART' and inf_child.text.lower() == 'to':
-                            infinitive_part = inf_child
-                            break
-                    
-                    if infinitive_part:
-                        # 不定詞句を構築
-                        infinitive_phrase = f"to {child.text}"
-                        # 動詞の目的語があれば追加
-                        for verb_child in child.children:
-                            if verb_child.dep_ in ['dobj', 'pobj'] and verb_child != infinitive_part:
-                                infinitive_phrase += f" {self._get_complete_noun_phrase(verb_child)}"
-                        
-                        phrase_text = ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
-                        return f"{phrase_text} {infinitive_phrase}"
-                    else:
-                        # 通常の関係詞節
-                        rel_phrase = self._get_relative_clause_phrase(child)
-                        phrase_text = ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
-                        return f"{phrase_text} {rel_phrase}"
+                # 関係詞節の終端まで含める
+                end_i = max(end_i, child.right_edge.i + 1)
         
-        return ' '.join(sorted([t.text for t in phrase_tokens], key=lambda x: token.doc[[t.text for t in token.doc].index(x)].i))
+        # 前置詞句の場合の処理
+        if token.head and token.head.pos_ == 'ADP' and token.head.i < start_i:
+            start_i = token.head.i
+        
+        return token.doc[start_i:end_i].text
     
     def _get_relative_clause_phrase(self, rel_verb) -> str:
-        """関係詞節の完全なフレーズを取得"""
+        """関係詞節の完全なフレーズを取得 - Rephraseサブスロット形式"""
         # 関係代名詞の特定
         relativizer = self._find_relativizer(rel_verb)
         if not relativizer:
-            relativizer = "that"  # デフォルト
+            # thatの場合（目的格関係代名詞）
+            for token in rel_verb.doc:
+                if (token.text.lower() == 'that' and 
+                    token.i < rel_verb.i and
+                    any(child.dep_ == 'relcl' and child == rel_verb for child in token.head.children)):
+                    relativizer = "that"
+                    break
+            if not relativizer:
+                relativizer = "that"  # デフォルト
             
-        # 関係詞節内の要素を収集
-        clause_tokens = [rel_verb]
-        for descendant in rel_verb.subtree:
-            if descendant != rel_verb:
-                clause_tokens.append(descendant)
+        # 関係詞節内の要素を収集（関係代名詞を除く）
+        clause_tokens = []
         
-        # トークンを位置順でソート
-        clause_tokens.sort(key=lambda t: t.i)
-        clause_text = ' '.join([t.text for t in clause_tokens])
+        # サブスロットの要素を特定
+        sub_elements = {}
         
-        return f"{relativizer} {clause_text}".strip()
+        # 主語 (関係代名詞 or 通常の主語)
+        if relativizer.lower() in ['who', 'which']:
+            sub_elements['s'] = f"{relativizer}_sub-s"
+        else:
+            # 目的格関係代名詞の場合
+            if relativizer.lower() in ['that', 'whom', 'which']:
+                sub_elements['o1'] = f"{relativizer}_sub-o1"
+            
+            # 関係詞節内の主語を探す
+            for child in rel_verb.children:
+                if child.dep_ == 'nsubj':
+                    sub_elements['s'] = f"{child.text}_sub-s"
+                    break
+        
+        # 動詞
+        sub_elements['v'] = f"{rel_verb.text}_sub-v"
+        
+        # 目的語
+        for child in rel_verb.children:
+            if (child.dep_ == 'dobj' and 
+                child.text.lower() not in ['who', 'which', 'that', 'whom']):
+                sub_elements['o1'] = f"{child.text}_sub-o1"
+                break
+        
+        # 副詞・修飾語
+        for child in rel_verb.children:
+            if child.dep_ == 'advmod' and child.pos_ == 'ADV':
+                sub_elements['m2'] = f"{child.text}_sub-m2"
+            elif child.dep_ == 'prep':
+                prep_phrase = self._get_prepositional_phrase(child)
+                if self._is_temporal_or_locative(child):
+                    sub_elements['m3'] = f"{prep_phrase}_sub-m3"
+        
+        # サブスロット形式で結合
+        parts = []
+        for slot in ['s', 'v', 'o1', 'o2', 'aux', 'm1', 'm2', 'm3', 'c1']:
+            if slot in sub_elements:
+                parts.append(sub_elements[slot])
+        
+        return ', '.join(parts) if parts else f"{relativizer} {rel_verb.text}"
     
     def _has_modifying_clause(self, token) -> bool:
         """修飾節を持つかどうかの確認"""
@@ -2847,5 +2869,218 @@ class CompleteRephraseParsingEngine:
         
         return slots
         
-    def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
-    def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
+    def _process_relative_clause_subslots(self, verb, sub_slots, doc):
+        """関係詞節のサブスロット処理 - Rephraseルール準拠"""
+        print(f"🔍 関係詞節サブスロット処理: {verb.text}")
+        
+        # 関係詞節内の要素を順序通りに処理
+        # Excelの例: the manager who had recently taken charge of the project
+        # サブスロット順: the manager who (1) -> had (2) -> recently (3) -> taken (4) -> charge of the project (5)
+        
+        clause_elements = []
+        
+        # 関係詞節内のトークンを収集して順序付け
+        for token in doc[verb.left_edge.i:verb.right_edge.i + 1]:
+            if token.i >= verb.left_edge.i and token.i <= verb.right_edge.i:
+                # 関係代名詞 + 先行詞の処理
+                if token.text.lower() in ['who', 'which', 'that', 'whom'] and token.dep_ in ['nsubj', 'dobj', 'pobj']:
+                    # 先行詞を含めた形で処理（例：the manager who）
+                    antecedent = token.head
+                    while antecedent.head != antecedent and antecedent.head.dep_ not in ['ROOT']:
+                        if any(child.dep_ == 'relcl' and child == verb for child in antecedent.children):
+                            break
+                        antecedent = antecedent.head
+                    
+                    # 先行詞の完全な名詞句を構築
+                    antecedent_phrase = self._get_noun_phrase_before_relative(antecedent, token)
+                    clause_elements.append({
+                        'position': token.i - verb.left_edge.i,
+                        'value': f"{antecedent_phrase} {token.text}",
+                        'type': 'antecedent_relativizer',
+                        'slot_type': 'sub-s' if token.dep_ == 'nsubj' else 'sub-o1'
+                    })
+                    
+                # 助動詞
+                elif token.dep_ in ['aux', 'auxpass']:
+                    clause_elements.append({
+                        'position': token.i - verb.left_edge.i,
+                        'value': token.text,
+                        'type': 'auxiliary',
+                        'slot_type': 'sub-aux'
+                    })
+                    
+                # 副詞
+                elif token.dep_ == 'advmod':
+                    clause_elements.append({
+                        'position': token.i - verb.left_edge.i,
+                        'value': token.text,
+                        'type': 'adverb',
+                        'slot_type': 'sub-m2'
+                    })
+                    
+                # 動詞（メインの関係詞節動詞）
+                elif token == verb:
+                    clause_elements.append({
+                        'position': token.i - verb.left_edge.i,
+                        'value': token.text,
+                        'type': 'verb',
+                        'slot_type': 'sub-v'
+                    })
+                    
+                # 動詞の目的語や補語の句
+                elif token.dep_ in ['dobj', 'pobj'] and token.pos_ in ['NOUN', 'PRON']:
+                    obj_phrase = self._get_complete_noun_phrase(token)
+                    clause_elements.append({
+                        'position': token.i - verb.left_edge.i,
+                        'value': obj_phrase,
+                        'type': 'object_phrase',
+                        'slot_type': 'sub-o1'
+                    })
+        
+        # 位置順にソートしてサブスロットに配置
+        clause_elements.sort(key=lambda x: x['position'])
+        
+        for element in clause_elements:
+            slot_type = element['slot_type']
+            sub_slots[slot_type].append({
+                'value': element['value'],
+                'type': element['type'],
+                'rule_id': f'relative-clause-{element["type"]}'
+            })
+            print(f"  ✅ {slot_type}: {element['value']}")
+    
+    def _get_noun_phrase_before_relative(self, antecedent, relativizer):
+        """関係代名詞の先行詞部分を取得"""
+        # 冠詞や修飾語を含む名詞句を構築
+        phrase_tokens = []
+        
+        # 左側の修飾語（the, my, などの冠詞・所有格）
+        for child in antecedent.children:
+            if child.i < antecedent.i and child.dep_ in ['det', 'amod', 'compound', 'poss']:
+                phrase_tokens.append(child)
+        
+        # 中心の名詞
+        phrase_tokens.append(antecedent)
+        
+        # 位置順にソート
+        phrase_tokens.sort(key=lambda x: x.i)
+        
+        return ' '.join([t.text for t in phrase_tokens])
+
+    def _process_adverbial_clause_subslots(self, verb, sub_slots, doc):
+        """副詞節のサブスロット処理 - Rephrase100%取りこぼしなしルール対応"""
+        print(f"🔍 副詞節サブスロット処理: {verb.text}")
+        
+        # 接続詞の検出と処理（When, If, Because, etc.）
+        conjunction = None
+        for child in verb.children:
+            if child.dep_ == 'mark':
+                conjunction = child.text
+                break
+        
+        # 接続詞がない場合は文頭から探す
+        if not conjunction:
+            # 副詞節の開始を探す
+            for token in doc:
+                if (token.text.lower() in ['when', 'if', 'because', 'although', 'while', 'since', 'before', 'after', 'unless', 'until'] and
+                    token.i < verb.i):
+                    conjunction = token.text
+                    break
+        
+        # 接続詞をsub-m3に配置（時間・条件・理由などの修飾）
+        if conjunction:
+            sub_slots['sub-m3'].append({
+                'value': conjunction,
+                'type': 'conjunction',
+                'rule_id': 'adverbial-clause-conjunction'
+            })
+            print(f"  ✅ sub-m3: {conjunction} (接続詞)")
+        
+        # sub-s (副詞節内の主語)
+        for child in verb.children:
+            if child.dep_ == 'nsubj':
+                sub_slots['sub-s'].append({
+                    'value': self._get_complete_noun_phrase(child),
+                    'type': 'noun_phrase',
+                    'rule_id': 'adverbial-clause-subject'
+                })
+                print(f"  ✅ sub-s: {self._get_complete_noun_phrase(child)}")
+        
+        # sub-v (副詞節内の動詞)
+        sub_slots['sub-v'].append({
+            'value': verb.text,
+            'type': 'verb',
+            'rule_id': 'adverbial-clause-verb'
+        })
+        print(f"  ✅ sub-v: {verb.text}")
+        
+        # sub-o1 (副詞節内の目的語)
+        for child in verb.children:
+            if child.dep_ == 'dobj':
+                sub_slots['sub-o1'].append({
+                    'value': self._get_complete_noun_phrase(child),
+                    'type': 'noun_phrase',
+                    'rule_id': 'adverbial-clause-object'
+                })
+                print(f"  ✅ sub-o1: {self._get_complete_noun_phrase(child)}")
+        
+        # sub-m2 (副詞節内の方法・手段)
+        for child in verb.children:
+            if child.dep_ == 'advmod' and child.pos_ == 'ADV':
+                sub_slots['sub-m2'].append({
+                    'value': child.text,
+                    'type': 'adverb',
+                    'rule_id': 'adverbial-clause-manner'
+                })
+                print(f"  ✅ sub-m2: {child.text}")
+        
+        # sub-m3 (副詞節内の場所・時間)
+        for child in verb.children:
+            if child.dep_ == 'prep':
+                prep_phrase = self._get_prepositional_phrase(child)
+                if self._is_temporal_or_locative(child):
+                    sub_slots['sub-m3'].append({
+                        'value': prep_phrase,
+                        'type': 'prepositional_phrase',
+                        'rule_id': 'adverbial-clause-location-time'
+                    })
+                    print(f"  ✅ sub-m3: {prep_phrase}")
+        
+        # sub-aux (副詞節内の助動詞)
+        for child in verb.children:
+            if child.dep_ == 'aux' or child.dep_ == 'auxpass':
+                sub_slots['sub-aux'].append({
+                    'value': child.text,
+                    'type': 'auxiliary',
+                    'rule_id': 'adverbial-clause-auxiliary'
+                })
+                print(f"  ✅ sub-aux: {child.text}")
+        
+        # sub-c1 (副詞節内の補語)
+        for child in verb.children:
+            if child.dep_ == 'attr' or child.dep_ == 'acomp':
+                sub_slots['sub-c1'].append({
+                    'value': self._get_complete_noun_phrase(child) if child.pos_ in ['NOUN', 'PROPN'] else child.text,
+                    'type': 'complement',
+                    'rule_id': 'adverbial-clause-complement'
+                })
+                print(f"  ✅ sub-c1: {child.text}")
+    
+    def _get_prepositional_phrase(self, prep_token):
+        """前置詞句の完全な取得"""
+        phrase_parts = [prep_token.text]
+        
+        for child in prep_token.children:
+            if child.dep_ == 'pobj':
+                phrase_parts.append(self._get_complete_noun_phrase(child))
+        
+        return ' '.join(phrase_parts)
+    
+    def _is_temporal_or_locative(self, prep_token):
+        """前置詞が時間・場所を表すかの判定"""
+        temporal_locative_preps = [
+            'at', 'in', 'on', 'by', 'during', 'after', 'before', 'since', 'until',
+            'over', 'under', 'above', 'below', 'near', 'next', 'behind', 'beside',
+            'through', 'across', 'around', 'within', 'outside', 'inside'
+        ]
+        return prep_token.text.lower() in temporal_locative_preps
