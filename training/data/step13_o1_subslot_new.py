@@ -48,6 +48,11 @@ class O1SubslotGenerator:
         """O1 Phraseサブスロット抽出"""
         subslots = {}
         
+        # 最優先：O1O2構造（間接目的語+直接目的語）検出
+        o1o2_subslots = self._detect_o1o2_structure(doc)
+        subslots.update(o1o2_subslots)
+        print(f"🔍 O1O2構造検出結果: {list(o1o2_subslots.keys())}")
+        
         # 最初にnoun-verb phrase統合検出 (完全カバレッジの原則)
         # "students studying" のような名詞+動詞を統合してsub-vとして処理
         root_tokens = [token for token in doc if token.dep_ == "ROOT" and token.pos_ in ["NOUN", "PROPN"]]
@@ -115,9 +120,9 @@ class O1SubslotGenerator:
             subslots.update(self._extract_compound_subject_subslots(doc))
             print(f"🔍 複合主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
-        # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3） - 既に使用されたトークンを除く
+        # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3） - O1O2構造保護版
         print(f"🔍 修飾語割り当て前sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
-        modifier_subslots = self._assign_modifiers_by_position(doc, subslots)
+        modifier_subslots = self._assign_modifiers_by_position_with_o1o2_protection(doc, subslots)
         subslots.update(modifier_subslots)
         
         # 通常のROOT主語検出 (noun-verb統合されなかった場合のフォールバック)
@@ -143,7 +148,7 @@ class O1SubslotGenerator:
             }
             print(f"✅ sub-sとして処理: '{s_text}' (ROOT主語+冠詞)")
         
-        # 不定詞「to + 動詞」の統合処理 (既存sub-vを尊重)
+        # 不定詞「to + 動詞」の統合処理 (既存sub-vを尊重、O1O2構造も尊重)
         to_token = None
         main_verb_token = None
         
@@ -311,11 +316,21 @@ class O1SubslotGenerator:
         for token in doc:
             if token.text.lower() == "that":
                 # that節の検出条件を広げる
-                if token.dep_ in ["acl", "ccomp", "mark", "dobj"] or (token.pos_ == "SCONJ"):
+                if token.dep_ in ["acl", "ccomp", "mark", "dobj"] or (token.pos_ == "SCONJ") or token.i == 0:
                     that_token = token
                     break
         
         if that_token:
+            # 単純that節の処理（"that he is studying hard"）
+            if that_token.i == 0:
+                # 既存の修飾語サブスロットを保持
+                that_subslots = self._extract_simple_that_clause_subslots(doc, that_token)
+                # 既存subslots（_detect_all_subslotsの結果）を優先し、重複しないもののみ追加
+                for key, value in that_subslots.items():
+                    if key not in subslots:
+                        subslots[key] = value
+                return subslots
+            
             # 同格that節かどうかを判定（名詞の後にthatがある場合）
             has_noun_before = False
             for token in doc:
@@ -324,7 +339,20 @@ class O1SubslotGenerator:
                     break
             
             if has_noun_before:
-                return self._extract_appositive_that_clause_subslots(doc, that_token)
+                that_subslots = self._extract_appositive_that_clause_subslots(doc, that_token)
+                # 既存subslots（_detect_all_subslotsの結果）を優先し、重複しないもののみ追加
+                for key, value in that_subslots.items():
+                    if key not in subslots:
+                        subslots[key] = value
+                return subslots
+            else:
+                # 単純that節として処理
+                that_subslots = self._extract_simple_that_clause_subslots(doc, that_token)
+                # 既存subslots（_detect_all_subslotsの結果）を優先し、重複しないもののみ追加
+                for key, value in that_subslots.items():
+                    if key not in subslots:
+                        subslots[key] = value
+                return subslots
         
         # 疑問詞節の検出（what, where, when, how など）
         wh_words = ["what", "where", "when", "how", "why", "which"]
@@ -363,7 +391,7 @@ class O1SubslotGenerator:
         return subslots
     
     def _extract_wh_clause_subslots(self, doc, wh_word_token):
-        """疑問詞節のサブスロット抽出（what you said など）"""
+        """疑問詞節のサブスロット抽出（重複回避強化版）"""
         subslots = {}
         
         # 疑問詞節の構造解析: what(dobj) you(nsubj) said(ROOT)
@@ -371,33 +399,97 @@ class O1SubslotGenerator:
         subject_tokens = []
         
         for token in doc:
-            if token.pos_ == "VERB" and token.dep_ == "ROOT":
-                verb_token = token
-            elif token.dep_ in ["nsubj", "nsubjpass"]:
+            # より柔軟な動詞検出
+            if token.pos_ == "VERB" or (token.pos_ == "AUX" and token.lemma_ in ["be", "have", "do"]):
+                if token.dep_ in ["ROOT", "ccomp", "xcomp", "acl", "relcl"] or token.head == wh_word_token:
+                    verb_token = token
+                    print(f"🔍 疑問詞節動詞候補: '{token.text}' (pos: {token.pos_}, dep: {token.dep_})")
+            elif token.dep_ in ["nsubj", "nsubjpass"] and token != wh_word_token:
                 subject_tokens.append(token)
         
-        if verb_token and subject_tokens:
-            # sub-o1: 疑問詞
-            subslots['sub-o1'] = {
-                'text': wh_word_token.text,
-                'tokens': [wh_word_token.text],
-                'token_indices': [wh_word_token.i]
-            }
+        # 動詞が見つからない場合は、疑問詞の後の全動詞を探す
+        if not verb_token:
+            for token in doc:
+                if token.i > wh_word_token.i and (token.pos_ == "VERB" or token.pos_ == "AUX"):
+                    verb_token = token
+                    print(f"🔍 後続動詞検出: '{token.text}' (pos: {token.pos_})")
+                    break
+        
+        print(f"🔍 疑問詞節分析: wh_word='{wh_word_token.text}', verb='{verb_token.text if verb_token else None}', subjects={[t.text for t in subject_tokens]}")
+        
+        if verb_token:
+            # 疑問詞が主語の場合（what happened, who studies, which is）
+            if wh_word_token.dep_ in ["nsubj", "nsubjpass"]:
+                # sub-s: 疑問詞（主語として）
+                subslots['sub-s'] = {
+                    'text': wh_word_token.text,
+                    'tokens': [wh_word_token.text],
+                    'token_indices': [wh_word_token.i]
+                }
+                print(f"✅ sub-s(疑問詞主語): '{wh_word_token.text}'")
+                
+                # sub-v: 動詞
+                subslots['sub-v'] = {
+                    'text': verb_token.text,
+                    'tokens': [verb_token.text],
+                    'token_indices': [verb_token.i]
+                }
+                print(f"✅ sub-v(疑問詞節動詞): '{verb_token.text}'")
+                
+                # 動詞の目的語を処理（who studies English の English）
+                objects = [child for child in verb_token.children if child.dep_ == "dobj"]
+                if objects:
+                    subslots['sub-o1'] = {
+                        'text': objects[0].text,
+                        'tokens': [objects[0].text],
+                        'token_indices': [objects[0].i]
+                    }
+                    print(f"✅ sub-o1(疑問詞節目的語): '{objects[0].text}'")
             
-            # sub-s: 主語
-            subject_text = ' '.join([t.text for t in subject_tokens])
-            subslots['sub-s'] = {
-                'text': subject_text,
-                'tokens': [t.text for t in subject_tokens],
-                'token_indices': [t.i for t in subject_tokens]
-            }
+            # 疑問詞が目的語の場合（what you said）
+            elif wh_word_token.dep_ in ["dobj", "pobj"] and subject_tokens:
+                # sub-o1: 疑問詞（目的語として）
+                subslots['sub-o1'] = {
+                    'text': wh_word_token.text,
+                    'tokens': [wh_word_token.text],
+                    'token_indices': [wh_word_token.i]
+                }
+                print(f"✅ sub-o1(疑問詞目的語): '{wh_word_token.text}'")
+                
+                # sub-s: 主語
+                subject_text = ' '.join([t.text for t in subject_tokens])
+                subslots['sub-s'] = {
+                    'text': subject_text,
+                    'tokens': [t.text for t in subject_tokens],
+                    'token_indices': [t.i for t in subject_tokens]
+                }
+                print(f"✅ sub-s(疑問詞節主語): '{subject_text}'")
+                
+                # sub-v: 動詞
+                subslots['sub-v'] = {
+                    'text': verb_token.text,
+                    'tokens': [verb_token.text],
+                    'token_indices': [verb_token.i]
+                }
+                print(f"✅ sub-v(疑問詞節動詞): '{verb_token.text}'")
             
-            # sub-v: 動詞
-            subslots['sub-v'] = {
-                'text': verb_token.text,
-                'tokens': [verb_token.text],
-                'token_indices': [verb_token.i]
-            }
+            # その他の場合（単純処理）
+            else:
+                # sub-s: 疑問詞（デフォルト主語として）
+                subslots['sub-s'] = {
+                    'text': wh_word_token.text,
+                    'tokens': [wh_word_token.text],
+                    'token_indices': [wh_word_token.i]
+                }
+                print(f"✅ sub-s(疑問詞デフォルト): '{wh_word_token.text}'")
+                
+                # sub-v: 動詞
+                subslots['sub-v'] = {
+                    'text': verb_token.text,
+                    'tokens': [verb_token.text],
+                    'token_indices': [verb_token.i]
+                }
+                print(f"✅ sub-v(疑問詞節動詞): '{verb_token.text}'")
         
         return subslots
     
@@ -666,12 +758,164 @@ class O1SubslotGenerator:
         
         return coverage, uncovered
 
+    def _detect_o1o2_structure(self, doc):
+        """O1O2構造（間接目的語+直接目的語）の専用検出"""
+        subslots = {}
+        
+        print(f"🔍 O1O2構造検出開始")
+        
+        # give, send, tell, show, bring, take などの二重目的語を取る動詞を検出
+        ditransitive_verbs = ["give", "send", "tell", "show", "bring", "take", "teach", "buy", "make", "get"]
+        
+        for token in doc:
+            if token.pos_ == "VERB" and token.lemma_ in ditransitive_verbs:
+                print(f"🔍 二重目的語動詞検出: '{token.text}' (lemma: {token.lemma_})")
+                
+                # 動詞の子要素から直接目的語と間接目的語を特定
+                direct_objects = []  # dobj
+                indirect_objects = []  # iobj または特定パターン
+                
+                for child in token.children:
+                    if child.dep_ == "dobj":
+                        direct_objects.append(child)
+                        print(f"🔍 直接目的語候補: '{child.text}' (dep: {child.dep_})")
+                    elif child.dep_ == "iobj":
+                        indirect_objects.append(child)
+                        print(f"🔍 間接目的語候補: '{child.text}' (dep: {child.dep_})")
+                    elif child.dep_ == "dative":
+                        indirect_objects.append(child)
+                        print(f"🔍 間接目的語候補(dative): '{child.text}' (dep: {child.dep_})")
+                
+                # パターン1: "give him a book" - 代名詞+名詞の順序パターン
+                if not indirect_objects and len(direct_objects) >= 2:
+                    # 複数のdobjがある場合、最初が間接目的語の可能性
+                    sorted_objects = sorted(direct_objects, key=lambda x: x.i)
+                    if sorted_objects[0].pos_ == "PRON" and sorted_objects[1].pos_ in ["NOUN", "DET"]:
+                        indirect_objects = [sorted_objects[0]]
+                        direct_objects = sorted_objects[1:]
+                        print(f"🔍 代名詞パターンで間接目的語再分類: '{indirect_objects[0].text}'")
+                
+                # パターン2: 順序による判定（前のオブジェクトが間接目的語）
+                if not indirect_objects and len(direct_objects) >= 2:
+                    sorted_objects = sorted(direct_objects, key=lambda x: x.i)
+                    if sorted_objects[0].i < sorted_objects[1].i:
+                        indirect_objects = [sorted_objects[0]]
+                        direct_objects = sorted_objects[1:]
+                        print(f"🔍 位置パターンで間接目的語再分類: '{indirect_objects[0].text}'")
+                
+                # サブスロット割り当て（修正版: O1=間接目的語, O2=直接目的語）
+                if indirect_objects and 'sub-o1' not in subslots:
+                    io = indirect_objects[0]
+                    subslots['sub-o1'] = {
+                        'text': io.text,
+                        'tokens': [io.text],
+                        'token_indices': [io.i]
+                    }
+                    print(f"✅ sub-o1(間接目的語)検出: '{io.text}'")
+                
+                if direct_objects and 'sub-o2' not in subslots:
+                    do = direct_objects[0]
+                    # 冠詞・定冠詞は必ず名詞とセット（100%のルール）
+                    do_det_tokens = [child for child in do.children if child.dep_ == "det"]
+                    if do_det_tokens:
+                        o2_tokens = do_det_tokens + [do]
+                        o2_tokens.sort(key=lambda x: x.i)
+                        o2_text = ' '.join([t.text for t in o2_tokens])
+                        o2_token_indices = [t.i for t in o2_tokens]
+                    else:
+                        o2_tokens = [do]
+                        o2_text = do.text
+                        o2_token_indices = [do.i]
+                    
+                    subslots['sub-o2'] = {
+                        'text': o2_text,
+                        'tokens': [t.text for t in o2_tokens],
+                        'token_indices': o2_token_indices
+                    }
+                    print(f"✅ sub-o2(直接目的語)検出: '{o2_text}' (冠詞統合)")
+                
+                break
+        
+        return subslots
+
+    def _extract_simple_that_clause_subslots(self, doc, that_token):
+        """単純that節のサブスロット抽出（"that he is studying hard"）改善版"""
+        subslots = {}
+        
+        # that節内の主語、助動詞、動詞を特定
+        that_clause_subj = None
+        that_clause_aux = None
+        that_clause_verb = None
+        
+        print(f"🔍 単純that節分析開始: '{that_token.text}'")
+        
+        # that後のトークンを順次解析
+        for token in doc:
+            if token.i > that_token.i:
+                # 主語検出
+                if token.dep_ == "nsubj" and that_clause_subj is None:
+                    that_clause_subj = token
+                    print(f"🔍 that節内主語検出: '{token.text}' (dep: {token.dep_})")
+                
+                # 助動詞検出（be動詞、have動詞、do動詞など）
+                if token.pos_ == "AUX" and that_clause_aux is None:
+                    that_clause_aux = token
+                    print(f"🔍 that節内助動詞検出: '{token.text}' (pos: {token.pos_})")
+                
+                # メイン動詞検出（助動詞以外の動詞）
+                if token.pos_ == "VERB" and that_clause_verb is None:
+                    that_clause_verb = token
+                    print(f"🔍 that節内動詞検出: '{token.text}' (pos: {token.pos_})")
+        
+        # サブスロット構築
+        if that_clause_subj:
+            # sub-s: that + 主語（統合）
+            subslots['sub-s'] = {
+                'text': f"{that_token.text} {that_clause_subj.text}",
+                'tokens': [that_token.text, that_clause_subj.text],
+                'token_indices': [that_token.i, that_clause_subj.i]
+            }
+            print(f"✅ sub-s(that節主語統合): '{that_token.text} {that_clause_subj.text}'")
+        
+        if that_clause_aux:
+            # sub-aux: 助動詞
+            subslots['sub-aux'] = {
+                'text': that_clause_aux.text,
+                'tokens': [that_clause_aux.text],
+                'token_indices': [that_clause_aux.i]
+            }
+            print(f"✅ sub-aux(that節助動詞): '{that_clause_aux.text}'")
+        
+        if that_clause_verb:
+            # sub-v: メイン動詞
+            subslots['sub-v'] = {
+                'text': that_clause_verb.text,
+                'tokens': [that_clause_verb.text],
+                'token_indices': [that_clause_verb.i]
+            }
+            print(f"✅ sub-v(that節動詞): '{that_clause_verb.text}'")
+        
+        return subslots
+
     def _detect_all_subslots(self, doc):
         """完全な10個サブスロット検出エンジン"""
         print(f"🔍 _detect_all_subslots 実行開始")
         subslots = {}
         
+        # まずO1O2構造（間接目的語+直接目的語）を優先検出
+        o1o2_subslots = self._detect_o1o2_structure(doc)
+        subslots.update(o1o2_subslots)
+        
+        # 既に使用されているトークンインデックスを追跡
+        used_indices = set()
+        for sub_data in subslots.values():
+            used_indices.update(sub_data.get('token_indices', []))
+        
         for token in doc:
+            # 既に使用されているトークンをスキップ
+            if token.i in used_indices:
+                continue
+                
             # 既存の処理と重複しないように、新たに必要なサブスロットのみ検出
             
             # sub-m1: 前置修飾語 (形容詞、決定詞など)
@@ -681,6 +925,7 @@ class O1SubslotGenerator:
                     'tokens': [token.text],
                     'token_indices': [token.i]
                 }
+                used_indices.add(token.i)
                 print(f"🔍 sub-m1検出: '{token.text}' (dep: {token.dep_})")
             
             # sub-aux: 助動詞
@@ -690,6 +935,7 @@ class O1SubslotGenerator:
                     'tokens': [token.text],
                     'token_indices': [token.i]
                 }
+                used_indices.add(token.i)
                 print(f"🔍 sub-aux検出: '{token.text}'")
             
             # sub-c1: 補語1 (attr, acomp)
@@ -699,16 +945,38 @@ class O1SubslotGenerator:
                     'tokens': [token.text],
                     'token_indices': [token.i]
                 }
+                used_indices.add(token.i)
                 print(f"🔍 sub-c1検出: '{token.text}' (dep: {token.dep_})")
             
-            # sub-o2: 間接目的語
-            elif token.dep_ == "iobj" and 'sub-o2' not in subslots:
-                subslots['sub-o2'] = {
-                    'text': token.text,
-                    'tokens': [token.text],
-                    'token_indices': [token.i]
-                }
-                print(f"🔍 sub-o2検出: '{token.text}'")
+            # sub-o2: 間接目的語（iobj または dative構造）
+            elif (token.dep_ == "iobj" or (token.dep_ == "dobj" and token.pos_ == "PRON")) and 'sub-o2' not in subslots:
+                # "giving him a book" の him を間接目的語として検出
+                verb_children = [child for child in token.head.children if child.dep_ == "dobj"]
+                if verb_children and token.i < verb_children[0].i:  # 代名詞が直接目的語より前にある
+                    subslots['sub-o2'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"✅ sub-o2(間接目的語)検出: '{token.text}' (giving構造)")
+                elif token.dep_ == "iobj":  # 通常のiobj
+                    subslots['sub-o2'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"✅ sub-o2(間接目的語)検出: '{token.text}' (iobj)")
+            
+            # sub-c1: 補語1 (attr, acomp, 連結動詞用)
+            elif token.dep_ in ["attr", "acomp"] and 'sub-c1' not in subslots:
+                # becoming, being 等の連結動詞の補語
+                if token.head.lemma_ in ["become", "be", "seem", "appear", "look", "sound", "feel"]:
+                    subslots['sub-c1'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"✅ sub-c1(連結動詞補語)検出: '{token.text}' (dep: {token.dep_})")
             
             # sub-c2: 補語2 (xcomp, ccomp)
             elif token.dep_ in ["xcomp", "ccomp"] and 'sub-c2' not in subslots:
@@ -719,8 +987,8 @@ class O1SubslotGenerator:
                 }
                 print(f"🔍 sub-c2検出: '{token.text}' (dep: {token.dep_})")
         
-        # 位置ベースで修飾語を割り当て（前置詞句処理を含む）
-        position_modifiers = self._assign_modifiers_by_position(doc)
+        # 位置ベースで修飾語を割り当て（前置詞句処理を含む）- O1O2構造を考慮
+        position_modifiers = self._assign_modifiers_by_position_with_o1o2_protection(doc, subslots)
         subslots.update(position_modifiers)
         
         # 未分類トークンの処理（残余分類システム）
@@ -752,55 +1020,145 @@ class O1SubslotGenerator:
         
         return sorted(tokens, key=lambda t: t.i)
     
-    def _classify_remaining_tokens(self, doc, subslots):
-        """未分類トークンを適切なサブスロットに分類"""
+    def _assign_modifiers_by_position_with_o1o2_protection(self, doc, existing_subslots):
+        """位置ベース修飾語割り当て（O1O2構造保護版）"""
+        modifiers = {}
+        
+        # 既存のO1O2構造で使用されているトークンをスキップ
+        protected_indices = set()
+        for sub_data in existing_subslots.values():
+            protected_indices.update(sub_data.get('token_indices', []))
+        
+        print(f"🔍 O1O2保護インデックス: {sorted(protected_indices)}")
+        
+        # O1O2構造に干渉しない修飾語のみを位置ベースで割り当て
+        sentence_length = len(doc)
+        
+        # 副詞修飾語（O1O2構造のトークンを除外）
+        advmod_tokens = [token for token in doc 
+                        if token.dep_ in ["advmod", "npadvmod"] 
+                        and token.i not in protected_indices]
+        
+        for token in advmod_tokens:
+            position = token.i / sentence_length
+            
+            if position <= 0.33 and 'sub-m1' not in modifiers:
+                slot = 'sub-m1'
+            elif position <= 0.66 and 'sub-m2' not in modifiers:
+                slot = 'sub-m2'
+            else:
+                slot = 'sub-m3'
+            
+            if slot not in modifiers:
+                modifiers[slot] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"✅ {slot}として割り当て: '{token.text}' (位置: {position:.2f}, advmod)")
+        
+        print(f"🔍 保護版修飾語割り当て結果: {list(modifiers.keys())}")
+        return modifiers
+        """未分類トークンを適切なサブスロットに分類（重複防止強化版）"""
         covered_indices = set()
         
         # 既にカバーされているトークンのインデックスを収集
         for sub_data in subslots.values():
             covered_indices.update(sub_data['token_indices'])
         
+        print(f"🔍 分類前カバー済みインデックス: {sorted(covered_indices)}")
+        
         for token in doc:
             if token.i in covered_indices:
                 continue
                 
-            # 名詞・代名詞で未分類のもの（既に処理済みは除外）
+            # 名詞・代名詞で未分類のもの
             if token.pos_ in ["NOUN", "PROPN", "PRON"]:
-                # 既に処理済みかチェック
-                already_processed = False
-                for sub_data in subslots.values():
-                    if token.i in sub_data.get('token_indices', []):
-                        already_processed = True
-                        break
+                # 重複チェック（さらに厳密）
+                is_already_assigned = any(
+                    token.i in sub_data.get('token_indices', [])
+                    for sub_data in subslots.values()
+                )
                 
-                if not already_processed:
-                    # 補語の主語の場合はsub-o1として処理
-                    if token.dep_ == "nsubj" and token.head.dep_ in ["ccomp", "xcomp"]:
-                        if 'sub-o1' not in subslots:
-                            subslots['sub-o1'] = {
-                                'text': token.text,
-                                'tokens': [token.text],
-                                'token_indices': [token.i]
-                            }
-                            print(f"🔍 sub-o1(補語主語)検出: '{token.text}' (dep: {token.dep_})")
-                    # 前置詞の目的語はスキップ（前置詞句として処理済み）
-                    elif token.dep_ == "pobj":
-                        pass  # 前置詞句として処理済みのはず
-                    # 通常の主語処理
+                if is_already_assigned:
+                    print(f"⚠️ 重複スキップ: '{token.text}' (既に割り当て済み)")
+                    continue
+                
+                # that節内の主語検出を強化
+                if token.dep_ == "nsubj" and token.head.pos_ == "VERB":
+                    # that節内の主語を優先的にsub-sとして処理
+                    if 'sub-s' not in subslots:
+                        subslots['sub-s'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        covered_indices.add(token.i)
+                        print(f"✅ sub-s(that節主語)検出: '{token.text}' (dep: {token.dep_})")
+                        continue
+                
+                # 補語の主語の場合
+                if token.dep_ == "nsubj" and token.head.dep_ in ["ccomp", "xcomp"]:
+                    if 'sub-o1' not in subslots:
+                        subslots['sub-o1'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        covered_indices.add(token.i)
+                        print(f"✅ sub-o1(補語主語)検出: '{token.text}' (dep: {token.dep_})")
+                        continue
+                
+                # 関係代名詞の処理を強化
+                if token.text.lower() in ["who", "which", "that"] and token.dep_ in ["nsubj", "nsubjpass"]:
+                    if 'sub-s' not in subslots:
+                        subslots['sub-s'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        covered_indices.add(token.i)
+                        print(f"✅ sub-s(関係代名詞)検出: '{token.text}' (dep: {token.dep_})")
+                        continue
+                
+                # 疑問詞の処理（重複回避）
+                if token.text.lower() in ["what", "who", "which", "where", "when", "why", "how"]:
+                    # 既にsub-o1に割り当て済みの場合はsub-sに割り当てない
+                    if 'sub-o1' in subslots and token.i in subslots['sub-o1']['token_indices']:
+                        print(f"⚠️ 疑問詞重複回避: '{token.text}' (sub-o1既割り当て)")
+                        continue
                     elif 'sub-s' not in subslots:
                         subslots['sub-s'] = {
                             'text': token.text,
                             'tokens': [token.text],
                             'token_indices': [token.i]
                         }
-                        print(f"🔍 sub-s(残余)検出: '{token.text}' (pos: {token.pos_})")
-                    elif 'sub-o1' not in subslots:
-                        subslots['sub-o1'] = {
-                            'text': token.text,
-                            'tokens': [token.text],
-                            'token_indices': [token.i]
-                        }
-                        print(f"🔍 sub-o1(残余)検出: '{token.text}' (pos: {token.pos_})")
+                        covered_indices.add(token.i)
+                        print(f"✅ sub-s(疑問詞)検出: '{token.text}' (pos: {token.pos_})")
+                        continue
+                
+                # 前置詞の目的語はスキップ
+                if token.dep_ == "pobj":
+                    print(f"⚠️ 前置詞目的語スキップ: '{token.text}' (dep: {token.dep_})")
+                    continue
+                
+                # 通常の処理
+                if 'sub-s' not in subslots:
+                    subslots['sub-s'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    covered_indices.add(token.i)
+                    print(f"✅ sub-s(残余)検出: '{token.text}' (pos: {token.pos_})")
+                elif 'sub-o1' not in subslots:
+                    subslots['sub-o1'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    covered_indices.add(token.i)
+                    print(f"✅ sub-o1(残余)検出: '{token.text}' (pos: {token.pos_})")
             
             # 形容詞で未分類のもの
             elif token.pos_ == "ADJ" and 'sub-c2' not in subslots:
@@ -1019,6 +1377,33 @@ class O1SubslotGenerator:
         print(f"🔍 修飾語割り当て結果: {list(subslots.keys())}")
         
         return subslots
+    
+    def _classify_remaining_tokens(self, doc, subslots):
+        """残りのトークン分類処理"""
+        remaining_subslots = {}
+        
+        # 既に使用されているトークンのインデックスを取得
+        used_indices = set()
+        for sub_data in subslots.values():
+            used_indices.update(sub_data.get('token_indices', []))
+        
+        print(f"🔍 残りトークン分類 - 使用済みインデックス: {sorted(used_indices)}")
+        
+        # 未使用トークンの分類
+        for token in doc:
+            if token.i not in used_indices:
+                # 基本的な分類ロジック（必要に応じて拡張）
+                if token.pos_ in ["NOUN", "PROPN"] and token.dep_ == "dobj":
+                    if 'sub-o1' not in remaining_subslots:
+                        remaining_subslots['sub-o1'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        print(f"✅ 残りトークンsub-o1: '{token.text}'")
+        
+        print(f"🔍 残りトークン分類結果: {list(remaining_subslots.keys())}")
+        return remaining_subslots
 
 
 def test_o1_subslots():

@@ -9,7 +9,17 @@ def main():
         ('to make the project successful', 'phrase'), 
         ('running very fast in the park', 'phrase'),
         ('books on the table in the library', 'word'),
-        ('students studying abroad this year', 'phrase')
+        ('students studying abroad this year', 'phrase'),
+        # sub-s（主語スロット）テスト用追加
+        ('that he is studying hard', 'clause'),
+        ('who studies English daily', 'clause'),
+        ('which is on the table', 'clause'),
+        ('what happened yesterday', 'clause'),
+        # O1O2構造テスト用追加
+        ('give him a book', 'phrase'),  # sub-o2: him, sub-o1: a book
+        ('giving him a book', 'phrase'),  # sub-o2: him, sub-o1: a book
+        ('send her the letter', 'phrase'),  # sub-o2: her, sub-o1: the letter
+        ('becoming very tired', 'phrase'),  # sub-c1: tired
     ]
     
     print('=== 現在の完全性テスト結果 ===\n')
