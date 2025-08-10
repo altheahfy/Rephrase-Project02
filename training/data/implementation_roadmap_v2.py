@@ -49,30 +49,33 @@ PHASE_1_FOUNDATION = {
             ]
         },
         "1.2_サブスロット生成エンジン": {
-            "説明": "9種類のサブスロット自動生成システム",
+            "説明": "spaCy構造解析に基づく9種類のサブスロット自動生成システム",
             "必須機能": [
-                "sub-s: 主語抽出 (関係詞 'who/that/which' 処理含む)",
-                "sub-aux: 助動詞認識 (had, would, might等)",
-                "sub-v: 動詞抽出 (句動詞、be動詞+形容詞含む)",
-                "sub-o1/o2: 目的語階層処理",
-                "sub-c1/c2: 補語認識",
-                "sub-m1/m2/m3: 修飾句分類 (時間/場所/様態)"
+                "sub-s: nsubj/nsubjpass依存関係による主語抽出 (関係詞処理はdep_='relcl')",
+                "sub-aux: aux/auxpass依存ラベルによる助動詞認識",
+                "sub-v: ROOT/ccomp/relclでの動詞核抽出",
+                "sub-o1/o2: dobj/iobj/pobj構造による目的語階層処理",
+                "sub-c1/c2: acomp/xcomp/attr による補語認識",
+                "sub-m1/m2/m3: advmod/prep/npadvmod による修飾句分類"
             ],
-            "参考パターン": [
-                "S[clause]: 'the manager who had recently taken charge of the project'",
-                "→ sub-s: 'the manager who', sub-aux: 'had', sub-m2: 'recently', sub-v: 'taken', sub-o1: 'charge of the project'"
+            "構造的判定原理": [
+                "表現マッチング全面禁止",
+                "依存構造ラベル(token.dep_)による分類",
+                "品詞タグ(token.pos_)と係り受け(token.head)の組み合わせ判定",
+                "文法的役割に基づく自動分類"
             ]
         },
         "1.3_clause型処理システム": {
-            "説明": "複文・関係詞節の階層構造解析",
-            "対象構造": [
-                "関係詞節: who/that/which + 完全文",
-                "時間節: when/while + 主語+動詞",
-                "理由節: because/since + 完全文", 
-                "結果節: so that + 完全文",
-                "条件節: although/even though + 完全文"
+            "説明": "spaCy依存関係による複文・関係詞節の階層構造解析",
+            "対象構造_依存ラベル": [
+                "関係詞節: dep_='relcl' (relative clause)",
+                "時間副詞節: dep_='advcl' + mark='when/while'",
+                "理由副詞節: dep_='advcl' + mark='because/since'", 
+                "結果副詞節: dep_='advcl' + mark='so'",
+                "対比副詞節: dep_='advcl' + mark='although'"
             ],
-            "実装方針": "spaCy依存関係グラフからの自動抽出"
+            "実装方針": "依存関係グラフ(doc._, token.children)からの構造的抽出のみ",
+            "禁止事項": "文字列マッチング ('who', 'because' 等の具体語検索禁止)"
         }
     }
 }
