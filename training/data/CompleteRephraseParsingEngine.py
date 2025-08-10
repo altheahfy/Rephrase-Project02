@@ -1109,10 +1109,10 @@ class CompleteRephraseParsingEngine:
             return None
         
         for token in doc:
-            # 前置詞句の処理
+            # 前置詞句の処理（通常の前置詞句 + 二重目的語の間接目的語マーカー）
             if (token.pos_ == "ADP" and 
                 token.text.lower() == target_prep and
-                token.dep_ == "prep"):
+                token.dep_ in ["prep", "dative"]):  # dativeも追加
                 
                 # 前置詞の目的語を取得
                 for child in token.children:
