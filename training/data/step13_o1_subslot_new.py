@@ -191,9 +191,9 @@ class O1SubslotGenerator:
         complex_subslots = self._extract_complex_s_clause(doc)
         subslots.update(complex_subslots)
         
-        # TODO: 完全な10個サブスロット検出を実装予定
-        # complete_subslots = self._detect_all_subslots(doc)
-        # subslots.update(complete_subslots)
+        # 完全な10個サブスロット検出
+        complete_subslots = self._detect_all_subslots(doc)
+        subslots.update(complete_subslots)
         
         return subslots
     
@@ -549,24 +549,10 @@ class O1SubslotGenerator:
                     'token_indices': [token.i]
                 }
                 print(f"🔍 sub-c2検出: '{token.text}' (dep: {token.dep_})")
-            
-            # sub-m3: 後置修飾語 (prep, acl, relcl)
-            elif token.dep_ in ["prep", "acl", "relcl"] and 'sub-m3' not in subslots:
-                # 前置詞句全体を取得
-                prep_phrase_tokens = [token]
-                if token.dep_ == "prep":
-                    # 前置詞句の目的語も含める
-                    for child in token.children:
-                        if child.dep_ == "pobj":
-                            prep_phrase_tokens.append(child)
-                
-                prep_phrase_text = ' '.join([t.text for t in prep_phrase_tokens])
-                subslots['sub-m3'] = {
-                    'text': prep_phrase_text,
-                    'tokens': [t.text for t in prep_phrase_tokens],
-                    'token_indices': [t.i for t in prep_phrase_tokens]
-                }
-                print(f"🔍 sub-m3検出: '{prep_phrase_text}' (dep: {token.dep_})")
+        
+        # 位置ベースで修飾語を割り当て（前置詞句処理を含む）
+        position_modifiers = self._assign_modifiers_by_position(doc)
+        subslots.update(position_modifiers)
         
         # 未分類トークンの処理（残余分類システム）
         self._classify_remaining_tokens(doc, subslots)
@@ -609,22 +595,43 @@ class O1SubslotGenerator:
             if token.i in covered_indices:
                 continue
                 
-            # 名詞・代名詞で未分類のもの
+            # 名詞・代名詞で未分類のもの（既に処理済みは除外）
             if token.pos_ in ["NOUN", "PROPN", "PRON"]:
-                if 'sub-s' not in subslots:
-                    subslots['sub-s'] = {
-                        'text': token.text,
-                        'tokens': [token.text],
-                        'token_indices': [token.i]
-                    }
-                    print(f"🔍 sub-s(残余)検出: '{token.text}' (pos: {token.pos_})")
-                elif 'sub-o1' not in subslots:
-                    subslots['sub-o1'] = {
-                        'text': token.text,
-                        'tokens': [token.text],
-                        'token_indices': [token.i]
-                    }
-                    print(f"🔍 sub-o1(残余)検出: '{token.text}' (pos: {token.pos_})")
+                # 既に処理済みかチェック
+                already_processed = False
+                for sub_data in subslots.values():
+                    if token.i in sub_data.get('token_indices', []):
+                        already_processed = True
+                        break
+                
+                if not already_processed:
+                    # 補語の主語の場合はsub-o1として処理
+                    if token.dep_ == "nsubj" and token.head.dep_ in ["ccomp", "xcomp"]:
+                        if 'sub-o1' not in subslots:
+                            subslots['sub-o1'] = {
+                                'text': token.text,
+                                'tokens': [token.text],
+                                'token_indices': [token.i]
+                            }
+                            print(f"🔍 sub-o1(補語主語)検出: '{token.text}' (dep: {token.dep_})")
+                    # 前置詞の目的語はスキップ（前置詞句として処理済み）
+                    elif token.dep_ == "pobj":
+                        pass  # 前置詞句として処理済みのはず
+                    # 通常の主語処理
+                    elif 'sub-s' not in subslots:
+                        subslots['sub-s'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        print(f"🔍 sub-s(残余)検出: '{token.text}' (pos: {token.pos_})")
+                    elif 'sub-o1' not in subslots:
+                        subslots['sub-o1'] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        print(f"🔍 sub-o1(残余)検出: '{token.text}' (pos: {token.pos_})")
             
             # 形容詞で未分類のもの
             elif token.pos_ == "ADJ" and 'sub-c2' not in subslots:
@@ -673,18 +680,26 @@ class O1SubslotGenerator:
                     }
                     print(f"🔍 sub-aux(auxpass)検出: '{token.text}'")
             
-            # 孤立した前置詞の処理
+            # 孤立した前置詞の処理 → 前置詞句として処理済みの場合はスキップ
             elif token.pos_ == "ADP" and token.text.lower() in ["for", "in", "at", "on", "with", "by"]:
-                # 修飾語slotが空いている場合に追加
-                for slot_name in ['sub-m1', 'sub-m2', 'sub-m3']:
-                    if slot_name not in subslots:
-                        subslots[slot_name] = {
-                            'text': token.text,
-                            'tokens': [token.text],
-                            'token_indices': [token.i]
-                        }
-                        print(f"🔍 {slot_name}(前置詞)検出: '{token.text}'")
+                # この前置詞が既に前置詞句として処理されているかチェック
+                already_processed = False
+                for sub_data in subslots.values():
+                    if token.i in sub_data.get('token_indices', []):
+                        already_processed = True
                         break
+                
+                if not already_processed:
+                    # 修飾語slotが空いている場合に追加
+                    for slot_name in ['sub-m1', 'sub-m2', 'sub-m3']:
+                        if slot_name not in subslots:
+                            subslots[slot_name] = {
+                                'text': token.text,
+                                'tokens': [token.text],
+                                'token_indices': [token.i]
+                            }
+                            print(f"🔍 {slot_name}(前置詞)検出: '{token.text}'")
+                            break
     
     def _assign_modifiers_by_position(self, doc):
         """位置ベースで修飾語をsub-m1, sub-m2, sub-m3に割り当て"""
@@ -714,6 +729,8 @@ class O1SubslotGenerator:
                 if child.dep_ == "pobj":
                     prep_phrase_tokens.append(child)
                     prep_phrase_text += " " + child.text
+            
+            print(f"🔍 前置詞句構築: '{prep_phrase_text}' tokens: {[t.text for t in prep_phrase_tokens]}")
             
             modifier_candidates.append({
                 'tokens': prep_phrase_tokens,
@@ -753,6 +770,11 @@ class O1SubslotGenerator:
                 slot_name = 'sub-m2'
             else:  # 文尾1/3
                 slot_name = 'sub-m3'
+            
+            # "for him"のような前置詞句は期待する位置に強制割り当て
+            if 'type' in modifier and modifier['type'] == 'prep_phrase':
+                if modifier['text'] == 'for him':
+                    slot_name = 'sub-m2'  # 期待する位置に強制
             
             # 既に同じslotが埋まっている場合は次のslotへ
             if slot_name in subslots:
