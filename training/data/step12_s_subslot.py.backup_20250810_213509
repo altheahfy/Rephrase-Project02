@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Rule Dictionary v2.0 - O1(直接目的語)サブスロット生成システム
+Rule Dictionary v2.0 - S(主語)サブスロット生成システム
 spaCy依存構造解析による動的サブスロット抽出
 
-直接目的語の複雑構造パターン:
-1. 関係代名詞付き目的語: "The book that you recommended" → sub-o1: 'The book that', sub-v: 'recommended'
-2. 同格that節: "The fact that he left" → sub-s: 'The fact that he', sub-v: 'left'  
-3. 不定詞目的語: "To go home" → sub-v: 'To go', sub-o1: 'home'
-4. 動名詞目的語: "Reading books" → sub-v: 'Reading', sub-o1: 'books'
-5. 複合目的語: "apples and oranges" → word扱い (V構造なし)
+主語の複雑構造パターン:
+1. 関係代名詞付き主語: "The person who called" → sub-s: 'The person who', sub-v: 'called'
+2. 同格that節: "The fact that he came" → sub-s: 'The fact that he', sub-v: 'came'  
+3. 不定詞主語: "To learn English" → sub-s: 'To learn', sub-o1: 'English'
+4. 動名詞主語: "Reading books" → sub-s: 'Reading', sub-o1: 'books'
+5. 複合主語: "John and Mary" → sub-s: 'John and Mary' (一体として処理)
 """
 
 import spacy
 from typing import Dict, List, Tuple, Any
 
-class O1SubslotGenerator:
-    """O1(直接目的語)サブスロット生成クラス"""
+class SSubslotGenerator:
+    """S(主語)サブスロット生成クラス"""
     
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
     
-    def generate_o1_subslots(self, slot_phrase: str, phrase_type: str) -> Dict[str, Dict[str, Any]]:
+    def generate_s_subslots(self, slot_phrase: str, phrase_type: str) -> Dict[str, Dict[str, Any]]:
         """
-        O1(直接目的語)スロットのサブスロット生成
+        S(主語)スロットのサブスロット生成
         
         Args:
-            slot_phrase: 目的語フレーズ
+            slot_phrase: 主語フレーズ
             phrase_type: フレーズタイプ (word/phrase/clause)
             
         Returns:
@@ -38,14 +38,14 @@ class O1SubslotGenerator:
             # 単語の場合はサブスロット分解不要
             return {}
         elif phrase_type == "phrase":
-            return self._extract_o1_phrase_subslots(doc)
+            return self._extract_s_phrase_subslots(doc)
         elif phrase_type == "clause":
-            return self._extract_o1_clause_subslots(doc)
+            return self._extract_s_clause_subslots(doc)
         else:
             return {}
     
-    def _extract_o1_phrase_subslots(self, doc):
-        """O1 Phraseサブスロット抽出"""
+    def _extract_s_phrase_subslots(self, doc):
+        """S Phraseサブスロット抽出"""
         subslots = {}
         
         # 関係代名詞の検出（より柔軟な条件）
@@ -60,50 +60,27 @@ class O1SubslotGenerator:
                     break
         
         if rel_pronoun_token:
-            subslots.update(self._extract_relative_clause_subslots(doc, rel_pronoun_token))
+            return self._extract_relative_clause_subslots(doc, rel_pronoun_token)
         
         # 不定詞主語の処理: "To learn English is important"
-        elif doc[0].text.lower() == "to" and doc[0].pos_ == "PART":
-            subslots.update(self._extract_infinitive_subject_subslots(doc))
+        if doc[0].text.lower() == "to" and doc[0].pos_ == "PART":
+            return self._extract_infinitive_subject_subslots(doc)
         
         # 動名詞主語の処理: "Reading books is fun"
-        else:
-            gerund_tokens = [token for token in doc if token.pos_ == "VERB" and token.tag_ == "VBG"]
-            if gerund_tokens:
-                subslots.update(self._extract_gerund_subject_subslots(doc, gerund_tokens[0]))
+        gerund_tokens = [token for token in doc if token.pos_ == "VERB" and token.tag_ == "VBG"]
+        if gerund_tokens:
+            return self._extract_gerund_subject_subslots(doc, gerund_tokens[0])
         
         # 複合主語の処理: "John and Mary are here"
         and_tokens = [token for token in doc if token.text.lower() == "and" and token.dep_ == "cc"]
         if and_tokens:
-            subslots.update(self._extract_compound_subject_subslots(doc))
-        
-        # advmod（副詞修飾語）をsub-m2として最後に追加
-        advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
-        if advmod_tokens:
-            advmod_text = ' '.join([token.text for token in advmod_tokens])
-            subslots['sub-m2'] = {
-                'text': advmod_text,
-                'tokens': [token.text for token in advmod_tokens],
-                'token_indices': [token.i for token in advmod_tokens]
-            }
-            print(f"✅ sub-m2として処理: '{advmod_text}'")
+            return self._extract_compound_subject_subslots(doc)
         
         return subslots
     
-    def _extract_o1_clause_subslots(self, doc):
-        """O1 Clauseサブスロット抽出"""
+    def _extract_s_clause_subslots(self, doc):
+        """S Clauseサブスロット抽出"""
         subslots = {}
-        
-        # advmod（副詞修飾語）をsub-m2として処理
-        advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
-        if advmod_tokens:
-            advmod_text = ' '.join([token.text for token in advmod_tokens])
-            subslots['sub-m2'] = {
-                'text': advmod_text,
-                'tokens': [token.text for token in advmod_tokens],
-                'token_indices': [token.i for token in advmod_tokens]
-            }
-            print(f"✅ sub-m2として処理: '{advmod_text}'")
         
         # まず同格that節を優先チェック
         that_token = None
@@ -125,20 +102,6 @@ class O1SubslotGenerator:
             if has_noun_before:
                 return self._extract_appositive_that_clause_subslots(doc, that_token)
         
-        # 疑問詞節の検出（what, where, when, how など）
-        wh_words = ["what", "where", "when", "how", "why", "which"]
-        wh_word_token = None
-        
-        for token in doc:
-            if token.text.lower() in wh_words:
-                # 疑問詞の条件：dobj, advmod, nsubj などの関係
-                if token.dep_ in ["dobj", "advmod", "nsubj", "pobj"] or token.pos_ in ["PRON", "SCONJ"]:
-                    wh_word_token = token
-                    break
-        
-        if wh_word_token:
-            return self._extract_wh_clause_subslots(doc, wh_word_token)
-        
         # 関係代名詞の検出（clause内）
         rel_pronouns = ["who", "whom", "whose", "which", "that"]
         rel_pronoun_token = None
@@ -153,45 +116,6 @@ class O1SubslotGenerator:
         
         # その他の関係節処理
         return self._extract_complex_s_clause(doc)
-    
-    def _extract_wh_clause_subslots(self, doc, wh_word_token):
-        """疑問詞節のサブスロット抽出（what you said など）"""
-        subslots = {}
-        
-        # 疑問詞節の構造解析: what(dobj) you(nsubj) said(ROOT)
-        verb_token = None
-        subject_tokens = []
-        
-        for token in doc:
-            if token.pos_ == "VERB" and token.dep_ == "ROOT":
-                verb_token = token
-            elif token.dep_ in ["nsubj", "nsubjpass"]:
-                subject_tokens.append(token)
-        
-        if verb_token and subject_tokens:
-            # sub-o1: 疑問詞
-            subslots['sub-o1'] = {
-                'text': wh_word_token.text,
-                'tokens': [wh_word_token.text],
-                'token_indices': [wh_word_token.i]
-            }
-            
-            # sub-s: 主語
-            subject_text = ' '.join([t.text for t in subject_tokens])
-            subslots['sub-s'] = {
-                'text': subject_text,
-                'tokens': [t.text for t in subject_tokens],
-                'token_indices': [t.i for t in subject_tokens]
-            }
-            
-            # sub-v: 動詞
-            subslots['sub-v'] = {
-                'text': verb_token.text,
-                'tokens': [verb_token.text],
-                'token_indices': [verb_token.i]
-            }
-        
-        return subslots
     
     def _extract_relative_clause_s_subslots(self, doc, rel_pronoun_token):
         """関係代名詞を含むS Clauseのサブスロット抽出"""
@@ -456,30 +380,32 @@ class O1SubslotGenerator:
         return coverage, uncovered
 
 
-def test_o1_subslots():
-    generator = O1SubslotGenerator()
+def test_s_subslots():
+    generator = SSubslotGenerator()
     
     test_cases = [
-        ("apple", "word"),
-        ("car", "word"), 
-        ("apples and oranges", "word"),  # V構造なし
-        ("the book that you recommended", "clause"),  # SV構造があるのでclause
-        ("the man whom I met", "clause"),  # SV構造があるのでclause
-        ("to go home", "phrase"),  # V構造
-        ("reading books", "phrase"),  # V構造
-        ("the fact that he left", "clause"),
-        ("what you said", "clause")
+        ("John", "word"),
+        ("Mary", "word"), 
+        ("John and Mary", "word"),  # V構造なし
+        ("The person who called", "phrase"),
+        ("The man whom I met", "clause"),  # SV構造があるのでclause
+        ("To learn English", "phrase"),  # V構造
+        ("Reading books", "phrase"),  # V構造
+        ("The fact that he came", "clause"),
+        ("The idea that we discussed", "clause"),
+        ("the book that you recommended", "clause"),  # 追加テスト
+        ("what you said", "clause")  # 追加テスト
     ]
     
-    print("=== O1サブスロット生成テスト ===\n")
+    print("=== Sサブスロット生成テスト ===\n")
     
     for slot_phrase, phrase_type in test_cases:
         print("=" * 50)
-        print(f"O1 SlotPhrase: '{slot_phrase}'")
+        print(f"S SlotPhrase: '{slot_phrase}'")
         print(f"PhraseType: {phrase_type}")
         print("=" * 50)
         
-        subslots = generator.generate_o1_subslots(slot_phrase, phrase_type)
+        subslots = generator.generate_s_subslots(slot_phrase, phrase_type)
         
         if not subslots:
             print("判定: wordタイプ：サブスロット分解不要")
@@ -502,4 +428,4 @@ def test_o1_subslots():
 
 
 if __name__ == "__main__":
-    test_o1_subslots()
+    test_s_subslots()
