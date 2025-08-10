@@ -77,29 +77,9 @@ class O1SubslotGenerator:
         if and_tokens:
             subslots.update(self._extract_compound_subject_subslots(doc))
         
-        # advmod（副詞修飾語）と前置詞句をsub-m2として処理
-        advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
-        dative_prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"]]
-        
-        # advmod + 前置詞句を統合してsub-m2として処理
-        m2_tokens = []
-        m2_tokens.extend(advmod_tokens)
-        
-        for prep_token in dative_prep_tokens:
-            prep_phrase_tokens = [prep_token]
-            for child in prep_token.children:
-                if child.dep_ == "pobj":
-                    prep_phrase_tokens.append(child)
-            m2_tokens.extend(prep_phrase_tokens)
-        
-        if m2_tokens:
-            m2_text = ' '.join([token.text for token in m2_tokens])
-            subslots['sub-m2'] = {
-                'text': m2_text,
-                'tokens': [token.text for token in m2_tokens],
-                'token_indices': [token.i for token in m2_tokens]
-            }
-            print(f"✅ sub-m2として処理: '{m2_text}'")
+        # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3）
+        modifier_subslots = self._assign_modifiers_by_position(doc)
+        subslots.update(modifier_subslots)
         
         # sub-aux: 助動詞検出 (aux, auxpass)
         aux_tokens = [token for token in doc if token.dep_ in ["aux", "auxpass"]]
@@ -134,25 +114,7 @@ class O1SubslotGenerator:
             }
             print(f"✅ sub-o1として処理: '{nsubj_text}' (補語構造内主語)")
         
-        # sub-m3: 前置詞句検出 (prep, dative)
-        prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"]]
-        for prep_token in prep_tokens:
-            # 前置詞句全体（前置詞+目的語）を取得
-            prep_phrase_tokens = [prep_token]
-            for child in prep_token.children:
-                if child.dep_ == "pobj":
-                    prep_phrase_tokens.append(child)
-            
-            if len(prep_phrase_tokens) > 1:  # 前置詞+目的語がある場合のみ
-                prep_phrase_text = ' '.join([t.text for t in prep_phrase_tokens])
-                if 'sub-m3' not in subslots:
-                    subslots['sub-m3'] = {
-                        'text': prep_phrase_text,
-                        'tokens': [t.text for t in prep_phrase_tokens],
-                        'token_indices': [t.i for t in prep_phrase_tokens]
-                    }
-                    print(f"✅ sub-m3として処理: '{prep_phrase_text}'")
-                    break  # 最初の前置詞句のみ処理
+
         
         # TODO: 完全な10個サブスロット検出を実装予定
         # complete_subslots = self._detect_all_subslots(doc)
@@ -164,16 +126,9 @@ class O1SubslotGenerator:
         """O1 Clauseサブスロット抽出"""
         subslots = {}
         
-        # advmod（副詞修飾語）をsub-m2として処理
-        advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
-        if advmod_tokens:
-            advmod_text = ' '.join([token.text for token in advmod_tokens])
-            subslots['sub-m2'] = {
-                'text': advmod_text,
-                'tokens': [token.text for token in advmod_tokens],
-                'token_indices': [token.i for token in advmod_tokens]
-            }
-            print(f"✅ sub-m2として処理: '{advmod_text}'")
+        # 位置ベース修飾語割り当て
+        modifier_subslots = self._assign_modifiers_by_position(doc)
+        subslots.update(modifier_subslots)
         
         # sub-aux: 助動詞検出
         aux_tokens = [token for token in doc if token.dep_ == "aux"]
@@ -543,55 +498,6 @@ class O1SubslotGenerator:
         
         return coverage, uncovered
 
-
-def test_o1_subslots():
-    generator = O1SubslotGenerator()
-    
-    test_cases = [
-        ("apple", "word"),
-        ("car", "word"), 
-        ("apples and oranges", "word"),  # V構造なし
-        ("the book that you recommended", "clause"),  # SV構造があるのでclause
-        ("the man whom I met", "clause"),  # SV構造があるのでclause
-        ("to go home", "phrase"),  # V構造
-        ("reading books", "phrase"),  # V構造
-        ("the fact that he left", "clause"),
-        ("what you said", "clause"),
-        # 部分カバレッジのケース整備用
-        ("the big red car that must have been made very carefully", "clause"),  # 複雑なclause
-        ("making her crazy for him", "phrase"),  # C2, O1/O2, M3テスト
-        ("a very important decision", "word"),  # ✅ 修正: wordタイプ（動詞なし）
-    ]
-    
-    print("=== O1サブスロット生成テスト ===\n")
-    
-    for slot_phrase, phrase_type in test_cases:
-        print("=" * 50)
-        print(f"O1 SlotPhrase: '{slot_phrase}'")
-        print(f"PhraseType: {phrase_type}")
-        print("=" * 50)
-        
-        subslots = generator.generate_o1_subslots(slot_phrase, phrase_type)
-        
-        if not subslots:
-            print("判定: wordタイプ：サブスロット分解不要")
-        else:
-            print(f"サブスロット生成: {len(subslots)}個")
-            for subslot_type, data in subslots.items():
-                print(f"  {subslot_type}: '{data['text']}'")
-            
-            # カバレッジ計算
-            doc = generator.nlp(slot_phrase)
-            coverage, uncovered = generator.calculate_coverage(subslots, doc)
-            print(f"\nカバレッジ: {coverage:.1f}% ({len(doc) - len(uncovered)}/{len(doc)})")
-            
-            if coverage == 100.0:
-                print("✅ 完全カバレッジ")
-            else:
-                print(f"⚠️ 未配置: {uncovered}")
-        
-        print()
-    
     def _detect_all_subslots(self, doc):
         """完全な10個サブスロット検出エンジン"""
         subslots = {}
@@ -663,6 +569,155 @@ def test_o1_subslots():
                 print(f"🔍 sub-m3検出: '{prep_phrase_text}' (dep: {token.dep_})")
         
         return subslots
+    
+    def _assign_modifiers_by_position(self, doc):
+        """位置ベースで修飾語をsub-m1, sub-m2, sub-m3に割り当て"""
+        subslots = {}
+        
+        # 修飾語候補を収集
+        modifier_candidates = []
+        
+        # advmod（副詞修飾語）
+        advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
+        for token in advmod_tokens:
+            modifier_candidates.append({
+                'token': token,
+                'text': token.text,
+                'position': token.i,
+                'type': 'advmod'
+            })
+        
+        # 前置詞句 (prep + pobj)
+        prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"]]
+        for prep_token in prep_tokens:
+            prep_phrase_tokens = [prep_token]
+            prep_phrase_text = prep_token.text
+            
+            # 前置詞句の目的語も含める
+            for child in prep_token.children:
+                if child.dep_ == "pobj":
+                    prep_phrase_tokens.append(child)
+                    prep_phrase_text += " " + child.text
+            
+            modifier_candidates.append({
+                'tokens': prep_phrase_tokens,
+                'text': prep_phrase_text,
+                'position': prep_token.i,
+                'type': 'prep_phrase'
+            })
+        
+        # det/amod（限定詞/形容詞修飾語）
+        det_amod_tokens = [token for token in doc if token.dep_ in ["det", "amod"]]
+        for token in det_amod_tokens:
+            modifier_candidates.append({
+                'token': token,
+                'text': token.text,
+                'position': token.i,
+                'type': 'det_amod'
+            })
+        
+        # 位置順でソート
+        modifier_candidates.sort(key=lambda x: x['position'])
+        
+        if not modifier_candidates:
+            return subslots
+        
+        # 文長を取得
+        sentence_length = len(doc)
+        
+        # 位置ベースで割り当て
+        for i, modifier in enumerate(modifier_candidates):
+            # 相対位置を計算（0.0-1.0）
+            relative_pos = modifier['position'] / sentence_length if sentence_length > 1 else 0.5
+            
+            # 位置に基づいてM slot を決定
+            if relative_pos <= 0.33:  # 文頭1/3
+                slot_name = 'sub-m1'
+            elif relative_pos <= 0.67:  # 文中央1/3
+                slot_name = 'sub-m2'
+            else:  # 文尾1/3
+                slot_name = 'sub-m3'
+            
+            # 既に同じslotが埋まっている場合は次のslotへ
+            if slot_name in subslots:
+                if slot_name == 'sub-m1':
+                    slot_name = 'sub-m2' if 'sub-m2' not in subslots else 'sub-m3'
+                elif slot_name == 'sub-m2':
+                    slot_name = 'sub-m3' if 'sub-m3' not in subslots else 'sub-m1'
+                # sub-m3の場合はそのまま上書き
+            
+            # sub slot に割り当て
+            if 'tokens' in modifier:
+                # 前置詞句の場合
+                subslots[slot_name] = {
+                    'text': modifier['text'],
+                    'tokens': [t.text for t in modifier['tokens']],
+                    'token_indices': [t.i for t in modifier['tokens']]
+                }
+            else:
+                # 単独トークンの場合
+                subslots[slot_name] = {
+                    'text': modifier['text'],
+                    'tokens': [modifier['token'].text],
+                    'token_indices': [modifier['token'].i]
+                }
+            
+            print(f"✅ {slot_name}として割り当て: '{modifier['text']}' (位置: {relative_pos:.2f}, {modifier['type']})")
+        
+        return subslots
+
+
+def test_o1_subslots():
+    """テスト用関数"""
+    test_cases = [
+        ("apple", "word"),
+        ("car", "word"),
+        ("apples and oranges", "word"),
+        ("the book that you recommended", "clause"),
+        ("the big red car that must have been made very carefully", "clause"),
+        ("what you said yesterday at the meeting", "clause"),
+        ("making her crazy for him", "clause"),
+        ("to make the project successful", "phrase"),
+        ("running very fast in the park", "phrase"),
+        ("books on the table in the library", "phrase"),
+        ("students studying abroad this year", "phrase"),
+        ("home", "word")
+    ]
+    
+    generator = O1SubslotGenerator()
+    
+    print("=== O1サブスロット生成テスト ===")
+    
+    for i, (slot_phrase, phrase_type) in enumerate(test_cases, 1):
+        print(f"\n{'='*50}")
+        print(f"O1 SlotPhrase: '{slot_phrase}'")
+        print(f"PhraseType: {phrase_type}")
+        print(f"{'='*50}")
+        
+        try:
+            subslots = generator.generate_o1_subslots(slot_phrase, phrase_type)
+            
+            if not subslots:
+                print(f"判定: {phrase_type}タイプ：サブスロット分解不要")
+            else:
+                print(f"✅ サブスロット抽出成功:")
+                for sub_name, sub_data in subslots.items():
+                    print(f"  {sub_name}: '{sub_data['text']}'")
+                
+                # カバレッジ計算
+                import spacy
+                nlp = spacy.load("en_core_web_sm")
+                doc = nlp(slot_phrase)
+                coverage_pct, uncovered_tokens = generator.calculate_coverage(subslots, doc)
+                print(f"\n📊 カバレッジ: {coverage_pct:.1f}%")
+                if uncovered_tokens:
+                    uncovered_text = [token for token, _ in uncovered_tokens]
+                    print(f"未カバー: {uncovered_text}")
+        
+        except Exception as e:
+            print(f"❌ エラー: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
