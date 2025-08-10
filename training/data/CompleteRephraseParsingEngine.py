@@ -85,6 +85,9 @@ class CompleteRephraseParsingEngine:
             # Step 3: Rephraseルール21個の完全適用
             rephrase_slots = self._apply_complete_rephrase_rules(doc, sentence_hierarchy)
             
+            # Step 3.5: 🚀 フェーズ1 spaCy完全対応拡張機能適用
+            rephrase_slots = self._apply_phase1_enhancements(doc, rephrase_slots)
+            
             # Step 4: Sub-slot構造の生成
             sub_structures = self._generate_subslot_structures(doc, sentence_hierarchy)
             
@@ -100,7 +103,8 @@ class CompleteRephraseParsingEngine:
                 'metadata': {
                     'engine': self.engine_name,
                     'rules_applied': len([r for r in rephrase_slots.values() if r]),
-                    'complexity_score': self._calculate_complexity(sentence_hierarchy)
+                    'complexity_score': self._calculate_complexity(sentence_hierarchy),
+                    'phase1_enhanced': True
                 }
             }
             
@@ -1784,6 +1788,182 @@ class CompleteRephraseParsingEngine:
                 token.dep_ == "intj"):
                 return token.text
         return None
+    
+    # =============================================================================
+    # フェーズ1: spaCy完全対応 - 新依存関係処理機能
+    # =============================================================================
+    
+    def _extract_compound_phrase(self, token) -> str:
+        """複合語・複合名詞の完全抽出 (compound依存関係)"""
+        compound_tokens = [token]
+        
+        # 複合語の構成要素を収集
+        for child in token.children:
+            if child.dep_ == 'compound':
+                compound_tokens.append(child)
+        
+        # 語順でソート
+        compound_tokens.sort(key=lambda x: x.i)
+        return ' '.join([t.text for t in compound_tokens])
+    
+    def _extract_conjunction_phrase(self, token) -> str:
+        """並列構造の完全抽出 (conj + cc依存関係)"""
+        conj_elements = [token]
+        coordinator = None
+        
+        # 並列要素と等位接続詞を収集
+        for child in token.children:
+            if child.dep_ == 'conj':
+                conj_elements.append(child)
+            elif child.dep_ == 'cc':
+                coordinator = child
+        
+        # 語順でソート
+        conj_elements.sort(key=lambda x: x.i)
+        
+        if coordinator and len(conj_elements) > 1:
+            # "A and B" 形式
+            result = []
+            for i, elem in enumerate(conj_elements):
+                result.append(elem.text)
+                if i == len(conj_elements) - 2:  # 最後から2番目の要素の後
+                    result.append(coordinator.text)
+            return ' '.join(result)
+        else:
+            return ' '.join([elem.text for elem in conj_elements])
+    
+    def _extract_negation_scope(self, token) -> str:
+        """否定表現のスコープ付き抽出 (neg依存関係)"""
+        neg_token = None
+        
+        # 否定語を検索
+        for child in token.children:
+            if child.dep_ == 'neg':
+                neg_token = child
+                break
+        
+        if neg_token:
+            # 否定語 + 動詞/形容詞
+            if token.pos_ in ['VERB', 'AUX']:
+                # 助動詞がある場合の処理
+                aux_tokens = [child for child in token.children if child.dep_ == 'aux']
+                if aux_tokens:
+                    aux = aux_tokens[0]
+                    return f"{aux.text} {neg_token.text} {token.text}"
+                else:
+                    return f"{neg_token.text} {token.text}"
+            else:
+                return f"{neg_token.text} {token.text}"
+        
+        return token.text
+    
+    def _extract_numeric_phrase(self, token) -> str:
+        """数詞修飾の完全抽出 (nummod依存関係)"""
+        numeric_parts = [token]
+        
+        # 数詞修飾語を収集
+        for child in token.children:
+            if child.dep_ == 'nummod':
+                numeric_parts.append(child)
+        
+        # 語順でソート
+        numeric_parts.sort(key=lambda x: x.i)
+        return ' '.join([part.text for part in numeric_parts])
+    
+    def _detect_compound_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """compound依存関係の検出"""
+        compounds = []
+        for token in doc:
+            if token.dep_ == 'compound':
+                compounds.append({
+                    'head': token.head,
+                    'compound': token,
+                    'phrase': self._extract_compound_phrase(token.head)
+                })
+        return compounds
+    
+    def _detect_conjunction_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """conj + cc依存関係の検出"""
+        conjunctions = []
+        for token in doc:
+            if token.dep_ == 'conj':
+                conjunctions.append({
+                    'head': token.head,
+                    'conj_element': token,
+                    'phrase': self._extract_conjunction_phrase(token.head)
+                })
+        return conjunctions
+    
+    def _detect_negation_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """neg依存関係の検出"""
+        negations = []
+        for token in doc:
+            if token.dep_ == 'neg':
+                negations.append({
+                    'negated_element': token.head,
+                    'negation': token,
+                    'phrase': self._extract_negation_scope(token.head)
+                })
+        return negations
+    
+    def _detect_nummod_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """nummod依存関係の検出"""
+        nummods = []
+        for token in doc:
+            if token.dep_ == 'nummod':
+                nummods.append({
+                    'modified_noun': token.head,
+                    'number': token,
+                    'phrase': self._extract_numeric_phrase(token.head)
+                })
+        return nummods
+    
+    def _apply_phase1_enhancements(self, doc, slots: Dict[str, List]) -> Dict[str, List]:
+        """フェーズ1拡張機能の適用"""
+        
+        # 既存スロットの値を取得（辞書と文字列の両方に対応）
+        def get_slot_values(slot_list):
+            values = []
+            for item in slot_list:
+                if isinstance(item, dict) and 'value' in item:
+                    values.append(item['value'])
+                elif isinstance(item, str):
+                    values.append(item)
+            return values
+        
+        all_existing_values = []
+        for slot_name, slot_items in slots.items():
+            all_existing_values.extend(get_slot_values(slot_items))
+        
+        # 1. 複合語処理
+        compounds = self._detect_compound_dependencies(doc)
+        for compound in compounds:
+            phrase = compound['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M1'].append(phrase)
+        
+        # 2. 並列構造処理  
+        conjunctions = self._detect_conjunction_dependencies(doc)
+        for conj in conjunctions:
+            phrase = conj['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M2'].append(phrase)
+        
+        # 3. 否定表現処理
+        negations = self._detect_negation_dependencies(doc)
+        for neg in negations:
+            phrase = neg['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M1'].append(phrase)
+        
+        # 4. 数詞修飾処理
+        nummods = self._detect_nummod_dependencies(doc)
+        for nummod in nummods:
+            phrase = nummod['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M1'].append(phrase)
+        
+        return slots
         
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass
     def _process_adverbial_clause_subslots(self, verb, sub_slots, doc): pass
