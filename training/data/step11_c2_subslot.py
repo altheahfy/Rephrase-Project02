@@ -65,44 +65,33 @@ class C2SubslotGenerator:
         
         if that_token:
             # "confident that he will succeed" の処理
-            return self._extract_that_clause_subslots(doc, that_token)
+            return self._extract_that_clause_c2_subslots(doc)
         
         # 関係節や他の複雑構造の処理
         return self._extract_complex_c2_clause(doc)
     
-    def _extract_that_clause_subslots(self, doc, that_token):
-        """that節の処理: "confident that he will succeed" """
+    def _extract_that_clause_c2_subslots(self, doc):
+        """
+        C2文型のthat節を解析してRephrase subslotを抽出
+        例: "I am confident that he will succeed"
+        """
         subslots = {}
         
-        # that節の前の形容詞部分
-        adj_tokens = []
+        # that節を見つける
+        that_token = None
         for token in doc:
-            if token.i < that_token.i and token.pos_ in ["ADJ", "ADV"]:
-                adj_tokens.append(token)
-        
-        # メイン形容詞を特定
-        main_adj = None
-        for token in adj_tokens:
-            if token.pos_ == "ADJ":
-                main_adj = token
+            if token.text.lower() == "that":
+                that_token = token
                 break
         
-        if main_adj:
-            # sub-v: 形容詞をメイン動詞として扱う
-            subslots['sub-v'] = {
-                'text': main_adj.text,
-                'tokens': [main_adj.text],
-                'token_indices': [main_adj.i]
-            }
-            
-            # sub-m2: 副詞修飾語（very等）
-            adv_tokens = [t for t in adj_tokens if t.pos_ == "ADV"]
-            if adv_tokens:
-                subslots['sub-m2'] = {
-                    'text': ' '.join([t.text for t in adv_tokens]),
-                    'tokens': [t.text for t in adv_tokens],
-                    'token_indices': [t.i for t in adv_tokens]
-                }
+        if not that_token:
+            return subslots
+        
+        # that節の前にある形容詞を特定（C2の補語）
+        main_adj = None
+        for token in doc:
+            if token.i < that_token.i and token.pos_ == "ADJ":
+                main_adj = token
         
         # that節内部の動詞を特定
         clause_verb = None
@@ -111,14 +100,14 @@ class C2SubslotGenerator:
                 clause_verb = token
                 break
         
+        # sub-s: 形容詞 + that + 主語（Rephraseルール：全部まとめてsub-s）
         if clause_verb:
-            # sub-s: that節内の主語
             subjects = [child for child in clause_verb.children if child.dep_ == "nsubj"]
-            if subjects:
+            if subjects and main_adj:
                 subslots['sub-s'] = {
-                    'text': subjects[0].text,
-                    'tokens': [subjects[0].text],
-                    'token_indices': [subjects[0].i]
+                    'text': f"{main_adj.text} that {subjects[0].text}",
+                    'tokens': [main_adj.text, that_token.text, subjects[0].text],
+                    'token_indices': [main_adj.i, that_token.i, subjects[0].i]
                 }
             
             # sub-aux: 助動詞
@@ -130,9 +119,8 @@ class C2SubslotGenerator:
                     'token_indices': [t.i for t in aux_tokens]
                 }
             
-            # sub-v (clause内): 節内動詞
-            # 既存のsub-vがあるので、区別するため別名で格納
-            subslots['sub-v-clause'] = {
+            # sub-v: 節内動詞
+            subslots['sub-v'] = {
                 'text': clause_verb.text,
                 'tokens': [clause_verb.text],
                 'token_indices': [clause_verb.i]
@@ -173,23 +161,23 @@ class C2SubslotGenerator:
                 break
         
         if main_adj:
-            # sub-v: 形容詞をメイン動詞として扱う
-            subslots['sub-v'] = {
+            # sub-c1: 形容詞補語
+            subslots['sub-c1'] = {
                 'text': main_adj.text,
                 'tokens': [main_adj.text],
                 'token_indices': [main_adj.i]
             }
             
-            # sub-m2: 副詞修飾語（very等）
+            # sub-m1: 副詞修飾語（too, very等）を分離
             adv_tokens = [child for child in main_adj.children if child.dep_ == "advmod"]
             if adv_tokens:
-                subslots['sub-m2'] = {
+                subslots['sub-m1'] = {
                     'text': ' '.join([t.text for t in adv_tokens]),
                     'tokens': [t.text for t in adv_tokens],
                     'token_indices': [t.i for t in adv_tokens]
                 }
             
-            # 不定詞句の処理（easy to understand等）
+            # 不定詞句の処理（to understand等）→ sub-m2
             infinitive_tokens = []
             for child in main_adj.children:
                 if child.dep_ in ["xcomp", "ccomp"]:  # 不定詞補語
@@ -198,22 +186,45 @@ class C2SubslotGenerator:
                         infinitive_tokens.extend([to_token, child])
                     else:
                         # toが別の場所にある場合を探す
-                        to_found = None
+                        to_for_verb = None
                         for token in doc:
                             if token.text.lower() == "to" and token.head == child:
-                                to_found = token
+                                to_for_verb = token
                                 break
-                        if to_found:
-                            infinitive_tokens.extend([to_found, child])
+                        
+                        if to_for_verb:
+                            infinitive_tokens.extend([to_for_verb, child])
                         else:
                             infinitive_tokens.append(child)
+                    break
             
             if infinitive_tokens:
                 infinitive_tokens = sorted(infinitive_tokens, key=lambda x: x.i)
-                subslots['sub-o1'] = {
+                subslots['sub-m2'] = {
                     'text': ' '.join([t.text for t in infinitive_tokens]),
                     'tokens': [t.text for t in infinitive_tokens],
                     'token_indices': [t.i for t in infinitive_tokens]
+                }
+        
+        # very easy のような副詞+形容詞の処理
+        elif not subslots:
+            adv_tokens = [token for token in doc if token.pos_ == "ADV"]
+            adj_tokens = [token for token in doc if token.pos_ == "ADJ"]
+            
+            if adj_tokens:
+                # sub-c1: 形容詞
+                subslots['sub-c1'] = {
+                    'text': adj_tokens[0].text,
+                    'tokens': [adj_tokens[0].text],
+                    'token_indices': [adj_tokens[0].i]
+                }
+            
+            if adv_tokens:
+                # sub-m2: 副詞修飾語（very等）
+                subslots['sub-m2'] = {
+                    'text': ' '.join([t.text for t in adv_tokens]),
+                    'tokens': [t.text for t in adv_tokens],
+                    'token_indices': [t.i for t in adv_tokens]
                 }
         
         return subslots
