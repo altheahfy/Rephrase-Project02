@@ -422,6 +422,15 @@ class CompleteRephraseParsingEngine:
             if not pos_match:
                 return False
         
+        # depトリガーの確認（依存関係ラベル）
+        if 'dep' in trigger:
+            dep_tags = trigger['dep'] if isinstance(trigger['dep'], list) else [trigger['dep']]
+            doc_deps = [token.dep_ for token in doc]
+            dep_match = any(token.dep_ in dep_tags for token in doc)
+            print(f"  depトリガー: {dep_tags} → 文書内: {doc_deps} → マッチ: {dep_match}")
+            if not dep_match:
+                return False
+        
         # patternトリガーの確認
         if 'pattern' in trigger:
             pattern = trigger['pattern']
@@ -473,6 +482,25 @@ class CompleteRephraseParsingEngine:
                 prep_tokens = [token for token in doc if token.pos_ == 'ADP']
                 location_preps = any(token.text.lower() in ['in', 'on', 'at', 'by'] for token in prep_tokens)
                 print(f"    場所的前置詞: {location_preps}")
+        
+        # conditionsフィールドの確認（追加条件）
+        conditions = rule.get('conditions', {})
+        if conditions:
+            position = conditions.get('position', '')
+            if position == 'sentence_final':
+                # 文末位置の確認
+                lemmas = trigger.get('lemma', [])
+                if lemmas:
+                    target_lemma = lemmas[0] if isinstance(lemmas, list) else lemmas
+                    # 対象lemmaが文末近くにあるかチェック（句読点除く）
+                    content_tokens = [token for token in doc if not token.is_punct]
+                    if content_tokens:
+                        last_content_token = content_tokens[-1]
+                        if last_content_token.lemma_ == target_lemma:
+                            print(f"    文末位置確認: '{target_lemma}' が文末に配置")
+                        else:
+                            print(f"    文末位置確認失敗: 最終語は '{last_content_token.lemma_}' (期待: '{target_lemma}')")
+                            return False
         
         print(f"  → ルール適用対象: {rule_id}")
         return True
@@ -721,6 +749,8 @@ class CompleteRephraseParsingEngine:
             return self._extract_adverb_value(doc)
         elif rule_id == 'wh-where-front':
             return self._extract_wh_where_value(doc)
+        elif rule_id == 'please-interjection-M3':
+            return self._extract_please_interjection_value(doc)
         else:
             # 汎用的な値抽出
             return self._extract_generic_value(assignment, doc, hierarchy)
@@ -1680,6 +1710,15 @@ class CompleteRephraseParsingEngine:
         for token in doc:
             if token.text.lower() == "where":
                 return "where_M3_1"
+        return None
+    
+    def _extract_please_interjection_value(self, doc) -> Optional[str]:
+        """文末の「please」感嘆詞を抽出（M3スロット用）"""
+        for token in doc:
+            if (token.lemma_.lower() == "please" and 
+                token.pos_ == "INTJ" and 
+                token.dep_ == "intj"):
+                return token.text
         return None
         
     def _process_relative_clause_subslots(self, verb, sub_slots, doc): pass

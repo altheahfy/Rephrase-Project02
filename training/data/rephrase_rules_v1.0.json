@@ -96,6 +96,23 @@
       }
     },
     {
+      "id": "please-interjection-M3",
+      "priority": 15,
+      "trigger": {
+        "lemma": ["please"],
+        "pos": ["INTJ"],
+        "dep": ["intj"]
+      },
+      "conditions": {
+        "position": "sentence_final"
+      },
+      "assign": {
+        "slot": "M3",
+        "type": "word"
+      },
+      "description": "文末の感嘆詞「please」をM3スロットに割り当て"
+    },
+    {
       "id": "wh-where-front", 
       "priority": 5,
       "trigger": {
