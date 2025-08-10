@@ -88,6 +88,10 @@ class O1SubslotGenerator:
             }
             print(f"✅ sub-m2として処理: '{advmod_text}'")
         
+        # TODO: 完全な10個サブスロット検出を実装予定
+        # complete_subslots = self._detect_all_subslots(doc)
+        # subslots.update(complete_subslots)
+        
         return subslots
     
     def _extract_o1_clause_subslots(self, doc):
@@ -152,7 +156,14 @@ class O1SubslotGenerator:
             return self._extract_relative_clause_s_subslots(doc, rel_pronoun_token)
         
         # その他の関係節処理
-        return self._extract_complex_s_clause(doc)
+        complex_subslots = self._extract_complex_s_clause(doc)
+        subslots.update(complex_subslots)
+        
+        # TODO: 完全な10個サブスロット検出を実装予定
+        # complete_subslots = self._detect_all_subslots(doc)
+        # subslots.update(complete_subslots)
+        
+        return subslots
     
     def _extract_wh_clause_subslots(self, doc, wh_word_token):
         """疑問詞節のサブスロット抽出（what you said など）"""
@@ -468,7 +479,11 @@ def test_o1_subslots():
         ("to go home", "phrase"),  # V構造
         ("reading books", "phrase"),  # V構造
         ("the fact that he left", "clause"),
-        ("what you said", "clause")
+        ("what you said", "clause"),
+        # 10個サブスロット検出テスト用の複雑なケース
+        ("the big red car that must have been made very carefully", "clause"),  # 複数要素
+        ("making her crazy for him", "phrase"),  # C2テスト (crazyが補語)
+        ("a very important decision", "phrase"),  # M1テスト (very, important)
     ]
     
     print("=== O1サブスロット生成テスト ===\n")
@@ -499,6 +514,78 @@ def test_o1_subslots():
                 print(f"⚠️ 未配置: {uncovered}")
         
         print()
+    
+    def _detect_all_subslots(self, doc):
+        """完全な10個サブスロット検出エンジン"""
+        subslots = {}
+        
+        for token in doc:
+            # 既存の処理と重複しないように、新たに必要なサブスロットのみ検出
+            
+            # sub-m1: 前置修飾語 (形容詞、決定詞など)
+            if token.dep_ in ["amod", "det", "nummod", "compound"] and 'sub-m1' not in subslots:
+                subslots['sub-m1'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-m1検出: '{token.text}' (dep: {token.dep_})")
+            
+            # sub-aux: 助動詞
+            elif token.dep_ == "aux" and 'sub-aux' not in subslots:
+                subslots['sub-aux'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-aux検出: '{token.text}'")
+            
+            # sub-c1: 補語1 (attr, acomp)
+            elif token.dep_ in ["attr", "acomp"] and 'sub-c1' not in subslots:
+                subslots['sub-c1'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-c1検出: '{token.text}' (dep: {token.dep_})")
+            
+            # sub-o2: 間接目的語
+            elif token.dep_ == "iobj" and 'sub-o2' not in subslots:
+                subslots['sub-o2'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-o2検出: '{token.text}'")
+            
+            # sub-c2: 補語2 (xcomp, ccomp)
+            elif token.dep_ in ["xcomp", "ccomp"] and 'sub-c2' not in subslots:
+                subslots['sub-c2'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-c2検出: '{token.text}' (dep: {token.dep_})")
+            
+            # sub-m3: 後置修飾語 (prep, acl, relcl)
+            elif token.dep_ in ["prep", "acl", "relcl"] and 'sub-m3' not in subslots:
+                # 前置詞句全体を取得
+                prep_phrase_tokens = [token]
+                if token.dep_ == "prep":
+                    # 前置詞句の目的語も含める
+                    for child in token.children:
+                        if child.dep_ == "pobj":
+                            prep_phrase_tokens.append(child)
+                
+                prep_phrase_text = ' '.join([t.text for t in prep_phrase_tokens])
+                subslots['sub-m3'] = {
+                    'text': prep_phrase_text,
+                    'tokens': [t.text for t in prep_phrase_tokens],
+                    'token_indices': [t.i for t in prep_phrase_tokens]
+                }
+                print(f"🔍 sub-m3検出: '{prep_phrase_text}' (dep: {token.dep_})")
+        
+        return subslots
 
 
 if __name__ == "__main__":
