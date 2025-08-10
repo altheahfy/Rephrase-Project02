@@ -126,9 +126,9 @@ class O1SubslotGenerator:
         """O1 Clauseサブスロット抽出"""
         subslots = {}
         
-        # 位置ベース修飾語割り当て
-        modifier_subslots = self._assign_modifiers_by_position(doc)
-        subslots.update(modifier_subslots)
+        # 完全な10サブスロット検出システムを使用
+        complete_subslots = self._detect_all_subslots(doc)
+        subslots.update(complete_subslots)
         
         # sub-aux: 助動詞検出
         aux_tokens = [token for token in doc if token.dep_ == "aux"]
@@ -568,7 +568,123 @@ class O1SubslotGenerator:
                 }
                 print(f"🔍 sub-m3検出: '{prep_phrase_text}' (dep: {token.dep_})")
         
+        # 未分類トークンの処理（残余分類システム）
+        self._classify_remaining_tokens(doc, subslots)
+        
         return subslots
+    
+    def _collect_token_with_modifiers(self, token, doc):
+        """トークンとその修飾語を収集"""
+        tokens = [token]
+        
+        # 子トークン（修飾語）を追加
+        for child in token.children:
+            if child.dep_ in ["det", "amod", "compound", "nummod"]:
+                tokens.insert(0, child)  # 修飾語は前に配置
+        
+        return sorted(tokens, key=lambda t: t.i)
+    
+    def _collect_verb_phrase(self, token, doc):
+        """動詞句全体を収集（助動詞、不定詞マーカー含む）"""
+        tokens = [token]
+        
+        # 助動詞を前に追加
+        for other_token in doc:
+            if other_token.head == token and other_token.dep_ in ["aux", "auxpass"]:
+                tokens.insert(0, other_token)
+            elif other_token.head == token and other_token.dep_ == "mark" and other_token.text.lower() == "to":
+                tokens.insert(0, other_token)  # 不定詞のto
+        
+        return sorted(tokens, key=lambda t: t.i)
+    
+    def _classify_remaining_tokens(self, doc, subslots):
+        """未分類トークンを適切なサブスロットに分類"""
+        covered_indices = set()
+        
+        # 既にカバーされているトークンのインデックスを収集
+        for sub_data in subslots.values():
+            covered_indices.update(sub_data['token_indices'])
+        
+        for token in doc:
+            if token.i in covered_indices:
+                continue
+                
+            # 名詞・代名詞で未分類のもの
+            if token.pos_ in ["NOUN", "PROPN", "PRON"]:
+                if 'sub-s' not in subslots:
+                    subslots['sub-s'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"🔍 sub-s(残余)検出: '{token.text}' (pos: {token.pos_})")
+                elif 'sub-o1' not in subslots:
+                    subslots['sub-o1'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"🔍 sub-o1(残余)検出: '{token.text}' (pos: {token.pos_})")
+            
+            # 形容詞で未分類のもの
+            elif token.pos_ == "ADJ" and 'sub-c2' not in subslots:
+                subslots['sub-c2'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-c2(残余)検出: '{token.text}' (pos: {token.pos_})")
+            
+            # 動詞で未分類のもの
+            elif token.pos_ == "VERB" and 'sub-v' not in subslots:
+                subslots['sub-v'] = {
+                    'text': token.text,
+                    'tokens': [token.text],
+                    'token_indices': [token.i]
+                }
+                print(f"🔍 sub-v(残余)検出: '{token.text}' (pos: {token.pos_})")
+            
+            # 時間副詞の処理（yesterday, today, etc）
+            elif token.pos_ in ["NOUN", "ADV"] and token.text.lower() in ["yesterday", "today", "tomorrow", "year", "time"]:
+                # 修飾語slotが空いている場合に追加
+                for slot_name in ['sub-m1', 'sub-m2', 'sub-m3']:
+                    if slot_name not in subslots:
+                        subslots[slot_name] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        print(f"🔍 {slot_name}(時間副詞)検出: '{token.text}'")
+                        break
+            
+            # auxpass処理（been, beingなど）
+            elif token.dep_ == "auxpass" and token.text.lower() in ["been", "being"]:
+                # 既存のsub-auxに追加するか、新規作成
+                if 'sub-aux' in subslots:
+                    subslots['sub-aux']['text'] += ' ' + token.text
+                    subslots['sub-aux']['tokens'].append(token.text)
+                    subslots['sub-aux']['token_indices'].append(token.i)
+                    print(f"🔍 sub-aux(auxpass)追加: '{token.text}'")
+                else:
+                    subslots['sub-aux'] = {
+                        'text': token.text,
+                        'tokens': [token.text],
+                        'token_indices': [token.i]
+                    }
+                    print(f"🔍 sub-aux(auxpass)検出: '{token.text}'")
+            
+            # 孤立した前置詞の処理
+            elif token.pos_ == "ADP" and token.text.lower() in ["for", "in", "at", "on", "with", "by"]:
+                # 修飾語slotが空いている場合に追加
+                for slot_name in ['sub-m1', 'sub-m2', 'sub-m3']:
+                    if slot_name not in subslots:
+                        subslots[slot_name] = {
+                            'text': token.text,
+                            'tokens': [token.text],
+                            'token_indices': [token.i]
+                        }
+                        print(f"🔍 {slot_name}(前置詞)検出: '{token.text}'")
+                        break
     
     def _assign_modifiers_by_position(self, doc):
         """位置ベースで修飾語をsub-m1, sub-m2, sub-m3に割り当て"""
