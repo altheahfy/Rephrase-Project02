@@ -82,6 +82,26 @@ class SSubslotGenerator:
         """S Clauseサブスロット抽出"""
         subslots = {}
         
+        # まず同格that節を優先チェック
+        that_token = None
+        for token in doc:
+            if token.text.lower() == "that":
+                # that節の検出条件を広げる
+                if token.dep_ in ["acl", "ccomp", "mark", "dobj"] or (token.pos_ == "SCONJ"):
+                    that_token = token
+                    break
+        
+        if that_token:
+            # 同格that節かどうかを判定（名詞の後にthatがある場合）
+            has_noun_before = False
+            for token in doc:
+                if token.i < that_token.i and token.pos_ in ["NOUN", "PROPN"]:
+                    has_noun_before = True
+                    break
+            
+            if has_noun_before:
+                return self._extract_appositive_that_clause_subslots(doc, that_token)
+        
         # 関係代名詞の検出（clause内）
         rel_pronouns = ["who", "whom", "whose", "which", "that"]
         rel_pronoun_token = None
@@ -93,18 +113,6 @@ class SSubslotGenerator:
         
         if rel_pronoun_token:
             return self._extract_relative_clause_s_subslots(doc, rel_pronoun_token)
-        
-        # 同格that節: "The fact that he came surprised me"
-        that_token = None
-        for token in doc:
-            if token.text.lower() == "that":
-                # that節の検出条件を広げる
-                if token.dep_ in ["acl", "ccomp", "mark", "dobj"] or (token.pos_ == "SCONJ"):
-                    that_token = token
-                    break
-        
-        if that_token:
-            return self._extract_appositive_that_clause_subslots(doc, that_token)
         
         # その他の関係節処理
         return self._extract_complex_s_clause(doc)
@@ -327,7 +335,7 @@ class SSubslotGenerator:
                 'tokens': [t.text for t in noun_phrase_tokens] + [that_token.text, that_clause_subj.text],
                 'token_indices': [t.i for t in noun_phrase_tokens] + [that_token.i, that_clause_subj.i]
             }
-        elif noun_phrase_tokens and not that_clause_subj:
+        elif noun_phrase_tokens:
             # 主語が見つからない場合はthatまでを含める
             noun_phrase_text = ' '.join([t.text for t in noun_phrase_tokens])
             subslots['sub-s'] = {
@@ -335,15 +343,15 @@ class SSubslotGenerator:
                 'tokens': [t.text for t in noun_phrase_tokens] + [that_token.text],
                 'token_indices': [t.i for t in noun_phrase_tokens] + [that_token.i]
             }
-            
-            # that節内の動詞を処理（既に見つけ済み）
-            if that_clause_verb:
-                # sub-v: that節内動詞
-                subslots['sub-v'] = {
-                    'text': that_clause_verb.text,
-                    'tokens': [that_clause_verb.text],
-                    'token_indices': [that_clause_verb.i]
-                }
+        
+        # that節内の動詞を処理（すべてのケースで実行）
+        if that_clause_verb:
+            # sub-v: that節内動詞
+            subslots['sub-v'] = {
+                'text': that_clause_verb.text,
+                'tokens': [that_clause_verb.text],
+                'token_indices': [that_clause_verb.i]
+            }
         
         return subslots
     
