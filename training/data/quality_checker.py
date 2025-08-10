@@ -146,6 +146,94 @@ def check_cant_contraction(df):
     
     return issues
 
+def check_possessive_pronouns(df):
+    """チェック3: his, her, their等の所有格代名詞が抜けていないか"""
+    print("\n=== チェック3: 所有格代名詞の検証 ===")
+    
+    issues = []
+    possessives = ["his", "her", "their", "our", "my", "your", "its"]
+    
+    for idx, row in df.iterrows():
+        sentence = row['原文']
+        
+        if pd.isna(sentence):
+            continue
+            
+        sentence_lower = sentence.lower()
+        
+        # 原文に所有格代名詞が含まれている場合
+        for possessive in possessives:
+            if f" {possessive} " in f" {sentence_lower} ":  # 単語境界を考慮
+                # その文に対応するスロット内容をチェック
+                sentence_slots = df[df['原文'] == sentence]['SlotPhrase'].tolist()
+                slot_text_combined = ' '.join([str(slot) for slot in sentence_slots if not pd.isna(slot)])
+                
+                if possessive not in slot_text_combined.lower():
+                    issues.append({
+                        'type': 'missing_possessive',
+                        'sentence': sentence,
+                        'missing_word': possessive,
+                        'slots_content': slot_text_combined,
+                        'reason': f'所有格代名詞"{possessive}"が抜けている'
+                    })
+                    break  # 同じ文で複数回カウントしないように
+    
+    if issues:
+        print(f"⚠️ 所有格代名詞の問題: {len(issues)}件")
+        for issue in issues[:5]:  # 最初の5件を表示
+            print(f"  - {issue['sentence']}")
+            print(f"    欠落: '{issue['missing_word']}'")
+            print(f"    スロット内容: {issue['slots_content']}")
+            print(f"    理由: {issue['reason']}")
+    else:
+        print("✅ 所有格代名詞の問題なし")
+    
+    return issues
+
+def check_articles(df):
+    """チェック4: 冠詞(a, an, the)が抜けていないか"""
+    print("\n=== チェック4: 冠詞の検証 ===")
+    
+    issues = []
+    articles = ["a", "an", "the"]
+    
+    for idx, row in df.iterrows():
+        sentence = row['原文']
+        
+        if pd.isna(sentence):
+            continue
+            
+        sentence_lower = sentence.lower()
+        
+        # 原文に冠詞が含まれている場合
+        for article in articles:
+            if f" {article} " in f" {sentence_lower} ":  # 単語境界を考慮
+                # その文に対応するスロット内容をチェック
+                sentence_slots = df[df['原文'] == sentence]['SlotPhrase'].tolist()
+                slot_text_combined = ' '.join([str(slot) for slot in sentence_slots if not pd.isna(slot)])
+                
+                if article not in slot_text_combined.lower():
+                    issues.append({
+                        'type': 'missing_article',
+                        'sentence': sentence,
+                        'missing_word': article,
+                        'slots_content': slot_text_combined,
+                        'reason': f'冠詞"{article}"が抜けている'
+                    })
+                    break  # 同じ文で複数回カウントしないように
+    
+    if issues:
+        print(f"⚠️ 冠詞の問題: {len(issues)}件")
+        for issue in issues[:5]:  # 最初の5件を表示
+            print(f"  - {issue['sentence']}")
+            print(f"    欠落: '{issue['missing_word']}'")
+            print(f"    スロット内容: {issue['slots_content']}")
+            print(f"    理由: {issue['reason']}")
+    else:
+        print("✅ 冠詞の問題なし")
+    
+    return issues
+
 if __name__ == "__main__":
     data = load_excel_data()
     if data is None:
@@ -160,5 +248,13 @@ if __name__ == "__main__":
     # チェック2: 短縮形
     contraction_issues = check_cant_contraction(df)
     
+    # チェック3: 所有格代名詞
+    possessive_issues = check_possessive_pronouns(df)
+    
+    # チェック4: 冠詞
+    article_issues = check_articles(df)
+    
     print(f"\n📊 チェック1完了: Aux order問題={len(aux_issues)}件")
     print(f"📊 チェック2完了: 短縮形問題={len(contraction_issues)}件")
+    print(f"📊 チェック3完了: 所有格代名詞問題={len(possessive_issues)}件")
+    print(f"📊 チェック4完了: 冠詞問題={len(article_issues)}件")

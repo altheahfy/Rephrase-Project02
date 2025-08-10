@@ -334,6 +334,13 @@ class CompleteRephraseParsingEngine:
         if blocked_rules:
             print(f"🚫 ブロックされたルール数: {len(blocked_rules)} → {blocked_rules}")
         
+        # 汎用的な主語検出（ルールで捕獲されなかった場合）
+        if not slots['S']:
+            generic_subject = self._extract_generic_subject(doc, hierarchy)
+            if generic_subject:
+                slots['S'].append(generic_subject)
+                print(f"✅ 汎用主語検出: {generic_subject}")
+        
         # 汎用的な動詞検出（ルールで捕獲されなかった場合）
         if not slots['V']:
             generic_verb = self._extract_generic_verb(doc, hierarchy)
@@ -1065,6 +1072,27 @@ class CompleteRephraseParsingEngine:
                 return token.text
         
         print(f"  → 動詞見つからず")
+        return None
+    
+    def _extract_generic_subject(self, doc, hierarchy) -> Optional[str]:
+        """汎用的な主語検出（ルールで捕獲されなかった場合のフォールバック）"""
+        print(f"🔍 汎用主語検出開始")
+        
+        # 階層から主語を取得
+        main_subject = hierarchy.get('main_clause', {}).get('subject')
+        if main_subject and 'full_phrase' in main_subject:
+            subject_phrase = main_subject['full_phrase']
+            print(f"  → 階層から主語抽出: '{subject_phrase}'")
+            return subject_phrase
+        
+        # フォールバック: spaCyから直接抽出（関係詞節を含む完全な名詞句）
+        for token in doc:
+            if token.dep_ == "nsubj" and token.head.dep_ == "ROOT":
+                subject_phrase = self._get_complete_noun_phrase(token)
+                print(f"  → spaCyから主語抽出: '{subject_phrase}' (token: {token.text})")
+                return subject_phrase
+        
+        print(f"  → 主語見つからず")
         return None
     
     def _extract_generic_verb(self, doc, hierarchy) -> Optional[str]:
@@ -2467,12 +2495,15 @@ class CompleteRephraseParsingEngine:
                     rel_pronoun = child.text
                     break
             
-            # 関係節全体を構築
+            # 関係節と先行詞を含む完全な名詞句を取得
+            complete_noun_phrase = self._get_complete_noun_phrase(head_noun)
+            
+            # 関係節部分のテキストも保持（デバッグ用）
             relcl_tokens = list(relcl_verb.subtree)
             relcl_text = ' '.join([t.text for t in relcl_tokens])
             
             return {
-                'phrase': f"{head_noun.text} {relcl_text}",
+                'phrase': complete_noun_phrase,
                 'head_noun': head_noun.text,
                 'relative_clause': relcl_text,
                 'relative_pronoun': rel_pronoun,
