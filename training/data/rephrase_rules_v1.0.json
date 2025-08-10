@@ -69,6 +69,19 @@
       ]
     },
     {
+      "id": "vocative-you-comma",
+      "priority": 20,
+      "trigger": {
+        "pattern": "(?i)^You\\s*,\\s*"
+      },
+      "assign": {
+        "slot": "M1",
+        "type": "word",
+        "capture": 0,
+        "note": "Vocative 'You,' in imperative sentences"
+      }
+    },
+    {
       "id": "wh-why-front",
       "priority": 5,
       "trigger": {

@@ -272,9 +272,16 @@ class CompleteRephraseParsingEngine:
                       reverse=True)
         
         applied_rules = []
+        blocked_rules = []  # ブロックされたルールのリスト
         
         for rule in rules:
             rule_id = rule.get('id', '')
+            
+            # 呼びかけルールが適用されている場合、主語ルールをブロック
+            if rule_id == 'subject-pronoun-np-front' and 'vocative-you-comma' in applied_rules:
+                blocked_rules.append(rule_id)
+                print(f"🚫 ルールブロック: {rule_id} (呼びかけルール優先)")
+                continue
             
             try:
                 # ルールの適用
@@ -288,6 +295,8 @@ class CompleteRephraseParsingEngine:
                 print(f"⚠️ ルール適用エラー {rule_id}: {e}")
         
         print(f"📊 適用されたルール数: {len(applied_rules)}/21")
+        if blocked_rules:
+            print(f"🚫 ブロックされたルール数: {len(blocked_rules)} → {blocked_rules}")
         
         # 汎用的な動詞検出（ルールで捕獲されなかった場合）
         if not slots['V']:
