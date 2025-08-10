@@ -53,6 +53,11 @@ class O1SubslotGenerator:
         subslots.update(o1o2_subslots)
         print(f"🔍 O1O2構造検出結果: {list(o1o2_subslots.keys())}")
         
+        # 第2優先：第5文型SVOC構造検出
+        svoc_subslots = self._detect_svoc_structure(doc)
+        subslots.update(svoc_subslots)
+        print(f"🔍 第5文型SVOC検出結果: {list(svoc_subslots.keys())}")
+        
         # 最初にnoun-verb phrase統合検出 (完全カバレッジの原則)
         # "students studying" のような名詞+動詞を統合してsub-vとして処理
         root_tokens = [token for token in doc if token.dep_ == "ROOT" and token.pos_ in ["NOUN", "PROPN"]]
@@ -120,7 +125,7 @@ class O1SubslotGenerator:
             subslots.update(self._extract_compound_subject_subslots(doc))
             print(f"🔍 複合主語処理後sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         
-        # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3） - O1O2構造保護版
+        # 位置ベース修飾語割り当て（sub-m1, sub-m2, sub-m3） - O1O2+SVOC構造保護版
         print(f"🔍 修飾語割り当て前sub-v: {subslots.get('sub-v', {}).get('text', 'なし')}")
         modifier_subslots = self._assign_modifiers_by_position_with_o1o2_protection(doc, subslots)
         subslots.update(modifier_subslots)
@@ -833,6 +838,70 @@ class O1SubslotGenerator:
                         'token_indices': o2_token_indices
                     }
                     print(f"✅ sub-o2(直接目的語)検出: '{o2_text}' (冠詞統合)")
+                
+                break
+        
+        return subslots
+    
+    def _detect_svoc_structure(self, doc):
+        """第5文型SVOC構造（主語+動詞+目的語+補語）検出"""
+        subslots = {}
+        
+        print(f"🔍 第5文型SVOC構造検出開始")
+        
+        # SVOC動詞（知覚動詞・使役動詞・認識動詞）
+        svoc_verbs = ["see", "saw", "watch", "hear", "feel", "make", "let", "have", 
+                     "find", "consider", "think", "believe", "keep", "leave"]
+        
+        for token in doc:
+            if token.pos_ == "VERB" and (token.lemma_ in svoc_verbs or token.text.lower() in svoc_verbs):
+                print(f"🔍 SVOC動詞検出: '{token.text}' (lemma: {token.lemma_})")
+                
+                # パターン1: ccomp（補文）構造 - "I found it interesting"
+                ccomp_children = [child for child in token.children if child.dep_ == "ccomp"]
+                if ccomp_children:
+                    ccomp_token = ccomp_children[0]
+                    # ccompの主語がSVOCの目的語
+                    ccomp_subjects = [child for child in ccomp_token.children if child.dep_ == "nsubj"]
+                    if ccomp_subjects and 'sub-o1' not in subslots:
+                        obj_token = ccomp_subjects[0]
+                        subslots['sub-o1'] = {
+                            'text': obj_token.text,
+                            'tokens': [obj_token.text],
+                            'token_indices': [obj_token.i]
+                        }
+                        print(f"✅ sub-o1(SVOC目的語)検出: '{obj_token.text}'")
+                    
+                    # ccomp自体が補語
+                    if 'sub-c1' not in subslots:
+                        subslots['sub-c1'] = {
+                            'text': ccomp_token.text,
+                            'tokens': [ccomp_token.text],
+                            'token_indices': [ccomp_token.i]
+                        }
+                        print(f"✅ sub-c1(SVOC補語)検出: '{ccomp_token.text}' (ccomp)")
+                
+                # パターン2: oprd（目的補語）構造 - "She kept the door open"  
+                oprd_children = [child for child in token.children if child.dep_ == "oprd"]
+                if oprd_children and 'sub-c1' not in subslots:
+                    oprd_token = oprd_children[0]
+                    subslots['sub-c1'] = {
+                        'text': oprd_token.text,
+                        'tokens': [oprd_token.text],
+                        'token_indices': [oprd_token.i]
+                    }
+                    print(f"✅ sub-c1(SVOC補語)検出: '{oprd_token.text}' (oprd)")
+                
+                # パターン3: xcomp（infinitive補文）構造 - "I saw her cry"
+                xcomp_children = [child for child in token.children if child.dep_ == "xcomp"]
+                if xcomp_children and 'sub-c1' not in subslots:
+                    xcomp_token = xcomp_children[0]
+                    subslots['sub-c1'] = {
+                        'text': xcomp_token.text,
+                        'tokens': [xcomp_token.text],
+                        'token_indices': [xcomp_token.i]
+                    }
+                    print(f"✅ sub-c1(SVOC補語)検出: '{xcomp_token.text}' (xcomp)")
                 
                 break
         

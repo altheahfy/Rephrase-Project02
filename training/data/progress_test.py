@@ -16,10 +16,15 @@ def main():
         ('which is on the table', 'clause'),
         ('what happened yesterday', 'clause'),
         # O1O2構造テスト用追加
-        ('give him a book', 'phrase'),  # sub-o2: him, sub-o1: a book
-        ('giving him a book', 'phrase'),  # sub-o2: him, sub-o1: a book
-        ('send her the letter', 'phrase'),  # sub-o2: her, sub-o1: the letter
-        ('becoming very tired', 'phrase'),  # sub-c1: tired
+        ('give him a book', 'phrase'),  # sub-o1: him, sub-o2: a book
+        ('giving him a book', 'phrase'),  # sub-o1: him, sub-o2: a book
+        ('send her the letter', 'phrase'),  # sub-o1: her, sub-o2: the letter
+        ('becoming very tired', 'phrase'),  # sub-c2: tired
+        # 第5文型SVOC構造テスト用追加
+        ('I saw her cry', 'phrase'),  # sub-s: I, sub-v: saw, sub-o1: her, sub-c1: cry
+        ('I found it interesting', 'phrase'),  # sub-s: I, sub-v: found, sub-o1: it, sub-c1: interesting
+        ('They made him happy', 'phrase'),  # sub-s: They, sub-v: made, sub-o1: him, sub-c1: happy
+        ('She kept the door open', 'phrase'),  # sub-s: She, sub-v: kept, sub-o1: the door, sub-c1: open
     ]
     
     print('=== 現在の完全性テスト結果 ===\n')
