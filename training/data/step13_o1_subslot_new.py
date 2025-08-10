@@ -77,16 +77,82 @@ class O1SubslotGenerator:
         if and_tokens:
             subslots.update(self._extract_compound_subject_subslots(doc))
         
-        # advmod（副詞修飾語）をsub-m2として最後に追加
+        # advmod（副詞修飾語）と前置詞句をsub-m2として処理
         advmod_tokens = [token for token in doc if token.dep_ == "advmod"]
-        if advmod_tokens:
-            advmod_text = ' '.join([token.text for token in advmod_tokens])
+        dative_prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"]]
+        
+        # advmod + 前置詞句を統合してsub-m2として処理
+        m2_tokens = []
+        m2_tokens.extend(advmod_tokens)
+        
+        for prep_token in dative_prep_tokens:
+            prep_phrase_tokens = [prep_token]
+            for child in prep_token.children:
+                if child.dep_ == "pobj":
+                    prep_phrase_tokens.append(child)
+            m2_tokens.extend(prep_phrase_tokens)
+        
+        if m2_tokens:
+            m2_text = ' '.join([token.text for token in m2_tokens])
             subslots['sub-m2'] = {
-                'text': advmod_text,
-                'tokens': [token.text for token in advmod_tokens],
-                'token_indices': [token.i for token in advmod_tokens]
+                'text': m2_text,
+                'tokens': [token.text for token in m2_tokens],
+                'token_indices': [token.i for token in m2_tokens]
             }
-            print(f"✅ sub-m2として処理: '{advmod_text}'")
+            print(f"✅ sub-m2として処理: '{m2_text}'")
+        
+        # sub-aux: 助動詞検出 (aux, auxpass)
+        aux_tokens = [token for token in doc if token.dep_ in ["aux", "auxpass"]]
+        if aux_tokens:
+            aux_text = ' '.join([token.text for token in aux_tokens])
+            subslots['sub-aux'] = {
+                'text': aux_text,
+                'tokens': [token.text for token in aux_tokens],
+                'token_indices': [token.i for token in aux_tokens]
+            }
+            print(f"✅ sub-auxとして処理: '{aux_text}'")
+        
+        # sub-c2: 補語2検出 (xcomp, acomp, attr, ccomp)
+        comp_tokens = [token for token in doc if token.dep_ in ["xcomp", "acomp", "attr", "ccomp"]]
+        if comp_tokens:
+            comp_text = ' '.join([token.text for token in comp_tokens])
+            subslots['sub-c2'] = {
+                'text': comp_text,
+                'tokens': [token.text for token in comp_tokens],
+                'token_indices': [token.i for token in comp_tokens]
+            }
+            print(f"✅ sub-c2として処理: '{comp_text}'")
+        
+        # sub-o1追加検出: nsubjが補語構造内にある場合
+        nsubj_tokens = [token for token in doc if token.dep_ == "nsubj" and token.head.dep_ in ["ccomp", "xcomp"]]
+        if nsubj_tokens and 'sub-o1' not in subslots:
+            nsubj_text = ' '.join([token.text for token in nsubj_tokens])
+            subslots['sub-o1'] = {
+                'text': nsubj_text,
+                'tokens': [token.text for token in nsubj_tokens],
+                'token_indices': [token.i for token in nsubj_tokens]
+            }
+            print(f"✅ sub-o1として処理: '{nsubj_text}' (補語構造内主語)")
+        
+        # sub-m3: 前置詞句検出 (prep, dative)
+        prep_tokens = [token for token in doc if token.dep_ in ["prep", "dative"]]
+        for prep_token in prep_tokens:
+            # 前置詞句全体（前置詞+目的語）を取得
+            prep_phrase_tokens = [prep_token]
+            for child in prep_token.children:
+                if child.dep_ == "pobj":
+                    prep_phrase_tokens.append(child)
+            
+            if len(prep_phrase_tokens) > 1:  # 前置詞+目的語がある場合のみ
+                prep_phrase_text = ' '.join([t.text for t in prep_phrase_tokens])
+                if 'sub-m3' not in subslots:
+                    subslots['sub-m3'] = {
+                        'text': prep_phrase_text,
+                        'tokens': [t.text for t in prep_phrase_tokens],
+                        'token_indices': [t.i for t in prep_phrase_tokens]
+                    }
+                    print(f"✅ sub-m3として処理: '{prep_phrase_text}'")
+                    break  # 最初の前置詞句のみ処理
         
         # TODO: 完全な10個サブスロット検出を実装予定
         # complete_subslots = self._detect_all_subslots(doc)
@@ -108,6 +174,17 @@ class O1SubslotGenerator:
                 'token_indices': [token.i for token in advmod_tokens]
             }
             print(f"✅ sub-m2として処理: '{advmod_text}'")
+        
+        # sub-aux: 助動詞検出
+        aux_tokens = [token for token in doc if token.dep_ == "aux"]
+        if aux_tokens:
+            aux_text = ' '.join([token.text for token in aux_tokens])
+            subslots['sub-aux'] = {
+                'text': aux_text,
+                'tokens': [token.text for token in aux_tokens],
+                'token_indices': [token.i for token in aux_tokens]
+            }
+            print(f"✅ sub-auxとして処理: '{aux_text}'")
         
         # まず同格that節を優先チェック
         that_token = None
@@ -480,10 +557,10 @@ def test_o1_subslots():
         ("reading books", "phrase"),  # V構造
         ("the fact that he left", "clause"),
         ("what you said", "clause"),
-        # 10個サブスロット検出テスト用の複雑なケース
-        ("the big red car that must have been made very carefully", "clause"),  # 複数要素
-        ("making her crazy for him", "phrase"),  # C2テスト (crazyが補語)
-        ("a very important decision", "phrase"),  # M1テスト (very, important)
+        # 部分カバレッジのケース整備用
+        ("the big red car that must have been made very carefully", "clause"),  # 複雑なclause
+        ("making her crazy for him", "phrase"),  # C2, O1/O2, M3テスト
+        ("a very important decision", "word"),  # ✅ 修正: wordタイプ（動詞なし）
     ]
     
     print("=== O1サブスロット生成テスト ===\n")
