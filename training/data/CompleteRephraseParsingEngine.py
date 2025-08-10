@@ -37,6 +37,10 @@ class CompleteRephraseParsingEngine:
         self.rule_priority_map = {}
         self._build_rule_priority_map()
         
+        # 🚀 フェーズ拡張統計データ初期化
+        self.phase1_stats = {}
+        self.phase2_stats = {}
+        
     def load_rules(self):
         """Rephraseルール辞書の完全読み込み"""
         rules_file = os.path.join(os.path.dirname(__file__), 'rephrase_rules_v1.0.json')
@@ -88,23 +92,41 @@ class CompleteRephraseParsingEngine:
             # Step 3.5: 🚀 フェーズ1 spaCy完全対応拡張機能適用
             rephrase_slots = self._apply_phase1_enhancements(doc, rephrase_slots)
             
+            # Step 3.6: 🚀 フェーズ2 文構造拡張機能適用（80%カバレッジ達成）
+            rephrase_slots = self._apply_phase2_enhancements(doc, rephrase_slots)
+            
             # Step 4: Sub-slot構造の生成
             sub_structures = self._generate_subslot_structures(doc, sentence_hierarchy)
             
             # Step 5: 文型判定（第1〜5文型）
             sentence_pattern = self._determine_sentence_pattern(rephrase_slots, sub_structures)
             
+            # 🎯 フェーズ1&2統合データ統計
+            enhanced_data = {}
+            
+            # フェーズ1統計
+            if hasattr(self, 'phase1_stats'):
+                enhanced_data.update(self.phase1_stats)
+            
+            # フェーズ2統計
+            if hasattr(self, 'phase2_stats'):
+                enhanced_data.update(self.phase2_stats)
+            
             return {
+                'rephrase_slots': rephrase_slots,
                 'slots': rephrase_slots,
                 'main_slots': rephrase_slots,
                 'sub_structures': sub_structures,
                 'sentence_pattern': sentence_pattern,
                 'sentence_type': sentence_pattern,
+                'enhanced_data': enhanced_data,
                 'metadata': {
                     'engine': self.engine_name,
                     'rules_applied': len([r for r in rephrase_slots.values() if r]),
                     'complexity_score': self._calculate_complexity(sentence_hierarchy),
-                    'phase1_enhanced': True
+                    'phase1_enhanced': True,
+                    'phase2_enhanced': True,
+                    'coverage_features': len(enhanced_data)
                 }
             }
             
@@ -1962,6 +1984,301 @@ class CompleteRephraseParsingEngine:
             phrase = nummod['phrase']
             if phrase and phrase not in all_existing_values:
                 slots['M1'].append(phrase)
+        
+        return slots
+    
+    # ============================================================================
+    # フェーズ2: 文構造拡張機能 (nmod, xcomp, ccomp, auxpass, agent, pcomp, dative)
+    # ============================================================================
+    
+    def _extract_nmod_phrase(self, token) -> str:
+        """名詞修飾関係の完全抽出 (nmod依存関係)"""
+        nmod_parts = [token]
+        
+        # nmod修飾語を収集
+        for child in token.children:
+            if child.dep_ == 'nmod':
+                nmod_parts.append(child)
+                # 前置詞も含める
+                for grandchild in child.children:
+                    if grandchild.dep_ == 'case':
+                        nmod_parts.append(grandchild)
+        
+        # 語順でソート
+        nmod_parts.sort(key=lambda x: x.i)
+        return ' '.join([part.text for part in nmod_parts])
+    
+    def _extract_xcomp_clause(self, token) -> str:
+        """オープン節補語の完全抽出 (xcomp依存関係)"""
+        xcomp_parts = []
+        
+        # xcomp節を検索
+        for child in token.children:
+            if child.dep_ == 'xcomp':
+                clause_tokens = [child]
+                # xcomp節の全ての子要素を収集
+                for grandchild in child.subtree:
+                    if grandchild != child:
+                        clause_tokens.append(grandchild)
+                
+                # 語順でソート
+                clause_tokens.sort(key=lambda x: x.i)
+                # to不定詞マーカーも追加
+                if any(t.text.lower() == 'to' and t.dep_ == 'aux' for t in clause_tokens):
+                    return 'to ' + ' '.join([t.text for t in clause_tokens if t.text.lower() != 'to'])
+                else:
+                    return ' '.join([t.text for t in clause_tokens])
+        
+        return token.text
+    
+    def _extract_ccomp_clause(self, token) -> str:
+        """節補語の完全抽出 (ccomp依存関係)"""
+        ccomp_parts = []
+        
+        # ccomp節を検索
+        for child in token.children:
+            if child.dep_ == 'ccomp':
+                clause_tokens = list(child.subtree)
+                # 語順でソート
+                clause_tokens.sort(key=lambda x: x.i)
+                # that補完詞も含める
+                complementizer = None
+                for sibling in token.children:
+                    if sibling.dep_ == 'mark' and sibling.text.lower() == 'that':
+                        complementizer = sibling
+                        break
+                
+                if complementizer:
+                    return f"that {' '.join([t.text for t in clause_tokens])}"
+                else:
+                    return ' '.join([t.text for t in clause_tokens])
+        
+        return token.text
+    
+    def _extract_auxpass_auxiliary(self, token) -> str:
+        """受動態助動詞の抽出 (auxpass依存関係)"""
+        auxpass_tokens = []
+        
+        # 受動態助動詞を検索
+        for child in token.children:
+            if child.dep_ == 'auxpass':
+                auxpass_tokens.append(child)
+        
+        # 語順でソート
+        auxpass_tokens.sort(key=lambda x: x.i)
+        if auxpass_tokens:
+            return ' '.join([aux.text for aux in auxpass_tokens])
+        
+        return token.text
+    
+    def _extract_agent_phrase(self, token) -> str:
+        """受動態の動作主抽出 (agent依存関係)"""
+        agent_parts = []
+        
+        # agent句を検索
+        for child in token.children:
+            if child.dep_ == 'agent':
+                # 前置詞byを含める
+                prep_tokens = []
+                for grandchild in child.children:
+                    if grandchild.dep_ == 'case' and grandchild.text.lower() == 'by':
+                        prep_tokens.append(grandchild)
+                
+                agent_phrase = list(child.subtree)
+                agent_phrase.sort(key=lambda x: x.i)
+                
+                if prep_tokens:
+                    return f"by {' '.join([t.text for t in agent_phrase])}"
+                else:
+                    return ' '.join([t.text for t in agent_phrase])
+        
+        return token.text
+    
+    def _extract_pcomp_complement(self, token) -> str:
+        """前置詞補語の抽出 (pcomp依存関係)"""
+        pcomp_parts = []
+        
+        # pcomp補語を検索
+        for child in token.children:
+            if child.dep_ == 'pcomp':
+                comp_tokens = list(child.subtree)
+                comp_tokens.sort(key=lambda x: x.i)
+                return ' '.join([t.text for t in comp_tokens])
+        
+        return token.text
+    
+    def _extract_dative_object(self, token) -> str:
+        """与格・間接目的語の抽出 (dative依存関係)"""
+        dative_parts = []
+        
+        # 与格目的語を検索
+        for child in token.children:
+            if child.dep_ == 'dative':
+                dative_phrase = self._get_complete_noun_phrase(child)
+                return dative_phrase
+        
+        return token.text
+    
+    def _detect_nmod_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """nmod依存関係の検出"""
+        nmods = []
+        for token in doc:
+            if token.dep_ == 'nmod':
+                nmods.append({
+                    'modified_noun': token.head,
+                    'modifier': token,
+                    'phrase': self._extract_nmod_phrase(token.head)
+                })
+        return nmods
+    
+    def _detect_xcomp_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """xcomp依存関係の検出"""
+        xcomps = []
+        for token in doc:
+            if token.dep_ == 'xcomp':
+                xcomps.append({
+                    'governing_verb': token.head,
+                    'xcomp_clause': token,
+                    'phrase': self._extract_xcomp_clause(token.head)
+                })
+        return xcomps
+    
+    def _detect_ccomp_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """ccomp依存関係の検出"""
+        ccomps = []
+        for token in doc:
+            if token.dep_ == 'ccomp':
+                ccomps.append({
+                    'governing_verb': token.head,
+                    'ccomp_clause': token,
+                    'phrase': self._extract_ccomp_clause(token.head)
+                })
+        return ccomps
+    
+    def _detect_auxpass_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """auxpass依存関係の検出"""
+        auxpasses = []
+        for token in doc:
+            if token.dep_ == 'auxpass':
+                auxpasses.append({
+                    'main_verb': token.head,
+                    'auxiliary': token,
+                    'phrase': self._extract_auxpass_auxiliary(token.head)
+                })
+        return auxpasses
+    
+    def _detect_agent_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """agent依存関係の検出"""
+        agents = []
+        for token in doc:
+            if token.dep_ == 'agent':
+                agents.append({
+                    'passive_verb': token.head,
+                    'agent_phrase': token,
+                    'phrase': self._extract_agent_phrase(token.head)
+                })
+        return agents
+    
+    def _detect_pcomp_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """pcomp依存関係の検出"""
+        pcomps = []
+        for token in doc:
+            if token.dep_ == 'pcomp':
+                pcomps.append({
+                    'preposition': token.head,
+                    'complement': token,
+                    'phrase': self._extract_pcomp_complement(token.head)
+                })
+        return pcomps
+    
+    def _detect_dative_dependencies(self, doc) -> List[Dict[str, Any]]:
+        """dative依存関係の検出"""
+        datives = []
+        for token in doc:
+            if token.dep_ == 'dative':
+                datives.append({
+                    'governing_verb': token.head,
+                    'dative_object': token,
+                    'phrase': self._extract_dative_object(token.head)
+                })
+        return datives
+    
+    def _apply_phase2_enhancements(self, doc, slots: Dict[str, List]) -> Dict[str, List]:
+        """フェーズ2拡張機能の適用"""
+        
+        # 既存スロットの値を取得
+        def get_slot_values(slot_list):
+            values = []
+            for item in slot_list:
+                if isinstance(item, dict) and 'value' in item:
+                    values.append(item['value'])
+                elif isinstance(item, str):
+                    values.append(item)
+            return values
+        
+        all_existing_values = []
+        for slot_name, slot_items in slots.items():
+            all_existing_values.extend(get_slot_values(slot_items))
+        
+        # 1. 名詞修飾処理 (nmod)
+        nmods = self._detect_nmod_dependencies(doc)
+        for nmod in nmods:
+            phrase = nmod['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M1'].append(phrase)
+        
+        # 2. オープン節補語処理 (xcomp)
+        xcomps = self._detect_xcomp_dependencies(doc)
+        for xcomp in xcomps:
+            phrase = xcomp['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['O2'].append(phrase)
+        
+        # 3. 節補語処理 (ccomp)
+        ccomps = self._detect_ccomp_dependencies(doc)
+        for ccomp in ccomps:
+            phrase = ccomp['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['O2'].append(phrase)
+        
+        # 4. 受動態助動詞処理 (auxpass)
+        auxpasses = self._detect_auxpass_dependencies(doc)
+        for auxpass in auxpasses:
+            phrase = auxpass['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['Aux'].append(phrase)
+        
+        # 5. 受動態動作主処理 (agent)
+        agents = self._detect_agent_dependencies(doc)
+        for agent in agents:
+            phrase = agent['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M3'].append(phrase)
+        
+        # 6. 前置詞補語処理 (pcomp)
+        pcomps = self._detect_pcomp_dependencies(doc)
+        for pcomp in pcomps:
+            phrase = pcomp['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['M2'].append(phrase)
+        
+        # 7. 与格処理 (dative)
+        datives = self._detect_dative_dependencies(doc)
+        for dative in datives:
+            phrase = dative['phrase']
+            if phrase and phrase not in all_existing_values:
+                slots['O2'].append(phrase)
+        
+        # 🎯 フェーズ2統計更新
+        self.phase2_stats = {
+            'nmod_phrases': [nmod['phrase'] for nmod in nmods if nmod['phrase']],
+            'xcomp_clauses': [xcomp['phrase'] for xcomp in xcomps if xcomp['phrase']],
+            'ccomp_clauses': [ccomp['phrase'] for ccomp in ccomps if ccomp['phrase']],
+            'auxpass_auxiliaries': [auxpass['phrase'] for auxpass in auxpasses if auxpass['phrase']],
+            'agent_phrases': [agent['phrase'] for agent in agents if agent['phrase']],
+            'pcomp_complements': [pcomp['phrase'] for pcomp in pcomps if pcomp['phrase']],
+            'dative_objects': [dative['phrase'] for dative in datives if dative['phrase']]
+        }
         
         return slots
         
