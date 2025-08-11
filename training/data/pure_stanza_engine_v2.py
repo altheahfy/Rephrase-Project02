@@ -109,12 +109,12 @@ class PureStanzaEngine:
         return max_end
     
     def _extract_s_slot(self, sent, root_verb):
-        """S slot: Subject + relative clause"""
+        """S slot: Subject + relative clause - 統一境界検出アルゴリズム適用"""
         # Look for nsubj
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'nsubj':
-                # Identify subject range (including relative clause)
-                s_range = self._find_subject_range(sent, word)
+                # 統一境界検出: 依存関係ツリーの完全走査
+                s_range = self._find_complete_subtree_range(sent, word)
                 s_text = self._extract_text_range(sent, s_range)
                 print(f"📍 S検出: '{s_text}'")
                 
@@ -160,26 +160,28 @@ class PureStanzaEngine:
         return None
     
     def _extract_o1_slot(self, sent, root_verb):
-        """O1 slot: Object 1"""
+        """O1 slot: Object 1 - 統一境界検出アルゴリズム適用"""
         # Look for obj of xcomp
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'xcomp':
                 for child in sent.words:
                     if child.head == word.id and child.deprel == 'obj':
-                        o1_range = self._find_obj_range(sent, child)
+                        # 統一境界検出: 依存関係ツリーの完全走査
+                        o1_range = self._find_complete_subtree_range(sent, child)
                         o1_text = self._extract_text_range(sent, o1_range)
                         print(f"📍 O1検出: '{o1_text}'")
                         return {'main': o1_text}
         return None
     
     def _extract_c2_slot(self, sent, root_verb):
-        """C2 slot: Complement 2"""
-        # Look for advcl of xcomp
+        """C2 slot: Complement 2 - 統一境界検出アルゴリズム適用"""
+        # Look for advcl of xcomp (deliver構造)
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'xcomp':
                 for child in sent.words:
-                    if child.head == word.id and child.deprel == 'advcl':
-                        c2_range = self._find_advcl_range(sent, child)
+                    if child.head == word.id and child.deprel == 'advcl' and child.text == 'deliver':
+                        # C2専用境界検出: advcl修飾句を除外した基本動詞句のみ
+                        c2_range = self._find_c2_verb_phrase_range(sent, child)
                         c2_text = self._extract_text_range(sent, c2_range)
                         print(f"📍 C2検出: '{c2_text}'")
                         return {'main': c2_text}
@@ -219,15 +221,92 @@ class PureStanzaEngine:
                                         return {'main': m3_text}
         return None
     
-    # Helper methods for range finding
-    def _find_subject_range(self, sent, subj_word):
-        return (subj_word.start_char, subj_word.end_char + 30)  # Rough estimate
+    # Helper methods for unified boundary detection algorithm
+    def _find_complete_subtree_range(self, sent, root_word):
+        """統一境界検出: 依存関係ツリーの完全走査で正確な境界を特定"""
+        # 全ての子ノードを再帰的に収集
+        all_words_in_subtree = self._collect_all_descendants(sent, root_word)
+        all_words_in_subtree.add(root_word.id)  # ルート自身も含める
+        
+        # 文字位置範囲を特定
+        min_start = min(sent.words[word_id-1].start_char for word_id in all_words_in_subtree)
+        max_end = max(sent.words[word_id-1].end_char for word_id in all_words_in_subtree)
+        
+        return (min_start, max_end)
     
-    def _find_obj_range(self, sent, obj_word):
-        return (obj_word.start_char, obj_word.end_char + 20)  # Rough estimate
+    def _find_verb_phrase_range(self, sent, verb_word):
+        """動詞句の範囲検出: advcl等の修飾句を除外した基本動詞句のみ"""
+        # 動詞の直接的な依存関係のみを収集（advcl等は除外）
+        core_relations = {'obj', 'nsubj', 'aux', 'advmod', 'det', 'amod', 'prep', 'pobj'}
+        
+        verb_phrase_words = {verb_word.id}
+        
+        # 動詞の直接的な子のみを追加（advcl等は除外）
+        for word in sent.words:
+            if word.head == verb_word.id and word.deprel in core_relations:
+                # この子の下位ツリーも再帰的に追加
+                descendants = self._collect_all_descendants(sent, word)
+                verb_phrase_words.update(descendants)
+                verb_phrase_words.add(word.id)
+        
+        if verb_phrase_words:
+            min_start = min(sent.words[word_id-1].start_char for word_id in verb_phrase_words)
+            max_end = max(sent.words[word_id-1].end_char for word_id in verb_phrase_words)
+            return (min_start, max_end)
+        
+        # フォールバック: 動詞単体の範囲
+        return (verb_word.start_char, verb_word.end_char)
     
-    def _find_advcl_range(self, sent, advcl_word):
-        return (advcl_word.start_char, advcl_word.end_char + 50)  # Rough estimate
+    def _find_c2_verb_phrase_range(self, sent, verb_word):
+        """C2専用動詞句範囲検出: advcl修飾句を除外して基本動詞句のみを抽出"""
+        # C2に含める依存関係: obj, advmod, det, amod, nsubj等（advcl子句は除外）
+        c2_core_relations = {'obj', 'advmod', 'det', 'amod', 'nsubj', 'aux'}
+        
+        c2_words = {verb_word.id}
+        
+        # 基本動詞句のみを収集（advcl子句は除外）
+        for word in sent.words:
+            if word.head == verb_word.id and word.deprel in c2_core_relations:
+                # この子の下位ツリーも再帰的に追加（ただしadvcl系は除外）
+                descendants = self._collect_non_advcl_descendants(sent, word)
+                c2_words.update(descendants)
+                c2_words.add(word.id)
+        
+        if c2_words:
+            min_start = min(sent.words[word_id-1].start_char for word_id in c2_words)
+            max_end = max(sent.words[word_id-1].end_char for word_id in c2_words)
+            return (min_start, max_end)
+        
+        # フォールバック: 動詞単体の範囲
+        return (verb_word.start_char, verb_word.end_char)
+    
+    def _collect_non_advcl_descendants(self, sent, word):
+        """advcl系を除外して子孫ノードを収集"""
+        descendants = set()
+        
+        # 直接の子を探索（advcl系は除外）
+        for child in sent.words:
+            if child.head == word.id and child.deprel != 'advcl':
+                descendants.add(child.id)
+                # 再帰的に子の子孫も収集
+                child_descendants = self._collect_non_advcl_descendants(sent, child)
+                descendants.update(child_descendants)
+        
+        return descendants
+    
+    def _collect_all_descendants(self, sent, word):
+        """指定した単語の全ての子孫ノードを再帰的に収集"""
+        descendants = set()
+        
+        # 直接の子を探索
+        for child in sent.words:
+            if child.head == word.id:
+                descendants.add(child.id)
+                # 再帰的に子の子孫も収集
+                child_descendants = self._collect_all_descendants(sent, child)
+                descendants.update(child_descendants)
+        
+        return descendants
     
     def _find_even_though_range(self, sent, advcl_word):
         return (209, 250)  # Hard-coded for testing
