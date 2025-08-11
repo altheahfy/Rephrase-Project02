@@ -104,14 +104,17 @@ results = [process_clause(clause) for clause in all_clauses]  # 再帰処理
 
 #### サブスロット詳細分解例
 ```
-S: 'The experienced manager'
-├── main: 'The experienced manager'    # メインスロット
+S: （サブスロット分解により上位スロットは空）
 ├── sub-M1: 'The'                      # 限定詞
 ├── sub-M3: 'experienced'              # 形容詞修飾
-└── sub-S: 'The experienced manager'   # 主語コア
+└── sub-S: 'manager'                   # 主語コア（重複なし）
 
 総スロット数: 16/90 （拡張可能な基盤確立）
 ```
+
+**🎯 重要なRephrase仕様**:
+- phrase/clauseがサブスロットに分解された場合、**上位スロット（main）は空になる**
+- サブスロットのみが内容を持つ（重複を避ける設計）
 
 ---
 
@@ -119,22 +122,29 @@ S: 'The experienced manager'
 
 ### 3.1 Phase 5: 品質最適化 🎯 次期実装目標
 
-#### 3.1.1 サブスロット重複解消
+#### 3.1.1 上位スロット空化ルール実装
 ```python
-# 現在の課題例
+# 現在の仕様違反
 S: {
-    'main': 'The experienced manager',
-    'sub-S': 'The experienced manager'  # ← 重複問題
-}
-
-# 改善目標
-S: {
-    'main': 'The experienced manager',
+    'main': 'The experienced manager',     # ← 仕様違反！
     'sub-M1': 'The',
     'sub-M3': 'experienced', 
-    'sub-S': 'manager'  # ← コア部分のみ
+    'sub-S': 'manager'
+}
+
+# 正しいRephrase仕様
+S: {
+    # mainは空（サブスロットに分解されたため）
+    'sub-M1': 'The',
+    'sub-M3': 'experienced', 
+    'sub-S': 'manager'  # ← コア部分のみ、重複なし
 }
 ```
+
+**🔑 Rephraseの核心仕様**:
+- **サブスロット分解時は上位スロット空化**: phrase/clauseがサブスロットに分解された場合、上位スロット（main）は空になる
+- **情報重複の完全排除**: 同じ内容が複数箇所に出現することを防ぐ
+- **学習効率の最適化**: 学習者が同じ情報を重複して見ることを避ける
 
 #### 3.1.2 90スロット完全到達最適化
 - **目標**: 複雑文で90スロット満載文の処理
@@ -353,9 +363,9 @@ class ComprehensiveTestSuite:
 ## 10. 成功指標・KPI
 
 ### Phase 5完了指標
-- [ ] サブスロット重複率: 0%
-- [ ] 90スロット到達文での完全処理: 100%
-- [ ] 境界検出精度: 95%以上
+- [ ] 上位スロット空化率: 100%（サブスロット分解時）
+- [ ] 情報重複率: 0%（同内容の複数出現なし）
+- [ ] Rephrase仕様準拠率: 100%
 
 ### Phase 6完了指標  
 - [ ] 平均処理時間: 1秒以内（標準複文）

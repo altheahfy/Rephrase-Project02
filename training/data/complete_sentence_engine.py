@@ -122,12 +122,15 @@ class SubslotStructureProcessor:
                 
                 # サブスロット分解実行
                 subslots = self._extract_subslots_for_main_slot(slot_text, slot_name, spacy_doc)
-                complete_slots[slot_name] = {
-                    'main': slot_text,
-                    **subslots  # サブスロットを統合
-                }
                 
-                print(f"  📊 {slot_name}: {len(subslots)}個のサブスロット")
+                if subslots:
+                    # 🎯 Rephrase仕様: サブスロットが存在する場合、mainは空にする
+                    complete_slots[slot_name] = subslots
+                    print(f"  📊 {slot_name}: {len(subslots)}個のサブスロット（main空化）")
+                else:
+                    # サブスロットがない場合のみmainを保持
+                    complete_slots[slot_name] = {'main': slot_text}
+                    print(f"  📊 {slot_name}: サブスロットなし（main保持）")
                 for sub_name, sub_text in subslots.items():
                     print(f"    {sub_name}: '{sub_text}'")
             else:
