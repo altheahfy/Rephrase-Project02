@@ -1,9 +1,19 @@
 """
 Pure Stanza Engine - Stanzaネイティブな基本構造
 Stanzaの依存関係をそのまま活用したシンプルな分解エンジン
-"""
-
-import stanza
+"    def _extract_m1_slot(self, sent, root_verb):
+        """M1スロット: 文頭修飾句"""
+        # obl:unmarkedを探す
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel == 'obl:unmarked':
+                # obl:unmarkedに直接関連する範囲を特定
+                # "afternoon"の依存関係ツリー全体の終端位置を探す
+                m1_end_char = self._find_obl_unmarked_end(sent, word)
+                if m1_end_char:
+                    m1_text = sent.text[:m1_end_char].strip().rstrip(',').strip()
+                    print(f"📍 M1検出: '{m1_text}'")
+                    return {'main': m1_text}
+        return Nonestanza
 
 class PureStanzaEngine:
     def __init__(self):
@@ -81,18 +91,29 @@ class PureStanzaEngine:
         # obl:unmarkedを探す
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'obl:unmarked':
-                # 文頭から主語開始まで
-                subject_start = None
-                for w in sent.words:
-                    if w.head == root_verb.id and w.deprel == 'nsubj':
-                        subject_start = w.start_char
-                        break
-                
-                if subject_start:
-                    m1_text = sent.text[:subject_start].strip().rstrip(',')
+                # obl:unmarkedに直接関連する範囲を特定
+                # "afternoon"の依存関係ツリー全体の終端位置を探す
+                m1_end_char = self._find_obl_unmarked_end(sent, word)
+                if m1_end_char:
+                    m1_text = sent.text[:m1_end_char].strip()
                     print(f"📍 M1検出: '{m1_text}'")
                     return {'main': m1_text}
         return None
+    
+    def _find_obl_unmarked_end(self, sent, obl_word):
+        """obl:unmarkedの終端文字位置を特定"""
+        # obl:unmarkedの子要素を再帰的に探索
+        max_end = obl_word.end_char
+        
+        def find_children_end(word_id):
+            nonlocal max_end
+            for w in sent.words:
+                if w.head == word_id:
+                    max_end = max(max_end, w.end_char)
+                    find_children_end(w.id)  # 再帰的に子要素を探索
+        
+        find_children_end(obl_word.id)
+        return max_end
     
     def _extract_s_slot(self, sent, root_verb):
         """Sスロット: 主語 + 関係節"""
