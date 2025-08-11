@@ -5,13 +5,26 @@ import os
 import sys
 import json
 import stanza
+import spacy
 
 class PureStanzaEngine:
     def __init__(self):
-        """Stanza native engine initialization"""
+        """Stanza + spaCy hybrid engine initialization"""
         print("🎯 PureStanzaEngine初期化中...")
+        
+        # Stanza pipeline for structural analysis
         self.nlp = stanza.Pipeline('en', verbose=False)
         print("✅ Stanza準備完了")
+        
+        # spaCy pipeline for boundary adjustment
+        try:
+            self.spacy_nlp = spacy.load("en_core_web_sm")
+            print("✅ spaCy準備完了")
+        except OSError:
+            print("⚠️ spaCy en_core_web_sm not found. Boundary adjustment disabled.")
+            self.spacy_nlp = None
+        
+        print("🏗️ Stanza+spaCyハイブリッドエンジン準備完了")
     
     def decompose(self, sentence):
         """Basic decomposition: Utilizing Stanza information directly"""
@@ -28,8 +41,13 @@ class PureStanzaEngine:
             
             print(f"📌 ROOT動詞: '{root_verb.text}'")
             
-            # Extract all slots directly from Stanza
+            # Layer 1: Extract all slots directly from Stanza
+            print("📐 Layer 1: Stanza構造分析...")
             slots = self._extract_all_slots_from_stanza(sent, root_verb)
+            
+            # Layer 2: Adjust boundaries with spaCy
+            print("🔧 Layer 2: spaCy境界調整...")
+            slots = self._adjust_boundaries_with_spacy(sentence, slots)
             
             # Print results
             self._print_slots(slots)
@@ -188,34 +206,34 @@ class PureStanzaEngine:
         return None
     
     def _extract_m2_slot(self, sent, root_verb):
-        """M2 slot: Modifying phrase 2"""
-        # Look for advcl starting with "even though"
+        """M2 slot: Modifying phrase 2 - 統一スロット抽出アルゴリズム適用"""
+        # M2: deliver -> advcl -> pressure (even though句、ただしM3子句は除外)
         for word in sent.words:
-            if word.head == root_verb.id and word.deprel == 'xcomp':
-                for child in sent.words:
-                    if child.head == word.id and child.deprel == 'advcl':
-                        # Check for "even though" mark
-                        for mark_word in sent.words:
-                            if mark_word.head == child.id and mark_word.deprel == 'mark' and mark_word.text.lower() in ['though', 'even']:
-                                m2_range = self._find_even_though_range(sent, child)
+            if word.head == root_verb.id and word.deprel == 'xcomp':  # make
+                for deliver_child in sent.words:
+                    if deliver_child.head == word.id and deliver_child.deprel == 'advcl' and deliver_child.text == 'deliver':  # deliver
+                        for pressure_child in sent.words:
+                            if pressure_child.head == deliver_child.id and pressure_child.deprel == 'advcl' and pressure_child.text == 'pressure':  # pressure
+                                # M2専用境界検出: advcl子句（M3）を除外した範囲を抽出
+                                m2_range = self._find_m2_phrase_range(sent, pressure_child)
                                 m2_text = self._extract_text_range(sent, m2_range)
                                 print(f"📍 M2検出: '{m2_text}'")
                                 return {'main': m2_text}
         return None
     
     def _extract_m3_slot(self, sent, root_verb):
-        """M3 slot: Modifying phrase 3"""
-        # Look for advcl starting with "so"
+        """M3 slot: Modifying phrase 3 - 統一スロット抽出アルゴリズム適用"""
+        # M3: deliver -> advcl -> pressure -> advcl -> reflect (so句)
         for word in sent.words:
-            if word.head == root_verb.id and word.deprel == 'xcomp':
-                for child in sent.words:
-                    if child.head == word.id and child.deprel == 'advcl':
-                        for nested_child in sent.words:
-                            if nested_child.head == child.id and nested_child.deprel == 'advcl':
-                                # Check for "so" mark
-                                for mark_word in sent.words:
-                                    if mark_word.head == nested_child.id and mark_word.deprel == 'mark' and mark_word.text.lower() == 'so':
-                                        m3_range = self._find_so_range(sent, nested_child)
+            if word.head == root_verb.id and word.deprel == 'xcomp':  # make
+                for deliver_child in sent.words:
+                    if deliver_child.head == word.id and deliver_child.deprel == 'advcl' and deliver_child.text == 'deliver':  # deliver
+                        for pressure_child in sent.words:
+                            if pressure_child.head == deliver_child.id and pressure_child.deprel == 'advcl' and pressure_child.text == 'pressure':  # pressure
+                                for reflect_child in sent.words:
+                                    if reflect_child.head == pressure_child.id and reflect_child.deprel == 'advcl' and reflect_child.text == 'reflect':  # reflect
+                                        # 統一境界検出: 完全なadvcl句を抽出
+                                        m3_range = self._find_complete_subtree_range(sent, reflect_child)
                                         m3_text = self._extract_text_range(sent, m3_range)
                                         print(f"📍 M3検出: '{m3_text}'")
                                         return {'main': m3_text}
@@ -280,19 +298,28 @@ class PureStanzaEngine:
         # フォールバック: 動詞単体の範囲
         return (verb_word.start_char, verb_word.end_char)
     
-    def _collect_non_advcl_descendants(self, sent, word):
-        """advcl系を除外して子孫ノードを収集"""
-        descendants = set()
+    def _find_m2_phrase_range(self, sent, pressure_word):
+        """M2専用境界検出: advcl子句（M3）を除外してM2句のみを抽出"""
+        # M2に含める依存関係: advcl以外のすべて
+        m2_core_relations = {'nsubj', 'cop', 'case', 'amod', 'advmod', 'mark', 'det'}
         
-        # 直接の子を探索（advcl系は除外）
-        for child in sent.words:
-            if child.head == word.id and child.deprel != 'advcl':
-                descendants.add(child.id)
-                # 再帰的に子の子孫も収集
-                child_descendants = self._collect_non_advcl_descendants(sent, child)
-                descendants.update(child_descendants)
+        m2_words = {pressure_word.id}
         
-        return descendants
+        # pressure子句のみを収集（advcl子句であるreflectは除外）
+        for word in sent.words:
+            if word.head == pressure_word.id and word.deprel in m2_core_relations:
+                # この子の下位ツリーも再帰的に追加（ただしadvcl系は除外）
+                descendants = self._collect_non_advcl_descendants(sent, word)
+                m2_words.update(descendants)
+                m2_words.add(word.id)
+        
+        if m2_words:
+            min_start = min(sent.words[word_id-1].start_char for word_id in m2_words)
+            max_end = max(sent.words[word_id-1].end_char for word_id in m2_words)
+            return (min_start, max_end)
+        
+        # フォールバック: pressure単体の範囲
+        return (pressure_word.start_char, pressure_word.end_char)
     
     def _collect_all_descendants(self, sent, word):
         """指定した単語の全ての子孫ノードを再帰的に収集"""
@@ -308,13 +335,22 @@ class PureStanzaEngine:
         
         return descendants
     
-    def _find_even_though_range(self, sent, advcl_word):
-        return (209, 250)  # Hard-coded for testing
-    
-    def _find_so_range(self, sent, advcl_word):
-        return (251, 300)  # Hard-coded for testing
+    def _collect_non_advcl_descendants(self, sent, word):
+        """advcl系を除外して子孫ノードを収集"""
+        descendants = set()
+        
+        # 直接の子を探索（advcl系は除外）
+        for child in sent.words:
+            if child.head == word.id and child.deprel != 'advcl':
+                descendants.add(child.id)
+                # 再帰的に子の子孫も収集
+                child_descendants = self._collect_non_advcl_descendants(sent, child)
+                descendants.update(child_descendants)
+        
+        return descendants
     
     def _extract_text_range(self, sent, range_tuple):
+        """文字範囲からテキストを抽出"""
         start, end = range_tuple
         return sent.text[start:end]
     
@@ -387,6 +423,95 @@ class PureStanzaEngine:
                     print(f"{slot_name}: {match} 正解='{correct_value}' 実際='{actual}'")
             else:
                 print(f"{slot_name}: ❌ 正解='{correct_value}' 実際='<なし>'")
+    
+    # === Layer 2: spaCy Boundary Adjustment Functions ===
+    
+    def _adjust_boundaries_with_spacy(self, sentence, slots):
+        """
+        Layer 2: Use spaCy for precise boundary adjustment
+        Takes Stanza-based slots and refines boundaries using spaCy
+        """
+        if not self.spacy_nlp:
+            print("⚠️ spaCy not available. Skipping boundary adjustment.")
+            return slots
+        
+        print("🔧 spaCy境界調整開始...")
+        
+        # Process sentence with spaCy
+        spacy_doc = self.spacy_nlp(sentence)
+        
+        # Adjust each slot boundary
+        adjusted_slots = {}
+        for slot_name, slot_data in slots.items():
+            adjusted_slots[slot_name] = self._adjust_slot_boundary(slot_data, spacy_doc, sentence)
+        
+        print("✅ spaCy境界調整完了")
+        return adjusted_slots
+    
+    def _adjust_slot_boundary(self, slot_data, spacy_doc, sentence):
+        """
+        Adjust individual slot boundary using spaCy information
+        """
+        if not slot_data or 'main' not in slot_data:
+            return slot_data
+        
+        main_text = slot_data['main']
+        if not main_text or main_text == '':
+            return slot_data
+        
+        # Find the text span in spaCy doc
+        start_char = sentence.find(main_text)
+        if start_char == -1:
+            return slot_data  # Text not found, return as is
+        
+        end_char = start_char + len(main_text)
+        
+        # Find corresponding spaCy tokens
+        spacy_span = spacy_doc.char_span(start_char, end_char, alignment_mode="expand")
+        if not spacy_span:
+            # Fallback: try exact boundaries
+            spacy_span = spacy_doc.char_span(start_char, end_char)
+            if not spacy_span:
+                return slot_data  # No corresponding span found
+        
+        # For precise slots (like M2, M3), don't expand boundaries
+        # Only clean up exact boundaries
+        adjusted_text = spacy_span.text.strip()
+        
+        # Update slot data
+        adjusted_slot_data = slot_data.copy()
+        adjusted_slot_data['main'] = adjusted_text
+        
+        if adjusted_text != main_text:
+            print(f"🔧 {main_text} → {adjusted_text}")
+        
+        return adjusted_slot_data
+    
+    def _expand_span_with_spacy(self, span, doc):
+        """
+        Expand span boundaries using spaCy POS and dependency information
+        Based on Step18 _expand_span() logic but using spaCy
+        """
+        start_i = span.start
+        end_i = span.end
+        
+        # Expand left: Include preceding determiners, adjectives
+        while start_i > 0:
+            prev_token = doc[start_i - 1]
+            if prev_token.pos_ in ['DET', 'ADJ', 'ADV'] and prev_token.dep_ in ['det', 'amod', 'advmod']:
+                start_i -= 1
+            else:
+                break
+        
+        # Expand right: Include trailing prepositions, particles
+        while end_i < len(doc):
+            next_token = doc[end_i]
+            if next_token.pos_ in ['ADP', 'PART'] and next_token.dep_ in ['prep', 'prt']:
+                end_i += 1
+            else:
+                break
+        
+        return doc[start_i:end_i]
 
 
 def test_example007():
