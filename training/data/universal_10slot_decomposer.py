@@ -57,12 +57,10 @@ class Universal10SlotDecomposer:
         # 統一10スロット抽出
         slots = {}
         
-        # 10スロット定義（統一処理）
-        slot_extractors = {
+        # スロット分類（正しいRephrase仕様）
+        subslot_capable_slots = {
             'M1': self._extract_m1,
-            'S': self._extract_s, 
-            'Aux': self._extract_aux,
-            'V': self._extract_v,
+            'S': self._extract_s,
             'O1': self._extract_o1,
             'O2': self._extract_o2,
             'C1': self._extract_c1,
@@ -71,7 +69,13 @@ class Universal10SlotDecomposer:
             'M3': self._extract_m3
         }
         
-        for slot_name, extractor in slot_extractors.items():
+        word_only_slots = {
+            'Aux': self._extract_aux,
+            'V': self._extract_v
+        }
+        
+        # サブスロット対応スロット処理（8スロット統一ロジック）
+        for slot_name, extractor in subslot_capable_slots.items():
             content, phrase_type = extractor(doc, root)
             
             if content and phrase_type:
@@ -91,6 +95,14 @@ class Universal10SlotDecomposer:
                     # 単語レベル - 上位スロット保持
                     slots[slot_name] = {slot_name.lower(): content}
                     print(f"{indent}✅ {slot_name}: 単語保持 '{content}'")
+        
+        # 単語専用スロット処理（Aux, Vのみ）
+        for slot_name, extractor in word_only_slots.items():
+            content = extractor(doc, root)
+            
+            if content:
+                slots[slot_name] = {slot_name.lower(): content}
+                print(f"{indent}✅ {slot_name}: 単語専用 '{content}'")
         
         print(f"{indent}📋 統一分解完了: {len(slots)}スロット")
         return slots
@@ -121,16 +133,16 @@ class Universal10SlotDecomposer:
                     return span, 'word' if len(span.split()) <= 2 else 'phrase'
         return "", ""
     
-    def _extract_aux(self, doc, root) -> Tuple[str, str]:
-        """Aux: 助動詞抽出"""
+    def _extract_aux(self, doc, root) -> str:
+        """Aux: 助動詞抽出（単語専用）"""
         for child in root.children:
             if child.dep_ in ['aux', 'auxpass']:
-                return child.text, 'word'
-        return "", ""
+                return child.text
+        return ""
     
-    def _extract_v(self, doc, root) -> Tuple[str, str]:
-        """V: 動詞抽出"""
-        return root.text, 'word'
+    def _extract_v(self, doc, root) -> str:
+        """V: 動詞抽出（単語専用）"""
+        return root.text
     
     def _extract_o1(self, doc, root) -> Tuple[str, str]:
         """O1: 直接目的語抽出"""
@@ -175,9 +187,34 @@ class Universal10SlotDecomposer:
         """M3: 副詞節抽出"""
         for child in root.children:
             if child.dep_ == 'advcl':
-                span = self._basic_span_expansion(child, doc)
+                # 副詞節の完全なスパンを取得（接続詞含む）
+                span = self._get_adverbial_clause_span(child, doc)
                 return span, 'clause'  # 副詞節はclause
         return "", ""
+    
+    def _get_adverbial_clause_span(self, advcl_root, doc) -> str:
+        """副詞節の完全なスパンを取得（接続詞含む）"""
+        tokens = [advcl_root]  # 副詞節の動詞
+        
+        # 接続詞（mark）を探す
+        for child in advcl_root.children:
+            if child.dep_ == 'mark':  # because, although, etc.
+                tokens.append(child)
+            else:
+                tokens.append(child)
+                # 子要素も再帰的に追加
+                self._collect_all_children(child, tokens)
+        
+        # 順序でソート
+        tokens.sort(key=lambda t: t.i)
+        
+        return ' '.join([t.text for t in tokens])
+    
+    def _collect_all_children(self, token, tokens_list):
+        """全ての子要素を再帰的に収集"""
+        for child in token.children:
+            tokens_list.append(child)
+            self._collect_all_children(child, tokens_list)
     
     def _generic_extract(self, doc, root, dep_types, position='any') -> Tuple[str, str]:
         """汎用的な抽出メソッド"""
@@ -204,36 +241,45 @@ class Universal10SlotDecomposer:
         return ' '.join([doc[i].text for i in range(start, end + 1)])
     
     def _expand_span_with_relcl(self, token, doc) -> str:
-        """関係節を含むスパン拡張"""
-        # 基本拡張
-        span = self._basic_span_expansion(token, doc)
+        """関係節を含むスパン拡張（修正版）"""
+        # 基本拡張（主語部分）
+        base_span = self._basic_span_expansion(token, doc)
         
-        # 関係節を含めて拡張  
+        # 関係節部分を抽出
         for child in token.children:
             if child.dep_ == 'relcl':
-                # 関係代名詞を含める
+                # 関係代名詞を探す
+                rel_pronoun = ""
                 for relcl_child in child.children:
                     if relcl_child.dep_ == 'nsubj' and relcl_child.pos_ == 'PRON':
-                        span += f" {relcl_child.text}"
+                        rel_pronoun = relcl_child.text
                         break
                 
-                # 関係節全体を含める（後で再帰分解される）
+                # 関係節全体を取得（関係代名詞 + 動詞以降）
                 relcl_span = self._get_full_clause_span(child, doc)
-                span += f" {relcl_span}"
-                break
+                
+                # 結合（重複回避）
+                if rel_pronoun and rel_pronoun not in base_span:
+                    return f"{base_span} {rel_pronoun} {relcl_span}"
+                else:
+                    return f"{base_span} {relcl_span}"
         
-        return span.strip()
+        return base_span
     
     def _get_full_clause_span(self, clause_root, doc) -> str:
-        """節の完全なスパンを取得"""
-        tokens = [clause_root]
+        """節の完全なスパンを取得（改善版）"""
+        # 節のROOT以外の要素を取得
+        tokens = []
         
-        def collect_tokens(token):
+        def collect_non_root_tokens(token):
             for child in token.children:
-                tokens.append(child)
-                collect_tokens(child)
+                if child.dep_ != 'nsubj':  # 関係代名詞は除外（既に処理済み）
+                    tokens.append(child)
+                    collect_non_root_tokens(child)
         
-        collect_tokens(clause_root)
+        # ROOT動詞自体も含める
+        tokens.append(clause_root)
+        collect_non_root_tokens(clause_root)
         
         # 順序でソート
         tokens.sort(key=lambda t: t.i)
