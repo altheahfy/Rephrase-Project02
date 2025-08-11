@@ -360,21 +360,66 @@ class Step18UnifiedRephraseSystem:
 if __name__ == "__main__":
     system = Step18UnifiedRephraseSystem()
     
-    print('🎯 Step18統一Rephraseシステムテスト')
-    print('=' * 100)
-    
-    # テスト例文（5文型フルセット ex007）
-    test_sentence = "That afternoon at the crucial point in the presentation, the manager who had recently taken charge of the project had to make the committee responsible for implementation deliver the final proposal flawlessly even though he was under intense pressure so the outcome would reflect their full potential."
-    
-    print(f"🎯 Step18処理開始: '{test_sentence}'")
-    print("=" * 91)
-    
-    # 処理実行
-    results = system.process_sentence(test_sentence)
-    
-    # 結果表示
-    print('\n✅ 処理結果:')
+    print('🎯 Step18統一Rephraseシステム - 5文型フルセット全例文処理')
     print('=' * 80)
+    
+    try:
+        # 5文型フルセットExcelから全例文を読み込み
+        df = pd.read_excel('（小文字化した最初の5文型フルセット）例文入力元.xlsx')
+        
+        # 例文ID別に原文を取得
+        sentences = {}
+        for _, row in df.iterrows():
+            if pd.notna(row['例文ID']) and pd.notna(row['原文']):
+                if row['例文ID'] not in sentences:
+                    sentences[row['例文ID']] = row['原文']
+        
+        print(f"📂 5文型フルセットから{len(sentences)}個の例文を読み込み完了")
+        
+        # 各例文を処理（最初の3例文のみテスト）
+        for i, (ex_id, sentence) in enumerate(list(sentences.items())[:3], 1):
+            print(f"\n{'=' * 80}")
+            print(f"📋 [{i}/3] 処理中: {ex_id}")
+            print(f"原文: {sentence}")
+            print('=' * 80)
+            
+            # Step18で処理
+            results = system.process_sentence(sentence)
+            
+            # 結果表示
+            print(f'\n✅ {ex_id} 処理結果:')
+            print('-' * 60)
+            
+            for slot_name, slot_data in results.items():
+                if slot_data:  # データが存在する場合のみ表示
+                    print(f'\n📋 {slot_name}スロット:')
+                    if slot_name in system.single_slots:
+                        for key, value in slot_data.items():
+                            print(f'  {key}: "{value}"')
+                    else:
+                        for key, value in slot_data.items():
+                            if value:
+                                print(f'  {key:10}: "{value}"')
+        
+        print(f"\n{'=' * 80}")
+        print("🎯 テスト処理完了 - より多くの例文を処理するには制限を解除してください")
+        print('=' * 80)
+        
+    except Exception as e:
+        print(f"❌ Excel読み込みエラー: {e}")
+        print("フォールバック: 単一テスト文で処理")
+        
+        # フォールバック用固定文
+        test_sentence = "That afternoon at the crucial point in the presentation, the manager who had recently taken charge of the project had to make the committee responsible for implementation deliver the final proposal flawlessly even though he was under intense pressure so the outcome would reflect their full potential."
+        
+        print(f"🎯 Step18処理開始: '{test_sentence[:100]}...'")
+        print("=" * 80)
+        
+        results = system.process_sentence(test_sentence)
+        
+        # 結果表示
+        print('\n✅ 処理結果:')
+        print('=' * 80)
     
     for slot_name, slot_data in results.items():
         print(f'\n📋 {slot_name}スロット:')
