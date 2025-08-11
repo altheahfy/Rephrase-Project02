@@ -52,6 +52,75 @@ class PureStanzaEngineV3:
                 }
             },
             
+            # 助動詞構文: nsubj -> aux -> root(VERB)
+            "S_AUX_V": {
+                "required_relations": ["nsubj", "aux", "root"],
+                "root_pos": ["VERB"],
+                "mapping": {
+                    "nsubj": "S",
+                    "aux": "Aux",
+                    "root": "V"
+                }
+            },
+            
+            # 助動詞 + 目的語: nsubj -> aux -> root(VERB) -> obj
+            "S_AUX_V_O": {
+                "required_relations": ["nsubj", "aux", "root", "obj"],
+                "root_pos": ["VERB"],
+                "mapping": {
+                    "nsubj": "S",
+                    "aux": "Aux",
+                    "root": "V",
+                    "obj": "O1"
+                }
+            },
+            
+            # 受動態: nsubj:pass -> aux:pass -> root(VERB)
+            "PASSIVE": {
+                "required_relations": ["nsubj:pass", "aux:pass", "root"],
+                "root_pos": ["VERB"],
+                "mapping": {
+                    "nsubj:pass": "S",
+                    "aux:pass": "Aux",
+                    "root": "V"
+                }
+            },
+            
+            # 受動態 + 助動詞: nsubj:pass -> aux -> aux:pass -> root(VERB)
+            "PASSIVE_AUX": {
+                "required_relations": ["nsubj:pass", "aux", "aux:pass", "root"],
+                "root_pos": ["VERB"],
+                "mapping": {
+                    "nsubj:pass": "S",
+                    "aux": "Aux",
+                    "aux:pass": "Aux",  # 複数のAuxは統合処理
+                    "root": "V"
+                }
+            },
+            
+            # There構文: expl -> root(VERB) -> nsubj
+            "THERE_BE": {
+                "required_relations": ["expl", "nsubj", "root"],
+                "root_pos": ["VERB"],
+                "expl_check": True,
+                "mapping": {
+                    "expl": "M1",  # "There" を M1 に配置
+                    "root": "V",
+                    "nsubj": "O1"  # 真の主語は O1 に配置
+                }
+            },
+            
+            # 疑問文（疑問詞がROOT）: root(PRON) -> cop -> nsubj
+            "WH_BE": {
+                "required_relations": ["nsubj", "cop", "root"],
+                "root_pos": ["PRON"],
+                "mapping": {
+                    "root": "O1",  # 疑問詞を O1 に配置
+                    "cop": "V",
+                    "nsubj": "S"
+                }
+            },
+            
             # 第2文型 (SVC): nsubj -> cop -> root(ADJ/NOUN)  
             "SVC_BE": {
                 "required_relations": ["nsubj", "cop", "root"],
@@ -114,11 +183,13 @@ class PureStanzaEngineV3:
     def _load_modifier_mappings(self) -> Dict[str, str]:
         """修飾語マッピングルール"""
         return {
-            "advmod": "M2",      # 副詞修飾語 → M2
+            "advmod": "M2",      # 副詞修飾語・否定辞 → M2
             "amod": "subslot",   # 形容詞修飾語 → サブスロット内処理
             "det": "subslot",    # 限定詞 → サブスロット内処理
             "case": "subslot",   # 前置詞 → サブスロット内処理
-            "nmod": "M1"         # 名詞修飾語 → M1 (文脈により変更可能)
+            "nmod": "M1",        # 名詞修飾語 → M1 (文脈により変更可能)
+            "mark": "subslot",   # 従属節マーカー → サブスロット内処理
+            "csubj": "O1",       # 節主語 → O1
         }
     
     def decompose(self, text: str) -> Dict[str, Any]:
@@ -191,7 +262,14 @@ class PureStanzaEngineV3:
         print(f"🔍 検出された関係: {sorted(present_relations)}")
                 
         # パターン優先順位付き検査（より具体的なものから）
-        pattern_priority = ["SVOO", "SVOC", "SVO", "SVC_LOOKS", "SVC_BE", "SV"]
+        pattern_priority = [
+            # 特殊構文
+            "PASSIVE_AUX", "PASSIVE", "THERE_BE", "WH_BE",
+            # 助動詞系
+            "S_AUX_V_O", "S_AUX_V",
+            # 基本文型
+            "SVOO", "SVOC", "SVO", "SVC_LOOKS", "SVC_BE", "SV"
+        ]
         
         for pattern_name in pattern_priority:
             if pattern_name not in self.sentence_patterns:
@@ -214,6 +292,11 @@ class PureStanzaEngineV3:
                 if pos_info.get('xcomp') not in pattern_config["xcomp_pos"]:
                     continue
                     
+            # There構文の特別チェック
+            if "expl_check" in pattern_config:
+                if 'expl' not in present_relations:
+                    continue
+                    
             print(f"✅ マッチしたパターン: {pattern_name}")
             return pattern_name
             
@@ -228,9 +311,16 @@ class PureStanzaEngineV3:
         slots = {}
         
         # 依存関係ごとにスロット抽出
+        aux_words = []  # 複数のAuxを統合
+        
         for word in sent.words:
             if word.deprel in mapping:
                 slot_name = mapping[word.deprel]
+                
+                # Auxスロットの特別処理（複数のauxを統合）
+                if slot_name == "Aux":
+                    aux_words.append(word)
+                    continue
                 
                 # スロット境界を取得
                 slot_range = self._get_slot_boundary(sent, word, word.deprel)
@@ -239,6 +329,13 @@ class PureStanzaEngineV3:
                 print(f"📍 {slot_name}検出: '{slot_text}' (deprel: {word.deprel})")
                 
                 slots[slot_name] = {'main': slot_text}
+        
+        # 複数のAuxを統合処理
+        if aux_words:
+            aux_texts = [word.text for word in sorted(aux_words, key=lambda w: w.id)]
+            aux_combined = " ".join(aux_texts)
+            print(f"📍 Aux検出: '{aux_combined}' (統合: {len(aux_words)}個)")
+            slots["Aux"] = {'main': aux_combined}
                 
         return slots
         
@@ -264,21 +361,27 @@ class PureStanzaEngineV3:
     def _get_slot_boundary(self, sent, word, deprel: str) -> Tuple[int, int]:
         """スロット境界を決定（関係タイプに応じて）"""
         
-        if deprel == "cop":
-            # be動詞は単語そのもの
+        if deprel in ["cop", "aux", "aux:pass"]:
+            # be動詞・助動詞は単語そのもの
             return (word.start_char, word.end_char)
         elif deprel == "root" and word.upos == "VERB":
             # 動詞ROOTは動詞単体のみ
             return (word.start_char, word.end_char)
-        elif deprel in ["nsubj", "obj", "iobj"]:
+        elif deprel in ["nsubj", "nsubj:pass", "obj", "iobj"]:
             # 主語・目的語は限定詞・修飾語を含む
             return self._find_noun_phrase_boundary(sent, word)
-        elif deprel == "root" and word.upos in ["ADJ", "NOUN"]:
-            # be動詞構文の補語
+        elif deprel == "root" and word.upos in ["ADJ", "NOUN", "PRON"]:
+            # be動詞構文の補語・疑問詞
             return self._find_complement_boundary(sent, word)
         elif deprel == "xcomp":
             # 補語は修飾語を含む
             return self._find_complement_boundary(sent, word)
+        elif deprel == "expl":
+            # "There"は単語そのもの
+            return (word.start_char, word.end_char)
+        elif deprel == "csubj":
+            # 節主語は完全な下位ツリー
+            return self._find_complete_subtree_range(sent, word)
         else:
             # その他は完全な下位ツリー
             return self._find_complete_subtree_range(sent, word)
