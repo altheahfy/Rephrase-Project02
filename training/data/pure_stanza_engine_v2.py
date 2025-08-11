@@ -200,12 +200,26 @@ class PureStanzaEngine:
         return None
     
     def _extract_v_slot(self, sent, root_verb):
-        """V slot: Verb (actual action verb)"""
-        # Look for xcomp (actual action verb)
+        """V slot: Verb - 第2文型（SVC）対応版"""
+        
+        # パターン1: 通常の動詞（ROOT = VERB）
+        if root_verb.upos == 'VERB':
+            print(f"📍 V検出: '{root_verb.text}'（ROOT VERB）")
+            return {'main': root_verb.text}
+        
+        # パターン2: be動詞構文（ROOT = ADJ, cop関係でbe動詞特定）
+        elif root_verb.upos == 'ADJ':
+            for word in sent.words:
+                if word.head == root_verb.id and word.deprel == 'cop':
+                    print(f"📍 V検出: '{word.text}'（cop + ROOT ADJ）")
+                    return {'main': word.text}
+        
+        # パターン3: xcomp構造での実際の動詞
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'xcomp':
                 print(f"📍 V検出: '{word.text}'（xcomp）")
                 return {'main': word.text}
+        
         return None
     
     def _extract_o1_slot(self, sent, root_verb):
@@ -235,15 +249,34 @@ class PureStanzaEngine:
         return None
     
     def _extract_c1_slot(self, sent, root_verb):
-        """C1 slot: Complement 1 (predicative complement) - 統一パターン適用"""
-        # Look for attr/acomp dependency (predicative complement)
+        """C1 slot: Complement 1 - 第2文型（SVC）対応版"""
+        
+        # パターン1: 通常のattr/acomp依存関係
         for word in sent.words:
             if word.head == root_verb.id and word.deprel in ['attr', 'acomp']:
-                # 統一境界検出: 完全なcomplement句を抽出
                 c1_range = self._find_complete_subtree_range(sent, word)
                 c1_text = self._extract_text_range(sent, c1_range)
-                print(f"📍 C1検出: '{c1_text}'")
+                print(f"📍 C1検出: '{c1_text}'（{word.deprel}）")
                 return {'main': c1_text}
+        
+        # パターン2: be動詞構文（ROOT自体が補語）
+        if root_verb.upos == 'ADJ':
+            # be動詞があることを確認
+            has_cop = any(word.head == root_verb.id and word.deprel == 'cop' 
+                         for word in sent.words)
+            if has_cop:
+                # ROOT形容詞のみを抽出（修正版: 文全体ではなく形容詞のみ）
+                print(f"📍 C1検出: '{root_verb.text}'（ROOT ADJ + cop）")
+                return {'main': root_verb.text}
+        
+        # パターン3: xcomp構造（become a teacher等）
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel == 'xcomp':
+                c1_range = self._find_complete_subtree_range(sent, word)
+                c1_text = self._extract_text_range(sent, c1_range)
+                print(f"📍 C1検出: '{c1_text}'（xcomp）")
+                return {'main': c1_text}
+        
         return None
     
     def _extract_c2_slot(self, sent, root_verb):
