@@ -34,16 +34,34 @@ class PrecisionIntegratedSubslotGenerator:
             'sub-c1', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3', 'sub-aux'
         ]
         
-        # 対象上位スロット
-        self.target_slots = ['S', 'O1', 'O2', 'C1', 'C2', 'M1', 'M2', 'M3']
+        # 全10上位スロット（Rephrase完全体）
+        self.all_upper_slots = ['M1', 'S', 'Aux', 'M2', 'V', 'C1', 'O1', 'O2', 'C2', 'M3']
         
-        print(f"🎯 対象上位スロット: {', '.join(self.target_slots)}")
-        print(f"🔧 精密統合サブスロット体系: {', '.join(self.subslot_types)}")
+        # サブスロット対象8スロット（Aux、V除く）
+        self.target_slots = ['M1', 'S', 'M2', 'C1', 'O1', 'O2', 'C2', 'M3']
+        
+        # 単一機能スロット（サブスロット無し）
+        self.single_slots = ['Aux', 'V']
+        
+        print(f"🎯 全10上位スロット: {', '.join(self.all_upper_slots)}")
+        print(f"🔧 サブスロット対象8スロット: {', '.join(self.target_slots)}")
+        print(f"⚡ 単一機能スロット: {', '.join(self.single_slots)}")
+        print(f"🧩 10サブスロット体系: {', '.join(self.subslot_types)}")
         
     def generate_subslots_for_slot(self, slot_name, sentence):
         """指定スロットの精密サブスロット生成"""
         print(f"\n🎯 {slot_name}スロット 精密サブスロット生成開始: '{sentence}'")
         
+        # 単一機能スロット（Aux, V）の処理
+        if slot_name in self.single_slots:
+            print(f"⚡ {slot_name}は単一機能スロット（サブスロット無し）")
+            return {
+                'slot_phrase': sentence,
+                'slot_type': 'single',
+                'message': f'{slot_name}スロット：サブスロット分解不要'
+            }
+        
+        # サブスロット対象スロットの処理
         if slot_name not in self.target_slots:
             print(f"❌ 非対象スロット: {slot_name}")
             return {}
@@ -63,7 +81,7 @@ class PrecisionIntegratedSubslotGenerator:
             elif slot_name == 'C2':
                 enhanced = self._apply_step11_c2_precision(doc, base_subslots, sentence)
             else:
-                # 他のスロットはStep15ベース + 軽微強化
+                # 他のスロット（M1, M2, O1, O2, M3）はStep15ベース + 軽微強化
                 enhanced = self._apply_general_enhancements(doc, base_subslots, slot_name)
             
             print(f"🔧 精密統合後サブスロット数: {len(enhanced)}")
@@ -323,45 +341,63 @@ class PrecisionIntegratedSubslotGenerator:
         return base_subslots
 
 def precision_integration_test():
-    """精密統合テスト"""
-    print("🏆 精密統合テスト開始")
+    """精密統合テスト - Rephrase完全版"""
+    print("🏆 Rephrase完全版精密統合テスト開始")
     print("=" * 80)
     
     generator = PrecisionIntegratedSubslotGenerator()
     
+    # Rephrase完全構造テスト
     test_cases = [
-        ("S", "the woman who seemed indecisive"),
-        ("O1", "that he had been trying to avoid Tom"),
-        ("M3", "because he was afraid of hurting her feelings"),
+        # サブスロット対象8スロット
+        ("M1", "this morning"),
+        ("S", "the woman who seemed indecisive"), 
+        ("M2", "although it was emotionally hard"),
         ("C1", "very experienced"),
+        ("O1", "that he had been trying to avoid Tom"),
+        ("O2", "to avoid Tom"),
+        ("C2", "confident that he will succeed"),
+        ("M3", "because he was afraid of hurting her feelings"),
+        # 単一機能2スロット
+        ("Aux", "had"),
+        ("V", "known")
     ]
     
     results = {}
     total_score = 0
+    subslot_count = 0
+    single_count = 0
     
     for slot_name, phrase in test_cases:
         print(f"\n{'='*60}")
-        print(f"🧪 {slot_name}スロット精密テスト")
+        print(f"🧪 {slot_name}スロット完全版テスト")
         print(f"📝 テストフレーズ: '{phrase}'")
         
-        subslots = generator.generate_subslots_for_slot(slot_name, phrase)
+        result = generator.generate_subslots_for_slot(slot_name, phrase)
         
-        print(f"📊 精密分解結果: {len(subslots)}")
-        for sub_type, sub_data in subslots.items():
-            print(f"   ✅ {sub_type}: '{sub_data['text']}'")
+        if isinstance(result, dict) and 'slot_type' in result and result['slot_type'] == 'single':
+            print(f"⚡ 単一機能スロット: {result['message']}")
+            single_count += 1
+        else:
+            print(f"📊 精密分解結果: {len(result)}")
+            for sub_type, sub_data in result.items():
+                print(f"   ✅ {sub_type}: '{sub_data['text']}'")
+            subslot_count += len(result)
         
         results[slot_name] = {
             'phrase': phrase,
-            'subslots': subslots,
-            'count': len(subslots)
+            'result': result,
+            'count': len(result) if not (isinstance(result, dict) and 'slot_type' in result) else 1
         }
-        total_score += len(subslots)
+        total_score += 1  # 成功スロット数
     
     print(f"\n{'='*80}")
-    print("🎯 精密統合最終結果")
+    print("🎯 Rephrase完全版最終結果")
     print(f"{'='*80}")
-    print(f"総サブスロット数: {total_score}")
-    print(f"平均サブスロット数: {total_score/len(test_cases):.1f}")
+    print(f"処理スロット数: {total_score}/10 (完全)")
+    print(f"サブスロット生成数: {subslot_count}")
+    print(f"単一機能スロット数: {single_count}")
+    print(f"平均サブスロット数（対象8スロット）: {subslot_count/8:.1f}")
     
     return results
 
