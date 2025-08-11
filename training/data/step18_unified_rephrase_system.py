@@ -206,6 +206,12 @@ class Step18UnifiedRephraseSystem:
             dep = token.dep_
             pos = token.pos_
             
+            # 前置詞の特別処理：親トークンと統合
+            if dep == 'prep':
+                print(f"📌 前置詞統合処理: '{token.text}' -> 親トークン'{token.head.text}'と統合")
+                # 前置詞は独立処理せず、親トークンの拡張スパンで自動統合
+                continue
+            
             # sub-m2の特別処理：副詞のみを単独で認識
             if dep == 'advmod' and pos == 'ADV':
                 print(f"📌 sub-m2発見: '{token.text}' (dep={dep}, pos={pos})")
@@ -499,10 +505,10 @@ if __name__ == "__main__":
         
         print(f"📂 5文型フルセットから{len(sentences)}個の例文を読み込み完了")
         
-        # 各例文を処理（最初の3例文のみテスト）
-        for i, (ex_id, sentence) in enumerate(list(sentences.items())[:3], 1):
+        # 各例文を処理（全例文処理）
+        for i, (ex_id, sentence) in enumerate(sentences.items(), 1):
             print(f"\n{'=' * 80}")
-            print(f"📋 [{i}/3] 処理中: {ex_id}")
+            print(f"📋 [{i}/{len(sentences)}] 処理中: {ex_id}")
             print(f"原文: {sentence}")
             print('=' * 80)
             
@@ -525,7 +531,7 @@ if __name__ == "__main__":
                                 print(f'  {key:10}: "{value}"')
         
         print(f"\n{'=' * 80}")
-        print("🎯 テスト処理完了 - より多くの例文を処理するには制限を解除してください")
+        print(f"🎯 全{len(sentences)}例文の処理完了！")
         print('=' * 80)
         
     except Exception as e:
