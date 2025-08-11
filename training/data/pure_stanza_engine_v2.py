@@ -91,9 +91,33 @@ class PureStanzaEngine:
                 return word
         return None
     
+    def _is_be_verb_construction(self, sent, root_verb):
+        """be動詞構文かどうかを判定する"""
+        # パターン1: ROOT = ADJ with cop (He is happy)
+        if root_verb.upos == 'ADJ':
+            return any(word.head == root_verb.id and word.deprel == 'cop' for word in sent.words)
+        
+        # パターン2: ROOT = NOUN with cop (He is a teacher, He is under pressure)
+        elif root_verb.upos == 'NOUN':
+            return any(word.head == root_verb.id and word.deprel == 'cop' for word in sent.words)
+        
+        return False
+    
+    def _get_be_verb_from_root(self, sent, root_verb):
+        """be動詞構文からbe動詞を取得する"""
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel == 'cop':
+                return word
+        return None
+    
     def _extract_all_slots_from_stanza(self, sent, root_verb):
         """Extract all 8 slots directly from Stanza"""
         print("🏗️ Stanzaから直接スロット抽出中...")
+        
+        # be動詞構文の検出
+        is_be_construction = self._is_be_verb_construction(sent, root_verb)
+        if is_be_construction:
+            print(f"🔍 be動詞構文を検出: ROOT={root_verb.text}({root_verb.upos})")
         
         slots = {}
         
@@ -200,7 +224,7 @@ class PureStanzaEngine:
         return None
     
     def _extract_v_slot(self, sent, root_verb):
-        """V slot: Verb - 第2文型（SVC）対応版"""
+        """V slot: Verb - be動詞構文完全対応版"""
         
         # パターン1: xcomp構造での実際の動詞（優先）
         for word in sent.words:
@@ -213,12 +237,12 @@ class PureStanzaEngine:
             print(f"📍 V検出: '{root_verb.text}'（ROOT VERB）")
             return {'main': root_verb.text}
         
-        # パターン3: be動詞構文（ROOT = ADJ, cop関係でbe動詞特定）
-        elif root_verb.upos == 'ADJ':
-            for word in sent.words:
-                if word.head == root_verb.id and word.deprel == 'cop':
-                    print(f"📍 V検出: '{word.text}'（cop + ROOT ADJ）")
-                    return {'main': word.text}
+        # パターン3: be動詞構文（ROOT = ADJ/NOUN, cop関係でbe動詞特定）
+        if self._is_be_verb_construction(sent, root_verb):
+            be_verb = self._get_be_verb_from_root(sent, root_verb)
+            if be_verb:
+                print(f"📍 V検出: '{be_verb.text}'（be動詞構文）")
+                return {'main': be_verb.text}
         
         return None
     
@@ -249,7 +273,7 @@ class PureStanzaEngine:
         return None
     
     def _extract_c1_slot(self, sent, root_verb):
-        """C1 slot: Complement 1 - 第2文型（SVC）対応版"""
+        """C1 slot: Complement 1 - be動詞構文完全対応版"""
         
         # パターン1: 通常のattr/acomp依存関係
         for word in sent.words:
@@ -259,15 +283,23 @@ class PureStanzaEngine:
                 print(f"📍 C1検出: '{c1_text}'（{word.deprel}）")
                 return {'main': c1_text}
         
-        # パターン2: be動詞構文（ROOT自体が補語）
-        if root_verb.upos == 'ADJ':
-            # be動詞があることを確認
-            has_cop = any(word.head == root_verb.id and word.deprel == 'cop' 
-                         for word in sent.words)
-            if has_cop:
-                # ROOT形容詞のみを抽出（修正版: 文全体ではなく形容詞のみ）
-                print(f"📍 C1検出: '{root_verb.text}'（ROOT ADJ + cop）")
-                return {'main': root_verb.text}
+        # パターン2: be動詞構文 - 3つの補語タイプに対応
+        if self._is_be_verb_construction(sent, root_verb):
+            # 補語専用境界検出を使用（主語・be動詞を除外）
+            c1_range = self._find_c1_complement_range(sent, root_verb)
+            c1_text = self._extract_text_range(sent, c1_range)
+            
+            if root_verb.upos == 'ADJ':
+                print(f"📍 C1検出: '{c1_text}'（be動詞+形容詞補語）")
+            elif root_verb.upos == 'NOUN':
+                has_preposition = any(word.head == root_verb.id and word.deprel == 'case' 
+                                    for word in sent.words)
+                if has_preposition:
+                    print(f"📍 C1検出: '{c1_text}'（be動詞+前置詞句補語）")
+                else:
+                    print(f"📍 C1検出: '{c1_text}'（be動詞+名詞補語）")
+            
+            return {'main': c1_text}
         
         # パターン3: xcomp構造（become a teacher等）
         for word in sent.words:
@@ -297,6 +329,17 @@ class PureStanzaEngine:
     
     def _extract_m2_slot(self, sent, root_verb):
         """M2 slot: Modifying phrase 2 - 統一スロット抽出アルゴリズム適用"""
+        
+        # パターン1: be動詞構文の副詞修飾語（advmod）
+        if self._is_be_verb_construction(sent, root_verb):
+            for word in sent.words:
+                if word.head == root_verb.id and word.deprel == 'advmod':
+                    print(f"📍 M2検出: '{word.text}'（be動詞構文の副詞修飾語）")
+                    # 統一サブスロット処理追加
+                    subslots = self._extract_unified_subslots(sent, word, word.text)
+                    return subslots
+        
+        # パターン2: 既存の複雑なM2パターン（xcomp -> advcl -> pressure）
         # M2: deliver -> advcl -> pressure (even though句、ただしM3子句は除外)
         for word in sent.words:
             if word.head == root_verb.id and word.deprel == 'xcomp':  # make
@@ -343,6 +386,34 @@ class PureStanzaEngine:
         # 文字位置範囲を特定
         min_start = min(sent.words[word_id-1].start_char for word_id in all_words_in_subtree)
         max_end = max(sent.words[word_id-1].end_char for word_id in all_words_in_subtree)
+        
+        return (min_start, max_end)
+    
+    def _find_c1_complement_range(self, sent, root_verb):
+        """C1補語専用境界検出: be動詞構文の補語のみを抽出（主語・be動詞・副詞修飾語・句読点を除外）"""
+        complement_words = {root_verb.id}  # ROOT（補語）自身
+        
+        # 補語の修飾語のみを収集（nsubj・cop・advmod・punctは除外）
+        # advmodはRephraseのM2スロットなので、C1からは除外
+        complement_relations = {'det', 'amod', 'case'}
+        
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel in complement_relations:
+                complement_words.add(word.id)
+                # この子の下位ツリーも再帰的に追加
+                descendants = self._collect_all_descendants(sent, word)
+                complement_words.update(descendants)
+        
+        # 句読点を除外
+        complement_words = {word_id for word_id in complement_words 
+                          if sent.words[word_id-1].upos != 'PUNCT'}
+        
+        if not complement_words:
+            return (root_verb.start_char, root_verb.end_char)
+        
+        # 文字位置範囲を特定
+        min_start = min(sent.words[word_id-1].start_char for word_id in complement_words)
+        max_end = max(sent.words[word_id-1].end_char for word_id in complement_words)
         
         return (min_start, max_end)
     
@@ -449,30 +520,66 @@ class PureStanzaEngine:
         return sent.text[start:end]
     
     def _extract_s_subslots(self, sent, subj_word):
-        """Extract S subslots"""
-        # Simplified implementation for testing
-        return {
-            'sub-s': 'the manager who',
-            'sub-aux': 'had',
-            'sub-m2': 'recently',
-            'sub-v': 'taken',
-            'sub-o1': 'charge of the project'
-        }
+        """Extract S subslots - 統一サブスロット処理を使用"""
+        # Sスロットのメインテキストを取得
+        s_range = self._find_complete_subtree_range(sent, subj_word)
+        s_text = self._extract_text_range(sent, s_range)
+        
+        # 統一サブスロット処理を適用
+        return self._extract_unified_subslots(sent, subj_word, s_text)
     
     def _extract_unified_subslots(self, sent, root_word, main_text):
-        """統一サブスロット処理: Aux/V以外の全スロット共通処理"""
-        result = {'main': main_text}
+        """統一サブスロット処理: 上位分解ロジックを再利用した本格実装"""
         
-        # Step18と同様のサブスロット分解を適用（スモールステップ: 基本パターンのみ）
-        # 将来的にはSスロットと同等の詳細分解を実装
-        words = main_text.split()
+        # メインテキストをStanzaで再解析
+        sub_doc = self.nlp(main_text)
         
-        # 基本的なサブスロット分解パターン（例として）
-        if len(words) >= 2:
-            result['sub-m1'] = words[0] if len(words) > 0 else ''
-            result['sub-m2'] = words[-1] if len(words) > 1 else ''
+        if not sub_doc.sentences:
+            return {'main': main_text}
         
-        return result
+        sub_sent = sub_doc.sentences[0] 
+        sub_root_verb = self._find_root_verb(sub_sent)
+        
+        if not sub_root_verb:
+            return {'main': main_text}
+        
+        print(f"  🧩 サブスロット分解開始: '{main_text}' (ROOT: {sub_root_verb.text})")
+        
+        # 上位分解と同じロジックを適用（サブスロットレベル）
+        subslots = {'main': main_text}
+        
+        # sub-s: Subject
+        sub_s = self._extract_s_slot(sub_sent, sub_root_verb)
+        if sub_s:
+            subslots['sub-s'] = sub_s['main']
+        
+        # sub-aux: Auxiliary
+        sub_aux = self._extract_aux_slot(sub_sent, sub_root_verb)
+        if sub_aux:
+            subslots['sub-aux'] = sub_aux['main']
+            
+        # sub-v: Verb
+        sub_v = self._extract_v_slot(sub_sent, sub_root_verb)
+        if sub_v:
+            subslots['sub-v'] = sub_v['main']
+            
+        # sub-o1: Object 1
+        sub_o1 = self._extract_o1_slot(sub_sent, sub_root_verb)
+        if sub_o1:
+            subslots['sub-o1'] = sub_o1['main']
+            
+        # sub-m1: Modifying phrase 1
+        sub_m1 = self._extract_m1_slot(sub_sent, sub_root_verb)
+        if sub_m1:
+            subslots['sub-m1'] = sub_m1['main']
+        
+        # sub-m2: Modifying phrase 2  
+        sub_m2 = self._extract_m2_slot(sub_sent, sub_root_verb)
+        if sub_m2:
+            subslots['sub-m2'] = sub_m2['main']
+        
+        print(f"    ✅ サブスロット抽出完了: {len(subslots)-1}個のサブスロット")
+        return subslots
     
     def _print_slots(self, slots):
         """Print slot results"""
