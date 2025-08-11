@@ -98,8 +98,8 @@ class Step18UnifiedRephraseSystem:
         # spaCy解析
         doc = self.nlp(sentence)
         
-        # スロット分割（仮想的 - 実際は上位システムから受け取る）
-        slot_phrases = self._extract_slot_phrases(sentence, doc)
+        # 動的スロット分割
+        slot_phrases = self._extract_basic_slots(doc)
         
         # 各スロット処理
         results = {}
@@ -113,7 +113,7 @@ class Step18UnifiedRephraseSystem:
         
         return results
     
-    def _extract_slot_phrases(self, sentence, doc):
+    def _extract_basic_slots(self, doc):
         """動的スロット抽出：spaCy解析に基づく実際のスロット分割"""
         slots = {}
         
@@ -143,7 +143,7 @@ class Step18UnifiedRephraseSystem:
                     slots['S'] = doc[s_tokens[0].i:s_tokens[-1].i+1].text
                 break
         
-        # O1スロット（目的語節）：that節など
+        # O1スロット（目的語節）：xcomp構造
         for token in doc:
             if token.dep_ in ['ccomp', 'xcomp'] and token.head == root_verb:
                 # 目的語節全体を抽出
@@ -153,21 +153,47 @@ class Step18UnifiedRephraseSystem:
                     slots['O1'] = doc[o1_tokens[0].i:o1_tokens[-1].i+1].text
                 break
         
-        # M2, M3スロット（副詞節）：although, because節など
-        adv_clauses = []
+        # C2スロット（conj構造）：deliver節など
         for token in doc:
-            if token.dep_ in ['advcl'] and token.head == root_verb:
+            if token.dep_ == 'conj' and token.head == root_verb:
+                # conj節全体を抽出
+                c2_tokens = list(token.subtree)
+                c2_tokens.sort(key=lambda t: t.i)
+                if c2_tokens:
+                    slots['C2'] = doc[c2_tokens[0].i:c2_tokens[-1].i+1].text
+                break
+        
+        # 副詞節収集（階層構造を考慮）
+        adv_clauses = []
+        
+        # ROOT直属のadvcl → M3スロット
+        for token in doc:
+            if token.dep_ == 'advcl' and token.head == root_verb:
                 adv_tokens = list(token.subtree)
                 adv_tokens.sort(key=lambda t: t.i)
                 if adv_tokens:
                     clause_text = doc[adv_tokens[0].i:adv_tokens[-1].i+1].text
-                    adv_clauses.append(clause_text)
+                    adv_clauses.append(('M3', clause_text))
         
-        # 副詞節をM2, M3に割り当て
-        if len(adv_clauses) >= 1:
-            slots['M2'] = adv_clauses[0]
-        if len(adv_clauses) >= 2:
-            slots['M3'] = adv_clauses[1]
+        # C2スロット内のadvcl → M2スロット
+        c2_token = None
+        for token in doc:
+            if token.dep_ == 'conj' and token.head == root_verb:
+                c2_token = token
+                break
+        
+        if c2_token:
+            for token in doc:
+                if token.dep_ == 'advcl' and token.head == c2_token:
+                    adv_tokens = list(token.subtree)
+                    adv_tokens.sort(key=lambda t: t.i)
+                    if adv_tokens:
+                        clause_text = doc[adv_tokens[0].i:adv_tokens[-1].i+1].text
+                        adv_clauses.append(('M2', clause_text))
+        
+        # 副詞節をスロットに割り当て
+        for slot_type, clause_text in adv_clauses:
+            slots[slot_type] = clause_text
         
         return slots
     
