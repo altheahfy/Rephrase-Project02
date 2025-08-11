@@ -1,103 +1,166 @@
-# Complete Sentence Engine v3.0 設計仕様書
-**バージョン**: v3.0  
-**作成日**: 2025年8月11日（Phase 1-4統合完成版）  
-**目的**: 90スロット完全対応英文分解エンジン 統合完成仕様書  
-**基盤**: Phase 1-4統合アーキテクチャによる完全システム実現
+# Complete Sentence Engine v4.0 設計仕様書
+**バージョン**: v4.0  
+**作成日**: 2025年8月12日（正しいRephrase仕様準拠版）  
+**目的**: 90スロット完全対応英文分解エンジン Rephrase仕様準拠完成版  
+**基盤**: 統一10スロット分解エンジンによる再帰的構造処理
 
 ---
 
-## 1. 革命的達成：Phase 1-4統合完成
+## 1. Rephrase仕様の正しい理解：統一分解エンジンによる再帰構造
 
-### 1.1 今日の革命的成果（2025年8月11日）
-- **完全90スロット対応エンジン完成**: complete_sentence_engine.py
-- **4段階統合アーキテクチャ実現**: Pattern→Hierarchy→Boundary→Subslot
-- **複文完全対応**: "even though"節等の従属節処理完成
-- **実動作実証**: 単文3スロット→複文10スロット→複雑文16スロット確認
+### 1.1 Rephrase仕様の核心原則
+- **10スロット統一構造**: M1, S, Aux, V, O1, O2, C1, C2, M2, M3
+- **再帰的分解**: 全スロットで同じ分解アルゴリズムを適用
+- **上位スロット空化**: PhraseType="phrase"/"clause"の場合、上位スロットは空化
+- **サブスロット展開**: 空化された上位スロットは同じ10スロット構造でサブ分解
 
-### 1.2 完成したアーキテクチャ
+### 1.2 統一分解エンジンアーキテクチャ
 
 ```
-🏗️ 4段階統合システム（完成版）
+🏗️ 統一10スロット分解エンジン（正しい設計）
 
-Phase 1: Pattern Recognition ✅ 完成
-├── PureStanzaEngineV3
-├── 11種類文型パターン（SV, SVC_BE, SVO, SVOO, SVOC等）
-├── ゼロハードコーディング原則
-└── 単文100%精度基盤
-
-Phase 2: Hierarchical Decomposition ✅ 完成  
-├── HierarchicalClauseEngine
-├── 複文主節・従属節分離
-├── 再帰的パターン適用
-└── advcl, ccomp, acl:relcl対応
-
-Phase 3: Boundary Refinement ✅ 完成
-├── SpacyBoundaryRefiner  
-├── 接続詞回復（though, because等）
-├── token.left_edge/right_edge活用
-└── Step18境界検出技術統合
-
-Phase 4: Subslot Processing ✅ 完成
-├── SubslotStructureProcessor
-├── dep_to_subslot完全マッピング
-├── 90スロット体系対応
-└── Step18サブスロット構造統合
+Universal10SlotDecomposer
+├── decompose_any_text(text_or_phrase)
+│   ├── 構文解析（spaCy/Stanza）
+│   ├── 10スロット構造認識
+│   │   ├── M1: 文頭修飾句
+│   │   ├── S: 主語部
+│   │   ├── Aux: 助動詞
+│   │   ├── V: 動詞
+│   │   ├── O1, O2: 目的語
+│   │   ├── C1, C2: 補語
+│   │   └── M2, M3: 修飾句
+│   ├── PhraseType判定 (word/phrase/clause)
+│   └── 再帰適用
+│       ├── word → そのまま保持
+│       └── phrase/clause → decompose_any_text(サブ内容)
 ```
 
-### 1.3 技術的革新ポイント
+### 1.3 統一分解の実装例
 
-#### ゼロハードコーディング + パターン駆動
 ```python
-# 従来の失敗（ハードコーディング）
-if word == "though": slot = "M2"  # ← 破綻
-
-# v3.0成功アプローチ（パターン駆動）
-pattern = identify_sentence_pattern(sent, root_verb)  # 構造理解
-slots = extract_slots_by_pattern(sent, pattern)      # パターン適用
+class Universal10SlotDecomposer:
+    """統一10スロット分解エンジン"""
+    
+    def decompose_any_text(self, text: str) -> Dict[str, Any]:
+        """
+        任意のテキストを10スロット構造に分解
+        - 再帰的適用により無限階層対応
+        - スロット固有処理は一切なし（統一アルゴリズム）
+        """
+        # 1. 構文解析
+        doc = self.nlp(text)
+        root = self._find_root_verb(doc)
+        
+        # 2. 10スロット構造抽出
+        slots = {}
+        
+        # 統一スロット抽出（全スロットで同じロジック）
+        slot_definitions = {
+            'M1': self._extract_pre_modifiers,
+            'S': self._extract_subject,
+            'Aux': self._extract_auxiliary, 
+            'V': self._extract_verb,
+            'O1': self._extract_object1,
+            'O2': self._extract_object2,
+            'C1': self._extract_complement1,
+            'C2': self._extract_complement2,
+            'M2': self._extract_modifier2,
+            'M3': self._extract_modifier3
+        }
+        
+        for slot_name, extractor in slot_definitions.items():
+            content, phrase_type = extractor(doc, root)
+            
+            if phrase_type in ['phrase', 'clause']:
+                # 上位スロット空化 + 再帰分解
+                sub_result = self.decompose_any_text(content)  # 同じ関数を再帰適用
+                if sub_result:
+                    slots[slot_name] = {f"sub-{k.lower()}": v for k, v in sub_result.items()}
+            elif phrase_type == 'word' and content:
+                # 単語レベル - 上位スロット保持
+                slots[slot_name] = {slot_name.lower(): content}
+        
+        return slots
 ```
 
-#### 階層的処理による複文対応
+### 1.4 Rephrase仕様違反の典型的な間違い
+
+#### ❌ 間違ったアプローチ（従来の実装）
 ```python
-# 複文分解戦略
-main_clause = extract_main_clause(sent)              # 主節分離
-sub_clauses = extract_subordinate_clauses(sent)      # 従属節分離
-results = [process_clause(clause) for clause in all_clauses]  # 再帰処理
+# スロット個別処理 - Rephrase仕様違反
+def _extract_s_slot(self, doc, root):  # S専用処理
+def _extract_v_slot(self, doc, root):  # V専用処理  
+def _extract_o1_slot(self, doc, root): # O1専用処理
+```
+
+#### ✅ 正しいアプローチ（Rephrase仕様準拠）
+```python
+# 統一処理 - 全スロットで同じアルゴリズム
+def decompose_any_text(self, text):  # 万能分解関数
+    for slot in ['M1', 'S', 'Aux', 'V', 'O1', 'O2', 'C1', 'C2', 'M2', 'M3']:
+        result = self._apply_unified_algorithm(text, slot)  # 同じアルゴリズム
 ```
 
 ---
 
-## 2. 現在の性能実証（2025年8月11日時点）
+## 2. 正しいRephrase仕様による実装例
 
-### 2.1 実動作検証結果
+### 2.1 基本原理の実証
 
-#### 単文処理（Phase 1基盤）
+#### 例文1: "She gave him a message."
 ```
-入力: "He succeeded."
-出力: 3スロット
-├── S: 'He' (main + sub-S)
-└── V: 'succeeded' (サブスロットなし)
+統一分解エンジン適用結果:
 
-✅ 成功率: 100% （基盤確立）
-```
+文全体 → 10スロット分解:
+├── S: "She" (word) → S: {s: "She"}
+├── V: "gave" (word) → V: {v: "gave"} 
+├── O1: "him" (word) → O1: {o1: "him"}
+└── O2: "a message" (word) → O2: {o2: "a message"}
 
-#### 複文処理（Phase 2統合）
-```
-入力: "He succeeded even though he was under intense pressure."
-出力: 10スロット
-├── 主節: S, V (2スロット)
-└── 従属節: S, V, C1, M2 (8スロット)
-
-✅ 成功率: 100% （従属節完全分離・処理）
+✅ 4つの上位スロット全て同じアルゴリズムで処理
+✅ PhraseType = "word" のため上位スロット保持
 ```
 
-#### 複雑文処理（Phase 3-4統合）
+#### 例文2: "The woman who seemed indecisive knew the answer."
 ```
-入力: "The experienced manager who had recently taken charge completed the project successfully."
-出力: 16スロット
-├── 主節: S(4サブ), V, O1(1サブ), M2(1サブ) (7スロット)
-└── 従属節: S(1サブ), V, O1, Aux, M2(1サブ) (5スロット)
+統一分解エンジン適用結果:
 
-✅ 成功率: 100% （サブスロット完全対応）
+文全体 → 10スロット分解:
+├── S: "The woman who seemed indecisive" (clause)
+│   └── 上位空化 + 再帰分解 → decompose_any_text("who seemed indecisive")
+│       ├── sub-s: "who" (word)
+│       ├── sub-v: "seemed" (word) 
+│       └── sub-c1: "indecisive" (word)
+├── V: "knew" (word) → V: {v: "knew"}
+└── O1: "the answer" (word) → O1: {o1: "the answer"}
+
+✅ S, V, O1全て同じアルゴリズムで処理
+✅ Sスロットのphrase/clauseのみ再帰適用
+```
+
+### 2.2 再帰構造の無限階層対応
+
+#### 理論的な深い階層例
+```
+"The manager who said that he believed that she would succeed knew the answer."
+
+S: "The manager who said that he believed that she would succeed" (clause)
+└── 上位空化 + 再帰分解1 → decompose_any_text("who said that...")
+    ├── sub-s: "who" (word)
+    ├── sub-v: "said" (word)
+    └── sub-o1: "that he believed that she would succeed" (clause)
+        └── 上位空化 + 再帰分解2 → decompose_any_text("he believed that...")
+            ├── sub-s: "he" (word) 
+            ├── sub-v: "believed" (word)
+            └── sub-o1: "that she would succeed" (clause)
+                └── 上位空化 + 再帰分解3 → decompose_any_text("she would succeed")
+                    ├── sub-s: "she" (word)
+                    ├── sub-aux: "would" (word)
+                    └── sub-v: "succeed" (word)
+
+✅ 同じ統一アルゴリズムを3層再帰適用
+✅ 無限階層理論対応
 ```
 
 ### 2.2 90スロット体系実証
