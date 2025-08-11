@@ -194,12 +194,28 @@ class Step18UnifiedRephraseSystem:
         return result
     
     def _analyze_dependencies(self, doc):
-        """spaCy依存関係解析 - 関係節動詞対応強化"""
+        """spaCy依存関係解析 - sub-m2精密化対応"""
         assignments = {}
+        
+        # デバッグ: 依存関係を確認
+        print(f"🔍 依存関係解析デバッグ: '{doc.text}'")
+        for token in doc:
+            print(f"  {token.text:15} | {token.dep_:10} | {token.pos_:5} | head: {token.head.text}")
         
         for token in doc:
             dep = token.dep_
             pos = token.pos_
+            
+            # sub-m2の特別処理：副詞のみを単独で認識
+            if dep == 'advmod' and pos == 'ADV':
+                print(f"📌 sub-m2発見: '{token.text}' (dep={dep}, pos={pos})")
+                assignments[token.i] = {
+                    'token': token,
+                    'subslot': 'sub-m2',
+                    'text': token.text,  # 単語のみ、拡張なし
+                    'no_expansion': True  # 拡張禁止フラグ
+                }
+                continue
             
             # 特別処理: 関係節内の動詞
             if dep == 'relcl' and pos == 'VERB':
@@ -240,21 +256,53 @@ class Step18UnifiedRephraseSystem:
             token = assignment['token']
             subslot_tokens[subslot].append(token)
         
+        # sub-m2の特別処理：advmod副詞を分離
+        if 'sub-m2' in subslot_tokens:
+            sub_m2_tokens = subslot_tokens['sub-m2']
+            advmod_tokens = [t for t in sub_m2_tokens if t.dep_ == 'advmod' and t.pos_ == 'ADV']
+            other_tokens = [t for t in sub_m2_tokens if not (t.dep_ == 'advmod' and t.pos_ == 'ADV')]
+            
+            if advmod_tokens:
+                print(f"🔍 sub-m2分離: advmod={len(advmod_tokens)}個, other={len(other_tokens)}個")
+                # advmod副詞のみでsub-m2を構成（最優先）
+                subslot_tokens['sub-m2'] = advmod_tokens
+                # 他の要素があれば別のスロットに移動（今回は無視）
+                if other_tokens:
+                    print(f"🔍 sub-m2から除外: {[t.text for t in other_tokens]}")
+        
         # 各サブスロットでトークンを選択・結合
         for subslot, tokens in subslot_tokens.items():
+            print(f"🔍 処理中サブスロット: {subslot}, トークン数: {len(tokens)}")
             if tokens:
                 if subslot == 'sub-v':
                     # 動詞は特別処理：最も適切な1つを選択
                     result[subslot] = self._select_best_verb(tokens)
+                    print(f"🔍 動詞選択: {result[subslot]}")
                 elif len(tokens) == 1:
-                    # 単一トークン：拡張スパン適用
-                    result[subslot] = self._get_extended_span(tokens[0], doc)
+                    token = tokens[0]
+                    assignment = assignments.get(token.i, {})
+                    
+                    print(f"🔍 単一トークン処理: {subslot} = '{token.text}' (dep={token.dep_}, pos={token.pos_})")
+                    
+                    # 拡張禁止フラグがある場合は事前設定テキストを使用
+                    if assignment.get('no_expansion'):
+                        result[subslot] = assignment.get('text', token.text)
+                        print(f"📌 拡張禁止適用: {subslot} = '{result[subslot]}'")
+                    else:
+                        # その他は拡張スパン適用
+                        print(f"🔍 拡張スパン適用前: {subslot}")
+                        result[subslot] = self._get_extended_span(token, doc)
+                        print(f"🔍 拡張スパン適用後: {subslot} = '{result[subslot]}'")
                 else:
                     # 複数トークン：連続スパン構築
                     tokens.sort(key=lambda t: t.i)
                     start_idx = tokens[0].i
                     end_idx = tokens[-1].i + 1
                     result[subslot] = doc[start_idx:end_idx].text
+                    print(f"🔍 複数トークン結合: {subslot} = '{result[subslot]}'")
+                    
+            else:
+                print(f"🔍 空トークン: {subslot}")
         
         return result
     
@@ -277,7 +325,30 @@ class Step18UnifiedRephraseSystem:
         return best_token.text
     
     def _get_extended_span(self, token, doc):
-        """拡張スパン構築 - 関係代名詞句対応強化"""
+        """拡張スパン構築 - sub-m2過大拡張防止対応"""
+        
+        # sub-m2の副詞は絶対に拡張しない（最優先ガード）
+        if token.dep_ == 'advmod' and token.pos_ == 'ADV':
+            print(f"📌 advmod副詞拡張防止: '{token.text}'")
+            return token.text
+        
+        # sub-m2の特別処理：副詞・形容詞の範囲を適切に制限
+        if token.dep_ in ['advmod', 'amod'] and token.pos_ in ['ADV', 'ADJ']:
+            # 単語レベルまたは最小限の修飾のみ
+            span_tokens = [token]
+            
+            # 限定的な修飾のみ追加（det, compoundなど）
+            for child in token.children:
+                if child.dep_ in ['det', 'compound'] and child.pos_ in ['DET', 'NOUN']:
+                    span_tokens.append(child)
+            
+            if len(span_tokens) == 1:
+                return token.text
+            
+            # 連続スパンを構築（範囲制限）
+            span_tokens.sort(key=lambda t: t.i)
+            return doc[span_tokens[0].i:span_tokens[-1].i + 1].text
+        
         # 関係代名詞を含む主語句の特別処理
         if token.dep_ == 'nsubj' and any(child.text.lower() in ['who', 'which', 'that'] for child in token.head.children):
             # 関係代名詞句全体を主語として認識
@@ -407,7 +478,7 @@ class Step18UnifiedRephraseSystem:
 if __name__ == "__main__":
     system = Step18UnifiedRephraseSystem()
     
-    print('🎯 Step18統一Rephraseシステム - 5文型フルセット全例文処理')
+    print('Step18統一Rephraseシステム - 5文型フルセット全例文処理')
     print('=' * 80)
     
     try:
