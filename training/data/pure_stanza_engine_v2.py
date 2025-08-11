@@ -290,7 +290,9 @@ class PureStanzaEngine:
                         c2_range = self._find_c2_verb_phrase_range(sent, child)
                         c2_text = self._extract_text_range(sent, c2_range)
                         print(f"📍 C2検出: '{c2_text}'")
-                        return {'main': c2_text}
+                        # 統一サブスロット処理追加
+                        subslots = self._extract_unified_subslots(sent, child, c2_text)
+                        return subslots
         return None
     
     def _extract_m2_slot(self, sent, root_verb):
@@ -306,7 +308,9 @@ class PureStanzaEngine:
                                 m2_range = self._find_m2_phrase_range(sent, pressure_child)
                                 m2_text = self._extract_text_range(sent, m2_range)
                                 print(f"📍 M2検出: '{m2_text}'")
-                                return {'main': m2_text}
+                                # 統一サブスロット処理追加
+                                subslots = self._extract_unified_subslots(sent, pressure_child, m2_text)
+                                return subslots
         return None
     
     def _extract_m3_slot(self, sent, root_verb):
@@ -324,7 +328,9 @@ class PureStanzaEngine:
                                         m3_range = self._find_complete_subtree_range(sent, reflect_child)
                                         m3_text = self._extract_text_range(sent, m3_range)
                                         print(f"📍 M3検出: '{m3_text}'")
-                                        return {'main': m3_text}
+                                        # 統一サブスロット処理追加
+                                        subslots = self._extract_unified_subslots(sent, reflect_child, m3_text)
+                                        return subslots
         return None
     
     # Helper methods for unified boundary detection algorithm
@@ -453,6 +459,21 @@ class PureStanzaEngine:
             'sub-o1': 'charge of the project'
         }
     
+    def _extract_unified_subslots(self, sent, root_word, main_text):
+        """統一サブスロット処理: Aux/V以外の全スロット共通処理"""
+        result = {'main': main_text}
+        
+        # Step18と同様のサブスロット分解を適用（スモールステップ: 基本パターンのみ）
+        # 将来的にはSスロットと同等の詳細分解を実装
+        words = main_text.split()
+        
+        # 基本的なサブスロット分解パターン（例として）
+        if len(words) >= 2:
+            result['sub-m1'] = words[0] if len(words) > 0 else ''
+            result['sub-m2'] = words[-1] if len(words) > 1 else ''
+        
+        return result
+    
     def _print_slots(self, slots):
         """Print slot results"""
         print(f"\n=== Stanza基本分解結果 ===")
@@ -461,10 +482,11 @@ class PureStanzaEngine:
             if isinstance(slot_data, dict) and 'main' in slot_data:
                 print(f"\n📋 {slot_name}スロット: \"{slot_data['main']}\"")
                 
-                # Print subslots if available
-                if slot_name == 'S':
-                    print(f"\n📋 Sスロット:")
-                    for sub_key in ['sub-s', 'sub-aux', 'sub-m2', 'sub-o1', 'sub-v']:
+                # Print subslots if available (統一処理で全スロット対応)
+                has_subslots = any(key.startswith('sub-') for key in slot_data.keys())
+                if has_subslots:
+                    print(f"\n📋 {slot_name}スロット:")
+                    for sub_key in ['sub-s', 'sub-aux', 'sub-m1', 'sub-m2', 'sub-m3', 'sub-o1', 'sub-o2', 'sub-c1', 'sub-c2', 'sub-v']:
                         if sub_key in slot_data:
                             print(f"  {sub_key:10}: \"{slot_data[sub_key]}\"")
                     print(f"  {'main':10}: \"{slot_data['main']}\"")
