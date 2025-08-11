@@ -262,13 +262,18 @@ class Step18UnifiedRephraseSystem:
             advmod_tokens = [t for t in sub_m2_tokens if t.dep_ == 'advmod' and t.pos_ == 'ADV']
             other_tokens = [t for t in sub_m2_tokens if not (t.dep_ == 'advmod' and t.pos_ == 'ADV')]
             
+            print(f"🔍 sub-m2分離: advmod={len(advmod_tokens)}個, other={len(other_tokens)}個")
+            
             if advmod_tokens:
-                print(f"🔍 sub-m2分離: advmod={len(advmod_tokens)}個, other={len(other_tokens)}個")
                 # advmod副詞のみでsub-m2を構成（最優先）
                 subslot_tokens['sub-m2'] = advmod_tokens
                 # 他の要素があれば別のスロットに移動（今回は無視）
                 if other_tokens:
                     print(f"🔍 sub-m2から除外: {[t.text for t in other_tokens]}")
+            else:
+                # advmodがない場合は、sub-m2を空にする
+                print(f"🔍 sub-m2にadvmodなし - スロット削除: {[t.text for t in other_tokens]}")
+                del subslot_tokens['sub-m2']
         
         # 各サブスロットでトークンを選択・結合
         for subslot, tokens in subslot_tokens.items():
