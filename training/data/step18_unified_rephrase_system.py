@@ -114,15 +114,62 @@ class Step18UnifiedRephraseSystem:
         return results
     
     def _extract_slot_phrases(self, sentence, doc):
-        """テスト用：簡易スロット抽出"""
-        # 実際の運用では上位システムからスロット分割済みデータを受け取る
-        return {
-            'S': 'the woman who seemed indecisive',
-            'M2': 'although it was emotionally hard',
-            'V': 'known',
-            'O1': 'that he had been trying to avoid Tom',
-            'M3': 'because he was afraid of hurting her feelings'
-        }
+        """動的スロット抽出：spaCy解析に基づく実際のスロット分割"""
+        slots = {}
+        
+        # ROOT動詞を特定
+        root_verb = None
+        for token in doc:
+            if token.dep_ == "ROOT" and token.pos_ in ["VERB", "AUX"]:
+                root_verb = token
+                break
+        
+        if not root_verb:
+            return {}
+        
+        # Vスロット（メイン動詞）
+        slots['V'] = root_verb.text
+        
+        # Sスロット（主語）：主語とその修飾を含む
+        for token in doc:
+            if token.dep_ in ['nsubj', 'nsubjpass', 'csubj'] and token.head == root_verb:
+                # 主語句全体を抽出（修飾語も含む）
+                s_tokens = [token]
+                for child in token.subtree:
+                    if child != token:
+                        s_tokens.append(child)
+                s_tokens.sort(key=lambda t: t.i)
+                if s_tokens:
+                    slots['S'] = doc[s_tokens[0].i:s_tokens[-1].i+1].text
+                break
+        
+        # O1スロット（目的語節）：that節など
+        for token in doc:
+            if token.dep_ in ['ccomp', 'xcomp'] and token.head == root_verb:
+                # 目的語節全体を抽出
+                o1_tokens = list(token.subtree)
+                o1_tokens.sort(key=lambda t: t.i)
+                if o1_tokens:
+                    slots['O1'] = doc[o1_tokens[0].i:o1_tokens[-1].i+1].text
+                break
+        
+        # M2, M3スロット（副詞節）：although, because節など
+        adv_clauses = []
+        for token in doc:
+            if token.dep_ in ['advcl'] and token.head == root_verb:
+                adv_tokens = list(token.subtree)
+                adv_tokens.sort(key=lambda t: t.i)
+                if adv_tokens:
+                    clause_text = doc[adv_tokens[0].i:adv_tokens[-1].i+1].text
+                    adv_clauses.append(clause_text)
+        
+        # 副詞節をM2, M3に割り当て
+        if len(adv_clauses) >= 1:
+            slots['M2'] = adv_clauses[0]
+        if len(adv_clauses) >= 2:
+            slots['M3'] = adv_clauses[1]
+        
+        return slots
     
     def _unified_decompose(self, phrase):
         """統一分解エンジン：8スロット共通"""
