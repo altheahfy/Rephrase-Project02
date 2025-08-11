@@ -9,7 +9,7 @@ import spacy
 
 class PureStanzaEngine:
     def __init__(self):
-        """Stanza + spaCy hybrid engine initialization"""
+        """Stanza + spaCy + Step18 hybrid engine initialization"""
         print("🎯 PureStanzaEngine初期化中...")
         
         # Stanza pipeline for structural analysis
@@ -24,7 +24,28 @@ class PureStanzaEngine:
             print("⚠️ spaCy en_core_web_sm not found. Boundary adjustment disabled.")
             self.spacy_nlp = None
         
-        print("🏗️ Stanza+spaCyハイブリッドエンジン準備完了")
+        # Step18 subslot mapping integration
+        self.dep_to_subslot = {
+            'nsubj': 'sub-s',
+            'nsubjpass': 'sub-s',
+            'aux': 'sub-aux', 
+            'auxpass': 'sub-aux',
+            'dobj': 'sub-o1',
+            'iobj': 'sub-o2',
+            'attr': 'sub-c1',
+            'ccomp': 'sub-c2',
+            'xcomp': 'sub-c2',
+            'advmod': 'sub-m2',
+            'amod': 'sub-m3', 
+            'prep': 'sub-m3',
+            'pobj': 'sub-o1',
+            'pcomp': 'sub-c2',
+            'mark': 'sub-m1',
+            'relcl': 'sub-m3',
+            'acl': 'sub-m3'
+        }
+        
+        print("🏗️ Stanza+spaCy+Step18ハイブリッドエンジン準備完了")
     
     def decompose(self, sentence):
         """Basic decomposition: Utilizing Stanza information directly"""
@@ -48,6 +69,10 @@ class PureStanzaEngine:
             # Layer 2: Adjust boundaries with spaCy
             print("🔧 Layer 2: spaCy境界調整...")
             slots = self._adjust_boundaries_with_spacy(sentence, slots)
+            
+            # Layer 3: Add Step18 subslot enhancements (preserve main slots)
+            print("🧩 Layer 3: Step18サブスロット強化...")
+            slots = self._add_step18_subslot_enhancements(sentence, slots)
             
             # Print results
             self._print_slots(slots)
@@ -512,6 +537,225 @@ class PureStanzaEngine:
                 break
         
         return doc[start_i:end_i]
+    
+    # === Layer 3: Step18 Advanced Subslot Processing ===
+    
+    def _enhance_with_step18_subslots(self, sentence, slots):
+        """
+        Layer 3: Step18のサブスロット処理技術を統合
+        既存のスロットにStep18のサブスロット詳細処理を追加
+        """
+        if not self.spacy_nlp:
+            print("⚠️ spaCy not available. Skipping Step18 subslot processing.")
+            return slots
+        
+        print("🧩 Layer 3: Step18サブスロット処理...")
+        
+        # Process sentence with spaCy for Step18 techniques
+        spacy_doc = self.spacy_nlp(sentence)
+        
+        enhanced_slots = {}
+        for slot_name, slot_data in slots.items():
+            if slot_name in ['S', 'O1', 'C2', 'M2', 'M3']:  # Subslot capable slots
+                enhanced_slots[slot_name] = self._apply_step18_subslot_processing(
+                    slot_data, spacy_doc, sentence, slot_name
+                )
+            else:
+                enhanced_slots[slot_name] = slot_data
+        
+        print("✅ Step18サブスロット処理完了")
+        return enhanced_slots
+    
+    def _apply_step18_subslot_processing(self, slot_data, spacy_doc, sentence, slot_name):
+        """
+        Apply Step18's detailed subslot processing to individual slots
+        """
+        if not slot_data or 'main' not in slot_data:
+            return slot_data
+        
+        main_text = slot_data['main']
+        if not main_text:
+            return slot_data
+        
+        # Find the span in spaCy doc
+        start_char = sentence.find(main_text)
+        if start_char == -1:
+            return slot_data
+        
+        end_char = start_char + len(main_text)
+        spacy_span = spacy_doc.char_span(start_char, end_char, alignment_mode="expand")
+        
+        if not spacy_span:
+            return slot_data
+        
+        # Apply Step18's _expand_span and _integrate_prepositions techniques
+        enhanced_slot_data = slot_data.copy()
+        
+        # Find root token of this slot
+        root_token = None
+        for token in spacy_span:
+            if token.dep_ in ['ROOT', 'nsubj', 'dobj', 'xcomp', 'ccomp', 'advcl']:
+                root_token = token
+                break
+        
+        if root_token:
+            # Apply Step18 expansion
+            expanded_text = self._step18_expand_span(root_token, spacy_doc)
+            
+            # Apply Step18 preposition integration
+            integrated_text = self._step18_integrate_prepositions(root_token, spacy_doc)
+            if integrated_text:
+                expanded_text = integrated_text
+            
+            enhanced_slot_data['main'] = expanded_text
+            
+            # Generate subslots using Step18 mapping
+            subslots = self._generate_step18_subslots(root_token, spacy_doc)
+            enhanced_slot_data.update(subslots)
+            
+            if expanded_text != main_text:
+                print(f"🧩 {slot_name}拡張: {main_text} → {expanded_text}")
+        
+        return enhanced_slot_data
+    
+    def _step18_expand_span(self, token, doc):
+        """Step18のスパン拡張アルゴリズム移植"""
+        expand_deps = ['det', 'poss', 'compound', 'amod']
+        
+        start = token.i
+        end = token.i
+        
+        # 基本的な子要素の拡張
+        for child in token.children:
+            if child.dep_ in expand_deps:
+                start = min(start, child.i)
+                end = max(end, child.i)
+        
+        # 関係節処理
+        for child in token.children:
+            if child.dep_ == 'relcl':
+                # 関係代名詞(who)のみ含める
+                for relcl_child in child.children:
+                    if relcl_child.dep_ == 'nsubj' and relcl_child.pos_ == 'PRON':
+                        start = min(start, relcl_child.i)
+                        end = max(end, relcl_child.i)
+                        break
+        
+        return ' '.join([doc[i].text for i in range(start, end + 1)])
+    
+    def _step18_integrate_prepositions(self, token, doc):
+        """Step18の前置詞統合処理移植"""
+        # 動詞 + 前置詞句統合
+        if token.pos_ in ['VERB', 'AUX']:
+            prep_parts = []
+            
+            for child in token.children:
+                if child.dep_ == 'prep':
+                    prep_text = child.text
+                    
+                    for prep_child in child.children:
+                        if prep_child.dep_ == 'pobj':
+                            obj_span = self._step18_expand_span(prep_child, doc)
+                            prep_text += f" {obj_span}"
+                    
+                    prep_parts.append(prep_text)
+            
+            if prep_parts:
+                return f"{token.text} {' '.join(prep_parts)}"
+        
+        # 名詞 + 前置詞句統合
+        if token.pos_ == 'NOUN' and token.dep_ == 'dobj':
+            prep_parts = []
+            
+            for child in token.children:
+                if child.dep_ == 'prep':
+                    prep_text = child.text
+                    
+                    for prep_child in child.children:
+                        if prep_child.dep_ == 'pobj':
+                            obj_span = self._step18_expand_span(prep_child, doc)
+                            prep_text += f" {obj_span}"
+                    
+                    prep_parts.append(prep_text)
+            
+            if prep_parts:
+                return f"{token.text} {' '.join(prep_parts)}"
+        
+        return None
+    
+    def _generate_step18_subslots(self, token, doc):
+        """Step18のサブスロット生成技術移植"""
+        subslots = {}
+        
+        for child in token.children:
+            if child.dep_ in self.dep_to_subslot:
+                subslot_name = self.dep_to_subslot[child.dep_]
+                expanded_text = self._step18_expand_span(child, doc)
+                subslots[subslot_name] = expanded_text
+        
+        return subslots
+    
+    def _add_step18_subslot_enhancements(self, sentence, slots):
+        """
+        Layer 3 Alternative: Step18のサブスロット技術を既存スロットに追加
+        メインスロットは保持し、追加サブスロット情報のみ統合
+        """
+        if not self.spacy_nlp:
+            print("⚠️ spaCy not available. Skipping Step18 enhancements.")
+            return slots
+        
+        print("🧩 Step18サブスロット強化処理...")
+        
+        # Process sentence with spaCy
+        spacy_doc = self.spacy_nlp(sentence)
+        
+        enhanced_slots = {}
+        for slot_name, slot_data in slots.items():
+            enhanced_slot_data = slot_data.copy()
+            
+            # Add Step18 subslot classifications for complex slots
+            if slot_name in ['S', 'O1', 'C2'] and 'main' in slot_data:
+                additional_subslots = self._extract_additional_step18_subslots(
+                    slot_data['main'], spacy_doc, sentence
+                )
+                enhanced_slot_data.update(additional_subslots)
+            
+            enhanced_slots[slot_name] = enhanced_slot_data
+        
+        print("✅ Step18サブスロット強化完了")
+        return enhanced_slots
+    
+    def _extract_additional_step18_subslots(self, main_text, spacy_doc, sentence):
+        """
+        Step18のサブスロット分類技術を使って追加サブスロットを抽出
+        メインテキストは変更せず、内部構造のみ分析
+        """
+        additional_subslots = {}
+        
+        # Find span in spaCy doc
+        start_char = sentence.find(main_text)
+        if start_char == -1:
+            return additional_subslots
+        
+        end_char = start_char + len(main_text)
+        spacy_span = spacy_doc.char_span(start_char, end_char, alignment_mode="expand")
+        
+        if not spacy_span:
+            return additional_subslots
+        
+        # Apply Step18 dependency mapping within the span
+        for token in spacy_span:
+            for child in token.children:
+                if child in spacy_span and child.dep_ in self.dep_to_subslot:
+                    subslot_name = self.dep_to_subslot[child.dep_]
+                    # Only add if not already present
+                    if subslot_name not in additional_subslots:
+                        additional_subslots[f"step18-{subslot_name}"] = child.text
+        
+        if additional_subslots:
+            print(f"  🧩 追加サブスロット: {additional_subslots}")
+        
+        return additional_subslots
 
 
 def test_example007():
