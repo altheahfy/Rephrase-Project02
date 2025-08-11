@@ -109,16 +109,49 @@ class Step16ExcelGenerator:
                     return token.lemma_
         return verb.lower()
     
+    def _calculate_slot_display_order(self, sentence, all_slot_results):
+        """原文の語順に基づいてスロットの表示順序を計算"""
+        # spaCyで原文を解析
+        doc = self.subslot_generator.nlp(sentence)
+        
+        # 各スロットの最初のトークン位置を取得
+        slot_first_positions = {}
+        
+        for slot_name, subslots in all_slot_results.items():
+            min_position = float('inf')
+            
+            for subslot_data in subslots.values():
+                if subslot_data and 'token_indices' in subslot_data:
+                    token_indices = subslot_data['token_indices']
+                    if token_indices and token_indices[0] != -1:
+                        min_position = min(min_position, token_indices[0])
+            
+            if min_position != float('inf'):
+                slot_first_positions[slot_name] = min_position
+        
+        # 位置順でソートしてdisplay_orderを割り当て
+        sorted_slots = sorted(slot_first_positions.items(), key=lambda x: x[1])
+        slot_display_orders = {}
+        
+        for i, (slot_name, _) in enumerate(sorted_slots, 1):
+            slot_display_orders[slot_name] = i
+            
+        return slot_display_orders
+    
     def _convert_to_excel_format(self, sentence, all_slot_results, v_group_key):
         """Step16解析結果を5文型フルセット形式のExcel行に変換"""
         excel_rows = []
         example_id = f"ex{self.current_example_id:03d}"
         
-        # 各上位スロットを処理
-        for slot_name in self.main_slot_order.keys():
+        # 動的にSlot_display_orderを計算
+        slot_display_orders = self._calculate_slot_display_order(sentence, all_slot_results)
+        
+        # 各上位スロットを処理（原文の語順で）
+        sorted_slots = sorted(slot_display_orders.items(), key=lambda x: x[1])
+        
+        for slot_name, slot_display_order in sorted_slots:
             if slot_name in all_slot_results:
                 subslots = all_slot_results[slot_name]
-                slot_display_order = self.main_slot_order[slot_name]
                 
                 # 上位スロットの統合フレーズを生成
                 main_phrase = self._generate_main_slot_phrase(subslots)
