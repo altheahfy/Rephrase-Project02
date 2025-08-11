@@ -147,19 +147,27 @@ class Step18UnifiedRephraseSystem:
         return result
     
     def _analyze_dependencies(self, doc):
-        """spaCy依存関係解析"""
+        """spaCy依存関係解析 - 関係節動詞対応強化"""
         assignments = {}
         
         for token in doc:
             dep = token.dep_
-            if dep in self.dep_to_subslot:
+            pos = token.pos_
+            
+            # 特別処理: 関係節内の動詞
+            if dep == 'relcl' and pos == 'VERB':
+                target_subslot = 'sub-v'  # 動詞として認識
+            elif dep in self.dep_to_subslot:
                 target_subslot = self.dep_to_subslot[dep]
-                if target_subslot:  # 空文字列でない場合
-                    assignments[token.i] = {
-                        'token': token,
-                        'subslot': target_subslot,
-                        'text': token.text
-                    }
+            else:
+                continue
+                
+            if target_subslot:  # 空文字列でない場合
+                assignments[token.i] = {
+                    'token': token,
+                    'subslot': target_subslot,
+                    'text': token.text
+                }
         
         return assignments
     
@@ -192,8 +200,30 @@ class Step18UnifiedRephraseSystem:
         return result
     
     def _get_extended_span(self, token, doc):
-        """拡張スパン構築"""
-        # 重要な修飾語を含める
+        """拡張スパン構築 - 関係代名詞句対応強化"""
+        # 関係代名詞を含む主語句の特別処理
+        if token.dep_ == 'nsubj' and any(child.text.lower() in ['who', 'which', 'that'] for child in token.head.children):
+            # 関係代名詞句全体を主語として認識
+            span_tokens = []
+            
+            # 主語部分（関係代名詞より前）
+            for t in doc:
+                if t.i <= token.i:
+                    span_tokens.append(t)
+                else:
+                    break
+            
+            # 関係代名詞を含める
+            for child in token.head.children:
+                if child.text.lower() in ['who', 'which', 'that'] and child.i > token.i:
+                    span_tokens.append(child)
+                    break
+            
+            if len(span_tokens) > 1:
+                span_tokens.sort(key=lambda t: t.i)
+                return doc[span_tokens[0].i:span_tokens[-1].i + 1].text
+        
+        # 通常の拡張スパン処理
         span_tokens = [token]
         
         for child in token.children:
