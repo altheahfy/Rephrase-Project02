@@ -202,23 +202,23 @@ class PureStanzaEngine:
     def _extract_v_slot(self, sent, root_verb):
         """V slot: Verb - 第2文型（SVC）対応版"""
         
-        # パターン1: 通常の動詞（ROOT = VERB）
+        # パターン1: xcomp構造での実際の動詞（優先）
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel == 'xcomp':
+                print(f"📍 V検出: '{word.text}'（xcomp）")
+                return {'main': word.text}
+        
+        # パターン2: 通常の動詞（ROOT = VERB）
         if root_verb.upos == 'VERB':
             print(f"📍 V検出: '{root_verb.text}'（ROOT VERB）")
             return {'main': root_verb.text}
         
-        # パターン2: be動詞構文（ROOT = ADJ, cop関係でbe動詞特定）
+        # パターン3: be動詞構文（ROOT = ADJ, cop関係でbe動詞特定）
         elif root_verb.upos == 'ADJ':
             for word in sent.words:
                 if word.head == root_verb.id and word.deprel == 'cop':
                     print(f"📍 V検出: '{word.text}'（cop + ROOT ADJ）")
                     return {'main': word.text}
-        
-        # パターン3: xcomp構造での実際の動詞
-        for word in sent.words:
-            if word.head == root_verb.id and word.deprel == 'xcomp':
-                print(f"📍 V検出: '{word.text}'（xcomp）")
-                return {'main': word.text}
         
         return None
     
