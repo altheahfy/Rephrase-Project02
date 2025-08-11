@@ -360,36 +360,33 @@ class Step18Complete8SlotSystem:
         return None
     
     def _expand_span(self, token, doc):
-        """スパン拡張処理（改良版 - det確実統合）"""
-        expand_deps = ['det', 'poss', 'compound', 'amod', 'relcl']
+        """スパン拡張処理（修正版 - 関係代名詞のみ含める）"""
+        expand_deps = ['det', 'poss', 'compound', 'amod']
         
         start = token.i
         end = token.i
         
         print(f"  🔍 スパン拡張デバッグ: '{token.text}' (dep={token.dep_})")
         
-        # 子要素の拡張
+        # 基本的な子要素の拡張
         for child in token.children:
             print(f"    子要素: '{child.text}' (dep={child.dep_})")
             if child.dep_ in expand_deps:
-                print(f"    ✅ 拡張対象: '{child.text}'")
+                print(f"    ✅ 基本拡張対象: '{child.text}'")
                 start = min(start, child.i)
                 end = max(end, child.i)
-                
-                # 関係節の場合、関係代名詞も含める
-                if child.dep_ == 'relcl':
-                    for relcl_child in child.children:
-                        if relcl_child.dep_ == 'nsubj' and relcl_child.pos_ == 'PRON':  # who
-                            print(f"    ✅ 関係代名詞拡張: '{relcl_child.text}'")
-                            start = min(start, relcl_child.i)
-                            end = max(end, relcl_child.i)
         
-        # 左側の冠詞も含める（主語の場合） - 追加保険
-        if token.dep_ in ['nsubj', 'nsubjpass']:
-            for i in range(max(0, token.i - 2), token.i):
-                if doc[i].dep_ == 'det' and doc[i].head.i >= start and doc[i].head.i <= end:
-                    print(f"    ✅ 左側冠詞拡張: '{doc[i].text}'")
-                    start = min(start, i)
+        # 関係節の場合は関係代名詞のみ含める
+        for child in token.children:
+            if child.dep_ == 'relcl':
+                print(f"    🔍 関係節処理: '{child.text}'")
+                # 関係代名詞(who)のみ探して含める
+                for relcl_child in child.children:
+                    if relcl_child.dep_ == 'nsubj' and relcl_child.pos_ == 'PRON':  # who
+                        print(f"    ✅ 関係代名詞含める: '{relcl_child.text}'")
+                        start = min(start, relcl_child.i)
+                        end = max(end, relcl_child.i)  # ← end も更新
+                        break
         
         result = ' '.join([doc[i].text for i in range(start, end + 1)])
         print(f"  📌 拡張結果: '{result}'")
