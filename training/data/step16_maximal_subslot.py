@@ -166,7 +166,8 @@ class MaximalSubslotGenerator:
                     complete[slot_name] = {
                         'text': f'[{slot_name}]',
                         'tokens': [f'[{slot_name}]'],
-                        'token_indices': [-1]
+                        'token_indices': [-1],
+                        'display_order': 999  # プレースホルダーは最後に表示
                     }
                     print(f"✅ プレースホルダー {slot_name}: '[{slot_name}]'")
         
@@ -178,7 +179,8 @@ class MaximalSubslotGenerator:
         return {
             'text': text,
             'tokens': [text],
-            'token_indices': [token.i]
+            'token_indices': [token.i],
+            'display_order': token.i + 1  # 原文の語順（1-based）
         }
 
 def ultimate_test_all_slots():
