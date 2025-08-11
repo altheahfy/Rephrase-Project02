@@ -112,6 +112,12 @@ class PureStanzaEngine:
         # O1: Object 1
         slots['O1'] = self._extract_o1_slot(sent, root_verb)
         
+        # O2: Object 2 (indirect object) - 統一処理追加
+        slots['O2'] = self._extract_o2_slot(sent, root_verb)
+        
+        # C1: Complement 1 (predicative complement) - 統一処理追加  
+        slots['C1'] = self._extract_c1_slot(sent, root_verb)
+        
         # C2: Complement 2
         slots['C2'] = self._extract_c2_slot(sent, root_verb)
         
@@ -214,6 +220,30 @@ class PureStanzaEngine:
                         o1_text = self._extract_text_range(sent, o1_range)
                         print(f"📍 O1検出: '{o1_text}'")
                         return {'main': o1_text}
+        return None
+    
+    def _extract_o2_slot(self, sent, root_verb):
+        """O2 slot: Object 2 (indirect object) - 統一パターン適用"""
+        # Look for iobj dependency (indirect object)
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel == 'iobj':
+                # 統一境界検出: 完全なiobj句を抽出
+                o2_range = self._find_complete_subtree_range(sent, word)
+                o2_text = self._extract_text_range(sent, o2_range)
+                print(f"📍 O2検出: '{o2_text}'")
+                return {'main': o2_text}
+        return None
+    
+    def _extract_c1_slot(self, sent, root_verb):
+        """C1 slot: Complement 1 (predicative complement) - 統一パターン適用"""
+        # Look for attr/acomp dependency (predicative complement)
+        for word in sent.words:
+            if word.head == root_verb.id and word.deprel in ['attr', 'acomp']:
+                # 統一境界検出: 完全なcomplement句を抽出
+                c1_range = self._find_complete_subtree_range(sent, word)
+                c1_text = self._extract_text_range(sent, c1_range)
+                print(f"📍 C1検出: '{c1_text}'")
+                return {'main': c1_text}
         return None
     
     def _extract_c2_slot(self, sent, root_verb):
