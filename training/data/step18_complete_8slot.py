@@ -140,8 +140,9 @@ class Step18Complete8SlotSystem:
                 # 関係節動詞自体
                 s_tokens['sub-v'].append(child)
         
-        # 主語自体
+        # 主語自体（スパン拡張適用）
         s_tokens['sub-s'].append(main_subject)
+        print(f"📌 主語トークン追加: '{main_subject.text}' (dep={main_subject.dep_})")
         
         # ROOT動詞のaux収集（Sスロット用）
         for child in root_verb.children:
@@ -293,6 +294,8 @@ class Step18Complete8SlotSystem:
             if len(tokens) == 1:
                 token = tokens[0]
                 
+                print(f"  🔍 単一トークン処理: {subslot_name} = '{token.text}' (dep={token.dep_})")
+                
                 # 前置詞統合チェック
                 integrated = self._integrate_prepositions(token, doc)
                 if integrated:
@@ -309,9 +312,28 @@ class Step18Complete8SlotSystem:
         return subslots
     
     def _integrate_prepositions(self, token, doc):
-        """前置詞統合処理"""
+        """前置詞統合処理（強化版）"""
         # 動詞 + 前置詞句統合
         if token.pos_ in ['VERB', 'AUX']:
+            prep_parts = []
+            
+            for child in token.children:
+                if child.dep_ == 'prep':
+                    prep_text = child.text
+                    
+                    # 前置詞の目的語
+                    for prep_child in child.children:
+                        if prep_child.dep_ == 'pobj':
+                            obj_span = self._expand_span(prep_child, doc)
+                            prep_text += f" {obj_span}"
+                    
+                    prep_parts.append(prep_text)
+            
+            if prep_parts:
+                return f"{token.text} {' '.join(prep_parts)}"
+        
+        # 名詞 + 前置詞句統合（Sスロットのsub-o1用）
+        if token.pos_ == 'NOUN' and token.dep_ == 'dobj':
             prep_parts = []
             
             for child in token.children:
@@ -338,19 +360,40 @@ class Step18Complete8SlotSystem:
         return None
     
     def _expand_span(self, token, doc):
-        """スパン拡張処理"""
-        expand_deps = ['det', 'poss', 'compound', 'amod']
+        """スパン拡張処理（改良版 - det確実統合）"""
+        expand_deps = ['det', 'poss', 'compound', 'amod', 'relcl']
         
         start = token.i
         end = token.i
         
+        print(f"  🔍 スパン拡張デバッグ: '{token.text}' (dep={token.dep_})")
+        
         # 子要素の拡張
         for child in token.children:
+            print(f"    子要素: '{child.text}' (dep={child.dep_})")
             if child.dep_ in expand_deps:
+                print(f"    ✅ 拡張対象: '{child.text}'")
                 start = min(start, child.i)
                 end = max(end, child.i)
+                
+                # 関係節の場合、関係代名詞も含める
+                if child.dep_ == 'relcl':
+                    for relcl_child in child.children:
+                        if relcl_child.dep_ == 'nsubj' and relcl_child.pos_ == 'PRON':  # who
+                            print(f"    ✅ 関係代名詞拡張: '{relcl_child.text}'")
+                            start = min(start, relcl_child.i)
+                            end = max(end, relcl_child.i)
         
-        return ' '.join([doc[i].text for i in range(start, end + 1)])
+        # 左側の冠詞も含める（主語の場合） - 追加保険
+        if token.dep_ in ['nsubj', 'nsubjpass']:
+            for i in range(max(0, token.i - 2), token.i):
+                if doc[i].dep_ == 'det' and doc[i].head.i >= start and doc[i].head.i <= end:
+                    print(f"    ✅ 左側冠詞拡張: '{doc[i].text}'")
+                    start = min(start, i)
+        
+        result = ' '.join([doc[i].text for i in range(start, end + 1)])
+        print(f"  📌 拡張結果: '{result}'")
+        return result
 
 def test_complete_8slot_ex007():
     """ex007完全8スロットテスト"""
