@@ -182,22 +182,52 @@ class Step18UnifiedRephraseSystem:
             token = assignment['token']
             subslot_tokens[subslot].append(token)
         
-        # 各サブスロットでトークンを結合
+    def _apply_rephrase_rules(self, doc, assignments):
+        """Rephraseルール適用 - 動詞優先度対応強化"""
+        result = self._empty_subslots()
+        subslot_tokens = defaultdict(list)
+        
+        # トークンをサブスロット別に分類
+        for token_idx, assignment in assignments.items():
+            subslot = assignment['subslot']
+            token = assignment['token']
+            subslot_tokens[subslot].append(token)
+        
+        # 各サブスロットでトークンを選択・結合
         for subslot, tokens in subslot_tokens.items():
             if tokens:
-                # 位置順にソート
-                tokens.sort(key=lambda t: t.i)
-                
-                # スパン構築
-                if len(tokens) == 1:
+                if subslot == 'sub-v':
+                    # 動詞は特別処理：最も適切な1つを選択
+                    result[subslot] = self._select_best_verb(tokens)
+                elif len(tokens) == 1:
+                    # 単一トークン：拡張スパン適用
                     result[subslot] = self._get_extended_span(tokens[0], doc)
                 else:
-                    # 複数トークン：最初と最後の位置で連続スパン構築
+                    # 複数トークン：連続スパン構築
+                    tokens.sort(key=lambda t: t.i)
                     start_idx = tokens[0].i
                     end_idx = tokens[-1].i + 1
                     result[subslot] = doc[start_idx:end_idx].text
         
         return result
+    
+    def _select_best_verb(self, tokens):
+        """動詞の最適選択"""
+        # 動詞の優先度定義
+        verb_priority = {
+            'relcl': 1,    # 関係節動詞（最優先）
+            'ROOT': 2,     # 主動詞
+            'cop': 3,      # コピュラ
+            'aux': 4       # 助動詞（低優先）
+        }
+        
+        # 優先度でソート
+        sorted_tokens = sorted(tokens, 
+                              key=lambda t: verb_priority.get(t.dep_, 999))
+        
+        # 最優先の動詞を選択
+        best_token = sorted_tokens[0]
+        return best_token.text
     
     def _get_extended_span(self, token, doc):
         """拡張スパン構築 - 関係代名詞句対応強化"""
@@ -333,8 +363,11 @@ if __name__ == "__main__":
     print('🎯 Step18統一Rephraseシステムテスト')
     print('=' * 100)
     
-    # テスト例文
-    test_sentence = "This morning, the woman who seemed indecisive had, although it was emotionally hard, known that he had been trying to avoid Tom because he was afraid of hurting her feelings."
+    # テスト例文（5文型フルセット ex007）
+    test_sentence = "That afternoon at the crucial point in the presentation, the manager who had recently taken charge of the project had to make the committee responsible for implementation deliver the final proposal flawlessly even though he was under intense pressure so the outcome would reflect their full potential."
+    
+    print(f"🎯 Step18処理開始: '{test_sentence}'")
+    print("=" * 91)
     
     # 処理実行
     results = system.process_sentence(test_sentence)
