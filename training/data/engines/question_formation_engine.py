@@ -61,12 +61,12 @@ class QuestionFormationEngine:
         'may', 'might', 'must', 'ought', 'dare', 'need', 'used'
     }
     
-    # Question types and their characteristics
+    # Question types and their characteristics (order matters!)
     QUESTION_TYPES = {
-        'yes_no': {
-            'pattern': r'^(?:do|does|did|am|is|are|was|were|have|has|had|will|would|can|could|may|might|must|shall|should)\b',
-            'answer_type': 'yes_no',
-            'inversion': True
+        'negative_question': {
+            'pattern': r'^(?:isn\'t|aren\'t|wasn\'t|weren\'t|don\'t|doesn\'t|didn\'t|haven\'t|hasn\'t|hadn\'t|won\'t|wouldn\'t|can\'t|couldn\'t|shouldn\'t|mustn\'t)\b',
+            'answer_type': 'yes_no_negative',
+            'negative': True
         },
         'wh_question': {
             'pattern': r'^(?:what|where|when|why|who|whom|whose|which|how)\b',
@@ -78,15 +78,20 @@ class QuestionFormationEngine:
             'answer_type': 'confirmation',
             'tag_structure': True
         },
+        'embedded_question': {
+            'pattern': r'(?:wonder|know|ask|tell|show).*(?:what|where|when|why|who|whom|whose|which|how)\b',
+            'answer_type': 'embedded',
+            'indirect': True
+        },
         'choice_question': {
             'pattern': r'.*\bor\b.*\?',
             'answer_type': 'choice',
             'alternatives': True
         },
-        'embedded_question': {
-            'pattern': r'(?:wonder|know|ask|tell|show).*(?:what|where|when|why|who|whom|whose|which|how)\b',
-            'answer_type': 'embedded',
-            'indirect': True
+        'yes_no': {
+            'pattern': r'^(?:do|does|did|am|is|are|was|were|have|has|had|will|would|can|could|may|might|must|shall|should)\b',
+            'answer_type': 'yes_no',
+            'inversion': True
         }
     }
     
@@ -242,6 +247,10 @@ class QuestionFormationEngine:
         elif qtype == 'yes_no':
             slots = self._handle_yes_no_question(sentence, question_info)
         
+        # Handle Negative Questions
+        elif qtype == 'negative_question':
+            slots = self._handle_negative_question(sentence, question_info)
+        
         # Handle Tag Questions
         elif qtype == 'tag_question':
             slots = self._handle_tag_question(sentence, question_info)
@@ -380,6 +389,67 @@ class QuestionFormationEngine:
         
         return slots
     
+    def _handle_negative_question(self, sentence: str, info: Dict) -> Dict[str, str]:
+        """Handle negative questions: Isn't this amazing? Don't you like it?"""
+        slots = {}
+        
+        # Negative question patterns
+        negative_patterns = [
+            # Isn't/Aren't + subject + complement?
+            r'^(isn\'t|aren\'t|wasn\'t|weren\'t)\s+(\w+)\s+(.+)\?$',
+            
+            # Don't/Doesn't/Didn't + subject + verb + object?
+            r'^(don\'t|doesn\'t|didn\'t)\s+(\w+)\s+(\w+)(?:\s+(.+))?\?$',
+            
+            # Haven't/Hasn't/Hadn't + subject + past-participle + object?
+            r'^(haven\'t|hasn\'t|hadn\'t)\s+(\w+)\s+(\w+)(?:\s+(.+))?\?$',
+            
+            # Won't/Wouldn't/Can't/Couldn't + subject + verb + object?
+            r'^(won\'t|wouldn\'t|can\'t|couldn\'t|shouldn\'t|mustn\'t)\s+(\w+)\s+(\w+)(?:\s+(.+))?\?$'
+        ]
+        
+        for i, pattern in enumerate(negative_patterns):
+            match = re.search(pattern, sentence, re.IGNORECASE)
+            if match:
+                groups = match.groups()
+                
+                if i == 0:  # Be negative: Isn't this amazing?
+                    neg_aux, subject, complement = groups
+                    slots['Aux'] = neg_aux  # isn't, aren't, etc.
+                    slots['S'] = subject
+                    slots['C1'] = complement
+                    
+                elif i == 1:  # Do negative: Don't you like it?
+                    neg_aux, subject, verb = groups[:3]
+                    obj = groups[3] if len(groups) > 3 and groups[3] else None
+                    slots['Aux'] = neg_aux  # don't, doesn't, didn't
+                    slots['S'] = subject
+                    slots['V'] = verb
+                    if obj:
+                        slots['O1'] = obj
+                        
+                elif i == 2:  # Perfect negative: Haven't you finished?
+                    neg_aux, subject, verb = groups[:3]
+                    obj = groups[3] if len(groups) > 3 and groups[3] else None
+                    slots['Aux'] = neg_aux  # haven't, hasn't, hadn't
+                    slots['S'] = subject
+                    slots['V'] = verb
+                    if obj:
+                        slots['O1'] = obj
+                        
+                elif i == 3:  # Modal negative: Can't you do it?
+                    neg_aux, subject, verb = groups[:3]
+                    obj = groups[3] if len(groups) > 3 and groups[3] else None
+                    slots['Aux'] = neg_aux  # can't, won't, etc.
+                    slots['S'] = subject
+                    slots['V'] = verb
+                    if obj:
+                        slots['O1'] = obj
+                
+                return slots
+        
+        return slots
+    
     def _handle_tag_question(self, sentence: str, info: Dict) -> Dict[str, str]:
         """Handle tag questions with M3 for tag part"""
         slots = {}
@@ -420,46 +490,54 @@ class QuestionFormationEngine:
         return slots
     
     def _handle_embedded_question(self, sentence: str, info: Dict) -> Dict[str, str]:
-        """Handle embedded questions with sub-slots"""
+        """Handle embedded questions with improved parsing"""
         slots = {}
         
-        # Pattern for embedded questions
+        # Improved embedded question patterns
         embedded_patterns = [
             # I wonder what time it is
-            r'^(\w+)\s+(wonder|ask|know)\s+(what|who)\s+(.+)$',
+            r'^(\w+)\s+(wonder|ask|know)\s+(what)\s+([^.]+)\.?$',
             # Tell me where you live  
-            r'^(\w+)\s+(\w+)\s+(where|when|why|how)\s+(.+)$'
+            r'^(\w+)\s+(\w+)\s+(where|when|why|how)\s+([^.]+)\.?$'
         ]
         
-        for pattern in embedded_patterns:
+        for i, pattern in enumerate(embedded_patterns):
             match = re.search(pattern, sentence, re.IGNORECASE)
             if match:
                 groups = match.groups()
                 
                 if len(groups) == 4:
-                    subject, verb, wh_word, embedded_part = groups
+                    main_subject, main_verb, wh_word, embedded_part = groups
                     
                     # Main clause slots
-                    slots['S'] = subject
-                    slots['V'] = verb
+                    slots['S'] = main_subject
+                    slots['V'] = main_verb
                     
-                    # Embedded clause as O1 or O2 with sub-slots
-                    embedded_clause = f"{wh_word} {embedded_part}"
+                    # Parse embedded clause better
+                    embedded_words = embedded_part.strip().split()
                     
-                    if verb.lower() == 'tell':
-                        slots['O1'] = 'me'  # Indirect object
-                        slots['O2'] = embedded_clause  # Direct object
-                        slots['sub-m3'] = wh_word  # Where/when/why in embedded clause
-                        slots['sub-s'] = self._extract_embedded_subject(embedded_part)
-                        slots['sub-v'] = self._extract_embedded_verb(embedded_part)
-                    else:
+                    if i == 0:  # wonder pattern: "I wonder what time it is"
+                        embedded_clause = f"{wh_word} {embedded_part}"
                         slots['O1'] = embedded_clause
-                        if wh_word.lower() in ['where', 'when', 'why', 'how']:
-                            slots['sub-m3'] = wh_word
+                        
+                        if wh_word.lower() == 'what' and len(embedded_words) >= 3:
+                            # "what time it is" -> what time, it, is
+                            slots['sub-c1'] = f"{wh_word} {embedded_words[0]}"  # "what time"
+                            slots['sub-s'] = embedded_words[1]  # "it"
+                            slots['sub-v'] = embedded_words[2]  # "is"
+                            
+                    elif i == 1:  # tell pattern: "Tell me where you live"
+                        if main_verb.lower() == 'tell':
+                            slots['O1'] = 'me'  # Indirect object
+                            slots['O2'] = f"{wh_word} {embedded_part}"  # Direct object
                         else:
-                            slots['sub-c1'] = wh_word  # what, who
-                        slots['sub-s'] = self._extract_embedded_subject(embedded_part)
-                        slots['sub-v'] = self._extract_embedded_verb(embedded_part)
+                            slots['O1'] = f"{wh_word} {embedded_part}"
+                            
+                        # Sub-slots for embedded clause
+                        slots['sub-m3'] = wh_word  # where, when, why, how
+                        if len(embedded_words) >= 2:
+                            slots['sub-s'] = embedded_words[0]  # "you"
+                            slots['sub-v'] = embedded_words[1]  # "live"
                 
                 break
         
@@ -480,22 +558,60 @@ class QuestionFormationEngine:
         return ""
     
     def _extract_statement_slots(self, statement: str) -> Dict[str, str]:
-        """Helper method to extract slots from a statement (used for tag questions)."""
+        """Helper method to extract slots from a statement with modal recognition"""
         slots = {}
         
-        # Simple statement pattern: Subject + Verb + Object/Complement
+        # Statement patterns with modal/auxiliary recognition
         statement_patterns = [
+            # Subject + Modal + Verb + Object: She can swim
+            r'^(\w+)\s+(can|could|will|would|may|might|must|shall|should)\s+(\w+)\s*(.*)$',
+            
+            # Subject + Be + Verb-ing + Object: She is coming
+            r'^(\w+)\s+(am|is|are|was|were)\s+(\w+ing)\s*(.*)$',
+            
+            # Subject + Have + Past-Participle: She has finished
+            r'^(\w+)\s+(have|has|had)\s+(\w+(?:ed|en))\s*(.*)$',
+            
+            # Subject + Verb + Object: She likes coffee
             r'^(\w+)\s+(\w+)\s*(.*)$'
         ]
         
-        for pattern in statement_patterns:
+        for i, pattern in enumerate(statement_patterns):
             match = re.search(pattern, statement.strip(), re.IGNORECASE)
             if match:
-                subject, verb, rest = match.groups()
-                slots['S'] = subject
-                slots['V'] = verb
-                if rest.strip():
-                    slots['O1'] = rest.strip()
+                groups = match.groups()
+                
+                if i == 0:  # Modal pattern
+                    subject, aux, verb, obj = groups
+                    slots['S'] = subject
+                    slots['Aux'] = aux  # can, will, etc.
+                    slots['V'] = verb   # swim, go, etc.
+                    if obj.strip():
+                        slots['O1'] = obj.strip()
+                        
+                elif i == 1:  # Be + -ing pattern  
+                    subject, aux, verb, obj = groups
+                    slots['S'] = subject
+                    slots['Aux'] = aux  # is, are, etc.
+                    slots['V'] = verb   # coming, going, etc.
+                    if obj.strip():
+                        slots['O1'] = obj.strip()
+                        
+                elif i == 2:  # Perfect tense pattern
+                    subject, aux, verb, obj = groups
+                    slots['S'] = subject
+                    slots['Aux'] = aux  # have, has, had
+                    slots['V'] = verb   # finished, done, etc.
+                    if obj.strip():
+                        slots['O1'] = obj.strip()
+                        
+                else:  # Simple pattern
+                    subject, verb, obj = groups
+                    slots['S'] = subject
+                    slots['V'] = verb
+                    if obj.strip():
+                        slots['O1'] = obj.strip()
+                
                 break
         
         return slots
