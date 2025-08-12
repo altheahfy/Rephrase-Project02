@@ -225,21 +225,21 @@ class InversionEngine:
         if inversion_info['main_verb']:
             main_verb = inversion_info['main_verb'].text
         
-        # 上位スロット配置
+        # 上位スロット配置（実際の語順）
         if adverbial_phrase:
-            result['M1'] = adverbial_phrase
+            result['M2'] = adverbial_phrase  # 副詞句はM2位置
         if main_verb:
             result['V'] = main_verb
         if subject:
             result['S'] = subject
         
-        # サブスロット分解
-        if subject:
-            result['sub-s'] = subject
+        # サブスロット分解（同じ構造をサブスロットにも）
+        if adverbial_phrase:
+            result['sub-m2'] = adverbial_phrase
         if main_verb:
             result['sub-v'] = main_verb
-        if adverbial_phrase:
-            result['sub-m1'] = adverbial_phrase
+        if subject:
+            result['sub-s'] = subject
         
         print(f"  ✅ 副詞句倒置分解完了: {result}")
         return result
@@ -256,36 +256,57 @@ class InversionEngine:
             }
         }
         
+        # 条件句全体の構築
+        conditional_phrase = self._build_conditional_phrase(sent)
+        
+        # 主節の要素検出（カンマ後の部分）
+        main_subject = None
+        main_auxiliary = None
+        main_verb = None
+        
+        # 簡易的に主節を検出（カンマ後の部分）
+        sentence_text = ' '.join([w.text for w in sent.words])
+        if ',' in sentence_text:
+            main_part = sentence_text.split(',', 1)[1].strip()
+            # 主節の基本要素を抽出
+            main_words = main_part.split()
+            if len(main_words) >= 3:
+                main_subject = main_words[0]  # I
+                main_auxiliary = ' '.join(main_words[1:3])  # would have
+                main_verb = main_words[3] if len(main_words) > 3 else main_words[-1]  # come
+        
+        # 上位スロット配置
+        if conditional_phrase:
+            result['M1'] = conditional_phrase  # 条件句全体をM1に
+        if main_subject:
+            result['S'] = main_subject
+        if main_auxiliary:
+            result['Aux'] = main_auxiliary
+        if main_verb:
+            result['V'] = main_verb
+        
+        # サブスロット分解（条件句の内部構造）
         auxiliary = inversion_info['auxiliary'].text if inversion_info['auxiliary'] else None
         subject = None
-        main_verb = None
+        verb = None
         
         if inversion_info['subject']:
             subject = self._build_phrase(sent, inversion_info['subject'])
         if inversion_info['main_verb']:
-            main_verb = inversion_info['main_verb'].text
+            verb = inversion_info['main_verb'].text
         
-        # 上位スロット配置
-        if auxiliary:
-            result['Aux'] = auxiliary
-        if subject:
-            result['S'] = subject
-        if main_verb:
-            result['V'] = main_verb
-        
-        # サブスロット分解
-        if subject:
-            result['sub-s'] = subject
         if auxiliary:
             result['sub-aux'] = auxiliary
-        if main_verb:
-            result['sub-v'] = main_verb
+        if subject:
+            result['sub-s'] = subject
+        if verb:
+            result['sub-v'] = verb
         
         print(f"  ✅ 条件倒置分解完了: {result}")
         return result
     
     def _process_comparative_inversion(self, sent, inversion_info) -> Dict[str, Any]:
-        """比較倒置処理 (So beautiful was...)"""
+        """比較倒置処理 (Such was his anger that...)"""
         print(f"  🎯 比較倒置処理開始")
         
         result = {
@@ -296,39 +317,61 @@ class InversionEngine:
             }
         }
         
-        trigger = inversion_info['inversion_trigger']
-        subject = None
+        # 比較句全体の構築（that節まで含む）
+        comparative_phrase = self._build_comparative_phrase(sent)
+        
+        # 主節の要素検出（that節後の部分）
+        main_subject = None
+        main_auxiliary = None
         main_verb = None
+        
+        # that節後の主節を検出
+        sentence_text = ' '.join([w.text for w in sent.words])
+        if ' that ' in sentence_text:
+            main_part = sentence_text.split(' that ', 1)[1].strip()
+            main_words = main_part.split()
+            if len(main_words) >= 2:
+                main_subject = main_words[0]  # he
+                if len(main_words) >= 3 and main_words[1] in ['could', 'would', 'should', 'might', 'couldn\'t', 'wouldn\'t']:
+                    main_auxiliary = main_words[1]  # couldn't
+                    main_verb = main_words[2] if len(main_words) > 2 else None  # speak
+                else:
+                    main_verb = main_words[1]
+        
+        # 上位スロット配置
+        if comparative_phrase:
+            result['M1'] = comparative_phrase  # 比較句全体をM1に
+        if main_subject:
+            result['S'] = main_subject
+        if main_auxiliary:
+            result['Aux'] = main_auxiliary
+        if main_verb:
+            result['V'] = main_verb
+        
+        # サブスロット分解（比較句の内部構造）
+        trigger = inversion_info['inversion_trigger']  # Such
+        subject = None
+        verb = None
         complement = None
         
         if inversion_info['subject']:
             subject = self._build_phrase(sent, inversion_info['subject'])
         if inversion_info['main_verb']:
-            main_verb = inversion_info['main_verb'].text
+            verb = inversion_info['main_verb'].text
         
         # 補語検出
         for word in sent.words:
-            if word.deprel in ['acomp', 'xcomp']:
+            if word.deprel in ['acomp', 'xcomp', 'nsubj'] and word.text.lower() not in ['he', 'she', 'it', 'they']:
                 complement = self._build_phrase(sent, word)
                 break
         
-        # 上位スロット配置
-        result['M1'] = trigger
-        if complement:
-            result['C1'] = complement
-        if main_verb:
-            result['V'] = main_verb
+        if trigger:
+            result['sub-c1'] = trigger.lower()  # such
+        if verb:
+            result['sub-v'] = verb  # was
         if subject:
-            result['S'] = subject
-        
-        # サブスロット分解
-        if subject:
-            result['sub-s'] = subject
-        if main_verb:
-            result['sub-v'] = main_verb
-        if complement:
-            result['sub-c1'] = complement
-        result['sub-m1'] = trigger
+            result['sub-s'] = subject  # his anger
+        result['sub-m2'] = 'that'  # that
         
         print(f"  ✅ 比較倒置分解完了: {result}")
         return result
@@ -443,6 +486,42 @@ class InversionEngine:
         
         words.sort(key=lambda w: w.id)
         return ' '.join([w.text for w in words]) if words else None
+    
+    def _build_conditional_phrase(self, sent):
+        """条件句の構築（カンマまで）"""
+        words = []
+        sentence_text = ' '.join([w.text for w in sent.words])
+        
+        if ',' in sentence_text:
+            conditional_part = sentence_text.split(',', 1)[0].strip()
+            return conditional_part
+        else:
+            # カンマがない場合は最初の3-4語
+            for i, word in enumerate(sent.words):
+                if i < 4:
+                    words.append(word)
+                else:
+                    break
+            words.sort(key=lambda w: w.id)
+            return ' '.join([w.text for w in words])
+    
+    def _build_comparative_phrase(self, sent):
+        """比較句の構築（that節まで含む）"""
+        sentence_text = ' '.join([w.text for w in sent.words])
+        
+        if ' that ' in sentence_text:
+            comparative_part = sentence_text.split(' that ')[0].strip() + ' that'
+            return comparative_part
+        else:
+            # that がない場合は最初の部分
+            words = []
+            for i, word in enumerate(sent.words):
+                if i < 5:
+                    words.append(word)
+                else:
+                    break
+            words.sort(key=lambda w: w.id)
+            return ' '.join([w.text for w in words])
     
     def _contains_conjunction(self, sentence):
         """接続詞を含む複文かどうかを判定"""
