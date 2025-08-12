@@ -38,10 +38,8 @@
 - `simple_grammar_monitor.py` - 簡易監視
 
 ### 📁 specifications/
-設計仕様書・ロードマップ（4個）
-- `*_SPEC.md` - 技術仕様書
-- `*_roadmap.md` - 開発ロードマップ
-- `GRAMMAR_PATTERN_IMPLEMENTATION_PLAN.md` - 実装計画
+設計仕様書（1ファイル - 最新統合版）
+- `文要素分解システム設計仕様書_v2.0_Ultimate.md` - **Ultimate Grammar System v1.0完全仕様書**
 
 ### 📁 development_archive/
 開発履歴アーカイブ

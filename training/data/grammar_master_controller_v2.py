@@ -34,6 +34,7 @@ class EngineType(Enum):
     INVERSION = "inversion"
     SUBJUNCTIVE = "subjunctive"
     MODAL = "modal"  # New: Modal auxiliary system
+    QUESTION = "question"  # New: Question formation system
 
 @dataclass
 class EngineResult:
@@ -138,6 +139,8 @@ class GrammarMasterControllerV2:
              10, "Participial constructions", ["-ing", "-ed", "running", "broken"]),
             (EngineType.INFINITIVE, "engines.infinitive_engine", "InfinitiveEngine", 
              11, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
+            (EngineType.QUESTION, "engines.question_formation_engine", "QuestionFormationEngine", 
+             12, "Question formation patterns", ["what", "where", "when", "who", "how", "why", "do", "does", "did"]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
