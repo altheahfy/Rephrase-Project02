@@ -33,6 +33,7 @@ class EngineType(Enum):
     PERFECT_PROGRESSIVE = "perfect_progressive"
     INVERSION = "inversion"
     SUBJUNCTIVE = "subjunctive"
+    MODAL = "modal"  # New: Modal auxiliary system
 
 @dataclass
 class EngineResult:
@@ -108,31 +109,35 @@ class GrammarMasterControllerV2:
         
         # Engine configurations with module paths
         engine_configs = [
+            # Highest Priority: Modal auxiliaries (very common and fundamental)
+            (EngineType.MODAL, "engines.modal_engine", "ModalEngine", 
+             1, "Modal auxiliary processing", ["can", "could", "will", "would", "must", "should", "may", "might"]),
+            
             # High Priority: Fundamental grammatical structures
             (EngineType.CONJUNCTION, "engines.stanza_based_conjunction_engine", "StanzaBasedConjunctionEngine", 
-             1, "Subordinate conjunction processing", ["because", "although", "while", "since", "if"]),
+             2, "Subordinate conjunction processing", ["because", "although", "while", "since", "if"]),
             (EngineType.RELATIVE, "engines.simple_relative_engine", "SimpleRelativeEngine", 
-             2, "Relative clause processing", ["who", "which", "that", "where", "when"]),
+             3, "Relative clause processing", ["who", "which", "that", "where", "when"]),
             (EngineType.PASSIVE, "engines.passive_voice_engine", "PassiveVoiceEngine", 
-             3, "Passive voice constructions", ["was", "were", "been", "being", "by"]),
+             4, "Passive voice constructions", ["was", "were", "been", "being", "by"]),
             
             # Medium Priority: Complex tense and mood structures  
             (EngineType.PERFECT_PROGRESSIVE, "engines.perfect_progressive_engine", "PerfectProgressiveEngine", 
-             4, "Perfect progressive tenses", ["has been", "had been", "will have been"]),
+             5, "Perfect progressive tenses", ["has been", "had been", "will have been"]),
             (EngineType.SUBJUNCTIVE, "engines.subjunctive_conditional_engine", "SubjunctiveConditionalEngine", 
-             5, "Subjunctive and conditional moods", ["if", "were", "wish", "unless"]),
+             6, "Subjunctive and conditional moods", ["if", "were", "wish", "unless"]),
             (EngineType.INVERSION, "engines.inversion_engine", "InversionEngine", 
-             6, "Inverted constructions", ["never", "rarely", "seldom", "hardly", "not only"]),
+             7, "Inverted constructions", ["never", "rarely", "seldom", "hardly", "not only"]),
             (EngineType.COMPARATIVE, "engines.comparative_superlative_engine", "ComparativeSuperlativeEngine", 
-             7, "Comparative and superlative forms", ["more", "most", "than", "-er", "-est"]),
+             8, "Comparative and superlative forms", ["more", "most", "than", "-er", "-est"]),
             
             # Lower Priority: Verbal forms (more specific patterns)
             (EngineType.GERUND, "engines.gerund_engine", "GerundEngine", 
-             8, "Gerund constructions", ["-ing", "swimming", "reading", "working"]),
+             9, "Gerund constructions", ["-ing", "swimming", "reading", "working"]),
             (EngineType.PARTICIPLE, "engines.participle_engine", "ParticipleEngine", 
-             9, "Participial constructions", ["-ing", "-ed", "running", "broken"]),
+             10, "Participial constructions", ["-ing", "-ed", "running", "broken"]),
             (EngineType.INFINITIVE, "engines.infinitive_engine", "InfinitiveEngine", 
-             10, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
+             11, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
