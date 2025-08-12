@@ -84,9 +84,11 @@ class SimpleRelativeEngine:
         if not rel_pronoun:
             rel_pronoun = self._find_by_head_and_deprel(sent, rel_verb.id, 'obj')  # "that" (目的語)
         
-        # 4. 関係代名詞検出（主語）
+        # 4. 関係代名詞検出（主語）- ただし先行詞がwayの場合は除外
         if not rel_pronoun:
-            rel_pronoun = self._find_by_head_and_deprel(sent, rel_verb.id, 'nsubj')  # "who" (主語)
+            potential_subj = self._find_by_head_and_deprel(sent, rel_verb.id, 'nsubj')
+            if potential_subj and not (antecedent and antecedent.text.lower() in ['way', 'manner']):
+                rel_pronoun = potential_subj  # "who" (主語)
         
         # 所有格関係代名詞の特別処理
         possessive_rel_pronoun = None
@@ -168,17 +170,39 @@ class SimpleRelativeEngine:
                 # be動詞がない場合
                 result["sub-v"] = rel_verb.text
         elif rel_pronoun and rel_pronoun.deprel == 'advmod' and rel_pronoun.text.lower() in ['where', 'when', 'why', 'how']:
-            # 関係副詞: "The place where he lives"
-            result["sub-m3"] = noun_phrase  # "The place where"
+            # 関係副詞: "The place where he lives", "The reason why he is angry"
+            if rel_pronoun.text.lower() in ['where', 'when']:
+                result["sub-m3"] = noun_phrase  # 場所・時間: "The place where"
+            elif rel_pronoun.text.lower() in ['why', 'how']:
+                result["sub-m1"] = noun_phrase  # 理由・方法: "The reason why"
+            
             if rel_subject:
                 result["sub-s"] = rel_subject.text  # "he"
-            result["sub-v"] = rel_verb.text  # "lives"
+            
+            # be動詞+形容詞の場合の処理
+            cop_verb = self._find_by_head_and_deprel(sent, rel_verb.id, 'cop')
+            if cop_verb and rel_verb.pos == 'ADJ':
+                # "is angry" の場合
+                result["sub-v"] = cop_verb.text    # "is"
+                result["sub-c1"] = rel_verb.text   # "angry"
+            else:
+                result["sub-v"] = rel_verb.text  # "work"
         else:
-            # デフォルト（目的語扱い）
-            result["O1"] = ""
-            result["sub-o1"] = noun_phrase
-            if rel_subject:
-                result["sub-s"] = rel_subject.text
+            # デフォルト処理 - 省略された関係副詞の可能性もチェック
+            if antecedent and antecedent.text.lower() in ['way', 'manner']:
+                # "The way we work" (省略されたhow)
+                result["sub-m1"] = noun_phrase + " (how)"
+                # 省略されたhowの場合も主語を取得
+                way_subject = self._find_by_head_and_deprel(sent, rel_verb.id, 'nsubj')
+                if way_subject:
+                    result["sub-s"] = way_subject.text
+                result["sub-v"] = rel_verb.text
+            else:
+                # その他のデフォルト（目的語扱い）
+                result["O1"] = ""
+                result["sub-o1"] = noun_phrase
+                if rel_subject:
+                    result["sub-s"] = rel_subject.text
         
         # be動詞以外の場合の動詞設定
         if "sub-v" not in result and "sub-aux" not in result:
@@ -280,6 +304,11 @@ if __name__ == "__main__":
         ("The book of which he spoke", "前置詞+関係代名詞 of"),
         ("The house in which he lives", "前置詞+関係代名詞 in"),
         ("The person to whom he gave it", "前置詞+関係代名詞 to"),
+        
+        # 関係副詞 why/how
+        ("The reason why he is angry", "関係副詞 why"),
+        ("The way we work", "関係副詞 how 省略"),
+        ("The way how we work", "関係副詞 how 明示"),
     ]
     
     for i, (test_text, pattern_type) in enumerate(test_cases, 1):
