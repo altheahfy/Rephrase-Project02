@@ -55,18 +55,36 @@ class SimpleRelativeEngine:
         
         # 関係代名詞（関係動詞の目的語/主語/所有格/副詞修飾）
         rel_pronoun = None
+        preposition = None
         
-        # 1. 関係副詞を最優先で検出（advmodで関係動詞を修飾している語）
-        advmod_word = self._find_by_head_and_deprel(sent, rel_verb.id, 'advmod')
-        if advmod_word and advmod_word.text.lower() in ['where', 'when', 'why', 'how']:
-            rel_pronoun = advmod_word
-            print(f"  🔍 関係副詞検出: {rel_pronoun.text}")
+        # 1. 前置詞+関係代名詞を最優先で検出
+        for word in sent.words:
+            if word.text.lower() in ['which', 'whom', 'whose'] and word.deprel in ['nmod', 'obl']:
+                # 前置詞を探す（関係代名詞をcaseで修飾する語）
+                prep = None
+                for w in sent.words:
+                    if w.head == word.id and w.deprel == 'case':
+                        prep = w
+                        break
+                
+                if prep:
+                    rel_pronoun = word
+                    preposition = prep
+                    print(f"  🔍 前置詞+関係代名詞検出: {prep.text} {word.text}")
+                    break
         
-        # 2. 関係代名詞検出（目的語）
+        # 2. 関係副詞検出（advmodで関係動詞を修飾している語）
+        if not rel_pronoun:
+            advmod_word = self._find_by_head_and_deprel(sent, rel_verb.id, 'advmod')
+            if advmod_word and advmod_word.text.lower() in ['where', 'when', 'why', 'how']:
+                rel_pronoun = advmod_word
+                print(f"  🔍 関係副詞検出: {rel_pronoun.text}")
+        
+        # 3. 関係代名詞検出（目的語）
         if not rel_pronoun:
             rel_pronoun = self._find_by_head_and_deprel(sent, rel_verb.id, 'obj')  # "that" (目的語)
         
-        # 3. 関係代名詞検出（主語）
+        # 4. 関係代名詞検出（主語）
         if not rel_pronoun:
             rel_pronoun = self._find_by_head_and_deprel(sent, rel_verb.id, 'nsubj')  # "who" (主語)
         
@@ -85,9 +103,10 @@ class SimpleRelativeEngine:
                     print(f"  🔍 所有格検出: {possessive_rel_pronoun.text} → {possessed_noun.text}")
                     break
         
-        # 関係節内主語（目的語関係代名詞と関係副詞の場合）
+        # 関係節内主語（目的語関係代名詞、関係副詞、前置詞+関係代名詞の場合）
         rel_subject = None
-        if rel_pronoun and (rel_pronoun.deprel == 'obj' or rel_pronoun.deprel == 'advmod'):
+        if rel_pronoun and (rel_pronoun.deprel == 'obj' or rel_pronoun.deprel == 'advmod' or 
+                           rel_pronoun.deprel in ['nmod', 'obl']):
             rel_subject = self._find_by_head_and_deprel(sent, rel_verb.id, 'nsubj')  # "he"
         
         print(f"  先行詞: {antecedent.text if antecedent else '?'}")
@@ -97,14 +116,29 @@ class SimpleRelativeEngine:
         print(f"  関係動詞: {rel_verb.text}")
         
         # === 2. 先行詞句構築 ===
-        noun_phrase = self._build_noun_phrase(sent, antecedent, rel_pronoun, possessed_noun)
+        noun_phrase = self._build_noun_phrase(sent, antecedent, rel_pronoun, possessed_noun, preposition)
         print(f"  構築句: '{noun_phrase}'")
         
         # === 3. Rephrase分解 ===
         result = {}
         
         # 関係代名詞の役割に応じて配置
-        if rel_pronoun and rel_pronoun.deprel == 'obj':
+        if preposition and rel_pronoun:
+            # 前置詞+関係代名詞: "The book of which he spoke"
+            if preposition.text.lower() in ['in', 'at', 'on']:  # 場所
+                result["sub-m3"] = noun_phrase  # "The house in which"
+            else:  # その他（of, to, for, about など）
+                result["sub-m2"] = noun_phrase  # "The book of which"
+            
+            if rel_subject:
+                result["sub-s"] = rel_subject.text  # "he"
+            
+            # 目的語があれば追加
+            obj_word = self._find_by_head_and_deprel(sent, rel_verb.id, 'obj')
+            if obj_word:
+                result["sub-o2"] = obj_word.text  # "it"
+                
+        elif rel_pronoun and rel_pronoun.deprel == 'obj':
             # 目的語関係代名詞: "The book that he bought"
             result["O1"] = ""
             result["sub-o1"] = noun_phrase
@@ -152,8 +186,8 @@ class SimpleRelativeEngine:
         
         return result
     
-    def _build_noun_phrase(self, sent, antecedent, rel_pronoun, possessed_noun=None) -> str:
-        """先行詞句を構築（修飾語含む、所有格対応）"""
+    def _build_noun_phrase(self, sent, antecedent, rel_pronoun, possessed_noun=None, preposition=None) -> str:
+        """先行詞句を構築（修飾語含む、所有格・前置詞対応）"""
         if not antecedent:
             return rel_pronoun.text if rel_pronoun else ""
         
@@ -166,8 +200,11 @@ class SimpleRelativeEngine:
         # 語順でソート
         phrase_words = modifiers + [antecedent]
         
+        # 前置詞+関係代名詞の場合
+        if preposition and rel_pronoun:
+            phrase_words.extend([preposition, rel_pronoun])
         # 所有格関係代名詞の場合
-        if possessed_noun and rel_pronoun:
+        elif possessed_noun and rel_pronoun:
             phrase_words.extend([rel_pronoun, possessed_noun])
         elif rel_pronoun:
             phrase_words.append(rel_pronoun)
@@ -238,6 +275,11 @@ if __name__ == "__main__":
         # 関係副詞
         ("The place where he lives", "関係副詞 where"),
         ("The day when she arrived", "関係副詞 when"),
+        
+        # 前置詞+関係代名詞
+        ("The book of which he spoke", "前置詞+関係代名詞 of"),
+        ("The house in which he lives", "前置詞+関係代名詞 in"),
+        ("The person to whom he gave it", "前置詞+関係代名詞 to"),
     ]
     
     for i, (test_text, pattern_type) in enumerate(test_cases, 1):
