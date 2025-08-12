@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
 Participial Construction Engine - 分詞構文処理
-Stanzaの構造を活用した分詞構文の分解
+Stanzaの構造を活用した分詞構文の完全分解（統合型）
 
 核心原則:
 1. advcl関係の分詞動詞を検出
-2. 現在分詞(VBG)と過去分詞(VBN/ADJ)の区別
-3. 分詞句の範囲確定
-4. 主節との分離処理
+2. 現在分詞(VBG)と過去分詞(VBN/ADJ)の区別  
+3. 分詞句全体の上位スロット配置
+4. 分詞句内部のサブスロット分解
+5. 主節要素との統合処理
 """
 
 import stanza
 from typing import Dict, List, Optional, Any
 
 class ParticipleEngine:
-    """分詞構文エンジン"""
+    """分詞構文エンジン（統合型）"""
     
     def __init__(self):
         print("🚀 分詞構文エンジン初期化中...")
@@ -26,10 +27,18 @@ class ParticipleEngine:
             'past': ['VBN', 'ADJ'],  # 過去分詞: tired, surprised (形容詞化も含む)
             'perfect': ['VBG']  # 完了分詞: having + VBN
         }
+        
+        # 上位スロット配置規則
+        self.slot_mapping = {
+            'temporal': 'M3',     # 時間的分詞構文
+            'causal': 'M1',       # 理由的分詞構文  
+            'conditional': 'M1',  # 条件的分詞構文
+            'general': 'M1'       # 一般的分詞構文
+        }
         print("✅ 初期化完了")
     
     def process(self, text: str) -> Dict[str, str]:
-        """メイン処理"""
+        """メイン処理 - 統合型完全分解"""
         print(f"🔍 分詞構文解析: '{text}'")
         
         doc = self.nlp(text)
@@ -39,7 +48,7 @@ class ParticipleEngine:
         participle_info = self._analyze_participle_structure(sent)
         
         if participle_info:
-            return self._process_participle_construction(sent, participle_info)
+            return self._process_complete_participle_construction(sent, participle_info)
         else:
             return self._process_simple_sentence(sent)
     
@@ -165,6 +174,71 @@ class ParticipleEngine:
             filtered_words.append(word)
         
         return filtered_words
+    
+    def _process_complete_participle_construction(self, sent, participle_info) -> Dict[str, str]:
+        """分詞構文の完全処理 - 統合型"""
+        participle_verb = participle_info['participle_verb']
+        main_verb = participle_info['main_verb']
+        participle_type = participle_info['participle_type']
+        phrase_words = participle_info['participle_phrase']
+        
+        result = {}
+        
+        print(f"  🎯 統合処理開始: {participle_type}分詞構文")
+        
+        # 1. 分詞句全体を上位スロットに配置
+        participle_phrase = self._build_complete_participle_phrase(sent, participle_info)
+        upper_slot = self._determine_upper_slot_position(participle_info, sent)
+        
+        if upper_slot:
+            result[upper_slot] = participle_phrase
+            print(f"    上位配置: {upper_slot} = '{participle_phrase}'")
+        
+        # 2. 分詞句をサブスロットに分解
+        sub_elements = self._decompose_participle_phrase_to_subslots(sent, participle_verb, phrase_words)
+        result.update(sub_elements)
+        
+        # 3. 主節の他の要素を処理
+        if main_verb:
+            main_elements = self._extract_main_clause_elements(sent, main_verb, phrase_words)
+            result.update(main_elements)
+        
+        print(f"  ✅ 統合型完全分解: {result}")
+        return result
+    
+    def _build_complete_participle_phrase(self, sent, participle_info) -> str:
+        """分詞句全体を構築"""
+        phrase_words = participle_info['participle_phrase']
+        phrase_parts = []
+        
+        # 分詞句の語を順序通りに追加
+        for word in phrase_words:
+            phrase_parts.append(word.text)
+        
+        return ' '.join(phrase_parts).lower()
+    
+    def _determine_upper_slot_position(self, participle_info, sent) -> str:
+        """上位スロット位置の決定"""
+        # 分詞構文の意味的分類
+        participle_verb = participle_info['participle_verb']
+        participle_type = participle_info['participle_type']
+        
+        # 時間的表現を含む場合はM3
+        if self._has_time_expression(participle_info['participle_phrase']):
+            return 'M3'
+        
+        # 理由・原因を表す場合はM1
+        if participle_type in ['past', 'perfect']:
+            return 'M1'
+        
+        # 一般的な分詞構文はM1
+        return 'M1'
+    
+    def _has_time_expression(self, phrase_words) -> bool:
+        """時間表現を含むかチェック"""
+        time_indicators = ['when', 'while', 'after', 'before', 'during', 'yesterday', 'today', 'now']
+        phrase_text = ' '.join([w.text.lower() for w in phrase_words])
+        return any(indicator in phrase_text for indicator in time_indicators)
     
     def _process_participle_construction(self, sent, participle_info) -> Dict[str, str]:
         """分詞構文の処理 - Rephraseルール準拠"""
@@ -332,8 +406,48 @@ def test_participle_engine():
         "She slept peacefully"  # 分詞構文なし
     ]
     
+    print("\n" + "="*60)
+    print("🧪 分詞構文エンジン テスト（統合型）")
+    print("="*60)
+    
+    for i, test in enumerate(test_cases, 1):
+        print(f"\n【Test {i}】 '{test}'")
+        result = engine.process(test)
+        
+        print("📊 完全分解結果:")
+        # 上位スロットを先に表示
+        upper_slots = {k: v for k, v in result.items() if not k.startswith('sub-') and k != 'error'}
+        sub_slots = {k: v for k, v in result.items() if k.startswith('sub-')}
+        
+        if upper_slots:
+            print("  【上位スロット】")
+            for key, value in sorted(upper_slots.items()):
+                print(f"    {key}: {value}")
+        
+        if sub_slots:
+            print("  【サブスロット】")
+            for key, value in sorted(sub_slots.items()):
+                print(f"    {key}: {value}")
+        
+        if 'error' in result:
+            print(f"  ❌ エラー: {result['error']}")
+
+def test_participle_engine_legacy():
+    """レガシーテスト実行"""
+    engine = ParticipleEngine()
+    
+    test_cases = [
+        "Running fast, he won the race",
+        "Tired from work, she went to bed", 
+        "Having finished homework, he watched TV",
+        "Surprised by the news, they celebrated",
+        "Walking to school, I met my friend",
+        "He won the race running fast",  # 後置分詞句
+        "She slept peacefully"  # 分詞構文なし
+    ]
+    
     print("\n" + "="*50)
-    print("🧪 分詞構文エンジン テスト")
+    print("🧪 分詞構文エンジン テスト（レガシー）")
     print("="*50)
     
     for i, test in enumerate(test_cases, 1):

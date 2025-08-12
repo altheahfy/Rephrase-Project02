@@ -1,35 +1,45 @@
 #!/usr/bin/env python3
 """
 Infinitive Engine - 不定詞構文処理
-Stanzaの構造を活用した不定詞構文の分解
+Stanzaの構造を活用した不定詞構文の完全分解（統合型）
 
 核心原則:
 1. Stanza依存関係による不定詞パターン検出 (csubj, xcomp, acl)
 2. "to" マーカーの保持
-3. Rephraseルール準拠の上位・サブスロット分解
-4. 不定詞の機能別処理（主語・目的語・副詞・形容詞修飾）
+3. 不定詞句全体の上位スロット配置
+4. 不定詞句内部のサブスロット分解
+5. 主節要素との統合処理
 """
 
 import stanza
 from typing import Dict, List, Optional, Any
 
 class InfinitiveEngine:
-    """不定詞構文エンジン"""
+    """不定詞構文エンジン（統合型）"""
     
     def __init__(self):
         print("🚀 不定詞構文エンジン初期化中...")
         self.nlp = stanza.Pipeline('en', verbose=False)
         
-        # 不定詞の依存関係パターン
+        # 不定詞の依存関係パターンと機能分類
         self.infinitive_patterns = {
             'csubj': 'subject',      # 主語不定詞: "To swim is fun"
             'xcomp': 'complement',   # 補語不定詞: "He wants to go", "I want him to come"
             'acl': 'adjectival',     # 形容詞修飾: "nothing to do", "work to finish"
+            'advcl': 'complement',   # 副詞的不定詞: "He came to help us"
+        }
+        
+        # 上位スロット配置マッピング
+        self.slot_mapping = {
+            'subject': None,          # 主語不定詞: 上位配置なし（サブスロットのみ）
+            'complement_object': None,    # 目的語補語: 上位配置なし（サブスロットのみ）
+            'complement_adverbial': 'M2', # 副詞的補語: M2位置  
+            'adjectival': 'O1'       # 形容詞修飾: O1位置（名詞+不定詞全体）
         }
         print("✅ 初期化完了")
     
     def process(self, text: str) -> Dict[str, str]:
-        """メイン処理"""
+        """メイン処理 - 統合型完全分解"""
         print(f"🔍 不定詞構文解析: '{text}'")
         
         doc = self.nlp(text)
@@ -39,7 +49,7 @@ class InfinitiveEngine:
         infinitive_info = self._analyze_infinitive_structure(sent)
         
         if infinitive_info:
-            return self._process_infinitive_construction(sent, infinitive_info)
+            return self._process_complete_infinitive_construction(sent, infinitive_info)
         else:
             return self._process_simple_sentence(sent)
     
@@ -73,33 +83,122 @@ class InfinitiveEngine:
                 return word
         return None
     
-    def _process_infinitive_construction(self, sent, infinitive_info) -> Dict[str, str]:
-        """不定詞構文の処理 - Rephraseルール準拠"""
+    def _process_complete_infinitive_construction(self, sent, infinitive_info) -> Dict[str, str]:
+        """不定詞構文の完全処理 - 統合型"""
         infinitive_verb = infinitive_info['infinitive_verb']
         pattern_type = infinitive_info['pattern_type']
         head_word = infinitive_info['head_word']
         
         result = {}
         
+        print(f"  🎯 統合処理開始: {pattern_type}不定詞")
+        
         if pattern_type == 'subject':
             # 主語不定詞: "To swim is fun"
-            result.update(self._process_subject_infinitive(sent, infinitive_verb, head_word))
+            result.update(self._process_complete_subject_infinitive(sent, infinitive_info))
             
         elif pattern_type == 'complement':
             # 補語不定詞の種類を判定
             if self._is_adverbial_complement(sent, infinitive_verb, head_word):
                 # 副詞的: "He came to help"
-                result.update(self._process_adverbial_infinitive(sent, infinitive_verb, head_word))
+                result.update(self._process_complete_adverbial_infinitive(sent, infinitive_info))
             else:
                 # 目的語的: "He wants to go", "I want him to come"
-                result.update(self._process_object_infinitive(sent, infinitive_verb, head_word))
+                result.update(self._process_complete_object_infinitive(sent, infinitive_info))
                 
         elif pattern_type == 'adjectival':
             # 形容詞修飾: "nothing to do", "work to finish"
-            result.update(self._process_adjectival_infinitive(sent, infinitive_verb, head_word))
+            result.update(self._process_complete_adjectival_infinitive(sent, infinitive_info))
         
-        print(f"  ✅ Rephraseルール準拠分解: {result}")
+        print(f"  ✅ 統合型完全分解: {result}")
         return result
+    
+    def _process_complete_subject_infinitive(self, sent, infinitive_info) -> Dict[str, str]:
+        """主語不定詞の統合処理: To swim is fun"""
+        result = {}
+        infinitive_verb = infinitive_info['infinitive_verb']
+        head_word = infinitive_info['head_word']
+        
+        # 不定詞句はサブスロットのみ（上位配置なし）
+        infinitive_phrase = self._build_infinitive_phrase(sent, infinitive_verb)
+        result['sub-v'] = infinitive_phrase
+        print(f"    サブスロット配置: sub-v = '{infinitive_phrase}'")
+        
+        # 主節の処理
+        if head_word:
+            main_elements = self._extract_main_clause_elements(sent, head_word, [infinitive_verb])
+            result.update(main_elements)
+        
+        return result
+    
+    def _process_complete_object_infinitive(self, sent, infinitive_info) -> Dict[str, str]:
+        """目的語不定詞の統合処理"""
+        result = {}
+        infinitive_verb = infinitive_info['infinitive_verb']
+        head_word = infinitive_info['head_word']
+        
+        # 主節の主語・動詞
+        main_elements = self._extract_main_clause_elements(sent, head_word, [infinitive_verb])
+        result.update(main_elements)
+        
+        # 不定詞句の処理（サブスロットのみ）
+        infinitive_phrase = self._build_infinitive_phrase(sent, infinitive_verb)
+        result['sub-v'] = infinitive_phrase
+        print(f"    サブスロット配置: sub-v = '{infinitive_phrase}'")
+        
+        # 目的語不定詞かチェック: "I want him to come"
+        obj_before_infinitive = self._find_object_before_infinitive(sent, head_word, infinitive_verb)
+        if obj_before_infinitive:
+            result['O1'] = obj_before_infinitive.text
+            print(f"    上位配置: O1 = '{obj_before_infinitive.text}'")
+        
+        return result
+    
+    def _process_complete_adverbial_infinitive(self, sent, infinitive_info) -> Dict[str, str]:
+        """副詞的不定詞の統合処理: He came to help"""
+        result = {}
+        infinitive_verb = infinitive_info['infinitive_verb']
+        head_word = infinitive_info['head_word']
+        
+        # 主節の処理
+        main_elements = self._extract_main_clause_elements(sent, head_word, [infinitive_verb])
+        result.update(main_elements)
+        
+        # 不定詞句をM2位置に配置 + サブスロット分解
+        infinitive_phrase = self._build_infinitive_phrase(sent, infinitive_verb)
+        result['M2'] = infinitive_phrase
+        result['sub-v'] = infinitive_phrase
+        print(f"    上位配置: M2 = '{infinitive_phrase}'")
+        print(f"    サブスロット配置: sub-v = '{infinitive_phrase}'")
+        
+        return result
+    
+    def _process_complete_adjectival_infinitive(self, sent, infinitive_info) -> Dict[str, str]:
+        """形容詞修飾不定詞の統合処理: nothing to do, work to finish"""
+        result = {}
+        infinitive_verb = infinitive_info['infinitive_verb']
+        head_word = infinitive_info['head_word']
+        
+        # 主節の動詞を探す
+        main_verb = self._find_main_verb(sent)
+        if main_verb:
+            main_elements = self._extract_main_clause_elements(sent, main_verb, [infinitive_verb, head_word])
+            result.update(main_elements)
+        
+        # O1位置に名詞+不定詞全体、サブスロットに不定詞のみ
+        infinitive_phrase = self._build_infinitive_phrase(sent, infinitive_verb)
+        noun_phrase = self._build_noun_infinitive_phrase(sent, head_word, infinitive_verb)
+        
+        result['O1'] = noun_phrase
+        result['sub-v'] = infinitive_phrase
+        print(f"    上位配置: O1 = '{noun_phrase}'")
+        print(f"    サブスロット配置: sub-v = '{infinitive_phrase}'")
+        
+        return result
+    
+    def _process_infinitive_construction(self, sent, infinitive_info) -> Dict[str, str]:
+        """統合型処理への橋渡し（互換性維持）"""
+        return self._process_complete_infinitive_construction(sent, infinitive_info)
     
     def _process_subject_infinitive(self, sent, infinitive_verb, head_word) -> Dict[str, str]:
         """主語不定詞の処理: To swim is fun"""
