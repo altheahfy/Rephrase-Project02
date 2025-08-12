@@ -14,7 +14,7 @@ def debug_relative_clause():
     stanza_nlp = stanza.Pipeline('en', verbose=False)
     spacy_nlp = spacy.load("en_core_web_sm")
     
-    text = "The book that he bought"
+    text = "The man whose car is red"
     
     print("="*60)
     print(f"🔍 関係節構造解析: '{text}'")
