@@ -143,6 +143,27 @@ class InversionEngine:
                     inversion_info['main_verb'] = word
                 elif word.upos == 'AUX' and not inversion_info['auxiliary']:
                     inversion_info['auxiliary'] = word
+            
+            # 倒置文では主語が動詞の後に来ることがあるので追加チェック
+            if not inversion_info['subject']:
+                # 動詞の後の名詞句を主語として検出
+                main_verb_id = inversion_info['main_verb'].id if inversion_info['main_verb'] else 0
+                for word in words:
+                    if (word.upos in ['NOUN', 'PRON'] and 
+                        word.id > main_verb_id and
+                        word.deprel in ['nsubj', 'obj', 'obl']):
+                        inversion_info['subject'] = word
+                        break
+                
+                # さらに、不定冠詞 + 名詞のパターンもチェック（On the table lay a book）
+                if not inversion_info['subject']:
+                    for i, word in enumerate(words):
+                        if (word.text.lower() in ['a', 'an'] and 
+                            i + 1 < len(words) and 
+                            words[i + 1].upos == 'NOUN' and
+                            word.id > main_verb_id):
+                            inversion_info['subject'] = words[i + 1]
+                            break
         
         return inversion_info
     
@@ -292,11 +313,20 @@ class InversionEngine:
         
         if inversion_info['subject']:
             subject = self._build_phrase(sent, inversion_info['subject'])
-        if inversion_info['main_verb']:
-            verb = inversion_info['main_verb'].text
+        
+        # 条件句内の動詞を正確に特定
+        conditional_part = conditional_phrase if conditional_phrase else ""
+        if conditional_part:
+            cond_words = conditional_part.replace(',', '').strip().split()
+            if len(cond_words) >= 3:
+                # Had I known → known が動詞
+                verb = cond_words[-1]  # 最後の語が動詞
+            elif len(cond_words) == 2:
+                # 短い場合は2番目が動詞の可能性
+                verb = cond_words[1] if cond_words[1] not in ['I', 'you', 'he', 'she', 'it', 'they', 'we'] else None
         
         if auxiliary:
-            result['sub-aux'] = auxiliary
+            result['sub-aux'] = auxiliary.lower()  # 小文字に統一
         if subject:
             result['sub-s'] = subject
         if verb:
@@ -332,9 +362,17 @@ class InversionEngine:
             main_words = main_part.split()
             if len(main_words) >= 2:
                 main_subject = main_words[0]  # he
-                if len(main_words) >= 3 and main_words[1] in ['could', 'would', 'should', 'might', 'couldn\'t', 'wouldn\'t']:
-                    main_auxiliary = main_words[1]  # couldn't
-                    main_verb = main_words[2] if len(main_words) > 2 else None  # speak
+                if len(main_words) >= 3:
+                    # couldn't を正しく処理
+                    aux_verb = main_words[1]  # couldn't
+                    if aux_verb.endswith("n't"):
+                        main_auxiliary = aux_verb  # couldn't 全体を保持
+                        main_verb = main_words[2] if len(main_words) > 2 else None  # speak
+                    elif aux_verb in ['could', 'would', 'should', 'might']:
+                        main_auxiliary = aux_verb
+                        main_verb = main_words[2] if len(main_words) > 2 else None
+                    else:
+                        main_verb = aux_verb
                 else:
                     main_verb = main_words[1]
         
@@ -354,24 +392,20 @@ class InversionEngine:
         verb = None
         complement = None
         
-        if inversion_info['subject']:
-            subject = self._build_phrase(sent, inversion_info['subject'])
-        if inversion_info['main_verb']:
-            verb = inversion_info['main_verb'].text
+        # Such was his anger の部分から要素を抽出
+        comparative_part = comparative_phrase.replace(' that', '') if comparative_phrase else ""
+        comp_words = comparative_part.split()
         
-        # 補語検出
-        for word in sent.words:
-            if word.deprel in ['acomp', 'xcomp', 'nsubj'] and word.text.lower() not in ['he', 'she', 'it', 'they']:
-                complement = self._build_phrase(sent, word)
-                break
-        
-        if trigger:
-            result['sub-c1'] = trigger.lower()  # such
-        if verb:
-            result['sub-v'] = verb  # was
-        if subject:
-            result['sub-s'] = subject  # his anger
-        result['sub-m2'] = 'that'  # that
+        if len(comp_words) >= 3:
+            # Such was his anger → such=C1, was=V, his anger=S
+            trigger_word = comp_words[0]  # Such
+            verb_word = comp_words[1]     # was
+            subject_words = comp_words[2:] # his anger
+            
+            result['sub-c1'] = trigger_word.lower()  # such
+            result['sub-v'] = verb_word              # was
+            result['sub-s'] = ' '.join(subject_words) # his anger
+            result['sub-m2'] = 'that'                # that
         
         print(f"  ✅ 比較倒置分解完了: {result}")
         return result
@@ -464,16 +498,36 @@ class InversionEngine:
         return ' '.join([w.text for w in phrase_words])
     
     def _build_adverbial_phrase(self, sent):
-        """副詞句の構築（文頭から動詞まで）"""
-        words = []
-        for word in sent.words:
-            if word.upos in ['ADP', 'ADV', 'DET', 'NOUN'] and word.deprel in ['obl', 'advmod', 'det', 'pobj']:
-                words.append(word)
-            elif word.upos == 'VERB':
-                break
+        """副詞句の構築（前置詞 + 名詞句）"""
+        adverbial_words = []
         
-        words.sort(key=lambda w: w.id)
-        return ' '.join([w.text for w in words]) if words else None
+        # 前置詞で始まる場合（On, In, etc.）
+        first_word = sent.words[0] if sent.words else None
+        if first_word and first_word.upos == 'ADP':
+            adverbial_words.append(first_word)
+            
+            # 前置詞の目的語を探す
+            for word in sent.words:
+                if word.head == first_word.id or (word.deprel in ['pobj', 'obl'] and word.id > first_word.id and word.id <= first_word.id + 3):
+                    adverbial_words.append(word)
+                    # さらに修飾語を探す
+                    for modifier in sent.words:
+                        if modifier.head == word.id and modifier.deprel in ['det', 'amod']:
+                            adverbial_words.append(modifier)
+        
+        # 副詞で始まる場合（Away, Down, etc.）
+        elif first_word and first_word.upos == 'ADV':
+            adverbial_words.append(first_word)
+            # 後続の修飾語を探す
+            for word in sent.words[1:4]:  # 最初の数語をチェック
+                if word.upos in ['DET', 'NOUN', 'ADJ'] and word.deprel in ['det', 'obl', 'nmod']:
+                    adverbial_words.append(word)
+        
+        if adverbial_words:
+            adverbial_words.sort(key=lambda w: w.id)
+            return ' '.join([w.text for w in adverbial_words])
+        
+        return None
     
     def _build_location_phrase(self, sent):
         """場所句の構築"""
