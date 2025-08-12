@@ -42,11 +42,17 @@ class PureStanzaEngineV31:
         self.WORD_ONLY_SLOTS = ['Aux', 'V']
         self.ALL_SLOTS = self.RECURSIVE_SLOTS + self.WORD_ONLY_SLOTS
         
-        # 文型パターンルール
+        # 文型パターンルール（上位レベル用）
         self.sentence_patterns = self._load_sentence_patterns()
         
-        # 修飾語マッピングルール
+        # サブレベル専用パターンルール
+        self.sublevel_patterns = self._load_sublevel_patterns()
+        
+        # 修飾語マッピングルール（上位レベル用）
         self.modifier_mappings = self._load_modifier_mappings()
+        
+        # サブレベル専用修飾語マッピング
+        self.sublevel_modifiers = self._load_sublevel_modifiers()
         
         # 入れ子判定ルール
         self.nested_triggers = self._load_nested_triggers()
@@ -54,7 +60,7 @@ class PureStanzaEngineV31:
         print("🏗️ 統一再帰分解エンジン準備完了 (v3.1)")
         
     def _load_sentence_patterns(self) -> Dict[str, Any]:
-        """統一文型パターンルール"""
+        """統一文型パターンルール（上位レベル用）"""
         return {
             # 基本5文型
             "SV": {
@@ -96,6 +102,49 @@ class PureStanzaEngineV31:
             }
         }
     
+    def _load_sublevel_patterns(self) -> Dict[str, Any]:
+        """サブレベル専用パターンルール - Stanza入れ子構造対応"""
+        return {
+            # サブレベルでは中心語が常にrootになる
+            "NOUN_PHRASE": {
+                "required_relations": ["root"],
+                "root_pos": ["NOUN", "PRON"],
+                "mapping": {"root": "C1"}
+            },
+            "ADJ_PHRASE": {
+                "required_relations": ["root"],
+                "root_pos": ["ADJ"],
+                "mapping": {"root": "C1"}
+            },
+            "ADV_PHRASE": {
+                "required_relations": ["root"],
+                "root_pos": ["ADV"],
+                "mapping": {"root": "M2"}
+            },
+            "VERB_PHRASE": {
+                "required_relations": ["root"],
+                "root_pos": ["VERB"],
+                "mapping": {"root": "V"}
+            },
+            # 前置詞句（"in the garden"など）
+            "PREP_PHRASE": {
+                "required_relations": ["root", "case"],
+                "root_pos": ["NOUN"],
+                "mapping": {"root": "C1", "case": "M1"}
+            }
+        }
+    
+    def _load_sublevel_modifiers(self) -> Dict[str, str]:
+        """サブレベル専用修飾語マッピング"""
+        return {
+            "det": "M1",        # 限定詞: a, the, this → M1
+            "amod": "M2",       # 形容詞修飾: tall, beautiful → M2  
+            "advmod": "M3",     # 副詞修飾: very, quite → M3
+            "case": "M1",       # 前置詞: in, on, at → M1
+            "compound": "M2",   # 複合語: New York → M2
+            "nummod": "M1",     # 数量詞: two, many → M1
+        }
+    
     def _load_modifier_mappings(self) -> Dict[str, str]:
         """修飾語スロットマッピング"""
         return {
@@ -118,6 +167,7 @@ class PureStanzaEngineV31:
     def decompose_unified(self, text: str, depth: int = 0) -> Dict[str, Any]:
         """
         統一分解アルゴリズム - Rephraseの核心実装
+        階層に応じて上位レベル/サブレベル専用処理を適用
         
         Args:
             text: 分解対象テキスト
@@ -132,16 +182,25 @@ class PureStanzaEngineV31:
         doc = self.nlp(text)
         sent = doc.sentences[0]
         
-        # ROOT動詞検出
-        root_verb = self._find_root_verb(sent)
-        if not root_verb:
-            print(f"{'  ' * depth}⚠️ ROOT動詞未検出")
-            return {"error": "No root verb found"}
+        # ROOT語検出（階層に関係なく実行）
+        root_word = self._find_root_word(sent)
+        if not root_word:
+            print(f"{'  ' * depth}⚠️ ROOT語未検出")
+            return {"error": "No root word found"}
         
-        print(f"{'  ' * depth}🎯 ROOT: '{root_verb.text}' ({root_verb.pos})")
+        print(f"{'  ' * depth}🎯 ROOT: '{root_word.text}' ({root_word.pos})")
         
-        # 基本10スロット分解
-        basic_slots = self._extract_basic_slots(sent, root_verb, depth)
+        # 階層判定：上位レベル vs サブレベル
+        is_sublevel = depth > 0
+        
+        if is_sublevel:
+            # サブレベル専用処理
+            print(f"{'  ' * depth}📊 サブレベル処理適用")
+            basic_slots = self._extract_sublevel_slots(sent, root_word, depth)
+        else:
+            # 上位レベル処理（従来通り）
+            print(f"{'  ' * depth}📊 上位レベル処理適用")
+            basic_slots = self._extract_basic_slots(sent, root_word, depth)
         
         # 統一入れ子処理：8つの再帰可能スロットで再帰適用
         unified_result = self._apply_unified_nesting(basic_slots, depth)
@@ -150,12 +209,108 @@ class PureStanzaEngineV31:
         
         return unified_result
     
-    def _find_root_verb(self, sent) -> Optional[Any]:
-        """ROOT動詞検出（統一アルゴリズム用）"""
+    def _find_root_word(self, sent) -> Optional[Any]:
+        """ROOT語検出（階層共通）- 動詞以外も対応"""
         for word in sent.words:
             if word.deprel == 'root':
                 return word
         return None
+    
+    def _find_root_verb(self, sent) -> Optional[Any]:
+        """ROOT動詞検出（上位レベル互換用）"""
+        return self._find_root_word(sent)
+    
+    def _extract_sublevel_slots(self, sent, root_word, depth: int) -> Dict[str, Any]:
+        """サブレベル専用スロット抽出 - Stanza入れ子構造対応"""
+        # 全依存関係を収集
+        all_relations = {}
+        for word in sent.words:
+            all_relations[word.deprel] = word
+        
+        # サブレベル専用パターンマッチング
+        matched_pattern = self._match_sublevel_pattern(sent, root_word, depth)
+        
+        if not matched_pattern:
+            print(f"{'  ' * depth}❌ サブレベルパターン未検出")
+            return {}
+        
+        print(f"{'  ' * depth}✅ サブマッチパターン: {matched_pattern}")
+        
+        # スロット抽出
+        slots = {}
+        
+        # サブレベル専用コアスロット抽出
+        self._extract_sublevel_core_slots(sent, root_word, slots, depth)
+        
+        # サブレベル専用修飾語処理
+        self._process_sublevel_modifiers(sent, slots, depth)
+        
+        return slots
+    
+    def _match_sublevel_pattern(self, sent, root_word, depth: int) -> Optional[str]:
+        """サブレベル専用パターンマッチング"""
+        relations = {word.deprel: word for word in sent.words}
+        root_pos = root_word.pos
+        
+        # サブレベルパターン判定
+        for pattern_name, pattern_info in self.sublevel_patterns.items():
+            required = set(pattern_info["required_relations"])
+            available = set(relations.keys())
+            
+            if required.issubset(available) and root_pos in pattern_info["root_pos"]:
+                return pattern_name
+        
+        # フォールバック：基本的な品詞ベース判定
+        if root_pos in ["NOUN", "PRON"]:
+            return "NOUN_PHRASE"
+        elif root_pos == "ADJ":
+            return "ADJ_PHRASE"
+        elif root_pos == "ADV":
+            return "ADV_PHRASE"
+        elif root_pos == "VERB":
+            return "VERB_PHRASE"
+        
+        return "NOUN_PHRASE"  # デフォルト
+    
+    def _extract_sublevel_core_slots(self, sent, root_word, slots: Dict[str, Any], depth: int):
+        """サブレベル専用コアスロット抽出"""
+        # ROOT語を適切なスロットにマッピング
+        root_pos = root_word.pos
+        
+        if root_pos in ["NOUN", "PRON"]:
+            slot_name = "C1"  # 補語として扱う
+        elif root_pos == "ADJ":
+            slot_name = "C1"  # 形容詞補語
+        elif root_pos == "ADV":
+            slot_name = "M2"  # 副詞修飾語
+        elif root_pos == "VERB":
+            slot_name = "V"   # 動詞
+        else:
+            slot_name = "C1"  # デフォルト
+        
+        slots[slot_name] = {
+            "content": root_word.text,
+            "pos": root_word.pos,
+            "deprel": root_word.deprel,
+            "word_obj": root_word
+        }
+        
+        print(f"{'  ' * depth}📍 {slot_name}: '{root_word.text}' (サブレベルROOT)")
+    
+    def _process_sublevel_modifiers(self, sent, slots: Dict[str, Any], depth: int):
+        """サブレベル専用修飾語処理"""
+        for word in sent.words:
+            if word.deprel in self.sublevel_modifiers:
+                slot_mapping = self.sublevel_modifiers[word.deprel]
+                
+                # サブレベルでは直接スロットマッピング
+                slots[slot_mapping] = {
+                    "content": word.text,
+                    "pos": word.pos,
+                    "deprel": word.deprel,
+                    "word_obj": word
+                }
+                print(f"{'  ' * depth}📍 {slot_mapping}: '{word.text}' (サブレベル修飾語: {word.deprel})")
     
     def _extract_basic_slots(self, sent, root_verb, depth: int) -> Dict[str, Any]:
         """基本10スロット抽出（統一ベース処理）"""
@@ -212,7 +367,12 @@ class PureStanzaEngineV31:
         return "SV"  # デフォルト
     
     def _extract_core_slots(self, sent, root_verb, slots: Dict[str, Any], depth: int):
-        """コアスロットの抽出"""
+        """コアスロットの抽出（SVOO重複問題修正版）"""
+        # 文型判定
+        relations = {word.deprel: word for word in sent.words}
+        is_svoo = 'iobj' in relations and 'obj' in relations
+        is_svo = 'obj' in relations and 'iobj' not in relations
+        
         for word in sent.words:
             slot_name = None
             
@@ -222,13 +382,16 @@ class PureStanzaEngineV31:
                 # 複合主語の場合の処理
                 subject_text = self._extract_compound_phrase(sent, word)
                 word_text = subject_text if subject_text != word.text else word.text
-            # 目的語系  
-            elif word.deprel == 'obj':
-                slot_name = 'O1'
-                word_text = self._extract_compound_phrase(sent, word)
+            # 目的語系（文型に応じて適切に分類）
             elif word.deprel == 'iobj':
-                slot_name = 'O1' 
+                slot_name = 'O1'  # 間接目的語 → 常にO1
                 word_text = word.text
+            elif word.deprel == 'obj':
+                if is_svoo:
+                    slot_name = 'O2'  # SVOO構文：直接目的語 → O2
+                else:
+                    slot_name = 'O1'  # SVO構文：目的語 → O1
+                word_text = self._extract_compound_phrase(sent, word)
             # 補語系
             elif word.deprel == 'xcomp':
                 slot_name = 'C2'
@@ -256,7 +419,15 @@ class PureStanzaEngineV31:
                     "deprel": word.deprel,
                     "word_obj": word
                 }
-                print(f"{'  ' * depth}📍 {slot_name}: '{word_text}' (deprel: {word.deprel})")
+                
+                # デバッグ情報に文型情報を追加
+                pattern_info = ""
+                if is_svoo and word.deprel in ['iobj', 'obj']:
+                    pattern_info = f" [SVOO: {'間接' if word.deprel == 'iobj' else '直接'}目的語]"
+                elif is_svo and word.deprel == 'obj':
+                    pattern_info = " [SVO: 目的語]"
+                
+                print(f"{'  ' * depth}📍 {slot_name}: '{word_text}' (deprel: {word.deprel}){pattern_info}")
     
     def _extract_compound_phrase(self, sent, head_word) -> str:
         """複合句の抽出（限定詞・形容詞などを含む）"""
