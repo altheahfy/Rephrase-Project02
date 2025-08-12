@@ -133,41 +133,76 @@ class ModalEngine:
     
     def extract_modal_info(self, sentence: str) -> Dict[str, Any]:
         """
-        Extract modal information from the sentence.
-        
-        Returns:
-            Dict containing modal type, function, certainty level, etc.
+        Extract modal information from sentence.
+        Returns dictionary with modal details including type and question status.
         """
-        sentence_lower = sentence.lower()
+        sentence = sentence.strip()
+        
+        # Initialize modal info
         modal_info = {
-            'modal_found': None,
-            'modal_type': 'core',  # 'core' or 'semi'
+            'modal_found': False,
+            'modal_type': None,
+            'is_question': False,
             'modal_function': 'unknown',
             'certainty_level': 0.5,
             'formality_level': 'neutral',
-            'is_negative': False,
-            'is_question': False
+            'is_negative': False
         }
         
         # Check for negatives
-        if re.search(r'\b(?:cannot|can\'t|couldn\'t|won\'t|wouldn\'t|shan\'t|shouldn\'t|mustn\'t|may not|might not)\b', sentence_lower):
+        if re.search(r'\b(?:cannot|can\'t|couldn\'t|won\'t|wouldn\'t|shan\'t|shouldn\'t|mustn\'t|may not|might not)\b', sentence.lower()):
             modal_info['is_negative'] = True
         
-        # Check if it's a question
-        if sentence.strip().endswith('?') or re.match(r'^(?:can|could|may|might|will|would|shall|should|must|do|does|did)\b', sentence_lower):
-            modal_info['is_question'] = True
-        
-        # Find core modals
+        # Check if question (starts with modal)
         for modal in self.CORE_MODALS:
-            if re.search(rf'\b{modal}\b', sentence_lower):
+            if sentence.lower().startswith(modal.lower() + ' '):
+                modal_info['is_question'] = True
+                break
+        
+        # Find core modals with word boundary checking
+        for modal in self.CORE_MODALS:
+            pattern = rf'\b{re.escape(modal)}\b'
+            if re.search(pattern, sentence, re.IGNORECASE):
                 modal_info['modal_found'] = modal
                 modal_info['modal_type'] = 'core'
+                
+                # Add function information if available
                 if modal in self.MODAL_FUNCTIONS:
                     info = self.MODAL_FUNCTIONS[modal]
                     modal_info['modal_function'] = info['function']
                     modal_info['certainty_level'] = info['certainty']
                     modal_info['formality_level'] = info['formality']
-                break
+                return modal_info
+        
+        # Find semi-modals with specific patterns (more accurate)
+        semi_modal_patterns = [
+            (r'\b(have|has|had)\s+to\b', 'have to'),
+            (r'\b(need|needs|needed)\s+to\b', 'need to'),
+            (r'\b(am|is|are|was|were)\s+able\s+to\b', 'be able to'),
+            (r'\bused\s+to\b', 'used to'),
+            (r'\bought\s+to\b', 'ought to'),
+            (r'\bhad\s+better\b', 'had better'),
+            (r'\bwould\s+rather\b', 'would rather')
+        ]
+        
+        for pattern, modal_name in semi_modal_patterns:
+            if re.search(pattern, sentence, re.IGNORECASE):
+                modal_info['modal_found'] = modal_name
+                modal_info['modal_type'] = 'semi'
+                
+                # Add function information if available
+                if modal_name in self.MODAL_FUNCTIONS:
+                    info = self.MODAL_FUNCTIONS[modal_name]
+                    modal_info['modal_function'] = info['function']
+                    modal_info['certainty_level'] = info['certainty']
+                    modal_info['formality_level'] = info['formality']
+                return modal_info
+        
+        # If question detected but no modal found above, check question patterns
+        if sentence.strip().endswith('?') or re.match(r'^(?:do|does|did)\b', sentence.lower()):
+            modal_info['is_question'] = True
+        
+        return modal_info
         
         # Find semi-modals if no core modal found
         if not modal_info['modal_found']:
@@ -210,73 +245,153 @@ class ModalEngine:
     
     def _fallback_extraction(self, sentence: str) -> Dict[str, str]:
         """
-        Fallback extraction method when Stanza is not available.
-        Uses regex patterns to identify modal constructions.
+        Improved fallback extraction with proper Aux slot handling.
+        Ensures main verbs are correctly placed in Aux slot.
         """
         slots = {}
-        
-        # Extract modal information
         modal_info = self.extract_modal_info(sentence)
         
-        if modal_info['modal_found']:
-            slots['V'] = modal_info['modal_found']
+        if not modal_info['modal_found']:
+            return slots
+        
+        # Core modal processing
+        if modal_info['modal_type'] == 'core':
+            modal = modal_info['modal_found']
             
-            # Basic pattern matching for subject and main verb
-            modal_pattern = None
+            # Handle questions: Modal + Subject + Main_Verb + Rest
+            if modal_info['is_question']:
+                question_pattern = rf'^({re.escape(modal)})\s+(\w+)\s+(\w+)(.*)$'
+                match = re.search(question_pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    modal_verb, subject, main_verb, rest = match.groups()
+                    slots['S'] = subject
+                    slots['V'] = modal_verb  # Modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+                    return {k: v for k, v in slots.items() if v and str(v).strip()}
             
-            if modal_info['modal_type'] == 'core':
-                # Pattern: Subject + Modal + Main_Verb + Rest
-                pattern = rf'^(.*?)\b({modal_info["modal_found"]})\b\s+(\w+)(.*)$'
+            # Standard declarative: Subject + Modal + Main_Verb + Rest
+            pattern = rf'^(.*?)\b({re.escape(modal)})\s+(\w+)(.*)$'
+            match = re.search(pattern, sentence, re.IGNORECASE)
+            
+            if match:
+                subject, modal_verb, main_verb, rest = match.groups()
+                slots['S'] = subject.strip() if subject.strip() else None
+                slots['V'] = modal_verb  # Modal to V
+                slots['Aux'] = main_verb  # Main verb to Aux ✅
+                
+                rest = rest.strip()
+                if rest:
+                    slots['O1'] = rest
+        
+        # Semi-modal processing
+        elif modal_info['modal_type'] == 'semi':
+            modal_found = modal_info['modal_found']
+            
+            if 'have to' in modal_found:
+                pattern = r'^(.*?)\b(have|has|had)\s+to\s+(\w+)(.*)$'
                 match = re.search(pattern, sentence, re.IGNORECASE)
                 
                 if match:
-                    subject, modal, main_verb, rest = match.groups()
+                    subject, aux_verb, main_verb, rest = match.groups()
                     slots['S'] = subject.strip()
-                    slots['V'] = modal
-                    slots['Aux'] = main_verb
+                    slots['V'] = f"{aux_verb} to"  # Semi-modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
                     
-                    # Simple object extraction from rest
                     rest = rest.strip()
                     if rest:
-                        # Remove common adverbials to get object
-                        rest_clean = re.sub(r'\b(quickly|slowly|now|today|here|there)\b', '', rest, flags=re.IGNORECASE).strip()
-                        if rest_clean:
-                            slots['O1'] = rest_clean
+                        slots['O1'] = rest
             
-            elif modal_info['modal_type'] == 'semi':
-                # Handle semi-modals like "have to", "be able to"
-                if 'have to' in modal_info['modal_found'] or 'has to' in modal_info['modal_found']:
-                    pattern = r'^(.*?)\b(have|has)\s+to\s+(\w+)(.*)$'
-                    match = re.search(pattern, sentence, re.IGNORECASE)
-                    
-                    if match:
-                        subject, modal_part, main_verb, rest = match.groups()
-                        slots['S'] = subject.strip()
-                        slots['V'] = f"{modal_part} to"
-                        slots['Aux'] = main_verb
-                        
-                        rest = rest.strip()
-                        if rest:
-                            slots['O1'] = rest
+            elif 'be able to' in modal_found:
+                pattern = r'^(.*?)\b(am|is|are|was|were)\s+able\s+to\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
                 
-                elif 'be able to' in modal_info['modal_found']:
-                    pattern = r'^(.*?)\b(am|is|are|was|were)\s+able\s+to\s+(\w+)(.*)$'
-                    match = re.search(pattern, sentence, re.IGNORECASE)
+                if match:
+                    subject, be_verb, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = f"{be_verb} able to"  # Semi-modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
                     
-                    if match:
-                        subject, be_verb, main_verb, rest = match.groups()
-                        slots['S'] = subject.strip()
-                        slots['V'] = f"{be_verb} able to"
-                        slots['Aux'] = main_verb
-                        
-                        rest = rest.strip()
-                        if rest:
-                            slots['O1'] = rest
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+            
+            elif 'used to' in modal_found:
+                pattern = r'^(.*?)\bused\s+to\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    subject, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = 'used to'  # Semi-modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+            
+            elif 'need to' in modal_found:
+                pattern = r'^(.*?)\b(need|needs|needed)\s+to\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    subject, need_verb, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = f"{need_verb} to"
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+            
+            elif 'ought to' in modal_found:
+                pattern = r'^(.*?)\bought\s+to\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    subject, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = 'ought to'
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+            
+            elif 'had better' in modal_found:
+                pattern = r'^(.*?)\bhad\s+better\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    subject, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = 'had better'
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
+            
+            elif 'would rather' in modal_found:
+                pattern = r'^(.*?)\bwould\s+rather\s+(\w+)(.*)$'
+                match = re.search(pattern, sentence, re.IGNORECASE)
+                
+                if match:
+                    subject, main_verb, rest = match.groups()
+                    slots['S'] = subject.strip()
+                    slots['V'] = 'would rather'
+                    slots['Aux'] = main_verb  # Main verb to Aux ✅
+                    
+                    rest = rest.strip()
+                    if rest:
+                        slots['O1'] = rest
         
-        # Clean up empty slots
-        slots = {k: v.strip() for k, v in slots.items() if v.strip()}
-        
-        return slots
+        # Clean up and return only non-empty slots
+        return {k: v for k, v in slots.items() if v and str(v).strip()}
     
     def get_confidence(self, sentence: str, slots: Dict[str, str]) -> float:
         """
