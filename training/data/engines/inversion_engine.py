@@ -362,19 +362,37 @@ class InversionEngine:
             main_words = main_part.split()
             if len(main_words) >= 2:
                 main_subject = main_words[0]  # he
+                
+                # 助動詞の正確な処理
                 if len(main_words) >= 3:
-                    # couldn't を正しく処理
-                    aux_verb = main_words[1]  # couldn't
-                    if aux_verb.endswith("n't"):
-                        main_auxiliary = aux_verb  # couldn't 全体を保持
-                        main_verb = main_words[2] if len(main_words) > 2 else None  # speak
-                    elif aux_verb in ['could', 'would', 'should', 'might']:
-                        main_auxiliary = aux_verb
-                        main_verb = main_words[2] if len(main_words) > 2 else None
+                    aux_and_verb = main_words[1:]  # ['couldn't', 'speak'] or ['could', 'not', 'speak']
+                    
+                    # couldn't のような縮約形を検出
+                    if aux_and_verb[0].endswith("n't"):
+                        main_auxiliary = aux_and_verb[0]  # couldn't 全体
+                        main_verb = aux_and_verb[1] if len(aux_and_verb) > 1 else None  # speak
+                    
+                    # could not のような分離形を検出
+                    elif (len(aux_and_verb) >= 2 and 
+                          aux_and_verb[0] in ['could', 'would', 'should', 'might'] and
+                          aux_and_verb[1] in ['not', "n't"]):
+                        main_auxiliary = aux_and_verb[0] + "n't"  # couldn't に統一
+                        main_verb = aux_and_verb[2] if len(aux_and_verb) > 2 else None  # speak
+                    
+                    # 通常の助動詞 + 動詞
+                    elif aux_and_verb[0] in ['could', 'would', 'should', 'might', 'can', 'will']:
+                        main_auxiliary = aux_and_verb[0]
+                        main_verb = aux_and_verb[1] if len(aux_and_verb) > 1 else None
+                    
                     else:
-                        main_verb = aux_verb
-                else:
+                        # 助動詞なしの場合
+                        main_verb = aux_and_verb[0]
+                        main_auxiliary = None
+                
+                elif len(main_words) == 2:
+                    # 2語の場合は動詞のみ
                     main_verb = main_words[1]
+                    main_auxiliary = None
         
         # 上位スロット配置
         if comparative_phrase:
