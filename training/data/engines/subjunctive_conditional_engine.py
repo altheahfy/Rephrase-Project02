@@ -427,15 +427,16 @@ class SubjunctiveConditionalEngine:
             slots['O1'] = main_analysis.get('object', '')
             slots['C1'] = main_analysis.get('complement', '')
         
-        # Parse subordinate clause for sub-slots
+        # Parse subordinate clause for sub-slots with detailed decomposition
         if sub_clause:
-            # Handle inverted structure: "Were I rich" -> subject="I", aux="Were", complement="rich"
+            # Handle inverted structure: "Were I rich" -> subject="I", verb="Were", complement="rich"
+            # Note: In conditionals, "were" acts as main verb, not auxiliary
             sub_doc = self.nlp(sub_clause)
-            sub_analysis = self._analyze_inverted_clause(sub_doc, sub_clause)
+            sub_analysis = self._analyze_inverted_clause_detailed(sub_doc, sub_clause)
             
             slots['sub-s'] = sub_analysis.get('subject', '')
-            slots['sub-v'] = sub_analysis.get('main_verb', '')
-            slots['sub-aux'] = sub_analysis.get('auxiliary', '')
+            slots['sub-v'] = sub_analysis.get('main_verb', '')  # "Were" as main verb
+            slots['sub-aux'] = sub_analysis.get('auxiliary', '')  # Empty for most inversions
             slots['sub-c1'] = sub_analysis.get('complement', '')
         
         # Set M1 to the entire conditional clause
@@ -481,16 +482,37 @@ class SubjunctiveConditionalEngine:
             slots['O1'] = main_analysis.get('object', '')
             slots['C1'] = main_analysis.get('complement', '')
         
-        # Parse conditional clause (if clause)
+        # Parse conditional clause (if clause) with detailed decomposition
         if conditional_clause:
-            sub_doc = self.nlp(conditional_clause)
-            sub_analysis = self._analyze_clause_components(sub_doc, conditional_clause)
+            # Extract "If" or other conditional markers separately
+            conditional_marker = structure.get('conditional_marker', '')
+            if conditional_marker:
+                slots['sub-m1'] = conditional_marker
+                # Remove the conditional marker from the clause for further analysis
+                clause_without_marker = conditional_clause.replace(conditional_marker, '', 1).strip()
+            else:
+                clause_without_marker = conditional_clause
             
-            slots['sub-s'] = sub_analysis.get('subject', '')
-            slots['sub-v'] = sub_analysis.get('main_verb', '')
-            slots['sub-aux'] = sub_analysis.get('auxiliary', '')
-            slots['sub-o1'] = sub_analysis.get('object', '')
-            slots['sub-c1'] = sub_analysis.get('complement', '')
+            if clause_without_marker:
+                sub_doc = self.nlp(clause_without_marker)
+                sub_analysis = self._analyze_clause_components(sub_doc, clause_without_marker)
+                
+                slots['sub-s'] = sub_analysis.get('subject', '')
+                slots['sub-v'] = sub_analysis.get('main_verb', '')
+                slots['sub-aux'] = sub_analysis.get('auxiliary', '')
+                slots['sub-o1'] = sub_analysis.get('object', '')
+                slots['sub-c1'] = sub_analysis.get('complement', '')
+        
+        # Parse main clause with detailed analysis for M2, M3
+        if result_clause:
+            # Check for additional modifiers like location (home)
+            main_analysis = self._analyze_detailed_main_clause(result_clause)
+            
+            # Update existing slots with more detailed analysis
+            if main_analysis.get('location_modifier'):
+                slots['M2'] = main_analysis['location_modifier']
+            if main_analysis.get('manner_modifier'):
+                slots['M3'] = main_analysis['manner_modifier']
         
         # Set M1 to the entire conditional clause (clean up punctuation)
         clean_conditional = conditional_clause.rstrip('.').rstrip(',')
@@ -547,19 +569,23 @@ class SubjunctiveConditionalEngine:
             slots['V'] = 'wish'  # Main verb is always "wish"
             slots['Aux'] = main_analysis.get('auxiliary', '')
         
-        # Parse subordinate clause (wish content)
+        # Parse subordinate clause (wish content) with detailed decomposition
         if sub_part:
             sub_doc = self.nlp(sub_part)
             sub_analysis = self._analyze_clause_components(sub_doc, sub_part)
             
             slots['sub-s'] = sub_analysis.get('subject', '')
-            slots['sub-v'] = sub_analysis.get('main_verb', '')
-            slots['sub-aux'] = sub_analysis.get('auxiliary', '')
+            # In subjunctive "were", treat as main verb not auxiliary
+            slots['sub-v'] = sub_analysis.get('main_verb', '') or sub_analysis.get('auxiliary', '')
+            slots['sub-aux'] = ''  # Clear auxiliary for subjunctive constructions
             slots['sub-c1'] = sub_analysis.get('complement', '')
             slots['sub-o1'] = sub_analysis.get('object', '')
         
-        # Set M1 to the wish content (clean up punctuation)
+        # Set O1 to the wish content (entire subordinate clause)
         clean_sub_part = sub_part.rstrip('.').rstrip(',')
+        slots['O1'] = clean_sub_part
+        
+        # Also keep M1 for consistency
         slots['M1'] = clean_sub_part
         
         return slots
@@ -660,10 +686,14 @@ class SubjunctiveConditionalEngine:
                     break
                 elif word.upos == 'ADJ':  # For predicative adjectives
                     components['complement'] = word.text
-                    # Find auxiliary for predicative constructions
+                    # Find linking verb for predicative constructions
                     for aux_word in sent.words:
                         if aux_word.head == word.id and aux_word.upos == 'AUX':
-                            components['auxiliary'] = aux_word.text
+                            # In conditional contexts, "were" is main verb, not auxiliary
+                            if aux_word.lemma.lower() == 'be':
+                                components['main_verb'] = aux_word.text
+                            else:
+                                components['auxiliary'] = aux_word.text
                             break
                     # Find subject
                     for subj_word in sent.words:
@@ -673,7 +703,11 @@ class SubjunctiveConditionalEngine:
                     return components
         
         if root_verb:
-            components['main_verb'] = root_verb.text
+            # Special handling for "be" verbs in conditional contexts
+            if root_verb.lemma.lower() == 'be':
+                components['main_verb'] = root_verb.text  # "were" as main verb
+            else:
+                components['main_verb'] = root_verb.text
             
             # Find subject
             for word in sent.words:
@@ -681,10 +715,11 @@ class SubjunctiveConditionalEngine:
                     components['subject'] = self._build_noun_phrase(sent, word)
                     break
             
-            # Find auxiliary
+            # Find auxiliary (but not "be" forms in conditionals)
             for word in sent.words:
                 if word.head == root_verb.id and word.deprel == 'aux':
-                    components['auxiliary'] = word.text
+                    if word.lemma.lower() != 'be':  # Don't treat "were" as auxiliary
+                        components['auxiliary'] = word.text
                     break
             
             # Find object
@@ -701,7 +736,87 @@ class SubjunctiveConditionalEngine:
         
         return components
     
-    def _analyze_inverted_clause(self, doc: Any, clause: str) -> Dict[str, str]:
+    def _analyze_detailed_main_clause(self, clause: str) -> Dict[str, str]:
+        """
+        Analyze main clause with detailed modifier extraction.
+        
+        Args:
+            clause: Main clause text
+            
+        Returns:
+            Dict: Detailed analysis including location and manner modifiers
+        """
+        analysis = {
+            'location_modifier': '',
+            'manner_modifier': ''
+        }
+        
+        # Common location words that should be M2
+        location_patterns = [
+            r'\bhome\b', r'\bthere\b', r'\bhere\b', r'\babroad\b', 
+            r'\binside\b', r'\boutside\b', r'\bupstairs\b', r'\bdownstairs\b'
+        ]
+        
+        clause_lower = clause.lower()
+        for pattern in location_patterns:
+            if re.search(pattern, clause_lower):
+                match = re.search(pattern, clause_lower)
+                if match:
+                    analysis['location_modifier'] = match.group()
+                    break
+        
+        return analysis
+    
+    def _analyze_inverted_clause_detailed(self, doc: Any, clause: str) -> Dict[str, str]:
+        """
+        Analyze inverted conditional clauses with detailed verb classification.
+        
+        Args:
+            doc: Stanza parsed document
+            clause: Original clause text
+            
+        Returns:
+            Dict: Components with proper verb classification
+        """
+        components = {
+            'subject': '',
+            'auxiliary': '',
+            'main_verb': '',
+            'complement': ''
+        }
+        
+        if not doc.sentences:
+            return components
+            
+        sent = doc.sentences[0]
+        words = [w.text for w in sent.words]
+        
+        if len(words) >= 3:
+            # Pattern: [VERB] [SUBJECT] [COMPLEMENT/OBJECT]
+            first_word = words[0]
+            
+            # In inverted conditionals, first word is usually the main verb
+            components['main_verb'] = first_word
+            components['subject'] = words[1]
+            
+            # Check if the rest is a complement or contains auxiliary
+            remaining = ' '.join(words[2:])
+            
+            # Special handling for "Had [subject] [past participle]"
+            if first_word.lower() == 'had':
+                if len(words) > 2:
+                    # "Had she known" -> had=auxiliary, known=main verb  
+                    components['auxiliary'] = first_word
+                    components['main_verb'] = words[2] if len(words) > 2 else ''
+                    remaining = ' '.join(words[3:]) if len(words) > 3 else ''
+            
+            components['complement'] = remaining
+            
+        elif len(words) == 2:
+            components['main_verb'] = words[0]
+            components['subject'] = words[1]
+        
+        return components
         """
         Analyze inverted conditional clauses (Were I rich, Had she known).
         
