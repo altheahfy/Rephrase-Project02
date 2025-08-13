@@ -745,6 +745,11 @@ class GrammarMasterControllerV2:
         if not self.boundary_lib:
             return sentence
         
+        # TEMPORARY: 境界拡張を一時無効化（重複問題修正まで）
+        if debug:
+            self.logger.info(f"🔧 境界拡張: 一時無効化中 '{sentence}'")
+        return sentence
+        
         try:
             # 基本境界拡張適用
             expanded_sentence = self.boundary_lib.expand_span_generic(sentence)
@@ -770,6 +775,11 @@ class GrammarMasterControllerV2:
         Returns:
             スロット特化最適化された結果
         """
+        # TEMPORARY: スロット特化拡張を一時無効化（重複問題修正まで）
+        if debug:
+            self.logger.info(f"🔧 スロット特化拡張: 一時無効化中")
+        return result
+        
         if not self.boundary_lib or not result.success or not result.slots:
             return result
         
