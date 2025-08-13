@@ -114,7 +114,15 @@ class GrammarMasterControllerV2:
             'average_processing_time': 0.0,
             'startup_time': time.time(),
             'boundary_expansions_applied': 0,      # 境界拡張統計
-            'sublevel_patterns_applied': 0         # サブレベルパターン統計（Phase 2）
+            'sublevel_patterns_applied': 0,        # サブレベルパターン統計（Phase 2）
+            # Multi-Engine Coordination Statistics
+            'coordination_strategies_used': {
+                'single_optimal': 0,
+                'foundation_plus_specialist': 0,
+                'multi_cooperative': 0
+            },
+            'multi_engine_processes': 0,           # マルチエンジン協調回数
+            'total_engine_cooperations': 0         # エンジン協調総数
         }
         
         # Register engine configurations (no actual loading)
@@ -247,14 +255,19 @@ class GrammarMasterControllerV2:
     
     def process_sentence(self, sentence: str, debug: bool = False) -> EngineResult:
         """
-        Main processing method with lazy loading.
+        Enhanced processing method with multi-engine coordination capabilities.
+        
+        Implements the restored multi-engine coordination architecture:
+        - Single Optimal: For simple sentences
+        - Foundation Plus Specialist: For moderate complexity  
+        - Multi-Cooperative: For complex sentences with multiple patterns
         
         Args:
             sentence: Input sentence to process
             debug: Enable detailed processing information
             
         Returns:
-            EngineResult: Unified result from the best matching engine
+            EngineResult: Coordinated result from optimal engine selection strategy
         """
         start_time = time.time()
         
@@ -274,29 +287,39 @@ class GrammarMasterControllerV2:
                 return self._create_error_result("No applicable engines found", start_time)
             
             if debug:
-                self.logger.info(f"Applicable engines: {[e.value for e in applicable_engines]}")
+                self.logger.info(f"Detected applicable engines: {[e.value for e in applicable_engines]}")
             
-            # Step 2: Select optimal engine (heuristic-based)
-            selected_engine_type = self._select_optimal_engine(enhanced_sentence, applicable_engines)
+            # Step 2: 🎯 Multi-Engine Coordination Strategy Selection
+            coordination_strategy = self._determine_coordination_strategy(enhanced_sentence, applicable_engines)
             
             if debug:
-                self.logger.info(f"Selected engine: {selected_engine_type.value}")
+                self.logger.info(f"Coordination strategy: {coordination_strategy}")
             
-            # Step 3: Lazy load selected engine if not already loaded
-            if not self._load_engine(selected_engine_type):
-                return self._create_error_result(f"Failed to load {selected_engine_type.value} engine", start_time)
-            
-            # Step 4: Process with loaded engine
-            result = self._process_with_engine(enhanced_sentence, selected_engine_type, start_time)
-            
-            # Step 5: 後処理 - 結果スロットの境界拡張最適化
-            result = self._enhance_result_slots(result, debug)
-            
-            # Step 6: Update statistics
-            self.engine_registry[selected_engine_type].usage_count += 1
-            self._update_statistics(selected_engine_type, time.time() - start_time, result.success)
-            
-            return result
+            # Step 3: Execute strategy-based processing
+            if coordination_strategy == "single_optimal":
+                return self._process_single_optimal(enhanced_sentence, applicable_engines, start_time, debug)
+            elif coordination_strategy == "foundation_plus_specialist":
+                return self._process_foundation_plus_specialist(enhanced_sentence, applicable_engines, start_time, debug)
+            elif coordination_strategy == "multi_cooperative":
+                return self._process_multi_cooperative(enhanced_sentence, applicable_engines, start_time, debug)
+            else:
+                # Fallback to traditional single engine selection
+                selected_engine_type = self._select_optimal_engine(enhanced_sentence, applicable_engines)
+                
+                if debug:
+                    self.logger.info(f"Fallback to single engine: {selected_engine_type.value}")
+                
+                # Load and process with single engine
+                if not self._load_engine(selected_engine_type):
+                    return self._create_error_result(f"Failed to load {selected_engine_type.value} engine", start_time)
+                
+                result = self._process_with_engine(enhanced_sentence, selected_engine_type, start_time)
+                result = self._enhance_result_slots(result, debug)
+                
+                self.engine_registry[selected_engine_type].usage_count += 1
+                self._update_statistics(selected_engine_type, time.time() - start_time, result.success)
+                
+                return result
             
         except Exception as e:
             self.logger.error(f"Unexpected error in process_sentence: {str(e)}")
@@ -337,6 +360,229 @@ class GrammarMasterControllerV2:
         applicable.sort(key=lambda x: self.engine_registry[x].priority)
         
         return applicable
+    
+    def _determine_coordination_strategy(self, sentence: str, applicable_engines: List[EngineType]) -> str:
+        """
+        Determine the optimal multi-engine coordination strategy.
+        
+        Args:
+            sentence: Input sentence
+            applicable_engines: List of applicable engines
+            
+        Returns:
+            str: Strategy name ("single_optimal", "foundation_plus_specialist", "multi_cooperative")
+        """
+        sentence_lower = sentence.lower()
+        
+        # Count complexity indicators
+        complexity_indicators = {
+            'conjunctions': sum(1 for conj in ["because", "although", "while", "since", "if", "when", "where"] if conj in sentence_lower),
+            'relative_clauses': sum(1 for rel in ["who", "which", "that"] if rel in sentence_lower),
+            'passive_voice': 1 if ("by" in sentence_lower and any(aux in sentence_lower for aux in ["was", "were", "been"])) else 0,
+            'modal_verbs': sum(1 for modal in ["can", "could", "will", "would", "must", "should", "may", "might"] if modal in sentence_lower),
+            'progressive_forms': len([word for word in sentence_lower.split() if word.endswith('ing')]) > 1
+        }
+        
+        total_complexity = sum(complexity_indicators.values())
+        
+        # Strategy decision logic based on complexity and available engines
+        if total_complexity >= 3:
+            return "multi_cooperative"  # Very complex sentence needs multiple engines
+        elif total_complexity >= 2 or len(applicable_engines) >= 3:
+            return "foundation_plus_specialist"  # Moderate complexity needs foundation + specialist
+        elif len(applicable_engines) == 1:
+            return "single_optimal"  # Simple case
+        elif len(applicable_engines) >= 2:
+            return "foundation_plus_specialist"  # Multiple engines available
+        else:
+            return "single_optimal"  # Default to single engine
+    
+    def _process_single_optimal(self, sentence: str, applicable_engines: List[EngineType], 
+                               start_time: float, debug: bool = False) -> EngineResult:
+        """Process with single optimal engine."""
+        selected_engine = applicable_engines[0] if applicable_engines else EngineType.BASIC_FIVE_PATTERN
+        
+        if debug:
+            self.logger.info(f"Single optimal processing with: {selected_engine.value}")
+        
+        if not self._load_engine(selected_engine):
+            return self._create_error_result(f"Failed to load {selected_engine.value}", start_time)
+        
+        result = self._process_with_engine(sentence, selected_engine, start_time)
+        result = self._enhance_result_slots(result, debug)
+        
+        # Update statistics
+        self.engine_registry[selected_engine].usage_count += 1
+        self._update_statistics(selected_engine, time.time() - start_time, result.success)
+        self.processing_stats['coordination_strategies_used']['single_optimal'] += 1
+        
+        return result
+    
+    def _process_foundation_plus_specialist(self, sentence: str, applicable_engines: List[EngineType], 
+                                          start_time: float, debug: bool = False) -> EngineResult:
+        """Process with Basic Five Pattern as foundation plus specialist engine."""
+        foundation_result = None
+        specialist_result = None
+        
+        # Foundation processing with Basic Five Pattern
+        foundation_engine = EngineType.BASIC_FIVE_PATTERN
+        if foundation_engine in self.engine_registry:
+            if self._load_engine(foundation_engine):
+                foundation_result = self._process_with_engine(sentence, foundation_engine, start_time)
+                self.engine_registry[foundation_engine].usage_count += 1
+                
+                if debug:
+                    self.logger.info(f"Foundation processing: {len(foundation_result.slots)} slots extracted")
+        
+        # Specialist processing (highest priority non-foundation engine)
+        specialist_engine = None
+        for engine_type in applicable_engines:
+            if engine_type != foundation_engine:
+                specialist_engine = engine_type
+                break
+        
+        if specialist_engine and self._load_engine(specialist_engine):
+            specialist_result = self._process_with_engine(sentence, specialist_engine, start_time)
+            self.engine_registry[specialist_engine].usage_count += 1
+            
+            if debug:
+                self.logger.info(f"Specialist processing ({specialist_engine.value}): {len(specialist_result.slots)} slots extracted")
+        
+        # Merge results
+        merged_result = self._merge_foundation_specialist_results(foundation_result, specialist_result, sentence, start_time)
+        merged_result = self._enhance_result_slots(merged_result, debug)
+        
+        # Update coordination statistics
+        self.processing_stats['coordination_strategies_used']['foundation_plus_specialist'] += 1
+        if foundation_result and specialist_result:
+            self.processing_stats['multi_engine_processes'] += 1
+            self.processing_stats['total_engine_cooperations'] += 2
+        
+        return merged_result
+    
+    def _process_multi_cooperative(self, sentence: str, applicable_engines: List[EngineType], 
+                                 start_time: float, debug: bool = False) -> EngineResult:
+        """Process with multiple engines in cooperative mode."""
+        cooperation_results = {}
+        
+        # Process with up to 3 engines for performance
+        engines_to_use = applicable_engines[:3]
+        
+        for engine_type in engines_to_use:
+            try:
+                if self._load_engine(engine_type):
+                    result = self._process_with_engine(sentence, engine_type, start_time)
+                    
+                    if result.success:
+                        cooperation_results[engine_type] = result
+                        self.engine_registry[engine_type].usage_count += 1
+                        
+                        if debug:
+                            self.logger.info(f"Cooperative engine {engine_type.value}: {len(result.slots)} slots extracted")
+                            
+            except Exception as e:
+                if debug:
+                    self.logger.warning(f"Cooperative engine {engine_type.value} failed: {str(e)}")
+                continue
+        
+        # Merge all cooperative results
+        merged_result = self._merge_cooperative_results(cooperation_results, sentence, start_time)
+        merged_result = self._enhance_result_slots(merged_result, debug)
+        
+        # Update coordination statistics
+        self.processing_stats['coordination_strategies_used']['multi_cooperative'] += 1
+        if cooperation_results:
+            self.processing_stats['multi_engine_processes'] += 1
+            self.processing_stats['total_engine_cooperations'] += len(cooperation_results)
+        
+        return merged_result
+    
+    def _merge_foundation_specialist_results(self, foundation_result: Optional[EngineResult], 
+                                           specialist_result: Optional[EngineResult],
+                                           sentence: str, start_time: float) -> EngineResult:
+        """Merge foundation (Basic Five Pattern) with specialist engine results."""
+        import time
+        
+        # Determine base result
+        if foundation_result and foundation_result.success:
+            base_result = foundation_result
+            enhancement_result = specialist_result
+        elif specialist_result and specialist_result.success:
+            base_result = specialist_result
+            enhancement_result = foundation_result
+        else:
+            return self._create_error_result("No successful results from foundation+specialist", start_time)
+        
+        # Start with base slots
+        merged_slots = base_result.slots.copy()
+        merged_metadata = base_result.metadata.copy()
+        
+        # Add enhancements from specialist
+        if enhancement_result and enhancement_result.success:
+            for slot_key, slot_value in enhancement_result.slots.items():
+                if slot_key not in merged_slots or not merged_slots[slot_key]:
+                    merged_slots[slot_key] = slot_value
+                elif slot_value and len(str(slot_value)) > len(str(merged_slots.get(slot_key, ""))):
+                    # Use longer/more detailed slot value
+                    merged_slots[slot_key] = slot_value
+            
+            merged_metadata['enhancement_engine'] = enhancement_result.engine_type.value
+            merged_metadata['enhancement_slots'] = len(enhancement_result.slots)
+        
+        return EngineResult(
+            engine_type=base_result.engine_type,
+            confidence=min(base_result.confidence + (0.05 if enhancement_result else 0), 1.0),
+            slots=merged_slots,
+            metadata={
+                **merged_metadata,
+                'coordination_mode': 'foundation_plus_specialist',
+                'foundation_engine': base_result.engine_type.value,
+                'total_slots': len(merged_slots)
+            },
+            success=True,
+            processing_time=time.time() - start_time,
+            error=None
+        )
+    
+    def _merge_cooperative_results(self, results: Dict[EngineType, EngineResult], 
+                                 sentence: str, start_time: float) -> EngineResult:
+        """Merge multiple cooperative engine results."""
+        import time
+        
+        if not results:
+            return self._create_error_result("No successful cooperative results", start_time)
+        
+        # Select primary result (highest confidence)
+        primary_result = max(results.values(), key=lambda r: r.confidence)
+        
+        # Enhance with additional slots from other engines
+        merged_slots = primary_result.slots.copy()
+        merged_metadata = primary_result.metadata.copy()
+        
+        for engine_type, result in results.items():
+            if result != primary_result:
+                # Add unique slots from other engines
+                for slot_key, slot_value in result.slots.items():
+                    if slot_key not in merged_slots or not merged_slots[slot_key]:
+                        merged_slots[slot_key] = slot_value
+                
+                # Merge metadata
+                merged_metadata[f"{engine_type.value}_contribution"] = len(result.slots)
+        
+        return EngineResult(
+            engine_type=primary_result.engine_type,
+            confidence=min(primary_result.confidence + 0.1, 1.0),  # Boost confidence for multi-engine
+            slots=merged_slots,
+            metadata={
+                **merged_metadata,
+                'coordination_mode': 'multi_cooperative',
+                'engines_used': [e.value for e in results.keys()],
+                'total_slots': len(merged_slots)
+            },
+            success=True,
+            processing_time=time.time() - start_time,
+            error=None
+        )
     
     def _select_optimal_engine(self, sentence: str, applicable_engines: List[EngineType]) -> EngineType:
         """
