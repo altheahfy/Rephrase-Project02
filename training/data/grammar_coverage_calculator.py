@@ -35,7 +35,8 @@ def calculate_grammar_coverage():
         "modal_verbs", 
         "questions", 
         "basic_sentence_structure",
-        "progressive_tenses"  # ✅ Progressive Tenses Engine implemented
+        "progressive_tenses",  # ✅ Progressive Tenses Engine implemented
+        "prepositional_phrases"  # ✅ Prepositional Phrase Engine implemented
     ]
     
     partially_implemented_stanza = [
@@ -49,7 +50,7 @@ def calculate_grammar_coverage():
     ]
     
     not_implemented = [
-        "prepositional_phrases"
+        # すべて実装完了！
     ]
     
     # カバレッジ計算
@@ -129,20 +130,27 @@ def calculate_grammar_coverage():
     # 次のマイルストーン提案
     print("🎯 Next Milestones:")
     print("=" * 60)
-    print("1. +4%: Implement Prepositional Phrase Engine")
-    print("2. +5%: Remove Stanza dependency from Passive Voice (10% × 50%)")
-    print("3. +4%: Remove Stanza dependency from Perfect Tenses (8% × 50%)")
-    print("4. +3.5%: Remove Stanza dependency from Relative Clauses (7% × 50%)")
+    print("🎉 CORE GRAMMAR COMPLETE! All essential patterns implemented!")
+    print("1. +5%: Remove Stanza dependency from Passive Voice (10% × 50%)")
+    print("2. +4%: Remove Stanza dependency from Perfect Tenses (8% × 50%)")
+    print("3. +3.5%: Remove Stanza dependency from Relative Clauses (7% × 50%)")
+    print("4. +1.5%: Remove Stanza dependency from other engines")
     print()
     
-    target_80 = 80.0
-    needed_for_80 = target_80 - effective_coverage
-    print(f"💡 To reach 80% coverage: Need +{needed_for_80:.1f}% more")
-    print("🚀 Next step: Prepositional Phrase Engine = +4%")
-    if needed_for_80 <= 4:
-        print(f"   → Would reach {effective_coverage + 4:.1f}% coverage! 🎉")
+    target_90 = 90.0
+    target_95 = 95.0
+    needed_for_90 = max(0, target_90 - effective_coverage)
+    needed_for_95 = max(0, target_95 - effective_coverage)
+    
+    print(f"🎯 To reach 90% coverage: Need +{needed_for_90:.1f}% more")
+    print(f"🚀 To reach 95% coverage: Need +{needed_for_95:.1f}% more")
+    
+    if effective_coverage >= 90:
+        print("🎉 CONGRATULATIONS! 90%+ coverage achieved! ✨")
+    elif effective_coverage >= 85:
+        print("🔥 AMAZING! 85%+ coverage - almost perfect!")
     else:
-        print(f"   → Would reach {effective_coverage + 4:.1f}% coverage")
+        print("📈 Next: Remove Stanza dependencies for higher accuracy!")
 
 if __name__ == "__main__":
     calculate_grammar_coverage()

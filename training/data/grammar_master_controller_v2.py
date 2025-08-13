@@ -36,6 +36,7 @@ class EngineType(Enum):
     MODAL = "modal"  # New: Modal auxiliary system
     QUESTION = "question"  # New: Question formation system
     PROGRESSIVE = "progressive"  # New: Progressive tenses system
+    PREPOSITIONAL = "prepositional"  # New: Prepositional phrase system
 
 @dataclass
 class EngineResult:
@@ -126,24 +127,26 @@ class GrammarMasterControllerV2:
             # Medium Priority: Common tense structures
             (EngineType.PROGRESSIVE, "engines.progressive_tenses_engine", "ProgressiveTensesEngine", 
              5, "Progressive tense processing", ["am", "is", "are", "was", "were", "-ing", "being"]),
+            (EngineType.PREPOSITIONAL, "engines.prepositional_phrase_engine", "PrepositionalPhraseEngine", 
+             6, "Prepositional phrase processing", ["in", "on", "at", "by", "with", "for", "during"]),
             (EngineType.PERFECT_PROGRESSIVE, "engines.perfect_progressive_engine", "PerfectProgressiveEngine", 
-             6, "Perfect progressive tenses", ["has been", "had been", "will have been"]),
+             7, "Perfect progressive tenses", ["has been", "had been", "will have been"]),
             (EngineType.SUBJUNCTIVE, "engines.subjunctive_conditional_engine", "SubjunctiveConditionalEngine", 
-             7, "Subjunctive and conditional moods", ["if", "were", "wish", "unless"]),
+             8, "Subjunctive and conditional moods", ["if", "were", "wish", "unless"]),
             (EngineType.INVERSION, "engines.inversion_engine", "InversionEngine", 
-             8, "Inverted constructions", ["never", "rarely", "seldom", "hardly", "not only"]),
+             9, "Inverted constructions", ["never", "rarely", "seldom", "hardly", "not only"]),
             (EngineType.COMPARATIVE, "engines.comparative_superlative_engine", "ComparativeSuperlativeEngine", 
-             9, "Comparative and superlative forms", ["more", "most", "than", "-er", "-est"]),
+             10, "Comparative and superlative forms", ["more", "most", "than", "-er", "-est"]),
             
             # Lower Priority: Verbal forms (more specific patterns)
             (EngineType.GERUND, "engines.gerund_engine", "GerundEngine", 
-             10, "Gerund constructions", ["-ing", "swimming", "reading", "working"]),
+             11, "Gerund constructions", ["-ing", "swimming", "reading", "working"]),
             (EngineType.PARTICIPLE, "engines.participle_engine", "ParticipleEngine", 
-             11, "Participial constructions", ["-ing", "-ed", "running", "broken"]),
+             12, "Participial constructions", ["-ing", "-ed", "running", "broken"]),
             (EngineType.INFINITIVE, "engines.infinitive_engine", "InfinitiveEngine", 
-             12, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
+             13, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
             (EngineType.QUESTION, "engines.question_formation_engine", "QuestionFormationEngine", 
-             13, "Question formation patterns", ["what", "where", "when", "who", "how", "why", "do", "does", "did"]),
+             14, "Question formation patterns", ["what", "where", "when", "who", "how", "why", "do", "does", "did"]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
