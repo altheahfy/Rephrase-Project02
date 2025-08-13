@@ -45,6 +45,7 @@ class EngineType(Enum):
     PROGRESSIVE = "progressive"  # New: Progressive tenses system
     PREPOSITIONAL = "prepositional"  # New: Prepositional phrase system
     IMPERATIVE = "imperative"  # New: Imperative sentence system (Priority 15)
+    EXISTENTIAL_THERE = "existential_there"  # New: Existential there system (Priority 16)
 
 @dataclass
 class EngineResult:
@@ -189,6 +190,10 @@ class GrammarMasterControllerV2:
              15, "Imperative sentence processing", [
                 "please", "do", "don't", "take", "give", "leave", "help", "stop", "go", "come", "sit", "run", "open", "close", "read", "write", "look", "listen", "wait", "bring", "show", "tell", "call", "keep", "let", "put", "make", "find", "start", "turn", "try", "ask", "remember", "forget", "never", "always"
             ]),
+            (EngineType.EXISTENTIAL_THERE, "engines.existential_there_engine", "ExistentialThereEngine", 
+             16, "Existential there sentence processing", [
+                "there is", "there are", "there was", "there were", "there will be", "there has been", "there have been", "there used to be", "there isn't", "there aren't", "there won't be", "there can be"
+            ]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
@@ -297,6 +302,12 @@ class GrammarMasterControllerV2:
                     self.logger.info("IMPERATIVE engine detected: forcing single_optimal strategy with IMPERATIVE only.")
                 return self._process_single_optimal(enhanced_sentence, [EngineType.IMPERATIVE], start_time, debug)
 
+            # 存在構文エンジンがapplicable_enginesに含まれる場合は必ずEXISTENTIAL_THEREのみでsingle_optimal処理
+            if EngineType.EXISTENTIAL_THERE in applicable_engines:
+                if debug:
+                    self.logger.info("EXISTENTIAL_THERE engine detected: forcing single_optimal strategy with EXISTENTIAL_THERE only.")
+                return self._process_single_optimal(enhanced_sentence, [EngineType.EXISTENTIAL_THERE], start_time, debug)
+
             coordination_strategy = self._determine_coordination_strategy(enhanced_sentence, applicable_engines)
 
             if debug:
@@ -366,10 +377,20 @@ class GrammarMasterControllerV2:
                 elif sentence.strip().endswith('!') and len(words) <= 7:
                     applicable.append(EngineType.IMPERATIVE)
 
+        # 次に存在構文エンジン（EXISTENTIAL_THERE）を判定
+        if EngineType.EXISTENTIAL_THERE in self.engine_registry:
+            existential_info = self.engine_registry[EngineType.EXISTENTIAL_THERE]
+            # There + be 構文の判定
+            if sentence_lower.startswith('there '):
+                for pattern in existential_info.patterns:
+                    if pattern.lower() in sentence_lower:
+                        applicable.append(EngineType.EXISTENTIAL_THERE)
+                        break
+
         # 他の専門エンジンを優先的に検出
         for engine_type, engine_info in self.engine_registry.items():
             # Basic Fiveは最後に処理
-            if engine_type in (EngineType.BASIC_FIVE, EngineType.IMPERATIVE):
+            if engine_type in (EngineType.BASIC_FIVE, EngineType.IMPERATIVE, EngineType.EXISTENTIAL_THERE):
                 continue
 
             # Pattern-based detection (no engine loading required)
