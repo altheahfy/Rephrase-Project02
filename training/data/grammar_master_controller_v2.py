@@ -22,13 +22,10 @@ from dataclasses import dataclass
 # Import boundary expansion library
 from boundary_expansion_lib import BoundaryExpansionLib
 
-# Import sublevel pattern library (Phase 2)
-from sublevel_pattern_lib import SublevelPatternLib
+# Import sublevel pattern library (Phase 2) - REMOVED (redundant with individual engines)  
+# from sublevel_pattern_lib import SublevelPatternLib
 from enum import Enum
 from threading import Lock
-
-# 統一境界拡張ライブラリのインポート
-from boundary_expansion_lib import BoundaryExpansionLib
 
 class EngineType(Enum):
     """Engine type enumeration for priority and classification."""
@@ -90,20 +87,17 @@ class GrammarMasterControllerV2:
         self.engine_registry: Dict[EngineType, LazyEngineInfo] = {}
         self.loading_locks: Dict[EngineType, Lock] = {}
         
-        # 統一境界拡張ライブラリの初期化（中央集権管理）（temporarily disabled)
-        # try:
-        #     self.boundary_lib = BoundaryExpansionLib()
-        #     self.logger.info("✅ 統一境界拡張ライブラリ統合完了")
-        # except Exception as e:
-        #     self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
-        self.boundary_lib = None
+        # 統一境界拡張ライブラリの初期化（中央集権管理）
+        try:
+            self.boundary_lib = BoundaryExpansionLib()
+            self.logger.info("✅ 統一境界拡張ライブラリ統合完了")
+        except Exception as e:
+            self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
+            self.boundary_lib = None
         
-        # Initialize sublevel pattern library (Phase 2) (temporarily disabled)
-        # try:
-        #     self.sublevel_lib = SublevelPatternLib()
-        #     self.logger.info("✅ サブレベル専用パターンライブラリ統合完了")
-        # except Exception as e:
-        #     self.logger.warning(f"⚠️ サブレベルパターンライブラリ初期化失敗: {e}")
+        # Initialize sublevel pattern library (Phase 2) - REMOVED (redundant with individual engines)
+        # Each engine already implements its own sublevel decomposition (sub-s, sub-v, sub-o1, etc.)
+        # Central sublevel library adds unnecessary overhead without meaningful benefits
         self.sublevel_lib = None
         
         self.processing_stats = {
@@ -803,8 +797,9 @@ class GrammarMasterControllerV2:
             # 結果更新（境界拡張まで）
             result.slots = enhanced_slots
             
-            # Phase 2: サブレベルパターン統合処理
-            result = self._apply_sublevel_pattern_enhancement(result, debug)
+            # Phase 2: サブレベルパターン統合処理 - REMOVED (redundant with individual engines)
+            # result = self._apply_sublevel_pattern_enhancement(result, debug)
+            # Each engine already implements sublevel decomposition (sub-s, sub-v, etc.)
             enhanced_slots = result.slots
             
             # メタデータにスロット特化境界拡張情報追加
@@ -830,49 +825,23 @@ class GrammarMasterControllerV2:
             self.logger.warning(f"⚠️ スロット特化境界拡張エラー: {e}")
             return result
 
-    def _apply_sublevel_pattern_enhancement(self, result: EngineResult, debug: bool = False) -> EngineResult:
-        """
-        Phase 2: サブレベルパターン統合によるスロット内複雑構造解析（Pure Stanza V3.1完全版）
-        
-        Args:
-            result: 境界拡張済みの結果
-            debug: デバッグ情報表示
+    # REMOVED: _apply_sublevel_pattern_enhancement - redundant with individual engines
+    # Each specialist engine already implements sublevel decomposition (sub-s, sub-v, etc.)
+
+    def get_detailed_statistics(self) -> Dict[str, Any]:
             
-        Returns:
-            サブレベルパターン解析による拡張結果
-        """
-        if not self.sublevel_lib or not result.success or not result.slots:
             return result
-        
-        try:
-            sublevel_enhancements = {}
-            sublevel_stats = {'patterns_detected': 0, 'slots_enhanced': 0, 'total_sublevels': 0}
             
-            # 各スロットでサブレベルパターン検出・適用
-            for slot, value in result.slots.items():
-                if value and value.strip():
-                    # サブレベルパターン検出
-                    pattern_result = self.sublevel_lib.analyze_sublevel_pattern(value)
-                    
-                    if pattern_result and pattern_result[0] != 'NONE':
-                        pattern_type = pattern_result[0]  # タプルの最初の要素がパターンタイプ
-                        
-                        # パターン検出成功 → サブレベル分解
-                        sublevel_slots = self.sublevel_lib.extract_sublevel_slots(value, pattern_type)
-                        
-                        if sublevel_slots:
-                            # サブレベル情報をメタデータに記録
-                            sublevel_enhancements[slot] = {
-                                'original_value': value,
-                                'pattern_type': pattern_type,
-                                'sublevel_slots': sublevel_slots,
-                                'enhanced': True
-                            }
-                            
-                            # 統計更新
-                            sublevel_stats['patterns_detected'] += 1
-                            sublevel_stats['slots_enhanced'] += 1
-                            sublevel_stats['total_sublevels'] += len(sublevel_slots)
+        except Exception as e:
+            self.logger.warning(f"⚠️ スロット特化境界拡張エラー: {e}")
+            return result
+
+    # REMOVED: _apply_sublevel_pattern_enhancement - redundant with individual engines
+    # Each specialist engine (relative, passive, etc.) already implements sublevel decomposition:
+    # - Simple Relative Engine: sub-v (relative clause verb)  
+    # - Passive Voice Engine: sub-s, sub-aux, sub-v, sub-m1, sub-o1
+    # - Other engines: detailed internal structure parsing
+    # Central sublevel library adds overhead without meaningful benefits
                             
                             if debug:
                                 self.logger.info(f"🔍 {slot}スロット サブレベル検出: {pattern_type}")
@@ -898,18 +867,21 @@ class GrammarMasterControllerV2:
                 'library_version': '1.0'
             })
             
-            # グローバル統計更新
-            self.processing_stats['sublevel_patterns_applied'] += sublevel_stats['patterns_detected']
-            
-            if debug and sublevel_stats['patterns_detected'] > 0:
-                self.logger.info(f"🔬 サブレベルパターン統計: {sublevel_stats['patterns_detected']}個検出, {sublevel_stats['total_sublevels']}個サブレベル分解")
-            
-            return result
-            
-        except Exception as e:
-            self.logger.warning(f"⚠️ サブレベルパターン処理エラー: {e}")
-            return result
-    
+    def get_detailed_statistics(self) -> Dict[str, Any]:
+        """Get comprehensive multi-engine coordination statistics."""
+        loaded_engines = sum(1 for info in self.engine_registry.values() if info.engine_instance is not None)
+        
+        return {
+            'total_requests': self.processing_stats.get('total_requests', 0),
+            'total_engines_registered': len(self.engine_registry),
+            'engines_loaded': loaded_engines,
+            'coordination_strategies_used': self.processing_stats.get('coordination_strategies_used', {}),
+            'multi_engine_processes': self.processing_stats.get('multi_engine_processes', 0),
+            'total_engine_cooperations': self.processing_stats.get('total_engine_cooperations', 0),
+            'boundary_expansions_applied': self.processing_stats.get('boundary_expansions_applied', 0),
+            'success_rate_percent': 0.0,  # To be calculated based on success/failure tracking
+        }
+
     def get_engine_info(self) -> Dict[str, Any]:
         """Get information about all registered engines."""
         loaded_engines = sum(1 for info in self.engine_registry.values() if info.instance is not None)
