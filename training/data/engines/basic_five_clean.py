@@ -1,68 +1,44 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-Basic Five Pattern Engine Enhanced - With Unified Boundary Expansion
-統一境界拡張ライブラリ統合版
+Basic Five Pattern Engine - Lightweight Integrated Version
+Pure Stanza Engine V3.1縺九ｉ謚ｽ蜃ｺ縺励◆遏･隴倥・繝ｼ繧ｹ縺ｫ繧医ｋ霆ｽ驥丞渕譛ｬ5譁・梛繧ｨ繝ｳ繧ｸ繝ｳ
 
 Features:
-1. Pure Stanza Engine V3.1の知識ベースを継承
-2. Grammar Master Controller統合仕様準拠  
-3. 統一境界拡                # メインスロット構築
-        for dep_rel, slot in mapping.items():
-            if dep_rel in dep_relations:
-                words = dep_relations[dep_rel]
-                if words:
-                    # 複数の語がある場合は最初の語を使用
-                    target_word = words[0]
-                    # 統一境界拡張ライブラリによる高精度拡張
-                    expanded_text = self._expand_phrase_boundary_enhanced(target_word.text, slot)
-                    slots[slot] = expanded_text1.0）
-4. スロット別最適化された境界拡張
-5. 基本5文型 + 助動詞構文に特化
-"""
+1. Pure Stanza Engine V3.1縺ｮ遏･隴倥・繝ｼ繧ｹ繧堤ｶ呎価
+2. Grammar Master Controller邨ｱ蜷井ｻ墓ｧ俶ｺ匁侠
+3. 繝上・繝峨さ繝ｼ繝・ぅ繝ｳ繧ｰ謗帝勁・育衍隴倥・繝ｼ繧ｹ鬧・虚・・4. 蝓ｺ譛ｬ5譁・梛 + 蜉ｩ蜍戊ｩ樊ｧ区枚縺ｫ迚ｹ蛹・"""
 
 import stanza
 from typing import Dict, List, Optional, Any
 import time
-import sys
-import os
-
-# 統一境界拡張ライブラリのインポート
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
-from boundary_expansion_lib import BoundaryExpansionLib
 
 class BasicFivePatternEngine:
-    """基本5文型エンジン（統合型軽量版 + 統一境界拡張）"""
+    """蝓ｺ譛ｬ5譁・梛繧ｨ繝ｳ繧ｸ繝ｳ・育ｵｱ蜷亥梛霆ｽ驥冗沿・・""
     
     def __init__(self):
-        """統合仕様対応の軽量5文型エンジン初期化（境界拡張強化版）"""
-        print("🚀 Basic Five Pattern Engine Enhanced 初期化中...")
+        """邨ｱ蜷井ｻ墓ｧ伜ｯｾ蠢懊・霆ｽ驥・譁・梛繧ｨ繝ｳ繧ｸ繝ｳ蛻晄悄蛹・""
+        print("噫 Basic Five Pattern Engine 蛻晄悄蛹紋ｸｭ...")
         
-        # Stanza NLP パイプライン
+        # Stanza NLP 繝代う繝励Λ繧､繝ｳ
         self.nlp = stanza.Pipeline('en', verbose=False)
         
-        # 統一境界拡張ライブラリ
-        self.boundary_lib = BoundaryExpansionLib()
-        print("🔧 統一境界拡張ライブラリ統合完了")
-        
-        # Pure Stanza Engine V3.1から抽出した知識ベース
+        # Pure Stanza Engine V3.1縺九ｉ謚ｽ蜃ｺ縺励◆遏･隴倥・繝ｼ繧ｹ
         self.sentence_patterns = self._load_sentence_patterns()
         self.modifier_mappings = self._load_modifier_mappings()
         
-        self.name = "BasicFivePatternEngineEnhanced"
-        self.version = "1.1"
+        self.name = "BasicFivePatternEngine"
+        self.version = "1.0"
         
-        print("✅ 基本5文型エンジン Enhanced 準備完了")
+        print("笨・蝓ｺ譛ｬ5譁・梛繧ｨ繝ｳ繧ｸ繝ｳ貅門ｙ螳御ｺ・)
     
     def _load_sentence_patterns(self) -> Dict[str, Any]:
-        """Pure Stanza Engine V3.1から抽出：基本文型パターン"""
+        """Pure Stanza Engine V3.1縺九ｉ謚ｽ蜃ｺ・壼渕譛ｬ譁・梛繝代ち繝ｼ繝ｳ"""
         return {
-            # 基本5文型（優先度を調整）
-            "SVOO": {
+            # 蝓ｺ譛ｬ5譁・梛・亥━蜈亥ｺｦ繧定ｪｿ謨ｴ・・            "SVOO": {
                 "required_relations": ["nsubj", "iobj", "obj", "root"],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "iobj": "O1", "obj": "O2", "root": "V"},
-                "priority": 1  # 最高優先度（最も具体的）
-            },
+                "priority": 1  # 譛鬮伜━蜈亥ｺｦ・域怙繧ょ・菴鍋噪・・            },
             "SVOC": {
                 "required_relations": ["nsubj", "obj", "xcomp", "root"],
                 "root_pos": ["VERB"],
@@ -85,11 +61,10 @@ class BasicFivePatternEngine:
                 "required_relations": ["nsubj", "root"],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "root": "V"},
-                "priority": 5  # 最も汎用的なので低優先度
+                "priority": 5  # 譛繧よｱ守畑逧・↑縺ｮ縺ｧ菴主━蜈亥ｺｦ
             },
             
-            # 助動詞構文（Pure Stanza Engine V3.1から継承）
-            "S_AUX_VO": {
+            # 蜉ｩ蜍戊ｩ樊ｧ区枚・・ure Stanza Engine V3.1縺九ｉ邯呎価・・            "S_AUX_VO": {
                 "required_relations": ["nsubj", "aux", "obj", "root"],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "aux": "Aux", "obj": "O1", "root": "V"},
@@ -108,7 +83,7 @@ class BasicFivePatternEngine:
                 "priority": 8
             },
             
-            # 受動態パターン
+            # 蜿怜虚諷九ヱ繧ｿ繝ｼ繝ｳ
             "PASSIVE": {
                 "required_relations": ["nsubj:pass", "aux:pass", "root"],
                 "root_pos": ["VERB"],
@@ -118,36 +93,27 @@ class BasicFivePatternEngine:
         }
     
     def _load_modifier_mappings(self) -> Dict[str, str]:
-        """Pure Stanza Engine V3.1から抽出：修飾語マッピング（基本5文型に特化）"""
+        """Pure Stanza Engine V3.1縺九ｉ謚ｽ蜃ｺ・壻ｿｮ鬟ｾ隱槭・繝・ヴ繝ｳ繧ｰ・亥渕譛ｬ5譁・梛縺ｫ迚ｹ蛹厄ｼ・""
         return {
-            # 基本修飾語（文型構造に関わるもののみ）
-            "advmod": "M2",     # 副詞修飾語（quickly, hard, etc.）
-            "nmod": "M1",       # 名詞修飾語
-            "obl": "M3",        # 斜格語（前置詞句など）
-            "tmod": "M3",       # 時間修飾
-            "neg": "M3",        # 否定
-            
-            # 除外する修飾語（他エンジンの役割）
-            # "det": 冠詞・限定詞は基本5文型では扱わない
-            # "case": 前置詞は前置詞句エンジンの役割
-            # "aux": 助動詞はモーダルエンジンの役割
-            # "agent": 動作主は受動態エンジンの役割
+            # 蝓ｺ譛ｬ菫ｮ鬟ｾ隱橸ｼ域枚蝙区ｧ矩縺ｫ髢｢繧上ｋ繧ゅ・縺ｮ縺ｿ・・            "advmod": "M2",     # 蜑ｯ隧樔ｿｮ鬟ｾ隱橸ｼ・uickly, hard, etc.・・            "nmod": "M1",       # 蜷崎ｩ樔ｿｮ鬟ｾ隱・            "obl": "M3",        # 譁懈ｼ隱橸ｼ亥燕鄂ｮ隧槫唱縺ｪ縺ｩ・・            "tmod": "M3",       # 譎る俣菫ｮ鬟ｾ
+            "neg": "M3",        # 蜷ｦ螳・            
+            # 髯､螟悶☆繧倶ｿｮ鬟ｾ隱橸ｼ井ｻ悶お繝ｳ繧ｸ繝ｳ縺ｮ蠖ｹ蜑ｲ・・            # "det": 蜀隧槭・髯仙ｮ夊ｩ槭・蝓ｺ譛ｬ5譁・梛縺ｧ縺ｯ謇ｱ繧上↑縺・            # "case": 蜑咲ｽｮ隧槭・蜑咲ｽｮ隧槫唱繧ｨ繝ｳ繧ｸ繝ｳ縺ｮ蠖ｹ蜑ｲ
+            # "aux": 蜉ｩ蜍戊ｩ槭・繝｢繝ｼ繝繝ｫ繧ｨ繝ｳ繧ｸ繝ｳ縺ｮ蠖ｹ蜑ｲ
+            # "agent": 蜍穂ｽ應ｸｻ縺ｯ蜿怜虚諷九お繝ｳ繧ｸ繝ｳ縺ｮ蠖ｹ蜑ｲ
         }
     
     def process_sentence(self, sentence: str) -> Optional[Dict]:
-        """統合仕様準拠のメイン処理メソッド"""
+        """邨ｱ蜷井ｻ墓ｧ俶ｺ匁侠縺ｮ繝｡繧､繝ｳ蜃ｦ逅・Γ繧ｽ繝・ラ"""
         if not sentence or len(sentence.strip()) < 2:
             return None
         
         start_time = time.time()
         
         try:
-            # Stanza解析
-            doc = self.nlp(sentence)
+            # Stanza隗｣譫・            doc = self.nlp(sentence)
             sent = doc.sentences[0]
             
-            # 基本5文型の検出と処理
-            result = self._analyze_basic_patterns(sent)
+            # 蝓ｺ譛ｬ5譁・梛縺ｮ讀懷・縺ｨ蜃ｦ逅・            result = self._analyze_basic_patterns(sent)
             
             if result:
                 processing_time = time.time() - start_time
@@ -162,28 +128,26 @@ class BasicFivePatternEngine:
                 }
                 
         except Exception as e:
-            print(f"⚠️ Basic Pattern Engine Error: {e}")
+            print(f"笞・・Basic Pattern Engine Error: {e}")
             return None
         
         return None
     
     def _analyze_basic_patterns(self, sent) -> Optional[Dict]:
-        """知識ベース駆動の基本文型解析"""
+        """遏･隴倥・繝ｼ繧ｹ鬧・虚縺ｮ蝓ｺ譛ｬ譁・梛隗｣譫・""
         
-        # ROOT語検出
+        # ROOT隱樊､懷・
         root_word = self._find_root_word(sent)
         if not root_word:
             return None
         
-        # 依存関係マップ構築
-        dep_relations = {}
+        # 萓晏ｭ倬未菫ゅ・繝・・讒狗ｯ・        dep_relations = {}
         for word in sent.words:
             if word.deprel not in dep_relations:
                 dep_relations[word.deprel] = []
             dep_relations[word.deprel].append(word)
         
-        # パターンマッチング（優先度順）
-        for pattern_name, pattern_info in sorted(
+        # 繝代ち繝ｼ繝ｳ繝槭ャ繝√Φ繧ｰ・亥━蜈亥ｺｦ鬆・ｼ・        for pattern_name, pattern_info in sorted(
             self.sentence_patterns.items(), 
             key=lambda x: x[1]["priority"]
         ):
@@ -199,14 +163,13 @@ class BasicFivePatternEngine:
         return None
     
     def _matches_pattern(self, pattern_info: Dict, dep_relations: Dict, root_word) -> bool:
-        """パターンマッチング判定"""
-        # 必要な依存関係の存在確認
-        required_relations = pattern_info["required_relations"]
+        """繝代ち繝ｼ繝ｳ繝槭ャ繝√Φ繧ｰ蛻､螳・""
+        # 蠢・ｦ√↑萓晏ｭ倬未菫ゅ・蟄伜惠遒ｺ隱・        required_relations = pattern_info["required_relations"]
         for rel in required_relations:
             if rel not in dep_relations:
                 return False
         
-        # ROOT語の品詞チェック
+        # ROOT隱槭・蜩∬ｩ槭メ繧ｧ繝・け
         root_pos_allowed = pattern_info["root_pos"]
         if root_word.pos not in root_pos_allowed:
             return False
@@ -214,81 +177,87 @@ class BasicFivePatternEngine:
         return True
     
     def _build_slots(self, pattern_info: Dict, dep_relations: Dict, sent) -> Dict[str, str]:
-        """スロット構築（知識ベース駆動）"""
+        """繧ｹ繝ｭ繝・ヨ讒狗ｯ会ｼ育衍隴倥・繝ｼ繧ｹ鬧・虚・・""
         slots = {}
         mapping = pattern_info["mapping"]
         
-        # メインスロット構築
-        for dep_rel, slot in mapping.items():
+        # 繝｡繧､繝ｳ繧ｹ繝ｭ繝・ヨ讒狗ｯ・        for dep_rel, slot in mapping.items():
             if dep_rel in dep_relations:
                 words = dep_relations[dep_rel]
                 if words:
-                    # 複数の語がある場合は最初の語を使用
+                    # 隍・焚縺ｮ隱槭′縺ゅｋ蝣ｴ蜷医・譛蛻昴・隱槭ｒ菴ｿ逕ｨ
                     target_word = words[0]
-                    # 語句境界の拡張
+                    # 隱槫唱蠅・阜縺ｮ諡｡蠑ｵ
                     expanded_text = self._expand_phrase_boundary(target_word, sent)
                     slots[slot] = expanded_text
             elif dep_rel == "root":
-                # ROOT語の処理
-                root_word = self._find_root_word(sent)
+                # ROOT隱槭・蜃ｦ逅・                root_word = self._find_root_word(sent)
                 if root_word and slot in ["V"]:
                     slots[slot] = root_word.text
         
-        # 修飾語の処理
-        modifier_slots = {"M1": [], "M2": [], "M3": []}
+        # 菫ｮ鬟ｾ隱槭・蜃ｦ逅・        modifier_slots = {"M1": [], "M2": [], "M3": []}
         for word in sent.words:
             if word.deprel in self.modifier_mappings:
                 slot = self.modifier_mappings[word.deprel]
-                if slot.startswith("M"):  # M1, M2, M3スロット
-                    # 統一境界拡張ライブラリによる修飾語拡張
-                    expanded_text = self._expand_phrase_boundary_enhanced(word.text, slot)
+                if slot.startswith("M"):  # M1, M2, M3繧ｹ繝ｭ繝・ヨ
+                    expanded_text = self._expand_phrase_boundary(word, sent)
                     if expanded_text not in modifier_slots[slot]:
                         modifier_slots[slot].append(expanded_text)
         
-        # 修飾語スロットを統合
-        for slot, values in modifier_slots.items():
+        # 菫ｮ鬟ｾ隱槭せ繝ｭ繝・ヨ繧堤ｵｱ蜷・        for slot, values in modifier_slots.items():
             if values:
                 slots[slot] = ", ".join(values)
         
         return slots
     
     def _find_root_word(self, sent):
-        """ROOT語検出"""
+        """ROOT隱樊､懷・"""
         for word in sent.words:
             if word.deprel == 'root':
                 return word
         return None
     
-    def _expand_phrase_boundary_enhanced(self, text: str, slot: str) -> str:
-        """統一境界拡張ライブラリによる高精度境界拡張"""
-        return self.boundary_lib.expand_span_for_slot(text, slot)
-    
     def _expand_phrase_boundary(self, word, sent) -> str:
-        """旧式境界拡張（互換性維持用・非推奨）"""
-        # 新しい境界拡張に転送
-        return self._expand_phrase_boundary_enhanced(word.text, "S")
+        """蝓ｺ譛ｬ5譁・梛縺ｫ驕ｩ縺励◆隱槫唱蠅・阜諡｡蠑ｵ"""
+        # 隱槫唱蠅・阜諡｡蠑ｵ縺ｮ萓晏ｭ倬未菫ゑｼ亥渕譛ｬ譁・梛讒矩縺ｫ蠢・ｦ√↑繧ゅ・縺ｮ縺ｿ・・        expand_deps = ['compound', 'amod', 'nummod']  # 隍・粋隱槭∝ｽ｢螳ｹ隧槭∵焚驥剰ｩ槭・縺ｿ
+        
+        words_to_include = [word]
+        
+        # 蟄占ｦ∫ｴ縺ｮ謗｢邏｢
+        for other_word in sent.words:
+            if (other_word.head == word.id and 
+                other_word.deprel in expand_deps):
+                words_to_include.append(other_word)
+        
+        # 蜀隧槭・髯仙ｮ夊ｩ槭・蝓ｺ譛ｬ譁・梛縺ｧ縺ｯ蜷ｫ繧√ｋ・医せ繝ｭ繝・ヨ縺ｫ縺ｯ險ｭ螳壹＠縺ｪ縺・ｼ・        for other_word in sent.words:
+            if (other_word.head == word.id and 
+                other_word.deprel == 'det'):
+                words_to_include.append(other_word)
+        
+        # 菴咲ｽｮ鬆・〒繧ｽ繝ｼ繝・        words_to_include.sort(key=lambda w: w.id)
+        
+        return " ".join([w.text for w in words_to_include])
     
     def _calculate_confidence(self, pattern_name: str, slots: Dict) -> float:
-        """信頼度計算"""
+        """菫｡鬆ｼ蠎ｦ險育ｮ・""
         base_confidence = 0.85
         
-        # スロット数によるボーナス
+        # 繧ｹ繝ｭ繝・ヨ謨ｰ縺ｫ繧医ｋ繝懊・繝翫せ
         slot_bonus = len(slots) * 0.02
         
-        # パターン固有のボーナス
+        # 繝代ち繝ｼ繝ｳ蝗ｺ譛峨・繝懊・繝翫せ
         pattern_bonus = {
-            "SVO": 0.05,    # 最も一般的
-            "SV": 0.03,     # シンプル
-            "SVC": 0.04,    # 明確な構造
-            "SVOO": 0.08,   # 複雑だが明確
-            "SVOC": 0.06    # 複雑構造
+            "SVO": 0.05,    # 譛繧ゆｸ闊ｬ逧・            "SV": 0.03,     # 繧ｷ繝ｳ繝励Ν
+            "SVC": 0.04,    # 譏守｢ｺ縺ｪ讒矩
+            "SVOO": 0.08,   # 隍・尅縺縺梧・遒ｺ
+            "SVOC": 0.06    # 隍・尅讒矩
         }.get(pattern_name, 0.0)
         
         confidence = min(0.98, base_confidence + slot_bonus + pattern_bonus)
         return confidence
 
 def test_basic_five_pattern_engine():
-    """テスト関数"""
+    """繝・せ繝磯未謨ｰ"""
     engine = BasicFivePatternEngine()
     
     test_sentences = [
@@ -302,18 +271,18 @@ def test_basic_five_pattern_engine():
         "The book was written by John."
     ]
     
-    print("\n🧪 Testing Basic Five Pattern Engine")
+    print("\nｧｪ Testing Basic Five Pattern Engine")
     print("=" * 60)
     
     for i, sentence in enumerate(test_sentences, 1):
-        print(f"\n✅ Test {i}: {sentence}")
+        print(f"\n笨・Test {i}: {sentence}")
         result = engine.process_sentence(sentence)
         if result:
             print(f"    Pattern: {result['pattern']}")
             print(f"    Slots: {result['slots']}")
             print(f"    Confidence: {result['confidence']:.3f}")
         else:
-            print("    ❌ No pattern detected")
+            print("    笶・No pattern detected")
 
 if __name__ == "__main__":
     test_basic_five_pattern_engine()
