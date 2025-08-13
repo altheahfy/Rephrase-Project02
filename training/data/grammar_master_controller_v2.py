@@ -44,6 +44,7 @@ class EngineType(Enum):
     QUESTION = "question"  # New: Question formation system
     PROGRESSIVE = "progressive"  # New: Progressive tenses system
     PREPOSITIONAL = "prepositional"  # New: Prepositional phrase system
+    IMPERATIVE = "imperative"  # New: Imperative sentence system (Priority 15)
 
 @dataclass
 class EngineResult:
@@ -182,6 +183,10 @@ class GrammarMasterControllerV2:
              13, "Infinitive constructions", ["to", "to be", "to have", "to do"]),
             (EngineType.QUESTION, "engines.question_formation_engine", "QuestionFormationEngine", 
              14, "Question formation patterns", ["what", "where", "when", "who", "how", "why", "do", "does", "did"]),
+            
+            # Phase 3: Priority 15-18 Engine Group
+            (EngineType.IMPERATIVE, "engines.imperative_engine", "ImperativeEngine", 
+             15, "Imperative sentence processing", ["Go!", "Stop!", "Please come here!", "Don't run!", "You sit down!"]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
