@@ -245,7 +245,7 @@ class ExistentialThereEngine:
             doc: Stanza parsed document
             
         Returns:
-            str: Logical subject
+            str: Logical subject (cleaned)
         """
         # Look for the NP that follows "there be"
         for sent in doc.sentences:
@@ -255,26 +255,49 @@ class ExistentialThereEngine:
                     # Look for the actual logical subject (usually nsubj or obj)
                     for other_word in sent.words:
                         if other_word.head == word.head and other_word.deprel in ['nsubj', 'obj', 'nmod']:
-                            return self._build_noun_phrase(sent, other_word)
+                            subject = self._build_noun_phrase(sent, other_word)
+                            return self._clean_duplicate_words(subject)
                             
                 # Alternative: find main verb and look for its object
                 elif word.upos in ['AUX', 'VERB'] and word.lemma.lower() == 'be':
                     for other_word in sent.words:
                         if other_word.head == word.id and other_word.deprel in ['nsubj', 'obj']:
-                            return self._build_noun_phrase(sent, other_word)
+                            subject = self._build_noun_phrase(sent, other_word)
+                            return self._clean_duplicate_words(subject)
                             
-        # Fallback: regex extraction
+        # Fallback: regex extraction with enhanced patterns
         patterns = [
-            r'there\s+(?:is|are|was|were|will\s+be|has\s+been|have\s+been)\s+([^,.]+?)(?:\s+(?:in|on|at|by|with|for|from|to|under|over|near|behind|beside)\b|$|\.|,)',
-            r'there\s+(?:is|are|was|were|will\s+be|has\s+been|have\s+been)\s+([^,.]+)',
+            # Basic patterns - capture everything until preposition or end
+            r'there\s+(?:is|are|was|were|will\s+be|has\s+been|have\s+been|used\s+to\s+be)\s+([^,.]+?)(?:\s+(?:in|on|at|by|with|for|from|to|under|over|near|behind|beside|during|since|until)\b|$|\.|,)',
+            # Fallback - capture everything after "there be"
+            r'there\s+(?:is|are|was|were|will\s+be|has\s+been|have\s+been|used\s+to\s+be)\s+([^,.]+)',
+            # Handle contractions
+            r'there\s+(?:isn\'t|aren\'t|wasn\'t|weren\'t|won\'t\s+be|hasn\'t\s+been|haven\'t\s+been)\s+([^,.]+)',
         ]
         
         for pattern in patterns:
             match = re.search(pattern, sentence, re.IGNORECASE)
             if match:
-                return match.group(1).strip()
+                subject = match.group(1).strip()
+                return self._clean_duplicate_words(subject)
                 
         return ''
+
+    def _clean_duplicate_words(self, text: str) -> str:
+        """Clean duplicate words that may result from boundary expansion."""
+        if not text:
+            return text
+            
+        words = text.split()
+        cleaned_words = []
+        
+        for word in words:
+            # Remove duplicate consecutive words (case insensitive) and common duplicates
+            if not cleaned_words or (word.lower() != cleaned_words[-1].lower() and 
+                                   not (len(cleaned_words) > 1 and word.lower() == cleaned_words[-2].lower())):
+                cleaned_words.append(word)
+                
+        return ' '.join(cleaned_words)
 
     def _extract_existential_slots(self, sentence: str, doc: Any, structure: Dict[str, Any]) -> Dict[str, str]:
         """
@@ -312,17 +335,30 @@ class ExistentialThereEngine:
         location_info = self._extract_location_modifiers(sentence, doc)
         
         if location_info.get('location'):
-            # C2 for locative complements
-            slots['C2'] = location_info['location']
+            # C2 for locative complements - clean duplicates
+            location_clean = self._clean_duplicate_words(location_info['location'])
+            if location_clean and location_clean not in ['in', 'on', 'at']:  # Avoid incomplete prep phrases
+                slots['C2'] = location_clean
             
         if location_info.get('time'):
-            # M2 for time modifiers
-            slots['M2'] = location_info['time']
+            # M2 for time modifiers - but avoid duplicating what's already in other slots
+            time_clean = self._clean_duplicate_words(location_info['time'])
+            if time_clean and time_clean not in [slots.get('C2', ''), slots.get('M3', '')]:
+                slots['M2'] = time_clean
             
-        # Additional modifiers
+        # Additional modifiers and negation
         modifiers = self._extract_additional_modifiers(sentence, doc)
-        if modifiers.get('manner'):
+        if modifiers.get('manner') and modifiers['manner'] not in [slots.get('M2', ''), slots.get('C2', '')]:
+            # Avoid duplicating information already in other slots
             slots['M3'] = modifiers['manner']
+        
+        # Handle negation patterns
+        negation_info = self._handle_negation(sentence, structure)
+        if negation_info.get('negation'):
+            if negation_info['position'] == 'M1':
+                slots['M1'] = negation_info['negation']
+            elif negation_info['position'] == 'M2' and 'M2' not in slots:
+                slots['M2'] = negation_info['negation']
             
         return slots
 
@@ -368,7 +404,7 @@ class ExistentialThereEngine:
 
     def _extract_location_modifiers(self, sentence: str, doc: Any) -> Dict[str, str]:
         """
-        Extract location and time modifiers.
+        Extract location and time modifiers with complete prepositional phrases.
         
         Args:
             sentence: Input sentence
@@ -383,7 +419,7 @@ class ExistentialThereEngine:
         location_preps = ['in', 'on', 'at', 'under', 'over', 'near', 'behind', 'beside', 'between', 'among', 'inside', 'outside']
         time_preps = ['at', 'on', 'in', 'during', 'after', 'before', 'since', 'until', 'by']
         
-        # Parse prepositional phrases
+        # Parse prepositional phrases using Stanza
         for sent in doc.sentences:
             for word in sent.words:
                 if word.upos == 'ADP':  # Preposition
@@ -396,13 +432,46 @@ class ExistentialThereEngine:
                         if not info['time']:  # Take first time
                             info['time'] = prep_phrase
                             
-        # Fallback: regex extraction
+        # Enhanced regex fallback for better phrase extraction
         if not info['location']:
-            loc_pattern = r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+([^,.]+)'
-            loc_match = re.search(loc_pattern, sentence, re.IGNORECASE)
-            if loc_match:
-                info['location'] = f"{loc_match.group(1)} {loc_match.group(2).strip()}"
+            # Enhanced regex fallback for better phrase extraction
+            loc_patterns = [
+                # Complete prepositional phrases
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(the\s+\w+(?:\s+\w+)*)',
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(a\s+\w+(?:\s+\w+)*)', 
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(\w+(?:\s+\w+)*?)(?:\s+(?:sleeping|peacefully|quietly|\w+ly)|\.|,|$)',
+                # Simple preposition + noun
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(\w+)',
+            ]
+            
+            for pattern in loc_patterns:
+                loc_match = re.search(pattern, sentence, re.IGNORECASE)
+                if loc_match:
+                    prep = loc_match.group(1)
+                    noun_phrase = loc_match.group(2).strip()
+                    # Clean the extracted phrase
+                    cleaned_phrase = self._clean_duplicate_words(f"{prep} {noun_phrase}")
+                    if len(cleaned_phrase.split()) >= 2:  # Ensure we have preposition + at least one word
+                        info['location'] = cleaned_phrase
+                        break
                 
+        # Enhanced time extraction
+        if not info['time']:
+            time_patterns = [
+                r'\b(yesterday|today|tomorrow|tonight|recently|now|then|soon|later)\b',
+                r'\b(during|after|before|since|until|by)\s+([^,.]+)',
+                r'\b(at|on|in)\s+(night|morning|afternoon|evening|\d+|the\s+\w+)',
+            ]
+            
+            for pattern in time_patterns:
+                time_match = re.search(pattern, sentence, re.IGNORECASE)
+                if time_match:
+                    if len(time_match.groups()) >= 2:
+                        info['time'] = time_match.group(0).strip()
+                    else:
+                        info['time'] = time_match.group(1).strip()
+                    break
+                    
         return info
 
     def _extract_additional_modifiers(self, sentence: str, doc: Any) -> Dict[str, str]:
@@ -418,27 +487,82 @@ class ExistentialThereEngine:
                         
         return modifiers
 
-    def _build_noun_phrase(self, sent: Any, head_word: Any) -> str:
-        """Build complete noun phrase from head word."""
-        phrase_words = [head_word.text]
+    def _handle_negation(self, sentence: str, structure: Dict[str, Any]) -> Dict[str, str]:
+        """Handle negation patterns in existential sentences."""
+        text = sentence.lower()
+        negation_info = {'negation': '', 'position': ''}
         
-        # Collect modifiers
+        # Pattern 1: "There is no/not any..."
+        if re.search(r'\bthere\s+(is|are|was|were)\s+(no|not)', text):
+            # Extract negation
+            no_match = re.search(r'\bthere\s+(?:is|are|was|were)\s+(no)\b', text)
+            not_match = re.search(r'\bthere\s+(?:is|are|was|were)\s+(not)(?:\s+any)?\b', text)
+            
+            if no_match:
+                negation_info['negation'] = 'no'
+                negation_info['position'] = 'M2'
+            elif not_match:
+                negation_info['negation'] = 'not'
+                negation_info['position'] = 'M1'
+                # Check for "any" after "not"
+                if re.search(r'\bnot\s+any\b', text):
+                    negation_info['negation'] = 'not any'
+        
+        # Pattern 2: Contractions "There isn't/aren't..."
+        elif re.search(r'\bthere\s+(isn\'t|aren\'t|wasn\'t|weren\'t)', text):
+            negation_info['negation'] = 'not'
+            negation_info['position'] = 'M1'
+        
+        # Pattern 3: Modal negations "There won't/can't..."
+        elif re.search(r'\bthere\s+(won\'t|can\'t|couldn\'t|shouldn\'t|mustn\'t)', text):
+            negation_info['negation'] = 'not'
+            negation_info['position'] = 'M1'
+        
+        # Pattern 4: Perfect negations "There hasn't/haven't..."
+        elif re.search(r'\bthere\s+(hasn\'t|haven\'t|hadn\'t)', text):
+            negation_info['negation'] = 'not'
+            negation_info['position'] = 'M1'
+        
+        return negation_info
+
+    def _build_noun_phrase(self, sent: Any, head_word: Any) -> str:
+        """Build complete noun phrase from head word, avoiding duplicates."""
+        phrase_words = []
+        word_positions = []
+        
+        # Collect head word
+        phrase_words.append(head_word.text)
+        word_positions.append(head_word.id)
+        
+        # Collect modifiers (excluding duplicates)
         for word in sent.words:
             if word.head == head_word.id and word.deprel in ['det', 'amod', 'nummod', 'compound']:
-                phrase_words.append(word.text)
+                if word.text not in phrase_words:  # Avoid exact duplicates
+                    phrase_words.append(word.text)
+                    word_positions.append(word.id)
         
         # Sort by word order and join
-        phrase_words.sort(key=lambda w: next(word.id for word in sent.words if word.text == w))
-        return ' '.join(phrase_words)
+        paired_words = list(zip(phrase_words, word_positions))
+        paired_words.sort(key=lambda x: x[1])  # Sort by position
+        
+        # Build final phrase with additional duplicate cleaning
+        final_words = []
+        for word, _ in paired_words:
+            if not final_words or word.lower() != final_words[-1].lower():
+                final_words.append(word)
+                
+        result = ' '.join(final_words)
+        return self._clean_duplicate_words(result)
 
     def _build_prepositional_phrase(self, sent: Any, prep_word: Any) -> str:
-        """Build complete prepositional phrase."""
+        """Build complete prepositional phrase, avoiding duplicates."""
         phrase_parts = [prep_word.text]
         
         # Find the object of preposition
         for word in sent.words:
             if word.head == prep_word.id and word.deprel == 'pobj':
-                phrase_parts.append(self._build_noun_phrase(sent, word))
+                obj_phrase = self._build_noun_phrase(sent, word)
+                phrase_parts.append(obj_phrase)
                 break
                 
         return ' '.join(phrase_parts)
