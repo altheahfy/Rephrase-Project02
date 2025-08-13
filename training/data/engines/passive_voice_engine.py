@@ -108,18 +108,37 @@ class PassiveVoiceEngine:
             'type': None          # 受動態の種類
         }
         
+        # 典型的な過去分詞リスト（形容詞として解析される可能性がある）
+        common_past_participles = {
+            'fed', 'done', 'made', 'seen', 'built', 'written', 'taken', 'given',
+            'broken', 'stolen', 'found', 'lost', 'sold', 'bought', 'taught',
+            'caught', 'brought', 'thought', 'sent', 'kept', 'left', 'told',
+            'heard', 'felt', 'held', 'met', 'read', 'paid', 'laid', 'said',
+            'put', 'cut', 'hit', 'set', 'let', 'shut', 'hurt', 'cost', 'beat',
+            'eaten', 'driven', 'shown', 'known', 'grown', 'thrown', 'blown',
+            'drawn', 'worn', 'torn', 'born', 'sworn', 'chosen', 'frozen',
+            'spoken', 'broken', 'woken', 'stolen'
+        }
+        
         # 構造要素の検出
         for word in sent.words:
-            # 受動態主語検出
+            # 受動態主語検出（標準 + 代替）
             if word.deprel == 'nsubj:pass':
                 passive_features['subject'] = word
+            elif word.deprel == 'nsubj':  # 形容詞受動態の場合
+                passive_features['subject'] = word
                 
-            # 受動態補助動詞検出
+            # 受動態補助動詞検出（標準 + 代替）
             elif word.deprel == 'aux:pass':
                 passive_features['auxiliary'] = word
+            elif word.deprel == 'cop' and word.lemma == 'be':  # 連結詞be動詞
+                passive_features['auxiliary'] = word
                 
-            # 主動詞検出（root + 過去分詞）
+            # 主動詞検出（標準 + 代替）
             elif word.deprel == 'root' and word.upos == 'VERB':
+                passive_features['main_verb'] = word
+            elif (word.deprel == 'root' and word.upos == 'ADJ' and 
+                  word.text.lower() in common_past_participles):  # 形容詞として解析された過去分詞
                 passive_features['main_verb'] = word
                 
             # by句動作主検出
