@@ -18,6 +18,12 @@ import logging
 import time
 import importlib
 from dataclasses import dataclass
+
+# Import boundary expansion library
+from boundary_expansion_lib import BoundaryExpansionLib
+
+# Import sublevel pattern library (Phase 2)
+from sublevel_pattern_lib import SublevelPatternLib
 from enum import Enum
 from threading import Lock
 
@@ -92,6 +98,14 @@ class GrammarMasterControllerV2:
             self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
             self.boundary_lib = None
         
+        # Initialize sublevel pattern library (Phase 2)
+        try:
+            self.sublevel_lib = SublevelPatternLib()
+            self.logger.info("✅ サブレベル専用パターンライブラリ統合完了")
+        except Exception as e:
+            self.logger.warning(f"⚠️ サブレベルパターンライブラリ初期化失敗: {e}")
+            self.sublevel_lib = None
+        
         self.processing_stats = {
             'total_requests': 0,
             'successful_processes': 0,
@@ -99,7 +113,8 @@ class GrammarMasterControllerV2:
             'total_engines_registered': 0,
             'average_processing_time': 0.0,
             'startup_time': time.time(),
-            'boundary_expansions_applied': 0  # 境界拡張統計追加
+            'boundary_expansions_applied': 0,      # 境界拡張統計
+            'sublevel_patterns_applied': 0         # サブレベルパターン統計（Phase 2）
         }
         
         # Register engine configurations (no actual loading)
@@ -536,8 +551,12 @@ class GrammarMasterControllerV2:
                     enhanced_slots[slot] = value
                     enhancement_stats['unchanged'] += 1
             
-            # 結果更新
+            # 結果更新（境界拡張まで）
             result.slots = enhanced_slots
+            
+            # Phase 2: サブレベルパターン統合処理
+            result = self._apply_sublevel_pattern_enhancement(result, debug)
+            enhanced_slots = result.slots
             
             # メタデータにスロット特化境界拡張情報追加
             if 'boundary_expansion' not in result.metadata:
@@ -560,6 +579,86 @@ class GrammarMasterControllerV2:
             
         except Exception as e:
             self.logger.warning(f"⚠️ スロット特化境界拡張エラー: {e}")
+            return result
+
+    def _apply_sublevel_pattern_enhancement(self, result: EngineResult, debug: bool = False) -> EngineResult:
+        """
+        Phase 2: サブレベルパターン統合によるスロット内複雑構造解析（Pure Stanza V3.1完全版）
+        
+        Args:
+            result: 境界拡張済みの結果
+            debug: デバッグ情報表示
+            
+        Returns:
+            サブレベルパターン解析による拡張結果
+        """
+        if not self.sublevel_lib or not result.success or not result.slots:
+            return result
+        
+        try:
+            sublevel_enhancements = {}
+            sublevel_stats = {'patterns_detected': 0, 'slots_enhanced': 0, 'total_sublevels': 0}
+            
+            # 各スロットでサブレベルパターン検出・適用
+            for slot, value in result.slots.items():
+                if value and value.strip():
+                    # サブレベルパターン検出
+                    pattern_result = self.sublevel_lib.analyze_sublevel_pattern(value)
+                    
+                    if pattern_result and pattern_result[0] != 'NONE':
+                        pattern_type = pattern_result[0]  # タプルの最初の要素がパターンタイプ
+                        
+                        # パターン検出成功 → サブレベル分解
+                        sublevel_slots = self.sublevel_lib.extract_sublevel_slots(value, pattern_type)
+                        
+                        if sublevel_slots:
+                            # サブレベル情報をメタデータに記録
+                            sublevel_enhancements[slot] = {
+                                'original_value': value,
+                                'pattern_type': pattern_type,
+                                'sublevel_slots': sublevel_slots,
+                                'enhanced': True
+                            }
+                            
+                            # 統計更新
+                            sublevel_stats['patterns_detected'] += 1
+                            sublevel_stats['slots_enhanced'] += 1
+                            sublevel_stats['total_sublevels'] += len(sublevel_slots)
+                            
+                            if debug:
+                                self.logger.info(f"🔍 {slot}スロット サブレベル検出: {pattern_type}")
+                                self.logger.info(f"   📋 分解結果: {sublevel_slots}")
+                    else:
+                        # パターン検出されないスロット
+                        sublevel_enhancements[slot] = {
+                            'original_value': value,
+                            'pattern_type': 'SIMPLE',
+                            'sublevel_slots': {},
+                            'enhanced': False
+                        }
+            
+            # メタデータにサブレベルパターン解析結果を統合
+            if 'sublevel_patterns' not in result.metadata:
+                result.metadata['sublevel_patterns'] = {}
+            
+            result.metadata['sublevel_patterns'].update({
+                'applied': True,
+                'pure_stanza_v31_features': True,
+                'enhancement_details': sublevel_enhancements,
+                'processing_stats': sublevel_stats,
+                'library_version': '1.0'
+            })
+            
+            # グローバル統計更新
+            self.processing_stats['sublevel_patterns_applied'] += sublevel_stats['patterns_detected']
+            
+            if debug and sublevel_stats['patterns_detected'] > 0:
+                self.logger.info(f"🔬 サブレベルパターン統計: {sublevel_stats['patterns_detected']}個検出, {sublevel_stats['total_sublevels']}個サブレベル分解")
+            
+            return result
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ サブレベルパターン処理エラー: {e}")
             return result
     
     def get_engine_info(self) -> Dict[str, Any]:
