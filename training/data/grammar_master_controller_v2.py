@@ -23,6 +23,7 @@ from threading import Lock
 
 class EngineType(Enum):
     """Engine type enumeration for priority and classification."""
+    BASIC_FIVE = "basic_five"  # New: Basic five pattern system
     GERUND = "gerund"
     PARTICIPLE = "participle"
     INFINITIVE = "infinitive"
@@ -112,7 +113,11 @@ class GrammarMasterControllerV2:
         
         # Engine configurations with module paths
         engine_configs = [
-            # Highest Priority: Modal auxiliaries (very common and fundamental)
+            # Highest Priority: Basic sentence structure (fundamental)
+            (EngineType.BASIC_FIVE, "engines.basic_five_pattern_engine", "BasicFivePatternEngine", 
+             0, "Basic five pattern processing", ["SV", "SVO", "SVC", "SVOO", "SVOC"]),
+            
+            # High Priority: Modal auxiliaries (very common and fundamental)
             (EngineType.MODAL, "engines.modal_engine", "ModalEngine", 
              1, "Modal auxiliary processing", ["can", "could", "will", "would", "must", "should", "may", "might"]),
             
@@ -276,7 +281,15 @@ class GrammarMasterControllerV2:
         applicable = []
         sentence_lower = sentence.lower()
         
+        # Basic Five Pattern Engine is always applicable (fundamental structure)
+        if EngineType.BASIC_FIVE in self.engine_registry:
+            applicable.append(EngineType.BASIC_FIVE)
+        
         for engine_type, engine_info in self.engine_registry.items():
+            # Skip basic_five (already added)
+            if engine_type == EngineType.BASIC_FIVE:
+                continue
+                
             # Pattern-based detection (no engine loading required)
             for pattern in engine_info.patterns:
                 if pattern.lower() in sentence_lower:
@@ -352,35 +365,41 @@ class GrammarMasterControllerV2:
             return self._create_error_result(f"Engine {engine_type.value} not loaded", start_time)
         
         try:
-            # Call engine's process method
-            if hasattr(engine_instance, 'process'):
+            # Call engine's process method (try both process and process_sentence)
+            raw_result = None
+            
+            if hasattr(engine_instance, 'process_sentence'):
+                raw_result = engine_instance.process_sentence(sentence)
+            elif hasattr(engine_instance, 'process'):
                 raw_result = engine_instance.process(sentence)
-                
-                # Standardize result format (same as v1)
-                if isinstance(raw_result, dict):
-                    slots = raw_result.get('slots', {})
-                    metadata = raw_result.get('metadata', {})
-                    success = raw_result.get('success', True)
-                    error = raw_result.get('error', None)
-                else:
-                    slots = raw_result if isinstance(raw_result, dict) else {}
-                    metadata = {'engine': engine_type.value}
-                    success = bool(slots)
-                    error = None if slots else "No slots extracted"
-                
-                processing_time = time.time() - start_time
-                
-                return EngineResult(
-                    engine_type=engine_type,
-                    confidence=self._calculate_confidence(slots, metadata),
-                    slots=slots,
-                    metadata={**metadata, 'processing_time': processing_time, 'controller_version': '2.0'},
-                    success=success,
-                    processing_time=processing_time,
-                    error=error
-                )
             else:
                 return self._create_error_result(f"Engine {engine_type.value} has no process method", start_time)
+            
+            # Standardize result format
+            if isinstance(raw_result, dict):
+                slots = raw_result.get('slots', {})
+                metadata = raw_result.get('metadata', {})
+                success = raw_result.get('success', True)
+                error = raw_result.get('error', None)
+                confidence = raw_result.get('confidence', self._calculate_confidence(slots, metadata))
+            else:
+                slots = raw_result if isinstance(raw_result, dict) else {}
+                metadata = {'engine': engine_type.value}
+                success = bool(slots)
+                error = None if slots else "No slots extracted"
+                confidence = self._calculate_confidence(slots, metadata)
+            
+            processing_time = time.time() - start_time
+            
+            return EngineResult(
+                engine_type=engine_type,
+                confidence=confidence,
+                slots=slots,
+                metadata={**metadata, 'processing_time': processing_time, 'controller_version': '2.0'},
+                success=success,
+                processing_time=processing_time,
+                error=error
+            )
                 
         except Exception as e:
             self.logger.error(f"Error processing with {engine_type.value}: {str(e)}")
