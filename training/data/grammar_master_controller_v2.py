@@ -90,21 +90,21 @@ class GrammarMasterControllerV2:
         self.engine_registry: Dict[EngineType, LazyEngineInfo] = {}
         self.loading_locks: Dict[EngineType, Lock] = {}
         
-        # 統一境界拡張ライブラリの初期化（中央集権管理）
-        try:
-            self.boundary_lib = BoundaryExpansionLib()
-            self.logger.info("✅ 統一境界拡張ライブラリ統合完了")
-        except Exception as e:
-            self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
-            self.boundary_lib = None
+        # 統一境界拡張ライブラリの初期化（中央集権管理）（temporarily disabled)
+        # try:
+        #     self.boundary_lib = BoundaryExpansionLib()
+        #     self.logger.info("✅ 統一境界拡張ライブラリ統合完了")
+        # except Exception as e:
+        #     self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
+        self.boundary_lib = None
         
-        # Initialize sublevel pattern library (Phase 2)
-        try:
-            self.sublevel_lib = SublevelPatternLib()
-            self.logger.info("✅ サブレベル専用パターンライブラリ統合完了")
-        except Exception as e:
-            self.logger.warning(f"⚠️ サブレベルパターンライブラリ初期化失敗: {e}")
-            self.sublevel_lib = None
+        # Initialize sublevel pattern library (Phase 2) (temporarily disabled)
+        # try:
+        #     self.sublevel_lib = SublevelPatternLib()
+        #     self.logger.info("✅ サブレベル専用パターンライブラリ統合完了")
+        # except Exception as e:
+        #     self.logger.warning(f"⚠️ サブレベルパターンライブラリ初期化失敗: {e}")
+        self.sublevel_lib = None
         
         self.processing_stats = {
             'total_requests': 0,
@@ -400,7 +400,7 @@ class GrammarMasterControllerV2:
     def _process_single_optimal(self, sentence: str, applicable_engines: List[EngineType], 
                                start_time: float, debug: bool = False) -> EngineResult:
         """Process with single optimal engine."""
-        selected_engine = applicable_engines[0] if applicable_engines else EngineType.BASIC_FIVE_PATTERN
+        selected_engine = applicable_engines[0] if applicable_engines else EngineType.BASIC_FIVE
         
         if debug:
             self.logger.info(f"Single optimal processing with: {selected_engine.value}")
@@ -425,7 +425,7 @@ class GrammarMasterControllerV2:
         specialist_result = None
         
         # Foundation processing with Basic Five Pattern
-        foundation_engine = EngineType.BASIC_FIVE_PATTERN
+        foundation_engine = EngineType.BASIC_FIVE
         if foundation_engine in self.engine_registry:
             if self._load_engine(foundation_engine):
                 foundation_result = self._process_with_engine(sentence, foundation_engine, start_time)
@@ -940,6 +940,20 @@ class GrammarMasterControllerV2:
             **self.processing_stats,
             'success_rate_percent': round(success_rate, 2),
             'memory_usage': f"{self.processing_stats['engines_loaded']}/{self.processing_stats['total_engines_registered']} engines loaded"
+        }
+
+    def get_detailed_statistics(self) -> Dict[str, Any]:
+        """Get comprehensive multi-engine coordination statistics."""
+        loaded_engines = sum(1 for info in self.engine_registry.values() if info.engine_instance is not None)
+        
+        return {
+            'total_requests': self.processing_stats.get('total_requests', 0),
+            'total_engines_registered': len(self.engine_registry),
+            'engines_loaded': loaded_engines,
+            'coordination_strategies_used': self.processing_stats.get('coordination_strategies_used', {}),
+            'multi_engine_processes': self.processing_stats.get('multi_engine_processes', 0),
+            'total_engine_cooperations': self.processing_stats.get('total_engine_cooperations', 0),
+            'success_rate_percent': 0.0,  # To be calculated based on success/failure tracking
         }
 
 # Performance comparison demonstration
