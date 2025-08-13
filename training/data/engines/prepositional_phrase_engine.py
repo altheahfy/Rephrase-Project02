@@ -70,25 +70,6 @@ class PrepositionalPhraseEngine:
         self.all_prepositions = set()
         for category in self.preposition_categories.values():
             self.all_prepositions.update(category)
-        
-        # ハードコーディング除去: 動的設定可能なキーワードセット
-        self.time_keywords = {
-            'morning', 'evening', 'night', 'afternoon', 'monday', 'tuesday', 
-            'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december',
-            'summer', 'winter', 'spring', 'fall', 'autumn', "o'clock", 'am', 'pm'
-        }
-        
-        self.location_keywords = {
-            'home', 'office', 'school', 'room', 'park', 'station', 'street',
-            'city', 'country', 'table', 'chair', 'floor', 'wall', 'library',
-            'tokyo', 'kyoto', 'japan', 'america', 'store', 'shop'
-        }
-        
-        self.manner_prepositions = {'by', 'with', 'through', 'via', 'using'}
-        self.purpose_prepositions = {'for'}
-        self.location_prepositions = {'in', 'on', 'at'}
             
         print("✅ 前置詞句エンジン初期化完了")
     
@@ -110,16 +91,13 @@ class PrepositionalPhraseEngine:
         return slots
     
     def _extract_prepositional_phrases(self, text: str) -> List[Tuple[str, str, str]]:
-        """前置詞句を抽出 (前置詞, 目的語, 完全な句) - ハードコーディング除去版"""
+        """前置詞句を抽出 (前置詞, 目的語, 完全な句)"""
         phrases = []
-        
-        # 動的な前置詞境界パターンを生成
-        prep_boundary = '|'.join(sorted(self.all_prepositions, key=len, reverse=True))
         
         # 各前置詞について検索
         for prep in sorted(self.all_prepositions, key=len, reverse=True):
-            # 前置詞 + 名詞句（次の前置詞または文末まで）
-            pattern = r'\b' + re.escape(prep) + r'\s+((?:\w+\s+)*\w+)(?=\s+(?:' + prep_boundary + r')\s|\s*[,\.!?;]|\s*$)'
+            # 前置詞 + 名詞句のパターンを検索
+            pattern = r'\b' + re.escape(prep) + r'\s+([^,\.!?;]+?)(?=\s+(?:and|or|but|,|\.|\?|!|;)|\s*$)'
             
             matches = re.finditer(pattern, text, re.IGNORECASE)
             
@@ -128,14 +106,19 @@ class PrepositionalPhraseEngine:
                 object_phrase = match.group(1).strip()
                 full_phrase = f"{preposition} {object_phrase}"
                 
-                # 重複チェック - 完全重複のみ除去
+                # 重複チェック（より長い句を優先）
                 is_duplicate = False
                 for existing_prep, existing_obj, existing_full in phrases:
-                    if full_phrase == existing_full:
-                        is_duplicate = True
-                        break
+                    if full_phrase in existing_full or existing_full in full_phrase:
+                        if len(full_phrase) <= len(existing_full):
+                            is_duplicate = True
+                            break
+                        else:
+                            # より長い句で置き換え
+                            phrases.remove((existing_prep, existing_obj, existing_full))
+                            break
                 
-                if not is_duplicate and len(object_phrase.split()) >= 1:
+                if not is_duplicate:
                     phrases.append((preposition, object_phrase, full_phrase))
         
         return phrases
@@ -186,40 +169,43 @@ class PrepositionalPhraseEngine:
         return PrepositionalType.OTHER
     
     def _assign_to_slots(self, phrases: List[Tuple[str, str, str]]) -> Dict[str, str]:
-        """前置詞句をRephraseスロットに割り当て - 複数前置詞句を個別スロットに分離"""
+        """前置詞句をRephraseスロットに割り当て"""
         slots = {}
+        
+        # スロットカウンター
+        slot_counters = {'M1': 0, 'M2': 0, 'M3': 0}
         
         for preposition, object_phrase, full_phrase in phrases:
             # 前置詞句の種類を分類
             phrase_type = self._classify_prepositional_phrase(preposition, object_phrase)
             
-            # スロット割り当て - 各前置詞句を個別スロットに分離
+            # スロット割り当て
             if phrase_type == PrepositionalType.TIME:
-                # 時間表現：M1優先、埋まっていればM2、M3へ
-                if 'M1' not in slots:
+                slot_counters['M1'] += 1
+                if slot_counters['M1'] == 1:
                     slots['M1'] = full_phrase
-                elif 'M2' not in slots:
-                    slots['M2'] = full_phrase
-                elif 'M3' not in slots:
-                    slots['M3'] = full_phrase
+                else:
+                    # 複数の時間前置詞句がある場合
+                    existing = slots.get('M1', '')
+                    slots['M1'] = f"{existing}, {full_phrase}" if existing else full_phrase
                     
             elif phrase_type == PrepositionalType.LOCATION:
-                # 場所表現：M2優先、埋まっていればM1、M3へ
-                if 'M2' not in slots:
+                slot_counters['M2'] += 1
+                if slot_counters['M2'] == 1:
                     slots['M2'] = full_phrase
-                elif 'M1' not in slots:
-                    slots['M1'] = full_phrase
-                elif 'M3' not in slots:
-                    slots['M3'] = full_phrase
+                else:
+                    # 複数の場所前置詞句がある場合
+                    existing = slots.get('M2', '')
+                    slots['M2'] = f"{existing}, {full_phrase}" if existing else full_phrase
                     
             else:  # MANNER, PURPOSE, OTHER
-                # その他表現：M3優先、埋まっていればM2、M1へ
-                if 'M3' not in slots:
+                slot_counters['M3'] += 1
+                if slot_counters['M3'] == 1:
                     slots['M3'] = full_phrase
-                elif 'M2' not in slots:
-                    slots['M2'] = full_phrase
-                elif 'M1' not in slots:
-                    slots['M1'] = full_phrase
+                else:
+                    # 複数のその他前置詞句がある場合
+                    existing = slots.get('M3', '')
+                    slots['M3'] = f"{existing}, {full_phrase}" if existing else full_phrase
         
         return slots
 
