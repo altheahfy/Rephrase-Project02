@@ -32,18 +32,32 @@ class BoundaryExpansionLib:
         self.span_expand_deps = ['det', 'poss', 'compound', 'amod', 'nummod', 'case']
         self.relative_pronoun_deps = ['nsubj', 'dobj', 'pobj']  # 関係代名詞の役割
         
-        # スロット別境界拡張ルール（Pure Stanza V3.1由来）
-        self.slot_expansion_map = {
-            'S': ['det', 'amod', 'compound', 'nmod', 'acl', 'relcl'],
-            'V': ['aux', 'auxpass', 'neg', 'advmod'],
-            'O1': ['det', 'amod', 'compound', 'nmod', 'acl', 'relcl'],
-            'O2': ['det', 'amod', 'compound', 'nmod'],
-            'M1': ['advmod', 'prep', 'pobj', 'case'],
-            'C1': ['det', 'amod', 'compound'],
-            'C2': ['det', 'amod', 'compound'],
-            'M2': ['advmod', 'prep', 'pobj'],
-            'M3': ['advmod', 'prep', 'pobj']
+        # スロット特化拡張ルール（Pure Stanza V3.1完全抽出版）
+        self.slot_specific_expansion_map = {
+            # === 主語系（完全拡張）===
+            'S': ['det', 'amod', 'compound', 'nmod', 'acl', 'acl:relcl', 'nummod', 'poss', 
+                  'case', 'mark'],  # 関係節含む完全主語拡張
+            
+            # === 動詞系（助動詞・修飾完全対応）===
+            'V': ['aux', 'aux:pass', 'auxpass', 'neg', 'advmod', 'compound:prt', 'prt'],
+            'Aux': ['neg', 'advmod'],  # 助動詞専用
+            
+            # === 目的語系（主語と同等拡張）===
+            'O1': ['det', 'amod', 'compound', 'nmod', 'acl', 'acl:relcl', 'nummod', 'poss'],
+            'O2': ['det', 'amod', 'compound', 'nmod', 'nummod', 'poss'],
+            
+            # === 補語系（形容詞・名詞補語特化）===
+            'C1': ['det', 'amod', 'compound', 'advmod', 'case', 'mark'],  # 比較構文対応強化
+            'C2': ['det', 'amod', 'compound', 'to'],  # 不定詞補語対応
+            
+            # === 修飾語系（各タイプ特化）===
+            'M1': ['advmod', 'prep', 'pobj', 'case', 'mark', 'cc', 'conj'],  # 前置詞句・接続詞完全対応
+            'M2': ['advmod', 'prep', 'pobj', 'compound'],  # 副詞修飾強化
+            'M3': ['advmod', 'prep', 'pobj', 'tmod', 'npadvmod']  # 時間・場所修飾特化
         }
+        
+        # 後方互換性のため既存マップも保持
+        self.slot_expansion_map = self.slot_specific_expansion_map
         
         print("🏗️ 統一境界拡張ライブラリ準備完了")
     
@@ -104,7 +118,7 @@ class BoundaryExpansionLib:
     
     def expand_span_for_slot(self, text: str, slot_key: str) -> str:
         """
-        スロット別特化境界拡張
+        スロット特化境界拡張（Pure Stanza V3.1完全版）
         
         Args:
             text: 拡張対象テキスト
@@ -113,16 +127,75 @@ class BoundaryExpansionLib:
         Returns:
             スロット別最適化された境界拡張テキスト
         """
-        # スロット別拡張依存語設定取得
-        expand_deps = self.slot_expansion_map.get(slot_key, self.span_expand_deps)
+        # スロット特化拡張依存語設定取得
+        expand_deps = self.slot_specific_expansion_map.get(slot_key, self.span_expand_deps)
         
-        # 拡張コンテキスト作成
+        # スロット特化拡張コンテキスト作成
         expansion_context = {
             'expand_deps': expand_deps,
-            'slot_type': slot_key
+            'slot_type': slot_key,
+            'slot_specific': True  # スロット特化モードフラグ
         }
         
-        return self.expand_span_generic(text, expansion_context)
+        # スロット別特別処理
+        if slot_key in ['S', 'O1'] and self._contains_relative_clause(text):
+            # 主語・目的語の関係節特化処理
+            return self._expand_with_relative_clause_optimization(text, expansion_context)
+        elif slot_key == 'V' and self._contains_modal_verb(text):
+            # 動詞のモーダル特化処理
+            return self._expand_with_modal_optimization(text, expansion_context)
+        elif slot_key in ['M1', 'M2', 'M3'] and self._contains_prepositional_phrase(text):
+            # 修飾語の前置詞句特化処理
+            return self._expand_with_prepositional_optimization(text, expansion_context)
+        else:
+            # 汎用拡張処理
+            return self.expand_span_generic(text, expansion_context)
+    
+    def _contains_relative_clause(self, text: str) -> bool:
+        """関係節含有判定"""
+        if not self.spacy_nlp:
+            return False
+        try:
+            doc = self.spacy_nlp(text)
+            return any(token.dep_ in ['acl:relcl', 'relcl'] for token in doc)
+        except:
+            return False
+    
+    def _contains_modal_verb(self, text: str) -> bool:
+        """モーダル動詞含有判定"""
+        modal_verbs = {'can', 'could', 'may', 'might', 'will', 'would', 'shall', 'should', 'must'}
+        return any(word.lower() in modal_verbs for word in text.split())
+    
+    def _contains_prepositional_phrase(self, text: str) -> bool:
+        """前置詞句含有判定"""
+        if not self.spacy_nlp:
+            return False
+        try:
+            doc = self.spacy_nlp(text)
+            return any(token.pos_ == 'ADP' for token in doc)
+        except:
+            return False
+    
+    def _expand_with_relative_clause_optimization(self, text: str, context: Dict) -> str:
+        """関係節最適化拡張"""
+        # 関係節特化の拡張処理
+        enhanced_deps = context['expand_deps'] + ['mark', 'nsubj:relcl', 'obj:relcl']
+        enhanced_context = {**context, 'expand_deps': enhanced_deps}
+        return self.expand_span_generic(text, enhanced_context)
+    
+    def _expand_with_modal_optimization(self, text: str, context: Dict) -> str:
+        """モーダル動詞最適化拡張"""
+        # モーダル動詞特化の拡張処理
+        enhanced_deps = context['expand_deps'] + ['ccomp', 'xcomp', 'advcl']
+        enhanced_context = {**context, 'expand_deps': enhanced_deps}
+        return self.expand_span_generic(text, enhanced_context)
+    
+    def _expand_with_prepositional_optimization(self, text: str, context: Dict) -> str:
+        """前置詞句最適化拡張"""
+        # 前置詞句特化の拡張処理
+        enhanced_deps = context['expand_deps'] + ['pcomp', 'pobj', 'agent']
+        enhanced_context = {**context, 'expand_deps': enhanced_deps}
+        return self.expand_span_generic(text, enhanced_context)
     
     def _find_relative_pronouns_in_span(self, rel_token, spacy_doc) -> List[int]:
         """スパン内関係代名詞インデックス検出（汎用）"""
@@ -138,15 +211,15 @@ class BoundaryExpansionLib:
     
     def get_expansion_deps_for_slot(self, slot_key: str) -> List[str]:
         """
-        スロットタイプ別拡張依存語設定取得
+        スロットタイプ別拡張依存語設定取得（Pure Stanza V3.1完全版）
         
         Args:
             slot_key: スロット名
             
         Returns:
-            拡張依存語リスト
+            スロット特化拡張依存語リスト
         """
-        return self.slot_expansion_map.get(slot_key, self.span_expand_deps)
+        return self.slot_specific_expansion_map.get(slot_key, self.span_expand_deps)
     
     def check_requires_expansion(self, text: str) -> bool:
         """

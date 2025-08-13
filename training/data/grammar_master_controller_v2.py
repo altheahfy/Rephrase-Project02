@@ -21,6 +21,9 @@ from dataclasses import dataclass
 from enum import Enum
 from threading import Lock
 
+# 統一境界拡張ライブラリのインポート
+from boundary_expansion_lib import BoundaryExpansionLib
+
 class EngineType(Enum):
     """Engine type enumeration for priority and classification."""
     BASIC_FIVE = "basic_five"  # New: Basic five pattern system
@@ -80,13 +83,23 @@ class GrammarMasterControllerV2:
         self._setup_logging(log_level)
         self.engine_registry: Dict[EngineType, LazyEngineInfo] = {}
         self.loading_locks: Dict[EngineType, Lock] = {}
+        
+        # 統一境界拡張ライブラリの初期化（中央集権管理）
+        try:
+            self.boundary_lib = BoundaryExpansionLib()
+            self.logger.info("✅ 統一境界拡張ライブラリ統合完了")
+        except Exception as e:
+            self.logger.warning(f"⚠️ 統一境界拡張ライブラリ初期化失敗: {e}")
+            self.boundary_lib = None
+        
         self.processing_stats = {
             'total_requests': 0,
             'successful_processes': 0,
             'engines_loaded': 0,
             'total_engines_registered': 0,
             'average_processing_time': 0.0,
-            'startup_time': time.time()
+            'startup_time': time.time(),
+            'boundary_expansions_applied': 0  # 境界拡張統計追加
         }
         
         # Register engine configurations (no actual loading)
@@ -236,8 +249,11 @@ class GrammarMasterControllerV2:
             return self._create_error_result("Empty sentence provided", start_time)
         
         try:
+            # Step 0: 前処理 - 統一境界拡張（中央集権処理）
+            enhanced_sentence = self._apply_boundary_expansion(sentence, debug)
+            
             # Step 1: Get applicable engines (pattern-based, no loading needed)
-            applicable_engines = self._get_applicable_engines_fast(sentence)
+            applicable_engines = self._get_applicable_engines_fast(enhanced_sentence)
             
             if not applicable_engines:
                 return self._create_error_result("No applicable engines found", start_time)
@@ -246,7 +262,7 @@ class GrammarMasterControllerV2:
                 self.logger.info(f"Applicable engines: {[e.value for e in applicable_engines]}")
             
             # Step 2: Select optimal engine (heuristic-based)
-            selected_engine_type = self._select_optimal_engine(sentence, applicable_engines)
+            selected_engine_type = self._select_optimal_engine(enhanced_sentence, applicable_engines)
             
             if debug:
                 self.logger.info(f"Selected engine: {selected_engine_type.value}")
@@ -256,9 +272,12 @@ class GrammarMasterControllerV2:
                 return self._create_error_result(f"Failed to load {selected_engine_type.value} engine", start_time)
             
             # Step 4: Process with loaded engine
-            result = self._process_with_engine(sentence, selected_engine_type, start_time)
+            result = self._process_with_engine(enhanced_sentence, selected_engine_type, start_time)
             
-            # Step 5: Update statistics
+            # Step 5: 後処理 - 結果スロットの境界拡張最適化
+            result = self._enhance_result_slots(result, debug)
+            
+            # Step 6: Update statistics
             self.engine_registry[selected_engine_type].usage_count += 1
             self._update_statistics(selected_engine_type, time.time() - start_time, result.success)
             
@@ -451,6 +470,97 @@ class GrammarMasterControllerV2:
         total_time = (self.processing_stats['average_processing_time'] * 
                      (self.processing_stats['total_requests'] - 1) + processing_time)
         self.processing_stats['average_processing_time'] = total_time / self.processing_stats['total_requests']
+    
+    # === 統一境界拡張メソッド（中央集権処理）===
+    
+    def _apply_boundary_expansion(self, sentence: str, debug: bool = False) -> str:
+        """
+        統一境界拡張の前処理（中央集権管理）
+        
+        Args:
+            sentence: 処理対象文
+            debug: デバッグ情報表示
+            
+        Returns:
+            境界拡張された文
+        """
+        if not self.boundary_lib:
+            return sentence
+        
+        try:
+            # 基本境界拡張適用
+            expanded_sentence = self.boundary_lib.expand_span_generic(sentence)
+            
+            if debug and expanded_sentence != sentence:
+                self.logger.info(f"🔧 境界拡張適用: '{sentence}' → '{expanded_sentence}'")
+            
+            self.processing_stats['boundary_expansions_applied'] += 1
+            return expanded_sentence
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 境界拡張処理エラー: {e}")
+            return sentence
+    
+    def _enhance_result_slots(self, result: EngineResult, debug: bool = False) -> EngineResult:
+        """
+        結果スロットのスロット特化境界拡張最適化（Pure Stanza V3.1完全版）
+        
+        Args:
+            result: エンジン処理結果
+            debug: デバッグ情報表示
+            
+        Returns:
+            スロット特化最適化された結果
+        """
+        if not self.boundary_lib or not result.success or not result.slots:
+            return result
+        
+        try:
+            enhanced_slots = {}
+            enhancement_stats = {'enhanced': 0, 'unchanged': 0}
+            
+            for slot, value in result.slots.items():
+                if value and value.strip():
+                    # Pure Stanza V3.1スロット特化境界拡張
+                    enhanced_value = self.boundary_lib.expand_span_for_slot(value, slot)
+                    enhanced_slots[slot] = enhanced_value
+                    
+                    # 拡張効果統計
+                    if enhanced_value != value:
+                        enhancement_stats['enhanced'] += 1
+                        if debug:
+                            self.logger.info(f"🔧 {slot}スロット特化拡張: '{value}' → '{enhanced_value}'")
+                    else:
+                        enhancement_stats['unchanged'] += 1
+                else:
+                    enhanced_slots[slot] = value
+                    enhancement_stats['unchanged'] += 1
+            
+            # 結果更新
+            result.slots = enhanced_slots
+            
+            # メタデータにスロット特化境界拡張情報追加
+            if 'boundary_expansion' not in result.metadata:
+                result.metadata['boundary_expansion'] = {}
+            
+            result.metadata['boundary_expansion'].update({
+                'slot_specific_applied': True,
+                'pure_stanza_v31_features': True,
+                'enhancement_stats': enhancement_stats,
+                'library_version': '1.0'
+            })
+            
+            # グローバル統計更新
+            self.processing_stats['boundary_expansions_applied'] += enhancement_stats['enhanced']
+            
+            if debug:
+                self.logger.info(f"📊 スロット特化拡張統計: {enhancement_stats['enhanced']}個拡張, {enhancement_stats['unchanged']}個維持")
+            
+            return result
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ スロット特化境界拡張エラー: {e}")
+            return result
     
     def get_engine_info(self) -> Dict[str, Any]:
         """Get information about all registered engines."""
