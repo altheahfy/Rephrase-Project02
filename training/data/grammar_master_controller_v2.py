@@ -305,22 +305,20 @@ class GrammarMasterControllerV2:
     def _get_applicable_engines_fast(self, sentence: str) -> List[EngineType]:
         """
         Fast pattern-based engine detection without loading engines.
+        文の特徴に基づいて適切な専門エンジンを優先選択する。
         
         Args:
             sentence: Input sentence
             
         Returns:
-            List of applicable engine types, sorted by priority
+            List of applicable engine types, sorted by specificity (most specific first)
         """
         applicable = []
         sentence_lower = sentence.lower()
         
-        # Basic Five Pattern Engine is always applicable (fundamental structure)
-        if EngineType.BASIC_FIVE in self.engine_registry:
-            applicable.append(EngineType.BASIC_FIVE)
-        
+        # 専門エンジンを優先的に検出
         for engine_type, engine_info in self.engine_registry.items():
-            # Skip basic_five (already added)
+            # Basic Fiveは最後に処理
             if engine_type == EngineType.BASIC_FIVE:
                 continue
                 
@@ -330,7 +328,12 @@ class GrammarMasterControllerV2:
                     applicable.append(engine_type)
                     break
         
-        # Sort by priority (lower number = higher priority)
+        # Basic Five Pattern Engine is fallback (fundamental structure)
+        # 専門エンジンが見つからない場合のみ追加
+        if not applicable and EngineType.BASIC_FIVE in self.engine_registry:
+            applicable.append(EngineType.BASIC_FIVE)
+        
+        # 専門性の高い順にソート（優先度が高い = より専門的）
         applicable.sort(key=lambda x: self.engine_registry[x].priority)
         
         return applicable
