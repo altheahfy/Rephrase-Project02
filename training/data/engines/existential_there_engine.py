@@ -326,10 +326,10 @@ class ExistentialThereEngine:
         if aux_form:
             slots['Aux'] = aux_form
             
-        # O1 slot: Logical subject (the thing that exists)
+        # C1 slot: Subject complement (the thing that exists - logical subject)
         logical_subject = structure.get('logical_subject', '')
         if logical_subject:
-            slots['O1'] = logical_subject
+            slots['C1'] = logical_subject
             
         # Location and time modifiers
         location_info = self._extract_location_modifiers(sentence, doc)
@@ -585,10 +585,10 @@ class ExistentialThereEngine:
             base_confidence += 0.1
         if 'V' in slots and slots['V']:
             base_confidence += 0.1
-        if 'O1' in slots and slots['O1']:  # Logical subject is crucial
+        if 'C1' in slots and slots['C1']:  # Subject complement is crucial
             base_confidence += 0.1
         else:
-            base_confidence -= 0.2  # Penalty for missing logical subject
+            base_confidence -= 0.2  # Penalty for missing subject complement
             
         # Bonus for additional slots
         additional_slots = ['Aux', 'C2', 'M2', 'M3']
