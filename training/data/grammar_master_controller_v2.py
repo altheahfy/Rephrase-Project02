@@ -186,7 +186,9 @@ class GrammarMasterControllerV2:
             
             # Phase 3: Priority 15-18 Engine Group
             (EngineType.IMPERATIVE, "engines.imperative_engine", "ImperativeEngine", 
-             15, "Imperative sentence processing", ["Go!", "Stop!", "Please come here!", "Don't run!", "You sit down!"]),
+             15, "Imperative sentence processing", [
+                "please", "do", "don't", "take", "give", "leave", "help", "stop", "go", "come", "sit", "run", "open", "close", "read", "write", "look", "listen", "wait", "bring", "show", "tell", "call", "keep", "let", "put", "make", "find", "start", "turn", "try", "ask", "remember", "forget", "never", "always"
+            ]),
         ]
         
         for engine_type, module_path, class_name, priority, description, patterns in engine_configs:
@@ -289,11 +291,17 @@ class GrammarMasterControllerV2:
                 self.logger.info(f"Detected applicable engines: {[e.value for e in applicable_engines]}")
             
             # Step 2: 🎯 Multi-Engine Coordination Strategy Selection
+            # 命令文エンジンがapplicable_enginesに含まれる場合は必ずIMPERATIVEのみでsingle_optimal処理
+            if EngineType.IMPERATIVE in applicable_engines:
+                if debug:
+                    self.logger.info("IMPERATIVE engine detected: forcing single_optimal strategy with IMPERATIVE only.")
+                return self._process_single_optimal(enhanced_sentence, [EngineType.IMPERATIVE], start_time, debug)
+
             coordination_strategy = self._determine_coordination_strategy(enhanced_sentence, applicable_engines)
-            
+
             if debug:
                 self.logger.info(f"Coordination strategy: {coordination_strategy}")
-            
+
             # Step 3: Execute strategy-based processing
             if coordination_strategy == "single_optimal":
                 return self._process_single_optimal(enhanced_sentence, applicable_engines, start_time, debug)
@@ -304,20 +312,20 @@ class GrammarMasterControllerV2:
             else:
                 # Fallback to traditional single engine selection
                 selected_engine_type = self._select_optimal_engine(enhanced_sentence, applicable_engines)
-                
+
                 if debug:
                     self.logger.info(f"Fallback to single engine: {selected_engine_type.value}")
-                
+
                 # Load and process with single engine
                 if not self._load_engine(selected_engine_type):
                     return self._create_error_result(f"Failed to load {selected_engine_type.value} engine", start_time)
-                
+
                 result = self._process_with_engine(enhanced_sentence, selected_engine_type, start_time)
                 result = self._enhance_result_slots(result, debug)
-                
+
                 self.engine_registry[selected_engine_type].usage_count += 1
                 self._update_statistics(selected_engine_type, time.time() - start_time, result.success)
-                
+
                 return result
             
         except Exception as e:
@@ -337,27 +345,47 @@ class GrammarMasterControllerV2:
         """
         applicable = []
         sentence_lower = sentence.lower()
-        
-        # 専門エンジンを優先的に検出
+
+        # まず命令文エンジン（IMPERATIVE）を最優先で判定
+        if EngineType.IMPERATIVE in self.engine_registry:
+            imperative_info = self.engine_registry[EngineType.IMPERATIVE]
+            # 文頭がPlease/Don't/動詞で始まる or !で終わる短文
+            words = sentence.strip().split()
+            if words:
+                first_word = words[0].lower()
+                # Please/Don'tで始まる
+                if first_word in ("please", "don't"):
+                    applicable.append(EngineType.IMPERATIVE)
+                # 文頭が動詞（patternsに含まれる）
+                elif first_word in [p.lower() for p in imperative_info.patterns]:
+                    applicable.append(EngineType.IMPERATIVE)
+                # 2語目が動詞（You go! など）
+                elif len(words) > 1 and words[1].lower() in [p.lower() for p in imperative_info.patterns]:
+                    applicable.append(EngineType.IMPERATIVE)
+                # !で終わる短文
+                elif sentence.strip().endswith('!') and len(words) <= 7:
+                    applicable.append(EngineType.IMPERATIVE)
+
+        # 他の専門エンジンを優先的に検出
         for engine_type, engine_info in self.engine_registry.items():
             # Basic Fiveは最後に処理
-            if engine_type == EngineType.BASIC_FIVE:
+            if engine_type in (EngineType.BASIC_FIVE, EngineType.IMPERATIVE):
                 continue
-                
+
             # Pattern-based detection (no engine loading required)
             for pattern in engine_info.patterns:
                 if pattern.lower() in sentence_lower:
                     applicable.append(engine_type)
                     break
-        
+
         # Basic Five Pattern Engine is fundamental structure (always applicable)
         # 基本5文型は文法の基盤構造として常に評価対象
         if EngineType.BASIC_FIVE in self.engine_registry:
             applicable.append(EngineType.BASIC_FIVE)
-        
+
         # 専門性の高い順にソート（優先度が高い = より専門的）
         applicable.sort(key=lambda x: self.engine_registry[x].priority)
-        
+
         return applicable
     
     def _determine_coordination_strategy(self, sentence: str, applicable_engines: List[EngineType]) -> str:
