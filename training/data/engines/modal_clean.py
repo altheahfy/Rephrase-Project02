@@ -243,20 +243,6 @@ class ModalEngine:
         # Always use fallback extraction since Stanza may not be available
         return self._fallback_extraction(sentence)
     
-    def _clean_rest_text(self, text: str) -> str:
-        """
-        Remove punctuation from the end of text.
-        
-        Args:
-            text: Input text to clean
-            
-        Returns:
-            Cleaned text without trailing punctuation
-        """
-        if not text:
-            return text
-        return re.sub(r'[.!?;,]+$', '', text.strip()).strip()
-    
     def _fallback_extraction(self, sentence: str) -> Dict[str, str]:
         """
         Improved fallback extraction with proper Aux slot handling.
@@ -280,11 +266,9 @@ class ModalEngine:
                 if match:
                     modal_verb, subject, main_verb, rest = match.groups()
                     slots['S'] = subject
-                    slots['Aux'] = modal_verb  # Modal to Aux (correct)
-                    slots['V'] = main_verb  # Main verb to V (correct)
+                    slots['V'] = modal_verb  # Modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux 笨・                    
                     rest = rest.strip()
-                    # 句読点を除去
-                    rest = self._clean_rest_text(rest)
                     if rest:
                         slots['O1'] = rest
                     return {k: v for k, v in slots.items() if v and str(v).strip()}
@@ -296,11 +280,9 @@ class ModalEngine:
             if match:
                 subject, modal_verb, main_verb, rest = match.groups()
                 slots['S'] = subject.strip() if subject.strip() else None
-                slots['Aux'] = modal_verb  # Modal to Aux (correct)
-                slots['V'] = main_verb  # Main verb to V (correct)
+                slots['V'] = modal_verb  # Modal to V
+                slots['Aux'] = main_verb  # Main verb to Aux 笨・                
                 rest = rest.strip()
-                # 句読点を除去
-                rest = self._clean_rest_text(rest)
                 if rest:
                     slots['O1'] = rest
         
@@ -315,11 +297,8 @@ class ModalEngine:
                 if match:
                     subject, aux_verb, main_verb, rest = match.groups()
                     slots['S'] = subject.strip()
-                    slots['Aux'] = f"{aux_verb} to"  # Semi-modal to Aux (correct)
-                    slots['V'] = main_verb  # Main verb to V (correct)
-                    rest = rest.strip()
-                    if rest:
-                        slots['O1'] = rest                    
+                    slots['V'] = f"{aux_verb} to"  # Semi-modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux 笨・                    
                     rest = rest.strip()
                     if rest:
                         slots['O1'] = rest
@@ -331,11 +310,8 @@ class ModalEngine:
                 if match:
                     subject, be_verb, main_verb, rest = match.groups()
                     slots['S'] = subject.strip()
-                    slots['Aux'] = f"{be_verb} able to"  # Semi-modal to Aux (correct)
-                    slots['V'] = main_verb  # Main verb to V (correct)
-                    rest = rest.strip()
-                    if rest:
-                        slots['O1'] = rest                    
+                    slots['V'] = f"{be_verb} able to"  # Semi-modal to V
+                    slots['Aux'] = main_verb  # Main verb to Aux 笨・                    
                     rest = rest.strip()
                     if rest:
                         slots['O1'] = rest
