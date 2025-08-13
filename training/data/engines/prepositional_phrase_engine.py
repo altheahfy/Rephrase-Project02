@@ -478,6 +478,20 @@ class PrepositionalPhraseEngine:
             "processed": True
         }
 
+    def process(self, text: str) -> Dict[str, str]:
+        """標準のprocessメソッド - マルチエンジン協調システム対応"""
+        print(f"🎯 前置詞句エンジン処理開始: '{text}'")
+        
+        result = self.process_sentence(text)
+        if result and result.get("processed"):
+            # 標準形式に変換
+            slots = result.get("slots", {})
+            print(f"✅ 前置詞句検出完了: {len(slots)}スロット")
+            return slots
+        else:
+            print("ℹ️ 前置詞句未検出")
+            return {}
+
 # テスト用のメイン関数
 def test_prepositional_engine():
     """前置詞句エンジンのテスト"""
