@@ -74,7 +74,7 @@ class PrepositionalPhraseEngine:
         print("✅ 前置詞句エンジン初期化完了")
     
     def process(self, text: str) -> Dict[str, str]:
-        """標準processメソッド - マルチエンジン協調システム対応"""
+        """標準processメソッド - 上位スロット＋サブスロット対応"""
         print(f"🎯 前置詞句エンジン処理開始: '{text}'")
         
         # 前置詞句を抽出
@@ -84,10 +84,14 @@ class PrepositionalPhraseEngine:
             print("ℹ️ 前置詞句未検出")
             return {}
             
-        # スロット分解
+        # 上位スロット分解
         slots = self._assign_to_slots(prepositional_phrases)
         
-        print(f"✅ 前置詞句検出完了: {len(slots)}スロット")
+        # サブスロット分解を追加
+        sub_slots = self._decompose_to_subslots(prepositional_phrases)
+        slots.update(sub_slots)
+        
+        print(f"✅ 前置詞句検出完了: {len([k for k in slots.keys() if not k.startswith('sub-')])}上位スロット + {len([k for k in slots.keys() if k.startswith('sub-')])}サブスロット")
         return slots
     
     def _extract_prepositional_phrases(self, text: str) -> List[Tuple[str, str, str]]:
@@ -208,6 +212,37 @@ class PrepositionalPhraseEngine:
                     slots['M3'] = f"{existing}, {full_phrase}" if existing else full_phrase
         
         return slots
+    
+    def _decompose_to_subslots(self, phrases: List[Tuple[str, str, str]]) -> Dict[str, str]:
+        """前置詞句をサブスロットに分解 - Gerund エンジン設計準拠"""
+        sub_slots = {}
+        
+        for i, (preposition, object_phrase, full_phrase) in enumerate(phrases, 1):
+            # サブスロットの命名規則: sub-m1, sub-m2, sub-m3 + 前置詞・目的語分離
+            base_sub_key = f"sub-m{i}"
+            prep_sub_key = f"sub-m{i}-prep"  # 前置詞部分
+            obj_sub_key = f"sub-m{i}-obj"   # 目的語部分
+            
+            # 前置詞をサブスロットに格納
+            if base_sub_key not in sub_slots:
+                sub_slots[prep_sub_key] = preposition.lower()
+                sub_slots[obj_sub_key] = object_phrase.lower()
+                
+                # より詳細な目的語分解（名詞句の場合）
+                obj_words = object_phrase.strip().split()
+                if len(obj_words) > 1:
+                    # 複数語の場合、主要名詞を特定
+                    main_noun = obj_words[-1]  # 通常、最後の語が主要名詞
+                    modifiers = ' '.join(obj_words[:-1])  # 修飾語群
+                    
+                    sub_slots[f"{base_sub_key}-noun"] = main_noun.lower()
+                    if modifiers.strip():
+                        sub_slots[f"{base_sub_key}-mod"] = modifiers.lower()
+                else:
+                    # 単一語の場合
+                    sub_slots[f"{base_sub_key}-noun"] = object_phrase.lower()
+        
+        return sub_slots
 
 # テスト用
 if __name__ == "__main__":
