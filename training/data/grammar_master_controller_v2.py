@@ -345,9 +345,9 @@ class GrammarMasterControllerV2:
                     applicable.append(engine_type)
                     break
         
-        # Basic Five Pattern Engine is fallback (fundamental structure)
-        # 専門エンジンが見つからない場合のみ追加
-        if not applicable and EngineType.BASIC_FIVE in self.engine_registry:
+        # Basic Five Pattern Engine is fundamental structure (always applicable)
+        # 基本5文型は文法の基盤構造として常に評価対象
+        if EngineType.BASIC_FIVE in self.engine_registry:
             applicable.append(EngineType.BASIC_FIVE)
         
         # 専門性の高い順にソート（優先度が高い = より専門的）
@@ -828,45 +828,6 @@ class GrammarMasterControllerV2:
     # REMOVED: _apply_sublevel_pattern_enhancement - redundant with individual engines
     # Each specialist engine already implements sublevel decomposition (sub-s, sub-v, etc.)
 
-    def get_detailed_statistics(self) -> Dict[str, Any]:
-            
-            return result
-            
-        except Exception as e:
-            self.logger.warning(f"⚠️ スロット特化境界拡張エラー: {e}")
-            return result
-
-    # REMOVED: _apply_sublevel_pattern_enhancement - redundant with individual engines
-    # Each specialist engine (relative, passive, etc.) already implements sublevel decomposition:
-    # - Simple Relative Engine: sub-v (relative clause verb)  
-    # - Passive Voice Engine: sub-s, sub-aux, sub-v, sub-m1, sub-o1
-    # - Other engines: detailed internal structure parsing
-    # Central sublevel library adds overhead without meaningful benefits
-                            
-                            if debug:
-                                self.logger.info(f"🔍 {slot}スロット サブレベル検出: {pattern_type}")
-                                self.logger.info(f"   📋 分解結果: {sublevel_slots}")
-                    else:
-                        # パターン検出されないスロット
-                        sublevel_enhancements[slot] = {
-                            'original_value': value,
-                            'pattern_type': 'SIMPLE',
-                            'sublevel_slots': {},
-                            'enhanced': False
-                        }
-            
-            # メタデータにサブレベルパターン解析結果を統合
-            if 'sublevel_patterns' not in result.metadata:
-                result.metadata['sublevel_patterns'] = {}
-            
-            result.metadata['sublevel_patterns'].update({
-                'applied': True,
-                'pure_stanza_v31_features': True,
-                'enhancement_details': sublevel_enhancements,
-                'processing_stats': sublevel_stats,
-                'library_version': '1.0'
-            })
-            
     def get_detailed_statistics(self) -> Dict[str, Any]:
         """Get comprehensive multi-engine coordination statistics."""
         loaded_engines = sum(1 for info in self.engine_registry.values() if info.engine_instance is not None)
