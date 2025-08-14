@@ -108,10 +108,10 @@ class TenseAspectDetector:
     
     def _extract_verb_phrase(self, doc) -> Dict[str, Any]:
         """文から動詞句を抽出"""
-        # ROOT動詞を見つける
+        # ROOT動詞を見つける（VERB, AUXどちらも対象）
         root_verb = None
         for token in doc:
-            if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+            if token.dep_ == 'ROOT' and token.pos_ in ['VERB', 'AUX']:
                 root_verb = token
                 break
         
@@ -129,11 +129,19 @@ class TenseAspectDetector:
                     'text': child.text,
                     'lemma': child.lemma_,
                     'pos': child.tag_,
-                    'type': self._classify_auxiliary(child.text.lower())
+                    'type': self._classify_auxiliary(child.text.lower()),
+                    'index': child.i  # 語順用のインデックス追加
                 })
         
-        # 助動詞を語順でソート
-        auxiliaries.sort(key=lambda x: x['text'])  # 簡易ソート
+        # ROOTがAUXの場合、子要素のVERBを探す
+        if root_verb.pos_ == 'AUX':
+            for child in root_verb.children:
+                if child.pos_ == 'VERB':
+                    main_verb = child
+                    break
+        
+        # 助動詞を実際の語順でソート
+        auxiliaries.sort(key=lambda x: x['index'])
         
         return {
             'main_verb': {
@@ -180,55 +188,96 @@ class TenseAspectDetector:
         aux_texts = [aux['text'].lower() for aux in auxiliaries]
         main_verb_form = main_verb.get('form', '')
         
-        # パターンマッチング
+        # パターンマッチング（順序重要）
         
-        # 1. 完了時制パターン
+        # 1. 未来完了進行: will have been + -ing
+        if ('will' in aux_texts and 'have' in aux_texts and 'been' in aux_texts and 
+            main_verb_form == 'present_participle'):
+            return self._analyze_future_perfect_progressive(auxiliaries, main_verb)
+        
+        # 2. 完了進行形パターン: have/has/had been + -ing
+        if ('have' in aux_types or 'had' in aux_texts) and 'been' in aux_texts and main_verb_form == 'present_participle':
+            return self._analyze_perfect_progressive(auxiliaries, main_verb)
+        
+        # 3. 未来時制パターン（will + have/be を含む複合形）
+        if 'will' in aux_texts:
+            return self._analyze_future_tense(auxiliaries, main_verb, doc)
+        
+        # 4. 完了時制パターン
         if 'have' in aux_types and main_verb_form == 'past_participle':
             return self._analyze_perfect_tense(auxiliaries, main_verb, doc)
         
-        # 2. 進行時制パターン  
+        # 5. 進行時制パターン  
         if 'be' in aux_types and main_verb_form == 'present_participle':
             return self._analyze_progressive_tense(auxiliaries, main_verb, doc)
         
-        # 3. 受動態パターン
+        # 6. 受動態パターン
         if 'be' in aux_types and main_verb_form == 'past_participle':
             return self._analyze_passive_voice(auxiliaries, main_verb, doc)
         
-        # 4. 未来時制パターン
-        if 'modal' in aux_types and any(aux in ['will', 'shall'] for aux in aux_texts):
-            return self._analyze_future_tense(auxiliaries, main_verb, doc)
-        
-        # 5. 法（conditional, subjunctive）
+        # 7. 法（conditional, subjunctive）
         if 'modal' in aux_types and any(aux in ['would', 'could', 'should', 'might', 'may'] for aux in aux_texts):
             return self._analyze_modal_verbs(auxiliaries, main_verb, doc)
         
-        # 6. 単純時制
+        # 8. 単純時制
         return self._analyze_simple_tense(auxiliaries, main_verb, doc)
     
-    def _analyze_perfect_tense(self, auxiliaries: List, main_verb: Dict, doc) -> TenseAspectAnalysis:
-        """完了時制分析"""
+    def _analyze_perfect_progressive(self, auxiliaries: List, main_verb: Dict) -> TenseAspectAnalysis:
+        """完了進行時制分析"""
         aux_texts = [aux['text'].lower() for aux in auxiliaries]
         
         # 現在完了進行: have/has been + -ing
-        if len(auxiliaries) == 2 and 'been' in aux_texts and main_verb['form'] == 'present_participle':
+        if any(aux in ['have', 'has'] for aux in aux_texts) and 'been' in aux_texts:
             tense_type = TenseAspectType.PRESENT_PERFECT_PROGRESSIVE
             explanation = "Present perfect progressive: action started in past, continues to present"
             timeline = "past → present (ongoing)"
         
         # 過去完了進行: had been + -ing  
-        elif 'had' in aux_texts and 'been' in aux_texts and main_verb['form'] == 'present_participle':
+        elif 'had' in aux_texts and 'been' in aux_texts:
             tense_type = TenseAspectType.PAST_PERFECT_PROGRESSIVE
             explanation = "Past perfect progressive: ongoing action completed before past reference point"
             timeline = "past ← past (completed ongoing)"
         
-        # 現在完了: have/has + past participle
-        elif any(aux in ['have', 'has'] for aux in aux_texts):
+        else:
+            return self._create_default_analysis()
+        
+        return TenseAspectAnalysis(
+            tense_aspect=tense_type,
+            auxiliary_verbs=aux_texts,
+            main_verb=main_verb['text'],
+            main_verb_form=main_verb['form'],
+            confidence=0.92,
+            components={'perfect_progressive_marker': 'have/has/had been + -ing', 'main_verb': main_verb['text']},
+            explanation=explanation,
+            timeline=timeline
+        )
+    
+    def _analyze_future_perfect_progressive(self, auxiliaries: List, main_verb: Dict) -> TenseAspectAnalysis:
+        """未来完了進行時制分析"""
+        aux_texts = [aux['text'].lower() for aux in auxiliaries]
+        
+        return TenseAspectAnalysis(
+            tense_aspect=TenseAspectType.FUTURE_PERFECT_PROGRESSIVE,
+            auxiliary_verbs=aux_texts,
+            main_verb=main_verb['text'],
+            main_verb_form=main_verb['form'],
+            confidence=0.95,
+            components={'future_perfect_progressive_marker': 'will have been + -ing', 'main_verb': main_verb['text']},
+            explanation="Future perfect progressive: ongoing action completed by future point",
+            timeline="present → future (completed ongoing)"
+        )
+    def _analyze_perfect_tense(self, auxiliaries: List, main_verb: Dict, doc) -> TenseAspectAnalysis:
+        """完了時制分析（単純完了のみ）"""
+        aux_texts = [aux['text'].lower() for aux in auxiliaries]
+        
+        # 現在完了: have/has + past participle (beenは除外)
+        if any(aux in ['have', 'has'] for aux in aux_texts) and 'been' not in aux_texts:
             tense_type = TenseAspectType.PRESENT_PERFECT
             explanation = "Present perfect: past action with present relevance"
             timeline = "past → present (relevant)"
         
-        # 過去完了: had + past participle
-        elif 'had' in aux_texts:
+        # 過去完了: had + past participle (beenは除外)
+        elif 'had' in aux_texts and 'been' not in aux_texts:
             tense_type = TenseAspectType.PAST_PERFECT
             explanation = "Past perfect: action completed before past reference point"
             timeline = "past ← past (completed)"
