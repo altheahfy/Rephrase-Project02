@@ -133,6 +133,13 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                     lambda clause: clause.is_passive_voice(),
                 ],
                 'confidence_boost': 0.3,
+                'contextual_patterns': [
+                    r'\bby\s+\w+',       # "by someone" pattern  
+                    r'\bwas\s+\w+ed\b',  # "was verbed" pattern
+                    r'\bwere\s+\w+ed\b', # "were verbed" pattern
+                    r'\bbe\s+\w+ed\b',   # "be verbed" pattern
+                    r'\bbeen\s+\w+ed\b'  # "been verbed" pattern
+                ],
                 'blocking_conditions': [
                     lambda clause: not clause.is_passive_voice()
                 ]
@@ -233,19 +240,56 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             
             GrammarPattern.PARTICIPLE_PATTERN: {
                 'required_conditions': [
-                    lambda clause: clause.root_pos in ['VBN', 'VBG', 'VERB'],
+                    # Enhanced participle detection - both present and past participles
+                    lambda clause: (
+                        # Present participle (VBG) like "Being", "Walking", "Having"
+                        (clause.root_pos in ['VBG', 'VERB'] and 
+                         (clause.root_word.endswith('ing') or clause.root_lemma.endswith('ing'))) or
+                        # Past participle (VBN) like "Written", "Excited", "Finished"
+                        (clause.root_pos in ['VBN', 'VERB'] and 
+                         (clause.root_word.endswith('ed') or clause.root_word.endswith('en') or
+                          clause.root_lemma != clause.root_word))  # Past participle often differs from lemma
+                    ),
+                    # Must be in adverbial clause context
                     lambda clause: clause.clause_type == 'adverbial_clause'
                 ],
-                'contextual_patterns': [
-                    r'^(Having\s+\w+ed|Written|Finished)',
-                    r'(ed|en)\s*,'
+                'contextual_requirements': [
+                    # Check for sentence-initial position (typical for participial constructions)
+                    lambda clause, full_sentence: (
+                        any(word.lower() in full_sentence.lower()[:20] 
+                            for word in [clause.root_word, clause.root_lemma]) or
+                        # Check for comma after participial phrase
+                        ',' in full_sentence and
+                        full_sentence.find(',') < full_sentence.find(clause.root_word) + 50
+                    )
                 ],
-                'confidence_boost': 0.3
+                'contextual_patterns': [
+                    # Present participle patterns
+                    r'^\s*(Being|Having|Walking|Running|Coming|Going|Seeing)',
+                    r'(Being|Having)\s+\w+',
+                    # Past participle patterns  
+                    r'^\s*(Written|Finished|Completed|Excited|Surprised|Given)',
+                    r'(ed|en)\s*,',
+                    # General participial phrase patterns
+                    r'\w+(ing|ed|en)\s+[^,]*,'
+                ],
+                'confidence_boost': 0.4
             },
             
             GrammarPattern.INFINITIVE_PATTERN: {
                 'required_conditions': [
-                    lambda clause: any(dep.relation == 'mark' and dep.dependent == 'to' for dep in clause.dependencies)
+                    # Check for 'to' marker in dependencies or text
+                    lambda clause: any(dep.relation == 'mark' and dep.dependent == 'to' for dep in clause.dependencies) or 
+                                  'to' in clause.text.lower().split()[:3],  # 'to' appears early in clause
+                    # Additional check for infinitive context
+                    lambda clause: clause.clause_type in ['open_clausal_complement', 'clausal_complement'] or
+                                  any('to ' in clause.text.lower() for _ in [True])
+                ],
+                'contextual_patterns': [
+                    r'\bto\s+be\b',      # "to be" construction
+                    r'\bto\s+\w+\b',     # "to verb" pattern
+                    r'seems?\s+to\b',    # "seems to" pattern
+                    r'\w+\s+to\s+\w+\b'  # general "verb to verb" pattern
                 ],
                 'confidence_boost': 0.4
             },
@@ -355,6 +399,29 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                 root_pos = pos_tags.get(dep.dependent, 'UNKNOWN')
                 root_lemma = lemmas.get(dep.dependent, dep.dependent)
                 
+                # Special handling for participial constructions
+                if dep.relation == 'advcl':
+                    # Check if this is a participial construction
+                    participial_root = self._find_participial_root(dep, dependencies, sentence, pos_tags, lemmas)
+                    if participial_root:
+                        # Use the participle (Being, Walking, etc.) as root instead
+                        clause_heads[participial_root['word']] = PreciseClauseInfo(
+                            text="",
+                            clause_type=clause_type,
+                            root_word=participial_root['word'],
+                            root_index=participial_root['index'],
+                            root_pos=participial_root['pos'],
+                            root_lemma=participial_root['lemma'],
+                            dependencies=[],
+                            linguistic_features={
+                                'relation_to_parent': dep.relation,
+                                'parent_word': dep.head,
+                                'participial_construction': True,
+                                'original_dependent': dep.dependent
+                            }
+                        )
+                        continue
+                
                 clause_heads[dep.dependent] = PreciseClauseInfo(
                     text="",
                     clause_type=clause_type,
@@ -403,6 +470,72 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             )
         
         return list(clause_heads.values())
+
+    def _find_participial_root(self, advcl_dep: 'DependencyInfo', 
+                             all_dependencies: List['DependencyInfo'],
+                             sentence: str, pos_tags: Dict, lemmas: Dict) -> Dict:
+        """Find the actual participial root (Being, Walking, etc.) for adverbial clauses."""
+        
+        # Look for participles that modify the dependent word
+        dependent_word = advcl_dep.dependent
+        sentence_words = sentence.lower().split()
+        
+        # Common participial patterns
+        participial_candidates = []
+        
+        # Check for dependencies where the dependent is actually governed by a participle
+        for dep in all_dependencies:
+            if (dep.head == dependent_word and 
+                dep.relation in ['cop', 'nsubj', 'det', 'amod', 'advmod']):
+                
+                candidate_pos = pos_tags.get(dep.dependent, '')
+                candidate_lemma = lemmas.get(dep.dependent, dep.dependent)
+                
+                # Check if this could be a participle
+                is_present_participle = (candidate_pos in ['VBG', 'VERB'] and 
+                                       (dep.dependent.endswith('ing') or candidate_lemma.endswith('ing')))
+                is_past_participle = (candidate_pos in ['VBN', 'VERB'] and 
+                                    (dep.dependent.endswith('ed') or dep.dependent.endswith('en') or
+                                     candidate_lemma != dep.dependent))
+                
+                if is_present_participle or is_past_participle:
+                    participial_candidates.append({
+                        'word': dep.dependent,
+                        'pos': candidate_pos,
+                        'lemma': candidate_lemma,
+                        'index': self._get_token_index([], dep.dependent),  # Will be recalculated
+                        'confidence': 0.8 if is_present_participle else 0.7
+                    })
+        
+        # Also check sentence-initial position for participial constructions
+        if sentence_words:
+            first_word = sentence_words[0]
+            # Remove punctuation
+            first_word_clean = first_word.replace(',', '').replace('.', '')
+            
+            first_pos = pos_tags.get(first_word_clean, pos_tags.get(first_word_clean.capitalize(), ''))
+            first_lemma = lemmas.get(first_word_clean, lemmas.get(first_word_clean.capitalize(), first_word_clean))
+            
+            is_sentence_initial_participle = (
+                (first_pos in ['VBG', 'VERB'] and first_word_clean.endswith('ing')) or
+                (first_pos in ['VBN', 'VERB'] and (first_word_clean.endswith('ed') or first_word_clean.endswith('en')))
+            )
+            
+            if is_sentence_initial_participle:
+                participial_candidates.append({
+                    'word': first_word_clean.capitalize(),
+                    'pos': first_pos,
+                    'lemma': first_lemma,
+                    'index': 0,
+                    'confidence': 0.9  # High confidence for sentence-initial
+                })
+        
+        # Return the best candidate
+        if participial_candidates:
+            best_candidate = max(participial_candidates, key=lambda x: x['confidence'])
+            return best_candidate
+        
+        return None
 
     def _analyze_clause_pattern_v4(self, clause: PreciseClauseInfo, 
                                   stanza_analysis: Dict, full_sentence: str) -> Dict[str, Any]:
@@ -647,16 +780,58 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
     def _extract_clause_text(self, sentence: str, tokens: List, 
                            dependencies: List[DependencyInfo], 
                            clause_root: str) -> str:
-        """Extract the text span for a specific clause."""
-        words_in_clause = set([clause_root])
-        for dep in dependencies:
-            words_in_clause.add(dep.head)
-            words_in_clause.add(dep.dependent)
+        """Extract the text span for a specific clause with improved accuracy."""
         
-        clause_words = sorted(words_in_clause)
-        if clause_words:
+        # Collect all words that belong to this clause
+        words_in_clause = set([clause_root])
+        
+        # Add all dependent and head words directly related to this clause
+        for dep in dependencies:
+            if dep.head == clause_root:
+                words_in_clause.add(dep.dependent)
+            elif dep.dependent == clause_root:
+                words_in_clause.add(dep.head)
+        
+        # For participial constructions, look for sentence spans that contain the root
+        sentence_words = sentence.split()
+        
+        # Find the position of the clause root in the original sentence
+        root_positions = []
+        for i, word in enumerate(sentence_words):
+            if word.lower().replace(',', '').replace('.', '') == clause_root.lower():
+                root_positions.append(i)
+        
+        if not root_positions:
+            # Fallback to the original method if root not found in sentence
+            clause_words = list(words_in_clause)
             return ' '.join(clause_words)
-        return sentence
+        
+        # For participial constructions, extract meaningful spans
+        best_span = ""
+        for root_pos in root_positions:
+            # Look for comma-separated participial phrases
+            comma_pos = -1
+            for i in range(root_pos, len(sentence_words)):
+                if ',' in sentence_words[i]:
+                    comma_pos = i
+                    break
+            
+            if comma_pos > root_pos:
+                # Extract span from root to comma (typical participial phrase)
+                span_words = sentence_words[max(0, root_pos-2):comma_pos+1]
+                span_text = ' '.join(span_words)
+                if len(span_text) > len(best_span):
+                    best_span = span_text
+            else:
+                # Extract a reasonable window around the root
+                start_pos = max(0, root_pos - 3)
+                end_pos = min(len(sentence_words), root_pos + 4)
+                span_words = sentence_words[start_pos:end_pos]
+                span_text = ' '.join(span_words)
+                if len(span_text) > len(best_span):
+                    best_span = span_text
+        
+        return best_span if best_span else ' '.join(words_in_clause)
 
     def _calculate_complexity_v4(self, main_clause, subordinate_clauses, embedded_constructions) -> float:
         """Calculate complexity score."""
