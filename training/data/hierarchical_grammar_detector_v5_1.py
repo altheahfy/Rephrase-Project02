@@ -159,14 +159,14 @@ class UniversalHierarchicalDetector:
         # 各節タイプに応じた正しい置換範囲を計算
         replacements = []
         for clause in clauses:
-            if clause.clause_type == 'relcl':
-                # 関係節：修飾される名詞句全体 + 関係節を置換
+            if clause.clause_type in ['relcl', 'acl']:
+                # 関係節・形容詞節：修飾される名詞句全体 + 節を置換
                 for token in doc:
-                    if token.dep_ == 'relcl':
-                        # 関係節の範囲
-                        relcl_tokens = list(token.subtree)
-                        relcl_start = min(t.i for t in relcl_tokens)
-                        relcl_end = max(t.i for t in relcl_tokens) + 1
+                    if token.dep_ == clause.clause_type:
+                        # 節の範囲
+                        clause_tokens = list(token.subtree)
+                        clause_start = min(t.i for t in clause_tokens)
+                        clause_end = max(t.i for t in clause_tokens) + 1
                         
                         # 修飾される名詞句の開始位置
                         head_token = token.head
@@ -178,9 +178,9 @@ class UniversalHierarchicalDetector:
                         
                         replacements.append({
                             'start': noun_phrase_start,
-                            'end': relcl_end,
+                            'end': clause_end,
                             'placeholder': clause.placeholder,
-                            'type': 'relcl'
+                            'type': clause.clause_type
                         })
                         break
             else:
