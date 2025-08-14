@@ -154,14 +154,60 @@ class UniversalHierarchicalDetector:
     def _analyze_main_structure(self, sentence: str, clauses: List[UniversalClauseInfo]) -> Tuple[str, Any]:
         """Stage 2: プレースホルダー置換 + 高精度文法判定"""
         
-        # 文字列置換でプレースホルダー生成
-        main_sentence = sentence
-        for clause in sorted(clauses, key=lambda x: x.start_idx, reverse=True):  # 後ろから置換
-            main_sentence = (
-                main_sentence[:clause.start_idx] + 
-                clause.placeholder + 
-                main_sentence[clause.end_idx:]
-            )
+        doc = self.nlp_spacy(sentence)
+        
+        # 関係節の場合は名詞句全体を置換
+        replacements = []
+        for clause in clauses:
+            if clause.clause_type == 'relcl':
+                # 関係節の場合：修飾される名詞句全体を置換
+                for token in doc:
+                    if token.dep_ == 'relcl':
+                        # 関係節の範囲
+                        relcl_tokens = list(token.subtree)
+                        relcl_start = min(t.i for t in relcl_tokens)
+                        relcl_end = max(t.i for t in relcl_tokens) + 1
+                        
+                        # 修飾される名詞句の開始位置
+                        head_token = token.head
+                        noun_phrase_start = head_token.i
+                        for chunk in doc.noun_chunks:
+                            if head_token.i >= chunk.start and head_token.i < chunk.end:
+                                noun_phrase_start = chunk.start
+                                break
+                        
+                        # 名詞句+関係節全体を置換
+                        replacements.append({
+                            'start': noun_phrase_start,
+                            'end': relcl_end,
+                            'placeholder': clause.placeholder
+                        })
+                        break
+            else:
+                # その他の節：通常の範囲置換
+                replacements.append({
+                    'start': clause.start_idx,
+                    'end': clause.end_idx, 
+                    'placeholder': clause.placeholder
+                })
+        
+        # トークンベースで置換実行
+        if replacements:
+            result_tokens = []
+            i = 0
+            replacement = replacements[0]  # 1つずつ処理
+            
+            while i < len(doc):
+                if i == replacement['start']:
+                    result_tokens.append(replacement['placeholder'])
+                    i = replacement['end']  # 該当範囲をスキップ
+                else:
+                    result_tokens.append(doc[i].text)
+                    i += 1
+            
+            main_sentence = ' '.join(result_tokens)
+        else:
+            main_sentence = sentence
         
         print(f"    🔄 Modified: '{main_sentence}'")
         
