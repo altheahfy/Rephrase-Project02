@@ -49,14 +49,36 @@ class SimpleUnifiedRephraseSlotIntegrator:
         
         # 基本スロット分解
         basic_slots = self._extract_basic_elements(doc)
-        slots.update(basic_slots)
         
-        # 特殊構文の処理
-        special_slots = self._process_special_constructions(sentence, grammar_result, doc)
-        # 特殊構文の結果で空文字列のスロットは既存値を保持
-        for key, value in special_slots.items():
-            if value and value.strip():  # 空文字列でない場合のみ更新
-                slots[key] = value
+        # 特殊構文チェック（先にチェックして基本スロットをオーバーライド）
+        is_special_construction = False
+        
+        # There構文チェック
+        if sentence.lower().startswith('there '):
+            special_slots = self._process_there_construction(doc)
+            # 基本スロットをクリアして特殊構文結果のみ使用
+            slots = self._init_empty_slots()
+            slots.update(special_slots)
+            is_special_construction = True
+        
+        # 複文チェック
+        elif 'think' in sentence.lower() and 'that' in sentence.lower():
+            special_slots = self._process_complex_sentence(sentence, doc)
+            # 基本スロットをクリアして特殊構文結果のみ使用
+            slots = self._init_empty_slots()
+            slots.update(special_slots)
+            is_special_construction = True
+        
+        # 通常文の場合のみ基本スロット使用
+        if not is_special_construction:
+            slots.update(basic_slots)
+        
+        # その他の特殊構文の処理（受動態、It-cleft、関係詞節など）
+        if not is_special_construction:
+            other_special_slots = self._process_other_special_constructions(sentence, grammar_result, doc)
+            for key, value in other_special_slots.items():
+                if value and value.strip():
+                    slots[key] = value
         
         # メタデータ追加
         result = {
@@ -179,17 +201,9 @@ class SimpleUnifiedRephraseSlotIntegrator:
                 if not slots.get('M2'):
                     slots['M2'] = adverb
     
-    def _process_special_constructions(self, sentence: str, grammar_result: GrammarAnalysisResult, doc) -> Dict[str, str]:
-        """特殊構文処理"""
+    def _process_other_special_constructions(self, sentence: str, grammar_result: GrammarAnalysisResult, doc) -> Dict[str, str]:
+        """その他の特殊構文処理（受動態、It-cleft、関係詞節など）"""
         slots = {}
-        
-        # There構文の特別処理
-        if sentence.lower().startswith('there '):
-            return self._process_there_construction(doc)
-        
-        # 複文処理（主文・従属文分離）
-        if 'think' in sentence.lower() and 'that' in sentence.lower():
-            return self._process_complex_sentence(sentence, doc)
         
         # 主要文法パターンに基づく特別処理
         if grammar_result.detected_patterns:
@@ -209,6 +223,10 @@ class SimpleUnifiedRephraseSlotIntegrator:
                 slots.update(self._process_relative_clause(sentence, doc))
         
         return slots
+    
+    def _process_special_constructions(self, sentence: str, grammar_result: GrammarAnalysisResult, doc) -> Dict[str, str]:
+        """特殊構文処理（削除予定 - 互換性維持）"""
+        return self._process_other_special_constructions(sentence, grammar_result, doc)
     
     def _process_there_construction(self, doc) -> Dict[str, str]:
         """There構文専用処理"""
@@ -255,14 +273,21 @@ class SimpleUnifiedRephraseSlotIntegrator:
         
         # that節全体を目的語として設定
         if sub_clause_start > -1:
-            that_clause = ' '.join([t.text for t in doc[sub_clause_start:]])
-            slots['O1'] = that_clause.strip()
+            # 句読点を除外してthat節を作成
+            that_clause_tokens = []
+            for token in doc[sub_clause_start:]:
+                if token.pos_ != 'PUNCT':  # 句読点を除外
+                    that_clause_tokens.append(token.text)
+            that_clause = ' '.join(that_clause_tokens)
+            slots['O1'] = that_clause
             
             # サブスロット処理（従属節内のみ）
             for token in doc[sub_clause_start:]:
                 if token.dep_ == 'nsubj':
                     slots['sub-s'] = token.text
                 elif token.dep_ == 'cop':  # be動詞
+                    slots['sub-v'] = token.text
+                elif token.dep_ == 'ccomp' and token.pos_ in ['AUX', 'VERB']:  # 補語節の動詞・助動詞
                     slots['sub-v'] = token.text
                 elif token.dep_ == 'ROOT' and token.i > sub_clause_start:  # 従属節内の動詞
                     slots['sub-v'] = token.text
