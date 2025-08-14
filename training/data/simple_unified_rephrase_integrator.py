@@ -53,7 +53,10 @@ class SimpleUnifiedRephraseSlotIntegrator:
         
         # 特殊構文の処理
         special_slots = self._process_special_constructions(sentence, grammar_result, doc)
-        slots.update(special_slots)
+        # 特殊構文の結果で空文字列のスロットは既存値を保持
+        for key, value in special_slots.items():
+            if value and value.strip():  # 空文字列でない場合のみ更新
+                slots[key] = value
         
         # メタデータ追加
         result = {
@@ -117,7 +120,8 @@ class SimpleUnifiedRephraseSlotIntegrator:
             
             # 補語
             elif token.dep_ in ['acomp', 'attr']:
-                slots['C1'] = token.text
+                complement_phrase = self._extract_full_phrase(token, doc)
+                slots['C1'] = complement_phrase
             
             # 修飾語（副詞・副詞句）
             elif token.dep_ in ['advmod', 'obl', 'nmod'] or token.pos_ == 'ADV':
@@ -218,6 +222,8 @@ class SimpleUnifiedRephraseSlotIntegrator:
             elif token.dep_ == 'attr':  # There are students の students
                 attr_phrase = self._extract_full_phrase(token, doc)
                 slots['O1'] = attr_phrase
+                # There構文では補語(C1)は使わず、存在するものはO1として扱う
+                slots['C1'] = ""  # 明示的に空にして重複を避ける
         
         return slots
     
@@ -250,16 +256,21 @@ class SimpleUnifiedRephraseSlotIntegrator:
         # that節全体を目的語として設定
         if sub_clause_start > -1:
             that_clause = ' '.join([t.text for t in doc[sub_clause_start:]])
-            slots['O1'] = that_clause
+            slots['O1'] = that_clause.strip()
             
-            # サブスロット処理
+            # サブスロット処理（従属節内のみ）
             for token in doc[sub_clause_start:]:
                 if token.dep_ == 'nsubj':
                     slots['sub-s'] = token.text
-                elif token.dep_ == 'cop':
+                elif token.dep_ == 'cop':  # be動詞
+                    slots['sub-v'] = token.text
+                elif token.dep_ == 'ROOT' and token.i > sub_clause_start:  # 従属節内の動詞
                     slots['sub-v'] = token.text
                 elif token.dep_ in ['acomp', 'attr']:
                     slots['sub-c1'] = token.text
+            
+            # 複文では主文のC1は使わない（従属節の内容と混同を避ける）
+            slots['C1'] = ""
         
         return slots
     
@@ -275,26 +286,23 @@ class SimpleUnifiedRephraseSlotIntegrator:
                 slots['Aux'] = token.text
             elif token.dep_ == 'ROOT' and token.tag_ == 'VBN':  # 過去分詞
                 slots['V'] = token.text
-            elif token.dep_ == 'agent':  # by句
-                # "by John" を正しく処理
-                agent_phrase = self._extract_agent_phrase(token, doc)
-                slots['C2'] = agent_phrase
+            elif token.dep_ == 'agent':  # by句 - tokenは"by"
+                # "by"の子要素から実際の主体を取得
+                agent_name = ""
+                for child in token.children:
+                    if child.dep_ == 'pobj':  # "John"
+                        agent_name = child.text
+                        break
+                if agent_name:
+                    slots['M2'] = f"by {agent_name}"  # M2修飾語として配置
         
         return slots
     
     def _extract_agent_phrase(self, agent_token, doc):
         """by句の正しい抽出"""
-        # byを探す
-        by_token = None
-        for token in doc:
-            if token.text.lower() == 'by' and agent_token in list(token.children):
-                by_token = token
-                break
-        
-        if by_token:
-            return f"by {agent_token.text}"
-        else:
-            return f"by {agent_token.text}"
+        # agent_tokenは既に"John"のような名前
+        # 単純に"by"を前につけるだけ
+        return f"by {agent_token.text}"
     
     def _process_it_cleft(self, sentence: str, doc) -> Dict[str, str]:
         """It-cleft構文処理"""

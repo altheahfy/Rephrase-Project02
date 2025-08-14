@@ -27,8 +27,8 @@ def detailed_analysis_session():
             'sentence': "She is a teacher.",
             'expected': {
                 'S': 'She',
-                'V': 'is',  # ← これが抜けているかも？
-                'C1': 'teacher'
+                'V': 'is',
+                'C1': 'a teacher'  # 冠詞"a"を含む
             },
             'description': '基本SVC'
         },
@@ -56,10 +56,10 @@ def detailed_analysis_session():
         {
             'sentence': "The letter was written by John.",
             'expected': {
-                'S': 'The letter',  # ← 冠詞も含める？
+                'S': 'The letter',
                 'Aux': 'was',
                 'V': 'written',
-                'C2': 'by John'  # ← "by by"の重複修正必要
+                'M2': 'by John'  # 修飾語として正しく配置
             },
             'description': '受動態'
         },
