@@ -156,11 +156,11 @@ class UniversalHierarchicalDetector:
         
         doc = self.nlp_spacy(sentence)
         
-        # 関係節の場合は名詞句全体を置換
+        # 各節タイプに応じた正しい置換範囲を計算
         replacements = []
         for clause in clauses:
             if clause.clause_type == 'relcl':
-                # 関係節の場合：修飾される名詞句全体を置換
+                # 関係節：修飾される名詞句全体 + 関係節を置換
                 for token in doc:
                     if token.dep_ == 'relcl':
                         # 関係節の範囲
@@ -176,39 +176,44 @@ class UniversalHierarchicalDetector:
                                 noun_phrase_start = chunk.start
                                 break
                         
-                        # 名詞句+関係節全体を置換
                         replacements.append({
                             'start': noun_phrase_start,
                             'end': relcl_end,
-                            'placeholder': clause.placeholder
+                            'placeholder': clause.placeholder,
+                            'type': 'relcl'
                         })
                         break
             else:
-                # その他の節：通常の範囲置換
-                replacements.append({
-                    'start': clause.start_idx,
-                    'end': clause.end_idx, 
-                    'placeholder': clause.placeholder
-                })
+                # その他の節（ccomp, advcl, acl等）：節のみ置換
+                for token in doc:
+                    if token.dep_ == clause.clause_type:
+                        clause_tokens = list(token.subtree)
+                        clause_start = min(t.i for t in clause_tokens)
+                        clause_end = max(t.i for t in clause_tokens) + 1
+                        
+                        replacements.append({
+                            'start': clause_start,
+                            'end': clause_end,
+                            'placeholder': clause.placeholder,
+                            'type': clause.clause_type
+                        })
+                        break
+        
+        # 後ろから順次置換（インデックス維持のため）
+        replacements.sort(key=lambda x: x['start'], reverse=True)
         
         # トークンベースで置換実行
-        if replacements:
-            result_tokens = []
-            i = 0
-            replacement = replacements[0]  # 1つずつ処理
-            
-            while i < len(doc):
-                if i == replacement['start']:
-                    result_tokens.append(replacement['placeholder'])
-                    i = replacement['end']  # 該当範囲をスキップ
-                else:
-                    result_tokens.append(doc[i].text)
-                    i += 1
-            
-            main_sentence = ' '.join(result_tokens)
-        else:
-            main_sentence = sentence
+        result_tokens = [token.text for token in doc]
         
+        for replacement in replacements:
+            # 該当範囲を置換
+            result_tokens = (
+                result_tokens[:replacement['start']] + 
+                [replacement['placeholder']] + 
+                result_tokens[replacement['end']:]
+            )
+        
+        main_sentence = ' '.join(result_tokens)
         print(f"    🔄 Modified: '{main_sentence}'")
         
         # 既存高精度システムで解析
