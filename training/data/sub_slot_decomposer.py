@@ -57,7 +57,23 @@ class SubSlotDecomposer:
                 sub_slot_results['C2'] = [complement_result]
         
         print("\n✅ サブスロット分解完了")
+        
+        # 🔧 重要: サブスロットがある上位スロットを空にする
+        self._clear_upper_slots_with_subs(main_slots, sub_slot_results)
+        
         return sub_slot_results
+    
+    def _clear_upper_slots_with_subs(self, main_slots: Dict[str, str], sub_slot_results: Dict[str, List[SubSlotResult]]):
+        """サブスロットがある上位スロットを空にする"""
+        print("\n🔧 上位スロットクリア処理開始")
+        
+        for slot_name in sub_slot_results.keys():
+            if slot_name in main_slots and main_slots[slot_name].strip():
+                original_content = main_slots[slot_name]
+                main_slots[slot_name] = ""  # 上位スロットを空にする
+                print(f"  ✅ {slot_name}スロット: '{original_content}' → 空 (サブスロット有のため)")
+        
+        print("🔧 上位スロットクリア処理完了")
     
     def _decompose_relative_clause(self, text: str) -> SubSlotResult:
         """関係詞節のサブスロット分解"""
