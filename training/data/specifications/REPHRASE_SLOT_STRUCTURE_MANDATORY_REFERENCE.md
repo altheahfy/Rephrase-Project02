@@ -80,7 +80,7 @@ sub-m1, sub-s, sub-aux, sub-m2, sub-v, sub-c1, sub-o1, sub-o2, sub-c2, sub-m3
 ```json
 {
   "V": "Go",
-  "C2": "home"
+  "M2": "home"
 }
 ```
 
