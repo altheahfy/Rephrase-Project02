@@ -158,17 +158,27 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                     lambda clause: clause.clause_type in ['adverbial_clause', 'relative_clause', 'adnominal_clause'],
                     # 定冠詞があれば通常の宣言文
                     lambda clause: any(word.lower() == 'the' for word in clause.text.split()[:2]),
-                    # 'to' マーカーがあれば不定詞構文
-                    lambda clause: any(dep.relation == 'mark' and dep.dependent.lower() == 'to' for dep in clause.dependencies),
-                    lambda clause: 'to ' in clause.text.lower()[:10]  # 節の最初の方に'to'があれば不定詞
+                    # 'to' マーカーがあれば不定詞構文（ただし前置詞の'to school'は除外）
+                    lambda clause: (
+                        any(dep.relation == 'mark' and dep.dependent.lower() == 'to' for dep in clause.dependencies) and
+                        not any(dep.relation == 'obl' and 'school' in dep.dependent.lower() for dep in clause.dependencies)
+                    )
                 ],
                 'sentence_patterns': [
                     r'^(please\s+)?[A-Z][a-z]*\s+',
-                    r'^[A-Z][a-z]*\s+(to|me|him|her|us|them)'
+                    r'^[A-Z][a-z]*\s+(to|me|him|her|us|them)',
+                    r'^Go\s+to\s+',  # "Go to school" pattern
+                    r'^(Come|Stop|Wait|Help|Listen|Look)'  # Common imperative verbs
                 ],
                 'contextual_requirements': [
                     # Must be sentence initial or after comma for imperatives  
-                    lambda clause, sentence: clause.text.strip().startswith(sentence.strip().split()[0])
+                    lambda clause, sentence: (
+                        clause.text.strip().startswith(sentence.strip().split()[0]) or
+                        # Also check for "Please..." pattern
+                        sentence.strip().lower().startswith('please') or
+                        # Check for typical imperative sentence structure
+                        sentence.strip().endswith('.') and not '?' in sentence
+                    )
                 ]
             },
             
