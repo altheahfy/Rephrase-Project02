@@ -53,15 +53,23 @@ class SimpleUnifiedRephraseSlotIntegrator:
         # 特殊構文チェック（先にチェックして基本スロットをオーバーライド）
         is_special_construction = False
         
-        # There構文チェック
-        if sentence.lower().startswith('there '):
+        # 1. 使役動詞構文チェック
+        causative_result = self._process_causative_construction(sentence, doc)
+        if causative_result:
+            print(f"✅ 使役動詞構文を適用: {list(causative_result.keys())}")
+            slots = self._init_empty_slots()
+            slots.update(causative_result)
+            is_special_construction = True
+        
+        # 2. There構文チェック
+        elif sentence.lower().startswith('there '):
             special_slots = self._process_there_construction(doc)
             # 基本スロットをクリアして特殊構文結果のみ使用
             slots = self._init_empty_slots()
             slots.update(special_slots)
             is_special_construction = True
         
-        # 複文チェック
+        # 3. 複文チェック
         elif 'think' in sentence.lower() and 'that' in sentence.lower():
             special_slots = self._process_complex_sentence(sentence, doc)
             # 基本スロットをクリアして特殊構文結果のみ使用
@@ -72,6 +80,14 @@ class SimpleUnifiedRephraseSlotIntegrator:
         # 通常文の場合のみ基本スロット使用
         if not is_special_construction:
             slots.update(basic_slots)
+        
+        # 使役動詞構文の特別処理
+        causative_slots = self._process_causative_construction(sentence, doc)
+        if causative_slots:
+            for key, value in causative_slots.items():
+                if value and value.strip():
+                    slots[key] = value
+            is_special_construction = True
         
         # その他の特殊構文の処理（受動態、It-cleft、関係詞節など）
         if not is_special_construction:
@@ -228,6 +244,402 @@ class SimpleUnifiedRephraseSlotIntegrator:
         """特殊構文処理（削除予定 - 互換性維持）"""
         return self._process_other_special_constructions(sentence, grammar_result, doc)
     
+    def _process_causative_construction(self, sentence: str, doc) -> Dict[str, str]:
+        """使役動詞構文処理 (make/let/have + O + C)"""
+        slots = {}
+        
+        # 使役動詞を検出（makeを優先的に探す）
+        causative_verbs = ['make', 'let', 'have']
+        main_causative = None
+        
+        # 文中のmakeを探す（hadではなく）
+        for token in doc:
+            if token.lemma_ in causative_verbs and token.lemma_ != 'have':
+                main_causative = token
+                print(f"🎯 使役動詞発見: {main_causative.text} (lemma: {main_causative.lemma_})")
+                break
+        
+        # makeが見つからない場合、haveでも検証
+        if not main_causative:
+            for token in doc:
+                if token.lemma_ == 'have' and any(child.dep_ == 'xcomp' for child in token.children):
+                    main_causative = token
+                    print(f"🎯 have使役構文発見: {main_causative.text}")
+                    break
+        
+        if not main_causative:
+            print("❌ 使役動詞が見つからない")
+            return {}
+        
+        print(f"🔧 使役動詞構文検出: {main_causative.text}")
+        
+        # 主語を検出（関係詞節を含む完全な主語）
+        main_subject = self._extract_complex_subject_improved(doc)
+        if main_subject:
+            slots['S'] = main_subject
+        
+        # 助動詞句を検出 (had to)
+        aux_phrase = self._extract_aux_phrase_improved(doc)
+        if aux_phrase:
+            slots['Aux'] = aux_phrase
+        
+        # 使役動詞をVに設定
+        if main_causative:
+            slots['V'] = main_causative.text
+        
+        # 使役動詞の目的語（委員会）
+        causative_object = self._extract_causative_object_improved(doc, main_causative)
+        if causative_object:
+            slots['O1'] = causative_object
+        
+        # 使役動詞の補語（deliver句）
+        causative_complement = self._extract_causative_complement_improved(doc, main_causative)
+        if causative_complement:
+            slots['C2'] = causative_complement
+        
+        # 修飾語を抽出
+        self._extract_complex_modifiers(doc, slots)
+        
+        return slots
+    
+    def _extract_complex_subject_improved(self, doc) -> str:
+        """改善版：関係詞節を含む複雑な主語を抽出"""
+        # ROOT動詞のnsubj を探す
+        root_token = None
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                root_token = token
+                break
+        
+        if not root_token:
+            return ""
+        
+        # ROOT動詞の主語を探す
+        main_subject = None
+        for child in root_token.children:
+            if child.dep_ == 'nsubj':
+                main_subject = child
+                break
+        
+        if not main_subject:
+            return ""
+        
+        # 主語の範囲を決定（関係詞節を含む）
+        subject_range = self._get_phrase_range(main_subject, doc)
+        
+        return ' '.join([doc[i].text for i in subject_range])
+    
+    def _get_phrase_range(self, head_token, doc) -> List[int]:
+        """句の範囲を取得（関係詞節含む）"""
+        indices = [head_token.i]
+        
+        # 修飾語を収集
+        for child in head_token.children:
+            if child.dep_ in ['det', 'amod', 'compound', 'nmod']:
+                indices.append(child.i)
+            elif child.dep_ == 'relcl':  # 関係詞節
+                rel_indices = self._get_relative_clause_range(child, doc)
+                indices.extend(rel_indices)
+        
+        # ソートして連続する範囲を作成
+        indices.sort()
+        return indices
+    
+    def _get_relative_clause_range(self, rel_token, doc) -> List[int]:
+        """関係詞節の範囲を取得"""
+        indices = [rel_token.i]
+        
+        # 関係詞節内の全要素を収集
+        for child in rel_token.children:
+            indices.append(child.i)
+            # 再帰的に子要素も収集
+            sub_indices = self._get_phrase_range_recursive(child, doc)
+            indices.extend(sub_indices)
+        
+        return indices
+    
+    def _get_phrase_range_recursive(self, token, doc) -> List[int]:
+        """再帰的に句の範囲を取得"""
+        indices = []
+        for child in token.children:
+            indices.append(child.i)
+            sub_indices = self._get_phrase_range_recursive(child, doc)
+            indices.extend(sub_indices)
+        return indices
+    
+    def _extract_aux_phrase_improved(self, doc) -> str:
+        """改善版：助動詞句を抽出 (had to)"""
+        aux_parts = []
+        
+        # ROOT動詞の直接の助動詞
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                # ROOTが直接助動詞の場合
+                if token.pos_ in ['AUX', 'VERB']:
+                    aux_parts.append(token.text)
+                break
+        
+        # make動詞の"to"を追加
+        for token in doc:
+            if token.text == 'make' and token.dep_ == 'xcomp':
+                for child in token.children:
+                    if child.dep_ == 'aux' and child.text == 'to':
+                        aux_parts.append(child.text)
+        
+        return ' '.join(aux_parts)
+    
+    def _extract_causative_object_improved(self, doc, causative_verb) -> str:
+        """改善版：使役動詞の目的語を抽出"""
+        # makeのccompを検索（responsible句）
+        for child in causative_verb.children:
+            if child.dep_ == 'ccomp' and child.text == 'responsible':
+                # responsible句の主語（committee）
+                committee_phrase = ""
+                for sub_child in child.children:
+                    if sub_child.dep_ == 'nsubj':
+                        committee_phrase = self._extract_full_phrase_enhanced(sub_child, doc)
+                
+                # responsible + for句を追加
+                responsible_phrase = child.text
+                for sub_child in child.children:
+                    if sub_child.dep_ == 'prep' and sub_child.text == 'for':
+                        prep_obj = self._get_prep_object(sub_child, doc)
+                        responsible_phrase += f" {sub_child.text} {prep_obj}"
+                
+                # 完全な目的語句: "the committee responsible for implementation"
+                return f"{committee_phrase} {responsible_phrase}"
+        
+        return ""
+    
+    def _extract_causative_complement_improved(self, doc, causative_verb) -> str:
+        """改善版：使役動詞の補語を抽出 (deliver句)"""
+        # ROOTのconj動詞を検索（deliver）
+        root_token = None
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                root_token = token
+                break
+        
+        if root_token:
+            for child in root_token.children:
+                if child.dep_ == 'conj' and child.text == 'deliver':
+                    # deliver + その目的語 + 修飾語
+                    complement_parts = [child.text]
+                    
+                    # deliverの目的語
+                    for sub_child in child.children:
+                        if sub_child.dep_ == 'dobj':
+                            complement_parts.append(self._extract_full_phrase_enhanced(sub_child, doc))
+                        elif sub_child.dep_ == 'advmod':
+                            complement_parts.append(sub_child.text)
+                    
+                    return ' '.join(filter(None, complement_parts))
+        
+        return ""
+    
+    def _extract_full_phrase_enhanced(self, head_token, doc) -> str:
+        """強化版：名詞句の完全な形を抽出"""
+        phrase_parts = []
+        
+        # 修飾語を位置順で収集
+        all_modifiers = []
+        
+        # 左側修飾語
+        for child in head_token.children:
+            if child.dep_ in ['det', 'amod', 'poss', 'compound'] and child.i < head_token.i:
+                all_modifiers.append((child.i, child.text))
+        
+        # ヘッド語
+        all_modifiers.append((head_token.i, head_token.text))
+        
+        # 右側修飾語
+        for child in head_token.children:
+            if child.dep_ in ['nmod', 'prep'] and child.i > head_token.i:
+                prep_phrase = self._get_prep_phrase(child, doc)
+                if prep_phrase:
+                    all_modifiers.append((child.i, prep_phrase))
+        
+        # 位置順でソート
+        all_modifiers.sort()
+        return ' '.join([text for _, text in all_modifiers])
+    
+    def _get_prep_object(self, prep_token, doc) -> str:
+        """前置詞の目的語を取得"""
+        for child in prep_token.children:
+            if child.dep_ == 'pobj':
+                return self._extract_full_phrase_enhanced(child, doc)
+        return ""
+    
+    def _get_prep_phrase(self, prep_token, doc) -> str:
+        """前置詞句を取得"""
+        if prep_token.pos_ == 'ADP':
+            obj = self._get_prep_object(prep_token, doc)
+            return f"{prep_token.text} {obj}" if obj else prep_token.text
+        return ""
+    
+    def _extract_complex_subject(self, doc) -> str:
+        """関係詞節を含む複雑な主語を抽出"""
+        main_subject = None
+        
+        # ROOT動詞のnsubj を探す
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                for child in token.children:
+                    if child.dep_ == 'nsubj':
+                        # 関係詞節を含む主語句を構築
+                        subject_tokens = []
+                        self._collect_subject_phrase(child, subject_tokens, doc)
+                        return ' '.join([t.text for t in sorted(subject_tokens, key=lambda x: x.i)])
+        
+        return ""
+    
+    def _collect_subject_phrase(self, head_token, tokens, doc):
+        """主語句の全要素を収集（関係詞節含む）"""
+        tokens.append(head_token)
+        
+        for child in head_token.children:
+            if child.dep_ in ['det', 'amod', 'compound', 'nmod', 'relcl']:
+                self._collect_subject_phrase(child, tokens, doc)
+            # 関係詞節の場合、さらに深く収集
+            elif child.dep_ == 'relcl':
+                self._collect_relative_clause(child, tokens, doc)
+    
+    def _collect_relative_clause(self, rel_token, tokens, doc):
+        """関係詞節の全要素を収集"""
+        tokens.append(rel_token)
+        for child in rel_token.children:
+            self._collect_relative_clause(child, tokens, doc)
+    
+    def _extract_auxiliary_phrase(self, doc, main_verb) -> str:
+        """助動詞句を抽出 (had to)"""
+        aux_tokens = []
+        
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                for child in token.children:
+                    if child.dep_ == 'aux':
+                        aux_tokens.append(child.text)
+        
+        # xcompの助動詞も検出
+        for token in doc:
+            if token.dep_ == 'xcomp':
+                for child in token.children:
+                    if child.dep_ == 'aux':
+                        aux_tokens.append(child.text)
+        
+        return ' '.join(aux_tokens) if aux_tokens else ""
+    
+    def _extract_causative_object(self, doc, causative_verb) -> str:
+        """使役動詞の目的語を抽出"""
+        # makeの場合、ccompの主語が使役の対象
+        for token in doc:
+            if token.head == causative_verb and token.dep_ == 'ccomp':
+                for child in token.children:
+                    if child.dep_ == 'nsubj':
+                        return self._extract_full_phrase(child, doc)
+        
+        return ""
+    
+    def _extract_causative_complement(self, doc, causative_verb) -> str:
+        """使役動詞の補語を抽出 (deliver句)"""
+        complement_tokens = []
+        
+        # conjで繋がれた動詞を検出
+        for token in doc:
+            if token.dep_ == 'conj' and token.pos_ == 'VERB':
+                complement_tokens.append(token.text)
+                # その動詞の目的語も含める
+                for child in token.children:
+                    if child.dep_ in ['dobj', 'amod', 'advmod']:
+                        self._collect_complement_phrase(child, complement_tokens, doc)
+        
+        return ' '.join(complement_tokens) if complement_tokens else ""
+    
+    def _collect_complement_phrase(self, token, tokens, doc):
+        """補語句の要素を収集"""
+        tokens.append(token.text)
+        for child in token.children:
+            if child.dep_ in ['det', 'amod', 'advmod']:
+                self._collect_complement_phrase(child, tokens, doc)
+    
+    def _extract_complex_modifiers(self, doc, slots):
+        """複雑文の修飾語を抽出"""
+        # 時間表現（文頭）
+        time_expressions = []
+        for token in doc:
+            if token.dep_ == 'npadvmod' and token.i < 10:  # 文頭近く
+                time_phrase = self._extract_time_phrase(token, doc)
+                if time_phrase:
+                    slots['M1'] = time_phrase
+                    break
+        
+        # even though節
+        for token in doc:
+            if token.text.lower() == 'though':
+                even_though_clause = self._extract_adverbial_clause(token, doc, 'even though')
+                if even_though_clause:
+                    slots['M2'] = even_though_clause
+                    break
+        
+        # so節
+        for token in doc:
+            if token.text.lower() == 'so' and token.dep_ == 'mark':
+                so_clause = self._extract_adverbial_clause(token, doc, 'so')
+                if so_clause:
+                    slots['M3'] = so_clause
+                    break
+    
+    def _extract_time_phrase(self, time_token, doc) -> str:
+        """時間表現の完全な句を抽出"""
+        time_tokens = []
+        
+        # 前置詞句を含む時間表現を収集
+        start_idx = 0
+        end_idx = time_token.i + 1
+        
+        # 直前のDETから開始
+        for i in range(time_token.i - 1, -1, -1):
+            if doc[i].pos_ in ['DET']:
+                start_idx = i
+                break
+        
+        # 前置詞句が続く限り収集
+        for i in range(time_token.i + 1, len(doc)):
+            if doc[i].pos_ in ['ADP', 'DET', 'ADJ', 'NOUN'] or doc[i].dep_ in ['prep', 'pobj']:
+                end_idx = i + 1
+            elif doc[i].text == ',':
+                break
+            else:
+                break
+        
+        return ' '.join([doc[i].text for i in range(start_idx, end_idx)])
+    
+    def _extract_adverbial_clause(self, marker_token, doc, clause_type) -> str:
+        """副詞節を抽出"""
+        clause_tokens = []
+        
+        if clause_type == 'even though':
+            # even though節の範囲を特定
+            start_idx = marker_token.i - 1 if marker_token.i > 0 and doc[marker_token.i - 1].text.lower() == 'even' else marker_token.i
+            
+            # so節が始まるまでまたは文末まで
+            end_idx = len(doc)
+            for i in range(marker_token.i + 1, len(doc)):
+                if doc[i].text.lower() == 'so' and doc[i].dep_ == 'mark':
+                    end_idx = i
+                    break
+            
+            return ' '.join([doc[i].text for i in range(start_idx, end_idx)])
+        
+        elif clause_type == 'so':
+            # so節の範囲を特定
+            start_idx = marker_token.i
+            end_idx = len(doc) - 1  # 句読点を除く
+            
+            return ' '.join([doc[i].text for i in range(start_idx, end_idx)])
+        
+        return ""
+
     def _process_there_construction(self, doc) -> Dict[str, str]:
         """There構文専用処理"""
         slots = {}
