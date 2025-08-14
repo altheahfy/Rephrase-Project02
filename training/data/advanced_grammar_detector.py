@@ -38,19 +38,20 @@ class GrammarPattern(Enum):
     SVOO_PATTERN = "svoo_pattern"                # Priority 4: S + V + O + O (ditransitive)
     SVOC_PATTERN = "svoc_pattern"                # Priority 5: S + V + O + C (complex transitive)
     
-    # Advanced Constructions (Priority 6-17)
+    # Advanced Constructions (Priority 6-18)
     GERUND_PATTERN = "gerund_pattern"            # Priority 6: Gerund constructions
     PARTICIPLE_PATTERN = "participle_pattern"    # Priority 7: Participle constructions
     INFINITIVE_PATTERN = "infinitive_pattern"    # Priority 8: Infinitive constructions
     RELATIVE_PATTERN = "relative_pattern"        # Priority 9: Relative clause constructions
-    CONJUNCTION_PATTERN = "conjunction_pattern"  # Priority 10: Conjunction constructions
-    PASSIVE_PATTERN = "passive_pattern"          # Priority 11: Passive voice constructions
-    COMPARATIVE_PATTERN = "comparative_pattern"  # Priority 12: Comparative constructions
-    PERFECT_PROGRESSIVE = "perfect_progressive"  # Priority 13: Perfect progressive constructions
-    INVERSION_PATTERN = "inversion_pattern"      # Priority 14: Inversion constructions
-    IMPERATIVE_PATTERN = "imperative_pattern"    # Priority 15: Command sentences
-    EXISTENTIAL_THERE = "existential_there"      # Priority 16: There + be constructions
-    SUBJUNCTIVE_PATTERN = "subjunctive_pattern"  # Priority 17: Subjunctive constructions
+    NOUN_CLAUSE = "noun_clause"                  # Priority 10: Noun clause constructions (NEW)
+    CONJUNCTION_PATTERN = "conjunction_pattern"  # Priority 11: Conjunction constructions
+    PASSIVE_PATTERN = "passive_pattern"          # Priority 12: Passive voice constructions
+    COMPARATIVE_PATTERN = "comparative_pattern"  # Priority 13: Comparative constructions
+    PERFECT_PROGRESSIVE = "perfect_progressive"  # Priority 14: Perfect progressive constructions
+    INVERSION_PATTERN = "inversion_pattern"      # Priority 15: Inversion constructions
+    IMPERATIVE_PATTERN = "imperative_pattern"    # Priority 16: Command sentences
+    EXISTENTIAL_THERE = "existential_there"      # Priority 17: There + be constructions
+    SUBJUNCTIVE_PATTERN = "subjunctive_pattern"  # Priority 18: Subjunctive constructions
 
 @dataclass
 class GrammarDetectionResult:

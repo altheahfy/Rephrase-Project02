@@ -243,20 +243,28 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                 'required_conditions': [
                     lambda clause: clause.root_pos in ['VBG', 'VERB'],
                     # Gerunds are primarily nominal (act as nouns), not adverbial  
-                    lambda clause: clause.clause_type in ['clausal_subject', 'clausal_complement']
+                    lambda clause: clause.clause_type in ['clausal_subject', 'clausal_complement', 'adverbial_clause']
                 ],
                 'blocking_conditions': [
                     # If it's in adverbial position and modifies main clause subject, it's participial
                     lambda clause: (
                         clause.clause_type == 'adverbial_clause' and
                         # Check if sentence has comma structure typical of participial constructions
-                        ',' in clause.text
+                        ',' in clause.text and
+                        # BUT NOT if it's introduced by preposition "by"
+                        not re.search(r'\bby\s+\w+ing\b', clause.text, re.IGNORECASE)
                     )
                 ],
                 'contextual_patterns': [
                     # Gerund patterns tend to be nominal
                     r'^(Swimming|Reading|Writing)\s+(is|was)', # "Swimming is fun"
-                    r'(enjoy|like|hate|love)\s+\w+ing'        # "I enjoy reading"
+                    r'(enjoy|like|hate|love)\s+\w+ing',        # "I enjoy reading"
+                    # NEW: Prepositional gerund patterns - key improvement!
+                    r'\bby\s+\w+ing\b',                        # "by encouraging" - gerund after preposition
+                    r'\bof\s+\w+ing\b',                        # "of running"
+                    r'\bin\s+\w+ing\b',                        # "in swimming"
+                    r'\bafter\s+\w+ing\b',                     # "after finishing"
+                    r'\bbefore\s+\w+ing\b'                     # "before starting"
                 ],
                 'confidence_boost': 0.3
             },
@@ -326,9 +334,46 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             
             GrammarPattern.RELATIVE_PATTERN: {
                 'required_conditions': [
-                    lambda clause: clause.clause_type == 'relative_clause'
+                    # Relative clauses modify nouns and follow specific patterns
+                    lambda clause: (
+                        clause.clause_type in ['relative_clause', 'adnominal_clause'] or
+                        # Look for relative pronouns but NOT in object position after verbs like "tell", "know"
+                        (any(word in clause.text.lower() for word in ['which', 'that', 'who', 'whom', 'whose', 'where', 'when']) and
+                         not re.search(r'(tell|know|ask|wonder|explain|say|show)\s+\w*\s*\b(what|who|which|where|when|how|why)\b', clause.text, re.IGNORECASE))
+                    )
+                ],
+                'blocking_conditions': [
+                    # Block if it's clearly a noun clause (object of mental verb)
+                    lambda clause: re.search(r'(tell|know|ask|wonder|explain|say|show|think|believe|remember)\s+\w*\s*\b(what|who|which|where|when|how|why)\b', clause.text, re.IGNORECASE)
                 ],
                 'confidence_boost': 0.4
+            },
+            
+            # NEW: Add Noun Clause Pattern
+            GrammarPattern.NOUN_CLAUSE: {
+                'required_conditions': [
+                    # Noun clauses function as subjects, objects, or complements
+                    lambda clause: (
+                        clause.clause_type in ['clausal_complement', 'clausal_subject', 'relative_clause'] and  # Include relative_clause
+                        # Object clauses after mental/communication verbs
+                        any(word in clause.text.lower() for word in ['what', 'who', 'which', 'where', 'when', 'how', 'why', 'that', 'if', 'whether'])
+                    )
+                ],
+                'contextual_requirements': [
+                    # Must be after verbs that take noun clause objects - STRONG PRIORITY
+                    lambda clause, full_sentence: (
+                        re.search(r'(tell|know|ask|wonder|explain|say|show|think|believe|remember|understand|realize|see|hear|feel|notice)\s+\w*\s*(?:me\s+)?(?:him\s+)?(?:her\s+)?(?:us\s+)?(?:them\s+)?what', full_sentence, re.IGNORECASE) or
+                        re.search(r'(tell|know|ask|wonder|explain|say|show)\s+\w*\s*(?:me\s+)?(?:him\s+)?(?:her\s+)?(?:us\s+)?(?:them\s+)?(?:what|who|which|where|when|how|why)', full_sentence, re.IGNORECASE) or
+                        # Or be in subject/complement position
+                        clause.clause_type in ['clausal_subject', 'clausal_complement']
+                    )
+                ],
+                'contextual_patterns': [
+                    r'(tell|know|ask|wonder|explain|say|show)\s+\w*\s*\b(what|who|which|where|when|how|why)\b',  # "tell me what"
+                    r'(think|believe|remember|understand|realize)\s+\w*\s*\b(that|what|who|which|where|when|how|why)\b',  # "think that"
+                    r'(see|hear|feel|notice)\s+\w*\s*\b(that|what|who|which|where|when|how|why)\b'  # "see that"
+                ],
+                'confidence_boost': 0.6  # Higher confidence boost than relative pattern
             }
         }
         
@@ -620,12 +665,31 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         # Only try special patterns if they have potential for significant improvement
         # or if structural analysis confidence is low
         if best_confidence < 0.7:  # Only override if structural analysis is uncertain
+            
+            # **PRIORITY CHECK: Noun Clause patterns have high priority for wh-clauses**
+            # Check noun clause first for "what/who/which/where/when/how/why" constructions
+            if any(word in clause.text.lower() for word in ['what', 'who', 'which', 'where', 'when', 'how', 'why']):
+                if GrammarPattern.NOUN_CLAUSE in self.pattern_detection_rules:
+                    noun_rules = self.pattern_detection_rules[GrammarPattern.NOUN_CLAUSE]
+                    noun_confidence, noun_features = self._calculate_ultra_precise_score(
+                        GrammarPattern.NOUN_CLAUSE, clause, noun_rules, full_sentence
+                    )
+                    
+                    # Noun clause gets priority if it meets contextual requirements
+                    if noun_confidence >= 0.8:  # High threshold for noun clause override
+                        return {
+                            'pattern': GrammarPattern.NOUN_CLAUSE,
+                            'confidence': noun_confidence,
+                            'features': noun_features
+                        }
+            
             for pattern, rules in self.pattern_detection_rules.items():
                 # Skip basic structural patterns since we already analyzed them
-                # Skip imperative since we already checked it above
+                # Skip imperative and noun_clause since we already checked them above
                 if (pattern in [GrammarPattern.SV_PATTERN, GrammarPattern.SVO_PATTERN, 
                                GrammarPattern.SVC_PATTERN, GrammarPattern.SVOO_PATTERN, 
-                               GrammarPattern.SVOC_PATTERN, GrammarPattern.IMPERATIVE_PATTERN]):
+                               GrammarPattern.SVOC_PATTERN, GrammarPattern.IMPERATIVE_PATTERN,
+                               GrammarPattern.NOUN_CLAUSE]):
                     continue
                     
                 confidence, features = self._calculate_ultra_precise_score(
@@ -935,6 +999,8 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                 engines.add('existential_there_engine')
             elif pattern == GrammarPattern.RELATIVE_PATTERN:
                 engines.add('relative_engine')
+            elif pattern == GrammarPattern.NOUN_CLAUSE:
+                engines.add('relative_engine')  # Use relative engine for noun clauses too
             elif pattern in [GrammarPattern.GERUND_PATTERN, GrammarPattern.PARTICIPLE_PATTERN]:
                 engines.add('progressive_engine')
         
