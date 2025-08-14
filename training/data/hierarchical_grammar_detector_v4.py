@@ -72,14 +72,37 @@ class PreciseClauseInfo:
         return (has_passive_aux and has_past_participle) or has_by_agent
     
     def is_linking_verb(self) -> bool:
-        """Check if root verb is a linking verb."""
-        linking_verbs = {'be', 'seem', 'appear', 'become', 'feel', 'look', 'sound', 'taste', 'smell'}
-        return self.root_lemma.lower() in linking_verbs
-    
+        """Check if root verb is a linking verb with enhanced detection."""
+        # Check for copula relation in dependencies (indicates linking verb structure)
+        has_copula = any(dep.relation == 'cop' for dep in self.dependencies)
+        if has_copula:
+            return True
+            
+        linking_verbs = {'be', 'seem', 'appear', 'become', 'feel', 'look', 'sound', 'taste', 'smell', 
+                        'remain', 'stay', 'prove', 'turn', 'grow', 'get'}
+        root_lemma_lower = self.root_lemma.lower()
+        
+        # Direct lemma match
+        if root_lemma_lower in linking_verbs:
+            return True
+            
+        # Check for 'be' verb forms
+        be_forms = {'is', 'are', 'was', 'were', 'being', 'been', 'am'}
+        if self.root_word.lower() in be_forms:
+            return True
+            
+        return False
+
     def count_objects(self) -> int:
         """Count different types of objects."""
         object_relations = ['obj', 'dobj', 'iobj']
         return len([dep for dep in self.dependencies if dep.relation in object_relations])
+    
+    def is_copular_construction(self) -> bool:
+        """Check if this clause is a copular construction (X is Y pattern)."""
+        # Look for copula relation
+        has_copula = any(dep.relation == 'cop' for dep in self.dependencies)
+        return has_copula
 
 @dataclass 
 class HierarchicalGrammarResultV4:
@@ -117,13 +140,25 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             
             GrammarPattern.IMPERATIVE_PATTERN: {
                 'required_conditions': [
-                    lambda clause: not clause.has_subject(),
-                    lambda clause: clause.root_pos in ['VB', 'VERB']
+                    lambda clause: not clause.has_subject(),  # 主語が絶対にない
+                    lambda clause: clause.root_pos in ['VB', 'VERB'],  # 動詞である
+                    lambda clause: clause.clause_type == 'main'  # メイン節のみ
                 ],
-                'confidence_boost': 0.4,
+                'confidence_boost': 0.5,  # 高い信頼度ブースト
+                'blocking_conditions': [
+                    # 以下の場合は絶対に命令文ではない
+                    lambda clause: clause.has_subject(),  # 主語があれば命令文ではない
+                    lambda clause: clause.clause_type in ['adverbial_clause', 'relative_clause'],
+                    # 定冠詞があれば通常の宣言文
+                    lambda clause: any(word.lower() == 'the' for word in clause.text.split()[:2])
+                ],
                 'sentence_patterns': [
                     r'^(please\s+)?[A-Z][a-z]*\s+',
                     r'^[A-Z][a-z]*\s+(to|me|him|her|us|them)'
+                ],
+                'contextual_requirements': [
+                    # Must be sentence initial or after comma for imperatives  
+                    lambda clause, sentence: clause.text.strip().startswith(sentence.strip().split()[0])
                 ]
             },
             
@@ -137,11 +172,11 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             
             GrammarPattern.SVC_PATTERN: {
                 'required_conditions': [
-                    lambda clause: clause.is_linking_verb(),
-                    lambda clause: clause.has_complement()
+                    lambda clause: clause.is_copular_construction() or clause.is_linking_verb(),
+                    lambda clause: clause.has_complement() or clause.has_subject()
                 ],
                 'blocking_conditions': [
-                    lambda clause: clause.has_object()
+                    lambda clause: clause.has_object() and not clause.is_copular_construction()
                 ],
                 'confidence_boost': 0.3
             },
@@ -377,24 +412,31 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         best_confidence = 0.0
         best_features = {}
         
-        # Test each pattern with ultra-precise rules
-        for pattern, rules in self.pattern_detection_rules.items():
-            confidence, features = self._calculate_ultra_precise_score(
-                pattern, clause, rules, full_sentence
-            )
-            
-            if confidence > best_confidence:
-                best_confidence = confidence
-                best_pattern = pattern
-                best_features = features
+        # First, always try structural analysis (most reliable)
+        structural_result = self._structural_pattern_analysis(clause)
+        best_pattern = structural_result['pattern']
+        best_confidence = structural_result['confidence']
+        best_features = structural_result.get('features', {})
         
-        # Fallback to basic structural analysis if no pattern matches well
-        if best_confidence < 0.4:
-            fallback_result = self._structural_pattern_analysis(clause)
-            if fallback_result['confidence'] > best_confidence:
-                best_pattern = fallback_result['pattern']
-                best_confidence = fallback_result['confidence']
-                best_features = fallback_result.get('features', {})
+        # Only try special patterns if they have potential for significant improvement
+        # or if structural analysis confidence is low
+        if best_confidence < 0.7:  # Only override if structural analysis is uncertain
+            for pattern, rules in self.pattern_detection_rules.items():
+                # Skip basic structural patterns since we already analyzed them
+                if (pattern in [GrammarPattern.SV_PATTERN, GrammarPattern.SVO_PATTERN, 
+                               GrammarPattern.SVC_PATTERN, GrammarPattern.SVOO_PATTERN, 
+                               GrammarPattern.SVOC_PATTERN]):
+                    continue
+                    
+                confidence, features = self._calculate_ultra_precise_score(
+                    pattern, clause, rules, full_sentence
+                )
+                
+                # Need very high confidence to override structural analysis
+                if confidence > best_confidence + 0.3:  
+                    best_confidence = confidence
+                    best_pattern = pattern
+                    best_features = features
         
         return {
             'pattern': best_pattern or GrammarPattern.SV_PATTERN,
@@ -444,6 +486,16 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             except:
                 pass
         
+        # Check contextual requirements (specific to context)
+        contextual_requirements = rules.get('contextual_requirements', [])
+        for requirement in contextual_requirements:
+            try:
+                if not requirement(clause, full_sentence):
+                    score *= 0.5  # Reduce score if contextual requirement not met
+                    features['contextual_requirement_failed'] = True
+            except:
+                pass
+        
         # Check contextual patterns
         contextual_patterns = rules.get('contextual_patterns', [])
         sentence_patterns = rules.get('sentence_patterns', [])
@@ -476,24 +528,32 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         has_complement = clause.has_complement()
         object_count = clause.count_objects()
         is_linking = clause.is_linking_verb()
+        is_copular = clause.is_copular_construction()
         
         # Determine pattern based on structure
         if clause.is_passive_voice():
             return {
                 'pattern': GrammarPattern.PASSIVE_PATTERN,
-                'confidence': 0.7,
+                'confidence': 0.8,
                 'features': {'structural_analysis': 'passive_voice'}
+            }
+        elif is_copular and has_subject:
+            # Copular constructions are SVC patterns
+            return {
+                'pattern': GrammarPattern.SVC_PATTERN,
+                'confidence': 0.8,
+                'features': {'structural_analysis': 'copular_construction'}
             }
         elif has_object and has_complement:
             return {
                 'pattern': GrammarPattern.SVOC_PATTERN,
-                'confidence': 0.6,
+                'confidence': 0.7,
                 'features': {'structural_analysis': 'object_complement'}
             }
         elif object_count >= 2:
             return {
                 'pattern': GrammarPattern.SVOO_PATTERN,
-                'confidence': 0.6,
+                'confidence': 0.7,
                 'features': {'structural_analysis': 'double_object'}
             }
         elif is_linking and has_complement:
@@ -505,13 +565,13 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         elif has_subject and has_object:
             return {
                 'pattern': GrammarPattern.SVO_PATTERN,
-                'confidence': 0.5,
+                'confidence': 0.6,
                 'features': {'structural_analysis': 'subject_object'}
             }
         elif has_subject:
             return {
                 'pattern': GrammarPattern.SV_PATTERN,
-                'confidence': 0.4,
+                'confidence': 0.5,
                 'features': {'structural_analysis': 'subject_only'}
             }
         else:
@@ -538,12 +598,30 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         return objects
 
     def _extract_complements(self, dependencies: List[DependencyInfo]) -> List[str]:
-        """Extract complement words from dependencies."""
+        """Extract complement words from dependencies with enhanced detection."""
         complements = []
         for dep in dependencies:
+            # Traditional complement relations
             if dep.relation in ['nsubj:xsubj', 'ccomp', 'xcomp', 'acomp']:
                 complements.append(dep.dependent)
+            # Predicate nominals and adjectives (key for SVC pattern)
+            elif dep.relation in ['nmod:pred', 'amod', 'det']:
+                complements.append(dep.dependent)
+            # Objects that function as complements in copular constructions
+            elif dep.relation in ['obj'] and self._is_likely_complement_context(dependencies):
+                complements.append(dep.dependent)
         return complements
+    
+    def _is_likely_complement_context(self, dependencies: List[DependencyInfo]) -> bool:
+        """Check if this is likely a complement context (e.g., with linking verbs)."""
+        # Check if root verb is copular/linking
+        root_verbs = [dep.dependent for dep in dependencies if dep.relation == 'root']
+        if root_verbs:
+            root_word = root_verbs[0].lower()
+            linking_verbs = {'be', 'is', 'are', 'was', 'were', 'being', 'been', 
+                           'seem', 'appear', 'become', 'feel', 'look', 'sound', 'taste', 'smell'}
+            return root_word in linking_verbs
+        return False
 
     def _get_token_index(self, tokens: List, word: str) -> int:
         """Get the index of a word in the token list."""
