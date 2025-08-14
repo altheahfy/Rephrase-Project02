@@ -155,9 +155,12 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                 'blocking_conditions': [
                     # 以下の場合は絶対に命令文ではない
                     lambda clause: clause.has_subject(),  # 主語があれば命令文ではない
-                    lambda clause: clause.clause_type in ['adverbial_clause', 'relative_clause'],
+                    lambda clause: clause.clause_type in ['adverbial_clause', 'relative_clause', 'adnominal_clause'],
                     # 定冠詞があれば通常の宣言文
-                    lambda clause: any(word.lower() == 'the' for word in clause.text.split()[:2])
+                    lambda clause: any(word.lower() == 'the' for word in clause.text.split()[:2]),
+                    # 'to' マーカーがあれば不定詞構文
+                    lambda clause: any(dep.relation == 'mark' and dep.dependent.lower() == 'to' for dep in clause.dependencies),
+                    lambda clause: 'to ' in clause.text.lower()[:10]  # 節の最初の方に'to'があれば不定詞
                 ],
                 'sentence_patterns': [
                     r'^(please\s+)?[A-Z][a-z]*\s+',
@@ -240,7 +243,7 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             
             GrammarPattern.PARTICIPLE_PATTERN: {
                 'required_conditions': [
-                    # Enhanced participle detection - both present and past participles
+                    # Enhanced participle detection - including AUX for copular constructions
                     lambda clause: (
                         # Present participle (VBG) like "Being", "Walking", "Having"
                         (clause.root_pos in ['VBG', 'VERB'] and 
@@ -248,7 +251,10 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                         # Past participle (VBN) like "Written", "Excited", "Finished"
                         (clause.root_pos in ['VBN', 'VERB'] and 
                          (clause.root_word.endswith('ed') or clause.root_word.endswith('en') or
-                          clause.root_lemma != clause.root_word))  # Past participle often differs from lemma
+                          clause.root_lemma != clause.root_word)) or
+                        # AUX tag for "Being" constructions (Stanza treats "Being" as auxiliary)
+                        (clause.root_pos == 'AUX' and 
+                         clause.root_word.lower() == 'being' and clause.root_lemma.lower() == 'be')
                     ),
                     # Must be in adverbial clause context
                     lambda clause: clause.clause_type == 'adverbial_clause'
@@ -264,7 +270,7 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                     )
                 ],
                 'contextual_patterns': [
-                    # Present participle patterns
+                    # Present participle patterns (including Being)
                     r'^\s*(Being|Having|Walking|Running|Coming|Going|Seeing)',
                     r'(Being|Having)\s+\w+',
                     # Past participle patterns  
@@ -492,8 +498,12 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                 candidate_lemma = lemmas.get(dep.dependent, dep.dependent)
                 
                 # Check if this could be a participle
-                is_present_participle = (candidate_pos in ['VBG', 'VERB'] and 
-                                       (dep.dependent.endswith('ing') or candidate_lemma.endswith('ing')))
+                is_present_participle = (
+                    (candidate_pos in ['VBG', 'VERB'] and 
+                     (dep.dependent.endswith('ing') or candidate_lemma.endswith('ing'))) or
+                    # Special case for "Being" which Stanza tags as AUX
+                    (candidate_pos == 'AUX' and dep.dependent.lower() == 'being')
+                )
                 is_past_participle = (candidate_pos in ['VBN', 'VERB'] and 
                                     (dep.dependent.endswith('ed') or dep.dependent.endswith('en') or
                                      candidate_lemma != dep.dependent))
@@ -504,7 +514,7 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                         'pos': candidate_pos,
                         'lemma': candidate_lemma,
                         'index': self._get_token_index([], dep.dependent),  # Will be recalculated
-                        'confidence': 0.8 if is_present_participle else 0.7
+                        'confidence': 0.9 if (is_present_participle and dep.relation == 'cop') else 0.8 if is_present_participle else 0.7
                     })
         
         # Also check sentence-initial position for participial constructions
