@@ -242,11 +242,21 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
             GrammarPattern.GERUND_PATTERN: {
                 'required_conditions': [
                     lambda clause: clause.root_pos in ['VBG', 'VERB'],
-                    lambda clause: clause.clause_type == 'adverbial_clause'
+                    # Gerunds are primarily nominal (act as nouns), not adverbial  
+                    lambda clause: clause.clause_type in ['clausal_subject', 'clausal_complement']
+                ],
+                'blocking_conditions': [
+                    # If it's in adverbial position and modifies main clause subject, it's participial
+                    lambda clause: (
+                        clause.clause_type == 'adverbial_clause' and
+                        # Check if sentence has comma structure typical of participial constructions
+                        ',' in clause.text
+                    )
                 ],
                 'contextual_patterns': [
-                    r'^(Being|Having|Seeing|Knowing)',
-                    r'ing\s+[a-z]'
+                    # Gerund patterns tend to be nominal
+                    r'^(Swimming|Reading|Writing)\s+(is|was)', # "Swimming is fun"
+                    r'(enjoy|like|hate|love)\s+\w+ing'        # "I enjoy reading"
                 ],
                 'confidence_boost': 0.3
             },
@@ -266,8 +276,12 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
                         (clause.root_pos == 'AUX' and 
                          clause.root_word.lower() == 'being' and clause.root_lemma.lower() == 'be')
                     ),
-                    # Must be in adverbial clause context
+                    # Must be in adverbial clause context - NOT main clause
                     lambda clause: clause.clause_type == 'adverbial_clause'
+                ],
+                'blocking_conditions': [
+                    # NEVER apply to main clauses with clear subjects
+                    lambda clause: (clause.clause_type == 'main' and clause.has_subject()),
                 ],
                 'contextual_requirements': [
                     # Check for sentence-initial position (typical for participial constructions)
@@ -411,6 +425,18 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         for dep in dependencies:
             if dep.relation in self.enhanced_clause_mapping:
                 clause_type = self.enhanced_clause_mapping[dep.relation]
+                
+                # **FILTER OUT: Simple adjectival complements that don't form clauses**
+                if dep.relation == 'xcomp':
+                    dep_pos = pos_tags.get(dep.dependent, 'UNKNOWN')
+                    # If xcomp dependent is just an adjective, don't create separate clause
+                    if dep_pos in ['ADJ', 'JJ'] and not any(
+                        other_dep.head == dep.dependent 
+                        for other_dep in dependencies 
+                        if other_dep.relation in ['nsubj', 'csubj', 'nsubj:pass']
+                    ):
+                        # This is just an adjectival complement, skip clause creation
+                        continue
                 
                 root_pos = pos_tags.get(dep.dependent, 'UNKNOWN')
                 root_lemma = lemmas.get(dep.dependent, dep.dependent)
@@ -565,7 +591,27 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         best_confidence = 0.0
         best_features = {}
         
-        # First, always try structural analysis (most reliable)
+        # **SPECIAL PRIORITY CHECK: Imperative patterns have high priority**
+        # Check imperative first as it's often misclassified by structural analysis
+        if clause.clause_type == 'main':
+            imperative_rules = self.pattern_detection_rules.get(GrammarPattern.IMPERATIVE_PATTERN, {})
+            imperative_confidence, imperative_features = self._calculate_ultra_precise_score(
+                GrammarPattern.IMPERATIVE_PATTERN, clause, imperative_rules, full_sentence
+            )
+            
+            # Special boost for "Please..." sentences
+            if full_sentence.strip().lower().startswith('please') and imperative_confidence >= 0.5:
+                imperative_confidence = min(1.0, imperative_confidence + 0.3)
+                imperative_features['please_boost'] = True
+            
+            if imperative_confidence >= 0.8:  # High threshold for imperative
+                return {
+                    'pattern': GrammarPattern.IMPERATIVE_PATTERN,
+                    'confidence': imperative_confidence,
+                    'features': imperative_features
+                }
+        
+        # Then try structural analysis (most reliable for other patterns)
         structural_result = self._structural_pattern_analysis(clause)
         best_pattern = structural_result['pattern']
         best_confidence = structural_result['confidence']
@@ -576,9 +622,10 @@ class HierarchicalGrammarDetectorV4(AdvancedGrammarDetector):
         if best_confidence < 0.7:  # Only override if structural analysis is uncertain
             for pattern, rules in self.pattern_detection_rules.items():
                 # Skip basic structural patterns since we already analyzed them
+                # Skip imperative since we already checked it above
                 if (pattern in [GrammarPattern.SV_PATTERN, GrammarPattern.SVO_PATTERN, 
                                GrammarPattern.SVC_PATTERN, GrammarPattern.SVOO_PATTERN, 
-                               GrammarPattern.SVOC_PATTERN]):
+                               GrammarPattern.SVOC_PATTERN, GrammarPattern.IMPERATIVE_PATTERN]):
                     continue
                     
                 confidence, features = self._calculate_ultra_precise_score(
