@@ -125,15 +125,39 @@ class SimpleUnifiedRephraseSlotIntegrator:
         return slots
     
     def _extract_basic_elements(self, doc) -> Dict[str, str]:
-        """基本文要素抽出"""
+        """基本文要素抽出（関係詞節完全対応版）"""
         slots = {}
         
         # 修飾語カウンター（位置ベース配置用）
         adverbs = []
         
+        # 🚨 完全修正: 関係詞節を含む主語の正確な抽出
+        main_subject = None
+        relative_pronouns = ['who', 'which', 'that', 'whose', 'whom']
+        
+        # まずROOT動詞を特定
+        root_verb = None
         for token in doc:
-            # 主語（冠詞・限定詞を含む）
-            if token.dep_ == 'nsubj':
+            if token.dep_ == 'ROOT':
+                root_verb = token
+                break
+        
+        # 主語を特定（ROOT動詞の主語）
+        if root_verb:
+            for child in root_verb.children:
+                if child.dep_ in ['nsubj', 'nsubjpass']:
+                    # subtree で関係詞節を含む完全な主語句を取得
+                    subject_tokens = list(child.subtree)
+                    subject_tokens.sort(key=lambda x: x.i)  # インデックス順でソート
+                    
+                    subject_text = ' '.join([token.text for token in subject_tokens])
+                    slots['S'] = subject_text
+                    main_subject = subject_text
+                    break
+        
+        for token in doc:
+            # 主語（冠詞・限定詞を含む）- 関係詞節で修正されていない場合のみ
+            if token.dep_ == 'nsubj' and not main_subject:
                 subject_phrase = self._extract_full_phrase(token, doc)
                 slots['S'] = subject_phrase
             
@@ -148,10 +172,12 @@ class SimpleUnifiedRephraseSlotIntegrator:
             elif token.dep_ == 'aux':
                 slots['Aux'] = token.text
             
-            # 目的語（冠詞・所有格を含む）
+            # 目的語（冠詞・所有格を含む）- 関係詞節の一部を除外
             elif token.dep_ == 'dobj':
                 object_phrase = self._extract_full_phrase(token, doc)
-                slots['O1'] = object_phrase
+                # 関係代名詞は除外
+                if object_phrase.lower() not in relative_pronouns:
+                    slots['O1'] = object_phrase
             elif token.dep_ == 'iobj':
                 iobject_phrase = self._extract_full_phrase(token, doc)
                 slots['O2'] = iobject_phrase
@@ -173,6 +199,61 @@ class SimpleUnifiedRephraseSlotIntegrator:
         self._assign_adverbs_by_position(slots, adverbs, doc)
         
         return slots
+    
+    def _find_relative_clause_end(self, sentence: str, start_pos: int) -> int:
+        """関係詞節の終了位置を特定"""
+        doc = self.nlp(sentence)
+        
+        # 関係代名詞を探す
+        rel_pronoun_token = None
+        for token in doc:
+            if token.i * len(token.text_with_ws) >= start_pos and token.pos_ in ['PRON'] and token.text.lower() in ['who', 'which', 'that']:
+                rel_pronoun_token = token
+                break
+        
+        if not rel_pronoun_token:
+            return -1
+        
+        # 関係詞節の動詞を探す
+        rel_clause_verb = None
+        for child in rel_pronoun_token.head.children:
+            if child.pos_ == 'VERB' and child.i > rel_pronoun_token.i:
+                rel_clause_verb = child
+                break
+        
+        if not rel_clause_verb:
+            # 関係詞の直後の動詞を探す
+            for token in doc:
+                if token.i > rel_pronoun_token.i and token.pos_ == 'VERB':
+                    rel_clause_verb = token
+                    break
+        
+        if rel_clause_verb:
+            # 関係詞節の動詞の後ろの語句も含める
+            end_token = rel_clause_verb
+            for child in rel_clause_verb.children:
+                if child.i > end_token.i:
+                    end_token = child
+            
+            # 主節の動詞を探す
+            main_verb = None
+            for token in doc:
+                if (token.i > end_token.i and 
+                    token.pos_ == 'VERB' and 
+                    token.dep_ == 'ROOT'):
+                    main_verb = token
+                    break
+            
+            if main_verb:
+                # 主節動詞の直前まで
+                end_char_pos = 0
+                for token in doc:
+                    if token.i == main_verb.i:
+                        break
+                    end_char_pos += len(token.text_with_ws)
+                return end_char_pos
+        
+        return -1
     
     def _extract_full_phrase(self, head_token, doc):
         """名詞句の完全な形を抽出（冠詞・所有格・形容詞を含む）"""

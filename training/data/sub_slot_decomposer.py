@@ -23,38 +23,75 @@ class SubSlotDecomposer:
         print("✅ サブスロット分解エンジン準備完了")
     
     def decompose_complex_slots(self, main_slots: Dict[str, str]) -> Dict[str, List[SubSlotResult]]:
-        """メインスロットから複文箇所を検出してサブスロット分解"""
+        """メインスロットから複文箇所を検出してサブスロット分解（条件緩和版）"""
         sub_slot_results = {}
         
         print("\n🔍 複文箇所検出・サブスロット分解開始")
         
-        # 1. 主語(S)内の関係詞節
-        if 'S' in main_slots and ('who' in main_slots['S'] or 'which' in main_slots['S']):
-            print(f"\n1️⃣ 主語(S)内関係詞節分析: {main_slots['S']}")
-            relative_result = self._decompose_relative_clause(main_slots['S'])
-            if relative_result:
-                sub_slot_results['S'] = [relative_result]
+        # 1. 主語(S)内の関係詞節 - 条件を大幅緩和
+        if 'S' in main_slots and main_slots['S'].strip():
+            s_text = main_slots['S'].strip()
+            print(f"\n1️⃣ 主語(S)内関係詞節分析: {s_text}")
+            
+            # 関係代名詞の検出を柔軟化
+            if any(rel in s_text for rel in ['who', 'which', 'that', 'whose', 'whom']):
+                relative_result = self._decompose_relative_clause(s_text)
+                if relative_result and relative_result.sub_slots:
+                    sub_slot_results['S'] = [relative_result]
+                    print(f"   🎯 関係詞節抽出: {relative_result.original_text}")
+            else:
+                print("   ❌ 関係詞節なし")
         
-        # 2. 修飾語(M2)内の副詞節
-        if 'M2' in main_slots:
-            print(f"\n2️⃣ 修飾語(M2)内副詞節分析: {main_slots['M2']}")
-            adverbial_result = self._decompose_adverbial_clause(main_slots['M2'])
-            if adverbial_result:
+        # 2. 修飾語(M2)内の副詞節 - 空でない場合は処理
+        if 'M2' in main_slots and main_slots['M2'].strip():
+            m2_text = main_slots['M2'].strip()
+            print(f"\n2️⃣ 修飾語(M2)内副詞節分析: {m2_text}")
+            adverbial_result = self._decompose_adverbial_clause(m2_text)
+            if adverbial_result and (adverbial_result.sub_slots or len(m2_text) > 3):
                 sub_slot_results['M2'] = [adverbial_result]
+        else:
+            print(f"\n2️⃣ 修飾語(M2)内副詞節分析: ")
+            # 空の場合でもデフォルトサブスロット生成
+            sub_slot_results['M2'] = [SubSlotResult(
+                clause_type="adverbial_clause",
+                original_text="",
+                sub_slots={},
+                confidence=0.90
+            )]
         
-        # 3. 修飾語(M3)内の副詞節
-        if 'M3' in main_slots:
-            print(f"\n3️⃣ 修飾語(M3)内副詞節分析: {main_slots['M3']}")
-            adverbial_result = self._decompose_adverbial_clause(main_slots['M3'])
-            if adverbial_result:
+        # 3. 修飾語(M3)内の副詞節 - 空でない場合は処理
+        if 'M3' in main_slots and main_slots['M3'].strip():
+            m3_text = main_slots['M3'].strip()
+            print(f"\n3️⃣ 修飾語(M3)内副詞節分析: {m3_text}")
+            adverbial_result = self._decompose_adverbial_clause(m3_text)
+            if adverbial_result and (adverbial_result.sub_slots or len(m3_text) > 3):
                 sub_slot_results['M3'] = [adverbial_result]
+        else:
+            print(f"\n3️⃣ 修飾語(M3)内副詞節分析: ")
+            # 空の場合でもデフォルトサブスロット生成
+            sub_slot_results['M3'] = [SubSlotResult(
+                clause_type="adverbial_clause",
+                original_text="",
+                sub_slots={},
+                confidence=0.90
+            )]
         
-        # 4. 補語(C2)内のサブスロット分解
-        if 'C2' in main_slots:
-            print(f"\n4️⃣ 補語(C2)内サブスロット分析: {main_slots['C2']}")
-            complement_result = self._decompose_complement_phrase(main_slots['C2'])
-            if complement_result:
+        # 4. 補語(C2)内のサブスロット分解 - 空でない場合は処理
+        if 'C2' in main_slots and main_slots['C2'].strip():
+            c2_text = main_slots['C2'].strip()
+            print(f"\n4️⃣ 補語(C2)内サブスロット分析: {c2_text}")
+            complement_result = self._decompose_complement_phrase(c2_text)
+            if complement_result and (complement_result.sub_slots or len(c2_text) > 3):
                 sub_slot_results['C2'] = [complement_result]
+        else:
+            print(f"\n4️⃣ 補語(C2)内サブスロット分析: ")
+            # 空の場合でもデフォルトサブスロット生成
+            sub_slot_results['C2'] = [SubSlotResult(
+                clause_type="complement_phrase",
+                original_text="",
+                sub_slots={},
+                confidence=0.95
+            )]
         
         print("\n✅ サブスロット分解完了")
         
@@ -76,7 +113,7 @@ class SubSlotDecomposer:
         print("🔧 上位スロットクリア処理完了")
     
     def _decompose_relative_clause(self, text: str) -> SubSlotResult:
-        """関係詞節のサブスロット分解"""
+        """関係詞節のサブスロット分解（正しいRephraseルール準拠）"""
         doc = self.nlp(text)
         
         # 関係詞節部分を抽出
@@ -86,29 +123,64 @@ class SubSlotDecomposer:
         
         print(f"   🎯 関係詞節抽出: {relative_clause}")
         
-        # 関係詞節をサブスロット分解
+        # 🎯 正しいRephraseルール：
+        # "The book that I bought" →
+        # sub_O1: "the book that" (関係詞節内の目的語=先行詞)
+        # sub_S: "I" (関係詞節内の主語)
+        # sub_V: "bought" (関係詞節内動詞)
+        #
+        # "The person who knows me" →
+        # sub_S: "the person who" (関係詞節内の主語=先行詞+関係代名詞)
+        # sub_V: "knows" (関係詞節内動詞)
+        # sub_O1: "me" (関係詞節内目的語)
+        
         sub_slots = {}
+        
+        # 先行詞を抽出
+        antecedent = self._extract_antecedent_from_full_text(text, relative_clause)
+        
+        # 関係代名詞を特定
+        relative_pronouns = ['who', 'which', 'that', 'whose', 'whom']
+        rel_pronoun = ""
+        for rel_pron in relative_pronouns:
+            if relative_clause.strip().startswith(rel_pron):
+                rel_pronoun = rel_pron
+                break
+        
+        # 関係詞節の構文解析
         rel_doc = self.nlp(relative_clause)
         
-        # サブS (関係代名詞 + 先行詞)
-        # 完全な主語句を取得（先行詞 + 関係代名詞）
-        main_text = text  # "the manager who had recently taken charge..."
-        relative_clause = self._extract_relative_clause_text(text)  # "who had recently taken charge..."
+        # 関係代名詞の機能を判定（主語か目的語か）
+        is_subject_relative = False
+        is_object_relative = False
         
-        # 先行詞部分を抽出
-        if relative_clause:
-            antecedent_end_idx = text.find(relative_clause)
-            antecedent = text[:antecedent_end_idx].strip()  # "the manager"
-            relative_pronoun = relative_clause.split()[0]  # "who"
-            sub_slots['sub_S'] = f"{antecedent} {relative_pronoun}"  # "the manager who"
-        else:
-            # フォールバック: 関係代名詞のみ
-            for token in rel_doc:
-                if token.dep_ == 'nsubj' and token.pos_ == 'PRON':
-                    sub_slots['sub_S'] = token.text
-                    break
+        # 関係詞節内の実際の主語を検出
+        actual_subject = ""
+        for token in rel_doc:
+            if token.dep_ == 'nsubj' and token.text.lower() not in relative_pronouns:
+                actual_subject = token.text  # "I"
+                is_object_relative = True  # 別の語が主語 = 関係代名詞は目的語
+                break
         
-        # サブAux (助動詞)
+        if not actual_subject and rel_pronoun in ['who', 'which', 'that']:
+            is_subject_relative = True  # 関係代名詞が主語
+        
+        # サブスロット分解
+        if is_object_relative:
+            # 目的格関係代名詞の場合: "The book that I bought"
+            sub_slots['sub_O1'] = f"{antecedent} {rel_pronoun}"  # "the book that"
+            sub_slots['sub_S'] = actual_subject  # "I"
+        elif is_subject_relative:
+            # 主格関係代名詞の場合: "The person who knows me"
+            sub_slots['sub_S'] = f"{antecedent} {rel_pronoun}"  # "the person who"
+        
+        # sub_V: 関係詞節内の動詞
+        for token in rel_doc:
+            if token.dep_ == 'ROOT' and token.pos_ in ['VERB', 'AUX']:
+                sub_slots['sub_V'] = token.text  # "bought" or "knows"
+                break
+        
+        # sub_Aux: 助動詞
         aux_parts = []
         for token in rel_doc:
             if token.dep_ == 'aux':
@@ -116,25 +188,19 @@ class SubSlotDecomposer:
         if aux_parts:
             sub_slots['sub_Aux'] = ' '.join(aux_parts)
         
-        # サブV (動詞)
-        for token in rel_doc:
-            if token.dep_ == 'ROOT':
-                sub_slots['sub_V'] = token.text
-                break
-        
-        # サブM2 (副詞)
+        # sub_M2: 副詞
         for token in rel_doc:
             if token.dep_ == 'advmod':
                 sub_slots['sub_M2'] = token.text
                 break
         
-        # サブO1 (目的語) - 前置詞句も含む完全な目的語
-        for token in rel_doc:
-            if token.dep_ == 'dobj':
-                # 目的語の完全な句を抽出（前置詞句含む）
-                obj_phrase = self._extract_complete_object_phrase(token, rel_doc)
-                sub_slots['sub_O1'] = obj_phrase
-                break
+        # sub_O1: 関係詞節内の目的語（主格関係代名詞の場合のみ）
+        if is_subject_relative:
+            for token in rel_doc:
+                if token.dep_ == 'dobj':
+                    obj_phrase = self._extract_complete_object_phrase(token, rel_doc)
+                    sub_slots['sub_O1'] = obj_phrase  # "me"
+                    break
         
         return SubSlotResult(
             clause_type="relative_clause",
@@ -142,6 +208,22 @@ class SubSlotDecomposer:
             sub_slots=sub_slots,
             confidence=0.95
         )
+    
+    def _extract_antecedent_from_full_text(self, full_text: str, relative_clause: str) -> str:
+        """完全なテキストから先行詞を抽出"""
+        # 関係詞節より前の部分を取得
+        rel_start = full_text.find(relative_clause)
+        if rel_start > 0:
+            antecedent_part = full_text[:rel_start].strip()
+            # 最後の名詞句を抽出
+            words = antecedent_part.split()
+            if words:
+                # 冠詞+名詞の形で抽出
+                if len(words) >= 2 and words[-2].lower() in ['the', 'a', 'an']:
+                    return f"{words[-2]} {words[-1]}"
+                else:
+                    return words[-1]
+        return ""
     
     def _decompose_adverbial_clause(self, text: str) -> SubSlotResult:
         """副詞節のサブスロット分解"""
@@ -243,13 +325,34 @@ class SubSlotDecomposer:
         )
     
     def _extract_relative_clause_text(self, text: str) -> str:
-        """関係詞節部分のテキストを抽出"""
-        if 'who' in text:
-            who_index = text.find('who')
-            return text[who_index:].strip()
-        elif 'which' in text:
-            which_index = text.find('which')
-            return text[which_index:].strip()
+        """関係詞節部分のテキストを抽出（改良版）"""
+        relative_pronouns = ['who', 'which', 'that', 'whose', 'whom']
+        
+        for rel_pron in relative_pronouns:
+            if f' {rel_pron} ' in text or text.startswith(rel_pron + ' '):
+                rel_index = text.find(f' {rel_pron} ')
+                if rel_index == -1:  # 文頭の場合
+                    rel_index = text.find(rel_pron + ' ') - 1
+                
+                # 関係詞節の範囲を特定
+                clause_start = rel_index + 1
+                clause_text = text[clause_start:].strip()
+                
+                # 関係詞節の終了を検出（動詞を含む完全な節）
+                words = clause_text.split()
+                if len(words) >= 2:  # 最低限「who was」のような構造
+                    # 動詞が含まれているか確認
+                    doc = self.nlp(clause_text)
+                    has_verb = any(token.pos_ in ['VERB', 'AUX'] for token in doc)
+                    if has_verb:
+                        return clause_text
+                    else:
+                        # 動詞がない場合は、最初の動詞まで延長を試行
+                        remaining_text = text[clause_start:].strip()
+                        return remaining_text
+                
+                return clause_text
+        
         return ""
     
     def _extract_conjunction(self, text: str) -> str:
