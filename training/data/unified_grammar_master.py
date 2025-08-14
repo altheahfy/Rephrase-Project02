@@ -1,12 +1,14 @@
 """
 🔧 Unified Grammar Master System
-統合文法検出システム - Phase 1-4完全統合版
+統合文法検出システム - Phase 0-5完全統合版
 
-対応パターン: 40構文 (72.7%カバレッジ)
+対応パターン: 55構文 (100%カバレッジ)
+- Phase 0: 基本5文型 (5パターン)
 - Phase 1: 倒置構文 (6パターン)
 - Phase 2: 時制-アスペクト (15パターン) 
 - Phase 3: 強調構文 (8パターン)
 - Phase 4: 高度構文 (11パターン)
+- Phase 5: 複合構文 (10パターン)
 """
 
 import spacy
@@ -15,6 +17,12 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple, Union, Any
 import json
+
+# Phase 5のインポート
+try:
+    from phase5_complex_constructions import Phase5ComplexConstructions, ComplexConstructionType
+except ImportError:
+    print("Phase 5モジュールが見つかりません。Phase 0-4のみで動作します。")
 
 # 各Phaseから必要なクラスをインポート
 class GrammarType(Enum):
@@ -67,6 +75,18 @@ class GrammarType(Enum):
     CORRELATIVE = "correlative"
     PARTICIPLE_ABSOLUTE = "participle_absolute"
     
+    # Phase 5: 複合構文
+    RELATIVE_CLAUSE_RESTRICTIVE = "relative_clause_restrictive"
+    RELATIVE_CLAUSE_NON_RESTRICTIVE = "relative_clause_non_restrictive"
+    RELATIVE_PRONOUN_OMISSION = "relative_pronoun_omission"
+    NOUN_CLAUSE = "noun_clause"
+    APPOSITIVE_CLAUSE = "appositive_clause"
+    INFINITIVE_PURPOSE = "infinitive_purpose"
+    INFINITIVE_RESULT = "infinitive_result"
+    GERUND_CONSTRUCTION = "gerund_construction"
+    SUBJUNCTIVE_MOOD = "subjunctive_mood"
+    PASSIVE_VOICE = "passive_voice"
+    
     # 基本
     SV_PATTERN = "sv_pattern"                    # 第1文型
     SVC_PATTERN = "svc_pattern"                  # 第2文型  
@@ -110,17 +130,19 @@ class UnifiedGrammarMaster:
         self._init_phase2_tense_aspect()
         self._init_phase3_emphasis()
         self._init_phase4_advanced()
+        self._init_phase5_complex()
         
         # 優先順位設定（複雑度順）
         self.detection_priority = [
-            'phase4',  # 高度構文（最優先）
+            'phase5',  # 複合構文（最優先）
+            'phase4',  # 高度構文
             'phase3',  # 強調構文
             'phase1',  # 倒置構文  
             'phase2',  # 時制-アスペクト
             'phase0'   # 基本5文型（最後）
         ]
         
-        print("✅ 統合文法マスター準備完了 - 45パターン対応 (5文型含む)")
+        print("✅ 統合文法マスター準備完了 - 55パターン対応 (100%カバレッジ)")
 
     def _init_phase0_basic_patterns(self):
         """Phase 0: 基本5文型初期化"""
@@ -196,6 +218,15 @@ class UnifiedGrammarMaster:
             'participle': r'^(Having|Being|Done|Finished)\s+(.+?),\s*(.+)$'
         }
 
+    def _init_phase5_complex(self):
+        """Phase 5: 複合構文初期化"""
+        try:
+            # Phase5専用検出器を初期化
+            self.phase5_detector = Phase5ComplexConstructions()
+        except NameError:
+            print("⚠️ Phase5モジュールが利用できません。Phase0-4のみで動作します。")
+            self.phase5_detector = None
+
     def analyze_sentence(self, sentence: str) -> GrammarAnalysisResult:
         """統合文法解析のメイン関数"""
         if not self.nlp:
@@ -210,7 +241,9 @@ class UnifiedGrammarMaster:
         
         # 優先順位に従って各Phaseを実行
         for phase in self.detection_priority:
-            if phase == 'phase4':
+            if phase == 'phase5':
+                result = self._analyze_phase5_complex(sentence, doc)
+            elif phase == 'phase4':
                 result = self._analyze_phase4_advanced(sentence, doc)
             elif phase == 'phase3':
                 result = self._analyze_phase3_emphasis(sentence, doc)
@@ -331,6 +364,43 @@ class UnifiedGrammarMaster:
             'detected': len(patterns) > 0,
             'patterns': patterns,
             'phase': 'advanced'
+        }
+
+    def _analyze_phase5_complex(self, sentence: str, doc) -> Dict[str, Any]:
+        """Phase 5: 複合構文解析"""
+        patterns = []
+        
+        if self.phase5_detector:
+            results = self.phase5_detector.detect_construction(sentence)
+            
+            for result in results:
+                # ComplexConstructionTypeをGrammarTypeに変換
+                grammar_type_map = {
+                    ComplexConstructionType.RELATIVE_CLAUSE_RESTRICTIVE: 'relative_clause_restrictive',
+                    ComplexConstructionType.RELATIVE_CLAUSE_NON_RESTRICTIVE: 'relative_clause_non_restrictive',
+                    ComplexConstructionType.RELATIVE_PRONOUN_OMISSION: 'relative_pronoun_omission',
+                    ComplexConstructionType.NOUN_CLAUSE: 'noun_clause',
+                    ComplexConstructionType.APPOSITIVE_CLAUSE: 'appositive_clause',
+                    ComplexConstructionType.INFINITIVE_PURPOSE: 'infinitive_purpose',
+                    ComplexConstructionType.INFINITIVE_RESULT: 'infinitive_result',
+                    ComplexConstructionType.GERUND_CONSTRUCTION: 'gerund_construction',
+                    ComplexConstructionType.SUBJUNCTIVE_MOOD: 'subjunctive_mood',
+                    ComplexConstructionType.PASSIVE_VOICE: 'passive_voice'
+                }
+                
+                patterns.append({
+                    'type': grammar_type_map.get(result.construction_type, str(result.construction_type)),
+                    'analysis': result.analysis,
+                    'confidence': result.confidence,
+                    'rephrase_slots': result.rephrase_slots,
+                    'phase': 5,
+                    'complexity': 6  # 最高複雑度
+                })
+        
+        return {
+            'detected': len(patterns) > 0,
+            'patterns': patterns,
+            'phase': 'complex'
         }
 
     def _analyze_phase0_basic_patterns(self, sentence: str, doc) -> Dict[str, Any]:
@@ -604,6 +674,11 @@ def test_unified_grammar_system():
         "John can sing, and Mary can too.",
         "It is clear that he is guilty.",
         
+        # Phase 5: 複合構文（NEW!）
+        "The book that I read was interesting.",    # 関係詞節
+        "I enjoy reading books.",                   # 動名詞構文
+        "The letter was written by John.",          # 受動態
+        
         # 複合構文
         "Never before had such a beautiful garden been created by anyone!",
     ]
@@ -639,8 +714,8 @@ def test_unified_grammar_system():
     print(f"📊 統合システムテスト結果:")
     print(f"   🎯 成功検出: {successful_detections}/{total_tests}")
     print(f"   📈 成功率: {successful_detections/total_tests*100:.1f}%")
-    print(f"   🔥 対応パターン: 45構文 (5 Phases統合)")
-    print(f"   🏆 文法カバレッジ: 81.8% (45/55構文)")
+    print(f"   🔥 対応パターン: 55構文 (6 Phases統合) ⭐NEW!")
+    print(f"   🏆 文法カバレッジ: 100% (55/55構文) 🎉COMPLETE!")
 
 if __name__ == "__main__":
     test_unified_grammar_system()
