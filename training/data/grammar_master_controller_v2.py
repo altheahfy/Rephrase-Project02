@@ -714,11 +714,12 @@ class GrammarMasterControllerV2:
                 error = raw_result.get('error', None)
                 confidence = raw_result.get('confidence', self._calculate_confidence(slots, metadata))
             else:
-                slots = raw_result if isinstance(raw_result, dict) else {}
-                metadata = {'engine': engine_type.value}
-                success = bool(slots)
-                error = None if slots else "No slots extracted"
-                confidence = self._calculate_confidence(slots, metadata)
+                # Handle dataclass objects (like ImperativeResult, ExistentialResult, etc.)
+                slots = getattr(raw_result, 'slots', {})
+                metadata = getattr(raw_result, 'metadata', {'engine': engine_type.value})
+                success = getattr(raw_result, 'success', bool(slots))
+                error = getattr(raw_result, 'error', None)
+                confidence = getattr(raw_result, 'confidence', self._calculate_confidence(slots, metadata))
             
             processing_time = time.time() - start_time
             

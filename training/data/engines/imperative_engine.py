@@ -195,7 +195,17 @@ class ImperativeEngine:
             # Check for negative markers (Aux slot)
             for neg_marker in self.imperative_patterns['negative_markers']:
                 if sentence_lower.startswith(neg_marker):
-                    slots['Aux'] = neg_marker
+                    # Extract exact negative auxiliary from original sentence
+                    original_tokens = sentence.strip().split()
+                    if original_tokens:
+                        first_word = original_tokens[0]
+                        # Check if it matches the negative marker (case insensitive)
+                        if first_word.lower() == neg_marker.lower():
+                            slots['Aux'] = first_word  # Preserve original case
+                        elif neg_marker == "don't" and first_word.lower() == "don't":
+                            slots['Aux'] = first_word  # "Don't" preserved
+                        else:
+                            slots['Aux'] = neg_marker.title()  # Default capitalization
                     break
             
             # Check for explicit subject (rare in imperatives, but possible)
@@ -238,26 +248,40 @@ class ImperativeEngine:
                 if len(adv_mods) >= 2:
                     slots['M3'] = adv_mods[1]
             
-            # Find prepositional phrases (C2)
+            # Find prepositional phrases - 位置ベースで M3 (文尾) に配置
             prep_phrases = []
             for word in sent.words:
                 if word.upos == 'ADP':  # Preposition
-                    # Find the noun it modifies
+                    # Build complete prepositional phrase
+                    phrase_parts = [word.text]
+                    
+                    # Find the object of preposition
                     for target in sent.words:
-                        if target.head == word.id and target.upos in ['NOUN', 'PRON']:
-                            prep_phrase = f"{word.text} {target.text}"
-                            # Add any adjectives or determiners
+                        if target.head == word.id and target.upos in ['NOUN', 'PRON', 'PROPN']:
+                            # Add determiners and adjectives that modify the noun
                             modifiers = []
                             for mod in sent.words:
-                                if mod.head == target.id and mod.upos in ['ADJ', 'DET', 'NUM']:
-                                    modifiers.append(mod.text)
-                            if modifiers:
-                                prep_phrase = f"{word.text} {' '.join(modifiers)} {target.text}"
-                            prep_phrases.append(prep_phrase)
+                                if mod.head == target.id and mod.upos in ['DET', 'ADJ', 'NUM']:
+                                    modifiers.append((mod.id, mod.text))
+                            
+                            # Sort modifiers by position
+                            modifiers.sort(key=lambda x: x[0])
+                            modifier_texts = [mod[1] for mod in modifiers]
+                            
+                            # Build complete noun phrase
+                            if modifier_texts:
+                                noun_phrase = f"{' '.join(modifier_texts)} {target.text}"
+                            else:
+                                noun_phrase = target.text
+                            
+                            complete_phrase = f"{word.text} {noun_phrase}"
+                            prep_phrases.append(complete_phrase)
                             break
             
-            if prep_phrases and 'C2' not in slots:
-                slots['C2'] = prep_phrases[0]
+            # 位置ベース配置: 前置詞句は文尾に出現する場合は M3 に配置
+            if prep_phrases:
+                # 最初の前置詞句を M3 に配置（文尾位置の修飾語）
+                slots['M3'] = prep_phrases[0]
             
             if debug:
                 self.logger.info(f"Imperative analysis: {slots}")
@@ -301,7 +325,13 @@ class ImperativeEngine:
         # Check for negative markers
         for neg_marker in self.imperative_patterns['negative_markers']:
             if sentence_lower.startswith(neg_marker):
-                slots['Aux'] = neg_marker
+                # Preserve original capitalization from sentence
+                original_words = sentence.strip().split()
+                if original_words and original_words[0].lower() in neg_marker.lower():
+                    slots['Aux'] = original_words[0]  # Keep original case (Don't, not don't)
+                else:
+                    slots['Aux'] = neg_marker.capitalize()  # Fallback with proper capitalization
+                
                 # Find verb after negative
                 neg_words = neg_marker.split()
                 if len(words) > len(neg_words):

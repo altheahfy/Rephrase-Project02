@@ -335,22 +335,31 @@ class ExistentialThereEngine:
         location_info = self._extract_location_modifiers(sentence, doc)
         
         if location_info.get('location'):
-            # C2 for locative complements - clean duplicates
+            # 位置ベースルール: 文尾近くの場所情報は M3 に配置
             location_clean = self._clean_duplicate_words(location_info['location'])
             if location_clean and location_clean not in ['in', 'on', 'at']:  # Avoid incomplete prep phrases
-                slots['C2'] = location_clean
+                # 場所情報は文尾に出現する場合が多いので M3 に配置
+                slots['M3'] = location_clean
             
         if location_info.get('time'):
-            # M2 for time modifiers - but avoid duplicating what's already in other slots
+            # 位置ベースルール: 文尾近くの時間情報は M3 に配置
             time_clean = self._clean_duplicate_words(location_info['time'])
-            if time_clean and time_clean not in [slots.get('C2', ''), slots.get('M3', '')]:
-                slots['M2'] = time_clean
+            if time_clean and time_clean not in [slots.get('M3', ''), slots.get('C2', '')]:
+                # 時間情報も文尾に出現することが多いので M3 に配置
+                if 'M3' not in slots:  # 場所情報が既にM3にない場合
+                    slots['M3'] = time_clean
+                else:
+                    # M3が既に使用されている場合は M2 に配置
+                    slots['M2'] = time_clean
             
         # Additional modifiers and negation
         modifiers = self._extract_additional_modifiers(sentence, doc)
-        if modifiers.get('manner') and modifiers['manner'] not in [slots.get('M2', ''), slots.get('C2', '')]:
-            # Avoid duplicating information already in other slots
-            slots['M3'] = modifiers['manner']
+        if modifiers.get('manner') and modifiers['manner'] not in [slots.get('M2', ''), slots.get('M3', ''), slots.get('C2', '')]:
+            # 方法副詞は動詞周辺（M2）または文尾（M3）に配置
+            if 'M2' not in slots:
+                slots['M2'] = modifiers['manner']
+            elif 'M3' not in slots:
+                slots['M3'] = modifiers['manner']
         
         # Handle negation patterns
         negation_info = self._handle_negation(sentence, structure)
@@ -436,12 +445,15 @@ class ExistentialThereEngine:
         if not info['location']:
             # Enhanced regex fallback for better phrase extraction
             loc_patterns = [
-                # Complete prepositional phrases
+                # "on the table" のような特定パターンを最初に試行
+                r'\b(on)\s+(the\s+table)\b',
+                r'\b(in)\s+(the\s+(?:room|house|garden|classroom|office|kitchen|bedroom))\b',
+                r'\b(at)\s+(the\s+(?:store|school|hospital|station|office|library))\b',
+                # 一般的な完全前置詞句パターン
                 r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(the\s+\w+(?:\s+\w+)*)',
-                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(a\s+\w+(?:\s+\w+)*)', 
-                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(\w+(?:\s+\w+)*?)(?:\s+(?:sleeping|peacefully|quietly|\w+ly)|\.|,|$)',
-                # Simple preposition + noun
-                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(\w+)',
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+(a\s+\w+(?:\s+\w+)*)',
+                # より寛容なパターン（句読点まで）
+                r'\b(in|on|at|under|over|near|behind|beside|between|among|inside|outside)\s+([^,.!?]+?)(?=\s*[,.!?]|$)',
             ]
             
             for pattern in loc_patterns:
@@ -449,9 +461,15 @@ class ExistentialThereEngine:
                 if loc_match:
                     prep = loc_match.group(1)
                     noun_phrase = loc_match.group(2).strip()
+                    
+                    # Build complete prepositional phrase
+                    full_phrase = f"{prep} {noun_phrase}"
+                    
                     # Clean the extracted phrase
-                    cleaned_phrase = self._clean_duplicate_words(f"{prep} {noun_phrase}")
-                    if len(cleaned_phrase.split()) >= 2:  # Ensure we have preposition + at least one word
+                    cleaned_phrase = self._clean_duplicate_words(full_phrase).strip()
+                    
+                    # Validate the phrase (should have at least preposition + noun)
+                    if len(cleaned_phrase.split()) >= 2 and not cleaned_phrase.endswith(('the', 'a', 'an')):
                         info['location'] = cleaned_phrase
                         break
                 
