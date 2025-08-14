@@ -120,6 +120,17 @@ class HierarchicalGrammarResultV4:
     detailed_analysis: Dict[str, Any] = field(default_factory=dict)
     confidence_breakdown: Dict[str, float] = field(default_factory=dict)
 
+@dataclass
+class HierarchicalGrammarResultV5:
+    """V5: 2段階処理に特化した結果クラス."""
+    sentence: str
+    main_result: Any  # Step1の主節解析結果
+    subordinate_results: List[Any] = field(default_factory=list)  # Step2の従属節解析結果
+    processing_method: str = "two_step"
+    total_confidence: float = 0.0
+    step1_time: float = 0.0
+    step2_time: float = 0.0
+
 class HierarchicalGrammarDetectorV5(AdvancedGrammarDetector):
     """V5: 2段階処理による階層文法検出器 - V4の83.3%精度を基盤として改良."""
     
@@ -410,7 +421,7 @@ class HierarchicalGrammarDetectorV5(AdvancedGrammarDetector):
                 sentence, main_result, subordinate_results, start_time
             )
             
-            print(f"✅ V5 Complete: Main={final_result.main_clause.grammatical_pattern.value}")
+            print(f"✅ V5 Complete: Main={final_result.main_result.main_clause.grammatical_pattern.value}")
             return final_result
             
         except Exception as e:
@@ -437,8 +448,8 @@ class HierarchicalGrammarDetectorV5(AdvancedGrammarDetector):
                 'type': 'that_clause',
                 'original_position': match.start()
             })
-            # プレースホルダーに置換
-            modified_sentence = modified_sentence.replace(clause_text, '[that節]', 1)
+            # プレースホルダーに置換（通常の名詞を使用）
+            modified_sentence = modified_sentence.replace(clause_text, 'something', 1)
         
         print(f"    🔄 Modified: '{modified_sentence}'")
         print(f"    📋 Found {len(detected_clauses)} clauses")
@@ -478,25 +489,15 @@ class HierarchicalGrammarDetectorV5(AdvancedGrammarDetector):
     
     def _integrate_v5_results(self, original_sentence, main_result, subordinate_results, start_time):
         """V5結果の統合"""
-        # 従属節情報を統合
-        integrated_subordinates = []
-        
-        for sub_result in subordinate_results:
-            # V4の従属節形式に変換
-            integrated_subordinates.extend(main_result.subordinate_clauses)
-            
-            # 新しい節情報を追加
-            if sub_result['result'].subordinate_clauses:
-                integrated_subordinates.extend(sub_result['result'].subordinate_clauses)
-        
-        # 統合結果作成
-        final_result = HierarchicalGrammarResultV4(
-            original_sentence=original_sentence,
-            main_clause=main_result.main_clause,
-            subordinate_clauses=integrated_subordinates,
-            processing_time=time.time() - start_time,
-            confidence=main_result.confidence,
-            detailed_analysis=main_result.detailed_analysis
+        # V5専用結果クラスを使用
+        final_result = HierarchicalGrammarResultV5(
+            sentence=original_sentence,
+            main_result=main_result,
+            subordinate_results=subordinate_results,
+            processing_method="two_step",
+            total_confidence=getattr(main_result, 'confidence_breakdown', {}).get('overall', 0.8),
+            step1_time=0.0,  # TODO: 実測値を追加
+            step2_time=time.time() - start_time
         )
         
         return final_result
