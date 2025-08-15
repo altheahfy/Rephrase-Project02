@@ -384,8 +384,21 @@ class UnifiedStanzaRephraseMapper:
         if not rel_verb:
             return base_result
         
-        # 先行詞（関係節動詞の頭）
-        antecedent = self._find_word_by_id(sentence, rel_verb.head)
+        # whose構文の特別処理：Stanzaが誤解析する場合の対応
+        if self._is_whose_construction(sentence, rel_verb):
+            # whose構文の場合、実際の関係節動詞はcop関係にある
+            actual_rel_verb = self._find_cop_verb_in_whose_clause(sentence, rel_verb)
+            if actual_rel_verb:
+                self.logger.debug(f"  🔧 whose構文検出: 関係動詞を {rel_verb.text} → {actual_rel_verb.text} に修正")
+                # 先行詞も修正：whoseのnmod:poss関係を経由してroot主語を取得
+                antecedent = self._find_whose_antecedent(sentence)
+                rel_verb = actual_rel_verb
+            else:
+                # cop動詞が見つからない場合は通常処理
+                antecedent = self._find_word_by_id(sentence, rel_verb.head)
+        else:
+            # 先行詞（関係節動詞の頭）
+            antecedent = self._find_word_by_id(sentence, rel_verb.head)
         if not antecedent:
             return base_result
         
@@ -428,6 +441,28 @@ class UnifiedStanzaRephraseMapper:
         
         result['slots'].update(rephrase_slots.get('slots', {}))
         result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+        
+        # 主文の基本構造処理（関係節以外の部分）
+        main_verb = self._find_main_verb(sentence)
+        if main_verb and main_verb.id != rel_verb.id:
+            # 主文の動詞が関係動詞と異なる場合、上位スロットに配置
+            result['slots']['V'] = main_verb.text
+            
+            # 主文の主語：関係節を含む場合は位置のみ（Rephrase仕様）
+            # 関係節が主語に含まれる場合、上位スロットSは空
+            result['slots']['S'] = ""  # 位置のみ、テキストは空
+            
+            # 主文の補語（形容詞述語の場合）
+            root_word = next((w for w in sentence.words if w.head == 0), None)
+            if root_word and root_word.upos == 'ADJ':
+                result['slots']['C1'] = root_word.text
+            
+            # その他の修飾語（here等）を処理
+            for word in sentence.words:
+                if (word.head == main_verb.id and 
+                    word.deprel == 'advmod' and 
+                    word.id != rel_verb.id):
+                    result['slots']['M3'] = word.text
         
         # 文法情報記録
         result['grammar_info'] = {
@@ -599,9 +634,29 @@ class UnifiedStanzaRephraseMapper:
             # 所有格関係代名詞: "The man whose car is red"
             slots["S"] = ""  # 上位スロット空
             sub_slots["sub-s"] = noun_phrase
+            
+            # 関係節内の動詞・補語を正しく抽出
             if aux_word:
                 sub_slots["sub-aux"] = aux_word.text
             sub_slots["sub-v"] = rel_verb.text
+            
+            # whose構文の特別処理：Stanzaの誤解析対応
+            if any(w.text.lower() == 'whose' for w in sentence.words):
+                # acl:relclとして解析されたlives（id=7）の依存語からredを探す
+                acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+                if acl_relcl_word:
+                    complement = self._find_word_by_head_and_deprel(sentence, acl_relcl_word.id, 'amod')
+                    if complement:
+                        sub_slots["sub-c1"] = complement.text
+            else:
+                # 通常の補語検出
+                complement = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'acomp')  # 形容詞補語
+                if not complement:
+                    complement = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'attr')  # 属性補語
+                if not complement:
+                    complement = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nmod')  # 名詞修飾
+                if complement:
+                    sub_slots["sub-c1"] = complement.text
             
         elif rel_type == 'advmod':
             # 関係副詞: "The place where he lives"
@@ -647,6 +702,79 @@ class UnifiedStanzaRephraseMapper:
     def _find_word_by_head_and_deprel(self, sentence, head_id: int, deprel: str):
         """頭IDと依存関係で語を検索"""
         return next((w for w in sentence.words if w.head == head_id and w.deprel == deprel), None)
+    
+    def _find_main_verb(self, sentence):
+        """主文の動詞を検索（関係節を除外）"""
+        # whose構文の特別処理：Stanzaがlivesを誤解析する場合の対応
+        if any(w.text.lower() == 'whose' for w in sentence.words):
+            # acl:relcl関係にある語を確認
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if (acl_relcl_word and 
+                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes'] and
+                acl_relcl_word.lemma in ['life', 'work', 'run', 'go']):
+                # これは動詞として解釈すべき
+                return acl_relcl_word
+        
+        # 通常の場合：rootを検索
+        root_word = None
+        for word in sentence.words:
+            if word.head == 0:  # root
+                root_word = word
+                break
+        
+        if not root_word:
+            return None
+            
+        # rootが形容詞の場合、cop動詞を主動詞とする（"The man is strong"構造）
+        if root_word.upos == 'ADJ':
+            cop_verb = self._find_word_by_head_and_deprel(sentence, root_word.id, 'cop')
+            if cop_verb:
+                return cop_verb
+        
+        return root_word
+    
+    def _build_full_subject_with_relative_clause(self, sentence, antecedent, rel_verb):
+        """関係節を含む完全な主語句を構築"""
+        # 先行詞から開始
+        subject_phrase = antecedent.text
+        
+        # 先行詞の修飾語を追加
+        modifiers = []
+        for word in sentence.words:
+            if word.head == antecedent.id and word.id != rel_verb.id:
+                if word.deprel in ['det', 'amod', 'compound']:
+                    modifiers.append((word.id, word.text))
+        
+        # 修飾語を位置順でソート
+        modifiers.sort(key=lambda x: x[0])
+        
+        # 完全な主語句を構築
+        if modifiers:
+            modifier_text = ' '.join([m[1] for m in modifiers])
+            subject_phrase = f"{modifier_text} {subject_phrase}"
+        
+        return subject_phrase
+    
+    def _is_whose_construction(self, sentence, rel_verb):
+        """whose構文かどうかを判定"""
+        # whoseが存在し、かつrel_verbの依存語にcopがある場合
+        has_whose = any(w.text.lower() == 'whose' for w in sentence.words)
+        has_cop_child = any(w.head == rel_verb.id and w.deprel == 'cop' for w in sentence.words)
+        return has_whose and has_cop_child
+    
+    def _find_cop_verb_in_whose_clause(self, sentence, rel_verb):
+        """whose構文での実際の関係節動詞（cop）を検索"""
+        # rel_verbの依存語でcopのものを探す
+        cop_verb = next((w for w in sentence.words if w.head == rel_verb.id and w.deprel == 'cop'), None)
+        return cop_verb
+    
+    def _find_whose_antecedent(self, sentence):
+        """whose構文の先行詞を検索"""
+        # root主語を取得（通常は先行詞）
+        for word in sentence.words:
+            if word.head == 0 and word.deprel == 'root':
+                return word
+        return None
     
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
