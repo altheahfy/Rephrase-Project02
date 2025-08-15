@@ -752,7 +752,7 @@ class UnifiedStanzaRephraseMapper:
         
         # === 3. 関係節内要素特定 ===
         rel_subject = None
-        if rel_type in ['obj', 'advmod']:  # 目的語・関係副詞の場合のみ主語検索
+        if rel_type in ['obj', 'advmod', 'obj_omitted']:  # 省略目的語も含める
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
         elif rel_type == 'poss':
             # 所有格関係代名詞の場合は特別処理
@@ -1068,7 +1068,16 @@ class UnifiedStanzaRephraseMapper:
             # 省略目的語関係代名詞: "The book I read"
             # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
+            if rel_subject:
+                sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
+            
+            # 関係節内の副詞を検出
+            for adverb_word in sentence.words:
+                if (adverb_word.head == rel_verb.id and 
+                    adverb_word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:unmarked', 'nmod:tmod']):
+                    sub_slots["sub-m2"] = adverb_word.text
+                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}'")
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
@@ -1648,6 +1657,12 @@ class UnifiedStanzaRephraseMapper:
                 # 既に処理済みの副詞をスキップ
                 if word.text in existing_adverbs:
                     self.logger.debug(f"⚠️ 既存スロットに割り当て済み - スキップ: {word.text}")
+                    continue
+                
+                # 関係節内の副詞は関係節ハンドラーに任せる（acl:relcl構文チェック）
+                head_word = next((w for w in sentence.words if w.id == word.head), None)
+                if head_word and any(w.deprel == 'acl:relcl' and w.head == head_word.id for w in sentence.words):
+                    self.logger.debug(f"🔧 関係節内副詞を除外: {word.text} (head: {head_word.text})")
                     continue
                     
                 # 関係副詞は関係節ハンドラーに任せる
