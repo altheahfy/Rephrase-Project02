@@ -373,6 +373,25 @@ class UnifiedStanzaRephraseMapper:
             handler_result: ハンドラー処理結果  
             handler_name: ハンドラー名
         """
+        # 🎯 関係副詞重複排除：関係副詞がsub-m3にある場合、メインスロットの重複を除去
+        if 'sub_slots' in handler_result and handler_name == 'relative_clause':
+            sub_m3_value = handler_result['sub_slots'].get('sub-m3', '')
+            if sub_m3_value:
+                # "The way how", "The place where"などから基本部分を抽出
+                for rel_adv in ['how', 'where', 'when', 'why']:
+                    if rel_adv in sub_m3_value.lower():
+                        # "The way how" → "The way"を除去対象に設定
+                        base_part = sub_m3_value.replace(f" {rel_adv}", "").replace(f" {rel_adv.title()}", "")
+                        self.logger.debug(f"🔧 関係副詞重複排除: '{base_part}' をメインスロットから除去")
+                        
+                        # メインスロットから除去
+                        if 'slots' in base_result:
+                            for slot_key in list(base_result['slots'].keys()):
+                                if base_result['slots'][slot_key] == base_part.strip():
+                                    self.logger.debug(f"🗑️ 重複除去: {slot_key}='{base_part.strip()}'")
+                                    base_result['slots'][slot_key] = ""
+                        break
+        
         # スロット情報マージ
         if 'slots' in handler_result:
             for slot_name, slot_data in handler_result['slots'].items():
@@ -1633,6 +1652,12 @@ class UnifiedStanzaRephraseMapper:
                     
                 # 関係副詞は関係節ハンドラーに任せる
                 if word.text.lower() in ['where', 'when', 'why', 'how']:
+                    continue
+                    
+                # 関係副詞構文の先行詞（The way, The place等）は関係節ハンドラーに任せる
+                if (word.text.lower() in ['way', 'place', 'time', 'reason'] and 
+                    any(w.text.lower() in ['where', 'when', 'why', 'how'] for w in sentence.words)):
+                    self.logger.debug(f"🔧 関係副詞構文の先行詞をスキップ: {word.text}")
                     continue
                 
                 # 副詞分類
