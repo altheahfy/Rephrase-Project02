@@ -442,7 +442,7 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _identify_relative_pronoun(self, sentence, rel_verb) -> Tuple[Optional[Any], str]:
-        """関係代名詞/関係副詞の特定と分類"""
+        """関係代名詞/関係副詞の特定と分類（省略文対応強化）"""
         
         # 1. 関係副詞検出（最優先）
         advmod_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
@@ -454,17 +454,81 @@ class UnifiedStanzaRephraseMapper:
             if word.text.lower() == 'whose' and word.deprel == 'nmod:poss':
                 return word, 'poss'
         
-        # 3. 目的語関係代名詞
+        # 3. 明示的関係代名詞検出
+        # 目的語関係代名詞
         obj_pronoun = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obj')
-        if obj_pronoun:
+        if obj_pronoun and obj_pronoun.text.lower() in ['who', 'whom', 'which', 'that']:
             return obj_pronoun, 'obj'
         
-        # 4. 主語関係代名詞
+        # 主語関係代名詞  
         subj_pronoun = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
-        if subj_pronoun:
+        if subj_pronoun and subj_pronoun.text.lower() in ['who', 'which', 'that']:
             return subj_pronoun, 'nsubj'
         
+        # 4. 省略関係代名詞の推定（新実装）
+        inferred_type = self._infer_omitted_relative_pronoun(sentence, rel_verb)
+        if inferred_type:
+            # 仮想的な関係代名詞オブジェクトを作成
+            virtual_pronoun = self._create_virtual_relative_pronoun(sentence, rel_verb, inferred_type)
+            return virtual_pronoun, inferred_type
+        
         return None, 'unknown'
+    
+    def _infer_omitted_relative_pronoun(self, sentence, rel_verb) -> Optional[str]:
+        """省略された関係代名詞の推定"""
+        
+        # 関係節動詞の依存構造を分析
+        rel_verb_deps = []
+        for word in sentence.words:
+            if word.head == rel_verb.id:
+                rel_verb_deps.append(word.deprel)
+        
+        self.logger.debug(f"    関係動詞 '{rel_verb.text}' の依存語: {rel_verb_deps}")
+        
+        # パターン1: 省略目的語関係代名詞の検出
+        # "The book [that/which] was read" → rel_verb="read"だが主語が存在しない場合
+        has_nsubj_pass = 'nsubj:pass' in rel_verb_deps or 'nsubjpass' in rel_verb_deps
+        has_aux_pass = any(word.deprel in ['aux:pass', 'auxpass'] and word.head == rel_verb.id 
+                          for word in sentence.words)
+        
+        if has_nsubj_pass or has_aux_pass:
+            # 受動態関係節：先行詞が動作の対象（目的語相当）
+            self.logger.debug(f"    推定: 省略目的語関係代名詞（受動態パターン）")
+            return 'obj_omitted'
+        
+        # パターン2: 関係節内に主語が存在し、目的語がない場合
+        has_nsubj = 'nsubj' in rel_verb_deps
+        has_obj = 'obj' in rel_verb_deps or 'dobj' in rel_verb_deps
+        
+        if has_nsubj and not has_obj:
+            # 能動態で目的語がない場合、先行詞が目的語の可能性
+            self.logger.debug(f"    推定: 省略目的語関係代名詞（能動態パターン）")  
+            return 'obj_omitted'
+        
+        # パターン3: 主語がなく、関係節が能動態の場合
+        if not has_nsubj and not has_nsubj_pass:
+            self.logger.debug(f"    推定: 省略主語関係代名詞")
+            return 'nsubj_omitted'
+        
+        return None
+    
+    def _create_virtual_relative_pronoun(self, sentence, rel_verb, inferred_type):
+        """仮想的な関係代名詞オブジェクト作成"""
+        
+        # 関係節の先行詞を取得
+        antecedent = self._find_word_by_id(sentence, rel_verb.head)
+        
+        # 仮想オブジェクト（辞書形式で簡易実装）
+        virtual_pronoun = type('VirtualWord', (), {
+            'text': '[omitted]',  # 省略マーカー
+            'id': rel_verb.id - 0.5,  # 仮想ID（関係動詞の直前）
+            'head': rel_verb.head,
+            'deprel': inferred_type.replace('_omitted', ''),
+            'lemma': '[omitted]'
+        })()
+        
+        self.logger.debug(f"    仮想関係代名詞作成: type={inferred_type}, text=[omitted]")
+        return virtual_pronoun
     
     def _build_antecedent_phrase(self, sentence, antecedent, rel_pronoun, possessed_noun=None) -> str:
         """先行詞句構築（修飾語含む）- 関係節全体を含む完全な句を構築"""
@@ -898,12 +962,15 @@ def test_phase1_relative_clause():
         mapper.add_handler('relative_clause')
         print("✅ 関係節ハンドラー追加完了")
         
-        # 重要テストケース
+        # 重要テストケース（省略関係代名詞対応強化）
         test_cases = [
             ("The car which we saw was red.", "目的語関係代名詞"),
-            ("The man who runs fast is strong.", "主語関係代名詞"),
+            ("The man who runs fast is strong.", "主語関係代名詞"), 
             ("The man whose car is red lives here.", "所有格関係代名詞"),
-            ("The place where he lives is nice.", "関係副詞where")
+            ("The place where he lives is nice.", "関係副詞where"),
+            ("The book I read was interesting.", "省略目的語関係代名詞（能動態）"),
+            ("The book that was written is famous.", "省略目的語関係代名詞（受動態）"),
+            ("The person standing there is my friend.", "省略主語関係代名詞（現在分詞）")
         ]
         
         success_count = 0
