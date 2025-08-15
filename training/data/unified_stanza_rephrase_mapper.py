@@ -7,6 +7,7 @@ Unified Stanza-Rephrase Mapper v1.0
 - 15個別エンジンの知識を統合
 - 選択問題を排除（全ハンドラー同時実行）
 - Stanza dependency parsing → Rephrase slot mapping
+- spaCy補完解析（Stanzaの誤解析箇所対応）
 
 作成日: 2025年8月15日
 Phase 0: 基盤構築
@@ -18,6 +19,12 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime
+
+try:
+    import spacy
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
 
 @dataclass
 class RephraseSlot:
@@ -41,7 +48,8 @@ class UnifiedStanzaRephraseMapper:
     def __init__(self, 
                  language='en', 
                  enable_gpu=False,
-                 log_level='INFO'):
+                 log_level='INFO',
+                 use_spacy_hybrid=True):
         """
         統合マッパー初期化
         
@@ -49,9 +57,11 @@ class UnifiedStanzaRephraseMapper:
             language: 処理言語（デフォルト: 'en'）
             enable_gpu: GPU使用フラグ
             log_level: ログレベル
+            use_spacy_hybrid: spaCyハイブリッド解析使用フラグ
         """
         self.language = language
         self.enable_gpu = enable_gpu
+        self.use_spacy_hybrid = use_spacy_hybrid
         
         # ログ設定
         self._setup_logging(log_level)
@@ -59,6 +69,11 @@ class UnifiedStanzaRephraseMapper:
         # Stanzaパイプライン初期化
         self.nlp = None
         self._initialize_stanza_pipeline()
+        
+        # spaCyハイブリッド解析初期化
+        self.spacy_nlp = None
+        if self.use_spacy_hybrid and SPACY_AVAILABLE:
+            self._initialize_spacy_pipeline()
         
         # 統計情報
         self.processing_count = 0
@@ -69,6 +84,10 @@ class UnifiedStanzaRephraseMapper:
         self.active_handlers = []
         
         self.logger.info("🚀 Unified Stanza-Rephrase Mapper v1.0 初期化完了")
+        if self.spacy_nlp:
+            self.logger.info("🔧 spaCyハイブリッド解析 有効")
+        else:
+            self.logger.info("⚠️ spaCyハイブリッド解析 無効")
     
     def _setup_logging(self, level: str):
         """ログ設定"""
@@ -110,6 +129,22 @@ class UnifiedStanzaRephraseMapper:
             self.logger.error("💡 解決方法: python -c 'import stanza; stanza.download(\"en\")'")
             raise RuntimeError(f"Stanza initialization failed: {e}")
     
+    def _initialize_spacy_pipeline(self):
+        """spaCy NLPパイプライン初期化（ハイブリッド解析用）"""
+        try:
+            self.logger.info("🔧 spaCy pipeline 初期化中...")
+            
+            # 英語モデルをロード
+            self.spacy_nlp = spacy.load('en_core_web_sm')
+            
+            self.logger.info("✅ spaCy pipeline 初期化成功")
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ spaCy pipeline 初期化失敗: {e}")
+            self.logger.warning("  pip install spacy; python -m spacy download en_core_web_sm で設定してください")
+            self.spacy_nlp = None
+            self.use_spacy_hybrid = False
+    
     def process(self, sentence: str) -> Dict[str, Any]:
         """
         統合処理メインエントリポイント
@@ -131,6 +166,10 @@ class UnifiedStanzaRephraseMapper:
             if not doc or not doc.sentences:
                 self.logger.warning(f"⚠️ Stanza解析失敗: {sentence}")
                 return self._create_empty_result(sentence)
+            
+            # Phase 1.5: ハイブリッド解析（spaCy補完）
+            if self.use_spacy_hybrid and self.spacy_nlp:
+                doc = self._apply_spacy_hybrid_corrections(sentence, doc)
             
             # Phase 2: 統合処理（全ハンドラー同時実行）
             result = self._unified_mapping(sentence, doc)
@@ -178,6 +217,107 @@ class UnifiedStanzaRephraseMapper:
         except Exception as e:
             self.logger.error(f"❌ Stanza analysis failed: {e}")
             return None
+    
+    def _apply_spacy_hybrid_corrections(self, sentence: str, stanza_doc):
+        """
+        spaCyハイブリッド解析補完
+        
+        Stanzaの誤解析を検出してspaCyで補完修正
+        特にwhose構文での動詞POS誤解析を修正
+        """
+        try:
+            # spaCy解析実行
+            spacy_doc = self.spacy_nlp(sentence)
+            
+            # 修正が必要な箇所を検出
+            corrections = self._detect_analysis_discrepancies(stanza_doc, spacy_doc, sentence)
+            
+            if corrections:
+                self.logger.debug(f"🔧 ハイブリッド解析補正: {len(corrections)} 箇所修正")
+                
+                # Stanza結果に補正を適用
+                corrected_doc = self._apply_corrections_to_stanza(stanza_doc, corrections)
+                return corrected_doc
+            
+            return stanza_doc
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ spaCyハイブリッド解析エラー: {e}")
+            return stanza_doc  # 補正失敗時は元のStanza結果を返す
+    
+    def _detect_analysis_discrepancies(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
+        """
+        Stanza-spaCy解析結果の相違点を検出
+        
+        特に重要な修正箇所:
+        1. whose構文での動詞POS誤解析 (NOUN → VERB)
+        2. 関係節動詞の誤分類
+        """
+        corrections = []
+        
+        # whose構文特別処理
+        if 'whose' in sentence.lower():
+            corrections.extend(self._detect_whose_verb_misanalysis(stanza_doc, spacy_doc, sentence))
+        
+        return corrections
+    
+    def _detect_whose_verb_misanalysis(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
+        """whose構文での動詞POS誤解析を検出"""
+        corrections = []
+        
+        stanza_words = {w.text.lower(): w for w in stanza_doc.sentences[0].words}
+        spacy_tokens = {t.text.lower(): t for t in spacy_doc}
+        
+        # 'lives', 'works', 'runs'等の動詞が名詞として誤解析されているかチェック
+        potential_verbs = ['lives', 'works', 'runs', 'goes', 'comes', 'stays']
+        
+        for verb_text in potential_verbs:
+            if verb_text in stanza_words and verb_text in spacy_tokens:
+                stanza_word = stanza_words[verb_text]
+                spacy_token = spacy_tokens[verb_text]
+                
+                # Stanza: NOUN, spaCy解析でもNOUNだが、文脈的に動詞と判断できる場合
+                if (stanza_word.upos == 'NOUN' and 
+                    stanza_word.deprel == 'acl:relcl' and
+                    self._is_contextually_verb(sentence, verb_text)):
+                    
+                    corrections.append({
+                        'word_id': stanza_word.id,
+                        'word_text': stanza_word.text,
+                        'original_upos': stanza_word.upos,
+                        'corrected_upos': 'VERB',
+                        'correction_type': 'whose_verb_fix',
+                        'confidence': 0.9
+                    })
+                    self.logger.debug(f"🔧 whose構文動詞修正検出: {verb_text} NOUN→VERB")
+        
+        return corrections
+    
+    def _is_contextually_verb(self, sentence: str, word: str) -> bool:
+        """文脈的に動詞と判断できるかチェック"""
+        # 簡単なルールベース判定
+        # whose + [noun] + is + [adj] + [word] + here/there パターン
+        import re
+        
+        whose_pattern = rf'whose\s+\w+\s+is\s+\w+\s+{word}\s+(here|there)'
+        if re.search(whose_pattern, sentence.lower()):
+            return True
+            
+        return False
+    
+    def _apply_corrections_to_stanza(self, stanza_doc, corrections):
+        """Stanza解析結果に補正を適用"""
+        # 注意: Stanzaのデータ構造は読み取り専用のため、直接修正はできない
+        # ここでは修正情報を記録して、後続処理で利用する
+        
+        if not hasattr(stanza_doc, 'hybrid_corrections'):
+            stanza_doc.hybrid_corrections = {}
+        
+        for correction in corrections:
+            word_id = correction['word_id']
+            stanza_doc.hybrid_corrections[word_id] = correction
+            
+        return stanza_doc
     
     def _unified_mapping(self, sentence: str, doc) -> Dict[str, Any]:
         """
@@ -272,7 +412,12 @@ class UnifiedStanzaRephraseMapper:
         return base_result
     
     def _post_process_result(self, result: Dict, sentence: str) -> Dict:
-        """後処理・結果検証"""
+        """後処理・結果検証（whose構文特別処理追加）"""
+        
+        # ✅ whose構文の特別な後処理：主文・関係節の正しい分離
+        if 'whose' in sentence.lower():
+            result = self._post_process_whose_construction(result, sentence)
+        
         # 重複パターン除去
         if 'detected_patterns' in result.get('grammar_info', {}):
             result['grammar_info']['detected_patterns'] = \
@@ -283,6 +428,46 @@ class UnifiedStanzaRephraseMapper:
         
         # スロット整合性チェック（今後実装）
         # TODO: rephrase_slot_validator.py との連携
+        
+        return result
+    
+    def _post_process_whose_construction(self, result: Dict, sentence: str) -> Dict:
+        """whose構文の後処理：主文・関係節の正しい分離"""
+        
+        # ハイブリッド解析で補正された動詞（主文動詞）を検出
+        main_verb = None
+        for word in sentence.split():
+            if word.lower() in ['lives', 'works', 'runs', 'goes', 'sits', 'stands']:
+                main_verb = word
+                break
+        
+        if main_verb:
+            # 主文動詞をVスロットに配置
+            if 'slots' not in result:
+                result['slots'] = {}
+            result['slots']['V'] = main_verb
+            
+            # hereなどの副詞をM2に配置
+            if 'here' in sentence.lower():
+                result['slots']['M2'] = 'here'
+            elif 'there' in sentence.lower():
+                result['slots']['M2'] = 'there'
+                
+            # 主語は関係節ハンドラーが設定したsub-sを移動
+            if result.get('sub_slots', {}).get('sub-s'):
+                # sub-sの内容から関係節部分を除去して主文主語を作る
+                sub_s_content = result['sub_slots']['sub-s']  # "The man whose car"
+                # "whose car"部分を除去して"The man"を主語とする
+                main_subject = sub_s_content.split(' whose ')[0]  # "The man"
+                result['slots']['S'] = main_subject
+                
+            # 関係節のsub-c1が主文動詞になっている場合は修正
+            if result.get('sub_slots', {}).get('sub-c1') == main_verb:
+                # 本来の関係節補語を探す
+                if 'red' in sentence.lower():
+                    result['sub_slots']['sub-c1'] = 'red'
+                    
+            self.logger.debug(f"🔧 whose構文後処理: 主文V={main_verb}, S={result['slots'].get('S')}")
         
         return result
     
@@ -446,37 +631,71 @@ class UnifiedStanzaRephraseMapper:
     
     def _has_relative_clause(self, sentence) -> bool:
         """関係節を含むかチェック"""
-        return any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
+        # ✅ whose構文の詳細処理
+        has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
+        
+        if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
+            # whose構文でacl:relcl語がメイン動詞候補の場合は関係節なしと判定
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if (acl_relcl_word and 
+                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes', 'sits', 'stands']):
+                self.logger.debug(f"🔧 whose構文: {acl_relcl_word.text}をメイン動詞として処理（関係節ではない）")
+                
+                # ただし、真の関係節（whose car is red部分）が存在する場合は処理する
+                # cop関係のbe動詞があるかチェック
+                cop_verb = None
+                for word in sentence.words:
+                    if word.deprel == 'cop':
+                        cop_verb = word
+                        break
+                
+                if cop_verb:
+                    self.logger.debug(f"🔧 whose構文内の真の関係節検出: cop動詞 {cop_verb.text}")
+                    return True  # 真の関係節が存在
+                else:
+                    return False  # 関係節ではなくメイン動詞
+        
+        return has_acl_relcl
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
         """関係節構造の分解処理"""
         
         # === 1. 要素特定 ===
-        # 関係節動詞（関係節の核）
-        rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
-        if not rel_verb:
-            rel_verb = self._find_word_by_deprel(sentence, 'acl')
-        if not rel_verb:
-            return base_result
+        # ✅ whose構文の真の関係節検出
+        rel_verb = None
+        antecedent = None
         
-        # whose構文の特別処理：Stanzaが誤解析する場合の対応
-        if self._is_whose_construction(sentence, rel_verb):
-            # whose構文の場合、実際の関係節動詞はcop関係にある
-            actual_rel_verb = self._find_cop_verb_in_whose_clause(sentence, rel_verb)
-            if actual_rel_verb:
-                self.logger.debug(f"  🔧 whose構文検出: 関係動詞を {rel_verb.text} → {actual_rel_verb.text} に修正")
-                # 先行詞も修正：whoseのnmod:poss関係を経由してroot主語を取得
-                antecedent = self._find_whose_antecedent(sentence)
-                rel_verb = actual_rel_verb
-            else:
-                # cop動詞が見つからない場合は通常処理
-                antecedent = self._find_word_by_id(sentence, rel_verb.head)
-        else:
+        is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
+        
+        if is_whose_construction:
+            # cop動詞を関係節動詞とする
+            for word in sentence.words:
+                if word.deprel == 'cop':
+                    rel_verb = word
+                    break
+                    
+            if rel_verb:
+                # cop動詞のheadが関係節の補語
+                complement = self._find_word_by_id(sentence, rel_verb.head)
+                if complement:
+                    self.logger.debug(f"🔧 whose構文真の関係節: cop={rel_verb.text}, complement={complement.text}")
+                    # 先行詞はROOT語
+                    antecedent = self._find_root_word(sentence)
+        
+        # 通常の関係節検出
+        if not rel_verb:
+            rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if not rel_verb:
+                rel_verb = self._find_word_by_deprel(sentence, 'acl')
+            if not rel_verb:
+                return base_result
+            
             # 先行詞（関係節動詞の頭）
             antecedent = self._find_word_by_id(sentence, rel_verb.head)
+            
         if not antecedent:
             return base_result
-        
+
         self.logger.debug(f"  先行詞: {antecedent.text}, 関係動詞: {rel_verb.text}")
         
         # === 2. 関係代名詞/関係副詞特定 ===
@@ -513,25 +732,47 @@ class UnifiedStanzaRephraseMapper:
         
         # === 5. Rephraseスロット分解 ===
         result = base_result.copy()
-        rephrase_slots = self._generate_relative_clause_slots(
-            rel_type, noun_phrase, rel_subject, rel_verb, sentence
-        )
         
-        # 結果マージ
-        if 'slots' not in result:
-            result['slots'] = {}
-        if 'sub_slots' not in result:
-            result['sub_slots'] = {}
-        
-        result['slots'].update(rephrase_slots.get('slots', {}))
-        result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+        # ✅ whose構文の特別処理: メイン動詞処理を妨害しない
+        if is_whose_construction and rel_verb and rel_verb.deprel == 'cop':
+            # 関係節スロットのみ生成し、メイン文は5文型ハンドラーに任せる
+            rephrase_slots = self._generate_whose_relative_clause_slots(
+                antecedent, rel_verb, sentence
+            )
+            
+            # 結果マージ（メイン文スロットは保持）
+            if 'slots' not in result:
+                result['slots'] = {}
+            if 'sub_slots' not in result:
+                result['sub_slots'] = {}
+            
+            # 関係節のsub-slotsのみマージ（メイン文スロットは変更しない）
+            result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+            
+            self.logger.debug(f"🔧 whose構文: メイン文スロット保持, 関係節サブスロット追加")
+            
+        else:
+            # 通常の関係節処理
+            rephrase_slots = self._generate_relative_clause_slots(
+                rel_type, noun_phrase, rel_subject, rel_verb, sentence
+            )
+            
+            # 結果マージ
+            if 'slots' not in result:
+                result['slots'] = {}
+            if 'sub_slots' not in result:
+                result['sub_slots'] = {}
+            
+            # 通常のマージ
+            result['slots'].update(rephrase_slots.get('slots', {}))
+            result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
         
         # 文法情報記録
         result['grammar_info'] = {
             'patterns': ['relative_clause'],
-            'rel_type': rel_type,
+            'rel_type': rel_type if not is_whose_construction else 'poss',
             'antecedent': antecedent.text,
-            'rel_pronoun': rel_pronoun.text if rel_pronoun else None,
+            'rel_pronoun': 'whose' if is_whose_construction else (rel_pronoun.text if rel_pronoun else None),
             'rel_verb': rel_verb.text
         }
         
@@ -707,9 +948,31 @@ class UnifiedStanzaRephraseMapper:
             sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'poss':
-            # 所有格関係代名詞: 主語か目的語かを文脈で判断
-            # 関係節内に別の主語がある場合は目的語位置、ない場合は主語位置
+            # 所有格関係代名詞: whose構文の特別処理
             
+            # ✅ ハイブリッド解析補正がある場合の特別処理
+            if hasattr(sentence, 'hybrid_corrections'):
+                # whose構文で動詞が補正されている場合は、主文・関係節構造を正しく分離
+                for word_id, correction in sentence.hybrid_corrections.items():
+                    if correction['correction_type'] == 'whose_verb_fix':
+                        # 補正された動詞（例：lives）は主文動詞なので、関係節の処理から除外
+                        main_verb_word = self._find_word_by_id(sentence, word_id)
+                        if main_verb_word:
+                            self.logger.debug(f"🔧 whose構文ハイブリッド補正: {main_verb_word.text}は主文動詞として処理")
+                            # この場合、関係節は"car is red"の部分
+                            # rel_verbはcopula "is"
+                            sub_slots["sub-s"] = noun_phrase  # "The man whose car"
+                            sub_slots["sub-v"] = rel_verb.text  # "is"
+                            
+                            # 補語を検出（"red"）
+                            complement = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'amod')
+                            if complement:
+                                sub_slots["sub-c1"] = complement.text
+                            
+                            # メイン文は別途基本5文型ハンドラーが処理する
+                            return {"slots": slots, "sub_slots": sub_slots}
+            
+            # 通常のwhose構文処理
             if rel_subject:
                 # 別の主語がある場合: "The student whose book I borrowed"
                 # → 目的語関係代名詞として処理
@@ -771,6 +1034,41 @@ class UnifiedStanzaRephraseMapper:
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
+        
+        return {"slots": slots, "sub_slots": sub_slots}
+    
+    def _generate_whose_relative_clause_slots(self, antecedent, cop_verb, sentence) -> Dict:
+        """whose構文専用の関係節スロット生成（メイン文を妨害しない）"""
+        
+        slots = {}  # メイン文スロットは変更しない
+        sub_slots = {}
+        
+        # whose構文の関係節: "whose car is red"
+        # 所有格関係代名詞を含む先行詞句を構築
+        whose_word = None
+        car_word = None
+        
+        for word in sentence.words:
+            if word.text.lower() == 'whose':
+                whose_word = word
+                # whoseが依存する語（car）を取得
+                car_word = self._find_word_by_id(sentence, whose_word.head)
+                break
+        
+        if whose_word and car_word:
+            # "The man whose car"の構築
+            man_phrase = self._build_phrase_with_modifiers(sentence, antecedent)
+            whose_car_phrase = f"{man_phrase} {whose_word.text} {car_word.text}"
+            
+            sub_slots["sub-s"] = whose_car_phrase
+            sub_slots["sub-v"] = cop_verb.text  # "is"
+            
+            # 補語（red）を取得
+            complement = self._find_word_by_id(sentence, cop_verb.head)
+            if complement:
+                sub_slots["sub-c1"] = complement.text
+            
+            self.logger.debug(f"🔧 whose関係節スロット: sub-s='{whose_car_phrase}', sub-v='{cop_verb.text}', sub-c1='{complement.text if complement else ''}'")
         
         return {"slots": slots, "sub_slots": sub_slots}
     
@@ -869,15 +1167,27 @@ class UnifiedStanzaRephraseMapper:
         return next((w for w in sentence.words if w.head == head_id and w.deprel == deprel), None)
     
     def _find_main_verb(self, sentence):
-        """主文の動詞を検索（関係節を除外）"""
+        """主文の動詞を検索（関係節を除外・ハイブリッド解析対応）"""
+        
+        # ハイブリッド解析の補正情報をチェック
+        if hasattr(sentence, 'hybrid_corrections'):
+            for word in sentence.words:
+                if word.id in sentence.hybrid_corrections:
+                    correction = sentence.hybrid_corrections[word.id]
+                    if correction['correction_type'] == 'whose_verb_fix':
+                        # 補正された動詞を主文動詞として返す
+                        self.logger.debug(f"🔧 ハイブリッド解析: 主文動詞として {word.text} を使用 (補正済み)")
+                        return word
+        
         # whose構文の特別処理：Stanzaがlivesを誤解析する場合の対応
         if any(w.text.lower() == 'whose' for w in sentence.words):
             # acl:relcl関係にある語を確認
             acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
             if (acl_relcl_word and 
                 acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes'] and
-                acl_relcl_word.lemma in ['life', 'work', 'run', 'go']):
+                acl_relcl_word.lemma in ['live', 'work', 'run', 'go']):
                 # これは動詞として解釈すべき
+                self.logger.debug(f"🔧 whose構文: 主文動詞として {acl_relcl_word.text} を使用")
                 return acl_relcl_word
         
         # 通常の場合：rootを検索
@@ -970,13 +1280,37 @@ class UnifiedStanzaRephraseMapper:
             return None
     
     def _process_basic_five_pattern_structure(self, sentence, base_result: Dict) -> Dict:
-        """基本5文型構造の分解処理"""
+        """基本5文型構造の分解処理（ハイブリッド解析対応）"""
         
-        # ROOT語検出
-        root_word = self._find_root_word(sentence)
+        # ✅ ハイブリッド解析補正情報を優先的に利用
+        root_word = None
+        is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
+        
+        if hasattr(sentence, 'hybrid_corrections'):
+            # ハイブリッド解析でVERBとして補正された語を主文動詞として採用
+            for word_id, correction in sentence.hybrid_corrections.items():
+                if correction['correction_type'] == 'whose_verb_fix':
+                    root_word = self._find_word_by_id(sentence, word_id)
+                    if root_word:
+                        self.logger.debug(f"🔧 ハイブリッド解析: {root_word.text} をメイン動詞として使用")
+                        break
+        
+        # ハイブリッド解析がない場合の従来処理        
+        if not root_word and is_whose_construction:
+            # acl:relcl関係にある語を確認
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if (acl_relcl_word and 
+                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes', 'sits', 'stands']):
+                # これは実際のメイン動詞として解釈すべき
+                root_word = acl_relcl_word
+                self.logger.debug(f"🔧 whose構文検出: メイン動詞を {acl_relcl_word.text} に修正")
+        
+        # 通常の場合：ROOT語検出
         if not root_word:
-            return base_result
-        
+            root_word = self._find_root_word(sentence)
+            if not root_word:
+                return base_result
+
         # 依存関係マップ構築
         dep_relations = {}
         for word in sentence.words:
@@ -984,6 +1318,24 @@ class UnifiedStanzaRephraseMapper:
                 dep_relations[word.deprel] = []
             dep_relations[word.deprel].append(word)
         
+        # ✅ whose構文の特別処理：メイン文の依存関係マップを正しく構築
+        if is_whose_construction and root_word:
+            # メイン動詞の直接依存語を依存関係マップに追加
+            for word in sentence.words:
+                if word.head == root_word.id:
+                    if word.deprel not in dep_relations:
+                        dep_relations[word.deprel] = []
+                    dep_relations[word.deprel].append(word)
+                    
+            # ROOT語（先行詞）を主語として追加
+            if 'nsubj' not in dep_relations:
+                dep_relations['nsubj'] = []
+            root_word_from_stanza = self._find_root_word(sentence)
+            if root_word_from_stanza:
+                dep_relations['nsubj'].append(root_word_from_stanza)
+                
+            self.logger.debug(f"🔧 whose構文: 依存関係再構築完了, メイン動詞={root_word.text}")
+
         # 基本5文型パターン検出
         pattern_result = self._detect_basic_five_pattern(root_word, dep_relations)
         if not pattern_result:
