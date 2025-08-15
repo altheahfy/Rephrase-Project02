@@ -863,6 +863,12 @@ class UnifiedStanzaRephraseMapper:
                 "root_pos": ["ADJ", "NOUN"],
                 "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
             },
+            "SVC_ALT": {
+                "required": ["nsubj", "xcomp"],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"nsubj": "S", "root": "V", "xcomp": "C1"}
+            },
             "SV": {
                 "required": ["nsubj"],
                 "optional": [],
