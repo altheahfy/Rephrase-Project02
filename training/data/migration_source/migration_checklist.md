@@ -2,21 +2,21 @@
 
 ## 📋 移植対象エンジン一覧
 
-### ✅ 優先度1 (Phase 1-4: 基礎構文)
+### ✅ 優先度1 (Phase 1-5: 基礎構文)
 
-- [ ] **basic_five_pattern_engine.py** (新規最優先)
+- [x] **basic_five_pattern_engine.py** (✅完了 - Phase 1)
   - 機能: 基本5文型処理 (SV, SVC, SVO, SVOO, SVOC)
   - 移植先メソッド: `_handle_basic_five_pattern()`
   - テスト例文: "The man is strong." / "He bought a car."
-  - 重要度: ⭐⭐⭐ **基盤エンジン・最優先移植**
+  - 重要度: ⭐⭐⭐ **基盤エンジン・完了済み**
 
-- [ ] **simple_relative_engine.py** (256行)
+- [x] **simple_relative_engine.py** (✅完了 - Phase 2) 
   - 機能: 関係節処理 (acl:relcl, nsubj, obj, nmod:poss, advmod)  
   - 移植先メソッド: `_handle_relative_clause()`
   - テスト例文: "The car which we saw was red."
   - 責任範囲: **関係節のみ**（主文処理は5文型エンジンに委譲）
 
-- [ ] **passive_voice_engine.py** (281行)
+- [x] **passive_voice_engine.py** (✅完了 - Phase 2)
   - 機能: 受動態処理 (nsubj:pass, aux:pass, obl:agent)
   - 移植先メソッド: `_handle_passive_voice()`  
   - テスト例文: "The car was bought by him."
@@ -27,6 +27,20 @@
   - 移植先メソッド: `_handle_adverb()`
   - テスト例文: "The man runs fast." / "She speaks very clearly."
   - 処理対象: 様態副詞(M2), 程度副詞(埋込), 否定副詞(M3), 時間副詞(M1)
+
+- [ ] **article_determiner_engine.py** (新規実装) 🆕
+  - 機能: 冠詞・定冠詞処理 (det依存関係専門処理)
+  - 移植先メソッド: `_handle_article_determiner()`
+  - テスト例文: "The car is red." → S: "The car" / "A book was bought." → S: "A book"
+  - 処理対象: 定冠詞(the), 不定冠詞(a/an), 数量詞(some/many), 所有格(my/your)
+  - 重要度: ⭐⭐ **基本文変換・必須機能**
+
+- [ ] **article_determiner_engine.py** (新規作成 - Phase 3)
+  - 機能: 冠詞・定冠詞処理 (det dependency)  
+  - 処理対象: the, a, an, this, that, my, your, などのdet関係
+  - テスト例文: "The car is red." → S: "The car"
+  - 目的: 名詞句の完全性確保（現在"The car"が"car"のみになる問題を解決）
+  - 重要度: ⭐⭐ **名詞句抽出完全性・必須**
 
 ### ⚡ 優先度2 (Phase 5-7: 句構造・従属節)
 

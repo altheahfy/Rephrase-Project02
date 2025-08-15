@@ -11,6 +11,9 @@ def test_custom_sentences():
     
     # 初期化
     mapper = UnifiedStanzaRephraseMapper(log_level='INFO')
+    
+    # 全ハンドラーを追加（Phase 2統合完了版）
+    mapper.add_handler('basic_five_pattern')  # 🎯 基本5文型ハンドラー追加！
     mapper.add_handler('relative_clause')
     mapper.add_handler('passive_voice')
     print("✅ システム準備完了")

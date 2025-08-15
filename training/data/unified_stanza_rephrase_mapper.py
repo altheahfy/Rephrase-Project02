@@ -442,7 +442,15 @@ class UnifiedStanzaRephraseMapper:
         result['slots'].update(rephrase_slots.get('slots', {}))
         result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
         
-        # 文法情報記録
+        # === 6. 主文の残り部分を5文型エンジンで処理 ===
+        self.logger.debug(f"  🔧 主文処理開始中...")
+        main_clause_result = self._process_main_clause_after_relative(sentence, antecedent, rel_verb, noun_phrase)
+        if main_clause_result:
+            # 主文の処理結果をマージ（サブスロットは保持）
+            result['slots'].update(main_clause_result.get('slots', {}))
+            self.logger.debug(f"  ✅ 主文処理追加: {len(main_clause_result.get('slots', {}))} main clause slots")
+        else:
+            self.logger.debug(f"  ⚠️ 主文処理結果なし")
         result['grammar_info'] = {
             'patterns': ['relative_clause'],
             'rel_type': rel_type,
@@ -451,7 +459,7 @@ class UnifiedStanzaRephraseMapper:
             'rel_verb': rel_verb.text
         }
         
-        self.logger.debug(f"  ✅ 関係節処理完了: {len(rephrase_slots.get('slots', {}))} main slots, {len(rephrase_slots.get('sub_slots', {}))} sub slots")
+        self.logger.debug(f"  ✅ 関係節処理完了: {len(result.get('slots', {}))} main slots, {len(result.get('sub_slots', {}))} sub slots")
         return result
     
     def _identify_relative_pronoun(self, sentence, rel_verb) -> Tuple[Optional[Any], str]:
@@ -666,6 +674,86 @@ class UnifiedStanzaRephraseMapper:
             sub_slots["sub-v"] = rel_verb.text
         
         return {"slots": slots, "sub_slots": sub_slots}
+    
+    def _process_main_clause_after_relative(self, sentence, antecedent, rel_verb, noun_phrase) -> Optional[Dict]:
+        """関係節処理後の主文部分を5文型で処理"""
+        
+        # 主文の動詞（ROOT語）を特定
+        main_verb = self._find_root_word(sentence)
+        if not main_verb:
+            self.logger.debug("  ⚠️ 主文動詞なし")
+            return None
+            
+        if main_verb.id == rel_verb.id:
+            self.logger.debug("  ⚠️ 関係節動詞がROOT - 主文なし")
+            return None
+        
+        self.logger.debug(f"  🔍 主文動詞検出: {main_verb.text} (id: {main_verb.id}, POS: {main_verb.upos})")
+        
+        # 依存関係マップ構築（関係節を除外）
+        dep_relations = {}
+        excluded_words = []
+        
+        for word in sentence.words:
+            # 関係節内の語をスキップ
+            if self._is_word_in_relative_clause(word, rel_verb):
+                excluded_words.append(word.text)
+                continue
+                
+            if word.deprel not in dep_relations:
+                dep_relations[word.deprel] = []
+            dep_relations[word.deprel].append(word)
+        
+        self.logger.debug(f"  🚫 除外語: {excluded_words}")
+        self.logger.debug(f"  📝 主文依存関係: {list(dep_relations.keys())}")
+        
+        # 基本5文型パターン検出
+        pattern_result = self._detect_basic_five_pattern(main_verb, dep_relations)
+        if not pattern_result:
+            self.logger.debug("  ❌ 主文パターン検出失敗")
+            return None
+        
+        self.logger.debug(f"  🎯 主文パターン検出: {pattern_result['pattern']}")
+        
+        # スロット生成（Sスロットは空にして構造を維持）
+        five_pattern_slots = self._generate_basic_five_slots(
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
+        )
+        
+        # 関係節を含む主語はサブスロットにあるため、上位SスロットはNoneまたは空
+        if 'slots' in five_pattern_slots and 'S' in five_pattern_slots['slots']:
+            five_pattern_slots['slots']['S'] = ""  # 関係節がサブスロットに含まれることを示す
+            
+        self.logger.debug(f"  ✅ 主文処理完了: パターン={pattern_result['pattern']}")
+        return five_pattern_slots
+    
+    def _is_word_in_relative_clause(self, word, rel_verb) -> bool:
+        """語が関係節内にあるかチェック"""
+        
+        # 関係節動詞自身
+        if word.id == rel_verb.id:
+            return True
+            
+        # 関係節動詞の依存語
+        if word.head == rel_verb.id:
+            return True
+            
+        # 関係代名詞（関係節動詞に依存するnsubj/obj等）
+        if word.deprel in ['nsubj', 'obj', 'advmod'] and word.head == rel_verb.id:
+            return True
+        
+        # 関係節を修飾するacl:relclの依存語
+        if word.deprel == 'acl:relcl':
+            return True
+            
+        return False
+    
+    def _get_all_dependents(self, head_word) -> List:
+        """指定語のすべての依存語を取得"""
+        # この実装では、sentenceオブジェクトに直接アクセスできないため
+        # 簡易実装として空リストを返す
+        # 実際の使用では、sentence.wordsを通じて依存語を検索する
+        return []
     
     # === Stanza解析ヘルパーメソッド ===
     
