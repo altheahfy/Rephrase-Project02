@@ -484,7 +484,7 @@ class UnifiedStanzaRephraseMapper:
         
         # === 3. 関係節内要素特定 ===
         rel_subject = None
-        if rel_type in ['obj', 'advmod']:  # 目的語・関係副詞の場合は別途主語検索
+        if rel_type in ['obj', 'advmod', 'poss']:  # ✅ 修正：possも追加
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
         
         # 所有格関係代名詞の特別処理
@@ -684,9 +684,13 @@ class UnifiedStanzaRephraseMapper:
             sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'poss':
-            # 所有格関係代名詞: "The man whose car is red"
-            # slots["S"] = ""  # 上位スロットは5文型エンジンに任せる
-            sub_slots["sub-s"] = noun_phrase
+            # 所有格関係代名詞: "The student whose book I borrowed"
+            # whose構文は目的語位置に配置される
+            sub_slots["sub-o1"] = noun_phrase  # ✅ 修正：目的語位置
+            
+            # 関係節内の実際の主語を検出
+            if rel_subject:
+                sub_slots["sub-s"] = rel_subject.text
             
             # 関係節内の動詞・補語を正しく抽出
             if aux_word:
