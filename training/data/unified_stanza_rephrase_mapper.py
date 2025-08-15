@@ -665,6 +665,9 @@ class UnifiedStanzaRephraseMapper:
         # ✅ whose構文の詳細処理
         has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
         
+        # 節主語パターンもチェック ("The car parked outside is mine")
+        has_csubj = any(w.deprel == 'csubj' for w in sentence.words)
+        
         if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
             # whose構文でacl:relcl語がメイン動詞候補の場合は関係節なしと判定
             acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
@@ -686,7 +689,8 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     return False  # 関係節ではなくメイン動詞
         
-        return has_acl_relcl
+        # 標準的な関係節またはcsubjパターンの存在チェック
+        return has_acl_relcl or has_csubj
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
         """関係節構造の分解処理"""
@@ -727,14 +731,35 @@ class UnifiedStanzaRephraseMapper:
         
         # 通常の関係節検出
         if not rel_verb:
+            self.logger.debug("🔍 関係節検出開始...")
+            
+            # 標準的な関係節パターン
             rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if not rel_verb:
+            if rel_verb:
+                self.logger.debug(f"  acl:relcl検出: {rel_verb.text}")
+            else:
                 rel_verb = self._find_word_by_deprel(sentence, 'acl')
+                if rel_verb:
+                    self.logger.debug(f"  acl検出: {rel_verb.text}")
+            
+            # 節主語パターンも検出 ("The car parked outside is mine")
             if not rel_verb:
+                csubj_verb = self._find_word_by_deprel(sentence, 'csubj')
+                if csubj_verb:
+                    self.logger.debug(f"  csubj検出: {csubj_verb.text}")
+                    # csubjパターンでは、動詞自体が関係節動詞
+                    rel_verb = csubj_verb
+                    # 先行詞は動詞の主語
+                    antecedent = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
+                    self.logger.debug(f"🔧 節主語パターン検出: {rel_verb.text} with subject {antecedent.text if antecedent else 'None'}")
+            
+            if not rel_verb:
+                self.logger.debug("  関係節動詞未検出")
                 return base_result
             
-            # 先行詞（関係節動詞の頭）
-            antecedent = self._find_word_by_id(sentence, rel_verb.head)
+            # 先行詞（関係節動詞の頭、またはcsubjの場合は既に設定済み）
+            if not antecedent:
+                antecedent = self._find_word_by_id(sentence, rel_verb.head)
             
         if not antecedent:
             return base_result
@@ -743,6 +768,11 @@ class UnifiedStanzaRephraseMapper:
         
         # === 2. 関係代名詞/関係副詞特定 ===
         rel_pronoun, rel_type = self._identify_relative_pronoun(sentence, rel_verb)
+        
+        # csubjパターンの場合は省略主語関係代名詞として扱う
+        if rel_verb.deprel == 'csubj':
+            rel_type = 'nsubj_omitted'
+            self.logger.debug(f"🔧 csubjパターン -> nsubj_omitted変換")
         
         # === 3. 関係節内要素特定 ===
         rel_subject = None
