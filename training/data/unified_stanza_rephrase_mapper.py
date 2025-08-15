@@ -278,10 +278,72 @@ class UnifiedStanzaRephraseMapper:
             result['grammar_info']['detected_patterns'] = \
                 list(set(result['grammar_info']['detected_patterns']))
         
+        # 🔧 REPHRASE SPECIFICATION COMPLIANCE: Sub-slots require empty main slots
+        self._apply_rephrase_slot_structure_rules(result)
+        
         # スロット整合性チェック（今後実装）
         # TODO: rephrase_slot_validator.py との連携
         
         return result
+    
+    def _apply_rephrase_slot_structure_rules(self, result: Dict) -> None:
+        """
+        Rephrase仕様準拠：複文での正しいスロット配置
+        
+        重要ルール：sub-slotsが存在する場合、対応するmain slotsは空文字にする
+        例外：Aux, Vスロットは例外適用なし
+        
+        対応関係：
+        - S ←→ sub-s (S位置の従属節)
+        - O1 ←→ sub-o1 (O1位置の従属節)  
+        - O2 ←→ sub-o2 (O2位置の従属節)
+        - C1 ←→ sub-c1 (C1位置の従属節)
+        - C2 ←→ sub-c2 (C2位置の従属節)
+        - M1 ←→ sub-m1 (M1位置の従属節)
+        - M2 ←→ sub-m2 (M2位置の従属節) 
+        - M3 ←→ sub-m3 (M3位置の従属節)
+        """
+        slots = result.get('slots', {})
+        sub_slots = result.get('sub_slots', {})
+        
+        # 対応関係マッピング（Aux, V除外）
+        main_to_sub_mapping = {
+            'S': 'sub-s',
+            'O1': 'sub-o1', 
+            'O2': 'sub-o2',
+            'C1': 'sub-c1',
+            'C2': 'sub-c2', 
+            'M1': 'sub-m1',
+            'M2': 'sub-m2',
+            'M3': 'sub-m3'
+        }
+        
+        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
+        
+        # 複文判定＆スロット空文字化処理
+        for main_slot, sub_slot in main_to_sub_mapping.items():
+            if sub_slot in sub_slots and sub_slots[sub_slot]:
+                # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
+                if main_slot in slots:
+                    original_value = slots[main_slot]
+                    slots[main_slot] = ""  # 位置マーカーとして空文字設定
+                    
+                    self.logger.debug(
+                        f"🔄 Complex sentence rule applied: "
+                        f"{main_slot}: '{original_value}' → '' "
+                        f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
+                    )
+        
+        # 処理結果をデバッグログ出力
+        applied_rules = [
+            f"{main}→{sub}" for main, sub in main_to_sub_mapping.items() 
+            if sub in sub_slots and sub_slots[sub] and main in slots
+        ]
+        
+        if applied_rules:
+            self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
+        else:
+            self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
     
     def _create_empty_result(self, sentence: str) -> Dict[str, Any]:
         """空結果の作成"""
