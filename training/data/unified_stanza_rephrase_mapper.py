@@ -424,7 +424,7 @@ class UnifiedStanzaRephraseMapper:
                 list(set(result['grammar_info']['detected_patterns']))
         
         # 🔧 REPHRASE SPECIFICATION COMPLIANCE: Sub-slots require empty main slots
-        self._apply_rephrase_slot_structure_rules(result)
+        self._apply_rephrase_slot_structure_rules(result, sentence)
         
         # スロット整合性チェック（今後実装）
         # TODO: rephrase_slot_validator.py との連携
@@ -471,7 +471,7 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _apply_rephrase_slot_structure_rules(self, result: Dict) -> None:
+    def _apply_rephrase_slot_structure_rules(self, result: Dict, sentence: str) -> None:
         """
         Rephrase仕様準拠：複文での正しいスロット配置
         
@@ -527,6 +527,24 @@ class UnifiedStanzaRephraseMapper:
         
         if applied_rules:
             self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
+        
+        # ✅ whose構文の主文副詞は上位スロットに保持（自動移動無効化）
+        # 主文の副詞（M1, M2, M3）は上位スロットに残すのが正しい仕様
+        # if 'whose' in sentence.lower() and any(s in sub_slots for s in ['sub-s', 'sub-v', 'sub-c1']):
+        #     # whose構文検出時、主文のM-slotを自動的にsub-slotに移動
+        #     additional_rules = []
+        #     for main_slot in ['M1', 'M2', 'M3']:
+        #         if main_slot in slots and slots[main_slot]:  # 内容がある場合
+        #             sub_slot = main_to_sub_mapping[main_slot]
+        #             if sub_slot not in sub_slots or not sub_slots[sub_slot]:  # sub-slotが空の場合
+        #                 sub_slots[sub_slot] = slots[main_slot]
+        #                 slots[main_slot] = ""
+        #                 additional_rules.append(f"{main_slot}→{sub_slot}")
+        #                 self.logger.debug(f"🔄 whose構文主文副詞移動: {main_slot}: '{sub_slots[sub_slot]}' → {sub_slot}")
+        #     
+        #     if additional_rules:
+        #         self.logger.info(f"✅ whose構文主文副詞移動: {', '.join(additional_rules)}")
+        
         else:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
     
