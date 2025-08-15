@@ -239,8 +239,21 @@ class UnifiedStanzaRephraseMapper:
                 if slot_name not in base_result['slots']:
                     base_result['slots'][slot_name] = slot_data
                 else:
-                    # 競合解決（単純上書き - 文字列の場合も対応）
-                    base_result['slots'][slot_name] = slot_data
+                    # 競合解決：空文字や空値で既存の有効な値を上書きしない
+                    existing_value = base_result['slots'][slot_name]
+                    
+                    # 既存値が空で新値が有効な場合は上書き
+                    if not existing_value and slot_data:
+                        base_result['slots'][slot_name] = slot_data
+                    # 既存値が有効で新値も有効な場合は後勝ち（従来通り）
+                    elif existing_value and slot_data:
+                        base_result['slots'][slot_name] = slot_data
+                    # 既存値が有効で新値が空の場合は保持（★修正ポイント）
+                    elif existing_value and not slot_data:
+                        pass  # 既存値を保持
+                    # 両方空の場合は後勝ち
+                    else:
+                        base_result['slots'][slot_name] = slot_data
         
         # サブスロット情報マージ
         if 'sub_slots' in handler_result:
@@ -442,14 +455,7 @@ class UnifiedStanzaRephraseMapper:
         result['slots'].update(rephrase_slots.get('slots', {}))
         result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
         
-        # === 6. 主文の残り部分を5文型エンジンで処理 ===
-        main_clause_result = self._process_main_clause_after_relative(sentence, antecedent, rel_verb, noun_phrase)
-        if main_clause_result:
-            # 主文の処理結果をマージ（サブスロットは保持）
-            result['slots'].update(main_clause_result.get('slots', {}))
-            self.logger.debug(f"  ✅ 主文処理追加: {len(main_clause_result.get('slots', {}))} main clause slots")
-        else:
-            self.logger.debug(f"  ⚠️ 主文処理結果なし")
+        # 文法情報記録
         result['grammar_info'] = {
             'patterns': ['relative_clause'],
             'rel_type': rel_type,
@@ -595,7 +601,7 @@ class UnifiedStanzaRephraseMapper:
         
         if rel_type == 'obj':
             # 目的語関係代名詞: "The book that he bought"
-            slots["O1"] = ""  # 上位スロット空
+            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
@@ -603,13 +609,13 @@ class UnifiedStanzaRephraseMapper:
             
         elif rel_type == 'nsubj':
             # 主語関係代名詞: "The man who runs"
-            slots["S"] = ""  # 上位スロット空
+            # slots["S"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-s"] = noun_phrase
             sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'nsubj:pass':
             # 受動態主語関係代名詞: "The car which was crashed"
-            slots["S"] = ""  # 上位スロット空
+            # slots["S"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-s"] = noun_phrase
             if aux_word:
                 sub_slots["sub-aux"] = aux_word.text
@@ -617,7 +623,7 @@ class UnifiedStanzaRephraseMapper:
             
         elif rel_type == 'poss':
             # 所有格関係代名詞: "The man whose car is red"
-            slots["S"] = ""  # 上位スロット空
+            # slots["S"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-s"] = noun_phrase
             
             # 関係節内の動詞・補語を正しく抽出
@@ -645,7 +651,7 @@ class UnifiedStanzaRephraseMapper:
             
         elif rel_type == 'advmod':
             # 関係副詞: "The place where he lives"
-            slots["M3"] = ""  # 上位スロット空
+            # slots["M3"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-m3"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
@@ -654,19 +660,19 @@ class UnifiedStanzaRephraseMapper:
         # 省略関係代名詞の処理
         elif rel_type == 'obj_omitted':
             # 省略目的語関係代名詞: "The book I read"
-            slots["O1"] = ""
+            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
             sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
-            slots["O1"] = ""
+            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
             sub_slots["sub-v"] = rel_verb.text
             
         else:
             # デフォルト（目的語扱い）
-            slots["O1"] = ""
+            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
