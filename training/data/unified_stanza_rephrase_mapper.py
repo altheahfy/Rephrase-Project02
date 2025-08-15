@@ -668,19 +668,27 @@ class UnifiedStanzaRephraseMapper:
         is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
         
         if is_whose_construction:
-            # cop動詞を関係節動詞とする
-            for word in sentence.words:
-                if word.deprel == 'cop':
-                    rel_verb = word
-                    break
-                    
-            if rel_verb:
-                # cop動詞のheadが関係節の補語
-                complement = self._find_word_by_id(sentence, rel_verb.head)
-                if complement:
-                    self.logger.debug(f"🔧 whose構文真の関係節: cop={rel_verb.text}, complement={complement.text}")
-                    # 先行詞はROOT語
-                    antecedent = self._find_root_word(sentence)
+            # whose構文では、acl:relcl関係の語が真の関係節動詞
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if acl_relcl_word:
+                rel_verb = acl_relcl_word
+                # acl:relcl関係の語のheadが先行詞
+                antecedent = self._find_word_by_id(sentence, rel_verb.head)
+                self.logger.debug(f"🔧 whose構文: 関係節動詞={rel_verb.text}, 先行詞={antecedent.text if antecedent else 'None'}")
+            else:
+                # fallback: cop動詞を使用（ただし先行詞は慎重に選択）
+                for word in sentence.words:
+                    if word.deprel == 'cop':
+                        rel_verb = word
+                        # whose構文でのcop動詞の場合、先行詞はnsubjを探す
+                        for w in sentence.words:
+                            if w.deprel == 'nsubj':
+                                antecedent = w
+                                break
+                        break
+                        
+            if rel_verb and antecedent:
+                self.logger.debug(f"🔧 whose構文修正: 関係節動詞={rel_verb.text}, 先行詞={antecedent.text}")
         
         # 通常の関係節検出
         if not rel_verb:
@@ -1268,9 +1276,10 @@ class UnifiedStanzaRephraseMapper:
         try:
             self.logger.debug("🔍 5文型ハンドラー実行中...")
             
-            # 他のエンジンが既に処理済みの場合はスキップ
-            if base_result.get('slots', {}).get('V') or base_result.get('sub_slots', {}).get('sub-v'):
-                self.logger.debug("  他エンジンが処理済み - スキップ")
+            # 他のエンジンが主文動詞（V）を既に処理済みの場合のみスキップ
+            # sub-vは関係節動詞なので主文処理には影響しない
+            if base_result.get('slots', {}).get('V'):
+                self.logger.debug("  主文動詞(V)が処理済み - スキップ")
                 return None
             
             return self._process_basic_five_pattern_structure(sentence, base_result)
