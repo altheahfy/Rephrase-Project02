@@ -511,35 +511,94 @@ class UnifiedStanzaRephraseMapper:
         sub_slots = result.get('sub_slots', {})
         
         self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
+        self.logger.debug(f"🔧 空化ルール開始: slots={list(slots.keys())}, sub_slots={list(sub_slots.keys())}")
+        if 'S' in slots:
+            self.logger.debug(f"🔧 S値確認: '{slots['S']}' (type: {type(slots['S'])}, bool: {bool(slots['S'])})")
+        else:
+            self.logger.debug("🔧 Sスロット不存在")
+        
+        # 🎯 Rephraseルール適用（特殊構文の後処理）
+        self._apply_consecutive_verb_rephrase_rule(result, sentence)
         
         # 🎯 正しいルール：そのスロット自体がサブスロット分解された場合のみ空にする
         # 例: "The man I met was my father" → S空、V保持、C1保持
         emptied_slots = []
         
         # 🔍 どのメインスロットがサブスロット分解されているかを判定
-        # サブスロットの存在パターンから逆算
+        # 関係節のsub-slotsは関係節内の要素であり、メインスロットの直接分解ではない
         
-        # S スロットの判定: sub-s, sub-v, sub-o1などSに関連するサブスロットがあるか
-        s_related_subs = [key for key in sub_slots.keys() if key in ['sub-s', 'sub-v', 'sub-o1', 'sub-aux', 'sub-c1', 'sub-m1', 'sub-m2', 'sub-m3']]
-        if s_related_subs and 'S' in slots and slots['S']:
+        # S スロットの判定: 関係節要素がある場合のみ空にする
+        if any(key in sub_slots for key in ['sub-s', 'sub-v', 'sub-o1', 'sub-m2']) and 'S' in slots and slots['S']:
             slots['S'] = ""
             emptied_slots.append('S')
-            self.logger.debug(f"🔄 S slot emptied due to sub-slot decomposition: {s_related_subs}")
+            self.logger.debug(f"🔄 S slot emptied due to relative clause decomposition")
+        # 🎯 正しいRephraseルール：各上位スロットが自身のサブスロットを持つ場合のみ空にする
+        # M1のサブスロット群に要素があれば → M1を空
+        # Sのサブスロット群に要素があれば → Sを空
+        # O1のサブスロット群に要素があれば → O1を空
+        emptied_slots = []
         
-        # 他のスロットも同様の論理で処理
-        # M2スロット: sub-m2があればM2を空にする
-        if 'sub-m2' in sub_slots and sub_slots['sub-m2'] and 'M2' in slots and slots['M2']:
-            slots['M2'] = ""
-            emptied_slots.append('M2')
-            self.logger.debug(f"🔄 M2 slot emptied due to sub-m2: {sub_slots['sub-m2']}")
+        # 各上位スロットごとに、その配下のサブスロット群をチェック
+        main_slot_mappings = {
+            'M1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'S': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'O1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'O2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'C1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'C2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'M2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
+            'M3': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3']
+        }
         
-        # 他のスロットも必要に応じて追加
+        # ✅ 連続動詞構造の特別処理：S位置のサブスロット要素のみ認識
+        consecutive_verb_detected = ('sub-v' in sub_slots and 
+                                   sub_slots['sub-v'] and 
+                                   'sub-m2' in sub_slots and 
+                                   sub_slots['sub-m2'])
+        
+        for main_slot, sub_slot_names in main_slot_mappings.items():
+            # その上位スロットの配下サブスロット群に要素が存在するかチェック
+            has_sub_elements = any(sub_slots.get(sub_name) for sub_name in sub_slot_names)
             
-            # V、Auxは例外的に保持（主文動詞は残す）
-            # V、Auxスロットは空にしない
-            
+            if has_sub_elements and main_slot in slots and slots[main_slot]:
+                # ✅ 連続動詞構造の場合：S位置のsub-vとsub-m2はSスロットのみ影響
+                if consecutive_verb_detected:
+                    # sub-vとsub-m2はS位置のサブスロット → Sのみ空化、M2は保持
+                    if main_slot == 'S':
+                        original_value = slots[main_slot]
+                        slots[main_slot] = ""  # S位置に従属節があるため空化
+                        emptied_slots.append(main_slot)
+                        self.logger.debug(f"🔄 連続動詞S空化: S: '{original_value}' → '' (S-sub-v, S-sub-m2)")
+                    # M2は空化しない（M2のサブスロットではないため）
+                    elif main_slot == 'M2':
+                        self.logger.debug(f"🔄 連続動詞M2保持: M2: '{slots[main_slot]}' (S位置サブスロットのため影響なし)")
+                        continue
+                    else:
+                        # 他のスロットは通常ルール適用
+                        original_value = slots[main_slot]
+                        slots[main_slot] = ""  # 位置マーカーとして空文字設定
+                        emptied_slots.append(main_slot)
+                        active_sub_slots = [name for name in sub_slot_names if sub_slots.get(name)]
+                        self.logger.debug(
+                            f"🔄 Slot-specific emptying rule: "
+                            f"{main_slot}: '{original_value}' → '' "
+                            f"(active sub-slots: {active_sub_slots})"
+                        )
+                else:
+                    # 通常の空化ルール
+                    original_value = slots[main_slot]
+                    slots[main_slot] = ""  # 位置マーカーとして空文字設定
+                    emptied_slots.append(main_slot)
+                    
+                    active_sub_slots = [name for name in sub_slot_names if sub_slots.get(name)]
+                    self.logger.debug(
+                        f"🔄 Slot-specific emptying rule: "
+                        f"{main_slot}: '{original_value}' → '' "
+                        f"(active sub-slots: {active_sub_slots})"
+                    )
+        
         if emptied_slots:
-            self.logger.info(f"✅ Rephrase汎用空化ルール適用: {', '.join(emptied_slots)} → 空")
+            self.logger.info(f"✅ Rephrase個別空化ルール適用: {', '.join(emptied_slots)} → 空")
         
         # ✅ whose構文の主文副詞は上位スロットに保持（自動移動無効化）
         # 主文の副詞（M1, M2, M3）は上位スロットに残すのが正しい仕様
@@ -560,6 +619,86 @@ class UnifiedStanzaRephraseMapper:
         
         else:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
+    
+    def _apply_consecutive_verb_rephrase_rule(self, result: Dict, sentence: str) -> None:
+        """連続動詞構文のRephraseルール
+        
+        対象: "The door opened slowly creaked loudly"
+        意図: "The door [which] opened slowly creaked loudly"
+        
+        適用条件:
+        - 既存の関係節検出が失敗している場合のみ
+        - [名詞] [動詞1] [副詞] [動詞2] [副詞] パターン
+        """
+        slots = result.get('slots', {})
+        sub_slots = result.get('sub_slots', {})
+        
+        # 安全性チェック: 既存の関係節が検出されている場合はスキップ
+        if sub_slots:
+            self.logger.debug("🔍 既存関係節検出済み - 連続動詞ルールスキップ")
+            return
+        
+        # パターン検出: 2つの動詞が存在し、適切な構造を持つか
+        if not self._detect_consecutive_verb_pattern(slots, sentence):
+            return
+            
+        # 連続動詞パターン処理
+        self._process_consecutive_verb_structure(result, sentence)
+    
+    def _detect_consecutive_verb_pattern(self, slots: Dict, sentence: str) -> bool:
+        """連続動詞パターンの検出"""
+        # 簡単なヒューリスティック: S, V, C1が全て埋まっており、C1が動詞的な語の場合
+        if not (slots.get('S') and slots.get('V') and slots.get('C1')):
+            return False
+            
+        # C1が動詞として使用される可能性のある語かチェック
+        c1_text = slots.get('C1', '').lower().strip()
+        
+        # よくある動詞パターン（過去形・過去分詞形含む）
+        verb_indicators = ['creaked', 'moved', 'fell', 'broke', 'jumped', 'ran', 'walked', 'spoke']
+        
+        if c1_text in verb_indicators:
+            self.logger.debug(f"🔍 連続動詞パターン検出: {c1_text}")
+            return True
+            
+        return False
+    
+    def _process_consecutive_verb_structure(self, result: Dict, sentence: str) -> None:
+        """連続動詞構造の処理"""
+        slots = result.get('slots', {})
+        sub_slots = result.get('sub_slots', {})
+        
+        # 現在のスロット内容を取得
+        original_s = slots.get('S', '')
+        original_v = slots.get('V', '')
+        original_c1 = slots.get('C1', '')
+        original_m2 = slots.get('M2', '')
+        original_m3 = slots.get('M3', '')
+        
+        # 構造変換: S+V -> sub-v, C1 -> V
+        if original_s and original_v and original_c1:
+            # サブスロットに第一動詞句を移動
+            sub_slots['sub-v'] = f"{original_s} {original_v}"
+            
+            # 第一動詞に関連する副詞をサブスロットに移動  
+            if original_m2:
+                sub_slots['sub-m2'] = original_m2
+                slots['M2'] = ""  # M2を一時的に空にする
+            
+            # メインスロットを再構成
+            slots['S'] = ""  # Sを空にする（サブスロット要素があるため）
+            slots['V'] = original_c1  # C1をメイン動詞に昇格
+            slots['C1'] = ""  # C1を空にする
+            
+            self.logger.debug(f"🔧 連続動詞構造変換中: S設定 S='' (type: {type(slots['S'])})")
+            
+            # M3があればM2に移動（loudly -> M2）
+            if original_m3:
+                slots['M2'] = original_m3
+                slots['M3'] = ""
+                self.logger.debug(f"🔄 M3→M2移動: '{original_m3}'")
+            
+            self.logger.debug(f"🔄 連続動詞構造変換完了: sub-v='{sub_slots['sub-v']}', V='{slots['V']}', M2='{slots.get('M2', '')}'")
     
     def _create_empty_result(self, sentence: str) -> Dict[str, Any]:
         """空結果の作成"""
@@ -665,8 +804,17 @@ class UnifiedStanzaRephraseMapper:
         # ✅ whose構文の詳細処理
         has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
         
-        # 節主語パターンもチェック ("The car parked outside is mine")
+        # 節主語パターンまたは副詞節パターンもチェック ("The car parked outside is mine", "The door opened slowly creaked loudly")
         has_csubj = any(w.deprel == 'csubj' for w in sentence.words)
+        
+        # spaCyの副詞節パターン（advcl）もチェック
+        has_advcl = False
+        if hasattr(sentence, 'words') and hasattr(sentence.words[0], 'deprel'):
+            # Stanza形式
+            has_advcl = any(w.deprel == 'advcl' for w in sentence.words)
+        else:
+            # spaCy形式の場合はspaCyハイブリッド解析で検出
+            pass
         
         # 補文パターンもチェック ("The door opened slowly creaked loudly")
         has_xcomp = any(w.deprel == 'xcomp' for w in sentence.words)
@@ -692,8 +840,8 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     return False  # 関係節ではなくメイン動詞
         
-        # 標準的な関係節またはcsubjパターンまたはxcompパターンの存在チェック
-        return has_acl_relcl or has_csubj or has_xcomp
+        # 標準的な関係節またはcsubjパターンまたは副詞節パターンの存在チェック  
+        return has_acl_relcl or has_csubj or has_advcl
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
         """関係節構造の分解処理"""
