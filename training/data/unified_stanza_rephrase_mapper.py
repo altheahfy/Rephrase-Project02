@@ -668,23 +668,27 @@ class UnifiedStanzaRephraseMapper:
         is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
         
         if is_whose_construction:
-            # whose構文では、acl:relcl関係の語が真の関係節動詞
-            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if acl_relcl_word:
-                rel_verb = acl_relcl_word
-                # acl:relcl関係の語のheadが先行詞
-                antecedent = self._find_word_by_id(sentence, rel_verb.head)
-                self.logger.debug(f"🔧 whose構文: 関係節動詞={rel_verb.text}, 先行詞={antecedent.text if antecedent else 'None'}")
+            # whose構文では、まずacl:relcl関係の実動詞を探す
+            acl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if acl_word and acl_word.upos == 'VERB':
+                # Pattern B: 実動詞が関係節動詞 (例: borrowed)
+                rel_verb = acl_word
+                if acl_word.head > 0:
+                    antecedent = self._find_word_by_id(sentence, acl_word.head)
             else:
-                # fallback: cop動詞を使用（ただし先行詞は慎重に選択）
+                # Pattern A: cop動詞が関係節動詞 (例: is in "car is red")  
                 for word in sentence.words:
                     if word.deprel == 'cop':
                         rel_verb = word
-                        # whose構文でのcop動詞の場合、先行詞はnsubjを探す
-                        for w in sentence.words:
-                            if w.deprel == 'nsubj':
-                                antecedent = w
-                                break
+                        # acl:relclのheadから先行詞を探す
+                        if acl_word and acl_word.head > 0:
+                            antecedent = self._find_word_by_id(sentence, acl_word.head)
+                        else:
+                            # fallback: root語を先行詞とする
+                            for w in sentence.words:
+                                if w.deprel == 'root':
+                                    antecedent = w
+                                    break
                         break
                         
             if rel_verb and antecedent:
