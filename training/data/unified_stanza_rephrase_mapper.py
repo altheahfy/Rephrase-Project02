@@ -668,6 +668,9 @@ class UnifiedStanzaRephraseMapper:
         # 節主語パターンもチェック ("The car parked outside is mine")
         has_csubj = any(w.deprel == 'csubj' for w in sentence.words)
         
+        # 補文パターンもチェック ("The door opened slowly creaked loudly")
+        has_xcomp = any(w.deprel == 'xcomp' for w in sentence.words)
+        
         if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
             # whose構文でacl:relcl語がメイン動詞候補の場合は関係節なしと判定
             acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
@@ -689,8 +692,8 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     return False  # 関係節ではなくメイン動詞
         
-        # 標準的な関係節またはcsubjパターンの存在チェック
-        return has_acl_relcl or has_csubj
+        # 標準的な関係節またはcsubjパターンまたはxcompパターンの存在チェック
+        return has_acl_relcl or has_csubj or has_xcomp
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
         """関係節構造の分解処理"""
@@ -742,16 +745,33 @@ class UnifiedStanzaRephraseMapper:
                 if rel_verb:
                     self.logger.debug(f"  acl検出: {rel_verb.text}")
             
-            # 節主語パターンも検出 ("The car parked outside is mine")
+            # 補文パターンも検出 ("The door opened slowly creaked loudly")
             if not rel_verb:
-                csubj_verb = self._find_word_by_deprel(sentence, 'csubj')
-                if csubj_verb:
-                    self.logger.debug(f"  csubj検出: {csubj_verb.text}")
-                    # csubjパターンでは、動詞自体が関係節動詞
-                    rel_verb = csubj_verb
-                    # 先行詞は動詞の主語
-                    antecedent = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
-                    self.logger.debug(f"🔧 節主語パターン検出: {rel_verb.text} with subject {antecedent.text if antecedent else 'None'}")
+                xcomp_verb = self._find_word_by_deprel(sentence, 'xcomp')
+                if xcomp_verb:
+                    self.logger.debug(f"  xcomp検出: {xcomp_verb.text}")
+                    # xcompパターンでは、補文動詞をメイン動詞とし、rootを関係節動詞とする
+                    root_verb = None
+                    for word in sentence.words:
+                        if word.deprel == 'root':
+                            root_verb = word
+                            break
+                    
+                    if root_verb:
+                        rel_verb = root_verb  # root動詞を関係節動詞とする
+                        # 先行詞は関係節動詞の主語
+                        antecedent = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
+                        self.logger.debug(f"🔧 補文パターン検出: {rel_verb.text} with subject {antecedent.text if antecedent else 'None'}, main verb: {xcomp_verb.text}")
+                        
+                        # メイン動詞を上位スロットに設定
+                        base_result['slots']['V'] = xcomp_verb.text
+                        
+                        # xcomp動詞の副詞をメイン副詞として処理
+                        for adverb_word in sentence.words:
+                            if (adverb_word.head == xcomp_verb.id and 
+                                adverb_word.deprel in ['advmod']):
+                                base_result['slots']['M2'] = adverb_word.text
+                                self.logger.debug(f"🔧 メイン副詞検出: M2 = '{adverb_word.text}'")
             
             if not rel_verb:
                 self.logger.debug("  関係節動詞未検出")
