@@ -447,11 +447,11 @@ class UnifiedStanzaRephraseMapper:
                 result['slots'] = {}
             result['slots']['V'] = main_verb
             
-            # hereなどの副詞をM2に配置
-            if 'here' in sentence.lower():
-                result['slots']['M2'] = 'here'
-            elif 'there' in sentence.lower():
-                result['slots']['M2'] = 'there'
+            # ✅ 副詞処理は専門エンジンに委譲 - 固定処理を無効化
+            # if 'here' in sentence.lower():
+            #     result['slots']['M2'] = 'here'
+            # elif 'there' in sentence.lower():
+            #     result['slots']['M2'] = 'there'
                 
             # 主語は関係節ハンドラーが設定したsub-sを移動
             if result.get('sub_slots', {}).get('sub-s'):
@@ -1551,14 +1551,14 @@ class UnifiedStanzaRephraseMapper:
             if word.id in excluded_word_ids:
                 continue
                 
-            # 関係副詞は処理しない（関係節ハンドラーが担当）
-            if word.deprel == 'advmod' and 'M2' not in slots:
-                if word.text.lower() not in relative_adverbs:
-                    slots['M2'] = word.text  # 通常の副詞修飾語のみ
-                else:
-                    self.logger.debug(f"🔍 関係副詞除外: {word.text} (関係節ハンドラーに委譲)")
-            elif word.deprel == 'obl' and 'M3' not in slots:
-                slots['M3'] = word.text  # 前置詞句等
+            # ✅ 副詞処理は専門エンジンに委譲 - 基本5文型では処理しない
+            # if word.deprel == 'advmod' and 'M2' not in slots:
+            #     if word.text.lower() not in relative_adverbs:
+            #         slots['M2'] = word.text  # 通常の副詞修飾語のみ
+            #     else:
+            #         self.logger.debug(f"🔍 関係副詞除外: {word.text} (関係節ハンドラーに委譲)")
+            # elif word.deprel == 'obl' and 'M3' not in slots:
+            #     slots['M3'] = word.text  # 前置詞句等
         
         return {'slots': slots, 'sub_slots': sub_slots}
     
