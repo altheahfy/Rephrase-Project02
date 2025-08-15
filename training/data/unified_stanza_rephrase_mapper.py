@@ -1561,7 +1561,236 @@ class UnifiedStanzaRephraseMapper:
             #     slots['M3'] = word.text  # 前置詞句等
         
         return {'slots': slots, 'sub_slots': sub_slots}
+
+    def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        副詞エンジン（Phase 4実装）
+        
+        migration_source/prepositional_phrase_engine.py の分類システムを参考に
+        統一された副詞処理を実装
+        
+        Args:
+            sentence: Stanza sentence オブジェクト
+            base_result: 基本解析結果（重複防止用）
+            
+        Returns:
+            Optional[Dict]: 副詞処理結果、または None
+        """
+        from enum import Enum
+        
+        class AdverbialType(Enum):
+            """副詞の意味分類"""
+            TIME = "time"           # 時間副詞 → M1
+            FREQUENCY = "frequency" # 頻度副詞 → M2
+            MANNER = "manner"       # 様態副詞 → M2/M3
+            LOCATION = "location"   # 場所副詞 → M2/M3
+            DEGREE = "degree"       # 程度副詞 → M2
+        
+        self.logger.debug("🔍 副詞ハンドラー実行中...")
+        
+        # === 既存スロット確認（重複防止） ===
+        existing_slots = {}
+        if base_result and 'slots' in base_result:
+            existing_slots = base_result['slots']
+        
+        # 既に割り当て済みの副詞文字列を特定
+        existing_adverbs = set()
+        for slot_key, slot_value in existing_slots.items():
+            if slot_key.startswith('M') and slot_value:
+                # スロット値を単語に分解して副詞を特定
+                words = slot_value.split()
+                existing_adverbs.update(words)
+        
+        # === 1. 副詞検出（拡張対応） ===
+        adverbial_modifiers = []
+        sentence_length = len(sentence.words)
+        
+        for word in sentence.words:
+            # 拡張副詞依存関係対応（Yesterday検出バグ修正済み）
+            if word.deprel in ['advmod', 'obl', 'obl:unmarked', 'obl:tmod', 'obl:npmod', 'nmod:unmarked', 'nmod:tmod']:
+                # 既に処理済みの副詞をスキップ
+                if word.text in existing_adverbs:
+                    self.logger.debug(f"⚠️ 既存スロットに割り当て済み - スキップ: {word.text}")
+                    continue
+                    
+                # 関係副詞は関係節ハンドラーに任せる
+                if word.text.lower() in ['where', 'when', 'why', 'how']:
+                    continue
+                
+                # 副詞分類
+                adv_type = self._classify_adverb(word, sentence)
+                
+                # 位置計算（1ベース）
+                position_ratio = word.id / sentence_length
+                
+                adverbial_modifiers.append({
+                    'word': word,
+                    'type': adv_type,
+                    'position': word.id,
+                    'position_ratio': position_ratio,
+                    'text': word.text
+                })
+        
+        if not adverbial_modifiers:
+            self.logger.debug("❌ 副詞なし - スキップ")
+            return None
+        
+        # === 2. 位置ベース配置 ===
+        slots = {}
+        sub_slots = {}
+        
+        # 位置順でソート（前から後ろへ）
+        adverbial_modifiers.sort(key=lambda x: x['position'])
+        
+        for adv_info in adverbial_modifiers:
+            word = adv_info['word']
+            adv_type = adv_info['type']
+            position_ratio = adv_info['position_ratio']
+            word_text = word.text
+            
+            # 複合副詞句の構築
+            phrase = self._build_adverbial_phrase(sentence, word)
+            if phrase != word_text:
+                word_text = phrase
+            
+            # 位置ベース配置判定
+            target_slot = self._determine_adverb_slot(adv_type, position_ratio)
+            
+            # スロット配置（重複回避）
+            if target_slot == 'M1' and 'M1' not in slots:
+                slots['M1'] = word_text
+                self.logger.debug(f"🔧 M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+            elif target_slot == 'M2' and 'M2' not in slots:
+                slots['M2'] = word_text
+                self.logger.debug(f"🔧 M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+            elif target_slot == 'M3' and 'M3' not in slots:
+                slots['M3'] = word_text
+                self.logger.debug(f"🔧 M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+            else:
+                # フォールバック配置
+                for fallback_slot in ['M1', 'M2', 'M3']:
+                    if fallback_slot not in slots:
+                        slots[fallback_slot] = word_text
+                        self.logger.debug(f"🔧 {fallback_slot}フォールバック配置: {word_text}")
+                        break
+        
+        if slots:
+            self.logger.debug(f"  ✅ 副詞処理完了: {len(slots)} slots detected")
+            return {'slots': slots, 'sub_slots': sub_slots}
+        else:
+            return None
     
+    def _classify_adverb(self, word, sentence):
+        """副詞の意味分類"""
+        from enum import Enum
+        
+        class AdverbialType(Enum):
+            TIME = "time"
+            FREQUENCY = "frequency"
+            MANNER = "manner"
+            LOCATION = "location"
+            DEGREE = "degree"
+        
+        word_lower = word.text.lower()
+        
+        # 時間副詞
+        time_adverbs = {
+            'yesterday', 'today', 'tomorrow', 'now', 'then', 'recently', 
+            'currently', 'formerly', 'previously', 'eventually', 'finally',
+            'earlier', 'later', 'soon', 'immediately', 'already', 'still',
+            'ago', 'before', 'after', 'during', 'meanwhile'
+        }
+        
+        # 頻度副詞
+        frequency_adverbs = {
+            'always', 'usually', 'often', 'sometimes', 'rarely', 'never',
+            'frequently', 'occasionally', 'seldom', 'constantly', 'repeatedly',
+            'once', 'twice', 'again', 'daily', 'weekly', 'monthly'
+        }
+        
+        # 様態副詞
+        manner_adverbs = {
+            'carefully', 'quickly', 'slowly', 'quietly', 'loudly', 'gently',
+            'suddenly', 'gradually', 'easily', 'hardly', 'clearly', 'properly',
+            'correctly', 'incorrectly', 'well', 'badly', 'perfectly', 'seriously'
+        }
+        
+        # 場所副詞
+        location_adverbs = {
+            'here', 'there', 'everywhere', 'nowhere', 'somewhere', 'anywhere',
+            'upstairs', 'downstairs', 'outside', 'inside', 'nearby', 'far',
+            'home', 'abroad', 'locally', 'globally'
+        }
+        
+        # 程度副詞
+        degree_adverbs = {
+            'very', 'quite', 'rather', 'extremely', 'completely', 'totally',
+            'partially', 'slightly', 'barely', 'almost', 'entirely', 'mostly',
+            'too', 'enough', 'highly', 'deeply'
+        }
+        
+        # 分類実行
+        if word_lower in time_adverbs:
+            return AdverbialType.TIME
+        elif word_lower in frequency_adverbs:
+            return AdverbialType.FREQUENCY
+        elif word_lower in manner_adverbs:
+            return AdverbialType.MANNER
+        elif word_lower in location_adverbs:
+            return AdverbialType.LOCATION
+        elif word_lower in degree_adverbs:
+            return AdverbialType.DEGREE
+        else:
+            # デフォルト（品詞ベース判定）
+            if word.upos == 'ADV':
+                return AdverbialType.MANNER  # 副詞は様態として扱う
+            else:
+                return AdverbialType.LOCATION  # 名詞句は場所として扱う
+    
+    def _determine_adverb_slot(self, adv_type, position_ratio) -> str:
+        """副詞タイプと位置に基づくスロット決定"""
+        from enum import Enum
+        
+        class AdverbialType(Enum):
+            TIME = "time"
+            FREQUENCY = "frequency"
+            MANNER = "manner"
+            LOCATION = "location"
+            DEGREE = "degree"
+        
+        # 時間副詞は常にM1
+        if adv_type == AdverbialType.TIME:
+            return 'M1'
+        
+        # 位置ベース判定
+        if position_ratio <= 0.3:  # 文頭30%
+            return 'M1'
+        elif position_ratio >= 0.7:  # 文末30% 
+            return 'M3'
+        else:  # 文中40%
+            return 'M2'
+    
+    def _build_adverbial_phrase(self, sentence, main_word):
+        """副詞句の構築（前置詞句対応）"""
+        # 修飾語収集
+        modifiers = []
+        for word in sentence.words:
+            if word.head == main_word.id:
+                if word.deprel in ['det', 'amod', 'case', 'compound']:
+                    modifiers.append(word)
+        
+        if not modifiers:
+            return main_word.text
+        
+        # 修飾語をID順でソート（語順保持）
+        modifiers.sort(key=lambda w: w.id)
+        
+        # 句構築: 修飾語 + メイン語
+        phrase_words = modifiers + [main_word]
+        phrase_words.sort(key=lambda w: w.id)
+        
+        return ' '.join(word.text for word in phrase_words)
+
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
         受動態ハンドラー（Phase 2実装）
