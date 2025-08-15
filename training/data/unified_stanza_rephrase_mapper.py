@@ -581,6 +581,207 @@ class UnifiedStanzaRephraseMapper:
     def _find_word_by_head_and_deprel(self, sentence, head_id: int, deprel: str):
         """頭IDと依存関係で語を検索"""
         return next((w for w in sentence.words if w.head == head_id and w.deprel == deprel), None)
+    
+    def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        受動態ハンドラー（Phase 2実装）
+        
+        passive_voice_engine.py の機能を統合システムに移植
+        Stanza dependency parsing による受動態検出・分解
+        
+        Args:
+            sentence: Stanza解析済みsentence object
+            base_result: ベース結果（コピー）
+            
+        Returns:
+            Dict: 受動態分解結果 or None
+        """
+        try:
+            self.logger.debug("🔍 受動態ハンドラー実行中...")
+            
+            # 受動態構造分析
+            passive_info = self._analyze_passive_structure(sentence)
+            if not passive_info:
+                self.logger.debug("  受動態なし - スキップ")
+                return None
+                
+            self.logger.debug("  ✅ 受動態検出")
+            return self._process_passive_construction(sentence, passive_info, base_result)
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 受動態ハンドラーエラー: {e}")
+            return None
+    
+    def _analyze_passive_structure(self, sentence) -> Optional[Dict]:
+        """受動態構造の分析"""
+        passive_features = {
+            'auxiliary': None,      # be動詞
+            'main_verb': None,      # 過去分詞
+            'subject': None,        # 主語
+            'agent': None,          # by句動作主
+            'agent_phrase': None,   # by句全体
+            'type': None            # 受動態の種類
+        }
+        
+        # 典型的な過去分詞リスト
+        common_past_participles = {
+            'written', 'bought', 'sold', 'made', 'taken', 'given', 'seen', 'done',
+            'broken', 'stolen', 'found', 'lost', 'taught', 'caught', 'brought',
+            'eaten', 'driven', 'shown', 'known', 'grown', 'thrown', 'chosen'
+        }
+        
+        # 構造要素の検出
+        for word in sentence.words:
+            # 受動態主語検出
+            if word.deprel == 'nsubj:pass':
+                passive_features['subject'] = word
+            elif word.deprel == 'nsubjpass':  # 旧版Stanza対応
+                passive_features['subject'] = word
+            elif word.deprel == 'nsubj':  # 形容詞受動態の場合
+                if not passive_features['subject']:  # まだ見つかっていない場合のみ
+                    passive_features['subject'] = word
+                    
+            # 受動態補助動詞検出
+            elif word.deprel == 'aux:pass':
+                passive_features['auxiliary'] = word
+            elif word.deprel == 'auxpass':  # 旧版Stanza対応
+                passive_features['auxiliary'] = word
+            elif word.deprel == 'cop' and word.lemma == 'be':
+                passive_features['auxiliary'] = word
+                
+            # 主動詞検出（過去分詞）
+            elif word.deprel == 'root':
+                if word.upos == 'VERB' and word.xpos == 'VBN':  # 過去分詞
+                    passive_features['main_verb'] = word
+                elif word.upos == 'ADJ' and word.text.lower() in common_past_participles:
+                    passive_features['main_verb'] = word
+                    
+            # by句動作主検出
+            elif word.deprel == 'obl:agent':
+                passive_features['agent'] = word
+                passive_features['agent_phrase'] = self._build_agent_phrase(sentence, word)
+            elif word.deprel == 'agent':  # 旧版対応
+                passive_features['agent'] = word
+                passive_features['agent_phrase'] = self._build_agent_phrase(sentence, word)
+        
+        # 受動態判定
+        if (passive_features['auxiliary'] and 
+            passive_features['main_verb'] and 
+            passive_features['subject']):
+            
+            passive_features['type'] = 'agent_passive' if passive_features['agent'] else 'simple_passive'
+            
+            self.logger.debug(f"  主語: {passive_features['subject'].text}")
+            self.logger.debug(f"  補助動詞: {passive_features['auxiliary'].text}")
+            self.logger.debug(f"  主動詞: {passive_features['main_verb'].text}")
+            self.logger.debug(f"  動作主: {passive_features['agent'].text if passive_features['agent'] else 'なし'}")
+            self.logger.debug(f"  種類: {passive_features['type']}")
+            
+            return passive_features
+        
+        return None
+    
+    def _process_passive_construction(self, sentence, passive_info: Dict, base_result: Dict) -> Dict:
+        """受動態構文の処理"""
+        result = base_result.copy()
+        
+        auxiliary = passive_info['auxiliary']
+        main_verb = passive_info['main_verb']
+        subject = passive_info['subject']
+        agent_phrase = passive_info['agent_phrase']
+        passive_type = passive_info['type']
+        
+        self.logger.debug(f"  受動態処理: {passive_type}")
+        
+        # スロット生成
+        rephrase_slots = self._generate_passive_voice_slots(
+            passive_type, subject, auxiliary, main_verb, agent_phrase, passive_info['agent'], sentence
+        )
+        
+        # 結果マージ
+        if 'slots' not in result:
+            result['slots'] = {}
+        if 'sub_slots' not in result:
+            result['sub_slots'] = {}
+        
+        result['slots'].update(rephrase_slots.get('slots', {}))
+        result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+        
+        # 文法情報記録
+        result['grammar_info'] = {
+            'patterns': ['passive_voice'],
+            'passive_type': passive_type,
+            'subject': subject.text,
+            'auxiliary': auxiliary.text,
+            'main_verb': main_verb.text,
+            'agent': passive_info['agent'].text if passive_info['agent'] else None
+        }
+        
+        self.logger.debug(f"  ✅ 受動態処理完了: {len(rephrase_slots.get('slots', {}))} main slots, {len(rephrase_slots.get('sub_slots', {}))} sub slots")
+        return result
+    
+    def _generate_passive_voice_slots(self, passive_type: str, subject, auxiliary, main_verb, 
+                                     agent_phrase: str, agent, sentence) -> Dict:
+        """受動態タイプ別スロット生成"""
+        
+        slots = {}
+        sub_slots = {}
+        
+        # 基本スロット（共通）
+        slots['S'] = self._build_subject_phrase(sentence, subject)
+        slots['Aux'] = auxiliary.text
+        slots['V'] = main_verb.text
+        
+        # by句付き受動態の場合
+        if passive_type == 'agent_passive' and agent_phrase:
+            slots['M1'] = agent_phrase  # by句全体
+            if agent:
+                sub_slots['sub-m1'] = agent.text  # 動作主のみ
+        
+        return {'slots': slots, 'sub_slots': sub_slots}
+    
+    def _build_agent_phrase(self, sentence, agent_word) -> str:
+        """by句全体の構築"""
+        if not agent_word:
+            return None
+        
+        # by前置詞を探す
+        by_preposition = None
+        for word in sentence.words:
+            if word.text.lower() == 'by' and word.deprel == 'case' and word.head == agent_word.id:
+                by_preposition = word
+                break
+        
+        if by_preposition:
+            # by + 動作主 + 修飾語
+            phrase_words = [by_preposition, agent_word]
+            
+            # 動作主の修飾語を追加
+            for word in sentence.words:
+                if word.head == agent_word.id and word.deprel in ['det', 'amod', 'nmod']:
+                    phrase_words.append(word)
+            
+            # ID順ソート（語順保持）
+            phrase_words.sort(key=lambda w: w.id)
+            return ' '.join(w.text for w in phrase_words)
+        
+        return f"by {agent_word.text}"
+    
+    def _build_subject_phrase(self, sentence, subject) -> str:
+        """主語句の構築（修飾語含む）"""
+        if not subject:
+            return ""
+            
+        subject_words = [subject]
+        
+        # 主語の修飾語を収集
+        for word in sentence.words:
+            if word.head == subject.id and word.deprel in ['det', 'amod', 'compound', 'nmod']:
+                subject_words.append(word)
+        
+        # ID順ソート（語順保持）
+        subject_words.sort(key=lambda w: w.id)
+        return ' '.join(w.text for w in subject_words)
 
 # =============================================================================
 # Phase 0 テスト用 基本テストハーネス
@@ -617,6 +818,73 @@ def test_phase0_basic():
 # =============================================================================
 # Phase 1 テスト用 関係節テストハーネス
 # =============================================================================
+
+def test_phase2_passive_voice():
+    """Phase 2 受動態ハンドラーテスト"""
+    print("🧪 Phase 2 受動態テスト開始...")
+    
+    try:
+        # 初期化
+        mapper = UnifiedStanzaRephraseMapper(log_level='DEBUG')
+        
+        # Phase 1 & 2 ハンドラー追加
+        mapper.add_handler('relative_clause')
+        mapper.add_handler('passive_voice')
+        print("✅ 関係節 + 受動態ハンドラー追加完了")
+        
+        # 重要テストケース
+        test_cases = [
+            ("The car was bought.", "単純受動態"),
+            ("The car was bought by him.", "by句付き受動態"),
+            ("The book which was read was interesting.", "関係節+受動態複合"),
+            ("The letter was written by her.", "受動態基本形")
+        ]
+        
+        success_count = 0
+        for i, (test_sentence, pattern_type) in enumerate(test_cases, 1):
+            print(f"\n📖 テスト{i}: '{test_sentence}' ({pattern_type})")
+            print("-" * 60)
+            
+            try:
+                result = mapper.process(test_sentence)
+                
+                print("📊 処理結果:")
+                print(f"  メインスロット: {result.get('slots', {})}")
+                print(f"  サブスロット: {result.get('sub_slots', {})}")
+                print(f"  文法情報: {result.get('grammar_info', {})}")
+                print(f"  処理時間: {result['meta']['processing_time']:.3f}s")
+                
+                # 受動態チェック
+                slots = result.get('slots', {})
+                if 'Aux' in slots and 'V' in slots:
+                    print(f"\n🎯 受動態チェック:")
+                    print(f"  S: '{slots.get('S', '')}'")
+                    print(f"  Aux: '{slots.get('Aux', '')}'")  
+                    print(f"  V: '{slots.get('V', '')}'")
+                    if 'M1' in slots:
+                        print(f"  M1 (by句): '{slots.get('M1', '')}'")
+                    
+                    print("  ✅ 受動態構造検出成功！")
+                    success_count += 1
+                else:
+                    print("  ❌ 受動態構造未検出")
+                    
+            except Exception as e:
+                print(f"❌ テスト{i}エラー: {e}")
+        
+        # 統計確認
+        stats = mapper.get_stats()
+        print(f"\n📈 Phase 2 統計:")
+        print(f"  処理数: {stats['processing_count']}")
+        print(f"  平均処理時間: {stats['average_processing_time']:.3f}s")
+        print(f"  ハンドラー成功数: {stats['handler_success_count']}")
+        
+        print(f"\n🎉 Phase 2 テスト完了! 成功: {success_count}/{len(test_cases)}")
+        return success_count == len(test_cases)
+        
+    except Exception as e:
+        print(f"❌ Phase 2 テスト失敗: {e}")
+        return False
 
 def test_phase1_relative_clause():
     """Phase 1 関係節ハンドラーテスト"""
@@ -692,7 +960,12 @@ if __name__ == "__main__":
     # Phase 0 基本テスト
     if test_phase0_basic():
         print("\n" + "="*60)
-        # Phase 1 関係節テスト
-        test_phase1_relative_clause()
+        # Phase 1 関係節テスト  
+        if test_phase1_relative_clause():
+            print("\n" + "="*60)
+            # Phase 2 受動態テスト
+            test_phase2_passive_voice()
+        else:
+            print("❌ Phase 1失敗のため Phase 2をスキップ")
     else:
-        print("❌ Phase 0失敗のため Phase 1をスキップ")
+        print("❌ Phase 0失敗のため Phase 1,2をスキップ")
