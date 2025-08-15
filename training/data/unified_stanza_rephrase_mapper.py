@@ -1077,9 +1077,18 @@ class UnifiedStanzaRephraseMapper:
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
-            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
-            sub_slots["sub-o1"] = noun_phrase
-            sub_slots["sub-v"] = rel_verb.text
+            # sub-v: 先行詞 + 関係動詞の全体 ("the person standing")
+            antecedent_text = noun_phrase.replace(" [omitted]", "")  # [omitted]を除去
+            sub_slots["sub-v"] = f"{antecedent_text} {rel_verb.text}"
+            
+            # 関係節内の副詞を検出
+            for adverb_word in sentence.words:
+                if (adverb_word.head == rel_verb.id and 
+                    adverb_word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:unmarked', 'nmod:tmod']):
+                    # 副詞句全体を構築（修飾語を含める）
+                    adverb_phrase = self._build_adverbial_phrase(sentence, adverb_word)
+                    sub_slots["sub-m2"] = adverb_phrase
+                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_phrase}'")
             
         else:
             # デフォルト（目的語扱い）
