@@ -510,42 +510,36 @@ class UnifiedStanzaRephraseMapper:
         slots = result.get('slots', {})
         sub_slots = result.get('sub_slots', {})
         
-        # 対応関係マッピング（Aux, V除外）
-        main_to_sub_mapping = {
-            'S': 'sub-s',
-            'O1': 'sub-o1', 
-            'O2': 'sub-o2',
-            'C1': 'sub-c1',
-            'C2': 'sub-c2', 
-            'M1': 'sub-m1',
-            'M2': 'sub-m2',
-            'M3': 'sub-m3'
-        }
-        
         self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
         
-        # 複文判定＆スロット空文字化処理
-        for main_slot, sub_slot in main_to_sub_mapping.items():
-            if sub_slot in sub_slots and sub_slots[sub_slot]:
-                # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
-                if main_slot in slots:
-                    original_value = slots[main_slot]
-                    slots[main_slot] = ""  # 位置マーカーとして空文字設定
-                    
-                    self.logger.debug(
-                        f"🔄 Complex sentence rule applied: "
-                        f"{main_slot}: '{original_value}' → '' "
-                        f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
-                    )
+        # 🎯 正しいルール：そのスロット自体がサブスロット分解された場合のみ空にする
+        # 例: "The man I met was my father" → S空、V保持、C1保持
+        emptied_slots = []
         
-        # 処理結果をデバッグログ出力
-        applied_rules = [
-            f"{main}→{sub}" for main, sub in main_to_sub_mapping.items() 
-            if sub in sub_slots and sub_slots[sub] and main in slots
-        ]
+        # 🔍 どのメインスロットがサブスロット分解されているかを判定
+        # サブスロットの存在パターンから逆算
         
-        if applied_rules:
-            self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
+        # S スロットの判定: sub-s, sub-v, sub-o1などSに関連するサブスロットがあるか
+        s_related_subs = [key for key in sub_slots.keys() if key in ['sub-s', 'sub-v', 'sub-o1', 'sub-aux', 'sub-c1', 'sub-m1', 'sub-m2', 'sub-m3']]
+        if s_related_subs and 'S' in slots and slots['S']:
+            slots['S'] = ""
+            emptied_slots.append('S')
+            self.logger.debug(f"🔄 S slot emptied due to sub-slot decomposition: {s_related_subs}")
+        
+        # 他のスロットも同様の論理で処理
+        # M2スロット: sub-m2があればM2を空にする
+        if 'sub-m2' in sub_slots and sub_slots['sub-m2'] and 'M2' in slots and slots['M2']:
+            slots['M2'] = ""
+            emptied_slots.append('M2')
+            self.logger.debug(f"🔄 M2 slot emptied due to sub-m2: {sub_slots['sub-m2']}")
+        
+        # 他のスロットも必要に応じて追加
+            
+            # V、Auxは例外的に保持（主文動詞は残す）
+            # V、Auxスロットは空にしない
+            
+        if emptied_slots:
+            self.logger.info(f"✅ Rephrase汎用空化ルール適用: {', '.join(emptied_slots)} → 空")
         
         # ✅ whose構文の主文副詞は上位スロットに保持（自動移動無効化）
         # 主文の副詞（M1, M2, M3）は上位スロットに残すのが正しい仕様
