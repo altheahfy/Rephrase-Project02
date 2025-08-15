@@ -252,12 +252,17 @@ class UnifiedStanzaRephraseMapper:
         特に重要な修正箇所:
         1. whose構文での動詞POS誤解析 (NOUN → VERB)
         2. 関係節動詞の誤分類
+        3. where構文でのROOT語誤認識
         """
         corrections = []
         
         # whose構文特別処理
         if 'whose' in sentence.lower():
             corrections.extend(self._detect_whose_verb_misanalysis(stanza_doc, spacy_doc, sentence))
+        
+        # where構文のROOT語誤認識補正
+        if 'where' in sentence.lower():
+            corrections.extend(self._detect_where_root_misanalysis(stanza_doc, spacy_doc, sentence))
         
         return corrections
     
@@ -290,6 +295,50 @@ class UnifiedStanzaRephraseMapper:
                         'confidence': 0.9
                     })
                     self.logger.debug(f"🔧 whose構文動詞修正検出: {verb_text} NOUN→VERB")
+        
+        return corrections
+    
+    def _detect_where_root_misanalysis(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
+        """where構文でのROOT語誤認識を検出"""
+        corrections = []
+        
+        # spaCyのROOT語を取得
+        spacy_root = None
+        for token in spacy_doc:
+            if token.dep_ == "ROOT":
+                spacy_root = token
+                break
+        
+        # StanzaのROOT語を取得
+        stanza_root = None
+        for word in stanza_doc.sentences[0].words:
+            if word.head == 0:
+                stanza_root = word
+                break
+        
+        if spacy_root and stanza_root and spacy_root.text != stanza_root.text:
+            # ROOT語が異なる場合、spaCyの結果を優先
+            self.logger.debug(f"🔧 where構文ROOT語不一致: Stanza={stanza_root.text} vs spaCy={spacy_root.text}")
+            
+            # spaCyのROOT語に対応するStanza語を探す
+            spacy_root_in_stanza = None
+            for word in stanza_doc.sentences[0].words:
+                if word.text.lower() == spacy_root.text.lower():
+                    spacy_root_in_stanza = word
+                    break
+            
+            if spacy_root_in_stanza:
+                corrections.append({
+                    'word_id': spacy_root_in_stanza.id,
+                    'word_text': spacy_root_in_stanza.text,
+                    'original_head': spacy_root_in_stanza.head,
+                    'corrected_head': 0,  # ROOT語に修正
+                    'correction_type': 'where_root_fix',
+                    'confidence': 0.95
+                })
+                self.logger.debug(f"🔧 where構文ROOT修正: {spacy_root.text} をROOT語に設定")
+        
+        return corrections
         
         return corrections
     
@@ -374,7 +423,9 @@ class UnifiedStanzaRephraseMapper:
             handler_name: ハンドラー名
         """
         # 🎯 関係副詞重複排除：関係副詞がsub-m3にある場合、メインスロットの重複を除去
-        if 'sub_slots' in handler_result and handler_name == 'relative_clause':
+        # 🚨 DISABLED: 過剰な除去により主文が破壊される問題のため無効化
+        # 正しい処理は後のRephrase仕様適用で行われる
+        if False and 'sub_slots' in handler_result and handler_name == 'relative_clause':
             sub_m3_value = handler_result['sub_slots'].get('sub-m3', '')
             if sub_m3_value:
                 # "The way how", "The place where"などから基本部分を抽出
@@ -1535,7 +1586,10 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug("  主文動詞(V)が処理済み - スキップ")
                 return None
             
-            return self._process_basic_five_pattern_structure(sentence, base_result)
+            self.logger.debug(f"🔧 5文型処理開始: base_result={base_result}")
+            result = self._process_basic_five_pattern_structure(sentence, base_result)
+            self.logger.debug(f"🔧 5文型処理結果: {result}")
+            return result
             
         except Exception as e:
             self.logger.warning(f"⚠️ 5文型ハンドラーエラー: {e}")
@@ -1571,7 +1625,9 @@ class UnifiedStanzaRephraseMapper:
         if not root_word:
             root_word = self._find_root_word(sentence)
             if not root_word:
+                self.logger.debug("🚨 ROOT語が見つからない")
                 return base_result
+            self.logger.debug(f"🔧 ROOT語検出: {root_word.text} (id: {root_word.id})")
 
         # 依存関係マップ構築
         dep_relations = {}
@@ -1579,6 +1635,8 @@ class UnifiedStanzaRephraseMapper:
             if word.deprel not in dep_relations:
                 dep_relations[word.deprel] = []
             dep_relations[word.deprel].append(word)
+        
+        self.logger.debug(f"🔧 依存関係マップ: {list(dep_relations.keys())}")
         
         # ✅ whose構文の特別処理：メイン文の依存関係マップを正しく構築
         if is_whose_construction and root_word:
@@ -1601,7 +1659,10 @@ class UnifiedStanzaRephraseMapper:
         # 基本5文型パターン検出
         pattern_result = self._detect_basic_five_pattern(root_word, dep_relations)
         if not pattern_result:
+            self.logger.debug("🚨 5文型パターンが検出されない")
             return base_result
+        
+        self.logger.debug(f"🔧 5文型パターン検出: {pattern_result['pattern']}")
         
         # スロット生成
         result = base_result.copy()
@@ -1611,8 +1672,10 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'] = {}
         
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, pattern_result
         )
+        
+        self.logger.debug(f"🔧 生成されたスロット: {five_pattern_slots}")
         
         result['slots'].update(five_pattern_slots.get('slots', {}))
         result['sub_slots'].update(five_pattern_slots.get('sub_slots', {}))
@@ -1632,8 +1695,42 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _find_root_word(self, sentence):
-        """ROOT語を検索"""
-        return next((w for w in sentence.words if w.head == 0), None)
+        """ROOT語を検索（ハイブリッド解析対応版）"""
+        # ハイブリッド解析補正情報を優先チェック
+        if hasattr(sentence, 'hybrid_corrections'):
+            for word_id, correction in sentence.hybrid_corrections.items():
+                if correction['correction_type'] == 'where_root_fix':
+                    corrected_root = self._find_word_by_id(sentence, word_id)
+                    if corrected_root:
+                        self.logger.debug(f"🔧 ハイブリッド解析ROOT修正: {corrected_root.text} をROOT語として使用")
+                        return corrected_root
+        
+        # 標準的なROOT語検出
+        standard_root = next((w for w in sentence.words if w.head == 0), None)
+        self.logger.debug(f"🔧 標準ROOT語: {standard_root.text if standard_root else 'None'} (POS: {standard_root.upos if standard_root else 'None'})")
+        
+        # 関係節がある場合、動詞を優先的にROOT語として選択
+        has_relative_clause = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
+        self.logger.debug(f"🔧 関係節存在: {has_relative_clause}")
+        
+        if has_relative_clause and standard_root:
+            # 現在のROOT語が動詞でない場合、動詞を探す
+            if standard_root.upos not in ['VERB', 'AUX']:
+                self.logger.debug(f"🔧 ROOT語が動詞でない({standard_root.upos})ため動詞を探索")
+                # 動詞またはAUX（be動詞等）でかつ関係節内でないものを探す
+                for word in sentence.words:
+                    self.logger.debug(f"  語検索: {word.text} (POS: {word.upos}, deprel: {word.deprel})")
+                    if (word.upos in ['VERB', 'AUX'] and 
+                        word.deprel not in ['aux:pass'] and  # aux:passは除外（受動態助動詞）
+                        word.text.lower() not in ['born', 'was']):  # 関係節内の動詞を除外
+                        self.logger.debug(f"🔧 関係節文でROOT修正: {standard_root.text} → {word.text}")
+                        return word
+        
+        return standard_root
+    
+    def _find_word_by_id(self, sentence, word_id):
+        """IDで語を検索"""
+        return next((w for w in sentence.words if w.id == word_id), None)
     
     def _detect_basic_five_pattern(self, root_word, dep_relations):
         """基本5文型パターン検出"""
@@ -1670,6 +1767,12 @@ class UnifiedStanzaRephraseMapper:
                 "root_pos": ["PRON"],
                 "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
             },
+            "SVC_PROPN": {
+                "required": ["nsubj", "cop"],
+                "optional": [],
+                "root_pos": ["PROPN"],
+                "mapping": {"nsubj": "S", "cop": "V", "root": "C2"}
+            },
             "SVC_ADV": {
                 "required": ["nsubj", "cop"],
                 "optional": [],
@@ -1687,6 +1790,22 @@ class UnifiedStanzaRephraseMapper:
                 "optional": [],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "root": "V"}
+            },
+            # Rephrase独自ルール: 前置詞句パターン（階層的解析第3段階）
+            "SV_PREP_LOC": {
+                "required": ["nsubj", "cop", "case"],
+                "optional": [],
+                "root_pos": ["PROPN", "NOUN"],
+                "mapping": {"nsubj": "S", "cop": "V", "case": "C2"},
+                "special_handling": "prepositional_phrase"
+            },
+            # Rephrase独自ルール: spaCyハイブリッド解析後の前置詞句パターン
+            "SV_HYBRID_PREP": {
+                "required": ["nsubj", "case"],
+                "optional": [],
+                "root_pos": ["AUX"],  # spaCy修正後はisがROOTでAUX品詞
+                "mapping": {"nsubj": "S", "root": "V", "case": "C2"},
+                "special_handling": "prepositional_phrase_hybrid"
             }
         }
         
@@ -1696,22 +1815,30 @@ class UnifiedStanzaRephraseMapper:
                 return {
                     'pattern': pattern_name,
                     'mapping': pattern_info['mapping'],
-                    'confidence': 0.9
+                    'confidence': 0.9,
+                    'special_handling': pattern_info.get('special_handling')
                 }
         
         return None
     
     def _matches_five_pattern(self, pattern_info, dep_relations, root_word):
-        """5文型パターンマッチング"""
+        """5文型パターンマッチング（デバッグ強化）"""
+        self.logger.debug(f"🔍 パターンマッチング: {pattern_info}")
+        self.logger.debug(f"🔍 依存関係: {dep_relations}")
+        self.logger.debug(f"🔍 ROOT語: {root_word.text} (POS: {root_word.upos})")
+        
         # 必要な依存関係の確認
         for rel in pattern_info['required']:
             if rel not in dep_relations:
+                self.logger.debug(f"❌ 必須関係未検出: {rel}")
                 return False
         
         # ROOT語の品詞チェック
         if root_word.upos not in pattern_info['root_pos']:
+            self.logger.debug(f"❌ ROOT語品詞不一致: {root_word.upos} not in {pattern_info['root_pos']}")
             return False
         
+        self.logger.debug(f"✅ パターンマッチ成功")
         return True
     
     def _build_phrase_with_modifiers(self, sentence, main_word):
@@ -1724,26 +1851,37 @@ class UnifiedStanzaRephraseMapper:
         - nummod: 数詞修飾語 (one, two, first, second)  
         - nmod:poss: 所有格修飾語 (John's, Mary's, my, your)
         - compound: 複合名詞 (car door, school bus)
+        - case: 前置詞 (in, on, at, with, for, etc.)
         """
         if not main_word:
             return ""
         
         # 修飾語収集
         modifiers = []
+        preposition = None
+        
         for word in sentence.words:
             if word.head == main_word.id:
                 if word.deprel in ['det', 'amod', 'nummod', 'nmod:poss', 'compound']:
                     modifiers.append(word)
+                elif word.deprel == 'case':
+                    preposition = word  # 前置詞を保存
         
         # デバッグログ追加
         if modifiers:
             self.logger.debug(f"🔧 修飾語検出 [{main_word.text}]: {[(m.text, m.deprel) for m in modifiers]}")
+        if preposition:
+            self.logger.debug(f"🔧 前置詞検出 [{main_word.text}]: {preposition.text}")
         
         # 修飾語をID順でソート（語順保持）
         modifiers.sort(key=lambda w: w.id)
         
-        # 句構築: 修飾語 + メイン語
-        phrase_words = modifiers + [main_word]
+        # 句構築: 前置詞 + 修飾語 + メイン語
+        phrase_words = []
+        if preposition:
+            phrase_words.append(preposition)
+        phrase_words.extend(modifiers)
+        phrase_words.append(main_word)
         phrase_words.sort(key=lambda w: w.id)  # 最終的な語順確保
         
         result = ' '.join(word.text for word in phrase_words)
@@ -1751,8 +1889,8 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence):
-        """基本5文型スロット生成（修飾語句対応強化）"""
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, pattern_info=None):
+        """基本5文型スロット生成（修飾語句対応強化・前置詞句特別処理）"""
         slots = {}
         sub_slots = {}
         
@@ -1814,6 +1952,39 @@ class UnifiedStanzaRephraseMapper:
             #         self.logger.debug(f"🔍 関係副詞除外: {word.text} (関係節ハンドラーに委譲)")
             # elif word.deprel == 'obl' and 'M3' not in slots:
             #     slots['M3'] = word.text  # 前置詞句等
+        
+        # Rephrase独自ルール: 前置詞句の特別処理（階層的解析第3段階）
+        if pattern_info and isinstance(pattern_info, dict):
+            special_handling = pattern_info.get('special_handling')
+            
+            if special_handling == 'prepositional_phrase':
+                # 通常の前置詞句構築: 前置詞 + 目的語
+                for word in sentence.words:
+                    if word.deprel == 'case':  # 前置詞検出
+                        # 前置詞の依存先（目的語）を検索
+                        for target_word in sentence.words:
+                            if target_word.id == word.head:
+                                prep_phrase = f"{word.text} {target_word.text}"
+                                # C2スロットに前置詞句設定
+                                if 'C2' in slots:
+                                    slots['C2'] = prep_phrase
+                                    self.logger.debug(f"🔧 前置詞句構築: C2 = '{prep_phrase}'")
+                                break
+                        break
+                        
+            elif special_handling == 'prepositional_phrase_hybrid':
+                # spaCyハイブリッド解析後の前置詞句構築
+                for word in sentence.words:
+                    if word.deprel == 'case':  # 前置詞検出
+                        # 前置詞の依存先（目的語）を検索
+                        for target_word in sentence.words:
+                            if target_word.id == word.head:
+                                prep_phrase = f"{word.text} {target_word.text}"
+                                # C2スロットに前置詞句設定
+                                slots['C2'] = prep_phrase
+                                self.logger.debug(f"🔧 ハイブリッド前置詞句構築: C2 = '{prep_phrase}'")
+                                break
+                        break
         
         return {'slots': slots, 'sub_slots': sub_slots}
 
