@@ -670,6 +670,20 @@ class UnifiedStanzaRephraseMapper:
         if not aux_word:
             aux_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'aux')
         
+        # ✅ 関係節内の副詞を検出してsub-m2に配置
+        adverb_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
+        if adverb_word:
+            # 関係副詞は除外（where, when, why, howは関係副詞として別途処理）
+            if adverb_word.text.lower() not in ['where', 'when', 'why', 'how']:
+                sub_slots["sub-m2"] = adverb_word.text
+                self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}'")
+        
+        # ✅ 関係節内の前置詞句・副詞句を検出してsub-m3に配置
+        obl_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obl')
+        if obl_word:
+            sub_slots["sub-m3"] = obl_word.text
+            self.logger.debug(f"🔧 関係節内副詞句検出: sub-m3 = '{obl_word.text}'")
+        
         if rel_type == 'obj':
             # 目的語関係代名詞: "The book that he bought"
             # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
@@ -819,12 +833,12 @@ class UnifiedStanzaRephraseMapper:
         if word.id == rel_verb.id:
             return True
             
-        # 関係節動詞の依存語
+        # 関係節動詞の直接依存語（全種類）
         if word.head == rel_verb.id:
             return True
             
         # 関係代名詞（関係節動詞に依存するnsubj/obj等）
-        if word.deprel in ['nsubj', 'obj', 'advmod'] and word.head == rel_verb.id:
+        if word.deprel in ['nsubj', 'obj', 'advmod', 'obl', 'aux', 'aux:pass', 'acomp', 'attr', 'nmod'] and word.head == rel_verb.id:
             return True
         
         # 関係節を修飾するacl:relclの依存語
@@ -1154,9 +1168,30 @@ class UnifiedStanzaRephraseMapper:
                         self.logger.debug(f"🔧 ROOT語修飾語句適用: {slot} = '{root_phrase}'")
         
         # 修飾語の処理（基本的なもののみ）
+        # 関係副詞は関係節ハンドラーに任せるため除外
+        relative_adverbs = ['where', 'when', 'why', 'how']
+        
+        # ✅ 関係節内の語を事前に特定して除外
+        rel_verb_candidates = [w for w in sentence.words if w.deprel in ['acl:relcl', 'acl']]
+        excluded_word_ids = set()
+        for rel_verb_cand in rel_verb_candidates:
+            # 関係節動詞とその依存語をすべて除外
+            excluded_word_ids.add(rel_verb_cand.id)
+            for word in sentence.words:
+                if word.head == rel_verb_cand.id:
+                    excluded_word_ids.add(word.id)
+        
         for word in sentence.words:
+            # 関係節内の語をスキップ
+            if word.id in excluded_word_ids:
+                continue
+                
+            # 関係副詞は処理しない（関係節ハンドラーが担当）
             if word.deprel == 'advmod' and 'M2' not in slots:
-                slots['M2'] = word.text  # 副詞修飾語
+                if word.text.lower() not in relative_adverbs:
+                    slots['M2'] = word.text  # 通常の副詞修飾語のみ
+                else:
+                    self.logger.debug(f"🔍 関係副詞除外: {word.text} (関係節ハンドラーに委譲)")
             elif word.deprel == 'obl' and 'M3' not in slots:
                 slots['M3'] = word.text  # 前置詞句等
         
