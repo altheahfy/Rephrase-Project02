@@ -1469,6 +1469,12 @@ class UnifiedStanzaRephraseMapper:
                 "root_pos": ["PRON"],
                 "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
             },
+            "SVC_ADV": {
+                "required": ["nsubj", "cop"],
+                "optional": [],
+                "root_pos": ["ADV"],
+                "mapping": {"nsubj": "S", "cop": "V", "root": "M2"}
+            },
             "SVC_ALT": {
                 "required": ["nsubj", "xcomp"],
                 "optional": [],
