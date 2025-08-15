@@ -2,7 +2,7 @@
 
 ## 📋 移植対象エンジン一覧
 
-### ✅ 優先度1 (Phase 1-3: 基礎構文)
+### ✅ 優先度1 (Phase 1-4: 基礎構文)
 - [ ] **simple_relative_engine.py** (256行)
   - 機能: 関係節処理 (acl:relcl, nsubj, obj, nmod:poss, advmod)  
   - 移植先メソッド: `_handle_relative_clause()`
@@ -13,12 +13,18 @@
   - 移植先メソッド: `_handle_passive_voice()`  
   - テスト例文: "The car was bought by him."
 
+- [ ] **adverb_engine.py** (新規実装)
+  - 機能: 副詞単独処理 (advmod依存関係専門処理)
+  - 移植先メソッド: `_handle_adverb()`
+  - テスト例文: "The man runs fast." / "She speaks very clearly."
+  - 処理対象: 様態副詞(M2), 程度副詞(埋込), 否定副詞(M3), 時間副詞(M1)
+
 - [ ] **stanza_based_conjunction_engine.py** (218行)
   - 機能: 従属接続詞処理 (mark, advcl, 意味分類)
   - 移植先メソッド: `_handle_conjunction()`
   - テスト例文: "I came because it rained."
 
-### ⚡ 優先度2 (Phase 4-6: 時制・句構造)
+### ⚡ 優先度2 (Phase 5-7: 時制・句構造)
 - [ ] **progressive_tenses_engine.py** 
   - 機能: 進行形処理
   - 移植先メソッド: `_handle_progressive()`
@@ -31,7 +37,7 @@
   - 機能: 完了進行形処理
   - 移植先メソッド: `_handle_perfect_progressive()`
 
-### 🔧 優先度3 (Phase 7-9: 準動詞)
+### 🔧 優先度3 (Phase 8-10: 準動詞)
 - [ ] **participle_engine.py**
   - 機能: 分詞処理
   - 移植先メソッド: `_handle_participle()`
@@ -44,7 +50,7 @@
   - 機能: 不定詞処理
   - 移植先メソッド: `_handle_infinitive()`
 
-### 🎯 優先度4 (Phase 10-12: 特殊構文)
+### 🎯 優先度4 (Phase 11-13: 特殊構文)
 - [ ] **question_formation_engine.py**
   - 機能: 疑問文処理
   - 移植先メソッド: `_handle_question()`
@@ -57,7 +63,7 @@
   - 機能: 倒置構文処理
   - 移植先メソッド: `_handle_inversion()`
 
-### 📊 優先度5 (Phase 13-15: その他・基礎)
+### 📊 優先度5 (Phase 14-16: その他・基礎)
 - [ ] **comparative_superlative_engine.py**
   - 機能: 比較・最上級処理
   - 移植先メソッド: `_handle_comparative()`
@@ -107,8 +113,13 @@ Phase 2: 関係節 + 受動態
 ✅ "The car which was bought was red."
 ✅ "The book which was read by him is interesting."
 
-Phase 3: 関係節 + 受動態 + 接続詞
-✅ "Because the car which was bought was red, he liked it."
+Phase 3: 関係節 + 受動態 + 副詞
+✅ "The man who runs fast is my friend."
+✅ "She speaks very clearly."
+✅ "He doesn't work hard."
+
+Phase 4: 関係節 + 受動態 + 副詞 + 接続詞
+✅ "Because the car which was bought quickly was red, he liked it."
 ```
 
 ### パフォーマンステスト
@@ -124,9 +135,10 @@ Phase 3: 関係節 + 受動態 + 接続詞
 - [ ] Phase 0: 基盤構築
 - [ ] Phase 1: 関係節移植
 - [ ] Phase 2: 受動態移植  
-- [ ] Phase 3: 接続詞移植
-- [ ] Phase 4-15: 段階的拡張
-- [ ] Phase 16: 統合・最適化
+- [ ] Phase 3: 副詞エンジン実装（新規）
+- [ ] Phase 4: 接続詞移植
+- [ ] Phase 5-16: 段階的拡張
+- [ ] Phase 17: 統合・最適化
 
 ### 品質基準
 各Phase完了時に以下をクリア:

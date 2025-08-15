@@ -536,7 +536,7 @@ class UnifiedStanzaRephraseMapper:
         return virtual_pronoun
     
     def _build_antecedent_phrase(self, sentence, antecedent, rel_pronoun, possessed_noun=None) -> str:
-        """先行詞句構築（修飾語含む）- 関係節全体を含む完全な句を構築"""
+        """先行詞句構築（修飾語含む）- 関係節の動詞部分は除外"""
         if not antecedent:
             return rel_pronoun.text if rel_pronoun else ""
         
@@ -546,34 +546,14 @@ class UnifiedStanzaRephraseMapper:
             if word.head == antecedent.id and word.deprel in ['det', 'amod', 'compound']:
                 modifiers.append(word)
         
-        # 関係節内の全単語を収集（関係節動詞とその依存語）
-        rel_clause_words = []
+        # 基本構成：修飾語 + 先行詞 + 関係代名詞
+        phrase_words = modifiers + [antecedent]
+        
+        # 関係代名詞を追加（動詞部分は除外）
         if rel_pronoun:
-            # 関係代名詞を追加
-            rel_clause_words.append(rel_pronoun)
-            
-            # 関係節動詞を特定
-            rel_verb = None
-            for word in sentence.words:
-                if (word.deprel in ['acl:relcl', 'acl'] and 
-                    word.head == antecedent.id):
-                    rel_verb = word
-                    break
-            
-            if rel_verb:
-                # 関係節動詞を追加
-                rel_clause_words.append(rel_verb)
-                
-                # 関係節動詞の依存語を追加
-                for word in sentence.words:
-                    if (word.head == rel_verb.id and 
-                        word.id != rel_pronoun.id):  # 関係代名詞は既に追加済み
-                        rel_clause_words.append(word)
+            phrase_words.append(rel_pronoun)
         
-        # 語順構築
-        phrase_words = modifiers + [antecedent] + rel_clause_words
-        
-        # 所有格の特別処理
+        # 所有格の特別処理（所有される名詞のみ）
         if possessed_noun and rel_pronoun:
             if possessed_noun not in phrase_words:
                 phrase_words.append(possessed_noun)
