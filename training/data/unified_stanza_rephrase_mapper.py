@@ -1076,8 +1076,10 @@ class UnifiedStanzaRephraseMapper:
             for adverb_word in sentence.words:
                 if (adverb_word.head == rel_verb.id and 
                     adverb_word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:unmarked', 'nmod:tmod']):
-                    sub_slots["sub-m2"] = adverb_word.text
-                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}'")
+                    # 副詞句全体を構築（修飾語を含める）
+                    adverb_phrase = self._build_adverbial_phrase(sentence, adverb_word)
+                    sub_slots["sub-m2"] = adverb_phrase
+                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_phrase}'")
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
