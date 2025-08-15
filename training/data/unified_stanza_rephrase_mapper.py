@@ -442,7 +442,7 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _identify_relative_pronoun(self, sentence, rel_verb) -> Tuple[Optional[Any], str]:
-        """関係代名詞/関係副詞の特定と分類（省略文対応強化）"""
+        """関係代名詞/関係副詞の特定と分類（省略文対応強化・受動態考慮）"""
         
         # 1. 関係副詞検出（最優先）
         advmod_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
@@ -460,12 +460,18 @@ class UnifiedStanzaRephraseMapper:
         if obj_pronoun and obj_pronoun.text.lower() in ['who', 'whom', 'which', 'that']:
             return obj_pronoun, 'obj'
         
-        # 主語関係代名詞  
+        # 主語関係代名詞（受動態チェック追加）  
         subj_pronoun = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
         if subj_pronoun and subj_pronoun.text.lower() in ['who', 'which', 'that']:
+            # 受動態の場合は主語関係代名詞として処理
             return subj_pronoun, 'nsubj'
+            
+        # 受動態主語関係代名詞
+        pass_subj_pronoun = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj:pass')
+        if pass_subj_pronoun and pass_subj_pronoun.text.lower() in ['who', 'which', 'that']:
+            return pass_subj_pronoun, 'nsubj:pass'
         
-        # 4. 省略関係代名詞の推定（新実装）
+        # 4. 省略関係代名詞の推定（受動態構造改善）
         inferred_type = self._infer_omitted_relative_pronoun(sentence, rel_verb)
         if inferred_type:
             # 仮想的な関係代名詞オブジェクトを作成
@@ -475,7 +481,7 @@ class UnifiedStanzaRephraseMapper:
         return None, 'unknown'
     
     def _infer_omitted_relative_pronoun(self, sentence, rel_verb) -> Optional[str]:
-        """省略された関係代名詞の推定"""
+        """省略された関係代名詞の推定（受動態構造改善）"""
         
         # 関係節動詞の依存構造を分析
         rel_verb_deps = []
@@ -485,18 +491,17 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.debug(f"    関係動詞 '{rel_verb.text}' の依存語: {rel_verb_deps}")
         
-        # パターン1: 省略目的語関係代名詞の検出
-        # "The book [that/which] was read" → rel_verb="read"だが主語が存在しない場合
+        # パターン1: 受動態関係節の検出（改善）
         has_nsubj_pass = 'nsubj:pass' in rel_verb_deps or 'nsubjpass' in rel_verb_deps
         has_aux_pass = any(word.deprel in ['aux:pass', 'auxpass'] and word.head == rel_verb.id 
                           for word in sentence.words)
         
         if has_nsubj_pass or has_aux_pass:
-            # 受動態関係節：先行詞が動作の対象（目的語相当）
-            self.logger.debug(f"    推定: 省略目的語関係代名詞（受動態パターン）")
-            return 'obj_omitted'
+            # 受動態関係節：先行詞が受動態の主語
+            self.logger.debug(f"    推定: 受動態主語関係代名詞")
+            return 'nsubj:pass'  # 受動態主語として扱う
         
-        # パターン2: 関係節内に主語が存在し、目的語がない場合
+        # パターン2: 能動態で目的語がない場合
         has_nsubj = 'nsubj' in rel_verb_deps
         has_obj = 'obj' in rel_verb_deps or 'dobj' in rel_verb_deps
         
@@ -578,10 +583,15 @@ class UnifiedStanzaRephraseMapper:
         return ' '.join(w.text for w in phrase_words)
     
     def _generate_relative_clause_slots(self, rel_type: str, noun_phrase: str, rel_subject, rel_verb, sentence) -> Dict:
-        """関係節タイプ別スロット生成"""
+        """関係節タイプ別スロット生成（受動態対応改善）"""
         
         slots = {}
         sub_slots = {}
+        
+        # 受動態補助動詞の検出
+        aux_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'aux:pass')
+        if not aux_word:
+            aux_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'aux')
         
         if rel_type == 'obj':
             # 目的語関係代名詞: "The book that he bought"
@@ -597,29 +607,41 @@ class UnifiedStanzaRephraseMapper:
             sub_slots["sub-s"] = noun_phrase
             sub_slots["sub-v"] = rel_verb.text
             
+        elif rel_type == 'nsubj:pass':
+            # 受動態主語関係代名詞: "The car which was crashed"
+            slots["S"] = ""  # 上位スロット空
+            sub_slots["sub-s"] = noun_phrase
+            if aux_word:
+                sub_slots["sub-aux"] = aux_word.text
+            sub_slots["sub-v"] = rel_verb.text
+            
         elif rel_type == 'poss':
             # 所有格関係代名詞: "The man whose car is red"
             slots["S"] = ""  # 上位スロット空
             sub_slots["sub-s"] = noun_phrase
+            if aux_word:
+                sub_slots["sub-aux"] = aux_word.text
+            sub_slots["sub-v"] = rel_verb.text
             
-            # be動詞確認
-            cop_verb = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'cop')
-            if cop_verb:
-                if rel_verb.pos == 'ADJ':
-                    sub_slots["sub-aux"] = cop_verb.text
-                    sub_slots["sub-c1"] = rel_verb.text
-                else:
-                    sub_slots["sub-aux"] = cop_verb.text
-                    sub_slots["sub-v"] = rel_verb.text
-            else:
-                sub_slots["sub-v"] = rel_verb.text
-                
         elif rel_type == 'advmod':
             # 関係副詞: "The place where he lives"
-            slots["M3"] = ""  # 上位スロット空（副詞句扱い）
+            slots["M3"] = ""  # 上位スロット空
             sub_slots["sub-m3"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
+            sub_slots["sub-v"] = rel_verb.text
+            
+        # 省略関係代名詞の処理
+        elif rel_type == 'obj_omitted':
+            # 省略目的語関係代名詞: "The book I read"
+            slots["O1"] = ""
+            sub_slots["sub-o1"] = noun_phrase
+            sub_slots["sub-v"] = rel_verb.text
+            
+        elif rel_type == 'nsubj_omitted':  
+            # 省略主語関係代名詞: "The person standing there"
+            slots["O1"] = ""
+            sub_slots["sub-o1"] = noun_phrase
             sub_slots["sub-v"] = rel_verb.text
             
         else:
@@ -630,7 +652,7 @@ class UnifiedStanzaRephraseMapper:
                 sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
         
-        return {'slots': slots, 'sub_slots': sub_slots}
+        return {"slots": slots, "sub_slots": sub_slots}
     
     # === Stanza解析ヘルパーメソッド ===
     

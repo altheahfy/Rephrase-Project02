@@ -42,8 +42,9 @@ def test_custom_sentences():
         "The car that was bought by him is expensive.",
         
         # ここに新しい例文を追加 ↓
-        # "Your sentence here...",
-        # "Another sentence...",
+        "The car which was crashed is red.",
+        "The student who studies hard will succeed.",
+        "The door that was opened by the wind is broken."
     ]
     
     print(f"\n📖 テスト例文数: {len(your_test_sentences)}")
