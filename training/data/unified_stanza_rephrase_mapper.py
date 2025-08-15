@@ -442,28 +442,6 @@ class UnifiedStanzaRephraseMapper:
         result['slots'].update(rephrase_slots.get('slots', {}))
         result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
         
-        # 主文の基本構造処理（関係節以外の部分）
-        main_verb = self._find_main_verb(sentence)
-        if main_verb and main_verb.id != rel_verb.id:
-            # 主文の動詞が関係動詞と異なる場合、上位スロットに配置
-            result['slots']['V'] = main_verb.text
-            
-            # 主文の主語：関係節を含む場合は位置のみ（Rephrase仕様）
-            # 関係節が主語に含まれる場合、上位スロットSは空
-            result['slots']['S'] = ""  # 位置のみ、テキストは空
-            
-            # 主文の補語（形容詞述語の場合）
-            root_word = next((w for w in sentence.words if w.head == 0), None)
-            if root_word and root_word.upos == 'ADJ':
-                result['slots']['C1'] = root_word.text
-            
-            # その他の修飾語（here等）を処理
-            for word in sentence.words:
-                if (word.head == main_verb.id and 
-                    word.deprel == 'advmod' and 
-                    word.id != rel_verb.id):
-                    result['slots']['M3'] = word.text
-        
         # 文法情報記録
         result['grammar_info'] = {
             'patterns': ['relative_clause'],
@@ -775,6 +753,174 @@ class UnifiedStanzaRephraseMapper:
             if word.head == 0 and word.deprel == 'root':
                 return word
         return None
+    
+    def _handle_basic_five_pattern(self, sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        基本5文型ハンドラー（Phase 1実装）
+        
+        basic_five_pattern_engine.py の機能を統合システムに移植
+        Stanza dependency parsing による基本文型検出・分解
+        
+        Args:
+            sentence: Stanza sentence object
+            base_result: 基本結果辞書
+            
+        Returns:
+            Optional[Dict]: 5文型処理結果 or None
+        """
+        try:
+            self.logger.debug("🔍 5文型ハンドラー実行中...")
+            
+            # 他のエンジンが既に処理済みの場合はスキップ
+            if base_result.get('slots', {}).get('V') or base_result.get('sub_slots', {}).get('sub-v'):
+                self.logger.debug("  他エンジンが処理済み - スキップ")
+                return None
+            
+            return self._process_basic_five_pattern_structure(sentence, base_result)
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 5文型ハンドラーエラー: {e}")
+            return None
+    
+    def _process_basic_five_pattern_structure(self, sentence, base_result: Dict) -> Dict:
+        """基本5文型構造の分解処理"""
+        
+        # ROOT語検出
+        root_word = self._find_root_word(sentence)
+        if not root_word:
+            return base_result
+        
+        # 依存関係マップ構築
+        dep_relations = {}
+        for word in sentence.words:
+            if word.deprel not in dep_relations:
+                dep_relations[word.deprel] = []
+            dep_relations[word.deprel].append(word)
+        
+        # 基本5文型パターン検出
+        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations)
+        if not pattern_result:
+            return base_result
+        
+        # スロット生成
+        result = base_result.copy()
+        if 'slots' not in result:
+            result['slots'] = {}
+        if 'sub_slots' not in result:
+            result['sub_slots'] = {}
+        
+        five_pattern_slots = self._generate_basic_five_slots(
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
+        )
+        
+        result['slots'].update(five_pattern_slots.get('slots', {}))
+        result['sub_slots'].update(five_pattern_slots.get('sub_slots', {}))
+        
+        # 文法情報記録（_merge_handler_resultsと互換性のある形式）
+        result['grammar_info'] = {
+            'detected_patterns': ['basic_five_pattern'],
+            'handler_contributions': {
+                'basic_five_pattern': {
+                    'pattern': pattern_result['pattern'],
+                    'confidence': pattern_result.get('confidence', 0.8)
+                }
+            }
+        }
+        
+        self.logger.debug(f"  ✅ 5文型処理完了: パターン={pattern_result['pattern']}")
+        return result
+    
+    def _find_root_word(self, sentence):
+        """ROOT語を検索"""
+        return next((w for w in sentence.words if w.head == 0), None)
+    
+    def _detect_basic_five_pattern(self, root_word, dep_relations):
+        """基本5文型パターン検出"""
+        
+        # 基本5文型パターン定義（詳細→単純の順序で検出）
+        patterns = {
+            "SVOO": {
+                "required": ["nsubj", "obj", "iobj"],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"nsubj": "S", "root": "V", "iobj": "O1", "obj": "O2"}
+            },
+            "SVOC": {
+                "required": ["nsubj", "obj", "xcomp"],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"nsubj": "S", "root": "V", "obj": "O1", "xcomp": "C2"}
+            },
+            "SVO": {
+                "required": ["nsubj", "obj"],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"nsubj": "S", "root": "V", "obj": "O1"}
+            },
+            "SVC": {
+                "required": ["nsubj", "cop"],
+                "optional": [],
+                "root_pos": ["ADJ", "NOUN"],
+                "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
+            },
+            "SV": {
+                "required": ["nsubj"],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"nsubj": "S", "root": "V"}
+            }
+        }
+        
+        # パターンマッチング
+        for pattern_name, pattern_info in patterns.items():
+            if self._matches_five_pattern(pattern_info, dep_relations, root_word):
+                return {
+                    'pattern': pattern_name,
+                    'mapping': pattern_info['mapping'],
+                    'confidence': 0.9
+                }
+        
+        return None
+    
+    def _matches_five_pattern(self, pattern_info, dep_relations, root_word):
+        """5文型パターンマッチング"""
+        # 必要な依存関係の確認
+        for rel in pattern_info['required']:
+            if rel not in dep_relations:
+                return False
+        
+        # ROOT語の品詞チェック
+        if root_word.upos not in pattern_info['root_pos']:
+            return False
+        
+        return True
+    
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence):
+        """基本5文型スロット生成"""
+        slots = {}
+        sub_slots = {}
+        
+        # マッピングに従ってスロット生成
+        for dep_rel, slot in mapping.items():
+            if dep_rel == "root":
+                # ROOT語の処理
+                root_word = self._find_root_word(sentence)
+                if root_word:
+                    slots[slot] = root_word.text
+            elif dep_rel in dep_relations:
+                # 依存関係語の処理
+                words = dep_relations[dep_rel]
+                if words:
+                    slots[slot] = words[0].text
+        
+        # 修飾語の処理（基本的なもののみ）
+        for word in sentence.words:
+            if word.deprel == 'advmod' and 'M2' not in slots:
+                slots['M2'] = word.text  # 副詞修飾語
+            elif word.deprel == 'obl' and 'M3' not in slots:
+                slots['M3'] = word.text  # 前置詞句等
+        
+        return {'slots': slots, 'sub_slots': sub_slots}
     
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
