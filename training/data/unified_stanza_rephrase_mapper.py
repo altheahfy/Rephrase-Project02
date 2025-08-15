@@ -484,8 +484,17 @@ class UnifiedStanzaRephraseMapper:
         
         # === 3. 関係節内要素特定 ===
         rel_subject = None
-        if rel_type in ['obj', 'advmod', 'poss']:  # ✅ 修正：possも追加
+        if rel_type in ['obj', 'advmod']:  # 目的語・関係副詞の場合のみ主語検索
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
+        elif rel_type == 'poss':
+            # 所有格関係代名詞の場合は特別処理
+            # whose構文では、所有される名詞以外の独立した主語を探す
+            nsubj_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
+            possessed_noun = self._find_word_by_id(sentence, rel_pronoun.head) if rel_pronoun else None
+            
+            # 所有される名詞と異なる主語がある場合のみrel_subjectとして認識
+            if nsubj_word and possessed_noun and nsubj_word.id != possessed_noun.id:
+                rel_subject = nsubj_word
         
         # 所有格関係代名詞の特別処理
         possessed_noun = None
@@ -684,13 +693,18 @@ class UnifiedStanzaRephraseMapper:
             sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'poss':
-            # 所有格関係代名詞: "The student whose book I borrowed"
-            # whose構文は目的語位置に配置される
-            sub_slots["sub-o1"] = noun_phrase  # ✅ 修正：目的語位置
+            # 所有格関係代名詞: 主語か目的語かを文脈で判断
+            # 関係節内に別の主語がある場合は目的語位置、ない場合は主語位置
             
-            # 関係節内の実際の主語を検出
             if rel_subject:
+                # 別の主語がある場合: "The student whose book I borrowed"
+                # → 目的語関係代名詞として処理
+                sub_slots["sub-o1"] = noun_phrase
                 sub_slots["sub-s"] = rel_subject.text
+            else:
+                # 別の主語がない場合: "The woman whose dog barks"  
+                # → 主語関係代名詞として処理
+                sub_slots["sub-s"] = noun_phrase
             
             # 関係節内の動詞・補語を正しく抽出
             if aux_word:
@@ -1066,23 +1080,78 @@ class UnifiedStanzaRephraseMapper:
         
         return True
     
+    def _build_phrase_with_modifiers(self, sentence, main_word):
+        """
+        修飾語句を含む完全な句を構築
+        
+        対応修飾語タイプ：
+        - det: 限定詞 (a, an, the, my, your, his, her, its, our, their)
+        - amod: 形容詞修飾語 (red, beautiful, smart, old)
+        - nummod: 数詞修飾語 (one, two, first, second)  
+        - nmod:poss: 所有格修飾語 (John's, Mary's, my, your)
+        - compound: 複合名詞 (car door, school bus)
+        """
+        if not main_word:
+            return ""
+        
+        # 修飾語収集
+        modifiers = []
+        for word in sentence.words:
+            if word.head == main_word.id:
+                if word.deprel in ['det', 'amod', 'nummod', 'nmod:poss', 'compound']:
+                    modifiers.append(word)
+        
+        # デバッグログ追加
+        if modifiers:
+            self.logger.debug(f"🔧 修飾語検出 [{main_word.text}]: {[(m.text, m.deprel) for m in modifiers]}")
+        
+        # 修飾語をID順でソート（語順保持）
+        modifiers.sort(key=lambda w: w.id)
+        
+        # 句構築: 修飾語 + メイン語
+        phrase_words = modifiers + [main_word]
+        phrase_words.sort(key=lambda w: w.id)  # 最終的な語順確保
+        
+        result = ' '.join(word.text for word in phrase_words)
+        self.logger.debug(f"🔧 句構築完了: '{result}'")
+        
+        return result
+    
     def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence):
-        """基本5文型スロット生成"""
+        """基本5文型スロット生成（修飾語句対応強化）"""
         slots = {}
         sub_slots = {}
         
         # マッピングに従ってスロット生成
         for dep_rel, slot in mapping.items():
             if dep_rel == "root":
-                # ROOT語の処理
+                # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
                 root_word = self._find_root_word(sentence)
                 if root_word:
                     slots[slot] = root_word.text
             elif dep_rel in dep_relations:
-                # 依存関係語の処理
+                # 依存関係語の処理（修飾語句を含む完全な句を構築）
                 words = dep_relations[dep_rel]
                 if words:
-                    slots[slot] = words[0].text
+                    # メインの語
+                    main_word = words[0]
+                    # 修飾語句を構築
+                    phrase = self._build_phrase_with_modifiers(sentence, main_word)
+                    slots[slot] = phrase
+        
+        # ✅ 追加処理：ROOTワードにも修飾語句処理を適用（動詞以外の場合）
+        # 例: "The woman is my neighbor" でneighborがROOTの場合
+        root_word = self._find_root_word(sentence)
+        if root_word and root_word.pos in ['NOUN', 'PRON', 'ADJ']:
+            # 名詞・代名詞・形容詞がROOTの場合、修飾語句を構築
+            root_phrase = self._build_phrase_with_modifiers(sentence, root_word)
+            
+            # ROOTワード対応のスロットを更新
+            for dep_rel, slot in mapping.items():
+                if dep_rel == "root" and slot in slots:
+                    if slots[slot] == root_word.text:  # 単語のみの場合
+                        slots[slot] = root_phrase  # 修飾語句に更新
+                        self.logger.debug(f"🔧 ROOT語修飾語句適用: {slot} = '{root_phrase}'")
         
         # 修飾語の処理（基本的なもののみ）
         for word in sentence.words:
