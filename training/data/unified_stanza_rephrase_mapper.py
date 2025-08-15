@@ -443,7 +443,6 @@ class UnifiedStanzaRephraseMapper:
         result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
         
         # === 6. 主文の残り部分を5文型エンジンで処理 ===
-        self.logger.debug(f"  🔧 主文処理開始中...")
         main_clause_result = self._process_main_clause_after_relative(sentence, antecedent, rel_verb, noun_phrase)
         if main_clause_result:
             # 主文の処理結果をマージ（サブスロットは保持）
@@ -685,7 +684,7 @@ class UnifiedStanzaRephraseMapper:
             return None
             
         if main_verb.id == rel_verb.id:
-            self.logger.debug("  ⚠️ 関係節動詞がROOT - 主文なし")
+            self.logger.debug(f"  ⚠️ 関係節動詞がROOT - 主文なし (main_verb={main_verb.text}, rel_verb={rel_verb.text})")
             return None
         
         self.logger.debug(f"  🔍 主文動詞検出: {main_verb.text} (id: {main_verb.id}, POS: {main_verb.upos})")
@@ -949,6 +948,12 @@ class UnifiedStanzaRephraseMapper:
                 "required": ["nsubj", "cop"],
                 "optional": [],
                 "root_pos": ["ADJ", "NOUN"],
+                "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
+            },
+            "SVC_PRON": {
+                "required": ["nsubj", "cop"],
+                "optional": [],
+                "root_pos": ["PRON"],
                 "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
             },
             "SVC_ALT": {
