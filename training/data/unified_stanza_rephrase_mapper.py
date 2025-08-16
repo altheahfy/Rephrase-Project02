@@ -35,6 +35,72 @@ class RephraseSlot:
     confidence: float = 1.0
     source_handler: str = ""
 
+class PositionalSubSlotManager:
+    """位置別サブスロット管理システム"""
+    
+    MAIN_SLOTS = ['M1', 'S', 'Aux', 'M2', 'V', 'C1', 'O1', 'O2', 'C2', 'M3']
+    SUB_SLOT_TYPES = ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 
+                      'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3']
+    
+    def __init__(self):
+        """位置別サブスロット管理初期化"""
+        self.positional_sub_slots = {}
+        self._initialize_structure()
+    
+    def _initialize_structure(self):
+        """階層構造初期化"""
+        for main_slot in self.MAIN_SLOTS:
+            if main_slot not in ['Aux', 'V']:  # Aux, Vはサブスロット無し
+                self.positional_sub_slots[main_slot] = {}
+                for sub_type in self.SUB_SLOT_TYPES:
+                    self.positional_sub_slots[main_slot][sub_type] = ""
+    
+    def set_sub_slot(self, main_slot_position: str, sub_slot_type: str, content: str):
+        """位置別サブスロット設定"""
+        if main_slot_position in self.positional_sub_slots:
+            if sub_slot_type in self.SUB_SLOT_TYPES:
+                self.positional_sub_slots[main_slot_position][sub_slot_type] = content
+                return True
+        return False
+    
+    def get_sub_slots_for_position(self, main_slot_position: str) -> Dict[str, str]:
+        """指定位置のサブスロット群取得"""
+        return self.positional_sub_slots.get(main_slot_position, {})
+    
+    def has_sub_slots_at_position(self, main_slot_position: str) -> bool:
+        """指定位置にサブスロット要素があるかチェック"""
+        sub_slots = self.get_sub_slots_for_position(main_slot_position)
+        return any(content.strip() for content in sub_slots.values())
+    
+    def get_all_sub_slots_flat(self) -> Dict[str, str]:
+        """全サブスロットをフラット化して取得（従来互換性用）"""
+        flat_result = {}
+        for main_pos, sub_slots in self.positional_sub_slots.items():
+            for sub_type, content in sub_slots.items():
+                if content.strip():
+                    # 位置プレフィックス付きキー作成
+                    key = f"{main_pos}-{sub_type}"
+                    flat_result[key] = content
+        return flat_result
+    
+    def get_legacy_sub_slots(self) -> Dict[str, str]:
+        """従来形式のサブスロット取得（sub-s, sub-v等）"""
+        # 優先順位: S > O1 > M1 > その他
+        priority_order = ['S', 'O1', 'M1', 'M2', 'C1', 'O2', 'C2', 'M3']
+        
+        legacy_result = {}
+        used_sub_types = set()
+        
+        for main_pos in priority_order:
+            if main_pos in self.positional_sub_slots:
+                sub_slots = self.positional_sub_slots[main_pos]
+                for sub_type, content in sub_slots.items():
+                    if content.strip() and sub_type not in used_sub_types:
+                        legacy_result[sub_type] = content
+                        used_sub_types.add(sub_type)
+        
+        return legacy_result
+
 class UnifiedStanzaRephraseMapper:
     """
     統合型Stanza→Rephraseマッパー
@@ -43,6 +109,7 @@ class UnifiedStanzaRephraseMapper:
     - 全文法ハンドラーが同時実行（選択問題排除）
     - 単一Stanza解析結果の多角的分析
     - 個別エンジンの実装知識継承
+    - 位置別サブスロット管理システム統合
     """
     
     def __init__(self, 
@@ -65,6 +132,9 @@ class UnifiedStanzaRephraseMapper:
         
         # ログ設定
         self._setup_logging(log_level)
+        
+        # 位置別サブスロット管理システム初期化
+        self.sub_slot_manager = PositionalSubSlotManager()
         
         # Stanzaパイプライン初期化
         self.nlp = None
@@ -378,7 +448,8 @@ class UnifiedStanzaRephraseMapper:
         result = {
             'sentence': sentence,
             'slots': {},
-            'sub_slots': {},
+            'sub_slots': {},  # 従来互換性用
+            'positional_sub_slots': {},  # 新しい位置別構造
             'grammar_info': {
                 'detected_patterns': [],
                 'handler_contributions': {}
@@ -465,10 +536,18 @@ class UnifiedStanzaRephraseMapper:
                     else:
                         base_result['slots'][slot_name] = slot_data
         
-        # サブスロット情報マージ
+        # サブスロット情報マージ（位置別対応）
         if 'sub_slots' in handler_result:
+            # 従来互換性用のマージ
             for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
                 base_result['sub_slots'][sub_slot_name] = sub_slot_data
+        
+        # 位置別サブスロット情報マージ（新システム）
+        if 'positional_sub_slots' in handler_result:
+            for main_pos, sub_slots in handler_result['positional_sub_slots'].items():
+                if main_pos not in base_result['positional_sub_slots']:
+                    base_result['positional_sub_slots'][main_pos] = {}
+                base_result['positional_sub_slots'][main_pos].update(sub_slots)
         
         # 文法情報記録
         if 'grammar_info' in handler_result:
@@ -482,7 +561,7 @@ class UnifiedStanzaRephraseMapper:
         return base_result
     
     def _post_process_result(self, result: Dict, sentence: str) -> Dict:
-        """後処理・結果検証（whose構文特別処理追加）"""
+        """後処理・結果検証（位置別サブスロット対応）"""
         
         # ✅ whose構文の特別な後処理：主文・関係節の正しい分離
         if 'whose' in sentence.lower():
@@ -496,10 +575,34 @@ class UnifiedStanzaRephraseMapper:
         # 🔧 REPHRASE SPECIFICATION COMPLIANCE: Sub-slots require empty main slots
         self._apply_rephrase_slot_structure_rules(result, sentence)
         
+        # 位置別サブスロットから従来形式への変換（後方互換性）
+        if 'positional_sub_slots' in result and result['positional_sub_slots']:
+            self._convert_positional_to_legacy_sub_slots(result)
+        
         # スロット整合性チェック（今後実装）
         # TODO: rephrase_slot_validator.py との連携
         
         return result
+    
+    def _convert_positional_to_legacy_sub_slots(self, result: Dict) -> None:
+        """位置別サブスロットから従来形式sub_slotsへの変換"""
+        positional_sub_slots = result.get('positional_sub_slots', {})
+        legacy_sub_slots = result.get('sub_slots', {})
+        
+        # 優先順位: S > O1 > M1 > その他（関係節の優先順位ルール）
+        priority_order = ['S', 'O1', 'M1', 'M2', 'C1', 'O2', 'C2', 'M3']
+        
+        used_sub_types = set()
+        
+        for main_pos in priority_order:
+            if main_pos in positional_sub_slots:
+                sub_slots = positional_sub_slots[main_pos]
+                for sub_type, content in sub_slots.items():
+                    if content.strip() and sub_type not in used_sub_types:
+                        legacy_sub_slots[sub_type] = content
+                        used_sub_types.add(sub_type)
+        
+        result['sub_slots'] = legacy_sub_slots
     
     def _post_process_whose_construction(self, result: Dict, sentence: str) -> Dict:
         """whose構文の後処理：主文・関係節の正しい分離"""
@@ -543,41 +646,50 @@ class UnifiedStanzaRephraseMapper:
     
     def _apply_rephrase_slot_structure_rules(self, result: Dict, sentence: str) -> None:
         """
-        Rephrase仕様準拠：複文での正しいスロット配置
+        Rephrase仕様準拠：位置別サブスロット対応の正しいスロット配置
         
-        重要ルール：sub-slotsが存在する場合、対応するmain slotsは空文字にする
-        例外：Aux, Vスロットは例外適用なし
+        重要ルール：各上位スロット位置にサブスロットが存在する場合、その上位スロットは空文字にする
         
-        対応関係：
-        - S ←→ sub-s (S位置の従属節)
-        - O1 ←→ sub-o1 (O1位置の従属節)  
-        - O2 ←→ sub-o2 (O2位置の従属節)
-        - C1 ←→ sub-c1 (C1位置の従属節)
-        - C2 ←→ sub-c2 (C2位置の従属節)
-        - M1 ←→ sub-m1 (M1位置の従属節)
-        - M2 ←→ sub-m2 (M2位置の従属節) 
-        - M3 ←→ sub-m3 (M3位置の従属節)
+        位置別対応関係：
+        - S位置にサブスロット → Sを空
+        - O1位置にサブスロット → O1を空  
+        - M1位置にサブスロット → M1を空
+        等々
         """
         slots = result.get('slots', {})
         sub_slots = result.get('sub_slots', {})
+        positional_sub_slots = result.get('positional_sub_slots', {})
         
-        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
-        self.logger.debug(f"🔧 空化ルール開始: slots={list(slots.keys())}, sub_slots={list(sub_slots.keys())}")
-        if 'S' in slots:
-            self.logger.debug(f"🔧 S値確認: '{slots['S']}' (type: {type(slots['S'])}, bool: {bool(slots['S'])})")
-        else:
-            self.logger.debug("🔧 Sスロット不存在")
+        self.logger.debug(f"🏗️ Rephrase仕様適用開始")
+        self.logger.debug(f"🔧 位置別サブスロット: {list(positional_sub_slots.keys())}")
         
         # 🎯 Rephraseルール適用（特殊構文の後処理）
         self._apply_consecutive_verb_rephrase_rule(result, sentence)
         
-        # 🎯 正しいルール：そのスロット自体がサブスロット分解された場合のみ空にする
-        # 例: "The man I met was my father" → S空、V保持、C1保持
+        # � 位置別サブスロット管理による空化処理
         emptied_slots = []
         
-        # 🔍 どのメインスロットがサブスロット分解されているかを判定
-        # 関係節のsub-slotsは関係節内の要素であり、メインスロットの直接分解ではない
+        # 位置別サブスロットシステムがある場合は新ルール適用
+        if positional_sub_slots:
+            for main_slot_position in positional_sub_slots:
+                if main_slot_position in slots and self._has_content_in_sub_slots(positional_sub_slots[main_slot_position]):
+                    if main_slot_position not in ['Aux', 'V']:  # Aux, Vは例外
+                        self.logger.info(f"✅ Rephrase個別空化ルール適用: {main_slot_position} → 空")
+                        slots[main_slot_position] = ""
+                        emptied_slots.append(main_slot_position)
+        else:
+            # 従来の空化ルール（後方互換性）
+            self._apply_legacy_emptying_rules(slots, sub_slots, emptied_slots)
         
+        if emptied_slots:
+            self.logger.debug(f"🔄 空化適用完了: {emptied_slots}")
+    
+    def _has_content_in_sub_slots(self, sub_slots_dict: Dict[str, str]) -> bool:
+        """サブスロット辞書に内容があるかチェック"""
+        return any(content.strip() for content in sub_slots_dict.values())
+    
+    def _apply_legacy_emptying_rules(self, slots: Dict, sub_slots: Dict, emptied_slots: List):
+        """従来の空化ルール（後方互換性用）"""
         # S スロットの判定: 関係節要素がある場合のみ空にする
         if any(key in sub_slots for key in ['sub-s', 'sub-v', 'sub-o1', 'sub-m2']) and 'S' in slots and slots['S']:
             slots['S'] = ""

@@ -1,0 +1,21 @@
+{
+  "test30": {
+    "sentence": "The house where I was born is in Tokyo.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C2": "in Tokyo"
+      },
+      "sub_slots": {
+        "sub-m3": "The house where",
+        "sub-s": "I",
+        "sub-aux": "was",
+        "sub-v": "born"
+      }
+    },
+    "notes": "階層的解析アプローチ（Stanza→spaCy→Rephrase独自ルール）テスト",
+    "validated_by": "manual_inspection",
+    "timestamp": "2025-08-16"
+  }
+}
