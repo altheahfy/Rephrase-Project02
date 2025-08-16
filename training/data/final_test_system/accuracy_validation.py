@@ -53,7 +53,10 @@ def accuracy_validation():
         try:
             result = mapper.process(sentence)
             if result and 'slots' in result:
-                system_output = result['slots']
+                # メインスロットとサブスロットを統合
+                system_output = result['slots'].copy()
+                if 'sub_slots' in result:
+                    system_output.update(result['sub_slots'])
                 
                 # 精度判定
                 match_result = compare_slots(system_output, expected)
