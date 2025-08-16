@@ -8,7 +8,7 @@
   },
   "correct_answers": {
     "1": {
-      "sentence": "I love you.",
+      "sentence": "The car is red.",
       "ai_prediction": {
         "main_slots": {
           "S": "The car",
@@ -31,7 +31,7 @@
       }
     },
     "2": {
-      "sentence": "She reads books.",
+      "sentence": "I love you.",
       "ai_prediction": {
         "main_slots": {
           "S": "I",
@@ -54,7 +54,7 @@
       }
     },
     "3": {
-      "sentence": "The cat sleeps.",
+      "sentence": "The man who runs fast is strong.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -85,7 +85,7 @@
       }
     },
     "4": {
-      "sentence": "He gives me a book.",
+      "sentence": "The book which lies there is mine.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -116,7 +116,7 @@
       }
     },
     "5": {
-      "sentence": "I find it interesting.",
+      "sentence": "The person that works here is kind.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -147,7 +147,7 @@
       }
     },
     "6": {
-      "sentence": "The book is good.",
+      "sentence": "The book which I bought is expensive.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -178,7 +178,7 @@
       }
     },
     "7": {
-      "sentence": "The person that works here is kind.",
+      "sentence": "The man whom I met is tall.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -209,7 +209,7 @@
       }
     },
     "8": {
-      "sentence": "The car which was parked outside is mine.",
+      "sentence": "The car that he drives is new.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -240,7 +240,7 @@
       }
     },
     "9": {
-      "sentence": "The house where I was born is old.",
+      "sentence": "The car which was crashed is red.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -271,7 +271,7 @@
       }
     },
     "10": {
-      "sentence": "The day when we met was sunny.",
+      "sentence": "The book that was written is famous.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -302,7 +302,7 @@
       }
     },
     "11": {
-      "sentence": "The reason why he left is unclear.",
+      "sentence": "The letter which was sent arrived.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -331,7 +331,7 @@
       }
     },
     "12": {
-      "sentence": "The man whose car was stolen called the police.",
+      "sentence": "The man whose car is red lives here.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -362,7 +362,7 @@
       }
     },
     "13": {
-      "sentence": "I know the person that you mentioned.",
+      "sentence": "The student whose book I borrowed is smart.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -393,7 +393,7 @@
       }
     },
     "14": {
-      "sentence": "The book which I read was fascinating.",
+      "sentence": "The woman whose dog barks is my neighbor.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -422,7 +422,7 @@
       }
     },
     "15": {
-      "sentence": "The place where we lived was peaceful.",
+      "sentence": "The place where we met is beautiful.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -453,7 +453,7 @@
       }
     },
     "16": {
-      "sentence": "The time when you called was perfect.",
+      "sentence": "The time when he arrived was late.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -484,7 +484,7 @@
       }
     },
     "17": {
-      "sentence": "The woman whose idea won the contest is my sister.",
+      "sentence": "The reason why she left is unclear.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -515,7 +515,7 @@
       }
     },
     "18": {
-      "sentence": "I like the movie that you recommended.",
+      "sentence": "The way how he solved it was clever.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -548,7 +548,7 @@
       }
     },
     "19": {
-      "sentence": "The restaurant where we ate was expensive.",
+      "sentence": "The book I read yesterday was boring.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -581,7 +581,7 @@
       }
     },
     "20": {
-      "sentence": "The moment when I realized the truth was shocking.",
+      "sentence": "The movie we watched last night was amazing.",
       "ai_prediction": {
         "main_slots": {
           "S": "",
@@ -602,7 +602,7 @@
       "expected": null
     },
     "21": {
-      "sentence": "I am running quickly to catch the bus.",
+      "sentence": "The food she cooked was delicious.",
       "ai_prediction": {
         "main_slots": {
           "S": "I",
@@ -622,7 +622,7 @@
       "expected": null
     },
     "22": {
-      "sentence": "She sings beautifully at the concert.",
+      "sentence": "The person you mentioned is here.",
       "ai_prediction": {
         "main_slots": {
           "S": "She",
@@ -647,7 +647,7 @@
       }
     },
     "23": {
-      "sentence": "The dog barks loudly in the yard.",
+      "sentence": "The person standing there is my friend.",
       "ai_prediction": {
         "main_slots": {
           "S": "The dog",
@@ -672,7 +672,7 @@
       }
     },
     "24": {
-      "sentence": "He works diligently on his project.",
+      "sentence": "The car parked outside is mine.",
       "ai_prediction": {
         "main_slots": {
           "S": "He",
@@ -697,7 +697,7 @@
       }
     },
     "25": {
-      "sentence": "They dance gracefully at the party.",
+      "sentence": "The students studying hard will succeed.",
       "ai_prediction": {
         "main_slots": {
           "S": "They",
@@ -722,7 +722,7 @@
       }
     },
     "26": {
-      "sentence": "I eat breakfast every morning.",
+      "sentence": "The door opened slowly creaked loudly.",
       "ai_prediction": {
         "main_slots": {
           "S": "I",
@@ -747,7 +747,7 @@
       }
     },
     "27": {
-      "sentence": "She studies English twice a week.",
+      "sentence": "The book which was written by Shakespeare is famous.",
       "ai_prediction": {
         "main_slots": {
           "S": "She",
@@ -772,7 +772,7 @@
       }
     },
     "28": {
-      "sentence": "He visits his grandmother on Sundays.",
+      "sentence": "The car that was bought by him is expensive.",
       "ai_prediction": {
         "main_slots": {
           "S": "He",
@@ -797,7 +797,7 @@
       }
     },
     "29": {
-      "sentence": "We go to the beach in summer.",
+      "sentence": "The letter which was sent by her arrived today.",
       "ai_prediction": {
         "main_slots": {
           "S": "We",
@@ -822,7 +822,7 @@
       }
     },
     "30": {
-      "sentence": "They play tennis after school.",
+      "sentence": "The house where I was born is in Tokyo.",
       "ai_prediction": {
         "main_slots": {
           "S": "They",
@@ -847,7 +847,7 @@
       }
     },
     "31": {
-      "sentence": "I will call you tomorrow.",
+      "sentence": "The day when we first met was sunny.",
       "ai_prediction": {
         "main_slots": {
           "S": "I",
