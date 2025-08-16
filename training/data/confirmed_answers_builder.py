@@ -393,11 +393,111 @@ db.add_confirmed_answer(
     "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)"
 )
 
+# 50番: 承認済み
+db.add_confirmed_answer(
+    50,
+    "The team working overtime completed the project successfully yesterday.",
+    {
+        "main_slots": {
+            "S": "",
+            "V": "completed",
+            "O1": "the project",
+            "M2": "successfully",
+            "M3": "yesterday"
+        },
+        "sub_slots": {
+            "sub-v": "the team working",
+            "sub-m2": "overtime"
+        }
+    },
+    "分詞構文 + adverbial_modifier (2ハンドラー連携)"
+)
+
+# 51番: 承認済み
+db.add_confirmed_answer(
+    51,
+    "The woman standing quietly near the door was waiting patiently.",
+    {
+        "main_slots": {
+            "S": "",
+            "Aux": "was",
+            "V": "waiting",
+            "M3": "patiently"
+        },
+        "sub_slots": {
+            "sub-v": "the woman standing",
+            "sub-m1": "quietly",
+            "sub-m2": "near the door"
+        }
+    },
+    "分詞構文 + adverbial_modifier (2ハンドラー連携)"
+)
+
+# 52番: 承認済み
+db.add_confirmed_answer(
+    52,
+    "The children playing happily in the garden were supervised carefully.",
+    {
+        "main_slots": {
+            "S": "",
+            "Aux": "were",
+            "V": "supervised",
+            "M3": "carefully"
+        },
+        "sub_slots": {
+            "sub-v": "the children playing",
+            "sub-m1": "happily",
+            "sub-m2": "in the garden"
+        }
+    },
+    "分詞構文 + passive_voice + adverbial_modifier (3ハンドラー連携)"
+)
+
+# 53番: 承認済み
+db.add_confirmed_answer(
+    53,
+    "The documents being reviewed thoroughly will be approved soon.",
+    {
+        "main_slots": {
+            "S": "",
+            "Aux": "will be",
+            "V": "approved",
+            "M2": "soon"
+        },
+        "sub_slots": {
+            "sub-aux": "the documents being",
+            "sub-v": "reviewed",
+            "sub-m2": "thoroughly"
+        }
+    },
+    "分詞構文 + passive_voice + adverbial_modifier (3ハンドラー連携)"
+)
+
+# 54番: 承認済み（最終文）
+db.add_confirmed_answer(
+    54,
+    "The artist whose paintings were exhibited internationally became famous rapidly.",
+    {
+        "main_slots": {
+            "S": "",
+            "V": "became",
+            "C1": "famous",
+            "M2": "rapidly"
+        },
+        "sub_slots": {
+            "sub-s": "The artist whose paintings",
+            "sub-aux": "were",
+            "sub-v": "exhibited",
+            "sub-m2": "internationally"
+        }
+    },
+    "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)"
+)
+
 # 保存
 db.save_to_file()
 
-print("\n📊 進捗確認:")
-print("✅ 承認済み: 18件")
-print("⏳ 残り確認: 5件")
-print("\n🎯 次の確認: 50番")
-print("50番: 次の文を確認予定")
+print("\n🎉 全23例文確認完了！")
+print("✅ 承認済み: 23件")
+print("⏳ 残り確認: 0件")
+print("\n� 4ハンドラー境界テスト用正解データベース完成！")
