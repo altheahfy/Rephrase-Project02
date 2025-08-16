@@ -35,72 +35,6 @@ class RephraseSlot:
     confidence: float = 1.0
     source_handler: str = ""
 
-class PositionalSubSlotManager:
-    """位置別サブスロット管理システム"""
-    
-    MAIN_SLOTS = ['M1', 'S', 'Aux', 'M2', 'V', 'C1', 'O1', 'O2', 'C2', 'M3']
-    SUB_SLOT_TYPES = ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 
-                      'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3']
-    
-    def __init__(self):
-        """位置別サブスロット管理初期化"""
-        self.positional_sub_slots = {}
-        self._initialize_structure()
-    
-    def _initialize_structure(self):
-        """階層構造初期化"""
-        for main_slot in self.MAIN_SLOTS:
-            if main_slot not in ['Aux', 'V']:  # Aux, Vはサブスロット無し
-                self.positional_sub_slots[main_slot] = {}
-                for sub_type in self.SUB_SLOT_TYPES:
-                    self.positional_sub_slots[main_slot][sub_type] = ""
-    
-    def set_sub_slot(self, main_slot_position: str, sub_slot_type: str, content: str):
-        """位置別サブスロット設定"""
-        if main_slot_position in self.positional_sub_slots:
-            if sub_slot_type in self.SUB_SLOT_TYPES:
-                self.positional_sub_slots[main_slot_position][sub_slot_type] = content
-                return True
-        return False
-    
-    def get_sub_slots_for_position(self, main_slot_position: str) -> Dict[str, str]:
-        """指定位置のサブスロット群取得"""
-        return self.positional_sub_slots.get(main_slot_position, {})
-    
-    def has_sub_slots_at_position(self, main_slot_position: str) -> bool:
-        """指定位置にサブスロット要素があるかチェック"""
-        sub_slots = self.get_sub_slots_for_position(main_slot_position)
-        return any(content.strip() for content in sub_slots.values())
-    
-    def get_all_sub_slots_flat(self) -> Dict[str, str]:
-        """全サブスロットをフラット化して取得（従来互換性用）"""
-        flat_result = {}
-        for main_pos, sub_slots in self.positional_sub_slots.items():
-            for sub_type, content in sub_slots.items():
-                if content.strip():
-                    # 位置プレフィックス付きキー作成
-                    key = f"{main_pos}-{sub_type}"
-                    flat_result[key] = content
-        return flat_result
-    
-    def get_legacy_sub_slots(self) -> Dict[str, str]:
-        """従来形式のサブスロット取得（sub-s, sub-v等）"""
-        # 優先順位: S > O1 > M1 > その他
-        priority_order = ['S', 'O1', 'M1', 'M2', 'C1', 'O2', 'C2', 'M3']
-        
-        legacy_result = {}
-        used_sub_types = set()
-        
-        for main_pos in priority_order:
-            if main_pos in self.positional_sub_slots:
-                sub_slots = self.positional_sub_slots[main_pos]
-                for sub_type, content in sub_slots.items():
-                    if content.strip() and sub_type not in used_sub_types:
-                        legacy_result[sub_type] = content
-                        used_sub_types.add(sub_type)
-        
-        return legacy_result
-
 class UnifiedStanzaRephraseMapper:
     """
     統合型Stanza→Rephraseマッパー
@@ -109,7 +43,6 @@ class UnifiedStanzaRephraseMapper:
     - 全文法ハンドラーが同時実行（選択問題排除）
     - 単一Stanza解析結果の多角的分析
     - 個別エンジンの実装知識継承
-    - 位置別サブスロット管理システム統合
     """
     
     def __init__(self, 
@@ -132,9 +65,6 @@ class UnifiedStanzaRephraseMapper:
         
         # ログ設定
         self._setup_logging(log_level)
-        
-        # 位置別サブスロット管理システム初期化
-        self.sub_slot_manager = PositionalSubSlotManager()
         
         # Stanzaパイプライン初期化
         self.nlp = None
@@ -322,17 +252,12 @@ class UnifiedStanzaRephraseMapper:
         特に重要な修正箇所:
         1. whose構文での動詞POS誤解析 (NOUN → VERB)
         2. 関係節動詞の誤分類
-        3. where構文でのROOT語誤認識
         """
         corrections = []
         
         # whose構文特別処理
         if 'whose' in sentence.lower():
             corrections.extend(self._detect_whose_verb_misanalysis(stanza_doc, spacy_doc, sentence))
-        
-        # where構文のROOT語誤認識補正
-        if 'where' in sentence.lower():
-            corrections.extend(self._detect_where_root_misanalysis(stanza_doc, spacy_doc, sentence))
         
         return corrections
     
@@ -365,50 +290,6 @@ class UnifiedStanzaRephraseMapper:
                         'confidence': 0.9
                     })
                     self.logger.debug(f"🔧 whose構文動詞修正検出: {verb_text} NOUN→VERB")
-        
-        return corrections
-    
-    def _detect_where_root_misanalysis(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
-        """where構文でのROOT語誤認識を検出"""
-        corrections = []
-        
-        # spaCyのROOT語を取得
-        spacy_root = None
-        for token in spacy_doc:
-            if token.dep_ == "ROOT":
-                spacy_root = token
-                break
-        
-        # StanzaのROOT語を取得
-        stanza_root = None
-        for word in stanza_doc.sentences[0].words:
-            if word.head == 0:
-                stanza_root = word
-                break
-        
-        if spacy_root and stanza_root and spacy_root.text != stanza_root.text:
-            # ROOT語が異なる場合、spaCyの結果を優先
-            self.logger.debug(f"🔧 where構文ROOT語不一致: Stanza={stanza_root.text} vs spaCy={spacy_root.text}")
-            
-            # spaCyのROOT語に対応するStanza語を探す
-            spacy_root_in_stanza = None
-            for word in stanza_doc.sentences[0].words:
-                if word.text.lower() == spacy_root.text.lower():
-                    spacy_root_in_stanza = word
-                    break
-            
-            if spacy_root_in_stanza:
-                corrections.append({
-                    'word_id': spacy_root_in_stanza.id,
-                    'word_text': spacy_root_in_stanza.text,
-                    'original_head': spacy_root_in_stanza.head,
-                    'corrected_head': 0,  # ROOT語に修正
-                    'correction_type': 'where_root_fix',
-                    'confidence': 0.95
-                })
-                self.logger.debug(f"🔧 where構文ROOT修正: {spacy_root.text} をROOT語に設定")
-        
-        return corrections
         
         return corrections
     
@@ -448,8 +329,7 @@ class UnifiedStanzaRephraseMapper:
         result = {
             'sentence': sentence,
             'slots': {},
-            'sub_slots': {},  # 従来互換性用
-            'positional_sub_slots': {},  # 新しい位置別構造
+            'sub_slots': {},
             'grammar_info': {
                 'detected_patterns': [],
                 'handler_contributions': {}
@@ -493,27 +373,6 @@ class UnifiedStanzaRephraseMapper:
             handler_result: ハンドラー処理結果  
             handler_name: ハンドラー名
         """
-        # 🎯 関係副詞重複排除：関係副詞がsub-m3にある場合、メインスロットの重複を除去
-        # 🚨 DISABLED: 過剰な除去により主文が破壊される問題のため無効化
-        # 正しい処理は後のRephrase仕様適用で行われる
-        if False and 'sub_slots' in handler_result and handler_name == 'relative_clause':
-            sub_m3_value = handler_result['sub_slots'].get('sub-m3', '')
-            if sub_m3_value:
-                # "The way how", "The place where"などから基本部分を抽出
-                for rel_adv in ['how', 'where', 'when', 'why']:
-                    if rel_adv in sub_m3_value.lower():
-                        # "The way how" → "The way"を除去対象に設定
-                        base_part = sub_m3_value.replace(f" {rel_adv}", "").replace(f" {rel_adv.title()}", "")
-                        self.logger.debug(f"🔧 関係副詞重複排除: '{base_part}' をメインスロットから除去")
-                        
-                        # メインスロットから除去
-                        if 'slots' in base_result:
-                            for slot_key in list(base_result['slots'].keys()):
-                                if base_result['slots'][slot_key] == base_part.strip():
-                                    self.logger.debug(f"🗑️ 重複除去: {slot_key}='{base_part.strip()}'")
-                                    base_result['slots'][slot_key] = ""
-                        break
-        
         # スロット情報マージ
         if 'slots' in handler_result:
             for slot_name, slot_data in handler_result['slots'].items():
@@ -536,18 +395,10 @@ class UnifiedStanzaRephraseMapper:
                     else:
                         base_result['slots'][slot_name] = slot_data
         
-        # サブスロット情報マージ（位置別対応）
+        # サブスロット情報マージ
         if 'sub_slots' in handler_result:
-            # 従来互換性用のマージ
             for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
                 base_result['sub_slots'][sub_slot_name] = sub_slot_data
-        
-        # 位置別サブスロット情報マージ（新システム）
-        if 'positional_sub_slots' in handler_result:
-            for main_pos, sub_slots in handler_result['positional_sub_slots'].items():
-                if main_pos not in base_result['positional_sub_slots']:
-                    base_result['positional_sub_slots'][main_pos] = {}
-                base_result['positional_sub_slots'][main_pos].update(sub_slots)
         
         # 文法情報記録
         if 'grammar_info' in handler_result:
@@ -561,7 +412,7 @@ class UnifiedStanzaRephraseMapper:
         return base_result
     
     def _post_process_result(self, result: Dict, sentence: str) -> Dict:
-        """後処理・結果検証（位置別サブスロット対応）"""
+        """後処理・結果検証（whose構文特別処理追加）"""
         
         # ✅ whose構文の特別な後処理：主文・関係節の正しい分離
         if 'whose' in sentence.lower():
@@ -573,36 +424,12 @@ class UnifiedStanzaRephraseMapper:
                 list(set(result['grammar_info']['detected_patterns']))
         
         # 🔧 REPHRASE SPECIFICATION COMPLIANCE: Sub-slots require empty main slots
-        self._apply_rephrase_slot_structure_rules(result, sentence)
-        
-        # 位置別サブスロットから従来形式への変換（後方互換性）
-        if 'positional_sub_slots' in result and result['positional_sub_slots']:
-            self._convert_positional_to_legacy_sub_slots(result)
+        self._apply_rephrase_slot_structure_rules(result)
         
         # スロット整合性チェック（今後実装）
         # TODO: rephrase_slot_validator.py との連携
         
         return result
-    
-    def _convert_positional_to_legacy_sub_slots(self, result: Dict) -> None:
-        """位置別サブスロットから従来形式sub_slotsへの変換"""
-        positional_sub_slots = result.get('positional_sub_slots', {})
-        legacy_sub_slots = result.get('sub_slots', {})
-        
-        # 優先順位: S > O1 > M1 > その他（関係節の優先順位ルール）
-        priority_order = ['S', 'O1', 'M1', 'M2', 'C1', 'O2', 'C2', 'M3']
-        
-        used_sub_types = set()
-        
-        for main_pos in priority_order:
-            if main_pos in positional_sub_slots:
-                sub_slots = positional_sub_slots[main_pos]
-                for sub_type, content in sub_slots.items():
-                    if content.strip() and sub_type not in used_sub_types:
-                        legacy_sub_slots[sub_type] = content
-                        used_sub_types.add(sub_type)
-        
-        result['sub_slots'] = legacy_sub_slots
     
     def _post_process_whose_construction(self, result: Dict, sentence: str) -> Dict:
         """whose構文の後処理：主文・関係節の正しい分離"""
@@ -644,224 +471,64 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _apply_rephrase_slot_structure_rules(self, result: Dict, sentence: str) -> None:
+    def _apply_rephrase_slot_structure_rules(self, result: Dict) -> None:
         """
-        Rephrase仕様準拠：位置別サブスロット対応の正しいスロット配置
+        Rephrase仕様準拠：複文での正しいスロット配置
         
-        重要ルール：各上位スロット位置にサブスロットが存在する場合、その上位スロットは空文字にする
+        重要ルール：sub-slotsが存在する場合、対応するmain slotsは空文字にする
+        例外：Aux, Vスロットは例外適用なし
         
-        位置別対応関係：
-        - S位置にサブスロット → Sを空
-        - O1位置にサブスロット → O1を空  
-        - M1位置にサブスロット → M1を空
-        等々
+        対応関係：
+        - S ←→ sub-s (S位置の従属節)
+        - O1 ←→ sub-o1 (O1位置の従属節)  
+        - O2 ←→ sub-o2 (O2位置の従属節)
+        - C1 ←→ sub-c1 (C1位置の従属節)
+        - C2 ←→ sub-c2 (C2位置の従属節)
+        - M1 ←→ sub-m1 (M1位置の従属節)
+        - M2 ←→ sub-m2 (M2位置の従属節) 
+        - M3 ←→ sub-m3 (M3位置の従属節)
         """
         slots = result.get('slots', {})
         sub_slots = result.get('sub_slots', {})
-        positional_sub_slots = result.get('positional_sub_slots', {})
         
-        self.logger.debug(f"🏗️ Rephrase仕様適用開始")
-        self.logger.debug(f"🔧 位置別サブスロット: {list(positional_sub_slots.keys())}")
-        
-        # 🎯 Rephraseルール適用（特殊構文の後処理）
-        self._apply_consecutive_verb_rephrase_rule(result, sentence)
-        
-        # � 位置別サブスロット管理による空化処理
-        emptied_slots = []
-        
-        # 位置別サブスロットシステムがある場合は新ルール適用
-        if positional_sub_slots:
-            for main_slot_position in positional_sub_slots:
-                if main_slot_position in slots and self._has_content_in_sub_slots(positional_sub_slots[main_slot_position]):
-                    if main_slot_position not in ['Aux', 'V']:  # Aux, Vは例外
-                        self.logger.info(f"✅ Rephrase個別空化ルール適用: {main_slot_position} → 空")
-                        slots[main_slot_position] = ""
-                        emptied_slots.append(main_slot_position)
-        else:
-            # 従来の空化ルール（後方互換性）
-            self._apply_legacy_emptying_rules(slots, sub_slots, emptied_slots)
-        
-        if emptied_slots:
-            self.logger.debug(f"🔄 空化適用完了: {emptied_slots}")
-    
-    def _has_content_in_sub_slots(self, sub_slots_dict: Dict[str, str]) -> bool:
-        """サブスロット辞書に内容があるかチェック"""
-        return any(content.strip() for content in sub_slots_dict.values())
-    
-    def _apply_legacy_emptying_rules(self, slots: Dict, sub_slots: Dict, emptied_slots: List):
-        """従来の空化ルール（後方互換性用）"""
-        # S スロットの判定: 関係節要素がある場合のみ空にする
-        if any(key in sub_slots for key in ['sub-s', 'sub-v', 'sub-o1', 'sub-m2']) and 'S' in slots and slots['S']:
-            slots['S'] = ""
-            emptied_slots.append('S')
-            self.logger.debug(f"🔄 S slot emptied due to relative clause decomposition")
-        # 🎯 正しいRephraseルール：各上位スロットが自身のサブスロットを持つ場合のみ空にする
-        # M1のサブスロット群に要素があれば → M1を空
-        # Sのサブスロット群に要素があれば → Sを空
-        # O1のサブスロット群に要素があれば → O1を空
-        emptied_slots = []
-        
-        # 各上位スロットごとに、その配下のサブスロット群をチェック
-        main_slot_mappings = {
-            'M1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'S': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'O1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'O2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'C1': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'C2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'M2': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3'],
-            'M3': ['sub-m1', 'sub-s', 'sub-aux', 'sub-m2', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m3']
+        # 対応関係マッピング（Aux, V除外）
+        main_to_sub_mapping = {
+            'S': 'sub-s',
+            'O1': 'sub-o1', 
+            'O2': 'sub-o2',
+            'C1': 'sub-c1',
+            'C2': 'sub-c2', 
+            'M1': 'sub-m1',
+            'M2': 'sub-m2',
+            'M3': 'sub-m3'
         }
         
-        # ✅ 連続動詞構造の特別処理：S位置のサブスロット要素のみ認識
-        consecutive_verb_detected = ('sub-v' in sub_slots and 
-                                   sub_slots['sub-v'] and 
-                                   'sub-m2' in sub_slots and 
-                                   sub_slots['sub-m2'])
+        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
         
-        for main_slot, sub_slot_names in main_slot_mappings.items():
-            # その上位スロットの配下サブスロット群に要素が存在するかチェック
-            has_sub_elements = any(sub_slots.get(sub_name) for sub_name in sub_slot_names)
-            
-            if has_sub_elements and main_slot in slots and slots[main_slot]:
-                # ✅ 連続動詞構造の場合：S位置のsub-vとsub-m2はSスロットのみ影響
-                if consecutive_verb_detected:
-                    # sub-vとsub-m2はS位置のサブスロット → Sのみ空化、M2は保持
-                    if main_slot == 'S':
-                        original_value = slots[main_slot]
-                        slots[main_slot] = ""  # S位置に従属節があるため空化
-                        emptied_slots.append(main_slot)
-                        self.logger.debug(f"🔄 連続動詞S空化: S: '{original_value}' → '' (S-sub-v, S-sub-m2)")
-                    # M2は空化しない（M2のサブスロットではないため）
-                    elif main_slot == 'M2':
-                        self.logger.debug(f"🔄 連続動詞M2保持: M2: '{slots[main_slot]}' (S位置サブスロットのため影響なし)")
-                        continue
-                    else:
-                        # 他のスロットは通常ルール適用
-                        original_value = slots[main_slot]
-                        slots[main_slot] = ""  # 位置マーカーとして空文字設定
-                        emptied_slots.append(main_slot)
-                        active_sub_slots = [name for name in sub_slot_names if sub_slots.get(name)]
-                        self.logger.debug(
-                            f"🔄 Slot-specific emptying rule: "
-                            f"{main_slot}: '{original_value}' → '' "
-                            f"(active sub-slots: {active_sub_slots})"
-                        )
-                else:
-                    # 通常の空化ルール
+        # 複文判定＆スロット空文字化処理
+        for main_slot, sub_slot in main_to_sub_mapping.items():
+            if sub_slot in sub_slots and sub_slots[sub_slot]:
+                # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
+                if main_slot in slots:
                     original_value = slots[main_slot]
                     slots[main_slot] = ""  # 位置マーカーとして空文字設定
-                    emptied_slots.append(main_slot)
                     
-                    active_sub_slots = [name for name in sub_slot_names if sub_slots.get(name)]
                     self.logger.debug(
-                        f"🔄 Slot-specific emptying rule: "
+                        f"🔄 Complex sentence rule applied: "
                         f"{main_slot}: '{original_value}' → '' "
-                        f"(active sub-slots: {active_sub_slots})"
+                        f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
                     )
         
-        if emptied_slots:
-            self.logger.info(f"✅ Rephrase個別空化ルール適用: {', '.join(emptied_slots)} → 空")
+        # 処理結果をデバッグログ出力
+        applied_rules = [
+            f"{main}→{sub}" for main, sub in main_to_sub_mapping.items() 
+            if sub in sub_slots and sub_slots[sub] and main in slots
+        ]
         
-        # ✅ whose構文の主文副詞は上位スロットに保持（自動移動無効化）
-        # 主文の副詞（M1, M2, M3）は上位スロットに残すのが正しい仕様
-        # if 'whose' in sentence.lower() and any(s in sub_slots for s in ['sub-s', 'sub-v', 'sub-c1']):
-        #     # whose構文検出時、主文のM-slotを自動的にsub-slotに移動
-        #     additional_rules = []
-        #     for main_slot in ['M1', 'M2', 'M3']:
-        #         if main_slot in slots and slots[main_slot]:  # 内容がある場合
-        #             sub_slot = main_to_sub_mapping[main_slot]
-        #             if sub_slot not in sub_slots or not sub_slots[sub_slot]:  # sub-slotが空の場合
-        #                 sub_slots[sub_slot] = slots[main_slot]
-        #                 slots[main_slot] = ""
-        #                 additional_rules.append(f"{main_slot}→{sub_slot}")
-        #                 self.logger.debug(f"🔄 whose構文主文副詞移動: {main_slot}: '{sub_slots[sub_slot]}' → {sub_slot}")
-        #     
-        #     if additional_rules:
-        #         self.logger.info(f"✅ whose構文主文副詞移動: {', '.join(additional_rules)}")
-        
+        if applied_rules:
+            self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
         else:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
-    
-    def _apply_consecutive_verb_rephrase_rule(self, result: Dict, sentence: str) -> None:
-        """連続動詞構文のRephraseルール
-        
-        対象: "The door opened slowly creaked loudly"
-        意図: "The door [which] opened slowly creaked loudly"
-        
-        適用条件:
-        - 既存の関係節検出が失敗している場合のみ
-        - [名詞] [動詞1] [副詞] [動詞2] [副詞] パターン
-        """
-        slots = result.get('slots', {})
-        sub_slots = result.get('sub_slots', {})
-        
-        # 安全性チェック: 既存の関係節が検出されている場合はスキップ
-        if sub_slots:
-            self.logger.debug("🔍 既存関係節検出済み - 連続動詞ルールスキップ")
-            return
-        
-        # パターン検出: 2つの動詞が存在し、適切な構造を持つか
-        if not self._detect_consecutive_verb_pattern(slots, sentence):
-            return
-            
-        # 連続動詞パターン処理
-        self._process_consecutive_verb_structure(result, sentence)
-    
-    def _detect_consecutive_verb_pattern(self, slots: Dict, sentence: str) -> bool:
-        """連続動詞パターンの検出"""
-        # 簡単なヒューリスティック: S, V, C1が全て埋まっており、C1が動詞的な語の場合
-        if not (slots.get('S') and slots.get('V') and slots.get('C1')):
-            return False
-            
-        # C1が動詞として使用される可能性のある語かチェック
-        c1_text = slots.get('C1', '').lower().strip()
-        
-        # よくある動詞パターン（過去形・過去分詞形含む）
-        verb_indicators = ['creaked', 'moved', 'fell', 'broke', 'jumped', 'ran', 'walked', 'spoke']
-        
-        if c1_text in verb_indicators:
-            self.logger.debug(f"🔍 連続動詞パターン検出: {c1_text}")
-            return True
-            
-        return False
-    
-    def _process_consecutive_verb_structure(self, result: Dict, sentence: str) -> None:
-        """連続動詞構造の処理"""
-        slots = result.get('slots', {})
-        sub_slots = result.get('sub_slots', {})
-        
-        # 現在のスロット内容を取得
-        original_s = slots.get('S', '')
-        original_v = slots.get('V', '')
-        original_c1 = slots.get('C1', '')
-        original_m2 = slots.get('M2', '')
-        original_m3 = slots.get('M3', '')
-        
-        # 構造変換: S+V -> sub-v, C1 -> V
-        if original_s and original_v and original_c1:
-            # サブスロットに第一動詞句を移動
-            sub_slots['sub-v'] = f"{original_s} {original_v}"
-            
-            # 第一動詞に関連する副詞をサブスロットに移動  
-            if original_m2:
-                sub_slots['sub-m2'] = original_m2
-                slots['M2'] = ""  # M2を一時的に空にする
-            
-            # メインスロットを再構成
-            slots['S'] = ""  # Sを空にする（サブスロット要素があるため）
-            slots['V'] = original_c1  # C1をメイン動詞に昇格
-            slots['C1'] = ""  # C1を空にする
-            
-            self.logger.debug(f"🔧 連続動詞構造変換中: S設定 S='' (type: {type(slots['S'])})")
-            
-            # M3があればM2に移動（loudly -> M2）
-            if original_m3:
-                slots['M2'] = original_m3
-                slots['M3'] = ""
-                self.logger.debug(f"🔄 M3→M2移動: '{original_m3}'")
-            
-            self.logger.debug(f"🔄 連続動詞構造変換完了: sub-v='{sub_slots['sub-v']}', V='{slots['V']}', M2='{slots.get('M2', '')}'")
     
     def _create_empty_result(self, sentence: str) -> Dict[str, Any]:
         """空結果の作成"""
@@ -967,21 +634,6 @@ class UnifiedStanzaRephraseMapper:
         # ✅ whose構文の詳細処理
         has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
         
-        # 節主語パターンまたは副詞節パターンもチェック ("The car parked outside is mine", "The door opened slowly creaked loudly")
-        has_csubj = any(w.deprel == 'csubj' for w in sentence.words)
-        
-        # spaCyの副詞節パターン（advcl）もチェック
-        has_advcl = False
-        if hasattr(sentence, 'words') and hasattr(sentence.words[0], 'deprel'):
-            # Stanza形式
-            has_advcl = any(w.deprel == 'advcl' for w in sentence.words)
-        else:
-            # spaCy形式の場合はspaCyハイブリッド解析で検出
-            pass
-        
-        # 補文パターンもチェック ("The door opened slowly creaked loudly")
-        has_xcomp = any(w.deprel == 'xcomp' for w in sentence.words)
-        
         if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
             # whose構文でacl:relcl語がメイン動詞候補の場合は関係節なしと判定
             acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
@@ -1003,8 +655,7 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     return False  # 関係節ではなくメイン動詞
         
-        # 標準的な関係節またはcsubjパターンまたは副詞節パターンの存在チェック  
-        return has_acl_relcl or has_csubj or has_advcl
+        return has_acl_relcl
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
         """関係節構造の分解処理"""
@@ -1045,52 +696,14 @@ class UnifiedStanzaRephraseMapper:
         
         # 通常の関係節検出
         if not rel_verb:
-            self.logger.debug("🔍 関係節検出開始...")
-            
-            # 標準的な関係節パターン
             rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if rel_verb:
-                self.logger.debug(f"  acl:relcl検出: {rel_verb.text}")
-            else:
+            if not rel_verb:
                 rel_verb = self._find_word_by_deprel(sentence, 'acl')
-                if rel_verb:
-                    self.logger.debug(f"  acl検出: {rel_verb.text}")
-            
-            # 補文パターンも検出 ("The door opened slowly creaked loudly")
             if not rel_verb:
-                xcomp_verb = self._find_word_by_deprel(sentence, 'xcomp')
-                if xcomp_verb:
-                    self.logger.debug(f"  xcomp検出: {xcomp_verb.text}")
-                    # xcompパターンでは、補文動詞をメイン動詞とし、rootを関係節動詞とする
-                    root_verb = None
-                    for word in sentence.words:
-                        if word.deprel == 'root':
-                            root_verb = word
-                            break
-                    
-                    if root_verb:
-                        rel_verb = root_verb  # root動詞を関係節動詞とする
-                        # 先行詞は関係節動詞の主語
-                        antecedent = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
-                        self.logger.debug(f"🔧 補文パターン検出: {rel_verb.text} with subject {antecedent.text if antecedent else 'None'}, main verb: {xcomp_verb.text}")
-                        
-                        # メイン動詞を上位スロットに設定
-                        base_result['slots']['V'] = xcomp_verb.text
-                        
-                        # xcomp動詞の副詞をメイン副詞として処理
-                        for adverb_word in sentence.words:
-                            if (adverb_word.head == xcomp_verb.id and 
-                                adverb_word.deprel in ['advmod']):
-                                base_result['slots']['M2'] = adverb_word.text
-                                self.logger.debug(f"🔧 メイン副詞検出: M2 = '{adverb_word.text}'")
-            
-            if not rel_verb:
-                self.logger.debug("  関係節動詞未検出")
                 return base_result
             
-            # 先行詞（関係節動詞の頭、またはcsubjの場合は既に設定済み）
-            if not antecedent:
-                antecedent = self._find_word_by_id(sentence, rel_verb.head)
+            # 先行詞（関係節動詞の頭）
+            antecedent = self._find_word_by_id(sentence, rel_verb.head)
             
         if not antecedent:
             return base_result
@@ -1100,14 +713,9 @@ class UnifiedStanzaRephraseMapper:
         # === 2. 関係代名詞/関係副詞特定 ===
         rel_pronoun, rel_type = self._identify_relative_pronoun(sentence, rel_verb)
         
-        # csubjパターンの場合は省略主語関係代名詞として扱う
-        if rel_verb.deprel == 'csubj':
-            rel_type = 'nsubj_omitted'
-            self.logger.debug(f"🔧 csubjパターン -> nsubj_omitted変換")
-        
         # === 3. 関係節内要素特定 ===
         rel_subject = None
-        if rel_type in ['obj', 'advmod', 'obj_omitted']:  # 省略目的語も含める
+        if rel_type in ['obj', 'advmod']:  # 目的語・関係副詞の場合のみ主語検索
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
         elif rel_type == 'poss':
             # 所有格関係代名詞の場合は特別処理
@@ -1423,33 +1031,13 @@ class UnifiedStanzaRephraseMapper:
             # 省略目的語関係代名詞: "The book I read"
             # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-o1"] = noun_phrase
-            if rel_subject:
-                sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
-            
-            # 関係節内の副詞を検出
-            for adverb_word in sentence.words:
-                if (adverb_word.head == rel_verb.id and 
-                    adverb_word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:unmarked', 'nmod:tmod']):
-                    # 副詞句全体を構築（修飾語を含める）
-                    adverb_phrase = self._build_adverbial_phrase(sentence, adverb_word)
-                    sub_slots["sub-m2"] = adverb_phrase
-                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_phrase}'")
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
-            # sub-v: 先行詞 + 関係動詞の全体 ("the person standing")
-            antecedent_text = noun_phrase.replace(" [omitted]", "")  # [omitted]を除去
-            sub_slots["sub-v"] = f"{antecedent_text} {rel_verb.text}"
-            
-            # 関係節内の副詞を検出
-            for adverb_word in sentence.words:
-                if (adverb_word.head == rel_verb.id and 
-                    adverb_word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:unmarked', 'nmod:tmod']):
-                    # 副詞句全体を構築（修飾語を含める）
-                    adverb_phrase = self._build_adverbial_phrase(sentence, adverb_word)
-                    sub_slots["sub-m2"] = adverb_phrase
-                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_phrase}'")
+            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
+            sub_slots["sub-o1"] = noun_phrase
+            sub_slots["sub-v"] = rel_verb.text
             
         else:
             # デフォルト（目的語扱い）
@@ -1698,10 +1286,7 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug("  主文動詞(V)が処理済み - スキップ")
                 return None
             
-            self.logger.debug(f"🔧 5文型処理開始: base_result={base_result}")
-            result = self._process_basic_five_pattern_structure(sentence, base_result)
-            self.logger.debug(f"🔧 5文型処理結果: {result}")
-            return result
+            return self._process_basic_five_pattern_structure(sentence, base_result)
             
         except Exception as e:
             self.logger.warning(f"⚠️ 5文型ハンドラーエラー: {e}")
@@ -1737,9 +1322,7 @@ class UnifiedStanzaRephraseMapper:
         if not root_word:
             root_word = self._find_root_word(sentence)
             if not root_word:
-                self.logger.debug("🚨 ROOT語が見つからない")
                 return base_result
-            self.logger.debug(f"🔧 ROOT語検出: {root_word.text} (id: {root_word.id})")
 
         # 依存関係マップ構築
         dep_relations = {}
@@ -1747,8 +1330,6 @@ class UnifiedStanzaRephraseMapper:
             if word.deprel not in dep_relations:
                 dep_relations[word.deprel] = []
             dep_relations[word.deprel].append(word)
-        
-        self.logger.debug(f"🔧 依存関係マップ: {list(dep_relations.keys())}")
         
         # ✅ whose構文の特別処理：メイン文の依存関係マップを正しく構築
         if is_whose_construction and root_word:
@@ -1771,10 +1352,7 @@ class UnifiedStanzaRephraseMapper:
         # 基本5文型パターン検出
         pattern_result = self._detect_basic_five_pattern(root_word, dep_relations)
         if not pattern_result:
-            self.logger.debug("🚨 5文型パターンが検出されない")
             return base_result
-        
-        self.logger.debug(f"🔧 5文型パターン検出: {pattern_result['pattern']}")
         
         # スロット生成
         result = base_result.copy()
@@ -1784,10 +1362,8 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'] = {}
         
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, pattern_result
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
         )
-        
-        self.logger.debug(f"🔧 生成されたスロット: {five_pattern_slots}")
         
         result['slots'].update(five_pattern_slots.get('slots', {}))
         result['sub_slots'].update(five_pattern_slots.get('sub_slots', {}))
@@ -1807,42 +1383,8 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _find_root_word(self, sentence):
-        """ROOT語を検索（ハイブリッド解析対応版）"""
-        # ハイブリッド解析補正情報を優先チェック
-        if hasattr(sentence, 'hybrid_corrections'):
-            for word_id, correction in sentence.hybrid_corrections.items():
-                if correction['correction_type'] == 'where_root_fix':
-                    corrected_root = self._find_word_by_id(sentence, word_id)
-                    if corrected_root:
-                        self.logger.debug(f"🔧 ハイブリッド解析ROOT修正: {corrected_root.text} をROOT語として使用")
-                        return corrected_root
-        
-        # 標準的なROOT語検出
-        standard_root = next((w for w in sentence.words if w.head == 0), None)
-        self.logger.debug(f"🔧 標準ROOT語: {standard_root.text if standard_root else 'None'} (POS: {standard_root.upos if standard_root else 'None'})")
-        
-        # 関係節がある場合、動詞を優先的にROOT語として選択
-        has_relative_clause = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
-        self.logger.debug(f"🔧 関係節存在: {has_relative_clause}")
-        
-        if has_relative_clause and standard_root:
-            # 現在のROOT語が動詞でない場合、動詞を探す
-            if standard_root.upos not in ['VERB', 'AUX']:
-                self.logger.debug(f"🔧 ROOT語が動詞でない({standard_root.upos})ため動詞を探索")
-                # 動詞またはAUX（be動詞等）でかつ関係節内でないものを探す
-                for word in sentence.words:
-                    self.logger.debug(f"  語検索: {word.text} (POS: {word.upos}, deprel: {word.deprel})")
-                    if (word.upos in ['VERB', 'AUX'] and 
-                        word.deprel not in ['aux:pass'] and  # aux:passは除外（受動態助動詞）
-                        word.text.lower() not in ['born', 'was']):  # 関係節内の動詞を除外
-                        self.logger.debug(f"🔧 関係節文でROOT修正: {standard_root.text} → {word.text}")
-                        return word
-        
-        return standard_root
-    
-    def _find_word_by_id(self, sentence, word_id):
-        """IDで語を検索"""
-        return next((w for w in sentence.words if w.id == word_id), None)
+        """ROOT語を検索"""
+        return next((w for w in sentence.words if w.head == 0), None)
     
     def _detect_basic_five_pattern(self, root_word, dep_relations):
         """基本5文型パターン検出"""
@@ -1879,18 +1421,6 @@ class UnifiedStanzaRephraseMapper:
                 "root_pos": ["PRON"],
                 "mapping": {"nsubj": "S", "cop": "V", "root": "C1"}
             },
-            "SVC_PROPN": {
-                "required": ["nsubj", "cop"],
-                "optional": [],
-                "root_pos": ["PROPN"],
-                "mapping": {"nsubj": "S", "cop": "V", "root": "C2"}
-            },
-            "SVC_ADV": {
-                "required": ["nsubj", "cop"],
-                "optional": [],
-                "root_pos": ["ADV"],
-                "mapping": {"nsubj": "S", "cop": "V", "root": "M2"}
-            },
             "SVC_ALT": {
                 "required": ["nsubj", "xcomp"],
                 "optional": [],
@@ -1902,22 +1432,6 @@ class UnifiedStanzaRephraseMapper:
                 "optional": [],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "root": "V"}
-            },
-            # Rephrase独自ルール: 前置詞句パターン（階層的解析第3段階）
-            "SV_PREP_LOC": {
-                "required": ["nsubj", "cop", "case"],
-                "optional": [],
-                "root_pos": ["PROPN", "NOUN"],
-                "mapping": {"nsubj": "S", "cop": "V", "case": "C2"},
-                "special_handling": "prepositional_phrase"
-            },
-            # Rephrase独自ルール: spaCyハイブリッド解析後の前置詞句パターン
-            "SV_HYBRID_PREP": {
-                "required": ["nsubj", "case"],
-                "optional": [],
-                "root_pos": ["AUX"],  # spaCy修正後はisがROOTでAUX品詞
-                "mapping": {"nsubj": "S", "root": "V", "case": "C2"},
-                "special_handling": "prepositional_phrase_hybrid"
             }
         }
         
@@ -1927,30 +1441,22 @@ class UnifiedStanzaRephraseMapper:
                 return {
                     'pattern': pattern_name,
                     'mapping': pattern_info['mapping'],
-                    'confidence': 0.9,
-                    'special_handling': pattern_info.get('special_handling')
+                    'confidence': 0.9
                 }
         
         return None
     
     def _matches_five_pattern(self, pattern_info, dep_relations, root_word):
-        """5文型パターンマッチング（デバッグ強化）"""
-        self.logger.debug(f"🔍 パターンマッチング: {pattern_info}")
-        self.logger.debug(f"🔍 依存関係: {dep_relations}")
-        self.logger.debug(f"🔍 ROOT語: {root_word.text} (POS: {root_word.upos})")
-        
+        """5文型パターンマッチング"""
         # 必要な依存関係の確認
         for rel in pattern_info['required']:
             if rel not in dep_relations:
-                self.logger.debug(f"❌ 必須関係未検出: {rel}")
                 return False
         
         # ROOT語の品詞チェック
         if root_word.upos not in pattern_info['root_pos']:
-            self.logger.debug(f"❌ ROOT語品詞不一致: {root_word.upos} not in {pattern_info['root_pos']}")
             return False
         
-        self.logger.debug(f"✅ パターンマッチ成功")
         return True
     
     def _build_phrase_with_modifiers(self, sentence, main_word):
@@ -1963,37 +1469,26 @@ class UnifiedStanzaRephraseMapper:
         - nummod: 数詞修飾語 (one, two, first, second)  
         - nmod:poss: 所有格修飾語 (John's, Mary's, my, your)
         - compound: 複合名詞 (car door, school bus)
-        - case: 前置詞 (in, on, at, with, for, etc.)
         """
         if not main_word:
             return ""
         
         # 修飾語収集
         modifiers = []
-        preposition = None
-        
         for word in sentence.words:
             if word.head == main_word.id:
                 if word.deprel in ['det', 'amod', 'nummod', 'nmod:poss', 'compound']:
                     modifiers.append(word)
-                elif word.deprel == 'case':
-                    preposition = word  # 前置詞を保存
         
         # デバッグログ追加
         if modifiers:
             self.logger.debug(f"🔧 修飾語検出 [{main_word.text}]: {[(m.text, m.deprel) for m in modifiers]}")
-        if preposition:
-            self.logger.debug(f"🔧 前置詞検出 [{main_word.text}]: {preposition.text}")
         
         # 修飾語をID順でソート（語順保持）
         modifiers.sort(key=lambda w: w.id)
         
-        # 句構築: 前置詞 + 修飾語 + メイン語
-        phrase_words = []
-        if preposition:
-            phrase_words.append(preposition)
-        phrase_words.extend(modifiers)
-        phrase_words.append(main_word)
+        # 句構築: 修飾語 + メイン語
+        phrase_words = modifiers + [main_word]
         phrase_words.sort(key=lambda w: w.id)  # 最終的な語順確保
         
         result = ' '.join(word.text for word in phrase_words)
@@ -2001,8 +1496,8 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, pattern_info=None):
-        """基本5文型スロット生成（修飾語句対応強化・前置詞句特別処理）"""
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence):
+        """基本5文型スロット生成（修飾語句対応強化）"""
         slots = {}
         sub_slots = {}
         
@@ -2065,114 +1560,78 @@ class UnifiedStanzaRephraseMapper:
             # elif word.deprel == 'obl' and 'M3' not in slots:
             #     slots['M3'] = word.text  # 前置詞句等
         
-        # Rephrase独自ルール: 前置詞句の特別処理（階層的解析第3段階）
-        if pattern_info and isinstance(pattern_info, dict):
-            special_handling = pattern_info.get('special_handling')
-            
-            if special_handling == 'prepositional_phrase':
-                # 通常の前置詞句構築: 前置詞 + 目的語
-                for word in sentence.words:
-                    if word.deprel == 'case':  # 前置詞検出
-                        # 前置詞の依存先（目的語）を検索
-                        for target_word in sentence.words:
-                            if target_word.id == word.head:
-                                prep_phrase = f"{word.text} {target_word.text}"
-                                # C2スロットに前置詞句設定
-                                if 'C2' in slots:
-                                    slots['C2'] = prep_phrase
-                                    self.logger.debug(f"🔧 前置詞句構築: C2 = '{prep_phrase}'")
-                                break
-                        break
-                        
-            elif special_handling == 'prepositional_phrase_hybrid':
-                # spaCyハイブリッド解析後の前置詞句構築
-                for word in sentence.words:
-                    if word.deprel == 'case':  # 前置詞検出
-                        # 前置詞の依存先（目的語）を検索
-                        for target_word in sentence.words:
-                            if target_word.id == word.head:
-                                prep_phrase = f"{word.text} {target_word.text}"
-                                # C2スロットに前置詞句設定
-                                slots['C2'] = prep_phrase
-                                self.logger.debug(f"🔧 ハイブリッド前置詞句構築: C2 = '{prep_phrase}'")
-                                break
-                        break
-        
         return {'slots': slots, 'sub_slots': sub_slots}
 
     def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
         副詞エンジン（Phase 4実装）
-        
-        migration_source/prepositional_phrase_engine.py の分類システムを参考に
+        migration_source/prepositional_phrase_engine.py の分析システムを統合に
         統一された副詞処理を実装
-        
         Args:
             sentence: Stanza sentence オブジェクト
-            base_result: 基本解析結果（重複防止用）
-            
+            base_result: 基本解析結果（既存スロット再利用）
         Returns:
             Optional[Dict]: 副詞処理結果、または None
         """
         from enum import Enum
-        
+
         class AdverbialType(Enum):
-            """副詞の意味分類"""
-            TIME = "time"           # 時間副詞 → M1
-            FREQUENCY = "frequency" # 頻度副詞 → M2
-            MANNER = "manner"       # 様態副詞 → M2/M3
-            LOCATION = "location"   # 場所副詞 → M2/M3
-            DEGREE = "degree"       # 程度副詞 → M2
-        
-        self.logger.debug("🔍 副詞ハンドラー実行中...")
-        
-        # === 既存スロット確認（重複防止） ===
+            """副詞の種類分類"""
+            TIME = "time"           # 時間副詞（M1）
+            FREQUENCY = "frequency" # 頻度副詞（M2）
+            MANNER = "manner"       # 様態副詞（M2/M3）
+            LOCATION = "location"   # 場所副詞（M2/M3）
+            DEGREE = "degree"       # 程度副詞（M2）
+
+        self.logger.debug("副詞ハンドラー実行中...")
+
+        # === 既存スロット確認（既存スロット再利用）===
         existing_slots = {}
         if base_result and 'slots' in base_result:
             existing_slots = base_result['slots']
-        
-        # 既に割り当て済みの副詞文字列を特定
+
+        # 既に割り当て済みの副詞情報を特定
         existing_adverbs = set()
         for slot_key, slot_value in existing_slots.items():
             if slot_key.startswith('M') and slot_value:
                 # スロット値を単語に分解して副詞を特定
                 words = slot_value.split()
                 existing_adverbs.update(words)
-        
-        # === 1. 副詞検出（拡張対応） ===
+
+        # === 1. 副詞候補の収集（対象副詞依存関係） ===
         adverbial_modifiers = []
         sentence_length = len(sentence.words)
-        
+
         for word in sentence.words:
-            # 拡張副詞依存関係対応（Yesterday検出バグ修正済み）
+            # 汎用副詞依存関係対象（yesterday読込バグ修正済み）
             if word.deprel in ['advmod', 'obl', 'obl:unmarked', 'obl:tmod', 'obl:npmod', 'nmod:unmarked', 'nmod:tmod']:
                 # 既に処理済みの副詞をスキップ
                 if word.text in existing_adverbs:
-                    self.logger.debug(f"⚠️ 既存スロットに割り当て済み - スキップ: {word.text}")
+                    self.logger.debug(f"既存スロットに割り当て済み - スキップ: {word.text}")
                     continue
-                
-                # 関係節内の副詞は関係節ハンドラーに任せる（acl:relcl構文チェック）
+
+                # 関係詞内の副詞は関係詞ハンドラーに委ねる（acl:relcl検索チェック）
                 head_word = next((w for w in sentence.words if w.id == word.head), None)
                 if head_word and any(w.deprel == 'acl:relcl' and w.head == head_word.id for w in sentence.words):
-                    self.logger.debug(f"🔧 関係節内副詞を除外: {word.text} (head: {head_word.text})")
+                    self.logger.debug(f"関係詞内副詞を除外: {word.text} (head: {head_word.text})")
                     continue
-                    
-                # 関係副詞は関係節ハンドラーに任せる
+
+                # 関係副詞は関係詞ハンドラーに委ねる
                 if word.text.lower() in ['where', 'when', 'why', 'how']:
                     continue
-                    
-                # 関係副詞構文の先行詞（The way, The place等）は関係節ハンドラーに任せる
-                if (word.text.lower() in ['way', 'place', 'time', 'reason'] and 
+
+                # 関係副詞構文の先行詞（The way, The place等）は関係詞ハンドラーに委ねる
+                if (word.text.lower() in ['way', 'place', 'time', 'reason'] and
                     any(w.text.lower() in ['where', 'when', 'why', 'how'] for w in sentence.words)):
-                    self.logger.debug(f"🔧 関係副詞構文の先行詞をスキップ: {word.text}")
+                    self.logger.debug(f"関係副詞構文の先行詞をスキップ: {word.text}")
                     continue
-                
+
                 # 副詞分類
                 adv_type = self._classify_adverb(word, sentence)
                 
-                # 位置計算（1ベース）
+                # 位置計算（ベース配置）
                 position_ratio = word.id / sentence_length
-                
+
                 adverbial_modifiers.append({
                     'word': word,
                     'type': adv_type,
@@ -2180,105 +1639,105 @@ class UnifiedStanzaRephraseMapper:
                     'position_ratio': position_ratio,
                     'text': word.text
                 })
-        
+
         if not adverbial_modifiers:
-            self.logger.debug("❌ 副詞なし - スキップ")
+            self.logger.debug("副詞なし - スキップ")
             return None
-        
+
         # === 2. 位置ベース配置 ===
         slots = {}
         sub_slots = {}
-        
+
         # 位置順でソート（前から後ろへ）
         adverbial_modifiers.sort(key=lambda x: x['position'])
-        
+
         for adv_info in adverbial_modifiers:
             word = adv_info['word']
             adv_type = adv_info['type']
             position_ratio = adv_info['position_ratio']
             word_text = word.text
-            
+
             # 複合副詞句の構築
             phrase = self._build_adverbial_phrase(sentence, word)
             if phrase != word_text:
                 word_text = phrase
-            
+
             # 位置ベース配置判定
             target_slot = self._determine_adverb_slot(adv_type, position_ratio)
-            
-            # スロット配置（重複回避）
+
+            # スロット配置（既存回避）
             if target_slot == 'M1' and 'M1' not in slots:
                 slots['M1'] = word_text
-                self.logger.debug(f"🔧 M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+                self.logger.debug(f"M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
             elif target_slot == 'M2' and 'M2' not in slots:
                 slots['M2'] = word_text
-                self.logger.debug(f"🔧 M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+                self.logger.debug(f"M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
             elif target_slot == 'M3' and 'M3' not in slots:
                 slots['M3'] = word_text
-                self.logger.debug(f"🔧 M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+                self.logger.debug(f"M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
             else:
                 # フォールバック配置
                 for fallback_slot in ['M1', 'M2', 'M3']:
                     if fallback_slot not in slots:
                         slots[fallback_slot] = word_text
-                        self.logger.debug(f"🔧 {fallback_slot}フォールバック配置: {word_text}")
+                        self.logger.debug(f"{fallback_slot}フォールバック配置: {word_text}")
                         break
-        
+
         if slots:
-            self.logger.debug(f"  ✅ 副詞処理完了: {len(slots)} slots detected")
+            self.logger.debug(f"副詞処理結果: {len(slots)} slots detected")
             return {'slots': slots, 'sub_slots': sub_slots}
         else:
             return None
-    
+
     def _classify_adverb(self, word, sentence):
-        """副詞の意味分類"""
+        """副詞の種類分類"""
         from enum import Enum
-        
+
         class AdverbialType(Enum):
             TIME = "time"
             FREQUENCY = "frequency"
             MANNER = "manner"
             LOCATION = "location"
             DEGREE = "degree"
-        
+
         word_lower = word.text.lower()
-        
+
         # 時間副詞
         time_adverbs = {
-            'yesterday', 'today', 'tomorrow', 'now', 'then', 'recently', 
+            'yesterday', 'today', 'tomorrow', 'now', 'then', 'recently',
             'currently', 'formerly', 'previously', 'eventually', 'finally',
             'earlier', 'later', 'soon', 'immediately', 'already', 'still',
             'ago', 'before', 'after', 'during', 'meanwhile'
         }
-        
+
         # 頻度副詞
         frequency_adverbs = {
             'always', 'usually', 'often', 'sometimes', 'rarely', 'never',
             'frequently', 'occasionally', 'seldom', 'constantly', 'repeatedly',
             'once', 'twice', 'again', 'daily', 'weekly', 'monthly'
         }
-        
+
         # 様態副詞
         manner_adverbs = {
             'carefully', 'quickly', 'slowly', 'quietly', 'loudly', 'gently',
             'suddenly', 'gradually', 'easily', 'hardly', 'clearly', 'properly',
             'correctly', 'incorrectly', 'well', 'badly', 'perfectly', 'seriously'
         }
-        
+
         # 場所副詞
         location_adverbs = {
             'here', 'there', 'everywhere', 'nowhere', 'somewhere', 'anywhere',
             'upstairs', 'downstairs', 'outside', 'inside', 'nearby', 'far',
             'home', 'abroad', 'locally', 'globally'
         }
-        
+
         # 程度副詞
         degree_adverbs = {
             'very', 'quite', 'rather', 'extremely', 'completely', 'totally',
             'partially', 'slightly', 'barely', 'almost', 'entirely', 'mostly',
             'too', 'enough', 'highly', 'deeply'
         }
-        
+
         # 分類実行
         if word_lower in time_adverbs:
             return AdverbialType.TIME
@@ -2296,30 +1755,30 @@ class UnifiedStanzaRephraseMapper:
                 return AdverbialType.MANNER  # 副詞は様態として扱う
             else:
                 return AdverbialType.LOCATION  # 名詞句は場所として扱う
-    
+
     def _determine_adverb_slot(self, adv_type, position_ratio) -> str:
         """副詞タイプと位置に基づくスロット決定"""
         from enum import Enum
-        
+
         class AdverbialType(Enum):
             TIME = "time"
             FREQUENCY = "frequency"
             MANNER = "manner"
             LOCATION = "location"
             DEGREE = "degree"
-        
+
         # 時間副詞は常にM1
         if adv_type == AdverbialType.TIME:
             return 'M1'
-        
+
         # 位置ベース判定
         if position_ratio <= 0.3:  # 文頭30%
             return 'M1'
-        elif position_ratio >= 0.7:  # 文末30% 
+        elif position_ratio >= 0.7:  # 文末30%
             return 'M3'
         else:  # 文中40%
             return 'M2'
-    
+
     def _build_adverbial_phrase(self, sentence, main_word):
         """副詞句の構築（前置詞句対応）"""
         # 修飾語収集
@@ -2328,17 +1787,17 @@ class UnifiedStanzaRephraseMapper:
             if word.head == main_word.id:
                 if word.deprel in ['det', 'amod', 'case', 'compound']:
                     modifiers.append(word)
-        
+
         if not modifiers:
             return main_word.text
-        
-        # 修飾語をID順でソート（語順保持）
+
+        # 修飾語をID順でソート（語順通り）
         modifiers.sort(key=lambda w: w.id)
         
         # 句構築: 修飾語 + メイン語
         phrase_words = modifiers + [main_word]
         phrase_words.sort(key=lambda w: w.id)
-        
+
         return ' '.join(word.text for word in phrase_words)
 
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
