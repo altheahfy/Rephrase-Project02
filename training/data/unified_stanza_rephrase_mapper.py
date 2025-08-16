@@ -1149,9 +1149,17 @@ class UnifiedStanzaRephraseMapper:
                 result['slots'] = {}
             if 'sub_slots' not in result:
                 result['sub_slots'] = {}
+            if 'positional_sub_slots' not in result:
+                result['positional_sub_slots'] = {}
             
             # 関係節のsub-slotsのみマージ（メイン文スロットは変更しない）
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+            
+            # 位置別サブスロットもマージ
+            for position, sub_slots in rephrase_slots.get('positional_sub_slots', {}).items():
+                if position not in result['positional_sub_slots']:
+                    result['positional_sub_slots'][position] = {}
+                result['positional_sub_slots'][position].update(sub_slots)
             
             self.logger.debug(f"🔧 whose構文: メイン文スロット保持, 関係節サブスロット追加")
             
@@ -1166,10 +1174,18 @@ class UnifiedStanzaRephraseMapper:
                 result['slots'] = {}
             if 'sub_slots' not in result:
                 result['sub_slots'] = {}
+            if 'positional_sub_slots' not in result:
+                result['positional_sub_slots'] = {}
             
             # 通常のマージ
             result['slots'].update(rephrase_slots.get('slots', {}))
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+            
+            # 位置別サブスロットもマージ
+            for position, sub_slots in rephrase_slots.get('positional_sub_slots', {}).items():
+                if position not in result['positional_sub_slots']:
+                    result['positional_sub_slots'][position] = {}
+                result['positional_sub_slots'][position].update(sub_slots)
         
         # 文法情報記録
         result['grammar_info'] = {
@@ -1374,7 +1390,7 @@ class UnifiedStanzaRephraseMapper:
                                 sub_slots["sub-c1"] = complement.text
                             
                             # メイン文は別途基本5文型ハンドラーが処理する
-                            return {"slots": slots, "sub_slots": sub_slots}
+                            return self._create_positional_sub_slot_result("S", slots, sub_slots, sentence)
             
             # 通常のwhose構文処理
             if rel_subject:
@@ -1459,7 +1475,7 @@ class UnifiedStanzaRephraseMapper:
                 sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
         
-        return {"slots": slots, "sub_slots": sub_slots}
+        return self._create_positional_sub_slot_result("S", slots, sub_slots, sentence)
     
     def _generate_whose_relative_clause_slots(self, antecedent, cop_verb, sentence) -> Dict:
         """whose構文専用の関係節スロット生成（メイン文を妨害しない）"""
@@ -1494,7 +1510,57 @@ class UnifiedStanzaRephraseMapper:
             
             self.logger.debug(f"🔧 whose関係節スロット: sub-s='{whose_car_phrase}', sub-v='{cop_verb.text}', sub-c1='{complement.text if complement else ''}'")
         
-        return {"slots": slots, "sub_slots": sub_slots}
+        return self._create_positional_sub_slot_result("S", slots, sub_slots, sentence)
+    
+    def _create_positional_sub_slot_result(self, main_slot_position: str, slots: Dict, sub_slots: Dict, sentence=None) -> Dict:
+        """位置別サブスロット結果の作成（表示順序付き）"""
+        
+        # 位置別サブスロット構造を作成
+        positional_sub_slots = {}
+        if sub_slots:
+            # 表示順序情報を追加
+            sub_slots_with_order = {}
+            
+            if sentence:
+                # 元の例文での出現順序を取得
+                word_positions = {word.text.lower(): word.id for word in sentence.words}
+                self.logger.debug(f"🔧 Word positions: {word_positions}")
+                
+                for sub_slot_key, sub_slot_value in sub_slots.items():
+                    # サブスロット値に対応する単語の位置を取得
+                    words_in_value = sub_slot_value.lower().split()
+                    min_position = float('inf')
+                    
+                    for word in words_in_value:
+                        if word in word_positions:
+                            min_position = min(min_position, word_positions[word])
+                            self.logger.debug(f"🔧 Word '{word}' found at position {word_positions[word]}")
+                    
+                    # 表示順序情報付きでサブスロットを保存
+                    display_order = min_position if min_position != float('inf') else 999
+                    sub_slots_with_order[sub_slot_key] = {
+                        'value': sub_slot_value,
+                        'display_order': display_order,
+                        'position': main_slot_position
+                    }
+                    self.logger.debug(f"🔧 Sub-slot {sub_slot_key}: '{sub_slot_value}' → order {display_order}")
+            else:
+                # sentenceが無い場合は順序なしで保存
+                for sub_slot_key, sub_slot_value in sub_slots.items():
+                    sub_slots_with_order[sub_slot_key] = {
+                        'value': sub_slot_value,
+                        'display_order': 999,
+                        'position': main_slot_position
+                    }
+            
+            positional_sub_slots[main_slot_position] = sub_slots_with_order
+            self.logger.debug(f"🔧 Final positional_sub_slots: {positional_sub_slots}")
+        
+        return {
+            "slots": slots, 
+            "sub_slots": sub_slots,  # 従来互換性用
+            "positional_sub_slots": positional_sub_slots  # 新しい位置別構造（表示順序付き）
+        }
     
     def _process_main_clause_after_relative(self, sentence, antecedent, rel_verb, noun_phrase) -> Optional[Dict]:
         """関係節処理後の主文部分を5文型で処理"""
@@ -1632,6 +1698,95 @@ class UnifiedStanzaRephraseMapper:
         
         return root_word
     
+    def _find_main_clause_verb(self, sentence):
+        """
+        主文の動詞を検索（関係節の動詞を除外）
+        
+        関係節内の動詞ではなく、主文の実際の動詞を特定する。
+        例: "The book which I bought is expensive" → V="is" (bought ではない)
+        """
+        # ハイブリッド解析の補正情報をチェック
+        if hasattr(sentence, 'hybrid_corrections'):
+            for word in sentence.words:
+                if word.id in sentence.hybrid_corrections:
+                    correction = sentence.hybrid_corrections[word.id]
+                    if correction['correction_type'] == 'main_clause_verb':
+                        self.logger.debug(f"🔧 ハイブリッド解析: 主文動詞として {word.text} を使用 (補正済み)")
+                        return word
+        
+        # 1. まずrootを特定
+        root_word = None
+        for word in sentence.words:
+            if word.head == 0:  # root
+                root_word = word
+                break
+        
+        if not root_word:
+            return None
+        
+        # 2. rootが動詞の場合の判定
+        if root_word.upos in ['VERB', 'AUX']:
+            # 関係節の動詞でないかチェック
+            if not self._is_relative_clause_verb(sentence, root_word):
+                return root_word
+        
+        # 3. rootが形容詞の場合、cop動詞を主動詞とする
+        if root_word.upos == 'ADJ':
+            cop_verb = self._find_word_by_head_and_deprel(sentence, root_word.id, 'cop')
+            if cop_verb and not self._is_relative_clause_verb(sentence, cop_verb):
+                return cop_verb
+        
+        # 4. rootが名詞の場合、主文の動詞を再探索
+        if root_word.upos in ['NOUN', 'PROPN']:
+            # 主語に対する述語動詞を探す
+            main_verbs = []
+            for word in sentence.words:
+                if (word.upos in ['VERB', 'AUX'] and 
+                    not self._is_relative_clause_verb(sentence, word)):
+                    # 主文レベルの動詞を特定
+                    if word.deprel in ['ROOT', 'ccomp', 'xcomp'] or word.head == 0:
+                        main_verbs.append(word)
+            
+            if main_verbs:
+                # 最も適切な主文動詞を選択（rootに最も近い）
+                return min(main_verbs, key=lambda v: abs(v.id - root_word.id))
+        
+        # 5. フォールバック：root自体を返す
+        return root_word
+    
+    def _is_relative_clause_verb(self, sentence, verb):
+        """動詞が関係節内の動詞かどうかを判定"""
+        # acl:relcl関係で接続されている場合は関係節の動詞
+        if verb.deprel == 'acl:relcl':
+            return True
+        
+        # 関係代名詞の下位にある動詞かチェック
+        relative_pronouns = ['which', 'who', 'whom', 'whose', 'that']
+        for word in sentence.words:
+            if (word.text.lower() in relative_pronouns and 
+                self._is_descendant(sentence, verb, word)):
+                return True
+        
+        # nmod:tmod（時間修飾）関係にある動詞も関係節として扱う
+        if verb.deprel == 'nmod:tmod':
+            return True
+        
+        return False
+    
+    def _is_descendant(self, sentence, potential_descendant, ancestor):
+        """potential_descendantがancestorの下位語かどうかを判定"""
+        current = potential_descendant
+        visited = set()
+        
+        while current and current.id not in visited:
+            visited.add(current.id)
+            if current.head == ancestor.id:
+                return True
+            # 次の親を探す
+            current = next((w for w in sentence.words if w.id == current.head), None)
+        
+        return False
+    
     def _build_full_subject_with_relative_clause(self, sentence, antecedent, rel_verb):
         """関係節を含む完全な主語句を構築"""
         # 先行詞から開始
@@ -1733,13 +1888,13 @@ class UnifiedStanzaRephraseMapper:
                 root_word = acl_relcl_word
                 self.logger.debug(f"🔧 whose構文検出: メイン動詞を {acl_relcl_word.text} に修正")
         
-        # 通常の場合：ROOT語検出
+        # 通常の場合：ROOT語検出（関係代名詞文の特別処理）
         if not root_word:
-            root_word = self._find_root_word(sentence)
+            root_word = self._find_main_clause_verb(sentence)
             if not root_word:
-                self.logger.debug("🚨 ROOT語が見つからない")
+                self.logger.debug("🚨 主文動詞が見つからない")
                 return base_result
-            self.logger.debug(f"🔧 ROOT語検出: {root_word.text} (id: {root_word.id})")
+            self.logger.debug(f"🔧 主文動詞検出: {root_word.text} (id: {root_word.id})")
 
         # 依存関係マップ構築
         dep_relations = {}
