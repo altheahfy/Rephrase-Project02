@@ -19,7 +19,7 @@ def test_custom_sentences():
     mapper.add_handler('adverbial_modifier')  # 🎯 副詞エンジン追加！
     print("✅ システム準備完了")
     
-    # 実装済み4ハンドラー完全対応版54例文
+    # 実装済み4ハンドラー完全対応版54例文（正解データと完全一致版）
     your_test_sentences = [
         "The car is red.",
         "I love you.",
@@ -52,29 +52,29 @@ def test_custom_sentences():
         "The letter which was sent by her arrived today.",
         "The house where I was born is in Tokyo.",
         "The day when we first met was sunny.",
-        "The reason why he quit was personal.",
-        "The man who carefully drives slowly is cautious.",
-        "The book which I recently bought is interesting.",
-        "The place where we often go is crowded.",
-        "The man who owns the car that was stolen is angry.",
-        "The book which I read that was recommended is good.",
-        "The student who studies harder than others will succeed.",
-        "The car which runs faster than mine is expensive.",
-        "The person who can speak French is helpful.",
-        "The student who must study hard will pass.",
-        "The man who should arrive soon is late.",
-        "The book which I have read is interesting.",
-        "The man who had left returned yesterday.",
-        "The project which will have finished is important.",
-        "The person who is running there is my brother.",
-        "The car which was moving fast stopped suddenly.",
-        "The man who runs fast and works hard is successful.",
-        "The book which I bought but haven't read is thick.",
-        "The place where we lived when I was young is gone.",
-        "The window was broken.",
+        "She is going to visit Paris next month.",
+        "He has finished his homework.",
         "The letter was written by John.",
         "The house was built in 1990.",
-        "The cake was eaten by the children."
+        "The book was written by a famous author.",
+        "The cake is being baked by my mother.",
+        "The cake was eaten by the children.",
+        "The door was opened by the key.",
+        "The message was sent yesterday.",
+        "If it rains, I stay home.",
+        "She acts as if she knows everything.",
+        "The students study hard for exams.",
+        "The car was repaired last week.",
+        "The book was published in 2020.",
+        "I went to the store and bought some milk.",
+        "She was tired, but she continued working.",
+        "Although it was raining, we went for a walk.",
+        "Because he was late, he missed the train.",
+        "The room was cleaned this morning.",
+        "The man who is standing there is my father.",
+        "The girl whom I met yesterday is very smart.",
+        "The house that we visited last week is for sale.",
+        "The teacher whose class I attended was excellent."
     ]
     
     print(f"\n📖 テスト例文数: {len(your_test_sentences)}")
