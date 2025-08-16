@@ -75,7 +75,6 @@ def test_custom_sentences():
         "The letter was written by John.",
         "The house was built in 1990.",
         "The cake was eaten by the children."
-
     ]
     
     print(f"\n📖 テスト例文数: {len(your_test_sentences)}")

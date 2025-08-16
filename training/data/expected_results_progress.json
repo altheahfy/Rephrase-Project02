@@ -1,7 +1,7 @@
 {
   "meta": {
-    "last_updated": "2025-08-16T12:52:35.422831",
-    "current_sentence": 32,
+    "last_updated": "2025-08-16T17:49:05.300875",
+    "current_sentence": 55,
     "total_sentences": 54,
     "completion_status": "in_progress",
     "session_notes": []
@@ -872,6 +872,477 @@
         },
         "sub_slots": {}
       }
+    },
+    "32": {
+      "sentence": "She is going to visit Paris next month.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "is going to",
+          "V": "visit",
+          "O1": "Paris",
+          "M2": "next month"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "corrected",
+      "corrections": {},
+      "notes": "be going to: 全体でAux扱い",
+      "timestamp": "2025-08-16T13:02:10.302222",
+      "expected": null
+    },
+    "33": {
+      "sentence": "He has finished his homework.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "現在完了形第3文型",
+      "timestamp": "2025-08-16T13:18:41.359856",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      }
+    },
+    "34": {
+      "sentence": "The letter was written by John.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "受動態+by句",
+      "timestamp": "2025-08-16T13:19:28.328475",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      }
+    },
+    "35": {
+      "sentence": "The house was built in 1990.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "受動態+時間表現",
+      "timestamp": "2025-08-16T17:24:01.297695",
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      }
+    },
+    "36": {
+      "sentence": "The book was written by a famous author.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "受動態+by句",
+      "timestamp": "2025-08-16T17:24:34.016518",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by a famous author"
+        },
+        "sub_slots": {}
+      }
+    },
+    "37": {
+      "sentence": "The cake is being baked by my mother.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M1": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "現在進行形受動態+by句",
+      "timestamp": "2025-08-16T17:25:21.471306",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M1": "by my mother"
+        },
+        "sub_slots": {}
+      }
+    },
+    "38": {
+      "sentence": "The cake was eaten by the children.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M1": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "過去形受動態+by句",
+      "timestamp": "2025-08-16T17:26:44.255673",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M1": "by the children"
+        },
+        "sub_slots": {}
+      }
+    },
+    "39": {
+      "sentence": "The door was opened by the key.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "過去形受動態+by句",
+      "timestamp": "2025-08-16T17:27:17.740983",
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "by the key"
+        },
+        "sub_slots": {}
+      }
+    },
+    "40": {
+      "sentence": "The message was sent yesterday.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "過去形受動態+時間表現（by句なし）",
+      "timestamp": "2025-08-16T17:27:51.375894",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      }
+    },
+    "41": {
+      "sentence": "If it rains, I stay home.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "I",
+          "V": "stay",
+          "M1": "",
+          "M2": "home"
+        },
+        "sub_slots": {
+          "sub-m1": "If",
+          "sub-s": "it",
+          "sub-v": "rains"
+        }
+      },
+      "user_judgment": "corrected",
+      "corrections": {},
+      "notes": "条件節: If節sub-slots分解",
+      "timestamp": "2025-08-16T17:30:58.850945",
+      "expected": null
+    },
+    "42": {
+      "sentence": "She acts as if she knows everything.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M1": ""
+        },
+        "sub_slots": {
+          "sub-m1": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "as if節: 様態副詞節sub-slots分解",
+      "timestamp": "2025-08-16T17:31:48.115885",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M1": ""
+        },
+        "sub_slots": {
+          "sub-m1": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      }
+    },
+    "43": {
+      "sentence": "The students study hard for exams.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M1": "hard",
+          "M2": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+副詞+目的前置詞句",
+      "timestamp": "2025-08-16T17:32:24.194173",
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M1": "hard",
+          "M2": "for exams"
+        },
+        "sub_slots": {}
+      }
+    },
+    "44": {
+      "sentence": "The car was repaired last week.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "過去形受動態+時間表現（by句なし）",
+      "timestamp": "2025-08-16T17:33:07.226721",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      }
+    },
+    "45": {
+      "sentence": "The book was published in 2020.",
+      "ai_prediction": {
+        "S": "The book",
+        "Aux": "was",
+        "V": "published",
+        "M1": "in 2020"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:34:38.769378",
+      "expected": null
+    },
+    "46": {
+      "sentence": "I went to the store and bought some milk.",
+      "ai_prediction": "SKIP",
+      "user_judgment": "重文のため対象外",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:36:32.348393",
+      "expected": null
+    },
+    "47": {
+      "sentence": "She was tired, but she continued working.",
+      "ai_prediction": "SKIP",
+      "user_judgment": "重文のため対象外",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:36:55.471465",
+      "expected": null
+    },
+    "48": {
+      "sentence": "Although it was raining, we went for a walk.",
+      "ai_prediction": {
+        "S": "we",
+        "V": "went",
+        "M1": "",
+        "M2": "for a walk",
+        "sub-m1": "Although",
+        "sub-s": "it",
+        "sub-aux": "was",
+        "sub-v": "raining"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:41:54.055834",
+      "expected": null
+    },
+    "49": {
+      "sentence": "Because he was late, he missed the train.",
+      "ai_prediction": {
+        "S": "he",
+        "V": "missed",
+        "O": "the train",
+        "M1": "",
+        "sub-m1": "Because",
+        "sub-s": "he",
+        "sub-v": "was",
+        "sub-c": "late"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:42:56.876189",
+      "expected": null
+    },
+    "50": {
+      "sentence": "The room was cleaned this morning.",
+      "ai_prediction": {
+        "S": "The room",
+        "Aux": "was",
+        "V": "cleaned",
+        "M2": "this morning"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:43:48.439358",
+      "expected": null
+    },
+    "51": {
+      "sentence": "The man who is standing there is my father.",
+      "ai_prediction": {
+        "S": "",
+        "V": "is",
+        "C": "my father",
+        "sub-s": "The man who",
+        "sub-aux": "is",
+        "sub-v": "standing",
+        "sub-m2": "there"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:44:19.824280",
+      "expected": null
+    },
+    "52": {
+      "sentence": "The girl whom I met yesterday is very smart.",
+      "ai_prediction": {
+        "S": "",
+        "V": "is",
+        "C": "very smart",
+        "sub-o": "The girl whom",
+        "sub-s": "I",
+        "sub-v": "met",
+        "sub-m2": "yesterday"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:44:48.695664",
+      "expected": null
+    },
+    "53": {
+      "sentence": "The house that we visited last week is for sale.",
+      "ai_prediction": {
+        "S": "",
+        "V": "is",
+        "C1": "for sale",
+        "sub-o1": "The house that",
+        "sub-s": "we",
+        "sub-v": "visited",
+        "sub-m2": "last week"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:47:26.536386",
+      "expected": null
+    },
+    "54": {
+      "sentence": "The teacher whose class I attended was excellent.",
+      "ai_prediction": {
+        "S": "",
+        "V": "was",
+        "C1": "excellent",
+        "sub-s": "The teacher whose class",
+        "sub-o1": "I",
+        "sub-v": "attended"
+      },
+      "user_judgment": "正解",
+      "corrections": {},
+      "notes": "",
+      "timestamp": "2025-08-16T17:49:05.300875",
+      "expected": null
     }
   },
   "learned_patterns": {
