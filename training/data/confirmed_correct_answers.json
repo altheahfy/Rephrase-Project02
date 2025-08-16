@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "created_at": "2025-08-17T00:01:47.294565",
+    "total_entries": 8,
+    "purpose": "4ハンドラー完全性テスト用確認済み正解データ"
+  },
+  "correct_answers": {
+    "20": {
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "written",
+          "sub-aux": "was",
+          "sub-m1": "carefully",
+          "sub-m2": "by Shakespeare"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.293563",
+      "user_judgment": "correct"
+    },
+    "21": {
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "runs",
+          "M1": "smoothly"
+        },
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-v": "repaired",
+          "sub-aux": "was",
+          "sub-m1": "quickly",
+          "sub-m2": "yesterday"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "32": {
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "today"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-v": "typed",
+          "sub-aux": "was",
+          "sub-m1": "slowly",
+          "sub-m2": "by the secretary"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "23": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M1": "always",
+          "M2": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m1": "diligently"
+        }
+      },
+      "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "24": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose",
+          "sub-c1": "class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "25": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        }
+      },
+      "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "26": {
+      "sentence": "The window was gently opened by the morning breeze.",
+      "expected": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "gently",
+          "M2": "by the morning breeze"
+        },
+        "sub_slots": {}
+      },
+      "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    },
+    "27": {
+      "sentence": "The message is being carefully written by the manager.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M1": "carefully",
+          "M2": "by the manager"
+        },
+        "sub_slots": {}
+      },
+      "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "user_judgment": "correct"
+    }
+  }
+}
