@@ -1,7 +1,7 @@
 {
   "meta": {
-    "last_updated": "2025-08-16T12:52:35.422831",
-    "current_sentence": 32,
+    "last_updated": "2025-08-16T13:19:28.328475",
+    "current_sentence": 35,
     "total_sentences": 54,
     "completion_status": "in_progress",
     "session_notes": []
@@ -869,6 +869,74 @@
           "V": "call",
           "O1": "you",
           "M2": "tomorrow"
+        },
+        "sub_slots": {}
+      }
+    },
+    "32": {
+      "sentence": "She is going to visit Paris next month.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "is going to",
+          "V": "visit",
+          "O1": "Paris",
+          "M2": "next month"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "corrected",
+      "corrections": {},
+      "notes": "be going to: 全体でAux扱い",
+      "timestamp": "2025-08-16T13:02:10.302222",
+      "expected": null
+    },
+    "33": {
+      "sentence": "He has finished his homework.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "現在完了形第3文型",
+      "timestamp": "2025-08-16T13:18:41.359856",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      }
+    },
+    "34": {
+      "sentence": "The letter was written by John.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "受動態+by句",
+      "timestamp": "2025-08-16T13:19:28.328475",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
         },
         "sub_slots": {}
       }
