@@ -19,31 +19,14 @@ def test_custom_sentences():
     mapper.add_handler('adverbial_modifier')  # 🎯 副詞エンジン追加！
     print("✅ システム準備完了")
     
-    # 実装済み4ハンドラー完全対応版54例文
+    # 正解データベースに基づく54例文（expected_results_progress.jsonから取得）
     your_test_sentences = [
-        # === 基本5文型例文 (20個) ===
         "I love you.",
         "She reads books.",
         "The cat sleeps.",
         "He gives me a book.",
         "I find it interesting.",
-        "The flowers are beautiful.",
-        "I eat breakfast every morning.",
-        "She studies English twice a week.",
-        "He visits his grandmother on Sundays.",
-        "We go to the beach in summer.",
-        "They play tennis after school.",
-        "She is going to visit Paris next month.",
-        "He has finished his homework.",
-        "I went to the store and bought some milk.",
-        "She was tired, but she continued working.",
-        "Although it was raining, we went for a walk.",
-        "Because he was late, he missed the train.",
-        "If it rains, I stay home.",
-        "She acts as if she knows everything.",
-        "The students study hard for exams.",
-        
-        # === 関係節例文 (18個) ===
+        "The book is good.",
         "The person that works here is kind.",
         "The car which was parked outside is mine.",
         "The house where I was born is old.",
@@ -58,20 +41,19 @@ def test_custom_sentences():
         "I like the movie that you recommended.",
         "The restaurant where we ate was expensive.",
         "The moment when I realized the truth was shocking.",
-        "The man who is standing there is my father.",
-        "The girl whom I met yesterday is very smart.",
-        "The house that we visited last week is for sale.",
-        "The teacher whose class I attended was excellent.",
-        
-        # === 副詞修飾例文 (5個) ===
         "I am running quickly to catch the bus.",
         "She sings beautifully at the concert.",
         "The dog barks loudly in the yard.",
         "He works diligently on his project.",
         "They dance gracefully at the party.",
-        
-        # === 受動態例文 (11個) ===
-        "The window was broken.",
+        "I eat breakfast every morning.",
+        "She studies English twice a week.",
+        "He visits his grandmother on Sundays.",
+        "We go to the beach in summer.",
+        "They play tennis after school.",
+        "I will call you tomorrow.",
+        "She is going to visit Paris next month.",
+        "He has finished his homework.",
         "The letter was written by John.",
         "The house was built in 1990.",
         "The book was written by a famous author.",
@@ -79,9 +61,20 @@ def test_custom_sentences():
         "The cake was eaten by the children.",
         "The door was opened by the key.",
         "The message was sent yesterday.",
+        "If it rains, I stay home.",
+        "She acts as if she knows everything.",
+        "The students study hard for exams.",
         "The car was repaired last week.",
         "The book was published in 2020.",
-        "The room was cleaned this morning."
+        "I went to the store and bought some milk.",
+        "She was tired, but she continued working.",
+        "Although it was raining, we went for a walk.",
+        "Because he was late, he missed the train.",
+        "The room was cleaned this morning.",
+        "The man who is standing there is my father.",
+        "The girl whom I met yesterday is very smart.",
+        "The house that we visited last week is for sale.",
+        "The teacher whose class I attended was excellent."
     ]
     
     print(f"\n📖 テスト例文数: {len(your_test_sentences)}")
