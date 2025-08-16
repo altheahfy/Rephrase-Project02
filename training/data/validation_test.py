@@ -63,6 +63,15 @@ class ValidationTester:
     
     def compare_results(self, expected: Dict, actual: Dict) -> Dict:
         """結果比較"""
+        if expected is None or actual is None:
+            return {
+                'main_slots_match': False,
+                'sub_slots_match': False,
+                'main_slots_diff': {},
+                'sub_slots_diff': {},
+                'score': 0.0
+            }
+            
         comparison = {
             'main_slots_match': True,
             'sub_slots_match': True,
@@ -71,9 +80,9 @@ class ValidationTester:
             'score': 0.0
         }
         
-        # メインスロット比較（expected: main_slots, actual: slots）
+        # メインスロット比較（expected: main_slots, actual: main_slots）
         expected_main = self.normalize_slots(expected.get('main_slots', {}))
-        actual_main = self.normalize_slots(actual.get('slots', {}))
+        actual_main = self.normalize_slots(actual.get('main_slots', {}))
         
         # メインスロット差分チェック
         all_main_keys = set(expected_main.keys()) | set(actual_main.keys())
@@ -123,6 +132,9 @@ class ValidationTester:
     
     def run_validation(self) -> Dict:
         """バリデーション実行"""
+        # custom_test.pyから例文リストを取得
+        from custom_test import test_sentences
+        
         print("🔍 正解データとの照合テスト開始")
         print("=" * 60)
         
@@ -135,11 +147,19 @@ class ValidationTester:
             'detailed_results': {}
         }
         
-        for test_id, expected_data in self.expected_data.items():
-            if 'expected' not in expected_data:
+        for idx, sentence in enumerate(test_sentences, 1):
+            test_id = str(idx)
+            
+            # 対応する正解データを取得
+            if test_id not in self.expected_data:
+                print(f"⚠️ テスト {test_id}: 正解データが見つかりません")
                 continue
                 
-            sentence = expected_data['sentence']
+            expected_data = self.expected_data[test_id]
+            if 'expected' not in expected_data or expected_data['expected'] is None:
+                print(f"⚠️ テスト {test_id}: 期待値データが不完全です")
+                continue
+                
             expected_result = expected_data['expected']
             
             print(f"\n🧪 テスト {test_id}: {sentence}")

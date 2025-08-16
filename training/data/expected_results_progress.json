@@ -625,25 +625,31 @@
       "sentence": "The person you mentioned is here.",
       "ai_prediction": {
         "main_slots": {
-          "S": "She",
-          "V": "sings",
-          "M1": "beautifully",
-          "M2": "at the concert"
+          "S": "The person",
+          "V": "is",
+          "M2": "here"
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-s": "you",
+          "sub-v": "mentioned",
+          "sub-o1": "The person [omitted]"
+        }
       },
       "user_judgment": "correct",
       "corrections": {},
-      "notes": "第1文型+副詞+場所の前置詞句",
+      "notes": "関係代名詞省略形の目的格",
       "timestamp": "2025-08-16T12:42:31.252776",
       "expected": {
         "main_slots": {
-          "S": "She",
-          "V": "sings",
-          "M1": "beautifully",
-          "M2": "at the concert"
+          "S": "The person",
+          "V": "is",
+          "M2": "here"
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-s": "you",
+          "sub-v": "mentioned",
+          "sub-o1": "The person [omitted]"
+        }
       }
     },
     "23": {
