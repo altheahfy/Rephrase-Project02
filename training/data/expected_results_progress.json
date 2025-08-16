@@ -1,7 +1,7 @@
 {
   "meta": {
-    "last_updated": "2025-08-16T12:32:01.175702",
-    "current_sentence": 19,
+    "last_updated": "2025-08-16T12:52:35.422831",
+    "current_sentence": 32,
     "total_sentences": 54,
     "completion_status": "in_progress",
     "session_notes": []
@@ -545,6 +545,332 @@
           "sub-v": "solved",
           "sub-o1": "it"
         }
+      }
+    },
+    "19": {
+      "sentence": "The restaurant where we ate was expensive.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "省略された目的語関係代名詞[that]",
+      "timestamp": "2025-08-16T12:33:18.365824",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      }
+    },
+    "20": {
+      "sentence": "The moment when I realized the truth was shocking.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "shocking"
+        },
+        "sub_slots": {
+          "sub-o1": "the truth",
+          "sub-s": "I",
+          "sub-v": "realized",
+          "sub-m1": "The moment when"
+        }
+      },
+      "user_judgment": "corrected",
+      "corrections": {},
+      "notes": "関係副詞when: 先行詞+関係副詞sub-m1",
+      "timestamp": "2025-08-16T12:39:35.150866",
+      "expected": null
+    },
+    "21": {
+      "sentence": "I am running quickly to catch the bus.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "am",
+          "V": "running",
+          "M1": "quickly"
+        },
+        "sub_slots": {
+          "sub-v": "to catch",
+          "sub-o1": "the bus"
+        }
+      },
+      "user_judgment": "corrected",
+      "corrections": {},
+      "notes": "進行形: amAux, runningV (分離)",
+      "timestamp": "2025-08-16T12:40:44.841949",
+      "expected": null
+    },
+    "22": {
+      "sentence": "She sings beautifully at the concert.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M1": "beautifully",
+          "M2": "at the concert"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+副詞+場所の前置詞句",
+      "timestamp": "2025-08-16T12:42:31.252776",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M1": "beautifully",
+          "M2": "at the concert"
+        },
+        "sub_slots": {}
+      }
+    },
+    "23": {
+      "sentence": "The dog barks loudly in the yard.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The dog",
+          "V": "barks",
+          "M1": "loudly",
+          "M2": "in the yard"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+副詞+場所の前置詞句",
+      "timestamp": "2025-08-16T12:43:05.847586",
+      "expected": {
+        "main_slots": {
+          "S": "The dog",
+          "V": "barks",
+          "M1": "loudly",
+          "M2": "in the yard"
+        },
+        "sub_slots": {}
+      }
+    },
+    "24": {
+      "sentence": "He works diligently on his project.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "He",
+          "V": "works",
+          "M1": "diligently",
+          "M2": "on his project"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+副詞+前置詞句",
+      "timestamp": "2025-08-16T12:43:34.379043",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "works",
+          "M1": "diligently",
+          "M2": "on his project"
+        },
+        "sub_slots": {}
+      }
+    },
+    "25": {
+      "sentence": "They dance gracefully at the party.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "They",
+          "V": "dance",
+          "M1": "gracefully",
+          "M2": "at the party"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+副詞+場所の前置詞句",
+      "timestamp": "2025-08-16T12:43:58.949324",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "dance",
+          "M1": "gracefully",
+          "M2": "at the party"
+        },
+        "sub_slots": {}
+      }
+    },
+    "26": {
+      "sentence": "I eat breakfast every morning.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "I",
+          "V": "eat",
+          "O1": "breakfast",
+          "M2": "every morning"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第3文型+時間表現",
+      "timestamp": "2025-08-16T12:44:26.003707",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "eat",
+          "O1": "breakfast",
+          "M2": "every morning"
+        },
+        "sub_slots": {}
+      }
+    },
+    "27": {
+      "sentence": "She studies English twice a week.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "She",
+          "V": "studies",
+          "O1": "English",
+          "M2": "twice a week"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第3文型+頻度表現",
+      "timestamp": "2025-08-16T12:47:47.302033",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "studies",
+          "O1": "English",
+          "M2": "twice a week"
+        },
+        "sub_slots": {}
+      }
+    },
+    "28": {
+      "sentence": "He visits his grandmother on Sundays.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "He",
+          "V": "visits",
+          "O1": "his grandmother",
+          "M2": "on Sundays"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第3文型+時間表現",
+      "timestamp": "2025-08-16T12:49:45.729075",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "visits",
+          "O1": "his grandmother",
+          "M2": "on Sundays"
+        },
+        "sub_slots": {}
+      }
+    },
+    "29": {
+      "sentence": "We go to the beach in summer.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "We",
+          "V": "go",
+          "M1": "to the beach",
+          "M2": "in summer"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第1文型+場所の前置詞句+時間表現",
+      "timestamp": "2025-08-16T12:50:54.423832",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "go",
+          "M1": "to the beach",
+          "M2": "in summer"
+        },
+        "sub_slots": {}
+      }
+    },
+    "30": {
+      "sentence": "They play tennis after school.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "They",
+          "V": "play",
+          "O1": "tennis",
+          "M2": "after school"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第3文型+時間表現",
+      "timestamp": "2025-08-16T12:51:23.020975",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "play",
+          "O1": "tennis",
+          "M2": "after school"
+        },
+        "sub_slots": {}
+      }
+    },
+    "31": {
+      "sentence": "I will call you tomorrow.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "will",
+          "V": "call",
+          "O1": "you",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "未来形第3文型+時間表現",
+      "timestamp": "2025-08-16T12:52:35.422831",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "will",
+          "V": "call",
+          "O1": "you",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {}
       }
     }
   },
