@@ -1,7 +1,7 @@
 {
   "meta": {
-    "created_at": "2025-08-17T00:01:47.294565",
-    "total_entries": 8,
+    "created_at": "2025-08-17T00:23:49.375785",
+    "total_entries": 18,
     "purpose": "4ハンドラー完全性テスト用確認済み正解データ"
   },
   "correct_answers": {
@@ -22,7 +22,7 @@
         }
       },
       "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.293563",
+      "confirmed_at": "2025-08-17T00:23:49.322270",
       "user_judgment": "correct"
     },
     "21": {
@@ -42,7 +42,7 @@
         }
       },
       "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.358279",
       "user_judgment": "correct"
     },
     "32": {
@@ -62,7 +62,7 @@
         }
       },
       "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.362786",
       "user_judgment": "correct"
     },
     "23": {
@@ -81,7 +81,7 @@
         }
       },
       "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.374785",
       "user_judgment": "correct"
     },
     "24": {
@@ -101,7 +101,7 @@
         }
       },
       "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.374785",
       "user_judgment": "correct"
     },
     "25": {
@@ -120,7 +120,7 @@
         }
       },
       "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
       "user_judgment": "correct"
     },
     "26": {
@@ -136,7 +136,7 @@
         "sub_slots": {}
       },
       "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
       "user_judgment": "correct"
     },
     "27": {
@@ -152,7 +152,189 @@
         "sub_slots": {}
       },
       "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
-      "confirmed_at": "2025-08-17T00:01:47.294062",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "28": {
+      "sentence": "The problem was quickly solved by the expert team.",
+      "expected": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {}
+      },
+      "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "29": {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair"
+        },
+        "sub_slots": {
+          "sub-s": "the house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged",
+          "sub-m2": "badly"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "30": {
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot"
+        },
+        "sub_slots": {
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m1": "The place where",
+          "sub-m2": "accidentally"
+        }
+      },
+      "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "31": {
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "unexpected"
+        },
+        "sub_slots": {
+          "sub-s": "everything",
+          "sub-v": "changed",
+          "sub-m1": "The time when",
+          "sub-m2": "dramatically"
+        }
+      },
+      "notes": "relative_clause + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "41": {
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "expected": {
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is being",
+          "V": "constructed",
+          "M1": "very carefully",
+          "M2": "by skilled workers"
+        },
+        "sub_slots": {}
+      },
+      "notes": "passive_voice + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375288",
+      "user_judgment": "correct"
+    },
+    "45": {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "notes": "basic_five_pattern + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375785",
+      "user_judgment": "correct"
+    },
+    "46": {
+      "sentence": "The student writes essays carefully for better grades.",
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "notes": "basic_five_pattern + adverbial_modifier (2ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375785",
+      "user_judgment": "correct"
+    },
+    "47": {
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "published",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed",
+          "sub-m1": "thoroughly",
+          "sub-m2": "by experts"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375785",
+      "user_judgment": "correct"
+    },
+    "48": {
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "improved",
+          "Adv": "dramatically"
+        },
+        "sub_slots": {
+          "sub-s": "whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected",
+          "sub-m2": "carefully"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375785",
+      "user_judgment": "correct"
+    },
+    "49": {
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "works",
+          "M2": "efficiently",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-s": "the machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained",
+          "sub-m2": "properly"
+        }
+      },
+      "notes": "relative_clause + passive_voice + adverbial_modifier (3ハンドラー連携)",
+      "confirmed_at": "2025-08-17T00:23:49.375785",
       "user_judgment": "correct"
     }
   }
