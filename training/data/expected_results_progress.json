@@ -1,0 +1,557 @@
+{
+  "meta": {
+    "last_updated": "2025-08-16T12:32:01.175702",
+    "current_sentence": 19,
+    "total_sentences": 54,
+    "completion_status": "in_progress",
+    "session_notes": []
+  },
+  "correct_answers": {
+    "1": {
+      "sentence": "I love you.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第2文型のbe動詞文（正しい例文で再記録）",
+      "timestamp": "2025-08-16T11:38:49.044086",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      }
+    },
+    "2": {
+      "sentence": "She reads books.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "第3文型の基本構造",
+      "timestamp": "2025-08-16T11:39:07.051788",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      }
+    },
+    "3": {
+      "sentence": "The cat sleeps.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞+副詞修飾語",
+      "timestamp": "2025-08-16T11:39:31.294300",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      }
+    },
+    "4": {
+      "sentence": "He gives me a book.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞+場所副詞",
+      "timestamp": "2025-08-16T11:39:52.696826",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      }
+    },
+    "5": {
+      "sentence": "I find it interesting.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞that+場所副詞",
+      "timestamp": "2025-08-16T11:40:14.271058",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      }
+    },
+    "6": {
+      "sentence": "The book is good.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "目的語関係代名詞which",
+      "timestamp": "2025-08-16T11:40:37.163516",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      }
+    },
+    "7": {
+      "sentence": "The person that works here is kind.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "目的語関係代名詞whom（正式形）",
+      "timestamp": "2025-08-16T11:40:59.866774",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      }
+    },
+    "8": {
+      "sentence": "The car which was parked outside is mine.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "目的語関係代名詞that（能動態）",
+      "timestamp": "2025-08-16T11:41:21.505253",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      }
+    },
+    "9": {
+      "sentence": "The house where I was born is old.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞which（受動態）",
+      "timestamp": "2025-08-16T11:41:57.288314",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      }
+    },
+    "10": {
+      "sentence": "The day when we met was sunny.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞that（受動態）",
+      "timestamp": "2025-08-16T11:42:16.476574",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      }
+    },
+    "11": {
+      "sentence": "The reason why he left is unclear.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "主語関係代名詞which（受動態）+ 第1文型",
+      "timestamp": "2025-08-16T11:43:09.991771",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      }
+    },
+    "12": {
+      "sentence": "The man whose car was stolen called the police.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "所有格関係代名詞whose - sub-sに所有される名詞も含める",
+      "timestamp": "2025-08-16T11:44:19.770628",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      }
+    },
+    "13": {
+      "sentence": "I know the person that you mentioned.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "所有格関係代名詞whose（目的語として機能）",
+      "timestamp": "2025-08-16T11:45:17.158338",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      }
+    },
+    "14": {
+      "sentence": "The book which I read was fascinating.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "所有格関係代名詞whose（主語として機能）",
+      "timestamp": "2025-08-16T12:25:40.611337",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      }
+    },
+    "15": {
+      "sentence": "The place where we lived was peaceful.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "関係副詞where（場所）",
+      "timestamp": "2025-08-16T12:27:59.926591",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      }
+    },
+    "16": {
+      "sentence": "The time when you called was perfect.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "関係副詞when（時間）",
+      "timestamp": "2025-08-16T12:29:54.800052",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      }
+    },
+    "17": {
+      "sentence": "The woman whose idea won the contest is my sister.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "関係副詞why（理由）",
+      "timestamp": "2025-08-16T12:30:52.342032",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      }
+    },
+    "18": {
+      "sentence": "I like the movie that you recommended.",
+      "ai_prediction": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      },
+      "user_judgment": "correct",
+      "corrections": {},
+      "notes": "関係副詞how（方法）+ 関係節内目的語",
+      "timestamp": "2025-08-16T12:32:01.175702",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      }
+    }
+  },
+  "learned_patterns": {
+    "basic_sentence_types": {},
+    "relative_clauses": {},
+    "slot_emptying_rules": {},
+    "sub_slot_patterns": {}
+  }
+}
