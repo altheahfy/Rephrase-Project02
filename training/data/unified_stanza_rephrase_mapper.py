@@ -1629,14 +1629,18 @@ class UnifiedStanzaRephraseMapper:
                 # 副詞分類
                 adv_type = self._classify_adverb(word, sentence)
                 
-                # 位置計算（ベース配置）
+                # 位置計算：動詞からの相対距離を重視
                 position_ratio = word.id / sentence_length
+                
+                # 動詞位置を特定して、動詞からの距離を計算
+                verb_distance = self._calculate_verb_distance(word, sentence)
 
                 adverbial_modifiers.append({
                     'word': word,
                     'type': adv_type,
                     'position': word.id,
                     'position_ratio': position_ratio,
+                    'verb_distance': verb_distance,
                     'text': word.text
                 })
 
@@ -1662,25 +1666,26 @@ class UnifiedStanzaRephraseMapper:
             if phrase != word_text:
                 word_text = phrase
 
-            # 位置ベース配置判定
-            target_slot = self._determine_adverb_slot(adv_type, position_ratio)
+            # 位置ベース配置判定（新ルール適用）
+            target_slot = self._determine_adverb_slot(adv_type, position_ratio, adv_info['verb_distance'])
 
-            # スロット配置（既存回避）
-            if target_slot == 'M1' and 'M1' not in slots:
-                slots['M1'] = word_text
-                self.logger.debug(f"M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
-            elif target_slot == 'M2' and 'M2' not in slots:
+            # スロット配置（余裕重視の配置順序）
+            if target_slot == 'M2' and 'M2' not in slots:
                 slots['M2'] = word_text
-                self.logger.debug(f"M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+                self.logger.debug(f"M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
+            elif target_slot == 'M1' and 'M1' not in slots:
+                slots['M1'] = word_text
+                self.logger.debug(f"M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
             elif target_slot == 'M3' and 'M3' not in slots:
                 slots['M3'] = word_text
-                self.logger.debug(f"M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f})")
+                self.logger.debug(f"M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
             else:
-                # フォールバック配置
-                for fallback_slot in ['M1', 'M2', 'M3']:
+                # フォールバック配置（M2優先）
+                fallback_order = ['M2', 'M1', 'M3']  # M2を最優先
+                for fallback_slot in fallback_order:
                     if fallback_slot not in slots:
                         slots[fallback_slot] = word_text
-                        self.logger.debug(f"{fallback_slot}フォールバック配置: {word_text}")
+                        self.logger.debug(f"{fallback_slot}フォールバック配置: {word_text} (余裕重視, 動詞距離: {adv_info['verb_distance']})")
                         break
 
         if slots:
@@ -1756,8 +1761,15 @@ class UnifiedStanzaRephraseMapper:
             else:
                 return AdverbialType.LOCATION  # 名詞句は場所として扱う
 
-    def _determine_adverb_slot(self, adv_type, position_ratio) -> str:
-        """副詞タイプと位置に基づくスロット決定"""
+    def _determine_adverb_slot(self, adv_type, position_ratio, verb_distance=None) -> str:
+        """
+        副詞タイプと動詞からの距離に基づくスロット決定
+        
+        新ルール：「動詞からの距離」+ 「M2優先」基準
+        - 動詞から2語以内：M2優先（動詞周辺として扱う）
+        - 動詞から遠い：位置に応じてM1またはM3
+        - 拡張可能性を考慮した余裕のある配置
+        """
         from enum import Enum
 
         class AdverbialType(Enum):
@@ -1767,17 +1779,41 @@ class UnifiedStanzaRephraseMapper:
             LOCATION = "location"
             DEGREE = "degree"
 
-        # 時間副詞は常にM1
-        if adv_type == AdverbialType.TIME:
-            return 'M1'
-
-        # 位置ベース判定
-        if position_ratio <= 0.3:  # 文頭30%
-            return 'M1'
-        elif position_ratio >= 0.7:  # 文末30%
-            return 'M3'
-        else:  # 文中40%
+        # 動詞からの距離がある場合はそれを優先
+        if verb_distance is not None:
+            # 動詞から2語以内は「動詞周辺」としてM2を優先
+            if verb_distance <= 2:
+                return 'M2'
+            
+            # 動詞から遠い場合は位置で判定
+            if position_ratio < 0.3:  # 文頭30%
+                return 'M1'
+            elif position_ratio > 0.7:  # 文尾70%
+                # 時間副詞は例外的にM1優先（従来ルール維持）
+                if adv_type == AdverbialType.TIME:
+                    return 'M1'
+                else:
+                    return 'M3'
+            else:
+                # 中間部分は余裕を考慮してM2を優先
+                return 'M2'
+        
+        # フォールバック：従来の文中央からの距離
+        distance_from_center = abs(position_ratio - 0.5)
+        
+        # 動詞周辺（中央）に近い場合はM2を優先
+        if distance_from_center <= 0.25:  # 中央±25%範囲
             return 'M2'
+        
+        # 文の中央から遠い場合
+        if position_ratio < 0.5:  # 文頭寄り
+            return 'M1'
+        else:  # 文尾寄り
+            # 時間副詞は例外的にM1優先（従来ルール維持）
+            if adv_type == AdverbialType.TIME:
+                return 'M1'
+            else:
+                return 'M3'
 
     def _build_adverbial_phrase(self, sentence, main_word):
         """副詞句の構築（前置詞句対応）"""
@@ -1799,6 +1835,44 @@ class UnifiedStanzaRephraseMapper:
         phrase_words.sort(key=lambda w: w.id)
 
         return ' '.join(word.text for word in phrase_words)
+
+    def _calculate_verb_distance(self, word, sentence):
+        """動詞からの距離を計算"""
+        # メイン動詞を検索（複数の条件でチェック）
+        main_verb_pos = None
+        
+        # 1. ROOTの動詞を探す
+        for w in sentence.words:
+            if w.deprel == 'ROOT' and w.upos == 'VERB':
+                main_verb_pos = w.id
+                break
+        
+        # 2. ROOTが見つからない場合、コピュラ動詞を探す
+        if main_verb_pos is None:
+            for w in sentence.words:
+                if w.deprel == 'cop' and w.upos == 'AUX':
+                    main_verb_pos = w.id
+                    break
+        
+        # 3. それでも見つからない場合、最初の動詞を使用
+        if main_verb_pos is None:
+            for w in sentence.words:
+                if w.upos in ['VERB', 'AUX']:
+                    main_verb_pos = w.id
+                    break
+        
+        # 4. 実際に動詞に修飾されている副詞の場合、その動詞との距離を計算
+        if word.deprel == 'advmod':
+            head_word = next((w for w in sentence.words if w.id == word.head), None)
+            if head_word and head_word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める(livesがNOUNの場合)
+                return abs(word.id - head_word.id)
+        
+        if main_verb_pos is None:
+            # 動詞が見つからない場合は位置ベースの距離を返す
+            return abs(word.id - len(sentence.words) / 2)
+        
+        # 動詞からの絶対距離
+        return abs(word.id - main_verb_pos)
 
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
