@@ -24,6 +24,7 @@ def run_53_complete_test():
     mapper.add_handler('relative_clause')
     mapper.add_handler('passive_voice')
     mapper.add_handler('adverbial_modifier')
+    mapper.add_handler('auxiliary_complex')  # 新しい助動詞ハンドラー
     
     # 正解データ読み込み
     with codecs.open('final_54_test_data.json', 'r', 'utf-8') as f:

@@ -2074,6 +2074,140 @@ class UnifiedStanzaRephraseMapper:
         subject_words.sort(key=lambda w: w.id)
         return ' '.join(w.text for w in subject_words)
 
+    # =============================================================================
+    # 助動詞複合体処理ハンドラー (Phase 3)
+    # =============================================================================
+    
+    def _handle_auxiliary_complex(self, sentence, base_result: Dict) -> Dict[str, Any]:
+        """
+        助動詞複合体処理ハンドラー (Phase 3)
+        
+        複合助動詞チェーンの処理:
+        - is being (現在進行受動態)
+        - will be (未来時制)
+        - has finished (現在完了)
+        - will have been (未来完了)
+        
+        Migration Source: perfect_progressive_engine.py のロジック継承
+        """
+        print(f"  🔧 助動詞複合処理ハンドラー開始")
+        
+        result = {
+            'handler': 'auxiliary_complex',
+            'analysis_type': 'auxiliary_chain_processing',
+            'metadata': {}
+        }
+        
+        # 助動詞チェーン検出
+        auxiliary_chain = []
+        main_verb = None
+        subject = None
+        
+        # 第一パス: 主動詞を特定
+        for word in sentence.words:
+            if word.deprel == 'root' and word.upos == 'VERB':
+                main_verb = word
+                print(f"    🎯 主動詞検出: {word.text}")
+                break
+        
+        # 第二パス: 主動詞基準で助動詞・主語を収集
+        for word in sentence.words:
+            # 主文の助動詞のみ検出
+            if main_verb and self._is_main_clause_auxiliary(word, main_verb):
+                auxiliary_chain.append(word.text.lower())
+                print(f"    🔗 主文助動詞検出: {word.text}")
+            
+            # 主語検出 (主文のみ)
+            elif word.deprel == 'nsubj' and main_verb and word.head == main_verb.id:
+                subject = word
+                print(f"    👤 主語検出: {word.text}")
+        
+        # 第三パス: 関係節内の助動詞も収集（sub-auxとして）
+        subordinate_auxiliaries = []
+        for word in sentence.words:
+            # 関係節内の助動詞検出
+            if (word.upos == 'AUX' or (word.upos == 'VERB' and word.deprel in ['aux', 'cop'])):
+                # 主文助動詞でない場合は関係節助動詞
+                if not self._is_main_clause_auxiliary(word, main_verb):
+                    subordinate_auxiliaries.append(word)
+                    print(f"    🔗 関係節助動詞検出: {word.text}")
+        
+        # 助動詞チェーンが存在する場合のみ処理
+        if len(auxiliary_chain) >= 1:
+            print(f"    ✅ 助動詞チェーン発見: {auxiliary_chain}")
+            
+            # 助動詞チェーン結合 (核心ロジック)
+            auxiliary_phrase = ' '.join(auxiliary_chain)
+            result['metadata']['auxiliary_chain'] = auxiliary_phrase
+            result['metadata']['auxiliary_count'] = len(auxiliary_chain)
+            
+            # スロット構造の初期化
+            slots = {}
+            sub_slots = {}
+            
+            # 主文要素の配置
+            if subject:
+                subject_phrase = self._build_phrase_with_modifiers(sentence, subject)
+                slots['S'] = subject_phrase
+            
+            # 助動詞句をAuxスロットに配置（主文のみ）
+            slots['Aux'] = auxiliary_phrase
+            
+            # 主動詞処理
+            if main_verb:
+                verb_phrase = self._build_phrase_with_modifiers(sentence, main_verb)
+                slots['V'] = verb_phrase
+            
+            # 関係節内助動詞の処理
+            for sub_aux in subordinate_auxiliaries:
+                if 'sub-aux' not in sub_slots:
+                    sub_slots['sub-aux'] = sub_aux.text.lower()
+                else:
+                    sub_slots['sub-aux'] += ' ' + sub_aux.text.lower()
+            
+            # 目的語・修飾句処理
+            for word in sentence.words:
+                if word.deprel == 'obj' and word.head == main_verb.id:
+                    obj_phrase = self._build_phrase_with_modifiers(sentence, word)
+                    slots['O1'] = obj_phrase
+                elif word.deprel in ['obl', 'advmod'] and word.text.lower() not in auxiliary_chain and word.head == main_verb.id:
+                    # M-slot距離計算で配置
+                    if main_verb:
+                        distance = abs(word.id - main_verb.id)
+                        if distance <= 3:  # 近距離はM2
+                            slot_key = 'M2' if 'M2' not in slots else 'M3'
+                        else:  # 遠距離はM3
+                            slot_key = 'M3' if 'M3' not in slots else 'M4'
+                        
+                        mod_phrase = self._build_phrase_with_modifiers(sentence, word)
+                        slots[slot_key] = mod_phrase
+                        # sub-slotsは生成しない（単文として扱う）
+            
+            print(f"    ✅ 助動詞複合処理完了: Aux='{auxiliary_phrase}'")
+            return {'slots': slots, 'sub_slots': sub_slots}
+        
+        else:
+            print(f"    ❌ 助動詞チェーン未検出")
+            return None
+
+    def _is_main_clause_auxiliary(self, word, main_verb) -> bool:
+        """主文の助動詞かどうかを判定"""
+        # 基本的な助動詞判定
+        is_auxiliary = (
+            word.upos == 'AUX' or 
+            (word.upos == 'VERB' and word.deprel in ['aux', 'cop']) or
+            word.text.lower() in ['be', 'have', 'will', 'can', 'should', 'would', 'could', 'may', 'might', 'must']
+        )
+        
+        if not is_auxiliary:
+            return False
+        
+        # 主動詞に直接関連する助動詞のみ（主文レベル）
+        if word.deprel in ['aux', 'cop'] and word.head == main_verb.id:
+            return True
+            
+        return False
+
 # =============================================================================
 # Phase 0 テスト用 基本テストハーネス
 # =============================================================================
