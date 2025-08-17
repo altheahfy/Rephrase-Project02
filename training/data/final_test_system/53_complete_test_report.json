@@ -1,10 +1,10 @@
 {
   "meta": {
     "total_tests": 53,
-    "perfect_matches": 19,
-    "partial_matches": 18,
-    "failures": 16,
-    "accuracy": 35.84905660377358
+    "perfect_matches": 23,
+    "partial_matches": 15,
+    "failures": 15,
+    "accuracy": 43.39622641509434
   },
   "results": [
     {
@@ -57,8 +57,8 @@
       "test_id": "3",
       "sentence": "The man who runs fast is strong.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -68,8 +68,7 @@
         "sub_slots": {
           "sub-m2": "fast",
           "sub-s": "The man who",
-          "sub-v": "runs",
-          "sub-m1": "fast"
+          "sub-v": "runs"
         }
       },
       "expected": {
@@ -89,8 +88,8 @@
       "test_id": "4",
       "sentence": "The book which lies there is mine.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -100,8 +99,7 @@
         "sub_slots": {
           "sub-m2": "there",
           "sub-s": "The book which",
-          "sub-v": "lies",
-          "sub-m1": "there"
+          "sub-v": "lies"
         }
       },
       "expected": {
@@ -121,8 +119,8 @@
       "test_id": "5",
       "sentence": "The person that works here is kind.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -132,8 +130,7 @@
         "sub_slots": {
           "sub-m2": "here",
           "sub-s": "The person that",
-          "sub-v": "works",
-          "sub-m1": "here"
+          "sub-v": "works"
         }
       },
       "expected": {
@@ -467,7 +464,7 @@
           "S": "",
           "V": "was",
           "C1": "late",
-          "M2": "late"
+          "M1": "late"
         },
         "sub_slots": {
           "sub-m1": "The time when",
@@ -636,15 +633,15 @@
     {
       "test_id": "22",
       "sentence": "The house was built in 1990.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "The house",
           "Aux": "was",
           "V": "built",
-          "M1": "in 1990"
+          "M2": "in 1990"
         },
         "sub_slots": {}
       },
@@ -821,8 +818,8 @@
         "main_slots": {
           "S": "The students",
           "V": "study",
-          "M1": "hard",
-          "M3": "for exams"
+          "M2": "hard",
+          "M1": "for exams"
         },
         "sub_slots": {}
       },
@@ -865,8 +862,8 @@
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
       "main_match": true,
-      "sub_match": true,
-      "perfect": true,
+      "sub_match": false,
+      "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -877,8 +874,7 @@
           "sub-m2": "by Shakespeare",
           "sub-s": "The book which",
           "sub-aux": "was",
-          "sub-v": "written",
-          "sub-m1": "carefully"
+          "sub-v": "written"
         }
       },
       "expected": {
@@ -899,21 +895,21 @@
     {
       "test_id": "32",
       "sentence": "The car that was quickly repaired yesterday runs smoothly.",
-      "main_match": true,
-      "sub_match": true,
-      "perfect": true,
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "runs",
-          "M1": "smoothly"
+          "M2": "smoothly"
         },
         "sub_slots": {
-          "sub-m2": "yesterday",
+          "sub-m2": "quickly",
           "sub-s": "The car that",
           "sub-aux": "was",
           "sub-v": "repaired",
-          "sub-m1": "quickly"
+          "sub-m1": "yesterday"
         }
       },
       "expected": {
@@ -935,7 +931,7 @@
       "test_id": "33",
       "sentence": "The letter which was slowly typed by the secretary arrived today.",
       "main_match": false,
-      "sub_match": true,
+      "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
@@ -947,8 +943,7 @@
           "sub-m2": "by the secretary",
           "sub-s": "The letter which",
           "sub-aux": "was",
-          "sub-v": "typed",
-          "sub-m1": "slowly"
+          "sub-v": "typed"
         }
       },
       "expected": {
@@ -969,7 +964,7 @@
     {
       "test_id": "34",
       "sentence": "The student who studies diligently always succeeds academically.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": false,
       "perfect": false,
       "system_output": {
@@ -977,13 +972,12 @@
           "S": "",
           "V": "succeeds",
           "M1": "always",
-          "M3": "academically"
+          "M2": "academically"
         },
         "sub_slots": {
           "sub-m2": "diligently",
           "sub-s": "The student who",
-          "sub-v": "studies",
-          "sub-m1": "diligently"
+          "sub-v": "studies"
         }
       },
       "expected": {
@@ -1011,7 +1005,7 @@
           "S": "The teacher",
           "V": "runs",
           "Aux": "is",
-          "M1": "greatly"
+          "M2": "greatly"
         },
         "sub_slots": {
           "sub-m1": "efficiently"
@@ -1036,7 +1030,7 @@
       "test_id": "36",
       "sentence": "The doctor who works carefully saves lives successfully.",
       "main_match": false,
-      "sub_match": false,
+      "sub_match": true,
       "perfect": false,
       "system_output": {
         "main_slots": {
@@ -1048,8 +1042,7 @@
         "sub_slots": {
           "sub-m2": "carefully",
           "sub-s": "The doctor who",
-          "sub-v": "works",
-          "sub-m1": "carefully"
+          "sub-v": "works"
         }
       },
       "expected": {
@@ -1078,7 +1071,7 @@
           "Aux": "was",
           "V": "opened",
           "M1": "gently",
-          "M3": "morning"
+          "M2": "morning"
         },
         "sub_slots": {}
       },
@@ -1253,8 +1246,8 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very",
-          "M3": "carefully"
+          "M1": "very carefully",
+          "M2": "very"
         },
         "sub_slots": {}
       },
@@ -1272,17 +1265,17 @@
     {
       "test_id": "44",
       "sentence": "The teacher explains grammar clearly to confused students daily.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "The teacher",
           "V": "explains",
           "O1": "grammar",
           "M1": "clearly",
-          "M3": "to confused students",
-          "M2": "daily"
+          "M2": "to confused students",
+          "M3": "daily"
         },
         "sub_slots": {}
       },
@@ -1310,7 +1303,7 @@
           "V": "writes",
           "O1": "essays",
           "M1": "carefully",
-          "M3": "for better grades"
+          "M2": "for better grades"
         },
         "sub_slots": {}
       },
@@ -1342,8 +1335,7 @@
           "sub-m2": "thoroughly",
           "sub-s": "The report which",
           "sub-aux": "was",
-          "sub-v": "reviewed",
-          "sub-m1": "thoroughly"
+          "sub-v": "reviewed"
         }
       },
       "expected": {
@@ -1378,8 +1370,7 @@
           "sub-m2": "carefully",
           "sub-s": "The student whose essay",
           "sub-aux": "was",
-          "sub-v": "corrected",
-          "sub-m1": "carefully"
+          "sub-v": "corrected"
         }
       },
       "expected": {
@@ -1407,14 +1398,13 @@
           "S": "",
           "V": "works",
           "M1": "efficiently",
-          "M3": "every day"
+          "M2": "every day"
         },
         "sub_slots": {
           "sub-m2": "properly",
           "sub-s": "The machine that",
           "sub-aux": "was",
-          "sub-v": "maintained",
-          "sub-m1": "properly"
+          "sub-v": "maintained"
         }
       },
       "expected": {
@@ -1444,7 +1434,7 @@
           "V": "completed",
           "O1": "",
           "M1": "successfully",
-          "M3": "yesterday"
+          "M2": "yesterday"
         },
         "sub_slots": {
           "sub-o1": "The team [omitted]",
@@ -1475,15 +1465,15 @@
         "main_slots": {
           "S": "The woman",
           "V": "waiting",
-          "M1": "patiently",
+          "M2": "patiently",
           "Aux": "was"
         },
         "sub_slots": {
-          "sub-m2": "near",
-          "sub-m3": "near the door",
+          "sub-m2": "quietly",
+          "sub-m3": "door",
           "sub-o1": "The woman [omitted]",
           "sub-v": "standing",
-          "sub-m1": "quietly"
+          "sub-m1": "near"
         }
       },
       "expected": {
@@ -1514,11 +1504,10 @@
           "M1": "carefully"
         },
         "sub_slots": {
-          "sub-m2": "in the garden",
+          "sub-m2": "happily",
           "sub-m3": "garden",
           "sub-o1": "The children [omitted]",
-          "sub-v": "playing",
-          "sub-m1": "happily"
+          "sub-v": "playing"
         }
       },
       "expected": {
@@ -1552,8 +1541,7 @@
           "sub-m2": "thoroughly",
           "sub-s": "The documents [omitted]",
           "sub-aux": "being",
-          "sub-v": "reviewed",
-          "sub-m1": "thoroughly"
+          "sub-v": "reviewed"
         }
       },
       "expected": {
@@ -1573,22 +1561,21 @@
     {
       "test_id": "53",
       "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
-      "main_match": false,
-      "sub_match": false,
-      "perfect": false,
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "became",
           "C1": "famous",
-          "M1": "rapidly"
+          "M2": "rapidly"
         },
         "sub_slots": {
           "sub-m2": "internationally",
           "sub-s": "The artist whose paintings",
           "sub-aux": "were",
-          "sub-v": "exhibited",
-          "sub-m1": "internationally"
+          "sub-v": "exhibited"
         }
       },
       "expected": {

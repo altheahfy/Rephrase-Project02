@@ -562,23 +562,56 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
     
     def _remove_adverb_duplicates(self, slots: Dict, sub_slots: Dict):
-        """主節と関係節の副詞重複を除去"""
+        """主節と関係節の副詞重複を除去（関係節内重複も対応）"""
         
-        # 主節副詞と関係節副詞の重複チェック
-        main_adverbs = {k: v for k, v in slots.items() if k.startswith('M') and v}
+        # === 1. 関係節内重複除去（最重要）===
         sub_adverbs = {k: v for k, v in sub_slots.items() if k.startswith('sub-m') and v}
         
-        if not main_adverbs or not sub_adverbs:
+        if len(sub_adverbs) > 1:
+            # 関係節内で同じ副詞が複数スロットに配置されている場合
+            seen_adverbs = {}
+            slots_to_clear = []
+            
+            for sub_slot, sub_value in sub_adverbs.items():
+                adverb_text = sub_value.strip()
+                if adverb_text in seen_adverbs:
+                    # 重複検出: より優先度の低いスロットを削除
+                    existing_slot = seen_adverbs[adverb_text]
+                    
+                    # 優先度: sub-m2 > sub-m1 > sub-m3（Rephrase仕様準拠）
+                    priority_order = {'sub-m2': 3, 'sub-m1': 2, 'sub-m3': 1}
+                    
+                    if priority_order.get(sub_slot, 0) > priority_order.get(existing_slot, 0):
+                        # 新スロットの方が優先度高→既存を削除
+                        slots_to_clear.append(existing_slot)
+                        seen_adverbs[adverb_text] = sub_slot
+                        self.logger.debug(f"🔄 関係節内重複削除: {existing_slot}='{adverb_text}' → '' ({sub_slot}='{adverb_text}' を優先)")
+                    else:
+                        # 既存スロットの方が優先度高→新スロットを削除
+                        slots_to_clear.append(sub_slot)
+                        self.logger.debug(f"🔄 関係節内重複削除: {sub_slot}='{adverb_text}' → '' ({existing_slot}='{adverb_text}' を優先)")
+                else:
+                    seen_adverbs[adverb_text] = sub_slot
+            
+            # 重複スロットをクリア
+            for slot_to_clear in slots_to_clear:
+                sub_slots[slot_to_clear] = ""
+        
+        # === 2. 主節↔関係節間重複除去（従来機能）===
+        main_adverbs = {k: v for k, v in slots.items() if k.startswith('M') and v}
+        remaining_sub_adverbs = {k: v for k, v in sub_slots.items() if k.startswith('sub-m') and v}
+        
+        if not main_adverbs or not remaining_sub_adverbs:
             return
         
         # 重複副詞の検出と削除
         for main_slot, main_value in list(main_adverbs.items()):
-            for sub_slot, sub_value in sub_adverbs.items():
+            for sub_slot, sub_value in remaining_sub_adverbs.items():
                 # 同じ副詞が主節と関係節に存在する場合
                 if main_value.strip() == sub_value.strip():
                     # 関係節を優先し、主節から削除
                     slots[main_slot] = ""
-                    self.logger.debug(f"🔄 副詞重複削除: {main_slot}='{main_value}' → '' (sub-slot {sub_slot}='{sub_value}' を優先)")
+                    self.logger.debug(f"🔄 主節↔関係節重複削除: {main_slot}='{main_value}' → '' (sub-slot {sub_slot}='{sub_value}' を優先)")
                     break
     
     def _create_empty_result(self, sentence: str) -> Dict[str, Any]:
@@ -1642,12 +1675,23 @@ class UnifiedStanzaRephraseMapper:
             'successfully', 'efficiently', 'dramatically', 'academically', 'diligently'
         ]
         
-        # === 既存スロット確認 ===
+        # === 既存スロット確認（関係節スロット含む）===
         existing_slots = base_result.get('slots', {}) if base_result else {}
+        existing_sub_slots = base_result.get('sub_slots', {}) if base_result else {}
+        
         existing_adverbs = set()
+        
+        # 主節副詞を既存チェックに追加
         for slot_key, slot_value in existing_slots.items():
             if slot_key.startswith('M') and slot_value:
                 existing_adverbs.update(slot_value.split())
+        
+        # 🔧 重要修正: 関係節副詞も既存チェックに追加
+        for slot_key, slot_value in existing_sub_slots.items():
+            if slot_key.startswith('sub-m') and slot_value:
+                existing_adverbs.update(slot_value.split())
+        
+        self.logger.debug(f"🔍 既存副詞チェック: {existing_adverbs}")
         
         # === 関係節・従属節コンテキスト分析 ===
         main_verb_id = self._find_main_verb(sentence)
@@ -1697,8 +1741,13 @@ class UnifiedStanzaRephraseMapper:
                             if w.text == pw:
                                 processed_positions.add(w.id)
                 else:
-                    phrase = word.text
-                    processed_positions.add(word.id)
+                    # 🔧 副詞修飾語を含む句構築（"very carefully"対応）
+                    phrase = self._build_adverbial_phrase(sentence, word)
+                    phrase_words = phrase.split()
+                    for pw in phrase_words:
+                        for w in sentence.words:
+                            if w.text == pw:
+                                processed_positions.add(w.id)
                 
                 # 重複フレーズチェック
                 if phrase in processed_phrases:
@@ -1707,8 +1756,9 @@ class UnifiedStanzaRephraseMapper:
                 
                 processed_phrases.add(phrase)
                 
-                # Migration source分類システム活用
-                category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
+                # 🎯 Rephrase原理：分類不要、位置情報のみで判定
+                # category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
+                category = 'position_based'  # Rephrase距離ベース原理
                 
                 # 文脈分析: 主節 vs 従属節（Migration source判定ロジック）
                 context = self._determine_adverb_context(word, main_verb_id, subordinate_verbs, sentence)
@@ -1742,54 +1792,37 @@ class UnifiedStanzaRephraseMapper:
             position = phrase_info['position']
             
             if context == 'subordinate':
-                # 従属節副詞→sub-m*スロット（Migration source分類活用、重複回避）
-                if category == 'agent':  # by句は sub-m2 優先
-                    if 'sub-m2' not in sub_slots:
-                        sub_slots['sub-m2'] = phrase
-                    elif 'sub-m1' not in sub_slots:
-                        sub_slots['sub-m1'] = phrase
-                    elif 'sub-m3' not in sub_slots:
-                        sub_slots['sub-m3'] = phrase
-                elif category in ['manner', 'time']:  # 様態・時間副詞は sub-m1 優先
-                    if 'sub-m1' not in sub_slots:
-                        sub_slots['sub-m1'] = phrase
-                    elif 'sub-m2' not in sub_slots:
-                        sub_slots['sub-m2'] = phrase
-                    elif 'sub-m3' not in sub_slots:
-                        sub_slots['sub-m3'] = phrase
-                else:
-                    # その他→空きsub-mスロット
-                    for slot_num in [1, 2, 3]:
-                        if f'sub-m{slot_num}' not in sub_slots:
-                            sub_slots[f'sub-m{slot_num}'] = phrase
-                            break
+                # 🎯 従属節副詞も距離ベース配置（Rephrase原理一貫性）
+                # 従属節動詞からの距離で判定（簡略化：sub-m2優先→sub-m1/sub-m3）
+                if 'sub-m2' not in sub_slots:
+                    sub_slots['sub-m2'] = phrase
+                    self.logger.debug(f"🎯 従属節副詞配置: sub-m2 = '{phrase}' (距離ベース)")
+                elif 'sub-m1' not in sub_slots:
+                    sub_slots['sub-m1'] = phrase
+                    self.logger.debug(f"🎯 従属節副詞配置: sub-m1 = '{phrase}' (フォールバック)")
+                elif 'sub-m3' not in sub_slots:
+                    sub_slots['sub-m3'] = phrase
+                    self.logger.debug(f"🎯 従属節副詞配置: sub-m3 = '{phrase}' (フォールバック)")
                 
             else:
-                # 主節副詞→M*スロット（Rephrase仕様：M2優先原理 + 重複回避）
+                # 主節副詞→M*スロット（Rephrase仕様改良：特性・位置・優先度統合判定）
                 main_verb_position = main_verb_id if main_verb_id else 999
                 
-                # Rephrase仕様配置ルール（M2をデフォルト使用）
-                if 'M2' not in slots:
-                    # M2が空→M2優先（Rephrase標準配置）
-                    slots['M2'] = phrase
-                elif position < main_verb_position:
-                    # 動詞より前（文頭寄り）→M1
-                    if 'M1' not in slots:
-                        slots['M1'] = phrase
-                    elif 'M3' not in slots:
-                        slots['M3'] = phrase
-                elif position > main_verb_position:
-                    # 動詞より後（文尾寄り）→M3
-                    if 'M3' not in slots:
-                        slots['M3'] = phrase
-                    elif 'M1' not in slots:
-                        slots['M1'] = phrase
+                # 🎯 Rephrase仕様準拠：距離ベースの配置決定（カテゴリ不要）
+                target_slot = self._determine_optimal_main_adverb_slot(
+                    phrase, 'position_based', position, main_verb_position, slots
+                )
+                
+                if target_slot and target_slot not in slots:
+                    slots[target_slot] = phrase
+                    self.logger.debug(f"🎯 主節副詞配置: {target_slot} = '{phrase}' (pos={position}, verb_pos={main_verb_position})")
                 else:
-                    # 他の選択肢が無い→M1かM3
-                    if 'M1' not in slots:
-                        slots['M1'] = phrase
-                    elif 'M3' not in slots:
-                        slots['M3'] = phrase
+                    # フォールバック: 空きスロットに配置
+                    for fallback_slot in ['M1', 'M2', 'M3']:
+                        if fallback_slot not in slots:
+                            slots[fallback_slot] = phrase
+                            self.logger.debug(f"🔄 主節副詞フォールバック: {fallback_slot} = '{phrase}'")
+                            break
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
         return {'slots': slots, 'sub_slots': sub_slots}
@@ -1854,8 +1887,57 @@ class UnifiedStanzaRephraseMapper:
         
         return 'main'  # デフォルト
 
+    def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):
+        """
+        Rephrase仕様準拠：文の中央からの距離による最適Mスロット決定
+        
+        核心原理：
+        1. 動詞周辺（文の中央）からの物理的距離で判定
+        2. M2を優先使用（動詞に近い修飾語）
+        3. 余裕を残す配置（将来の拡張考慮）
+        4. 副詞の種類は判定に影響しない
+        """
+        
+        # 動詞からの絶対距離を計算
+        distance_from_verb = abs(position - main_verb_position)
+        
+        self.logger.debug(f"🎯 Mスロット判定: phrase='{phrase}', pos={position}, verb_pos={main_verb_position}, distance={distance_from_verb}")
+        
+        # === Rephrase核心ルール：動詞からの距離ベース配置 ===
+        
+        # 1. 動詞に最も近い修飾語 → M2優先
+        if distance_from_verb <= 2 and 'M2' not in existing_slots:
+            self.logger.debug(f"  → M2選択（動詞に近い, distance={distance_from_verb}）")
+            return 'M2'
+        
+        # 2. 文頭寄り（動詞より前で距離が大きい） → M1
+        if position < main_verb_position and distance_from_verb > 2:
+            if 'M1' not in existing_slots:
+                self.logger.debug(f"  → M1選択（文頭寄り, distance={distance_from_verb}）")
+                return 'M1'
+        
+        # 3. 文尾寄り（動詞より後で距離が大きい） → M3
+        if position > main_verb_position and distance_from_verb > 2:
+            if 'M3' not in existing_slots:
+                self.logger.debug(f"  → M3選択（文尾寄り, distance={distance_from_verb}）")
+                return 'M3'
+        
+        # 4. M2が空いていれば優先的にM2を使用（Rephrase余裕原則）
+        if 'M2' not in existing_slots:
+            self.logger.debug(f"  → M2選択（余裕原則, distance={distance_from_verb}）")
+            return 'M2'
+        
+        # 5. フォールバック：空いているスロットを使用
+        for slot in ['M1', 'M3']:
+            if slot not in existing_slots:
+                self.logger.debug(f"  → {slot}選択（フォールバック）")
+                return slot
+        
+        self.logger.debug(f"  → None（全Mスロット使用済み）")
+        return None
+
     def _build_prepositional_phrase(self, sentence, word):
-        """前置詞句の構築（migration sourceベース）"""
+        """前置詞句の構築（完全性強化版）"""
         # 前置詞句の完全構築
         phrase_parts = []
         
@@ -1869,10 +1951,16 @@ class UnifiedStanzaRephraseMapper:
         if preposition:
             phrase_parts.append(preposition)
         
-        # 修飾語を収集
+        # 🔧 修飾語収集を拡張（より多くの修飾関係を含める）
         modifiers = []
         for w in sentence.words:
-            if w.head == word.id and w.deprel in ['det', 'amod', 'compound']:
+            if w.head == word.id and w.deprel in ['det', 'amod', 'compound', 'nmod', 'nmod:poss']:
+                modifiers.append((w.id, w.text))
+        
+        # 🔧 間接修飾語も収集（"the morning breeze"の"morning"をキャッチ）
+        for w in sentence.words:
+            # wordの直接修飾語の修飾語も収集
+            if any(mod[0] == w.head for mod in modifiers) and w.deprel in ['amod', 'compound']:
                 modifiers.append((w.id, w.text))
         
         # 位置順ソート
@@ -1880,7 +1968,30 @@ class UnifiedStanzaRephraseMapper:
         phrase_parts.extend([mod[1] for mod in modifiers])
         phrase_parts.append(word.text)
         
-        return ' '.join(phrase_parts)
+        constructed_phrase = ' '.join(phrase_parts)
+        self.logger.debug(f"🔧 前置詞句構築: '{word.text}' → '{constructed_phrase}'")
+        
+        return constructed_phrase
+    
+    def _build_adverbial_phrase(self, sentence, word):
+        """副詞修飾語を含む句構築（"very carefully"対応）"""
+        phrase_parts = []
+        modifiers = []
+        
+        # 副詞の修飾語を収集（advmod）
+        for w in sentence.words:
+            if w.head == word.id and w.deprel == 'advmod':
+                modifiers.append((w.id, w.text))
+        
+        # 位置順ソート
+        modifiers.sort()
+        phrase_parts.extend([mod[1] for mod in modifiers])
+        phrase_parts.append(word.text)
+        
+        constructed_phrase = ' '.join(phrase_parts)
+        self.logger.debug(f"🔧 副詞句構築: '{word.text}' → '{constructed_phrase}'")
+        
+        return constructed_phrase
     
     def _classify_adverbial_phrase(self, phrase, time_keywords, location_keywords, manner_keywords):
         """Migration sourceベースの分類"""
