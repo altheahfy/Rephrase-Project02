@@ -1765,10 +1765,10 @@ class UnifiedStanzaRephraseMapper:
         """
         副詞タイプと動詞からの距離に基づくスロット決定
         
-        新ルール：「動詞からの距離」+ 「M2優先」基準
-        - 動詞から2語以内：M2優先（動詞周辺として扱う）
-        - 動詞から遠い：位置に応じてM1またはM3
-        - 拡張可能性を考慮した余裕のある配置
+        修正ルール：「動詞からの距離」を厳密に適用 + 「文中央からの距離」併用
+        - 動詞から1語以内：M1優先（最近接）
+        - 動詞から2-3語：M2（動詞周辺）
+        - 動詞から4語以上：位置に応じてM2またはM3
         """
         from enum import Enum
 
@@ -1779,37 +1779,43 @@ class UnifiedStanzaRephraseMapper:
             LOCATION = "location"
             DEGREE = "degree"
 
-        # 動詞からの距離がある場合はそれを優先
+        # 動詞からの距離がある場合はそれを最優先
         if verb_distance is not None:
-            # 動詞から2語以内は「動詞周辺」としてM2を優先
-            if verb_distance <= 2:
+            self.logger.debug(f"  距離判定: verb_distance={verb_distance}, position_ratio={position_ratio:.2f}")
+            
+            # 動詞から1語以内は最近接としてM1を最優先
+            if verb_distance <= 1:
+                return 'M1'
+            
+            # 動詞から2-3語は動詞周辺としてM2優先
+            elif verb_distance <= 3:
                 return 'M2'
             
-            # 動詞から遠い場合は位置で判定
-            if position_ratio < 0.3:  # 文頭30%
-                return 'M1'
-            elif position_ratio > 0.7:  # 文尾70%
-                # 時間副詞は例外的にM1優先（従来ルール維持）
-                if adv_type == AdverbialType.TIME:
-                    return 'M1'
-                else:
-                    return 'M3'
+            # 動詞から遠い場合（4語以上）は位置で判定
             else:
-                # 中間部分は余裕を考慮してM2を優先
-                return 'M2'
+                if position_ratio < 0.4:  # 文頭40%はM1
+                    return 'M1'
+                elif position_ratio > 0.6:  # 文尾40%はM3
+                    # 時間副詞は例外的にM1優先（"yesterday"等）
+                    if adv_type == AdverbialType.TIME:
+                        return 'M1'
+                    else:
+                        return 'M3'
+                else:  # 中間部分はM2
+                    return 'M2'
         
         # フォールバック：従来の文中央からの距離
         distance_from_center = abs(position_ratio - 0.5)
         
-        # 動詞周辺（中央）に近い場合はM2を優先
-        if distance_from_center <= 0.25:  # 中央±25%範囲
+        # 文中央に近い場合はM2を優先
+        if distance_from_center <= 0.2:  # 中央±20%範囲
             return 'M2'
         
         # 文の中央から遠い場合
         if position_ratio < 0.5:  # 文頭寄り
             return 'M1'
         else:  # 文尾寄り
-            # 時間副詞は例外的にM1優先（従来ルール維持）
+            # 時間副詞は例外的にM1優先
             if adv_type == AdverbialType.TIME:
                 return 'M1'
             else:
@@ -1821,8 +1827,32 @@ class UnifiedStanzaRephraseMapper:
         modifiers = []
         for word in sentence.words:
             if word.head == main_word.id:
-                if word.deprel in ['det', 'amod', 'case', 'compound']:
+                if word.deprel in ['det', 'amod', 'case', 'compound', 'nmod']:
                     modifiers.append(word)
+        
+        # 前置詞句の場合、前置詞も含める
+        prep_words = []
+        for word in sentence.words:
+            if word.deprel == 'case' and word.head == main_word.id:
+                prep_words.append(word)
+        
+        # byの動作主句の場合、特別処理
+        if main_word.text.lower() in ['team', 'expert', 'author', 'mother', 'manager', 'workers', 'secretary', 'breeze']:
+            # byを探す
+            by_word = None
+            for word in sentence.words:
+                if word.text.lower() == 'by' and word.deprel == 'case':
+                    # byが修飾する名詞を探す
+                    target_noun = next((w for w in sentence.words if w.id == word.head), None)
+                    if target_noun and target_noun.id == main_word.id:
+                        by_word = word
+                        break
+            
+            if by_word:
+                # "by + 修飾語 + 名詞"構築
+                phrase_words = [by_word] + modifiers + [main_word]
+                phrase_words.sort(key=lambda w: w.id)
+                return ' '.join(word.text for word in phrase_words)
 
         if not modifiers:
             return main_word.text

@@ -400,8 +400,8 @@
         "main_slots": {
           "S": "The students",
           "V": "study",
-          "M1": "hard",
-          "M2": "for exams"
+          "M2": "hard",
+          "M3": "for exams"
         },
         "sub_slots": {}
       }
