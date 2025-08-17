@@ -441,7 +441,7 @@
         "main_slots": {
           "S": "",
           "V": "runs",
-          "M1": "smoothly"
+          "M2": "smoothly"
         },
         "sub_slots": {
           "sub-s": "The car that",

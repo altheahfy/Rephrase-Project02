@@ -1007,15 +1007,20 @@ class UnifiedStanzaRephraseMapper:
         if not aux_word:
             aux_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'aux')
         
-        # ✅ 関係節内の副詞を検出してsub-m2に配置
+        # ✅ 関係節内の副詞を検出して位置ベースで配置
         adverb_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
         if adverb_word:
             # 関係副詞は除外（where, when, why, howは関係副詞として別途処理）
             if adverb_word.text.lower() not in ['where', 'when', 'why', 'how']:
-                sub_slots["sub-m2"] = adverb_word.text
-                self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}'")
+                # 🔧 位置ベース配置: 動詞前→sub-m1, 動詞後→sub-m2
+                if adverb_word.id < rel_verb.id:
+                    sub_slots["sub-m1"] = adverb_word.text
+                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m1 = '{adverb_word.text}' (動詞前)")
+                else:
+                    sub_slots["sub-m2"] = adverb_word.text
+                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}' (動詞後)")
         
-        # ✅ 関係節内の前置詞句・副詞句を検出してsub-m3に配置
+        # ✅ 関係節内の前置詞句・副詞句を検出してsub-m2/sub-m3に配置
         obl_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obl')
         if obl_word:
             sub_slots["sub-m3"] = obl_word.text
