@@ -1,0 +1,1617 @@
+{
+  "meta": {
+    "total_tests": 53,
+    "perfect_matches": 25,
+    "partial_matches": 12,
+    "failures": 16,
+    "accuracy": 47.16981132075472
+  },
+  "results": [
+    {
+      "test_id": "1",
+      "sentence": "The car is red.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "2",
+      "sentence": "I love you.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "3",
+      "sentence": "The man who runs fast is strong.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "fast",
+          "sub-s": "The man who",
+          "sub-v": "runs"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      }
+    },
+    {
+      "test_id": "4",
+      "sentence": "The book which lies there is mine.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "there",
+          "sub-s": "The book which",
+          "sub-v": "lies"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      }
+    },
+    {
+      "test_id": "5",
+      "sentence": "The person that works here is kind.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "here",
+          "sub-s": "The person that",
+          "sub-v": "works"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      }
+    },
+    {
+      "test_id": "6",
+      "sentence": "The book which I bought is expensive.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      }
+    },
+    {
+      "test_id": "7",
+      "sentence": "The man whom I met is tall.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      }
+    },
+    {
+      "test_id": "8",
+      "sentence": "The car that he drives is new.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      }
+    },
+    {
+      "test_id": "9",
+      "sentence": "The car which was crashed is red.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      }
+    },
+    {
+      "test_id": "10",
+      "sentence": "The book that was written is famous.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      }
+    },
+    {
+      "test_id": "11",
+      "sentence": "The letter which was sent arrived.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      }
+    },
+    {
+      "test_id": "12",
+      "sentence": "The man whose car is red lives here.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "C1": "",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      }
+    },
+    {
+      "test_id": "13",
+      "sentence": "The student whose book I borrowed is smart.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      }
+    },
+    {
+      "test_id": "14",
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      }
+    },
+    {
+      "test_id": "15",
+      "sentence": "The place where we met is beautiful.",
+      "main_match": true,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m3": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      }
+    },
+    {
+      "test_id": "16",
+      "sentence": "The time when he arrived was late.",
+      "main_match": true,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m3": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      }
+    },
+    {
+      "test_id": "17",
+      "sentence": "The reason why she left is unclear.",
+      "main_match": true,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m3": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      }
+    },
+    {
+      "test_id": "18",
+      "sentence": "The way how he solved it was clever.",
+      "main_match": true,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m3": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      }
+    },
+    {
+      "test_id": "19",
+      "sentence": "The book I read yesterday was boring.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The book",
+          "V": "was",
+          "C1": "boring",
+          "M2": "yesterday"
+        },
+        "sub_slots": {
+          "sub-o1": "The book [omitted]",
+          "sub-v": "read"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      }
+    },
+    {
+      "test_id": "20",
+      "sentence": "He has finished his homework.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "He",
+          "V": "finished",
+          "O1": "his homework",
+          "Aux": "has"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "21",
+      "sentence": "The letter was written by John.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "22",
+      "sentence": "The house was built in 1990.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "23",
+      "sentence": "The book was written by a famous author.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by a famous author"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "24",
+      "sentence": "The cake is being baked by my mother.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M1": "by mother"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M1": "by my mother"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "25",
+      "sentence": "The cake was eaten by the children.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M1": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M1": "by the children"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "26",
+      "sentence": "The door was opened by the key.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "by the key"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "27",
+      "sentence": "The message was sent yesterday.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "28",
+      "sentence": "She acts as if she knows everything.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "O1": "everything"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M1": ""
+        },
+        "sub_slots": {
+          "sub-m1": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      }
+    },
+    {
+      "test_id": "29",
+      "sentence": "The students study hard for exams.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "30",
+      "sentence": "The car was repaired last week.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "31",
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "main_match": true,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "carefully",
+          "sub-s": "The book which",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "written",
+          "sub-aux": "was",
+          "sub-m1": "carefully",
+          "sub-m2": "by Shakespeare"
+        }
+      }
+    },
+    {
+      "test_id": "32",
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "runs",
+          "M1": "quickly",
+          "M2": "",
+          "M3": "smoothly"
+        },
+        "sub_slots": {
+          "sub-m2": "quickly",
+          "sub-s": "The car that",
+          "sub-aux": "was",
+          "sub-v": "repaired"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "runs",
+          "M1": "smoothly"
+        },
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-v": "repaired",
+          "sub-aux": "was",
+          "sub-m1": "quickly",
+          "sub-m2": "yesterday"
+        }
+      }
+    },
+    {
+      "test_id": "33",
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "",
+          "M3": "today"
+        },
+        "sub_slots": {
+          "sub-m2": "slowly",
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "typed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "today"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-v": "typed",
+          "sub-aux": "was",
+          "sub-m1": "slowly",
+          "sub-m2": "by the secretary"
+        }
+      }
+    },
+    {
+      "test_id": "34",
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M1": "diligently",
+          "M2": "",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-m2": "diligently",
+          "sub-s": "The student who",
+          "sub-v": "studies"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M1": "always",
+          "M2": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m1": "diligently"
+        }
+      }
+    },
+    {
+      "test_id": "35",
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "runs",
+          "Aux": "is",
+          "M2": "efficiently",
+          "M3": "greatly"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose",
+          "sub-c1": "class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        }
+      }
+    },
+    {
+      "test_id": "36",
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "",
+          "M3": "successfully"
+        },
+        "sub_slots": {
+          "sub-m2": "carefully",
+          "sub-s": "The doctor who",
+          "sub-v": "works"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        }
+      }
+    },
+    {
+      "test_id": "37",
+      "sentence": "The window was gently opened by the morning breeze.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "by the breeze",
+          "M2": "gently"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M1": "gently",
+          "M2": "by the morning breeze"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "38",
+      "sentence": "The message is being carefully written by the manager.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M1": "by the manager",
+          "M2": "carefully"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M1": "carefully",
+          "M2": "by the manager"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "39",
+      "sentence": "The problem was quickly solved by the expert team.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M1": "by the team",
+          "M2": "quickly"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "40",
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair",
+          "M2": "badly"
+        },
+        "sub_slots": {
+          "sub-s": "The house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair"
+        },
+        "sub_slots": {
+          "sub-s": "the house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged",
+          "sub-m2": "badly"
+        }
+      }
+    },
+    {
+      "test_id": "41",
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot",
+          "M2": "accidentally"
+        },
+        "sub_slots": {
+          "sub-m3": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot"
+        },
+        "sub_slots": {
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m1": "The place where",
+          "sub-m2": "accidentally"
+        }
+      }
+    },
+    {
+      "test_id": "42",
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "unexpected",
+          "M2": "dramatically"
+        },
+        "sub_slots": {
+          "sub-m3": "The time when",
+          "sub-s": "everything",
+          "sub-v": "changed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "unexpected"
+        },
+        "sub_slots": {
+          "sub-s": "everything",
+          "sub-v": "changed",
+          "sub-m1": "The time when",
+          "sub-m2": "dramatically"
+        }
+      }
+    },
+    {
+      "test_id": "43",
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is being",
+          "V": "constructed",
+          "M1": "by skilled workers",
+          "M2": "very",
+          "M3": "carefully"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is being",
+          "V": "constructed",
+          "M1": "very carefully",
+          "M2": "by skilled workers"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "44",
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "45",
+      "sentence": "The student writes essays carefully for better grades.",
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      }
+    },
+    {
+      "test_id": "46",
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "published",
+          "M1": "by experts",
+          "M2": "",
+          "M3": "successfully"
+        },
+        "sub_slots": {
+          "sub-m2": "thoroughly",
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "published",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed",
+          "sub-m1": "thoroughly",
+          "sub-m2": "by experts"
+        }
+      }
+    },
+    {
+      "test_id": "47",
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "improved",
+          "M2": "",
+          "M3": "dramatically"
+        },
+        "sub_slots": {
+          "sub-m2": "carefully",
+          "sub-s": "The student whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "improved",
+          "Adv": "dramatically"
+        },
+        "sub_slots": {
+          "sub-s": "whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected",
+          "sub-m2": "carefully"
+        }
+      }
+    },
+    {
+      "test_id": "48",
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "works",
+          "M1": "properly",
+          "M2": "",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-m2": "properly",
+          "sub-s": "The machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "works",
+          "M2": "efficiently",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-s": "the machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained",
+          "sub-m2": "properly"
+        }
+      }
+    },
+    {
+      "test_id": "49",
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The team",
+          "V": "completed",
+          "O1": "",
+          "M2": "successfully",
+          "M3": "yesterday"
+        },
+        "sub_slots": {
+          "sub-o1": "The team [omitted]",
+          "sub-v": "working"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "completed",
+          "O1": "the project",
+          "M2": "successfully",
+          "M3": "yesterday"
+        },
+        "sub_slots": {
+          "sub-v": "the team working",
+          "sub-m2": "overtime"
+        }
+      }
+    },
+    {
+      "test_id": "50",
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The woman",
+          "V": "waiting",
+          "M1": "quietly",
+          "M2": "",
+          "M3": "",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-m2": "quietly",
+          "sub-m3": "door",
+          "sub-o1": "The woman [omitted]",
+          "sub-v": "standing"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "waiting",
+          "M3": "patiently"
+        },
+        "sub_slots": {
+          "sub-v": "the woman standing",
+          "sub-m1": "quietly",
+          "sub-m2": "near the door"
+        }
+      }
+    },
+    {
+      "test_id": "51",
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "The children",
+          "Aux": "were",
+          "V": "supervised",
+          "M1": "happily",
+          "M2": "",
+          "M3": ""
+        },
+        "sub_slots": {
+          "sub-m2": "happily",
+          "sub-m3": "garden",
+          "sub-o1": "The children [omitted]",
+          "sub-v": "playing"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "were",
+          "V": "supervised",
+          "M3": "carefully"
+        },
+        "sub_slots": {
+          "sub-v": "the children playing",
+          "sub-m1": "happily",
+          "sub-m2": "in the garden"
+        }
+      }
+    },
+    {
+      "test_id": "52",
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "main_match": false,
+      "sub_match": false,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "Aux": "will be",
+          "V": "approved",
+          "M2": "",
+          "M3": "soon"
+        },
+        "sub_slots": {
+          "sub-m2": "thoroughly",
+          "sub-s": "The documents [omitted]",
+          "sub-aux": "being",
+          "sub-v": "reviewed"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "will be",
+          "V": "approved",
+          "M2": "soon"
+        },
+        "sub_slots": {
+          "sub-aux": "the documents being",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly"
+        }
+      }
+    },
+    {
+      "test_id": "53",
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "main_match": false,
+      "sub_match": true,
+      "perfect": false,
+      "system_output": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "",
+          "M3": "rapidly"
+        },
+        "sub_slots": {
+          "sub-m2": "internationally",
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited"
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "rapidly"
+        },
+        "sub_slots": {
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited",
+          "sub-m2": "internationally"
+        }
+      }
+    }
+  ]
+}

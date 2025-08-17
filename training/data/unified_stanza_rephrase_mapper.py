@@ -1648,48 +1648,40 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("副詞なし - スキップ")
             return None
 
-        # === 2. 位置ベース配置 ===
+        # === 2. 位置ベース動的再配置システム ===
         slots = {}
         sub_slots = {}
 
-        # 位置順でソート（前から後ろへ）
+        # 位置順でソート（文中の出現順）
         adverbial_modifiers.sort(key=lambda x: x['position'])
 
-        for adv_info in adverbial_modifiers:
-            word = adv_info['word']
-            adv_type = adv_info['type']
-            position_ratio = adv_info['position_ratio']
-            word_text = word.text
-
-            # 複合副詞句の構築
-            phrase = self._build_adverbial_phrase(sentence, word)
-            if phrase != word_text:
-                word_text = phrase
-
-            # 位置ベース配置判定（新ルール適用）
-            target_slot = self._determine_adverb_slot(adv_type, position_ratio, adv_info['verb_distance'])
-
-            # スロット配置（余裕重視の配置順序）
-            if target_slot == 'M2' and 'M2' not in slots:
-                slots['M2'] = word_text
-                self.logger.debug(f"M2配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
-            elif target_slot == 'M1' and 'M1' not in slots:
-                slots['M1'] = word_text
-                self.logger.debug(f"M1配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
-            elif target_slot == 'M3' and 'M3' not in slots:
-                slots['M3'] = word_text
-                self.logger.debug(f"M3配置({adv_type.value}): {word_text} (位置: {position_ratio:.2f}, 動詞距離: {adv_info['verb_distance']})")
-            else:
-                # フォールバック配置（M2優先）
-                fallback_order = ['M2', 'M1', 'M3']  # M2を最優先
-                for fallback_slot in fallback_order:
-                    if fallback_slot not in slots:
-                        slots[fallback_slot] = word_text
-                        self.logger.debug(f"{fallback_slot}フォールバック配置: {word_text} (余裕重視, 動詞距離: {adv_info['verb_distance']})")
-                        break
+        # 動的3スロット配置アルゴリズム
+        if len(adverbial_modifiers) == 1:
+            # 1つの場合：M2（中央）に配置
+            mod = adverbial_modifiers[0]
+            phrase = self._build_adverbial_phrase(sentence, mod['word'])
+            slots['M2'] = phrase
+            self.logger.debug(f"単一副詞M2配置: {phrase}")
+            
+        elif len(adverbial_modifiers) == 2:
+            # 2つの場合：M2, M3に配置
+            mod1, mod2 = adverbial_modifiers
+            phrase1 = self._build_adverbial_phrase(sentence, mod1['word'])
+            phrase2 = self._build_adverbial_phrase(sentence, mod2['word'])
+            slots['M2'] = phrase1
+            slots['M3'] = phrase2
+            self.logger.debug(f"2副詞配置: M2={phrase1}, M3={phrase2}")
+            
+        elif len(adverbial_modifiers) >= 3:
+            # 3つ以上の場合：M1, M2, M3に配置（最初の3つ）
+            for i, mod in enumerate(adverbial_modifiers[:3]):
+                phrase = self._build_adverbial_phrase(sentence, mod['word'])
+                slot_name = f"M{i+1}"
+                slots[slot_name] = phrase
+                self.logger.debug(f"3副詞配置: {slot_name}={phrase}")
 
         if slots:
-            self.logger.debug(f"副詞処理結果: {len(slots)} slots detected")
+            self.logger.debug(f"副詞処理結果: {len(slots)} slots detected - 位置ベース動的配置完了")
             return {'slots': slots, 'sub_slots': sub_slots}
         else:
             return None
