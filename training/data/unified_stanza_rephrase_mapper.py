@@ -1805,19 +1805,54 @@ class UnifiedStanzaRephraseMapper:
         return {'slots': slots, 'sub_slots': sub_slots}
     
     def _find_main_verb(self, sentence):
-        """主動詞を特定"""
+        """主動詞を特定（構造的修正版）"""
+        
+        # 🎯 Step 1: ROOT動詞を優先
+        for word in sentence.words:
+            if word.deprel == 'root' and word.upos == 'VERB':
+                self.logger.debug(f"🎯 主動詞（ROOT動詞）: {word.text} (id={word.id})")
+                return word.id
+        
+        # 🔧 Step 2: ROOT名詞の場合、最も文法的に重要な動詞を特定
+        root_word = None
         for word in sentence.words:
             if word.deprel == 'root':
+                root_word = word
+                break
+        
+        if root_word and root_word.upos != 'VERB':
+            # 構造的階層で主動詞候補を評価
+            verb_candidates = [w for w in sentence.words if w.upos == 'VERB']
+            if verb_candidates:
+                # 最も文の中心に近い動詞を主動詞とする
+                main_verb = min(verb_candidates, key=lambda v: abs(v.id - root_word.id))
+                self.logger.debug(f"🎯 主動詞（構造的選択）: {main_verb.text} (id={main_verb.id})")
+                return main_verb.id
+        
+        # 🔄 Fallback: 最初の動詞
+        for word in sentence.words:
+            if word.upos == 'VERB':
+                self.logger.debug(f"🎯 主動詞（Fallback）: {word.text} (id={word.id})")
                 return word.id
+        
         return None
     
     def _find_subordinate_verbs(self, sentence, main_verb_id):
-        """従属節動詞を特定"""
+        """従属節動詞を特定（構造的修正版）"""
         subordinate_verbs = []
+        
+        # 🎯 主動詞を除外して、明確な従属節動詞のみを特定
         for word in sentence.words:
-            if (word.deprel in ['acl:relcl', 'advcl', 'ccomp', 'xcomp'] or
-                (word.upos == 'VERB' and word.id != main_verb_id)):
-                subordinate_verbs.append(word.id)
+            if word.id == main_verb_id:
+                continue  # 主動詞は除外
+                
+            # 明確な従属節パターンのみを従属節動詞として認識
+            if word.deprel in ['acl:relcl', 'advcl', 'ccomp', 'xcomp']:
+                # ただし、主動詞として特定済みの場合は除外
+                if word.upos == 'VERB':
+                    subordinate_verbs.append(word.id)
+                    self.logger.debug(f"🔍 従属節動詞検出: {word.text} (id={word.id}, deprel={word.deprel})")
+        
         return subordinate_verbs
     
     def _determine_adverb_context(self, adverb_word, main_verb_id, subordinate_verbs, sentence):
@@ -1856,13 +1891,37 @@ class UnifiedStanzaRephraseMapper:
             current_word = next_word
             depth += 1
         
-        # 位置的推論: 関係代名詞の後ろなら従属節
-        for word in sentence.words:
-            if word.text.lower() in ['which', 'that', 'who', 'whom', 'whose']:
-                if adverb_word.id > word.id:
-                    return 'subordinate'
+        # 🎯 依存関係ベース判定（位置的推論は危険なので削除）
+        # 副詞が主動詞系統か従属節動詞系統かを依存関係で正確に判定
         
-        return 'main'  # デフォルト
+        if current_word and current_word.id == main_verb_id:
+            return 'main'
+        elif current_word and current_word.id in subordinate_verbs:
+            return 'subordinate'
+        
+        # 🔧 改良版：主動詞への依存経路チェック
+        # 副詞 → head → head → ... → main_verb の経路があるか
+        visited = set()
+        check_word = current_word
+        
+        while check_word and check_word.id not in visited:
+            visited.add(check_word.id)
+            
+            if check_word.id == main_verb_id:
+                return 'main'
+            
+            # 次のheadを探す
+            if check_word.head == 0:
+                break
+                
+            next_word = None
+            for w in sentence.words:
+                if w.id == check_word.head:
+                    next_word = w
+                    break
+            check_word = next_word
+        
+        return 'main'  # デフォルト：主節（安全側）
 
     def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):
         """

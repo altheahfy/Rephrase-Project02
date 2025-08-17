@@ -268,86 +268,262 @@ stats = mapper.get_stats()
 • セマンティック妥当性チェック
 ```
 
-### **🔧 人間文法ロジック実装戦略**
+### **🔧 ハイブリッド文法解析戦略**
 
-#### **文脈依存曖昧性解決システム**
+#### **NLP + 人間文法ロジック統合システム**
 ```python
-class ContextualDisambiguator:
-    """Stanza解析を補完する文脈判断システム"""
+class HybridGrammarEngine:
+    """NLPエンジンと人間文法ロジックを統合した解析システム"""
     
-    def resolve_flying_planes_ambiguity(self, tokens):
-        """Flying planes問題の解決"""
-        # "Flying planes can be dangerous."
-        # → 後続に助動詞/動詞 → 複合主語として確定
+    def __init__(self):
+        self.nlp_engines = {
+            'stanza': StanzaPipeline(),
+            'spacy': SpacyPipeline()
+        }
+        self.grammar_logic = StructuralGrammarAnalyzer()
+        self.confidence_evaluator = ConfidenceBasedSelector()
+    
+    def analyze_with_verification(self, sentence):
+        """NLP結果を文法ロジックで検証・修正"""
         
-        if self._detect_pattern("ing_noun_aux_verb"):
-            return "compound_subject"
-        elif self._detect_pattern("ing_noun_is_abstract"):
-            return "gerund_phrase"
+        # Step 1: NLP基本解析
+        nlp_result = self.nlp_engines['stanza'].analyze(sentence)
+        
+        # Step 2: 構造的検証
+        verification_result = self.grammar_logic.verify_structure(nlp_result)
+        
+        # Step 3: 信頼度評価による最終判定
+        if verification_result.confidence > 0.8:
+            return verification_result.corrected_result
+        else:
+            return self.hybrid_resolution(nlp_result, verification_result)
     
-    def positional_grammar_logic(self, token_pos, sentence_structure):
-        """位置ベース文法判断"""
-        # 文頭+ing → 動名詞可能性高
-        # 文中+ing+名詞+助動詞 → 複合主語
-        # 前置詞後+ing → 動名詞確定
-    
-    def semantic_validity_check(self, interpretation):
-        """意味的妥当性による最終判断"""
-        # 複数解釈が可能な場合の意味的フィルタリング
+    def identify_problematic_patterns(self, sentence):
+        """NLPが苦手とするパターンを事前検出"""
+        patterns = [
+            self._detect_relative_clause_complexity(sentence),
+            self._detect_compound_subject_ambiguity(sentence),
+            self._detect_modifier_attachment_issues(sentence)
+        ]
+        return [p for p in patterns if p.requires_correction]
 ```
 
-#### **パターン認識ライブラリ**
+#### **構造的文法分析システム**
 ```python
-DISAMBIGUATION_PATTERNS = {
-    # Flying planes問題
-    "ing_noun_can": {
-        "pattern": r"(\w+ing)\s+(\w+)\s+(can|will|may|might|should)",
-        "resolution": "compound_subject",
-        "confidence": 0.95
+class StructuralGrammarAnalyzer:
+    """人間の文法直感に基づく構造分析"""
+    
+    def verify_main_verb_identification(self, sentence, nlp_result):
+        """主動詞判定の構造的検証"""
+        
+        # 関係節パターンの検出
+        relative_triggers = self._find_relative_pronouns(sentence)
+        
+        for trigger_pos in relative_triggers:
+            # 節境界の構造的分析
+            clause_boundary = self._analyze_clause_structure(sentence, trigger_pos)
+            
+            # 真の主動詞を構造的に特定
+            structural_main_verb = self._identify_sentence_core_verb(clause_boundary)
+            
+            if structural_main_verb != nlp_result.main_verb:
+                return self._create_correction(structural_main_verb, confidence=0.9)
+        
+        return self._create_verification(nlp_result.main_verb, confidence=0.95)
+    
+    def resolve_modifier_attachment(self, sentence, nlp_result):
+        """修飾語の付け先を構造的に解決"""
+        
+        # 距離ベース優先度計算
+        for modifier in nlp_result.modifiers:
+            candidates = self._find_modification_candidates(sentence, modifier)
+            
+            # 構造的距離 + 意味的妥当性で判定
+            best_target = self._select_by_structural_proximity(
+                modifier, candidates, sentence
+            )
+            
+            if best_target != nlp_result.get_modifier_target(modifier):
+                nlp_result.correct_modifier_attachment(modifier, best_target)
+        
+        return nlp_result
+```
+
+#### **動的パターン学習システム**
+```python
+class AdaptivePatternLearner:
+    """失敗ケースから学習する自己改善システム"""
+    
+    def __init__(self):
+        self.error_patterns = ErrorPatternDatabase()
+        self.correction_strategies = CorrectionStrategyLibrary()
+    
+    def learn_from_test_failures(self, test_results):
+        """テスト結果から新しいパターンを学習"""
+        
+        for failure in test_results.failures:
+            # パターン抽出
+            error_pattern = self._extract_error_pattern(
+                failure.sentence, 
+                failure.system_output, 
+                failure.expected_output
+            )
+            
+            # 修正戦略の導出
+            correction_strategy = self._derive_correction_strategy(error_pattern)
+            
+            # パターンライブラリに追加
+            self.correction_strategies.add_strategy(
+                pattern=error_pattern,
+                strategy=correction_strategy,
+                confidence=self._calculate_pattern_confidence(error_pattern)
+            )
+    
+    def apply_learned_corrections(self, sentence, nlp_result):
+        """学習した修正戦略を適用"""
+        
+        applicable_strategies = self.correction_strategies.find_applicable(sentence)
+        
+        for strategy in applicable_strategies:
+            if strategy.confidence > 0.75:
+                nlp_result = strategy.apply_correction(nlp_result)
+        
+        return nlp_result
+```
+#### **信頼度ベース判定システム**
+```python
+class ConfidenceBasedHybridSystem:
+    """信頼度に基づくNLPと文法ロジックの統合判定"""
+    
+    def __init__(self):
+        self.confidence_thresholds = {
+            'nlp_high_confidence': 0.9,
+            'grammar_logic_threshold': 0.8,
+            'hybrid_required': 0.7
+        }
+    
+    def select_best_analysis(self, sentence, nlp_result, grammar_result):
+        """最適な解析結果を信頼度ベースで選択"""
+        
+        nlp_confidence = self._evaluate_nlp_confidence(nlp_result, sentence)
+        grammar_confidence = self._evaluate_grammar_confidence(grammar_result)
+        
+        if nlp_confidence > self.confidence_thresholds['nlp_high_confidence']:
+            return nlp_result  # NLP結果を信頼
+        
+        elif grammar_confidence > self.confidence_thresholds['grammar_logic_threshold']:
+            return grammar_result  # 文法ロジック優先
+        
+        else:
+            return self._create_hybrid_result(nlp_result, grammar_result)
+    
+    def _evaluate_nlp_confidence(self, nlp_result, sentence):
+        """NLP結果の信頼度評価"""
+        factors = [
+            self._check_parse_consistency(nlp_result),
+            self._verify_dependency_coherence(nlp_result),
+            self._assess_sentence_complexity(sentence)
+        ]
+        return self._calculate_composite_confidence(factors)
+    
+    def _create_hybrid_result(self, nlp_result, grammar_result):
+        """NLPと文法ロジックの結果を統合"""
+        return HybridResult(
+            main_structure=grammar_result.main_structure,
+            detailed_analysis=nlp_result.detailed_analysis,
+            confidence=self._calculate_hybrid_confidence(nlp_result, grammar_result)
+        )
+```
+
+#### **エラーパターン管理システム**
+```python
+ERROR_PATTERN_LIBRARY = {
+    "relative_clause_main_verb_confusion": {
+        "description": "関係節での主動詞誤認識",
+        "detection_logic": lambda s: detect_relative_clause_pattern(s),
+        "correction_strategy": "structural_main_verb_identification",
+        "examples": [
+            "The man whose car is red lives here.",
+            "The book which was written yesterday arrived."
+        ],
+        "success_rate": 0.92
     },
     
-    # 動名詞vs分詞判定
-    "preposition_ing": {
-        "pattern": r"(in|on|at|by|for)\s+(\w+ing)",
-        "resolution": "gerund",
-        "confidence": 0.98
+    "compound_subject_verb_attachment": {
+        "description": "複合主語での動詞付け先曖昧性",
+        "detection_logic": lambda s: detect_compound_subject_pattern(s),
+        "correction_strategy": "subject_boundary_analysis", 
+        "examples": [
+            "Flying planes can be dangerous.",
+            "The students working hard succeed."
+        ],
+        "success_rate": 0.87
     },
     
-    # 関係節省略判定
-    "implied_relative": {
-        "pattern": r"(The\s+\w+)\s+(I|you|we|they)\s+(saw|met|know)",
-        "resolution": "relative_clause_implied",
-        "confidence": 0.90
+    "modifier_scope_ambiguity": {
+        "description": "修飾語のスコープ曖昧性",
+        "detection_logic": lambda s: detect_modifier_ambiguity(s),
+        "correction_strategy": "distance_based_attachment",
+        "examples": [
+            "I saw the man with binoculars.",
+            "She works carefully at home daily."
+        ],
+        "success_rate": 0.84
     }
 }
 ```
 
-### **🎯 具体的実装計画**
+### **🎯 ハイブリッドアプローチ実装計画**
 
-#### **Phase 2: M1/M2精度向上 + 文脈解決基盤**
-- **期間**: 1-2週間
-- **目標精度**: 45.3% → 60%
+#### **Phase 2: 構造的検証システム強化 + ハイブリッド基盤**
+- **期間**: 2-3週間
+- **目標精度**: 50.9% → 65%
 - **実装内容**:
-  - adverbial_modifierハンドラー強化
-  - 基本的な文脈判断ロジック実装
-  - Flying planes等の典型的曖昧性解決
+  - 構造的主動詞判定システム（実装済み）
+  - 信頼度ベース判定フレームワーク
+  - 基本的なエラーパターン検出・修正
 
-#### **Phase 3-5: 文法ハンドラー拡張**
+#### **Phase 3-4: 動的学習システム導入**
 - **期間**: 4-6週間  
-- **目標精度**: 60% → 75%
+- **目標精度**: 65% → 78%
 - **実装内容**:
-  - 接続詞ハンドラー
-  - 不定詞・動名詞ハンドラー
-  - 比較級ハンドラー
-  - 文脈解決システム本格運用
+  - テスト失敗ケースからの自動学習
+  - エラーパターンライブラリの自動拡張
+  - 修正戦略の動的最適化
 
-#### **Phase 6-10: 高度曖昧性解決**
-- **期間**: 8-12週間
-- **目標精度**: 75% → 90%
+#### **Phase 5-7: 高度統合システム**
+- **期間**: 6-8週間
+- **目標精度**: 78% → 88%
 - **実装内容**:
-  - セマンティック解析システム
-  - 慣用表現辞書
-  - 複合構造最適化
+  - マルチエンジン統合（Stanza + spaCy + 文法ロジック）
+  - セマンティック妥当性チェック
+  - 文脈依存解決システム
+
+#### **Phase 8-10: 自己改善・最適化**
+- **期間**: 6-8週間
+- **目標精度**: 88% → 95%
+- **実装内容**:
+  - 継続学習システム
+  - パフォーマンス最適化
+  - 商用レベル品質保証
+
+### **🔄 ハイブリッド改善サイクル**
+
+```
+各フェーズで実行:
+1. NLP基本解析 → 文法ロジック検証
+2. 失敗ケース分析 → パターン抽出
+3. 修正戦略開発 → 信頼度評価
+4. 統合システム更新 → 精度測定
+5. 学習データ更新 → 次フェーズ計画
+```
+
+### **📊 ハイブリッドアプローチの優位性**
+
+- **基盤の活用**: 既存NLPエンジンの高速性・精度を最大限活用
+- **弱点の補完**: 人間文法ロジックでNLPの限界を補完
+- **継続改善**: 失敗から学習する自己進化システム
+- **実用性**: 段階的改善で確実な精度向上を実現
   - エラーケース分析・対策
 
 #### **Phase 11-15: 完成度向上**
