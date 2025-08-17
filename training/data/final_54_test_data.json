@@ -475,8 +475,8 @@
         "main_slots": {
           "S": "",
           "V": "succeeds",
-          "M1": "always",
-          "M2": "academically"
+          "M2": "always",
+          "M3": "academically"
         },
         "sub_slots": {
           "sub-s": "The student who",
@@ -525,8 +525,8 @@
           "S": "The window",
           "Aux": "was",
           "V": "opened",
-          "M1": "gently",
-          "M2": "by the morning breeze"
+          "M1": "by the morning breeze",
+          "M2": "gently"
         },
         "sub_slots": {}
       }
@@ -538,8 +538,8 @@
           "S": "The message",
           "Aux": "is being",
           "V": "written",
-          "M1": "carefully",
-          "M2": "by the manager"
+          "M1": "by the manager",
+          "M2": "carefully"
         },
         "sub_slots": {}
       }
@@ -613,7 +613,8 @@
           "Aux": "is being",
           "V": "constructed",
           "M1": "by skilled workers",
-          "M2": "very carefully"
+          "M2": "very",
+          "M3": "very carefully"
         },
         "sub_slots": {}
       }
@@ -625,9 +626,9 @@
           "S": "The teacher",
           "V": "explains",
           "O1": "grammar",
-          "M1": "clearly",
-          "M2": "to confused students",
-          "M3": "daily"
+          "M1": "daily",
+          "M2": "clearly",
+          "M3": "to confused students"
         },
         "sub_slots": {}
       }

@@ -1980,48 +1980,52 @@ class UnifiedStanzaRephraseMapper:
 
     def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):
         """
-        Rephrase仕様準拠：文の中央からの距離による最適Mスロット決定
+        🎯 超シンプル副詞配置ルール（蒸し返し問題解決版）
         
-        核心原理：
-        1. 動詞周辺（文の中央）からの物理的距離で判定
-        2. M2を優先使用（動詞に近い修飾語）
-        3. 余裕を残す配置（将来の拡張考慮）
-        4. 副詞の種類は判定に影響しない
+        核心原理：複雑な判定を排除し、個数ベース配置
+        1個のみ → M2（どこにあっても）
+        2個 → 左（前半）=M1、右（後半）=M3  
+        3個 → 順番通りM1, M2, M3
+        
+        この方式により予測可能性と直感性を最大化
         """
         
-        # 動詞からの絶対距離を計算
-        distance_from_verb = abs(position - main_verb_position)
+        # 使用済みMスロット数をカウント
+        used_m_slots = sum(1 for slot in ['M1', 'M2', 'M3'] if slot in existing_slots)
+        total_m_slots_needed = used_m_slots + 1  # 現在追加分を含む
         
-        self.logger.debug(f"🎯 Mスロット判定: phrase='{phrase}', pos={position}, verb_pos={main_verb_position}, distance={distance_from_verb}")
+        self.logger.debug(f"🎯 シンプルMスロット判定: phrase='{phrase}', 使用済み={used_m_slots}, 必要総数={total_m_slots_needed}")
         
-        # === Rephrase核心ルール：動詞からの距離ベース配置 ===
+        # === 個数ベース配置ルール ===
         
-        # 1. 動詞の直前にある副詞 → M1（頻度副詞：always, usually等）  
-        if position < main_verb_position and distance_from_verb <= 2:
-            if 'M1' not in existing_slots:
-                self.logger.debug(f"  → M1選択（動詞前近接, distance={distance_from_verb}）")
-                return 'M1'
-        
-        # 2. 動詞の直後にある副詞 → M2（様態副詞：quickly, smoothly等）
-        if position > main_verb_position and distance_from_verb <= 2:
+        if total_m_slots_needed == 1:
+            # 1個のみ → M2（どこにあっても）
             if 'M2' not in existing_slots:
-                self.logger.debug(f"  → M2選択（動詞後近接, distance={distance_from_verb}）")
+                self.logger.debug(f"  → M2選択（1個のみルール）")
                 return 'M2'
         
-        # 3. 文尾の時間・場所副詞 → M3（yesterday, here等）
-        if position > main_verb_position and distance_from_verb > 2:
-            if 'M3' not in existing_slots:
-                self.logger.debug(f"  → M3選択（文尾修飾, distance={distance_from_verb}）")
-                return 'M3'
+        elif total_m_slots_needed == 2:
+            # 2個 → 動詞基準で前半/後半判定
+            if position < main_verb_position:
+                # 前半 → M1
+                if 'M1' not in existing_slots:
+                    self.logger.debug(f"  → M1選択（2個・前半ルール）")
+                    return 'M1'
+            else:
+                # 後半 → M3
+                if 'M3' not in existing_slots:
+                    self.logger.debug(f"  → M3選択（2個・後半ルール）")
+                    return 'M3'
         
-        # 4. 文頭の副詞 → M1
-        if position < main_verb_position and distance_from_verb > 2:
-            if 'M1' not in existing_slots:
-                self.logger.debug(f"  → M1選択（文頭修飾, distance={distance_from_verb}）")
-                return 'M1'
+        elif total_m_slots_needed >= 3:
+            # 3個以上 → 順番通りM1, M2, M3
+            for slot in ['M1', 'M2', 'M3']:
+                if slot not in existing_slots:
+                    self.logger.debug(f"  → {slot}選択（3個・順番ルール）")
+                    return slot
         
-        # 5. フォールバック：優先順位でスロット割り当て（M1 > M2 > M3）
-        for slot in ['M1', 'M2', 'M3']:
+        # フォールバック：空いているスロットを使用
+        for slot in ['M2', 'M1', 'M3']:
             if slot not in existing_slots:
                 self.logger.debug(f"  → {slot}選択（フォールバック）")
                 return slot
