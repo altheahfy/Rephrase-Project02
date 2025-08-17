@@ -83,6 +83,9 @@ class UnifiedStanzaRephraseMapper:
         # 段階的ハンドラー管理（Phase別追加）
         self.active_handlers = []
         
+        # 基本ハンドラーの初期化
+        self._initialize_basic_handlers()
+        
         self.logger.info("🚀 Unified Stanza-Rephrase Mapper v1.0 初期化完了")
         if self.spacy_nlp:
             self.logger.info("🔧 spaCyハイブリッド解析 有効")
@@ -144,6 +147,21 @@ class UnifiedStanzaRephraseMapper:
             self.logger.warning("  pip install spacy; python -m spacy download en_core_web_sm で設定してください")
             self.spacy_nlp = None
             self.use_spacy_hybrid = False
+    
+    def _initialize_basic_handlers(self):
+        """基本ハンドラーの初期化"""
+        basic_handlers = [
+            'basic_five_pattern',     # 基本5文型
+            'relative_clause',        # 関係節
+            'passive_voice',          # 受動態  
+            'adverbial_modifier',     # 副詞句（前置詞句含む）
+            'auxiliary_complex',      # 助動詞
+        ]
+        
+        for handler in basic_handlers:
+            self.add_handler(handler)
+        
+        self.logger.info(f"✅ 基本ハンドラー初期化完了: {len(self.active_handlers)}個")
     
     def process(self, sentence: str) -> Dict[str, Any]:
         """
@@ -2446,16 +2464,244 @@ def test_phase1_relative_clause():
         print(f"❌ Phase 1 テスト失敗: {e}")
         return False
 
-if __name__ == "__main__":
-    # Phase 0 基本テスト
-    if test_phase0_basic():
-        print("\n" + "="*60)
-        # Phase 1 関係節テスト  
-        if test_phase1_relative_clause():
-            print("\n" + "="*60)
-            # Phase 2 受動態テスト
-            test_phase2_passive_voice()
+def clean_result_for_json(result: Dict) -> Dict:
+    """
+    JSON出力用に結果をクリーンアップ
+    循環参照や非JSON対応オブジェクトを除去
+    """
+    def clean_value(obj, visited=None):
+        if visited is None:
+            visited = set()
+        
+        # 循環参照チェック
+        obj_id = id(obj)
+        if obj_id in visited:
+            return "<circular_reference>"
+        
+        if isinstance(obj, (str, int, float, bool, type(None))):
+            return obj
+        elif isinstance(obj, dict):
+            visited.add(obj_id)
+            cleaned = {}
+            for k, v in obj.items():
+                # 特定のキーは除外
+                if k in ['stanza_doc', 'spacy_doc', '__dict__', '__weakref__']:
+                    continue
+                try:
+                    cleaned[k] = clean_value(v, visited.copy())
+                except (RecursionError, RuntimeError):
+                    cleaned[k] = f"<error_cleaning_{k}>"
+            return cleaned
+        elif isinstance(obj, list):
+            visited.add(obj_id)
+            try:
+                return [clean_value(item, visited.copy()) for item in obj[:100]]  # 最大100要素
+            except (RecursionError, RuntimeError):
+                return ["<error_cleaning_list>"]
         else:
-            print("❌ Phase 1失敗のため Phase 2をスキップ")
+            # その他のオブジェクトは文字列表現
+            try:
+                return str(obj)[:200]  # 最大200文字
+            except:
+                return "<unrepresentable_object>"
+    
+    return clean_value(result)
+
+def process_batch_sentences(input_file: str, output_file: str = None) -> str:
+    """
+    バッチ処理：53例文一括実行
+    
+    Args:
+        input_file: 入力ファイル (JSON)
+        output_file: 出力ファイル (省略時は auto-generated)
+    
+    Returns:
+        output_file: 保存されたファイル名
+    """
+    import argparse
+    from datetime import datetime
+    
+    print(f"🔄 バッチ処理開始: {input_file}")
+    
+    # 入力データ読み込み
+    try:
+        with open(input_file, 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ エラー: ファイルが見つかりません - {input_file}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON解析エラー: {e}")
+        return None
+    
+    # 出力ファイル名生成
+    if output_file is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = f"batch_results_{timestamp}.json"
+    
+    # システム初期化
+    mapper = UnifiedStanzaRephraseMapper()
+    print("✅ システム初期化完了")
+    
+    # 結果格納
+    results = {
+        "meta": {
+            "input_file": input_file,
+            "processed_at": datetime.now().isoformat(),
+            "total_sentences": 0,
+            "success_count": 0,
+            "error_count": 0
+        },
+        "results": {}
+    }
+    
+    # データ形式判定と処理
+    if "data" in test_data:
+        # final_54_test_data.json 形式
+        sentences_data = test_data["data"]
+        results["meta"]["total_sentences"] = len(sentences_data)
+        
+        print(f"📊 処理対象: {len(sentences_data)}例文")
+        
+        for test_id, test_case in sentences_data.items():
+            try:
+                sentence = test_case["sentence"]
+                print(f"Processing [{test_id}]: {sentence}")
+                
+                # 文解析実行
+                result = mapper.process(sentence)
+                
+                # JSON出力用クリーンアップ
+                clean_result = clean_result_for_json(result)
+                
+                results["results"][test_id] = {
+                    "sentence": sentence,
+                    "analysis_result": clean_result,
+                    "expected": test_case.get("expected", {}),
+                    "status": "success"
+                }
+                results["meta"]["success_count"] += 1
+                
+            except Exception as e:
+                print(f"❌ エラー [{test_id}]: {e}")
+                results["results"][test_id] = {
+                    "sentence": test_case.get("sentence", ""),
+                    "error": str(e),
+                    "status": "error"
+                }
+                results["meta"]["error_count"] += 1
+    
+    elif isinstance(test_data, list):
+        # シンプルリスト形式 ["sentence1", "sentence2", ...]
+        results["meta"]["total_sentences"] = len(test_data)
+        
+        for i, sentence in enumerate(test_data):
+            try:
+                print(f"Processing [{i+1}]: {sentence}")
+                result = mapper.process(sentence)
+                
+                # JSON出力用クリーンアップ
+                clean_result = clean_result_for_json(result)
+                
+                results["results"][str(i+1)] = {
+                    "sentence": sentence,
+                    "analysis_result": clean_result,
+                    "status": "success"
+                }
+                results["meta"]["success_count"] += 1
+                
+            except Exception as e:
+                print(f"❌ エラー [{i+1}]: {e}")
+                results["results"][str(i+1)] = {
+                    "sentence": sentence,
+                    "error": str(e),
+                    "status": "error"
+                }
+                results["meta"]["error_count"] += 1
+    
     else:
-        print("❌ Phase 0失敗のため Phase 1,2をスキップ")
+        print("❌ 未対応のデータ形式です")
+        return None
+    
+    # 結果保存
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(results, f, indent=2, ensure_ascii=False)
+        
+        print(f"\n✅ 処理完了！")
+        print(f"📁 結果保存: {output_file}")
+        print(f"📊 統計:")
+        print(f"   総数: {results['meta']['total_sentences']}")
+        print(f"   成功: {results['meta']['success_count']}")
+        print(f"   エラー: {results['meta']['error_count']}")
+        print(f"   成功率: {results['meta']['success_count']/results['meta']['total_sentences']*100:.1f}%")
+        
+        return output_file
+        
+    except Exception as e:
+        print(f"❌ 保存エラー: {e}")
+        return None
+
+def main():
+    """CLI メインエントリーポイント"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description="Unified Stanza-Rephrase Mapper - バッチ処理版",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+使用例:
+  # 53例文一括処理
+  python unified_stanza_rephrase_mapper.py --input final_test_system/final_54_test_data.json
+  
+  # 出力ファイル指定
+  python unified_stanza_rephrase_mapper.py --input sentences.json --output my_results.json
+  
+  # シンプルリスト形式のJSONも対応
+  python unified_stanza_rephrase_mapper.py --input simple_sentences.json
+        """
+    )
+    
+    parser.add_argument(
+        '--input', '-i',
+        required=True,
+        help='入力JSONファイル（例文データ）'
+    )
+    
+    parser.add_argument(
+        '--output', '-o',
+        help='出力JSONファイル（省略時は自動生成）'
+    )
+    
+    parser.add_argument(
+        '--test-mode',
+        action='store_true',
+        help='テストモード（旧Phase 0-2実行）'
+    )
+    
+    args = parser.parse_args()
+    
+    if args.test_mode:
+        # 従来のテストモード
+        print("🧪 テストモード実行")
+        if test_phase0_basic():
+            print("\n" + "="*60)
+            if test_phase1_relative_clause():
+                print("\n" + "="*60)
+                test_phase2_passive_voice()
+            else:
+                print("❌ Phase 1失敗のため Phase 2をスキップ")
+        else:
+            print("❌ Phase 0失敗のため Phase 1,2をスキップ")
+    else:
+        # バッチ処理モード
+        result_file = process_batch_sentences(args.input, args.output)
+        if result_file:
+            print(f"\n🎉 バッチ処理が完了しました")
+            print(f"結果ファイル: {result_file}")
+        else:
+            print("\n❌ バッチ処理が失敗しました")
+            exit(1)
+
+if __name__ == "__main__":
+    main()

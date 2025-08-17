@@ -1,0 +1,276 @@
+{
+  "meta": {
+    "input_file": "final_test_system/final_54_test_data.json",
+    "processed_at": "2025-08-17T14:37:35.091848",
+    "total_sentences": 53,
+    "success_count": 0,
+    "error_count": 53
+  },
+  "results": {
+    "1": {
+      "sentence": "The car is red.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "2": {
+      "sentence": "I love you.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "3": {
+      "sentence": "The man who runs fast is strong.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "4": {
+      "sentence": "The book which lies there is mine.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "5": {
+      "sentence": "The person that works here is kind.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "6": {
+      "sentence": "The book which I bought is expensive.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "7": {
+      "sentence": "The man whom I met is tall.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "8": {
+      "sentence": "The car that he drives is new.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "9": {
+      "sentence": "The car which was crashed is red.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "10": {
+      "sentence": "The book that was written is famous.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "11": {
+      "sentence": "The letter which was sent arrived.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "12": {
+      "sentence": "The man whose car is red lives here.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "13": {
+      "sentence": "The student whose book I borrowed is smart.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "14": {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "15": {
+      "sentence": "The place where we met is beautiful.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "16": {
+      "sentence": "The time when he arrived was late.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "17": {
+      "sentence": "The reason why she left is unclear.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "18": {
+      "sentence": "The way how he solved it was clever.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "19": {
+      "sentence": "The book I read yesterday was boring.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "20": {
+      "sentence": "He has finished his homework.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "21": {
+      "sentence": "The letter was written by John.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "22": {
+      "sentence": "The house was built in 1990.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "23": {
+      "sentence": "The book was written by a famous author.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "24": {
+      "sentence": "The cake is being baked by my mother.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "25": {
+      "sentence": "The cake was eaten by the children.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "26": {
+      "sentence": "The door was opened by the key.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "27": {
+      "sentence": "The message was sent yesterday.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "28": {
+      "sentence": "She acts as if she knows everything.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "29": {
+      "sentence": "The students study hard for exams.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "30": {
+      "sentence": "The car was repaired last week.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "31": {
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "32": {
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "33": {
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "34": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "35": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "36": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "37": {
+      "sentence": "The window was gently opened by the morning breeze.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "38": {
+      "sentence": "The message is being carefully written by the manager.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "39": {
+      "sentence": "The problem was quickly solved by the expert team.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "40": {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "41": {
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "42": {
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "43": {
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "44": {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "45": {
+      "sentence": "The student writes essays carefully for better grades.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "46": {
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "47": {
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "48": {
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "49": {
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "50": {
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "51": {
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "52": {
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    },
+    "53": {
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'parse_to_slots'",
+      "status": "error"
+    }
+  }
+}

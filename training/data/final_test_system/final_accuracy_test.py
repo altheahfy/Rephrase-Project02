@@ -45,8 +45,21 @@ def final_accuracy_test():
         
         result = mapper.process(sentence)
         
+        # 期待値形式に合わせて結果を整形
+        formatted_result = {
+            "main_slots": {},
+            "sub_slots": {}
+        }
+        
+        # main_slotsとsub_slotsに分離
+        for key, value in result.items():
+            if key.startswith('sub-'):
+                formatted_result["sub_slots"][key] = value
+            else:
+                formatted_result["main_slots"][key] = value
+        
         # スロット比較
-        if result == expected:
+        if formatted_result == expected:
             perfect_matches += 1
             status = "✅"
         else:
