@@ -1338,11 +1338,17 @@ class UnifiedStanzaRephraseMapper:
         if not root_word:
             return None
             
-        # rootが形容詞の場合、cop動詞を主動詞とする（"The man is strong"構造）
+        # rootが形容詞の場合の特別処理
         if root_word.upos == 'ADJ':
-            cop_verb = self._find_word_by_head_and_deprel(sentence, root_word.id, 'cop')
-            if cop_verb:
-                return cop_verb
+            # when構文では形容詞を主動詞として扱う（Rephrase仕様）
+            if any(w.text.lower() == 'when' for w in sentence.words):
+                self.logger.debug(f"🔧 when構文: 形容詞を主動詞として使用 {root_word.text}")
+                return root_word
+            else:
+                # 通常の場合：cop動詞を主動詞とする（"The man is strong"構造）
+                cop_verb = self._find_word_by_head_and_deprel(sentence, root_word.id, 'cop')
+                if cop_verb:
+                    return cop_verb
         
         return root_word
     
@@ -1879,12 +1885,18 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug(f"🎯 主動詞（ROOT動詞）: {word.text} (id={word.id})")
                 return word.id
         
-        # 🔧 Step 2: ROOT名詞の場合、最も文法的に重要な動詞を特定
+        # 🔧 Step 2: ROOT形容詞で受動態の場合、ROOT自体を主動詞として扱う
         root_word = None
         for word in sentence.words:
             if word.deprel == 'root':
                 root_word = word
                 break
+        
+        if root_word and root_word.upos == 'ADJ':
+            # 受動態構造：ROOT形容詞を主動詞とする
+            # "was unexpected" → unexpected が主動詞相当
+            self.logger.debug(f"🎯 主動詞（受動態ROOT形容詞）: {root_word.text} (id={root_word.id})")
+            return root_word.id
         
         if root_word and root_word.upos != 'VERB':
             # 構造的階層で主動詞候補を評価
@@ -1913,7 +1925,7 @@ class UnifiedStanzaRephraseMapper:
                 continue  # 主動詞は除外
                 
             # 明確な従属節パターンのみを従属節動詞として認識
-            if word.deprel in ['acl:relcl', 'advcl', 'ccomp', 'xcomp']:
+            if word.deprel in ['acl:relcl', 'acl', 'advcl', 'ccomp', 'xcomp']:
                 # ただし、主動詞として特定済みの場合は除外
                 if word.upos == 'VERB':
                     subordinate_verbs.append(word.id)
@@ -2162,7 +2174,8 @@ class UnifiedStanzaRephraseMapper:
         common_past_participles = {
             'written', 'bought', 'sold', 'made', 'taken', 'given', 'seen', 'done',
             'broken', 'stolen', 'found', 'lost', 'taught', 'caught', 'brought',
-            'eaten', 'driven', 'shown', 'known', 'grown', 'thrown', 'chosen'
+            'eaten', 'driven', 'shown', 'known', 'grown', 'thrown', 'chosen',
+            'unexpected'  # 形容詞型受動態の追加
         }
         
         # 構造要素の検出
@@ -2189,6 +2202,11 @@ class UnifiedStanzaRephraseMapper:
                 if word.upos == 'VERB' and word.xpos == 'VBN':  # 過去分詞
                     passive_features['main_verb'] = word
                 elif word.upos == 'ADJ' and word.text.lower() in common_past_participles:
+                    passive_features['main_verb'] = word
+            
+            # 非root語での形容詞受動態検出（複文対応）
+            elif word.upos == 'ADJ' and word.text.lower() in common_past_participles:
+                if not passive_features['main_verb']:  # まだ見つかっていない場合
                     passive_features['main_verb'] = word
                     
             # by句動作主検出

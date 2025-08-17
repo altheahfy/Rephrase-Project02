@@ -1,10 +1,10 @@
 {
   "meta": {
     "total_tests": 53,
-    "perfect_matches": 29,
+    "perfect_matches": 36,
     "partial_matches": 10,
-    "failures": 14,
-    "accuracy": 54.71698113207547
+    "failures": 7,
+    "accuracy": 67.9245283018868
   },
   "results": [
     {
@@ -551,18 +551,20 @@
     {
       "test_id": "19",
       "sentence": "The book I read yesterday was boring.",
-      "main_match": false,
-      "sub_match": false,
-      "perfect": false,
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
-          "S": "The book",
+          "S": "",
           "V": "was",
           "C1": "boring"
         },
         "sub_slots": {
-          "sub-o1": "The book [omitted]",
-          "sub-v": "read"
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
         }
       },
       "expected": {
@@ -757,14 +759,15 @@
     {
       "test_id": "27",
       "sentence": "The message was sent yesterday.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "The message",
           "Aux": "was",
-          "V": "sent"
+          "V": "sent",
+          "M2": "yesterday"
         },
         "sub_slots": {}
       },
@@ -781,16 +784,22 @@
     {
       "test_id": "28",
       "sentence": "She acts as if she knows everything.",
-      "main_match": false,
-      "sub_match": false,
-      "perfect": false,
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "She",
           "V": "acts",
-          "O1": "everything"
+          "O1": "",
+          "M1": ""
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-m1": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
       },
       "expected": {
         "main_slots": {
@@ -834,14 +843,15 @@
     {
       "test_id": "30",
       "sentence": "The car was repaired last week.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "The car",
           "Aux": "was",
-          "V": "repaired"
+          "V": "repaired",
+          "M2": "last week"
         },
         "sub_slots": {}
       },
@@ -859,8 +869,8 @@
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -868,10 +878,11 @@
           "C1": "famous"
         },
         "sub_slots": {
-          "sub-m2": "by Shakespeare",
+          "sub-m1": "carefully",
           "sub-s": "The book which",
           "sub-aux": "was",
-          "sub-v": "written"
+          "sub-v": "written",
+          "sub-m2": "by Shakespeare"
         }
       },
       "expected": {
@@ -892,9 +903,9 @@
     {
       "test_id": "32",
       "sentence": "The car that was quickly repaired yesterday runs smoothly.",
-      "main_match": false,
-      "sub_match": false,
-      "perfect": false,
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -902,17 +913,18 @@
           "M2": "smoothly"
         },
         "sub_slots": {
-          "sub-m2": "quickly",
+          "sub-m1": "quickly",
           "sub-s": "The car that",
           "sub-aux": "was",
-          "sub-v": "repaired"
+          "sub-v": "repaired",
+          "sub-m2": "yesterday"
         }
       },
       "expected": {
         "main_slots": {
           "S": "",
           "V": "runs",
-          "M1": "smoothly"
+          "M2": "smoothly"
         },
         "sub_slots": {
           "sub-s": "The car that",
@@ -926,19 +938,21 @@
     {
       "test_id": "33",
       "sentence": "The letter which was slowly typed by the secretary arrived today.",
-      "main_match": false,
-      "sub_match": false,
-      "perfect": false,
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
-          "V": "arrived"
+          "V": "arrived",
+          "M2": "today"
         },
         "sub_slots": {
-          "sub-m2": "by the secretary",
+          "sub-m1": "slowly",
           "sub-s": "The letter which",
           "sub-aux": "was",
-          "sub-v": "typed"
+          "sub-v": "typed",
+          "sub-m2": "by the secretary"
         }
       },
       "expected": {
@@ -967,7 +981,7 @@
           "S": "",
           "V": "succeeds",
           "M2": "always",
-          "M1": "academically"
+          "M3": "academically"
         },
         "sub_slots": {
           "sub-m2": "diligently",
@@ -992,18 +1006,20 @@
     {
       "test_id": "35",
       "sentence": "The teacher whose class runs efficiently is respected greatly.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
-          "S": "The teacher",
-          "V": "runs",
+          "S": "",
+          "V": "respected",
           "Aux": "is",
           "M2": "greatly"
         },
         "sub_slots": {
-          "sub-m2": "efficiently"
+          "sub-m2": "efficiently",
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs"
         }
       },
       "expected": {
@@ -1205,19 +1221,20 @@
       "test_id": "42",
       "sentence": "The time when everything changed dramatically was unexpected.",
       "main_match": false,
-      "sub_match": false,
+      "sub_match": true,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
-          "V": "was",
+          "V": "unexpected",
           "C1": "unexpected",
-          "M2": "dramatically"
+          "Aux": "was"
         },
         "sub_slots": {
           "sub-m1": "The time when",
           "sub-s": "everything",
-          "sub-v": "changed"
+          "sub-v": "changed",
+          "sub-m2": "dramatically"
         }
       },
       "expected": {
@@ -1245,8 +1262,9 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very carefully",
-          "M2": "very"
+          "M1": "by skilled workers",
+          "M2": "very",
+          "M3": "very carefully"
         },
         "sub_slots": {}
       },
@@ -1332,7 +1350,7 @@
           "M2": "successfully"
         },
         "sub_slots": {
-          "sub-m2": "thoroughly",
+          "sub-m1": "thoroughly",
           "sub-s": "The report which",
           "sub-aux": "was",
           "sub-v": "reviewed"
@@ -1367,7 +1385,7 @@
           "M2": "dramatically"
         },
         "sub_slots": {
-          "sub-m2": "carefully",
+          "sub-m1": "carefully",
           "sub-s": "The student whose essay",
           "sub-aux": "was",
           "sub-v": "corrected"
@@ -1390,17 +1408,18 @@
     {
       "test_id": "48",
       "sentence": "The machine that was properly maintained works efficiently every day.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "works",
-          "M2": "efficiently"
+          "M2": "efficiently",
+          "M3": "every day"
         },
         "sub_slots": {
-          "sub-m2": "properly",
+          "sub-m1": "properly",
           "sub-s": "The machine that",
           "sub-aux": "was",
           "sub-v": "maintained"
@@ -1432,7 +1451,8 @@
           "S": "The team",
           "V": "completed",
           "O1": "",
-          "M3": "successfully"
+          "M2": "successfully",
+          "M3": "yesterday"
         },
         "sub_slots": {
           "sub-o1": "The team [omitted]",
