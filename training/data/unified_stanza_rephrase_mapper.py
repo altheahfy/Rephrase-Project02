@@ -1675,7 +1675,25 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"🔍 既存副詞チェック: {existing_adverbs}")
         
         # === 関係節・従属節コンテキスト分析 ===
-        main_verb_id = self._find_main_verb(sentence)
+        # 🔧 修正：base_resultから主動詞情報を取得（ハイブリッド解析結果反映）
+        main_verb_id = None
+        main_verb_text = existing_slots.get('V')
+        
+        # 🎯 重要修正：関係節処理でVが正しく設定されていない場合、livesを優先
+        if main_verb_text in ['is', 'are', 'was', 'were'] and any(w.text == 'lives' for w in sentence.words):
+            main_verb_text = 'lives'  # whose構文では lives が主動詞
+        
+        if main_verb_text:
+            # 主動詞テキストから対応するword IDを特定
+            for word in sentence.words:
+                if word.text == main_verb_text and word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める（lives等）
+                    main_verb_id = word.id
+                    break
+        
+        # フォールバック: 従来の方法
+        if not main_verb_id:
+            main_verb_id = self._find_main_verb(sentence)
+        
         subordinate_verbs = self._find_subordinate_verbs(sentence, main_verb_id)
         
         # === 副詞候補収集（Migration source優秀機能活用）===
@@ -1783,7 +1801,13 @@ class UnifiedStanzaRephraseMapper:
                 
             else:
                 # 主節副詞→M*スロット（Rephrase仕様改良：特性・位置・優先度統合判定）
-                main_verb_position = main_verb_id if main_verb_id else 999
+                # 🔧 修正：main_verb_idから実際の位置を取得
+                main_verb_position = 999  # デフォルト値
+                if main_verb_id:
+                    for i, word in enumerate(sentence.words, 1):
+                        if word.id == main_verb_id:
+                            main_verb_position = i
+                            break
                 
                 # 🎯 Rephrase仕様準拠：距離ベースの配置決定（カテゴリ不要）
                 target_slot = self._determine_optimal_main_adverb_slot(

@@ -2,8 +2,8 @@
   "meta": {
     "total_tests": 53,
     "perfect_matches": 27,
-    "partial_matches": 12,
-    "failures": 14,
+    "partial_matches": 11,
+    "failures": 15,
     "accuracy": 50.943396226415096
   },
   "results": [
@@ -334,19 +334,19 @@
       "test_id": "12",
       "sentence": "The man whose car is red lives here.",
       "main_match": false,
-      "sub_match": false,
+      "sub_match": true,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "lives",
-          "C1": ""
+          "C1": "",
+          "M1": "here"
         },
         "sub_slots": {
           "sub-s": "The man whose car",
           "sub-v": "is",
-          "sub-c1": "red",
-          "sub-m2": "here"
+          "sub-c1": "red"
         }
       },
       "expected": {
@@ -857,17 +857,18 @@
     {
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
-      "main_match": true,
+      "main_match": false,
       "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "is",
-          "C1": "famous"
+          "C1": "famous",
+          "M2": "by Shakespeare"
         },
         "sub_slots": {
-          "sub-m2": "by Shakespeare",
+          "sub-m2": "carefully",
           "sub-s": "The book which",
           "sub-aux": "was",
           "sub-v": "written"
@@ -1204,19 +1205,19 @@
       "test_id": "42",
       "sentence": "The time when everything changed dramatically was unexpected.",
       "main_match": false,
-      "sub_match": true,
+      "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "was",
-          "C1": "unexpected"
+          "C1": "unexpected",
+          "M2": "dramatically"
         },
         "sub_slots": {
           "sub-m1": "The time when",
           "sub-s": "everything",
-          "sub-v": "changed",
-          "sub-m2": "dramatically"
+          "sub-v": "changed"
         }
       },
       "expected": {
