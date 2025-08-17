@@ -1648,32 +1648,13 @@ class UnifiedStanzaRephraseMapper:
 
     def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
-        副詞処理エンジン（migration sourceの前置詞句エンジンベース）
-        従属節/主節の文脈を考慮した高精度な分類と配置を実装
+        副詞処理エンジン（Rephrase距離ベース原理）
+        Stanza/spaCy分析結果のみを使用、ハードコーディング分類は廃止
         """
-        self.logger.debug("副詞ハンドラー実行中...")
+        self.logger.debug("副詞ハンドラー実行中（距離ベース原理）...")
         
-        # === Migration sourceベースの分類キーワード ===
-        time_keywords = [
-            'today', 'yesterday', 'tomorrow', 'now', 'then', 'recently', 'soon',
-            'early', 'late', 'before', 'after', 'during', 'while', 'until',
-            'morning', 'afternoon', 'evening', 'night', 'day', 'week', 'month', 'year',
-            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december'
-        ]
-        
-        location_keywords = [
-            'here', 'there', 'where', 'everywhere', 'somewhere', 'nowhere',
-            'inside', 'outside', 'above', 'below', 'under', 'over', 'behind',
-            'front', 'near', 'far', 'around', 'between', 'among', 'beside',
-            'home', 'school', 'office', 'store', 'park', 'city', 'country'
-        ]
-        
-        manner_keywords = [
-            'carefully', 'quickly', 'slowly', 'gently', 'properly', 'thoroughly',
-            'successfully', 'efficiently', 'dramatically', 'academically', 'diligently'
-        ]
+        # 🎯 Rephrase原理：ハードコーディング分類は不要
+        # Stanza/spaCyの分析結果のみを信頼
         
         # === 既存スロット確認（関係節スロット含む）===
         existing_slots = base_result.get('slots', {}) if base_result else {}
@@ -1702,16 +1683,12 @@ class UnifiedStanzaRephraseMapper:
         processed_positions = set()
         processed_phrases = set()  # 重複フレーズ防止
         
-        self.logger.debug("🔍 副詞候補スキャン開始...")
+        self.logger.debug("🔍 副詞候補スキャン開始（Stanza/spaCy分析ベース）...")
         for word in sentence.words:
-            # Migration source拡張検出ルール（優秀な部分を活用）
+            # 🎯 Rephrase原理：純粋にStanza/spaCy分析結果を信頼
             is_adverb = (
                 word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod'] or
-                word.upos == 'ADV' or  # POS-based detection
-                word.text.lower() in time_keywords or  # Direct keyword matching
-                word.text.lower() in manner_keywords or  # Manner keywords
-                word.text.lower() in location_keywords or  # Location keywords
-                (word.deprel == 'nmod' and word.text.lower() in ['yesterday', 'today', 'tomorrow'])  # Time nouns
+                word.upos == 'ADV'  # POS-based detection（信頼性高い）
             )
             
             self.logger.debug(f"  {word.text}: deprel={word.deprel}, upos={word.upos}, is_adverb={is_adverb}")
@@ -1993,27 +1970,8 @@ class UnifiedStanzaRephraseMapper:
         
         return constructed_phrase
     
-    def _classify_adverbial_phrase(self, phrase, time_keywords, location_keywords, manner_keywords):
-        """Migration sourceベースの分類"""
-        phrase_lower = phrase.lower()
-        
-        # 時間判定
-        if any(keyword in phrase_lower for keyword in time_keywords):
-            return 'time'
-        
-        # 場所判定
-        if any(keyword in phrase_lower for keyword in location_keywords):
-            return 'location'
-        
-        # 様態判定
-        if any(keyword in phrase_lower for keyword in manner_keywords):
-            return 'manner'
-        
-        # by句は動作主→M1優先
-        if phrase_lower.startswith('by '):
-            return 'agent'
-        
-        return 'other'
+    # 🗑️ 削除：ハードコーディング分類機能（Rephrase距離ベース原理と矛盾）
+    # def _classify_adverbial_phrase(...) -> 不要
 
     # ==== PASSIVE VOICE HANDLER ====
         """複合副詞句の構築"""
