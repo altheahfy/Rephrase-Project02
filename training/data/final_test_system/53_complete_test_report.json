@@ -1,10 +1,10 @@
 {
   "meta": {
     "total_tests": 53,
-    "perfect_matches": 25,
-    "partial_matches": 11,
+    "perfect_matches": 26,
+    "partial_matches": 10,
     "failures": 17,
-    "accuracy": 47.16981132075472
+    "accuracy": 49.056603773584904
   },
   "results": [
     {
@@ -1250,9 +1250,9 @@
     {
       "test_id": "43",
       "sentence": "The building is being constructed very carefully by skilled workers.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "The building",
@@ -1268,8 +1268,8 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very carefully",
-          "M2": "by skilled workers"
+          "M1": "by skilled workers",
+          "M2": "very carefully"
         },
         "sub_slots": {}
       }

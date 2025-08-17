@@ -612,8 +612,8 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very carefully",
-          "M2": "by skilled workers"
+          "M1": "by skilled workers",
+          "M2": "very carefully"
         },
         "sub_slots": {}
       }
