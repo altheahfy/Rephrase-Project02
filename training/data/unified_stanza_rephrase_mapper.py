@@ -511,6 +511,16 @@ class UnifiedStanzaRephraseMapper:
                 # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
                 if main_slot in slots:
                     original_value = slots[main_slot]
+                    
+                    # 副詞スロット特別処理: 主節副詞は保持
+                    if main_slot.startswith('M') and original_value:
+                        # 主節副詞が存在する場合、sub-slotの移動は行わない
+                        self.logger.debug(
+                            f"🛡️ 主節副詞保護: {main_slot}: '{original_value}' (preserved) "
+                            f"while {sub_slot}: '{sub_slots[sub_slot]}' (kept in sub-slot)"
+                        )
+                        continue  # 空文字化をスキップ
+                    
                     slots[main_slot] = ""  # 位置マーカーとして空文字設定
                     
                     self.logger.debug(
@@ -1588,7 +1598,7 @@ class UnifiedStanzaRephraseMapper:
     def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
         副詞処理エンジン（migration sourceの前置詞句エンジンベース）
-        高精度な分類と配置を実装
+        従属節/主節の文脈を考慮した高精度な分類と配置を実装
         """
         self.logger.debug("副詞ハンドラー実行中...")
         
@@ -1621,16 +1631,32 @@ class UnifiedStanzaRephraseMapper:
             if slot_key.startswith('M') and slot_value:
                 existing_adverbs.update(slot_value.split())
         
-        # === 副詞候補収集 ===
+        # === 関係節・従属節コンテキスト分析 ===
+        main_verb_id = self._find_main_verb(sentence)
+        subordinate_verbs = self._find_subordinate_verbs(sentence, main_verb_id)
+        
+        # === 副詞候補収集（拡張検出） ===
         adverb_phrases = []
         
+        self.logger.debug("🔍 副詞候補スキャン開始...")
         for word in sentence.words:
-            if word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod']:
+            # 拡張副詞検出ルール
+            is_adverb = (
+                word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod'] or
+                word.upos == 'ADV' or  # POS-based detection
+                word.text.lower() in time_keywords  # Direct keyword matching
+            )
+            
+            self.logger.debug(f"  {word.text}: deprel={word.deprel}, upos={word.upos}, is_adverb={is_adverb}")
+            
+            if is_adverb:
                 if word.text in existing_adverbs:
+                    self.logger.debug(f"    → 除外（既存副詞）: {word.text}")
                     continue
                     
                 # 関係副詞除外
                 if word.text.lower() in ['where', 'when', 'why', 'how']:
+                    self.logger.debug(f"    → 除外（関係副詞）: {word.text}")
                     continue
                 
                 # 前置詞句構築
@@ -1642,63 +1668,147 @@ class UnifiedStanzaRephraseMapper:
                 # 分類（migration sourceロジック）
                 category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
                 
+                # 文脈分析: 主節 vs 従属節
+                context = self._determine_adverb_context(word, main_verb_id, subordinate_verbs, sentence)
+                
+                self.logger.debug(f"    → 検出: phrase='{phrase}', category={category}, context={context}")
+                
                 adverb_phrases.append({
                     'phrase': phrase,
                     'category': category,
                     'position': word.id,
-                    'word': word
+                    'word': word,
+                    'context': context  # 'main' or 'subordinate'
                 })
         
         if not adverb_phrases:
             self.logger.debug("副詞なし - スキップ")
             return None
         
-        # === Migration sourceベースの配置ロジック ===
+        # === 文脈別スロット配置ロジック ===
         slots = {}
         sub_slots = {}
         
         # 位置順ソート
         adverb_phrases.sort(key=lambda x: x['position'])
         
-        # 分類別配置（migration source準拠）
+        # 主節・従属節別カウンター
+        main_counters = {'M1': 0, 'M2': 0, 'M3': 0}
+        sub_counters = {'sub-m1': 0, 'sub-m2': 0, 'sub-m3': 0}
+        
+        # 文脈別配置
         for phrase_info in adverb_phrases:
             phrase = phrase_info['phrase']
             category = phrase_info['category']
+            context = phrase_info['context']
             
-            if category == 'time':
-                # 時間→M1（migration sourceでは時間がM1）
-                if 'M1' not in slots:
-                    slots['M1'] = phrase
-                elif 'M2' not in slots:
-                    slots['M2'] = phrase
+            if context == 'subordinate':
+                # 従属節副詞→sub-m*スロット
+                if category == 'time':
+                    sub_counters['sub-m1'] += 1
+                    slot_key = f"sub-m{sub_counters['sub-m1']}" if sub_counters['sub-m1'] <= 3 else 'sub-m3'
+                elif category == 'manner':
+                    sub_counters['sub-m1'] += 1  # 様態副詞は sub-m1 優先
+                    slot_key = f"sub-m{sub_counters['sub-m1']}" if sub_counters['sub-m1'] <= 3 else 'sub-m3'
+                elif category == 'agent':  # by句
+                    sub_counters['sub-m2'] += 1
+                    slot_key = f"sub-m{sub_counters['sub-m2']}" if sub_counters['sub-m2'] <= 3 else 'sub-m3'
                 else:
-                    slots['M3'] = phrase
-            elif category == 'location':
-                # 場所→M2
-                if 'M2' not in slots:
-                    slots['M2'] = phrase
-                elif 'M3' not in slots:
-                    slots['M3'] = phrase
-                else:
-                    slots['M1'] = phrase
-            elif category == 'manner':
-                # 様態→M3
-                if 'M3' not in slots:
-                    slots['M3'] = phrase
-                elif 'M2' not in slots:
-                    slots['M2'] = phrase
-                else:
-                    slots['M1'] = phrase
+                    # その他→空きsub-mスロット
+                    for i in [1, 2, 3]:
+                        if f'sub-m{i}' not in sub_slots:
+                            slot_key = f'sub-m{i}'
+                            break
+                    else:
+                        slot_key = 'sub-m3'
+                
+                sub_slots[slot_key] = phrase
+                
             else:
-                # その他→空きスロットに順次配置
-                for slot in ['M1', 'M2', 'M3']:
-                    if slot not in slots:
-                        slots[slot] = phrase
-                        break
+                # 主節副詞→M*スロット（migration source準拠）
+                if category == 'time':
+                    main_counters['M1'] += 1
+                    slot_key = 'M1' if main_counters['M1'] == 1 else ('M2' if main_counters['M2'] == 0 else 'M3')
+                elif category == 'location':
+                    main_counters['M2'] += 1
+                    slot_key = 'M2' if main_counters['M2'] == 1 else ('M3' if main_counters['M3'] == 0 else 'M1')
+                elif category == 'manner':
+                    main_counters['M3'] += 1
+                    slot_key = 'M3' if main_counters['M3'] == 1 else ('M2' if main_counters['M2'] == 0 else 'M1')
+                else:
+                    # その他→空きスロットに順次配置
+                    for slot in ['M1', 'M2', 'M3']:
+                        if slot not in slots:
+                            slot_key = slot
+                            break
+                    else:
+                        slot_key = 'M3'
+                
+                slots[slot_key] = phrase
         
-        self.logger.debug(f"副詞配置完了: {slots}")
+        self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
         return {'slots': slots, 'sub_slots': sub_slots}
     
+    def _find_main_verb(self, sentence):
+        """主動詞を特定"""
+        for word in sentence.words:
+            if word.deprel == 'root':
+                return word.id
+        return None
+    
+    def _find_subordinate_verbs(self, sentence, main_verb_id):
+        """従属節動詞を特定"""
+        subordinate_verbs = []
+        for word in sentence.words:
+            if (word.deprel in ['acl:relcl', 'advcl', 'ccomp', 'xcomp'] or
+                (word.upos == 'VERB' and word.id != main_verb_id)):
+                subordinate_verbs.append(word.id)
+        return subordinate_verbs
+    
+    def _determine_adverb_context(self, adverb_word, main_verb_id, subordinate_verbs, sentence):
+        """副詞の文脈（主節 vs 従属節）を判定"""
+        # 直接の動詞依存関係をチェック
+        head_id = adverb_word.head
+        
+        # 依存関係を遡って動詞を見つける
+        current_word = None
+        for word in sentence.words:
+            if word.id == head_id:
+                current_word = word
+                break
+        
+        # 依存関係を辿って主動詞/従属動詞を判定
+        max_depth = 5  # 無限ループ防止
+        depth = 0
+        
+        while current_word and depth < max_depth:
+            if current_word.id == main_verb_id:
+                return 'main'
+            elif current_word.id in subordinate_verbs:
+                return 'subordinate'
+            
+            # 次の head を探す
+            next_head = current_word.head
+            if next_head == 0:  # root到達
+                break
+                
+            next_word = None
+            for word in sentence.words:
+                if word.id == next_head:
+                    next_word = word
+                    break
+            
+            current_word = next_word
+            depth += 1
+        
+        # 位置的推論: 関係代名詞の後ろなら従属節
+        for word in sentence.words:
+            if word.text.lower() in ['which', 'that', 'who', 'whom', 'whose']:
+                if adverb_word.id > word.id:
+                    return 'subordinate'
+        
+        return 'main'  # デフォルト
+
     def _build_prepositional_phrase(self, sentence, word):
         """前置詞句の構築（migration sourceベース）"""
         # 前置詞句の完全構築
