@@ -2026,9 +2026,8 @@ class UnifiedStanzaRephraseMapper:
         
         # by句付き受動態の場合
         if passive_type == 'agent_passive' and agent_phrase:
-            slots['M1'] = agent_phrase  # by句全体
-            if agent:
-                sub_slots['sub-m1'] = agent.text  # 動作主のみ
+            slots['M1'] = agent_phrase  # by句全体（副詞句として扱う）
+            # sub-m1は使わない - 副詞ハンドラーに委ねる
         
         return {'slots': slots, 'sub_slots': sub_slots}
     
