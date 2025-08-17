@@ -1,10 +1,10 @@
 {
   "meta": {
     "total_tests": 53,
-    "perfect_matches": 27,
-    "partial_matches": 11,
-    "failures": 15,
-    "accuracy": 50.943396226415096
+    "perfect_matches": 29,
+    "partial_matches": 10,
+    "failures": 14,
+    "accuracy": 54.71698113207547
   },
   "results": [
     {
@@ -333,15 +333,15 @@
     {
       "test_id": "12",
       "sentence": "The man whose car is red lives here.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": true,
-      "perfect": false,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "lives",
           "C1": "",
-          "M1": "here"
+          "M2": "here"
         },
         "sub_slots": {
           "sub-s": "The man whose car",
@@ -519,8 +519,8 @@
       "test_id": "18",
       "sentence": "The way how he solved it was clever.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -530,7 +530,8 @@
         "sub_slots": {
           "sub-m1": "The way how",
           "sub-s": "he",
-          "sub-v": "solved"
+          "sub-v": "solved",
+          "sub-o1": "it"
         }
       },
       "expected": {
@@ -857,18 +858,17 @@
     {
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": false,
       "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "",
           "V": "is",
-          "C1": "famous",
-          "M2": "by Shakespeare"
+          "C1": "famous"
         },
         "sub_slots": {
-          "sub-m2": "carefully",
+          "sub-m2": "by Shakespeare",
           "sub-s": "The book which",
           "sub-aux": "was",
           "sub-v": "written"

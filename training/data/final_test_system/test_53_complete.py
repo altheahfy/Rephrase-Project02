@@ -15,7 +15,7 @@ import codecs
 
 def run_53_complete_test():
     """53例文完全整合テスト実行"""
-    print("🎯 53例文完全整合テスト開始")
+    print("53例文完全整合テスト開始")
     print("="*60)
     
     # システム初期化

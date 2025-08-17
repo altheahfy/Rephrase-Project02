@@ -1103,12 +1103,18 @@ class UnifiedStanzaRephraseMapper:
                     sub_slots["sub-c1"] = complement.text
             
         elif rel_type == 'advmod':
-            # 関係副詞: "The place where he lives"
+            # 関係副詞: "The place where he lives" / "The way how he solved it"
             # slots["M3"] = ""  # 上位スロットは5文型エンジンに任せる
             sub_slots["sub-m1"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
+            
+            # ✅ 関係副詞句内の目的語を検出してsub-o1に配置
+            obj_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obj')
+            if obj_word:
+                sub_slots["sub-o1"] = obj_word.text
+                self.logger.debug(f"🔧 関係副詞句内目的語検出: sub-o1 = '{obj_word.text}'")
             
         # 省略関係代名詞の処理
         elif rel_type == 'obj_omitted':
@@ -1705,7 +1711,7 @@ class UnifiedStanzaRephraseMapper:
         for word in sentence.words:
             # 🎯 Rephrase原理：純粋にStanza/spaCy分析結果を信頼
             is_adverb = (
-                word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod'] or
+                word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'obl:unmarked', 'nmod:tmod'] or
                 word.upos == 'ADV'  # POS-based detection（信頼性高い）
             )
             
@@ -1965,30 +1971,32 @@ class UnifiedStanzaRephraseMapper:
         
         # === Rephrase核心ルール：動詞からの距離ベース配置 ===
         
-        # 1. 動詞に最も近い修飾語 → M2優先
-        if distance_from_verb <= 2 and 'M2' not in existing_slots:
-            self.logger.debug(f"  → M2選択（動詞に近い, distance={distance_from_verb}）")
-            return 'M2'
-        
-        # 2. 文頭寄り（動詞より前で距離が大きい） → M1
-        if position < main_verb_position and distance_from_verb > 2:
+        # 1. 動詞の直前にある副詞 → M1（頻度副詞：always, usually等）  
+        if position < main_verb_position and distance_from_verb <= 2:
             if 'M1' not in existing_slots:
-                self.logger.debug(f"  → M1選択（文頭寄り, distance={distance_from_verb}）")
+                self.logger.debug(f"  → M1選択（動詞前近接, distance={distance_from_verb}）")
                 return 'M1'
         
-        # 3. 文尾寄り（動詞より後で距離が大きい） → M3
+        # 2. 動詞の直後にある副詞 → M2（様態副詞：quickly, smoothly等）
+        if position > main_verb_position and distance_from_verb <= 2:
+            if 'M2' not in existing_slots:
+                self.logger.debug(f"  → M2選択（動詞後近接, distance={distance_from_verb}）")
+                return 'M2'
+        
+        # 3. 文尾の時間・場所副詞 → M3（yesterday, here等）
         if position > main_verb_position and distance_from_verb > 2:
             if 'M3' not in existing_slots:
-                self.logger.debug(f"  → M3選択（文尾寄り, distance={distance_from_verb}）")
+                self.logger.debug(f"  → M3選択（文尾修飾, distance={distance_from_verb}）")
                 return 'M3'
         
-        # 4. M2が空いていれば優先的にM2を使用（Rephrase余裕原則）
-        if 'M2' not in existing_slots:
-            self.logger.debug(f"  → M2選択（余裕原則, distance={distance_from_verb}）")
-            return 'M2'
+        # 4. 文頭の副詞 → M1
+        if position < main_verb_position and distance_from_verb > 2:
+            if 'M1' not in existing_slots:
+                self.logger.debug(f"  → M1選択（文頭修飾, distance={distance_from_verb}）")
+                return 'M1'
         
-        # 5. フォールバック：空いているスロットを使用
-        for slot in ['M1', 'M3']:
+        # 5. フォールバック：優先順位でスロット割り当て（M1 > M2 > M3）
+        for slot in ['M1', 'M2', 'M3']:
             if slot not in existing_slots:
                 self.logger.debug(f"  → {slot}選択（フォールバック）")
                 return slot
