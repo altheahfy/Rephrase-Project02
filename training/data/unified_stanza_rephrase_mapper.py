@@ -2310,7 +2310,7 @@ class UnifiedStanzaRephraseMapper:
             
             # 動作主の修飾語を追加
             for word in sentence.words:
-                if word.head == agent_word.id and word.deprel in ['det', 'amod', 'nmod']:
+                if word.head == agent_word.id and word.deprel in ['det', 'amod', 'nmod', 'compound', 'nmod:poss']:
                     phrase_words.append(word)
             
             # ID順ソート（語順保持）
