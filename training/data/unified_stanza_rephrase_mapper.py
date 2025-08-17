@@ -1603,8 +1603,8 @@ class UnifiedStanzaRephraseMapper:
         sentence_length = len(sentence.words)
 
         for word in sentence.words:
-            # 汎用副詞依存関係対象（yesterday読込バグ修正済み）
-            if word.deprel in ['advmod', 'obl', 'obl:unmarked', 'obl:tmod', 'obl:npmod', 'nmod:unmarked', 'nmod:tmod']:
+            # 汎用副詞依存関係対象（yesterday読込バグ修正済み + obl:agent受動態エージェント追加）
+            if word.deprel in ['advmod', 'obl', 'obl:unmarked', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:unmarked', 'nmod:tmod']:
                 # 既に処理済みの副詞をスキップ
                 if word.text in existing_adverbs:
                     self.logger.debug(f"既存スロットに割り当て済み - スキップ: {word.text}")
@@ -1649,8 +1649,8 @@ class UnifiedStanzaRephraseMapper:
             return None
 
         # === 複合副詞の統合処理 ===
-        # TODO: 統合処理のデバッグが必要 - 一時的に無効化
-        # adverbial_modifiers = self._merge_compound_adverbs(adverbial_modifiers, sentence)
+        # 慎重に有効化：very carefully等の度合い副詞+様態副詞パターンを統合
+        adverbial_modifiers = self._merge_compound_adverbs(adverbial_modifiers, sentence)
 
         # === 2. 位置ベース動的再配置システム ===
         slots = {}
@@ -1663,23 +1663,60 @@ class UnifiedStanzaRephraseMapper:
         if len(adverbial_modifiers) == 1:
             # 1つの場合：M2（中央）に配置
             mod = adverbial_modifiers[0]
-            phrase = self._build_adverbial_phrase(sentence, mod['word'])
+            # 統合副詞の場合は統合されたテキストを使用
+            if 'text' in mod and mod['text'] != mod['word'].text:
+                phrase = mod['text']  # 統合されたフレーズ
+            else:
+                phrase = self._build_adverbial_phrase(sentence, mod['word'])
             slots['M2'] = phrase
             self.logger.debug(f"単一副詞M2配置: {phrase}")
             
         elif len(adverbial_modifiers) == 2:
-            # 2つの場合：M2, M3に配置
+            # 2つの場合：種類に基づく優先配置
             mod1, mod2 = adverbial_modifiers
-            phrase1 = self._build_adverbial_phrase(sentence, mod1['word'])
-            phrase2 = self._build_adverbial_phrase(sentence, mod2['word'])
-            slots['M2'] = phrase1
-            slots['M3'] = phrase2
-            self.logger.debug(f"2副詞配置: M2={phrase1}, M3={phrase2}")
+            
+            # mod1の処理
+            if 'text' in mod1 and mod1['text'] != mod1['word'].text:
+                phrase1 = mod1['text']
+            else:
+                phrase1 = self._build_adverbial_phrase(sentence, mod1['word'])
+            
+            # mod2の処理
+            if 'text' in mod2 and mod2['text'] != mod2['word'].text:
+                phrase2 = mod2['text']
+            else:
+                phrase2 = self._build_adverbial_phrase(sentence, mod2['word'])
+            
+            # 受動態エージェント句（by句）があるかチェック
+            agent_phrase = None
+            other_phrase = None
+            
+            if mod1['word'].deprel == 'obl:agent':
+                agent_phrase = phrase1
+                other_phrase = phrase2
+            elif mod2['word'].deprel == 'obl:agent':
+                agent_phrase = phrase2
+                other_phrase = phrase1
+            
+            if agent_phrase:
+                # 受動態エージェント句はM2優先、その他はM1
+                slots['M1'] = other_phrase
+                slots['M2'] = agent_phrase
+                self.logger.debug(f"2副詞優先配置: M1={other_phrase}, M2={agent_phrase}")
+            else:
+                # デフォルト配置: M2, M3
+                slots['M2'] = phrase1
+                slots['M3'] = phrase2
+                self.logger.debug(f"2副詞配置: M2={phrase1}, M3={phrase2}")
             
         elif len(adverbial_modifiers) >= 3:
             # 3つ以上の場合：M1, M2, M3に配置（最初の3つ）
             for i, mod in enumerate(adverbial_modifiers[:3]):
-                phrase = self._build_adverbial_phrase(sentence, mod['word'])
+                # 統合副詞の場合は統合されたテキストを使用
+                if 'text' in mod and mod['text'] != mod['word'].text:
+                    phrase = mod['text']
+                else:
+                    phrase = self._build_adverbial_phrase(sentence, mod['word'])
                 slot_name = f"M{i+1}"
                 slots[slot_name] = phrase
                 self.logger.debug(f"3副詞配置: {slot_name}={phrase}")
@@ -1833,22 +1870,31 @@ class UnifiedStanzaRephraseMapper:
                 prep_words.append(word)
         
         # byの動作主句の場合、特別処理
-        if main_word.text.lower() in ['team', 'expert', 'author', 'mother', 'manager', 'workers', 'secretary', 'breeze']:
+        if main_word.deprel == 'obl:agent':
+            # 前置詞句全体を構築（by + 修飾語 + 名詞）
+            phrase_words = []
+            
             # byを探す
             by_word = None
             for word in sentence.words:
-                if word.text.lower() == 'by' and word.deprel == 'case':
-                    # byが修飾する名詞を探す
-                    target_noun = next((w for w in sentence.words if w.id == word.head), None)
-                    if target_noun and target_noun.id == main_word.id:
-                        by_word = word
-                        break
+                if word.text.lower() == 'by' and word.deprel == 'case' and word.head == main_word.id:
+                    by_word = word
+                    break
             
             if by_word:
-                # "by + 修飾語 + 名詞"構築
-                phrase_words = [by_word] + modifiers + [main_word]
-                phrase_words.sort(key=lambda w: w.id)
-                return ' '.join(word.text for word in phrase_words)
+                phrase_words.append(by_word)
+            
+            # 修飾語を追加（by以外）
+            for modifier in modifiers:
+                if modifier.text.lower() != 'by':  # byの重複を避ける
+                    phrase_words.append(modifier)
+            
+            # メイン語を追加
+            phrase_words.append(main_word)
+            
+            # ID順ソート
+            phrase_words.sort(key=lambda w: w.id)
+            return ' '.join(word.text for word in phrase_words)
 
         if not modifiers:
             return main_word.text

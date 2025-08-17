@@ -2,8 +2,8 @@
   "meta": {
     "total_tests": 53,
     "perfect_matches": 25,
-    "partial_matches": 12,
-    "failures": 16,
+    "partial_matches": 11,
+    "failures": 17,
     "accuracy": 47.16981132075472
   },
   "results": [
@@ -863,7 +863,7 @@
     {
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
-      "main_match": true,
+      "main_match": false,
       "sub_match": false,
       "perfect": false,
       "system_output": {
@@ -871,6 +871,7 @@
           "S": "",
           "V": "is",
           "C1": "famous",
+          "M1": "carefully",
           "M2": ""
         },
         "sub_slots": {
@@ -941,6 +942,7 @@
         "main_slots": {
           "S": "",
           "V": "arrived",
+          "M1": "slowly",
           "M2": "",
           "M3": "today"
         },
@@ -1257,8 +1259,7 @@
           "Aux": "is being",
           "V": "constructed",
           "M1": "by skilled workers",
-          "M2": "very",
-          "M3": "carefully"
+          "M2": "very carefully"
         },
         "sub_slots": {}
       },
