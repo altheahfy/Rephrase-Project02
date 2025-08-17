@@ -205,7 +205,213 @@ stats = mapper.get_stats()
 
 ---
 
-## 📋 **更新履歴**
+## �️ **CLIインターフェース使用方法**
+
+### **基本コマンド構文**
+
+```bash
+# 基本的な一括処理
+python unified_stanza_rephrase_mapper.py --input [入力ファイル] --output [出力ファイル]
+
+# 出力ファイル省略（自動生成）
+python unified_stanza_rephrase_mapper.py --input [入力ファイル]
+
+# テストモード（従来のPhase 0-2実行）
+python unified_stanza_rephrase_mapper.py --test-mode
+
+# ヘルプ表示
+python unified_stanza_rephrase_mapper.py --help
+```
+
+### **結果分析コマンド**
+
+```bash
+# 基本的な精度分析
+python compare_results.py --results [結果ファイル]
+
+# 詳細分析（失敗ケース表示）
+python compare_results.py --results [結果ファイル] --detail
+
+# 分析レポート保存
+python compare_results.py --results [結果ファイル] --save-report [レポートファイル]
+```
+
+### **入力データ形式**
+
+#### **詳細形式（期待値付き）**
+```json
+{
+  "meta": {
+    "total_count": 5,
+    "description": "カスタム例文テスト"
+  },
+  "data": {
+    "1": {
+      "sentence": "She works carefully.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "works",
+          "M2": "carefully"
+        },
+        "sub_slots": {}
+      }
+    },
+    "2": {
+      "sentence": "The book is interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "V": "is",
+          "C1": "interesting"
+        },
+        "sub_slots": {}
+      }
+    }
+  }
+}
+```
+
+#### **シンプル形式（期待値なし）**
+```json
+[
+  "She works carefully.",
+  "The book is interesting.", 
+  "I give him a book.",
+  "He has finished his homework.",
+  "The letter was written by John."
+]
+```
+
+### **実用的な使用例**
+
+#### **例1: 既存の53例文テストセットを使用**
+```bash
+# 53例文一括処理
+cd training/data
+python unified_stanza_rephrase_mapper.py --input final_test_system/final_54_test_data.json
+
+# 結果確認
+python compare_results.py --results batch_results_[タイムスタンプ].json
+```
+
+#### **例2: カスタム例文テスト**
+```bash
+# カスタム例文ファイル作成（上記JSON形式）
+# my_test_sentences.json
+
+# 処理実行
+python unified_stanza_rephrase_mapper.py --input my_test_sentences.json --output my_results.json
+
+# 結果分析
+python compare_results.py --results my_results.json --detail
+```
+
+#### **例3: 簡単な文法チェック**
+```bash
+# シンプルな例文リスト作成
+# simple_sentences.json: ["She works carefully.", "The book is red."]
+
+# 処理実行
+python unified_stanza_rephrase_mapper.py --input simple_sentences.json
+
+# 結果確認（期待値なしのため、分析結果のみ）
+python compare_results.py --results batch_results_[タイムスタンプ].json
+```
+
+### **出力ファイル構造**
+
+#### **バッチ処理結果ファイル**
+```json
+{
+  "meta": {
+    "input_file": "my_test_sentences.json",
+    "processed_at": "2025-08-17T14:50:00.000000",
+    "total_sentences": 5,
+    "success_count": 5,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": "She works carefully.",
+      "analysis_result": {
+        "sentence": "She works carefully.",
+        "slots": {
+          "S": "She",
+          "V": "works",
+          "M2": "carefully"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": ["basic_five_pattern"],
+          "handler_contributions": {...}
+        },
+        "meta": {
+          "processing_time": 0.129,
+          "sentence_id": 1,
+          "active_handlers": 5
+        }
+      },
+      "expected": {...},
+      "status": "success"
+    }
+  }
+}
+```
+
+#### **精度分析レポート**
+```
+📊 精度分析レポート
+============================================================
+📁 対象ファイル: my_results.json
+⏰ 分析時刻: 2025-08-17T14:50:10.616823
+
+📈 全体統計:
+   総ケース数: 5
+   完全一致: 5
+   部分一致: 0
+   失敗: 0
+   🎯 完全一致率: 100.0%
+
+🔍 スロット別精度:
+   S: 100.0% (5/5)
+   V: 100.0% (5/5)
+   M2: 100.0% (1/1)
+   O1: 100.0% (2/2)
+   Aux: 100.0% (2/2)
+```
+
+### **実証済みパフォーマンス**
+
+| テストセット | 完全一致率 | 処理成功率 | 主要スロット精度 |
+|------------|------------|------------|----------------|
+| カスタム5例文 | 100.0% | 100.0% | S:100%, V:100%, M2:100% |
+| 標準53例文 | 45.3% | 100.0% | S:88.7%, V:96.2%, C1:95.2% |
+
+### **開発・デバッグ用途**
+
+```bash
+# 詳細ログ出力で実行
+python unified_stanza_rephrase_mapper.py --input test.json 2>&1 | tee debug.log
+
+# 特定例文のみテスト
+echo '["She works carefully."]' > quick_test.json
+python unified_stanza_rephrase_mapper.py --input quick_test.json
+
+# 従来のテストモードとの比較
+python unified_stanza_rephrase_mapper.py --test-mode
+```
+
+---
+
+## �📋 **更新履歴**
+
+### **v1.1 (2025年8月17日)**
+- CLIインターフェース実装完了
+- バッチ処理機能追加
+- 結果照合システム分離
+- 53例文一括処理対応
+- カスタム例文テスト機能
 
 ### **v1.0 (2025年8月16日)**
 - 初版リリース
@@ -215,4 +421,4 @@ stats = mapper.get_stats()
 
 ---
 
-**次期更新予定**: v1.1 (助動詞ハンドラー追加版)
+**次期更新予定**: v1.2 (M1/M2精度向上版)
