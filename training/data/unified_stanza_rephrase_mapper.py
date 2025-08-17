@@ -519,6 +519,9 @@ class UnifiedStanzaRephraseMapper:
                         f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
                     )
         
+        # 副詞重複チェックと削除
+        self._remove_adverb_duplicates(slots, sub_slots)
+        
         # 処理結果をデバッグログ出力
         applied_rules = [
             f"{main}→{sub}" for main, sub in main_to_sub_mapping.items() 
@@ -529,6 +532,26 @@ class UnifiedStanzaRephraseMapper:
             self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
         else:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
+    
+    def _remove_adverb_duplicates(self, slots: Dict, sub_slots: Dict):
+        """主節と関係節の副詞重複を除去"""
+        
+        # 主節副詞と関係節副詞の重複チェック
+        main_adverbs = {k: v for k, v in slots.items() if k.startswith('M') and v}
+        sub_adverbs = {k: v for k, v in sub_slots.items() if k.startswith('sub-m') and v}
+        
+        if not main_adverbs or not sub_adverbs:
+            return
+        
+        # 重複副詞の検出と削除
+        for main_slot, main_value in list(main_adverbs.items()):
+            for sub_slot, sub_value in sub_adverbs.items():
+                # 同じ副詞が主節と関係節に存在する場合
+                if main_value.strip() == sub_value.strip():
+                    # 関係節を優先し、主節から削除
+                    slots[main_slot] = ""
+                    self.logger.debug(f"🔄 副詞重複削除: {main_slot}='{main_value}' → '' (sub-slot {sub_slot}='{sub_value}' を優先)")
+                    break
     
     def _create_empty_result(self, sentence: str) -> Dict[str, Any]:
         """空結果の作成"""

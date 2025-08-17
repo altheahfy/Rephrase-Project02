@@ -2,8 +2,8 @@
   "meta": {
     "total_tests": 53,
     "perfect_matches": 29,
-    "partial_matches": 7,
-    "failures": 17,
+    "partial_matches": 8,
+    "failures": 16,
     "accuracy": 54.71698113207547
   },
   "results": [
@@ -863,7 +863,7 @@
     {
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
-      "main_match": false,
+      "main_match": true,
       "sub_match": false,
       "perfect": false,
       "system_output": {
@@ -871,7 +871,7 @@
           "S": "",
           "V": "is",
           "C1": "famous",
-          "M1": "carefully",
+          "M1": "",
           "M2": ""
         },
         "sub_slots": {
@@ -906,7 +906,7 @@
         "main_slots": {
           "S": "",
           "V": "runs",
-          "M1": "quickly",
+          "M1": "",
           "M2": "",
           "M3": "smoothly"
         },
@@ -942,7 +942,7 @@
         "main_slots": {
           "S": "",
           "V": "arrived",
-          "M1": "slowly",
+          "M1": "",
           "M2": "",
           "M3": "today"
         },
@@ -978,7 +978,7 @@
         "main_slots": {
           "S": "",
           "V": "succeeds",
-          "M1": "diligently",
+          "M1": "",
           "M2": "",
           "M3": "academically"
         },
@@ -1412,7 +1412,7 @@
         "main_slots": {
           "S": "",
           "V": "works",
-          "M1": "properly",
+          "M1": "",
           "M2": "",
           "M3": "every day"
         },
@@ -1481,7 +1481,7 @@
         "main_slots": {
           "S": "The woman",
           "V": "waiting",
-          "M1": "quietly",
+          "M1": "",
           "M2": "",
           "M3": "",
           "Aux": "was"
@@ -1518,7 +1518,7 @@
           "S": "The children",
           "Aux": "were",
           "V": "supervised",
-          "M1": "happily",
+          "M1": "",
           "M2": "",
           "M3": ""
         },
