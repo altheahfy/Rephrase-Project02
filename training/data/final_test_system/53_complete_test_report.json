@@ -1,10 +1,10 @@
 {
   "meta": {
     "total_tests": 53,
-    "perfect_matches": 26,
-    "partial_matches": 10,
+    "perfect_matches": 29,
+    "partial_matches": 7,
     "failures": 17,
-    "accuracy": 49.056603773584904
+    "accuracy": 54.71698113207547
   },
   "results": [
     {
@@ -429,8 +429,8 @@
       "test_id": "15",
       "sentence": "The place where we met is beautiful.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -438,7 +438,7 @@
           "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-m3": "The place where",
+          "sub-m1": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -450,7 +450,7 @@
           "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-m2": "The place where",
+          "sub-m1": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -460,8 +460,8 @@
       "test_id": "16",
       "sentence": "The time when he arrived was late.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -469,7 +469,7 @@
           "C1": "late"
         },
         "sub_slots": {
-          "sub-m3": "The time when",
+          "sub-m1": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
         }
@@ -481,7 +481,7 @@
           "C1": "late"
         },
         "sub_slots": {
-          "sub-m2": "The time when",
+          "sub-m1": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
         }
@@ -491,8 +491,8 @@
       "test_id": "17",
       "sentence": "The reason why she left is unclear.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -500,7 +500,7 @@
           "C1": "unclear"
         },
         "sub_slots": {
-          "sub-m3": "The reason why",
+          "sub-m1": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
         }
@@ -512,7 +512,7 @@
           "C1": "unclear"
         },
         "sub_slots": {
-          "sub-m2": "The reason why",
+          "sub-m1": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
         }
@@ -531,7 +531,7 @@
           "C1": "clever"
         },
         "sub_slots": {
-          "sub-m3": "The way how",
+          "sub-m1": "The way how",
           "sub-s": "he",
           "sub-v": "solved"
         }
@@ -543,7 +543,7 @@
           "C1": "clever"
         },
         "sub_slots": {
-          "sub-m2": "The way how",
+          "sub-m1": "The way how",
           "sub-s": "he",
           "sub-v": "solved",
           "sub-o1": "it"
@@ -1195,7 +1195,7 @@
           "M2": "accidentally"
         },
         "sub_slots": {
-          "sub-m3": "The place where",
+          "sub-m1": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -1228,7 +1228,7 @@
           "M2": "dramatically"
         },
         "sub_slots": {
-          "sub-m3": "The time when",
+          "sub-m1": "The time when",
           "sub-s": "everything",
           "sub-v": "changed"
         }

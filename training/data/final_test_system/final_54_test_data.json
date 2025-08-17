@@ -214,7 +214,7 @@
           "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-m2": "The place where",
+          "sub-m1": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -229,7 +229,7 @@
           "C1": "late"
         },
         "sub_slots": {
-          "sub-m2": "The time when",
+          "sub-m1": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
         }
@@ -244,7 +244,7 @@
           "C1": "unclear"
         },
         "sub_slots": {
-          "sub-m2": "The reason why",
+          "sub-m1": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
         }
@@ -259,7 +259,7 @@
           "C1": "clever"
         },
         "sub_slots": {
-          "sub-m2": "The way how",
+          "sub-m1": "The way how",
           "sub-s": "he",
           "sub-v": "solved",
           "sub-o1": "it"

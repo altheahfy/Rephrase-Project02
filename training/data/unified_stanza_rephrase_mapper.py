@@ -1021,7 +1021,7 @@ class UnifiedStanzaRephraseMapper:
         elif rel_type == 'advmod':
             # 関係副詞: "The place where he lives"
             # slots["M3"] = ""  # 上位スロットは5文型エンジンに任せる
-            sub_slots["sub-m3"] = noun_phrase
+            sub_slots["sub-m1"] = noun_phrase
             if rel_subject:
                 sub_slots["sub-s"] = rel_subject.text
             sub_slots["sub-v"] = rel_verb.text
