@@ -156,6 +156,7 @@ class UnifiedStanzaRephraseMapper:
             'passive_voice',          # 受動態  
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
+            'conjunction',            # 接続詞（"as if"等）
         ]
         
         for handler in basic_handlers:
@@ -494,7 +495,7 @@ class UnifiedStanzaRephraseMapper:
         Rephrase仕様準拠：複文での正しいスロット配置
         
         重要ルール：sub-slotsが存在する場合、対応するmain slotsは空文字にする
-        例外：Aux, Vスロットは例外適用なし
+        例外：Aux, Vスロットは例外適用なし、接続詞構文では主節要素保持
         
         対応関係：
         - S ←→ sub-s (S位置の従属節)
@@ -508,6 +509,15 @@ class UnifiedStanzaRephraseMapper:
         """
         slots = result.get('slots', {})
         sub_slots = result.get('sub_slots', {})
+        
+        # 接続詞構文では主節要素を保持
+        grammar_info = result.get('grammar_info', {})
+        handler_contributions = grammar_info.get('handler_contributions', {})
+        is_conjunction = 'conjunction' in handler_contributions
+        
+        if is_conjunction:
+            self.logger.debug("🔗 接続詞構文検出: 主節要素保持")
+            return
         
         # 対応関係マッピング（Aux, V除外）
         main_to_sub_mapping = {
@@ -1124,9 +1134,19 @@ class UnifiedStanzaRephraseMapper:
         # 省略関係代名詞の処理
         elif rel_type == 'obj_omitted':
             # 省略目的語関係代名詞: "The book I read"
-            # slots["O1"] = ""  # 上位スロットは5文型エンジンに任せる
-            sub_slots["sub-o1"] = noun_phrase
+            # 🔧 修正: 従属節主語と目的語を正しく設定
+            slots["S"] = ""  # 主節主語を空に設定（先行詞は従属節に移動）
+            
+            # 先行詞テキストから[omitted]を除去
+            clean_noun_phrase = noun_phrase.replace(" [omitted]", "").replace("[omitted]", "")
+            sub_slots["sub-o1"] = clean_noun_phrase
             sub_slots["sub-v"] = rel_verb.text
+            
+            # 従属節主語を検出（関係節動詞のnsubj）
+            rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
+            if rel_subject:
+                sub_slots["sub-s"] = rel_subject.text
+                self.logger.debug(f"🔧 省略目的語関係節: sub-s = '{rel_subject.text}'")
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
@@ -2453,6 +2473,124 @@ class UnifiedStanzaRephraseMapper:
             
         return False
 
+    def _handle_conjunction(self, sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        接続詞処理ハンドラー（"as if"等の従属接続詞対応）
+        migrationエンジンからの移植版
+        """
+        self.logger.debug("接続詞ハンドラー実行中...")
+        
+        # 従属接続詞の検出（mark + advcl の組み合わせ）
+        mark_words = []
+        advcl_verbs = []
+        
+        for word in sentence.words:
+            if word.deprel == 'mark' and word.upos == 'SCONJ':
+                mark_words.append(word)
+            elif word.deprel == 'advcl':
+                advcl_verbs.append(word)
+        
+        if not mark_words or not advcl_verbs:
+            self.logger.debug("  → 接続詞構文未検出")
+            return None
+        
+        # "as if"等の複合接続詞を検出
+        conjunction_phrase = self._detect_compound_conjunction(sentence, mark_words)
+        if not conjunction_phrase:
+            self.logger.debug("  → 複合接続詞未検出")
+            return None
+        
+        self.logger.debug(f"  🔗 複合接続詞検出: '{conjunction_phrase}'")
+        
+        # 従属節の要素を抽出
+        advcl_verb = advcl_verbs[0]  # 最初のadvcl動詞を使用
+        sub_slots = self._extract_subordinate_conjunction_elements(sentence, advcl_verb, conjunction_phrase)
+        
+        # 主節は既存のbase_resultを使用（接続詞構文では移行しない）
+        main_slots = base_result.get('slots', {}) if base_result else {}
+        
+        # 従属節要素を主節から除去
+        self._remove_subordinate_elements_from_main(main_slots, sub_slots, advcl_verb)
+        
+        # M1位置に接続詞を配置（空文字列でマーク）
+        if not main_slots.get('M1'):
+            main_slots['M1'] = ''
+        
+        result = {
+            'slots': main_slots,
+            'sub_slots': sub_slots,
+            'grammar_info': {
+                'detected_patterns': ['conjunction'],
+                'conjunction_type': conjunction_phrase,
+                'subordinate_verb': advcl_verb.text
+            }
+        }
+        
+        self.logger.debug(f"  ✅ 接続詞処理完了: {len(sub_slots)}個の従属節要素")
+        return result
+    
+    def _detect_compound_conjunction(self, sentence, mark_words) -> Optional[str]:
+        """複合接続詞の検出（"as if"等）"""
+        if len(mark_words) < 2:
+            return None
+        
+        # 連続するmark wordを検出
+        mark_words.sort(key=lambda x: x.id)
+        
+        # "as if"パターンの検出
+        for i in range(len(mark_words) - 1):
+            word1 = mark_words[i]
+            word2 = mark_words[i + 1]
+            
+            # 連続する位置にある場合
+            if word2.id == word1.id + 1:
+                phrase = f"{word1.text} {word2.text}"
+                if phrase.lower() in ['as if', 'even if', 'as though']:
+                    return phrase
+        
+        return None
+    
+    def _extract_subordinate_conjunction_elements(self, sentence, advcl_verb, conjunction_phrase) -> Dict[str, str]:
+        """従属節要素の抽出"""
+        sub_slots = {}
+        
+        # 接続詞をsub-m1に配置
+        sub_slots['sub-m1'] = conjunction_phrase
+        
+        # 従属節の主語
+        for word in sentence.words:
+            if word.head == advcl_verb.id and word.deprel == 'nsubj':
+                sub_slots['sub-s'] = word.text
+                break
+        
+        # 従属節の動詞
+        sub_slots['sub-v'] = advcl_verb.text
+        
+        # 従属節の目的語
+        for word in sentence.words:
+            if word.head == advcl_verb.id and word.deprel == 'obj':
+                sub_slots['sub-o1'] = word.text
+                break
+        
+        return sub_slots
+
+    def _remove_subordinate_elements_from_main(self, main_slots: Dict[str, str], sub_slots: Dict[str, str], advcl_verb) -> None:
+        """従属節要素を主節から除去（主節の主語・動詞は保持）"""
+        # 従属節にのみ存在する要素を特定
+        subordinate_only_elements = set()
+        
+        # 従属節の目的語・補語等（主語・動詞以外）を取得
+        for sub_key, sub_value in sub_slots.items():
+            if sub_value and sub_key.startswith('sub-') and sub_key not in ['sub-m1', 'sub-s', 'sub-v']:
+                subordinate_only_elements.add(sub_value.lower())
+        
+        # 主節スロットから従属節にのみ存在する要素を除去
+        for main_key, main_value in list(main_slots.items()):
+            if main_value and main_value.lower() in subordinate_only_elements:
+                main_slots[main_key] = ''
+                self.logger.debug(f"  🔄 従属節専用要素を主節から除去: {main_key}='{main_value}' → ''")
+
+
 # =============================================================================
 # Phase 0 テスト用 基本テストハーネス
 # =============================================================================
@@ -2669,8 +2807,7 @@ def clean_result_for_json(result: Dict) -> Dict:
                 return str(obj)[:200]  # 最大200文字
             except:
                 return "<unrepresentable_object>"
-    
-    return clean_value(result)
+
 
 def process_batch_sentences(input_file: str, output_file: str = None) -> str:
     """
