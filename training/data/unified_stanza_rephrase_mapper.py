@@ -485,8 +485,17 @@ class UnifiedStanzaRephraseMapper:
                 # 本来の関係節補語を探す
                 if 'red' in sentence.lower():
                     result['sub_slots']['sub-c1'] = 'red'
+            
+            # 助動詞ハンドラーが検出した主文動詞を適用
+            detected_patterns = result.get('grammar_info', {}).get('detected_patterns', [])
+            if 'passive_voice' in detected_patterns:
+                passive_info = result.get('grammar_info', {}).get('handler_contributions', {}).get('passive_voice', {})
+                if passive_info and 'main_verb' in passive_info:
+                    main_verb_from_passive = passive_info['main_verb']
+                    result['slots']['V'] = main_verb_from_passive
+                    self.logger.debug(f"🔧 whose構文: 受動態動詞修正 V='{main_verb_from_passive}'")
                     
-            self.logger.debug(f"🔧 whose構文後処理: 主文V={main_verb}, S={result['slots'].get('S')}")
+            self.logger.debug(f"🔧 whose構文後処理: 主文V={result['slots'].get('V')}, S={result['slots'].get('S')}")
         
         return result
     
@@ -729,25 +738,10 @@ class UnifiedStanzaRephraseMapper:
         has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
         
         if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
-            # whose構文でacl:relcl語がメイン動詞候補の場合は関係節なしと判定
-            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if (acl_relcl_word and 
-                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes', 'sits', 'stands']):
-                self.logger.debug(f"🔧 whose構文: {acl_relcl_word.text}をメイン動詞として処理（関係節ではない）")
-                
-                # ただし、真の関係節（whose car is red部分）が存在する場合は処理する
-                # cop関係のbe動詞があるかチェック
-                cop_verb = None
-                for word in sentence.words:
-                    if word.deprel == 'cop':
-                        cop_verb = word
-                        break
-                
-                if cop_verb:
-                    self.logger.debug(f"🔧 whose構文内の真の関係節検出: cop動詞 {cop_verb.text}")
-                    return True  # 真の関係節が存在
-                else:
-                    return False  # 関係節ではなくメイン動詞
+            # whose構文では常に関係節として処理
+            # 主文動詞と関係節動詞を適切に分離することで対応
+            self.logger.debug(f"🔧 whose構文: 関係節として処理開始")
+            return True
         
         return has_acl_relcl
     
@@ -1309,23 +1303,37 @@ class UnifiedStanzaRephraseMapper:
                         self.logger.debug(f"🔧 ハイブリッド解析: 主文動詞として {word.text} を使用 (補正済み)")
                         return word
         
-        # whose構文の特別処理：Stanzaがlivesを誤解析する場合の対応
-        if any(w.text.lower() == 'whose' for w in sentence.words):
-            # acl:relcl関係にある語を確認
-            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if (acl_relcl_word and 
-                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes'] and
-                acl_relcl_word.lemma in ['live', 'work', 'run', 'go']):
-                # これは動詞として解釈すべき
-                self.logger.debug(f"🔧 whose構文: 主文動詞として {acl_relcl_word.text} を使用")
-                return acl_relcl_word
-        
-        # 通常の場合：rootを検索
+        # 通常の場合：rootを検索（whose構文でも先にチェック）
         root_word = None
         for word in sentence.words:
             if word.head == 0:  # root
                 root_word = word
                 break
+        
+        # whose構文の特別処理：rootが存在せず、acl:relcl語がメイン動詞候補の場合のみ
+        if any(w.text.lower() == 'whose' for w in sentence.words) and not root_word:
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if (acl_relcl_word and 
+                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes'] and
+                acl_relcl_word.lemma in ['live', 'work', 'run', 'go']):
+                self.logger.debug(f"🔧 whose構文: 主文動詞として {acl_relcl_word.text} を使用")
+                return acl_relcl_word
+        
+        # 通常の場合：rootを検索（whose構文でも先にチェック）
+        root_word = None
+        for word in sentence.words:
+            if word.head == 0:  # root
+                root_word = word
+                break
+        
+        # whose構文の特別処理：rootが存在せず、acl:relcl語がメイン動詞候補の場合のみ
+        if any(w.text.lower() == 'whose' for w in sentence.words) and not root_word:
+            acl_relcl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+            if (acl_relcl_word and 
+                acl_relcl_word.text.lower() in ['lives', 'works', 'runs', 'goes'] and
+                acl_relcl_word.lemma in ['live', 'work', 'run', 'go']):
+                self.logger.debug(f"🔧 whose構文: 主文動詞として {acl_relcl_word.text} を使用")
+                return acl_relcl_word
         
         if not root_word:
             return None
