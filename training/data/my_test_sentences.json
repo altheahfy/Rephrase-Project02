@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "total_count": 5,
+    "description": "カスタム例文テスト"
+  },
+  "data": {
+    "1": {
+      "sentence": "She works carefully.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "works",
+          "M2": "carefully"
+        },
+        "sub_slots": {}
+      }
+    },
+    "2": {
+      "sentence": "The book is interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "V": "is",
+          "C1": "interesting"
+        },
+        "sub_slots": {}
+      }
+    },
+    "3": {
+      "sentence": "I give him a book.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "give",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      }
+    },
+    "4": {
+      "sentence": "He has finished his homework.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      }
+    },
+    "5": {
+      "sentence": "The letter was written by John.",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M1": "by John"
+        },
+        "sub_slots": {}
+      }
+    }
+  }
+}
