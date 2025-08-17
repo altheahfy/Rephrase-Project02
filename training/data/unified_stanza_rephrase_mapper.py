@@ -1648,6 +1648,10 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("副詞なし - スキップ")
             return None
 
+        # === 複合副詞の統合処理 ===
+        # TODO: 統合処理のデバッグが必要 - 一時的に無効化
+        # adverbial_modifiers = self._merge_compound_adverbs(adverbial_modifiers, sentence)
+
         # === 2. 位置ベース動的再配置システム ===
         slots = {}
         sub_slots = {}
@@ -1895,6 +1899,95 @@ class UnifiedStanzaRephraseMapper:
         
         # 動詞からの絶対距離
         return abs(word.id - main_verb_pos)
+
+    def _merge_compound_adverbs(self, adverbial_modifiers, sentence):
+        """複合副詞の選択的統合処理"""
+        if len(adverbial_modifiers) < 2:
+            return adverbial_modifiers
+        
+        # 位置順でソート
+        sorted_modifiers = sorted(adverbial_modifiers, key=lambda x: x['position'])
+        merged_modifiers = []
+        i = 0
+        
+        while i < len(sorted_modifiers):
+            current_mod = sorted_modifiers[i]
+            
+            # 次の副詞との統合判定
+            if i + 1 < len(sorted_modifiers):
+                next_mod = sorted_modifiers[i + 1]
+                
+                # 隣接性チェック（最大2語の間隔）
+                if next_mod['position'] - current_mod['position'] <= 2:
+                    # 統合判定
+                    if self._should_merge_adverbs(current_mod['word'], next_mod['word']):
+                        # 統合実行
+                        merged_phrase = self._build_compound_phrase(current_mod, next_mod, sentence)
+                        merged_mod = {
+                            'word': current_mod['word'],  # 代表単語
+                            'type': current_mod['type'],  # 最初の副詞のタイプ
+                            'position': current_mod['position'],  # 最初の位置
+                            'position_ratio': current_mod['position_ratio'],
+                            'verb_distance': current_mod['verb_distance'],
+                            'text': merged_phrase
+                        }
+                        merged_modifiers.append(merged_mod)
+                        self.logger.debug(f"複合副詞統合: '{current_mod['text']}' + '{next_mod['text']}' → '{merged_phrase}'")
+                        i += 2  # 2つをスキップ
+                        continue
+            
+            # 統合しない場合は現在の副詞をそのまま追加
+            merged_modifiers.append(current_mod)
+            i += 1
+        
+        return merged_modifiers
+
+    def _should_merge_adverbs(self, adv1, adv2):
+        """2つの副詞が統合すべきかを判定"""
+        
+        # 程度副詞 + 一般副詞のパターン
+        degree_adverbs = {
+            'very', 'quite', 'rather', 'extremely', 'highly', 'really', 
+            'completely', 'totally', 'entirely', 'absolutely', 'perfectly',
+            'more', 'most', 'less', 'least', 'too', 'so', 'enough'
+        }
+        
+        adv1_lower = adv1.text.lower()
+        adv2_lower = adv2.text.lower()
+        
+        # 程度副詞が先頭の場合
+        if adv1_lower in degree_adverbs:
+            return True
+        
+        # 特定の慣用句パターン
+        common_phrases = {
+            ('right', 'now'), ('just', 'then'), ('just', 'now'),
+            ('even', 'more'), ('much', 'more'), ('far', 'more'),
+            ('quite', 'well'), ('very', 'well'), ('right', 'here'),
+            ('right', 'there'), ('just', 'here'), ('over', 'there')
+        }
+        
+        if (adv1_lower, adv2_lower) in common_phrases:
+            return True
+        
+        # 比較級構文
+        if adv1_lower in ['more', 'most', 'less', 'least']:
+            return True
+        
+        return False  # デフォルトは統合しない
+
+    def _build_compound_phrase(self, mod1, mod2, sentence):
+        """複合副詞句の構築"""
+        # 2つの副詞の間にある語も含める
+        start_pos = min(mod1['position'], mod2['position'])
+        end_pos = max(mod1['position'], mod2['position'])
+        
+        phrase_words = []
+        for word in sentence.words:
+            if start_pos <= word.id <= end_pos:
+                phrase_words.append(word.text)
+        
+        return ' '.join(phrase_words)
 
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
