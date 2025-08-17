@@ -1587,465 +1587,169 @@ class UnifiedStanzaRephraseMapper:
 
     def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
-        副詞エンジン（Phase 4実装）
-        migration_source/prepositional_phrase_engine.py の分析システムを統合に
-        統一された副詞処理を実装
-        Args:
-            sentence: Stanza sentence オブジェクト
-            base_result: 基本解析結果（既存スロット再利用）
-        Returns:
-            Optional[Dict]: 副詞処理結果、または None
+        副詞処理エンジン（migration sourceの前置詞句エンジンベース）
+        高精度な分類と配置を実装
         """
-        from enum import Enum
-
-        class AdverbialType(Enum):
-            """副詞の種類分類"""
-            TIME = "time"           # 時間副詞（M1）
-            FREQUENCY = "frequency" # 頻度副詞（M2）
-            MANNER = "manner"       # 様態副詞（M2/M3）
-            LOCATION = "location"   # 場所副詞（M2/M3）
-            DEGREE = "degree"       # 程度副詞（M2）
-
         self.logger.debug("副詞ハンドラー実行中...")
-
-        # === 既存スロット確認（既存スロット再利用）===
-        existing_slots = {}
-        if base_result and 'slots' in base_result:
-            existing_slots = base_result['slots']
-
-        # 既に割り当て済みの副詞情報を特定
+        
+        # === Migration sourceベースの分類キーワード ===
+        time_keywords = [
+            'today', 'yesterday', 'tomorrow', 'now', 'then', 'recently', 'soon',
+            'early', 'late', 'before', 'after', 'during', 'while', 'until',
+            'morning', 'afternoon', 'evening', 'night', 'day', 'week', 'month', 'year',
+            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december'
+        ]
+        
+        location_keywords = [
+            'here', 'there', 'where', 'everywhere', 'somewhere', 'nowhere',
+            'inside', 'outside', 'above', 'below', 'under', 'over', 'behind',
+            'front', 'near', 'far', 'around', 'between', 'among', 'beside',
+            'home', 'school', 'office', 'store', 'park', 'city', 'country'
+        ]
+        
+        manner_keywords = [
+            'carefully', 'quickly', 'slowly', 'gently', 'properly', 'thoroughly',
+            'successfully', 'efficiently', 'dramatically', 'academically', 'diligently'
+        ]
+        
+        # === 既存スロット確認 ===
+        existing_slots = base_result.get('slots', {}) if base_result else {}
         existing_adverbs = set()
         for slot_key, slot_value in existing_slots.items():
             if slot_key.startswith('M') and slot_value:
-                # スロット値を単語に分解して副詞を特定
-                words = slot_value.split()
-                existing_adverbs.update(words)
-
-        # === 1. 副詞候補の収集（対象副詞依存関係） ===
-        adverbial_modifiers = []
-        sentence_length = len(sentence.words)
-
+                existing_adverbs.update(slot_value.split())
+        
+        # === 副詞候補収集 ===
+        adverb_phrases = []
+        
         for word in sentence.words:
-            # 汎用副詞依存関係対象（yesterday読込バグ修正済み + obl:agent受動態エージェント追加）
-            if word.deprel in ['advmod', 'obl', 'obl:unmarked', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:unmarked', 'nmod:tmod']:
-                # 既に処理済みの副詞をスキップ
+            if word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod']:
                 if word.text in existing_adverbs:
-                    self.logger.debug(f"既存スロットに割り当て済み - スキップ: {word.text}")
                     continue
-
-                # 関係詞内の副詞は関係詞ハンドラーに委ねる（acl:relcl検索チェック）
-                head_word = next((w for w in sentence.words if w.id == word.head), None)
-                if head_word and any(w.deprel == 'acl:relcl' and w.head == head_word.id for w in sentence.words):
-                    self.logger.debug(f"関係詞内副詞を除外: {word.text} (head: {head_word.text})")
-                    continue
-
-                # 関係副詞は関係詞ハンドラーに委ねる
+                    
+                # 関係副詞除外
                 if word.text.lower() in ['where', 'when', 'why', 'how']:
                     continue
-
-                # 関係副詞構文の先行詞（The way, The place等）は関係詞ハンドラーに委ねる
-                if (word.text.lower() in ['way', 'place', 'time', 'reason'] and
-                    any(w.text.lower() in ['where', 'when', 'why', 'how'] for w in sentence.words)):
-                    self.logger.debug(f"関係副詞構文の先行詞をスキップ: {word.text}")
-                    continue
-
-                # 副詞分類
-                adv_type = self._classify_adverb(word, sentence)
                 
-                # 位置計算：動詞からの相対距離を重視
-                position_ratio = word.id / sentence_length
+                # 前置詞句構築
+                if word.deprel.startswith('obl'):
+                    phrase = self._build_prepositional_phrase(sentence, word)
+                else:
+                    phrase = word.text
                 
-                # 動詞位置を特定して、動詞からの距離を計算
-                verb_distance = self._calculate_verb_distance(word, sentence)
-
-                adverbial_modifiers.append({
-                    'word': word,
-                    'type': adv_type,
+                # 分類（migration sourceロジック）
+                category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
+                
+                adverb_phrases.append({
+                    'phrase': phrase,
+                    'category': category,
                     'position': word.id,
-                    'position_ratio': position_ratio,
-                    'verb_distance': verb_distance,
-                    'text': word.text
+                    'word': word
                 })
-
-        if not adverbial_modifiers:
+        
+        if not adverb_phrases:
             self.logger.debug("副詞なし - スキップ")
             return None
-
-        # === 複合副詞の統合処理 ===
-        # 慎重に有効化：very carefully等の度合い副詞+様態副詞パターンを統合
-        adverbial_modifiers = self._merge_compound_adverbs(adverbial_modifiers, sentence)
-
-        # === 2. 位置ベース動的再配置システム ===
+        
+        # === Migration sourceベースの配置ロジック ===
         slots = {}
         sub_slots = {}
-
-        # 位置順でソート（文中の出現順）
-        adverbial_modifiers.sort(key=lambda x: x['position'])
-
-        # 動的3スロット配置アルゴリズム
-        if len(adverbial_modifiers) == 1:
-            # 1つの場合：M2（中央）に配置
-            mod = adverbial_modifiers[0]
-            # 統合副詞の場合は統合されたテキストを使用
-            if 'text' in mod and mod['text'] != mod['word'].text:
-                phrase = mod['text']  # 統合されたフレーズ
-            else:
-                phrase = self._build_adverbial_phrase(sentence, mod['word'])
-            slots['M2'] = phrase
-            self.logger.debug(f"単一副詞M2配置: {phrase}")
+        
+        # 位置順ソート
+        adverb_phrases.sort(key=lambda x: x['position'])
+        
+        # 分類別配置（migration source準拠）
+        for phrase_info in adverb_phrases:
+            phrase = phrase_info['phrase']
+            category = phrase_info['category']
             
-        elif len(adverbial_modifiers) == 2:
-            # 2つの場合：種類に基づく優先配置
-            mod1, mod2 = adverbial_modifiers
-            
-            # mod1の処理
-            if 'text' in mod1 and mod1['text'] != mod1['word'].text:
-                phrase1 = mod1['text']
-            else:
-                phrase1 = self._build_adverbial_phrase(sentence, mod1['word'])
-            
-            # mod2の処理
-            if 'text' in mod2 and mod2['text'] != mod2['word'].text:
-                phrase2 = mod2['text']
-            else:
-                phrase2 = self._build_adverbial_phrase(sentence, mod2['word'])
-            
-            # 受動態エージェント句（by句）があるかチェック
-            agent_phrase = None
-            other_phrase = None
-            
-            if mod1['word'].deprel == 'obl:agent':
-                agent_phrase = phrase1
-                other_phrase = phrase2
-            elif mod2['word'].deprel == 'obl:agent':
-                agent_phrase = phrase2
-                other_phrase = phrase1
-            
-            if agent_phrase:
-                # 受動態エージェント句はM2優先、その他はM1
-                slots['M1'] = other_phrase
-                slots['M2'] = agent_phrase
-                self.logger.debug(f"2副詞優先配置: M1={other_phrase}, M2={agent_phrase}")
-            else:
-                # デフォルト配置: M2, M3
-                slots['M2'] = phrase1
-                slots['M3'] = phrase2
-                self.logger.debug(f"2副詞配置: M2={phrase1}, M3={phrase2}")
-            
-        elif len(adverbial_modifiers) >= 3:
-            # 3つ以上の場合：M1, M2, M3に配置（最初の3つ）
-            for i, mod in enumerate(adverbial_modifiers[:3]):
-                # 統合副詞の場合は統合されたテキストを使用
-                if 'text' in mod and mod['text'] != mod['word'].text:
-                    phrase = mod['text']
+            if category == 'time':
+                # 時間→M1（migration sourceでは時間がM1）
+                if 'M1' not in slots:
+                    slots['M1'] = phrase
+                elif 'M2' not in slots:
+                    slots['M2'] = phrase
                 else:
-                    phrase = self._build_adverbial_phrase(sentence, mod['word'])
-                slot_name = f"M{i+1}"
-                slots[slot_name] = phrase
-                self.logger.debug(f"3副詞配置: {slot_name}={phrase}")
-
-        if slots:
-            self.logger.debug(f"副詞処理結果: {len(slots)} slots detected - 位置ベース動的配置完了")
-            return {'slots': slots, 'sub_slots': sub_slots}
-        else:
-            return None
-
-    def _classify_adverb(self, word, sentence):
-        """副詞の種類分類"""
-        from enum import Enum
-
-        class AdverbialType(Enum):
-            TIME = "time"
-            FREQUENCY = "frequency"
-            MANNER = "manner"
-            LOCATION = "location"
-            DEGREE = "degree"
-
-        word_lower = word.text.lower()
-
-        # 時間副詞
-        time_adverbs = {
-            'yesterday', 'today', 'tomorrow', 'now', 'then', 'recently',
-            'currently', 'formerly', 'previously', 'eventually', 'finally',
-            'earlier', 'later', 'soon', 'immediately', 'already', 'still',
-            'ago', 'before', 'after', 'during', 'meanwhile'
-        }
-
-        # 頻度副詞
-        frequency_adverbs = {
-            'always', 'usually', 'often', 'sometimes', 'rarely', 'never',
-            'frequently', 'occasionally', 'seldom', 'constantly', 'repeatedly',
-            'once', 'twice', 'again', 'daily', 'weekly', 'monthly'
-        }
-
-        # 様態副詞
-        manner_adverbs = {
-            'carefully', 'quickly', 'slowly', 'quietly', 'loudly', 'gently',
-            'suddenly', 'gradually', 'easily', 'hardly', 'clearly', 'properly',
-            'correctly', 'incorrectly', 'well', 'badly', 'perfectly', 'seriously'
-        }
-
-        # 場所副詞
-        location_adverbs = {
-            'here', 'there', 'everywhere', 'nowhere', 'somewhere', 'anywhere',
-            'upstairs', 'downstairs', 'outside', 'inside', 'nearby', 'far',
-            'home', 'abroad', 'locally', 'globally'
-        }
-
-        # 程度副詞
-        degree_adverbs = {
-            'very', 'quite', 'rather', 'extremely', 'completely', 'totally',
-            'partially', 'slightly', 'barely', 'almost', 'entirely', 'mostly',
-            'too', 'enough', 'highly', 'deeply'
-        }
-
-        # 分類実行
-        if word_lower in time_adverbs:
-            return AdverbialType.TIME
-        elif word_lower in frequency_adverbs:
-            return AdverbialType.FREQUENCY
-        elif word_lower in manner_adverbs:
-            return AdverbialType.MANNER
-        elif word_lower in location_adverbs:
-            return AdverbialType.LOCATION
-        elif word_lower in degree_adverbs:
-            return AdverbialType.DEGREE
-        else:
-            # デフォルト（品詞ベース判定）
-            if word.upos == 'ADV':
-                return AdverbialType.MANNER  # 副詞は様態として扱う
+                    slots['M3'] = phrase
+            elif category == 'location':
+                # 場所→M2
+                if 'M2' not in slots:
+                    slots['M2'] = phrase
+                elif 'M3' not in slots:
+                    slots['M3'] = phrase
+                else:
+                    slots['M1'] = phrase
+            elif category == 'manner':
+                # 様態→M3
+                if 'M3' not in slots:
+                    slots['M3'] = phrase
+                elif 'M2' not in slots:
+                    slots['M2'] = phrase
+                else:
+                    slots['M1'] = phrase
             else:
-                return AdverbialType.LOCATION  # 名詞句は場所として扱う
-
-    def _determine_adverb_slot(self, adv_type, position_ratio, verb_distance=None) -> str:
-        """
-        副詞タイプと動詞からの距離に基づくスロット決定
+                # その他→空きスロットに順次配置
+                for slot in ['M1', 'M2', 'M3']:
+                    if slot not in slots:
+                        slots[slot] = phrase
+                        break
         
-        修正ルール：「動詞からの距離」を厳密に適用 + 「文中央からの距離」併用
-        - 動詞から1語以内：M1優先（最近接）
-        - 動詞から2-3語：M2（動詞周辺）
-        - 動詞から4語以上：位置に応じてM2またはM3
-        """
-        from enum import Enum
-
-        class AdverbialType(Enum):
-            TIME = "time"
-            FREQUENCY = "frequency"
-            MANNER = "manner"
-            LOCATION = "location"
-            DEGREE = "degree"
-
-        # 動詞からの距離がある場合はそれを最優先
-        if verb_distance is not None:
-            self.logger.debug(f"  距離判定: verb_distance={verb_distance}, position_ratio={position_ratio:.2f}")
-            
-            # 動詞から1語以内は最近接としてM1を最優先
-            if verb_distance <= 1:
-                return 'M1'
-            
-            # 動詞から2-3語は動詞周辺としてM2優先
-            elif verb_distance <= 3:
-                return 'M2'
-            
-            # 動詞から遠い場合（4語以上）は位置で判定
-            else:
-                if position_ratio < 0.4:  # 文頭40%はM1
-                    return 'M1'
-                elif position_ratio > 0.6:  # 文尾40%はM3
-                    # 時間副詞は例外的にM1優先（"yesterday"等）
-                    if adv_type == AdverbialType.TIME:
-                        return 'M1'
-                    else:
-                        return 'M3'
-                else:  # 中間部分はM2
-                    return 'M2'
+        self.logger.debug(f"副詞配置完了: {slots}")
+        return {'slots': slots, 'sub_slots': sub_slots}
+    
+    def _build_prepositional_phrase(self, sentence, word):
+        """前置詞句の構築（migration sourceベース）"""
+        # 前置詞句の完全構築
+        phrase_parts = []
         
-        # フォールバック：従来の文中央からの距離
-        distance_from_center = abs(position_ratio - 0.5)
-        
-        # 文中央に近い場合はM2を優先
-        if distance_from_center <= 0.2:  # 中央±20%範囲
-            return 'M2'
-        
-        # 文の中央から遠い場合
-        if position_ratio < 0.5:  # 文頭寄り
-            return 'M1'
-        else:  # 文尾寄り
-            # 時間副詞は例外的にM1優先
-            if adv_type == AdverbialType.TIME:
-                return 'M1'
-            else:
-                return 'M3'
-
-    def _build_adverbial_phrase(self, sentence, main_word):
-        """副詞句の構築（前置詞句対応）"""
-        # 修飾語収集
-        modifiers = []
-        for word in sentence.words:
-            if word.head == main_word.id:
-                if word.deprel in ['det', 'amod', 'case', 'compound', 'nmod']:
-                    modifiers.append(word)
-        
-        # 前置詞句の場合、前置詞も含める
-        prep_words = []
-        for word in sentence.words:
-            if word.deprel == 'case' and word.head == main_word.id:
-                prep_words.append(word)
-        
-        # byの動作主句の場合、特別処理
-        if main_word.deprel == 'obl:agent':
-            # 前置詞句全体を構築（by + 修飾語 + 名詞）
-            phrase_words = []
-            
-            # byを探す
-            by_word = None
-            for word in sentence.words:
-                if word.text.lower() == 'by' and word.deprel == 'case' and word.head == main_word.id:
-                    by_word = word
-                    break
-            
-            if by_word:
-                phrase_words.append(by_word)
-            
-            # 修飾語を追加（by以外）
-            for modifier in modifiers:
-                if modifier.text.lower() != 'by':  # byの重複を避ける
-                    phrase_words.append(modifier)
-            
-            # メイン語を追加
-            phrase_words.append(main_word)
-            
-            # ID順ソート
-            phrase_words.sort(key=lambda w: w.id)
-            return ' '.join(word.text for word in phrase_words)
-
-        if not modifiers:
-            return main_word.text
-
-        # 修飾語をID順でソート（語順通り）
-        modifiers.sort(key=lambda w: w.id)
-        
-        # 句構築: 修飾語 + メイン語
-        phrase_words = modifiers + [main_word]
-        phrase_words.sort(key=lambda w: w.id)
-
-        return ' '.join(word.text for word in phrase_words)
-
-    def _calculate_verb_distance(self, word, sentence):
-        """動詞からの距離を計算"""
-        # メイン動詞を検索（複数の条件でチェック）
-        main_verb_pos = None
-        
-        # 1. ROOTの動詞を探す
+        # 前置詞を探す
+        preposition = None
         for w in sentence.words:
-            if w.deprel == 'ROOT' and w.upos == 'VERB':
-                main_verb_pos = w.id
+            if w.head == word.id and w.deprel == 'case':
+                preposition = w.text
                 break
         
-        # 2. ROOTが見つからない場合、コピュラ動詞を探す
-        if main_verb_pos is None:
-            for w in sentence.words:
-                if w.deprel == 'cop' and w.upos == 'AUX':
-                    main_verb_pos = w.id
-                    break
+        if preposition:
+            phrase_parts.append(preposition)
         
-        # 3. それでも見つからない場合、最初の動詞を使用
-        if main_verb_pos is None:
-            for w in sentence.words:
-                if w.upos in ['VERB', 'AUX']:
-                    main_verb_pos = w.id
-                    break
+        # 修飾語を収集
+        modifiers = []
+        for w in sentence.words:
+            if w.head == word.id and w.deprel in ['det', 'amod', 'compound']:
+                modifiers.append((w.id, w.text))
         
-        # 4. 実際に動詞に修飾されている副詞の場合、その動詞との距離を計算
-        if word.deprel == 'advmod':
-            head_word = next((w for w in sentence.words if w.id == word.head), None)
-            if head_word and head_word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める(livesがNOUNの場合)
-                return abs(word.id - head_word.id)
+        # 位置順ソート
+        modifiers.sort()
+        phrase_parts.extend([mod[1] for mod in modifiers])
+        phrase_parts.append(word.text)
         
-        if main_verb_pos is None:
-            # 動詞が見つからない場合は位置ベースの距離を返す
-            return abs(word.id - len(sentence.words) / 2)
+        return ' '.join(phrase_parts)
+    
+    def _classify_adverbial_phrase(self, phrase, time_keywords, location_keywords, manner_keywords):
+        """Migration sourceベースの分類"""
+        phrase_lower = phrase.lower()
         
-        # 動詞からの絶対距離
-        return abs(word.id - main_verb_pos)
+        # 時間判定
+        if any(keyword in phrase_lower for keyword in time_keywords):
+            return 'time'
+        
+        # 場所判定
+        if any(keyword in phrase_lower for keyword in location_keywords):
+            return 'location'
+        
+        # 様態判定
+        if any(keyword in phrase_lower for keyword in manner_keywords):
+            return 'manner'
+        
+        # by句は動作主→M1優先
+        if phrase_lower.startswith('by '):
+            return 'agent'
+        
+        return 'other'
 
-    def _merge_compound_adverbs(self, adverbial_modifiers, sentence):
-        """複合副詞の選択的統合処理"""
-        if len(adverbial_modifiers) < 2:
-            return adverbial_modifiers
-        
-        # 位置順でソート
-        sorted_modifiers = sorted(adverbial_modifiers, key=lambda x: x['position'])
-        merged_modifiers = []
-        i = 0
-        
-        while i < len(sorted_modifiers):
-            current_mod = sorted_modifiers[i]
-            
-            # 次の副詞との統合判定
-            if i + 1 < len(sorted_modifiers):
-                next_mod = sorted_modifiers[i + 1]
-                
-                # 隣接性チェック（最大2語の間隔）
-                if next_mod['position'] - current_mod['position'] <= 2:
-                    # 統合判定
-                    if self._should_merge_adverbs(current_mod['word'], next_mod['word']):
-                        # 統合実行
-                        merged_phrase = self._build_compound_phrase(current_mod, next_mod, sentence)
-                        merged_mod = {
-                            'word': current_mod['word'],  # 代表単語
-                            'type': current_mod['type'],  # 最初の副詞のタイプ
-                            'position': current_mod['position'],  # 最初の位置
-                            'position_ratio': current_mod['position_ratio'],
-                            'verb_distance': current_mod['verb_distance'],
-                            'text': merged_phrase
-                        }
-                        merged_modifiers.append(merged_mod)
-                        self.logger.debug(f"複合副詞統合: '{current_mod['text']}' + '{next_mod['text']}' → '{merged_phrase}'")
-                        i += 2  # 2つをスキップ
-                        continue
-            
-            # 統合しない場合は現在の副詞をそのまま追加
-            merged_modifiers.append(current_mod)
-            i += 1
-        
-        return merged_modifiers
-
-    def _should_merge_adverbs(self, adv1, adv2):
-        """2つの副詞が統合すべきかを判定"""
-        
-        # 程度副詞 + 一般副詞のパターン
-        degree_adverbs = {
-            'very', 'quite', 'rather', 'extremely', 'highly', 'really', 
-            'completely', 'totally', 'entirely', 'absolutely', 'perfectly',
-            'more', 'most', 'less', 'least', 'too', 'so', 'enough'
-        }
-        
-        adv1_lower = adv1.text.lower()
-        adv2_lower = adv2.text.lower()
-        
-        # 程度副詞が先頭の場合
-        if adv1_lower in degree_adverbs:
-            return True
-        
-        # 特定の慣用句パターン
-        common_phrases = {
-            ('right', 'now'), ('just', 'then'), ('just', 'now'),
-            ('even', 'more'), ('much', 'more'), ('far', 'more'),
-            ('quite', 'well'), ('very', 'well'), ('right', 'here'),
-            ('right', 'there'), ('just', 'here'), ('over', 'there')
-        }
-        
-        if (adv1_lower, adv2_lower) in common_phrases:
-            return True
-        
-        # 比較級構文
-        if adv1_lower in ['more', 'most', 'less', 'least']:
-            return True
-        
-        return False  # デフォルトは統合しない
-
-    def _build_compound_phrase(self, mod1, mod2, sentence):
+    # ==== PASSIVE VOICE HANDLER ====
         """複合副詞句の構築"""
         # 2つの副詞の間にある語も含める
         start_pos = min(mod1['position'], mod2['position'])
