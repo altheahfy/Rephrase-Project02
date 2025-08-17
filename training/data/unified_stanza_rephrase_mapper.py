@@ -1134,19 +1134,22 @@ class UnifiedStanzaRephraseMapper:
         # 省略関係代名詞の処理
         elif rel_type == 'obj_omitted':
             # 省略目的語関係代名詞: "The book I read"
-            # 🔧 修正: 従属節主語と目的語を正しく設定
+            # 🔧 修正: 関係節全体を構築
             slots["S"] = ""  # 主節主語を空に設定（先行詞は従属節に移動）
             
             # 先行詞テキストから[omitted]を除去
             clean_noun_phrase = noun_phrase.replace(" [omitted]", "").replace("[omitted]", "")
-            sub_slots["sub-o1"] = clean_noun_phrase
-            sub_slots["sub-v"] = rel_verb.text
             
             # 従属節主語を検出（関係節動詞のnsubj）
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
             if rel_subject:
+                sub_slots["sub-o1"] = clean_noun_phrase
                 sub_slots["sub-s"] = rel_subject.text
+                sub_slots["sub-v"] = rel_verb.text
                 self.logger.debug(f"🔧 省略目的語関係節: sub-s = '{rel_subject.text}'")
+            else:
+                sub_slots["sub-o1"] = clean_noun_phrase
+                sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
