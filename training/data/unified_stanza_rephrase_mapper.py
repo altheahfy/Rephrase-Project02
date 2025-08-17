@@ -2873,8 +2873,17 @@ def process_batch_sentences(input_file: str, output_file: str = None) -> str:
                 # 文解析実行
                 result = mapper.process(sentence)
                 
-                # JSON出力用クリーンアップ
-                clean_result = clean_result_for_json(result)
+                # 基本スロット情報のみ抽出（循環参照問題を回避）
+                clean_result = {
+                    "sentence": result.get("sentence", ""),
+                    "slots": result.get("slots", {}),
+                    "sub_slots": result.get("sub_slots", {}),
+                    "meta": {
+                        "processing_time": result.get("meta", {}).get("processing_time", 0.0),
+                        "sentence_id": result.get("meta", {}).get("sentence_id", 0),
+                        "active_handlers": result.get("meta", {}).get("active_handlers", 0)
+                    }
+                }
                 
                 results["results"][test_id] = {
                     "sentence": sentence,
@@ -2902,8 +2911,17 @@ def process_batch_sentences(input_file: str, output_file: str = None) -> str:
                 print(f"Processing [{i+1}]: {sentence}")
                 result = mapper.process(sentence)
                 
-                # JSON出力用クリーンアップ
-                clean_result = clean_result_for_json(result)
+                # 基本スロット情報のみ抽出（循環参照問題を回避）
+                clean_result = {
+                    "sentence": result.get("sentence", ""),
+                    "slots": result.get("slots", {}),
+                    "sub_slots": result.get("sub_slots", {}),
+                    "meta": {
+                        "processing_time": result.get("meta", {}).get("processing_time", 0.0),
+                        "sentence_id": result.get("meta", {}).get("sentence_id", 0),
+                        "active_handlers": result.get("meta", {}).get("active_handlers", 0)
+                    }
+                }
                 
                 results["results"][str(i+1)] = {
                     "sentence": sentence,

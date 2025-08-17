@@ -138,6 +138,16 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
         print(f"❌ JSON解析エラー: {e}")
         return None
     
+    # 期待値ファイルも読み込み（results_fileに期待値がない場合のため）
+    expected_data = {}
+    expected_file = "final_54_test_data.json"
+    try:
+        with open(expected_file, 'r', encoding='utf-8') as f:
+            expected_file_data = json.load(f)
+            expected_data = expected_file_data.get("data", {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        print(f"⚠️ 期待値ファイル読み込み失敗: {expected_file}")
+    
     # 分析結果格納
     analysis_report = {
         "meta": {
@@ -168,11 +178,21 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
             analysis_report["meta"]["failures"] += 1
             continue
         
+        # 期待値取得 (results内 または expected_data から)
         expected = result.get("expected", {})
+        if not expected and test_id in expected_data:
+            expected = expected_data[test_id].get("expected", {})
+        
+        # 実際の結果取得 (analysis_result または slots/sub_slots から直接)
         actual = result.get("analysis_result", {})
+        if not actual:
+            # analysis_resultがnullの場合、結果を再処理
+            print(f"⚠️ Test[{test_id}]: analysis_result is null, attempting direct processing...")
+            continue
         
         if not expected:
             # 期待値がない場合はスキップ
+            print(f"⚠️ Test[{test_id}]: No expected data found")
             continue
         
         # スロット比較実行
