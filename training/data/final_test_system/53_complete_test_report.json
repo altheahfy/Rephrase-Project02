@@ -2,8 +2,8 @@
   "meta": {
     "total_tests": 53,
     "perfect_matches": 19,
-    "partial_matches": 17,
-    "failures": 17,
+    "partial_matches": 18,
+    "failures": 16,
     "accuracy": 35.84905660377358
   },
   "results": [
@@ -467,7 +467,7 @@
           "S": "",
           "V": "was",
           "C1": "late",
-          "M1": "late"
+          "M2": "late"
         },
         "sub_slots": {
           "sub-m1": "The time when",
@@ -822,7 +822,7 @@
           "S": "The students",
           "V": "study",
           "M1": "hard",
-          "M2": "for exams"
+          "M3": "for exams"
         },
         "sub_slots": {}
       },
@@ -865,8 +865,8 @@
       "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
       "main_match": true,
-      "sub_match": false,
-      "perfect": false,
+      "sub_match": true,
+      "perfect": true,
       "system_output": {
         "main_slots": {
           "S": "",
@@ -874,11 +874,11 @@
           "C1": "famous"
         },
         "sub_slots": {
-          "sub-m2": "carefully",
+          "sub-m2": "by Shakespeare",
           "sub-s": "The book which",
           "sub-aux": "was",
           "sub-v": "written",
-          "sub-m1": "by Shakespeare"
+          "sub-m1": "carefully"
         }
       },
       "expected": {
@@ -935,7 +935,7 @@
       "test_id": "33",
       "sentence": "The letter which was slowly typed by the secretary arrived today.",
       "main_match": false,
-      "sub_match": false,
+      "sub_match": true,
       "perfect": false,
       "system_output": {
         "main_slots": {
@@ -944,11 +944,11 @@
           "M1": "today"
         },
         "sub_slots": {
-          "sub-m2": "slowly",
+          "sub-m2": "by the secretary",
           "sub-s": "The letter which",
           "sub-aux": "was",
           "sub-v": "typed",
-          "sub-m1": "by the secretary"
+          "sub-m1": "slowly"
         }
       },
       "expected": {
@@ -1043,7 +1043,7 @@
           "S": "",
           "V": "saves",
           "O1": "lives",
-          "M3": "successfully"
+          "M1": "successfully"
         },
         "sub_slots": {
           "sub-m2": "carefully",
@@ -1077,8 +1077,8 @@
           "S": "The window",
           "Aux": "was",
           "V": "opened",
-          "M1": "morning",
-          "M3": "gently"
+          "M1": "gently",
+          "M3": "morning"
         },
         "sub_slots": {}
       },
@@ -1104,8 +1104,7 @@
           "S": "The message",
           "Aux": "is being",
           "V": "written",
-          "M1": "by the manager",
-          "M3": "carefully"
+          "M1": "carefully"
         },
         "sub_slots": {}
       },
@@ -1131,8 +1130,7 @@
           "S": "The problem",
           "Aux": "was",
           "V": "solved",
-          "M1": "by the team",
-          "M3": "quickly"
+          "M1": "quickly"
         },
         "sub_slots": {}
       },
@@ -1274,17 +1272,17 @@
     {
       "test_id": "44",
       "sentence": "The teacher explains grammar clearly to confused students daily.",
-      "main_match": true,
+      "main_match": false,
       "sub_match": true,
-      "perfect": true,
+      "perfect": false,
       "system_output": {
         "main_slots": {
           "S": "The teacher",
           "V": "explains",
           "O1": "grammar",
           "M1": "clearly",
-          "M2": "to confused students",
-          "M3": "daily"
+          "M3": "to confused students",
+          "M2": "daily"
         },
         "sub_slots": {}
       },
@@ -1311,8 +1309,8 @@
           "S": "The student",
           "V": "writes",
           "O1": "essays",
-          "M3": "carefully",
-          "M1": "for better grades"
+          "M1": "carefully",
+          "M3": "for better grades"
         },
         "sub_slots": {}
       },
@@ -1338,8 +1336,7 @@
           "S": "",
           "Aux": "was",
           "V": "published",
-          "M1": "by experts",
-          "M3": "successfully"
+          "M1": "successfully"
         },
         "sub_slots": {
           "sub-m2": "thoroughly",
@@ -1375,7 +1372,7 @@
         "main_slots": {
           "S": "",
           "V": "improved",
-          "M3": "dramatically"
+          "M1": "dramatically"
         },
         "sub_slots": {
           "sub-m2": "carefully",
@@ -1409,8 +1406,8 @@
         "main_slots": {
           "S": "",
           "V": "works",
-          "M3": "efficiently",
-          "M1": "every day"
+          "M1": "efficiently",
+          "M3": "every day"
         },
         "sub_slots": {
           "sub-m2": "properly",
@@ -1446,8 +1443,8 @@
           "S": "The team",
           "V": "completed",
           "O1": "",
-          "M3": "successfully",
-          "M1": "yesterday"
+          "M1": "successfully",
+          "M3": "yesterday"
         },
         "sub_slots": {
           "sub-o1": "The team [omitted]",
@@ -1482,8 +1479,8 @@
           "Aux": "was"
         },
         "sub_slots": {
-          "sub-m2": "near the door",
-          "sub-m3": "door",
+          "sub-m2": "near",
+          "sub-m3": "near the door",
           "sub-o1": "The woman [omitted]",
           "sub-v": "standing",
           "sub-m1": "quietly"
@@ -1514,7 +1511,7 @@
           "S": "The children",
           "Aux": "were",
           "V": "supervised",
-          "M3": "carefully"
+          "M1": "carefully"
         },
         "sub_slots": {
           "sub-m2": "in the garden",

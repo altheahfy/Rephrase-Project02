@@ -1635,16 +1635,21 @@ class UnifiedStanzaRephraseMapper:
         main_verb_id = self._find_main_verb(sentence)
         subordinate_verbs = self._find_subordinate_verbs(sentence, main_verb_id)
         
-        # === 副詞候補収集（拡張検出） ===
+        # === 副詞候補収集（Migration source優秀機能活用）===
         adverb_phrases = []
+        processed_positions = set()
+        processed_phrases = set()  # 重複フレーズ防止
         
         self.logger.debug("🔍 副詞候補スキャン開始...")
         for word in sentence.words:
-            # 拡張副詞検出ルール
+            # Migration source拡張検出ルール（優秀な部分を活用）
             is_adverb = (
                 word.deprel in ['advmod', 'obl', 'obl:tmod', 'obl:npmod', 'obl:agent', 'nmod:tmod'] or
                 word.upos == 'ADV' or  # POS-based detection
-                word.text.lower() in time_keywords  # Direct keyword matching
+                word.text.lower() in time_keywords or  # Direct keyword matching
+                word.text.lower() in manner_keywords or  # Manner keywords
+                word.text.lower() in location_keywords or  # Location keywords
+                (word.deprel == 'nmod' and word.text.lower() in ['yesterday', 'today', 'tomorrow'])  # Time nouns
             )
             
             self.logger.debug(f"  {word.text}: deprel={word.deprel}, upos={word.upos}, is_adverb={is_adverb}")
@@ -1654,21 +1659,40 @@ class UnifiedStanzaRephraseMapper:
                     self.logger.debug(f"    → 除外（既存副詞）: {word.text}")
                     continue
                     
+                # 重複除去（Migration source優秀機能）
+                if word.id in processed_positions:
+                    self.logger.debug(f"    → 除外（重複位置）: {word.text}")
+                    continue
+                    
                 # 関係副詞除外
                 if word.text.lower() in ['where', 'when', 'why', 'how']:
                     self.logger.debug(f"    → 除外（関係副詞）: {word.text}")
                     continue
                 
-                # 前置詞句構築
+                # Migration source前置詞句構築機能活用
                 if word.deprel.startswith('obl'):
                     phrase = self._build_prepositional_phrase(sentence, word)
+                    # 前置詞句の全tokens記録（重複回避）
+                    phrase_words = phrase.split()
+                    for pw in phrase_words:
+                        for w in sentence.words:
+                            if w.text == pw:
+                                processed_positions.add(w.id)
                 else:
                     phrase = word.text
+                    processed_positions.add(word.id)
                 
-                # 分類（migration sourceロジック）
+                # 重複フレーズチェック
+                if phrase in processed_phrases:
+                    self.logger.debug(f"    → 除外（重複フレーズ）: {phrase}")
+                    continue
+                
+                processed_phrases.add(phrase)
+                
+                # Migration source分類システム活用
                 category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
                 
-                # 文脈分析: 主節 vs 従属節
+                # 文脈分析: 主節 vs 従属節（Migration source判定ロジック）
                 context = self._determine_adverb_context(word, main_verb_id, subordinate_verbs, sentence)
                 
                 self.logger.debug(f"    → 検出: phrase='{phrase}', category={category}, context={context}")
@@ -1684,67 +1708,70 @@ class UnifiedStanzaRephraseMapper:
         if not adverb_phrases:
             self.logger.debug("副詞なし - スキップ")
             return None
-        
-        # === 文脈別スロット配置ロジック ===
+
+        # === Rephrase仕様配置ロジック（Migration source機能活用） ===
         slots = {}
         sub_slots = {}
         
         # 位置順ソート
         adverb_phrases.sort(key=lambda x: x['position'])
         
-        # 主節・従属節別カウンター
-        main_counters = {'M1': 0, 'M2': 0, 'M3': 0}
-        sub_counters = {'sub-m1': 0, 'sub-m2': 0, 'sub-m3': 0}
-        
-        # 文脈別配置
+        # 文脈別配置（Rephrase仕様：文の中央からの距離原理）
         for phrase_info in adverb_phrases:
             phrase = phrase_info['phrase']
             category = phrase_info['category']
             context = phrase_info['context']
+            position = phrase_info['position']
             
             if context == 'subordinate':
-                # 従属節副詞→sub-m*スロット
-                if category == 'time':
-                    sub_counters['sub-m1'] += 1
-                    slot_key = f"sub-m{sub_counters['sub-m1']}" if sub_counters['sub-m1'] <= 3 else 'sub-m3'
-                elif category == 'manner':
-                    sub_counters['sub-m1'] += 1  # 様態副詞は sub-m1 優先
-                    slot_key = f"sub-m{sub_counters['sub-m1']}" if sub_counters['sub-m1'] <= 3 else 'sub-m3'
-                elif category == 'agent':  # by句
-                    sub_counters['sub-m2'] += 1
-                    slot_key = f"sub-m{sub_counters['sub-m2']}" if sub_counters['sub-m2'] <= 3 else 'sub-m3'
+                # 従属節副詞→sub-m*スロット（Migration source分類活用、重複回避）
+                if category == 'agent':  # by句は sub-m2 優先
+                    if 'sub-m2' not in sub_slots:
+                        sub_slots['sub-m2'] = phrase
+                    elif 'sub-m1' not in sub_slots:
+                        sub_slots['sub-m1'] = phrase
+                    elif 'sub-m3' not in sub_slots:
+                        sub_slots['sub-m3'] = phrase
+                elif category in ['manner', 'time']:  # 様態・時間副詞は sub-m1 優先
+                    if 'sub-m1' not in sub_slots:
+                        sub_slots['sub-m1'] = phrase
+                    elif 'sub-m2' not in sub_slots:
+                        sub_slots['sub-m2'] = phrase
+                    elif 'sub-m3' not in sub_slots:
+                        sub_slots['sub-m3'] = phrase
                 else:
                     # その他→空きsub-mスロット
-                    for i in [1, 2, 3]:
-                        if f'sub-m{i}' not in sub_slots:
-                            slot_key = f'sub-m{i}'
+                    for slot_num in [1, 2, 3]:
+                        if f'sub-m{slot_num}' not in sub_slots:
+                            sub_slots[f'sub-m{slot_num}'] = phrase
                             break
-                    else:
-                        slot_key = 'sub-m3'
-                
-                sub_slots[slot_key] = phrase
                 
             else:
-                # 主節副詞→M*スロット（migration source準拠）
-                if category == 'time':
-                    main_counters['M1'] += 1
-                    slot_key = 'M1' if main_counters['M1'] == 1 else ('M2' if main_counters['M2'] == 0 else 'M3')
-                elif category == 'location':
-                    main_counters['M2'] += 1
-                    slot_key = 'M2' if main_counters['M2'] == 1 else ('M3' if main_counters['M3'] == 0 else 'M1')
-                elif category == 'manner':
-                    main_counters['M3'] += 1
-                    slot_key = 'M3' if main_counters['M3'] == 1 else ('M2' if main_counters['M2'] == 0 else 'M1')
-                else:
-                    # その他→空きスロットに順次配置
-                    for slot in ['M1', 'M2', 'M3']:
-                        if slot not in slots:
-                            slot_key = slot
-                            break
-                    else:
-                        slot_key = 'M3'
+                # 主節副詞→M*スロット（Rephrase仕様：M2優先原理 + 重複回避）
+                main_verb_position = main_verb_id if main_verb_id else 999
                 
-                slots[slot_key] = phrase
+                # Rephrase仕様配置ルール（M2をデフォルト使用）
+                if 'M2' not in slots:
+                    # M2が空→M2優先（Rephrase標準配置）
+                    slots['M2'] = phrase
+                elif position < main_verb_position:
+                    # 動詞より前（文頭寄り）→M1
+                    if 'M1' not in slots:
+                        slots['M1'] = phrase
+                    elif 'M3' not in slots:
+                        slots['M3'] = phrase
+                elif position > main_verb_position:
+                    # 動詞より後（文尾寄り）→M3
+                    if 'M3' not in slots:
+                        slots['M3'] = phrase
+                    elif 'M1' not in slots:
+                        slots['M1'] = phrase
+                else:
+                    # 他の選択肢が無い→M1かM3
+                    if 'M1' not in slots:
+                        slots['M1'] = phrase
+                    elif 'M3' not in slots:
+                        slots['M3'] = phrase
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
         return {'slots': slots, 'sub_slots': sub_slots}
