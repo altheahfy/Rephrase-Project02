@@ -2472,28 +2472,21 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  分詞構文処理: type={participle_type}, verb={participle_verb.text}, subject={subject.text if subject else 'None'}")
         
         if participle_type == 'present':
-            # 現在分詞構文処理
-            if self._is_standalone_participle(sentence, subject, participle_verb):
-                # Case 49パターン: The team working overtime
-                # 主語は保持、分詞は sub-v へ
-                if subject:
-                    noun_phrase = self._build_noun_phrase_for_subject(sentence, subject)
-                    slots['S'] = noun_phrase
-                    sub_slots['sub-v'] = participle_verb.text
-                    
-                    # 分詞の修飾語を sub-m スロットに配置
-                    self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
-                    
-            else:
-                # Case 50, 51パターン: The woman standing quietly
-                # 主語を空にして、"主語+分詞"を sub-v へ
-                slots['S'] = ""
-                if subject:
-                    subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
-                    sub_slots['sub-v'] = f"{subject_phrase} {participle_verb.text}"
-                    
-                    # 分詞の修飾語を sub-m スロットに配置
-                    self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
+            # 現在分詞構文処理 - 全て主語を空にして sub-v に統合
+            slots['S'] = ""
+            
+            if subject:
+                subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+                sub_slots['sub-v'] = f"{subject_phrase} {participle_verb.text}"
+                
+                # Case 49: メイン動詞の目的語を O1 に配置
+                if self._is_standalone_participle(sentence, subject, participle_verb):
+                    main_object = self._find_main_verb_object(sentence)
+                    if main_object:
+                        slots['O1'] = self._build_noun_phrase_for_subject(sentence, main_object)
+                
+                # 分詞の修飾語を sub-m スロットに配置（Case 49: sub-m2, Case 50,51: sub-m2,sub-m3）
+                self._assign_participle_modifiers(modifiers, sub_slots, sentence, participle_type == 'present')
                     
         elif participle_type == 'being_past':
             # Case 52パターン: The documents being reviewed
@@ -2504,7 +2497,7 @@ class UnifiedStanzaRephraseMapper:
                 sub_slots['sub-v'] = participle_verb.text
                 
                 # 分詞の修飾語を sub-m スロットに配置
-                self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
+                self._assign_participle_modifiers(modifiers, sub_slots, sentence, False)
         
         # 結果を更新
         result['slots'] = slots
@@ -2543,6 +2536,17 @@ class UnifiedStanzaRephraseMapper:
         
         return False
     
+    def _find_main_verb_object(self, sentence):
+        """メイン動詞の目的語を探す（Case 49用）"""
+        # rootの直接目的語を探す
+        for word in sentence.words:
+            if word.deprel == 'root' and word.upos == 'VERB':
+                # この動詞の目的語を探す
+                for obj_word in sentence.words:
+                    if obj_word.head == word.id and obj_word.deprel == 'obj':
+                        return obj_word
+        return None
+    
     def _build_noun_phrase_for_subject(self, sentence, subject_word) -> str:
         """主語の名詞句を構築"""
         # 冠詞・修飾語を含む名詞句を構築
@@ -2560,6 +2564,32 @@ class UnifiedStanzaRephraseMapper:
         phrase_words.sort(key=lambda x: x[0])
         
         return " ".join([w[1] for w in phrase_words])
+    
+    def _assign_participle_modifiers(self, modifiers, sub_slots, sentence, is_single_modifier_case):
+        """分詞の修飾語を適切な sub-m スロットに配置"""
+        modifier_texts = []
+        
+        for modifier in modifiers:
+            # 修飾語の構築（前置詞句なども含む）
+            if modifier.deprel == 'obl':
+                # 前置詞句の場合
+                prep_phrase = self._build_prepositional_phrase(sentence, modifier)
+                modifier_texts.append(prep_phrase)
+            else:
+                # 単純な修飾語
+                modifier_texts.append(modifier.text)
+        
+        # 修飾語の配置ルール
+        if is_single_modifier_case:
+            # Case 49: 1つの修飾語 -> sub-m2
+            if len(modifier_texts) >= 1:
+                sub_slots['sub-m2'] = modifier_texts[0]
+        else:
+            # Case 50, 51: 複数修飾語 -> sub-m2, sub-m3
+            if len(modifier_texts) >= 1:
+                sub_slots['sub-m2'] = modifier_texts[0]
+            if len(modifier_texts) >= 2:
+                sub_slots['sub-m3'] = modifier_texts[1]
     
     def _assign_modifiers_to_sub_slots(self, modifiers, sub_slots, sentence):
         """修飾語を sub-m スロットに割り当て"""
