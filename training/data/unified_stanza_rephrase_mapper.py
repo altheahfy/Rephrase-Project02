@@ -364,8 +364,11 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.debug(f"🔧 Unified mapping開始: {len(self.active_handlers)} handlers active")
         
-        # 全アクティブハンドラーの同時実行
-        for handler_name in self.active_handlers:
+        # ハンドラー実行順序の制御（分詞構文を最優先）
+        ordered_handlers = self._get_ordered_handlers()
+        
+        # 全アクティブハンドラーの同時実行（順序制御付き）
+        for handler_name in ordered_handlers:
             try:
                 # ハンドラー制御フラグをチェック
                 control_flags = result.get('grammar_info', {}).get('control_flags', {})
@@ -398,6 +401,36 @@ class UnifiedStanzaRephraseMapper:
             return True
         
         return False
+    
+    def _get_ordered_handlers(self) -> List[str]:
+        """ハンドラーの実行順序を制御（分詞構文を最優先）"""
+        
+        # 優先順位テーブル
+        priority_order = [
+            'participle_construction',  # 最優先：分詞構文が制御フラグを設定
+            'basic_five_pattern',
+            'relative_clause',
+            'passive_voice',
+            'adverbial_modifier',
+            'auxiliary_complex',
+            'conjunction'
+        ]
+        
+        # アクティブハンドラーを優先順位順に並べ替え
+        ordered = []
+        
+        # 1. 優先順位テーブルに従って順序付け
+        for handler in priority_order:
+            if handler in self.active_handlers:
+                ordered.append(handler)
+        
+        # 2. テーブルにない新しいハンドラーは最後に追加
+        for handler in self.active_handlers:
+            if handler not in ordered:
+                ordered.append(handler)
+        
+        self.logger.debug(f"📋 ハンドラー実行順序: {ordered}")
+        return ordered
     
     def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
         """
@@ -560,7 +593,12 @@ class UnifiedStanzaRephraseMapper:
             'M3': 'sub-m3'
         }
         
-        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}")
+        # 分詞構文制御フラグをチェック
+        grammar_info = result.get('grammar_info', {})
+        control_flags = grammar_info.get('control_flags', {})
+        participle_detected = control_flags.get('participle_detected', False)
+        
+        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}, 分詞構文: {participle_detected}")
         
         # 複文判定＆スロット空文字化処理
         for main_slot, sub_slot in main_to_sub_mapping.items():
@@ -568,6 +606,13 @@ class UnifiedStanzaRephraseMapper:
                 # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
                 if main_slot in slots:
                     original_value = slots[main_slot]
+                    
+                    # 分詞構文特別処理: 分詞構文ハンドラーが既に適切に設定済み
+                    if participle_detected and sub_slot in ['sub-v', 'sub-aux', 'sub-m2', 'sub-m3']:
+                        self.logger.debug(
+                            f"🎯 分詞構文保護: {main_slot} - {sub_slot}は分詞構文ハンドラーが管理済み"
+                        )
+                        continue  # 分詞構文関連のsub-slotは変更しない
                     
                     # 副詞スロット特別処理: 主節副詞は保持
                     if main_slot.startswith('M') and original_value:
@@ -725,10 +770,11 @@ class UnifiedStanzaRephraseMapper:
     
     def _handle_relative_clause(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
-        関係節ハンドラー（Phase 1実装）
+        関係節ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応）
         
         simple_relative_engine.py の機能を統合システムに移植
         Stanza dependency parsing による直接的な関係節検出・分解
+        分詞構文が検出されている場合は、関係節処理をスキップ
         
         Args:
             sentence: Stanza解析済みsentence object
@@ -739,6 +785,15 @@ class UnifiedStanzaRephraseMapper:
         """
         try:
             self.logger.debug("🔍 関係節ハンドラー実行中...")
+            
+            # 分詞構文制御フラグをチェック
+            grammar_info = base_result.get('grammar_info', {})
+            control_flags = grammar_info.get('control_flags', {})
+            participle_detected = control_flags.get('participle_detected', False)
+            
+            if participle_detected:
+                self.logger.debug("  🎯 分詞構文検出済み - 関係節処理をスキップ（分詞構文が優先）")
+                return None
             
             # 関係節存在チェック
             if not self._has_relative_clause(sentence):
@@ -1416,10 +1471,11 @@ class UnifiedStanzaRephraseMapper:
     
     def _handle_basic_five_pattern(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
-        基本5文型ハンドラー（Phase 1実装）
+        基本5文型ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応）
         
         basic_five_pattern_engine.py の機能を統合システムに移植
         Stanza dependency parsing による基本文型検出・分解
+        分詞構文が検出されている場合は、適切に主語スロットを制御
         
         Args:
             sentence: Stanza sentence object
@@ -1430,6 +1486,15 @@ class UnifiedStanzaRephraseMapper:
         """
         try:
             self.logger.debug("🔍 5文型ハンドラー実行中...")
+            
+            # 分詞構文制御フラグをチェック
+            grammar_info = base_result.get('grammar_info', {})
+            control_flags = grammar_info.get('control_flags', {})
+            participle_detected = control_flags.get('participle_detected', False)
+            
+            if participle_detected:
+                self.logger.debug("  ✅ 分詞構文検出済み - 分詞構文ルールを適用")
+                return self._process_basic_pattern_with_participle_control(sentence, base_result)
             
             # 他のエンジンが主文動詞（V）を既に処理済みの場合のみスキップ
             # sub-vは関係節動詞なので主文処理には影響しない
@@ -2478,9 +2543,10 @@ class UnifiedStanzaRephraseMapper:
         return None
     
     def _process_participle_construction(self, sentence, participle_info: Dict, base_result: Dict) -> Dict:
-        """分詞構文の処理（構造分解のみ、修飾語は副詞ハンドラーに委譲）
+        """分詞修飾句の汎用処理（仕様書準拠：どのスロットでも対応可能）
         
-        仕様書準拠：Stanza/spaCy解析エラー対応のハイブリッド解析システム
+        分詞修飾句が修飾する名詞がどのスロット（S/O1/O2/C1/C2）にあっても、
+        適切にsub-スロットに移動させる汎用実装
         """
         result = base_result.copy()
         
@@ -2489,30 +2555,46 @@ class UnifiedStanzaRephraseMapper:
         sub_slots = result.get('sub_slots', {})
         
         participle_verb = participle_info['participle_verb']
-        subject = participle_info['subject']
+        subject = participle_info['subject']  # 実際は'modified_target'が適切
         participle_type = participle_info['participle_type']
         
-        self.logger.debug(f"  分詞構文処理: type={participle_type}, verb={participle_verb.text}, subject={subject.text if subject else 'None'}")
+        self.logger.debug(f"  汎用分詞処理: type={participle_type}, verb={participle_verb.text}, target={subject.text if subject else 'None'}")
+        
+        if not subject:
+            return result
+        
+        # Step 1: 修飾対象の名詞がメイン文のどのスロットにあるかを特定
+        target_slot = self._identify_modified_noun_slot(subject, slots)
         
         if participle_type == 'present':
-            # 現在分詞構文処理 - 主語をsub-vに統合
-            slots['S'] = ""
+            # 現在分詞構文処理
+            subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+            sub_v_content = f"{subject_phrase} {participle_verb.text}"
             
-            if subject:
-                subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
-                sub_slots['sub-v'] = f"{subject_phrase} {participle_verb.text}"
+            # Step 2: 該当スロットを空にして、sub-vに移動
+            if target_slot:
+                slots[target_slot] = ""  # 修飾対象スロットを空にする
+                sub_slots['sub-v'] = sub_v_content
+                self.logger.debug(f"  ✅ 分詞修飾処理: {target_slot} → sub-v = '{sub_v_content}'")
+            else:
+                # フォールバック: Sを空にする（従来の挙動）
+                slots['S'] = ""
+                sub_slots['sub-v'] = sub_v_content
+                self.logger.debug(f"  ⚠️ フォールバック: S → sub-v = '{sub_v_content}'")
                 
-                # Case 49: メイン動詞の目的語を O1 に配置
-                if self._is_standalone_participle(sentence, subject, participle_verb):
-                    main_object = self._find_main_verb_object(sentence)
-                    if main_object:
-                        slots['O1'] = self._build_noun_phrase_for_subject(sentence, main_object)
-                    
         elif participle_type == 'being_past':
             # Case 52パターン: The documents being reviewed
-            slots['S'] = ""
-            if subject:
-                subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+            subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+            
+            # Step 2: 該当スロットを空にして、sub-aux/sub-vに分割
+            if target_slot:
+                slots[target_slot] = ""
+                sub_slots['sub-aux'] = f"{subject_phrase} being"
+                sub_slots['sub-v'] = participle_verb.text
+                self.logger.debug(f"  ✅ being分詞処理: {target_slot} → sub-aux/sub-v")
+            else:
+                # フォールバック
+                slots['S'] = ""
                 sub_slots['sub-aux'] = f"{subject_phrase} being"
                 sub_slots['sub-v'] = participle_verb.text
         
@@ -2529,13 +2611,14 @@ class UnifiedStanzaRephraseMapper:
         # 制御フラグ設定：分詞構文が検出されたことをマーク（仕様書のhandler control system準拠）
         grammar_info['control_flags'] = grammar_info.get('control_flags', {})
         grammar_info['control_flags']['participle_detected'] = True
+        grammar_info['control_flags']['modified_slot'] = target_slot  # 修飾対象スロットを記録
         
         # Stanza/spaCy解析エラー対応：問題パターンをマーク（仕様書のError Pattern Management準拠）
         self._mark_analysis_error_patterns(sentence, participle_info, result)
         
         result['grammar_info'] = grammar_info
         
-        self.logger.debug(f"  ✅ 分詞構文処理完了: slots={slots}, sub_slots={sub_slots}")
+        self.logger.debug(f"  ✅ 汎用分詞処理完了: slots={slots}, sub_slots={sub_slots}")
         return result
     
     def _is_standalone_participle(self, sentence, subject, participle_verb) -> bool:
@@ -2650,6 +2733,115 @@ class UnifiedStanzaRephraseMapper:
             self.logger.error(f"Error in structural main verb fallback: {e}")
         
         return candidates
+    
+    def _identify_modified_noun_slot(self, modified_noun, current_slots: Dict) -> Optional[str]:
+        """修飾対象の名詞がメイン文のどのスロットにあるかを特定
+        
+        Args:
+            modified_noun: 分詞に修飾される名詞（Stanza word object）
+            current_slots: 現在のメインスロット状況
+            
+        Returns:
+            str: 該当スロット名（S/O1/O2/C1/C2）または None
+        """
+        try:
+            modified_text = modified_noun.text.lower()
+            
+            # 各スロットの内容と照合
+            for slot_name, slot_value in current_slots.items():
+                if slot_name in ['S', 'O1', 'O2', 'C1', 'C2'] and slot_value:
+                    # スロット値に修飾対象名詞が含まれているかチェック
+                    slot_words = slot_value.lower().split()
+                    if modified_text in slot_words:
+                        self.logger.debug(f"  🎯 修飾対象特定: {modified_text} → {slot_name} ('{slot_value}')")
+                        return slot_name
+                    
+                    # 部分一致もチェック（"team" in "The team"）
+                    if modified_text in slot_value.lower():
+                        self.logger.debug(f"  🎯 修飾対象特定（部分一致）: {modified_text} → {slot_name} ('{slot_value}')")
+                        return slot_name
+            
+            # デフォルト：主語を仮定
+            self.logger.debug(f"  ⚠️ 修飾対象特定失敗: {modified_text} → S（デフォルト）")
+            return 'S'
+            
+        except Exception as e:
+            self.logger.error(f"Error identifying modified noun slot: {e}")
+            return 'S'  # フォールバック
+    
+    def _process_basic_pattern_with_participle_control(self, sentence, base_result: Dict) -> Dict:
+        """分詞構文制御フラグが設定されている場合の基本文型処理
+        
+        分詞構文ハンドラーで既に設定されたスロット構造を尊重し、
+        メイン動詞・助動詞・目的語・補語のみを処理
+        """
+        result = base_result.copy()
+        slots = result.get('slots', {})
+        
+        self.logger.debug("  🎯 分詞構文制御モード: 主語スロットは維持、他要素のみ処理")
+        
+        # Step 1: メイン動詞の特定（分詞構文でない真の主動詞）
+        main_verb = self._find_main_verb_excluding_participles(sentence)
+        if main_verb:
+            slots['V'] = main_verb.text
+            self.logger.debug(f"    ✅ メイン動詞: {main_verb.text}")
+            
+            # Step 2: メイン動詞の直接目的語を特定
+            main_object = self._find_verb_direct_object(sentence, main_verb)
+            if main_object and not slots.get('O1'):
+                object_phrase = self._build_noun_phrase_for_subject(sentence, main_object)
+                slots['O1'] = object_phrase
+                self.logger.debug(f"    ✅ 目的語: {object_phrase}")
+            
+            # Step 3: メイン動詞の補語を特定
+            main_complement = self._find_verb_complement(sentence, main_verb)
+            if main_complement and not slots.get('C1'):
+                complement_phrase = self._build_noun_phrase_for_subject(sentence, main_complement)
+                slots['C1'] = complement_phrase
+                self.logger.debug(f"    ✅ 補語: {complement_phrase}")
+        
+        result['slots'] = slots
+        
+        # ハンドラー情報を記録
+        grammar_info = result.get('grammar_info', {})
+        grammar_info['detected_patterns'] = grammar_info.get('detected_patterns', [])
+        if 'basic_five_pattern' not in grammar_info['detected_patterns']:
+            grammar_info['detected_patterns'].append('basic_five_pattern')
+        
+        result['grammar_info'] = grammar_info
+        
+        self.logger.debug(f"  ✅ 分詞構文制御処理完了: slots={slots}")
+        return result
+    
+    def _find_main_verb_excluding_participles(self, sentence):
+        """分詞を除いた真のメイン動詞を特定"""
+        for word in sentence.words:
+            # ROOT動詞で、分詞（VBG/VBN）でないもの
+            if (word.deprel == 'root' and 
+                word.upos == 'VERB' and 
+                word.xpos not in ['VBG', 'VBN']):
+                return word
+        
+        # フォールバック: ROOT動詞
+        for word in sentence.words:
+            if word.deprel == 'root' and word.upos == 'VERB':
+                return word
+                
+        return None
+    
+    def _find_verb_direct_object(self, sentence, verb_word):
+        """動詞の直接目的語を特定"""
+        for word in sentence.words:
+            if word.head == verb_word.id and word.deprel == 'obj':
+                return word
+        return None
+    
+    def _find_verb_complement(self, sentence, verb_word):
+        """動詞の補語を特定"""
+        for word in sentence.words:
+            if word.head == verb_word.id and word.deprel in ['xcomp', 'ccomp', 'nsubj:xsubj']:
+                return word
+        return None
     
     def _apply_analysis_error_corrections(self, sentence, base_result: Dict) -> Dict:
         """解析エラーパターンに対応する修正戦略を適用（仕様書準拠）
