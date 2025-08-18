@@ -447,8 +447,8 @@
           "sub-s": "The car that",
           "sub-v": "repaired",
           "sub-aux": "was",
-          "sub-m1": "quickly",
-          "sub-m2": "yesterday"
+          "sub-m2": "quickly",
+          "sub-m3": "yesterday"
         }
       }
     },
@@ -475,13 +475,13 @@
         "main_slots": {
           "S": "",
           "V": "succeeds",
-          "M1": "always",
-          "M2": "academically"
+          "M2": "always",
+          "M3": "academically"
         },
         "sub_slots": {
           "sub-s": "The student who",
           "sub-v": "studies",
-          "sub-m1": "diligently"
+          "sub-m2": "diligently"
         }
       }
     },
@@ -525,8 +525,8 @@
           "S": "The window",
           "Aux": "was",
           "V": "opened",
-          "M1": "gently",
-          "M2": "by the morning breeze"
+          "M2": "gently",
+          "M3": "by the morning breeze"
         },
         "sub_slots": {}
       }
@@ -538,8 +538,8 @@
           "S": "The message",
           "Aux": "is being",
           "V": "written",
-          "M1": "carefully",
-          "M2": "by the manager"
+          "M2": "carefully",
+          "M3": "by the manager"
         },
         "sub_slots": {}
       }
