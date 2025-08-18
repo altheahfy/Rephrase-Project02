@@ -401,8 +401,12 @@ class UnifiedStanzaRephraseMapper:
                     # 競合解決：空文字や空値で既存の有効な値を上書きしない
                     existing_value = base_result['slots'][slot_name]
                     
+                    # ★ Mスロット保護：副詞ハンドラーで設定されたMスロットを保護
+                    if slot_name.startswith('M') and existing_value and handler_name != 'adverbial_modifier':
+                        # 副詞ハンドラー以外はMスロットを上書きできない
+                        pass  # 既存値を保持
                     # 既存値が空で新値が有効な場合は上書き
-                    if not existing_value and slot_data:
+                    elif not existing_value and slot_data:
                         base_result['slots'][slot_name] = slot_data
                     # 既存値が有効で新値も有効な場合は後勝ち（従来通り）
                     elif existing_value and slot_data:
@@ -2573,9 +2577,10 @@ class UnifiedStanzaRephraseMapper:
         # 従属節要素を主節から除去
         self._remove_subordinate_elements_from_main(main_slots, sub_slots, advcl_verb)
         
-        # M1位置に接続詞を配置（空文字列でマーク）
-        if not main_slots.get('M1'):
-            main_slots['M1'] = ''
+        # ★ M1位置に接続詞を配置（但し既存のMスロットは保護）
+        # 接続詞構造では一般的にM1は使わないため、この処理をコメントアウト
+        # if not main_slots.get('M1'):
+        #     main_slots['M1'] = ''
         
         result = {
             'slots': main_slots,
