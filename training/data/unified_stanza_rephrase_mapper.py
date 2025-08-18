@@ -154,6 +154,7 @@ class UnifiedStanzaRephraseMapper:
             'basic_five_pattern',     # 基本5文型
             'relative_clause',        # 関係節
             'passive_voice',          # 受動態  
+            'participle_construction', # 分詞構文（副詞処理より先）
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
             'conjunction',            # 接続詞（"as if"等）
@@ -2366,6 +2367,304 @@ class UnifiedStanzaRephraseMapper:
         # ID順ソート（語順保持）
         subject_words.sort(key=lambda w: w.id)
         return ' '.join(w.text for w in subject_words)
+
+    # =============================================================================
+    # 分詞構文処理ハンドラー (Phase 3)
+    # =============================================================================
+    
+    def _handle_participle_construction(self, sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        分詞構文ハンドラー
+        
+        分詞構文パターンの検出・分解:
+        - The team working overtime (現在分詞修飾)
+        - The woman standing quietly (現在分詞修飾)
+        - The documents being reviewed (being + 過去分詞)
+        
+        Args:
+            sentence: Stanza解析済みsentence object
+            base_result: ベース結果（コピー）
+            
+        Returns:
+            Dict: 分詞構文分解結果 or None
+        """
+        try:
+            self.logger.debug("🔍 分詞構文ハンドラー実行中...")
+            
+            # 分詞構文パターンの検出
+            participle_info = self._analyze_participle_structure(sentence)
+            if not participle_info:
+                self.logger.debug("  分詞構文なし - スキップ")
+                return None
+                
+            self.logger.debug("  ✅ 分詞構文検出")
+            return self._process_participle_construction(sentence, participle_info, base_result)
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 分詞構文ハンドラーエラー: {e}")
+            return None
+    
+    def _analyze_participle_structure(self, sentence) -> Optional[Dict]:
+        """分詞構文の分析"""
+        participle_info = {
+            'participle_verb': None,    # 分詞動詞
+            'subject': None,            # 主語
+            'participle_type': None,    # 分詞のタイプ (present/past/being)
+            'modifiers': []             # 修飾語
+        }
+        
+        # 現在分詞の検出 (VBG) - dep:acl パターンを優先検出
+        for word in sentence.words:
+            if word.xpos == 'VBG' and word.deprel == 'acl':
+                participle_info['participle_verb'] = word
+                participle_info['participle_type'] = 'present'
+                
+                # 分詞の主語を探す（head が NOUN の場合）
+                if word.head > 0:
+                    head_word = next((w for w in sentence.words if w.id == word.head), None)
+                    if head_word and head_word.upos == 'NOUN':
+                        participle_info['subject'] = head_word
+                
+                # 分詞の修飾語を収集
+                for modifier in sentence.words:
+                    if modifier.head == word.id:
+                        participle_info['modifiers'].append(modifier)
+                
+                self.logger.debug(f"  🎯 現在分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
+                return participle_info
+        
+        # being + 過去分詞の検出
+        for word in sentence.words:
+            if word.text.lower() == 'being' and word.deprel == 'aux:pass':
+                # beingが修飾する過去分詞を探す
+                for reviewed_word in sentence.words:
+                    if (reviewed_word.head == word.head and 
+                        reviewed_word.xpos == 'VBN' and 
+                        reviewed_word.deprel == 'acl'):
+                        
+                        participle_info['participle_verb'] = reviewed_word
+                        participle_info['participle_type'] = 'being_past'
+                        
+                        # beingの主語を探す（reviewed の head）
+                        if reviewed_word.head > 0:
+                            head_word = next((w for w in sentence.words if w.id == reviewed_word.head), None)
+                            if head_word and head_word.upos == 'NOUN':
+                                participle_info['subject'] = head_word
+                        
+                        self.logger.debug(f"  🎯 being+過去分詞検出: being {reviewed_word.text} (被修飾語:{head_word.text if head_word else 'unknown'})")
+                        return participle_info
+        
+        return None
+    
+    def _process_participle_construction(self, sentence, participle_info: Dict, base_result: Dict) -> Dict:
+        """分詞構文の処理"""
+        result = base_result.copy()
+        
+        # 分詞構文のスロット生成
+        slots = result.get('slots', {})
+        sub_slots = result.get('sub_slots', {})
+        
+        participle_verb = participle_info['participle_verb']
+        subject = participle_info['subject']
+        participle_type = participle_info['participle_type']
+        modifiers = participle_info['modifiers']
+        
+        self.logger.debug(f"  分詞構文処理: type={participle_type}, verb={participle_verb.text}, subject={subject.text if subject else 'None'}")
+        
+        if participle_type == 'present':
+            # 現在分詞構文処理
+            if self._is_standalone_participle(sentence, subject, participle_verb):
+                # Case 49パターン: The team working overtime
+                # 主語は保持、分詞は sub-v へ
+                if subject:
+                    noun_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+                    slots['S'] = noun_phrase
+                    sub_slots['sub-v'] = participle_verb.text
+                    
+                    # 分詞の修飾語を sub-m スロットに配置
+                    self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
+                    
+            else:
+                # Case 50, 51パターン: The woman standing quietly
+                # 主語を空にして、"主語+分詞"を sub-v へ
+                slots['S'] = ""
+                if subject:
+                    subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+                    sub_slots['sub-v'] = f"{subject_phrase} {participle_verb.text}"
+                    
+                    # 分詞の修飾語を sub-m スロットに配置
+                    self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
+                    
+        elif participle_type == 'being_past':
+            # Case 52パターン: The documents being reviewed
+            slots['S'] = ""
+            if subject:
+                subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+                sub_slots['sub-aux'] = f"{subject_phrase} being"
+                sub_slots['sub-v'] = participle_verb.text
+                
+                # 分詞の修飾語を sub-m スロットに配置
+                self._assign_modifiers_to_sub_slots(modifiers, sub_slots, sentence)
+        
+        # 結果を更新
+        result['slots'] = slots
+        result['sub_slots'] = sub_slots
+        
+        # ハンドラー情報を記録
+        grammar_info = result.get('grammar_info', {})
+        grammar_info['detected_patterns'] = grammar_info.get('detected_patterns', [])
+        if 'participle_construction' not in grammar_info['detected_patterns']:
+            grammar_info['detected_patterns'].append('participle_construction')
+        result['grammar_info'] = grammar_info
+        
+        self.logger.debug(f"  ✅ 分詞構文処理完了: slots={slots}, sub_slots={sub_slots}")
+        return result
+    
+    def _is_standalone_participle(self, sentence, subject, participle_verb) -> bool:
+        """分詞が独立した修飾語か（Case 49パターン）を判定"""
+        # メイン動詞が存在し、分詞とは別の場合は独立分詞
+        main_verb = None
+        for word in sentence.words:
+            if word.deprel == 'root' and word.upos == 'VERB' and word.id != participle_verb.id:
+                main_verb = word
+                break
+        
+        # メイン動詞が存在し、主語が同じ場合は独立分詞（Case 49）
+        if main_verb and subject:
+            # 主語がメイン動詞の主語でもある場合
+            main_subj = None
+            for word in sentence.words:
+                if word.head == main_verb.id and word.deprel == 'nsubj':
+                    main_subj = word
+                    break
+            
+            if main_subj and main_subj.id == subject.id:
+                return True
+        
+        return False
+    
+    def _build_noun_phrase_for_subject(self, sentence, subject_word) -> str:
+        """主語の名詞句を構築"""
+        # 冠詞・修飾語を含む名詞句を構築
+        phrase_words = []
+        
+        # 冠詞を探す
+        for word in sentence.words:
+            if word.head == subject_word.id and word.deprel == 'det':
+                phrase_words.append((word.id, word.text))
+        
+        # 主語本体を追加
+        phrase_words.append((subject_word.id, subject_word.text))
+        
+        # ID順でソート
+        phrase_words.sort(key=lambda x: x[0])
+        
+        return " ".join([w[1] for w in phrase_words])
+    
+    def _assign_modifiers_to_sub_slots(self, modifiers, sub_slots, sentence):
+        """修飾語を sub-m スロットに割り当て"""
+        modifier_texts = []
+        
+        for modifier in modifiers:
+            # 修飾語の構築（前置詞句なども含む）
+            if modifier.deprel == 'obl':
+                # 前置詞句の場合
+                prep_phrase = self._build_prepositional_phrase(sentence, modifier)
+                modifier_texts.append(prep_phrase)
+            else:
+                # 単純な修飾語
+                modifier_texts.append(modifier.text)
+        
+        # Simple Ruleに従って M スロットに配置
+        self._apply_simple_rule_to_sub_modifiers(modifier_texts, sub_slots)
+    
+    def _build_prepositional_phrase(self, sentence, obl_word) -> str:
+        """前置詞句を構築"""
+        # obl_wordは前置詞句の目的語なので、前置詞を探す
+        prep = None
+        for word in sentence.words:
+            if word.head == obl_word.id and word.deprel == 'case':
+                prep = word
+                break
+        
+        if prep:
+            # 冠詞も含めて構築
+            det = None
+            for word in sentence.words:
+                if word.head == obl_word.id and word.deprel == 'det':
+                    det = word
+                    break
+            
+            if det:
+                return f"{prep.text} {det.text} {obl_word.text}"
+            else:
+                return f"{prep.text} {obl_word.text}"
+        else:
+            return obl_word.text
+    
+    def _apply_simple_rule_to_sub_modifiers(self, modifier_texts, sub_slots):
+        """Simple Ruleを sub-m スロットに適用"""
+        if not modifier_texts:
+            return
+        
+        count = len(modifier_texts)
+        
+        if count == 1:
+            sub_slots['sub-m2'] = modifier_texts[0]
+        elif count == 2:
+            sub_slots['sub-m1'] = modifier_texts[0]
+            sub_slots['sub-m2'] = modifier_texts[1]
+        elif count == 3:
+            sub_slots['sub-m1'] = modifier_texts[0]
+            sub_slots['sub-m2'] = modifier_texts[1]
+            sub_slots['sub-m3'] = modifier_texts[2]
+    
+    def _is_object_of_main_verb(self, sentence, word) -> bool:
+        """語が主動詞の目的語かチェック"""
+        # 主動詞を探す
+        main_verb = None
+        for w in sentence.words:
+            if w.deprel == 'root':
+                main_verb = w
+                break
+        
+        if main_verb and word.head == main_verb.id and word.deprel in ['obj', 'dobj']:
+            return True
+        return False
+    
+    def _build_prepositional_phrase(self, sentence, prep) -> str:
+        """前置詞句の構築"""
+        phrase_words = [prep]
+        
+        # 前置詞の目的語を探す
+        for word in sentence.words:
+            if word.head == prep.id:
+                phrase_words.append(word)
+                
+                # 目的語の修飾語も追加
+                for modifier in sentence.words:
+                    if modifier.head == word.id and modifier.deprel in ['det', 'amod']:
+                        phrase_words.append(modifier)
+        
+        # ID順ソート（語順保持）
+        phrase_words.sort(key=lambda w: w.id)
+        return ' '.join(w.text for w in phrase_words)
+    
+    def _build_noun_phrase(self, sentence, noun) -> str:
+        """名詞句の構築（修飾語含む）"""
+        if not noun:
+            return ""
+            
+        noun_words = [noun]
+        
+        # 名詞の修飾語を収集
+        for word in sentence.words:
+            if word.head == noun.id and word.deprel in ['det', 'amod', 'compound', 'nmod']:
+                noun_words.append(word)
+        
+        # ID順ソート（語順保持）
+        noun_words.sort(key=lambda w: w.id)
+        return ' '.join(w.text for w in noun_words)
 
     # =============================================================================
     # 助動詞複合体処理ハンドラー (Phase 3)

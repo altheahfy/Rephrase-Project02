@@ -702,15 +702,14 @@
       "sentence": "The team working overtime completed the project successfully yesterday.",
       "expected": {
         "main_slots": {
-          "S": "The team",
+          "S": "",
           "V": "completed",
-          "O1": "",
+          "O1": "the project",
           "M2": "successfully",
           "M3": "yesterday"
         },
         "sub_slots": {
-          "sub-o1": "the project",
-          "sub-v": "working",
+          "sub-v": "the team working",
           "sub-m2": "overtime"
         }
       }
@@ -726,8 +725,8 @@
         },
         "sub_slots": {
           "sub-v": "the woman standing",
-          "sub-m1": "quietly",
-          "sub-m2": "near the door"
+          "sub-m2": "quietly",
+          "sub-m3": "near the door"
         }
       }
     },
@@ -742,8 +741,8 @@
         },
         "sub_slots": {
           "sub-v": "the children playing",
-          "sub-m1": "happily",
-          "sub-m2": "in the garden"
+          "sub-m2": "happily",
+          "sub-m3": "in the garden"
         }
       }
     },
