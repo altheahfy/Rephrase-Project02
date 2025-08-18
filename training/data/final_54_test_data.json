@@ -301,7 +301,7 @@
           "S": "The letter",
           "Aux": "was",
           "V": "written",
-          "M1": "by John"
+          "M2": "by John"
         },
         "sub_slots": {}
       }
@@ -325,7 +325,7 @@
           "S": "The book",
           "Aux": "was",
           "V": "written",
-          "M1": "by a famous author"
+          "M2": "by a famous author"
         },
         "sub_slots": {}
       }
@@ -337,7 +337,7 @@
           "S": "The cake",
           "Aux": "is being",
           "V": "baked",
-          "M1": "by my mother"
+          "M2": "by my mother"
         },
         "sub_slots": {}
       }
@@ -349,7 +349,7 @@
           "S": "The cake",
           "Aux": "was",
           "V": "eaten",
-          "M1": "by the children"
+          "M2": "by the children"
         },
         "sub_slots": {}
       }
@@ -361,7 +361,7 @@
           "S": "The door",
           "Aux": "was",
           "V": "opened",
-          "M1": "by the key"
+          "M2": "by the key"
         },
         "sub_slots": {}
       }
@@ -447,8 +447,8 @@
           "sub-s": "The car that",
           "sub-v": "repaired",
           "sub-aux": "was",
-          "sub-m1": "quickly",
-          "sub-m2": "yesterday"
+          "sub-m2": "quickly",
+          "sub-m3": "yesterday"
         }
       }
     },
@@ -525,8 +525,8 @@
           "S": "The window",
           "Aux": "was",
           "V": "opened",
-          "M1": "by the morning breeze",
-          "M2": "gently"
+          "M2": "gently",
+          "M3": "by the morning breeze"
         },
         "sub_slots": {}
       }
@@ -538,8 +538,8 @@
           "S": "The message",
           "Aux": "is being",
           "V": "written",
-          "M1": "by the manager",
-          "M2": "carefully"
+          "M2": "carefully",
+          "M3": "by the manager"
         },
         "sub_slots": {}
       }

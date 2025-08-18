@@ -15,10 +15,10 @@ def test_53_cases_coverage():
     """53ケース全体のカバレッジを測定"""
     
     # テストデータ読み込み
-    with open('batch_results_complete.json', 'r', encoding='utf-8') as f:
+    with open('final_54_test_data.json', 'r', encoding='utf-8') as f:
         test_data = json.load(f)
     
-    results = test_data.get('results', {})
+    results = test_data.get('data', {})
     
     mapper = UnifiedStanzaRephraseMapper()
     
@@ -28,7 +28,7 @@ def test_53_cases_coverage():
     failures = 0
     errors = 0
     
-    print("🎯 53ケース完全カバレッジテスト開始")
+    print("53ケース完全カバレッジテスト開始")
     print("=" * 60)
     print(f"開始時間: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()

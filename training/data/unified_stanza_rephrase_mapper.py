@@ -1011,24 +1011,23 @@ class UnifiedStanzaRephraseMapper:
         if not aux_word:
             aux_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'aux')
         
-        # ✅ 関係節内の副詞を検出して位置ベースで配置
-        adverb_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
-        if adverb_word:
-            # 関係副詞は除外（where, when, why, howは関係副詞として別途処理）
-            if adverb_word.text.lower() not in ['where', 'when', 'why', 'how']:
-                # 🔧 位置ベース配置: 動詞前→sub-m1, 動詞後→sub-m2
-                if adverb_word.id < rel_verb.id:
-                    sub_slots["sub-m1"] = adverb_word.text
-                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m1 = '{adverb_word.text}' (動詞前)")
-                else:
-                    sub_slots["sub-m2"] = adverb_word.text
-                    self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}' (動詞後)")
+        # 🚫 副詞処理を副詞ハンドラーに完全委譲（競合回避）
+        # 助動詞ハンドラーは副詞スロット設定を行わない
+        # adverb_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'advmod')
+        # if adverb_word:
+        #     if adverb_word.text.lower() not in ['where', 'when', 'why', 'how']:
+        #         if adverb_word.id < rel_verb.id:
+        #             sub_slots["sub-m1"] = adverb_word.text
+        #             self.logger.debug(f"🔧 関係節内副詞検出: sub-m1 = '{adverb_word.text}' (動詞前)")
+        #         else:
+        #             sub_slots["sub-m2"] = adverb_word.text
+        #             self.logger.debug(f"🔧 関係節内副詞検出: sub-m2 = '{adverb_word.text}' (動詞後)")
         
-        # ✅ 関係節内の前置詞句・副詞句を検出してsub-m2/sub-m3に配置
-        obl_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obl')
-        if obl_word:
-            sub_slots["sub-m3"] = obl_word.text
-            self.logger.debug(f"🔧 関係節内副詞句検出: sub-m3 = '{obl_word.text}'")
+        # 🚫 前置詞句処理も副詞ハンドラーに委譲（完全な副詞処理統一）
+        # obl_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obl')
+        # if obl_word:
+        #     sub_slots["sub-m3"] = obl_word.text
+        #     self.logger.debug(f"🔧 関係節内副詞句検出: sub-m3 = '{obl_word.text}'")
         
         if rel_type == 'obj':
             # 目的語関係代名詞: "The book that he bought"
@@ -1699,6 +1698,7 @@ class UnifiedStanzaRephraseMapper:
         副詞処理エンジン（Rephrase距離ベース原理）
         Stanza/spaCy分析結果のみを使用、ハードコーディング分類は廃止
         """
+        print("🔧 副詞ハンドラー開始")
         self.logger.debug("副詞ハンドラー実行中（距離ベース原理）...")
         
         # 🎯 Rephrase原理：ハードコーディング分類は不要
@@ -1827,54 +1827,73 @@ class UnifiedStanzaRephraseMapper:
         # 位置順ソート
         adverb_phrases.sort(key=lambda x: x['position'])
         
-        # 文脈別配置（Rephrase仕様：文の中央からの距離原理）
-        for phrase_info in adverb_phrases:
-            phrase = phrase_info['phrase']
-            category = phrase_info['category']
-            context = phrase_info['context']
-            position = phrase_info['position']
-            
-            if context == 'subordinate':
-                # 🎯 従属節副詞も距離ベース配置（Rephrase原理一貫性）
-                # 従属節動詞からの距離で判定（簡略化：sub-m2優先→sub-m1/sub-m3）
-                if 'sub-m2' not in sub_slots:
-                    sub_slots['sub-m2'] = phrase
-                    self.logger.debug(f"🎯 従属節副詞配置: sub-m2 = '{phrase}' (距離ベース)")
-                elif 'sub-m1' not in sub_slots:
-                    sub_slots['sub-m1'] = phrase
-                    self.logger.debug(f"🎯 従属節副詞配置: sub-m1 = '{phrase}' (フォールバック)")
-                elif 'sub-m3' not in sub_slots:
-                    sub_slots['sub-m3'] = phrase
-                    self.logger.debug(f"🎯 従属節副詞配置: sub-m3 = '{phrase}' (フォールバック)")
-                
-            else:
-                # 主節副詞→M*スロット（Rephrase仕様改良：特性・位置・優先度統合判定）
-                # 🔧 修正：main_verb_idから実際の位置を取得
-                main_verb_position = 999  # デフォルト値
-                if main_verb_id:
-                    for i, word in enumerate(sentence.words, 1):
-                        if word.id == main_verb_id:
-                            main_verb_position = i
-                            break
-                
-                # 🎯 Rephrase仕様準拠：距離ベースの配置決定（カテゴリ不要）
-                target_slot = self._determine_optimal_main_adverb_slot(
-                    phrase, 'position_based', position, main_verb_position, slots
-                )
-                
-                if target_slot and target_slot not in slots:
-                    slots[target_slot] = phrase
-                    self.logger.debug(f"🎯 主節副詞配置: {target_slot} = '{phrase}' (pos={position}, verb_pos={main_verb_position})")
-                else:
-                    # フォールバック: 空きスロットに配置
-                    for fallback_slot in ['M1', 'M2', 'M3']:
-                        if fallback_slot not in slots:
-                            slots[fallback_slot] = phrase
-                            self.logger.debug(f"🔄 主節副詞フォールバック: {fallback_slot} = '{phrase}'")
-                            break
+        # === シンプルルール一括配置システム ===
+        # 主節副詞と従属節副詞を分離して、それぞれにシンプルルールを適用
+        
+        main_adverbs = [p for p in adverb_phrases if p['context'] == 'main']
+        sub_adverbs = [p for p in adverb_phrases if p['context'] == 'subordinate']
+        
+        self.logger.debug(f"🎯 シンプルルール適用: 主節副詞{len(main_adverbs)}個, 従属節副詞{len(sub_adverbs)}個")
+        
+        # 主節副詞のシンプルルール配置
+        if main_adverbs:
+            main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main')
+            slots.update(main_slots)
+        
+        # 従属節副詞のシンプルルール配置
+        if sub_adverbs:
+            sub_main_slots = self._apply_simple_rule_to_adverbs(sub_adverbs, 'sub')
+            sub_slots.update(sub_main_slots)
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
+        print(f"🔧 副詞ハンドラー完了: slots={slots}, sub_slots={sub_slots}")
         return {'slots': slots, 'sub_slots': sub_slots}
+    
+    def _apply_simple_rule_to_adverbs(self, adverbs, context_type):
+        """
+        シンプルルールを副詞群に一括適用
+        
+        Args:
+            adverbs: 副詞リスト
+            context_type: 'main' or 'sub'
+        """
+        result_slots = {}
+        count = len(adverbs)
+        
+        self.logger.debug(f"🎯 {context_type}節シンプルルール適用: {count}個の副詞")
+        
+        if count == 0:
+            return result_slots
+        
+        # スロット名プレフィックス
+        slot_prefix = 'sub-m' if context_type == 'sub' else 'M'
+        
+        if count == 1:
+            # 1個 → M2 (または sub-m2)
+            slot_name = f"{slot_prefix}2"
+            result_slots[slot_name] = adverbs[0]['phrase']
+            self.logger.debug(f"  1個ルール: {slot_name} = '{adverbs[0]['phrase']}'")
+        
+        elif count == 2:
+            # 2個 → M2, M3 (または sub-m2, sub-m3)
+            # 位置順でソート済みなので、最初がM2、次がM3
+            result_slots[f"{slot_prefix}2"] = adverbs[0]['phrase']
+            result_slots[f"{slot_prefix}3"] = adverbs[1]['phrase']
+            self.logger.debug(f"  2個ルール: {slot_prefix}2 = '{adverbs[0]['phrase']}', {slot_prefix}3 = '{adverbs[1]['phrase']}'")
+        
+        elif count >= 3:
+            # 3個以上 → M1, M2, M3 (または sub-m1, sub-m2, sub-m3)
+            result_slots[f"{slot_prefix}1"] = adverbs[0]['phrase']
+            result_slots[f"{slot_prefix}2"] = adverbs[1]['phrase']
+            result_slots[f"{slot_prefix}3"] = adverbs[2]['phrase']
+            self.logger.debug(f"  3個ルール: {slot_prefix}1/2/3 = '{adverbs[0]['phrase']}'/'{adverbs[1]['phrase']}'/'{adverbs[2]['phrase']}'")
+            
+            # 4個以上は無視（警告）
+            if count > 3:
+                ignored = [a['phrase'] for a in adverbs[3:]]
+                self.logger.warning(f"  ⚠️ 4個以上の副詞を無視: {ignored}")
+        
+        return result_slots
     
     def _find_main_verb(self, sentence):
         """主動詞を特定（構造的修正版）"""
@@ -2003,58 +2022,68 @@ class UnifiedStanzaRephraseMapper:
 
     def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):
         """
-        🎯 超シンプル副詞配置ルール（蒸し返し問題解決版）
+        🎯 真のシンプル副詞配置ルール（蒸し返し問題完全解決版）
         
-        核心原理：複雑な判定を排除し、個数ベース配置
+        核心原理：個数に基づく固定配置
         1個のみ → M2（どこにあっても）
-        2個 → 左（前半）=M1、右（後半）=M3  
-        3個 → 順番通りM1, M2, M3
+        2個 → M2, M3（位置順） 
+        3個 → M1, M2, M3（位置順）
         
-        この方式により予測可能性と直感性を最大化
+        従来の複雑な判定を排除し、予測可能性を最大化
         """
         
-        # 使用済みMスロット数をカウント
-        used_m_slots = sum(1 for slot in ['M1', 'M2', 'M3'] if slot in existing_slots)
-        total_m_slots_needed = used_m_slots + 1  # 現在追加分を含む
+        # 全修飾語を収集（現在の処理対象含む）
+        all_modifiers = []
         
-        self.logger.debug(f"🎯 シンプルMスロット判定: phrase='{phrase}', 使用済み={used_m_slots}, 必要総数={total_m_slots_needed}")
+        # 既存のMスロットから修飾語を収集
+        for slot in ['M1', 'M2', 'M3']:
+            if slot in existing_slots and existing_slots[slot]:
+                all_modifiers.append(existing_slots[slot])
         
-        # === 個数ベース配置ルール ===
+        # 現在の修飾語を追加
+        all_modifiers.append(phrase)
         
-        if total_m_slots_needed == 1:
-            # 1個のみ → M2（どこにあっても）
-            if 'M2' not in existing_slots:
-                self.logger.debug(f"  → M2選択（1個のみルール）")
-                return 'M2'
+        total_count = len(all_modifiers)
         
-        elif total_m_slots_needed == 2:
-            # 2個 → 動詞基準で前半/後半判定
-            if position < main_verb_position:
-                # 前半 → M1
-                if 'M1' not in existing_slots:
-                    self.logger.debug(f"  → M1選択（2個・前半ルール）")
-                    return 'M1'
+        self.logger.debug(f"🎯 真シンプルMスロット判定: phrase='{phrase}', 総修飾語数={total_count}")
+        self.logger.debug(f"  全修飾語: {all_modifiers}")
+        
+        # === 真のシンプルルール適用 ===
+        
+        if total_count == 1:
+            # 1個のみ → M2
+            self.logger.debug(f"  → M2選択（1個ルール）")
+            return 'M2'
+        
+        elif total_count == 2:
+            # 2個 → M2, M3
+            # 現在の修飾語が最初の場合はM2、2番目の場合はM3
+            current_index = all_modifiers.index(phrase)
+            if current_index == 0:
+                target_slot = 'M2'
             else:
-                # 後半 → M3
-                if 'M3' not in existing_slots:
-                    self.logger.debug(f"  → M3選択（2個・後半ルール）")
-                    return 'M3'
+                target_slot = 'M3'
+            
+            self.logger.debug(f"  → {target_slot}選択（2個ルール・位置{current_index + 1}）")
+            return target_slot
         
-        elif total_m_slots_needed >= 3:
-            # 3個以上 → 順番通りM1, M2, M3
-            for slot in ['M1', 'M2', 'M3']:
-                if slot not in existing_slots:
-                    self.logger.debug(f"  → {slot}選択（3個・順番ルール）")
-                    return slot
+        elif total_count >= 3:
+            # 3個以上 → M1, M2, M3
+            current_index = all_modifiers.index(phrase)
+            slot_mapping = ['M1', 'M2', 'M3']
+            
+            if current_index < 3:
+                target_slot = slot_mapping[current_index]
+                self.logger.debug(f"  → {target_slot}選択（3個+ルール・位置{current_index + 1}）")
+                return target_slot
+            else:
+                # 3個を超える場合は無視（エラー回避）
+                self.logger.debug(f"  → None（3個超過・位置{current_index + 1}）")
+                return None
         
-        # フォールバック：空いているスロットを使用
-        for slot in ['M2', 'M1', 'M3']:
-            if slot not in existing_slots:
-                self.logger.debug(f"  → {slot}選択（フォールバック）")
-                return slot
-        
-        self.logger.debug(f"  → None（全Mスロット使用済み）")
-        return None
+        # フォールバック（通常は到達しない）
+        self.logger.debug(f"  → M2選択（フォールバック）")
+        return 'M2'
 
     def _build_prepositional_phrase(self, sentence, word):
         """前置詞句の構築（完全性強化版）"""
@@ -2275,7 +2304,7 @@ class UnifiedStanzaRephraseMapper:
     
     def _generate_passive_voice_slots(self, passive_type: str, subject, auxiliary, main_verb, 
                                      agent_phrase: str, agent, sentence) -> Dict:
-        """受動態タイプ別スロット生成"""
+        """受動態タイプ別スロット生成（副詞処理は専門ハンドラーに委譲）"""
         
         slots = {}
         sub_slots = {}
@@ -2285,10 +2314,9 @@ class UnifiedStanzaRephraseMapper:
         slots['Aux'] = auxiliary.text
         slots['V'] = main_verb.text
         
-        # by句付き受動態の場合
-        if passive_type == 'agent_passive' and agent_phrase:
-            slots['M1'] = agent_phrase  # by句全体（副詞句として扱う）
-            # sub-m1は使わない - 副詞ハンドラーに委ねる
+        # ✅ 副詞処理を除去：by句は副詞ハンドラーに委譲
+        # by句付き受動態でも、M1は設定せず副詞ハンドラーに任せる
+        # agent_phraseの情報は文法情報として記録するが、スロットには設定しない
         
         return {'slots': slots, 'sub_slots': sub_slots}
     
