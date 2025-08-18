@@ -2457,7 +2457,7 @@ class UnifiedStanzaRephraseMapper:
         return None
     
     def _process_participle_construction(self, sentence, participle_info: Dict, base_result: Dict) -> Dict:
-        """分詞構文の処理"""
+        """分詞構文の処理（構造分解のみ、修飾語は副詞ハンドラーに委譲）"""
         result = base_result.copy()
         
         # 分詞構文のスロット生成
@@ -2467,12 +2467,11 @@ class UnifiedStanzaRephraseMapper:
         participle_verb = participle_info['participle_verb']
         subject = participle_info['subject']
         participle_type = participle_info['participle_type']
-        modifiers = participle_info['modifiers']
         
         self.logger.debug(f"  分詞構文処理: type={participle_type}, verb={participle_verb.text}, subject={subject.text if subject else 'None'}")
         
         if participle_type == 'present':
-            # 現在分詞構文処理 - 全て主語を空にして sub-v に統合
+            # 現在分詞構文処理 - 主語をsub-vに統合
             slots['S'] = ""
             
             if subject:
@@ -2484,9 +2483,6 @@ class UnifiedStanzaRephraseMapper:
                     main_object = self._find_main_verb_object(sentence)
                     if main_object:
                         slots['O1'] = self._build_noun_phrase_for_subject(sentence, main_object)
-                
-                # 分詞の修飾語を sub-m スロットに配置（Case 49: sub-m2, Case 50,51: sub-m2,sub-m3）
-                self._assign_participle_modifiers(modifiers, sub_slots, sentence, participle_type == 'present')
                     
         elif participle_type == 'being_past':
             # Case 52パターン: The documents being reviewed
@@ -2495,9 +2491,6 @@ class UnifiedStanzaRephraseMapper:
                 subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
                 sub_slots['sub-aux'] = f"{subject_phrase} being"
                 sub_slots['sub-v'] = participle_verb.text
-                
-                # 分詞の修飾語を sub-m スロットに配置
-                self._assign_participle_modifiers(modifiers, sub_slots, sentence, False)
         
         # 結果を更新
         result['slots'] = slots
