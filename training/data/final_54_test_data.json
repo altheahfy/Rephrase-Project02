@@ -430,8 +430,8 @@
           "sub-s": "The book which",
           "sub-v": "written",
           "sub-aux": "was",
-          "sub-m1": "carefully",
-          "sub-m2": "by Shakespeare"
+          "sub-m2": "carefully",
+          "sub-m3": "by Shakespeare"
         }
       }
     },
@@ -464,8 +464,8 @@
           "sub-s": "The letter which",
           "sub-v": "typed",
           "sub-aux": "was",
-          "sub-m1": "slowly",
-          "sub-m2": "by the secretary"
+          "sub-m2": "slowly",
+          "sub-m3": "by the secretary"
         }
       }
     },
@@ -481,7 +481,7 @@
         "sub_slots": {
           "sub-s": "The student who",
           "sub-v": "studies",
-          "sub-m1": "diligently"
+          "sub-m2": "diligently"
         }
       }
     },
@@ -659,8 +659,8 @@
           "sub-s": "The report which",
           "sub-aux": "was",
           "sub-v": "reviewed",
-          "sub-m1": "thoroughly",
-          "sub-m2": "by experts"
+          "sub-m2": "thoroughly",
+          "sub-m3": "by experts"
         }
       }
     },
