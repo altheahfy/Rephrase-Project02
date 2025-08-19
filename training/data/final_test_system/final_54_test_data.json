@@ -301,7 +301,7 @@
           "S": "The letter",
           "Aux": "was",
           "V": "written",
-          "M1": "by John"
+          "M2": "by John"
         },
         "sub_slots": {}
       }
@@ -325,7 +325,7 @@
           "S": "The book",
           "Aux": "was",
           "V": "written",
-          "M1": "by a famous author"
+          "M2": "by a famous author"
         },
         "sub_slots": {}
       }
@@ -337,7 +337,7 @@
           "S": "The cake",
           "Aux": "is being",
           "V": "baked",
-          "M1": "by my mother"
+          "M2": "by my mother"
         },
         "sub_slots": {}
       }
@@ -349,7 +349,7 @@
           "S": "The cake",
           "Aux": "was",
           "V": "eaten",
-          "M1": "by the children"
+          "M2": "by the children"
         },
         "sub_slots": {}
       }
@@ -361,7 +361,7 @@
           "S": "The door",
           "Aux": "was",
           "V": "opened",
-          "M1": "by the key"
+          "M2": "by the key"
         },
         "sub_slots": {}
       }
@@ -563,7 +563,8 @@
         "main_slots": {
           "S": "",
           "V": "needs",
-          "O1": "immediate repair"
+          "O1": "immediate repair",
+          "M2": "badly"
         },
         "sub_slots": {
           "sub-s": "the house whose roof",
@@ -612,8 +613,9 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "by skilled workers",
-          "M2": "very carefully"
+          "M1": "very",
+          "M2": "very carefully",
+          "M3": "by skilled workers"
         },
         "sub_slots": {}
       }
@@ -669,7 +671,7 @@
         "main_slots": {
           "S": "The student",
           "V": "improved",
-          "Adv": "dramatically"
+          "M2": "dramatically"
         },
         "sub_slots": {
           "sub-s": "whose essay",
@@ -719,7 +721,7 @@
           "S": "",
           "Aux": "was",
           "V": "waiting",
-          "M3": "patiently"
+          "M2": "patiently"
         },
         "sub_slots": {
           "sub-v": "the woman standing",
@@ -735,7 +737,7 @@
           "S": "",
           "Aux": "were",
           "V": "supervised",
-          "M3": "carefully"
+          "M2": "carefully"
         },
         "sub_slots": {
           "sub-v": "the children playing",
