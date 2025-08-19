@@ -2080,12 +2080,21 @@ class UnifiedStanzaRephraseMapper:
         # 直接の動詞依存関係をチェック
         head_id = adverb_word.head
         
-        # 依存関係を遡って動詞を見つける
-        current_word = None
+        # 🔧 関係詞節検出強化：acl:relcl依存関係を確認
+        # まず、副詞が直接修飾している動詞を確認
+        direct_head = None
         for word in sentence.words:
             if word.id == head_id:
-                current_word = word
+                direct_head = word
                 break
+        
+        # 直接修飾している動詞が関係詞節動詞の場合
+        if direct_head and direct_head.deprel == 'acl:relcl':
+            self.logger.debug(f"🎯 関係詞節副詞検出: {adverb_word.text} → {direct_head.text} (acl:relcl)")
+            return 'subordinate'
+        
+        # 依存関係を遡って動詞を見つける
+        current_word = direct_head
         
         # 依存関係を辿って主動詞/従属動詞を判定
         max_depth = 5  # 無限ループ防止
@@ -2093,8 +2102,15 @@ class UnifiedStanzaRephraseMapper:
         
         while current_word and depth < max_depth:
             if current_word.id == main_verb_id:
+                self.logger.debug(f"🎯 主節副詞検出: {adverb_word.text} → 主動詞経路")
                 return 'main'
             elif current_word.id in subordinate_verbs:
+                self.logger.debug(f"🎯 従属節副詞検出: {adverb_word.text} → 従属動詞経路")
+                return 'subordinate'
+            
+            # 関係詞節マーカーチェック
+            if current_word.deprel in ['acl:relcl', 'acl', 'advcl']:
+                self.logger.debug(f"🎯 従属節副詞検出: {adverb_word.text} → {current_word.deprel}")
                 return 'subordinate'
             
             # 次の head を探す
@@ -2111,18 +2127,10 @@ class UnifiedStanzaRephraseMapper:
             current_word = next_word
             depth += 1
         
-        # 🎯 依存関係ベース判定（位置的推論は危険なので削除）
-        # 副詞が主動詞系統か従属節動詞系統かを依存関係で正確に判定
-        
-        if current_word and current_word.id == main_verb_id:
-            return 'main'
-        elif current_word and current_word.id in subordinate_verbs:
-            return 'subordinate'
-        
         # 🔧 改良版：主動詞への依存経路チェック
         # 副詞 → head → head → ... → main_verb の経路があるか
         visited = set()
-        check_word = current_word
+        check_word = direct_head
         
         while check_word and check_word.id not in visited:
             visited.add(check_word.id)
@@ -2141,7 +2149,9 @@ class UnifiedStanzaRephraseMapper:
                     break
             check_word = next_word
         
-        return 'main'  # デフォルト：主節（安全側）
+        # デフォルト：主節（安全側）
+        self.logger.debug(f"🎯 デフォルト判定: {adverb_word.text} → 主節（フォールバック）")
+        return 'main'
 
     def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):
         """
