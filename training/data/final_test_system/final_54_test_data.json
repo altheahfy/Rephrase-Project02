@@ -495,8 +495,7 @@
           "M2": "greatly"
         },
         "sub_slots": {
-          "sub-s": "The teacher whose",
-          "sub-c1": "class",
+          "sub-s": "The teacher whose class",
           "sub-v": "runs",
           "sub-m2": "efficiently"
         }
@@ -563,11 +562,10 @@
         "main_slots": {
           "S": "",
           "V": "needs",
-          "O1": "immediate repair",
-          "M2": "badly"
+          "O1": "immediate repair"
         },
         "sub_slots": {
-          "sub-s": "the house whose roof",
+          "sub-s": "The house whose roof",
           "sub-aux": "was",
           "sub-v": "damaged",
           "sub-m2": "badly"
