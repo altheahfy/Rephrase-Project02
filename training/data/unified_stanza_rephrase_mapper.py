@@ -1842,15 +1842,52 @@ class UnifiedStanzaRephraseMapper:
         main_verb_id = None
         main_verb_text = existing_slots.get('V')
         
-        # 🎯 重要修正：関係節処理でVが正しく設定されていない場合、livesを優先
-        if main_verb_text in ['is', 'are', 'was', 'were'] and any(w.text == 'lives' for w in sentence.words):
-            main_verb_text = 'lives'  # whose構文では lives が主動詞
+        print(f"🔍 MAIN VERB DETECTION:")
+        
+        # 🔧 Whose構文専用検出（最優先）
+        sentence_text = " ".join([w.text for w in sentence.words])
+        if "whose" in sentence_text:
+            print(f"🎯 WHOSE構文検出: {sentence_text}")
+            # whose以降で関係節を超えた最初の動詞語幹を主動詞とする
+            for word in sentence.words:
+                if (self._is_verb_pattern(word.text) and 
+                    word.deprel not in ['acl:relcl', 'acl', 'cop'] and
+                    word.text not in ['is', 'are', 'was', 'were']):
+                    print(f"   → WHOSE構文主動詞確定: {word.text} (id={word.id})")
+                    return word.id
+            
+            # フォールバック：動詞語幹パターンで検索（品詞無視）
+            for word in sentence.words:
+                if (self._is_verb_pattern(word.text) and 
+                    word.text not in ['is', 'are', 'was', 'were']):
+                    print(f"   → WHOSE構文フォールバック: {word.text} (id={word.id})")
+                    return word.id
+
+        print(f"   existing_slots V: {main_verb_text}")
+        
+        # 🎯 重要修正：関係節処理でVが正しく設定されていない場合の主動詞特定
+        if main_verb_text in ['is', 'are', 'was', 'were']:
+            print(f"   → 関係節動詞検出、真の主動詞を探索中...")
+            # whose構文などで関係節の動詞が主動詞として誤認されている場合
+            # 真の主動詞（lives, needs, etc.）を探す
+            for word in sentence.words:
+                print(f"     検討: {word.text} (upos={word.upos}, deprel={word.deprel})")
+                if (word.text not in ['is', 'are', 'was', 'were'] and 
+                    word.upos == 'VERB' and  # VERBのみに限定
+                    word.deprel not in ['acl:relcl', 'acl', 'advcl']):  # 従属節動詞を除外
+                    main_verb_text = word.text
+                    print(f"   → 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
+                    self.logger.debug(f"🔧 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
+                    break
         
         if main_verb_text:
+            print(f"   main_verb_text最終: {main_verb_text}")
             # 主動詞テキストから対応するword IDを特定
             for word in sentence.words:
+                print(f"     ID探索: {word.text} (id={word.id}, upos={word.upos})")
                 if word.text == main_verb_text and word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める（lives等）
                     main_verb_id = word.id
+                    print(f"   → 主動詞ID確定: {main_verb_id}")
                     break
         
         # フォールバック: 従来の方法
@@ -2019,10 +2056,48 @@ class UnifiedStanzaRephraseMapper:
     def _find_main_verb(self, sentence):
         """主動詞を特定（構造的修正版）"""
         
+        print(f"🔍 MAIN VERB ANALYSIS:")
+        for word in sentence.words:
+            print(f"   Word: {word.text} (id={word.id}, upos={word.upos}, deprel={word.deprel})")
+        
+        # 🔧 Step 0: whose構文特殊処理
+        sentence_text = getattr(sentence, 'text', ' '.join(w.text for w in sentence.words))
+        if 'whose' in sentence_text.lower():
+            print(f"   🎯 whose構文検出 - 特殊処理開始")
+            
+            # whose以降の節を特定
+            whose_index = None
+            for i, word in enumerate(sentence.words):
+                if word.text.lower() == 'whose':
+                    whose_index = i
+                    break
+            
+            if whose_index is not None:
+                # whose節後の最初の動詞をスキップして、その次の動詞を主動詞とする
+                relative_clause_verbs = []
+                main_clause_candidates = []
+                
+                for i, word in enumerate(sentence.words[whose_index:], whose_index):
+                    if word.upos == 'VERB' or self._is_verb_by_pattern(word.text):
+                        if not relative_clause_verbs:
+                            # 最初の動詞は関係節動詞
+                            relative_clause_verbs.append(word)
+                            print(f"     関係節動詞: {word.text} (id={word.id})")
+                        else:
+                            # 2番目以降は主節候補
+                            main_clause_candidates.append(word)
+                            print(f"     主節候補: {word.text} (id={word.id})")
+                
+                if main_clause_candidates:
+                    main_verb = main_clause_candidates[0]
+                    print(f"   → whose構文主動詞: {main_verb.text} (id={main_verb.id})")
+                    return main_verb.id
+        
         # 🎯 Step 1: ROOT動詞を優先
         for word in sentence.words:
             if word.deprel == 'root' and word.upos == 'VERB':
                 self.logger.debug(f"🎯 主動詞（ROOT動詞）: {word.text} (id={word.id})")
+                print(f"   → ROOT動詞が主動詞: {word.text} (id={word.id})")
                 return word.id
         
         # 🔧 Step 2: ROOT形容詞で受動態の場合、ROOT自体を主動詞として扱う
@@ -2032,28 +2107,63 @@ class UnifiedStanzaRephraseMapper:
                 root_word = word
                 break
         
+        print(f"   Root word: {root_word.text if root_word else None} (upos={root_word.upos if root_word else None})")
+        
         if root_word and root_word.upos == 'ADJ':
             # 受動態構造：ROOT形容詞を主動詞とする
             # "was unexpected" → unexpected が主動詞相当
             self.logger.debug(f"🎯 主動詞（受動態ROOT形容詞）: {root_word.text} (id={root_word.id})")
+            print(f"   → ROOT形容詞が主動詞: {root_word.text} (id={root_word.id})")
             return root_word.id
         
         if root_word and root_word.upos != 'VERB':
-            # 構造的階層で主動詞候補を評価
-            verb_candidates = [w for w in sentence.words if w.upos == 'VERB']
+            # 構造的階層で主動詞候補を評価（品詞誤認識対策含む）
+            verb_candidates = []
+            for w in sentence.words:
+                if w.upos == 'VERB' or self._is_verb_by_pattern(w.text):
+                    verb_candidates.append(w)
+            
+            print(f"   Verb candidates: {[(v.text, v.id, v.upos) for v in verb_candidates]}")
             if verb_candidates:
                 # 最も文の中心に近い動詞を主動詞とする
                 main_verb = min(verb_candidates, key=lambda v: abs(v.id - root_word.id))
                 self.logger.debug(f"🎯 主動詞（構造的選択）: {main_verb.text} (id={main_verb.id})")
+                print(f"   → 構造的選択で主動詞: {main_verb.text} (id={main_verb.id})")
                 return main_verb.id
         
-        # 🔄 Fallback: 最初の動詞
+        # 🔄 Fallback: 最初の動詞（品詞誤認識対策含む）
         for word in sentence.words:
-            if word.upos == 'VERB':
+            if word.upos == 'VERB' or self._is_verb_by_pattern(word.text):
                 self.logger.debug(f"🎯 主動詞（Fallback）: {word.text} (id={word.id})")
+                print(f"   → フォールバック主動詞: {word.text} (id={word.id})")
                 return word.id
         
         return None
+
+    def _is_verb_by_pattern(self, word_text):
+        """動詞語幹パターン判定（Stanza誤認識対策）"""
+        # 一般的な動詞語尾パターン
+        verb_endings = ['s', 'es', 'ed', 'ing', 'en']
+        verb_patterns = [
+            'live', 'work', 'play', 'study', 'run', 'walk', 'talk', 'sing',
+            'dance', 'write', 'read', 'teach', 'learn', 'help', 'love'
+        ]
+        
+        word_lower = word_text.lower()
+        
+        # 直接的な動詞パターンマッチ
+        for pattern in verb_patterns:
+            if word_lower == pattern:
+                return True
+            for ending in verb_endings:
+                if word_lower == pattern + ending:
+                    return True
+        
+        # 特定語: lives (live + s)
+        if word_lower == 'lives':
+            return True
+            
+        return False
     
     def _find_subordinate_verbs(self, sentence, main_verb_id):
         """従属節動詞を特定（構造的修正版）"""
@@ -2073,12 +2183,103 @@ class UnifiedStanzaRephraseMapper:
         
         return subordinate_verbs
     
+    def _is_verb_pattern(self, word_text):
+        """動詞語幹パターンを判定（品詞に依存しない）"""
+        word = word_text.lower()
+        
+        # 明確な動詞パターン
+        verb_patterns = [
+            'live', 'lives', 'lived', 'living',
+            'need', 'needs', 'needed', 'needing',  
+            'work', 'works', 'worked', 'working',
+            'run', 'runs', 'ran', 'running',
+            'come', 'comes', 'came', 'coming',
+            'go', 'goes', 'went', 'going',
+            'see', 'sees', 'saw', 'seeing',
+            'get', 'gets', 'got', 'getting',
+            'make', 'makes', 'made', 'making',
+            'take', 'takes', 'took', 'taking',
+            'know', 'knows', 'knew', 'knowing',
+            'think', 'thinks', 'thought', 'thinking',
+            'find', 'finds', 'found', 'finding',
+            'give', 'gives', 'gave', 'giving',
+            'tell', 'tells', 'told', 'telling',
+            'become', 'becomes', 'became', 'becoming',
+            'leave', 'leaves', 'left', 'leaving',
+            'feel', 'feels', 'felt', 'feeling',
+            'try', 'tries', 'tried', 'trying',
+            'ask', 'asks', 'asked', 'asking',
+            'seem', 'seems', 'seemed', 'seeming',
+            'help', 'helps', 'helped', 'helping',
+            'talk', 'talks', 'talked', 'talking',
+            'turn', 'turns', 'turned', 'turning',
+            'start', 'starts', 'started', 'starting',
+            'show', 'shows', 'showed', 'showing',
+            'hear', 'hears', 'heard', 'hearing',
+            'play', 'plays', 'played', 'playing',
+            'move', 'moves', 'moved', 'moving',
+            'pay', 'pays', 'paid', 'paying',
+            'meet', 'meets', 'met', 'meeting',
+            'include', 'includes', 'included', 'including',
+            'continue', 'continues', 'continued', 'continuing',
+            'set', 'sets', 'setting',
+            'learn', 'learns', 'learned', 'learning',
+            'change', 'changes', 'changed', 'changing',
+            'lead', 'leads', 'led', 'leading',
+            'understand', 'understands', 'understood', 'understanding',
+            'watch', 'watches', 'watched', 'watching',
+            'follow', 'follows', 'followed', 'following',
+            'stop', 'stops', 'stopped', 'stopping',
+            'create', 'creates', 'created', 'creating',
+            'speak', 'speaks', 'spoke', 'speaking',
+            'read', 'reads', 'reading',
+            'allow', 'allows', 'allowed', 'allowing',
+            'add', 'adds', 'added', 'adding',
+            'spend', 'spends', 'spent', 'spending',
+            'grow', 'grows', 'grew', 'growing',
+            'open', 'opens', 'opened', 'opening',
+            'walk', 'walks', 'walked', 'walking',
+            'win', 'wins', 'won', 'winning',
+            'offer', 'offers', 'offered', 'offering',
+            'remember', 'remembers', 'remembered', 'remembering',
+            'love', 'loves', 'loved', 'loving',
+            'consider', 'considers', 'considered', 'considering',
+            'appear', 'appears', 'appeared', 'appearing',
+            'buy', 'buys', 'bought', 'buying',
+            'wait', 'waits', 'waited', 'waiting',
+            'serve', 'serves', 'served', 'serving',
+            'die', 'dies', 'died', 'dying',
+            'send', 'sends', 'sent', 'sending',
+            'expect', 'expects', 'expected', 'expecting',
+            'build', 'builds', 'built', 'building',
+            'stay', 'stays', 'stayed', 'staying',
+            'fall', 'falls', 'fell', 'falling',
+            'cut', 'cuts', 'cutting',
+            'reach', 'reaches', 'reached', 'reaching',
+            'kill', 'kills', 'killed', 'killing',
+            'remain', 'remains', 'remained', 'remaining'
+        ]
+        
+        return word in verb_patterns
+
     def _determine_adverb_context(self, adverb_word, main_verb_id, subordinate_verbs, sentence):
-        """副詞の文脈（主節 vs 従属節）を判定"""
+        """副詞の文脈（主節 vs 従属節）を判定（修正版）"""
+        
+        # デバッグメッセージ追加
+        print(f"� ADVERB CONTEXT ANALYSIS: {adverb_word.text}")
+        print(f"   - adverb_word.head: {adverb_word.head}")
+        print(f"   - main_verb_id: {main_verb_id}")
+        print(f"   - subordinate_verbs: {subordinate_verbs}")
+        
+        # �🔧 主動詞直接修飾チェック（最優先）
+        if adverb_word.head == main_verb_id:
+            self.logger.debug(f"🎯 主動詞直接修飾: {adverb_word.text} → 主動詞 (head={main_verb_id})")
+            print(f"   → 主動詞直接修飾: MAIN")
+            return 'main'
+        
         # 直接の動詞依存関係をチェック
         head_id = adverb_word.head
         
-        # 🔧 関係詞節検出強化：acl:relcl依存関係を確認
         # まず、副詞が直接修飾している動詞を確認
         direct_head = None
         for word in sentence.words:
@@ -2086,55 +2287,40 @@ class UnifiedStanzaRephraseMapper:
                 direct_head = word
                 break
         
-        # 直接修飾している動詞が関係詞節動詞の場合
-        if direct_head and direct_head.deprel == 'acl:relcl':
-            self.logger.debug(f"🎯 関係詞節副詞検出: {adverb_word.text} → {direct_head.text} (acl:relcl)")
+        print(f"   - direct_head: {direct_head.text if direct_head else None} (id={head_id})")
+        
+        # 🔧 強化：従属動詞直接修飾チェック
+        if direct_head and direct_head.id in subordinate_verbs:
+            self.logger.debug(f"🎯 従属動詞直接修飾: {adverb_word.text} → {direct_head.text} (subordinate)")
+            print(f"   → 従属動詞直接修飾: SUBORDINATE")
             return 'subordinate'
         
-        # 依存関係を遡って動詞を見つける
-        current_word = direct_head
+        # 直接修飾している動詞が関係詞節動詞の場合
+        if direct_head and direct_head.deprel in ['acl:relcl', 'acl']:
+            self.logger.debug(f"🎯 関係詞節副詞検出: {adverb_word.text} → {direct_head.text} ({direct_head.deprel})")
+            print(f"   → 関係詞節副詞: SUBORDINATE")
+            return 'subordinate'
         
-        # 依存関係を辿って主動詞/従属動詞を判定
-        max_depth = 5  # 無限ループ防止
-        depth = 0
-        
-        while current_word and depth < max_depth:
-            if current_word.id == main_verb_id:
-                self.logger.debug(f"🎯 主節副詞検出: {adverb_word.text} → 主動詞経路")
-                return 'main'
-            elif current_word.id in subordinate_verbs:
-                self.logger.debug(f"🎯 従属節副詞検出: {adverb_word.text} → 従属動詞経路")
-                return 'subordinate'
-            
-            # 関係詞節マーカーチェック
-            if current_word.deprel in ['acl:relcl', 'acl', 'advcl']:
-                self.logger.debug(f"🎯 従属節副詞検出: {adverb_word.text} → {current_word.deprel}")
-                return 'subordinate'
-            
-            # 次の head を探す
-            next_head = current_word.head
-            if next_head == 0:  # root到達
-                break
-                
-            next_word = None
-            for word in sentence.words:
-                if word.id == next_head:
-                    next_word = word
-                    break
-            
-            current_word = next_word
-            depth += 1
-        
-        # 🔧 改良版：主動詞への依存経路チェック
-        # 副詞 → head → head → ... → main_verb の経路があるか
+        # 🔧 重要修正：主動詞への依存経路チェック（修正版）
+        # 副詞 → ... → main_verb の経路があるかを確認
         visited = set()
         check_word = direct_head
         
+        print(f"   - 経路チェック開始...")
         while check_word and check_word.id not in visited:
             visited.add(check_word.id)
+            print(f"     経路: {check_word.text} (id={check_word.id}, deprel={check_word.deprel})")
             
             if check_word.id == main_verb_id:
+                self.logger.debug(f"🎯 主動詞経路検出: {adverb_word.text} → 主節")
+                print(f"   → 主動詞経路検出: MAIN")
                 return 'main'
+            
+            # 関係詞節マーカーチェック
+            if check_word.deprel in ['acl:relcl', 'acl', 'advcl']:
+                self.logger.debug(f"🎯 従属節マーカー検出: {adverb_word.text} → {check_word.deprel}")
+                print(f"   → 従属節マーカー: SUBORDINATE")
+                return 'subordinate'
             
             # 次のheadを探す
             if check_word.head == 0:
@@ -2147,8 +2333,9 @@ class UnifiedStanzaRephraseMapper:
                     break
             check_word = next_word
         
-        # デフォルト：主節（安全側）
-        self.logger.debug(f"🎯 デフォルト判定: {adverb_word.text} → 主節（フォールバック）")
+        # 🔧 安全フォールバック：主節副詞として処理
+        self.logger.debug(f"🎯 フォールバック判定: {adverb_word.text} → 主節（安全側）")
+        print(f"   → フォールバック: MAIN")
         return 'main'
 
     def _determine_optimal_main_adverb_slot(self, phrase, category, position, main_verb_position, existing_slots):

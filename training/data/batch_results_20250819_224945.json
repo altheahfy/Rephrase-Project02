@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "input_file": "test_12_only.json",
+    "processed_at": "2025-08-19T22:49:50.144853",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": {
+        "id": 12,
+        "sentence": "The man whose car is red lives here.",
+        "expected": {
+          "main_slots": {
+            "S": "",
+            "V": "lives",
+            "M2": "here"
+          },
+          "sub_slots": {
+            "sub-s": "The man whose car",
+            "sub-v": "is",
+            "sub-c1": "red"
+          }
+        }
+      },
+      "analysis_result": {
+        "sentence": {
+          "id": 12,
+          "sentence": "The man whose car is red lives here.",
+          "expected": {
+            "main_slots": {
+              "S": "",
+              "V": "lives",
+              "M2": "here"
+            },
+            "sub_slots": {
+              "sub-s": "The man whose car",
+              "sub-v": "is",
+              "sub-c1": "red"
+            }
+          }
+        },
+        "slots": {},
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.0,
+          "sentence_id": 1,
+          "active_handlers": 0
+        }
+      },
+      "status": "success"
+    }
+  }
+}
