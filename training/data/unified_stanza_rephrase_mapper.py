@@ -450,8 +450,18 @@ class UnifiedStanzaRephraseMapper:
                     # 競合解決：空文字や空値で既存の有効な値を上書きしない
                     existing_value = base_result['slots'][slot_name]
                     
+                    # 🎯 分詞構文保護：分詞構文ハンドラーが設定した空文字を保護
+                    control_flags = base_result.get('grammar_info', {}).get('control_flags', {})
+                    participle_detected = control_flags.get('participle_detected', False)
+                    modified_slot = control_flags.get('modified_slot')
+                    
+                    if (participle_detected and slot_name == modified_slot and 
+                        existing_value == "" and handler_name != 'participle_construction'):
+                        # 分詞構文で空文字化されたスロットは他のハンドラーで上書き禁止
+                        self.logger.debug(f"🛡️ 分詞構文保護: {slot_name} 空文字保持 (by participle_construction)")
+                        pass  # 空文字を保持
                     # ★ Mスロット保護：副詞ハンドラーで設定されたMスロットを保護
-                    if slot_name.startswith('M') and existing_value and handler_name != 'adverbial_modifier':
+                    elif slot_name.startswith('M') and existing_value and handler_name != 'adverbial_modifier':
                         # 副詞ハンドラー以外はMスロットを上書きできない
                         pass  # 既存値を保持
                     # 既存値が空で新値が有効な場合は上書き
@@ -581,20 +591,20 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("🔗 接続詞構文検出: 主節要素保持")
             return
         
-        # 対応関係マッピング（Rephraseの完全なS階層構造準拠）
-        # Sの子スロット: sub-s, sub-aux, sub-v, sub-c1, sub-o1, sub-o2, sub-c2, sub-m1, sub-m2, sub-m3
-        s_sub_slots = ['sub-s', 'sub-aux', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
-        
+        # 対応関係マッピング（Aux, V除外）
         main_to_sub_mapping = {
-            'S': s_sub_slots,  # Sの完全な子スロット群
-            'O1': ['sub-o1'],  # 簡略版（将来O1_sub-*拡張予定）
-            'O2': ['sub-o2'], 
-            'C1': ['sub-c1'],
-            'C2': ['sub-c2'],
-            'M1': ['sub-m1'],
-            'M2': ['sub-m2'],
-            'M3': ['sub-m3']
+            'S': 'sub-s',
+            'O1': 'sub-o1', 
+            'O2': 'sub-o2',
+            'C1': 'sub-c1',
+            'C2': 'sub-c2', 
+            'M1': 'sub-m1',
+            'M2': 'sub-m2',
+            'M3': 'sub-m3'
         }
+        
+        # 🎯 Sスロットの完全な子スロット群（分詞構文用）
+        s_child_slots = ['sub-s', 'sub-aux', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
         
         # 分詞構文制御フラグをチェック
         grammar_info = result.get('grammar_info', {})
@@ -633,6 +643,17 @@ class UnifiedStanzaRephraseMapper:
                         f"{main_slot}: '{original_value}' → '' "
                         f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
                     )
+        
+        # 🎯 Sスロットの完全な子スロット群チェック（分詞構文対応）
+        s_has_child = any(child_slot in sub_slots and sub_slots[child_slot] for child_slot in s_child_slots)
+        if s_has_child and 'S' in slots and slots['S']:
+            original_s = slots['S']
+            slots['S'] = ""
+            active_children = [slot for slot in s_child_slots if slot in sub_slots and sub_slots[slot]]
+            self.logger.debug(
+                f"🎯 Sスロット空文字化: S: '{original_s}' → '' "
+                f"(子スロット存在: {', '.join(active_children)})"
+            )
         
         # 副詞重複チェックと削除
         self._remove_adverb_duplicates(slots, sub_slots)
@@ -1872,7 +1893,9 @@ class UnifiedStanzaRephraseMapper:
                 
                 # Migration source前置詞句構築機能活用
                 if word.deprel.startswith('obl'):
-                    phrase = self._build_prepositional_phrase(sentence, word)
+                    # 🔧 advmod修飾語を除外して基本語のみでOBL句構築
+                    phrase = self._build_prepositional_phrase(sentence, word, exclude_advmod=True)
+                    print(f"DEBUG OBL: '{word.text}' -> '{phrase}' (advmod除外)")
                     # 前置詞句の全tokens記録（重複回避）
                     phrase_words = phrase.split()
                     for pw in phrase_words:
@@ -1882,6 +1905,7 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     # 🔧 副詞修飾語を含む句構築（"very carefully"対応）
                     phrase = self._build_adverbial_phrase(sentence, word)
+                    print(f"🔧 ADV句構築: '{word.text}' → '{phrase}'")
                     phrase_words = phrase.split()
                     for pw in phrase_words:
                         for w in sentence.words:
@@ -1933,7 +1957,9 @@ class UnifiedStanzaRephraseMapper:
         
         # 主節副詞のシンプルルール配置
         if main_adverbs:
+            print(f"🎯 Main副詞詳細: {main_adverbs}")
             main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main')
+            print(f"🎯 Main副詞結果: {main_slots}")
             slots.update(main_slots)
         
         # 従属節副詞のシンプルルール配置
@@ -1976,6 +2002,7 @@ class UnifiedStanzaRephraseMapper:
             result_slots[f"{slot_prefix}2"] = adverbs[0]['phrase']
             result_slots[f"{slot_prefix}3"] = adverbs[1]['phrase']
             self.logger.debug(f"  2個ルール: {slot_prefix}2 = '{adverbs[0]['phrase']}', {slot_prefix}3 = '{adverbs[1]['phrase']}'")
+            self.logger.debug(f"  詳細: adverb[0]={adverbs[0]}, adverb[1]={adverbs[1]}")
         
         elif count >= 3:
             # 3個以上 → M1, M2, M3 (または sub-m1, sub-m2, sub-m3)
@@ -2181,8 +2208,10 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  → M2選択（フォールバック）")
         return 'M2'
 
-    def _build_prepositional_phrase(self, sentence, word):
+    def _build_prepositional_phrase(self, sentence, word, exclude_advmod=True):
         """前置詞句の構築（完全性強化版）"""
+        print(f"DEBUG METHOD1: '{word.text}' (id={word.id})")
+        
         # 前置詞句の完全構築
         phrase_parts = []
         
@@ -2197,16 +2226,24 @@ class UnifiedStanzaRephraseMapper:
             phrase_parts.append(preposition)
         
         # 🔧 修飾語収集を拡張（より多くの修飾関係を含める）
+        # ただし、advmod は除外（副詞は独立処理）
         modifiers = []
         for w in sentence.words:
             if w.head == word.id and w.deprel in ['det', 'amod', 'compound', 'nmod', 'nmod:poss']:
                 modifiers.append((w.id, w.text))
+                print(f"DEBUG MOD: {w.text} (deprel={w.deprel})")
+            elif w.head == word.id and w.deprel == 'advmod':
+                # advmod は副詞として独立処理するため除外
+                print(f"DEBUG ADVMOD EXCLUDED: {w.text} (advmod)")
+            elif w.head == word.id:
+                print(f"DEBUG OTHER: {w.text} (deprel={w.deprel})")
         
         # 🔧 間接修飾語も収集（"the morning breeze"の"morning"をキャッチ）
         for w in sentence.words:
             # wordの直接修飾語の修飾語も収集
             if any(mod[0] == w.head for mod in modifiers) and w.deprel in ['amod', 'compound']:
                 modifiers.append((w.id, w.text))
+                print(f"DEBUG INDIRECT: {w.text} (deprel={w.deprel})")
         
         # 位置順ソート
         modifiers.sort()
@@ -2215,6 +2252,7 @@ class UnifiedStanzaRephraseMapper:
         
         constructed_phrase = ' '.join(phrase_parts)
         self.logger.debug(f"🔧 前置詞句構築: '{word.text}' → '{constructed_phrase}'")
+        print(f"DEBUG RESULT: '{word.text}' -> '{constructed_phrase}'")
         
         return constructed_phrase
     
@@ -2242,17 +2280,6 @@ class UnifiedStanzaRephraseMapper:
     # def _classify_adverbial_phrase(...) -> 不要
 
     # ==== PASSIVE VOICE HANDLER ====
-        """複合副詞句の構築"""
-        # 2つの副詞の間にある語も含める
-        start_pos = min(mod1['position'], mod2['position'])
-        end_pos = max(mod1['position'], mod2['position'])
-        
-        phrase_words = []
-        for word in sentence.words:
-            if start_pos <= word.id <= end_pos:
-                phrase_words.append(word.text)
-        
-        return ' '.join(phrase_words)
 
     def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
         """
@@ -2574,6 +2601,9 @@ class UnifiedStanzaRephraseMapper:
             subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
             sub_v_content = f"{subject_phrase} {participle_verb.text}"
             
+            # 🎯 文頭を小文字化（Rephrase仕様準拠）
+            sub_v_content = sub_v_content[0].lower() + sub_v_content[1:] if sub_v_content else sub_v_content
+            
             # Step 2: 該当スロットを空にして、sub-vに移動
             if target_slot:
                 slots[target_slot] = ""  # 修飾対象スロットを空にする
@@ -2589,16 +2619,20 @@ class UnifiedStanzaRephraseMapper:
             # Case 52パターン: The documents being reviewed
             subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
             
+            # 🎯 文頭を小文字化（Rephrase仕様準拠）
+            sub_aux_content = f"{subject_phrase} being"
+            sub_aux_content = sub_aux_content[0].lower() + sub_aux_content[1:] if sub_aux_content else sub_aux_content
+            
             # Step 2: 該当スロットを空にして、sub-aux/sub-vに分割
             if target_slot:
                 slots[target_slot] = ""
-                sub_slots['sub-aux'] = f"{subject_phrase} being"
+                sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
                 self.logger.debug(f"  ✅ being分詞処理: {target_slot} → sub-aux/sub-v")
             else:
                 # フォールバック
                 slots['S'] = ""
-                sub_slots['sub-aux'] = f"{subject_phrase} being"
+                sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
         
         # 結果を更新
@@ -2968,7 +3002,7 @@ class UnifiedStanzaRephraseMapper:
             # 修飾語の構築（前置詞句なども含む）
             if modifier.deprel == 'obl':
                 # 前置詞句の場合
-                prep_phrase = self._build_prepositional_phrase(sentence, modifier)
+                prep_phrase = self._build_prepositional_phrase(sentence, modifier, exclude_advmod=False)
                 modifier_texts.append(prep_phrase)
             else:
                 # 単純な修飾語
@@ -2994,7 +3028,7 @@ class UnifiedStanzaRephraseMapper:
             # 修飾語の構築（前置詞句なども含む）
             if modifier.deprel == 'obl':
                 # 前置詞句の場合
-                prep_phrase = self._build_prepositional_phrase(sentence, modifier)
+                prep_phrase = self._build_prepositional_phrase(sentence, modifier, exclude_advmod=False)
                 modifier_texts.append(prep_phrase)
             else:
                 # 単純な修飾語
@@ -3003,14 +3037,23 @@ class UnifiedStanzaRephraseMapper:
         # Simple Ruleに従って M スロットに配置
         self._apply_simple_rule_to_sub_modifiers(modifier_texts, sub_slots)
     
-    def _build_prepositional_phrase(self, sentence, obl_word) -> str:
+    def _build_prepositional_phrase(self, sentence, obl_word, exclude_advmod=True) -> str:
         """前置詞句を構築"""
+        print(f"DEBUG METHOD2: '{obl_word.text}' (id={obl_word.id}) exclude_advmod={exclude_advmod}")
+        
         # obl_wordは前置詞句の目的語なので、前置詞を探す
         prep = None
         for word in sentence.words:
             if word.head == obl_word.id and word.deprel == 'case':
                 prep = word
                 break
+        
+        # 🔧 advmod除外処理を追加
+        advmod_modifiers = []
+        for word in sentence.words:
+            if word.head == obl_word.id and word.deprel == 'advmod':
+                advmod_modifiers.append(word.text)
+                print(f"DEBUG ADVMOD FOUND: {word.text} modifies {obl_word.text}")
         
         if prep:
             # 冠詞も含めて構築
@@ -3020,12 +3063,40 @@ class UnifiedStanzaRephraseMapper:
                     det = word
                     break
             
-            if det:
-                return f"{prep.text} {det.text} {obl_word.text}"
+            # 🔧 exclude_advmodがTrueの場合、advmodを含めない
+            if exclude_advmod and advmod_modifiers:
+                print(f"DEBUG EXCLUDING ADVMOD: {advmod_modifiers}")
+                if det:
+                    result = f"{prep.text} {det.text} {obl_word.text}"
+                else:
+                    result = f"{prep.text} {obl_word.text}"
             else:
-                return f"{prep.text} {obl_word.text}"
+                # 従来の処理（advmodも含める）
+                advmod_text = ' '.join(advmod_modifiers)
+                if det:
+                    if advmod_modifiers:
+                        result = f"{prep.text} {det.text} {advmod_text} {obl_word.text}"
+                    else:
+                        result = f"{prep.text} {det.text} {obl_word.text}"
+                else:
+                    if advmod_modifiers:
+                        result = f"{prep.text} {advmod_text} {obl_word.text}"
+                    else:
+                        result = f"{prep.text} {obl_word.text}"
         else:
-            return obl_word.text
+            # 前置詞がない場合
+            if exclude_advmod and advmod_modifiers:
+                print(f"DEBUG NO PREP, EXCLUDING ADVMOD: {advmod_modifiers}")
+                result = obl_word.text
+            else:
+                advmod_text = ' '.join(advmod_modifiers)
+                if advmod_modifiers:
+                    result = f"{advmod_text} {obl_word.text}"
+                else:
+                    result = obl_word.text
+        
+        print(f"DEBUG METHOD2 RESULT: '{result}'")
+        return result
     
     def _apply_simple_rule_to_sub_modifiers(self, modifier_texts, sub_slots):
         """Simple Ruleを sub-m スロットに適用"""
@@ -3057,23 +3128,40 @@ class UnifiedStanzaRephraseMapper:
             return True
         return False
     
-    def _build_prepositional_phrase(self, sentence, prep) -> str:
+    def _build_prepositional_phrase(self, sentence, prep, exclude_advmod=True) -> str:
         """前置詞句の構築"""
+        print(f"DEBUG METHOD3: called with prep='{prep.text}' exclude_advmod={exclude_advmod}")
+        
+        # 🔧 時間副詞の特別処理（"yesterday", "today", "tomorrow"など）
+        if prep.text.lower() in ['yesterday', 'today', 'tomorrow', 'now', 'then']:
+            print(f"DEBUG METHOD3: temporal adverb '{prep.text}' treated as standalone")
+            return prep.text
+        
         phrase_words = [prep]
         
         # 前置詞の目的語を探す
         for word in sentence.words:
             if word.head == prep.id:
                 phrase_words.append(word)
+                print(f"DEBUG METHOD3: found object '{word.text}' for prep '{prep.text}'")
                 
                 # 目的語の修飾語も追加
                 for modifier in sentence.words:
                     if modifier.head == word.id and modifier.deprel in ['det', 'amod']:
                         phrase_words.append(modifier)
+                        print(f"DEBUG METHOD3: added modifier '{modifier.text}' (deprel={modifier.deprel})")
+                    elif modifier.head == word.id and modifier.deprel == 'advmod':
+                        if not exclude_advmod:
+                            phrase_words.append(modifier)
+                            print(f"DEBUG METHOD3: added advmod '{modifier.text}' (exclude_advmod=False)")
+                        else:
+                            print(f"DEBUG METHOD3: excluded advmod '{modifier.text}' (exclude_advmod=True)")
         
         # ID順ソート（語順保持）
         phrase_words.sort(key=lambda w: w.id)
-        return ' '.join(w.text for w in phrase_words)
+        result = ' '.join(w.text for w in phrase_words)
+        print(f"DEBUG METHOD3 RESULT: '{result}'")
+        return result
     
     def _build_noun_phrase(self, sentence, noun) -> str:
         """名詞句の構築（修飾語含む）"""
