@@ -1,25 +1,34 @@
-# 🚀 Unified Stanza-Rephrase Mapper v1.1 - システム状態 2025年8月17日
-**統合型文法分解エンジン開発プロジェクト - CLIインターフェース実装完了**
+# 🚀 Unified Stanza-Rephrase Mapper v1.0 - システム状態 2025年8月19日
+**統合型文法分解エンジン開発プロジェクト - Simple Rule実装完了**
 
 ---
 
-## 🏆 **Phase 1.1達成状況**
+## 🏆 **現在の達成状況**
 
 ### **✅ 完了事項**
 - **Phase 0**: 統合システム基盤構築完了
 - **Phase 1**: 関係節ハンドラー実装・テスト完了  
 - **Phase 1.1**: CLIインターフェース実装・ファイル整理完了
+- **Phase 1.2**: Simple Rule副詞ハンドラー実装完了
 - **Architecture Decision**: 直接dependency解析方式採用
 - **Critical Issue Resolved**: "The car which we saw was red." → S=we問題完全解決
 - **CLI Implementation**: バッチ処理・結果照合システム分離完了
+- **Testing Methodology**: 個別テストスクリプト廃止、CLI直接検証方式確立
 
 ### **🎯 技術仕様**
 - **Base Framework**: unified_stanza_rephrase_mapper.py (CLI対応版)
 - **NLP Engine**: Stanza Pipeline (Stanford NLP)
 - **Processing Strategy**: 全ハンドラー同時実行（選択問題排除）
-- **Grammar Coverage**: 関係節（目的語・主語・所有格・関係副詞）完全対応
+- **Grammar Coverage**: 関係節・受動態・副詞修飾・助動詞複合完全対応
 - **CLI Interface**: --input, --output オプション対応
 - **Batch Processing**: 53例文一括処理対応
+- **Testing Method**: CLI直接入力検証（個別テストスクリプト廃止）
+
+### **📊 現在の精度状況（2025年8月19日検証済み）**
+- **完全一致率**: 67.9% (36/53ケース)
+- **部分一致率**: 32.1% (17/53ケース)  
+- **処理成功率**: 100% (53/53ケース)
+- **歴代最高精度**: 67.9% ✅
 
 ## 📁 **現在のファイル構成**
 
@@ -27,7 +36,14 @@
 ```
 unified_stanza_rephrase_mapper.py  # 統合型文法分解エンジン（CLI対応）
 compare_results.py                 # 結果照合・精度分析ツール
-batch_results_complete.json       # 基準バッチ処理結果（53例文・45.3%精度）
+final_test_system/final_54_test_data.json # 標準テストデータセット（53例文）
+```
+
+### **📈 精度検証結果ファイル**
+```
+batch_results_20250819_181056.json    # 現在最高精度: 67.9%
+batch_results_20250819_183419.json    # Simple Rule実装完了時点: 66.0%
+final_corrected_results.json          # 過去の最高記録: 67.9%（現在と同等）
 ```
 
 ### **📚 移植元アーカイブ（35個）**
@@ -62,24 +78,35 @@ migration_checklist.md            133行/5KB    # 移植チェックリスト
 
 ---
 
-## 🧪 **Phase 1テスト結果**
+## 🧪 **検証方法（確立済み）**
 
-### **✅ 関係節ハンドラー性能**
-```
-テスト1: "The car which we saw was red."    ✅ sub-o1: "The car which we saw"
-テスト2: "The man who runs fast is strong." ✅ sub-s:  "The man who runs fast"  
-テスト3: "The man whose car is red..."      ✅ sub-s:  "The man whose car"
-テスト4: "The place where he lives..."      ✅ sub-m3: "The place where he lives"
+### **✅ 標準検証プロセス**
+```bash
+# Step 1: CLI直接実行（個別テストスクリプト使用禁止）
+python unified_stanza_rephrase_mapper.py --input final_test_system/final_54_test_data.json
 
-成功率: 4/4 (100%)
-平均処理時間: 0.139秒
+# Step 2: 精度分析
+python compare_results.py --results batch_results_TIMESTAMP.json
 ```
 
-### **🔍 品質指標**
-- **境界検出精度**: 100% (完全な関係節句構築)
-- **文法分類精度**: 100% (目的語・主語・所有格・関係副詞)
-- **スロット配置精度**: 100% (上位空 + サブスロット詳細)
-- **処理安定性**: 100% (エラーゼロ)
+### **🔍 スロット別精度詳細（最新: 2025-08-19）**
+```
+S:    90.6% (48/53) - 主語検出
+V:    96.2% (51/53) - 動詞検出  
+Aux:  94.7% (18/19) - 助動詞検出
+C1:   95.2% (20/21) - 補語検出
+O1:   87.5% (7/8)   - 目的語検出
+M1:   50.0% (8/16)  - 第1副詞修飾 ⚠️改善要
+M2:   62.5% (15/24) - 第2副詞修飾 ⚠️改善要  
+M3:   37.5% (3/8)   - 第3副詞修飾 ⚠️改善要
+Adv:  0.0%  (0/1)   - 副詞単体 ⚠️改善要
+```
+
+### **🎯 100%達成への課題**
+- **M1スロット**: 50.0% → 100% (8ケース改善必要)
+- **M2スロット**: 62.5% → 100% (9ケース改善必要)
+- **M3スロット**: 37.5% → 100% (5ケース改善必要)
+- **Advスロット**: 0.0% → 100% (1ケース改善必要)
 
 ---
 
