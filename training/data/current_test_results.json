@@ -1503,8 +1503,8 @@
           "sub-s": "The report which",
           "sub-aux": "was",
           "sub-v": "reviewed",
-          "sub-m1": "thoroughly",
-          "sub-m2": "by experts"
+          "sub-m2": "thoroughly",
+          "sub-m3": "by experts"
         }
       },
       "status": "success"
@@ -1649,8 +1649,8 @@
         },
         "sub_slots": {
           "sub-v": "the woman standing",
-          "sub-m1": "quietly",
-          "sub-m2": "near the door"
+          "sub-m2": "quietly",
+          "sub-m3": "near the door"
         }
       },
       "status": "success"
@@ -1685,8 +1685,8 @@
         },
         "sub_slots": {
           "sub-v": "the children playing",
-          "sub-m1": "happily",
-          "sub-m2": "in the garden"
+          "sub-m2": "happily",
+          "sub-m3": "in the garden"
         }
       },
       "status": "success"
@@ -1721,7 +1721,7 @@
           "M2": "soon"
         },
         "sub_slots": {
-          "sub-aux": "the documents being",
+          "sub-s": "The documents being",
           "sub-v": "reviewed",
           "sub-m2": "thoroughly"
         }
