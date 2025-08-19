@@ -140,7 +140,7 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
     
     # 期待値ファイルも読み込み（results_fileに期待値がない場合のため）
     expected_data = {}
-    expected_file = "final_54_test_data.json"
+    expected_file = "final_test_system/final_54_test_data.json"
     try:
         with open(expected_file, 'r', encoding='utf-8') as f:
             expected_file_data = json.load(f)

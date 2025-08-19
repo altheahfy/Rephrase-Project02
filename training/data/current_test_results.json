@@ -1533,12 +1533,12 @@
       },
       "expected": {
         "main_slots": {
-          "S": "The student",
+          "S": "",
           "V": "improved",
           "M2": "dramatically"
         },
         "sub_slots": {
-          "sub-s": "whose essay",
+          "sub-s": "The student whose essay",
           "sub-aux": "was",
           "sub-v": "corrected",
           "sub-m2": "carefully"
@@ -1576,7 +1576,7 @@
           "M3": "every day"
         },
         "sub_slots": {
-          "sub-s": "the machine that",
+          "sub-s": "The machine that",
           "sub-aux": "was",
           "sub-v": "maintained",
           "sub-m2": "properly"
