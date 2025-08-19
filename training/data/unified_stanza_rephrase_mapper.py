@@ -1854,45 +1854,51 @@ class UnifiedStanzaRephraseMapper:
                     word.deprel not in ['acl:relcl', 'acl', 'cop'] and
                     word.text not in ['is', 'are', 'was', 'were']):
                     print(f"   → WHOSE構文主動詞確定: {word.text} (id={word.id})")
-                    return word.id
+                    main_verb_id = word.id
+                    break
             
             # フォールバック：動詞語幹パターンで検索（品詞無視）
-            for word in sentence.words:
-                if (self._is_verb_pattern(word.text) and 
-                    word.text not in ['is', 'are', 'was', 'were']):
-                    print(f"   → WHOSE構文フォールバック: {word.text} (id={word.id})")
-                    return word.id
+            if not main_verb_id:
+                for word in sentence.words:
+                    if (self._is_verb_pattern(word.text) and 
+                        word.text not in ['is', 'are', 'was', 'were']):
+                        print(f"   → WHOSE構文フォールバック: {word.text} (id={word.id})")
+                        main_verb_id = word.id
+                        break
 
-        print(f"   existing_slots V: {main_verb_text}")
-        
-        # 🎯 重要修正：関係節処理でVが正しく設定されていない場合の主動詞特定
-        if main_verb_text in ['is', 'are', 'was', 'were']:
-            print(f"   → 関係節動詞検出、真の主動詞を探索中...")
-            # whose構文などで関係節の動詞が主動詞として誤認されている場合
-            # 真の主動詞（lives, needs, etc.）を探す
-            for word in sentence.words:
-                print(f"     検討: {word.text} (upos={word.upos}, deprel={word.deprel})")
-                if (word.text not in ['is', 'are', 'was', 'were'] and 
-                    word.upos == 'VERB' and  # VERBのみに限定
-                    word.deprel not in ['acl:relcl', 'acl', 'advcl']):  # 従属節動詞を除外
-                    main_verb_text = word.text
-                    print(f"   → 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
-                    self.logger.debug(f"🔧 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
-                    break
-        
-        if main_verb_text:
-            print(f"   main_verb_text最終: {main_verb_text}")
-            # 主動詞テキストから対応するword IDを特定
-            for word in sentence.words:
-                print(f"     ID探索: {word.text} (id={word.id}, upos={word.upos})")
-                if word.text == main_verb_text and word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める（lives等）
-                    main_verb_id = word.id
-                    print(f"   → 主動詞ID確定: {main_verb_id}")
-                    break
-        
-        # フォールバック: 従来の方法
         if not main_verb_id:
-            main_verb_id = self._find_main_verb(sentence)
+            print(f"   existing_slots V: {main_verb_text}")
+            
+            # 🎯 重要修正：関係節処理でVが正しく設定されていない場合の主動詞特定
+            if main_verb_text in ['is', 'are', 'was', 'were']:
+                print(f"   → 関係節動詞検出、真の主動詞を探索中...")
+                # whose構文などで関係節の動詞が主動詞として誤認されている場合
+                # 真の主動詞（lives, needs, etc.）を探す
+                for word in sentence.words:
+                    print(f"     検討: {word.text} (upos={word.upos}, deprel={word.deprel})")
+                    if (word.text not in ['is', 'are', 'was', 'were'] and 
+                        word.upos == 'VERB' and  # VERBのみに限定
+                        word.deprel not in ['acl:relcl', 'acl', 'advcl']):  # 従属節動詞を除外
+                        main_verb_text = word.text
+                        print(f"   → 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
+                        self.logger.debug(f"🔧 主動詞修正: '{main_verb_text}' (関係節動詞 '{existing_slots.get('V')}' から変更)")
+                        break
+            
+            if main_verb_text:
+                print(f"   main_verb_text最終: {main_verb_text}")
+                # 主動詞テキストから対応するword IDを特定
+                for word in sentence.words:
+                    print(f"     ID探索: {word.text} (id={word.id}, upos={word.upos})")
+                    if word.text == main_verb_text and word.upos in ['VERB', 'AUX', 'NOUN']:  # NOUNも含める（lives等）
+                        main_verb_id = word.id
+                        print(f"   → 主動詞ID確定: {main_verb_id}")
+                        break
+            
+            # フォールバック: 従来の方法
+            if not main_verb_id:
+                main_verb_id = self._find_main_verb(sentence)
+        
+        print(f"🎯 最終主動詞ID: {main_verb_id}")
         
         subordinate_verbs = self._find_subordinate_verbs(sentence, main_verb_id)
         
