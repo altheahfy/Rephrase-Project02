@@ -581,16 +581,19 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("🔗 接続詞構文検出: 主節要素保持")
             return
         
-        # 対応関係マッピング（Aux, V除外）
+        # 対応関係マッピング（Rephraseの完全なS階層構造準拠）
+        # Sの子スロット: sub-s, sub-aux, sub-v, sub-c1, sub-o1, sub-o2, sub-c2, sub-m1, sub-m2, sub-m3
+        s_sub_slots = ['sub-s', 'sub-aux', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
+        
         main_to_sub_mapping = {
-            'S': 'sub-s',
-            'O1': 'sub-o1', 
-            'O2': 'sub-o2',
-            'C1': 'sub-c1',
-            'C2': 'sub-c2', 
-            'M1': 'sub-m1',
-            'M2': 'sub-m2',
-            'M3': 'sub-m3'
+            'S': s_sub_slots,  # Sの完全な子スロット群
+            'O1': ['sub-o1'],  # 簡略版（将来O1_sub-*拡張予定）
+            'O2': ['sub-o2'], 
+            'C1': ['sub-c1'],
+            'C2': ['sub-c2'],
+            'M1': ['sub-m1'],
+            'M2': ['sub-m2'],
+            'M3': ['sub-m3']
         }
         
         # 分詞構文制御フラグをチェック
@@ -2773,12 +2776,14 @@ class UnifiedStanzaRephraseMapper:
         """分詞構文制御フラグが設定されている場合の基本文型処理
         
         分詞構文ハンドラーで既に設定されたスロット構造を尊重し、
-        メイン動詞・助動詞・目的語・補語のみを処理
+        主語スロット（S）は絶対に変更せず、メイン動詞・目的語・補語のみを処理
         """
         result = base_result.copy()
         slots = result.get('slots', {})
         
-        self.logger.debug("  🎯 分詞構文制御モード: 主語スロットは維持、他要素のみ処理")
+        # 🚨 重要：分詞構文では主語は絶対に変更しない
+        original_subject = slots.get('S', '')
+        self.logger.debug(f"  🎯 分詞構文制御モード: 主語'{original_subject}'を保護、他要素のみ処理")
         
         # Step 1: メイン動詞の特定（分詞構文でない真の主動詞）
         main_verb = self._find_main_verb_excluding_participles(sentence)
@@ -2799,6 +2804,10 @@ class UnifiedStanzaRephraseMapper:
                 complement_phrase = self._build_noun_phrase_for_subject(sentence, main_complement)
                 slots['C1'] = complement_phrase
                 self.logger.debug(f"    ✅ 補語: {complement_phrase}")
+        
+        # 🚨 主語保護：分詞構文ハンドラーが設定した主語を絶対に維持
+        slots['S'] = original_subject
+        self.logger.debug(f"    🛡️ 主語保護: S='{original_subject}' (分詞構文により固定)")
         
         result['slots'] = slots
         
