@@ -1133,8 +1133,7 @@
           "M2": "greatly"
         },
         "sub_slots": {
-          "sub-s": "The teacher whose",
-          "sub-c1": "class",
+          "sub-s": "The teacher whose class",
           "sub-v": "runs",
           "sub-m2": "efficiently"
         }
