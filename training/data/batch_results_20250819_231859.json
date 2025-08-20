@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "input_file": "test_12_only.json",
+    "processed_at": "2025-08-19T23:19:03.581696",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "analysis_result": {
+        "sentence": "The house whose roof was damaged badly needs immediate repair.",
+        "slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair",
+          "M2": "badly"
+        },
+        "sub_slots": {
+          "sub-s": "The house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged"
+        },
+        "meta": {
+          "processing_time": 0.222673,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    }
+  }
+}

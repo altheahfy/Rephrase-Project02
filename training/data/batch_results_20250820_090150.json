@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "input_file": "simple_sentences.json",
+    "processed_at": "2025-08-20T09:01:55.543041",
+    "total_sentences": 7,
+    "success_count": 7,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": "She works carefully.",
+      "analysis_result": {
+        "sentence": "She works carefully.",
+        "slots": {
+          "S": "She",
+          "V": "works",
+          "M2": "carefully"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.125956,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "2": {
+      "sentence": "The book is interesting.",
+      "analysis_result": {
+        "sentence": "The book is interesting.",
+        "slots": {
+          "S": "The book",
+          "V": "is",
+          "C1": "interesting"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.135659,
+          "sentence_id": 2,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "3": {
+      "sentence": "I give him a book.",
+      "analysis_result": {
+        "sentence": "I give him a book.",
+        "slots": {
+          "S": "I",
+          "V": "give",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.234233,
+          "sentence_id": 3,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "4": {
+      "sentence": "He has finished his homework.",
+      "analysis_result": {
+        "sentence": "He has finished his homework.",
+        "slots": {
+          "S": "He",
+          "V": "finished",
+          "O1": "his homework",
+          "Aux": "has"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.196747,
+          "sentence_id": 4,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "5": {
+      "sentence": "The letter was written by John.",
+      "analysis_result": {
+        "sentence": "The letter was written by John.",
+        "slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.144131,
+          "sentence_id": 5,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "6": {
+      "sentence": "The man who runs fast is strong.",
+      "analysis_result": {
+        "sentence": "The man who runs fast is strong.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        },
+        "meta": {
+          "processing_time": 0.149169,
+          "sentence_id": 6,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "7": {
+      "sentence": "The cake was eaten by the children.",
+      "analysis_result": {
+        "sentence": "The cake was eaten by the children.",
+        "slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.158031,
+          "sentence_id": 7,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    }
+  }
+}

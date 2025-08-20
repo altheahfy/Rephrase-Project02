@@ -1848,10 +1848,10 @@ class UnifiedStanzaRephraseMapper:
         sentence_text = " ".join([w.text for w in sentence.words])
         if "whose" in sentence_text:
             print(f"🎯 WHOSE構文検出: {sentence_text}")
-            # whose以降で関係節を超えた最初の動詞語幹を主動詞とする
+            # whose以降で関係節を超えた最初のVERB品詞の動詞を主動詞とする
             for word in sentence.words:
-                if (self._is_verb_pattern(word.text) and 
-                    word.deprel not in ['acl:relcl', 'acl', 'cop'] and
+                if (word.upos == 'VERB' and 
+                    word.deprel not in ['acl:relcl', 'acl'] and
                     word.text not in ['is', 'are', 'was', 'were']):
                     print(f"   → WHOSE構文主動詞確定: {word.text} (id={word.id})")
                     main_verb_id = word.id
@@ -2277,7 +2277,73 @@ class UnifiedStanzaRephraseMapper:
         print(f"   - main_verb_id: {main_verb_id}")
         print(f"   - subordinate_verbs: {subordinate_verbs}")
         
-        # �🔧 主動詞直接修飾チェック（最優先）
+        # 🔧 Whose構文位置ベース判定（Stanza誤解析対策）- 最優先
+
+        
+        sentence_text = " ".join([w.text for w in sentence.words])
+
+        
+        if "whose" in sentence_text:
+
+        
+            whose_pos = -1
+
+        
+            main_verb_pos = -1
+
+        
+            adverb_pos = adverb_word.id
+
+        
+            
+
+        
+            for word in sentence.words:
+
+        
+                if word.text.lower() == "whose":
+
+        
+                    whose_pos = word.id
+
+        
+                elif word.id == main_verb_id:
+
+        
+                    main_verb_pos = word.id
+
+        
+            
+
+        
+            # whose節内（whose〜主動詞前）の副詞は従属節
+
+        
+            if whose_pos > 0 and main_verb_pos > 0:
+
+        
+                if whose_pos < adverb_pos < main_verb_pos:
+
+        
+                    print(f"   → WHOSE構文位置判定: SUBORDINATE (whose:{whose_pos} less_than adverb:{adverb_pos} less_than main:{main_verb_pos})")
+
+        
+                    return 'subordinate'
+
+        
+                elif adverb_pos > main_verb_pos:
+
+        
+                    print(f"   → WHOSE構文位置判定: MAIN (adverb:{adverb_pos} greater_than main:{main_verb_pos})")
+
+        
+                    return 'main'
+
+        
+        
+
+        
+        # 🔧 主動詞直接修飾チェック（whose構文判定後）
         if adverb_word.head == main_verb_id:
             self.logger.debug(f"🎯 主動詞直接修飾: {adverb_word.text} → 主動詞 (head={main_verb_id})")
             print(f"   → 主動詞直接修飾: MAIN")
@@ -2306,6 +2372,28 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug(f"🎯 関係詞節副詞検出: {adverb_word.text} → {direct_head.text} ({direct_head.deprel})")
             print(f"   → 関係詞節副詞: SUBORDINATE")
             return 'subordinate'
+        
+        # 🔧 Whose構文位置ベース判定（Stanza誤解析対策）
+        sentence_text = " ".join([w.text for w in sentence.words])
+        if "whose" in sentence_text:
+            whose_pos = -1
+            main_verb_pos = -1
+            adverb_pos = adverb_word.id
+            
+            for word in sentence.words:
+                if word.text.lower() == "whose":
+                    whose_pos = word.id
+                elif word.id == main_verb_id:
+                    main_verb_pos = word.id
+            
+            # whose節内（whose〜主動詞前）の副詞は従属節
+            if whose_pos > 0 and main_verb_pos > 0:
+                if whose_pos < adverb_pos < main_verb_pos:
+                    print(f"   → WHOSE構文位置判定: SUBORDINATE (whose:{whose_pos} < adverb:{adverb_pos} < main:{main_verb_pos})")
+                    return 'subordinate'
+                elif adverb_pos > main_verb_pos:
+                    print(f"   → WHOSE構文位置判定: MAIN (adverb:{adverb_pos} > main:{main_verb_pos})")
+                    return 'main'
         
         # 🔧 重要修正：主動詞への依存経路チェック（修正版）
         # 副詞 → ... → main_verb の経路があるかを確認
