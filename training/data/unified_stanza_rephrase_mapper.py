@@ -80,6 +80,9 @@ class UnifiedStanzaRephraseMapper:
         self.total_processing_time = 0.0
         self.handler_success_count = {}
         
+        # ハンドラー間情報共有システム
+        self.handler_shared_context = {}
+        
         # 段階的ハンドラー管理（Phase別追加）
         self.active_handlers = []
         
@@ -547,6 +550,13 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.debug(f"Unified mapping開始: {len(self.active_handlers)} handlers active")
         
+        # ハンドラー間共有コンテキスト初期化
+        self.handler_shared_context = {
+            'occupied_main_slots': set(),  # 占有済み上位スロット
+            'remaining_elements': {},      # 残り要素情報
+            'handler_metadata': {}         # ハンドラー別メタデータ
+        }
+        
         # ハンドラー実行順序の制御（分詞構文を最優先）
         ordered_handlers = self._get_ordered_handlers()
         
@@ -561,7 +571,9 @@ class UnifiedStanzaRephraseMapper:
                 
                 self.logger.debug(f"Handler実行: {handler_name}")
                 handler_method = getattr(self, f'_handle_{handler_name}')
-                handler_result = handler_method(main_sentence, result)  # copyを削除して現在のresultを渡す
+                
+                # ハンドラーに共有コンテキストを渡す
+                handler_result = handler_method(main_sentence, result, self.handler_shared_context)
                 
                 # ハンドラー結果をマージ
                 if handler_result:
@@ -586,13 +598,13 @@ class UnifiedStanzaRephraseMapper:
         return False
     
     def _get_ordered_handlers(self) -> List[str]:
-        """ハンドラーの実行順序を制御（分詞構文を最優先）"""
+        """ハンドラーの実行順序を制御（ハンドラー間情報共有対応）"""
         
-        # 優先順位テーブル
+        # 優先順位テーブル（ハンドラー間情報共有のため、関係節を5文型より前に実行）
         priority_order = [
             'participle_construction',  # 最優先：分詞構文が制御フラグを設定
-            'basic_five_pattern',
-            'relative_clause',
+            'relative_clause',          # 上位スロット占有情報を提供
+            'basic_five_pattern',       # 占有済みスロット情報を受け取る
             'passive_voice',
             'adverbial_modifier',
             'auxiliary_complex',
@@ -1009,9 +1021,9 @@ class UnifiedStanzaRephraseMapper:
     # 文法ハンドラー実装（Phase 1+: 段階的追加）
     # =============================================================================
     
-    def _handle_relative_clause(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_relative_clause(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
-        関係節ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応）
+        関係節ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応 + ハンドラー間情報共有）
         
         simple_relative_engine.py の機能を統合システムに移植
         Stanza dependency parsing による直接的な関係節検出・分解
@@ -1020,10 +1032,15 @@ class UnifiedStanzaRephraseMapper:
         Args:
             sentence: Stanza解析済みsentence object
             base_result: ベース結果（コピー）
+            shared_context: ハンドラー間共有コンテキスト
             
         Returns:
             Dict: 関係節分解結果 or None
         """
+        # デフォルト値設定
+        if shared_context is None:
+            shared_context = {'occupied_main_slots': set(), 'handler_metadata': {}}
+            
         try:
             self.logger.debug("🔍 関係節ハンドラー実行中...")
             
@@ -1042,7 +1059,7 @@ class UnifiedStanzaRephraseMapper:
                 return None
             
             self.logger.debug("  ✅ 関係節検出")
-            return self._process_relative_clause_structure(sentence, base_result)
+            return self._process_relative_clause_structure(sentence, base_result, shared_context)
             
         except Exception as e:
             self.logger.warning(f"⚠️ 関係節ハンドラーエラー: {e}")
@@ -1061,7 +1078,7 @@ class UnifiedStanzaRephraseMapper:
         
         return has_acl_relcl
     
-    def _process_relative_clause_structure(self, sentence, base_result: Dict) -> Dict:
+    def _process_relative_clause_structure(self, sentence, base_result: Dict, shared_context: Dict = None) -> Dict:
         """関係節構造の分解処理"""
         
         # === 1. 要素特定 ===
@@ -1198,6 +1215,16 @@ class UnifiedStanzaRephraseMapper:
             for sub_slot_name in rephrase_slots.get('sub_slots', {}):
                 result['slot_positions'][sub_slot_name] = antecedent_position
                 self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
+            
+            # 🤝 ハンドラー間情報共有: 占有済み上位スロットを記録
+            if shared_context is not None and antecedent_position:
+                shared_context['occupied_main_slots'].add(antecedent_position)
+                shared_context['handler_metadata']['relative_clause'] = {
+                    'occupied_slot': antecedent_position,
+                    'antecedent': antecedent.text,
+                    'processed_sub_slots': list(rephrase_slots.get('sub_slots', {}).keys())
+                }
+                self.logger.debug(f"🤝 ハンドラー間共有: 関係節が{antecedent_position}スロットを占有")
             
             # 汎用スロット管理システムを適用
             self._apply_rephrase_slot_structure_rules(result)
@@ -1975,9 +2002,9 @@ class UnifiedStanzaRephraseMapper:
                 return word
         return None
     
-    def _handle_basic_five_pattern(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_basic_five_pattern(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
-        基本5文型ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応）
+        基本5文型ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応 + ハンドラー間情報共有）
         
         basic_five_pattern_engine.py の機能を統合システムに移植
         Stanza dependency parsing による基本文型検出・分解
@@ -1986,12 +2013,22 @@ class UnifiedStanzaRephraseMapper:
         Args:
             sentence: Stanza sentence object
             base_result: 基本結果辞書
+            shared_context: ハンドラー間共有コンテキスト
             
         Returns:
             Optional[Dict]: 5文型処理結果 or None
         """
+        # デフォルト値設定
+        if shared_context is None:
+            shared_context = {'occupied_main_slots': set(), 'handler_metadata': {}}
+            
         try:
             self.logger.debug("🔍 5文型ハンドラー実行中...")
+            
+            # 🤝 ハンドラー間情報共有: 占有済み上位スロットをチェック
+            occupied_slots = shared_context.get('occupied_main_slots', set())
+            if occupied_slots:
+                self.logger.debug(f"🤝 占有済みスロット検出: {occupied_slots} - 部分的パターン検出を実行")
             
             # 分詞構文制御フラグをチェック
             grammar_info = base_result.get('grammar_info', {})
@@ -2008,13 +2045,13 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug("  主文動詞(V)が処理済み - スキップ")
                 return None
             
-            return self._process_basic_five_pattern_structure(sentence, base_result)
+            return self._process_basic_five_pattern_structure(sentence, base_result, occupied_slots)
             
         except Exception as e:
             self.logger.warning(f"⚠️ 5文型ハンドラーエラー: {e}")
             return None
     
-    def _process_basic_five_pattern_structure(self, sentence, base_result: Dict) -> Dict:
+    def _process_basic_five_pattern_structure(self, sentence, base_result: Dict, occupied_slots: set = None) -> Dict:
         """基本5文型構造の分解処理（ハイブリッド解析対応）"""
         
         # ✅ ハイブリッド解析補正情報を優先的に利用
@@ -2055,6 +2092,12 @@ class UnifiedStanzaRephraseMapper:
         
         # ✅ whose構文の特別処理：メイン文の依存関係マップを正しく構築
         if is_whose_construction and root_word:
+            # whose構文では真のメイン動詞をROOT語として使用
+            self.logger.debug(f"🔧 whose構文: 真のメイン動詞={root_word.text}")
+            
+            # 依存関係マップをクリアして再構築
+            dep_relations = {}
+            
             # メイン動詞の直接依存語を依存関係マップに追加
             for word in sentence.words:
                 if word.head == root_word.id:
@@ -2062,17 +2105,21 @@ class UnifiedStanzaRephraseMapper:
                         dep_relations[word.deprel] = []
                     dep_relations[word.deprel].append(word)
                     
-            # ROOT語（先行詞）を主語として追加
-            if 'nsubj' not in dep_relations:
-                dep_relations['nsubj'] = []
+            # 先行詞（ROOT語）を主語として追加
             root_word_from_stanza = self._find_root_word(sentence)
             if root_word_from_stanza:
+                if 'nsubj' not in dep_relations:
+                    dep_relations['nsubj'] = []
                 dep_relations['nsubj'].append(root_word_from_stanza)
+                self.logger.debug(f"🔧 whose構文: 先行詞を主語として設定 S='{root_word_from_stanza.text}'")
                 
             self.logger.debug(f"🔧 whose構文: 依存関係再構築完了, メイン動詞={root_word.text}")
+            
+            # whose構文の場合は簡易処理を実行
+            return self._handle_whose_construction_simple(sentence, base_result, root_word, dep_relations)
 
         # 基本5文型パターン検出
-        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations)
+        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations, occupied_slots)
         if not pattern_result:
             return base_result
         
@@ -2104,12 +2151,45 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  ✅ 5文型処理完了: パターン={pattern_result['pattern']}")
         return result
     
+    def _handle_whose_construction_simple(self, sentence, base_result: Dict, main_verb, dep_relations: Dict) -> Dict:
+        """whose構文専用の簡易処理"""
+        result = base_result.copy()
+        if 'slots' not in result:
+            result['slots'] = {}
+        
+        # 主動詞を設定
+        result['slots']['V'] = main_verb.text
+        
+        # 主語を設定（先行詞）
+        if 'nsubj' in dep_relations and dep_relations['nsubj']:
+            subject = dep_relations['nsubj'][0]
+            subject_phrase = self._build_phrase_with_modifiers(sentence, subject)
+            result['slots']['S'] = subject_phrase
+            self.logger.debug(f"🔧 whose構文簡易処理: S='{subject_phrase}', V='{main_verb.text}'")
+        
+        # 文型情報を設定
+        result['grammar_info'] = {
+            'detected_patterns': ['basic_five_pattern'],
+            'handler_contributions': {
+                'basic_five_pattern': {
+                    'pattern': 'SV_whose',  # whose構文専用パターン
+                    'confidence': 0.9
+                }
+            }
+        }
+        
+        return result
+    
     def _find_root_word(self, sentence):
         """ROOT語を検索"""
         return next((w for w in sentence.words if w.head == 0), None)
     
-    def _detect_basic_five_pattern(self, root_word, dep_relations):
-        """基本5文型パターン検出"""
+    def _detect_basic_five_pattern(self, root_word, dep_relations, occupied_slots: set = None):
+        """基本5文型パターン検出（ハンドラー間情報共有対応）"""
+        
+        # 占有済みスロットのデフォルト値
+        if occupied_slots is None:
+            occupied_slots = set()
         
         # 基本5文型パターン定義（詳細→単純の順序で検出）
         patterns = {
@@ -2154,12 +2234,23 @@ class UnifiedStanzaRephraseMapper:
                 "optional": [],
                 "root_pos": ["VERB"],
                 "mapping": {"nsubj": "S", "root": "V"}
+            },
+            "V_ONLY": {
+                "required": [],
+                "optional": [],
+                "root_pos": ["VERB"],
+                "mapping": {"root": "V"}
             }
         }
         
+        # 占有済みスロットがある場合、部分的パターン検出を実行
+        if occupied_slots:
+            self.logger.debug(f"🤝 部分的パターン検出: 除外スロット={occupied_slots}")
+            patterns = self._filter_patterns_by_occupied_slots(patterns, occupied_slots)
+        
         # パターンマッチング
         for pattern_name, pattern_info in patterns.items():
-            if self._matches_five_pattern(pattern_info, dep_relations, root_word):
+            if self._matches_five_pattern(pattern_info, dep_relations, root_word, occupied_slots):
                 return {
                     'pattern': pattern_name,
                     'mapping': pattern_info['mapping'],
@@ -2168,8 +2259,41 @@ class UnifiedStanzaRephraseMapper:
         
         return None
     
-    def _matches_five_pattern(self, pattern_info, dep_relations, root_word):
-        """5文型パターンマッチング"""
+    def _filter_patterns_by_occupied_slots(self, patterns, occupied_slots):
+        """占有済みスロットに基づいてパターンをフィルタリング"""
+        filtered_patterns = {}
+        
+        for pattern_name, pattern_info in patterns.items():
+            # このパターンのマッピングで占有済みスロットに該当するものを除外
+            mapping = pattern_info['mapping']
+            conflicting_deps = []
+            
+            for dep, slot in mapping.items():
+                if slot in occupied_slots:
+                    conflicting_deps.append(dep)
+            
+            if conflicting_deps:
+                # 占有済みスロットと競合する依存関係を除外した新しいパターンを作成
+                new_mapping = {dep: slot for dep, slot in mapping.items() if dep not in conflicting_deps}
+                new_required = [req for req in pattern_info['required'] if req not in conflicting_deps]
+                
+                # 空文字にするのではなく、そのパターン自体を除外
+                if new_mapping and (new_required or 'root' in new_mapping):
+                    filtered_patterns[f"{pattern_name}_PARTIAL"] = {
+                        "required": new_required,
+                        "optional": pattern_info['optional'],
+                        "root_pos": pattern_info['root_pos'],
+                        "mapping": new_mapping
+                    }
+                    self.logger.debug(f"🔧 部分パターン生成: {pattern_name} → {pattern_name}_PARTIAL, マッピング={new_mapping}")
+            else:
+                # 競合なしの場合はそのまま使用
+                filtered_patterns[pattern_name] = pattern_info
+        
+        return filtered_patterns
+    
+    def _matches_five_pattern(self, pattern_info, dep_relations, root_word, occupied_slots: set = None):
+        """5文型パターンマッチング（占有済みスロット対応）"""
         # 必要な依存関係の確認
         for rel in pattern_info['required']:
             if rel not in dep_relations:
@@ -2300,7 +2424,7 @@ class UnifiedStanzaRephraseMapper:
         
         return {'slots': slots, 'sub_slots': sub_slots}
 
-    def _handle_adverbial_modifier(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_adverbial_modifier(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
         副詞処理エンジン（Rephrase距離ベース原理 + 仕様書準拠解析エラー修正）
         Stanza/spaCy分析結果を使用し、解析エラーパターンに対応する修正戦略を適用
@@ -3117,7 +3241,7 @@ class UnifiedStanzaRephraseMapper:
 
     # ==== PASSIVE VOICE HANDLER ====
 
-    def _handle_passive_voice(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_passive_voice(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
         受動態ハンドラー（Phase 2実装）
         
@@ -3134,6 +3258,17 @@ class UnifiedStanzaRephraseMapper:
         try:
             self.logger.debug("🔍 受動態ハンドラー実行中...")
             
+            # 分詞構文制御フラグをチェック
+            grammar_info = base_result.get('grammar_info', {})
+            control_flags = grammar_info.get('control_flags', {})
+            participle_detected = control_flags.get('participle_detected', False)
+            
+            if participle_detected:
+                # 分詞構文が検出されている場合、Sスロットの上書きを防ぐ
+                existing_s = base_result.get('slots', {}).get('S', '')
+                if existing_s == '':
+                    self.logger.debug("  🛡️ 分詞構文保護: S=''を維持")
+            
             # 受動態構造分析
             passive_info = self._analyze_passive_structure(sentence)
             if not passive_info:
@@ -3141,7 +3276,7 @@ class UnifiedStanzaRephraseMapper:
                 return None
                 
             self.logger.debug("  ✅ 受動態検出")
-            return self._process_passive_construction(sentence, passive_info, base_result)
+            return self._process_passive_construction(sentence, passive_info, base_result, participle_detected)
             
         except Exception as e:
             self.logger.warning(f"⚠️ 受動態ハンドラーエラー: {e}")
@@ -3222,7 +3357,7 @@ class UnifiedStanzaRephraseMapper:
         
         return None
     
-    def _process_passive_construction(self, sentence, passive_info: Dict, base_result: Dict) -> Dict:
+    def _process_passive_construction(self, sentence, passive_info: Dict, base_result: Dict, participle_detected: bool = False) -> Dict:
         """受動態構文の処理"""
         result = base_result.copy()
         
@@ -3236,7 +3371,7 @@ class UnifiedStanzaRephraseMapper:
         
         # スロット生成
         rephrase_slots = self._generate_passive_voice_slots(
-            passive_type, subject, auxiliary, main_verb, agent_phrase, passive_info['agent'], sentence
+            passive_type, subject, auxiliary, main_verb, agent_phrase, passive_info['agent'], sentence, participle_detected
         )
         
         # 結果マージ
@@ -3262,14 +3397,19 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _generate_passive_voice_slots(self, passive_type: str, subject, auxiliary, main_verb, 
-                                     agent_phrase: str, agent, sentence) -> Dict:
+                                     agent_phrase: str, agent, sentence, participle_detected: bool = False) -> Dict:
         """受動態タイプ別スロット生成（副詞処理は専門ハンドラーに委譲）"""
         
         slots = {}
         sub_slots = {}
         
         # 基本スロット（共通）
-        slots['S'] = self._build_subject_phrase(sentence, subject)
+        # 分詞構文保護: 分詞構文が検出されている場合はSスロットを上書きしない
+        if not participle_detected:
+            slots['S'] = self._build_subject_phrase(sentence, subject)
+        else:
+            self.logger.debug("分詞構文保護: S 空文字保持 (by participle_construction)")
+            
         slots['Aux'] = auxiliary.text
         slots['V'] = main_verb.text
         
@@ -3326,7 +3466,7 @@ class UnifiedStanzaRephraseMapper:
     # 分詞構文処理ハンドラー (Phase 3)
     # =============================================================================
     
-    def _handle_participle_construction(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_participle_construction(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
         分詞構文ハンドラー
         
@@ -4036,7 +4176,7 @@ class UnifiedStanzaRephraseMapper:
     # 助動詞複合体処理ハンドラー (Phase 3)
     # =============================================================================
     
-    def _handle_auxiliary_complex(self, sentence, base_result: Dict) -> Dict[str, Any]:
+    def _handle_auxiliary_complex(self, sentence, base_result: Dict, shared_context: Dict = None) -> Dict[str, Any]:
         """
         助動詞複合体処理ハンドラー (Phase 3)
         
@@ -4218,7 +4358,7 @@ class UnifiedStanzaRephraseMapper:
             
         return False
 
-    def _handle_conjunction(self, sentence, base_result: Dict) -> Optional[Dict]:
+    def _handle_conjunction(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
         接続詞処理ハンドラー（"as if"等の従属接続詞対応）
         migrationエンジンからの移植版
