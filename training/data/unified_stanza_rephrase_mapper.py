@@ -1193,19 +1193,23 @@ class UnifiedStanzaRephraseMapper:
             result['slots'].update(rephrase_slots.get('slots', {}))
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
             
-            # 🔥 位置情報記録: 先行詞の位置に基づいてサブスロット位置を決定
-            antecedent_position = self._determine_antecedent_position(sentence, antecedent)
+            # 🔥 位置情報記録: 先行詞の位置に基づいてサブスロット位置を決定（汎用システム対応）
+            antecedent_position = self._determine_element_position(sentence, antecedent)
             for sub_slot_name in rephrase_slots.get('sub_slots', {}):
                 result['slot_positions'][sub_slot_name] = antecedent_position
-                self.logger.debug(f"📍 位置情報記録: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
-        
-        # 文法情報記録
+                self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
+            
+            # 汎用スロット管理システムを適用
+            self._apply_rephrase_slot_structure_rules(result, rephrase_slots.get('sub_slots', {}))
+            
+        # 文法情報記録（汎用システム対応）
         result['grammar_info'] = {
             'patterns': ['relative_clause'],
             'rel_type': rel_type if not is_whose_construction else 'poss',
             'antecedent': antecedent.text,
             'rel_pronoun': 'whose' if is_whose_construction else (rel_pronoun.text if rel_pronoun else None),
-            'rel_verb': rel_verb.text
+            'rel_verb': rel_verb.text,
+            'universal_system': True  # 汎用システム使用フラグ
         }
         
         self.logger.debug(f"  ✅ 関係節処理完了: {len(result.get('slots', {}))} main slots, {len(result.get('sub_slots', {}))} sub slots")
@@ -1610,8 +1614,18 @@ class UnifiedStanzaRephraseMapper:
     
     # === Stanza解析ヘルパーメソッド ===
     
-    def _determine_antecedent_position(self, sentence, antecedent) -> str:
-        """先行詞がメイン文のどの位置にあるかを判定"""
+    # === 汎用位置決定システム ===
+    
+    def _determine_element_position(self, sentence, target_element) -> str:
+        """汎用位置決定: 任意の要素がメイン文のどの位置にあるかを判定
+        
+        Args:
+            sentence: Stanza sentence object
+            target_element: 位置を判定したい要素（先行詞、従属節の頭語等）
+            
+        Returns:
+            str: 位置名（S, O1, O2, C1, C2, M1, M2, M3）
+        """
         try:
             # メイン動詞（ROOT）を取得
             main_verb = self._find_root_word(sentence)
@@ -1619,41 +1633,230 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug(f"⚠️ メイン動詞が見つからない - デフォルト位置: S")
                 return 'S'
             
-            # 先行詞の依存関係を確認
-            antecedent_deprel = antecedent.deprel
-            antecedent_head = antecedent.head
+            # 要素の依存関係を確認
+            element_deprel = target_element.deprel
+            element_head = target_element.head
             
-            self.logger.debug(f"🔍 先行詞位置判定: {antecedent.text} (deprel: {antecedent_deprel}, head: {antecedent_head}, main_verb: {main_verb.text})")
+            self.logger.debug(f"🔍 汎用位置判定: {target_element.text} (deprel: {element_deprel}, head: {element_head}, main_verb: {main_verb.text})")
             
-            # 先行詞がメイン動詞に直接依存している場合の位置判定
-            if antecedent_head == main_verb.id:
-                if antecedent_deprel in ['nsubj', 'nsubj:pass']:
-                    return 'S'
-                elif antecedent_deprel in ['obj', 'dobj']:
-                    return 'O1'
-                elif antecedent_deprel in ['iobj']:
-                    return 'O2'
-                elif antecedent_deprel in ['acomp', 'attr', 'nmod:tmod']:
-                    return 'C1'
-                elif antecedent_deprel in ['obl', 'advmod', 'nmod']:
-                    # 副詞的修飾語の場合、M-スロットに配置
-                    return 'M2'  # デフォルトでM2に配置
+            # 要素がメイン動詞に直接依存している場合の位置判定
+            if element_head == main_verb.id:
+                return self._classify_position_by_deprel(element_deprel)
             
-            # 先行詞が間接的に関連している場合の処理
-            # 例：複合名詞句の一部など
-            elif antecedent_deprel in ['compound', 'amod', 'det']:
-                # 先行詞の頭語を確認してその位置を判定
-                head_word = self._find_word_by_id(sentence, antecedent_head)
+            # 要素が間接的に関連している場合の処理
+            elif element_deprel in ['compound', 'amod', 'det']:
+                # 要素の頭語を確認してその位置を判定（再帰）
+                head_word = self._find_word_by_id(sentence, element_head)
                 if head_word:
-                    return self._determine_antecedent_position(sentence, head_word)
+                    return self._determine_element_position(sentence, head_word)
             
             # その他の場合はデフォルト
-            self.logger.debug(f"📍 先行詞位置: デフォルト S位置適用 (deprel: {antecedent_deprel})")
+            self.logger.debug(f"📍 要素位置: デフォルト S位置適用 (deprel: {element_deprel})")
             return 'S'
             
         except Exception as e:
-            self.logger.warning(f"⚠️ 先行詞位置判定エラー: {e}")
+            self.logger.warning(f"⚠️ 汎用位置判定エラー: {e}")
             return 'S'
+    
+    def _classify_position_by_deprel(self, deprel: str) -> str:
+        """依存関係ラベルに基づく位置分類
+        
+        Args:
+            deprel: 依存関係ラベル
+            
+        Returns:
+            str: 位置名
+        """
+        # 主語系
+        if deprel in ['nsubj', 'nsubj:pass']:
+            return 'S'
+        
+        # 目的語系
+        elif deprel in ['obj', 'dobj']:
+            return 'O1'
+        elif deprel in ['iobj']:
+            return 'O2'
+        
+        # 補語系
+        elif deprel in ['acomp', 'attr', 'nmod:tmod']:
+            return 'C1'
+        elif deprel in ['xcomp']:  # 第2補語
+            return 'C2'
+        
+        # 修飾語系（副詞的）
+        elif deprel in ['obl', 'advmod', 'nmod']:
+            return self._determine_m_slot_position(deprel)
+        
+        # デフォルト
+        else:
+            return 'S'
+    
+    def _determine_m_slot_position(self, deprel: str) -> str:
+        """M-スロットの詳細位置決定
+        
+        Args:
+            deprel: 依存関係ラベル
+            
+        Returns:
+            str: M1, M2, M3のいずれか
+        """
+        # 現在はシンプルな実装
+        # TODO: 文脈や意味に基づくより詳細な分類
+        if deprel == 'advmod':
+            return 'M2'  # 副詞はM2
+        elif deprel == 'obl':
+            return 'M3'  # 前置詞句はM3
+        else:
+            return 'M1'  # その他はM1
+    
+    def _apply_position_to_sub_slots(self, result: Dict, sub_slots: Dict, position: str, handler_name: str = "") -> None:
+        """サブスロットに位置情報を適用（汎用版）
+        
+        Args:
+            result: 処理結果辞書
+            sub_slots: サブスロット辞書
+            position: 位置名
+            handler_name: ハンドラー名（ログ用）
+        """
+        if 'slot_positions' not in result:
+            result['slot_positions'] = {}
+        
+        for sub_slot_name in sub_slots:
+            result['slot_positions'][sub_slot_name] = position
+            self.logger.debug(f"📍 汎用位置情報記録[{handler_name}]: {sub_slot_name} → {position}位置")
+    
+    def _determine_antecedent_position(self, sentence, antecedent) -> str:
+        """先行詞がメイン文のどの位置にあるかを判定（互換性のためのラッパー）"""
+        return self._determine_element_position(sentence, antecedent)
+    
+    # === 汎用節処理ヘルパー ===
+    
+    def _process_clause_at_position(self, sentence, clause_elements: List, handler_name: str, **kwargs) -> Dict:
+        """汎用的な節処理: 任意の位置の節を処理
+        
+        Args:
+            sentence: Stanza sentence object
+            clause_elements: 節の要素リスト
+            handler_name: ハンドラー名
+            **kwargs: 追加のハンドラー固有パラメータ
+            
+        Returns:
+            Dict: 処理結果（サブスロット＋位置情報付き）
+        """
+        result = {}
+        
+        try:
+            if not clause_elements:
+                return result
+            
+            # 節の主要要素（頭語）を特定
+            main_element = clause_elements[0]  # デフォルトで最初の要素
+            
+            # 意味的な頭語を探す（動詞、名詞など）
+            for element in clause_elements:
+                if element.upos in ['VERB', 'NOUN', 'ADJ']:
+                    main_element = element
+                    break
+            
+            # 位置を決定
+            position = self._determine_element_position(sentence, main_element)
+            
+            self.logger.debug(f"🔄 汎用節処理[{handler_name}]: 位置={position}, 要素数={len(clause_elements)}")
+            
+            # ハンドラー固有の処理を実行
+            if handler_name == "relative_clause":
+                sub_slots = self._extract_relative_clause_components(clause_elements, **kwargs)
+            elif handler_name == "noun_clause":
+                sub_slots = self._extract_noun_clause_components(clause_elements, **kwargs)
+            elif handler_name == "adverbial_clause":
+                sub_slots = self._extract_adverbial_clause_components(clause_elements, **kwargs)
+            else:
+                # 汎用的な抽出
+                sub_slots = self._extract_generic_clause_components(clause_elements)
+            
+            # 位置情報を適用
+            self._apply_position_to_sub_slots(result, sub_slots, position, handler_name)
+            
+            # サブスロットを結果に追加
+            result.update(sub_slots)
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"❌ 汎用節処理エラー[{handler_name}]: {e}")
+            return {}
+    
+    def _extract_generic_clause_components(self, clause_elements: List) -> Dict:
+        """汎用的な節要素抽出
+        
+        Args:
+            clause_elements: 節の要素リスト
+            
+        Returns:
+            Dict: サブスロット辞書
+        """
+        sub_slots = {}
+        
+        try:
+            # 基本的な役割分類
+            subjects = []
+            verbs = []
+            objects = []
+            modifiers = []
+            
+            for word in clause_elements:
+                if word.deprel in ['nsubj', 'nsubj:pass']:
+                    subjects.append(word.text)
+                elif word.upos == 'VERB':
+                    verbs.append(word.text)
+                elif word.deprel in ['obj', 'dobj']:
+                    objects.append(word.text)
+                else:
+                    modifiers.append(word.text)
+            
+            # サブスロットに配置
+            if subjects:
+                sub_slots['sub-s'] = ' '.join(subjects)
+            if verbs:
+                sub_slots['sub-v'] = ' '.join(verbs)
+            if objects:
+                sub_slots['sub-o1'] = ' '.join(objects)
+            if modifiers:
+                sub_slots['sub-m2'] = ' '.join(modifiers)
+            
+            return sub_slots
+            
+        except Exception as e:
+            self.logger.error(f"❌ 汎用要素抽出エラー: {e}")
+            return {}
+    
+    def _extract_noun_clause_components(self, clause_elements: List, **kwargs) -> Dict:
+        """名詞節要素抽出（that節、wh節など）
+        
+        Args:
+            clause_elements: 節の要素リスト
+            **kwargs: 追加パラメータ
+            
+        Returns:
+            Dict: サブスロット辞書
+        """
+        # 現在は汎用実装を使用
+        # TODO: 名詞節固有の処理を実装
+        return self._extract_generic_clause_components(clause_elements)
+    
+    def _extract_adverbial_clause_components(self, clause_elements: List, **kwargs) -> Dict:
+        """副詞節要素抽出（when節、because節など）
+        
+        Args:
+            clause_elements: 節の要素リスト
+            **kwargs: 追加パラメータ
+            
+        Returns:
+            Dict: サブスロット辞書
+        """
+        # 現在は汎用実装を使用
+        # TODO: 副詞節固有の処理を実装
+        return self._extract_generic_clause_components(clause_elements)
     
     def _find_word_by_deprel(self, sentence, deprel: str):
         """依存関係で語を検索"""
