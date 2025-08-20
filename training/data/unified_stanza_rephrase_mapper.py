@@ -2181,18 +2181,36 @@ class UnifiedStanzaRephraseMapper:
         if 'slots' not in result:
             result['slots'] = {}
         
-        # 主動詞を設定
-        result['slots']['V'] = main_verb.text
+        # 🔧 連結動詞 + 補語構造の検出
+        copula = None
+        complement = None
+        
+        # 連結動詞（is/was等）を探索
+        for word in sentence.words:
+            if word.deprel == 'cop' and word.head == main_verb.id:
+                copula = word
+                break
+        
+        # main_verbが補語でcopulaが存在する場合
+        if copula and main_verb.upos in ['ADJ', 'NOUN']:
+            self.logger.debug(f"🔧 whose構文: 連結動詞構造検出 cop='{copula.text}' + complement='{main_verb.text}'")
+            result['slots']['V'] = copula.text  # 連結動詞を主動詞に
+            complement_phrase = self._build_phrase_with_modifiers(sentence, main_verb)
+            result['slots']['C1'] = complement_phrase  # 補語として設定
+            self.logger.debug(f"🔧 whose構文連結動詞処理: V='{copula.text}', C1='{complement_phrase}'")
+        else:
+            # 通常の動詞構造
+            result['slots']['V'] = main_verb.text
         
         # 主語を設定（先行詞）
         if 'nsubj' in dep_relations and dep_relations['nsubj']:
             subject = dep_relations['nsubj'][0]
             subject_phrase = self._build_phrase_with_modifiers(sentence, subject)
             result['slots']['S'] = subject_phrase
-            self.logger.debug(f"🔧 whose構文簡易処理: S='{subject_phrase}', V='{main_verb.text}'")
+            self.logger.debug(f"🔧 whose構文簡易処理: S='{subject_phrase}'")
         
-        # 補語を設定（xcomp）- became famousのfamousなど
-        if 'xcomp' in dep_relations and dep_relations['xcomp']:
+        # 補語を設定（xcomp）- became famousのfamousなど（連結動詞構造以外）
+        if not copula and 'xcomp' in dep_relations and dep_relations['xcomp']:
             complement = dep_relations['xcomp'][0]
             complement_phrase = self._build_phrase_with_modifiers(sentence, complement)
             result['slots']['C1'] = complement_phrase
@@ -2206,11 +2224,12 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug(f"🔧 whose構文簡易処理: O1='{obj_phrase}' 追加")
         
         # 文型情報を設定
+        pattern_name = 'SVC_whose' if copula else 'SV_whose'
         result['grammar_info'] = {
             'detected_patterns': ['basic_five_pattern'],
             'handler_contributions': {
                 'basic_five_pattern': {
-                    'pattern': 'SV_whose',  # whose構文専用パターン
+                    'pattern': pattern_name,  # whose構文専用パターン
                     'confidence': 0.9
                 }
             }
