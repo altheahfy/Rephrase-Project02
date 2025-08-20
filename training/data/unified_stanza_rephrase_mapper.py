@@ -86,11 +86,11 @@ class UnifiedStanzaRephraseMapper:
         # 基本ハンドラーの初期化
         self._initialize_basic_handlers()
         
-        self.logger.info("🚀 Unified Stanza-Rephrase Mapper v1.0 初期化完了")
+        self.logger.info("Unified Stanza-Rephrase Mapper v1.0 初期化完了")
         if self.spacy_nlp:
-            self.logger.info("🔧 spaCyハイブリッド解析 有効")
+            self.logger.info("spaCyハイブリッド解析 有効")
         else:
-            self.logger.info("⚠️ spaCyハイブリッド解析 無効")
+            self.logger.info("spaCyハイブリッド解析 無効")
     
     def _setup_logging(self, level: str):
         """ログ設定"""
@@ -108,7 +108,7 @@ class UnifiedStanzaRephraseMapper:
     def _initialize_stanza_pipeline(self):
         """Stanza NLPパイプライン初期化"""
         try:
-            self.logger.info("🔧 Stanza pipeline 初期化中...")
+            self.logger.info("Stanza pipeline 初期化中...")
             
             # 基本的なパイプライン構成
             processors = 'tokenize,pos,lemma,depparse'
@@ -121,29 +121,29 @@ class UnifiedStanzaRephraseMapper:
                 verbose=False
             )
             
-            self.logger.info("✅ Stanza pipeline 初期化成功")
+            self.logger.info("Stanza pipeline 初期化成功")
             
             # 動作確認
             test_result = self.nlp("Hello world.")
-            self.logger.info(f"🧪 Pipeline 動作確認: {len(test_result.sentences)} sentences processed")
+            self.logger.info(f"Pipeline 動作確認: {len(test_result.sentences)} sentences processed")
             
         except Exception as e:
-            self.logger.error(f"❌ Stanza pipeline 初期化失敗: {e}")
-            self.logger.error("💡 解決方法: python -c 'import stanza; stanza.download(\"en\")'")
+            self.logger.error(f"Stanza pipeline 初期化失敗: {e}")
+            self.logger.error("解決方法: python -c 'import stanza; stanza.download(\"en\")'")
             raise RuntimeError(f"Stanza initialization failed: {e}")
     
     def _initialize_spacy_pipeline(self):
         """spaCy NLPパイプライン初期化（ハイブリッド解析用）"""
         try:
-            self.logger.info("🔧 spaCy pipeline 初期化中...")
+            self.logger.info("spaCy pipeline 初期化中...")
             
             # 英語モデルをロード
             self.spacy_nlp = spacy.load('en_core_web_sm')
             
-            self.logger.info("✅ spaCy pipeline 初期化成功")
+            self.logger.info("spaCy pipeline 初期化成功")
             
         except Exception as e:
-            self.logger.warning(f"⚠️ spaCy pipeline 初期化失敗: {e}")
+            self.logger.warning(f"spaCy pipeline 初期化失敗: {e}")
             self.logger.warning("  pip install spacy; python -m spacy download en_core_web_sm で設定してください")
             self.spacy_nlp = None
             self.use_spacy_hybrid = False
@@ -163,7 +163,7 @@ class UnifiedStanzaRephraseMapper:
         for handler in basic_handlers:
             self.add_handler(handler)
         
-        self.logger.info(f"✅ 基本ハンドラー初期化完了: {len(self.active_handlers)}個")
+        self.logger.info(f"基本ハンドラー初期化完了: {len(self.active_handlers)}個")
     
     def process(self, sentence: str) -> Dict[str, Any]:
         """
@@ -179,12 +179,12 @@ class UnifiedStanzaRephraseMapper:
         self.processing_count += 1
         
         try:
-            self.logger.debug(f"🔍 Processing: {sentence}")
+            self.logger.debug(f"Processing: {sentence}")
             
             # Phase 1: Stanza解析
             doc = self._analyze_with_stanza(sentence)
             if not doc or not doc.sentences:
-                self.logger.warning(f"⚠️ Stanza解析失敗: {sentence}")
+                self.logger.warning(f"Stanza解析失敗: {sentence}")
                 return self._create_empty_result(sentence)
             
             # Phase 1.5: ハイブリッド解析（spaCy補完）
@@ -214,12 +214,12 @@ class UnifiedStanzaRephraseMapper:
                 }
             }
             
-            self.logger.info(f"✅ Processing完了 ({processing_time:.3f}s): {len(result.get('slots', {}))} slots detected")
+            self.logger.info(f"Processing完了 ({processing_time:.3f}s): {len(result.get('slots', {}))} slots detected")
             return result
             
         except Exception as e:
             processing_time = (datetime.now() - start_time).total_seconds()
-            self.logger.error(f"❌ Processing error: {e}")
+            self.logger.error(f"Processing error: {e}")
             
             return {
                 'sentence': sentence,
@@ -238,7 +238,7 @@ class UnifiedStanzaRephraseMapper:
             doc = self.nlp(sentence)
             return doc
         except Exception as e:
-            self.logger.error(f"❌ Stanza analysis failed: {e}")
+            self.logger.error(f"Stanza analysis failed: {e}")
             return None
     
     def _apply_spacy_hybrid_corrections(self, sentence: str, stanza_doc):
@@ -256,7 +256,7 @@ class UnifiedStanzaRephraseMapper:
             corrections = self._detect_analysis_discrepancies(stanza_doc, spacy_doc, sentence)
             
             if corrections:
-                self.logger.debug(f"🔧 ハイブリッド解析補正: {len(corrections)} 箇所修正")
+                self.logger.debug(f"ハイブリッド解析補正: {len(corrections)} 箇所修正")
                 
                 # Stanza結果に補正を適用
                 corrected_doc = self._apply_corrections_to_stanza(stanza_doc, corrections)
@@ -265,7 +265,7 @@ class UnifiedStanzaRephraseMapper:
             return stanza_doc
             
         except Exception as e:
-            self.logger.warning(f"⚠️ spaCyハイブリッド解析エラー: {e}")
+            self.logger.warning(f"spaCyハイブリッド解析エラー: {e}")
             return stanza_doc  # 補正失敗時は元のStanza結果を返す
     
     def _apply_human_grammar_patterns(self, sentence: str, doc):
@@ -285,7 +285,7 @@ class UnifiedStanzaRephraseMapper:
             return corrected_doc
             
         except Exception as e:
-            self.logger.warning(f"⚠️ 人間文法認識エラー: {e}")
+            self.logger.warning(f"人間文法認識エラー: {e}")
             return doc  # エラー時は元のdocを返す
     
     def _correct_passive_voice_pattern(self, doc, sentence):
@@ -315,7 +315,7 @@ class UnifiedStanzaRephraseMapper:
             # stanzaが過去分詞をrootとして誤判定している場合
             if past_participle.deprel == 'root' and be_verb.deprel == 'cop':
                 self.logger.info(
-                    f"🔧 人間文法修正: '{be_verb.text} {past_participle.text}' "
+                    f"人間文法修正: '{be_verb.text} {past_participle.text}' "
                     f"→ 受動態 (stanza: {past_participle.text}=root, {be_verb.text}=cop)"
                 )
                 
@@ -487,7 +487,7 @@ class UnifiedStanzaRephraseMapper:
                         'correction_type': 'whose_verb_fix',
                         'confidence': 0.9
                     })
-                    self.logger.debug(f"🔧 whose構文動詞修正検出: {verb_text} NOUN→VERB")
+                    self.logger.debug(f"whose構文動詞修正検出: {verb_text} NOUN→VERB")
         
         return corrections
     
@@ -544,7 +544,7 @@ class UnifiedStanzaRephraseMapper:
         if hasattr(doc, '_human_grammar_corrections'):
             self._apply_human_grammar_corrections(doc._human_grammar_corrections, result)
         
-        self.logger.debug(f"🔧 Unified mapping開始: {len(self.active_handlers)} handlers active")
+        self.logger.debug(f"Unified mapping開始: {len(self.active_handlers)} handlers active")
         
         # ハンドラー実行順序の制御（分詞構文を最優先）
         ordered_handlers = self._get_ordered_handlers()
@@ -558,9 +558,9 @@ class UnifiedStanzaRephraseMapper:
                     self.logger.debug(f"🚫 Handler スキップ: {handler_name} (制御フラグ)")
                     continue
                 
-                self.logger.debug(f"🎯 Handler実行: {handler_name}")
+                self.logger.debug(f"Handler実行: {handler_name}")
                 handler_method = getattr(self, f'_handle_{handler_name}')
-                handler_result = handler_method(main_sentence, result.copy())
+                handler_result = handler_method(main_sentence, result)  # copyを削除して現在のresultを渡す
                 
                 # ハンドラー結果をマージ
                 if handler_result:
@@ -571,7 +571,7 @@ class UnifiedStanzaRephraseMapper:
                         self.handler_success_count.get(handler_name, 0) + 1
                         
             except Exception as e:
-                self.logger.warning(f"⚠️ Handler error ({handler_name}): {e}")
+                self.logger.warning(f"Handler error ({handler_name}): {e}")
                 continue
         
         return result
@@ -643,7 +643,7 @@ class UnifiedStanzaRephraseMapper:
                 })
                 
                 self.logger.info(
-                    f"✅ 人間文法修正適用: V='{past_participle.text}', Aux='{be_verb.text}' "
+                    f"人間文法修正適用: V='{past_participle.text}', Aux='{be_verb.text}' "
                     f"(stanza誤判定修正)"
                 )
     
@@ -665,7 +665,7 @@ class UnifiedStanzaRephraseMapper:
                     # 競合解決：空文字や空値で既存の有効な値を上書きしない
                     existing_value = base_result['slots'][slot_name]
                     
-                    # 🎯 分詞構文保護：分詞構文ハンドラーが設定した空文字を保護
+                    # 分詞構文保護：分詞構文ハンドラーが設定した空文字を保護
                     control_flags = base_result.get('grammar_info', {}).get('control_flags', {})
                     participle_detected = control_flags.get('participle_detected', False)
                     modified_slot = control_flags.get('modified_slot')
@@ -673,7 +673,7 @@ class UnifiedStanzaRephraseMapper:
                     if (participle_detected and slot_name == modified_slot and 
                         existing_value == "" and handler_name != 'participle_construction'):
                         # 分詞構文で空文字化されたスロットは他のハンドラーで上書き禁止
-                        self.logger.debug(f"🛡️ 分詞構文保護: {slot_name} 空文字保持 (by participle_construction)")
+                        self.logger.debug(f"分詞構文保護: {slot_name} 空文字保持 (by participle_construction)")
                         pass  # 空文字を保持
                     # ★ Mスロット保護：副詞ハンドラーで設定されたMスロットを保護
                     elif slot_name.startswith('M') and existing_value and handler_name != 'adverbial_modifier':
@@ -695,6 +695,17 @@ class UnifiedStanzaRephraseMapper:
         # サブスロット情報マージ
         if 'sub_slots' in handler_result:
             for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
+                # 既存のサブスロット値をチェック
+                existing_sub_value = base_result['sub_slots'].get(sub_slot_name)
+                
+                # 分詞構文が設定したsub-auxを保護
+                if (sub_slot_name == 'sub-aux' and existing_sub_value and 
+                    ('being' in existing_sub_value or len(existing_sub_value.split()) > 1) and
+                    handler_name != 'participle_construction'):
+                    self.logger.debug(f"分詞構文sub-aux保護: '{existing_sub_value}' from {handler_name}")
+                    continue  # 既存値を保持
+                
+                # 通常のマージ
                 base_result['sub_slots'][sub_slot_name] = sub_slot_data
         
         # 文法情報記録
@@ -962,7 +973,7 @@ class UnifiedStanzaRephraseMapper:
         """ハンドラーを追加（Phase別開発用）"""
         if handler_name not in self.active_handlers:
             self.active_handlers.append(handler_name)
-            self.logger.info(f"➕ Handler追加: {handler_name}")
+            self.logger.info(f"Handler追加: {handler_name}")
         else:
             self.logger.warning(f"⚠️ Handler already active: {handler_name}")
     
@@ -2065,7 +2076,7 @@ class UnifiedStanzaRephraseMapper:
         main_verb_id = None
         main_verb_text = existing_slots.get('V')
         
-        print(f"🔍 MAIN VERB DETECTION:")
+        print(f"MAIN VERB DETECTION:")
         
         # 🔧 Whose構文専用検出（最優先）
         sentence_text = " ".join([w.text for w in sentence.words])
@@ -2121,7 +2132,7 @@ class UnifiedStanzaRephraseMapper:
             if not main_verb_id:
                 main_verb_id = self._find_main_verb(sentence)
         
-        print(f"🎯 最終主動詞ID: {main_verb_id}")
+        print(f"最終主動詞ID: {main_verb_id}")
         
         subordinate_verbs = self._find_subordinate_verbs(sentence, main_verb_id)
         
@@ -2169,7 +2180,7 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     # 🔧 副詞修飾語を含む句構築（"very carefully"対応）
                     phrase = self._build_adverbial_phrase(sentence, word)
-                    print(f"🔧 ADV句構築: '{word.text}' → '{phrase}'")
+                    print(f"ADV句構築: '{word.text}' → '{phrase}'")
                     phrase_words = phrase.split()
                     for pw in phrase_words:
                         for w in sentence.words:
@@ -2221,9 +2232,9 @@ class UnifiedStanzaRephraseMapper:
         
         # 主節副詞のシンプルルール配置
         if main_adverbs:
-            print(f"🎯 Main副詞詳細: {main_adverbs}")
+            print(f"Main副詞詳細: {main_adverbs}")
             main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main', main_verb_id)
-            print(f"🎯 Main副詞結果: {main_slots}")
+            print(f"Main副詞結果: {main_slots}")
             slots.update(main_slots)
         
         # 従属節副詞のシンプルルール配置
@@ -2332,7 +2343,7 @@ class UnifiedStanzaRephraseMapper:
     def _find_main_verb(self, sentence):
         """主動詞を特定（構造的修正版）"""
         
-        print(f"🔍 MAIN VERB ANALYSIS:")
+        print(f"MAIN VERB ANALYSIS:")
         for word in sentence.words:
             print(f"   Word: {word.text} (id={word.id}, upos={word.upos}, deprel={word.deprel})")
         
@@ -3065,16 +3076,19 @@ class UnifiedStanzaRephraseMapper:
         Returns:
             Dict: 分詞構文分解結果 or None
         """
+        print("PARTICIPLE HANDLER CALLED")
         try:
-            self.logger.debug("🔍 分詞構文ハンドラー実行中...")
+            self.logger.debug("分詞構文ハンドラー実行中...")
             
             # 分詞構文パターンの検出
             participle_info = self._analyze_participle_structure(sentence)
+            print(f"PARTICIPLE INFO: {participle_info}")
             if not participle_info:
                 self.logger.debug("  分詞構文なし - スキップ")
                 return None
                 
-            self.logger.debug("  ✅ 分詞構文検出")
+            self.logger.debug("  分詞構文検出")
+            print("PROCESSING PARTICIPLE")
             return self._process_participle_construction(sentence, participle_info, base_result)
             
         except Exception as e:
@@ -3105,13 +3119,13 @@ class UnifiedStanzaRephraseMapper:
                 # 分詞の修飾語を収集（Case 49 "overtime"問題対応）
                 participle_info['modifiers'] = self._find_participle_modifiers(sentence, word)
                 
-                self.logger.debug(f"  🎯 現在分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
+                self.logger.debug(f"  現在分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
                 return participle_info
         
         # being + 過去分詞の検出
         for word in sentence.words:
             if word.text.lower() == 'being' and word.deprel == 'aux:pass':
-                self.logger.debug(f"  🎯 being検出: {word.text} (deprel={word.deprel}, head={word.head})")
+                self.logger.debug(f"  being検出: {word.text} (deprel={word.deprel}, head={word.head})")
                 # beingが修飾する過去分詞を探す
                 for reviewed_word in sentence.words:
                     self.logger.debug(f"    📝 候補語: {reviewed_word.text} (id={reviewed_word.id}, xpos={reviewed_word.xpos}, deprel={reviewed_word.deprel})")
@@ -3128,7 +3142,7 @@ class UnifiedStanzaRephraseMapper:
                             if head_word and head_word.upos == 'NOUN':
                                 participle_info['subject'] = head_word
                         
-                        self.logger.debug(f"  🎯 being+過去分詞検出: being {reviewed_word.text} (被修飾語:{head_word.text if head_word else 'unknown'})")
+                        self.logger.debug(f"  being+過去分詞検出: being {reviewed_word.text} (被修飾語:{head_word.text if head_word else 'unknown'})")
                         return participle_info
         
         return None
@@ -3162,39 +3176,45 @@ class UnifiedStanzaRephraseMapper:
             subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
             sub_v_content = f"{subject_phrase} {participle_verb.text}"
             
-            # 🎯 文頭を小文字化（Rephrase仕様準拠）
+            # 文頭を小文字化（Rephrase仕様準拠）
             sub_v_content = sub_v_content[0].lower() + sub_v_content[1:] if sub_v_content else sub_v_content
             
             # Step 2: 該当スロットを空にして、sub-vに移動
             if target_slot:
                 slots[target_slot] = ""  # 修飾対象スロットを空にする
                 sub_slots['sub-v'] = sub_v_content
-                self.logger.debug(f"  ✅ 分詞修飾処理: {target_slot} → sub-v = '{sub_v_content}'")
+                self.logger.debug(f"  分詞修飾処理: {target_slot} → sub-v = '{sub_v_content}'")
             else:
                 # フォールバック: Sを空にする（従来の挙動）
                 slots['S'] = ""
                 sub_slots['sub-v'] = sub_v_content
-                self.logger.debug(f"  ⚠️ フォールバック: S → sub-v = '{sub_v_content}'")
+                self.logger.debug(f"  フォールバック: S → sub-v = '{sub_v_content}'")
                 
         elif participle_type == 'being_past':
             # Case 52パターン: The documents being reviewed
             subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
+            print(f"SUBJECT PHRASE: '{subject_phrase}'")
             
             # Test 52期待値に合わせて: "The documents being"（大文字保持）
             sub_aux_content = f"{subject_phrase} being"
+            print(f"SUB_AUX_CONTENT: '{sub_aux_content}'")
             
             # Step 2: 該当スロットを空にして、sub-aux/sub-vに分割
             if target_slot:
+                print(f"TARGET SLOT: {target_slot}")
                 slots[target_slot] = ""
                 sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
-                self.logger.debug(f"  ✅ being分詞処理: {target_slot} → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
+                print(f"SET SUB_AUX: '{sub_aux_content}'")
+                self.logger.debug(f"  being+過去分詞処理: {target_slot} → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
             else:
                 # フォールバック
+                print("FALLBACK CASE")
                 slots['S'] = ""
                 sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
-                self.logger.debug(f"  ✅ being分詞フォールバック: S → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
+                print(f"FALLBACK SET SUB_AUX: '{sub_aux_content}'")
+                self.logger.debug(f"  being+過去分詞フォールバック: S → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
         
         # 結果を更新
         result['slots'] = slots
@@ -3216,7 +3236,7 @@ class UnifiedStanzaRephraseMapper:
         
         result['grammar_info'] = grammar_info
         
-        self.logger.debug(f"  ✅ 汎用分詞処理完了: slots={slots}, sub_slots={sub_slots}")
+        self.logger.debug(f"  汎用分詞処理完了: slots={slots}, sub_slots={sub_slots}")
         return result
     
     def _is_standalone_participle(self, sentence, subject, participle_verb) -> bool:
@@ -3779,7 +3799,7 @@ class UnifiedStanzaRephraseMapper:
         for word in sentence.words:
             if word.deprel == 'root' and word.upos == 'VERB':
                 main_verb = word
-                print(f"    🎯 主動詞検出: {word.text}")
+                print(f"    主動詞検出: {word.text}")
                 break
         
         # 第二パス: 助動詞を節レベルで分類して収集
@@ -3791,7 +3811,7 @@ class UnifiedStanzaRephraseMapper:
             is_auxiliary = False
             if word.deprel in ['aux', 'aux:pass']:
                 is_auxiliary = True
-                print(f"    🔗 標準助動詞: {word.text} ({word.deprel})")
+                print(f"    標準助動詞: {word.text} ({word.deprel})")
             elif word.deprel == 'cop' and word.lemma == 'be':
                 # 連結詞は助動詞ではない（補語構文のbe動詞）
                 # 受動態・進行形の文脈でのみ助動詞として扱う
@@ -3814,17 +3834,17 @@ class UnifiedStanzaRephraseMapper:
                 
                 if is_auxiliary_context:
                     is_auxiliary = True
-                    print(f"    🔗 文脈的助動詞be: {word.text}")
+                    print(f"    文脈的助動詞be: {word.text}")
                 else:
                     print(f"    ❌ 連結詞be (非助動詞): {word.text}")
                     continue
             elif (word.upos == 'VERB' and 
                   word.text.lower() in ['can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might', 'must']):
                 is_auxiliary = True
-                print(f"    🔗 法助動詞: {word.text}")
+                print(f"    法助動詞: {word.text}")
             elif word.text.lower() == 'being' and word.upos in ['AUX', 'VERB']:
                 is_auxiliary = True
-                print(f"    🔗 being検出: {word.text}")
+                print(f"    being検出: {word.text}")
             
             # 助動詞の節レベル分類
             if is_auxiliary:
@@ -3840,13 +3860,13 @@ class UnifiedStanzaRephraseMapper:
             # 主語検出 (主文のみ)
             elif word.deprel == 'nsubj' and main_verb and word.head == main_verb.id:
                 subject = word
-                print(f"    👤 主語検出: {word.text}")
+                print(f"    主語検出: {word.text}")
         
         # 主節助動詞を位置順にソートして統合
         if main_auxiliary_words:
             main_auxiliary_words.sort(key=lambda x: x.id)
             auxiliary_chain = [word.text for word in main_auxiliary_words]
-            print(f"    🎯 主節助動詞チェーン: {auxiliary_chain}")
+            print(f"    主節助動詞チェーン: {auxiliary_chain}")
         else:
             auxiliary_chain = []
         
@@ -3854,11 +3874,11 @@ class UnifiedStanzaRephraseMapper:
         subordinate_auxiliaries = []
         for aux_word in sub_auxiliary_words:
             subordinate_auxiliaries.append(aux_word.text.lower())
-            print(f"    🔗 従属節助動詞統合: {aux_word.text}")
+            print(f"    従属節助動詞統合: {aux_word.text}")
         
         # 助動詞チェーンが存在する場合のみ処理
         if len(auxiliary_chain) >= 1:
-            print(f"    ✅ 主節助動詞チェーン発見: {auxiliary_chain}")
+            print(f"    主節助動詞チェーン発見: {auxiliary_chain}")
             
             # 助動詞チェーン結合 (核心ロジック)
             auxiliary_phrase = ' '.join(auxiliary_chain)
@@ -3885,30 +3905,33 @@ class UnifiedStanzaRephraseMapper:
             # 従属節助動詞の処理
             if subordinate_auxiliaries:
                 # 分詞構文ハンドラーが既にsub-auxを設定している場合は上書きしない
-                existing_sub_aux = result.get('sub_slots', {}).get('sub-aux')
-                if existing_sub_aux and existing_sub_aux != ' '.join(subordinate_auxiliaries):
-                    print(f"    🎯 分詞構文sub-aux保護: '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
+                existing_sub_aux = base_result.get('sub_slots', {}).get('sub-aux')
+                print(f"    CHECK existing_sub_aux: '{existing_sub_aux}', new: {subordinate_auxiliaries}")
+                # 分詞構文の場合は"being"が含まれているかチェック
+                if existing_sub_aux and ('being' in existing_sub_aux or len(existing_sub_aux.split()) > 1):
+                    print(f"    分詞構文sub-aux保護: '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
                 else:
                     sub_slots['sub-aux'] = ' '.join(subordinate_auxiliaries)
-                    print(f"    📍 従属節助動詞: sub-aux = {sub_slots['sub-aux']}")
+                    print(f"    従属節助動詞: sub-aux = {sub_slots['sub-aux']}")
             
-            print(f"    ✅ 助動詞複合処理完了: Aux='{auxiliary_phrase}'")
+            print(f"    助動詞複合処理完了: Aux='{auxiliary_phrase}'")
             return {'slots': slots, 'sub_slots': sub_slots}
         
         elif subordinate_auxiliaries:
             # 主節助動詞なし、従属節助動詞のみの場合
             # 分詞構文ハンドラーが既にsub-auxを設定している場合は上書きしない
-            existing_sub_aux = result.get('sub_slots', {}).get('sub-aux')
-            print(f"    CHECK existing_sub_aux: '{existing_sub_aux}', new: {subordinate_auxiliaries}")
-            if existing_sub_aux and existing_sub_aux != ' '.join(subordinate_auxiliaries):
-                print(f"    分詞構文sub-aux保護: '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
+            existing_sub_aux = base_result.get('sub_slots', {}).get('sub-aux')
+            print(f"    CHECK SUB-ONLY existing_sub_aux: '{existing_sub_aux}', new: {subordinate_auxiliaries}")
+            # 分詞構文の場合は"being"が含まれているかチェック
+            if existing_sub_aux and ('being' in existing_sub_aux or len(existing_sub_aux.split()) > 1):
+                print(f"    分詞構文sub-aux保護(従属のみ): '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
                 return {'slots': {}, 'sub_slots': {}}
             else:
                 print(f"    従属節助動詞のみ: {subordinate_auxiliaries}")
                 return {'slots': {}, 'sub_slots': {'sub-aux': ' '.join(subordinate_auxiliaries)}}
         
         else:
-            print(f"    ❌ 助動詞チェーン未検出")
+            print(f"    助動詞チェーン未検出")
             return None
 
     def _is_main_clause_auxiliary(self, word, main_verb) -> bool:

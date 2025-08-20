@@ -4,7 +4,7 @@ import logging
 from unified_stanza_rephrase_mapper import UnifiedStanzaRephraseMapper
 
 # ログ設定
-logging.basicConfig(level=logging.WARNING, format='%(levelname)s - %(message)s')
+logging.basicConfig(level=logging.ERROR, format='%(levelname)s - %(message)s')
 
 # Test 52の文
 sentence = "The documents being reviewed thoroughly will be approved soon."
