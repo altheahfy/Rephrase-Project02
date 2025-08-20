@@ -817,81 +817,54 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("🔗 接続詞構文検出: 主節要素保持")
             return
         
-        # 対応関係マッピング（Aux, V除外）
-        # 注意: Sスロットは専門ハンドラー（関係節、分詞構文）が処理するため除外
-        # 機械的なS→sub-s変換は文法的誤分類を引き起こすため削除
-        main_to_sub_mapping = {
-            # 'S': 'sub-s',  # 削除: 専門ハンドラーに委任
-            'O1': 'sub-o1', 
-            'O2': 'sub-o2',
-            'C1': 'sub-c1',
-            'C2': 'sub-c2'
-            # M1, M2, M3は除外 - 主節副詞と関係節副詞は独立存在
-        }
-        
-        # 🎯 Sスロットの完全な子スロット群（分詞構文用）
-        s_child_slots = ['sub-s', 'sub-aux', 'sub-v', 'sub-c1', 'sub-o1', 'sub-o2', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
+        # 位置情報ベースの処理に移行（メタデータ管理）
+        # 各上位スロットが自分のサブスロット群のみに基づいて空文字化される
         
         # 分詞構文制御フラグをチェック
         grammar_info = result.get('grammar_info', {})
         control_flags = grammar_info.get('control_flags', {})
         participle_detected = control_flags.get('participle_detected', False)
         
-        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}, 分詞構文: {participle_detected}")
+        # 位置情報ベースの処理に移行
+        slot_positions = result.get('slot_positions', {})
         
-        # 複文判定＆スロット空文字化処理
-        for main_slot, sub_slot in main_to_sub_mapping.items():
-            if sub_slot in sub_slots and sub_slots[sub_slot]:
-                # Sub-slotが存在し内容がある場合、対応するmain slotを空にする
-                if main_slot in slots:
-                    original_value = slots[main_slot]
-                    
-                    # 分詞構文特別処理: 分詞構文ハンドラーが既に適切に設定済み
-                    if participle_detected and sub_slot in ['sub-v', 'sub-aux', 'sub-m2', 'sub-m3']:
-                        self.logger.debug(
-                            f"🎯 分詞構文保護: {main_slot} - {sub_slot}は分詞構文ハンドラーが管理済み"
-                        )
-                        continue  # 分詞構文関連のsub-slotは変更しない
-                    
-                    # 副詞スロット特別処理: 主節副詞は保持
-                    if main_slot.startswith('M') and original_value:
-                        # 主節副詞が存在する場合、sub-slotの移動は行わない
-                        self.logger.debug(
-                            f"🛡️ 主節副詞保護: {main_slot}: '{original_value}' (preserved) "
-                            f"while {sub_slot}: '{sub_slots[sub_slot]}' (kept in sub-slot)"
-                        )
-                        continue  # 空文字化をスキップ
-                    
-                    slots[main_slot] = ""  # 位置マーカーとして空文字設定
-                    
-                    self.logger.debug(
-                        f"🔄 Complex sentence rule applied: "
-                        f"{main_slot}: '{original_value}' → '' "
-                        f"(sub-slot {sub_slot}: '{sub_slots[sub_slot]}')"
-                    )
+        self.logger.debug(f"🏗️ Rephrase仕様適用開始 - Sub-slots: {list(sub_slots.keys())}, 位置情報: {slot_positions}, 分詞構文: {participle_detected}")
         
-        # 🎯 Sスロットの完全な子スロット群チェック（分詞構文対応）
-        s_has_child = any(child_slot in sub_slots and sub_slots[child_slot] for child_slot in s_child_slots)
-        if s_has_child and 'S' in slots and slots['S']:
-            original_s = slots['S']
-            slots['S'] = ""
-            active_children = [slot for slot in s_child_slots if slot in sub_slots and sub_slots[slot]]
-            self.logger.debug(
-                f"🎯 Sスロット空文字化: S: '{original_s}' → '' "
-                f"(子スロット存在: {', '.join(active_children)})"
-            )
+        # 🔥 位置情報ベースの空文字化処理
+        # 各上位スロットについて、そのスロットに属するサブスロットがあるかチェック
+        upper_slots = ['S', 'O1', 'O2', 'C1', 'C2', 'M1', 'M2', 'M3']  # AuxとVは除外
+        
+        for upper_slot in upper_slots:
+            # この上位スロットに属するサブスロットを検索
+            belonging_sub_slots = [
+                sub_slot for sub_slot, position in slot_positions.items() 
+                if position == upper_slot and sub_slot in sub_slots and sub_slots[sub_slot] and sub_slots[sub_slot].strip()
+            ]
+            
+            if belonging_sub_slots and upper_slot in slots and slots[upper_slot] and slots[upper_slot].strip():
+                original_value = slots[upper_slot]
+                slots[upper_slot] = ""
+                self.logger.debug(
+                    f"🔄 位置情報ベース空文字化: {upper_slot}: '{original_value}' → '' "
+                    f"(属するサブスロット: {', '.join(belonging_sub_slots)})"
+                )
         
         # 副詞重複チェックと削除
         self._remove_adverb_duplicates(slots, sub_slots)
         
         # 処理結果をデバッグログ出力
-        applied_rules = [
-            f"{main}→{sub}" for main, sub in main_to_sub_mapping.items() 
-            if sub in sub_slots and sub_slots[sub] and main in slots
-        ]
+        position_based_rules = []
+        slot_positions = result.get('slot_positions', {})
+        for upper_slot in ['S', 'O1', 'O2', 'C1', 'C2', 'M1', 'M2', 'M3']:
+            belonging_sub_slots = [
+                sub_slot for sub_slot, position in slot_positions.items() 
+                if position == upper_slot and sub_slot in sub_slots and sub_slots[sub_slot]
+            ]
+            if belonging_sub_slots and upper_slot in slots and slots[upper_slot] == "":
+                position_based_rules.append(f"{upper_slot}←{', '.join(belonging_sub_slots)}")
         
-        if applied_rules:
-            self.logger.info(f"✅ Rephrase複文ルール適用: {', '.join(applied_rules)}")
+        if position_based_rules:
+            self.logger.info(f"✅ 位置情報ベース空文字化: {', '.join(position_based_rules)}")
         else:
             self.logger.debug("🔍 Simple sentence detected - No main slot emptying required")
     
@@ -942,7 +915,7 @@ class UnifiedStanzaRephraseMapper:
         for main_slot, main_value in list(main_adverbs.items()):
             for sub_slot, sub_value in remaining_sub_adverbs.items():
                 # 同じ副詞が主節と関係節に存在する場合
-                if main_value.strip() == sub_value.strip():
+                if main_value.strip() == sub_value.strip() and main_value.strip():  # 空文字チェック追加
                     # 関係節を優先し、主節から削除
                     slots[main_slot] = ""
                     self.logger.debug(f"🔄 主節↔関係節重複削除: {main_slot}='{main_value}' → '' (sub-slot {sub_slot}='{sub_value}' を優先)")
@@ -1187,10 +1160,17 @@ class UnifiedStanzaRephraseMapper:
                 result['slots'] = {}
             if 'sub_slots' not in result:
                 result['sub_slots'] = {}
+            if 'slot_positions' not in result:
+                result['slot_positions'] = {}
             
             # 通常のマージ
             result['slots'].update(rephrase_slots.get('slots', {}))
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+            
+            # 🔥 位置情報記録: 関係節のサブスロットはS位置に属する
+            for sub_slot_name in rephrase_slots.get('sub_slots', {}):
+                result['slot_positions'][sub_slot_name] = 'S'
+                self.logger.debug(f"📍 位置情報記録: {sub_slot_name} → S位置")
         
         # 文法情報記録
         result['grammar_info'] = {
@@ -1452,22 +1432,23 @@ class UnifiedStanzaRephraseMapper:
         # 省略関係代名詞の処理
         elif rel_type == 'obj_omitted':
             # 省略目的語関係代名詞: "The book I read"
-            # 🔧 修正: 関係節全体を構築
-            slots["S"] = ""  # 主節主語を空に設定（先行詞は従属節に移動）
+            # 🔧 修正: 空文字スロット生成を回避
+            # slots["S"] = ""  # 主節主語を空に設定は危険 → 5文型ハンドラーに委譲
             
             # 先行詞テキストから[omitted]を除去
             clean_noun_phrase = noun_phrase.replace(" [omitted]", "").replace("[omitted]", "")
             
             # 従属節主語を検出（関係節動詞のnsubj）
             rel_subject = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'nsubj')
-            if rel_subject:
+            if rel_subject and rel_subject.text.strip():  # 空文字チェック追加
                 sub_slots["sub-o1"] = clean_noun_phrase
                 sub_slots["sub-s"] = rel_subject.text
                 sub_slots["sub-v"] = rel_verb.text
                 self.logger.debug(f"🔧 省略目的語関係節: sub-s = '{rel_subject.text}'")
-            else:
+            elif clean_noun_phrase.strip():  # 空文字チェック追加
                 sub_slots["sub-o1"] = clean_noun_phrase
-                sub_slots["sub-v"] = rel_verb.text
+                if rel_verb.text.strip():  # 空文字チェック追加
+                    sub_slots["sub-v"] = rel_verb.text
             
         elif rel_type == 'nsubj_omitted':  
             # 省略主語関係代名詞: "The person standing there"
@@ -1977,8 +1958,13 @@ class UnifiedStanzaRephraseMapper:
                     if slot == "C1" and "V" in slots and slots["V"] == root_word.text:
                         self.logger.debug(f"🚫 C1重複防止: {root_word.text} (Vと同一)")
                         continue  # C1への設定をスキップ
-                    self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}'")
-                    slots[slot] = root_word.text
+                    
+                    # ✅ 空文字スロット防止: 有効な値のみ設定
+                    if root_word.text and root_word.text.strip():
+                        self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}'")
+                        slots[slot] = root_word.text
+                    else:
+                        self.logger.debug(f"🚫 空文字スロット防止: {slot} (ROOT語が空)")
             elif dep_rel in dep_relations:
                 # 依存関係語の処理（修飾語句を含む完全な句を構築）
                 words = dep_relations[dep_rel]
@@ -1987,8 +1973,13 @@ class UnifiedStanzaRephraseMapper:
                     main_word = words[0]
                     # 修飾語句を構築
                     phrase = self._build_phrase_with_modifiers(sentence, main_word)
-                    self.logger.debug(f"🔧 依存関係語設定: {slot} = '{phrase}'")
-                    slots[slot] = phrase
+                    
+                    # ✅ 空文字スロット防止: 有効な句のみ設定
+                    if phrase and phrase.strip():
+                        self.logger.debug(f"🔧 依存関係語設定: {slot} = '{phrase}'")
+                        slots[slot] = phrase
+                    else:
+                        self.logger.debug(f"🚫 空文字スロット防止: {slot} (句が空)")
         
         # ✅ 追加処理：ROOTワードにも修飾語句処理を適用（動詞以外の場合）
         # 例: "The woman is my neighbor" でneighborがROOTの場合
