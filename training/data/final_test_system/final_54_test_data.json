@@ -214,7 +214,7 @@
           "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-m1": "The place where",
+          "sub-m2": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -229,7 +229,7 @@
           "C1": "late"
         },
         "sub_slots": {
-          "sub-m1": "The time when",
+          "sub-m2": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
         }
@@ -244,7 +244,7 @@
           "C1": "unclear"
         },
         "sub_slots": {
-          "sub-m1": "The reason why",
+          "sub-m2": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
         }
@@ -259,7 +259,7 @@
           "C1": "clever"
         },
         "sub_slots": {
-          "sub-m1": "The way how",
+          "sub-m2": "The way how",
           "sub-s": "he",
           "sub-v": "solved",
           "sub-o1": "it"
@@ -384,10 +384,10 @@
         "main_slots": {
           "S": "She",
           "V": "acts",
-          "M1": ""
+          "M2": ""
         },
         "sub_slots": {
-          "sub-m1": "as if",
+          "sub-m2": "as if",
           "sub-s": "she",
           "sub-v": "knows",
           "sub-o1": "everything"
@@ -583,8 +583,8 @@
         "sub_slots": {
           "sub-s": "we",
           "sub-v": "met",
-          "sub-m1": "The place where",
-          "sub-m2": "accidentally"
+          "sub-m2": "The place where",
+          "sub-m3": "accidentally"
         }
       }
     },
@@ -599,8 +599,8 @@
         "sub_slots": {
           "sub-s": "everything",
           "sub-v": "changed",
-          "sub-m1": "The time when",
-          "sub-m2": "dramatically"
+          "sub-m2": "The time when",
+          "sub-m3": "dramatically"
         }
       }
     },
@@ -611,7 +611,6 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very",
           "M2": "very carefully",
           "M3": "by skilled workers"
         },

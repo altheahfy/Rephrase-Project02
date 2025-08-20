@@ -83,10 +83,26 @@ def compare_slots(actual: Dict[str, Any], expected: Dict[str, Any]) -> Tuple[boo
     all_main_keys = set(actual_main.keys()) | set(expected_main.keys())
     
     for key in all_main_keys:
-        actual_val = actual_main.get(key, "")
-        expected_val = expected_main.get(key, "")
+        # 存在しないスロットと空文字スロットを区別
+        actual_exists = key in actual_main
+        expected_exists = key in expected_main
         
-        match = actual_val == expected_val
+        if actual_exists and expected_exists:
+            # 両方存在する場合は値を比較
+            actual_val = actual_main[key]
+            expected_val = expected_main[key]
+            match = actual_val == expected_val
+        elif not actual_exists and not expected_exists:
+            # 両方存在しない場合は一致
+            actual_val = "(not present)"
+            expected_val = "(not present)"
+            match = True
+        else:
+            # 一方のみ存在する場合は不一致
+            actual_val = actual_main[key] if actual_exists else "(not present)"
+            expected_val = expected_main[key] if expected_exists else "(not present)"
+            match = False
+        
         analysis["main_slots_match"][key] = {
             "actual": actual_val,
             "expected": expected_val,
@@ -103,10 +119,26 @@ def compare_slots(actual: Dict[str, Any], expected: Dict[str, Any]) -> Tuple[boo
     all_sub_keys = set(actual_sub.keys()) | set(expected_sub.keys())
     
     for key in all_sub_keys:
-        actual_val = actual_sub.get(key, "")
-        expected_val = expected_sub.get(key, "")
+        # 存在しないスロットと空文字スロットを区別
+        actual_exists = key in actual_sub
+        expected_exists = key in expected_sub
         
-        match = actual_val == expected_val
+        if actual_exists and expected_exists:
+            # 両方存在する場合は値を比較
+            actual_val = actual_sub[key]
+            expected_val = expected_sub[key]
+            match = actual_val == expected_val
+        elif not actual_exists and not expected_exists:
+            # 両方存在しない場合は一致
+            actual_val = "(not present)"
+            expected_val = "(not present)"
+            match = True
+        else:
+            # 一方のみ存在する場合は不一致
+            actual_val = actual_sub[key] if actual_exists else "(not present)"
+            expected_val = expected_sub[key] if expected_exists else "(not present)"
+            match = False
+        
         analysis["sub_slots_match"][key] = {
             "actual": actual_val,
             "expected": expected_val,
