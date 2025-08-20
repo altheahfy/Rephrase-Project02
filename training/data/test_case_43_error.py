@@ -6,18 +6,18 @@ Case 43 副詞重複エラー診断テスト
 import sys
 sys.path.append('.')
 
-from unified_stanza_rephrase_mapper import UnifiedMapper
+from unified_stanza_rephrase_mapper import UnifiedStanzaRephraseMapper
 
 def test_case_43():
-    mapper = UnifiedMapper()
+    mapper = UnifiedStanzaRephraseMapper()
     
     print("=== Case 43分析 ===")
     sentence = "The book that was written very carefully by the author became famous."
     print(f"文: {sentence}")
     
-    result = mapper.process_sentence(sentence)
+    result = mapper.process(sentence)
     
-    print(f"実際メイン: {result['main_slots']}")
+    print(f"実際メイン: {result['slots']}")
     print(f"実際サブ: {result['sub_slots']}")
     
     # 期待値 (final_54_test_data.jsonから)
