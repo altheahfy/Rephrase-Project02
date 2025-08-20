@@ -9,6 +9,38 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+def safe_json_dump(data, filepath):
+    """Circular reference対応のJSONダンプ"""
+    def clean_circular_refs(obj, seen=None):
+        if seen is None:
+            seen = set()
+        
+        if isinstance(obj, dict):
+            obj_id = id(obj)
+            if obj_id in seen:
+                return {"<circular_reference>": str(obj_id)}
+            seen.add(obj_id)
+            cleaned = {}
+            for k, v in obj.items():
+                try:
+                    cleaned[k] = clean_circular_refs(v, seen.copy())
+                except:
+                    cleaned[k] = str(v)
+            return cleaned
+        elif isinstance(obj, list):
+            return [clean_circular_refs(item, seen.copy()) for item in obj]
+        else:
+            return obj
+    
+    try:
+        cleaned_data = clean_circular_refs(data)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"JSON保存エラー: {e}")
+        return False
+
 from unified_stanza_rephrase_mapper import UnifiedStanzaRephraseMapper
 
 def calculate_accuracy(expected, actual):
@@ -160,8 +192,10 @@ def run_full_test():
     
     # Save detailed results
     output_file = f'full_test_results_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+    if safe_json_dump(results, output_file):
+        print(f"\n結果を {output_file} に保存しました")
+    else:
+        print(f"\n結果保存に失敗しましたが、テストは完了しました")
     
     # Print summary
     print(f"\n=== テスト完了 ===")

@@ -1,0 +1,3976 @@
+{
+  "meta": {
+    "input_file": "final_test_system/final_54_test_data.json",
+    "processed_at": "2025-08-20T23:36:19.389269",
+    "total_sentences": 53,
+    "success_count": 53,
+    "error_count": 0,
+    "perfect_count": 48,
+    "high_accuracy_count": 1,
+    "overall_accuracy": 0.9910625620655411
+  },
+  "results": {
+    "1": {
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The car is red.",
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.100036,
+          "sentence_id": 1,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 5
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "2": {
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "I love you.",
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.098042,
+          "sentence_id": 2,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 4
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "3": {
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      },
+      "actual": {
+        "sentence": "The man who runs fast is strong.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj",
+              "antecedent": "man",
+              "rel_pronoun": "who",
+              "rel_verb": "runs",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.153043,
+          "sentence_id": 3,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "4": {
+      "sentence": "The book which lies there is mine.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      },
+      "actual": {
+        "sentence": "The book which lies there is mine.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj",
+              "antecedent": "book",
+              "rel_pronoun": "which",
+              "rel_verb": "lies",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PRON_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.225102,
+          "sentence_id": 4,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "5": {
+      "sentence": "The person that works here is kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      },
+      "actual": {
+        "sentence": "The person that works here is kind.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj",
+              "antecedent": "person",
+              "rel_pronoun": "that",
+              "rel_verb": "works",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.158551,
+          "sentence_id": 5,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "6": {
+      "sentence": "The book which I bought is expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      },
+      "actual": {
+        "sentence": "The book which I bought is expensive.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "obj",
+              "antecedent": "book",
+              "rel_pronoun": "which",
+              "rel_verb": "bought",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-o1": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.166057,
+          "sentence_id": 6,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-o1": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "7": {
+      "sentence": "The man whom I met is tall.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      },
+      "actual": {
+        "sentence": "The man whom I met is tall.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "obj",
+              "antecedent": "man",
+              "rel_pronoun": "whom",
+              "rel_verb": "met",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-o1": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.134532,
+          "sentence_id": 7,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-o1": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "8": {
+      "sentence": "The car that he drives is new.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      },
+      "actual": {
+        "sentence": "The car that he drives is new.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "obj",
+              "antecedent": "car",
+              "rel_pronoun": "that",
+              "rel_verb": "drives",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-o1": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.144558,
+          "sentence_id": 8,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-o1": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "9": {
+      "sentence": "The car which was crashed is red.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      },
+      "actual": {
+        "sentence": "The car which was crashed is red.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "car",
+              "rel_pronoun": "which",
+              "rel_verb": "crashed",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.174045,
+          "sentence_id": 9,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "10": {
+      "sentence": "The book that was written is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      },
+      "actual": {
+        "sentence": "The book that was written is famous.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "book",
+              "rel_pronoun": "that",
+              "rel_verb": "written",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.174073,
+          "sentence_id": 10,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "11": {
+      "sentence": "The letter which was sent arrived.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      },
+      "actual": {
+        "sentence": "The letter which was sent arrived.",
+        "slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "letter",
+              "rel_pronoun": "which",
+              "rel_verb": "sent",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.165983,
+          "sentence_id": 11,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 7
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "12": {
+      "sentence": "The man whose car is red lives here.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      },
+      "actual": {
+        "sentence": "The man whose car is red lives here.",
+        "slots": {
+          "V": "lives",
+          "S": "",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "man",
+              "rel_pronoun": "whose",
+              "rel_verb": "is",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S",
+          "sub-c1": "S"
+        },
+        "meta": {
+          "processing_time": 0.177053,
+          "sentence_id": 12,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S",
+            "sub-c1": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "13": {
+      "sentence": "The student whose book I borrowed is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      },
+      "actual": {
+        "sentence": "The student whose book I borrowed is smart.",
+        "slots": {
+          "S": "",
+          "V": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "student",
+              "rel_pronoun": "whose",
+              "rel_verb": "borrowed",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-o1": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.194035,
+          "sentence_id": 13,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-o1": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 0.8947368421052632,
+      "differences": [
+        "Main V: 'is' -> 'smart'",
+        "Main C1: 'smart' -> ''"
+      ],
+      "status": "success"
+    },
+    "14": {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      },
+      "actual": {
+        "sentence": "The woman whose dog barks is my neighbor.",
+        "slots": {
+          "S": "",
+          "V": "neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "woman",
+              "rel_pronoun": "whose",
+              "rel_verb": "barks",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.180048,
+          "sentence_id": 14,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 0.8947368421052632,
+      "differences": [
+        "Main V: 'is' -> 'neighbor'",
+        "Main C1: 'my neighbor' -> ''"
+      ],
+      "status": "success"
+    },
+    "15": {
+      "sentence": "The place where we met is beautiful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "actual": {
+        "sentence": "The place where we met is beautiful.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "place",
+              "rel_pronoun": "where",
+              "rel_verb": "met",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.163563,
+          "sentence_id": 15,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "16": {
+      "sentence": "The time when he arrived was late.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      },
+      "actual": {
+        "sentence": "The time when he arrived was late.",
+        "slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "time",
+              "rel_pronoun": "when",
+              "rel_verb": "arrived",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.152037,
+          "sentence_id": 16,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "17": {
+      "sentence": "The reason why she left is unclear.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      },
+      "actual": {
+        "sentence": "The reason why she left is unclear.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "reason",
+              "rel_pronoun": "why",
+              "rel_verb": "left",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.156578,
+          "sentence_id": 17,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "18": {
+      "sentence": "The way how he solved it was clever.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      },
+      "actual": {
+        "sentence": "The way how he solved it was clever.",
+        "slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "way",
+              "rel_pronoun": "how",
+              "rel_verb": "solved",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S",
+          "sub-o1": "S"
+        },
+        "meta": {
+          "processing_time": 0.183548,
+          "sentence_id": 18,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S",
+            "sub-o1": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "19": {
+      "sentence": "The book I read yesterday was boring.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      },
+      "actual": {
+        "sentence": "The book I read yesterday was boring.",
+        "slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "obj_omitted",
+              "antecedent": "book",
+              "rel_pronoun": "[omitted]",
+              "rel_verb": "read",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-o1": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.162625,
+          "sentence_id": 19,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {
+            "sub-o1": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "20": {
+      "sentence": "He has finished his homework.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "He has finished his homework.",
+        "slots": {
+          "S": "He",
+          "V": "finished",
+          "O1": "his homework",
+          "Aux": "has"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.153558,
+          "sentence_id": 20,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 6
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "21": {
+      "sentence": "The letter was written by John.",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The letter was written by John.",
+        "slots": {
+          "V": "written",
+          "S": "The letter",
+          "Aux": "was",
+          "M2": "by John"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "letter",
+              "auxiliary": "was",
+              "main_verb": "written",
+              "agent": "John"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.157606,
+          "sentence_id": 21,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 7
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "22": {
+      "sentence": "The house was built in 1990.",
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The house was built in 1990.",
+        "slots": {
+          "V": "built",
+          "S": "The house",
+          "Aux": "was",
+          "M2": "in 1990"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "house",
+              "auxiliary": "was",
+              "main_verb": "built",
+              "agent": null
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.147554,
+          "sentence_id": 22,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 7
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "23": {
+      "sentence": "The book was written by a famous author.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The book was written by a famous author.",
+        "slots": {
+          "V": "written",
+          "S": "The book",
+          "Aux": "was",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "book",
+              "auxiliary": "was",
+              "main_verb": "written",
+              "agent": "author"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.168056,
+          "sentence_id": 23,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "24": {
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The cake is being baked by my mother.",
+        "slots": {
+          "V": "baked",
+          "S": "The cake",
+          "Aux": "is being",
+          "M2": "by my mother"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "cake",
+              "auxiliary": "being",
+              "main_verb": "baked",
+              "agent": "mother"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.158034,
+          "sentence_id": 24,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "25": {
+      "sentence": "The cake was eaten by the children.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The cake was eaten by the children.",
+        "slots": {
+          "V": "eaten",
+          "S": "The cake",
+          "Aux": "was",
+          "M2": "by the children"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "cake",
+              "auxiliary": "was",
+              "main_verb": "eaten",
+              "agent": "children"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.149061,
+          "sentence_id": 25,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "26": {
+      "sentence": "The door was opened by the key.",
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The door was opened by the key.",
+        "slots": {
+          "V": "opened",
+          "S": "The door",
+          "Aux": "was",
+          "M2": "by the key"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "door",
+              "auxiliary": "was",
+              "main_verb": "opened",
+              "agent": "key"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.14055,
+          "sentence_id": 26,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "27": {
+      "sentence": "The message was sent yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The message was sent yesterday.",
+        "slots": {
+          "V": "sent",
+          "S": "The message",
+          "Aux": "was",
+          "M2": "yesterday"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "message",
+              "auxiliary": "was",
+              "main_verb": "sent",
+              "agent": null
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.139554,
+          "sentence_id": 27,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 6
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "28": {
+      "sentence": "She acts as if she knows everything.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      },
+      "actual": {
+        "sentence": "She acts as if she knows everything.",
+        "slots": {
+          "S": "She",
+          "V": "acts",
+          "O1": "",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        },
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "conjunction": {
+              "detected_patterns": [
+                "conjunction"
+              ],
+              "conjunction_type": "as if",
+              "subordinate_verb": "knows"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.15407,
+          "sentence_id": 28,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 8
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "29": {
+      "sentence": "The students study hard for exams.",
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The students study hard for exams.",
+        "slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.151555,
+          "sentence_id": 29,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 7
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "30": {
+      "sentence": "The car was repaired last week.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The car was repaired last week.",
+        "slots": {
+          "V": "repaired",
+          "S": "The car",
+          "Aux": "was",
+          "M2": "last week"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "car",
+              "auxiliary": "was",
+              "main_verb": "repaired",
+              "agent": null
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.148134,
+          "sentence_id": 30,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 7
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "31": {
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "written",
+          "sub-aux": "was",
+          "sub-m2": "carefully",
+          "sub-m3": "by Shakespeare"
+        }
+      },
+      "actual": {
+        "sentence": "The book which was carefully written by Shakespeare is famous.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-aux": "was",
+          "sub-v": "written",
+          "sub-m2": "carefully",
+          "sub-m3": "by Shakespeare"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "book",
+              "rel_pronoun": "which",
+              "rel_verb": "written",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.247082,
+          "sentence_id": 31,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "32": {
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "runs",
+          "M2": "smoothly"
+        },
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-v": "repaired",
+          "sub-aux": "was",
+          "sub-m2": "quickly",
+          "sub-m3": "yesterday"
+        }
+      },
+      "actual": {
+        "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+        "slots": {
+          "S": "",
+          "V": "runs",
+          "M2": "smoothly"
+        },
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-aux": "was",
+          "sub-v": "repaired",
+          "sub-m2": "quickly",
+          "sub-m3": "yesterday"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "car",
+              "rel_pronoun": "that",
+              "rel_verb": "repaired",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.238066,
+          "sentence_id": 32,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "33": {
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "today"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-v": "typed",
+          "sub-aux": "was",
+          "sub-m2": "slowly",
+          "sub-m3": "by the secretary"
+        }
+      },
+      "actual": {
+        "sentence": "The letter which was slowly typed by the secretary arrived today.",
+        "slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "today"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "typed",
+          "sub-m2": "slowly",
+          "sub-m3": "by the secretary"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "letter",
+              "rel_pronoun": "which",
+              "rel_verb": "typed",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.267613,
+          "sentence_id": 33,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 12
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "34": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently"
+        }
+      },
+      "actual": {
+        "sentence": "The student who studies diligently always succeeds academically.",
+        "slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj",
+              "antecedent": "student",
+              "rel_pronoun": "who",
+              "rel_verb": "studies",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.257098,
+          "sentence_id": 34,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "35": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        }
+      },
+      "actual": {
+        "sentence": "The teacher whose class runs efficiently is respected greatly.",
+        "slots": {
+          "S": "",
+          "V": "respected",
+          "Aux": "is",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice",
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "teacher",
+              "rel_pronoun": "whose",
+              "rel_verb": "runs",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "teacher",
+              "auxiliary": "is",
+              "main_verb": "respected",
+              "agent": null
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.226073,
+          "sentence_id": 35,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "36": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        }
+      },
+      "actual": {
+        "sentence": "The doctor who works carefully saves lives successfully.",
+        "slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj",
+              "antecedent": "doctor",
+              "rel_pronoun": "who",
+              "rel_verb": "works",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.213555,
+          "sentence_id": 36,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "37": {
+      "sentence": "The window was gently opened by the morning breeze.",
+      "expected": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The window was gently opened by the morning breeze.",
+        "slots": {
+          "V": "opened",
+          "S": "The window",
+          "Aux": "was",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "window",
+              "auxiliary": "was",
+              "main_verb": "opened",
+              "agent": "breeze"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.200053,
+          "sentence_id": 37,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "38": {
+      "sentence": "The message is being carefully written by the manager.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The message is being carefully written by the manager.",
+        "slots": {
+          "V": "written",
+          "S": "The message",
+          "Aux": "is being",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "message",
+              "auxiliary": "being",
+              "main_verb": "written",
+              "agent": "manager"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.20704,
+          "sentence_id": 38,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "39": {
+      "sentence": "The problem was quickly solved by the expert team.",
+      "expected": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The problem was quickly solved by the expert team.",
+        "slots": {
+          "V": "solved",
+          "S": "The problem",
+          "Aux": "was",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "problem",
+              "auxiliary": "was",
+              "main_verb": "solved",
+              "agent": "team"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.197908,
+          "sentence_id": 39,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "40": {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair"
+        },
+        "sub_slots": {
+          "sub-s": "The house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged",
+          "sub-m2": "badly"
+        }
+      },
+      "actual": {
+        "sentence": "The house whose roof was damaged badly needs immediate repair.",
+        "slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair"
+        },
+        "sub_slots": {
+          "sub-s": "The house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged",
+          "sub-m2": "badly"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "house",
+              "rel_pronoun": "whose",
+              "rel_verb": "damaged",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.228591,
+          "sentence_id": 40,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "41": {
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot"
+        },
+        "sub_slots": {
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m2": "The place where",
+          "sub-m3": "accidentally"
+        }
+      },
+      "actual": {
+        "sentence": "The place where we met accidentally became our favorite spot.",
+        "slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot"
+        },
+        "sub_slots": {
+          "sub-m2": "accidentally",
+          "sub-s": "we",
+          "sub-v": "met"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "place",
+              "rel_pronoun": "where",
+              "rel_verb": "met",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVC_ALT_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.228102,
+          "sentence_id": 41,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 0.8947368421052632,
+      "differences": [
+        "Sub sub-m2: 'The place where' -> 'accidentally'",
+        "Sub sub-m3: 'accidentally' -> ''"
+      ],
+      "status": "success"
+    },
+    "42": {
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "unexpected"
+        },
+        "sub_slots": {
+          "sub-s": "everything",
+          "sub-v": "changed",
+          "sub-m2": "The time when",
+          "sub-m3": "dramatically"
+        }
+      },
+      "actual": {
+        "sentence": "The time when everything changed dramatically was unexpected.",
+        "slots": {
+          "V": "unexpected",
+          "Aux": "was",
+          "S": ""
+        },
+        "sub_slots": {
+          "sub-m2": "dramatically",
+          "sub-s": "everything",
+          "sub-v": "changed"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice",
+            "human_corrected_passive_voice",
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "advmod",
+              "antecedent": "time",
+              "rel_pronoun": "when",
+              "rel_verb": "changed",
+              "universal_system": true
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "time",
+              "auxiliary": "was",
+              "main_verb": "unexpected",
+              "agent": null
+            }
+          },
+          "control_flags": {},
+          "human_corrections": [
+            {
+              "type": "passive_voice",
+              "original_stanza": "unexpected(root), was(cop)",
+              "corrected_to": "unexpected(V), was(Aux)",
+              "reason": "Human grammar pattern: be + past_participle = passive_voice"
+            }
+          ]
+        },
+        "slot_positions": {
+          "sub-m2": "S",
+          "sub-s": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.228005,
+          "sentence_id": 42,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {
+            "sub-m2": "S",
+            "sub-s": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 0.8947368421052632,
+      "differences": [
+        "Sub sub-m2: 'The time when' -> 'dramatically'",
+        "Sub sub-m3: 'dramatically' -> ''"
+      ],
+      "status": "success"
+    },
+    "43": {
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "expected": {
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is being",
+          "V": "constructed",
+          "M2": "very carefully",
+          "M3": "by skilled workers"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The building is being constructed very carefully by skilled workers.",
+        "slots": {
+          "V": "constructed",
+          "S": "The building",
+          "Aux": "is being",
+          "M1": "very",
+          "M2": "very carefully",
+          "M3": "by skilled workers"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "V_ONLY",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "building",
+              "auxiliary": "being",
+              "main_verb": "constructed",
+              "agent": "workers"
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.243184,
+          "sentence_id": 43,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 0.9473684210526315,
+      "differences": [
+        "Main M1: '' -> 'very'"
+      ],
+      "status": "success"
+    },
+    "44": {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The teacher explains grammar clearly to confused students daily.",
+        "slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.233829,
+          "sentence_id": 44,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "45": {
+      "sentence": "The student writes essays carefully for better grades.",
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "sentence": "The student writes essays carefully for better grades.",
+        "slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {},
+        "grammar_info": {
+          "detected_patterns": [],
+          "handler_contributions": {
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SVO",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "meta": {
+          "processing_time": 0.20854,
+          "sentence_id": 45,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 9
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "46": {
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "published",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly",
+          "sub-m3": "by experts"
+        }
+      },
+      "actual": {
+        "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+        "slots": {
+          "S": "",
+          "V": "published",
+          "Aux": "was",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly",
+          "sub-m3": "by experts"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "passive_voice",
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "report",
+              "rel_pronoun": "which",
+              "rel_verb": "reviewed",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "agent_passive",
+              "subject": "which",
+              "auxiliary": "was",
+              "main_verb": "published",
+              "agent": "experts"
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.275936,
+          "sentence_id": 46,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 12
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "47": {
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "improved",
+          "M2": "dramatically"
+        },
+        "sub_slots": {
+          "sub-s": "The student whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected",
+          "sub-m2": "carefully"
+        }
+      },
+      "actual": {
+        "sentence": "The student whose essay was carefully corrected improved dramatically.",
+        "slots": {
+          "S": "",
+          "V": "improved",
+          "M2": "dramatically"
+        },
+        "sub_slots": {
+          "sub-s": "The student whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected",
+          "sub-m2": "carefully"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "student",
+              "rel_pronoun": "whose",
+              "rel_verb": "corrected",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.246104,
+          "sentence_id": 47,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "48": {
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "works",
+          "M2": "efficiently",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-s": "The machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained",
+          "sub-m2": "properly"
+        }
+      },
+      "actual": {
+        "sentence": "The machine that was properly maintained works efficiently every day.",
+        "slots": {
+          "S": "",
+          "V": "works",
+          "M2": "efficiently",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-s": "The machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained",
+          "sub-m2": "properly"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "nsubj:pass",
+              "antecedent": "machine",
+              "rel_pronoun": "that",
+              "rel_verb": "maintained",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_PARTIAL",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.248596,
+          "sentence_id": 48,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "49": {
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "completed",
+          "O1": "the project",
+          "M2": "successfully",
+          "M3": "yesterday"
+        },
+        "sub_slots": {
+          "sub-v": "the team working",
+          "sub-m2": "overtime"
+        }
+      },
+      "actual": {
+        "sentence": "The team working overtime completed the project successfully yesterday.",
+        "slots": {
+          "S": "",
+          "V": "completed",
+          "O1": "the project",
+          "M2": "successfully",
+          "M3": "yesterday"
+        },
+        "sub_slots": {
+          "sub-v": "the team working",
+          "sub-m2": "overtime"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "participle_construction",
+            "basic_five_pattern"
+          ],
+          "handler_contributions": {
+            "participle_construction": {
+              "<circular_reference>": "1619637091712"
+            },
+            "basic_five_pattern": {
+              "<circular_reference>": "1619637091712"
+            }
+          },
+          "control_flags": {
+            "participle_detected": true,
+            "modified_slot": "S"
+          },
+          "analysis_error_patterns": [
+            {
+              "type": "time_adverb_misclassified_as_noun",
+              "word": "overtime",
+              "expected_pos": "ADV",
+              "correction_strategy": "force_adverbial_classification",
+              "target_slot": "sub-m2"
+            }
+          ]
+        },
+        "meta": {
+          "processing_time": 0.246375,
+          "sentence_id": 49,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "50": {
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "waiting",
+          "M2": "patiently"
+        },
+        "sub_slots": {
+          "sub-v": "the woman standing",
+          "sub-m2": "quietly",
+          "sub-m3": "near the door"
+        }
+      },
+      "actual": {
+        "sentence": "The woman standing quietly near the door was waiting patiently.",
+        "slots": {
+          "S": "",
+          "V": "waiting",
+          "M2": "patiently",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-v": "the woman standing",
+          "sub-m2": "quietly",
+          "sub-m3": "near the door"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "participle_construction",
+            "basic_five_pattern"
+          ],
+          "handler_contributions": {
+            "participle_construction": {
+              "<circular_reference>": "1619624391616"
+            },
+            "basic_five_pattern": {
+              "<circular_reference>": "1619624391616"
+            }
+          },
+          "control_flags": {
+            "participle_detected": true,
+            "modified_slot": "S"
+          },
+          "analysis_error_patterns": [
+            {
+              "type": "manner_adverb_in_participle",
+              "word": "quietly",
+              "expected_pos": "ADV",
+              "correction_strategy": "sub_slot_placement",
+              "target_slot": "sub-m2"
+            }
+          ]
+        },
+        "meta": {
+          "processing_time": 0.243613,
+          "sentence_id": 50,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "51": {
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "were",
+          "V": "supervised",
+          "M2": "carefully"
+        },
+        "sub_slots": {
+          "sub-v": "the children playing",
+          "sub-m2": "happily",
+          "sub-m3": "in the garden"
+        }
+      },
+      "actual": {
+        "sentence": "The children playing happily in the garden were supervised carefully.",
+        "slots": {
+          "S": "",
+          "V": "supervised",
+          "Aux": "were",
+          "M2": "carefully"
+        },
+        "sub_slots": {
+          "sub-v": "the children playing",
+          "sub-m2": "happily",
+          "sub-m3": "in the garden"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "participle_construction",
+            "basic_five_pattern",
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "participle_construction": {
+              "<circular_reference>": "1619538784512"
+            },
+            "basic_five_pattern": {
+              "<circular_reference>": "1619538784512"
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "children",
+              "auxiliary": "were",
+              "main_verb": "supervised",
+              "agent": null
+            }
+          },
+          "control_flags": {
+            "participle_detected": true,
+            "modified_slot": "S"
+          },
+          "analysis_error_patterns": [
+            {
+              "type": "manner_adverb_in_participle",
+              "word": "happily",
+              "expected_pos": "ADV",
+              "correction_strategy": "sub_slot_placement",
+              "target_slot": "sub-m2"
+            }
+          ]
+        },
+        "meta": {
+          "processing_time": 0.237302,
+          "sentence_id": 51,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "52": {
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "will be",
+          "V": "approved",
+          "M2": "soon"
+        },
+        "sub_slots": {
+          "sub-aux": "The documents being",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly"
+        }
+      },
+      "actual": {
+        "sentence": "The documents being reviewed thoroughly will be approved soon.",
+        "slots": {
+          "S": "",
+          "V": "approved",
+          "Aux": "will be",
+          "M2": "soon"
+        },
+        "sub_slots": {
+          "sub-aux": "The documents being",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "participle_construction",
+            "basic_five_pattern",
+            "passive_voice"
+          ],
+          "handler_contributions": {
+            "participle_construction": {
+              "<circular_reference>": "1619545220416"
+            },
+            "basic_five_pattern": {
+              "<circular_reference>": "1619545220416"
+            },
+            "passive_voice": {
+              "patterns": [
+                "passive_voice"
+              ],
+              "passive_type": "simple_passive",
+              "subject": "documents",
+              "auxiliary": "be",
+              "main_verb": "approved",
+              "agent": null
+            }
+          },
+          "control_flags": {
+            "participle_detected": true,
+            "modified_slot": "S"
+          },
+          "analysis_error_patterns": [
+            {
+              "type": "manner_adverb_in_participle",
+              "word": "thoroughly",
+              "expected_pos": "ADV",
+              "correction_strategy": "sub_slot_placement",
+              "target_slot": "sub-m2"
+            }
+          ]
+        },
+        "meta": {
+          "processing_time": 0.223768,
+          "sentence_id": 52,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 10
+          },
+          "slot_positions": {}
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    },
+    "53": {
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "rapidly"
+        },
+        "sub_slots": {
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited",
+          "sub-m2": "internationally"
+        }
+      },
+      "actual": {
+        "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+        "slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "rapidly"
+        },
+        "sub_slots": {
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited",
+          "sub-m2": "internationally"
+        },
+        "grammar_info": {
+          "detected_patterns": [
+            "relative_clause"
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                "relative_clause"
+              ],
+              "rel_type": "poss",
+              "antecedent": "artist",
+              "rel_pronoun": "whose",
+              "rel_verb": "exhibited",
+              "universal_system": true
+            },
+            "basic_five_pattern": {
+              "detected_patterns": [
+                "basic_five_pattern"
+              ],
+              "handler_contributions": {
+                "basic_five_pattern": {
+                  "pattern": "SV_whose",
+                  "confidence": 0.9
+                }
+              }
+            }
+          },
+          "control_flags": {}
+        },
+        "slot_positions": {
+          "sub-s": "S",
+          "sub-aux": "S",
+          "sub-v": "S"
+        },
+        "meta": {
+          "processing_time": 0.272634,
+          "sentence_id": 53,
+          "active_handlers": 7,
+          "stanza_info": {
+            "sentences": 1,
+            "tokens": 11
+          },
+          "slot_positions": {
+            "sub-s": "S",
+            "sub-aux": "S",
+            "sub-v": "S"
+          }
+        }
+      },
+      "accuracy": 1.0,
+      "differences": [],
+      "status": "success"
+    }
+  },
+  "summary": {
+    "perfect_cases": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53
+    ],
+    "high_accuracy_cases": [
+      43
+    ],
+    "low_accuracy_cases": [
+      13,
+      14,
+      41,
+      42
+    ],
+    "failed_cases": []
+  }
+}
