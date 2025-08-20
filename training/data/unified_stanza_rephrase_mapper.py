@@ -2005,26 +2005,27 @@ class UnifiedStanzaRephraseMapper:
         # 主節副詞のシンプルルール配置
         if main_adverbs:
             print(f"🎯 Main副詞詳細: {main_adverbs}")
-            main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main')
+            main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main', main_verb_id)
             print(f"🎯 Main副詞結果: {main_slots}")
             slots.update(main_slots)
         
         # 従属節副詞のシンプルルール配置
         if sub_adverbs:
-            sub_main_slots = self._apply_simple_rule_to_adverbs(sub_adverbs, 'sub')
+            sub_main_slots = self._apply_simple_rule_to_adverbs(sub_adverbs, 'sub', main_verb_id)
             sub_slots.update(sub_main_slots)
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
         print(f"🔧 副詞ハンドラー完了: slots={slots}, sub_slots={sub_slots}")
         return {'slots': slots, 'sub_slots': sub_slots}
     
-    def _apply_simple_rule_to_adverbs(self, adverbs, context_type):
+    def _apply_simple_rule_to_adverbs(self, adverbs, context_type, main_verb_id=None):
         """
         シンプルルールを副詞群に一括適用
         
         Args:
             adverbs: 副詞リスト
             context_type: 'main' or 'sub'
+            main_verb_id: 主動詞のID（動詞中心判定用）
         """
         result_slots = {}
         count = len(adverbs)
@@ -2044,12 +2045,58 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug(f"  1個ルール: {slot_name} = '{adverbs[0]['phrase']}'")
         
         elif count == 2:
-            # 2個 → M2, M3 (または sub-m2, sub-m3)
-            # 位置順でソート済みなので、最初がM2、次がM3
-            result_slots[f"{slot_prefix}2"] = adverbs[0]['phrase']
-            result_slots[f"{slot_prefix}3"] = adverbs[1]['phrase']
-            self.logger.debug(f"  2個ルール: {slot_prefix}2 = '{adverbs[0]['phrase']}', {slot_prefix}3 = '{adverbs[1]['phrase']}'")
-            self.logger.debug(f"  詳細: adverb[0]={adverbs[0]}, adverb[1]={adverbs[1]}")
+            # 2個 → 動詞中心(M2)を基準にM1とM3に配置
+            # 動詞中心より前→M1、後→M3（M2は中心で必ず使用）
+            
+            first_adverb = adverbs[0]
+            second_adverb = adverbs[1]
+            
+            # デフォルト：M2は最初の副詞、M3は2番目の副詞
+            result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
+            
+            # main_verb_idがある場合、動詞中心との位置関係で判定
+            if main_verb_id and 'word_id' in first_adverb and 'word_id' in second_adverb:
+                first_pos = first_adverb['word_id']
+                second_pos = second_adverb['word_id']
+                verb_pos = main_verb_id
+                
+                # 両方が動詞より前の場合
+                if first_pos < verb_pos and second_pos < verb_pos:
+                    # 前の方がM1、後の方がM2
+                    if first_pos < second_pos:
+                        result_slots[f"{slot_prefix}1"] = first_adverb['phrase']
+                        result_slots[f"{slot_prefix}2"] = second_adverb['phrase']
+                    else:
+                        result_slots[f"{slot_prefix}1"] = second_adverb['phrase']
+                        result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
+                
+                # 両方が動詞より後の場合
+                elif first_pos > verb_pos and second_pos > verb_pos:
+                    # 前の方がM2、後の方がM3
+                    if first_pos < second_pos:
+                        result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
+                        result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
+                    else:
+                        result_slots[f"{slot_prefix}2"] = second_adverb['phrase']
+                        result_slots[f"{slot_prefix}3"] = first_adverb['phrase']
+                
+                # 動詞を挟んでいる場合
+                else:
+                    # 前にある方がM1、後にある方がM3
+                    if first_pos < verb_pos:
+                        result_slots[f"{slot_prefix}1"] = first_adverb['phrase']
+                        result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
+                    else:
+                        result_slots[f"{slot_prefix}1"] = second_adverb['phrase']
+                        result_slots[f"{slot_prefix}3"] = first_adverb['phrase']
+                    # M2は空にする
+                    result_slots.pop(f"{slot_prefix}2", None)
+            else:
+                # フォールバック：従来の配置
+                result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
+            
+            self.logger.debug(f"  2個ルール適用: {result_slots}")
+            self.logger.debug(f"  詳細: adverb[0]={first_adverb}, adverb[1]={second_adverb}")
         
         elif count >= 3:
             # 3個以上 → M1, M2, M3 (または sub-m1, sub-m2, sub-m3)
