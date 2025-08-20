@@ -1745,6 +1745,11 @@ class UnifiedStanzaRephraseMapper:
                 # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
                 root_word = self._find_root_word(sentence)
                 if root_word:
+                    # ✅ C1重複防止: ROOTワードがVに既に設定されている場合はC1に設定しない
+                    if slot == "C1" and "V" in slots and slots["V"] == root_word.text:
+                        self.logger.debug(f"🚫 C1重複防止: {root_word.text} (Vと同一)")
+                        continue  # C1への設定をスキップ
+                    self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}'")
                     slots[slot] = root_word.text
             elif dep_rel in dep_relations:
                 # 依存関係語の処理（修飾語句を含む完全な句を構築）
@@ -1754,6 +1759,7 @@ class UnifiedStanzaRephraseMapper:
                     main_word = words[0]
                     # 修飾語句を構築
                     phrase = self._build_phrase_with_modifiers(sentence, main_word)
+                    self.logger.debug(f"🔧 依存関係語設定: {slot} = '{phrase}'")
                     slots[slot] = phrase
         
         # ✅ 追加処理：ROOTワードにも修飾語句処理を適用（動詞以外の場合）
@@ -2726,6 +2732,9 @@ class UnifiedStanzaRephraseMapper:
         slots['Aux'] = auxiliary.text
         slots['V'] = main_verb.text
         
+        # ✅ 受動態ではC1は空（補語なし）
+        slots['C1'] = ''
+        
         # ✅ 副詞処理を除去：by句は副詞ハンドラーに委譲
         # by句付き受動態でも、M1は設定せず副詞ハンドラーに任せる
         # agent_phraseの情報は文法情報として記録するが、スロットには設定しない
@@ -3125,9 +3134,15 @@ class UnifiedStanzaRephraseMapper:
             main_complement = self._find_verb_complement(sentence, main_verb)
             if main_complement and not slots.get('C1'):
                 complement_phrase = self._build_noun_phrase_for_subject(sentence, main_complement)
-                slots['C1'] = complement_phrase
-                self.logger.debug(f"    ✅ 補語: {complement_phrase}")
-        
+                
+                # 🔧 重複防止：主動詞と同じ単語は補語に設定しない
+                main_verb_text = slots.get('V', '')
+                if complement_phrase != main_verb_text:
+                    slots['C1'] = complement_phrase
+                    self.logger.debug(f"    ✅ 補語: {complement_phrase}")
+                else:
+                    self.logger.debug(f"    🚫 補語重複回避: {complement_phrase} (主動詞と同一)")
+                    
         # 🚨 主語保護：分詞構文ハンドラーが設定した主語を絶対に維持
         slots['S'] = original_subject
         self.logger.debug(f"    🛡️ 主語保護: S='{original_subject}' (分詞構文により固定)")
