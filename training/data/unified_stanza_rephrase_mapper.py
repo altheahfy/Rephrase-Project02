@@ -2694,20 +2694,21 @@ class UnifiedStanzaRephraseMapper:
         # 主節副詞のシンプルルール配置
         if main_adverbs:
             print(f"Main副詞詳細: {main_adverbs}")
-            main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main', main_verb_id)
+            main_slots = self._apply_simple_rule_to_adverbs(main_adverbs, 'main', main_verb_id, None)
             print(f"Main副詞結果: {main_slots}")
             slots.update(main_slots)
         
         # 従属節副詞のシンプルルール配置
         if sub_adverbs:
-            sub_main_slots = self._apply_simple_rule_to_adverbs(sub_adverbs, 'sub', main_verb_id)
+            # 既存のsub-slotsを渡して、先行詞句を保護
+            sub_main_slots = self._apply_simple_rule_to_adverbs(sub_adverbs, 'sub', main_verb_id, existing_sub_slots)
             sub_slots.update(sub_main_slots)
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
         print("副詞ハンドラー完了: slots={}, sub_slots={}".format(slots, sub_slots))
         return {'slots': slots, 'sub_slots': sub_slots}
     
-    def _apply_simple_rule_to_adverbs(self, adverbs, context_type, main_verb_id=None):
+    def _apply_simple_rule_to_adverbs(self, adverbs, context_type, main_verb_id=None, existing_sub_slots=None):
         """
         シンプルルールを副詞群に一括適用
         
@@ -2715,6 +2716,7 @@ class UnifiedStanzaRephraseMapper:
             adverbs: 副詞リスト
             context_type: 'main' or 'sub'
             main_verb_id: 主動詞のID（動詞中心判定用）
+            existing_sub_slots: 既存のsub-slots（関係節ハンドラーからの先行詞句保護用）
         """
         result_slots = {}
         count = len(adverbs)
@@ -2727,9 +2729,19 @@ class UnifiedStanzaRephraseMapper:
         # スロット名プレフィックス
         slot_prefix = 'sub-m' if context_type == 'sub' else 'M'
         
+        # 既存のsub-m2保護（関係節先行詞句用）
+        existing_sub_m2 = None
+        if context_type == 'sub' and existing_sub_slots:
+            existing_sub_m2 = existing_sub_slots.get('sub-m2')
+            if existing_sub_m2:
+                self.logger.debug(f"🛡️ 既存sub-m2保護: '{existing_sub_m2}' (関係節先行詞句)")
+        
         if count == 1:
-            # 1個 → M2 (または sub-m2)
-            slot_name = f"{slot_prefix}2"
+            # 1個 → M2 (または sub-m2)、ただし関係節先行詞句がある場合はM3へ
+            if existing_sub_m2:
+                slot_name = f"{slot_prefix}3"  # 関係節先行詞句がある場合はsub-m3へ
+            else:
+                slot_name = f"{slot_prefix}2"
             result_slots[slot_name] = adverbs[0]['phrase']
             self.logger.debug(f"  1個ルール: {slot_name} = '{adverbs[0]['phrase']}'")
         
