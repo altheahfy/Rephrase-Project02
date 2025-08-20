@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "input_file": "test_various_positions.json",
+    "processed_at": "2025-08-20T18:30:55.854644",
+    "total_sentences": 3,
+    "success_count": 3,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": "The book that I bought is interesting.",
+      "analysis_result": {
+        "sentence": "The book that I bought is interesting.",
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "interesting"
+        },
+        "sub_slots": {
+          "sub-o1": "The book that",
+          "sub-s": "I",
+          "sub-v": "bought"
+        },
+        "meta": {
+          "processing_time": 0.18286,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "2": {
+      "sentence": "I know the man who runs fast.",
+      "analysis_result": {
+        "sentence": "I know the man who runs fast.",
+        "slots": {
+          "S": "I",
+          "V": "know",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "the man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        },
+        "meta": {
+          "processing_time": 0.153203,
+          "sentence_id": 2,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    },
+    "3": {
+      "sentence": "She works in the place where we met.",
+      "analysis_result": {
+        "sentence": "She works in the place where we met.",
+        "slots": {
+          "S": "She",
+          "V": "works"
+        },
+        "sub_slots": {
+          "sub-m1": "the place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        },
+        "meta": {
+          "processing_time": 0.169189,
+          "sentence_id": 3,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    }
+  }
+}

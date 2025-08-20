@@ -849,13 +849,23 @@ class UnifiedStanzaRephraseMapper:
                 if position == upper_slot and sub_slot in sub_slots and sub_slots[sub_slot] and sub_slots[sub_slot].strip()
             ]
             
-            if belonging_sub_slots and upper_slot in slots and slots[upper_slot] and slots[upper_slot].strip():
-                original_value = slots[upper_slot]
-                slots[upper_slot] = ""
-                self.logger.debug(
-                    f"🔄 位置情報ベース空文字化: {upper_slot}: '{original_value}' → '' "
-                    f"(属するサブスロット: {', '.join(belonging_sub_slots)})"
-                )
+            if belonging_sub_slots:
+                # サブスロットが存在する場合は、上位スロットを空文字にする
+                if upper_slot in slots and slots[upper_slot] and slots[upper_slot].strip():
+                    # 既存の値がある場合は空文字に変更
+                    original_value = slots[upper_slot]
+                    slots[upper_slot] = ""
+                    self.logger.debug(
+                        f"🔄 位置情報ベース空文字化: {upper_slot}: '{original_value}' → '' "
+                        f"(属するサブスロット: {', '.join(belonging_sub_slots)})"
+                    )
+                elif upper_slot not in slots or not slots[upper_slot]:
+                    # 上位スロットが存在しないか空の場合も明示的に空文字を設定
+                    slots[upper_slot] = ""
+                    self.logger.debug(
+                        f"🔄 位置情報ベース空文字化: {upper_slot}: 未設定 → '' "
+                        f"(属するサブスロット: {', '.join(belonging_sub_slots)})"
+                    )
         
         # 副詞重複チェックと削除
         self._remove_adverb_duplicates(slots, sub_slots)
