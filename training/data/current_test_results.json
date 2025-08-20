@@ -1,7 +1,7 @@
 {
   "meta": {
     "input_file": "final_test_system/final_54_test_data.json",
-    "processed_at": "2025-08-19T20:38:51.123478",
+    "processed_at": "2025-08-20T19:42:02.900886",
     "total_sentences": 53,
     "success_count": 53,
     "error_count": 0
@@ -18,7 +18,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.101554,
+          "processing_time": 0.100632,
           "sentence_id": 1,
           "active_handlers": 7
         }
@@ -44,7 +44,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.102202,
+          "processing_time": 0.098974,
           "sentence_id": 2,
           "active_handlers": 7
         }
@@ -74,7 +74,7 @@
           "sub-m2": "fast"
         },
         "meta": {
-          "processing_time": 0.164237,
+          "processing_time": 0.156008,
           "sentence_id": 3,
           "active_handlers": 7
         }
@@ -108,7 +108,7 @@
           "sub-m2": "there"
         },
         "meta": {
-          "processing_time": 0.233908,
+          "processing_time": 0.157658,
           "sentence_id": 4,
           "active_handlers": 7
         }
@@ -142,7 +142,7 @@
           "sub-m2": "here"
         },
         "meta": {
-          "processing_time": 0.152514,
+          "processing_time": 0.154189,
           "sentence_id": 5,
           "active_handlers": 7
         }
@@ -176,7 +176,7 @@
           "sub-v": "bought"
         },
         "meta": {
-          "processing_time": 0.165855,
+          "processing_time": 0.171834,
           "sentence_id": 6,
           "active_handlers": 7
         }
@@ -210,7 +210,7 @@
           "sub-v": "met"
         },
         "meta": {
-          "processing_time": 0.135449,
+          "processing_time": 0.141442,
           "sentence_id": 7,
           "active_handlers": 7
         }
@@ -244,7 +244,7 @@
           "sub-v": "drives"
         },
         "meta": {
-          "processing_time": 0.154137,
+          "processing_time": 0.150095,
           "sentence_id": 8,
           "active_handlers": 7
         }
@@ -278,7 +278,7 @@
           "sub-v": "crashed"
         },
         "meta": {
-          "processing_time": 0.169372,
+          "processing_time": 0.157731,
           "sentence_id": 9,
           "active_handlers": 7
         }
@@ -312,7 +312,7 @@
           "sub-v": "written"
         },
         "meta": {
-          "processing_time": 0.176687,
+          "processing_time": 0.159333,
           "sentence_id": 10,
           "active_handlers": 7
         }
@@ -345,7 +345,7 @@
           "sub-v": "sent"
         },
         "meta": {
-          "processing_time": 0.161578,
+          "processing_time": 0.154822,
           "sentence_id": 11,
           "active_handlers": 7
         }
@@ -370,7 +370,7 @@
         "slots": {
           "S": "",
           "V": "lives",
-          "C1": "",
+          "C1": "The man",
           "M2": "here"
         },
         "sub_slots": {
@@ -379,7 +379,7 @@
           "sub-c1": "red"
         },
         "meta": {
-          "processing_time": 0.173005,
+          "processing_time": 0.161879,
           "sentence_id": 12,
           "active_handlers": 7
         }
@@ -413,7 +413,7 @@
           "sub-v": "borrowed"
         },
         "meta": {
-          "processing_time": 0.23089,
+          "processing_time": 0.189862,
           "sentence_id": 13,
           "active_handlers": 7
         }
@@ -446,7 +446,7 @@
           "sub-v": "barks"
         },
         "meta": {
-          "processing_time": 0.242083,
+          "processing_time": 0.181427,
           "sentence_id": 14,
           "active_handlers": 7
         }
@@ -479,7 +479,7 @@
           "sub-v": "met"
         },
         "meta": {
-          "processing_time": 0.167078,
+          "processing_time": 0.160298,
           "sentence_id": 15,
           "active_handlers": 7
         }
@@ -491,7 +491,7 @@
           "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-m1": "The place where",
+          "sub-m2": "The place where",
           "sub-s": "we",
           "sub-v": "met"
         }
@@ -513,7 +513,7 @@
           "sub-v": "arrived"
         },
         "meta": {
-          "processing_time": 0.189603,
+          "processing_time": 0.153602,
           "sentence_id": 16,
           "active_handlers": 7
         }
@@ -525,7 +525,7 @@
           "C1": "late"
         },
         "sub_slots": {
-          "sub-m1": "The time when",
+          "sub-m2": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
         }
@@ -547,7 +547,7 @@
           "sub-v": "left"
         },
         "meta": {
-          "processing_time": 0.170841,
+          "processing_time": 0.151729,
           "sentence_id": 17,
           "active_handlers": 7
         }
@@ -559,7 +559,7 @@
           "C1": "unclear"
         },
         "sub_slots": {
-          "sub-m1": "The reason why",
+          "sub-m2": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
         }
@@ -582,7 +582,7 @@
           "sub-o1": "it"
         },
         "meta": {
-          "processing_time": 0.176454,
+          "processing_time": 0.163009,
           "sentence_id": 18,
           "active_handlers": 7
         }
@@ -594,7 +594,7 @@
           "C1": "clever"
         },
         "sub_slots": {
-          "sub-m1": "The way how",
+          "sub-m2": "The way how",
           "sub-s": "he",
           "sub-v": "solved",
           "sub-o1": "it"
@@ -618,7 +618,7 @@
           "sub-m2": "yesterday"
         },
         "meta": {
-          "processing_time": 0.176925,
+          "processing_time": 0.168717,
           "sentence_id": 19,
           "active_handlers": 7
         }
@@ -650,7 +650,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.155146,
+          "processing_time": 0.139633,
           "sentence_id": 20,
           "active_handlers": 7
         }
@@ -678,7 +678,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.148277,
+          "processing_time": 0.143508,
           "sentence_id": 21,
           "active_handlers": 7
         }
@@ -706,7 +706,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.155881,
+          "processing_time": 0.137663,
           "sentence_id": 22,
           "active_handlers": 7
         }
@@ -734,7 +734,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.188946,
+          "processing_time": 0.171372,
           "sentence_id": 23,
           "active_handlers": 7
         }
@@ -762,7 +762,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.182343,
+          "processing_time": 0.157797,
           "sentence_id": 24,
           "active_handlers": 7
         }
@@ -790,7 +790,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.210942,
+          "processing_time": 0.151975,
           "sentence_id": 25,
           "active_handlers": 7
         }
@@ -818,7 +818,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.161568,
+          "processing_time": 0.142918,
           "sentence_id": 26,
           "active_handlers": 7
         }
@@ -846,7 +846,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.148107,
+          "processing_time": 0.152979,
           "sentence_id": 27,
           "active_handlers": 7
         }
@@ -878,7 +878,7 @@
           "sub-o1": "everything"
         },
         "meta": {
-          "processing_time": 0.159261,
+          "processing_time": 0.164474,
           "sentence_id": 28,
           "active_handlers": 7
         }
@@ -887,10 +887,10 @@
         "main_slots": {
           "S": "She",
           "V": "acts",
-          "M1": ""
+          "M2": ""
         },
         "sub_slots": {
-          "sub-m1": "as if",
+          "sub-m2": "as if",
           "sub-s": "she",
           "sub-v": "knows",
           "sub-o1": "everything"
@@ -910,7 +910,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.161379,
+          "processing_time": 0.161313,
           "sentence_id": 29,
           "active_handlers": 7
         }
@@ -938,7 +938,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.354377,
+          "processing_time": 0.146955,
           "sentence_id": 30,
           "active_handlers": 7
         }
@@ -971,7 +971,7 @@
           "sub-m3": "by Shakespeare"
         },
         "meta": {
-          "processing_time": 0.681342,
+          "processing_time": 0.233547,
           "sentence_id": 31,
           "active_handlers": 7
         }
@@ -1009,7 +1009,7 @@
           "sub-m3": "yesterday"
         },
         "meta": {
-          "processing_time": 0.483929,
+          "processing_time": 0.236817,
           "sentence_id": 32,
           "active_handlers": 7
         }
@@ -1047,7 +1047,7 @@
           "sub-m3": "by the secretary"
         },
         "meta": {
-          "processing_time": 0.295241,
+          "processing_time": 0.245147,
           "sentence_id": 33,
           "active_handlers": 7
         }
@@ -1084,7 +1084,7 @@
           "sub-m2": "diligently"
         },
         "meta": {
-          "processing_time": 0.274065,
+          "processing_time": 0.250834,
           "sentence_id": 34,
           "active_handlers": 7
         }
@@ -1120,7 +1120,7 @@
           "sub-m2": "efficiently"
         },
         "meta": {
-          "processing_time": 0.241978,
+          "processing_time": 0.229333,
           "sentence_id": 35,
           "active_handlers": 7
         }
@@ -1156,7 +1156,7 @@
           "sub-m2": "carefully"
         },
         "meta": {
-          "processing_time": 0.226704,
+          "processing_time": 0.2169,
           "sentence_id": 36,
           "active_handlers": 7
         }
@@ -1189,7 +1189,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.200715,
+          "processing_time": 0.199354,
           "sentence_id": 37,
           "active_handlers": 7
         }
@@ -1219,7 +1219,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.200429,
+          "processing_time": 0.211563,
           "sentence_id": 38,
           "active_handlers": 7
         }
@@ -1249,7 +1249,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.194627,
+          "processing_time": 0.201377,
           "sentence_id": 39,
           "active_handlers": 7
         }
@@ -1273,16 +1273,16 @@
         "slots": {
           "S": "",
           "V": "needs",
-          "O1": "immediate repair",
-          "M2": "badly"
+          "O1": "immediate repair"
         },
         "sub_slots": {
           "sub-s": "The house whose roof",
           "sub-aux": "was",
-          "sub-v": "damaged"
+          "sub-v": "damaged",
+          "sub-m2": "badly"
         },
         "meta": {
-          "processing_time": 0.218588,
+          "processing_time": 0.234806,
           "sentence_id": 40,
           "active_handlers": 7
         }
@@ -1294,7 +1294,7 @@
           "O1": "immediate repair"
         },
         "sub_slots": {
-          "sub-s": "the house whose roof",
+          "sub-s": "The house whose roof",
           "sub-aux": "was",
           "sub-v": "damaged",
           "sub-m2": "badly"
@@ -1318,7 +1318,7 @@
           "sub-m2": "accidentally"
         },
         "meta": {
-          "processing_time": 0.224363,
+          "processing_time": 0.236067,
           "sentence_id": 41,
           "active_handlers": 7
         }
@@ -1332,8 +1332,8 @@
         "sub_slots": {
           "sub-s": "we",
           "sub-v": "met",
-          "sub-m1": "The place where",
-          "sub-m2": "accidentally"
+          "sub-m2": "The place where",
+          "sub-m3": "accidentally"
         }
       },
       "status": "success"
@@ -1343,10 +1343,9 @@
       "analysis_result": {
         "sentence": "The time when everything changed dramatically was unexpected.",
         "slots": {
-          "S": "",
           "V": "unexpected",
-          "C1": "unexpected",
-          "Aux": "was"
+          "Aux": "was",
+          "S": ""
         },
         "sub_slots": {
           "sub-m1": "The time when",
@@ -1355,7 +1354,7 @@
           "sub-m2": "dramatically"
         },
         "meta": {
-          "processing_time": 0.213722,
+          "processing_time": 0.221032,
           "sentence_id": 42,
           "active_handlers": 7
         }
@@ -1369,8 +1368,8 @@
         "sub_slots": {
           "sub-s": "everything",
           "sub-v": "changed",
-          "sub-m1": "The time when",
-          "sub-m2": "dramatically"
+          "sub-m2": "The time when",
+          "sub-m3": "dramatically"
         }
       },
       "status": "success"
@@ -1389,7 +1388,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.257397,
+          "processing_time": 0.243826,
           "sentence_id": 43,
           "active_handlers": 7
         }
@@ -1399,7 +1398,6 @@
           "S": "The building",
           "Aux": "is being",
           "V": "constructed",
-          "M1": "very",
           "M2": "very carefully",
           "M3": "by skilled workers"
         },
@@ -1421,7 +1419,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.236538,
+          "processing_time": 0.23314,
           "sentence_id": 44,
           "active_handlers": 7
         }
@@ -1452,7 +1450,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.262622,
+          "processing_time": 0.203897,
           "sentence_id": 45,
           "active_handlers": 7
         }
@@ -1487,7 +1485,7 @@
           "sub-m3": "by experts"
         },
         "meta": {
-          "processing_time": 0.28408,
+          "processing_time": 0.271256,
           "sentence_id": 46,
           "active_handlers": 7
         }
@@ -1525,7 +1523,7 @@
           "sub-m2": "carefully"
         },
         "meta": {
-          "processing_time": 0.247601,
+          "processing_time": 0.254599,
           "sentence_id": 47,
           "active_handlers": 7
         }
@@ -1562,7 +1560,7 @@
           "sub-m2": "properly"
         },
         "meta": {
-          "processing_time": 0.244577,
+          "processing_time": 0.249484,
           "sentence_id": 48,
           "active_handlers": 7
         }
@@ -1599,7 +1597,7 @@
           "sub-m2": "overtime"
         },
         "meta": {
-          "processing_time": 0.242623,
+          "processing_time": 0.256808,
           "sentence_id": 49,
           "active_handlers": 7
         }
@@ -1635,7 +1633,7 @@
           "sub-m3": "near the door"
         },
         "meta": {
-          "processing_time": 0.241936,
+          "processing_time": 0.245671,
           "sentence_id": 50,
           "active_handlers": 7
         }
@@ -1660,7 +1658,7 @@
       "analysis_result": {
         "sentence": "The children playing happily in the garden were supervised carefully.",
         "slots": {
-          "S": "",
+          "S": "The children",
           "V": "supervised",
           "Aux": "were",
           "M2": "carefully"
@@ -1671,7 +1669,7 @@
           "sub-m3": "in the garden"
         },
         "meta": {
-          "processing_time": 0.231743,
+          "processing_time": 0.247785,
           "sentence_id": 51,
           "active_handlers": 7
         }
@@ -1696,19 +1694,18 @@
       "analysis_result": {
         "sentence": "The documents being reviewed thoroughly will be approved soon.",
         "slots": {
-          "S": "",
-          "Aux": "will be",
+          "S": "The documents",
           "V": "approved",
+          "Aux": "will be",
           "M2": "soon"
         },
         "sub_slots": {
-          "sub-s": "The documents [omitted]",
-          "sub-aux": "being",
+          "sub-aux": "The documents being",
           "sub-v": "reviewed",
           "sub-m2": "thoroughly"
         },
         "meta": {
-          "processing_time": 0.228591,
+          "processing_time": 0.230076,
           "sentence_id": 52,
           "active_handlers": 7
         }
@@ -1721,7 +1718,7 @@
           "M2": "soon"
         },
         "sub_slots": {
-          "sub-s": "The documents being",
+          "sub-aux": "The documents being",
           "sub-v": "reviewed",
           "sub-m2": "thoroughly"
         }
@@ -1745,7 +1742,7 @@
           "sub-m2": "internationally"
         },
         "meta": {
-          "processing_time": 0.283237,
+          "processing_time": 0.273553,
           "sentence_id": 53,
           "active_handlers": 7
         }

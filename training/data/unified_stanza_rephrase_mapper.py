@@ -1200,7 +1200,7 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
             
             # 汎用スロット管理システムを適用
-            self._apply_rephrase_slot_structure_rules(result, rephrase_slots.get('sub_slots', {}))
+            self._apply_rephrase_slot_structure_rules(result)
             
         # 文法情報記録（汎用システム対応）
         result['grammar_info'] = {
