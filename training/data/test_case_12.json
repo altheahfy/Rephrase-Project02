@@ -1,0 +1,18 @@
+[
+  {
+    "id": "test_case_12",
+    "sentence": "The man whose car is red lives here.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "sub-c1": "red"
+      }
+    }
+  }
+]

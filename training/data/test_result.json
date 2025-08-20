@@ -1,30 +1,64 @@
 {
   "meta": {
-    "input_file": "test_relative.json",
-    "processed_at": "2025-08-20T18:21:05.204944",
+    "input_file": "test_sample.json",
+    "processed_at": "2025-08-20T22:02:52.271616",
     "total_sentences": 1,
     "success_count": 1,
     "error_count": 0
   },
   "results": {
     "1": {
-      "sentence": "I like that man whose car is red.",
+      "sentence": {
+        "id": 15,
+        "sentence": "He lived quietly in the place where he was born.",
+        "expected": {
+          "S": "",
+          "V": "lived",
+          "O1": "",
+          "O2": "",
+          "C1": "",
+          "C2": "",
+          "Aux": "",
+          "M1": "",
+          "M2": "quietly in the place where he was born",
+          "M3": "",
+          "sub-s": "He",
+          "sub-aux": "",
+          "sub-v": "",
+          "sub-m1": "",
+          "sub-m2": "",
+          "sub-m3": ""
+        }
+      },
       "analysis_result": {
-        "sentence": "I like that man whose car is red.",
-        "slots": {
-          "S": "I",
-          "V": "like",
-          "O1": "that man"
+        "sentence": {
+          "id": 15,
+          "sentence": "He lived quietly in the place where he was born.",
+          "expected": {
+            "S": "",
+            "V": "lived",
+            "O1": "",
+            "O2": "",
+            "C1": "",
+            "C2": "",
+            "Aux": "",
+            "M1": "",
+            "M2": "quietly in the place where he was born",
+            "M3": "",
+            "sub-s": "He",
+            "sub-aux": "",
+            "sub-v": "",
+            "sub-m1": "",
+            "sub-m2": "",
+            "sub-m3": ""
+          }
         },
-        "sub_slots": {
-          "sub-s": "that man whose car",
-          "sub-v": "is",
-          "sub-c1": "red"
-        },
+        "slots": {},
+        "sub_slots": {},
         "meta": {
-          "processing_time": 0.241952,
+          "processing_time": 0.0,
           "sentence_id": 1,
-          "active_handlers": 7
+          "active_handlers": 0
         }
       },
       "status": "success"

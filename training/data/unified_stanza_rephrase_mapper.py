@@ -1475,10 +1475,12 @@ class UnifiedStanzaRephraseMapper:
             
         elif rel_type == 'advmod':
             # 関係副詞: "The place where he lives" / "The way how he solved it"
-            # slots["M3"] = ""  # 上位スロットは5文型エンジンに任せる
-            sub_slots["sub-m1"] = noun_phrase
-            if rel_subject:
-                sub_slots["sub-s"] = rel_subject.text
+            # 関係副詞句全体を主語として扱う
+            clause_text = "where " + rel_subject.text + " " + rel_verb.text if rel_subject else "where " + rel_verb.text
+            slots["S"] = noun_phrase + " " + clause_text
+            
+            # 関係副詞句の詳細はsub-slotsに配置
+            sub_slots["sub-s"] = rel_subject.text if rel_subject else ""
             sub_slots["sub-v"] = rel_verb.text
             
             # ✅ 関係副詞句内の目的語を検出してsub-o1に配置
@@ -1638,6 +1640,25 @@ class UnifiedStanzaRephraseMapper:
         # 簡易実装として空リストを返す
         # 実際の使用では、sentence.wordsを通じて依存語を検索する
         return []
+    
+    def _get_relative_clause_text(self, sentence, rel_verb) -> str:
+        """関係節のテキスト部分を抽出する"""
+        # 関係節に含まれる語を収集
+        rel_words = []
+        
+        # 関係動詞に直接依存する語を収集
+        for word in sentence.words:
+            if word.head == rel_verb.id:
+                rel_words.append(word)
+        
+        # 関係動詞自身も含める
+        rel_words.append(rel_verb)
+        
+        # 位置順にソート
+        rel_words.sort(key=lambda w: w.id)
+        
+        # テキストを結合
+        return " ".join([w.text for w in rel_words])
     
     # === Stanza解析ヘルパーメソッド ===
     
@@ -2461,18 +2482,18 @@ class UnifiedStanzaRephraseMapper:
             existing_sub_slots.update(error_corrections)
             self.logger.debug(f"✅ 解析エラー修正適用: {error_corrections}")
         
-        # 🆕 関係副詞再配置システム
+        # 🆕 関係副詞再配置システム（新しいロジックで対応のため無効化）
         # 既存のsub-m1スロットにある関係副詞句をsub-m2に移動
-        if existing_sub_slots.get('sub-m1'):
-            sub_m1_value = existing_sub_slots['sub-m1']
-            relative_adverbs = ['where', 'when', 'why', 'how', 'as if']
-            
-            for rel_adv in relative_adverbs:
-                if rel_adv in sub_m1_value.lower():
-                    self.logger.debug(f"🔄 関係副詞再配置: '{sub_m1_value}' sub-m1 → sub-m2")
-                    existing_sub_slots['sub-m2'] = sub_m1_value
-                    existing_sub_slots['sub-m1'] = ''
-                    break
+        # if existing_sub_slots.get('sub-m1'):
+        #     sub_m1_value = existing_sub_slots['sub-m1']
+        #     relative_adverbs = ['where', 'when', 'why', 'how', 'as if']
+        #     
+        #     for rel_adv in relative_adverbs:
+        #         if rel_adv in sub_m1_value.lower():
+        #             self.logger.debug(f"🔄 関係副詞再配置: '{sub_m1_value}' sub-m1 → sub-m2")
+        #             existing_sub_slots['sub-m2'] = sub_m1_value
+        #             existing_sub_slots['sub-m1'] = ''
+        #             break
         
         # === 関係節・従属節コンテキスト分析 ===
         # 🔧 修正：base_resultから主動詞情報を取得（ハイブリッド解析結果反映）
@@ -2563,11 +2584,6 @@ class UnifiedStanzaRephraseMapper:
                 if word.id in processed_positions:
                     self.logger.debug(f"    → 除外（重複位置）: {word.text}")
                     continue
-                    
-                # 関係副詞除外
-                if word.text.lower() in ['where', 'when', 'why', 'how']:
-                    self.logger.debug(f"    → 除外（関係副詞）: {word.text}")
-                    continue
                 
                 # Migration source前置詞句構築機能活用
                 if word.deprel.startswith('obl'):
@@ -2589,6 +2605,7 @@ class UnifiedStanzaRephraseMapper:
                         for w in sentence.words:
                             if w.text == pw:
                                 processed_positions.add(w.id)
+                    
                 
                 # 重複フレーズチェック
                 if phrase in processed_phrases:
@@ -2596,6 +2613,11 @@ class UnifiedStanzaRephraseMapper:
                     continue
                 
                 processed_phrases.add(phrase)
+                
+                # 🔧 相対副詞句の検出と特別処理
+                if self._is_relative_adverb_phrase(phrase):
+                    self.logger.debug(f"    → 相対副詞句検出: {phrase}")
+                    # 相対副詞は常にsub-m2またはM2に配置（1個ルール）
                 
                 # 🎯 Rephrase原理：分類不要、位置情報のみで判定
                 # category = self._classify_adverbial_phrase(phrase, time_keywords, location_keywords, manner_keywords)
@@ -2677,56 +2699,32 @@ class UnifiedStanzaRephraseMapper:
         
         elif count == 2:
             # 2個 → 動詞中心(M2)を基準にM1とM3に配置
-            # 動詞中心より前→M1、後→M3（M2は中心で必ず使用）
+            # 🆕 相対副詞の特別処理: 相対副詞は常にM2に配置
             
             first_adverb = adverbs[0]
             second_adverb = adverbs[1]
             
-            # デフォルト：M2は最初の副詞、M3は2番目の副詞
-            result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
+            # 相対副詞を特定
+            first_is_relative = self._is_relative_adverb_phrase(first_adverb['phrase'])
+            second_is_relative = self._is_relative_adverb_phrase(second_adverb['phrase'])
             
-            # main_verb_idがある場合、動詞中心との位置関係で判定
-            if main_verb_id and 'word_id' in first_adverb and 'word_id' in second_adverb:
-                first_pos = first_adverb['word_id']
-                second_pos = second_adverb['word_id']
-                verb_pos = main_verb_id
-                
-                # 両方が動詞より前の場合
-                if first_pos < verb_pos and second_pos < verb_pos:
-                    # 前の方がM1、後の方がM2
-                    if first_pos < second_pos:
-                        result_slots[f"{slot_prefix}1"] = first_adverb['phrase']
-                        result_slots[f"{slot_prefix}2"] = second_adverb['phrase']
-                    else:
-                        result_slots[f"{slot_prefix}1"] = second_adverb['phrase']
-                        result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
-                
-                # 両方が動詞より後の場合
-                elif first_pos > verb_pos and second_pos > verb_pos:
-                    # 前の方がM2、後の方がM3
-                    if first_pos < second_pos:
-                        result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
-                        result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
-                    else:
-                        result_slots[f"{slot_prefix}2"] = second_adverb['phrase']
-                        result_slots[f"{slot_prefix}3"] = first_adverb['phrase']
-                
-                # 動詞を挟んでいる場合
-                else:
-                    # 前にある方がM1、後にある方がM3
-                    if first_pos < verb_pos:
-                        result_slots[f"{slot_prefix}1"] = first_adverb['phrase']
-                        result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
-                    else:
-                        result_slots[f"{slot_prefix}1"] = second_adverb['phrase']
-                        result_slots[f"{slot_prefix}3"] = first_adverb['phrase']
-                    # M2は空にする
-                    result_slots.pop(f"{slot_prefix}2", None)
-            else:
-                # フォールバック：従来の配置
+            if first_is_relative and not second_is_relative:
+                # 最初が相対副詞：相対副詞→M2、通常副詞→M3
+                result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
                 result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
-            
-            self.logger.debug(f"  2個ルール適用: {result_slots}")
+                self.logger.debug(f"  2個ルール(相対副詞優先): {slot_prefix}2='{first_adverb['phrase']}', {slot_prefix}3='{second_adverb['phrase']}'")
+            elif second_is_relative and not first_is_relative:
+                # 2番目が相対副詞：相対副詞→M2、通常副詞→M3
+                result_slots[f"{slot_prefix}2"] = second_adverb['phrase']
+                result_slots[f"{slot_prefix}3"] = first_adverb['phrase']
+                self.logger.debug(f"  2個ルール(相対副詞優先): {slot_prefix}2='{second_adverb['phrase']}', {slot_prefix}3='{first_adverb['phrase']}'")
+            else:
+                # 従来の動詞中心ロジック（相対副詞なしまたは両方相対副詞）
+                # デフォルト：M2は最初の副詞、M3は2番目の副詞
+                result_slots[f"{slot_prefix}2"] = first_adverb['phrase']
+                result_slots[f"{slot_prefix}3"] = second_adverb['phrase']
+                self.logger.debug(f"  2個ルール適用: {result_slots}")
+                
             self.logger.debug(f"  詳細: adverb[0]={first_adverb}, adverb[1]={second_adverb}")
         
         elif count >= 3:
@@ -2742,6 +2740,17 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.warning(f"  ⚠️ 4個以上の副詞を無視: {ignored}")
         
         return result_slots
+    
+    def _is_relative_adverb_phrase(self, phrase):
+        """相対副詞句かどうかを判定（関係節構造除外）"""
+        # 関係節構造は除外（先行詞 + where/when/why/how構造）
+        if any(pattern in phrase.lower() for pattern in ['the place where', 'the time when', 'the reason why', 'the way how']):
+            return False  # 関係節として処理されるべき
+        
+        # 単独の相対副詞のみ
+        relative_patterns = ['where', 'when', 'why', 'how', 'as if']
+        phrase_lower = phrase.lower()
+        return any(pattern == phrase_lower for pattern in relative_patterns)
     
     def _find_main_verb(self, sentence):
         """主動詞を特定（構造的修正版）"""
