@@ -191,6 +191,9 @@ class UnifiedStanzaRephraseMapper:
             if self.use_spacy_hybrid and self.spacy_nlp:
                 doc = self._apply_spacy_hybrid_corrections(sentence, doc)
             
+            # Phase 1.8: 人間文法認識による前処理（stanza誤判定修正）
+            doc = self._apply_human_grammar_patterns(sentence, doc)
+            
             # Phase 2: 統合処理（全ハンドラー同時実行）
             result = self._unified_mapping(sentence, doc)
             
@@ -264,6 +267,181 @@ class UnifiedStanzaRephraseMapper:
         except Exception as e:
             self.logger.warning(f"⚠️ spaCyハイブリッド解析エラー: {e}")
             return stanza_doc  # 補正失敗時は元のStanza結果を返す
+    
+    def _apply_human_grammar_patterns(self, sentence: str, doc):
+        """
+        人間の文法認識プロセスによるstanza誤判定修正
+        
+        人間が無意識に行う文法パターン認識をコード化し、
+        stanza/spaCyの統計的判定を文法的判定で修正する
+        """
+        try:
+            self.logger.debug("🧠 人間文法認識開始")
+            
+            # be動詞 + 過去分詞 = 受動態パターン検出
+            corrected_doc = self._correct_passive_voice_pattern(doc, sentence)
+            
+            self.logger.debug("🧠 人間文法認識完了")
+            return corrected_doc
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 人間文法認識エラー: {e}")
+            return doc  # エラー時は元のdocを返す
+    
+    def _correct_passive_voice_pattern(self, doc, sentence):
+        """
+        be動詞 + 過去分詞パターンの受動態判定・修正
+        
+        人間の認識: "was unexpected" → be + pp → 受動態
+        stanza誤判定: unexpected(root) + was(cop) → 補語構文
+        """
+        if not doc.sentences:
+            return doc
+            
+        sent = doc.sentences[0]
+        words = sent.words
+        
+        # 各単語に文脈情報を追加（位置ベース判定用）
+        for word in words:
+            word._sentence_words = words
+        
+        # 構造的パターン認識: be動詞 + 過去分詞
+        passive_pattern = self._detect_passive_voice_structural_pattern(words)
+        
+        if passive_pattern['found']:
+            be_verb = passive_pattern['be_verb']
+            past_participle = passive_pattern['past_participle']
+            
+            # stanzaが過去分詞をrootとして誤判定している場合
+            if past_participle.deprel == 'root' and be_verb.deprel == 'cop':
+                self.logger.info(
+                    f"🔧 人間文法修正: '{be_verb.text} {past_participle.text}' "
+                    f"→ 受動態 (stanza: {past_participle.text}=root, {be_verb.text}=cop)"
+                )
+                
+                # 修正情報を記録
+                if not hasattr(doc, '_human_grammar_corrections'):
+                    doc._human_grammar_corrections = []
+                
+                doc._human_grammar_corrections.append({
+                    'type': 'passive_voice',
+                    'be_verb': be_verb,
+                    'past_participle': past_participle,
+                    'correction': f"Convert '{be_verb.text} {past_participle.text}' to passive voice",
+                    'confidence': passive_pattern['confidence']
+                })
+        
+        return doc
+    
+    def _detect_passive_voice_structural_pattern(self, words):
+        """構造的受動態パターン検出"""
+        result = {'found': False, 'be_verb': None, 'past_participle': None, 'confidence': 0.0}
+        
+        for i in range(len(words) - 1):
+            current = words[i]
+            next_word = words[i + 1]
+            
+            # パターン1: be動詞 + 直後の語
+            if self._is_be_verb(current):
+                confidence = 0.0
+                
+                # 直後が明確な過去分詞
+                if self._is_past_participle(next_word):
+                    confidence = 0.9
+                    
+                    # 高信頼度パターン
+                    if next_word.xpos == 'VBN':
+                        confidence = 0.95
+                    elif next_word.upos == 'ADJ' and self._has_past_participle_morphology(next_word):
+                        confidence = 0.8
+                    
+                    if confidence > result['confidence']:
+                        result.update({
+                            'found': True,
+                            'be_verb': current,
+                            'past_participle': next_word,
+                            'confidence': confidence
+                        })
+            
+            # パターン2: be動詞 + 副詞 + 過去分詞（将来の拡張用）
+            if (i < len(words) - 2 and 
+                self._is_be_verb(current) and 
+                words[i + 1].upos == 'ADV' and
+                self._is_past_participle(words[i + 2])):
+                
+                confidence = 0.85
+                if confidence > result['confidence']:
+                    result.update({
+                        'found': True,
+                        'be_verb': current,
+                        'past_participle': words[i + 2],
+                        'confidence': confidence
+                    })
+        
+        return result
+    
+    def _is_be_verb(self, word):
+        """be動詞判定（汎用的・lemmaベース）"""
+        return (word.upos == 'AUX' and word.lemma.lower() == 'be')
+    
+    def _is_past_participle(self, word):
+        """過去分詞判定（汎用的・形態論的分析重視）"""
+        # 1. stanzaの形態論的判定を最優先
+        if word.xpos == 'VBN':  # Past participle
+            return True
+            
+        # 2. be動詞直後の形容詞的語の文脈的判定
+        if word.upos == 'ADJ':
+            return self._contextual_past_participle_check(word)
+        
+        return False
+    
+    def _contextual_past_participle_check(self, word):
+        """文脈的過去分詞判定（be動詞直後の形容詞）"""
+        # be動詞直後で形容詞タグ → 受動態の可能性
+        if self._follows_be_verb_directly(word):
+            # 形態論的パターンチェック
+            return self._has_past_participle_morphology(word)
+        return False
+    
+    def _follows_be_verb_directly(self, word):
+        """直前にbe動詞があるかチェック"""
+        # word.headでbe動詞をチェック、またはposition-based check
+        if hasattr(word, '_sentence_words'):
+            words = word._sentence_words
+            word_pos = next((i for i, w in enumerate(words) if w.id == word.id), -1)
+            if word_pos > 0:
+                prev_word = words[word_pos - 1]
+                return self._is_be_verb(prev_word)
+        return False
+    
+    def _has_past_participle_morphology(self, word):
+        """形態論的パターンチェック（語尾分析）"""
+        text = word.text.lower()
+        
+        # 規則動詞の-ed語尾（最低4文字以上）
+        if text.endswith('ed') and len(text) > 3:
+            # ただし純粋な形容詞（kindred, sacred等）を除外
+            if not self._is_pure_adjective_ending(text):
+                return True
+        
+        # -en語尾パターン（broken, chosen等）
+        if text.endswith('en') and len(text) > 3:
+            # listen, kitten等の名詞・動詞を除外
+            if not text.endswith(('tten', 'sten', 'chen', 'len')):
+                return True
+        
+        # 特徴的な過去分詞語尾
+        past_participle_endings = ['ated', 'ized', 'ified', 'ected', 'ested']
+        if any(text.endswith(ending) for ending in past_participle_endings):
+            return True
+        
+        return False
+    
+    def _is_pure_adjective_ending(self, text):
+        """純粋な形容詞語尾（過去分詞ではない）"""
+        pure_adjective_patterns = ['red', 'ded', 'eed', 'ted']
+        return any(text.endswith(pattern) for pattern in pure_adjective_patterns)
     
     def _detect_analysis_discrepancies(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
         """
@@ -362,6 +540,10 @@ class UnifiedStanzaRephraseMapper:
         if not main_sentence:
             return result
         
+        # 人間文法認識の結果を処理
+        if hasattr(doc, '_human_grammar_corrections'):
+            self._apply_human_grammar_corrections(doc._human_grammar_corrections, result)
+        
         self.logger.debug(f"🔧 Unified mapping開始: {len(self.active_handlers)} handlers active")
         
         # ハンドラー実行順序の制御（分詞構文を最優先）
@@ -431,6 +613,39 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.debug(f"📋 ハンドラー実行順序: {ordered}")
         return ordered
+    
+    def _apply_human_grammar_corrections(self, corrections, result):
+        """
+        人間文法認識による修正をresultに適用
+        
+        Args:
+            corrections: 人間文法認識による修正リスト
+            result: 処理結果辞書
+        """
+        for correction in corrections:
+            if correction['type'] == 'passive_voice':
+                # 受動態パターンの修正
+                be_verb = correction['be_verb']
+                past_participle = correction['past_participle']
+                
+                # スロットを直接設定（stanza誤判定を上書き）
+                result['slots']['V'] = past_participle.text
+                result['slots']['Aux'] = be_verb.text
+                
+                # 文法情報として記録
+                result['grammar_info']['detected_patterns'].append('human_corrected_passive_voice')
+                result['grammar_info']['human_corrections'] = result['grammar_info'].get('human_corrections', [])
+                result['grammar_info']['human_corrections'].append({
+                    'type': 'passive_voice',
+                    'original_stanza': f"{past_participle.text}(root), {be_verb.text}(cop)",
+                    'corrected_to': f"{past_participle.text}(V), {be_verb.text}(Aux)",
+                    'reason': 'Human grammar pattern: be + past_participle = passive_voice'
+                })
+                
+                self.logger.info(
+                    f"✅ 人間文法修正適用: V='{past_participle.text}', Aux='{be_verb.text}' "
+                    f"(stanza誤判定修正)"
+                )
     
     def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
         """
