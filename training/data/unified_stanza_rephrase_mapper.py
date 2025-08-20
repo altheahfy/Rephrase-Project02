@@ -2176,31 +2176,49 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _handle_whose_construction_simple(self, sentence, base_result: Dict, main_verb, dep_relations: Dict) -> Dict:
-        """whose構文専用の簡易処理"""
+        """whose構文専用の簡易処理（copula構造対応）"""
         result = base_result.copy()
         if 'slots' not in result:
             result['slots'] = {}
         
-        # 🔧 連結動詞 + 補語構造の検出
-        copula = None
-        complement = None
+        # 🔧 whose構文でcopula構造を検出
+        copula_detected = False
+        copula_verb = None
         
-        # 連結動詞（is/was等）を探索
+        # cop依存関係を探す（be動詞）
         for word in sentence.words:
             if word.deprel == 'cop' and word.head == main_verb.id:
-                copula = word
+                copula_verb = word
+                copula_detected = True
                 break
         
-        # main_verbが補語でcopulaが存在する場合
-        if copula and main_verb.upos in ['ADJ', 'NOUN']:
-            self.logger.debug(f"🔧 whose構文: 連結動詞構造検出 cop='{copula.text}' + complement='{main_verb.text}'")
-            result['slots']['V'] = copula.text  # 連結動詞を主動詞に
+        if copula_detected and copula_verb:
+            # SVC構造: cop動詞をV、ROOT語をC1とする
+            result['slots']['V'] = copula_verb.text
             complement_phrase = self._build_phrase_with_modifiers(sentence, main_verb)
-            result['slots']['C1'] = complement_phrase  # 補語として設定
-            self.logger.debug(f"🔧 whose構文連結動詞処理: V='{copula.text}', C1='{complement_phrase}'")
+            result['slots']['C1'] = complement_phrase
+            self.logger.debug(f"🔧 whose構文copula検出: V='{copula_verb.text}', C1='{complement_phrase}'")
+            pattern_name = 'SVC_whose'
         else:
             # 通常の動詞構造
             result['slots']['V'] = main_verb.text
+            self.logger.debug(f"🔧 whose構文メイン動詞: V='{main_verb.text}'")
+            pattern_name = 'SV_whose'
+            
+            # 目的語・補語を設定（メイン動詞に直接依存するもの）
+            for word in sentence.words:
+                if word.head == main_verb.id:
+                    if word.deprel == 'obj':
+                        obj_phrase = self._build_phrase_with_modifiers(sentence, word)
+                        result['slots']['O1'] = obj_phrase
+                        self.logger.debug(f"🔧 whose構文簡易処理: O1='{obj_phrase}' 追加")
+                        pattern_name = 'SVO_whose'
+                    elif word.deprel == 'xcomp':
+                        # 補語（became famous等）
+                        complement_phrase = self._build_phrase_with_modifiers(sentence, word)
+                        result['slots']['C1'] = complement_phrase
+                        self.logger.debug(f"🔧 whose構文簡易処理: C1='{complement_phrase}' 追加")
+                        pattern_name = 'SVC_whose'
         
         # 主語を設定（先行詞）
         if 'nsubj' in dep_relations and dep_relations['nsubj']:
@@ -2209,27 +2227,12 @@ class UnifiedStanzaRephraseMapper:
             result['slots']['S'] = subject_phrase
             self.logger.debug(f"🔧 whose構文簡易処理: S='{subject_phrase}'")
         
-        # 補語を設定（xcomp）- became famousのfamousなど（連結動詞構造以外）
-        if not copula and 'xcomp' in dep_relations and dep_relations['xcomp']:
-            complement = dep_relations['xcomp'][0]
-            complement_phrase = self._build_phrase_with_modifiers(sentence, complement)
-            result['slots']['C1'] = complement_phrase
-            self.logger.debug(f"🔧 whose構文簡易処理: C1='{complement_phrase}' 追加")
-        
-        # 目的語を設定（obj）
-        if 'obj' in dep_relations and dep_relations['obj']:
-            obj = dep_relations['obj'][0]
-            obj_phrase = self._build_phrase_with_modifiers(sentence, obj)
-            result['slots']['O1'] = obj_phrase
-            self.logger.debug(f"🔧 whose構文簡易処理: O1='{obj_phrase}' 追加")
-        
         # 文型情報を設定
-        pattern_name = 'SVC_whose' if copula else 'SV_whose'
         result['grammar_info'] = {
             'detected_patterns': ['basic_five_pattern'],
             'handler_contributions': {
                 'basic_five_pattern': {
-                    'pattern': pattern_name,  # whose構文専用パターン
+                    'pattern': pattern_name,
                     'confidence': 0.9
                 }
             }
@@ -2675,6 +2678,23 @@ class UnifiedStanzaRephraseMapper:
         if not adverb_phrases:
             self.logger.debug("副詞なし - スキップ")
             return None
+
+        # === 重複副詞の除去 ===
+        # より完全な句（例："very carefully"）が含まれている場合、部分的な句（例："very"）を除去
+        filtered_adverb_phrases = []
+        for i, adverb in enumerate(adverb_phrases):
+            is_substring = False
+            for j, other_adverb in enumerate(adverb_phrases):
+                if i != j and adverb['phrase'] in other_adverb['phrase'] and adverb['phrase'] != other_adverb['phrase']:
+                    # adverbの句がother_adverbの句の一部である場合
+                    self.logger.debug(f"🔧 副詞重複除去: '{adverb['phrase']}' は '{other_adverb['phrase']}' に含まれるため除外")
+                    is_substring = True
+                    break
+            if not is_substring:
+                filtered_adverb_phrases.append(adverb)
+        
+        # フィルタリング後のリストを使用
+        adverb_phrases = filtered_adverb_phrases
 
         # === Rephrase仕様配置ロジック（Migration source機能活用） ===
         slots = {}
