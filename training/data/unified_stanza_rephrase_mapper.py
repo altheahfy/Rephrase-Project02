@@ -807,8 +807,10 @@ class UnifiedStanzaRephraseMapper:
             return
         
         # 対応関係マッピング（Aux, V除外）
+        # 注意: Sスロットは専門ハンドラー（関係節、分詞構文）が処理するため除外
+        # 機械的なS→sub-s変換は文法的誤分類を引き起こすため削除
         main_to_sub_mapping = {
-            'S': 'sub-s',
+            # 'S': 'sub-s',  # 削除: 専門ハンドラーに委任
             'O1': 'sub-o1', 
             'O2': 'sub-o2',
             'C1': 'sub-c1',
