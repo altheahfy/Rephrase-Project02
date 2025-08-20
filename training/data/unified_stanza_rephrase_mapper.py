@@ -3111,9 +3111,11 @@ class UnifiedStanzaRephraseMapper:
         # being + 過去分詞の検出
         for word in sentence.words:
             if word.text.lower() == 'being' and word.deprel == 'aux:pass':
+                self.logger.debug(f"  🎯 being検出: {word.text} (deprel={word.deprel}, head={word.head})")
                 # beingが修飾する過去分詞を探す
                 for reviewed_word in sentence.words:
-                    if (reviewed_word.head == word.head and 
+                    self.logger.debug(f"    📝 候補語: {reviewed_word.text} (id={reviewed_word.id}, xpos={reviewed_word.xpos}, deprel={reviewed_word.deprel})")
+                    if (reviewed_word.id == word.head and  # being → reviewed
                         reviewed_word.xpos == 'VBN' and 
                         reviewed_word.deprel == 'acl'):
                         
