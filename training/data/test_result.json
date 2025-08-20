@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "input_file": "test_relative.json",
+    "processed_at": "2025-08-20T18:21:05.204944",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": "I like that man whose car is red.",
+      "analysis_result": {
+        "sentence": "I like that man whose car is red.",
+        "slots": {
+          "S": "I",
+          "V": "like",
+          "O1": "that man"
+        },
+        "sub_slots": {
+          "sub-s": "that man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "meta": {
+          "processing_time": 0.241952,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "status": "success"
+    }
+  }
+}

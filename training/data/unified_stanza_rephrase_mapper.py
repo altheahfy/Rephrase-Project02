@@ -48,7 +48,7 @@ class UnifiedStanzaRephraseMapper:
     def __init__(self, 
                  language='en', 
                  enable_gpu=False,
-                 log_level='INFO',
+                 log_level='DEBUG',
                  use_spacy_hybrid=True):
         """
         統合マッパー初期化
@@ -211,7 +211,8 @@ class UnifiedStanzaRephraseMapper:
                 'stanza_info': {
                     'sentences': len(doc.sentences),
                     'tokens': len(doc.sentences[0].words) if doc.sentences else 0
-                }
+                },
+                'slot_positions': result.get('slot_positions', {})  # デバッグ用
             }
             
             self.logger.info(f"Processing完了 ({processing_time:.3f}s): {len(result.get('slots', {}))} slots detected")
@@ -708,6 +709,13 @@ class UnifiedStanzaRephraseMapper:
                 # 通常のマージ
                 base_result['sub_slots'][sub_slot_name] = sub_slot_data
         
+        # 🔥 位置情報マージ（重要！）
+        if 'slot_positions' in handler_result:
+            if 'slot_positions' not in base_result:
+                base_result['slot_positions'] = {}
+            base_result['slot_positions'].update(handler_result['slot_positions'])
+            self.logger.debug(f"📍 位置情報マージ from {handler_name}: {handler_result['slot_positions']}")
+        
         # 文法情報記録
         if 'grammar_info' in handler_result:
             grammar_info = handler_result['grammar_info']
@@ -1143,9 +1151,17 @@ class UnifiedStanzaRephraseMapper:
                 result['slots'] = {}
             if 'sub_slots' not in result:
                 result['sub_slots'] = {}
+            if 'slot_positions' not in result:
+                result['slot_positions'] = {}
             
             # 関係節のsub-slotsのみマージ（メイン文スロットは変更しない）
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
+            
+            # 🔥 whose構文でも位置情報を設定
+            antecedent_position = self._determine_antecedent_position(sentence, antecedent)
+            for sub_slot_name in rephrase_slots.get('sub_slots', {}):
+                result['slot_positions'][sub_slot_name] = antecedent_position
+                self.logger.debug(f"📍 whose構文位置情報記録: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
             
             self.logger.debug(f"🔧 whose構文: メイン文スロット保持, 関係節サブスロット追加")
             
@@ -1167,10 +1183,11 @@ class UnifiedStanzaRephraseMapper:
             result['slots'].update(rephrase_slots.get('slots', {}))
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
             
-            # 🔥 位置情報記録: 関係節のサブスロットはS位置に属する
+            # 🔥 位置情報記録: 先行詞の位置に基づいてサブスロット位置を決定
+            antecedent_position = self._determine_antecedent_position(sentence, antecedent)
             for sub_slot_name in rephrase_slots.get('sub_slots', {}):
-                result['slot_positions'][sub_slot_name] = 'S'
-                self.logger.debug(f"📍 位置情報記録: {sub_slot_name} → S位置")
+                result['slot_positions'][sub_slot_name] = antecedent_position
+                self.logger.debug(f"📍 位置情報記録: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
         
         # 文法情報記録
         result['grammar_info'] = {
@@ -1582,6 +1599,51 @@ class UnifiedStanzaRephraseMapper:
         return []
     
     # === Stanza解析ヘルパーメソッド ===
+    
+    def _determine_antecedent_position(self, sentence, antecedent) -> str:
+        """先行詞がメイン文のどの位置にあるかを判定"""
+        try:
+            # メイン動詞（ROOT）を取得
+            main_verb = self._find_root_word(sentence)
+            if not main_verb:
+                self.logger.debug(f"⚠️ メイン動詞が見つからない - デフォルト位置: S")
+                return 'S'
+            
+            # 先行詞の依存関係を確認
+            antecedent_deprel = antecedent.deprel
+            antecedent_head = antecedent.head
+            
+            self.logger.debug(f"🔍 先行詞位置判定: {antecedent.text} (deprel: {antecedent_deprel}, head: {antecedent_head}, main_verb: {main_verb.text})")
+            
+            # 先行詞がメイン動詞に直接依存している場合の位置判定
+            if antecedent_head == main_verb.id:
+                if antecedent_deprel in ['nsubj', 'nsubj:pass']:
+                    return 'S'
+                elif antecedent_deprel in ['obj', 'dobj']:
+                    return 'O1'
+                elif antecedent_deprel in ['iobj']:
+                    return 'O2'
+                elif antecedent_deprel in ['acomp', 'attr', 'nmod:tmod']:
+                    return 'C1'
+                elif antecedent_deprel in ['obl', 'advmod', 'nmod']:
+                    # 副詞的修飾語の場合、M-スロットに配置
+                    return 'M2'  # デフォルトでM2に配置
+            
+            # 先行詞が間接的に関連している場合の処理
+            # 例：複合名詞句の一部など
+            elif antecedent_deprel in ['compound', 'amod', 'det']:
+                # 先行詞の頭語を確認してその位置を判定
+                head_word = self._find_word_by_id(sentence, antecedent_head)
+                if head_word:
+                    return self._determine_antecedent_position(sentence, head_word)
+            
+            # その他の場合はデフォルト
+            self.logger.debug(f"📍 先行詞位置: デフォルト S位置適用 (deprel: {antecedent_deprel})")
+            return 'S'
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ 先行詞位置判定エラー: {e}")
+            return 'S'
     
     def _find_word_by_deprel(self, sentence, deprel: str):
         """依存関係で語を検索"""
