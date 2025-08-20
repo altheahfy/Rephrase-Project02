@@ -4422,6 +4422,9 @@ class UnifiedStanzaRephraseMapper:
         # 従属節要素を主節から除去
         self._remove_subordinate_elements_from_main(main_slots, sub_slots, advcl_verb)
         
+        # ★ M2位置を空に設定（接続詞は従属節のsub-m2に配置）
+        main_slots['M2'] = ''
+        
         # ★ M1位置に接続詞を配置（但し既存のMスロットは保護）
         # 接続詞構造では一般的にM1は使わないため、この処理をコメントアウト
         # if not main_slots.get('M1'):
@@ -4465,8 +4468,8 @@ class UnifiedStanzaRephraseMapper:
         """従属節要素の抽出"""
         sub_slots = {}
         
-        # 接続詞をsub-m1に配置
-        sub_slots['sub-m1'] = conjunction_phrase
+        # 接続詞をsub-m2に配置
+        sub_slots['sub-m2'] = conjunction_phrase
         
         # 従属節の主語
         for word in sentence.words:
@@ -4492,7 +4495,7 @@ class UnifiedStanzaRephraseMapper:
         
         # 従属節の目的語・補語等（主語・動詞以外）を取得
         for sub_key, sub_value in sub_slots.items():
-            if sub_value and sub_key.startswith('sub-') and sub_key not in ['sub-m1', 'sub-s', 'sub-v']:
+            if sub_value and sub_key.startswith('sub-') and sub_key not in ['sub-m2', 'sub-s', 'sub-v']:
                 subordinate_only_elements.add(sub_value.lower())
         
         # 主節スロットから従属節にのみ存在する要素を除去

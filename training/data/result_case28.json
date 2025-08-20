@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "input_file": "test_case28.json",
+    "processed_at": "2025-08-20T22:47:58.139194",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": {
+        "sentence": "She acts as if she knows everything."
+      },
+      "analysis_result": {
+        "sentence": {
+          "sentence": "She acts as if she knows everything."
+        },
+        "slots": {},
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.0,
+          "sentence_id": 1,
+          "active_handlers": 0
+        }
+      },
+      "status": "success"
+    }
+  }
+}

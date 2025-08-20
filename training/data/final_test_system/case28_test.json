@@ -1,0 +1,15 @@
+[
+  {
+    "id": 28,
+    "english": "She acts as if she knows everything.",
+    "expected": {
+      "S": "She",
+      "V": "acts",
+      "M2": "",
+      "sub-s": "she",
+      "sub-v": "knows",
+      "sub-o1": "everything",
+      "sub-m2": "as if"
+    }
+  }
+]
