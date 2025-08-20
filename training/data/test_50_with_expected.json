@@ -1,0 +1,20 @@
+[
+  {
+    "50": {
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "waiting",
+          "M2": "patiently"
+        },
+        "sub_slots": {
+          "sub-v": "the woman standing",
+          "sub-m1": "quietly",
+          "sub-m2": "near the door"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "input_file": "test_50_with_expected.json",
+    "processed_at": "2025-08-20T11:23:09.186464",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": {
+        "50": {
+          "sentence": "The woman standing quietly near the door was waiting patiently.",
+          "expected": {
+            "main_slots": {
+              "S": "",
+              "Aux": "was",
+              "V": "waiting",
+              "M2": "patiently"
+            },
+            "sub_slots": {
+              "sub-v": "the woman standing",
+              "sub-m1": "quietly",
+              "sub-m2": "near the door"
+            }
+          }
+        }
+      },
+      "analysis_result": {
+        "sentence": {
+          "50": {
+            "sentence": "The woman standing quietly near the door was waiting patiently.",
+            "expected": {
+              "main_slots": {
+                "S": "",
+                "Aux": "was",
+                "V": "waiting",
+                "M2": "patiently"
+              },
+              "sub_slots": {
+                "sub-v": "the woman standing",
+                "sub-m1": "quietly",
+                "sub-m2": "near the door"
+              }
+            }
+          }
+        },
+        "slots": {},
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.0,
+          "sentence_id": 1,
+          "active_handlers": 0
+        }
+      },
+      "status": "success"
+    }
+  }
+}
