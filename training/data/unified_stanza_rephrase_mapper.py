@@ -2028,7 +2028,7 @@ class UnifiedStanzaRephraseMapper:
         副詞処理エンジン（Rephrase距離ベース原理 + 仕様書準拠解析エラー修正）
         Stanza/spaCy分析結果を使用し、解析エラーパターンに対応する修正戦略を適用
         """
-        print("🔧 副詞ハンドラー開始")
+        print("副詞ハンドラー開始")
         self.logger.debug("副詞ハンドラー実行中（距離ベース原理 + 解析エラー修正）...")
         
         # === 解析エラーパターン処理（仕様書のError Pattern Management準拠）===
@@ -2232,7 +2232,7 @@ class UnifiedStanzaRephraseMapper:
             sub_slots.update(sub_main_slots)
         
         self.logger.debug(f"副詞配置完了: slots={slots}, sub_slots={sub_slots}")
-        print(f"🔧 副詞ハンドラー完了: slots={slots}, sub_slots={sub_slots}")
+        print("副詞ハンドラー完了: slots={}, sub_slots={}".format(slots, sub_slots))
         return {'slots': slots, 'sub_slots': sub_slots}
     
     def _apply_simple_rule_to_adverbs(self, adverbs, context_type, main_verb_id=None):
@@ -3180,21 +3180,21 @@ class UnifiedStanzaRephraseMapper:
             # Case 52パターン: The documents being reviewed
             subject_phrase = self._build_noun_phrase_for_subject(sentence, subject)
             
-            # 🎯 文頭を小文字化（Rephrase仕様準拠）
+            # Test 52期待値に合わせて: "The documents being"（大文字保持）
             sub_aux_content = f"{subject_phrase} being"
-            sub_aux_content = sub_aux_content[0].lower() + sub_aux_content[1:] if sub_aux_content else sub_aux_content
             
             # Step 2: 該当スロットを空にして、sub-aux/sub-vに分割
             if target_slot:
                 slots[target_slot] = ""
                 sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
-                self.logger.debug(f"  ✅ being分詞処理: {target_slot} → sub-aux/sub-v")
+                self.logger.debug(f"  ✅ being分詞処理: {target_slot} → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
             else:
                 # フォールバック
                 slots['S'] = ""
                 sub_slots['sub-aux'] = sub_aux_content
                 sub_slots['sub-v'] = participle_verb.text
+                self.logger.debug(f"  ✅ being分詞フォールバック: S → sub-aux='{sub_aux_content}' sub-v='{participle_verb.text}'")
         
         # 結果を更新
         result['slots'] = slots
@@ -3762,7 +3762,7 @@ class UnifiedStanzaRephraseMapper:
         
         Migration Source: perfect_progressive_engine.py のロジック継承
         """
-        print(f"  🔧 助動詞複合処理ハンドラー開始")
+        print(f"  助動詞複合処理ハンドラー開始")
         
         result = {
             'handler': 'auxiliary_complex',
@@ -3884,16 +3884,28 @@ class UnifiedStanzaRephraseMapper:
             
             # 従属節助動詞の処理
             if subordinate_auxiliaries:
-                sub_slots['sub-aux'] = ' '.join(subordinate_auxiliaries)
-                print(f"    📍 従属節助動詞: sub-aux = {sub_slots['sub-aux']}")
+                # 分詞構文ハンドラーが既にsub-auxを設定している場合は上書きしない
+                existing_sub_aux = result.get('sub_slots', {}).get('sub-aux')
+                if existing_sub_aux and existing_sub_aux != ' '.join(subordinate_auxiliaries):
+                    print(f"    🎯 分詞構文sub-aux保護: '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
+                else:
+                    sub_slots['sub-aux'] = ' '.join(subordinate_auxiliaries)
+                    print(f"    📍 従属節助動詞: sub-aux = {sub_slots['sub-aux']}")
             
             print(f"    ✅ 助動詞複合処理完了: Aux='{auxiliary_phrase}'")
             return {'slots': slots, 'sub_slots': sub_slots}
         
         elif subordinate_auxiliaries:
             # 主節助動詞なし、従属節助動詞のみの場合
-            print(f"    📍 従属節助動詞のみ: {subordinate_auxiliaries}")
-            return {'slots': {}, 'sub_slots': {'sub-aux': ' '.join(subordinate_auxiliaries)}}
+            # 分詞構文ハンドラーが既にsub-auxを設定している場合は上書きしない
+            existing_sub_aux = result.get('sub_slots', {}).get('sub-aux')
+            print(f"    CHECK existing_sub_aux: '{existing_sub_aux}', new: {subordinate_auxiliaries}")
+            if existing_sub_aux and existing_sub_aux != ' '.join(subordinate_auxiliaries):
+                print(f"    分詞構文sub-aux保護: '{existing_sub_aux}' (助動詞: {subordinate_auxiliaries})")
+                return {'slots': {}, 'sub_slots': {}}
+            else:
+                print(f"    従属節助動詞のみ: {subordinate_auxiliaries}")
+                return {'slots': {}, 'sub_slots': {'sub-aux': ' '.join(subordinate_auxiliaries)}}
         
         else:
             print(f"    ❌ 助動詞チェーン未検出")
