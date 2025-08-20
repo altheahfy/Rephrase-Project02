@@ -2461,6 +2461,19 @@ class UnifiedStanzaRephraseMapper:
             existing_sub_slots.update(error_corrections)
             self.logger.debug(f"✅ 解析エラー修正適用: {error_corrections}")
         
+        # 🆕 関係副詞再配置システム
+        # 既存のsub-m1スロットにある関係副詞句をsub-m2に移動
+        if existing_sub_slots.get('sub-m1'):
+            sub_m1_value = existing_sub_slots['sub-m1']
+            relative_adverbs = ['where', 'when', 'why', 'how', 'as if']
+            
+            for rel_adv in relative_adverbs:
+                if rel_adv in sub_m1_value.lower():
+                    self.logger.debug(f"🔄 関係副詞再配置: '{sub_m1_value}' sub-m1 → sub-m2")
+                    existing_sub_slots['sub-m2'] = sub_m1_value
+                    existing_sub_slots['sub-m1'] = ''
+                    break
+        
         # === 関係節・従属節コンテキスト分析 ===
         # 🔧 修正：base_resultから主動詞情報を取得（ハイブリッド解析結果反映）
         main_verb_id = None
