@@ -2779,9 +2779,6 @@ class UnifiedStanzaRephraseMapper:
         slots['Aux'] = auxiliary.text
         slots['V'] = main_verb.text
         
-        # ✅ 受動態ではC1は空（補語なし）
-        slots['C1'] = ''
-        
         # ✅ 副詞処理を除去：by句は副詞ハンドラーに委譲
         # by句付き受動態でも、M1は設定せず副詞ハンドラーに任せる
         # agent_phraseの情報は文法情報として記録するが、スロットには設定しない
