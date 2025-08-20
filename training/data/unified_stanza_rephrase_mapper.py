@@ -1474,16 +1474,19 @@ class UnifiedStanzaRephraseMapper:
                     sub_slots["sub-c1"] = complement.text
             
         elif rel_type == 'advmod':
-            # 関係副詞: "The place where he lives" / "The way how he solved it"
-            # 関係副詞句全体を主語として扱う
-            clause_text = "where " + rel_subject.text + " " + rel_verb.text if rel_subject else "where " + rel_verb.text
-            slots["S"] = noun_phrase + " " + clause_text
+            # 関係副詞: "The place where we met" → sub-m2="The place where", sub-s="we", sub-v="met"
+            # noun_phraseには既に関係副詞が含まれている
             
-            # 関係副詞句の詳細はsub-slotsに配置
-            sub_slots["sub-s"] = rel_subject.text if rel_subject else ""
+            # sub-m2: 先行詞句（関係副詞付き）
+            sub_slots["sub-m2"] = noun_phrase
+            
+            # sub-s: 関係節主語のみ
+            if rel_subject:
+                sub_slots["sub-s"] = rel_subject.text
+                
             sub_slots["sub-v"] = rel_verb.text
             
-            # ✅ 関係副詞句内の目的語を検出してsub-o1に配置
+            # 関係副詞句内の目的語を検出してsub-o1に配置
             obj_word = self._find_word_by_head_and_deprel(sentence, rel_verb.id, 'obj')
             if obj_word:
                 sub_slots["sub-o1"] = obj_word.text
