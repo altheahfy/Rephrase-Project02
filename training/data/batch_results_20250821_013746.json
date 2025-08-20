@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "input_file": "test_case52.json",
+    "processed_at": "2025-08-21T01:37:50.771309",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "1": {
+      "sentence": {
+        "sentence": "The documents being reviewed thoroughly will be approved soon."
+      },
+      "analysis_result": {
+        "sentence": {
+          "sentence": "The documents being reviewed thoroughly will be approved soon."
+        },
+        "slots": {},
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.0,
+          "sentence_id": 1,
+          "active_handlers": 0
+        }
+      },
+      "status": "success"
+    }
+  }
+}

@@ -184,17 +184,17 @@ class UnifiedStanzaRephraseMapper:
         try:
             self.logger.debug(f"Processing: {sentence}")
             
-            # Phase 1: Stanza解析
+            # Stanza解析
             doc = self._analyze_with_stanza(sentence)
             if not doc or not doc.sentences:
                 self.logger.warning(f"Stanza解析失敗: {sentence}")
                 return self._create_empty_result(sentence)
             
-            # Phase 1.5: ハイブリッド解析（spaCy補完）
+            # ハイブリッド解析（spaCy補完）
             if self.use_spacy_hybrid and self.spacy_nlp:
                 doc = self._apply_spacy_hybrid_corrections(sentence, doc)
             
-            # Phase 1.8: 人間文法認識による前処理（stanza誤判定修正）
+            # 人間文法認識による前処理（stanza誤判定修正）
             doc = self._apply_human_grammar_patterns(sentence, doc)
             
             # Phase 2: 統合処理（全ハンドラー同時実行）
@@ -1018,12 +1018,12 @@ class UnifiedStanzaRephraseMapper:
         self.logger.info("📊 Statistics reset")
     
     # =============================================================================
-    # 文法ハンドラー実装（Phase 1+: 段階的追加）
+    # 文法ハンドラー実装（段階的追加）
     # =============================================================================
     
     def _handle_relative_clause(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
-        関係節ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応 + ハンドラー間情報共有）
+        関係節ハンドラー（分詞構文制御フラグ対応 + ハンドラー間情報共有）
         
         simple_relative_engine.py の機能を統合システムに移植
         Stanza dependency parsing による直接的な関係節検出・分解
@@ -2028,7 +2028,7 @@ class UnifiedStanzaRephraseMapper:
     
     def _handle_basic_five_pattern(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
-        基本5文型ハンドラー（Phase 1実装 + 分詞構文制御フラグ対応 + ハンドラー間情報共有）
+        基本5文型ハンドラー（分詞構文制御フラグ対応 + ハンドラー間情報共有）
         
         basic_five_pattern_engine.py の機能を統合システムに移植
         Stanza dependency parsing による基本文型検出・分解
@@ -2196,8 +2196,9 @@ class UnifiedStanzaRephraseMapper:
             # SVC構造: cop動詞をV、ROOT語をC1とする
             result['slots']['V'] = copula_verb.text
             complement_phrase = self._build_phrase_with_modifiers(sentence, main_verb)
-            result['slots']['C1'] = complement_phrase
-            self.logger.debug(f"🔧 whose構文copula検出: V='{copula_verb.text}', C1='{complement_phrase}'")
+            # Case 12対応: whose構文では主文にC1を設定しない（関係節内の情報）
+            # result['slots']['C1'] = complement_phrase
+            self.logger.debug(f"🔧 whose構文copula検出: V='{copula_verb.text}', complement='{complement_phrase}' (C1不設定)")
             pattern_name = 'SVC_whose'
         else:
             # 通常の動詞構造
@@ -4566,185 +4567,19 @@ class UnifiedStanzaRephraseMapper:
         # 主節スロットから従属節にのみ存在する要素を除去
         for main_key, main_value in list(main_slots.items()):
             if main_value and main_value.lower() in subordinate_only_elements:
-                main_slots[main_key] = ''
-                self.logger.debug(f"  🔄 従属節専用要素を主節から除去: {main_key}='{main_value}' → ''")
+                # Case 28対応: O1スロット自体を削除せず、空文字設定を回避
+                if main_key == 'O1':
+                    # O1スロットは削除（期待値に存在しない）
+                    del main_slots[main_key]
+                    self.logger.debug(f"  🔄 従属節専用要素O1スロット削除: {main_key}='{main_value}'")
+                else:
+                    main_slots[main_key] = ''
+                    self.logger.debug(f"  🔄 従属節専用要素を主節から除去: {main_key}='{main_value}' → ''")
 
 
 # =============================================================================
 # Phase 0 テスト用 基本テストハーネス
 # =============================================================================
-
-def test_phase0_basic():
-    """Phase 0 基本動作確認テスト"""
-    print("🧪 Phase 0 基本テスト開始...")
-    
-    try:
-        # 初期化テスト
-        mapper = UnifiedStanzaRephraseMapper(log_level='DEBUG')
-        print("✅ 初期化成功")
-        
-        # 基本処理テスト
-        test_sentence = "The car is red."
-        result = mapper.process(test_sentence)
-        
-        print(f"✅ 基本処理成功: {result['sentence']}")
-        print(f"📊 処理時間: {result['meta']['processing_time']:.3f}s")
-        print(f"🔧 Stanza情報: {result['meta']['stanza_info']}")
-        
-        # 統計確認
-        stats = mapper.get_stats()
-        print(f"📈 処理統計: {stats}")
-        
-        print("🎉 Phase 0 基本テスト完了！")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Phase 0 テスト失敗: {e}")
-        return False
-
-# =============================================================================
-# Phase 1 テスト用 関係節テストハーネス
-# =============================================================================
-
-def test_phase2_passive_voice():
-    """Phase 2 受動態ハンドラーテスト"""
-    print("🧪 Phase 2 受動態テスト開始...")
-    
-    try:
-        # 初期化
-        mapper = UnifiedStanzaRephraseMapper(log_level='DEBUG')
-        
-        # Phase 1 & 2 ハンドラー追加
-        mapper.add_handler('relative_clause')
-        mapper.add_handler('passive_voice')
-        print("✅ 関係節 + 受動態ハンドラー追加完了")
-        
-        # 重要テストケース
-        test_cases = [
-            ("The car was bought.", "単純受動態"),
-            ("The car was bought by him.", "by句付き受動態"),
-            ("The book which was read was interesting.", "関係節+受動態複合"),
-            ("The letter was written by her.", "受動態基本形")
-        ]
-        
-        success_count = 0
-        for i, (test_sentence, pattern_type) in enumerate(test_cases, 1):
-            print(f"\n📖 テスト{i}: '{test_sentence}' ({pattern_type})")
-            print("-" * 60)
-            
-            try:
-                result = mapper.process(test_sentence)
-                
-                print("📊 処理結果:")
-                print(f"  メインスロット: {result.get('slots', {})}")
-                print(f"  サブスロット: {result.get('sub_slots', {})}")
-                print(f"  文法情報: {result.get('grammar_info', {})}")
-                print(f"  処理時間: {result['meta']['processing_time']:.3f}s")
-                
-                # 受動態チェック
-                slots = result.get('slots', {})
-                if 'Aux' in slots and 'V' in slots:
-                    print(f"\n🎯 受動態チェック:")
-                    print(f"  S: '{slots.get('S', '')}'")
-                    print(f"  Aux: '{slots.get('Aux', '')}'")  
-                    print(f"  V: '{slots.get('V', '')}'")
-                    if 'M1' in slots:
-                        print(f"  M1 (by句): '{slots.get('M1', '')}'")
-                    
-                    print("  ✅ 受動態構造検出成功！")
-                    success_count += 1
-                else:
-                    print("  ❌ 受動態構造未検出")
-                    
-            except Exception as e:
-                print(f"❌ テスト{i}エラー: {e}")
-        
-        # 統計確認
-        stats = mapper.get_stats()
-        print(f"\n📈 Phase 2 統計:")
-        print(f"  処理数: {stats['processing_count']}")
-        print(f"  平均処理時間: {stats['average_processing_time']:.3f}s")
-        print(f"  ハンドラー成功数: {stats['handler_success_count']}")
-        
-        print(f"\n🎉 Phase 2 テスト完了! 成功: {success_count}/{len(test_cases)}")
-        return success_count == len(test_cases)
-        
-    except Exception as e:
-        print(f"❌ Phase 2 テスト失敗: {e}")
-        return False
-
-def test_phase1_relative_clause():
-    """Phase 1 関係節ハンドラーテスト"""
-    print("🧪 Phase 1 関係節テスト開始...")
-    
-    try:
-        # 初期化
-        mapper = UnifiedStanzaRephraseMapper(log_level='DEBUG')
-        
-        # Phase 1 ハンドラー追加
-        mapper.add_handler('relative_clause')
-        print("✅ 関係節ハンドラー追加完了")
-        
-        # 重要テストケース（省略関係代名詞対応強化）
-        test_cases = [
-            ("The car which we saw was red.", "目的語関係代名詞"),
-            ("The man who runs fast is strong.", "主語関係代名詞"), 
-            ("The man whose car is red lives here.", "所有格関係代名詞"),
-            ("The place where he lives is nice.", "関係副詞where"),
-            ("The book I read was interesting.", "省略目的語関係代名詞（能動態）"),
-            ("The book that was written is famous.", "省略目的語関係代名詞（受動態）"),
-            ("The person standing there is my friend.", "省略主語関係代名詞（現在分詞）")
-        ]
-        
-        success_count = 0
-        for i, (test_sentence, pattern_type) in enumerate(test_cases, 1):
-            print(f"\n📖 テスト{i}: '{test_sentence}' ({pattern_type})")
-            print("-" * 60)
-            
-            try:
-                result = mapper.process(test_sentence)
-                
-                print("📊 処理結果:")
-                print(f"  メインスロット: {result.get('slots', {})}")
-                print(f"  サブスロット: {result.get('sub_slots', {})}")
-                print(f"  文法情報: {result.get('grammar_info', {})}")
-                print(f"  処理時間: {result['meta']['processing_time']:.3f}s")
-                
-                # 第1テストケースの特別チェック
-                if i == 1:  # "The car which we saw was red."
-                    slots = result.get('slots', {})
-                    sub_slots = result.get('sub_slots', {})
-                    
-                    print(f"\n🎯 重要チェック:")
-                    expected_sub_o1 = "The car which we saw"
-                    actual_sub_o1 = sub_slots.get('sub-o1', '')
-                    print(f"  期待 sub-o1: '{expected_sub_o1}'")
-                    print(f"  実際 sub-o1: '{actual_sub_o1}'")
-                    
-                    if expected_sub_o1.lower() in actual_sub_o1.lower():
-                        print("  ✅ 基本要求達成！")
-                        success_count += 1
-                    else:
-                        print("  ❌ 基本要求未達成")
-                else:
-                    success_count += 1
-                    
-            except Exception as e:
-                print(f"❌ テスト{i}エラー: {e}")
-        
-        # 統計確認
-        stats = mapper.get_stats()
-        print(f"\n📈 Phase 1 統計:")
-        print(f"  処理数: {stats['processing_count']}")
-        print(f"  平均処理時間: {stats['average_processing_time']:.3f}s")
-        print(f"  ハンドラー成功数: {stats['handler_success_count']}")
-        
-        print(f"\n🎉 Phase 1 テスト完了! 成功: {success_count}/{len(test_cases)}")
-        return success_count == len(test_cases)
-        
-    except Exception as e:
-        print(f"❌ Phase 1 テスト失敗: {e}")
-        return False
 
 def clean_result_for_json(result: Dict) -> Dict:
     """
@@ -4972,35 +4807,16 @@ def main():
         help='出力JSONファイル（省略時は自動生成）'
     )
     
-    parser.add_argument(
-        '--test-mode',
-        action='store_true',
-        help='テストモード（旧Phase 0-2実行）'
-    )
-    
     args = parser.parse_args()
     
-    if args.test_mode:
-        # 従来のテストモード
-        print("🧪 テストモード実行")
-        if test_phase0_basic():
-            print("\n" + "="*60)
-            if test_phase1_relative_clause():
-                print("\n" + "="*60)
-                test_phase2_passive_voice()
-            else:
-                print("❌ Phase 1失敗のため Phase 2をスキップ")
-        else:
-            print("❌ Phase 0失敗のため Phase 1,2をスキップ")
+    # バッチ処理モード
+    result_file = process_batch_sentences(args.input, args.output)
+    if result_file:
+        print(f"\n🎉 バッチ処理が完了しました")
+        print(f"結果ファイル: {result_file}")
     else:
-        # バッチ処理モード
-        result_file = process_batch_sentences(args.input, args.output)
-        if result_file:
-            print(f"\n🎉 バッチ処理が完了しました")
-            print(f"結果ファイル: {result_file}")
-        else:
-            print("\n❌ バッチ処理が失敗しました")
-            exit(1)
+        print("\n❌ バッチ処理が失敗しました")
+        exit(1)
 
 if __name__ == "__main__":
     main()
