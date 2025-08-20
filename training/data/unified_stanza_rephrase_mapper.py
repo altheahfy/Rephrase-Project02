@@ -2191,6 +2191,20 @@ class UnifiedStanzaRephraseMapper:
             result['slots']['S'] = subject_phrase
             self.logger.debug(f"🔧 whose構文簡易処理: S='{subject_phrase}', V='{main_verb.text}'")
         
+        # 補語を設定（xcomp）- became famousのfamousなど
+        if 'xcomp' in dep_relations and dep_relations['xcomp']:
+            complement = dep_relations['xcomp'][0]
+            complement_phrase = self._build_phrase_with_modifiers(sentence, complement)
+            result['slots']['C1'] = complement_phrase
+            self.logger.debug(f"🔧 whose構文簡易処理: C1='{complement_phrase}' 追加")
+        
+        # 目的語を設定（obj）
+        if 'obj' in dep_relations and dep_relations['obj']:
+            obj = dep_relations['obj'][0]
+            obj_phrase = self._build_phrase_with_modifiers(sentence, obj)
+            result['slots']['O1'] = obj_phrase
+            self.logger.debug(f"🔧 whose構文簡易処理: O1='{obj_phrase}' 追加")
+        
         # 文型情報を設定
         result['grammar_info'] = {
             'detected_patterns': ['basic_five_pattern'],
