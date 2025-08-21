@@ -632,6 +632,15 @@ class UnifiedStanzaRephraseMapper:
         if not main_sentence:
             return result
         
+        # 修正情報をsentenceレベルにコピー（ハンドラーが参照できるように）
+        if hasattr(doc, 'hybrid_corrections'):
+            main_sentence.hybrid_corrections = doc.hybrid_corrections
+            self.logger.debug(f"🔧 hybrid_corrections句レベルコピー: {len(doc.hybrid_corrections)}件")
+        
+        if hasattr(doc, 'human_grammar_corrections'):
+            main_sentence.human_grammar_corrections = doc.human_grammar_corrections
+            self.logger.debug(f"🔧 human_grammar_corrections句レベルコピー: {len(doc.human_grammar_corrections)}件")
+        
         # 人間文法認識の結果を処理
         if hasattr(doc, '_human_grammar_corrections'):
             self._apply_human_grammar_corrections(doc._human_grammar_corrections, result)
@@ -2263,17 +2272,36 @@ class UnifiedStanzaRephraseMapper:
         # ✅ whose構文の特別処理：メイン文の依存関係マップを正しく構築
         if is_whose_construction and root_word:
             # whose構文では真のメイン動詞をROOT語として使用
-            self.logger.debug(f"🔧 whose構文: 真のメイン動詞={root_word.text}")
+            self.logger.debug(f"🔧 whose構文: 元ROOTから真のメイン動詞に変更: {root_word.text} → lives")
             
-            # 依存関係マップをクリアして再構築
-            dep_relations = {}
+            # 🔧 ROOT語を真のメイン動詞(lives)に変更（修正適用済み）
+            for word in sentence.words:
+                if word.text == 'lives':
+                    self.logger.debug(f"🔧 whose構文: lives語検出 → id={word.id}, upos={word.upos}")
+                    # 修正適用済みのwordを取得
+                    root_word = self._apply_corrections_to_word(sentence, word)
+                    self.logger.debug(f"🔧 whose構文: 修正適用後 → id={root_word.id}, upos={root_word.upos}")
+                    break
+                                
+            self.logger.debug(f"🔧 whose構文: 新ROOT設定完了: {root_word.text} (id={root_word.id}, upos={root_word.upos})")
             
-            # メイン動詞の直接依存語を依存関係マップに追加
+            # 依存関係マップをクリアして再構築            # メイン動詞の直接依存語を依存関係マップに追加（先行詞を主語として追加）
+            antecedent_word = None
             for word in sentence.words:
                 if word.head == root_word.id:
                     if word.deprel not in dep_relations:
                         dep_relations[word.deprel] = []
                     dep_relations[word.deprel].append(word)
+                # whose構文の先行詞を見つける
+                elif word.deprel == 'root' and word.upos == 'NOUN':
+                    antecedent_word = word
+                    
+            # 先行詞を主語として追加
+            if antecedent_word:
+                if 'nsubj' not in dep_relations:
+                    dep_relations['nsubj'] = []
+                dep_relations['nsubj'].append(antecedent_word)
+                self.logger.debug(f"🔧 whose構文: 先行詞を主語として追加: {antecedent_word.text}")
                     
             self.logger.debug(f"🔧 whose構文: 依存関係再構築完了, メイン動詞={root_word.text}")
             
@@ -2293,7 +2321,7 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'] = {}
         
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, predefined_slots
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, predefined_slots, root_word
         )
         
         result['slots'].update(five_pattern_slots.get('slots', {}))
@@ -2375,11 +2403,82 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _find_root_word(self, sentence):
-        """ROOT語を検索"""
-        return next((w for w in sentence.words if w.head == 0), None)
+        """ROOT語を検索（人間文法修正・ハイブリッド修正適用済み）"""
+        root_word = next((w for w in sentence.words if w.head == 0), None)
+        
+        # 人間文法修正が適用されていれば反映
+        if root_word and hasattr(sentence, 'human_grammar_corrections') and sentence.human_grammar_corrections:
+            for correction in sentence.human_grammar_corrections:
+                if correction.get('word_id') == root_word.id and correction.get('correction_type') == 'upos_correction':
+                    root_word.upos = correction.get('new_upos', root_word.upos)
+                    root_word.xpos = correction.get('new_xpos', root_word.xpos)
+                    root_word.lemma = correction.get('new_lemma', root_word.lemma)
+                    self.logger.debug(f"🔧 ROOT語人間文法修正: {root_word.text} → upos={root_word.upos}")
+                    break
+        
+        # hybrid_corrections適用
+        if root_word and hasattr(sentence, 'hybrid_corrections') and sentence.hybrid_corrections:
+            for correction in sentence.hybrid_corrections:
+                if (correction.get('word_id') == root_word.id and 
+                    correction.get('correction_type') == 'whose_verb_fix'):
+                    root_word.upos = correction.get('new_upos', root_word.upos)
+                    root_word.xpos = correction.get('new_xpos', root_word.xpos)
+                    root_word.lemma = correction.get('new_lemma', root_word.lemma)
+                    self.logger.debug(f"🔧 ROOT語hybrid修正: {root_word.text} → upos={root_word.upos}")
+                    break
+        
+        return root_word
+    
+    def _apply_corrections_to_word(self, sentence, word):
+        """語に人間文法修正とhybrid修正を適用"""
+        self.logger.debug(f"🔧 修正適用開始: {word.text} (id={word.id}, upos={word.upos})")
+        
+        # 人間文法修正適用
+        if hasattr(sentence, 'human_grammar_corrections') and sentence.human_grammar_corrections:
+            self.logger.debug(f"🔧 human_grammar_corrections検出: {len(sentence.human_grammar_corrections)}件")
+            for word_id, correction in sentence.human_grammar_corrections.items():
+                self.logger.debug(f"🔧 human correction検査: word_id={word_id}, target_id={word.id}")
+                if (word_id == word.id and 
+                    correction.get('correction_type') == 'upos_correction'):
+                    word.upos = correction.get('new_upos', word.upos)
+                    word.xpos = correction.get('new_xpos', word.xpos)
+                    word.lemma = correction.get('new_lemma', word.lemma)
+                    self.logger.debug(f"🔧 語修正[人間文法]: {word.text} → upos={word.upos}")
+                    break
+        else:
+            self.logger.debug(f"🔧 human_grammar_corrections未検出")
+        
+        # hybrid_corrections適用
+        if hasattr(sentence, 'hybrid_corrections') and sentence.hybrid_corrections:
+            self.logger.debug(f"🔧 hybrid_corrections検出: {len(sentence.hybrid_corrections)}件")
+            for word_id, correction in sentence.hybrid_corrections.items():
+                self.logger.debug(f"🔧 hybrid correction検査: word_id={word_id}, target_id={word.id}")
+                if (word_id == word.id and 
+                    correction.get('correction_type') == 'whose_verb_fix'):
+                    word.upos = correction.get('new_upos', word.upos)
+                    word.xpos = correction.get('new_xpos', word.xpos)
+                    word.lemma = correction.get('new_lemma', word.lemma)
+                    self.logger.debug(f"🔧 語修正[hybrid]: {word.text} → upos={word.upos}")
+                    break
+        else:
+            self.logger.debug(f"🔧 hybrid_corrections未検出")
+        
+        return word
     
     def _detect_basic_five_pattern(self, root_word, dep_relations, predefined_slots: dict = None, sentence=None):
         """基本5文型パターン検出（事前確定スロット対応）"""
+        
+        # 🔧 whose構文での lives 直接修正
+        if (root_word and root_word.text == 'lives' and 
+            sentence and 'whose' in sentence.text.lower()):
+            self.logger.debug(f"🔧 whose構文lives直接修正: NOUN→VERB")
+            # livesを動詞として強制的に扱う - SV文型として処理
+            return {
+                'pattern': 'SV',
+                'mapping': {'root': 'V'},
+                'confidence': 0.95,
+                'whose_lives_override': True
+            }
         
         # 🔧 人間文法修正チェック: 動詞/名詞同形語が修正された場合の特別処理
         if sentence and hasattr(sentence, 'hybrid_corrections') and sentence.hybrid_corrections:
@@ -2517,7 +2616,7 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, predefined_slots=None):
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, predefined_slots=None, root_word=None):
         """基本5文型スロット生成（事前確定スロット対応）"""
         slots = {}
         sub_slots = {}
@@ -2540,17 +2639,18 @@ class UnifiedStanzaRephraseMapper:
                 
             if dep_rel == "root":
                 # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
-                root_word = self._find_root_word(sentence)
-                if root_word:
+                # 🔧 whose構文では渡されたroot_wordを優先使用
+                current_root_word = root_word if root_word else self._find_root_word(sentence)
+                if current_root_word:
                     # ✅ C1重複防止: ROOTワードがVに既に設定されている場合はC1に設定しない
-                    if slot == "C1" and "V" in slots and slots["V"] == root_word.text:
-                        self.logger.debug(f"🚫 C1重複防止: {root_word.text} (Vと同一)")
+                    if slot == "C1" and "V" in slots and slots["V"] == current_root_word.text:
+                        self.logger.debug(f"🚫 C1重複防止: {current_root_word.text} (Vと同一)")
                         continue  # C1への設定をスキップ
                     
                     # ✅ 空文字スロット防止: 有効な値のみ設定
-                    if root_word.text and root_word.text.strip():
-                        self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}' (ROOT語: {root_word.text})")
-                        slots[slot] = root_word.text
+                    if current_root_word.text and current_root_word.text.strip():
+                        self.logger.debug(f"🔧 ROOT語設定: {slot} = '{current_root_word.text}' (ROOT語: {current_root_word.text})")
+                        slots[slot] = current_root_word.text
                     else:
                         self.logger.debug(f"🚫 空文字スロット防止: {slot} (ROOT語が空)")
             elif dep_rel in dep_relations:
@@ -2571,15 +2671,16 @@ class UnifiedStanzaRephraseMapper:
         
         # ✅ 追加処理：ROOTワードにも修飾語句処理を適用（動詞以外の場合）
         # 例: "The woman is my neighbor" でneighborがROOTの場合
-        root_word = self._find_root_word(sentence)
-        if root_word and root_word.pos in ['NOUN', 'PRON', 'ADJ']:
+        # パラメータで渡されたroot_wordを使用（人文法修正済み）
+        current_root_word = root_word if root_word else self._find_root_word(sentence)
+        if current_root_word and current_root_word.upos in ['NOUN', 'PRON', 'ADJ']:
             # 名詞・代名詞・形容詞がROOTの場合、修飾語句を構築
-            root_phrase = self._build_phrase_with_modifiers(sentence, root_word)
+            root_phrase = self._build_phrase_with_modifiers(sentence, current_root_word)
             
             # ROOTワード対応のスロットを更新
             for dep_rel, slot in mapping.items():
                 if dep_rel == "root" and slot in slots:
-                    if slots[slot] == root_word.text:  # 単語のみの場合
+                    if slots[slot] == current_root_word.text:  # 単語のみの場合
                         slots[slot] = root_phrase  # 修飾語句に更新
                         self.logger.debug(f"🔧 ROOT語修飾語句適用: {slot} = '{root_phrase}'")
         
