@@ -192,8 +192,8 @@ class RiskManagedHybridHandler:
     def _stanza_process(self, sentence):
         """Stanzaフォールバック処理"""
         try:
-            # 既存システムでの処理（正しいメソッド名）
-            result = self.original_mapper.process(sentence)
+            # 既存システムでの処理
+            result = self.original_mapper.analyze_sentence(sentence)
             return result if result else {}
         except Exception as e:
             print(f"  ⚠️ Stanzaフォールバックエラー: {e}")
@@ -210,25 +210,10 @@ class RiskManagedHybridHandler:
             if "S" not in result:
                 return False
             
-            # 既知正解との照合（コア要素のみ比較）
+            # 既知正解との照合
             if sentence.replace(".", "") in self.known_correct_results:
                 expected = self.known_correct_results[sentence.replace(".", "")]
-                
-                # コアスロットの比較（メタデータは無視）
-                expected_slots = expected.get("slots", expected) if "slots" in expected else expected
-                actual_slots = result
-                
-                # 主要スロット（S, V, O1, M2など）のみ比較
-                core_slots = ["S", "V", "O1", "O2", "C1", "C2", "M1", "M2", "M3", "Aux"]
-                
-                for slot in core_slots:
-                    if slot in expected_slots:
-                        if slot not in actual_slots or actual_slots[slot] != expected_slots[slot]:
-                            print(f"    ❌ コアスロット不一致: {slot} - 期待={expected_slots.get(slot)}, 実際={actual_slots.get(slot)}")
-                            return False
-                
-                print(f"    ✅ コアスロット一致: {sentence}")
-                return True
+                return result == expected
             
             # 最低限の文法的妥当性
             return self._validate_grammatical_consistency(result)
@@ -257,11 +242,8 @@ class RiskManagedHybridHandler:
             for sentence in self.target_sentences:
                 current_result = self._stanza_process(sentence)
                 if current_result:
-                    # コアスロットのみ抽出
-                    core_slots = current_result.get("slots", current_result) if "slots" in current_result else current_result
-                    
-                    self.known_correct_results[sentence.replace(".", "")] = core_slots
-                    print(f"  ✅ 正解結果記録: {sentence} -> {core_slots}")
+                    self.known_correct_results[sentence.replace(".", "")] = current_result
+                    print(f"  ✅ 正解結果記録: {sentence} -> {current_result}")
             
             return len(self.known_correct_results) > 0
             
