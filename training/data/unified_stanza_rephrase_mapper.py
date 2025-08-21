@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Unified Stanza-Rephrase Mapper v1.0
 ===================================
