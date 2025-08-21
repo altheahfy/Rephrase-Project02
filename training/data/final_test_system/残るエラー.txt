@@ -1,3 +1,6 @@
+12
+the manが上位サブで重複。しかも上位C1
+
 ❌ [13] The student whose book I borrowed is smart.
    C1: '(not present)' ≠ 'smart'
 
