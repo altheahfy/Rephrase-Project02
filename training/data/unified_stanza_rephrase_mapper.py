@@ -1699,8 +1699,9 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  🎯 主文パターン検出: {pattern_result['pattern']}")
         
         # スロット生成（Sスロットは空にして構造を維持）
+        # 関係節がSスロットを占有していることを伝達
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, {'S'}
         )
         
         # 関係節を含む主語はサブスロットにあるため、上位SスロットはNoneまたは空
@@ -2241,7 +2242,7 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'] = {}
         
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, occupied_slots
         )
         
         result['slots'].update(five_pattern_slots.get('slots', {}))
@@ -2328,6 +2329,20 @@ class UnifiedStanzaRephraseMapper:
     
     def _detect_basic_five_pattern(self, root_word, dep_relations, occupied_slots: set = None, sentence=None):
         """基本5文型パターン検出（ハンドラー間情報共有対応）"""
+        
+        # 🔧 人間文法修正チェック: 動詞/名詞同形語が修正された場合の特別処理
+        if sentence and hasattr(sentence, 'hybrid_corrections') and sentence.hybrid_corrections:
+            for word_id, correction in sentence.hybrid_corrections.items():
+                if (correction.get('correction_type') == 'whose_verb_fix' and 
+                    correction.get('word_text') == root_word.text):
+                    self.logger.debug(f"🔧 人間文法修正適用: {root_word.text} NOUN→VERB (依存関係処理スキップ)")
+                    # 自動詞として簡単なSV構造で処理
+                    return {
+                        'pattern': 'SV_human_corrected',
+                        'mapping': {'root': 'V'},
+                        'confidence': 0.95,
+                        'human_grammar_override': True
+                    }
         
         # 占有済みスロットのデフォルト値
         if occupied_slots is None:
@@ -2484,13 +2499,21 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence):
-        """基本5文型スロット生成（修飾語句対応強化）"""
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, occupied_slots=None):
+        """基本5文型スロット生成（修飾語句対応強化、占有スロット考慮）"""
         slots = {}
         sub_slots = {}
         
+        if occupied_slots is None:
+            occupied_slots = set()
+        
         # マッピングに従ってスロット生成
         for dep_rel, slot in mapping.items():
+            # ✅ 占有済みスロットはスキップ
+            if slot in occupied_slots:
+                self.logger.debug(f"🚫 占有済みスロット: {slot} (他ハンドラーが処理済み)")
+                continue
+                
             if dep_rel == "root":
                 # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
                 root_word = self._find_root_word(sentence)
