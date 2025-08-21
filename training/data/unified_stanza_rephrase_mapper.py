@@ -1261,11 +1261,15 @@ class UnifiedStanzaRephraseMapper:
         result = base_result.copy()
         
         # ✅ whose構文の特別処理: メイン動詞処理を妨害しない
+        self.logger.debug(f"🔍 whose構文条件チェック: is_whose={is_whose_construction}, rel_verb={rel_verb.text if rel_verb else None}, deprel={rel_verb.deprel if rel_verb else None}")
         if is_whose_construction and rel_verb and rel_verb.deprel == 'cop':
+            self.logger.debug("🔧 whose構文特別処理ブロック開始")
             # 関係節スロットのみ生成し、メイン文は5文型ハンドラーに任せる
+            self.logger.debug("🔧 _generate_whose_relative_clause_slots呼び出し開始")
             rephrase_slots = self._generate_whose_relative_clause_slots(
                 antecedent, rel_verb, sentence
             )
+            self.logger.debug(f"🔧 _generate_whose_relative_clause_slots呼び出し完了: {rephrase_slots}")
             
             # 結果マージ（メイン文スロットは保持）
             if 'slots' not in result:
@@ -1286,6 +1290,32 @@ class UnifiedStanzaRephraseMapper:
             
             self.logger.debug(f"🔧 whose構文: メイン文スロット保持, 関係節サブスロット追加")
             
+            # 🔥 位置情報記録: 先行詞の位置に基づいてサブスロット位置を決定（汎用システム対応）
+            self.logger.debug("🔧 whose構文特別処理: 位置情報記録開始")
+            antecedent_position = self._determine_element_position(sentence, antecedent)
+            for sub_slot_name in rephrase_slots.get('sub_slots', {}):
+                result['slot_positions'][sub_slot_name] = antecedent_position
+                self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
+            
+            # 🤝 ハンドラー間情報共有: 具体的なスロット値を提供（あなたの正しいアプローチ）
+            self.logger.debug(f"🔍 shared_context: {shared_context is not None}, antecedent_position: '{antecedent_position}'")
+            if shared_context is not None and antecedent_position:
+                # ✅ 新方式: 具体的なスロット値を提供
+                if 'predefined_slots' not in shared_context:
+                    shared_context['predefined_slots'] = {}
+                
+                # 関係節により該当位置は空文字列に確定
+                shared_context['predefined_slots'][antecedent_position] = ""
+                self.logger.debug(f"🤝 関係節ハンドラー: predefined_slots[{antecedent_position}] = '' を設定")
+                
+                shared_context['handler_metadata']['relative_clause'] = {
+                    'occupied_slot': antecedent_position,
+                    'antecedent': antecedent.text,
+                    'processed_sub_slots': list(rephrase_slots.get('sub_slots', {}).keys()),
+                    'predefined_value': ""  # 明示的に空文字列を設定
+                }
+                self.logger.debug(f"🤝 ハンドラー間共有: 関係節により{antecedent_position}=\"\" を確定")
+            
         else:
             # 通常の関係節処理
             rephrase_slots = self._generate_relative_clause_slots(
@@ -1305,12 +1335,14 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'].update(rephrase_slots.get('sub_slots', {}))
             
             # 🔥 位置情報記録: 先行詞の位置に基づいてサブスロット位置を決定（汎用システム対応）
+            self.logger.debug("🔧 whose構文特別処理: 位置情報記録開始")
             antecedent_position = self._determine_element_position(sentence, antecedent)
             for sub_slot_name in rephrase_slots.get('sub_slots', {}):
                 result['slot_positions'][sub_slot_name] = antecedent_position
                 self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
             
             # 🤝 ハンドラー間情報共有: 具体的なスロット値を提供（あなたの正しいアプローチ）
+            self.logger.debug(f"🔍 shared_context: {shared_context is not None}, antecedent_position: '{antecedent_position}'")
             if shared_context is not None and antecedent_position:
                 # ❌ 旧方式: 占有情報のみ（スキップ方式）
                 # shared_context['occupied_main_slots'].add(antecedent_position)
@@ -1321,6 +1353,7 @@ class UnifiedStanzaRephraseMapper:
                 
                 # 関係節により該当位置は空文字列に確定
                 shared_context['predefined_slots'][antecedent_position] = ""
+                self.logger.debug(f"🤝 関係節ハンドラー: predefined_slots[{antecedent_position}] = '' を設定")
                 
                 shared_context['handler_metadata']['relative_clause'] = {
                     'occupied_slot': antecedent_position,
@@ -1711,7 +1744,7 @@ class UnifiedStanzaRephraseMapper:
         # スロット生成（Sスロットは空にして構造を維持）
         # 関係節がSスロットを占有していることを伝達
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, {'S'}
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, {'S': ""}
         )
         
         # 関係節を含む主語はサブスロットにあるため、上位SスロットはNoneまたは空
@@ -2156,8 +2189,11 @@ class UnifiedStanzaRephraseMapper:
             
             # 🤝 ハンドラー間情報共有: 事前確定されたスロット値をチェック（あなたの正しいアプローチ）
             predefined_slots = shared_context.get('predefined_slots', {})
+            self.logger.debug(f"🔍 shared_context内容: {shared_context}")
             if predefined_slots:
                 self.logger.debug(f"🤝 事前確定スロット検出: {predefined_slots} - これらの値を使用して残りを分解")
+            else:
+                self.logger.debug(f"🔍 事前確定スロットなし: predefined_slots = {predefined_slots}")
             
             # ❌ 旧方式: 占有情報によるスキップ方式（削除）
             # occupied_slots = shared_context.get('occupied_main_slots', set())
@@ -2496,9 +2532,9 @@ class UnifiedStanzaRephraseMapper:
         
         # マッピングに従ってスロット生成（事前確定されていないスロットのみ）
         for dep_rel, slot in mapping.items():
-            # ✅ 事前確定済みスロットはスキップ
+            # ✅ 事前確定済みスロットは既に設定済みなので依存関係分析をスキップ
             if slot in predefined_slots:
-                self.logger.debug(f"🚫 事前確定済みスロット: {slot} (関係節ハンドラーが処理済み)")
+                self.logger.debug(f"✅ 事前確定済みスロット: {slot} = '{predefined_slots[slot]}' (関係節ハンドラーが処理済み)")
                 continue
                 
             if dep_rel == "root":
@@ -2512,7 +2548,7 @@ class UnifiedStanzaRephraseMapper:
                     
                     # ✅ 空文字スロット防止: 有効な値のみ設定
                     if root_word.text and root_word.text.strip():
-                        self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}'")
+                        self.logger.debug(f"🔧 ROOT語設定: {slot} = '{root_word.text}' (ROOT語: {root_word.text})")
                         slots[slot] = root_word.text
                     else:
                         self.logger.debug(f"🚫 空文字スロット防止: {slot} (ROOT語が空)")
