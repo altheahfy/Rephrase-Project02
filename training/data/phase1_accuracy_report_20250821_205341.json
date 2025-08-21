@@ -1,0 +1,549 @@
+{
+  "test_info": {
+    "timestamp": "2025-08-21T20:53:41.161955",
+    "test_type": "phase1_universal_system_accuracy",
+    "total_sentences": 12,
+    "detailed_mode": true
+  },
+  "accuracy_stats": {
+    "total_tests": 12,
+    "perfect_matches": 12,
+    "partial_matches": 0,
+    "complete_mismatches": 0,
+    "error_count": 0
+  },
+  "detailed_results": [
+    {
+      "sentence": "The man whose car is red lives here",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "corrections": {
+          "human_grammar": {
+            "7": {
+              "word_id": 7,
+              "word_text": "lives",
+              "original_upos": "NOUN",
+              "corrected_upos": "VERB",
+              "original_deprel": "acl:relcl",
+              "corrected_deprel": "root",
+              "correction_type": "whose_ambiguous_verb",
+              "confidence": 1.0,
+              "timestamp": "2025-08-21T20:53:36.127975",
+              "pattern_name": "whose_ambiguous_verb"
+            }
+          }
+        },
+        "metadata": {
+          "patterns_applied": [
+            "whose_ambiguous_verb"
+          ],
+          "correction_metadata": {
+            "whose_ambiguous_verb": {
+              "word_id": 7,
+              "word_text": "lives",
+              "original_upos": "NOUN",
+              "corrected_upos": "VERB",
+              "original_deprel": "acl:relcl",
+              "corrected_deprel": "root",
+              "correction_type": "whose_ambiguous_verb",
+              "confidence": 1.0,
+              "timestamp": "2025-08-21T20:53:36.127975",
+              "pattern_name": "whose_ambiguous_verb"
+            }
+          },
+          "processing_time": 3,
+          "total_patterns_checked": 2,
+          "sentence_length": 35,
+          "timestamp": "2025-08-21T20:53:36.128996"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The woman whose house looks beautiful works there",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "M2": "there",
+          "V": "works"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose house",
+          "sub-v": "looks"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "M2": "there",
+          "V": "works"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose house",
+          "sub-v": "looks"
+        },
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 1,
+          "total_patterns_checked": 1,
+          "sentence_length": 49,
+          "timestamp": "2025-08-21T20:53:36.628729"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The person whose dog runs fast stays nearby",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "V": "runs",
+          "M2": "nearby"
+        },
+        "sub_slots": {
+          "sub-s": "The person whose dog",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "V": "runs",
+          "M2": "nearby"
+        },
+        "sub_slots": {
+          "sub-s": "The person whose dog",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        },
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 1,
+          "total_patterns_checked": 1,
+          "sentence_length": 43,
+          "timestamp": "2025-08-21T20:53:37.133549"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The result was unexpected",
+      "legacy_result": {
+        "slots": {
+          "V": "unexpected",
+          "Aux": "was",
+          "S": "The result"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "V": "unexpected",
+          "Aux": "was",
+          "S": "The result"
+        },
+        "sub_slots": {},
+        "corrections": {
+          "human_grammar": {
+            "3": {
+              "word_id": 3,
+              "word_text": "was",
+              "original_upos": "AUX",
+              "corrected_upos": "AUX",
+              "original_deprel": "cop",
+              "corrected_deprel": "aux",
+              "correction_type": "passive_voice",
+              "confidence": 0.8,
+              "timestamp": "2025-08-21T20:53:37.545859"
+            },
+            "4": {
+              "word_id": 4,
+              "word_text": "unexpected",
+              "original_upos": "ADJ",
+              "corrected_upos": "ADJ",
+              "original_deprel": "root",
+              "corrected_deprel": "root",
+              "correction_type": "passive_voice",
+              "confidence": 0.8,
+              "timestamp": "2025-08-21T20:53:37.545859"
+            }
+          }
+        },
+        "metadata": {
+          "patterns_applied": [
+            "passive_voice"
+          ],
+          "correction_metadata": {
+            "passive_voice": {
+              "correction_type": "passive_voice",
+              "be_verb": {
+                "word_id": 3,
+                "word_text": "was",
+                "original_upos": "AUX",
+                "corrected_upos": "AUX",
+                "original_deprel": "cop",
+                "corrected_deprel": "aux",
+                "correction_type": "passive_voice",
+                "confidence": 0.8,
+                "timestamp": "2025-08-21T20:53:37.545859"
+              },
+              "past_participle": {
+                "word_id": 4,
+                "word_text": "unexpected",
+                "original_upos": "ADJ",
+                "corrected_upos": "ADJ",
+                "original_deprel": "root",
+                "corrected_deprel": "root",
+                "correction_type": "passive_voice",
+                "confidence": 0.8,
+                "timestamp": "2025-08-21T20:53:37.545859"
+              },
+              "correction_description": "Convert 'was unexpected' to passive voice",
+              "confidence": 0.9692000000000001,
+              "original_structure": "unexpected(root) + was(cop)",
+              "corrected_structure": "was(aux) + unexpected(root, passive)",
+              "pattern_name": "passive_voice"
+            }
+          },
+          "processing_time": 1,
+          "total_patterns_checked": 1,
+          "sentence_length": 25,
+          "timestamp": "2025-08-21T20:53:37.545859"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The plan was completed",
+      "legacy_result": {
+        "slots": {
+          "V": "completed",
+          "S": "The plan",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "V": "completed",
+          "S": "The plan",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 0,
+          "total_patterns_checked": 1,
+          "sentence_length": 22,
+          "timestamp": "2025-08-21T20:53:37.894046"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The book was written",
+      "legacy_result": {
+        "slots": {
+          "V": "written",
+          "S": "The book",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "V": "written",
+          "S": "The book",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 0,
+          "total_patterns_checked": 1,
+          "sentence_length": 20,
+          "timestamp": "2025-08-21T20:53:38.216674"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The teacher whose class was cancelled lives here",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-aux": "was",
+          "sub-v": "cancelled"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-aux": "was",
+          "sub-v": "cancelled"
+        },
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 1,
+          "total_patterns_checked": 2,
+          "sentence_length": 48,
+          "timestamp": "2025-08-21T20:53:38.702591"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The report that was finished yesterday looks good",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "V": "looks",
+          "C1": "good"
+        },
+        "sub_slots": {
+          "sub-s": "The report that",
+          "sub-aux": "was",
+          "sub-v": "finished",
+          "sub-m2": "yesterday"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "V": "looks",
+          "C1": "good"
+        },
+        "sub_slots": {
+          "sub-s": "The report that",
+          "sub-aux": "was",
+          "sub-v": "finished",
+          "sub-m2": "yesterday"
+        },
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 1,
+          "total_patterns_checked": 1,
+          "sentence_length": 49,
+          "timestamp": "2025-08-21T20:53:39.216446"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The student whose homework was completed early goes home",
+      "legacy_result": {
+        "slots": {
+          "S": "",
+          "V": "goes",
+          "M2": "home"
+        },
+        "sub_slots": {
+          "sub-s": "The student whose homework",
+          "sub-aux": "was",
+          "sub-v": "completed",
+          "sub-m2": "early"
+        },
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "",
+          "V": "goes",
+          "M2": "home"
+        },
+        "sub_slots": {
+          "sub-s": "The student whose homework",
+          "sub-aux": "was",
+          "sub-v": "completed",
+          "sub-m2": "early"
+        },
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "correction_metadata": {},
+          "processing_time": 1,
+          "total_patterns_checked": 2,
+          "sentence_length": 56,
+          "timestamp": "2025-08-21T20:53:39.885076"
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "The man walks",
+      "legacy_result": {
+        "slots": {
+          "S": "The man",
+          "V": "walks"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "The man",
+          "V": "walks"
+        },
+        "sub_slots": {},
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "processing_time": 0
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "She is beautiful",
+      "legacy_result": {
+        "slots": {
+          "S": "She",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "She",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {},
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "processing_time": 0
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    },
+    {
+      "sentence": "They were working",
+      "legacy_result": {
+        "slots": {
+          "S": "They",
+          "V": "working",
+          "Aux": "were"
+        },
+        "sub_slots": {},
+        "corrections": {}
+      },
+      "universal_result": {
+        "slots": {
+          "S": "They",
+          "V": "working",
+          "Aux": "were"
+        },
+        "sub_slots": {},
+        "corrections": {},
+        "metadata": {
+          "patterns_applied": [],
+          "processing_time": 0
+        }
+      },
+      "legacy_error": null,
+      "universal_error": null,
+      "corrections_match": true,
+      "processing_match": true,
+      "accuracy_score": 1.0
+    }
+  ]
+}
