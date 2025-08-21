@@ -2544,6 +2544,11 @@ class UnifiedStanzaRephraseMapper:
                     slots[slot] = predefined_slots[slot]
                     continue  # ROOT語処理をスキップ
                 
+                # 🔄 whose構文チェック: whose構文の場合、誤ったROOT語処理をスキップ
+                if sentence and any(word.text.lower() == 'whose' for word in sentence.words):
+                    self.logger.debug(f"🔄 whose構文検出: ROOT語処理スキップ (誤ったStanza解析結果を回避)")
+                    continue  # whose構文ではROOT語処理をスキップ
+                
                 # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
                 root_word = self._find_root_word(sentence)
                 if root_word:
