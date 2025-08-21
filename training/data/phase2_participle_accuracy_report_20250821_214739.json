@@ -1,0 +1,137 @@
+{
+  "test_info": {
+    "timestamp": "20250821_214739",
+    "phase": "Phase 2 - ParticiplePattern",
+    "test_count": 12,
+    "focus": "participle_clause_integration"
+  },
+  "accuracy_stats": {
+    "total_tests": 12,
+    "perfect_matches": 0,
+    "partial_matches": 0,
+    "complete_mismatches": 12,
+    "error_count": 12
+  },
+  "detailed_results": [
+    {
+      "test_id": 1,
+      "sentence": "The man working overtime is tired",
+      "focus": "present_participle_adjectival",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 2,
+      "sentence": "She stood quietly watching the sunset",
+      "focus": "present_participle_adverbial",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 3,
+      "sentence": "The book written carefully is popular",
+      "focus": "past_participle_adjectival",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 4,
+      "sentence": "The report being reviewed thoroughly needs changes",
+      "focus": "compound_participle",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 5,
+      "sentence": "Running quickly he caught the train",
+      "focus": "present_participle_action",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 6,
+      "sentence": "Broken completely the machine stopped working",
+      "focus": "past_participle_state",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 7,
+      "sentence": "The document being written now is important",
+      "focus": "being_participle",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 8,
+      "sentence": "Standing silently in the corner he observed",
+      "focus": "participle_with_adverb",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 9,
+      "sentence": "The letter sent yesterday arrived late",
+      "focus": "past_participle_passive",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 10,
+      "sentence": "The dog barking loudly disturbed neighbors",
+      "focus": "present_participle_active",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 11,
+      "sentence": "Walking slowly through the park she enjoyed nature",
+      "focus": "complex_participle_adverbial",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    },
+    {
+      "test_id": 12,
+      "sentence": "Working hard studying English he improved quickly",
+      "focus": "multiple_participles",
+      "error": "'UnifiedStanzaRephraseMapper' object has no attribute 'rephrase_and_extract_slots'",
+      "evaluation": {
+        "is_perfect": false,
+        "overall_grade": "FAILED"
+      }
+    }
+  ]
+}
