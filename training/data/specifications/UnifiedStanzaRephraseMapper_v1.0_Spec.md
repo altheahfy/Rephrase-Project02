@@ -887,7 +887,104 @@ python unified_stanza_rephrase_mapper.py --test-mode
 
 ---
 
-**実装完了確認**: 2025年8月20日時点で、重要な2大システム（上位サブ連結汎用システム・分詞構文保護システム）の実装が成功し、システムアーキテクチャの基盤が確立されました。
+## 🚀 **今後の実装予定 (Phase 4: 位置情報表示システム)**
+
+### **📍 上位サブ連結位置情報表示機能**
+
+**実装予定**: v1.4 (2025年8月下旬)  
+**実装ステータス**: 📋 設計段階
+
+#### **実装背景**
+- **現在の状況**: 位置情報システムは関係節ハンドラーのみに実装済み
+- **内部処理**: `slot_positions`で位置情報を記録・管理中
+- **出力制限**: 位置情報は内部制御用のみ、ユーザー向け表示なし
+
+#### **実装計画**
+
+**Phase 1: 全ハンドラーへの位置情報システム拡張**
+```python
+# 拡張対象ハンドラー
+✅ relative_clause        # 実装済み (sub-s:S, sub-aux:S, sub-v:S)
+🔄 participle_construction # 拡張予定
+🔄 noun_clause            # 新規実装予定  
+🔄 adverbial_clause       # 新規実装予定
+🔄 passive_voice          # 位置情報対応予定
+🔄 auxiliary_complex      # 位置情報対応予定
+```
+
+**Phase 2: 位置情報付き出力フォーマット設計**
+```python
+# 従来フォーマット
+'sub_slots': {
+    'sub-s': 'The artist whose paintings',
+    'sub-aux': 'were', 
+    'sub-v': 'exhibited'
+}
+
+# 新フォーマット (位置情報付き)
+'sub_slots': {
+    'sub-s:S': 'The artist whose paintings',    # S位置の従属節
+    'sub-aux:S': 'were',                        # S位置の助動詞
+    'sub-v:S': 'exhibited',                     # S位置の動詞
+    'sub-m2:O1': 'quickly'                      # O1位置の修飾語
+}
+```
+
+**Phase 3: UI表示機能対応**
+```html
+<!-- 位置情報ベース表示 -->
+<div class="slot-position-s">
+    <span class="sub-slot">sub-s:S</span>
+    <span class="content">The artist whose paintings</span>
+</div>
+```
+
+#### **技術仕様**
+
+**位置特定アルゴリズム**
+```python
+def _determine_element_position(self, sentence, element):
+    """要素の位置を文法的役割から特定"""
+    if element.deprel in ['nsubj', 'nsubj:pass']:
+        return 'S'
+    elif element.deprel in ['obj', 'dobj']:
+        return 'O1'
+    elif element.deprel in ['iobj']:
+        return 'O2'
+    elif element.deprel in ['xcomp', 'ccomp']:
+        return 'C1'
+    # 継続実装...
+```
+
+**出力形式制御**
+```python
+# 設定による出力制御
+output_format = {
+    'show_position_info': True,     # 位置情報表示ON/OFF
+    'position_delimiter': ':',      # 区切り文字
+    'legacy_compatibility': False   # 従来形式との互換性
+}
+```
+
+#### **実装優先度**
+1. **高**: 関係節以外のハンドラーへの位置情報システム拡張
+2. **中**: 出力フォーマット変更とUI対応
+3. **低**: 設定による表示制御機能
+
+---
+
+**実装完了確認**: 2025年8月21日時点で、重要な2大システム（上位サブ連結汎用システム・分詞構文保護システム）の実装が成功し、システムアーキテクチャの基盤が確立されました。
+
+### **v1.3 (2025年8月21日)**
+- Phase1/test-mode機能削除完了
+- 94.3%精度達成 (50/53完全一致)
+- エラーケース特定: Cases 13,14,52
+- 位置情報表示システム設計策定
+
+### **v1.2 (2025年8月20日)**
+- 上位サブ連結汎用システム実装完了
+- 分詞構文保護システム強化
+- 77.4%精度達成
 
 ### **v1.1 (2025年8月17日)**
 - CLIインターフェース実装完了
@@ -904,4 +1001,4 @@ python unified_stanza_rephrase_mapper.py --test-mode
 
 ---
 
-**次期更新予定**: v1.2 (M1/M2精度向上版)
+**次期更新予定**: v1.4 (位置情報表示システム実装版)

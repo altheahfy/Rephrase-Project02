@@ -285,6 +285,9 @@ class UnifiedStanzaRephraseMapper:
             # be動詞 + 過去分詞 = 受動態パターン検出
             corrected_doc = self._correct_passive_voice_pattern(doc, sentence)
             
+            # whose構文 + 動詞/名詞同形語パターン検出
+            corrected_doc = self._correct_whose_ambiguous_verb_pattern(corrected_doc, sentence)
+            
             self.logger.debug("🧠 人間文法認識完了")
             return corrected_doc
             
@@ -447,6 +450,80 @@ class UnifiedStanzaRephraseMapper:
         pure_adjective_patterns = ['red', 'ded', 'eed', 'ted']
         return any(text.endswith(pattern) for pattern in pure_adjective_patterns)
     
+    def _correct_whose_ambiguous_verb_pattern(self, doc, sentence: str):
+        """
+        whose構文での動詞/名詞同形語の人間文法的判定
+        
+        人間の認識: "whose car is red lives here" 
+        → whose [名詞] [be動詞] [形容詞] [動詞] [場所] 
+        → [動詞]は確実に動詞として扱う
+        
+        stanza誤判定: lives(NOUN, acl:relcl) → 名詞として関係節修飾
+        人間修正: lives(VERB, root) → 動詞としてメイン動詞
+        """
+        if not doc.sentences or 'whose' not in sentence.lower():
+            return doc
+        
+        sent = doc.sentences[0]
+        words = sent.words
+        
+        # whose構文パターン認識
+        whose_pattern = self._detect_whose_ambiguous_verb_pattern(words, sentence)
+        
+        if whose_pattern['found']:
+            ambiguous_word = whose_pattern['ambiguous_verb']
+            self.logger.debug(f"🧠 whose構文動詞修正: {ambiguous_word.text} NOUN→VERB (人間文法認識)")
+            
+            # 修正情報を記録（stanzaデータ構造は不変のため、メタデータで管理）
+            if not hasattr(doc, 'human_grammar_corrections'):
+                doc.human_grammar_corrections = {}
+            
+            doc.human_grammar_corrections[ambiguous_word.id] = {
+                'word_text': ambiguous_word.text,
+                'original_upos': ambiguous_word.upos,
+                'corrected_upos': 'VERB',
+                'original_deprel': ambiguous_word.deprel,
+                'corrected_deprel': 'root',
+                'correction_type': 'whose_ambiguous_verb',
+                'confidence': 0.95
+            }
+        
+        return doc
+    
+    def _detect_whose_ambiguous_verb_pattern(self, words, sentence: str):
+        """whose構文での動詞/名詞同形語パターン検出"""
+        result = {'found': False, 'ambiguous_verb': None, 'confidence': 0.0}
+        
+        # 動詞/名詞同形語リスト
+        ambiguous_verbs = ['lives', 'works', 'runs', 'goes', 'comes', 'stays', 'plays', 'looks']
+        
+        # whose構文パターン: whose + 名詞 + (修飾語) + 同形語 + 場所/時間表現
+        import re
+        
+        for verb_text in ambiguous_verbs:
+            if verb_text in sentence.lower():
+                # パターン1: whose [名詞] is [形容詞] [動詞] (here|there|in...)
+                pattern1 = rf'whose\s+\w+\s+is\s+\w+\s+{verb_text}\s+(here|there|in\s+\w+)'
+                
+                # パターン2: whose [名詞] [修飾語]* [動詞] (場所表現)
+                pattern2 = rf'whose\s+\w+.*?\s+{verb_text}\s+(here|there|in|at|on)\s+\w+'
+                
+                if re.search(pattern1, sentence.lower()) or re.search(pattern2, sentence.lower()):
+                    # 該当する語を探す
+                    for word in words:
+                        if (word.text.lower() == verb_text and 
+                            word.upos == 'NOUN' and 
+                            word.deprel == 'acl:relcl'):
+                            
+                            result.update({
+                                'found': True,
+                                'ambiguous_verb': word,
+                                'confidence': 0.95
+                            })
+                            break
+        
+        return result
+
     def _detect_analysis_discrepancies(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
         """
         Stanza-spaCy解析結果の相違点を検出
@@ -497,12 +574,23 @@ class UnifiedStanzaRephraseMapper:
     
     def _is_contextually_verb(self, sentence: str, word: str) -> bool:
         """文脈的に動詞と判断できるかチェック"""
-        # 簡単なルールベース判定
-        # whose + [noun] + is + [adj] + [word] + here/there パターン
+        # 拡張されたルールベース判定
         import re
         
-        whose_pattern = rf'whose\s+\w+\s+is\s+\w+\s+{word}\s+(here|there)'
-        if re.search(whose_pattern, sentence.lower()):
+        # パターン1: whose + [noun] + is + [adj] + [word] + 場所表現
+        whose_pattern1 = rf'whose\s+\w+\s+is\s+\w+\s+{word}\s+(here|there|in\s+\w+)'
+        if re.search(whose_pattern1, sentence.lower()):
+            return True
+        
+        # パターン2: whose + [noun] + be動詞 + [形容詞] + [word] + 前置詞句（より一般的）
+        whose_pattern2 = rf'whose\s+\w+\s+(is|are|was|were)\s+\w+\s+{word}\s+(in|at|on|with|for)\s+\w+'
+        if re.search(whose_pattern2, sentence.lower()):
+            return True
+            
+        # パターン3: whose構文で語順的に動詞位置にある場合
+        # whose + [名詞] + [修飾語] + [word] + [場所/時間表現]
+        whose_pattern3 = rf'whose\s+\w+.*?\s+{word}\s+(in|at|on|during|after|before)\s+\w+'
+        if re.search(whose_pattern3, sentence.lower()):
             return True
             
         return False
@@ -933,6 +1021,12 @@ class UnifiedStanzaRephraseMapper:
             # 重複スロットをクリア
             for slot_to_clear in slots_to_clear:
                 sub_slots[slot_to_clear] = ""
+        
+        # === 空文字列サブスロット削除 (Case 52対応) ===
+        empty_sub_slots = [k for k, v in sub_slots.items() if v == ""]
+        for empty_slot in empty_sub_slots:
+            del sub_slots[empty_slot]
+            self.logger.debug(f"🗑️ 空文字列サブスロット削除: {empty_slot}")
         
         # === 2. 主節↔関係節間重複除去（従来機能）===
         main_adverbs = {k: v for k, v in slots.items() if k.startswith('M') and v}
@@ -1597,7 +1691,7 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  📝 主文依存関係: {list(dep_relations.keys())}")
         
         # 基本5文型パターン検出
-        pattern_result = self._detect_basic_five_pattern(main_verb, dep_relations)
+        pattern_result = self._detect_basic_five_pattern(main_verb, dep_relations, None, sentence)
         if not pattern_result:
             self.logger.debug("  ❌ 主文パターン検出失敗")
             return None
@@ -2129,21 +2223,13 @@ class UnifiedStanzaRephraseMapper:
                         dep_relations[word.deprel] = []
                     dep_relations[word.deprel].append(word)
                     
-            # 先行詞（ROOT語）を主語として追加
-            root_word_from_stanza = self._find_root_word(sentence)
-            if root_word_from_stanza:
-                if 'nsubj' not in dep_relations:
-                    dep_relations['nsubj'] = []
-                dep_relations['nsubj'].append(root_word_from_stanza)
-                self.logger.debug(f"🔧 whose構文: 先行詞を主語として設定 S='{root_word_from_stanza.text}'")
-                
             self.logger.debug(f"🔧 whose構文: 依存関係再構築完了, メイン動詞={root_word.text}")
             
-            # whose構文の場合は簡易処理を実行
-            return self._handle_whose_construction_simple(sentence, base_result, root_word, dep_relations)
+            # 🔄 whose構文は上位サブ連結汎用システムに完全委託（独自処理廃止）
+            self.logger.debug("🔄 whose構文: 上位サブ連結システムに処理委託")
 
         # 基本5文型パターン検出
-        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations, occupied_slots)
+        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations, occupied_slots, sentence)
         if not pattern_result:
             return base_result
         
@@ -2176,37 +2262,32 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _handle_whose_construction_simple(self, sentence, base_result: Dict, main_verb, dep_relations: Dict) -> Dict:
-        """whose構文専用の簡易処理（copula構造対応）"""
+        """whose構文専用の簡易処理（メイン文copula検出、関係節copula除外）"""
         result = base_result.copy()
         if 'slots' not in result:
             result['slots'] = {}
         
-        # 🔧 whose構文でcopula構造を検出
-        copula_detected = False
-        copula_verb = None
-        
-        # cop依存関係を探す（be動詞）
-        for word in sentence.words:
-            if word.deprel == 'cop' and word.head == main_verb.id:
-                copula_verb = word
-                copula_detected = True
-                break
-        
-        if copula_detected and copula_verb:
-            # SVC構造: cop動詞をV、ROOT語をC1とする
-            result['slots']['V'] = copula_verb.text
-            complement_phrase = self._build_phrase_with_modifiers(sentence, main_verb)
-            # Case 12対応: whose構文では主文にC1を設定しない（関係節内の情報）
-            # result['slots']['C1'] = complement_phrase
-            self.logger.debug(f"🔧 whose構文copula検出: V='{copula_verb.text}', complement='{complement_phrase}' (C1不設定)")
+        # 🔧 メイン動詞自体がbe動詞の場合のみSVC構造検出
+        if main_verb.lemma.lower() in ['be', 'am', 'is', 'are', 'was', 'were']:
+            # メイン動詞がbe動詞：SVC構造
+            result['slots']['V'] = main_verb.text
+            
+            # メイン動詞の補語を探す（xcomp依存関係）
+            for word in sentence.words:
+                if word.head == main_verb.id and word.deprel == 'xcomp':
+                    complement_phrase = self._build_phrase_with_modifiers(sentence, word)
+                    result['slots']['C1'] = complement_phrase
+                    self.logger.debug(f"🔧 whose構文SVC: V='{main_verb.text}', C1='{complement_phrase}'")
+                    break
+            
             pattern_name = 'SVC_whose'
         else:
-            # 通常の動詞構造
+            # メイン動詞が通常動詞：通常処理
             result['slots']['V'] = main_verb.text
             self.logger.debug(f"🔧 whose構文メイン動詞: V='{main_verb.text}'")
             pattern_name = 'SV_whose'
             
-            # 目的語・補語を設定（メイン動詞に直接依存するもの）
+            # メイン動詞に直接依存する要素のみを処理（関係節要素を除外）
             for word in sentence.words:
                 if word.head == main_verb.id:
                     if word.deprel == 'obj':
@@ -2245,7 +2326,7 @@ class UnifiedStanzaRephraseMapper:
         """ROOT語を検索"""
         return next((w for w in sentence.words if w.head == 0), None)
     
-    def _detect_basic_five_pattern(self, root_word, dep_relations, occupied_slots: set = None):
+    def _detect_basic_five_pattern(self, root_word, dep_relations, occupied_slots: set = None, sentence=None):
         """基本5文型パターン検出（ハンドラー間情報共有対応）"""
         
         # 占有済みスロットのデフォルト値
@@ -2308,7 +2389,7 @@ class UnifiedStanzaRephraseMapper:
         if occupied_slots:
             self.logger.debug(f"🤝 部分的パターン検出: 除外スロット={occupied_slots}")
             patterns = self._filter_patterns_by_occupied_slots(patterns, occupied_slots)
-        
+            
         # パターンマッチング
         for pattern_name, pattern_info in patterns.items():
             if self._matches_five_pattern(pattern_info, dep_relations, root_word, occupied_slots):

@@ -1,5 +1,18 @@
-２８で（期待値もそうだが）副詞シンプルルールに従うなら、副詞はsub-m1ではなくsub-m2のはず。
-２８はさらに、上位スロットもM1""ではなくM2""が正しい（期待値）。しかし実際の出力結果はO1""
-４１もthe place where_sub-m2, accidentally_sub-m3になるはずでは。
-４２もthe time when_sub-m2, dramatically_sub-m3。
-４３にveryの重複がある。
+❌ [13] The student whose book I borrowed is smart.
+   C1: '(not present)' ≠ 'smart'
+
+❌ [14] The woman whose dog barks is my neighbor.
+   C1: '(not present)' ≠ 'my neighbor'
+
+❌ [52] "sentence": "The documents being reviewed thoroughly will be approved soon.",
+        "slots": {
+          "S": "",
+          "V": "approved",
+          "Aux": "will be",
+          "M2": "soon"
+        },
+        "sub_slots": {
+          "sub-aux": "The documents being",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly",
+          "sub-m3": ""
