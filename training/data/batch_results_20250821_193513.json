@@ -1,7 +1,7 @@
 {
   "meta": {
     "input_file": "final_test_system/final_54_test_data.json",
-    "processed_at": "2025-08-21T16:36:13.784541",
+    "processed_at": "2025-08-21T19:35:18.578439",
     "total_sentences": 53,
     "success_count": 53,
     "error_count": 0
@@ -18,7 +18,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.114403,
+          "processing_time": 0.140381,
           "sentence_id": 1,
           "active_handlers": 7
         }
@@ -44,7 +44,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.109389,
+          "processing_time": 0.107817,
           "sentence_id": 2,
           "active_handlers": 7
         }
@@ -74,7 +74,7 @@
           "sub-m2": "fast"
         },
         "meta": {
-          "processing_time": 0.16597,
+          "processing_time": 0.171919,
           "sentence_id": 3,
           "active_handlers": 7
         }
@@ -108,7 +108,7 @@
           "sub-m2": "there"
         },
         "meta": {
-          "processing_time": 0.170414,
+          "processing_time": 0.252754,
           "sentence_id": 4,
           "active_handlers": 7
         }
@@ -142,7 +142,7 @@
           "sub-m2": "here"
         },
         "meta": {
-          "processing_time": 0.180627,
+          "processing_time": 0.17546,
           "sentence_id": 5,
           "active_handlers": 7
         }
@@ -176,7 +176,7 @@
           "sub-v": "bought"
         },
         "meta": {
-          "processing_time": 0.196088,
+          "processing_time": 0.187263,
           "sentence_id": 6,
           "active_handlers": 7
         }
@@ -210,7 +210,7 @@
           "sub-v": "met"
         },
         "meta": {
-          "processing_time": 0.149132,
+          "processing_time": 0.16531,
           "sentence_id": 7,
           "active_handlers": 7
         }
@@ -244,7 +244,7 @@
           "sub-v": "drives"
         },
         "meta": {
-          "processing_time": 0.159222,
+          "processing_time": 0.170237,
           "sentence_id": 8,
           "active_handlers": 7
         }
@@ -278,7 +278,7 @@
           "sub-v": "crashed"
         },
         "meta": {
-          "processing_time": 0.184203,
+          "processing_time": 0.286653,
           "sentence_id": 9,
           "active_handlers": 7
         }
@@ -312,7 +312,7 @@
           "sub-v": "written"
         },
         "meta": {
-          "processing_time": 0.179571,
+          "processing_time": 0.200892,
           "sentence_id": 10,
           "active_handlers": 7
         }
@@ -345,7 +345,7 @@
           "sub-v": "sent"
         },
         "meta": {
-          "processing_time": 0.175492,
+          "processing_time": 0.238502,
           "sentence_id": 11,
           "active_handlers": 7
         }
@@ -370,7 +370,6 @@
         "slots": {
           "S": "",
           "V": "lives",
-          "C1": "The man",
           "M2": "here"
         },
         "sub_slots": {
@@ -379,7 +378,7 @@
           "sub-c1": "red"
         },
         "meta": {
-          "processing_time": 0.193239,
+          "processing_time": 0.215951,
           "sentence_id": 12,
           "active_handlers": 7
         }
@@ -413,7 +412,7 @@
           "sub-v": "borrowed"
         },
         "meta": {
-          "processing_time": 0.208538,
+          "processing_time": 0.253187,
           "sentence_id": 13,
           "active_handlers": 7
         }
@@ -446,7 +445,7 @@
           "sub-v": "barks"
         },
         "meta": {
-          "processing_time": 0.202106,
+          "processing_time": 0.262636,
           "sentence_id": 14,
           "active_handlers": 7
         }
@@ -479,7 +478,7 @@
           "sub-v": "met"
         },
         "meta": {
-          "processing_time": 0.178623,
+          "processing_time": 0.200135,
           "sentence_id": 15,
           "active_handlers": 7
         }
@@ -513,7 +512,7 @@
           "sub-v": "arrived"
         },
         "meta": {
-          "processing_time": 0.173018,
+          "processing_time": 0.180657,
           "sentence_id": 16,
           "active_handlers": 7
         }
@@ -547,7 +546,7 @@
           "sub-v": "left"
         },
         "meta": {
-          "processing_time": 0.177932,
+          "processing_time": 0.179944,
           "sentence_id": 17,
           "active_handlers": 7
         }
@@ -582,7 +581,7 @@
           "sub-o1": "it"
         },
         "meta": {
-          "processing_time": 0.183251,
+          "processing_time": 0.197541,
           "sentence_id": 18,
           "active_handlers": 7
         }
@@ -618,7 +617,7 @@
           "sub-m2": "yesterday"
         },
         "meta": {
-          "processing_time": 0.17463,
+          "processing_time": 0.179134,
           "sentence_id": 19,
           "active_handlers": 7
         }
@@ -650,7 +649,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.151582,
+          "processing_time": 0.159601,
           "sentence_id": 20,
           "active_handlers": 7
         }
@@ -678,7 +677,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.159152,
+          "processing_time": 0.158119,
           "sentence_id": 21,
           "active_handlers": 7
         }
@@ -706,7 +705,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.161005,
+          "processing_time": 0.180905,
           "sentence_id": 22,
           "active_handlers": 7
         }
@@ -734,7 +733,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.190471,
+          "processing_time": 0.247033,
           "sentence_id": 23,
           "active_handlers": 7
         }
@@ -762,7 +761,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.178297,
+          "processing_time": 0.220862,
           "sentence_id": 24,
           "active_handlers": 7
         }
@@ -790,7 +789,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.16739,
+          "processing_time": 0.213368,
           "sentence_id": 25,
           "active_handlers": 7
         }
@@ -818,7 +817,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.156423,
+          "processing_time": 0.268844,
           "sentence_id": 26,
           "active_handlers": 7
         }
@@ -846,7 +845,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.150346,
+          "processing_time": 0.175497,
           "sentence_id": 27,
           "active_handlers": 7
         }
@@ -878,7 +877,7 @@
           "sub-o1": "everything"
         },
         "meta": {
-          "processing_time": 0.175908,
+          "processing_time": 0.183644,
           "sentence_id": 28,
           "active_handlers": 7
         }
@@ -910,7 +909,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.19102,
+          "processing_time": 0.188914,
           "sentence_id": 29,
           "active_handlers": 7
         }
@@ -938,7 +937,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.161298,
+          "processing_time": 0.169762,
           "sentence_id": 30,
           "active_handlers": 7
         }
@@ -971,7 +970,7 @@
           "sub-m3": "by Shakespeare"
         },
         "meta": {
-          "processing_time": 0.257459,
+          "processing_time": 0.406616,
           "sentence_id": 31,
           "active_handlers": 7
         }
@@ -1009,7 +1008,7 @@
           "sub-m3": "yesterday"
         },
         "meta": {
-          "processing_time": 0.238668,
+          "processing_time": 0.278572,
           "sentence_id": 32,
           "active_handlers": 7
         }
@@ -1047,7 +1046,7 @@
           "sub-m3": "by the secretary"
         },
         "meta": {
-          "processing_time": 0.297043,
+          "processing_time": 0.331206,
           "sentence_id": 33,
           "active_handlers": 7
         }
@@ -1084,7 +1083,7 @@
           "sub-m2": "diligently"
         },
         "meta": {
-          "processing_time": 0.333288,
+          "processing_time": 0.293683,
           "sentence_id": 34,
           "active_handlers": 7
         }
@@ -1120,7 +1119,7 @@
           "sub-m2": "efficiently"
         },
         "meta": {
-          "processing_time": 0.311012,
+          "processing_time": 0.258907,
           "sentence_id": 35,
           "active_handlers": 7
         }
@@ -1156,7 +1155,7 @@
           "sub-m2": "carefully"
         },
         "meta": {
-          "processing_time": 0.261712,
+          "processing_time": 0.235258,
           "sentence_id": 36,
           "active_handlers": 7
         }
@@ -1189,7 +1188,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.23557,
+          "processing_time": 0.244193,
           "sentence_id": 37,
           "active_handlers": 7
         }
@@ -1219,7 +1218,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.255665,
+          "processing_time": 0.307811,
           "sentence_id": 38,
           "active_handlers": 7
         }
@@ -1249,7 +1248,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.246954,
+          "processing_time": 0.256653,
           "sentence_id": 39,
           "active_handlers": 7
         }
@@ -1282,7 +1281,7 @@
           "sub-m2": "badly"
         },
         "meta": {
-          "processing_time": 0.291036,
+          "processing_time": 0.263583,
           "sentence_id": 40,
           "active_handlers": 7
         }
@@ -1318,7 +1317,7 @@
           "sub-m3": "accidentally"
         },
         "meta": {
-          "processing_time": 0.271809,
+          "processing_time": 0.264468,
           "sentence_id": 41,
           "active_handlers": 7
         }
@@ -1354,7 +1353,7 @@
           "sub-m3": "dramatically"
         },
         "meta": {
-          "processing_time": 0.266706,
+          "processing_time": 0.260382,
           "sentence_id": 42,
           "active_handlers": 7
         }
@@ -1387,7 +1386,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.329608,
+          "processing_time": 0.281971,
           "sentence_id": 43,
           "active_handlers": 7
         }
@@ -1418,7 +1417,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.270866,
+          "processing_time": 0.276925,
           "sentence_id": 44,
           "active_handlers": 7
         }
@@ -1449,7 +1448,7 @@
         },
         "sub_slots": {},
         "meta": {
-          "processing_time": 0.228728,
+          "processing_time": 0.288563,
           "sentence_id": 45,
           "active_handlers": 7
         }
@@ -1484,7 +1483,7 @@
           "sub-m3": "by experts"
         },
         "meta": {
-          "processing_time": 0.308086,
+          "processing_time": 0.351977,
           "sentence_id": 46,
           "active_handlers": 7
         }
@@ -1522,7 +1521,7 @@
           "sub-m2": "carefully"
         },
         "meta": {
-          "processing_time": 0.335732,
+          "processing_time": 0.499972,
           "sentence_id": 47,
           "active_handlers": 7
         }
@@ -1559,7 +1558,7 @@
           "sub-m2": "properly"
         },
         "meta": {
-          "processing_time": 0.306811,
+          "processing_time": 0.331671,
           "sentence_id": 48,
           "active_handlers": 7
         }
@@ -1596,7 +1595,7 @@
           "sub-m2": "overtime"
         },
         "meta": {
-          "processing_time": 0.303461,
+          "processing_time": 0.349904,
           "sentence_id": 49,
           "active_handlers": 7
         }
@@ -1632,7 +1631,7 @@
           "sub-m3": "near the door"
         },
         "meta": {
-          "processing_time": 0.315077,
+          "processing_time": 0.363554,
           "sentence_id": 50,
           "active_handlers": 7
         }
@@ -1668,7 +1667,7 @@
           "sub-m3": "in the garden"
         },
         "meta": {
-          "processing_time": 0.320535,
+          "processing_time": 0.368983,
           "sentence_id": 51,
           "active_handlers": 7
         }
@@ -1704,7 +1703,7 @@
           "sub-m2": "thoroughly"
         },
         "meta": {
-          "processing_time": 0.253456,
+          "processing_time": 0.319555,
           "sentence_id": 52,
           "active_handlers": 7
         }
@@ -1741,7 +1740,7 @@
           "sub-m2": "internationally"
         },
         "meta": {
-          "processing_time": 0.377987,
+          "processing_time": 0.422721,
           "sentence_id": 53,
           "active_handlers": 7
         }
