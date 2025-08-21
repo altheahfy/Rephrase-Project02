@@ -640,7 +640,7 @@ class UnifiedStanzaRephraseMapper:
         
         # ハンドラー間共有コンテキスト初期化
         self.handler_shared_context = {
-            'occupied_main_slots': set(),  # 占有済み上位スロット
+            'predefined_slots': {},        # 事前確定スロット
             'remaining_elements': {},      # 残り要素情報
             'handler_metadata': {}         # ハンドラー別メタデータ
         }
@@ -1133,7 +1133,7 @@ class UnifiedStanzaRephraseMapper:
         """
         # デフォルト値設定
         if shared_context is None:
-            shared_context = {'occupied_main_slots': set(), 'handler_metadata': {}}
+            shared_context = {'predefined_slots': {}, 'handler_metadata': {}}
             
         try:
             self.logger.debug("🔍 関係節ハンドラー実行中...")
@@ -1310,15 +1310,25 @@ class UnifiedStanzaRephraseMapper:
                 result['slot_positions'][sub_slot_name] = antecedent_position
                 self.logger.debug(f"📍 位置情報記録[汎用システム]: {sub_slot_name} → {antecedent_position}位置 (先行詞: {antecedent.text})")
             
-            # 🤝 ハンドラー間情報共有: 占有済み上位スロットを記録
+            # 🤝 ハンドラー間情報共有: 具体的なスロット値を提供（あなたの正しいアプローチ）
             if shared_context is not None and antecedent_position:
-                shared_context['occupied_main_slots'].add(antecedent_position)
+                # ❌ 旧方式: 占有情報のみ（スキップ方式）
+                # shared_context['occupied_main_slots'].add(antecedent_position)
+                
+                # ✅ 新方式: 具体的なスロット値を提供
+                if 'predefined_slots' not in shared_context:
+                    shared_context['predefined_slots'] = {}
+                
+                # 関係節により該当位置は空文字列に確定
+                shared_context['predefined_slots'][antecedent_position] = ""
+                
                 shared_context['handler_metadata']['relative_clause'] = {
                     'occupied_slot': antecedent_position,
                     'antecedent': antecedent.text,
-                    'processed_sub_slots': list(rephrase_slots.get('sub_slots', {}).keys())
+                    'processed_sub_slots': list(rephrase_slots.get('sub_slots', {}).keys()),
+                    'predefined_value': ""  # 明示的に空文字列を設定
                 }
-                self.logger.debug(f"🤝 ハンドラー間共有: 関係節が{antecedent_position}スロットを占有")
+                self.logger.debug(f"🤝 ハンドラー間共有: 関係節により{antecedent_position}=\"\" を確定")
             
             # 汎用スロット管理システムを適用
             self._apply_rephrase_slot_structure_rules(result)
@@ -2139,15 +2149,20 @@ class UnifiedStanzaRephraseMapper:
         """
         # デフォルト値設定
         if shared_context is None:
-            shared_context = {'occupied_main_slots': set(), 'handler_metadata': {}}
+            shared_context = {'predefined_slots': {}, 'handler_metadata': {}}
             
         try:
             self.logger.debug("🔍 5文型ハンドラー実行中...")
             
-            # 🤝 ハンドラー間情報共有: 占有済み上位スロットをチェック
-            occupied_slots = shared_context.get('occupied_main_slots', set())
-            if occupied_slots:
-                self.logger.debug(f"🤝 占有済みスロット検出: {occupied_slots} - 部分的パターン検出を実行")
+            # 🤝 ハンドラー間情報共有: 事前確定されたスロット値をチェック（あなたの正しいアプローチ）
+            predefined_slots = shared_context.get('predefined_slots', {})
+            if predefined_slots:
+                self.logger.debug(f"🤝 事前確定スロット検出: {predefined_slots} - これらの値を使用して残りを分解")
+            
+            # ❌ 旧方式: 占有情報によるスキップ方式（削除）
+            # occupied_slots = shared_context.get('occupied_main_slots', set())
+            # if occupied_slots:
+            #     self.logger.debug(f"🤝 占有済みスロット検出: {occupied_slots} - 部分的パターン検出を実行")
             
             # 分詞構文制御フラグをチェック
             grammar_info = base_result.get('grammar_info', {})
@@ -2164,13 +2179,13 @@ class UnifiedStanzaRephraseMapper:
                 self.logger.debug("  主文動詞(V)が処理済み - スキップ")
                 return None
             
-            return self._process_basic_five_pattern_structure(sentence, base_result, occupied_slots)
+            return self._process_basic_five_pattern_structure(sentence, base_result, predefined_slots)
             
         except Exception as e:
             self.logger.warning(f"⚠️ 5文型ハンドラーエラー: {e}")
             return None
     
-    def _process_basic_five_pattern_structure(self, sentence, base_result: Dict, occupied_slots: set = None) -> Dict:
+    def _process_basic_five_pattern_structure(self, sentence, base_result: Dict, predefined_slots: dict = None) -> Dict:
         """基本5文型構造の分解処理（ハイブリッド解析対応）"""
         
         # ✅ ハイブリッド解析補正情報を優先的に利用
@@ -2230,7 +2245,7 @@ class UnifiedStanzaRephraseMapper:
             self.logger.debug("🔄 whose構文: 上位サブ連結システムに処理委託")
 
         # 基本5文型パターン検出
-        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations, occupied_slots, sentence)
+        pattern_result = self._detect_basic_five_pattern(root_word, dep_relations, predefined_slots, sentence)
         if not pattern_result:
             return base_result
         
@@ -2242,7 +2257,7 @@ class UnifiedStanzaRephraseMapper:
             result['sub_slots'] = {}
         
         five_pattern_slots = self._generate_basic_five_slots(
-            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, occupied_slots
+            pattern_result['pattern'], pattern_result['mapping'], dep_relations, sentence, predefined_slots
         )
         
         result['slots'].update(five_pattern_slots.get('slots', {}))
@@ -2327,8 +2342,8 @@ class UnifiedStanzaRephraseMapper:
         """ROOT語を検索"""
         return next((w for w in sentence.words if w.head == 0), None)
     
-    def _detect_basic_five_pattern(self, root_word, dep_relations, occupied_slots: set = None, sentence=None):
-        """基本5文型パターン検出（ハンドラー間情報共有対応）"""
+    def _detect_basic_five_pattern(self, root_word, dep_relations, predefined_slots: dict = None, sentence=None):
+        """基本5文型パターン検出（事前確定スロット対応）"""
         
         # 🔧 人間文法修正チェック: 動詞/名詞同形語が修正された場合の特別処理
         if sentence and hasattr(sentence, 'hybrid_corrections') and sentence.hybrid_corrections:
@@ -2344,9 +2359,9 @@ class UnifiedStanzaRephraseMapper:
                         'human_grammar_override': True
                     }
         
-        # 占有済みスロットのデフォルト値
-        if occupied_slots is None:
-            occupied_slots = set()
+        # 事前確定スロットのデフォルト値
+        if predefined_slots is None:
+            predefined_slots = {}
         
         # 基本5文型パターン定義（詳細→単純の順序で検出）
         patterns = {
@@ -2400,57 +2415,24 @@ class UnifiedStanzaRephraseMapper:
             }
         }
         
-        # 占有済みスロットがある場合、部分的パターン検出を実行
-        if occupied_slots:
-            self.logger.debug(f"🤝 部分的パターン検出: 除外スロット={occupied_slots}")
-            patterns = self._filter_patterns_by_occupied_slots(patterns, occupied_slots)
+        # 事前確定スロットがある場合、それらを考慮してパターンマッチング
+        if predefined_slots:
+            self.logger.debug(f"🤝 事前確定スロットを考慮: {predefined_slots}")
             
-        # パターンマッチング
+        # パターンマッチング（事前確定スロットに関係なく、すべてのパターンを試行）
         for pattern_name, pattern_info in patterns.items():
-            if self._matches_five_pattern(pattern_info, dep_relations, root_word, occupied_slots):
+            if self._matches_five_pattern(pattern_info, dep_relations, root_word, predefined_slots):
                 return {
                     'pattern': pattern_name,
                     'mapping': pattern_info['mapping'],
-                    'confidence': 0.9
+                    'confidence': 0.9,
+                    'predefined_slots': predefined_slots  # 事前確定スロット情報を含める
                 }
         
         return None
     
-    def _filter_patterns_by_occupied_slots(self, patterns, occupied_slots):
-        """占有済みスロットに基づいてパターンをフィルタリング"""
-        filtered_patterns = {}
-        
-        for pattern_name, pattern_info in patterns.items():
-            # このパターンのマッピングで占有済みスロットに該当するものを除外
-            mapping = pattern_info['mapping']
-            conflicting_deps = []
-            
-            for dep, slot in mapping.items():
-                if slot in occupied_slots:
-                    conflicting_deps.append(dep)
-            
-            if conflicting_deps:
-                # 占有済みスロットと競合する依存関係を除外した新しいパターンを作成
-                new_mapping = {dep: slot for dep, slot in mapping.items() if dep not in conflicting_deps}
-                new_required = [req for req in pattern_info['required'] if req not in conflicting_deps]
-                
-                # 空文字にするのではなく、そのパターン自体を除外
-                if new_mapping and (new_required or 'root' in new_mapping):
-                    filtered_patterns[f"{pattern_name}_PARTIAL"] = {
-                        "required": new_required,
-                        "optional": pattern_info['optional'],
-                        "root_pos": pattern_info['root_pos'],
-                        "mapping": new_mapping
-                    }
-                    self.logger.debug(f"🔧 部分パターン生成: {pattern_name} → {pattern_name}_PARTIAL, マッピング={new_mapping}")
-            else:
-                # 競合なしの場合はそのまま使用
-                filtered_patterns[pattern_name] = pattern_info
-        
-        return filtered_patterns
-    
-    def _matches_five_pattern(self, pattern_info, dep_relations, root_word, occupied_slots: set = None):
-        """5文型パターンマッチング（占有済みスロット対応）"""
+    def _matches_five_pattern(self, pattern_info, dep_relations, root_word, predefined_slots: dict = None):
+        """5文型パターンマッチング（事前確定スロット対応）"""
         # 必要な依存関係の確認
         for rel in pattern_info['required']:
             if rel not in dep_relations:
@@ -2499,19 +2481,24 @@ class UnifiedStanzaRephraseMapper:
         
         return result
     
-    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, occupied_slots=None):
-        """基本5文型スロット生成（修飾語句対応強化、占有スロット考慮）"""
+    def _generate_basic_five_slots(self, pattern, mapping, dep_relations, sentence, predefined_slots=None):
+        """基本5文型スロット生成（事前確定スロット対応）"""
         slots = {}
         sub_slots = {}
         
-        if occupied_slots is None:
-            occupied_slots = set()
+        if predefined_slots is None:
+            predefined_slots = {}
         
-        # マッピングに従ってスロット生成
+        # 🤝 事前確定スロットを最優先で設定
+        for slot_name, slot_value in predefined_slots.items():
+            slots[slot_name] = slot_value
+            self.logger.debug(f"🤝 事前確定スロット設定: {slot_name} = '{slot_value}'")
+        
+        # マッピングに従ってスロット生成（事前確定されていないスロットのみ）
         for dep_rel, slot in mapping.items():
-            # ✅ 占有済みスロットはスキップ
-            if slot in occupied_slots:
-                self.logger.debug(f"🚫 占有済みスロット: {slot} (他ハンドラーが処理済み)")
+            # ✅ 事前確定済みスロットはスキップ
+            if slot in predefined_slots:
+                self.logger.debug(f"🚫 事前確定済みスロット: {slot} (関係節ハンドラーが処理済み)")
                 continue
                 
             if dep_rel == "root":
