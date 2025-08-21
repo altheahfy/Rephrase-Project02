@@ -157,7 +157,7 @@ class UnifiedStanzaRephraseMapper:
             'basic_five_pattern',     # 基本5文型
             'relative_clause',        # 関係節
             'passive_voice',          # 受動態  
-            'participle_construction', # 分詞構文（副詞処理より先）
+            # 'participle_construction', # 分詞構文（副詞処理より先） - Phase 1基準点のため無効化
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
             'conjunction',            # 接続詞（"as if"等）
