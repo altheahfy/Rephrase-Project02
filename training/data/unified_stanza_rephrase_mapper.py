@@ -158,7 +158,6 @@ class UnifiedStanzaRephraseMapper:
             'relative_clause',        # 関係節
             'passive_voice',          # 受動態  
             'participle_construction', # 分詞構文（副詞処理より先）
-            'adverbial_construction', # 副詞構文（Phase 2新規追加）
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
             'conjunction',            # 接続詞（"as if"等）
@@ -4014,48 +4013,6 @@ class UnifiedStanzaRephraseMapper:
         self.logger.debug(f"  汎用分詞処理完了: slots={slots}, sub_slots={sub_slots}")
         return result
     
-    def _analyze_adverbial_structure(self, sentence) -> Optional[Dict]:
-        """副詞構文の分析 - AdverbialPatternと統合"""
-        try:
-            # AdverbialPatternを使用した検出
-            from engines.patterns.adverbial_pattern import AdverbialPattern
-            
-            adverbial_pattern = AdverbialPattern()
-            
-            # Sentenceオブジェクトを含むダミーDocumentを作成
-            class DummyDoc:
-                def __init__(self, sentence):
-                    self.sentences = [sentence]
-                    
-            doc = DummyDoc(sentence)
-            print(f"DEBUG: AdverbialPattern analysis_doc作成成功: {type(doc)}")
-            
-            # 新しいBasePatternインターフェースに対応
-            detection_result = adverbial_pattern.detect(doc, sentence.text)
-            print(f"DEBUG: AdverbialPattern検出結果: {detection_result}")
-            
-            if not detection_result.get('found', False):
-                print("DEBUG: AdverbialPattern検出失敗")
-                return None
-                
-            print("DEBUG: AdverbialPattern検出成功")
-            
-            adverbial_info = {
-                'adverb_type': detection_result.get('adverb_type', 'complex'),
-                'pattern_data': detection_result.get('pattern_data', {}),
-                'confidence': detection_result.get('confidence', 0.0),
-                'adverb_phrase': detection_result.get('pattern_data', {}).get('phrase', ''),
-                'intensifier': detection_result.get('pattern_data', {}).get('intensifier', ''),
-                'target_adverb': detection_result.get('pattern_data', {}).get('target_adverb', ''),
-                'modifiers': []
-            }
-            
-            return adverbial_info
-            
-        except Exception as e:
-            self.logger.warning(f"⚠️ 副詞構文分析エラー: {e}")
-            return None
-    
     def _is_standalone_participle(self, sentence, subject, participle_verb) -> bool:
         """分詞が独立した修飾語か（Case 49パターン）を判定"""
         # メイン動詞が存在し、分詞とは別の場合は独立分詞
@@ -4582,114 +4539,6 @@ class UnifiedStanzaRephraseMapper:
         # ID順ソート（語順保持）
         noun_words.sort(key=lambda w: w.id)
         return ' '.join(w.text for w in noun_words)
-
-    # =============================================================================
-    # 副詞構文処理ハンドラー (Phase 2)
-    # =============================================================================
-    
-    def _handle_adverbial_construction(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
-        """
-        副詞構文処理ハンドラー (Phase 2) - AdverbialPatternと統合
-        
-        Args:
-            sentence: Stanza解析済み文
-            base_result: ベース結果（コピー）
-            shared_context: 共有コンテキスト
-            
-        Returns:
-            Dict: 副詞構文分解結果 or None
-        """
-        print("ADVERBIAL HANDLER CALLED")
-        try:
-            self.logger.debug("副詞構文ハンドラー実行中...")
-            
-            # 副詞構文パターンの検出
-            adverbial_info = self._analyze_adverbial_structure(sentence)
-            print(f"ADVERBIAL INFO: {adverbial_info}")
-            if not adverbial_info:
-                self.logger.debug("  副詞構文なし - スキップ")
-                return None
-                
-            self.logger.debug("  副詞構文検出")
-            print("PROCESSING ADVERBIAL")
-            return self._process_adverbial_construction(sentence, adverbial_info, base_result)
-            
-        except Exception as e:
-            self.logger.warning(f"⚠️ 副詞構文ハンドラーエラー: {e}")
-            return None
-    
-    def _process_adverbial_construction(self, sentence, adverbial_info: Dict, base_result: Dict) -> Dict:
-        """副詞構文の処理 - AdverbialPatternのcorrect()メソッドと統合"""
-        
-        try:
-            # AdverbialPatternを使用したスロット修正
-            from engines.patterns.adverbial_pattern import AdverbialPattern
-            
-            adverbial_pattern = AdverbialPattern()
-            
-            # Sentenceオブジェクトを含むダミーDocumentを作成
-            class DummyDoc:
-                def __init__(self, sentence):
-                    self.sentences = [sentence]
-                    
-            doc = DummyDoc(sentence)
-            
-            # 検出結果を再構成
-            detection_result = {
-                'found': True,
-                'confidence': adverbial_info.get('confidence', 0.85),
-                'pattern_data': adverbial_info.get('pattern_data', {})
-            }
-            
-            # AdverbialPatternのcorrect()メソッドを適用
-            corrected_doc, correction_metadata = adverbial_pattern.correct(doc, detection_result)
-            
-            # 結果作成
-            result = base_result.copy()
-            
-            # base_resultのスロットを取得
-            slots = result.get('slots', {}).copy()
-            
-            # 副詞句をM2スロットに追加（既存のadverbial_modifierと同じ動作）
-            adverb_phrase = adverbial_info.get('adverb_phrase', '')
-            if adverb_phrase:
-                if 'M2' not in slots or not slots['M2']:
-                    slots['M2'] = adverb_phrase
-                else:
-                    # 既存のM2に追加
-                    slots['M2'] = f"{slots['M2']} {adverb_phrase}"
-            
-            result['slots'] = slots
-            
-            # サブスロット処理
-            sub_slots = result.get('sub_slots', {})
-            if adverb_phrase:
-                sub_slots['sub-m2'] = adverb_phrase
-            result['sub_slots'] = sub_slots
-            
-            # ハンドラー情報を記録
-            grammar_info = result.get('grammar_info', {})
-            grammar_info['detected_patterns'] = grammar_info.get('detected_patterns', [])
-            if 'adverbial_construction' not in grammar_info['detected_patterns']:
-                grammar_info['detected_patterns'].append('adverbial_construction')
-            
-            # 制御フラグ設定
-            grammar_info['control_flags'] = grammar_info.get('control_flags', {})
-            grammar_info['control_flags']['adverbial_detected'] = True
-            grammar_info['control_flags']['adverb_type'] = adverbial_info.get('adverb_type', 'complex')
-            
-            # AdverbialPatternからの修正メタデータを統合
-            if correction_metadata:
-                grammar_info['adverbial_correction'] = correction_metadata
-            
-            result['grammar_info'] = grammar_info
-            
-            self.logger.debug(f"  副詞構文処理完了: slots={slots}, phrase='{adverb_phrase}'")
-            return result
-            
-        except Exception as e:
-            self.logger.warning(f"⚠️ 副詞構文処理エラー: {e}")
-            return base_result
 
     # =============================================================================
     # 助動詞複合体処理ハンドラー (Phase 3)
