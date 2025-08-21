@@ -2538,6 +2538,12 @@ class UnifiedStanzaRephraseMapper:
                 continue
                 
             if dep_rel == "root":
+                # 🔄 事前確定スロットチェック: ROOT語処理前に事前確定スロット情報を確認
+                if slot in predefined_slots:
+                    self.logger.debug(f"🤝 事前確定スロット優先: {slot} = '{predefined_slots[slot]}' (ROOT語処理スキップ)")
+                    slots[slot] = predefined_slots[slot]
+                    continue  # ROOT語処理をスキップ
+                
                 # ROOT語の処理（動詞は通常修飾語なしなので単語のみ）
                 root_word = self._find_root_word(sentence)
                 if root_word:
@@ -2553,6 +2559,12 @@ class UnifiedStanzaRephraseMapper:
                     else:
                         self.logger.debug(f"🚫 空文字スロット防止: {slot} (ROOT語が空)")
             elif dep_rel in dep_relations:
+                # 🔄 事前確定スロットチェック: 依存関係語処理前に事前確定スロット情報を確認
+                if slot in predefined_slots:
+                    self.logger.debug(f"🤝 事前確定スロット優先: {slot} = '{predefined_slots[slot]}' (依存関係語処理スキップ)")
+                    slots[slot] = predefined_slots[slot]
+                    continue  # 依存関係語処理をスキップ
+                
                 # 依存関係語の処理（修飾語句を含む完全な句を構築）
                 words = dep_relations[dep_rel]
                 if words:
