@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "input_file": "test_whose_fix.json",
+    "processed_at": "2025-08-21T16:48:30.724116",
+    "total_sentences": 1,
+    "success_count": 1,
+    "error_count": 0
+  },
+  "results": {
+    "12": {
+      "sentence": "The man whose car is red lives here.",
+      "analysis_result": {
+        "sentence": "The man whose car is red lives here.",
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "C1": "The man",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "meta": {
+          "processing_time": 0.214573,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "S": "",
+        "V": "lives",
+        "C1": "",
+        "sub-s": "The man whose car",
+        "sub-aux": "",
+        "sub-v": "is",
+        "sub-c1": "red"
+      },
+      "status": "success"
+    }
+  }
+}

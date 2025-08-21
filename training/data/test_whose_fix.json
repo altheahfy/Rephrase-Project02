@@ -1,0 +1,14 @@
+{
+  "test_cases": [
+    {
+      "id": "whose_fix_test_1",
+      "input": "The man whose car is red lives here.",
+      "expected_output": {
+        "S": "The man",
+        "V": "lives",
+        "A": "here"
+      },
+      "description": "whose構文でlives動詞が正しく認識されるかのテスト"
+    }
+  ]
+}
