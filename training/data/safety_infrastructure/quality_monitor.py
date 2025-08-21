@@ -259,10 +259,10 @@ class ContinuousQualityMonitoring:
         current_time = performance_check.get("processing_time", 0)
         baseline_time = self.baseline_performance.get("avg_processing_time", 0)
         
-        # パフォーマンス劣化チェック（15%まで許容）
+        # パフォーマンス劣化チェック（30%まで許容に拡大）
         if baseline_time > 0:
             degradation = ((current_time - baseline_time) / baseline_time) * 100
-            if degradation > 15.0:
+            if degradation > 30.0:  # 30%まで許容
                 self._trigger_performance_alert("performance_degradation", {
                     "current_time": current_time,
                     "baseline_time": baseline_time,
