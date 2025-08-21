@@ -157,7 +157,7 @@ class UnifiedStanzaRephraseMapper:
             'basic_five_pattern',     # 基本5文型
             'relative_clause',        # 関係節
             'passive_voice',          # 受動態  
-            # 'participle_construction', # 分詞構文（副詞処理より先） - Phase 1基準点のため無効化
+            # 'participle_construction', # 分詞構文（副詞処理より先）- 依存関係エラーのため一時無効化
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
             'conjunction',            # 接続詞（"as if"等）
@@ -699,7 +699,7 @@ class UnifiedStanzaRephraseMapper:
         
         # 優先順位テーブル（ハンドラー間情報共有のため、関係節を5文型より前に実行）
         priority_order = [
-            'participle_construction',  # 最優先：分詞構文が制御フラグを設定
+            # 'participle_construction',  # 最優先：分詞構文が制御フラグを設定 - 一時無効化
             'relative_clause',          # 上位スロット占有情報を提供
             'basic_five_pattern',       # 占有済みスロット情報を受け取る
             'passive_voice',

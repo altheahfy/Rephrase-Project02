@@ -16,13 +16,10 @@ Phase 2 Component: 予想効果 +7%
 import re
 import logging
 from typing import Dict, List, Tuple, Any, Optional
-from ..base_patterns import GrammarPattern
-from ..universal_manager import UniversalSlotPositionManager
 
 
-class ParticiplePattern(GrammarPattern):
+class ParticiplePattern:
     def __init__(self):
-        super().__init__(pattern_name="participle_clause")
         self.participle_markers = {
             'present': ['working', 'standing', 'running', 'sitting', 'walking', 'talking', 'being'],
             'past': ['written', 'spoken', 'broken', 'given', 'taken', 'made', 'done', 'seen'],
@@ -80,17 +77,11 @@ class ParticiplePattern(GrammarPattern):
         if not self.detect(analysis_doc, sentence):
             return None
             
-        # UniversalSlotPositionManagerによる基本処理
-        manager = UniversalSlotPositionManager()
-        base_result = manager.process_all_patterns(analysis_doc, sentence)
-        
-        if not isinstance(base_result, tuple) or len(base_result) != 2:
-            return None
-            
-        unified_result, confidence = base_result
-        
-        # JSONシリアライズ可能な形式に変換
-        clean_result = self._make_json_safe(unified_result)
+        # 簡単な分詞構文処理結果を返す
+        return {
+            'participle_detected': True,
+            'pattern_type': 'participle_construction'
+        }
         
         # 分詞構文の特殊処理
         enhanced_result = self._enhance_participle_slots(analysis_doc, clean_result, sentence)
