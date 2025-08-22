@@ -572,36 +572,156 @@ class DynamicGrammarMapper:
             'analysis_method': 'dynamic_grammar'
         }
 
-# テスト用のメイン関数
+# テスト用のメイン関数とテストスイート
+def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
+    """
+    53例文の完全テストを実行
+    
+    Args:
+        test_data_path: テストデータファイルのパス
+        
+    Returns:
+        Dict: テスト結果
+    """
+    import json
+    import os
+    from datetime import datetime
+    
+    if test_data_path is None:
+        test_data_path = os.path.join(
+            os.path.dirname(__file__),
+            "final_test_system",
+            "final_54_test_data.json"
+        )
+    
+    try:
+        with open(test_data_path, 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ テストデータファイルが見つかりません: {test_data_path}")
+        return {}
+    
+    mapper = DynamicGrammarMapper()
+    results = {
+        "timestamp": datetime.now().isoformat(),
+        "test_system": "dynamic_grammar_mapper",
+        "total_tests": len(test_data["data"]),
+        "successful_tests": 0,
+        "failed_tests": 0,
+        "test_results": {}
+    }
+    
+    print("=== 動的文法認識システム 53例文テスト ===\n")
+    
+    for test_id, test_case in test_data["data"].items():
+        sentence = test_case["sentence"]
+        expected = test_case["expected"]
+        
+        print(f"テスト {test_id}: {sentence}")
+        
+        try:
+            result = mapper.analyze_sentence(sentence)
+            
+            if 'error' in result:
+                print(f"❌ エラー: {result['error']}")
+                results["failed_tests"] += 1
+                status = "ERROR"
+            else:
+                print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
+                print(f"📊 スロット: {result['Slot']}")
+                results["successful_tests"] += 1
+                status = "SUCCESS"
+            
+            results["test_results"][test_id] = {
+                "sentence": sentence,
+                "expected": expected,
+                "actual": result,
+                "status": status
+            }
+            
+        except Exception as e:
+            print(f"❌ 例外エラー: {str(e)}")
+            results["failed_tests"] += 1
+            results["test_results"][test_id] = {
+                "sentence": sentence,
+                "expected": expected,
+                "actual": {"error": str(e)},
+                "status": "EXCEPTION"
+            }
+        
+        print("-" * 60)
+    
+    # 結果サマリー
+    success_rate = results["successful_tests"] / results["total_tests"] * 100
+    print(f"\n=== テスト結果サマリー ===")
+    print(f"総テスト数: {results['total_tests']}")
+    print(f"成功: {results['successful_tests']}")
+    print(f"失敗: {results['failed_tests']}")
+    print(f"成功率: {success_rate:.1f}%")
+    
+    return results
+
+def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
+    """
+    テスト結果をJSONファイルに保存
+    
+    Args:
+        results: テスト結果
+        output_path: 出力ファイルパス（None の場合は自動生成）
+        
+    Returns:
+        str: 保存されたファイルパス
+    """
+    import json
+    from datetime import datetime
+    
+    if output_path is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"dynamic_grammar_test_results_{timestamp}.json"
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    
+    print(f"📁 テスト結果を保存しました: {output_path}")
+    return output_path
+
 def main():
     """動的文法認識システムのテスト"""
-    mapper = DynamicGrammarMapper()
+    import sys
     
-    test_sentences = [
-        "The car is red.",
-        "I love you.",
-        "He has finished his homework.",
-        "The students study hard for exams.",
-        "The teacher explains grammar clearly to confused students daily.",
-        "She made him very happy yesterday.",
-        "The man who runs fast is strong."
-    ]
-    
-    print("=== 動的文法認識システム テスト ===\n")
-    
-    for sentence in test_sentences:
-        print(f"📝 テスト文: '{sentence}'")
-        result = mapper.analyze_sentence(sentence)
+    if len(sys.argv) > 1 and sys.argv[1] == "--full-test":
+        # 53例文の完全テスト
+        results = run_full_test_suite()
+        save_test_results(results)
+    else:
+        # 簡易テスト
+        mapper = DynamicGrammarMapper()
         
-        if 'error' in result:
-            print(f"❌ エラー: {result['error']}")
-        else:
-            print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
-            print(f"📊 スロット: {result['Slot']}")
-            print(f"📄 フレーズ: {result['SlotPhrase']}")
-            print(f"🎯 信頼度: {result.get('confidence', 0.0)}")
+        test_sentences = [
+            "The car is red.",
+            "I love you.",
+            "He has finished his homework.",
+            "The students study hard for exams.",
+            "The teacher explains grammar clearly to confused students daily.",
+            "She made him very happy yesterday.",
+            "The man who runs fast is strong."
+        ]
         
-        print("-" * 50)
+        print("=== 動的文法認識システム 簡易テスト ===\n")
+        
+        for sentence in test_sentences:
+            print(f"📝 テスト文: '{sentence}'")
+            result = mapper.analyze_sentence(sentence)
+            
+            if 'error' in result:
+                print(f"❌ エラー: {result['error']}")
+            else:
+                print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
+                print(f"📊 スロット: {result['Slot']}")
+                print(f"📄 フレーズ: {result['SlotPhrase']}")
+                print(f"🎯 信頼度: {result.get('confidence', 0.0)}")
+            
+            print("-" * 50)
 
 if __name__ == "__main__":
     main()
