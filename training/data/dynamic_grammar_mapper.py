@@ -475,7 +475,7 @@ class DynamicGrammarMapper:
                 elements.append(GrammarElement(
                     text=token['text'],
                     tokens=[token],
-                    role='C1',
+                    role='C2',  # 🔧 SVOCのCはC2に修正
                     start_idx=i,
                     end_idx=i,
                     confidence=0.85
