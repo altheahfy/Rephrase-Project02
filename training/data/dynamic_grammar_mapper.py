@@ -440,7 +440,7 @@ class DynamicGrammarMapper:
         return elements
     
     def _assign_svoo_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
-        """SVOO文型の要素を割り当て - 複合句対応"""
+        """SVOO文型の要素を割り当て - O1/O2分離対応"""
         elements = []
         o1_assigned = False
         o2_assigned = False
@@ -456,21 +456,32 @@ class DynamicGrammarMapper:
                 continue
             
             if not o1_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
-                # O1として複合句を検出（冠詞から始まる場合も含む）
-                phrase_indices, phrase_text = self._find_noun_phrase(remaining_tokens, i)
-                if phrase_indices:
+                # SVOO文型のO1は通常単一語（代名詞など）
+                if token['pos'] == 'PRON':
+                    # 代名詞の場合は単語のみでO1
                     elements.append(GrammarElement(
-                        text=phrase_text,
-                        tokens=[remaining_tokens[j][1] for j in range(i, i + len(phrase_indices))],
+                        text=token['text'],
+                        tokens=[token],
                         role='O1',
-                        start_idx=min(phrase_indices),
-                        end_idx=max(phrase_indices),
+                        start_idx=idx,
+                        end_idx=idx,
+                        confidence=0.9
+                    ))
+                    used_indices.add(idx)
+                    o1_assigned = True
+                    i += 1
+                else:
+                    # 代名詞以外も単語のみでO1として扱う
+                    elements.append(GrammarElement(
+                        text=token['text'],
+                        tokens=[token],
+                        role='O1',
+                        start_idx=idx,
+                        end_idx=idx,
                         confidence=0.85
                     ))
-                    used_indices.update(phrase_indices)
+                    used_indices.add(idx)
                     o1_assigned = True
-                    i += len(phrase_indices)
-                else:
                     i += 1
             elif not o2_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
                 # O2として複合句を検出（冠詞から始まる場合も含む）
@@ -627,8 +638,7 @@ class DynamicGrammarMapper:
         for i, element in enumerate(elements):
             # スロット名の調整
             slot_name = element.role
-            if slot_name == 'O1':
-                slot_name = 'O'  # Rephraseシステムの形式に合わせる
+            # 統一形式: 常にO1, O2, C1, C2を使用
             
             slots.append(slot_name)
             slot_phrases.append(element.text)
