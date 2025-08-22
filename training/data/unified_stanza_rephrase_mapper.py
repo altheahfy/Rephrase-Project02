@@ -315,6 +315,10 @@ class UnifiedStanzaRephraseMapper:
             corrected_doc = self._correct_conjunction_patterns(corrected_doc, sentence)
             self.logger.debug(f"🔍 conjunction後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
+            # 基本5文型パターンの人間文法認識検出
+            corrected_doc = self._correct_basic_five_patterns(corrected_doc, sentence)
+            self.logger.debug(f"🔍 basic_five後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
+            
             self.logger.debug("🧠 人間文法認識完了")
             return corrected_doc
             
@@ -1142,7 +1146,7 @@ class UnifiedStanzaRephraseMapper:
             
         return stanza_doc
     
-    def _unified_mapping(self, sentence: str, doc) -> Dict[str, Any]:
+    def _unified_mapping(self, sentence: str, doc, force_human_mode: bool = False) -> Dict[str, Any]:
         """
         統合マッピング処理
         
@@ -1616,38 +1620,33 @@ class UnifiedStanzaRephraseMapper:
         self.logger.info(f"🧠 人間文法認識のみでの処理開始: '{sentence}'")
         start_time = time.time()
         
-        # Document オブジェクトを作成（Stanzaを使わずに）
-        doc = type('Document', (), {
-            'text': sentence,
-            'sentences': [type('Sentence', (), {
-                'text': sentence,
-                'words': [],  # 空のワードリスト
-                'tokens': []  # 空のトークンリスト
-            })()]
-        })()
+        # Step 1: 人間文法認識でStanza形式のドキュメント構造を構築
+        doc = self._create_human_grammar_document(sentence)
         
-        # 人間文法認識パターンを適用
+        # Step 2: 人間文法認識パターンを適用してドキュメントを補正
         doc = self._apply_human_grammar_patterns(sentence, doc)
         
-        # スロット情報を抽出
-        main_slots = {}
-        sub_slots = {}
-        
-        if hasattr(doc, '_human_grammar_corrections') and doc._human_grammar_corrections:
-            # 人間文法認識の結果からスロットを構築
-            corrections = doc._human_grammar_corrections
+        # Step 3: 既存のハンドラーシステムを使ってスロット分解
+        if doc and doc.sentences:
+            # 既存の統合処理システムを利用
+            base_result = {
+                'sentence': sentence,
+                'slots': {},
+                'sub_slots': {},
+                'grammar_info': {'detected_patterns': [], 'handler_contributions': {}}
+            }
             
-            # 主節スロット
-            if 'main_slots' in corrections:
-                main_slots = corrections['main_slots']
+            # 統合ハンドラーシステムで処理
+            result = self._unified_mapping(sentence, doc, force_human_mode=True)
             
-            # 関係節スロット  
-            if 'sub_slots' in corrections:
-                sub_slots = corrections['sub_slots']
+            main_slots = result.get('slots', {})
+            sub_slots = result.get('sub_slots', {})
             
-            self.logger.debug(f"👤 人間文法認識結果: main_slots={main_slots}, sub_slots={sub_slots}")
+            self.logger.debug(f"👤 人間文法認識→ハンドラー処理結果: main_slots={main_slots}, sub_slots={sub_slots}")
         else:
-            self.logger.warning(f"⚠️ 人間文法認識でパターンが検出されませんでした: '{sentence}'")
+            self.logger.warning(f"⚠️ 人間文法認識でドキュメント構築に失敗: '{sentence}'")
+            main_slots = {}
+            sub_slots = {}
         
         processing_time = time.time() - start_time
         
@@ -1668,6 +1667,337 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.info(f"✅ 人間文法認識のみでの処理完了 ({processing_time:.3f}s)")
         return result
+    
+    def _create_human_grammar_document(self, sentence: str):
+        """人間文法認識による基本的なStanza形式ドキュメント構築"""
+        words = sentence.split()
+        
+        # 基本的なword構造を作成
+        word_objects = []
+        for i, word_text in enumerate(words):
+            word_id = i + 1
+            word_obj = type('Word', (), {
+                'id': word_id,
+                'text': word_text,
+                'lemma': word_text.lower(),
+                'upos': self._guess_basic_pos(word_text),
+                'xpos': self._guess_basic_pos(word_text),
+                'deprel': 'unknown',  # 人間文法認識で後で設定
+                'head': 0,  # 人間文法認識で後で設定
+                'feats': None,
+                'misc': None
+            })()
+            word_objects.append(word_obj)
+        
+        # Sentence構造を作成
+        sentence_obj = type('Sentence', (), {
+            'text': sentence,
+            'words': word_objects,
+            'tokens': word_objects  # 簡易実装
+        })()
+        
+        # Document構造を作成
+        doc = type('Document', (), {
+            'text': sentence,
+            'sentences': [sentence_obj]
+        })()
+        
+        return doc
+    
+    def _guess_basic_pos(self, word: str) -> str:
+        """改良された基本的な品詞推定（人間文法認識用）"""
+        word_lower = word.lower().strip('.,!?;:')  # 句読点除去
+        
+        # be動詞
+        if word_lower in ['is', 'am', 'are', 'was', 'were', 'be', 'been', 'being']:
+            return 'AUX'
+        
+        # 助動詞
+        elif word_lower in ['will', 'would', 'can', 'could', 'may', 'might', 'shall', 'should', 'must', 'have', 'has', 'had']:
+            return 'AUX'
+        
+        # 代名詞
+        elif word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them']:
+            return 'PRON'
+        
+        # 関係代名詞・疑問詞
+        elif word_lower in ['who', 'which', 'that', 'whose', 'whom', 'where', 'when', 'why', 'how']:
+            return 'PRON'
+        
+        # 冠詞
+        elif word_lower in ['the', 'a', 'an']:
+            return 'DET'
+        
+        # 明確な動詞
+        elif word_lower in ['love', 'loves', 'loved', 'run', 'runs', 'ran', 'go', 'goes', 'went', 'come', 'comes', 'came',
+                           'work', 'works', 'worked', 'study', 'studies', 'studied', 'live', 'lives', 'lived',
+                           'eat', 'eats', 'ate', 'drive', 'drives', 'drove', 'write', 'writes', 'wrote', 'written',
+                           'read', 'reads', 'open', 'opens', 'opened', 'close', 'closes', 'closed',
+                           'build', 'builds', 'built', 'send', 'sends', 'sent', 'buy', 'buys', 'bought',
+                           'finish', 'finished', 'complete', 'completed', 'explain', 'explains', 'explained',
+                           'solve', 'solved', 'repair', 'repaired', 'maintain', 'maintained',
+                           'review', 'reviewed', 'publish', 'published', 'exhibit', 'exhibited',
+                           'correct', 'corrected', 'improve', 'improved', 'supervise', 'supervised',
+                           'approve', 'approved', 'construct', 'constructed', 'save', 'saves', 'saved',
+                           'meet', 'meets', 'met', 'arrive', 'arrived', 'succeed', 'succeeded',
+                           'respect', 'respected', 'need', 'needs', 'needed', 'change', 'changed',
+                           'act', 'acts', 'acted', 'know', 'knows', 'knew', 'become', 'became',
+                           'wait', 'waiting', 'play', 'playing', 'stand', 'standing', 'work', 'working']:
+            return 'VERB'
+        
+        # 明確な形容詞
+        elif word_lower in ['red', 'blue', 'green', 'big', 'small', 'happy', 'sad', 'good', 'bad', 'new', 'old',
+                           'strong', 'weak', 'tall', 'short', 'kind', 'mean', 'expensive', 'cheap', 'famous', 'unknown',
+                           'smart', 'stupid', 'beautiful', 'ugly', 'late', 'early', 'unclear', 'clear', 'clever', 'boring',
+                           'mine', 'yours', 'his', 'hers', 'ours', 'theirs', 'respected', 'unexpected', 'confused',
+                           'skilled', 'better', 'careful', 'academic', 'smooth', 'efficient', 'successful', 'dramatic',
+                           'immediate', 'favorite', 'proper', 'thorough']:
+            return 'ADJ'
+        
+        # 明確な副詞
+        elif word_lower in ['quickly', 'slowly', 'very', 'really', 'carefully', 'hard', 'well', 'badly', 'fast',
+                           'always', 'never', 'often', 'sometimes', 'here', 'there', 'everywhere', 'nowhere',
+                           'today', 'yesterday', 'tomorrow', 'now', 'then', 'soon', 'late', 'early',
+                           'diligently', 'efficiently', 'greatly', 'successfully', 'gently', 'thoroughly',
+                           'accidentally', 'dramatically', 'clearly', 'daily', 'internationally', 'rapidly',
+                           'patiently', 'happily', 'quietly', 'overtime']:
+            return 'ADV'
+        
+        # 接続詞
+        elif word_lower in ['and', 'or', 'but', 'because', 'although', 'if', 'unless', 'while', 'since']:
+            return 'CCONJ'
+        
+        # 前置詞
+        elif word_lower in ['in', 'on', 'at', 'by', 'for', 'with', 'to', 'from', 'into', 'onto', 'under', 'over',
+                           'near', 'beside', 'between', 'among', 'through', 'across', 'around', 'during']:
+            return 'ADP'
+        
+        # 明確な名詞
+        elif word_lower in ['car', 'book', 'man', 'woman', 'person', 'student', 'teacher', 'house', 'door', 'window',
+                           'letter', 'message', 'cake', 'children', 'mother', 'father', 'author', 'key', 'place', 'time',
+                           'reason', 'way', 'homework', 'exam', 'exams', 'week', 'day', 'year', 'morning', 'evening',
+                           'problem', 'solution', 'team', 'expert', 'manager', 'doctor', 'roof', 'spot', 'building',
+                           'workers', 'grammar', 'essays', 'grades', 'report', 'experts', 'essay', 'machine', 'project',
+                           'garden', 'documents', 'artist', 'paintings', 'neighbor', 'life', 'lives', 'breeze']:
+            return 'NOUN'
+        
+        # 文字パターンによる推定
+        elif word_lower.endswith('ly'):
+            return 'ADV'
+        elif word_lower.endswith('ed') or word_lower.endswith('ing'):
+            return 'VERB'
+        elif word_lower.endswith('er') or word_lower.endswith('est'):
+            return 'ADJ'
+        elif word_lower.endswith('s') and len(word_lower) > 3:
+            return 'NOUN'  # 複数形の可能性
+        
+        # デフォルトは名詞
+        else:
+            return 'NOUN'
+    
+    def _correct_basic_five_patterns(self, doc, sentence):
+        """
+        基本5文型の人間文法認識パターン検出・修正
+        
+        人間の認識: 語順と語彙から直接的に文型を判定
+        - SV: 主語 + 動詞
+        - SVC: 主語 + be動詞 + 補語（形容詞/名詞）
+        - SVO: 主語 + 動詞 + 目的語
+        - SVOO: 主語 + 動詞 + 間接目的語 + 直接目的語
+        - SVOC: 主語 + 動詞 + 目的語 + 補語
+        """
+        if not doc.sentences:
+            return doc
+            
+        sent = doc.sentences[0]
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        
+        # 基本5文型パターン認識
+        five_pattern_result = self._detect_basic_five_pattern_human_grammar(sent.words, sentence_text)
+        
+        if five_pattern_result['found']:
+            pattern_info = five_pattern_result['pattern_info']
+            
+            self.logger.info(
+                f"人間文法修正[基本5文型]: '{pattern_info['type']}' pattern detected "
+                f"(確信度: {pattern_info['confidence']:.2f})"
+            )
+            
+            # 修正情報を記録
+            if not hasattr(doc, '_human_grammar_corrections'):
+                doc._human_grammar_corrections = []
+            
+            doc._human_grammar_corrections.append({
+                'type': 'basic_five_pattern',
+                'pattern_type': pattern_info['type'],
+                'subject': pattern_info.get('subject'),
+                'verb': pattern_info.get('verb'),
+                'object': pattern_info.get('object'),
+                'complement': pattern_info.get('complement'),
+                'indirect_object': pattern_info.get('indirect_object'),
+                'correction': f"Human grammar recognition: {pattern_info['type']} pattern",
+                'confidence': pattern_info['confidence']
+            })
+            
+            # 語の依存関係修正情報を設定
+            self._apply_five_pattern_corrections(sent.words, pattern_info)
+        
+        return doc
+    
+    def _detect_basic_five_pattern_human_grammar(self, words, sentence_text):
+        """人間的基本5文型パターン検出"""
+        result = {'found': False, 'pattern_info': {}}
+        
+        words_lower = [w.text.lower() for w in words]
+        sentence_lower = sentence_text.lower()
+        
+        # パターン1: SVC - 「主語 + be動詞 + 形容詞/名詞」
+        svc_result = self._detect_svc_pattern(words, words_lower)
+        if svc_result['found']:
+            result = {'found': True, 'pattern_info': svc_result}
+        
+        # パターン2: SVO - 「主語 + 動詞 + 目的語」
+        if not result['found']:
+            svo_result = self._detect_svo_pattern(words, words_lower)
+            if svo_result['found']:
+                result = {'found': True, 'pattern_info': svo_result}
+        
+        # パターン3: SV - 「主語 + 動詞」（単純）
+        if not result['found']:
+            sv_result = self._detect_sv_pattern(words, words_lower)
+            if sv_result['found']:
+                result = {'found': True, 'pattern_info': sv_result}
+        
+        return result
+    
+    def _detect_svc_pattern(self, words, words_lower):
+        """SVC (主語 + be動詞 + 補語) パターン検出"""
+        if len(words) < 3:
+            return {'found': False}
+        
+        # be動詞の位置を探す
+        be_verb_idx = None
+        for i, word_lower in enumerate(words_lower):
+            if word_lower in ['is', 'am', 'are', 'was', 'were']:
+                be_verb_idx = i
+                break
+        
+        if be_verb_idx is None or be_verb_idx == 0 or be_verb_idx >= len(words) - 1:
+            return {'found': False}
+        
+        subject = words[be_verb_idx - 1]
+        be_verb = words[be_verb_idx]
+        complement = words[be_verb_idx + 1]
+        
+        # 補語が形容詞的または名詞的
+        if complement.upos in ['ADJ', 'NOUN'] or words_lower[be_verb_idx + 1] in ['red', 'blue', 'happy', 'sad', 'big', 'small']:
+            return {
+                'found': True,
+                'type': 'SVC',
+                'subject': subject,
+                'verb': be_verb,
+                'complement': complement,
+                'confidence': 0.9
+            }
+        
+        return {'found': False}
+    
+    def _detect_svo_pattern(self, words, words_lower):
+        """SVO (主語 + 動詞 + 目的語) パターン検出"""
+        if len(words) < 3:
+            return {'found': False}
+        
+        # 動詞的語の位置を探す（be動詞以外）
+        verb_idx = None
+        for i, word in enumerate(words):
+            word_lower = word.text.lower()
+            if (word.upos == 'VERB' or 
+                word_lower in ['love', 'loves', 'loved', 'like', 'likes', 'liked', 'eat', 'eats', 'ate']) and \
+               word_lower not in ['is', 'am', 'are', 'was', 'were']:
+                verb_idx = i
+                break
+        
+        if verb_idx is None or verb_idx == 0 or verb_idx >= len(words) - 1:
+            return {'found': False}
+        
+        subject = words[verb_idx - 1]
+        verb = words[verb_idx]
+        obj = words[verb_idx + 1]
+        
+        # 目的語らしい語かチェック
+        if obj.upos in ['NOUN', 'PRON'] or words_lower[verb_idx + 1] in ['you', 'him', 'her', 'it', 'food', 'book']:
+            return {
+                'found': True,
+                'type': 'SVO',
+                'subject': subject,
+                'verb': verb,
+                'object': obj,
+                'confidence': 0.85
+            }
+        
+        return {'found': False}
+    
+    def _detect_sv_pattern(self, words, words_lower):
+        """SV (主語 + 動詞) パターン検出"""
+        if len(words) < 2:
+            return {'found': False}
+        
+        # 2語の場合の基本パターン
+        if len(words) == 2:
+            subject_candidate = words[0]
+            verb_candidate = words[1]
+            
+            if (subject_candidate.upos in ['NOUN', 'PRON'] and 
+                verb_candidate.upos in ['VERB', 'AUX']):
+                return {
+                    'found': True,
+                    'type': 'SV',
+                    'subject': subject_candidate,
+                    'verb': verb_candidate,
+                    'confidence': 0.8
+                }
+        
+        return {'found': False}
+    
+    def _apply_five_pattern_corrections(self, words, pattern_info):
+        """基本5文型認識結果に基づく依存関係修正"""
+        pattern_type = pattern_info['type']
+        
+        if pattern_type == 'SVC':
+            # 主語: nsubj, 動詞: root, 補語: cop
+            subject = pattern_info['subject']
+            verb = pattern_info['verb']
+            complement = pattern_info['complement']
+            
+            verb.deprel = 'root'
+            verb.head = 0
+            subject.deprel = 'nsubj'
+            subject.head = verb.id
+            complement.deprel = 'nmod'  # 補語として
+            complement.head = verb.id
+            
+        elif pattern_type == 'SVO':
+            # 主語: nsubj, 動詞: root, 目的語: obj
+            subject = pattern_info['subject']
+            verb = pattern_info['verb']
+            obj = pattern_info['object']
+            
+            verb.deprel = 'root'
+            verb.head = 0
+            subject.deprel = 'nsubj'
+            subject.head = verb.id
+            obj.deprel = 'obj'
+            obj.head = verb.id
+            
+        elif pattern_type == 'SV':
+            # 主語: nsubj, 動詞: root
+            subject = pattern_info['subject']
+            verb = pattern_info['verb']
+            
+            verb.deprel = 'root'
+            verb.head = 0
+            subject.deprel = 'nsubj'
+            subject.head = verb.id
     
     def _process_stanza_only(self, sentence: str) -> Dict[str, Any]:
         """Stanzaのみの処理（参考用）
