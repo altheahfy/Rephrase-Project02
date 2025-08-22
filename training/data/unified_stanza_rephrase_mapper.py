@@ -157,7 +157,7 @@ class UnifiedStanzaRephraseMapper:
             'basic_five_pattern',     # 基本5文型
             'relative_clause',        # 関係節
             'passive_voice',          # 受動態  
-            # 'participle_construction', # 分詞構文（副詞処理より先）- 依存関係エラーのため一時無効化
+            'participle_construction', # 分詞構文（副詞処理より先）
             'adverbial_modifier',     # 副詞句（前置詞句含む）
             'auxiliary_complex',      # 助動詞
             'conjunction',            # 接続詞（"as if"等）
@@ -699,7 +699,7 @@ class UnifiedStanzaRephraseMapper:
         
         # 優先順位テーブル（ハンドラー間情報共有のため、関係節を5文型より前に実行）
         priority_order = [
-            # 'participle_construction',  # 最優先：分詞構文が制御フラグを設定 - 一時無効化
+            'participle_construction',  # 最優先：分詞構文が制御フラグを設定
             'relative_clause',          # 上位スロット占有情報を提供
             'basic_five_pattern',       # 占有済みスロット情報を受け取る
             'passive_voice',
@@ -3822,79 +3822,31 @@ class UnifiedStanzaRephraseMapper:
             return None
     
     def _analyze_participle_structure(self, sentence) -> Optional[Dict]:
-        """分詞構文の分析 - ParticiplePatternと統合"""
-        try:
-            # ParticiplePatternを使用した検出
-            from universal_slot_system.patterns.participle_pattern import ParticiplePattern
-            
-            participle_pattern = ParticiplePattern()
-            
-            # Sentenceオブジェクトを含むダミーDocumentを作成
-            class DummyDoc:
-                def __init__(self, sentence):
-                    self.sentences = [sentence]
-                    
-            doc = DummyDoc(sentence)
-            print(f"DEBUG: analysis_doc作成成功: {type(doc)}")
-            
-            if not participle_pattern.detect(doc, sentence.text):
-                print("DEBUG: ParticiplePattern検出失敗")
-                return None
+        """分詞構文の分析"""
+        participle_info = {
+            'participle_verb': None,    # 分詞動詞
+            'subject': None,            # 主語
+            'participle_type': None,    # 分詞のタイプ (present/past/being)
+            'modifiers': []             # 修飾語
+        }
+        
+        # 現在分詞の検出 (VBG) - dep:acl パターンを優先検出
+        for word in sentence.words:
+            if word.xpos == 'VBG' and word.deprel == 'acl':
+                participle_info['participle_verb'] = word
+                participle_info['participle_type'] = 'present'
                 
-            print("DEBUG: ParticiplePattern検出成功")
-            
-            participle_info = {
-                'participle_verb': None,    # 分詞動詞
-                'subject': None,            # 主語
-                'participle_type': None,    # 分詞のタイプ (present/past/being)
-                'modifiers': []             # 修飾語
-            }
-            
-            # 現在分詞・過去分詞の検出 (Stanza feats ベース)
-            for word in sentence.words:
-                if word.upos == 'VERB' and word.feats:
-                    feats_str = str(word.feats)
-                    
-                    # 現在分詞検出
-                    if 'VerbForm=Ger' in feats_str or ('VerbForm=Part' in feats_str and 'Tense=Pres' in feats_str):
-                        participle_info['participle_verb'] = word
-                        participle_info['participle_type'] = 'present'
-                        
-                        # 分詞の主語を探す（head が NOUN の場合）
-                        if word.head > 0:
-                            head_word = next((w for w in sentence.words if w.id == word.head), None)
-                            if head_word and head_word.upos == 'NOUN':
-                                participle_info['subject'] = head_word
-                        
-                        # 分詞の修飾語を収集
-                        participle_info['modifiers'] = self._find_participle_modifiers(sentence, word)
-                        
-                        self.logger.debug(f"  現在分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
-                        return participle_info
-                    
-                    # 過去分詞検出
-                    elif 'VerbForm=Part' in feats_str and 'Tense=Past' in feats_str:
-                        participle_info['participle_verb'] = word
-                        participle_info['participle_type'] = 'past'
-                        
-                        # 分詞の主語を探す
-                        if word.head > 0:
-                            head_word = next((w for w in sentence.words if w.id == word.head), None)
-                            if head_word and head_word.upos == 'NOUN':
-                                participle_info['subject'] = head_word
-                        
-                        # 分詞の修飾語を収集
-                        participle_info['modifiers'] = self._find_participle_modifiers(sentence, word)
-                        
-                        self.logger.debug(f"  過去分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
-                        return participle_info
-                        
-            return None
-            
-        except Exception as e:
-            self.logger.error(f"分詞構文解析エラー: {e}")
-            print(f"DEBUG: 分詞構文解析エラー: {e}")
-            return None
+                # 分詞の主語を探す（head が NOUN の場合）
+                if word.head > 0:
+                    head_word = next((w for w in sentence.words if w.id == word.head), None)
+                    if head_word and head_word.upos == 'NOUN':
+                        participle_info['subject'] = head_word
+                
+                # 分詞の修飾語を収集（Case 49 "overtime"問題対応）
+                participle_info['modifiers'] = self._find_participle_modifiers(sentence, word)
+                
+                self.logger.debug(f"  現在分詞検出: {word.text} (ID:{word.id}, HEAD:{word.head}, DEP:{word.deprel})")
+                return participle_info
         
         # being + 過去分詞の検出
         for word in sentence.words:
