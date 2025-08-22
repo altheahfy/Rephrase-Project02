@@ -288,6 +288,12 @@ class UnifiedStanzaRephraseMapper:
             # whose構文 + 動詞/名詞同形語パターン検出
             corrected_doc = self._correct_whose_ambiguous_verb_pattern(corrected_doc, sentence)
             
+            # 関係節構造の人間文法認識パターン検出
+            corrected_doc = self._correct_relative_clause_patterns(corrected_doc, sentence)
+            
+            # 助動詞構造の人間文法認識パターン検出
+            corrected_doc = self._correct_auxiliary_patterns(corrected_doc, sentence)
+            
             self.logger.debug("🧠 人間文法認識完了")
             return corrected_doc
             
@@ -594,6 +600,173 @@ class UnifiedStanzaRephraseMapper:
             return True
             
         return False
+
+    def _correct_relative_clause_patterns(self, doc, sentence):
+        """
+        関係節構造の人間文法認識パターン検出・修正
+        
+        人間の認識: 関係代名詞 + 語順 → 関係節構造の意味的理解
+        stanza誤判定: 統計的依存関係解析による構造的誤認識
+        """
+        if not doc.sentences:
+            return doc
+            
+        sent = doc.sentences[0]
+        words = sent.words
+        
+        # 関係節パターン認識
+        relative_patterns = self._detect_relative_clause_structural_patterns(words, sentence)
+        
+        if relative_patterns['found']:
+            rel_info = relative_patterns['patterns'][0]  # 最も確信度の高いパターン
+            
+            self.logger.info(
+                f"人間文法修正[関係節]: '{rel_info['type']}' pattern detected "
+                f"(確信度: {rel_info['confidence']:.2f})"
+            )
+            
+            # 修正情報を記録
+            if not hasattr(doc, '_human_grammar_corrections'):
+                doc._human_grammar_corrections = []
+            
+            doc._human_grammar_corrections.append({
+                'type': 'relative_clause',
+                'pattern_type': rel_info['type'],
+                'relative_pronoun': rel_info.get('relative_pronoun'),
+                'relative_verb': rel_info.get('relative_verb'),
+                'antecedent': rel_info.get('antecedent'),
+                'correction': f"Human grammar recognition: {rel_info['type']} relative clause",
+                'confidence': rel_info['confidence']
+            })
+        
+        return doc
+    
+    def _detect_relative_clause_structural_patterns(self, words, sentence):
+        """人間的関係節構造パターン検出"""
+        result = {'found': False, 'patterns': []}
+        sentence_lower = sentence.lower()
+        
+        # パターン1: who/which/that + 動詞構造
+        if any(word in sentence_lower for word in ['who', 'which', 'that']):
+            pattern = self._detect_standard_relative_pattern(words, sentence_lower)
+            if pattern['found']:
+                result['patterns'].append(pattern)
+        
+        # パターン2: whose + 所有構造
+        if 'whose' in sentence_lower:
+            pattern = self._detect_possessive_relative_pattern(words, sentence_lower)
+            if pattern['found']:
+                result['patterns'].append(pattern)
+        
+        # パターン3: where/when/why関係副詞構造  
+        if any(word in sentence_lower for word in ['where', 'when', 'why', 'how']):
+            pattern = self._detect_adverbial_relative_pattern(words, sentence_lower)
+            if pattern['found']:
+                result['patterns'].append(pattern)
+        
+        result['found'] = len(result['patterns']) > 0
+        return result
+    
+    def _detect_standard_relative_pattern(self, words, sentence_lower):
+        """標準的関係代名詞パターン検出 (who/which/that + 動詞)"""
+        import re
+        pattern_result = {'found': False, 'type': 'standard_relative', 'confidence': 0.0}
+        
+        # パターン: [先行詞] + who/which/that + [関係節内容]
+        patterns = [
+            r'(\w+)\s+(who|which|that)\s+(\w+)',  # 基本パターン
+            r'(\w+)\s*,\s*(who|which)\s+(\w+)',   # コンマ区切り
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, sentence_lower)
+            if match:
+                antecedent_text, rel_pronoun_text, verb_text = match.groups()
+                
+                # 実際の語オブジェクトを探す
+                antecedent = next((w for w in words if w.text.lower() == antecedent_text), None)
+                rel_pronoun = next((w for w in words if w.text.lower() == rel_pronoun_text), None)
+                rel_verb = next((w for w in words if w.text.lower() == verb_text), None)
+                
+                if antecedent and rel_pronoun and rel_verb:
+                    pattern_result.update({
+                        'found': True,
+                        'antecedent': antecedent,
+                        'relative_pronoun': rel_pronoun,
+                        'relative_verb': rel_verb,
+                        'confidence': 0.9
+                    })
+                    break
+        
+        return pattern_result
+    
+    def _detect_possessive_relative_pattern(self, words, sentence_lower):
+        """所有格関係代名詞パターン検出 (whose)"""
+        import re
+        pattern_result = {'found': False, 'type': 'possessive_relative', 'confidence': 0.0}
+        
+        # パターン: [先行詞] whose [所有される名詞] + [動詞/形容詞]
+        patterns = [
+            r'(\w+)\s+whose\s+(\w+)\s+(is|are|was|were)\s+(\w+)',  # whose + be動詞
+            r'(\w+)\s+whose\s+(\w+)\s+(\w+)',  # whose + 一般動詞
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, sentence_lower)
+            if match:
+                groups = match.groups()
+                antecedent_text = groups[0]
+                possessed_text = groups[1]
+                
+                # 実際の語オブジェクトを探す
+                antecedent = next((w for w in words if w.text.lower() == antecedent_text), None)
+                possessed = next((w for w in words if w.text.lower() == possessed_text), None)
+                whose_word = next((w for w in words if w.text.lower() == 'whose'), None)
+                
+                if antecedent and possessed and whose_word:
+                    pattern_result.update({
+                        'found': True,
+                        'antecedent': antecedent,
+                        'relative_pronoun': whose_word,
+                        'possessed_noun': possessed,
+                        'confidence': 0.95
+                    })
+                    break
+        
+        return pattern_result
+    
+    def _detect_adverbial_relative_pattern(self, words, sentence_lower):
+        """関係副詞パターン検出 (where/when/why/how)"""
+        import re
+        pattern_result = {'found': False, 'type': 'adverbial_relative', 'confidence': 0.0}
+        
+        # パターン: [先行詞] + where/when/why/how + [関係節内容]
+        patterns = [
+            r'(\w+)\s+(where|when|why|how)\s+(\w+)',
+            r'(place|time|reason|way)\s+(where|when|why|how)\s+(\w+)',
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, sentence_lower)
+            if match:
+                antecedent_text, rel_adverb_text, verb_text = match.groups()
+                
+                # 実際の語オブジェクトを探す
+                antecedent = next((w for w in words if w.text.lower() == antecedent_text), None)
+                rel_adverb = next((w for w in words if w.text.lower() == rel_adverb_text), None)
+                rel_verb = next((w for w in words if w.text.lower() == verb_text), None)
+                
+                if antecedent and rel_adverb and rel_verb:
+                    pattern_result.update({
+                        'found': True,
+                        'antecedent': antecedent,
+                        'relative_adverb': rel_adverb,
+                        'relative_verb': rel_verb,
+                        'confidence': 0.85
+                    })
+                    break
+        
+        return pattern_result
     
     def _apply_corrections_to_stanza(self, stanza_doc, corrections):
         """Stanza解析結果に補正を適用"""
@@ -1169,8 +1342,16 @@ class UnifiedStanzaRephraseMapper:
             return None
     
     def _has_relative_clause(self, sentence) -> bool:
-        """関係節を含むかチェック"""
-        # ✅ whose構文の詳細処理
+        """関係節を含むかチェック（人間文法認識優先）"""
+        
+        # 🧠 人間文法認識結果をチェック
+        if hasattr(sentence, '_human_grammar_corrections'):
+            for correction in sentence._human_grammar_corrections:
+                if correction.get('type') == 'relative_clause':
+                    self.logger.debug(f"🧠 人間文法認識: {correction['pattern_type']} 関係節検出")
+                    return True
+        
+        # 従来のStanza依存型検出（フォールバック）
         has_acl_relcl = any(w.deprel in ['acl:relcl', 'acl'] for w in sentence.words)
         
         if has_acl_relcl and any(w.text.lower() == 'whose' for w in sentence.words):
@@ -1182,52 +1363,70 @@ class UnifiedStanzaRephraseMapper:
         return has_acl_relcl
     
     def _process_relative_clause_structure(self, sentence, base_result: Dict, shared_context: Dict = None) -> Dict:
-        """関係節構造の分解処理"""
+        """関係節構造の分解処理（人間文法認識パターン優先）"""
         
-        # === 1. 要素特定 ===
-        # ✅ whose構文の真の関係節検出
+        # === 1. 人間文法認識結果を優先して要素特定 ===
         rel_verb = None
         antecedent = None
+        rel_pronoun = None
         
-        is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
-        
-        if is_whose_construction:
-            # whose構文では、まずacl:relcl関係の実動詞を探す
-            acl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if acl_word and acl_word.upos == 'VERB':
-                # Pattern B: 実動詞が関係節動詞 (例: borrowed)
-                rel_verb = acl_word
-                if acl_word.head > 0:
-                    antecedent = self._find_word_by_id(sentence, acl_word.head)
-            else:
-                # Pattern A: cop動詞が関係節動詞 (例: is in "car is red")  
-                for word in sentence.words:
-                    if word.deprel == 'cop':
-                        rel_verb = word
-                        # acl:relclのheadから先行詞を探す
-                        if acl_word and acl_word.head > 0:
-                            antecedent = self._find_word_by_id(sentence, acl_word.head)
-                        else:
-                            # fallback: root語を先行詞とする
-                            for w in sentence.words:
-                                if w.deprel == 'root':
-                                    antecedent = w
-                                    break
+        # 🧠 人間文法認識パターンを最優先で利用
+        if hasattr(sentence, '_human_grammar_corrections'):
+            for correction in sentence._human_grammar_corrections:
+                if correction.get('type') == 'relative_clause':
+                    pattern_type = correction.get('pattern_type')
+                    self.logger.debug(f"🧠 人間文法認識適用: {pattern_type} 関係節")
+                    
+                    # 人間文法認識で特定された要素を使用
+                    rel_verb = correction.get('relative_verb')
+                    antecedent = correction.get('antecedent')
+                    rel_pronoun = correction.get('relative_pronoun') or correction.get('relative_adverb')
+                    
+                    if rel_verb and antecedent:
+                        self.logger.debug(f"🧠 人間文法認識: 先行詞={antecedent.text}, 関係動詞={rel_verb.text}")
                         break
-                        
-            if rel_verb and antecedent:
-                self.logger.debug(f"🔧 whose構文修正: 関係節動詞={rel_verb.text}, 先行詞={antecedent.text}")
         
-        # 通常の関係節検出
+        # === 2. フォールバック: 従来のStanza依存型検出 ===
         if not rel_verb:
-            rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
-            if not rel_verb:
-                rel_verb = self._find_word_by_deprel(sentence, 'acl')
-            if not rel_verb:
-                return base_result
+            is_whose_construction = any(w.text.lower() == 'whose' for w in sentence.words)
             
-            # 先行詞（関係節動詞の頭）
-            antecedent = self._find_word_by_id(sentence, rel_verb.head)
+            if is_whose_construction:
+                # whose構文では、まずacl:relcl関係の実動詞を探す
+                acl_word = self._find_word_by_deprel(sentence, 'acl:relcl')
+                if acl_word and acl_word.upos == 'VERB':
+                    # Pattern B: 実動詞が関係節動詞 (例: borrowed)
+                    rel_verb = acl_word
+                    if acl_word.head > 0:
+                        antecedent = self._find_word_by_id(sentence, acl_word.head)
+                else:
+                    # Pattern A: cop動詞が関係節動詞 (例: is in "car is red")  
+                    for word in sentence.words:
+                        if word.deprel == 'cop':
+                            rel_verb = word
+                            # acl:relclのheadから先行詞を探す
+                            if acl_word and acl_word.head > 0:
+                                antecedent = self._find_word_by_id(sentence, acl_word.head)
+                            else:
+                                # fallback: root語を先行詞とする
+                                for w in sentence.words:
+                                    if w.deprel == 'root':
+                                        antecedent = w
+                                        break
+                            break
+                            
+                if rel_verb and antecedent:
+                    self.logger.debug(f"🔧 whose構文修正: 関係節動詞={rel_verb.text}, 先行詞={antecedent.text}")
+            
+            # 通常の関係節検出
+            if not rel_verb:
+                rel_verb = self._find_word_by_deprel(sentence, 'acl:relcl')
+                if not rel_verb:
+                    rel_verb = self._find_word_by_deprel(sentence, 'acl')
+                if not rel_verb:
+                    return base_result
+                
+                # 先行詞（関係節動詞の頭）
+                antecedent = self._find_word_by_id(sentence, rel_verb.head)
             
         if not antecedent:
             return base_result
