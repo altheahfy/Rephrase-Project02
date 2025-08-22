@@ -1,27 +1,25 @@
 {
   "meta": {
-    "input_file": "final_test_system/final_54_test_data.json",
-    "processed_at": "2025-08-22T09:49:15.976063",
-    "total_sentences": 53,
-    "success_count": 53,
-    "error_count": 0
+    "total_tests": 53,
+    "perfect_matches": 53,
+    "partial_matches": 0,
+    "failures": 0,
+    "accuracy": 100.0
   },
-  "results": {
-    "1": {
+  "results": [
+    {
+      "test_id": "1",
       "sentence": "The car is red.",
-      "analysis_result": {
-        "sentence": "The car is red.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "The car",
           "V": "is",
           "C1": "red"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.160786,
-          "sentence_id": 1,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -30,24 +28,21 @@
           "C1": "red"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "2": {
+    {
+      "test_id": "2",
       "sentence": "I love you.",
-      "analysis_result": {
-        "sentence": "I love you.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "I",
           "V": "love",
           "O1": "you"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.11845,
-          "sentence_id": 2,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -56,14 +51,16 @@
           "O1": "you"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "3": {
+    {
+      "test_id": "3",
       "sentence": "The man who runs fast is strong.",
-      "analysis_result": {
-        "sentence": "The man who runs fast is strong.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "strong"
@@ -72,11 +69,6 @@
           "sub-s": "The man who",
           "sub-v": "runs",
           "sub-m2": "fast"
-        },
-        "meta": {
-          "processing_time": 0.174409,
-          "sentence_id": 3,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -90,14 +82,16 @@
           "sub-v": "runs",
           "sub-m2": "fast"
         }
-      },
-      "status": "success"
+      }
     },
-    "4": {
+    {
+      "test_id": "4",
       "sentence": "The book which lies there is mine.",
-      "analysis_result": {
-        "sentence": "The book which lies there is mine.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "mine"
@@ -106,11 +100,6 @@
           "sub-s": "The book which",
           "sub-v": "lies",
           "sub-m2": "there"
-        },
-        "meta": {
-          "processing_time": 0.332369,
-          "sentence_id": 4,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -124,14 +113,16 @@
           "sub-v": "lies",
           "sub-m2": "there"
         }
-      },
-      "status": "success"
+      }
     },
-    "5": {
+    {
+      "test_id": "5",
       "sentence": "The person that works here is kind.",
-      "analysis_result": {
-        "sentence": "The person that works here is kind.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "kind"
@@ -140,11 +131,6 @@
           "sub-s": "The person that",
           "sub-v": "works",
           "sub-m2": "here"
-        },
-        "meta": {
-          "processing_time": 0.187986,
-          "sentence_id": 5,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -158,14 +144,16 @@
           "sub-v": "works",
           "sub-m2": "here"
         }
-      },
-      "status": "success"
+      }
     },
-    "6": {
+    {
+      "test_id": "6",
       "sentence": "The book which I bought is expensive.",
-      "analysis_result": {
-        "sentence": "The book which I bought is expensive.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "expensive"
@@ -174,11 +162,6 @@
           "sub-o1": "The book which",
           "sub-s": "I",
           "sub-v": "bought"
-        },
-        "meta": {
-          "processing_time": 0.194765,
-          "sentence_id": 6,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -192,14 +175,16 @@
           "sub-s": "I",
           "sub-v": "bought"
         }
-      },
-      "status": "success"
+      }
     },
-    "7": {
+    {
+      "test_id": "7",
       "sentence": "The man whom I met is tall.",
-      "analysis_result": {
-        "sentence": "The man whom I met is tall.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "tall"
@@ -208,11 +193,6 @@
           "sub-o1": "The man whom",
           "sub-s": "I",
           "sub-v": "met"
-        },
-        "meta": {
-          "processing_time": 0.174666,
-          "sentence_id": 7,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -226,14 +206,16 @@
           "sub-s": "I",
           "sub-v": "met"
         }
-      },
-      "status": "success"
+      }
     },
-    "8": {
+    {
+      "test_id": "8",
       "sentence": "The car that he drives is new.",
-      "analysis_result": {
-        "sentence": "The car that he drives is new.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "new"
@@ -242,11 +224,6 @@
           "sub-o1": "The car that",
           "sub-s": "he",
           "sub-v": "drives"
-        },
-        "meta": {
-          "processing_time": 0.170489,
-          "sentence_id": 8,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -260,14 +237,16 @@
           "sub-s": "he",
           "sub-v": "drives"
         }
-      },
-      "status": "success"
+      }
     },
-    "9": {
+    {
+      "test_id": "9",
       "sentence": "The car which was crashed is red.",
-      "analysis_result": {
-        "sentence": "The car which was crashed is red.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "red"
@@ -276,11 +255,6 @@
           "sub-s": "The car which",
           "sub-aux": "was",
           "sub-v": "crashed"
-        },
-        "meta": {
-          "processing_time": 0.199588,
-          "sentence_id": 9,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -294,14 +268,16 @@
           "sub-aux": "was",
           "sub-v": "crashed"
         }
-      },
-      "status": "success"
+      }
     },
-    "10": {
+    {
+      "test_id": "10",
       "sentence": "The book that was written is famous.",
-      "analysis_result": {
-        "sentence": "The book that was written is famous.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "famous"
@@ -310,11 +286,6 @@
           "sub-s": "The book that",
           "sub-aux": "was",
           "sub-v": "written"
-        },
-        "meta": {
-          "processing_time": 0.191985,
-          "sentence_id": 10,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -328,14 +299,16 @@
           "sub-aux": "was",
           "sub-v": "written"
         }
-      },
-      "status": "success"
+      }
     },
-    "11": {
+    {
+      "test_id": "11",
       "sentence": "The letter which was sent arrived.",
-      "analysis_result": {
-        "sentence": "The letter which was sent arrived.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "arrived"
         },
@@ -343,11 +316,6 @@
           "sub-s": "The letter which",
           "sub-aux": "was",
           "sub-v": "sent"
-        },
-        "meta": {
-          "processing_time": 0.178784,
-          "sentence_id": 11,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -360,14 +328,16 @@
           "sub-aux": "was",
           "sub-v": "sent"
         }
-      },
-      "status": "success"
+      }
     },
-    "12": {
+    {
+      "test_id": "12",
       "sentence": "The man whose car is red lives here.",
-      "analysis_result": {
-        "sentence": "The man whose car is red lives here.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "lives",
           "M2": "here"
@@ -376,11 +346,6 @@
           "sub-s": "The man whose car",
           "sub-v": "is",
           "sub-c1": "red"
-        },
-        "meta": {
-          "processing_time": 0.19968,
-          "sentence_id": 12,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -394,14 +359,16 @@
           "sub-v": "is",
           "sub-c1": "red"
         }
-      },
-      "status": "success"
+      }
     },
-    "13": {
+    {
+      "test_id": "13",
       "sentence": "The student whose book I borrowed is smart.",
-      "analysis_result": {
-        "sentence": "The student whose book I borrowed is smart.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "smart"
@@ -410,11 +377,6 @@
           "sub-o1": "The student whose book",
           "sub-s": "I",
           "sub-v": "borrowed"
-        },
-        "meta": {
-          "processing_time": 0.223131,
-          "sentence_id": 13,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -428,14 +390,16 @@
           "sub-s": "I",
           "sub-v": "borrowed"
         }
-      },
-      "status": "success"
+      }
     },
-    "14": {
+    {
+      "test_id": "14",
       "sentence": "The woman whose dog barks is my neighbor.",
-      "analysis_result": {
-        "sentence": "The woman whose dog barks is my neighbor.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "my neighbor"
@@ -443,11 +407,6 @@
         "sub_slots": {
           "sub-s": "The woman whose dog",
           "sub-v": "barks"
-        },
-        "meta": {
-          "processing_time": 0.220337,
-          "sentence_id": 14,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -460,14 +419,16 @@
           "sub-s": "The woman whose dog",
           "sub-v": "barks"
         }
-      },
-      "status": "success"
+      }
     },
-    "15": {
+    {
+      "test_id": "15",
       "sentence": "The place where we met is beautiful.",
-      "analysis_result": {
-        "sentence": "The place where we met is beautiful.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "beautiful"
@@ -476,11 +437,6 @@
           "sub-m2": "The place where",
           "sub-s": "we",
           "sub-v": "met"
-        },
-        "meta": {
-          "processing_time": 0.200706,
-          "sentence_id": 15,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -494,14 +450,16 @@
           "sub-s": "we",
           "sub-v": "met"
         }
-      },
-      "status": "success"
+      }
     },
-    "16": {
+    {
+      "test_id": "16",
       "sentence": "The time when he arrived was late.",
-      "analysis_result": {
-        "sentence": "The time when he arrived was late.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "was",
           "C1": "late"
@@ -510,11 +468,6 @@
           "sub-m2": "The time when",
           "sub-s": "he",
           "sub-v": "arrived"
-        },
-        "meta": {
-          "processing_time": 0.195629,
-          "sentence_id": 16,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -528,14 +481,16 @@
           "sub-s": "he",
           "sub-v": "arrived"
         }
-      },
-      "status": "success"
+      }
     },
-    "17": {
+    {
+      "test_id": "17",
       "sentence": "The reason why she left is unclear.",
-      "analysis_result": {
-        "sentence": "The reason why she left is unclear.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "unclear"
@@ -544,11 +499,6 @@
           "sub-m2": "The reason why",
           "sub-s": "she",
           "sub-v": "left"
-        },
-        "meta": {
-          "processing_time": 0.190583,
-          "sentence_id": 17,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -562,14 +512,16 @@
           "sub-s": "she",
           "sub-v": "left"
         }
-      },
-      "status": "success"
+      }
     },
-    "18": {
+    {
+      "test_id": "18",
       "sentence": "The way how he solved it was clever.",
-      "analysis_result": {
-        "sentence": "The way how he solved it was clever.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "was",
           "C1": "clever"
@@ -579,11 +531,6 @@
           "sub-s": "he",
           "sub-v": "solved",
           "sub-o1": "it"
-        },
-        "meta": {
-          "processing_time": 0.19726,
-          "sentence_id": 18,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -598,14 +545,16 @@
           "sub-v": "solved",
           "sub-o1": "it"
         }
-      },
-      "status": "success"
+      }
     },
-    "19": {
+    {
+      "test_id": "19",
       "sentence": "The book I read yesterday was boring.",
-      "analysis_result": {
-        "sentence": "The book I read yesterday was boring.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "was",
           "C1": "boring"
@@ -615,11 +564,6 @@
           "sub-s": "I",
           "sub-v": "read",
           "sub-m2": "yesterday"
-        },
-        "meta": {
-          "processing_time": 0.197046,
-          "sentence_id": 19,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -634,25 +578,22 @@
           "sub-v": "read",
           "sub-m2": "yesterday"
         }
-      },
-      "status": "success"
+      }
     },
-    "20": {
+    {
+      "test_id": "20",
       "sentence": "He has finished his homework.",
-      "analysis_result": {
-        "sentence": "He has finished his homework.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "He",
           "V": "finished",
           "O1": "his homework",
           "Aux": "has"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.169678,
-          "sentence_id": 20,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -662,25 +603,22 @@
           "O1": "his homework"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "21": {
+    {
+      "test_id": "21",
       "sentence": "The letter was written by John.",
-      "analysis_result": {
-        "sentence": "The letter was written by John.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "written",
           "S": "The letter",
           "Aux": "was",
           "M2": "by John"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.170761,
-          "sentence_id": 21,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -690,25 +628,22 @@
           "M2": "by John"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "22": {
+    {
+      "test_id": "22",
       "sentence": "The house was built in 1990.",
-      "analysis_result": {
-        "sentence": "The house was built in 1990.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "built",
           "S": "The house",
           "Aux": "was",
           "M2": "in 1990"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.15758,
-          "sentence_id": 22,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -718,25 +653,22 @@
           "M2": "in 1990"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "23": {
+    {
+      "test_id": "23",
       "sentence": "The book was written by a famous author.",
-      "analysis_result": {
-        "sentence": "The book was written by a famous author.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "written",
           "S": "The book",
           "Aux": "was",
           "M2": "by a famous author"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.201271,
-          "sentence_id": 23,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -746,25 +678,22 @@
           "M2": "by a famous author"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "24": {
+    {
+      "test_id": "24",
       "sentence": "The cake is being baked by my mother.",
-      "analysis_result": {
-        "sentence": "The cake is being baked by my mother.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "baked",
           "S": "The cake",
           "Aux": "is being",
           "M2": "by my mother"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.180925,
-          "sentence_id": 24,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -774,25 +703,22 @@
           "M2": "by my mother"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "25": {
+    {
+      "test_id": "25",
       "sentence": "The cake was eaten by the children.",
-      "analysis_result": {
-        "sentence": "The cake was eaten by the children.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "eaten",
           "S": "The cake",
           "Aux": "was",
           "M2": "by the children"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.177842,
-          "sentence_id": 25,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -802,25 +728,22 @@
           "M2": "by the children"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "26": {
+    {
+      "test_id": "26",
       "sentence": "The door was opened by the key.",
-      "analysis_result": {
-        "sentence": "The door was opened by the key.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "opened",
           "S": "The door",
           "Aux": "was",
           "M2": "by the key"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.173039,
-          "sentence_id": 26,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -830,25 +753,22 @@
           "M2": "by the key"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "27": {
+    {
+      "test_id": "27",
       "sentence": "The message was sent yesterday.",
-      "analysis_result": {
-        "sentence": "The message was sent yesterday.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "sent",
           "S": "The message",
           "Aux": "was",
           "M2": "yesterday"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.162382,
-          "sentence_id": 27,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -858,14 +778,16 @@
           "M2": "yesterday"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "28": {
+    {
+      "test_id": "28",
       "sentence": "She acts as if she knows everything.",
-      "analysis_result": {
-        "sentence": "She acts as if she knows everything.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "She",
           "V": "acts",
           "M2": ""
@@ -875,11 +797,6 @@
           "sub-s": "she",
           "sub-v": "knows",
           "sub-o1": "everything"
-        },
-        "meta": {
-          "processing_time": 0.176751,
-          "sentence_id": 28,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -894,25 +811,22 @@
           "sub-v": "knows",
           "sub-o1": "everything"
         }
-      },
-      "status": "success"
+      }
     },
-    "29": {
+    {
+      "test_id": "29",
       "sentence": "The students study hard for exams.",
-      "analysis_result": {
-        "sentence": "The students study hard for exams.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "The students",
           "V": "study",
           "M2": "hard",
           "M3": "for exams"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.176842,
-          "sentence_id": 29,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -922,25 +836,22 @@
           "M3": "for exams"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "30": {
+    {
+      "test_id": "30",
       "sentence": "The car was repaired last week.",
-      "analysis_result": {
-        "sentence": "The car was repaired last week.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "repaired",
           "S": "The car",
           "Aux": "was",
           "M2": "last week"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.166474,
-          "sentence_id": 30,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -950,14 +861,16 @@
           "M2": "last week"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "31": {
+    {
+      "test_id": "31",
       "sentence": "The book which was carefully written by Shakespeare is famous.",
-      "analysis_result": {
-        "sentence": "The book which was carefully written by Shakespeare is famous.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "is",
           "C1": "famous"
@@ -968,11 +881,6 @@
           "sub-v": "written",
           "sub-m2": "carefully",
           "sub-m3": "by Shakespeare"
-        },
-        "meta": {
-          "processing_time": 0.275455,
-          "sentence_id": 31,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -988,14 +896,16 @@
           "sub-m2": "carefully",
           "sub-m3": "by Shakespeare"
         }
-      },
-      "status": "success"
+      }
     },
-    "32": {
+    {
+      "test_id": "32",
       "sentence": "The car that was quickly repaired yesterday runs smoothly.",
-      "analysis_result": {
-        "sentence": "The car that was quickly repaired yesterday runs smoothly.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "runs",
           "M2": "smoothly"
@@ -1006,11 +916,6 @@
           "sub-v": "repaired",
           "sub-m2": "quickly",
           "sub-m3": "yesterday"
-        },
-        "meta": {
-          "processing_time": 0.265233,
-          "sentence_id": 32,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1026,14 +931,16 @@
           "sub-m2": "quickly",
           "sub-m3": "yesterday"
         }
-      },
-      "status": "success"
+      }
     },
-    "33": {
+    {
+      "test_id": "33",
       "sentence": "The letter which was slowly typed by the secretary arrived today.",
-      "analysis_result": {
-        "sentence": "The letter which was slowly typed by the secretary arrived today.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "arrived",
           "M2": "today"
@@ -1044,11 +951,6 @@
           "sub-v": "typed",
           "sub-m2": "slowly",
           "sub-m3": "by the secretary"
-        },
-        "meta": {
-          "processing_time": 0.285216,
-          "sentence_id": 33,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1064,14 +966,16 @@
           "sub-m2": "slowly",
           "sub-m3": "by the secretary"
         }
-      },
-      "status": "success"
+      }
     },
-    "34": {
+    {
+      "test_id": "34",
       "sentence": "The student who studies diligently always succeeds academically.",
-      "analysis_result": {
-        "sentence": "The student who studies diligently always succeeds academically.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "succeeds",
           "M2": "always",
@@ -1081,11 +985,6 @@
           "sub-s": "The student who",
           "sub-v": "studies",
           "sub-m2": "diligently"
-        },
-        "meta": {
-          "processing_time": 0.288259,
-          "sentence_id": 34,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1100,14 +999,16 @@
           "sub-v": "studies",
           "sub-m2": "diligently"
         }
-      },
-      "status": "success"
+      }
     },
-    "35": {
+    {
+      "test_id": "35",
       "sentence": "The teacher whose class runs efficiently is respected greatly.",
-      "analysis_result": {
-        "sentence": "The teacher whose class runs efficiently is respected greatly.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "respected",
           "Aux": "is",
@@ -1117,11 +1018,6 @@
           "sub-s": "The teacher whose class",
           "sub-v": "runs",
           "sub-m2": "efficiently"
-        },
-        "meta": {
-          "processing_time": 0.268183,
-          "sentence_id": 35,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1136,14 +1032,16 @@
           "sub-v": "runs",
           "sub-m2": "efficiently"
         }
-      },
-      "status": "success"
+      }
     },
-    "36": {
+    {
+      "test_id": "36",
       "sentence": "The doctor who works carefully saves lives successfully.",
-      "analysis_result": {
-        "sentence": "The doctor who works carefully saves lives successfully.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "saves",
           "O1": "lives",
@@ -1153,11 +1051,6 @@
           "sub-s": "The doctor who",
           "sub-v": "works",
           "sub-m2": "carefully"
-        },
-        "meta": {
-          "processing_time": 0.281544,
-          "sentence_id": 36,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1172,26 +1065,23 @@
           "sub-v": "works",
           "sub-m2": "carefully"
         }
-      },
-      "status": "success"
+      }
     },
-    "37": {
+    {
+      "test_id": "37",
       "sentence": "The window was gently opened by the morning breeze.",
-      "analysis_result": {
-        "sentence": "The window was gently opened by the morning breeze.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "opened",
           "S": "The window",
           "Aux": "was",
           "M2": "gently",
           "M3": "by the morning breeze"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.233752,
-          "sentence_id": 37,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1202,26 +1092,23 @@
           "M3": "by the morning breeze"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "38": {
+    {
+      "test_id": "38",
       "sentence": "The message is being carefully written by the manager.",
-      "analysis_result": {
-        "sentence": "The message is being carefully written by the manager.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "written",
           "S": "The message",
           "Aux": "is being",
           "M2": "carefully",
           "M3": "by the manager"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.249803,
-          "sentence_id": 38,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1232,26 +1119,23 @@
           "M3": "by the manager"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "39": {
+    {
+      "test_id": "39",
       "sentence": "The problem was quickly solved by the expert team.",
-      "analysis_result": {
-        "sentence": "The problem was quickly solved by the expert team.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "solved",
           "S": "The problem",
           "Aux": "was",
           "M2": "quickly",
           "M3": "by the expert team"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.255154,
-          "sentence_id": 39,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1262,14 +1146,16 @@
           "M3": "by the expert team"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "40": {
+    {
+      "test_id": "40",
       "sentence": "The house whose roof was damaged badly needs immediate repair.",
-      "analysis_result": {
-        "sentence": "The house whose roof was damaged badly needs immediate repair.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "needs",
           "O1": "immediate repair"
@@ -1279,11 +1165,6 @@
           "sub-aux": "was",
           "sub-v": "damaged",
           "sub-m2": "badly"
-        },
-        "meta": {
-          "processing_time": 0.279927,
-          "sentence_id": 40,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1298,14 +1179,16 @@
           "sub-v": "damaged",
           "sub-m2": "badly"
         }
-      },
-      "status": "success"
+      }
     },
-    "41": {
+    {
+      "test_id": "41",
       "sentence": "The place where we met accidentally became our favorite spot.",
-      "analysis_result": {
-        "sentence": "The place where we met accidentally became our favorite spot.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "became",
           "C1": "our favorite spot"
@@ -1315,11 +1198,6 @@
           "sub-s": "we",
           "sub-v": "met",
           "sub-m3": "accidentally"
-        },
-        "meta": {
-          "processing_time": 0.26416,
-          "sentence_id": 41,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1334,14 +1212,16 @@
           "sub-m2": "The place where",
           "sub-m3": "accidentally"
         }
-      },
-      "status": "success"
+      }
     },
-    "42": {
+    {
+      "test_id": "42",
       "sentence": "The time when everything changed dramatically was unexpected.",
-      "analysis_result": {
-        "sentence": "The time when everything changed dramatically was unexpected.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "unexpected",
           "Aux": "was",
           "S": ""
@@ -1351,11 +1231,6 @@
           "sub-s": "everything",
           "sub-v": "changed",
           "sub-m3": "dramatically"
-        },
-        "meta": {
-          "processing_time": 0.297596,
-          "sentence_id": 42,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1370,26 +1245,23 @@
           "sub-m2": "The time when",
           "sub-m3": "dramatically"
         }
-      },
-      "status": "success"
+      }
     },
-    "43": {
+    {
+      "test_id": "43",
       "sentence": "The building is being constructed very carefully by skilled workers.",
-      "analysis_result": {
-        "sentence": "The building is being constructed very carefully by skilled workers.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "V": "constructed",
           "S": "The building",
           "Aux": "is being",
           "M2": "very carefully",
           "M3": "by skilled workers"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.338933,
-          "sentence_id": 43,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1400,14 +1272,16 @@
           "M3": "by skilled workers"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "44": {
+    {
+      "test_id": "44",
       "sentence": "The teacher explains grammar clearly to confused students daily.",
-      "analysis_result": {
-        "sentence": "The teacher explains grammar clearly to confused students daily.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "The teacher",
           "V": "explains",
           "O1": "grammar",
@@ -1415,12 +1289,7 @@
           "M2": "to confused students",
           "M3": "daily"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.303433,
-          "sentence_id": 44,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1432,26 +1301,23 @@
           "M3": "daily"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "45": {
+    {
+      "test_id": "45",
       "sentence": "The student writes essays carefully for better grades.",
-      "analysis_result": {
-        "sentence": "The student writes essays carefully for better grades.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "The student",
           "V": "writes",
           "O1": "essays",
           "M2": "carefully",
           "M3": "for better grades"
         },
-        "sub_slots": {},
-        "meta": {
-          "processing_time": 0.301815,
-          "sentence_id": 45,
-          "active_handlers": 7
-        }
+        "sub_slots": {}
       },
       "expected": {
         "main_slots": {
@@ -1462,14 +1328,16 @@
           "M3": "for better grades"
         },
         "sub_slots": {}
-      },
-      "status": "success"
+      }
     },
-    "46": {
+    {
+      "test_id": "46",
       "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
-      "analysis_result": {
-        "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "published",
           "Aux": "was",
@@ -1481,11 +1349,6 @@
           "sub-v": "reviewed",
           "sub-m2": "thoroughly",
           "sub-m3": "by experts"
-        },
-        "meta": {
-          "processing_time": 0.494731,
-          "sentence_id": 46,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1502,14 +1365,16 @@
           "sub-m2": "thoroughly",
           "sub-m3": "by experts"
         }
-      },
-      "status": "success"
+      }
     },
-    "47": {
+    {
+      "test_id": "47",
       "sentence": "The student whose essay was carefully corrected improved dramatically.",
-      "analysis_result": {
-        "sentence": "The student whose essay was carefully corrected improved dramatically.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "improved",
           "M2": "dramatically"
@@ -1519,11 +1384,6 @@
           "sub-aux": "was",
           "sub-v": "corrected",
           "sub-m2": "carefully"
-        },
-        "meta": {
-          "processing_time": 0.283974,
-          "sentence_id": 47,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1538,14 +1398,16 @@
           "sub-v": "corrected",
           "sub-m2": "carefully"
         }
-      },
-      "status": "success"
+      }
     },
-    "48": {
+    {
+      "test_id": "48",
       "sentence": "The machine that was properly maintained works efficiently every day.",
-      "analysis_result": {
-        "sentence": "The machine that was properly maintained works efficiently every day.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "works",
           "M2": "efficiently",
@@ -1556,11 +1418,6 @@
           "sub-aux": "was",
           "sub-v": "maintained",
           "sub-m2": "properly"
-        },
-        "meta": {
-          "processing_time": 0.290859,
-          "sentence_id": 48,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1576,14 +1433,16 @@
           "sub-v": "maintained",
           "sub-m2": "properly"
         }
-      },
-      "status": "success"
+      }
     },
-    "49": {
+    {
+      "test_id": "49",
       "sentence": "The team working overtime completed the project successfully yesterday.",
-      "analysis_result": {
-        "sentence": "The team working overtime completed the project successfully yesterday.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "completed",
           "O1": "the project",
@@ -1593,11 +1452,6 @@
         "sub_slots": {
           "sub-v": "the team working",
           "sub-m2": "overtime"
-        },
-        "meta": {
-          "processing_time": 0.280045,
-          "sentence_id": 49,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1612,14 +1466,16 @@
           "sub-v": "the team working",
           "sub-m2": "overtime"
         }
-      },
-      "status": "success"
+      }
     },
-    "50": {
+    {
+      "test_id": "50",
       "sentence": "The woman standing quietly near the door was waiting patiently.",
-      "analysis_result": {
-        "sentence": "The woman standing quietly near the door was waiting patiently.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "waiting",
           "M2": "patiently",
@@ -1629,11 +1485,6 @@
           "sub-v": "the woman standing",
           "sub-m2": "quietly",
           "sub-m3": "near the door"
-        },
-        "meta": {
-          "processing_time": 0.346543,
-          "sentence_id": 50,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1648,14 +1499,16 @@
           "sub-m2": "quietly",
           "sub-m3": "near the door"
         }
-      },
-      "status": "success"
+      }
     },
-    "51": {
+    {
+      "test_id": "51",
       "sentence": "The children playing happily in the garden were supervised carefully.",
-      "analysis_result": {
-        "sentence": "The children playing happily in the garden were supervised carefully.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "supervised",
           "Aux": "were",
@@ -1665,11 +1518,6 @@
           "sub-v": "the children playing",
           "sub-m2": "happily",
           "sub-m3": "in the garden"
-        },
-        "meta": {
-          "processing_time": 0.285781,
-          "sentence_id": 51,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1684,14 +1532,16 @@
           "sub-m2": "happily",
           "sub-m3": "in the garden"
         }
-      },
-      "status": "success"
+      }
     },
-    "52": {
+    {
+      "test_id": "52",
       "sentence": "The documents being reviewed thoroughly will be approved soon.",
-      "analysis_result": {
-        "sentence": "The documents being reviewed thoroughly will be approved soon.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "approved",
           "Aux": "will be",
@@ -1701,11 +1551,6 @@
           "sub-aux": "The documents being",
           "sub-v": "reviewed",
           "sub-m2": "thoroughly"
-        },
-        "meta": {
-          "processing_time": 0.279797,
-          "sentence_id": 52,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1720,14 +1565,16 @@
           "sub-v": "reviewed",
           "sub-m2": "thoroughly"
         }
-      },
-      "status": "success"
+      }
     },
-    "53": {
+    {
+      "test_id": "53",
       "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
-      "analysis_result": {
-        "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
-        "slots": {
+      "main_match": true,
+      "sub_match": true,
+      "perfect": true,
+      "system_output": {
+        "main_slots": {
           "S": "",
           "V": "became",
           "C1": "famous",
@@ -1738,11 +1585,6 @@
           "sub-aux": "were",
           "sub-v": "exhibited",
           "sub-m2": "internationally"
-        },
-        "meta": {
-          "processing_time": 0.330082,
-          "sentence_id": 53,
-          "active_handlers": 7
         }
       },
       "expected": {
@@ -1758,8 +1600,7 @@
           "sub-v": "exhibited",
           "sub-m2": "internationally"
         }
-      },
-      "status": "success"
+      }
     }
-  }
+  ]
 }

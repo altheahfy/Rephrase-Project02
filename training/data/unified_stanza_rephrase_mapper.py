@@ -294,6 +294,9 @@ class UnifiedStanzaRephraseMapper:
             # 助動詞構造の人間文法認識パターン検出
             corrected_doc = self._correct_auxiliary_patterns(corrected_doc, sentence)
             
+            # 接続詞構造の人間文法認識パターン検出
+            corrected_doc = self._correct_conjunction_patterns(corrected_doc, sentence)
+            
             self.logger.debug("🧠 人間文法認識完了")
             return corrected_doc
             
@@ -763,6 +766,177 @@ class UnifiedStanzaRephraseMapper:
                         'relative_adverb': rel_adverb,
                         'relative_verb': rel_verb,
                         'confidence': 0.85
+                    })
+                    break
+        
+        return pattern_result
+
+    def _correct_auxiliary_patterns(self, doc, sentence):
+        """
+        助動詞構造の人間文法認識パターン検出・修正
+        
+        人間の認識: 助動詞 + 動詞 → 時制・態・法の意味的理解
+        stanza誤判定: 統計的依存関係による助動詞構造の誤認識
+        """
+        if not doc.sentences:
+            return doc
+            
+        sent = doc.sentences[0]
+        words = sent.words
+        
+        # 助動詞パターン認識
+        auxiliary_patterns = self._detect_auxiliary_structural_patterns(words, sentence)
+        
+        if auxiliary_patterns['found']:
+            aux_info = auxiliary_patterns['patterns'][0]  # 最も確信度の高いパターン
+            
+            self.logger.info(
+                f"人間文法修正[助動詞]: '{aux_info['type']}' pattern detected "
+                f"(確信度: {aux_info['confidence']:.2f})"
+            )
+            
+            # 修正情報を記録
+            if not hasattr(doc, '_human_grammar_corrections'):
+                doc._human_grammar_corrections = []
+            
+            doc._human_grammar_corrections.append({
+                'type': 'auxiliary_complex',
+                'pattern_type': aux_info['type'],
+                'auxiliary_chain': aux_info.get('auxiliary_chain', []),
+                'main_verb': aux_info.get('main_verb'),
+                'correction': f"Human grammar recognition: {aux_info['type']} auxiliary pattern",
+                'confidence': aux_info['confidence']
+            })
+        
+        return doc
+    
+    def _detect_auxiliary_structural_patterns(self, words, sentence):
+        """人間的助動詞構造パターン検出"""
+        result = {'found': False, 'patterns': []}
+        sentence_lower = sentence.lower()
+        
+        # パターン1: Modal助動詞 + 動詞構造
+        modal_pattern = self._detect_modal_auxiliary_pattern(words, sentence_lower)
+        if modal_pattern['found']:
+            result['patterns'].append(modal_pattern)
+        
+        # パターン2: be/have + 過去分詞（完了・受動）
+        perfect_passive_pattern = self._detect_perfect_passive_pattern(words, sentence_lower)
+        if perfect_passive_pattern['found']:
+            result['patterns'].append(perfect_passive_pattern)
+        
+        # パターン3: 複合助動詞構造 (will have been, etc.)
+        complex_pattern = self._detect_complex_auxiliary_pattern(words, sentence_lower)
+        if complex_pattern['found']:
+            result['patterns'].append(complex_pattern)
+        
+        result['found'] = len(result['patterns']) > 0
+        return result
+    
+    def _detect_modal_auxiliary_pattern(self, words, sentence_lower):
+        """Modal助動詞パターン検出 (will/can/should + 動詞)"""
+        import re
+        pattern_result = {'found': False, 'type': 'modal_auxiliary', 'confidence': 0.0}
+        
+        # Modal助動詞リスト
+        modals = ['will', 'would', 'can', 'could', 'should', 'shall', 'may', 'might', 'must']
+        
+        for modal in modals:
+            if modal in sentence_lower:
+                # パターン: [主語] + modal + [動詞]
+                pattern = rf'(\w+)\s+{modal}\s+(\w+)'
+                match = re.search(pattern, sentence_lower)
+                
+                if match:
+                    subject_text, verb_text = match.groups()
+                    
+                    # 実際の語オブジェクトを探す
+                    modal_word = next((w for w in words if w.text.lower() == modal), None)
+                    main_verb = next((w for w in words if w.text.lower() == verb_text), None)
+                    
+                    if modal_word and main_verb:
+                        pattern_result.update({
+                            'found': True,
+                            'auxiliary_chain': [modal_word],
+                            'main_verb': main_verb,
+                            'confidence': 0.9
+                        })
+                        break
+        
+        return pattern_result
+    
+    def _detect_perfect_passive_pattern(self, words, sentence_lower):
+        """完了・受動パターン検出 (have/be + 過去分詞)"""
+        import re
+        pattern_result = {'found': False, 'type': 'perfect_passive', 'confidence': 0.0}
+        
+        # パターン: have/has/had + 過去分詞 (完了)
+        perfect_patterns = [
+            r'(have|has|had)\s+(\w+ed|\w+en)',  # 規則動詞
+            r'(have|has|had)\s+(been|done|gone|seen|taken)',  # 不規則動詞例
+        ]
+        
+        # パターン: be + 過去分詞 (受動)
+        passive_patterns = [
+            r'(is|are|was|were|being|been)\s+(\w+ed|\w+en)',
+            r'(is|are|was|were|being|been)\s+(done|made|given|taken)',
+        ]
+        
+        all_patterns = perfect_patterns + passive_patterns
+        
+        for pattern in all_patterns:
+            match = re.search(pattern, sentence_lower)
+            if match:
+                aux_text, participle_text = match.groups()
+                
+                # 実際の語オブジェクトを探す
+                aux_word = next((w for w in words if w.text.lower() == aux_text), None)
+                participle = next((w for w in words if w.text.lower() == participle_text), None)
+                
+                if aux_word and participle:
+                    pattern_result.update({
+                        'found': True,
+                        'auxiliary_chain': [aux_word],
+                        'main_verb': participle,
+                        'confidence': 0.85
+                    })
+                    break
+        
+        return pattern_result
+    
+    def _detect_complex_auxiliary_pattern(self, words, sentence_lower):
+        """複合助動詞パターン検出 (will have been, etc.)"""
+        import re
+        pattern_result = {'found': False, 'type': 'complex_auxiliary', 'confidence': 0.0}
+        
+        # 複合助動詞パターン
+        complex_patterns = [
+            r'(will|would|can|could|should|shall|may|might|must)\s+(have|be)\s+(\w+)',
+            r'(have|has|had)\s+(been)\s+(\w+)',
+            r'(is|are|was|were)\s+(being)\s+(\w+)',
+        ]
+        
+        for pattern in complex_patterns:
+            match = re.search(pattern, sentence_lower)
+            if match:
+                groups = match.groups()
+                
+                # 実際の語オブジェクトを探す
+                aux_chain = []
+                for aux_text in groups[:-1]:  # 最後は主動詞
+                    aux_word = next((w for w in words if w.text.lower() == aux_text), None)
+                    if aux_word:
+                        aux_chain.append(aux_word)
+                
+                main_verb_text = groups[-1]
+                main_verb = next((w for w in words if w.text.lower() == main_verb_text), None)
+                
+                if aux_chain and main_verb:
+                    pattern_result.update({
+                        'found': True,
+                        'auxiliary_chain': aux_chain,
+                        'main_verb': main_verb,
+                        'confidence': 0.8
                     })
                     break
         
@@ -4697,7 +4871,7 @@ class UnifiedStanzaRephraseMapper:
     
     def _handle_auxiliary_complex(self, sentence, base_result: Dict, shared_context: Dict = None) -> Dict[str, Any]:
         """
-        助動詞複合体処理ハンドラー (Phase 3)
+        助動詞複合体処理ハンドラー (Phase 3 - 人間文法認識優先)
         
         複合助動詞チェーンの処理:
         - is being (現在進行受動態)
@@ -4715,17 +4889,36 @@ class UnifiedStanzaRephraseMapper:
             'metadata': {}
         }
         
-        # 助動詞チェーン検出
+        # 🧠 人間文法認識結果を最優先で利用
         auxiliary_chain = []
         main_verb = None
         subject = None
         
-        # 第一パス: 主動詞を特定
-        for word in sentence.words:
-            if word.deprel == 'root' and word.upos == 'VERB':
-                main_verb = word
-                print(f"    主動詞検出: {word.text}")
-                break
+        # 人間文法認識による助動詞パターンをチェック
+        if hasattr(sentence, '_human_grammar_corrections'):
+            for correction in sentence._human_grammar_corrections:
+                if correction.get('type') == 'auxiliary_complex':
+                    pattern_type = correction.get('pattern_type')
+                    print(f"    🧠 人間文法認識適用: {pattern_type} 助動詞パターン")
+                    
+                    # 人間文法認識で特定された助動詞チェーンを使用
+                    aux_chain = correction.get('auxiliary_chain', [])
+                    human_main_verb = correction.get('main_verb')
+                    
+                    if aux_chain and human_main_verb:
+                        auxiliary_chain = [w.text for w in aux_chain]
+                        main_verb = human_main_verb
+                        print(f"    🧠 人間文法認識: 助動詞={auxiliary_chain}, 主動詞={main_verb.text}")
+                        break
+        
+        # フォールバック: 従来のStanza依存型検出
+        if not auxiliary_chain:
+            # 第一パス: 主動詞を特定
+            for word in sentence.words:
+                if word.deprel == 'root' and word.upos == 'VERB':
+                    main_verb = word
+                    print(f"    主動詞検出: {word.text}")
+                    break
         
         # 第二パス: 助動詞を節レベルで分類して収集
         main_auxiliary_words = []  # 主節助動詞
