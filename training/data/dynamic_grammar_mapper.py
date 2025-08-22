@@ -21,6 +21,9 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple, Set
 from dataclasses import dataclass
 
+# 🆕 Phase 1.2: 文型認識エンジン追加
+from sentence_type_detector import SentenceTypeDetector
+
 @dataclass
 class GrammarElement:
     """文法要素の定義"""
@@ -30,6 +33,16 @@ class GrammarElement:
     start_idx: int
     end_idx: int
     confidence: float
+    
+    # 🆕 Order機能関連フィールド (Phase 1.1)
+    # デフォルト値設定により既存コードへの影響を最小化
+    slot_display_order: int = 0      # 上位スロット順序
+    display_order: int = 0           # サブスロット内順序  
+    v_group_key: str = ""            # 動詞グループキー
+    sentence_type: str = ""          # 文型 (statement/wh_question/yes_no_question)
+    is_subslot: bool = False         # サブスロットフラグ
+    parent_slot: str = ""            # 親スロット (サブスロット用)
+    subslot_id: str = ""             # サブスロットID (sub-s, sub-v等)
 
 class DynamicGrammarMapper:
     """
@@ -47,6 +60,10 @@ class DynamicGrammarMapper:
             raise
         
         self.logger = logging.getLogger(__name__)
+        
+        # 🆕 Phase 1.2: 文型認識エンジン初期化
+        self.sentence_type_detector = SentenceTypeDetector()
+        print("✅ 文型認識エンジン初期化完了")
         
         # 動詞分類辞書
         self.linking_verbs = {
@@ -99,6 +116,10 @@ class DynamicGrammarMapper:
             Dict[str, Any]: Rephraseスロット構造
         """
         try:
+            # 🆕 Phase 1.2: 文型認識
+            sentence_type = self.sentence_type_detector.detect_sentence_type(sentence)
+            sentence_type_confidence = self.sentence_type_detector.get_detection_confidence(sentence)
+            
             # 1. spaCy基本解析
             doc = self.nlp(sentence)
             tokens = self._extract_tokens(doc)
@@ -114,6 +135,10 @@ class DynamicGrammarMapper:
             
             # 5. Rephraseスロット形式に変換
             rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern)
+            
+            # 🆕 Phase 1.2: 文型情報を結果に追加
+            rephrase_result['sentence_type'] = sentence_type
+            rephrase_result['sentence_type_confidence'] = sentence_type_confidence
             
             return rephrase_result
             
