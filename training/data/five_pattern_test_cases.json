@@ -1,0 +1,161 @@
+{
+  "test_description": "基本5文型のRephrase準拠スロット分解テストケース",
+  "total_cases": 15,
+  "patterns": ["SV", "SVC", "SVO", "SVOO", "SVOC"],
+  "cases_per_pattern": 3,
+  "test_cases": [
+    {
+      "id": "SV_001",
+      "pattern": "SV",
+      "sentence": "The dog runs.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "The dog", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "runs.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SV_002",
+      "pattern": "SV",
+      "sentence": "Children play.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "Children", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "play.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SV_003",
+      "pattern": "SV",
+      "sentence": "Birds fly.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "Birds", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "fly.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVC_001",
+      "pattern": "SVC",
+      "sentence": "The car is red.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "The car", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "is", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C1", "SlotPhrase": "red.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVC_002",
+      "pattern": "SVC",
+      "sentence": "She looks happy.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "She", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "looks", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C1", "SlotPhrase": "happy.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVC_003",
+      "pattern": "SVC",
+      "sentence": "This tastes good.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "This", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "tastes", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C1", "SlotPhrase": "good.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVO_001",
+      "pattern": "SVO",
+      "sentence": "I read books.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "I", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "read", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "books.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVO_002",
+      "pattern": "SVO",
+      "sentence": "He likes music.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "He", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "likes", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "music.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVO_003",
+      "pattern": "SVO",
+      "sentence": "They bought food.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "They", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "bought", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "food.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOO_001",
+      "pattern": "SVOO",
+      "sentence": "I gave him a book.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "I", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "gave", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "him", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O2", "SlotPhrase": "a book.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOO_002",
+      "pattern": "SVOO",
+      "sentence": "She sent me a letter.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "She", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "sent", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "me", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O2", "SlotPhrase": "a letter.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOO_003",
+      "pattern": "SVOO",
+      "sentence": "He told us the story.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "He", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "told", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "us", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O2", "SlotPhrase": "the story.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOC_001",
+      "pattern": "SVOC",
+      "sentence": "We made him happy.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "We", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "made", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "him", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C2", "SlotPhrase": "happy.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOC_002",
+      "pattern": "SVOC",
+      "sentence": "They found her clever.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "They", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "found", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "her", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C2", "SlotPhrase": "clever.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    },
+    {
+      "id": "SVOC_003",
+      "pattern": "SVOC",
+      "sentence": "I call him John.",
+      "expected_rephrase_slots": [
+        {"Slot": "S", "SlotPhrase": "I", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 1, "display_order": 0, "QuestionType": ""},
+        {"Slot": "V", "SlotPhrase": "call", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 2, "display_order": 0, "QuestionType": ""},
+        {"Slot": "O1", "SlotPhrase": "him", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 3, "display_order": 0, "QuestionType": ""},
+        {"Slot": "C2", "SlotPhrase": "John.", "SlotText": "", "PhraseType": "word", "SubslotID": "", "SubslotElement": "", "SubslotText": "", "Slot_display_order": 4, "display_order": 0, "QuestionType": ""}
+      ]
+    }
+  ]
+}

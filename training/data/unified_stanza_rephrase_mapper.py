@@ -1393,6 +1393,76 @@ class UnifiedStanzaRephraseMapper:
                         result['slots']['S'] = correction.get('subject_text', '')
                         result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
                 
+                elif pattern_type == 'SVOO':
+                    # SVOO文型: 主語 + 動詞 + 間接目的語 + 直接目的語（完全Rephrase準拠構造）
+                    try:
+                        subject_text = correction.get('subject_text')
+                        verb = correction['verb']
+                        indirect_object_text = correction.get('indirect_object_text')
+                        direct_object_text = correction.get('direct_object_text')
+                        
+                        # Rephrase準拠出力構造生成
+                        rephrase_slots = self._generate_rephrase_slot_structure([
+                            {'slot': 'S', 'text': subject_text, 'position': 1},
+                            {'slot': 'V', 'text': verb.text, 'position': 2},
+                            {'slot': 'O2', 'text': indirect_object_text, 'position': 3},  # 間接目的語
+                            {'slot': 'O1', 'text': direct_object_text, 'position': 4}    # 直接目的語
+                        ])
+                        
+                        # 互換性のため既存形式も維持
+                        result['slots']['S'] = subject_text
+                        result['slots']['V'] = verb.text
+                        result['slots']['O2'] = indirect_object_text
+                        result['slots']['O1'] = direct_object_text
+                        
+                        # 完全なRephrase構造をrephrase_slotsキーで格納
+                        result['rephrase_slots'] = rephrase_slots
+                        
+                        self.logger.info(f"✅ SVOO文型Rephrase準拠スロット生成: S='{subject_text}', V='{verb.text}', O2='{indirect_object_text}', O1='{direct_object_text}'")
+                        
+                    except Exception as e:
+                        self.logger.error(f"🚨 SVOO文型処理エラー: {e}, correction keys: {list(correction.keys())}")
+                        # フォールバック: エラー発生時は従来の処理
+                        result['slots']['S'] = correction.get('subject_text', '')
+                        result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
+                        result['slots']['O2'] = correction.get('indirect_object_text', '')
+                        result['slots']['O1'] = correction.get('direct_object_text', '')
+                
+                elif pattern_type == 'SVOC':
+                    # SVOC文型: 主語 + 動詞 + 目的語 + 補語（完全Rephrase準拠構造）
+                    try:
+                        subject_text = correction.get('subject_text')
+                        verb = correction['verb']
+                        object_text = correction.get('object_text')
+                        complement_text = correction.get('complement_text')
+                        
+                        # Rephrase準拠出力構造生成
+                        rephrase_slots = self._generate_rephrase_slot_structure([
+                            {'slot': 'S', 'text': subject_text, 'position': 1},
+                            {'slot': 'V', 'text': verb.text, 'position': 2},
+                            {'slot': 'O1', 'text': object_text, 'position': 3},
+                            {'slot': 'C2', 'text': complement_text, 'position': 4}  # 結果補語
+                        ])
+                        
+                        # 互換性のため既存形式も維持
+                        result['slots']['S'] = subject_text
+                        result['slots']['V'] = verb.text
+                        result['slots']['O1'] = object_text
+                        result['slots']['C2'] = complement_text
+                        
+                        # 完全なRephrase構造をrephrase_slotsキーで格納
+                        result['rephrase_slots'] = rephrase_slots
+                        
+                        self.logger.info(f"✅ SVOC文型Rephrase準拠スロット生成: S='{subject_text}', V='{verb.text}', O1='{object_text}', C2='{complement_text}'")
+                        
+                    except Exception as e:
+                        self.logger.error(f"🚨 SVOC文型処理エラー: {e}, correction keys: {list(correction.keys())}")
+                        # フォールバック: エラー発生時は従来の処理
+                        result['slots']['S'] = correction.get('subject_text', '')
+                        result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
+                        result['slots']['O1'] = correction.get('object_text', '')
+                        result['slots']['C2'] = correction.get('complement_text', '')
+                
                 # 文法情報として記録
                 result['grammar_info']['detected_patterns'].append(f'human_grammar_{pattern_type}')
                 result['grammar_info']['human_corrections'] = result['grammar_info'].get('human_corrections', [])
@@ -2038,6 +2108,18 @@ class UnifiedStanzaRephraseMapper:
             if sv_result['found']:
                 result = {'found': True, 'pattern_info': sv_result}
         
+        # パターン4: SVOO - 「主語 + 動詞 + 間接目的語 + 直接目的語」
+        if not result['found']:
+            svoo_result = self._detect_svoo_pattern(words, words_lower)
+            if svoo_result['found']:
+                result = {'found': True, 'pattern_info': svoo_result}
+        
+        # パターン5: SVOC - 「主語 + 動詞 + 目的語 + 補語」
+        if not result['found']:
+            svoc_result = self._detect_svoc_pattern(words, words_lower)
+            if svoc_result['found']:
+                result = {'found': True, 'pattern_info': svoc_result}
+        
         return result
     
     def _detect_svc_pattern(self, words, words_lower):
@@ -2210,6 +2292,148 @@ class UnifiedStanzaRephraseMapper:
         
         return {'found': False}
     
+    def _detect_svoo_pattern(self, words, words_lower):
+        """SVOO (主語 + 動詞 + 間接目的語 + 直接目的語) パターン検出"""
+        if len(words) < 4:
+            return {'found': False}
+        
+        # 第4文型動詞の検出
+        svoo_verbs = ['give', 'gives', 'gave', 'given', 'tell', 'tells', 'told', 'show', 'shows', 'showed',
+                      'teach', 'teaches', 'taught', 'send', 'sends', 'sent', 'buy', 'buys', 'bought',
+                      'bring', 'brings', 'brought', 'offer', 'offers', 'offered', 'lend', 'lends', 'lent']
+        
+        verb_idx = None
+        for i, word_lower in enumerate(words_lower):
+            if word_lower in svoo_verbs or words[i].upos == 'VERB':
+                if word_lower in svoo_verbs:  # 第4文型動詞を優先
+                    verb_idx = i
+                    break
+                elif verb_idx is None:  # 一般動詞をフォールバック
+                    verb_idx = i
+        
+        if verb_idx is None or verb_idx + 2 >= len(words):
+            return {'found': False}
+        
+        # 主語部分（動詞の前）
+        subject_parts = []
+        for i in range(verb_idx):
+            word_lower = words_lower[i]
+            if (word_lower in ['the', 'a', 'an'] or 
+                words[i].upos in ['NOUN', 'PRON', 'DET'] or
+                word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they']):
+                subject_parts.append(words[i])
+        
+        # 間接目的語と直接目的語（動詞の後）
+        indirect_obj_parts = []
+        direct_obj_parts = []
+        
+        # 動詞直後の語句を間接目的語として扱う
+        for i in range(verb_idx + 1, min(verb_idx + 3, len(words))):
+            word_lower = words_lower[i]
+            if (words[i].upos in ['NOUN', 'PRON'] or
+                word_lower in ['him', 'her', 'me', 'you', 'them', 'us']):
+                indirect_obj_parts.append(words[i])
+                break
+        
+        # その後の語句を直接目的語として扱う
+        start_idx = verb_idx + 1 + len(indirect_obj_parts)
+        for i in range(start_idx, len(words)):
+            word_lower = words_lower[i].rstrip('.,!?;:')
+            if (words[i].upos in ['NOUN', 'DET'] or
+                word_lower in ['the', 'a', 'an', 'book', 'gift', 'letter', 'money', 'food']):
+                direct_obj_parts.append(words[i])
+        
+        if subject_parts and indirect_obj_parts and direct_obj_parts:
+            subject_text = ' '.join([w.text for w in subject_parts])
+            indirect_obj_text = ' '.join([w.text for w in indirect_obj_parts])
+            direct_obj_text = ' '.join([w.text for w in direct_obj_parts])
+            
+            return {
+                'found': True,
+                'type': 'SVOO',
+                'subject_text': subject_text,
+                'verb': words[verb_idx],
+                'indirect_object_text': indirect_obj_text,
+                'direct_object_text': direct_obj_text,
+                'subject_words': subject_parts,
+                'indirect_object_words': indirect_obj_parts,
+                'direct_object_words': direct_obj_parts,
+                'subject': subject_parts[0] if subject_parts else None,
+                'indirect_object': indirect_obj_parts[0] if indirect_obj_parts else None,
+                'direct_object': direct_obj_parts[0] if direct_obj_parts else None,
+                'confidence': 0.85
+            }
+        
+        return {'found': False}
+    
+    def _detect_svoc_pattern(self, words, words_lower):
+        """SVOC (主語 + 動詞 + 目的語 + 補語) パターン検出"""
+        if len(words) < 4:
+            return {'found': False}
+        
+        # 第5文型動詞の検出
+        svoc_verbs = ['make', 'makes', 'made', 'call', 'calls', 'called', 'find', 'finds', 'found',
+                      'keep', 'keeps', 'kept', 'leave', 'leaves', 'left', 'consider', 'considers', 'considered',
+                      'think', 'thinks', 'thought', 'believe', 'believes', 'believed']
+        
+        verb_idx = None
+        for i, word_lower in enumerate(words_lower):
+            if word_lower in svoc_verbs:
+                verb_idx = i
+                break
+        
+        if verb_idx is None or verb_idx + 2 >= len(words):
+            return {'found': False}
+        
+        # 主語部分（動詞の前）
+        subject_parts = []
+        for i in range(verb_idx):
+            word_lower = words_lower[i]
+            if (word_lower in ['the', 'a', 'an'] or 
+                words[i].upos in ['NOUN', 'PRON', 'DET'] or
+                word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they']):
+                subject_parts.append(words[i])
+        
+        # 目的語（動詞直後）
+        object_parts = []
+        for i in range(verb_idx + 1, min(verb_idx + 3, len(words))):
+            word_lower = words_lower[i]
+            if (words[i].upos in ['NOUN', 'PRON', 'DET'] or
+                word_lower in ['him', 'her', 'me', 'you', 'them', 'us', 'the', 'a', 'an']):
+                object_parts.append(words[i])
+        
+        # 補語（目的語の後）
+        complement_parts = []
+        start_idx = verb_idx + 1 + len(object_parts)
+        for i in range(start_idx, len(words)):
+            word_lower = words_lower[i].rstrip('.,!?;:')
+            if (words[i].upos in ['ADJ', 'NOUN'] or
+                word_lower in ['happy', 'sad', 'angry', 'president', 'teacher', 'doctor', 'leader']):
+                complement_parts.append(words[i])
+        
+        if subject_parts and object_parts and complement_parts:
+            subject_text = ' '.join([w.text for w in subject_parts])
+            object_text = ' '.join([w.text for w in object_parts])
+            complement_text = ' '.join([w.text for w in complement_parts])
+            
+            return {
+                'found': True,
+                'type': 'SVOC',
+                'subject_text': subject_text,
+                'verb': words[verb_idx],
+                'object_text': object_text,
+                'complement_text': complement_text,
+                'subject_words': subject_parts,
+                'object_words': object_parts,
+                'complement_words': complement_parts,
+                'subject': subject_parts[0] if subject_parts else None,
+                'object': object_parts[0] if object_parts else None,
+                'complement': complement_parts[0] if complement_parts else None,
+                'confidence': 0.85
+            }
+        
+        return {'found': False}
+    
     def _apply_five_pattern_corrections(self, words, pattern_info):
         """基本5文型認識結果に基づく依存関係修正"""
         pattern_type = pattern_info['type']
@@ -2249,6 +2473,38 @@ class UnifiedStanzaRephraseMapper:
             verb.head = 0
             subject.deprel = 'nsubj'
             subject.head = verb.id
+            
+        elif pattern_type == 'SVOO':
+            # 主語: nsubj, 動詞: root, 間接目的語: iobj, 直接目的語: obj
+            subject = pattern_info['subject']
+            verb = pattern_info['verb']
+            indirect_obj = pattern_info['indirect_object']
+            direct_obj = pattern_info['direct_object']
+            
+            verb.deprel = 'root'
+            verb.head = 0
+            subject.deprel = 'nsubj'
+            subject.head = verb.id
+            indirect_obj.deprel = 'iobj'  # 間接目的語
+            indirect_obj.head = verb.id
+            direct_obj.deprel = 'obj'     # 直接目的語
+            direct_obj.head = verb.id
+            
+        elif pattern_type == 'SVOC':
+            # 主語: nsubj, 動詞: root, 目的語: obj, 補語: xcomp
+            subject = pattern_info['subject']
+            verb = pattern_info['verb']
+            obj = pattern_info['object']
+            complement = pattern_info['complement']
+            
+            verb.deprel = 'root'
+            verb.head = 0
+            subject.deprel = 'nsubj'
+            subject.head = verb.id
+            obj.deprel = 'obj'
+            obj.head = verb.id
+            complement.deprel = 'xcomp'  # 結果補語
+            complement.head = verb.id
     
     def _process_stanza_only(self, sentence: str) -> Dict[str, Any]:
         """Stanzaのみの処理（参考用）
