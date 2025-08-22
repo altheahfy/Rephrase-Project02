@@ -255,7 +255,7 @@ class DynamicGrammarMapper:
         """
         subject_indices = []
         
-        # 🆕 関係節を含む主語の特定
+        # 🆕 関係節を含む主語の特定（改良版）
         # トークンに関係節マーカーがある場合の処理
         antecedent_idx = None
         relative_clause_end_idx = None
@@ -264,8 +264,8 @@ class DynamicGrammarMapper:
             if token.get('is_antecedent', False):
                 antecedent_idx = i
             if token.get('is_relative_pronoun', False):
-                # 関係節の終わりを探す（簡単版：メイン動詞の直前まで）
-                relative_clause_end_idx = verb_idx - 1
+                # 関係節の実際の終了位置を使用
+                relative_clause_end_idx = token.get('relative_clause_end', verb_idx - 1)
                 break
         
         # 関係節を含む主語の場合
@@ -773,17 +773,61 @@ class DynamicGrammarMapper:
                             result['antecedent_idx'] = i - 1
                             result['confidence'] = 0.9
                         
-                        # 関係節の範囲を決定（簡単版）
+                        # 関係節の範囲を決定（改良版）
                         result['clause_start_idx'] = i
-                        result['clause_end_idx'] = len(tokens) - 1
+                        result['clause_end_idx'] = self._find_relative_clause_end(tokens, i, rel_pronoun)
                         
-                        self.logger.debug(f"関係節検出: {rel_pronoun} at position {i}")
+                        self.logger.debug(f"関係節検出: {rel_pronoun} at position {i}, end at {result['clause_end_idx']}")
                         break
                 
                 if result['found']:
                     break
         
         return result
+    
+    def _find_relative_clause_end(self, tokens: List[Dict], rel_start_idx: int, rel_type: str) -> int:
+        """関係節の終了位置を特定"""
+        
+        # whose構文の特別処理
+        if rel_type == 'whose':
+            return self._find_whose_clause_end(tokens, rel_start_idx)
+        
+        # 一般的な関係節の終了位置（ROOT動詞の直前）
+        for i, token in enumerate(tokens):
+            if token.get('dep') == 'ROOT' and i > rel_start_idx:
+                return i - 1
+        
+        # ROOTが見つからない場合、文末
+        return len(tokens) - 1
+    
+    def _find_whose_clause_end(self, tokens: List[Dict], whose_idx: int) -> int:
+        """whose構文の関係節終了位置を特定"""
+        
+        # whose構文パターン: whose + [名詞] + [動詞/形容詞] + [補語等...]
+        # 例: "whose car is blue" -> whose(2) car(3) is(4) blue(5)
+        
+        clause_end = whose_idx
+        
+        # whose の後の構造を解析
+        for i in range(whose_idx + 1, len(tokens)):
+            token = tokens[i]
+            
+            # 関係節内の動詞を発見したら、その補語/目的語も含める
+            if token['pos'] in ['VERB', 'AUX'] and token['dep'] == 'relcl':
+                # 関係節内動詞の補語/目的語を探す
+                for j in range(i + 1, len(tokens)):
+                    next_token = tokens[j]
+                    # メイン動詞(ROOT)に到達したら終了
+                    if next_token['dep'] == 'ROOT':
+                        clause_end = j - 1
+                        break
+                    # 関係節の補語/目的語も含める
+                    if next_token['pos'] in ['NOUN', 'ADJ', 'PROPN']:
+                        clause_end = j
+                break
+        
+        self.logger.debug(f"whose句終了位置: {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
+        return clause_end
     
     def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> List[Dict]:
         """関係節の処理
@@ -799,6 +843,8 @@ class DynamicGrammarMapper:
         if rel_pronoun_idx is not None:
             tokens[rel_pronoun_idx]['is_relative_pronoun'] = True
             tokens[rel_pronoun_idx]['relative_clause_type'] = relative_info['type']
+            # 🆕 関係節終了位置を追加
+            tokens[rel_pronoun_idx]['relative_clause_end'] = relative_info.get('clause_end_idx')
         
         antecedent_idx = relative_info.get('antecedent_idx')
         if antecedent_idx is not None:
