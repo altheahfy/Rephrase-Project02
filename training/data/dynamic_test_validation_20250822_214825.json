@@ -1,0 +1,834 @@
+{
+  "timestamp": "2025-08-22T21:48:25.586167",
+  "validator": "dynamic_test_validator",
+  "total_tests": 9,
+  "results": [
+    {
+      "test_id": "1",
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "The car",
+          "is",
+          "red"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "SUCCESS",
+      "accuracy_score": 100.0,
+      "differences": []
+    },
+    {
+      "test_id": "3",
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The man who",
+          "runs",
+          "fast",
+          "is",
+          "strong"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The man who",
+          "V": "runs",
+          "M1": "fast",
+          "M3": "strong"
+        },
+        "slots": {
+          "S": "The man who",
+          "V": "runs",
+          "M1": "fast",
+          "M3": "strong"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The man who」",
+        "メインスロット V: 期待「is」→ 実際「runs」",
+        "メインスロット C1: 期待「strong」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The man who」→ 実際「なし」",
+        "サブスロット sub-v: 期待「runs」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「fast」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "4",
+      "sentence": "The book which lies there is mine.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book which",
+          "lies",
+          "there",
+          "is",
+          "mine"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book which",
+          "V": "lies",
+          "O1": "there",
+          "M3": "mine"
+        },
+        "slots": {
+          "S": "The book which",
+          "V": "lies",
+          "O1": "there",
+          "M3": "mine"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book which」",
+        "メインスロット V: 期待「is」→ 実際「lies」",
+        "メインスロット C1: 期待「mine」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The book which」→ 実際「なし」",
+        "サブスロット sub-v: 期待「lies」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「there」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "5",
+      "sentence": "The person that works here is kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The person that",
+          "works",
+          "here",
+          "is",
+          "kind"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The person that",
+          "V": "works",
+          "M1": "here",
+          "M3": "kind"
+        },
+        "slots": {
+          "S": "The person that",
+          "V": "works",
+          "M1": "here",
+          "M3": "kind"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The person that」",
+        "メインスロット V: 期待「is」→ 実際「works」",
+        "メインスロット C1: 期待「kind」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The person that」→ 実際「なし」",
+        "サブスロット sub-v: 期待「works」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「here」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "15",
+      "sentence": "The place where we met is beautiful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "place",
+          "where",
+          "we",
+          "met",
+          "is",
+          "beautiful"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "beautiful",
+          "S": "we",
+          "V": "met"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "beautiful",
+          "S": "we",
+          "V": "met"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「we」",
+        "メインスロット V: 期待「is」→ 実際「met」",
+        "メインスロット C1: 期待「beautiful」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The place where」→ 実際「なし」",
+        "サブスロット sub-s: 期待「we」→ 実際「なし」",
+        "サブスロット sub-v: 期待「met」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "16",
+      "sentence": "The time when he arrived was late.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "time",
+          "when",
+          "he",
+          "arrived",
+          "was",
+          "late"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "late",
+          "S": "he",
+          "V": "arrived"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "late",
+          "S": "he",
+          "V": "arrived"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「he」",
+        "メインスロット V: 期待「was」→ 実際「arrived」",
+        "メインスロット C1: 期待「late」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The time when」→ 実際「なし」",
+        "サブスロット sub-s: 期待「he」→ 実際「なし」",
+        "サブスロット sub-v: 期待「arrived」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "17",
+      "sentence": "The reason why she left is unclear.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "C1",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "reason",
+          "why",
+          "she",
+          "left",
+          "is",
+          "unclear"
+        ],
+        "Slot_display_order": [
+          4,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "補語句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "C1": "reason",
+          "M3": "unclear",
+          "S": "she",
+          "V": "left"
+        },
+        "slots": {
+          "O1": "The",
+          "C1": "reason",
+          "M3": "unclear",
+          "S": "she",
+          "V": "left"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「she」",
+        "メインスロット V: 期待「is」→ 実際「left」",
+        "メインスロット C1: 期待「unclear」→ 実際「reason」",
+        "サブスロット sub-m2: 期待「The reason why」→ 実際「なし」",
+        "サブスロット sub-s: 期待「she」→ 実際「なし」",
+        "サブスロット sub-v: 期待「left」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "18",
+      "sentence": "The way how he solved it was clever.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "way",
+          "how",
+          "he",
+          "solved",
+          "it",
+          "was",
+          "clever"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "clever",
+          "S": "he",
+          "V": "solved"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "clever",
+          "S": "he",
+          "V": "solved"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「he」",
+        "メインスロット V: 期待「was」→ 実際「solved」",
+        "メインスロット C1: 期待「clever」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The way how」→ 実際「なし」",
+        "サブスロット sub-s: 期待「he」→ 実際「なし」",
+        "サブスロット sub-v: 期待「solved」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「it」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "19",
+      "sentence": "The book I read yesterday was boring.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book I",
+          "read",
+          "yesterday",
+          "was",
+          "boring"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book I",
+          "V": "read",
+          "O1": "yesterday",
+          "M3": "boring"
+        },
+        "slots": {
+          "S": "The book I",
+          "V": "read",
+          "O1": "yesterday",
+          "M3": "boring"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book I」",
+        "メインスロット V: 期待「was」→ 実際「read」",
+        "メインスロット C1: 期待「boring」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The book」→ 実際「なし」",
+        "サブスロット sub-s: 期待「I」→ 実際「なし」",
+        "サブスロット sub-v: 期待「read」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「yesterday」→ 実際「なし」"
+      ]
+    }
+  ]
+}

@@ -540,6 +540,9 @@ class DynamicGrammarMapper:
         phrase_types = []
         subslot_ids = []
         
+        # 🔧 main_slots辞書形式も生成
+        main_slots = {}
+        
         # 要素を位置順にソート
         elements.sort(key=lambda x: x.start_idx)
         
@@ -553,6 +556,9 @@ class DynamicGrammarMapper:
             
             slots.append(slot_name)
             slot_phrases.append(element.text)
+            
+            # 🔧 main_slots辞書に追加
+            main_slots[element.role] = element.text
             
             order = role_order.get(element.role, 99)
             slot_display_order.append(order)
@@ -577,6 +583,8 @@ class DynamicGrammarMapper:
             'display_order': display_order,
             'PhraseType': phrase_types,
             'SubslotID': subslot_ids,
+            'main_slots': main_slots,  # 🔧 辞書形式追加
+            'slots': main_slots,       # 🔧 統一システム互換性
             'pattern_detected': pattern,
             'confidence': 0.9,
             'analysis_method': 'dynamic_grammar',
@@ -592,6 +600,8 @@ class DynamicGrammarMapper:
             'display_order': [],
             'PhraseType': [],
             'SubslotID': [],
+            'main_slots': {},    # 🔧 辞書形式追加
+            'slots': {},         # 🔧 統一システム互換性
             'error': error,
             'sentence': sentence,
             'analysis_method': 'dynamic_grammar'

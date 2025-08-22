@@ -52,14 +52,16 @@ class DynamicTestValidator:
         
         # 文法項目別の例文IDマッピング
         self.grammar_categories = {
-            "svc": [1, 3, 4, 5, 15, 16, 17, 18, 19],  # SVC文型
-            "svo": [2, 6, 7, 8, 20, 36, 44, 45],      # SVO文型
-            "svoo": [46, 47],                          # SVOO文型（仮）
-            "svoc": [48, 49],                          # SVOC文型（仮）
+            "svc": [1, 3, 4, 5, 15, 16, 17, 18, 19, 58, 59, 60],  # SVC文型
+            "svo": [2, 6, 7, 8, 20, 36, 44, 45, 61, 62, 63],      # SVO文型
+            "svoo": [46, 47, 64, 65, 66],                          # SVOO文型
+            "svoc": [48, 49, 67, 68, 69],                          # SVOC文型
+            "sv": [55, 56, 57],                                    # SV文型（新規）
+            "basic_patterns": [55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69],  # 基本5文型
             "relative": [3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19],  # 関係詞
             "passive": [9, 10, 11, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32, 33],  # 受動態
             "complex": [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],     # 複雑構文
-            "basic": [1, 2, 20, 29, 44, 45],          # 基本文型
+            "basic": [1, 2, 20, 29, 44, 45, 55, 56, 57, 58, 59, 60, 61, 62, 63],  # 基本文型
             "auxiliary": [20, 24, 35, 38, 43, 46, 52, 53],  # 助動詞含む
             "modifier": [29, 34, 36, 37, 38, 39, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51]  # 修飾語多数
         }
@@ -263,6 +265,14 @@ class DynamicTestValidator:
         Returns:
             Dict: Rephrase形式の結果
         """
+        # 🔧 動的システムが既にmain_slotsを出力している場合は直接使用
+        if "main_slots" in result:
+            return {
+                "main_slots": result["main_slots"],
+                "sub_slots": result.get("sub_slots", {})
+            }
+        
+        # 従来の変換ロジック（古いシステム用）
         rephrase_format = {
             "main_slots": {},
             "sub_slots": {}
@@ -283,14 +293,19 @@ class DynamicTestValidator:
                     rephrase_format["main_slots"]["V"] = phrase
                 elif slot == "O":
                     rephrase_format["main_slots"]["O1"] = phrase
+                elif slot == "O1":  # 🔧 O1も処理
+                    rephrase_format["main_slots"]["O1"] = phrase
                 elif slot == "C":
                     rephrase_format["main_slots"]["C1"] = phrase
+                elif slot == "C1":  # 🔧 C1も処理
+                    rephrase_format["main_slots"]["C1"] = phrase
+                elif slot == "C2":  # 🔧 C2も処理
+                    rephrase_format["main_slots"]["C2"] = phrase
                 elif slot == "Aux":
                     rephrase_format["main_slots"]["Aux"] = phrase
                 elif slot.startswith("M"):
-                    # 修飾語の番号を動的に割り当て
-                    modifier_num = len([k for k in rephrase_format["main_slots"] if k.startswith("M")]) + 1
-                    rephrase_format["main_slots"][f"M{modifier_num}"] = phrase
+                    # 修飾語をそのまま使用
+                    rephrase_format["main_slots"][slot] = phrase
         
         return rephrase_format
     

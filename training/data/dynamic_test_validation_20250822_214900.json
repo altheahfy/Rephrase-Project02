@@ -1,0 +1,5339 @@
+{
+  "timestamp": "2025-08-22T21:49:00.216824",
+  "validator": "dynamic_test_validator",
+  "total_tests": 53,
+  "results": [
+    {
+      "test_id": "1",
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "The car",
+          "is",
+          "red"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "SUCCESS",
+      "accuracy_score": 100.0,
+      "differences": []
+    },
+    {
+      "test_id": "2",
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O"
+        ],
+        "SlotPhrase": [
+          "I",
+          "love",
+          "you"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "SUCCESS",
+      "accuracy_score": 100.0,
+      "differences": []
+    },
+    {
+      "test_id": "3",
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The man who",
+          "runs",
+          "fast",
+          "is",
+          "strong"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The man who",
+          "V": "runs",
+          "M1": "fast",
+          "M3": "strong"
+        },
+        "slots": {
+          "S": "The man who",
+          "V": "runs",
+          "M1": "fast",
+          "M3": "strong"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The man who」",
+        "メインスロット V: 期待「is」→ 実際「runs」",
+        "メインスロット C1: 期待「strong」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The man who」→ 実際「なし」",
+        "サブスロット sub-v: 期待「runs」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「fast」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "4",
+      "sentence": "The book which lies there is mine.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book which",
+          "lies",
+          "there",
+          "is",
+          "mine"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book which",
+          "V": "lies",
+          "O1": "there",
+          "M3": "mine"
+        },
+        "slots": {
+          "S": "The book which",
+          "V": "lies",
+          "O1": "there",
+          "M3": "mine"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book which」",
+        "メインスロット V: 期待「is」→ 実際「lies」",
+        "メインスロット C1: 期待「mine」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The book which」→ 実際「なし」",
+        "サブスロット sub-v: 期待「lies」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「there」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "5",
+      "sentence": "The person that works here is kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The person that",
+          "works",
+          "here",
+          "is",
+          "kind"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The person that",
+          "V": "works",
+          "M1": "here",
+          "M3": "kind"
+        },
+        "slots": {
+          "S": "The person that",
+          "V": "works",
+          "M1": "here",
+          "M3": "kind"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The person that」",
+        "メインスロット V: 期待「is」→ 実際「works」",
+        "メインスロット C1: 期待「kind」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The person that」→ 実際「なし」",
+        "サブスロット sub-v: 期待「works」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「here」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "6",
+      "sentence": "The book which I bought is expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book which I",
+          "bought",
+          "is",
+          "expensive"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "The book which I",
+          "V": "bought",
+          "M3": "expensive"
+        },
+        "slots": {
+          "S": "The book which I",
+          "V": "bought",
+          "M3": "expensive"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book which I」",
+        "メインスロット V: 期待「is」→ 実際「bought」",
+        "メインスロット C1: 期待「expensive」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The book which」→ 実際「なし」",
+        "サブスロット sub-s: 期待「I」→ 実際「なし」",
+        "サブスロット sub-v: 期待「bought」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "7",
+      "sentence": "The man whom I met is tall.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The man whom I",
+          "met",
+          "is",
+          "tall"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "The man whom I",
+          "V": "met",
+          "M3": "tall"
+        },
+        "slots": {
+          "S": "The man whom I",
+          "V": "met",
+          "M3": "tall"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The man whom I」",
+        "メインスロット V: 期待「is」→ 実際「met」",
+        "メインスロット C1: 期待「tall」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The man whom」→ 実際「なし」",
+        "サブスロット sub-s: 期待「I」→ 実際「なし」",
+        "サブスロット sub-v: 期待「met」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "8",
+      "sentence": "The car that he drives is new.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The car that he",
+          "drives",
+          "is",
+          "new"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "The car that he",
+          "V": "drives",
+          "M3": "new"
+        },
+        "slots": {
+          "S": "The car that he",
+          "V": "drives",
+          "M3": "new"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The car that he」",
+        "メインスロット V: 期待「is」→ 実際「drives」",
+        "メインスロット C1: 期待「new」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The car that」→ 実際「なし」",
+        "サブスロット sub-s: 期待「he」→ 実際「なし」",
+        "サブスロット sub-v: 期待「drives」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "9",
+      "sentence": "The car which was crashed is red.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The car which",
+          "was",
+          "crashed",
+          "is",
+          "red"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The car which",
+          "Aux": "was",
+          "V": "crashed",
+          "M3": "red"
+        },
+        "slots": {
+          "S": "The car which",
+          "Aux": "was",
+          "V": "crashed",
+          "M3": "red"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The car which」",
+        "メインスロット V: 期待「is」→ 実際「crashed」",
+        "メインスロット C1: 期待「red」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The car which」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「crashed」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "10",
+      "sentence": "The book that was written is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book that",
+          "was",
+          "written",
+          "is",
+          "famous"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book that",
+          "Aux": "was",
+          "V": "written",
+          "M3": "famous"
+        },
+        "slots": {
+          "S": "The book that",
+          "Aux": "was",
+          "V": "written",
+          "M3": "famous"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book that」",
+        "メインスロット V: 期待「is」→ 実際「written」",
+        "メインスロット C1: 期待「famous」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The book that」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「written」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "11",
+      "sentence": "The letter which was sent arrived.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M3",
+          "V"
+        ],
+        "SlotPhrase": [
+          "The",
+          "letter",
+          "which",
+          "was",
+          "sent",
+          "arrived"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          10,
+          3
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          10,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "sent",
+          "Aux": "was",
+          "V": "arrived"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "sent",
+          "Aux": "was",
+          "V": "arrived"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 6,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 20.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The letter which」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「sent」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "12",
+      "sentence": "The man whose car is red lives here.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "M3",
+          "C1",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "man",
+          "whose",
+          "car",
+          "is",
+          "red",
+          "lives",
+          "here"
+        ],
+        "Slot_display_order": [
+          10,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10,
+          8
+        ],
+        "display_order": [
+          10,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10,
+          8
+        ],
+        "PhraseType": [
+          "修飾句",
+          "補語句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "M3": "lives",
+          "C1": "man",
+          "S": "car",
+          "V": "is",
+          "M1": "here"
+        },
+        "slots": {
+          "M3": "lives",
+          "C1": "man",
+          "S": "car",
+          "V": "is",
+          "M1": "here"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「car」",
+        "メインスロット V: 期待「lives」→ 実際「is」",
+        "メインスロット M2: 期待「here」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The man whose car」→ 実際「なし」",
+        "サブスロット sub-v: 期待「is」→ 実際「なし」",
+        "サブスロット sub-c1: 期待「red」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "13",
+      "sentence": "The student whose book I borrowed is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "student",
+          "whose",
+          "book I",
+          "borrowed",
+          "is",
+          "smart"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "smart",
+          "S": "book I",
+          "V": "borrowed"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "smart",
+          "S": "book I",
+          "V": "borrowed"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「book I」",
+        "メインスロット V: 期待「is」→ 実際「borrowed」",
+        "メインスロット C1: 期待「smart」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The student whose book」→ 実際「なし」",
+        "サブスロット sub-s: 期待「I」→ 実際「なし」",
+        "サブスロット sub-v: 期待「borrowed」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "14",
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "woman",
+          "whose",
+          "dog",
+          "barks",
+          "is",
+          "my",
+          "neighbor"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "neighbor",
+          "S": "dog",
+          "V": "barks"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "neighbor",
+          "S": "dog",
+          "V": "barks"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「dog」",
+        "メインスロット V: 期待「is」→ 実際「barks」",
+        "メインスロット C1: 期待「my neighbor」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The woman whose dog」→ 実際「なし」",
+        "サブスロット sub-v: 期待「barks」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "15",
+      "sentence": "The place where we met is beautiful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "place",
+          "where",
+          "we",
+          "met",
+          "is",
+          "beautiful"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "beautiful",
+          "S": "we",
+          "V": "met"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "beautiful",
+          "S": "we",
+          "V": "met"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「we」",
+        "メインスロット V: 期待「is」→ 実際「met」",
+        "メインスロット C1: 期待「beautiful」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The place where」→ 実際「なし」",
+        "サブスロット sub-s: 期待「we」→ 実際「なし」",
+        "サブスロット sub-v: 期待「met」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "16",
+      "sentence": "The time when he arrived was late.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "late"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "he",
+          "sub-v": "arrived"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "time",
+          "when",
+          "he",
+          "arrived",
+          "was",
+          "late"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "late",
+          "S": "he",
+          "V": "arrived"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "late",
+          "S": "he",
+          "V": "arrived"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「he」",
+        "メインスロット V: 期待「was」→ 実際「arrived」",
+        "メインスロット C1: 期待「late」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The time when」→ 実際「なし」",
+        "サブスロット sub-s: 期待「he」→ 実際「なし」",
+        "サブスロット sub-v: 期待「arrived」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "17",
+      "sentence": "The reason why she left is unclear.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "unclear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-v": "left"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "C1",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "reason",
+          "why",
+          "she",
+          "left",
+          "is",
+          "unclear"
+        ],
+        "Slot_display_order": [
+          4,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          6,
+          10,
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "補語句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The",
+          "C1": "reason",
+          "M3": "unclear",
+          "S": "she",
+          "V": "left"
+        },
+        "slots": {
+          "O1": "The",
+          "C1": "reason",
+          "M3": "unclear",
+          "S": "she",
+          "V": "left"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「she」",
+        "メインスロット V: 期待「is」→ 実際「left」",
+        "メインスロット C1: 期待「unclear」→ 実際「reason」",
+        "サブスロット sub-m2: 期待「The reason why」→ 実際「なし」",
+        "サブスロット sub-s: 期待「she」→ 実際「なし」",
+        "サブスロット sub-v: 期待「left」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "18",
+      "sentence": "The way how he solved it was clever.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "clever"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "he",
+          "sub-v": "solved",
+          "sub-o1": "it"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "way",
+          "how",
+          "he",
+          "solved",
+          "it",
+          "was",
+          "clever"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "clever",
+          "S": "he",
+          "V": "solved"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "clever",
+          "S": "he",
+          "V": "solved"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「he」",
+        "メインスロット V: 期待「was」→ 実際「solved」",
+        "メインスロット C1: 期待「clever」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The way how」→ 実際「なし」",
+        "サブスロット sub-s: 期待「he」→ 実際「なし」",
+        "サブスロット sub-v: 期待「solved」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「it」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "19",
+      "sentence": "The book I read yesterday was boring.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "boring"
+        },
+        "sub_slots": {
+          "sub-o1": "The book",
+          "sub-s": "I",
+          "sub-v": "read",
+          "sub-m2": "yesterday"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book I",
+          "read",
+          "yesterday",
+          "was",
+          "boring"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book I",
+          "V": "read",
+          "O1": "yesterday",
+          "M3": "boring"
+        },
+        "slots": {
+          "S": "The book I",
+          "V": "read",
+          "O1": "yesterday",
+          "M3": "boring"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「The book I」",
+        "メインスロット V: 期待「was」→ 実際「read」",
+        "メインスロット C1: 期待「boring」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「The book」→ 実際「なし」",
+        "サブスロット sub-s: 期待「I」→ 実際「なし」",
+        "サブスロット sub-v: 期待「read」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「yesterday」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "20",
+      "sentence": "He has finished his homework.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "O",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "He",
+          "has",
+          "finished",
+          "his",
+          "homework"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          4,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          4,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "名詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his",
+          "M3": "homework"
+        },
+        "slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his",
+          "M3": "homework"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット O1: 期待「his homework」→ 実際「his」"
+      ]
+    },
+    {
+      "test_id": "21",
+      "sentence": "The letter was written by John.",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O"
+        ],
+        "SlotPhrase": [
+          "The letter",
+          "was",
+          "written",
+          "by",
+          "John"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by",
+          "O1": "John"
+        },
+        "slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by",
+          "O1": "John"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「by John」→ 実際「by」"
+      ]
+    },
+    {
+      "test_id": "22",
+      "sentence": "The house was built in 1990.",
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The house",
+          "was",
+          "built",
+          "in",
+          "1990"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in",
+          "M3": "1990"
+        },
+        "slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in",
+          "M3": "1990"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「in 1990」→ 実際「in」"
+      ]
+    },
+    {
+      "test_id": "23",
+      "sentence": "The book was written by a famous author.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The book",
+          "was",
+          "written",
+          "by",
+          "a",
+          "famous",
+          "author"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by",
+          "O1": "a",
+          "M3": "author"
+        },
+        "slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by",
+          "O1": "a",
+          "M3": "author"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「by a famous author」→ 実際「by」"
+      ]
+    },
+    {
+      "test_id": "24",
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "M3",
+          "V",
+          "M2",
+          "O",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The cake",
+          "is",
+          "being",
+          "baked",
+          "by",
+          "my",
+          "mother"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          10,
+          3,
+          9,
+          4,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          10,
+          3,
+          9,
+          4,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is",
+          "M3": "mother",
+          "V": "baked",
+          "M2": "by",
+          "O1": "my"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "is",
+          "M3": "mother",
+          "V": "baked",
+          "M2": "by",
+          "O1": "my"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 50.0,
+      "differences": [
+        "メインスロット Aux: 期待「is being」→ 実際「is」",
+        "メインスロット M2: 期待「by my mother」→ 実際「by」"
+      ]
+    },
+    {
+      "test_id": "25",
+      "sentence": "The cake was eaten by the children.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The cake",
+          "was",
+          "eaten",
+          "by",
+          "the",
+          "children"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by",
+          "O1": "the",
+          "M3": "children"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by",
+          "O1": "the",
+          "M3": "children"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 6,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「by the children」→ 実際「by」"
+      ]
+    },
+    {
+      "test_id": "26",
+      "sentence": "The door was opened by the key.",
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The door",
+          "was",
+          "opened",
+          "by",
+          "the",
+          "key"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by",
+          "O1": "the",
+          "M3": "key"
+        },
+        "slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by",
+          "O1": "the",
+          "M3": "key"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 6,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「by the key」→ 実際「by」"
+      ]
+    },
+    {
+      "test_id": "27",
+      "sentence": "The message was sent yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "O"
+        ],
+        "SlotPhrase": [
+          "The message",
+          "was",
+          "sent",
+          "yesterday"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "O1": "yesterday"
+        },
+        "slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "O1": "yesterday"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「yesterday」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "28",
+      "sentence": "She acts as if she knows everything.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M2",
+          "M2",
+          "S",
+          "V",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "She",
+          "acts",
+          "as",
+          "if",
+          "she",
+          "knows",
+          "everything"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          9,
+          9,
+          1,
+          3,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          9,
+          9,
+          1,
+          3,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "She",
+          "M3": "everything",
+          "M2": "if",
+          "S": "she",
+          "V": "knows"
+        },
+        "slots": {
+          "O1": "She",
+          "M3": "everything",
+          "M2": "if",
+          "S": "she",
+          "V": "knows"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット V: 期待「acts」→ 実際「knows」",
+        "メインスロット M2: 期待「」→ 実際「if」",
+        "サブスロット sub-m2: 期待「as if」→ 実際「なし」",
+        "サブスロット sub-s: 期待「she」→ 実際「なし」",
+        "サブスロット sub-v: 期待「knows」→ 実際「なし」",
+        "サブスロット sub-o1: 期待「everything」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "29",
+      "sentence": "The students study hard for exams.",
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "M1",
+          "M2",
+          "O"
+        ],
+        "SlotPhrase": [
+          "The students",
+          "study",
+          "hard",
+          "for",
+          "exams"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8,
+          9,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          8,
+          9,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M1": "hard",
+          "M2": "for",
+          "O1": "exams"
+        },
+        "slots": {
+          "S": "The students",
+          "V": "study",
+          "M1": "hard",
+          "M2": "for",
+          "O1": "exams"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 50.0,
+      "differences": [
+        "メインスロット M2: 期待「hard」→ 実際「for」",
+        "メインスロット M3: 期待「for exams」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "30",
+      "sentence": "The car was repaired last week.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M3",
+          "O"
+        ],
+        "SlotPhrase": [
+          "The car",
+          "was",
+          "repaired",
+          "last",
+          "week"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          10,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          10,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M3": "last",
+          "O1": "week"
+        },
+        "slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M3": "last",
+          "O1": "week"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 75.0,
+      "differences": [
+        "メインスロット M2: 期待「last week」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "31",
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "written",
+          "sub-aux": "was",
+          "sub-m2": "carefully",
+          "sub-m3": "by Shakespeare"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "V",
+          "M2",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "book",
+          "which",
+          "was",
+          "carefully",
+          "written",
+          "by",
+          "Shakespeare",
+          "is",
+          "famous"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "famous",
+          "Aux": "was",
+          "M1": "carefully",
+          "V": "written",
+          "M2": "by"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "famous",
+          "Aux": "was",
+          "M1": "carefully",
+          "V": "written",
+          "M2": "by"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット V: 期待「is」→ 実際「written」",
+        "メインスロット C1: 期待「famous」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The book which」→ 実際「なし」",
+        "サブスロット sub-v: 期待「written」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「carefully」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「by Shakespeare」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "32",
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "runs",
+          "M2": "smoothly"
+        },
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-v": "repaired",
+          "sub-aux": "was",
+          "sub-m2": "quickly",
+          "sub-m3": "yesterday"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "M3",
+          "S",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "car",
+          "that",
+          "was",
+          "quickly",
+          "repaired",
+          "yesterday",
+          "runs",
+          "smoothly"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          1,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          1,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "repaired",
+          "Aux": "was",
+          "M1": "smoothly",
+          "S": "yesterday",
+          "V": "runs"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "repaired",
+          "Aux": "was",
+          "M1": "smoothly",
+          "S": "yesterday",
+          "V": "runs"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 12.5,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「yesterday」",
+        "メインスロット M2: 期待「smoothly」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The car that」→ 実際「なし」",
+        "サブスロット sub-v: 期待「repaired」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「quickly」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「yesterday」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "33",
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived",
+          "M2": "today"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-v": "typed",
+          "sub-aux": "was",
+          "sub-m2": "slowly",
+          "sub-m3": "by the secretary"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "M3",
+          "M2",
+          "S",
+          "V",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "letter",
+          "which",
+          "was",
+          "slowly",
+          "typed",
+          "by",
+          "the secretary",
+          "arrived",
+          "today"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          9,
+          1,
+          3,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          9,
+          1,
+          3,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "today",
+          "Aux": "was",
+          "M1": "slowly",
+          "M2": "by",
+          "S": "the secretary",
+          "V": "arrived"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "today",
+          "Aux": "was",
+          "M1": "slowly",
+          "M2": "by",
+          "S": "the secretary",
+          "V": "arrived"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 12.5,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「the secretary」",
+        "メインスロット M2: 期待「today」→ 実際「by」",
+        "サブスロット sub-s: 期待「The letter which」→ 実際「なし」",
+        "サブスロット sub-v: 期待「typed」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「slowly」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「by the secretary」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "34",
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M3",
+          "M1",
+          "M1",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "student",
+          "who",
+          "studies",
+          "diligently",
+          "always",
+          "succeeds",
+          "academically"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          10,
+          8,
+          8,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          10,
+          8,
+          8,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "studies",
+          "M1": "academically",
+          "V": "succeeds"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "studies",
+          "M1": "academically",
+          "V": "succeeds"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット M2: 期待「always」→ 実際「なし」",
+        "メインスロット M3: 期待「academically」→ 実際「studies」",
+        "サブスロット sub-s: 期待「The student who」→ 実際「なし」",
+        "サブスロット sub-v: 期待「studies」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「diligently」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "35",
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M3",
+          "M3",
+          "M1",
+          "Aux",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "teacher",
+          "whose",
+          "class",
+          "runs",
+          "efficiently",
+          "is",
+          "respected",
+          "greatly"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          10,
+          10,
+          8,
+          2,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          10,
+          10,
+          8,
+          2,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "runs",
+          "M1": "greatly",
+          "Aux": "is",
+          "V": "respected"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "runs",
+          "M1": "greatly",
+          "Aux": "is",
+          "V": "respected"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 28.57142857142857,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット M2: 期待「greatly」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The teacher whose class」→ 実際「なし」",
+        "サブスロット sub-v: 期待「runs」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「efficiently」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "36",
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M3",
+          "M1",
+          "V",
+          "M3",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "doctor",
+          "who",
+          "works",
+          "carefully",
+          "saves",
+          "lives",
+          "successfully"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "lives",
+          "M1": "successfully",
+          "V": "saves"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "lives",
+          "M1": "successfully",
+          "V": "saves"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット O1: 期待「lives」→ 実際「The」",
+        "メインスロット M2: 期待「successfully」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The doctor who」→ 実際「なし」",
+        "サブスロット sub-v: 期待「works」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「carefully」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "37",
+      "sentence": "The window was gently opened by the morning breeze.",
+      "expected": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "Aux",
+          "M1",
+          "V",
+          "M2",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "window",
+          "was",
+          "gently",
+          "opened",
+          "by",
+          "the",
+          "morning",
+          "breeze"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "breeze",
+          "Aux": "was",
+          "M1": "gently",
+          "V": "opened",
+          "M2": "by"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "breeze",
+          "Aux": "was",
+          "M1": "gently",
+          "V": "opened",
+          "M2": "by"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 40.0,
+      "differences": [
+        "メインスロット S: 期待「The window」→ 実際「なし」",
+        "メインスロット M2: 期待「gently」→ 実際「by」",
+        "メインスロット M3: 期待「by the morning breeze」→ 実際「breeze」"
+      ]
+    },
+    {
+      "test_id": "38",
+      "sentence": "The message is being carefully written by the manager.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "Aux",
+          "M3",
+          "M1",
+          "V",
+          "M2",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "message",
+          "is",
+          "being",
+          "carefully",
+          "written",
+          "by",
+          "the",
+          "manager"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          2,
+          10,
+          8,
+          3,
+          9,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          2,
+          10,
+          8,
+          3,
+          9,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "manager",
+          "Aux": "is",
+          "M1": "carefully",
+          "V": "written",
+          "M2": "by"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "manager",
+          "Aux": "is",
+          "M1": "carefully",
+          "V": "written",
+          "M2": "by"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 20.0,
+      "differences": [
+        "メインスロット S: 期待「The message」→ 実際「なし」",
+        "メインスロット Aux: 期待「is being」→ 実際「is」",
+        "メインスロット M2: 期待「carefully」→ 実際「by」",
+        "メインスロット M3: 期待「by the manager」→ 実際「manager」"
+      ]
+    },
+    {
+      "test_id": "39",
+      "sentence": "The problem was quickly solved by the expert team.",
+      "expected": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "Aux",
+          "M1",
+          "V",
+          "M2",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "problem",
+          "was",
+          "quickly",
+          "solved",
+          "by",
+          "the",
+          "expert",
+          "team"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          2,
+          8,
+          3,
+          9,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "team",
+          "Aux": "was",
+          "M1": "quickly",
+          "V": "solved",
+          "M2": "by"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "team",
+          "Aux": "was",
+          "M1": "quickly",
+          "V": "solved",
+          "M2": "by"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 40.0,
+      "differences": [
+        "メインスロット S: 期待「The problem」→ 実際「なし」",
+        "メインスロット M2: 期待「quickly」→ 実際「by」",
+        "メインスロット M3: 期待「by the expert team」→ 実際「team」"
+      ]
+    },
+    {
+      "test_id": "40",
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "needs",
+          "O1": "immediate repair"
+        },
+        "sub_slots": {
+          "sub-s": "The house whose roof",
+          "sub-aux": "was",
+          "sub-v": "damaged",
+          "sub-m2": "badly"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M3",
+          "Aux",
+          "M3",
+          "M1",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "house",
+          "whose",
+          "roof",
+          "was",
+          "damaged",
+          "badly",
+          "needs",
+          "immediate",
+          "repair"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          10,
+          2,
+          10,
+          8,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          10,
+          2,
+          10,
+          8,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "repair",
+          "Aux": "was",
+          "M1": "badly",
+          "V": "needs"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "repair",
+          "Aux": "was",
+          "M1": "badly",
+          "V": "needs"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット O1: 期待「immediate repair」→ 実際「The」",
+        "サブスロット sub-s: 期待「The house whose roof」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「damaged」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「badly」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "41",
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "our favorite spot"
+        },
+        "sub_slots": {
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m2": "The place where",
+          "sub-m3": "accidentally"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "M3",
+          "C1",
+          "M3",
+          "M3",
+          "M3",
+          "M1",
+          "V",
+          "M3",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "place",
+          "where",
+          "we",
+          "met",
+          "accidentally",
+          "became",
+          "our",
+          "favorite",
+          "spot"
+        ],
+        "Slot_display_order": [
+          10,
+          6,
+          10,
+          10,
+          10,
+          8,
+          3,
+          10,
+          10,
+          10
+        ],
+        "display_order": [
+          10,
+          6,
+          10,
+          10,
+          10,
+          8,
+          3,
+          10,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "修飾句",
+          "補語句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "M3": "spot",
+          "C1": "place",
+          "M1": "accidentally",
+          "V": "became"
+        },
+        "slots": {
+          "M3": "spot",
+          "C1": "place",
+          "M1": "accidentally",
+          "V": "became"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット C1: 期待「our favorite spot」→ 実際「place」",
+        "サブスロット sub-s: 期待「we」→ 実際「なし」",
+        "サブスロット sub-v: 期待「met」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The place where」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「accidentally」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "42",
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "unexpected"
+        },
+        "sub_slots": {
+          "sub-s": "everything",
+          "sub-v": "changed",
+          "sub-m2": "The time when",
+          "sub-m3": "dramatically"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "time",
+          "when",
+          "everything",
+          "changed",
+          "dramatically",
+          "was",
+          "unexpected"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "unexpected",
+          "S": "everything",
+          "V": "changed",
+          "M1": "dramatically"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "unexpected",
+          "S": "everything",
+          "V": "changed",
+          "M1": "dramatically"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「everything」",
+        "メインスロット Aux: 期待「was」→ 実際「なし」",
+        "メインスロット V: 期待「unexpected」→ 実際「changed」",
+        "サブスロット sub-s: 期待「everything」→ 実際「なし」",
+        "サブスロット sub-v: 期待「changed」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「The time when」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「dramatically」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "43",
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "expected": {
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is being",
+          "V": "constructed",
+          "M2": "very carefully",
+          "M3": "by skilled workers"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "Aux",
+          "M3",
+          "V",
+          "M1",
+          "M1",
+          "M2",
+          "M3",
+          "O"
+        ],
+        "SlotPhrase": [
+          "The building",
+          "is",
+          "being",
+          "constructed",
+          "very",
+          "carefully",
+          "by",
+          "skilled",
+          "workers"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          10,
+          3,
+          8,
+          8,
+          9,
+          10,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          10,
+          3,
+          8,
+          8,
+          9,
+          10,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "S": "The building",
+          "Aux": "is",
+          "M3": "skilled",
+          "V": "constructed",
+          "M1": "carefully",
+          "M2": "by",
+          "O1": "workers"
+        },
+        "slots": {
+          "S": "The building",
+          "Aux": "is",
+          "M3": "skilled",
+          "V": "constructed",
+          "M1": "carefully",
+          "M2": "by",
+          "O1": "workers"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 40.0,
+      "differences": [
+        "メインスロット Aux: 期待「is being」→ 実際「is」",
+        "メインスロット M2: 期待「very carefully」→ 実際「by」",
+        "メインスロット M3: 期待「by skilled workers」→ 実際「skilled」"
+      ]
+    },
+    {
+      "test_id": "44",
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M1",
+          "M2",
+          "M3",
+          "M3",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The teacher",
+          "explains",
+          "grammar",
+          "clearly",
+          "to",
+          "confused",
+          "students",
+          "daily"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          8,
+          9,
+          10,
+          10,
+          8
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          8,
+          9,
+          10,
+          10,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "daily",
+          "M2": "to",
+          "M3": "students"
+        },
+        "slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "daily",
+          "M2": "to",
+          "M3": "students"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 8,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 50.0,
+      "differences": [
+        "メインスロット M1: 期待「clearly」→ 実際「daily」",
+        "メインスロット M2: 期待「to confused students」→ 実際「to」",
+        "メインスロット M3: 期待「daily」→ 実際「students」"
+      ]
+    },
+    {
+      "test_id": "45",
+      "sentence": "The student writes essays carefully for better grades.",
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "actual": {
+        "Slot": [
+          "S",
+          "V",
+          "O",
+          "M1",
+          "M2",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The student",
+          "writes",
+          "essays",
+          "carefully",
+          "for",
+          "better",
+          "grades"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          8,
+          9,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          8,
+          9,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M1": "carefully",
+          "M2": "for",
+          "M3": "grades"
+        },
+        "slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M1": "carefully",
+          "M2": "for",
+          "M3": "grades"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "PARTIAL",
+      "accuracy_score": 60.0,
+      "differences": [
+        "メインスロット M2: 期待「carefully」→ 実際「for」",
+        "メインスロット M3: 期待「for better grades」→ 実際「grades」"
+      ]
+    },
+    {
+      "test_id": "46",
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "published",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The report which",
+          "sub-aux": "was",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly",
+          "sub-m3": "by experts"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "M3",
+          "M2",
+          "S",
+          "M3",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "report",
+          "which",
+          "was",
+          "thoroughly",
+          "reviewed",
+          "by",
+          "experts",
+          "was",
+          "published",
+          "successfully"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          9,
+          1,
+          10,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          10,
+          9,
+          1,
+          10,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "was",
+          "Aux": "was",
+          "M1": "successfully",
+          "M2": "by",
+          "S": "experts",
+          "V": "published"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "was",
+          "Aux": "was",
+          "M1": "successfully",
+          "M2": "by",
+          "S": "experts",
+          "V": "published"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 11,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 22.22222222222222,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「experts」",
+        "メインスロット M2: 期待「successfully」→ 実際「by」",
+        "サブスロット sub-s: 期待「The report which」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「reviewed」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「thoroughly」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「by experts」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "47",
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "improved",
+          "M2": "dramatically"
+        },
+        "sub_slots": {
+          "sub-s": "The student whose essay",
+          "sub-aux": "was",
+          "sub-v": "corrected",
+          "sub-m2": "carefully"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "M3",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "student",
+          "whose",
+          "essay",
+          "was",
+          "carefully",
+          "corrected",
+          "improved",
+          "dramatically"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          10,
+          2,
+          8,
+          10,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          10,
+          2,
+          8,
+          10,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "corrected",
+          "Aux": "was",
+          "M1": "dramatically",
+          "V": "improved"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "corrected",
+          "Aux": "was",
+          "M1": "dramatically",
+          "V": "improved"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット M2: 期待「dramatically」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The student whose essay」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「corrected」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「carefully」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "48",
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "works",
+          "M2": "efficiently",
+          "M3": "every day"
+        },
+        "sub_slots": {
+          "sub-s": "The machine that",
+          "sub-aux": "was",
+          "sub-v": "maintained",
+          "sub-m2": "properly"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "Aux",
+          "M1",
+          "V",
+          "M3",
+          "M1",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "machine",
+          "that",
+          "was",
+          "properly",
+          "maintained",
+          "works",
+          "efficiently",
+          "every",
+          "day"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          3,
+          10,
+          8,
+          10,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          2,
+          8,
+          3,
+          10,
+          8,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "day",
+          "Aux": "was",
+          "M1": "efficiently",
+          "V": "maintained"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "day",
+          "Aux": "was",
+          "M1": "efficiently",
+          "V": "maintained"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 0.0,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット V: 期待「works」→ 実際「maintained」",
+        "メインスロット M2: 期待「efficiently」→ 実際「なし」",
+        "メインスロット M3: 期待「every day」→ 実際「day」",
+        "サブスロット sub-s: 期待「The machine that」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「was」→ 実際「なし」",
+        "サブスロット sub-v: 期待「maintained」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「properly」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "49",
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "completed",
+          "O1": "the project",
+          "M2": "successfully",
+          "M3": "yesterday"
+        },
+        "sub_slots": {
+          "sub-v": "the team working",
+          "sub-m2": "overtime"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "S",
+          "V",
+          "M3",
+          "M3",
+          "M1",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The",
+          "team",
+          "working",
+          "overtime",
+          "completed",
+          "the",
+          "project",
+          "successfully",
+          "yesterday"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          8,
+          10
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          1,
+          3,
+          10,
+          10,
+          8,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "yesterday",
+          "S": "overtime",
+          "V": "completed",
+          "M1": "successfully"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "yesterday",
+          "S": "overtime",
+          "V": "completed",
+          "M1": "successfully"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 28.57142857142857,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「overtime」",
+        "メインスロット O1: 期待「the project」→ 実際「The」",
+        "メインスロット M2: 期待「successfully」→ 実際「なし」",
+        "サブスロット sub-v: 期待「the team working」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「overtime」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "50",
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "waiting",
+          "M2": "patiently"
+        },
+        "sub_slots": {
+          "sub-v": "the woman standing",
+          "sub-m2": "quietly",
+          "sub-m3": "near the door"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M1",
+          "M2",
+          "S",
+          "Aux",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "woman",
+          "standing",
+          "quietly",
+          "near",
+          "the door",
+          "was",
+          "waiting",
+          "patiently"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          8,
+          9,
+          1,
+          2,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          8,
+          9,
+          1,
+          2,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "standing",
+          "M1": "patiently",
+          "M2": "near",
+          "S": "the door",
+          "Aux": "was",
+          "V": "waiting"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "standing",
+          "M1": "patiently",
+          "M2": "near",
+          "S": "the door",
+          "Aux": "was",
+          "V": "waiting"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 28.57142857142857,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「the door」",
+        "メインスロット M2: 期待「patiently」→ 実際「near」",
+        "サブスロット sub-v: 期待「the woman standing」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「quietly」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「near the door」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "51",
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "were",
+          "V": "supervised",
+          "M2": "carefully"
+        },
+        "sub_slots": {
+          "sub-v": "the children playing",
+          "sub-m2": "happily",
+          "sub-m3": "in the garden"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "M3",
+          "M1",
+          "M2",
+          "S",
+          "Aux",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "children",
+          "playing",
+          "happily",
+          "in",
+          "the garden",
+          "were",
+          "supervised",
+          "carefully"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          10,
+          8,
+          9,
+          1,
+          2,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          10,
+          8,
+          9,
+          1,
+          2,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "playing",
+          "M1": "carefully",
+          "M2": "in",
+          "S": "the garden",
+          "Aux": "were",
+          "V": "supervised"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "playing",
+          "M1": "carefully",
+          "M2": "in",
+          "S": "the garden",
+          "Aux": "were",
+          "V": "supervised"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 28.57142857142857,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「the garden」",
+        "メインスロット M2: 期待「carefully」→ 実際「in」",
+        "サブスロット sub-v: 期待「the children playing」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「happily」→ 実際「なし」",
+        "サブスロット sub-m3: 期待「in the garden」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "52",
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "will be",
+          "V": "approved",
+          "M2": "soon"
+        },
+        "sub_slots": {
+          "sub-aux": "The documents being",
+          "sub-v": "reviewed",
+          "sub-m2": "thoroughly"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "O",
+          "M3",
+          "Aux",
+          "M3",
+          "M1",
+          "M3",
+          "M3",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "documents",
+          "being",
+          "reviewed",
+          "thoroughly",
+          "will",
+          "be",
+          "approved",
+          "soon"
+        ],
+        "Slot_display_order": [
+          4,
+          10,
+          2,
+          10,
+          8,
+          10,
+          10,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          10,
+          2,
+          10,
+          8,
+          10,
+          10,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "main_slots": {
+          "O1": "The",
+          "M3": "be",
+          "Aux": "being",
+          "M1": "soon",
+          "V": "approved"
+        },
+        "slots": {
+          "O1": "The",
+          "M3": "be",
+          "Aux": "being",
+          "M1": "soon",
+          "V": "approved"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 9,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 14.285714285714285,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット Aux: 期待「will be」→ 実際「being」",
+        "メインスロット M2: 期待「soon」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「The documents being」→ 実際「なし」",
+        "サブスロット sub-v: 期待「reviewed」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「thoroughly」→ 実際「なし」"
+      ]
+    },
+    {
+      "test_id": "53",
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "rapidly"
+        },
+        "sub_slots": {
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited",
+          "sub-m2": "internationally"
+        }
+      },
+      "actual": {
+        "Slot": [
+          "M3",
+          "C1",
+          "M3",
+          "M3",
+          "Aux",
+          "M3",
+          "M1",
+          "V",
+          "M3",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The",
+          "artist",
+          "whose",
+          "paintings",
+          "were",
+          "exhibited",
+          "internationally",
+          "became",
+          "famous",
+          "rapidly"
+        ],
+        "Slot_display_order": [
+          10,
+          6,
+          10,
+          10,
+          2,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "display_order": [
+          10,
+          6,
+          10,
+          10,
+          2,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "PhraseType": [
+          "修飾句",
+          "補語句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "main_slots": {
+          "M3": "famous",
+          "C1": "artist",
+          "Aux": "were",
+          "M1": "rapidly",
+          "V": "became"
+        },
+        "slots": {
+          "M3": "famous",
+          "C1": "artist",
+          "Aux": "were",
+          "M1": "rapidly",
+          "V": "became"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 10,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.85
+      },
+      "status": "FAILURE",
+      "accuracy_score": 12.5,
+      "differences": [
+        "メインスロット S: 期待「」→ 実際「なし」",
+        "メインスロット C1: 期待「famous」→ 実際「artist」",
+        "メインスロット M2: 期待「rapidly」→ 実際「なし」",
+        "サブスロット sub-s: 期待「The artist whose paintings」→ 実際「なし」",
+        "サブスロット sub-aux: 期待「were」→ 実際「なし」",
+        "サブスロット sub-v: 期待「exhibited」→ 実際「なし」",
+        "サブスロット sub-m2: 期待「internationally」→ 実際「なし」"
+      ]
+    }
+  ]
+}

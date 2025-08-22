@@ -1,8 +1,9 @@
 {
   "meta": {
-    "total_count": 53,
-    "valid_count": 30,
-    "new_count": 23
+    "total_count": 68,
+    "valid_count": 45,
+    "new_count": 38,
+    "basic_pattern_count": 15
   },
   "data": {
     "1": {
@@ -774,6 +775,174 @@
           "sub-v": "exhibited",
           "sub-m2": "internationally"
         }
+      }
+    },
+    "55": {
+      "sentence": "Birds fly.",
+      "expected": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      }
+    },
+    "56": {
+      "sentence": "Children play.",
+      "expected": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      }
+    },
+    "57": {
+      "sentence": "Time passes.",
+      "expected": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      }
+    },
+    "58": {
+      "sentence": "She looks happy.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      }
+    },
+    "59": {
+      "sentence": "He became a doctor.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      }
+    },
+    "60": {
+      "sentence": "The food tastes good.",
+      "expected": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      }
+    },
+    "61": {
+      "sentence": "I read books.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      }
+    },
+    "62": {
+      "sentence": "She plays piano.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      }
+    },
+    "63": {
+      "sentence": "We study English.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      }
+    },
+    "64": {
+      "sentence": "I gave him a book.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      }
+    },
+    "65": {
+      "sentence": "She told me a story.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      }
+    },
+    "66": {
+      "sentence": "He bought her flowers.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      }
+    },
+    "67": {
+      "sentence": "We call him Tom.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      }
+    },
+    "68": {
+      "sentence": "I found it interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      }
+    },
+    "69": {
+      "sentence": "They made her happy.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "sub_slots": {}
       }
     }
   }
