@@ -471,7 +471,10 @@ class UnifiedStanzaRephraseMapper:
         stanza誤判定: lives(NOUN, acl:relcl) → 名詞として関係節修飾
         人間修正: lives(VERB, root) → 動詞としてメイン動詞
         """
-        if not doc.sentences or 'whose' not in sentence.lower():
+        # sentence が Document オブジェクトの場合はテキストを抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        
+        if not doc.sentences or 'whose' not in sentence_text.lower():
             return doc
         
         sent = doc.sentences[0]
@@ -507,18 +510,21 @@ class UnifiedStanzaRephraseMapper:
         # 動詞/名詞同形語リスト
         ambiguous_verbs = ['lives', 'works', 'runs', 'goes', 'comes', 'stays', 'plays', 'looks']
         
+        # sentence が Document オブジェクトの場合はテキストを抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        
         # whose構文パターン: whose + 名詞 + (修飾語) + 同形語 + 場所/時間表現
         import re
         
         for verb_text in ambiguous_verbs:
-            if verb_text in sentence.lower():
+            if verb_text in sentence_text.lower():
                 # パターン1: whose [名詞] is [形容詞] [動詞] (here|there|in...)
                 pattern1 = rf'whose\s+\w+\s+is\s+\w+\s+{verb_text}\s+(here|there|in\s+\w+)'
                 
                 # パターン2: whose [名詞] [修飾語]* [動詞] (場所表現)
                 pattern2 = rf'whose\s+\w+.*?\s+{verb_text}\s+(here|there|in|at|on)\s+\w+'
                 
-                if re.search(pattern1, sentence.lower()) or re.search(pattern2, sentence.lower()):
+                if re.search(pattern1, sentence_text.lower()) or re.search(pattern2, sentence_text.lower()):
                     # 該当する語を探す
                     for word in words:
                         if (word.text.lower() == verb_text and 
@@ -555,7 +561,9 @@ class UnifiedStanzaRephraseMapper:
             r'\bsince\b',         # "since"
         ]
         
-        sentence_lower = sentence.lower()
+        # sentence が Document オブジェクトの場合はテキストを抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        sentence_lower = sentence_text.lower()
         
         for pattern in conjunction_patterns:
             matches = re.finditer(pattern, sentence_lower)
@@ -680,8 +688,11 @@ class UnifiedStanzaRephraseMapper:
         """
         corrections = []
         
+        # sentence が Document オブジェクトの場合はテキストを抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        
         # whose構文特別処理
-        if 'whose' in sentence.lower():
+        if 'whose' in sentence_text.lower():
             corrections.extend(self._detect_whose_verb_misanalysis(stanza_doc, spacy_doc, sentence))
         
         return corrections
@@ -784,7 +795,10 @@ class UnifiedStanzaRephraseMapper:
     def _detect_relative_clause_structural_patterns(self, words, sentence):
         """人間的関係節構造パターン検出"""
         result = {'found': False, 'patterns': []}
-        sentence_lower = sentence.lower()
+        
+        # sentence が Document オブジェクトの場合はテキストを抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        sentence_lower = sentence_text.lower()
         
         # パターン1: who/which/that + 動詞構造
         if any(word in sentence_lower for word in ['who', 'which', 'that']):
