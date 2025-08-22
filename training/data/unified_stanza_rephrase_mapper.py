@@ -2242,41 +2242,38 @@ class UnifiedStanzaRephraseMapper:
         return {'found': False}
     
     def _detect_sv_pattern(self, words, words_lower):
-        """SV (主語 + 動詞) パターン検出（完全単語保持版）"""
+        """SV (主語 + 動詞) パターン検出（品詞解析ベース汎用版）"""
         if len(words) < 2:
             return {'found': False}
         
-        # より柔軟な主語+動詞パターン検出
+        # 品詞解析ベースの動詞検出（ハードコーディング撲滅）
         for verb_idx in range(1, len(words)):
             word = words[verb_idx]
-            word_lower = word.text.lower()
             
-            # 動詞候補チェック
-            if (word.upos in ['VERB', 'AUX'] or 
-                word_lower in ['run', 'runs', 'ran', 'walk', 'walks', 'walked', 'sleep', 'sleeps', 'slept',
-                              'work', 'works', 'worked', 'study', 'studies', 'studied', 'come', 'comes', 'came',
-                              'go', 'goes', 'went', 'arrive', 'arrives', 'arrived', 'leave', 'leaves', 'left']):
+            # 汎用的動詞判定：品詞解析のみに依存
+            if word.upos in ['VERB', 'AUX']:
                 
-                # この動詞の前の主語部分を抽出（冠詞含む完全な語句）
+                # 主語部分の汎用的抽出
                 subject_parts = []
                 for i in range(verb_idx):
-                    s_word_lower = words_lower[i]
-                    if (s_word_lower in ['the', 'a', 'an'] or  # 冠詞
-                        words[i].upos in ['NOUN', 'PRON', 'DET'] or
-                        s_word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'car', 'dog', 'student']):
-                        subject_parts.append(words[i])
+                    current_word = words[i]
+                    # 品詞ベース主語候補判定
+                    if (current_word.upos in ['NOUN', 'PRON', 'DET', 'PROPN'] or
+                        current_word.text.lower() in ['the', 'a', 'an']):  # 限定的冠詞のみ
+                        subject_parts.append(current_word)
                 
                 if subject_parts:
-                    # 動詞の後に目的語がないことを確認（SVパターン）
+                    # 汎用的目的語検出（品詞ベース）
                     has_object = False
                     for i in range(verb_idx + 1, len(words)):
-                        check_word = words_lower[i].rstrip('.,!?;:')
-                        if (words[i].upos in ['NOUN', 'PRON'] and 
-                            check_word not in ['the', 'a', 'an'] and
-                            check_word in ['you', 'him', 'her', 'it', 'them', 'food', 'book', 'car', 'house']):
+                        obj_word = words[i]
+                        # 句読点を除外して品詞チェック
+                        if (obj_word.upos in ['NOUN', 'PRON', 'PROPN'] and 
+                            obj_word.text.lower() not in ['the', 'a', 'an']):
                             has_object = True
                             break
                     
+                    # SVパターン：主語+動詞のみ、目的語なし
                     if not has_object:
                         subject_text = ' '.join([w.text for w in subject_parts])
                         
@@ -2284,9 +2281,9 @@ class UnifiedStanzaRephraseMapper:
                             'found': True,
                             'type': 'SV',
                             'subject_text': subject_text,
-                            'verb': words[verb_idx],
+                            'verb': word,
                             'subject_words': subject_parts,
-                            'subject': subject_parts[0] if subject_parts else None,  # 主語単語（互換性）
+                            'subject': subject_parts[0] if subject_parts else None,
                             'confidence': 0.8
                         }
         
