@@ -57,7 +57,7 @@
           "S": "The letter",
           "Aux": "was",
           "V": "written",
-          "M2": "by John"
+          "M1": "by John"
         },
         "sub_slots": {}
       }

@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "original_total": 53,
+    "selected_count": 7,
+    "level": "level_1_basic_5patterns",
+    "level_name": "基本5文型",
+    "level_description": "SV, SVC, SVO, SVOO, SVOC の基本文型のみ",
+    "selection_criteria": {
+      "no_relative_clauses": true,
+      "no_passive_voice": true,
+      "no_complex_structures": true,
+      "basic_patterns_only": [
+        "SV",
+        "SVC",
+        "SVO",
+        "SVOO",
+        "SVOC"
+      ]
+    }
+  },
+  "results": {
+    "1": {
+      "sentence": "The car is red.",
+      "analysis_result": {
+        "sentence": "The car is red.",
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.124124,
+          "sentence_id": 1,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    },
+    "2": {
+      "sentence": "I love you.",
+      "analysis_result": {
+        "sentence": "I love you.",
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.118811,
+          "sentence_id": 2,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    },
+    "20": {
+      "sentence": "He has finished his homework.",
+      "analysis_result": {
+        "sentence": "He has finished his homework.",
+        "slots": {
+          "S": "He",
+          "V": "finished",
+          "O1": "his homework",
+          "Aux": "has"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.249914,
+          "sentence_id": 20,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    },
+    "28": {
+      "sentence": "She acts as if she knows everything.",
+      "analysis_result": {
+        "sentence": "She acts as if she knows everything.",
+        "slots": {
+          "S": "She",
+          "V": "acts",
+          "O1": "everything"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.16915,
+          "sentence_id": 28,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "acts",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "as if",
+          "sub-s": "she",
+          "sub-v": "knows",
+          "sub-o1": "everything"
+        }
+      },
+      "status": "success"
+    },
+    "29": {
+      "sentence": "The students study hard for exams.",
+      "analysis_result": {
+        "sentence": "The students study hard for exams.",
+        "slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.16444,
+          "sentence_id": 29,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    },
+    "44": {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "analysis_result": {
+        "sentence": "The teacher explains grammar clearly to confused students daily.",
+        "slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.25261,
+          "sentence_id": 44,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    },
+    "45": {
+      "sentence": "The student writes essays carefully for better grades.",
+      "analysis_result": {
+        "sentence": "The student writes essays carefully for better grades.",
+        "slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {},
+        "meta": {
+          "processing_time": 0.232952,
+          "sentence_id": 45,
+          "active_handlers": 7
+        }
+      },
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "status": "success"
+    }
+  }
+}

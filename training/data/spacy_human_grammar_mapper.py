@@ -186,12 +186,15 @@ class SpacyHumanGrammarMapper:
         
         人間の認識: [主語] + [連結動詞] + [補語] = 第2文型
         """
-        if len(tokens) < 3:
+        # 句読点を除外したトークンリストを作成
+        content_tokens = [t for t in tokens if t['pos'] != 'PUNCT']
+        
+        if len(content_tokens) < 3:
             return {'detected': False, 'pattern': 'SVC', 'confidence': 0.0}
         
         # 3語パターン: S + 連結動詞 + C
-        if len(tokens) == 3:
-            subject, verb, complement = tokens[0], tokens[1], tokens[2]
+        if len(content_tokens) == 3:
+            subject, verb, complement = content_tokens[0], content_tokens[1], content_tokens[2]
             
             if (self._is_subject_human(subject) and 
                 self._is_linking_verb_human(verb) and 
@@ -211,8 +214,8 @@ class SpacyHumanGrammarMapper:
                 }
         
         # 4語パターン: The + 名詞 + 連結動詞 + 補語
-        elif len(tokens) == 4:
-            det, noun, verb, complement = tokens[0], tokens[1], tokens[2], tokens[3]
+        elif len(content_tokens) == 4:
+            det, noun, verb, complement = content_tokens[0], content_tokens[1], content_tokens[2], content_tokens[3]
             
             if (self._is_determiner_human(det) and 
                 self._is_noun_human(noun) and 
@@ -557,5 +560,59 @@ def test_spacy_human_grammar_system():
     
     return results
 
+def interactive_test():
+    """インタラクティブテスト機能"""
+    print("=== spaCy人間文法認識システム - インタラクティブテスト ===")
+    print("文章を入力してエンターを押してください（'quit'で終了）")
+    print()
+    
+    mapper = SpacyHumanGrammarMapper()
+    
+    while True:
+        try:
+            sentence = input("📝 文章を入力: ").strip()
+            
+            if sentence.lower() in ['quit', 'exit', 'q']:
+                print("テストを終了します。")
+                break
+            
+            if not sentence:
+                print("❌ 文章を入力してください。")
+                continue
+            
+            print(f"\n--- 解析中: '{sentence}' ---")
+            
+            # 解析実行
+            result = mapper.analyze_sentence(sentence)
+            
+            if 'error' in result:
+                print(f"❌ エラー: {result['error']}")
+            else:
+                print("✅ 解析成功!")
+                print(f"   🔍 検出パターン: {result['pattern_detected']}")
+                print(f"   📊 確信度: {result['confidence']:.1%}")
+                print(f"   🏷️  スロット: {result['Slot']}")
+                print(f"   📝 スロット句: {result['SlotPhrase']}")
+                print(f"   🏗️  句型: {result['PhraseType']}")
+                
+                # 語彙解析詳細
+                print("\n   📚 語彙解析詳細:")
+                lexical_info = mapper._extract_lexical_knowledge(sentence)
+                for token in lexical_info['tokens']:
+                    print(f"      {token['text']}: {token['pos']} ({token['tag']}) [lemma: {token['lemma']}]")
+            
+            print()
+            
+        except KeyboardInterrupt:
+            print("\n\nテストを中断しました。")
+            break
+        except Exception as e:
+            print(f"❌ 予期しないエラー: {e}")
+
 if __name__ == '__main__':
-    test_spacy_human_grammar_system()
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == '--interactive':
+        interactive_test()
+    else:
+        test_spacy_human_grammar_system()

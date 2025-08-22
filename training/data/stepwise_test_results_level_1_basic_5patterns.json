@@ -1,0 +1,345 @@
+{
+  "total_tests": 6,
+  "successful_tests": 0,
+  "failed_tests": 3,
+  "mismatch_tests": 3,
+  "success_rate": 0.0,
+  "analysis_rate": 0.5,
+  "accuracy_rate": 0.0,
+  "grammar_level": "level_1_basic_5patterns",
+  "results": [
+    {
+      "test_id": "1",
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "result": {
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
+        "error": "文型パターンを認識できませんでした",
+        "sentence": "The car is red.",
+        "analysis_method": "spacy_human_grammar"
+      },
+      "status": "ERROR",
+      "error": "文型パターンを認識できませんでした",
+      "comparison": null
+    },
+    {
+      "test_id": "2",
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "slots": [],
+      "slot_phrases": [],
+      "result": {
+        "Slot": [
+          "S",
+          "V",
+          "O"
+        ],
+        "SlotPhrase": [
+          "I",
+          "love",
+          "you"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3
+        ],
+        "display_order": [
+          1,
+          2,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "spacy_human_grammar",
+        "lexical_tokens": 4
+      },
+      "status": "MISMATCH",
+      "comparison": {
+        "main_slots_match": {
+          "V": {
+            "actual": "(not present)",
+            "expected": "love",
+            "match": false
+          },
+          "O1": {
+            "actual": "(not present)",
+            "expected": "you",
+            "match": false
+          },
+          "S": {
+            "actual": "(not present)",
+            "expected": "I",
+            "match": false
+          }
+        },
+        "sub_slots_match": {},
+        "main_perfect": false,
+        "sub_perfect": true,
+        "overall_perfect": false
+      }
+    },
+    {
+      "test_id": "3",
+      "sentence": "He has finished his homework.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "has",
+          "V": "finished",
+          "O1": "his homework"
+        },
+        "sub_slots": {}
+      },
+      "result": {
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
+        "error": "文型パターンを認識できませんでした",
+        "sentence": "He has finished his homework.",
+        "analysis_method": "spacy_human_grammar"
+      },
+      "status": "ERROR",
+      "error": "文型パターンを認識できませんでした",
+      "comparison": null
+    },
+    {
+      "test_id": "4",
+      "sentence": "The students study hard for exams.",
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "result": {
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
+        "error": "文型パターンを認識できませんでした",
+        "sentence": "The students study hard for exams.",
+        "analysis_method": "spacy_human_grammar"
+      },
+      "status": "ERROR",
+      "error": "文型パターンを認識できませんでした",
+      "comparison": null
+    },
+    {
+      "test_id": "5",
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "expected": {
+        "main_slots": {
+          "S": "The teacher",
+          "V": "explains",
+          "O1": "grammar",
+          "M1": "clearly",
+          "M2": "to confused students",
+          "M3": "daily"
+        },
+        "sub_slots": {}
+      },
+      "slots": [],
+      "slot_phrases": [],
+      "result": {
+        "Slot": [
+          "S",
+          "V",
+          "O"
+        ],
+        "SlotPhrase": [
+          "teacher",
+          "explains",
+          "grammar"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3
+        ],
+        "display_order": [
+          1,
+          2,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "spacy_human_grammar",
+        "lexical_tokens": 10
+      },
+      "status": "MISMATCH",
+      "comparison": {
+        "main_slots_match": {
+          "M2": {
+            "actual": "(not present)",
+            "expected": "to confused students",
+            "match": false
+          },
+          "M3": {
+            "actual": "(not present)",
+            "expected": "daily",
+            "match": false
+          },
+          "M1": {
+            "actual": "(not present)",
+            "expected": "clearly",
+            "match": false
+          },
+          "O1": {
+            "actual": "(not present)",
+            "expected": "grammar",
+            "match": false
+          },
+          "S": {
+            "actual": "(not present)",
+            "expected": "The teacher",
+            "match": false
+          },
+          "V": {
+            "actual": "(not present)",
+            "expected": "explains",
+            "match": false
+          }
+        },
+        "sub_slots_match": {},
+        "main_perfect": false,
+        "sub_perfect": true,
+        "overall_perfect": false
+      }
+    },
+    {
+      "test_id": "6",
+      "sentence": "The student writes essays carefully for better grades.",
+      "expected": {
+        "main_slots": {
+          "S": "The student",
+          "V": "writes",
+          "O1": "essays",
+          "M2": "carefully",
+          "M3": "for better grades"
+        },
+        "sub_slots": {}
+      },
+      "slots": [],
+      "slot_phrases": [],
+      "result": {
+        "Slot": [
+          "S",
+          "V",
+          "O"
+        ],
+        "SlotPhrase": [
+          "student",
+          "writes",
+          "essays"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3
+        ],
+        "display_order": [
+          1,
+          2,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "spacy_human_grammar",
+        "lexical_tokens": 9
+      },
+      "status": "MISMATCH",
+      "comparison": {
+        "main_slots_match": {
+          "M2": {
+            "actual": "(not present)",
+            "expected": "carefully",
+            "match": false
+          },
+          "M3": {
+            "actual": "(not present)",
+            "expected": "for better grades",
+            "match": false
+          },
+          "O1": {
+            "actual": "(not present)",
+            "expected": "essays",
+            "match": false
+          },
+          "S": {
+            "actual": "(not present)",
+            "expected": "The student",
+            "match": false
+          },
+          "V": {
+            "actual": "(not present)",
+            "expected": "writes",
+            "match": false
+          }
+        },
+        "sub_slots_match": {},
+        "main_perfect": false,
+        "sub_perfect": true,
+        "overall_perfect": false
+      }
+    }
+  ],
+  "timestamp": "2025-08-22T18:27:49.025595"
+}
