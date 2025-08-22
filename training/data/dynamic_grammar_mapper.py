@@ -378,24 +378,42 @@ class DynamicGrammarMapper:
         return elements
     
     def _assign_svc_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
-        """SVC文型の要素を割り当て"""
+        """SVC文型の要素を割り当て - 複合句対応"""
         elements = []
         complement_assigned = False
+        used_indices = set()
         
-        for i, token in remaining_tokens:
-            if not complement_assigned and self._can_be_complement(token):
-                elements.append(GrammarElement(
-                    text=token['text'],
-                    tokens=[token],
-                    role='C1',
-                    start_idx=i,
-                    end_idx=i,
-                    confidence=0.9
-                ))
-                complement_assigned = True
+        i = 0
+        while i < len(remaining_tokens):
+            idx, token = remaining_tokens[i]
+            
+            # 既に使用済みのインデックスはスキップ
+            if idx in used_indices:
+                i += 1
+                continue
+            
+            if not complement_assigned and (self._can_be_complement(token) or token['tag'] == 'DT'):
+                # C1として複合句を検出（冠詞から始まる場合も含む）
+                phrase_indices, phrase_text = self._find_noun_phrase(remaining_tokens, i)
+                if phrase_indices:
+                    elements.append(GrammarElement(
+                        text=phrase_text,
+                        tokens=[remaining_tokens[j][1] for j in range(i, i + len(phrase_indices))],
+                        role='C1',
+                        start_idx=min(phrase_indices),
+                        end_idx=max(phrase_indices),
+                        confidence=0.9
+                    ))
+                    used_indices.update(phrase_indices)
+                    complement_assigned = True
+                    i += len(phrase_indices)
+                else:
+                    i += 1
             else:
                 # 修飾語として処理
-                elements.append(self._create_modifier_element(i, token))
+                if idx not in used_indices:
+                    elements.append(self._create_modifier_element(idx, token))
+                i += 1
         
         return elements
     
@@ -422,35 +440,60 @@ class DynamicGrammarMapper:
         return elements
     
     def _assign_svoo_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
-        """SVOO文型の要素を割り当て"""
+        """SVOO文型の要素を割り当て - 複合句対応"""
         elements = []
         o1_assigned = False
         o2_assigned = False
+        used_indices = set()
         
-        for i, token in remaining_tokens:
-            if not o1_assigned and self._can_be_object(token):
-                elements.append(GrammarElement(
-                    text=token['text'],
-                    tokens=[token],
-                    role='O1',
-                    start_idx=i,
-                    end_idx=i,
-                    confidence=0.85
-                ))
-                o1_assigned = True
-            elif not o2_assigned and self._can_be_object(token):
-                elements.append(GrammarElement(
-                    text=token['text'],
-                    tokens=[token],
-                    role='O2',
-                    start_idx=i,
-                    end_idx=i,
-                    confidence=0.85
-                ))
-                o2_assigned = True
+        i = 0
+        while i < len(remaining_tokens):
+            idx, token = remaining_tokens[i]
+            
+            # 既に使用済みのインデックスはスキップ
+            if idx in used_indices:
+                i += 1
+                continue
+            
+            if not o1_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
+                # O1として複合句を検出（冠詞から始まる場合も含む）
+                phrase_indices, phrase_text = self._find_noun_phrase(remaining_tokens, i)
+                if phrase_indices:
+                    elements.append(GrammarElement(
+                        text=phrase_text,
+                        tokens=[remaining_tokens[j][1] for j in range(i, i + len(phrase_indices))],
+                        role='O1',
+                        start_idx=min(phrase_indices),
+                        end_idx=max(phrase_indices),
+                        confidence=0.85
+                    ))
+                    used_indices.update(phrase_indices)
+                    o1_assigned = True
+                    i += len(phrase_indices)
+                else:
+                    i += 1
+            elif not o2_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
+                # O2として複合句を検出（冠詞から始まる場合も含む）
+                phrase_indices, phrase_text = self._find_noun_phrase(remaining_tokens, i)
+                if phrase_indices:
+                    elements.append(GrammarElement(
+                        text=phrase_text,
+                        tokens=[remaining_tokens[j][1] for j in range(i, i + len(phrase_indices))],
+                        role='O2',
+                        start_idx=min(phrase_indices),
+                        end_idx=max(phrase_indices),
+                        confidence=0.85
+                    ))
+                    used_indices.update(phrase_indices)
+                    o2_assigned = True
+                    i += len(phrase_indices)
+                else:
+                    i += 1
             else:
                 # 修飾語として処理
-                elements.append(self._create_modifier_element(i, token))
+                if idx not in used_indices:
+                    elements.append(self._create_modifier_element(idx, token))
+                i += 1
         
         return elements
     
@@ -523,6 +566,39 @@ class DynamicGrammarMapper:
                      'may', 'might', 'must', 'ought'}
         return token['lemma'].lower() in aux_words or token['tag'] in ['MD']
     
+    def _find_noun_phrase(self, tokens: List[Tuple[int, Dict]], start_idx: int) -> Tuple[List[int], str]:
+        """
+        指定位置から複合名詞句を検出
+        
+        Args:
+            tokens: トークンリスト [(index, token), ...]
+            start_idx: 検索開始位置
+            
+        Returns:
+            Tuple[List[int], str]: (インデックスリスト, 結合したフレーズ)
+        """
+        phrase_indices = []
+        phrase_tokens = []
+        
+        # 開始位置から連続する名詞句要素を収集
+        for i in range(start_idx, len(tokens)):
+            idx, token = tokens[i]
+            
+            # 名詞句の構成要素かチェック
+            if (token['pos'] in ['NOUN', 'PROPN', 'PRON'] or 
+                token['tag'] in ['DT', 'CD', 'JJ', 'JJR', 'JJS', 'NN', 'NNS', 'NNP', 'NNPS']):
+                phrase_indices.append(idx)
+                phrase_tokens.append(token['text'])
+            else:
+                # 名詞句の終了
+                break
+        
+        if phrase_indices:
+            phrase_text = ' '.join(phrase_tokens)
+            return phrase_indices, phrase_text
+        else:
+            return [], ""
+
     def _can_be_object(self, token: Dict) -> bool:
         """目的語になれるかの判定"""
         return token['pos'] in ['NOUN', 'PROPN', 'PRON'] or token['tag'] in ['PRP', 'DT']
