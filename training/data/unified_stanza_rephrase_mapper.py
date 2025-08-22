@@ -1293,6 +1293,123 @@ class UnifiedStanzaRephraseMapper:
                     f"人間文法修正適用: V='{past_participle.text}', Aux='{be_verb.text}' "
                     f"(stanza誤判定修正)"
                 )
+                
+            elif correction['type'] == 'basic_five_pattern':
+                # ★ 基本5文型パターンの修正とスロット生成
+                pattern_type = correction['pattern_type']
+                confidence = correction['confidence']
+                
+                self.logger.info(f"🧠 人間文法認識: {pattern_type}文型スロット生成開始 (確信度: {confidence:.2f})")
+                
+                if pattern_type == 'SVC':
+                    # SVC文型: 主語 + be動詞 + 補語（完全Rephrase準拠構造）
+                    try:
+                        subject_text = correction.get('subject_text')
+                        verb = correction['verb'] 
+                        complement_text = correction.get('complement_text')
+                        
+                        self.logger.debug(f"🔧 SVC処理中: subject_text='{subject_text}', verb='{verb}', complement_text='{complement_text}'")
+                        
+                        # Rephrase準拠出力構造生成
+                        rephrase_slots = self._generate_rephrase_slot_structure([
+                            {'slot': 'S', 'text': subject_text, 'position': 1},
+                            {'slot': 'V', 'text': verb.text, 'position': 2},
+                            {'slot': 'C1', 'text': complement_text, 'position': 3}  # C→C1修正
+                        ])
+                        
+                        # 互換性のため既存形式も維持
+                        result['slots']['S'] = subject_text
+                        result['slots']['V'] = verb.text
+                        result['slots']['C1'] = complement_text  # C→C1修正
+                        
+                        # 完全なRephrase構造をrephrase_slotsキーで格納
+                        result['rephrase_slots'] = rephrase_slots
+                        
+                        self.logger.info(f"✅ SVC文型Rephrase準拠スロット生成: S='{subject_text}', V='{verb.text}', C1='{complement_text}'")
+                        self.logger.debug(f"🔧 rephrase_slots生成完了: {len(rephrase_slots)}エントリ")
+                        
+                    except Exception as e:
+                        self.logger.error(f"🚨 SVC文型処理エラー: {e}, correction keys: {list(correction.keys())}")
+                        # フォールバック: エラー発生時は従来の処理
+                        result['slots']['S'] = correction.get('subject_text', '')
+                        result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
+                        result['slots']['C1'] = correction.get('complement_text', '')
+                    
+                elif pattern_type == 'SVO':
+                    # SVO文型: 主語 + 動詞 + 目的語（完全Rephrase準拠構造）
+                    try:
+                        subject_text = correction.get('subject_text')
+                        verb = correction['verb']
+                        object_text = correction.get('object_text')
+                        
+                        # Rephrase準拠出力構造生成
+                        rephrase_slots = self._generate_rephrase_slot_structure([
+                            {'slot': 'S', 'text': subject_text, 'position': 1},
+                            {'slot': 'V', 'text': verb.text, 'position': 2},
+                            {'slot': 'O1', 'text': object_text, 'position': 3}  # O→O1修正
+                        ])
+                        
+                        # 互換性のため既存形式も維持
+                        result['slots']['S'] = subject_text
+                        result['slots']['V'] = verb.text
+                        result['slots']['O1'] = object_text  # O→O1修正
+                        
+                        # 完全なRephrase構造をrephrase_slotsキーで格納
+                        result['rephrase_slots'] = rephrase_slots
+                        
+                        self.logger.info(f"✅ SVO文型Rephrase準拠スロット生成: S='{subject_text}', V='{verb.text}', O1='{object_text}'")
+                        
+                    except Exception as e:
+                        self.logger.error(f"🚨 SVO文型処理エラー: {e}, correction keys: {list(correction.keys())}")
+                        # フォールバック: エラー発生時は従来の処理
+                        result['slots']['S'] = correction.get('subject_text', '')
+                        result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
+                        result['slots']['O1'] = correction.get('object_text', '')
+                    
+                elif pattern_type == 'SV':
+                    # SV文型: 主語 + 動詞（完全Rephrase準拠構造）
+                    try:
+                        subject_text = correction.get('subject_text')
+                        verb = correction['verb']
+                        
+                        # Rephrase準拠出力構造生成
+                        rephrase_slots = self._generate_rephrase_slot_structure([
+                            {'slot': 'S', 'text': subject_text, 'position': 1},
+                            {'slot': 'V', 'text': verb.text, 'position': 2}
+                        ])
+                        
+                        # 互換性のため既存形式も維持
+                        result['slots']['S'] = subject_text
+                        result['slots']['V'] = verb.text
+                        
+                        # 完全なRephrase構造をrephrase_slotsキーで格納
+                        result['rephrase_slots'] = rephrase_slots
+                        
+                        self.logger.info(f"✅ SV文型Rephrase準拠スロット生成: S='{subject_text}', V='{verb.text}'")
+                        
+                    except Exception as e:
+                        self.logger.error(f"🚨 SV文型処理エラー: {e}, correction keys: {list(correction.keys())}")
+                        # フォールバック: エラー発生時は従来の処理
+                        result['slots']['S'] = correction.get('subject_text', '')
+                        result['slots']['V'] = correction.get('verb', {}).get('text', '') if hasattr(correction.get('verb', {}), 'text') else str(correction.get('verb', ''))
+                
+                # 文法情報として記録
+                result['grammar_info']['detected_patterns'].append(f'human_grammar_{pattern_type}')
+                result['grammar_info']['human_corrections'] = result['grammar_info'].get('human_corrections', [])
+                result['grammar_info']['human_corrections'].append({
+                    'type': 'basic_five_pattern',
+                    'pattern_type': pattern_type,
+                    'confidence': confidence,
+                    'generated_slots': {k: v for k, v in result['slots'].items() if v},
+                    'reason': f'Human grammar recognition: {pattern_type} pattern detected with {confidence:.2f} confidence'
+                })
+                
+                # ハンドラー貢献度の記録
+                result['grammar_info']['handler_contributions']['human_grammar_five_pattern'] = {
+                    'pattern_type': pattern_type,
+                    'confidence': confidence,
+                    'generated_slots': len([k for k, v in result['slots'].items() if v])
+                }
     
     def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
         """
@@ -1372,6 +1489,45 @@ class UnifiedStanzaRephraseMapper:
                 base_result['grammar_info']['detected_patterns'].extend(grammar_info['patterns'])
         
         return base_result
+    
+    def _generate_rephrase_slot_structure(self, slot_data_list):
+        """
+        完全なRephrase準拠スロット構造を生成
+        
+        Args:
+            slot_data_list: [{'slot': 'S', 'text': 'The car', 'position': 1}, ...]
+            
+        Returns:
+            Rephrase準拠の完全なスロット構造リスト
+        """
+        rephrase_slots = []
+        
+        for slot_data in slot_data_list:
+            slot_name = slot_data['slot']
+            slot_text = slot_data['text']
+            position = slot_data['position']
+            
+            # 基本スロット構造
+            slot_entry = {
+                "構文ID": "",
+                "V_group_key": "",
+                "例文ID": "",
+                "Slot": slot_name,
+                "SlotPhrase": slot_text,
+                "SlotText": "",
+                "PhraseType": "word",  # 単純文では基本的にword
+                "SubslotID": "",
+                "SubslotElement": "",
+                "SubslotText": "",
+                "Slot_display_order": position,
+                "display_order": 0,
+                "QuestionType": ""
+            }
+            
+            rephrase_slots.append(slot_entry)
+        
+        self.logger.debug(f"🏗️ Rephrase準拠スロット構造生成完了: {len(rephrase_slots)}エントリ")
+        return rephrase_slots
     
     def _post_process_result(self, result: Dict, sentence: str) -> Dict:
         """後処理・結果検証（whose構文特別処理追加）"""
@@ -1650,7 +1806,8 @@ class UnifiedStanzaRephraseMapper:
         
         processing_time = time.time() - start_time
         
-        result = {
+        # 結果にrephrase_slotsを含める（重要！）
+        final_result = {
             'sentence': sentence,
             'slots': main_slots,
             'sub_slots': sub_slots,
@@ -1665,8 +1822,13 @@ class UnifiedStanzaRephraseMapper:
             }
         }
         
+        # rephrase_slotsが生成されている場合は追加
+        if 'rephrase_slots' in result:
+            final_result['rephrase_slots'] = result['rephrase_slots']
+            self.logger.debug(f"🔧 rephrase_slots最終結果に追加: {len(result['rephrase_slots'])}エントリ")
+        
         self.logger.info(f"✅ 人間文法認識のみでの処理完了 ({processing_time:.3f}s)")
-        return result
+        return final_result
     
     def _create_human_grammar_document(self, sentence: str):
         """人間文法認識による基本的なStanza形式ドキュメント構築"""
@@ -1745,12 +1907,20 @@ class UnifiedStanzaRephraseMapper:
                            'wait', 'waiting', 'play', 'playing', 'stand', 'standing', 'work', 'working']:
             return 'VERB'
         
-        # 明確な形容詞
-        elif word_lower in ['red', 'blue', 'green', 'big', 'small', 'happy', 'sad', 'good', 'bad', 'new', 'old',
-                           'strong', 'weak', 'tall', 'short', 'kind', 'mean', 'expensive', 'cheap', 'famous', 'unknown',
-                           'smart', 'stupid', 'beautiful', 'ugly', 'late', 'early', 'unclear', 'clear', 'clever', 'boring',
-                           'mine', 'yours', 'his', 'hers', 'ours', 'theirs', 'respected', 'unexpected', 'confused',
-                           'skilled', 'better', 'careful', 'academic', 'smooth', 'efficient', 'successful', 'dramatic',
+        # 明確な形容詞（拡張リスト）
+        elif word_lower in ['red', 'blue', 'green', 'yellow', 'black', 'white', 'orange', 'purple', 'pink', 'gray',
+                           'big', 'small', 'large', 'little', 'huge', 'tiny', 'tall', 'short', 'long', 'wide',
+                           'happy', 'sad', 'angry', 'excited', 'tired', 'hungry', 'thirsty', 'sick', 'healthy',
+                           'good', 'bad', 'great', 'terrible', 'excellent', 'awful', 'perfect', 'wrong',
+                           'new', 'old', 'young', 'ancient', 'modern', 'fresh', 'stale', 'clean', 'dirty',
+                           'hot', 'cold', 'warm', 'cool', 'freezing', 'boiling', 'wet', 'dry', 'soft', 'hard',
+                           'easy', 'difficult', 'simple', 'complex', 'important', 'interesting', 'boring',
+                           'beautiful', 'ugly', 'pretty', 'handsome', 'cute', 'strange', 'normal', 'special',
+                           'fast', 'slow', 'quick', 'careful', 'dangerous', 'safe', 'rich', 'poor', 'expensive', 'cheap',
+                           'kind', 'mean', 'nice', 'rude', 'polite', 'funny', 'serious', 'smart', 'stupid',
+                           'strong', 'weak', 'heavy', 'light', 'thick', 'thin', 'rough', 'smooth', 'late', 'early', 
+                           'unclear', 'clear', 'clever', 'boring', 'respected', 'unexpected', 'confused',
+                           'skilled', 'better', 'academic', 'efficient', 'successful', 'dramatic',
                            'immediate', 'favorite', 'proper', 'thorough']:
             return 'ADJ'
         
@@ -1830,10 +2000,10 @@ class UnifiedStanzaRephraseMapper:
             doc._human_grammar_corrections.append({
                 'type': 'basic_five_pattern',
                 'pattern_type': pattern_info['type'],
-                'subject': pattern_info.get('subject'),
+                'subject_text': pattern_info.get('subject_text'),
                 'verb': pattern_info.get('verb'),
-                'object': pattern_info.get('object'),
-                'complement': pattern_info.get('complement'),
+                'object_text': pattern_info.get('object_text'),
+                'complement_text': pattern_info.get('complement_text'),
                 'indirect_object': pattern_info.get('indirect_object'),
                 'correction': f"Human grammar recognition: {pattern_info['type']} pattern",
                 'confidence': pattern_info['confidence']
@@ -1871,7 +2041,7 @@ class UnifiedStanzaRephraseMapper:
         return result
     
     def _detect_svc_pattern(self, words, words_lower):
-        """SVC (主語 + be動詞 + 補語) パターン検出"""
+        """SVC (主語 + be動詞 + 補語) パターン検出（完全単語保持版）"""
         if len(words) < 3:
             return {'found': False}
         
@@ -1882,28 +2052,57 @@ class UnifiedStanzaRephraseMapper:
                 be_verb_idx = i
                 break
         
-        if be_verb_idx is None or be_verb_idx == 0 or be_verb_idx >= len(words) - 1:
+        if be_verb_idx is None:
             return {'found': False}
         
-        subject = words[be_verb_idx - 1]
-        be_verb = words[be_verb_idx]
-        complement = words[be_verb_idx + 1]
+        # be動詞の前の主語部分を抽出（冠詞含む完全な語句）
+        subject_parts = []
+        for i in range(be_verb_idx):
+            word_lower = words_lower[i]
+            # 主語に関連する語を全て収集
+            if (word_lower in ['the', 'a', 'an'] or  # 冠詞
+                words[i].upos in ['NOUN', 'PRON', 'DET'] or  # 名詞、代名詞、限定詞
+                word_lower in ['car', 'dog', 'cat', 'book', 'house', 'man', 'woman', 'child', 'student', 'teacher',
+                              'i', 'you', 'he', 'she', 'it', 'we', 'they']):
+                subject_parts.append(words[i])
         
-        # 補語が形容詞的または名詞的
-        if complement.upos in ['ADJ', 'NOUN'] or words_lower[be_verb_idx + 1] in ['red', 'blue', 'happy', 'sad', 'big', 'small']:
+        # be動詞の後の補語部分を抽出（完全な語句）  
+        complement_parts = []
+        for i in range(be_verb_idx + 1, len(words)):
+            word_lower = words_lower[i].rstrip('.,!?;:')  # 句読点を除いて判定
+            # 補語に関連する語を収集
+            if (words[i].upos in ['ADJ', 'NOUN'] or 
+                word_lower in ['red', 'blue', 'green', 'yellow', 'black', 'white', 'orange', 'purple', 'pink', 'gray',
+                              'big', 'small', 'large', 'little', 'huge', 'tiny', 'tall', 'short', 'long', 'wide',
+                              'happy', 'sad', 'angry', 'excited', 'tired', 'hungry', 'good', 'bad', 'great',
+                              'beautiful', 'ugly', 'pretty', 'handsome', 'cute', 'hot', 'cold', 'warm', 'cool',
+                              'teacher', 'student', 'doctor', 'engineer', 'manager']):
+                complement_parts.append(words[i])
+        
+        if subject_parts and complement_parts:
+            # 完全な語句として結合
+            subject_text = ' '.join([w.text for w in subject_parts])
+            complement_text = ' '.join([w.text for w in complement_parts])
+            
             return {
                 'found': True,
                 'type': 'SVC',
-                'subject': subject,
-                'verb': be_verb,
-                'complement': complement,
-                'confidence': 0.9
+                'subject_text': subject_text,  # 完全な主語句
+                'verb': words[be_verb_idx],
+                'complement_text': complement_text,  # 完全な補語句
+                'subject_words': subject_parts,  # 個別単語リスト
+                'complement_words': complement_parts,  # 個別単語リスト
+                'subject': subject_parts[0] if subject_parts else None,  # 主語単語（互換性）
+                'complement': complement_parts[0] if complement_parts else None,  # 補語単語（互換性）
+                'confidence': 0.95
             }
+        
+        return {'found': False}
         
         return {'found': False}
     
     def _detect_svo_pattern(self, words, words_lower):
-        """SVO (主語 + 動詞 + 目的語) パターン検出"""
+        """SVO (主語 + 動詞 + 目的語) パターン検出（完全単語保持版）"""
         if len(words) < 3:
             return {'found': False}
         
@@ -1911,51 +2110,103 @@ class UnifiedStanzaRephraseMapper:
         verb_idx = None
         for i, word in enumerate(words):
             word_lower = word.text.lower()
-            if (word.upos == 'VERB' or 
-                word_lower in ['love', 'loves', 'loved', 'like', 'likes', 'liked', 'eat', 'eats', 'ate']) and \
-               word_lower not in ['is', 'am', 'are', 'was', 'were']:
+            if ((word.upos == 'VERB' or 
+                word_lower in ['love', 'loves', 'loved', 'like', 'likes', 'liked', 'eat', 'eats', 'ate',
+                              'read', 'reads', 'write', 'writes', 'wrote', 'buy', 'buys', 'bought',
+                              'make', 'makes', 'made', 'take', 'takes', 'took', 'give', 'gives', 'gave',
+                              'see', 'sees', 'saw', 'hear', 'hears', 'heard', 'find', 'finds', 'found']) and 
+               word_lower not in ['is', 'am', 'are', 'was', 'were']):
                 verb_idx = i
                 break
         
-        if verb_idx is None or verb_idx == 0 or verb_idx >= len(words) - 1:
+        if verb_idx is None:
             return {'found': False}
         
-        subject = words[verb_idx - 1]
-        verb = words[verb_idx]
-        obj = words[verb_idx + 1]
+        # 動詞の前の主語部分を抽出（冠詞含む完全な語句）
+        subject_parts = []
+        for i in range(verb_idx):
+            word_lower = words_lower[i]
+            if (word_lower in ['the', 'a', 'an'] or  # 冠詞
+                words[i].upos in ['NOUN', 'PRON', 'DET'] or
+                word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'car', 'dog', 'cat', 'book', 'student']):
+                subject_parts.append(words[i])
         
-        # 目的語らしい語かチェック
-        if obj.upos in ['NOUN', 'PRON'] or words_lower[verb_idx + 1] in ['you', 'him', 'her', 'it', 'food', 'book']:
+        # 動詞の後の目的語部分を抽出（冠詞含む完全な語句）
+        object_parts = []
+        for i in range(verb_idx + 1, len(words)):
+            word_lower = words_lower[i].rstrip('.,!?;:')
+            if (word_lower in ['the', 'a', 'an'] or  # 冠詞
+                words[i].upos in ['NOUN', 'PRON'] or
+                word_lower in ['you', 'him', 'her', 'it', 'them', 'food', 'book', 'car', 'house', 'music']):
+                object_parts.append(words[i])
+        
+        if subject_parts and object_parts:
+            subject_text = ' '.join([w.text for w in subject_parts])
+            object_text = ' '.join([w.text for w in object_parts])
+            
             return {
                 'found': True,
                 'type': 'SVO',
-                'subject': subject,
-                'verb': verb,
-                'object': obj,
-                'confidence': 0.85
+                'subject_text': subject_text,
+                'verb': words[verb_idx],
+                'object_text': object_text,
+                'subject_words': subject_parts,
+                'object_words': object_parts,
+                'subject': subject_parts[0] if subject_parts else None,  # 主語単語（互換性）
+                'object': object_parts[0] if object_parts else None,  # 目的語単語（互換性）
+                'confidence': 0.9
             }
         
         return {'found': False}
     
     def _detect_sv_pattern(self, words, words_lower):
-        """SV (主語 + 動詞) パターン検出"""
+        """SV (主語 + 動詞) パターン検出（完全単語保持版）"""
         if len(words) < 2:
             return {'found': False}
         
-        # 2語の場合の基本パターン
-        if len(words) == 2:
-            subject_candidate = words[0]
-            verb_candidate = words[1]
+        # より柔軟な主語+動詞パターン検出
+        for verb_idx in range(1, len(words)):
+            word = words[verb_idx]
+            word_lower = word.text.lower()
             
-            if (subject_candidate.upos in ['NOUN', 'PRON'] and 
-                verb_candidate.upos in ['VERB', 'AUX']):
-                return {
-                    'found': True,
-                    'type': 'SV',
-                    'subject': subject_candidate,
-                    'verb': verb_candidate,
-                    'confidence': 0.8
-                }
+            # 動詞候補チェック
+            if (word.upos in ['VERB', 'AUX'] or 
+                word_lower in ['run', 'runs', 'ran', 'walk', 'walks', 'walked', 'sleep', 'sleeps', 'slept',
+                              'work', 'works', 'worked', 'study', 'studies', 'studied', 'come', 'comes', 'came',
+                              'go', 'goes', 'went', 'arrive', 'arrives', 'arrived', 'leave', 'leaves', 'left']):
+                
+                # この動詞の前の主語部分を抽出（冠詞含む完全な語句）
+                subject_parts = []
+                for i in range(verb_idx):
+                    s_word_lower = words_lower[i]
+                    if (s_word_lower in ['the', 'a', 'an'] or  # 冠詞
+                        words[i].upos in ['NOUN', 'PRON', 'DET'] or
+                        s_word_lower in ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'car', 'dog', 'student']):
+                        subject_parts.append(words[i])
+                
+                if subject_parts:
+                    # 動詞の後に目的語がないことを確認（SVパターン）
+                    has_object = False
+                    for i in range(verb_idx + 1, len(words)):
+                        check_word = words_lower[i].rstrip('.,!?;:')
+                        if (words[i].upos in ['NOUN', 'PRON'] and 
+                            check_word not in ['the', 'a', 'an'] and
+                            check_word in ['you', 'him', 'her', 'it', 'them', 'food', 'book', 'car', 'house']):
+                            has_object = True
+                            break
+                    
+                    if not has_object:
+                        subject_text = ' '.join([w.text for w in subject_parts])
+                        
+                        return {
+                            'found': True,
+                            'type': 'SV',
+                            'subject_text': subject_text,
+                            'verb': words[verb_idx],
+                            'subject_words': subject_parts,
+                            'subject': subject_parts[0] if subject_parts else None,  # 主語単語（互換性）
+                            'confidence': 0.8
+                        }
         
         return {'found': False}
     
