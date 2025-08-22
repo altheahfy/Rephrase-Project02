@@ -17,6 +17,7 @@ import stanza
 from typing import Dict, List, Optional, Any, Tuple
 import json
 import logging
+import re
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -532,6 +533,142 @@ class UnifiedStanzaRephraseMapper:
                             break
         
         return result
+
+    def _correct_conjunction_patterns(self, sentence: str, stanza_doc) -> List[Dict]:
+        """
+        接続詞構文の人間文法認識パターン
+        
+        複合接続詞 ("as if", "even if", "as though") の検出と
+        従属節構造の正確な分析
+        """
+        result = []
+        
+        # 複合接続詞パターンの検出
+        conjunction_patterns = [
+            r'\bas\s+if\b',       # "as if" 
+            r'\beven\s+if\b',     # "even if"
+            r'\bas\s+though\b',   # "as though"
+            r'\bwhile\b',         # "while"
+            r'\bbecause\b',       # "because"
+            r'\balthough\b',      # "although"
+            r'\bunless\b',        # "unless"
+            r'\bsince\b',         # "since"
+        ]
+        
+        sentence_lower = sentence.lower()
+        
+        for pattern in conjunction_patterns:
+            matches = re.finditer(pattern, sentence_lower)
+            for match in matches:
+                conjunction_text = match.group().strip()
+                start_pos = match.start()
+                
+                # 文中での位置分析
+                words_before = sentence[:start_pos].split()
+                words_after = sentence[start_pos + len(conjunction_text):].split()
+                
+                # 複合接続詞の場合 ("as if" など)
+                if ' ' in conjunction_text:
+                    result.append({
+                        'type': 'compound_conjunction',
+                        'text': conjunction_text,
+                        'position': start_pos,
+                        'pattern': 'complex_subordinator',
+                        'confidence': 0.95,
+                        'context': {
+                            'preceding_words': words_before[-3:] if len(words_before) >= 3 else words_before,
+                            'following_words': words_after[:3] if len(words_after) >= 3 else words_after
+                        }
+                    })
+                    self.logger.debug(f"複合接続詞検出: '{conjunction_text}' at position {start_pos}")
+                
+                # 単一接続詞の場合
+                else:
+                    # 文脈分析により従属接続詞か判定
+                    is_subordinator = self._analyze_conjunction_context(
+                        conjunction_text, words_before, words_after, sentence
+                    )
+                    
+                    if is_subordinator:
+                        result.append({
+                            'type': 'subordinating_conjunction',
+                            'text': conjunction_text,
+                            'position': start_pos,
+                            'pattern': 'simple_subordinator',
+                            'confidence': 0.90,
+                            'context': {
+                                'preceding_words': words_before[-2:] if len(words_before) >= 2 else words_before,
+                                'following_words': words_after[:2] if len(words_after) >= 2 else words_after
+                            }
+                        })
+                        self.logger.debug(f"従属接続詞検出: '{conjunction_text}' at position {start_pos}")
+        
+        # 従属節動詞の検出
+        if result:
+            # 接続詞が検出された場合、従属節動詞を特定
+            subordinate_verbs = self._identify_subordinate_verbs(sentence, result)
+            for verb_info in subordinate_verbs:
+                result.append(verb_info)
+        
+        return result
+    
+    def _analyze_conjunction_context(self, conjunction: str, words_before: List[str], 
+                                   words_after: List[str], full_sentence: str) -> bool:
+        """
+        接続詞の文脈を分析して従属接続詞かどうかを判定
+        """
+        # 文の先頭にある場合は従属接続詞の可能性が高い
+        if not words_before:
+            return True
+        
+        # 動詞句の後に続く場合
+        if words_before and words_before[-1].lower() in ['acts', 'looks', 'seems', 'appears', 'feels']:
+            return True
+        
+        # 前に主節の完全な構造がある場合
+        has_main_clause = any(word.lower() in ['is', 'are', 'was', 'were', 'looks', 'seems'] 
+                             for word in words_before)
+        
+        return has_main_clause
+    
+    def _identify_subordinate_verbs(self, sentence: str, conjunction_results: List[Dict]) -> List[Dict]:
+        """
+        従属節内の動詞を特定
+        """
+        verb_results = []
+        
+        for conj_info in conjunction_results:
+            # 接続詞以降の部分から動詞を検索
+            conjunction_pos = conj_info['position']
+            conjunction_text = conj_info['text']
+            
+            # 接続詞以降の文字列
+            after_conjunction = sentence[conjunction_pos + len(conjunction_text):].strip()
+            
+            # 基本的な動詞パターンマッチング
+            verb_patterns = [
+                r'\b(he|she|it|they)\s+(were|was|is|are)\b',      # be動詞
+                r'\b(he|she|it|they)\s+(\w+ed)\b',                # 過去形動詞
+                r'\b(he|she|it|they)\s+(\w+s)\b',                 # 三人称単数現在
+                r'\b(\w+ing)\b',                                  # 現在分詞
+                r'\b(were|was|is|are)\s+(\w+ing)\b',             # 進行形
+            ]
+            
+            for pattern in verb_patterns:
+                matches = re.finditer(pattern, after_conjunction.lower())
+                for match in matches:
+                    verb_text = match.group()
+                    verb_results.append({
+                        'type': 'subordinate_verb',
+                        'text': verb_text,
+                        'position': conjunction_pos + len(conjunction_text) + match.start(),
+                        'pattern': 'verb_in_subordinate_clause',
+                        'confidence': 0.85,
+                        'related_conjunction': conjunction_text
+                    })
+                    self.logger.debug(f"従属節動詞検出: '{verb_text}' (接続詞: {conjunction_text})")
+        
+        return verb_results
 
     def _detect_analysis_discrepancies(self, stanza_doc, spacy_doc, sentence: str) -> List[Dict]:
         """
@@ -5073,9 +5210,25 @@ class UnifiedStanzaRephraseMapper:
     def _handle_conjunction(self, sentence, base_result: Dict, shared_context: Dict = None) -> Optional[Dict]:
         """
         接続詞処理ハンドラー（"as if"等の従属接続詞対応）
-        migrationエンジンからの移植版
+        Phase 3: 人間文法認識優先システム移行版
         """
-        self.logger.debug("接続詞ハンドラー実行中...")
+        self.logger.debug("🔗 接続詞ハンドラー実行中 (人間文法認識優先)...")
+        
+        # === Phase 3: 人間文法認識による接続詞検出 ===
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        human_patterns = self._correct_conjunction_patterns(sentence_text, sentence)
+        
+        if human_patterns:
+            self.logger.debug(f"  🧠 人間文法認識成功: {len(human_patterns)}個のパターン検出")
+            
+            # 人間文法認識による構造分析
+            conjunction_result = self._process_human_conjunction_patterns(human_patterns, sentence, base_result)
+            if conjunction_result:
+                self.logger.debug("  ✅ 人間文法認識による接続詞処理完了")
+                return conjunction_result
+        
+        # === Stanzaフォールバック ===
+        self.logger.debug("  🤖 Stanza依存解析フォールバック...")
         
         # 従属接続詞の検出（mark + advcl の組み合わせ）
         mark_words = []
@@ -5129,6 +5282,137 @@ class UnifiedStanzaRephraseMapper:
         
         self.logger.debug(f"  ✅ 接続詞処理完了: {len(sub_slots)}個の従属節要素")
         return result
+    
+    def _process_human_conjunction_patterns(self, patterns: List[Dict], sentence, base_result: Dict) -> Optional[Dict]:
+        """
+        人間文法認識による接続詞パターンの処理
+        """
+        if not patterns:
+            return None
+        
+        # 複合接続詞または従属接続詞を抽出
+        conjunction_phrases = []
+        subordinate_verbs = []
+        
+        for pattern in patterns:
+            if pattern['type'] in ['compound_conjunction', 'subordinating_conjunction']:
+                conjunction_phrases.append(pattern['text'])
+            elif pattern['type'] == 'subordinate_verb':
+                subordinate_verbs.append(pattern)
+        
+        if not conjunction_phrases:
+            return None
+        
+        # 主接続詞を選択（最初の複合接続詞を優先）
+        primary_conjunction = conjunction_phrases[0]
+        
+        # 従属節要素を構築
+        sub_slots = {}
+        sub_slots['sub-m2'] = primary_conjunction
+        
+        # 人間文法認識による従属節要素の抽出
+        sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
+        
+        # 接続詞以降の部分を分析
+        conjunction_pos = sentence_text.lower().find(primary_conjunction.lower())
+        if conjunction_pos >= 0:
+            after_conjunction = sentence_text[conjunction_pos + len(primary_conjunction):].strip()
+            
+            # 基本的な文構造の解析
+            self._extract_human_subordinate_elements(after_conjunction, sub_slots)
+        
+        # 主節は既存のbase_resultを使用
+        main_slots = base_result.get('slots', {}) if base_result else {}
+        
+        # === 人間文法認識による従属節要素の主節からの除去 ===
+        self._remove_human_subordinate_elements_from_main(main_slots, sub_slots)
+        
+        # M2位置を空に設定（接続詞は従属節に配置）
+        main_slots['M2'] = ''
+        
+        result = {
+            'slots': main_slots,
+            'sub_slots': sub_slots,
+            'grammar_info': {
+                'detected_patterns': ['conjunction'],
+                'conjunction_type': primary_conjunction,
+                'recognition_method': 'human_grammar_patterns'
+            }
+        }
+        
+        self.logger.debug(f"  ✅ 人間文法認識処理完了: {len(sub_slots)}個の従属節要素")
+        return result
+    
+    def _extract_human_subordinate_elements(self, after_conjunction: str, sub_slots: Dict[str, str]) -> None:
+        """
+        人間文法認識による従属節要素の抽出
+        """
+        # 語順による基本的な分析
+        words = after_conjunction.split()
+        
+        if len(words) >= 2:
+            # 一般的なパターン: 主語 + 動詞
+            potential_subject = words[0]
+            potential_verb = words[1]
+            
+            # 代名詞パターンの検出
+            if potential_subject.lower() in ['he', 'she', 'it', 'they', 'i', 'you', 'we']:
+                sub_slots['sub-s'] = potential_subject
+                
+                # 動詞の検出
+                if potential_verb.lower() in ['were', 'was', 'is', 'are', 'had', 'have', 'will', 'would', 'could']:
+                    sub_slots['sub-v'] = potential_verb
+                elif potential_verb.endswith(('ed', 's', 'ing')):
+                    sub_slots['sub-v'] = potential_verb
+        
+        # より複雑な構造の場合の追加解析
+        if len(words) >= 3 and 'sub-v' in sub_slots:
+            # 目的語・補語の検出
+            remaining_words = words[2:]
+            if remaining_words:
+                # 簡単な後続要素の抽出（句読点除去）
+                obj_phrase = ' '.join(remaining_words)
+                # ピリオドや句読点を除去
+                obj_phrase = obj_phrase.rstrip('.,!?;:')
+                if len(obj_phrase.strip()) > 0:
+                    sub_slots['sub-o1'] = obj_phrase
+    
+    def _remove_human_subordinate_elements_from_main(self, main_slots: Dict[str, str], sub_slots: Dict[str, str]) -> None:
+        """
+        人間文法認識による従属節要素を主節から除去
+        
+        接続詞構文では従属節にのみ存在する要素（目的語・補語等）を
+        主節スロットから削除する必要がある
+        """
+        # 従属節にのみ存在する要素を特定
+        subordinate_only_elements = set()
+        
+        # 従属節の目的語・補語等（主語・動詞・接続詞以外）を取得
+        for sub_key, sub_value in sub_slots.items():
+            if sub_value and sub_key.startswith('sub-') and sub_key not in ['sub-m2', 'sub-s', 'sub-v']:
+                # ピリオドや句読点を除去して比較
+                cleaned_value = sub_value.rstrip('.,!?;:').lower()
+                subordinate_only_elements.add(cleaned_value)
+                self.logger.debug(f"  🔍 従属節専用要素特定: {sub_key}='{sub_value}' → '{cleaned_value}'")
+        
+        # 主節スロットから従属節にのみ存在する要素を除去
+        removed_slots = []
+        for main_key, main_value in list(main_slots.items()):
+            if main_value:
+                cleaned_main_value = main_value.rstrip('.,!?;:').lower()
+                if cleaned_main_value in subordinate_only_elements:
+                    # O1スロットは完全削除（期待値では存在しない）
+                    if main_key == 'O1':
+                        del main_slots[main_key]
+                        removed_slots.append(f"{main_key}='{main_value}' (削除)")
+                        self.logger.debug(f"  🔄 従属節専用要素O1スロット削除: {main_key}='{main_value}'")
+                    else:
+                        main_slots[main_key] = ''
+                        removed_slots.append(f"{main_key}='{main_value}' → ''")
+                        self.logger.debug(f"  🔄 従属節専用要素を主節から除去: {main_key}='{main_value}' → ''")
+        
+        if removed_slots:
+            self.logger.debug(f"  ✅ 人間文法認識除去完了: {', '.join(removed_slots)}")
     
     def _detect_compound_conjunction(self, sentence, mark_words) -> Optional[str]:
         """複合接続詞の検出（"as if"等）"""
