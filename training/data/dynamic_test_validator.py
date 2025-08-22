@@ -251,7 +251,7 @@ class DynamicTestValidator:
             test_id=test_id,
             sentence=sentence,
             expected=expected,
-            actual=actual,
+            actual=actual_rephrase,  # 🔧 見やすい形式で保存
             status=status,
             accuracy_score=accuracy_score,
             differences=differences
