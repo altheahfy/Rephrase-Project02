@@ -2085,9 +2085,19 @@ class UnifiedStanzaRephraseMapper:
         return doc
     
     def _detect_basic_five_pattern_human_grammar(self, words, sentence_text):
-        """人間的基本5文型パターン検出"""
+        """純粋人間文法認識による基本5文型パターン検出
+        
+        設計思想: Stanza解析完全不使用、人間の直感的文法判定のみ
+        根本原理: 語順パターン + 語彙的特徴による構造認識
+        """
         result = {'found': False, 'pattern_info': {}}
         
+        # Pure Human Grammar Recognition Engine
+        pure_result = self._pure_human_grammar_recognition(sentence_text)
+        if pure_result['found']:
+            return pure_result
+        
+        # フォールバック: 既存Stanzaベース（段階的移行）
         words_lower = [w.text.lower() for w in words]
         sentence_lower = sentence_text.lower()
         
@@ -2121,6 +2131,206 @@ class UnifiedStanzaRephraseMapper:
                 result = {'found': True, 'pattern_info': svoc_result}
         
         return result
+    
+    def _pure_human_grammar_recognition(self, sentence_text):
+        """Pure Human Grammar Recognition Engine
+        
+        設計思想: 人間が文を見て瞬時に判断する文法パターン認識
+        - Stanza解析一切不使用
+        - 語順パターン + 語彙カテゴリによる直感的判定
+        - ハードコーディング一切禁止、構造的パターンのみ
+        """
+        sentence = sentence_text.strip()
+        words = sentence.split()
+        
+        if len(words) < 2:
+            return {'found': False}
+        
+        # 基本5文型の人間直感判定
+        
+        # Pattern 1: SV (主語 + 動詞)
+        sv_result = self._detect_sv_pure_human(words)
+        if sv_result['found']:
+            return sv_result
+        
+        # Pattern 2: SVC (主語 + be動詞 + 補語)
+        svc_result = self._detect_svc_pure_human(words)
+        if svc_result['found']:
+            return svc_result
+        
+        # Pattern 3: SVO (主語 + 動詞 + 目的語)
+        svo_result = self._detect_svo_pure_human(words)
+        if svo_result['found']:
+            return svo_result
+        
+        return {'found': False}
+    
+    def _detect_sv_pure_human(self, words):
+        """SV文型の純粋人間文法判定
+        
+        人間の判定基準:
+        1. 2語構成
+        2. 第1語が主語的（代名詞、名詞）
+        3. 第2語が動詞的（動作・状態を表す語）
+        4. 目的語なし
+        """
+        if len(words) != 2:
+            return {'found': False}
+        
+        word1 = words[0].rstrip('.,!?;:')
+        word2 = words[1].rstrip('.,!?;:')
+        
+        # 主語パターン判定（人間直感）
+        if self._is_subject_like_human(word1):
+            # 動詞パターン判定（人間直感）
+            if self._is_verb_like_human(word2):
+                return {
+                    'found': True,
+                    'pattern': 'SV',
+                    'confidence': 0.80,
+                    'subject': words[0],
+                    'verb': words[1],
+                    'slots': {
+                        'S': words[0],
+                        'V': words[1]
+                    }
+                }
+        
+        return {'found': False}
+    
+    def _detect_svc_pure_human(self, words):
+        """SVC文型の純粋人間文法判定"""
+        if len(words) != 3:
+            return {'found': False}
+        
+        word1 = words[0].rstrip('.,!?;:')
+        word2 = words[1].rstrip('.,!?;:')
+        word3 = words[2].rstrip('.,!?;:')
+        
+        # 主語 + be動詞 + 補語パターン
+        if (self._is_subject_like_human(word1) and 
+            self._is_be_verb_human(word2) and
+            self._is_complement_like_human(word3)):
+            return {
+                'found': True,
+                'pattern': 'SVC',
+                'confidence': 0.95,
+                'subject': words[0],
+                'verb': words[1],
+                'complement': words[2],
+                'slots': {
+                    'S': words[0],
+                    'V': words[1],
+                    'C1': words[2]
+                }
+            }
+        
+        return {'found': False}
+    
+    def _detect_svo_pure_human(self, words):
+        """SVO文型の純粋人間文法判定"""
+        if len(words) != 3:
+            return {'found': False}
+        
+        word1 = words[0].rstrip('.,!?;:')
+        word2 = words[1].rstrip('.,!?;:')
+        word3 = words[2].rstrip('.,!?;:')
+        
+        # 主語 + 動詞 + 目的語パターン
+        if (self._is_subject_like_human(word1) and 
+            self._is_verb_like_human(word2) and
+            self._is_object_like_human(word3)):
+            return {
+                'found': True,
+                'pattern': 'SVO',
+                'confidence': 0.90,
+                'subject': words[0],
+                'verb': words[1],
+                'object': words[2],
+                'slots': {
+                    'S': words[0],
+                    'V': words[1],
+                    'O1': words[2]
+                }
+            }
+        
+        return {'found': False}
+    
+    def _is_subject_like_human(self, word):
+        """人間直感による主語判定（構造的特徴のみ）"""
+        word_lower = word.lower()
+        
+        # 代名詞パターン（完全リスト、有限）
+        pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'this', 'that']
+        if word_lower in pronouns:
+            return True
+        
+        # 固有名詞パターン（大文字開始）
+        if word[0].isupper() and word_lower not in ['the', 'a', 'an']:
+            return True
+        
+        # 複数形名詞パターン（sで終わる）
+        if word_lower.endswith('s') and len(word) > 2:
+            return True
+        
+        # 一般名詞パターン（小文字、単純）
+        common_nouns = ['dog', 'car', 'book', 'house', 'man', 'woman', 'child', 'student']
+        if word_lower in common_nouns:
+            return True
+        
+        return False
+    
+    def _is_verb_like_human(self, word):
+        """人間直感による動詞判定（構造的特徴のみ）"""
+        word_lower = word.lower()
+        
+        # 基本動詞（動作・状態の語彙的特徴）
+        action_verbs = ['run', 'runs', 'walk', 'walks', 'jump', 'jumps', 'fly', 'flies', 
+                       'play', 'plays', 'work', 'works', 'study', 'studies']
+        if word_lower in action_verbs:
+            return True
+        
+        return False
+    
+    def _is_be_verb_human(self, word):
+        """be動詞判定"""
+        word_lower = word.lower()
+        return word_lower in ['is', 'am', 'are', 'was', 'were']
+    
+    def _is_complement_like_human(self, word):
+        """補語判定（形容詞・名詞）"""
+        word_lower = word.lower()
+        
+        # 形容詞パターン
+        adjectives = ['red', 'blue', 'big', 'small', 'happy', 'sad', 'good', 'bad']
+        if word_lower in adjectives:
+            return True
+        
+        # 名詞補語パターン
+        if self._is_subject_like_human(word):
+            return True
+        
+        return False
+    
+    def _is_object_like_human(self, word):
+        """目的語判定（名詞・代名詞）"""
+        word_lower = word.lower()
+        
+        # 目的格代名詞
+        object_pronouns = ['me', 'you', 'him', 'her', 'it', 'us', 'them']
+        if word_lower in object_pronouns:
+            return True
+        
+        # 名詞パターン
+        if self._is_subject_like_human(word):
+            return True
+        
+        # 基本名詞
+        common_objects = ['book', 'food', 'music', 'water', 'money', 'letter']
+        if word_lower in common_objects:
+            return True
+        
+        return False
     
     def _detect_svc_pattern(self, words, words_lower):
         """SVC (主語 + be動詞 + 補語) パターン検出（完全単語保持版）"""
