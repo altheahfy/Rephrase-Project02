@@ -282,21 +282,27 @@ class UnifiedStanzaRephraseMapper:
         """
         try:
             self.logger.debug("🧠 人間文法認識開始")
+            self.logger.debug(f"🔍 初期doc型: {type(doc)}, sentences: {hasattr(doc, 'sentences')}")
             
             # be動詞 + 過去分詞 = 受動態パターン検出
             corrected_doc = self._correct_passive_voice_pattern(doc, sentence)
+            self.logger.debug(f"🔍 passive後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
             # whose構文 + 動詞/名詞同形語パターン検出
             corrected_doc = self._correct_whose_ambiguous_verb_pattern(corrected_doc, sentence)
+            self.logger.debug(f"🔍 whose後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
             # 関係節構造の人間文法認識パターン検出
             corrected_doc = self._correct_relative_clause_patterns(corrected_doc, sentence)
+            self.logger.debug(f"🔍 relative後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
             # 助動詞構造の人間文法認識パターン検出
             corrected_doc = self._correct_auxiliary_patterns(corrected_doc, sentence)
+            self.logger.debug(f"🔍 auxiliary後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
             # 接続詞構造の人間文法認識パターン検出
             corrected_doc = self._correct_conjunction_patterns(corrected_doc, sentence)
+            self.logger.debug(f"🔍 conjunction後doc型: {type(corrected_doc)}, sentences: {hasattr(corrected_doc, 'sentences')}")
             
             self.logger.debug("🧠 人間文法認識完了")
             return corrected_doc
@@ -540,13 +546,16 @@ class UnifiedStanzaRephraseMapper:
         
         return result
 
-    def _correct_conjunction_patterns(self, sentence: str, stanza_doc) -> List[Dict]:
+    def _correct_conjunction_patterns(self, doc, sentence):
         """
         接続詞構文の人間文法認識パターン
         
         複合接続詞 ("as if", "even if", "as though") の検出と
         従属節構造の正確な分析
         """
+        if not doc.sentences:
+            return doc
+            
         result = []
         
         # 複合接続詞パターンの検出
@@ -572,8 +581,8 @@ class UnifiedStanzaRephraseMapper:
                 start_pos = match.start()
                 
                 # 文中での位置分析
-                words_before = sentence[:start_pos].split()
-                words_after = sentence[start_pos + len(conjunction_text):].split()
+                words_before = sentence_text[:start_pos].split()
+                words_after = sentence_text[start_pos + len(conjunction_text):].split()
                 
                 # 複合接続詞の場合 ("as if" など)
                 if ' ' in conjunction_text:
@@ -594,7 +603,7 @@ class UnifiedStanzaRephraseMapper:
                 else:
                     # 文脈分析により従属接続詞か判定
                     is_subordinator = self._analyze_conjunction_context(
-                        conjunction_text, words_before, words_after, sentence
+                        conjunction_text, words_before, words_after, sentence_text
                     )
                     
                     if is_subordinator:
@@ -614,11 +623,26 @@ class UnifiedStanzaRephraseMapper:
         # 従属節動詞の検出
         if result:
             # 接続詞が検出された場合、従属節動詞を特定
-            subordinate_verbs = self._identify_subordinate_verbs(sentence, result)
+            subordinate_verbs = self._identify_subordinate_verbs(sentence_text, result)
             for verb_info in subordinate_verbs:
                 result.append(verb_info)
         
-        return result
+        # 修正情報をdocに記録
+        if result:
+            if not hasattr(doc, '_human_grammar_corrections'):
+                doc._human_grammar_corrections = []
+            
+            for correction in result:
+                doc._human_grammar_corrections.append({
+                    'type': 'conjunction',
+                    'pattern_type': correction['type'],
+                    'correction': correction,
+                    'confidence': correction['confidence']
+                })
+            
+            self.logger.info(f"🧠 人間文法認識成功: {len(result)}個のパターン検出")
+        
+        return doc
     
     def _analyze_conjunction_context(self, conjunction: str, words_before: List[str], 
                                    words_after: List[str], full_sentence: str) -> bool:
