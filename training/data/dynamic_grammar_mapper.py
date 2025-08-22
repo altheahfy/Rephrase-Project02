@@ -124,6 +124,12 @@ class DynamicGrammarMapper:
             doc = self.nlp(sentence)
             tokens = self._extract_tokens(doc)
             
+            # 1.5. 関係節構造の検出と処理
+            relative_clause_info = self._detect_relative_clause(tokens, sentence)
+            if relative_clause_info['found']:
+                self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
+                tokens = self._process_relative_clause(tokens, relative_clause_info)
+            
             # 2. 文の核要素を特定
             core_elements = self._identify_core_elements(tokens)
             
@@ -202,26 +208,35 @@ class DynamicGrammarMapper:
     def _find_main_verb(self, tokens: List[Dict]) -> Optional[int]:
         """
         メイン動詞を特定
-        優先順位: 1) 動詞タグ, 2) 文脈から判断
+        優先順位: 1) ROOT動詞, 2) 非関係節動詞, 3) その他の動詞
         """
         verb_candidates = []
         
         for i, token in enumerate(tokens):
             # 動詞の品詞タグ（より広範囲に検出）
             if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
-                # 助動詞の場合でも、メイン動詞候補として考慮
                 verb_candidates.append((i, token))
         
-        # 助動詞でないメイン動詞を優先
-        main_verbs = [(i, token) for i, token in verb_candidates if not self._is_auxiliary_verb(token)]
-        if main_verbs:
-            return main_verbs[-1][0]  # 最後の非助動詞を選択
+        if not verb_candidates:
+            return None
         
-        # メイン動詞が見つからない場合、助動詞も含めて検討
-        if verb_candidates:
-            return verb_candidates[-1][0]
+        # 1. ROOT動詞を最優先
+        root_verbs = [(i, token) for i, token in verb_candidates if token['dep'] == 'ROOT']
+        if root_verbs:
+            self.logger.debug(f"ROOT動詞検出: {root_verbs[0][1]['text']} (position {root_verbs[0][0]})")
+            return root_verbs[0][0]
         
-        return None
+        # 2. 関係節内動詞を除外（relcl依存関係の動詞は避ける）
+        non_relative_verbs = [(i, token) for i, token in verb_candidates if token['dep'] != 'relcl']
+        if non_relative_verbs:
+            # 助動詞でないメイン動詞を優先
+            main_verbs = [(i, token) for i, token in non_relative_verbs if not self._is_auxiliary_verb(token)]
+            if main_verbs:
+                return main_verbs[-1][0]  # 最後の非助動詞を選択
+            return non_relative_verbs[-1][0]
+        
+        # 3. 最後の手段として、どの動詞でも選択
+        return verb_candidates[-1][0]
     
     def _find_auxiliary(self, tokens: List[Dict], main_verb_idx: int) -> Optional[int]:
         """助動詞を特定"""
@@ -236,9 +251,36 @@ class DynamicGrammarMapper:
         """
         主語を特定（動詞の前の名詞句）
         複数語の名詞句に対応
+        関係節を含む場合は関係節全体を主語に含める
         """
         subject_indices = []
         
+        # 🆕 関係節を含む主語の特定
+        # トークンに関係節マーカーがある場合の処理
+        antecedent_idx = None
+        relative_clause_end_idx = None
+        
+        for i, token in enumerate(tokens):
+            if token.get('is_antecedent', False):
+                antecedent_idx = i
+            if token.get('is_relative_pronoun', False):
+                # 関係節の終わりを探す（簡単版：メイン動詞の直前まで）
+                relative_clause_end_idx = verb_idx - 1
+                break
+        
+        # 関係節を含む主語の場合
+        if antecedent_idx is not None and relative_clause_end_idx is not None:
+            # 先行詞の冠詞から関係節の最後まで全体を主語とする
+            subject_start = antecedent_idx
+            # 冠詞があれば含める
+            if subject_start > 0 and tokens[subject_start - 1]['pos'] == 'DET':
+                subject_start -= 1
+            
+            subject_indices = list(range(subject_start, relative_clause_end_idx + 1))
+            self.logger.debug(f"関係節含む主語検出: indices {subject_indices} -> '{' '.join([tokens[i]['text'] for i in subject_indices])}'")
+            return subject_indices
+        
+        # 通常の主語検出（関係節なし）
         # 動詞の前を右から左に探す
         for i in range(verb_idx - 1, -1, -1):
             token = tokens[i]
@@ -692,6 +734,77 @@ class DynamicGrammarMapper:
             'sentence': sentence,
             'analysis_method': 'dynamic_grammar'
         }
+
+    # ============================================
+    # 関係節処理メソッド群
+    # ============================================
+    
+    def _detect_relative_clause(self, tokens: List[Dict], sentence: str) -> Dict[str, Any]:
+        """関係節構造の検出"""
+        result = {
+            'found': False,
+            'type': None,
+            'confidence': 0.0,
+            'relative_pronoun_idx': None,
+            'antecedent_idx': None,
+            'clause_start_idx': None,
+            'clause_end_idx': None
+        }
+        
+        sentence_lower = sentence.lower()
+        
+        # 関係代名詞の検出
+        relative_pronouns = ['who', 'which', 'that', 'whose', 'where', 'when', 'why', 'how']
+        
+        for rel_pronoun in relative_pronouns:
+            if rel_pronoun in sentence_lower:
+                # トークンリストで関係代名詞を探す
+                for i, token in enumerate(tokens):
+                    if token['text'].lower() == rel_pronoun:
+                        result.update({
+                            'found': True,
+                            'type': f'{rel_pronoun}_clause',
+                            'confidence': 0.8,
+                            'relative_pronoun_idx': i
+                        })
+                        
+                        # 先行詞を探す（関係代名詞の直前の名詞）
+                        if i > 0 and tokens[i-1]['pos'] in ['NOUN', 'PROPN']:
+                            result['antecedent_idx'] = i - 1
+                            result['confidence'] = 0.9
+                        
+                        # 関係節の範囲を決定（簡単版）
+                        result['clause_start_idx'] = i
+                        result['clause_end_idx'] = len(tokens) - 1
+                        
+                        self.logger.debug(f"関係節検出: {rel_pronoun} at position {i}")
+                        break
+                
+                if result['found']:
+                    break
+        
+        return result
+    
+    def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> List[Dict]:
+        """関係節の処理
+        
+        現在は検出のみを行い、トークンをそのまま返す
+        将来的にはメイン文と関係節を分離して処理
+        """
+        self.logger.debug(f"関係節処理: {relative_info['type']} (信頼度: {relative_info['confidence']})")
+        
+        # 🔧 Phase 1: 基本的な関係節検出のみ
+        # トークンにマーカーを追加して、後の処理で参照できるようにする
+        rel_pronoun_idx = relative_info.get('relative_pronoun_idx')
+        if rel_pronoun_idx is not None:
+            tokens[rel_pronoun_idx]['is_relative_pronoun'] = True
+            tokens[rel_pronoun_idx]['relative_clause_type'] = relative_info['type']
+        
+        antecedent_idx = relative_info.get('antecedent_idx')
+        if antecedent_idx is not None:
+            tokens[antecedent_idx]['is_antecedent'] = True
+        
+        return tokens
 
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:

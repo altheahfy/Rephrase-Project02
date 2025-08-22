@@ -1,0 +1,61 @@
+{
+  "relative_clause_test_cases": [
+    {
+      "id": "rel_001",
+      "sentence": "The man who runs fast is strong.",
+      "description": "主格関係代名詞who - メイン文型はSVC",
+      "expected": {
+        "pattern_detected": "SVC", 
+        "main_slots": {
+          "S": "The man who runs fast",
+          "V": "is", 
+          "C1": "strong"
+        },
+        "relative_clause": {
+          "type": "who_clause",
+          "antecedent": "man",
+          "clause_content": "who runs fast",
+          "clause_pattern": "SV"
+        }
+      }
+    },
+    {
+      "id": "rel_002", 
+      "sentence": "The car which is red looks nice.",
+      "description": "主格関係代名詞which - メイン文型はSVC",
+      "expected": {
+        "pattern_detected": "SVC",
+        "main_slots": {
+          "S": "The car which is red",
+          "V": "looks",
+          "C1": "nice" 
+        },
+        "relative_clause": {
+          "type": "which_clause",
+          "antecedent": "car",
+          "clause_content": "which is red",
+          "clause_pattern": "SVC"
+        }
+      }
+    },
+    {
+      "id": "rel_003",
+      "sentence": "The book that I read was interesting.",
+      "description": "目的格関係代名詞that - メイン文型はSVC", 
+      "expected": {
+        "pattern_detected": "SVC",
+        "main_slots": {
+          "S": "The book that I read",
+          "V": "was",
+          "C1": "interesting"
+        },
+        "relative_clause": {
+          "type": "that_clause",
+          "antecedent": "book", 
+          "clause_content": "that I read",
+          "clause_pattern": "SVO"
+        }
+      }
+    }
+  ]
+}
