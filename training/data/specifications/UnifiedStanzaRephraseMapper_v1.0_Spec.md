@@ -2218,14 +2218,21 @@ Phase 2.0ハンドラー内部移行は技術的に実現可能であり、
 
 ```
 🎯 Order機能の核心概念:
-絶対順序システムによる文法要素のランダマイゼーション実現
-- V_group_key内での固定順序管理
+文型別絶対順序システムによる文法要素のランダマイゼーション実現
+- 文型別V_group_key管理（疑問文と肯定文で異なる順序構造）
 - 2階層Order構造（Slot_display_order + display_order）
+- 文型変換ルール（肯定文↔wh疑問文↔yes/no疑問文）による構造変換
 - 空白スロット・wh-word排他制御による文型バリエーション
 
-🔄 統合戦略: 現行システム保持＋機能拡張
+🔄 統合戦略: 現行システム保持＋文型認識機能拡張
 現在の69.7%認識精度の動的文法認識システムを基盤とし、
-order機能を段階的に統合してランダマイゼーション機能を実現
+文型認識機能を追加してorder機能を段階的に統合
+
+⚠️ 重要な発見: 疑問文と肯定文の順序構造差異
+✅ wh疑問文: O1が位置1に前置（"What did you buy?" → O1-Aux-S-V）
+✅ yes/no疑問文: Auxが位置1に前置（"Did you buy it?" → Aux-S-V-O1）
+✅ 肯定文: 標準S-V-O順序（"You bought it" → S-V-O1）
+❌ 1つのV_group_keyで疑問文と肯定文を統一管理は困難
 ```
 
 ### **Order機能アーキテクチャ**
@@ -2243,10 +2250,12 @@ order機能を段階的に統合してランダマイゼーション機能を実
 │ │ └─ is_subslot フラグ                   │ │
 │ └─────────────────────────────────────────┘ │
 │ ┌─────────────────────────────────────────┐ │
-│ │ V_group_key管理システム                │ │
-│ │ ├─ 動詞ベースグループ分類              │ │
-│ │ ├─ グループ別絶対順序テーブル          │ │
-│ │ └─ 順序マッピング機能                  │ │
+│ │ 文型別V_group_key管理システム          │ │
+│ │ ├─ 文型認識エンジン                    │ │
+│ │ ├─ 肯定文用絶対順序テーブル            │ │
+│ │ ├─ wh疑問文用絶対順序テーブル          │ │
+│ │ ├─ yes/no疑問文用絶対順序テーブル      │ │
+│ │ └─ 文型変換ルールエンジン              │ │
 │ └─────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────┤
 │ 🔧 Phase 2: コア機能実装 (強く推奨)         │
@@ -2303,34 +2312,46 @@ order機能を段階的に統合してランダマイゼーション機能を実
        subslot_id: str = ""             # サブスロットID (sub-s, sub-v等)
    ```
 
-2. **V_group_key管理システム**
+2. **文型別V_group_key管理システム**
    ```python
-   class VGroupKeyManager:
-       """V_group_key管理とorder計算"""
+   class SentenceTypeAwareVGroupManager:
+       """文型認識対応V_group_key管理システム"""
        
        def __init__(self):
-           self.absolute_order_tables = self._load_order_tables()
+           self.sentence_type_detector = SentenceTypeDetector()
+           self.order_tables = {
+               'statement': self._load_statement_order_tables(),      # 肯定文用
+               'wh_question': self._load_wh_question_order_tables(),  # wh疑問文用
+               'yes_no_question': self._load_yn_question_order_tables() # yes/no疑問文用
+           }
        
-       def determine_v_group_key(self, main_verb: str) -> str:
-           """メイン動詞からV_group_keyを決定"""
+       def determine_sentence_type(self, grammar_elements: List[GrammarElement]) -> str:
+           """文型を判定（statement/wh_question/yes_no_question）"""
            
-       def get_absolute_order_map(self, v_group_key: str) -> Dict[str, int]:
-           """絶対順序マップを取得"""
+       def get_v_group_key(self, main_verb: str, sentence_type: str) -> str:
+           """動詞と文型からV_group_keyを決定"""
            
-       def calculate_slot_display_order(self, slot: str, v_group_key: str) -> int:
-           """Slot_display_orderを計算"""
+       def get_absolute_order_map(self, v_group_key: str, sentence_type: str) -> Dict[str, int]:
+           """文型別絶対順序マップを取得"""
+           
+       def convert_sentence_type(self, elements: List[GrammarElement], 
+                               from_type: str, to_type: str) -> List[GrammarElement]:
+           """文型変換（肯定文↔疑問文）"""
    ```
 
-3. **基本order計算機能**
-   - 文中位置からSlot_display_order計算
-   - V_group_key別順序ルール適用
+3. **文型認識・変換システム**
+   - 文型自動判定（肯定文/wh疑問文/yes/no疑問文）
+   - 文型別order計算ルール適用
+   - 文型変換時の順序再配置システム
    - 順序検証機能
 
 **マイルストーン**:
 - [x] 設計仕様策定完了
+- [x] 疑問文vs肯定文の順序構造差異分析完了 *(重要発見)*
 - [ ] GrammarElement拡張実装
-- [ ] V_group_key管理システム実装
-- [ ] 基本order計算ロジック実装
+- [ ] 文型認識エンジン実装
+- [ ] 文型別V_group_key管理システム実装
+- [ ] 文型変換ルールエンジン実装
 - [ ] Phase 1統合テスト
 
 #### **🔧 Phase 2: コア機能実装** *(推定工数: 3-4週間, 強く推奨)*
@@ -2387,7 +2408,9 @@ order機能を段階的に統合してランダマイゼーション機能を実
    - yes/no疑問文/肯定文変換
    - 疑問文パターン管理
 
-3. **ランダマイゼーション機能**
+3. **文型変換・ランダマイゼーション機能**
+   - 肯定文↔wh疑問文↔yes/no疑問文の相互変換
+   - 文型変換時の順序自動再配置
    - スロット組み合わせ生成
    - 文意保持チェック
    - 学習データ生成支援
@@ -2403,10 +2426,11 @@ order機能を段階的に統合してランダマイゼーション機能を実
 #### **必須実装** *(Phase 1)*
 ```
 判定理由:
-✅ 現在の基本的なorderでは絶対順序が実現不可能
-✅ V_group_key管理なしではランダマイゼーション時の文意保持が困難
-✅ 後から追加するより、最初から設計した方が大幅に効率的
-✅ 現在の69.7%認識精度を活かした順序情報付与が実現可能
+✅ 疑問文と肯定文で順序構造が根本的に異なることが判明
+✅ 文型別絶対順序システムなしではランダマイゼーション不可能
+✅ 1つのV_group_keyで疑問文と肯定文を統一管理は困難
+✅ 文型認識機能は現在の69.7%認識精度を活かした実装が可能
+✅ 後から追加するより、最初から文型別設計した方が大幅に効率的
 ```
 
 #### **強く推奨** *(Phase 2)*
@@ -2471,7 +2495,12 @@ implementation_considerations = {
 Order機能統合は技術的に実現可能であり、
 現在の動的文法認識システムの価値を大幅に向上させる。
 
-開始条件: Phase 1設計完了（完了済み）
+⚠️ 重要な発見: 疑問文と肯定文の順序構造差異
+分析により、疑問文と肯定文では根本的に異なる順序構造を持つことが判明。
+文型別絶対順序システムの実装が必須。
+
+開始条件: Phase 1設計完了（完了済み）+ 文型別設計修正（完了済み）
 開始時期: 即座開始可能
-優先順序: Phase 1 → Phase 2 → （認識精度向上後）Phase 3
+優先順序: Phase 1（文型認識含む） → Phase 2 → （認識精度向上後）Phase 3
+実装複雑度: 中→高（文型別管理により複雑化したが、より正確な実装が可能）
 ```
