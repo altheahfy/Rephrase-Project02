@@ -554,7 +554,7 @@ class UnifiedStanzaRephraseMapper:
         従属節構造の正確な分析
         """
         if not doc.sentences:
-            return doc
+            return []
             
         result = []
         
@@ -5254,16 +5254,30 @@ class UnifiedStanzaRephraseMapper:
         
         # === Phase 3: 人間文法認識による接続詞検出 ===
         sentence_text = sentence.text if hasattr(sentence, 'text') else str(sentence)
-        human_patterns = self._correct_conjunction_patterns(sentence_text, sentence)
+        
+        # 人間文法認識パターンの取得
+        human_patterns = []
+        if hasattr(sentence, '_human_grammar_corrections'):
+            for correction in sentence._human_grammar_corrections:
+                if correction.get('type') == 'conjunction':
+                    human_patterns.append(correction['correction'])
         
         if human_patterns:
             self.logger.debug(f"  🧠 人間文法認識成功: {len(human_patterns)}個のパターン検出")
+            self.logger.debug(f"  📝 パターン詳細: {human_patterns}")
             
             # 人間文法認識による構造分析
-            conjunction_result = self._process_human_conjunction_patterns(human_patterns, sentence, base_result)
-            if conjunction_result:
-                self.logger.debug("  ✅ 人間文法認識による接続詞処理完了")
-                return conjunction_result
+            try:
+                conjunction_result = self._process_human_conjunction_patterns(human_patterns, sentence, base_result)
+                if conjunction_result:
+                    self.logger.debug("  ✅ 人間文法認識による接続詞処理完了")
+                    return conjunction_result
+                else:
+                    self.logger.debug("  ❌ 人間文法認識処理でNoneが返された")
+            except Exception as e:
+                self.logger.debug(f"  ❌ 人間文法認識処理でエラー: {str(e)}")
+        else:
+            self.logger.debug("  ❌ 人間文法認識パターン未検出")
         
         # === Stanzaフォールバック ===
         self.logger.debug("  🤖 Stanza依存解析フォールバック...")
@@ -5272,7 +5286,10 @@ class UnifiedStanzaRephraseMapper:
         mark_words = []
         advcl_verbs = []
         
-        for word in sentence.words:
+        # sentence が Document オブジェクトの場合は最初の文を取得
+        words = sentence.sentences[0].words if hasattr(sentence, 'sentences') else sentence.words
+        
+        for word in words:
             if word.deprel == 'mark' and word.upos == 'SCONJ':
                 mark_words.append(word)
             elif word.deprel == 'advcl':
@@ -5480,8 +5497,11 @@ class UnifiedStanzaRephraseMapper:
         # 接続詞をsub-m2に配置
         sub_slots['sub-m2'] = conjunction_phrase
         
+        # sentence が Document オブジェクトの場合は最初の文を取得
+        words = sentence.sentences[0].words if hasattr(sentence, 'sentences') else sentence.words
+        
         # 従属節の主語
-        for word in sentence.words:
+        for word in words:
             if word.head == advcl_verb.id and word.deprel == 'nsubj':
                 sub_slots['sub-s'] = word.text
                 break
@@ -5490,7 +5510,7 @@ class UnifiedStanzaRephraseMapper:
         sub_slots['sub-v'] = advcl_verb.text
         
         # 従属節の目的語
-        for word in sentence.words:
+        for word in words:
             if word.head == advcl_verb.id and word.deprel == 'obj':
                 sub_slots['sub-o1'] = word.text
                 break
