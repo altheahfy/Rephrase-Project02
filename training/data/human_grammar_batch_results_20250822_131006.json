@@ -1,0 +1,595 @@
+{
+  "meta": {
+    "test_type": "human_grammar_recognition_batch",
+    "total_sentences": 53,
+    "start_time": "2025-08-22T13:10:06.256759",
+    "end_time": "2025-08-22T13:10:06.438671",
+    "total_time": "0:00:00.181912",
+    "system_version": "unified_mapper_v1.0_human_only"
+  },
+  "results": {
+    "test_001": {
+      "sentence": "The car is red.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.003063678741455078,
+      "meta": {
+        "sentence_id": 1,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.261873"
+      }
+    },
+    "test_002": {
+      "sentence": "I love you.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010192394256591797,
+      "meta": {
+        "sentence_id": 2,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.263916"
+      }
+    },
+    "test_003": {
+      "sentence": "The man who runs fast is strong.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002046346664428711,
+      "meta": {
+        "sentence_id": 3,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.265962"
+      }
+    },
+    "test_004": {
+      "sentence": "The book which lies there is mine.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020563602447509766,
+      "meta": {
+        "sentence_id": 4,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.268019"
+      }
+    },
+    "test_005": {
+      "sentence": "The person that works here is kind.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0004994869232177734,
+      "meta": {
+        "sentence_id": 5,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.269024"
+      }
+    },
+    "test_006": {
+      "sentence": "The book which I bought is expensive.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.001018524169921875,
+      "meta": {
+        "sentence_id": 6,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.271165"
+      }
+    },
+    "test_007": {
+      "sentence": "The man whom I met is tall.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002046823501586914,
+      "meta": {
+        "sentence_id": 7,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.273212"
+      }
+    },
+    "test_008": {
+      "sentence": "The car that he drives is new.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010221004486083984,
+      "meta": {
+        "sentence_id": 8,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.275251"
+      }
+    },
+    "test_009": {
+      "sentence": "The car which was crashed is red.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0025339126586914062,
+      "meta": {
+        "sentence_id": 9,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.278292"
+      }
+    },
+    "test_010": {
+      "sentence": "The book that was written is famous.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.001676797866821289,
+      "meta": {
+        "sentence_id": 10,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.280475"
+      }
+    },
+    "test_011": {
+      "sentence": "The letter which was sent arrived.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020401477813720703,
+      "meta": {
+        "sentence_id": 11,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.282515"
+      }
+    },
+    "test_012": {
+      "sentence": "The man whose car is red lives here.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002055644989013672,
+      "meta": {
+        "sentence_id": 12,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.284571"
+      }
+    },
+    "test_013": {
+      "sentence": "The student whose book I borrowed is smart.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010180473327636719,
+      "meta": {
+        "sentence_id": 13,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.286606"
+      }
+    },
+    "test_014": {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.00159454345703125,
+      "meta": {
+        "sentence_id": 14,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.288707"
+      }
+    },
+    "test_015": {
+      "sentence": "The place where we met is beautiful.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0016589164733886719,
+      "meta": {
+        "sentence_id": 15,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.290366"
+      }
+    },
+    "test_016": {
+      "sentence": "The time when he arrived was late.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020406246185302734,
+      "meta": {
+        "sentence_id": 16,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.292407"
+      }
+    },
+    "test_017": {
+      "sentence": "The reason why she left is unclear.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002053499221801758,
+      "meta": {
+        "sentence_id": 17,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.296504"
+      }
+    },
+    "test_018": {
+      "sentence": "The way how he solved it was clever.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020499229431152344,
+      "meta": {
+        "sentence_id": 18,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.298554"
+      }
+    },
+    "test_019": {
+      "sentence": "The book I read yesterday was boring.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010263919830322266,
+      "meta": {
+        "sentence_id": 19,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.299580"
+      }
+    },
+    "test_020": {
+      "sentence": "He has finished his homework.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010170936584472656,
+      "meta": {
+        "sentence_id": 20,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.301615"
+      }
+    },
+    "test_021": {
+      "sentence": "The letter was written by John.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010159015655517578,
+      "meta": {
+        "sentence_id": 21,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.303651"
+      }
+    },
+    "test_022": {
+      "sentence": "The house was built in 1990.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.001020193099975586,
+      "meta": {
+        "sentence_id": 22,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.304672"
+      }
+    },
+    "test_023": {
+      "sentence": "The book was written by a famous author.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002039194107055664,
+      "meta": {
+        "sentence_id": 23,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.306711"
+      }
+    },
+    "test_024": {
+      "sentence": "The cake is being baked by my mother.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010197162628173828,
+      "meta": {
+        "sentence_id": 24,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.307730"
+      }
+    },
+    "test_025": {
+      "sentence": "The cake was eaten by the children.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002061128616333008,
+      "meta": {
+        "sentence_id": 25,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.311847"
+      }
+    },
+    "test_026": {
+      "sentence": "The door was opened by the key.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020394325256347656,
+      "meta": {
+        "sentence_id": 26,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.313887"
+      }
+    },
+    "test_027": {
+      "sentence": "The message was sent yesterday.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010170936584472656,
+      "meta": {
+        "sentence_id": 27,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.314904"
+      }
+    },
+    "test_028": {
+      "sentence": "She acts as if she knows everything.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0025398731231689453,
+      "meta": {
+        "sentence_id": 28,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.318460"
+      }
+    },
+    "test_029": {
+      "sentence": "The students study hard for exams.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.000499725341796875,
+      "meta": {
+        "sentence_id": 29,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.320017"
+      }
+    },
+    "test_030": {
+      "sentence": "The car was repaired last week.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010151863098144531,
+      "meta": {
+        "sentence_id": 30,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.321032"
+      }
+    },
+    "test_031": {
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.001013040542602539,
+      "meta": {
+        "sentence_id": 31,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.323065"
+      }
+    },
+    "test_032": {
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010166168212890625,
+      "meta": {
+        "sentence_id": 32,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.324081"
+      }
+    },
+    "test_033": {
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020380020141601562,
+      "meta": {
+        "sentence_id": 33,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.326119"
+      }
+    },
+    "test_034": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002046346664428711,
+      "meta": {
+        "sentence_id": 34,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.328166"
+      }
+    },
+    "test_035": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0015690326690673828,
+      "meta": {
+        "sentence_id": 35,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.330240"
+      }
+    },
+    "test_036": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010242462158203125,
+      "meta": {
+        "sentence_id": 36,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.332286"
+      }
+    },
+    "test_037": {
+      "sentence": "The window was gently opened by the morning breeze.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010194778442382812,
+      "meta": {
+        "sentence_id": 37,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.333305"
+      }
+    },
+    "test_038": {
+      "sentence": "The message is being carefully written by the manager.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002036571502685547,
+      "meta": {
+        "sentence_id": 38,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.335341"
+      }
+    },
+    "test_039": {
+      "sentence": "The problem was quickly solved by the expert team.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020308494567871094,
+      "meta": {
+        "sentence_id": 39,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.337372"
+      }
+    },
+    "test_040": {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0015246868133544922,
+      "meta": {
+        "sentence_id": 40,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.339396"
+      }
+    },
+    "test_041": {
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0011866092681884766,
+      "meta": {
+        "sentence_id": 41,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.340583"
+      }
+    },
+    "test_042": {
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.07806062698364258,
+      "meta": {
+        "sentence_id": 42,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.418644"
+      }
+    },
+    "test_043": {
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002129077911376953,
+      "meta": {
+        "sentence_id": 43,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.420773"
+      }
+    },
+    "test_044": {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010211467742919922,
+      "meta": {
+        "sentence_id": 44,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.421794"
+      }
+    },
+    "test_045": {
+      "sentence": "The student writes essays carefully for better grades.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020470619201660156,
+      "meta": {
+        "sentence_id": 45,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.423841"
+      }
+    },
+    "test_046": {
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010173320770263672,
+      "meta": {
+        "sentence_id": 46,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.425881"
+      }
+    },
+    "test_047": {
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020477771759033203,
+      "meta": {
+        "sentence_id": 47,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.427928"
+      }
+    },
+    "test_048": {
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010499954223632812,
+      "meta": {
+        "sentence_id": 48,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.429998"
+      }
+    },
+    "test_049": {
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0020372867584228516,
+      "meta": {
+        "sentence_id": 49,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.432035"
+      }
+    },
+    "test_050": {
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010318756103515625,
+      "meta": {
+        "sentence_id": 50,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.433067"
+      }
+    },
+    "test_051": {
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0010166168212890625,
+      "meta": {
+        "sentence_id": 51,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.435113"
+      }
+    },
+    "test_052": {
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.002033233642578125,
+      "meta": {
+        "sentence_id": 52,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.437146"
+      }
+    },
+    "test_053": {
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "slots": {},
+      "sub_slots": {},
+      "processing_time": 0.0015246868133544922,
+      "meta": {
+        "sentence_id": 53,
+        "test_mode": "human_only",
+        "timestamp": "2025-08-22T13:10:06.438671"
+      }
+    }
+  }
+}

@@ -1,0 +1,1519 @@
+{
+  "meta": {
+    "comparison_timestamp": "2025-08-22T13:01:55.694582",
+    "total_sentences": 53,
+    "perfect_matches": 0,
+    "accuracy_percentage": 0.0,
+    "main_slot_errors": 53,
+    "sub_slot_errors": 35
+  },
+  "detailed_results": [
+    {
+      "sentence": "The car is red.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The car', 実際値=''",
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='red', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.003078460693359375,
+      "has_error": false
+    },
+    {
+      "sentence": "I love you.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='I', 実際値=''",
+        "主節[V]: 期待値='love', 実際値=''",
+        "主節[O1]: 期待値='you', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "I",
+        "V": "love",
+        "O1": "you"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010077953338623047,
+      "has_error": false
+    },
+    {
+      "sentence": "The man who runs fast is strong.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='strong', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The man who', 実際値=''",
+        "関係節[sub-v]: 期待値='runs', 実際値=''",
+        "関係節[sub-m2]: 期待値='fast', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast"
+      },
+      "processing_time": 0.003089427947998047,
+      "has_error": false
+    },
+    {
+      "sentence": "The book which lies there is mine.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='mine', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The book which', 実際値=''",
+        "関係節[sub-v]: 期待値='lies', 実際値=''",
+        "関係節[sub-m2]: 期待値='there', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "sub-m2": "there"
+      },
+      "processing_time": 0.002765178680419922,
+      "has_error": false
+    },
+    {
+      "sentence": "The person that works here is kind.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='kind', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The person that', 実際値=''",
+        "関係節[sub-v]: 期待値='works', 実際値=''",
+        "関係節[sub-m2]: 期待値='here', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "sub-m2": "here"
+      },
+      "processing_time": 0.0020012855529785156,
+      "has_error": false
+    },
+    {
+      "sentence": "The book which I bought is expensive.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='expensive', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-o1]: 期待値='The book which', 実際値=''",
+        "関係節[sub-s]: 期待値='I', 実際値=''",
+        "関係節[sub-v]: 期待値='bought', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought"
+      },
+      "processing_time": 0.0012106895446777344,
+      "has_error": false
+    },
+    {
+      "sentence": "The man whom I met is tall.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='tall', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-o1]: 期待値='The man whom', 実際値=''",
+        "関係節[sub-s]: 期待値='I', 実際値=''",
+        "関係節[sub-v]: 期待値='met', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "tall"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-o1": "The man whom",
+        "sub-s": "I",
+        "sub-v": "met"
+      },
+      "processing_time": 0.001020193099975586,
+      "has_error": false
+    },
+    {
+      "sentence": "The car that he drives is new.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='new', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-o1]: 期待値='The car that', 実際値=''",
+        "関係節[sub-s]: 期待値='he', 実際値=''",
+        "関係節[sub-v]: 期待値='drives', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "new"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-o1": "The car that",
+        "sub-s": "he",
+        "sub-v": "drives"
+      },
+      "processing_time": 0.002034425735473633,
+      "has_error": false
+    },
+    {
+      "sentence": "The car which was crashed is red.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='red', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The car which', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='crashed', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "red"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The car which",
+        "sub-aux": "was",
+        "sub-v": "crashed"
+      },
+      "processing_time": 0.001016855239868164,
+      "has_error": false
+    },
+    {
+      "sentence": "The book that was written is famous.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='famous', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The book that', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='written', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The book that",
+        "sub-aux": "was",
+        "sub-v": "written"
+      },
+      "processing_time": 0.0010137557983398438,
+      "has_error": false
+    },
+    {
+      "sentence": "The letter which was sent arrived.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='arrived', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The letter which', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='sent', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "arrived"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent"
+      },
+      "processing_time": 0.0025475025177001953,
+      "has_error": false
+    },
+    {
+      "sentence": "The man whose car is red lives here.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='lives', 実際値=''",
+        "主節[M2]: 期待値='here', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The man whose car', 実際値=''",
+        "関係節[sub-v]: 期待値='is', 実際値=''",
+        "関係節[sub-c1]: 期待値='red', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "sub-c1": "red"
+      },
+      "processing_time": 0.0025415420532226562,
+      "has_error": false
+    },
+    {
+      "sentence": "The student whose book I borrowed is smart.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='smart', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-o1]: 期待値='The student whose book', 実際値=''",
+        "関係節[sub-s]: 期待値='I', 実際値=''",
+        "関係節[sub-v]: 期待値='borrowed', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed"
+      },
+      "processing_time": 0.002035856246948242,
+      "has_error": false
+    },
+    {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='my neighbor', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The woman whose dog', 実際値=''",
+        "関係節[sub-v]: 期待値='barks', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks"
+      },
+      "processing_time": 0.002036571502685547,
+      "has_error": false
+    },
+    {
+      "sentence": "The place where we met is beautiful.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='beautiful', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-m2]: 期待値='The place where', 実際値=''",
+        "関係節[sub-s]: 期待値='we', 実際値=''",
+        "関係節[sub-v]: 期待値='met', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "beautiful"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met"
+      },
+      "processing_time": 0.002041339874267578,
+      "has_error": false
+    },
+    {
+      "sentence": "The time when he arrived was late.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='was', 実際値=''",
+        "主節[C1]: 期待値='late', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-m2]: 期待値='The time when', 実際値=''",
+        "関係節[sub-s]: 期待値='he', 実際値=''",
+        "関係節[sub-v]: 期待値='arrived', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "was",
+        "C1": "late"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-m2": "The time when",
+        "sub-s": "he",
+        "sub-v": "arrived"
+      },
+      "processing_time": 0.001020193099975586,
+      "has_error": false
+    },
+    {
+      "sentence": "The reason why she left is unclear.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='unclear', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-m2]: 期待値='The reason why', 実際値=''",
+        "関係節[sub-s]: 期待値='she', 実際値=''",
+        "関係節[sub-v]: 期待値='left', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "unclear"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-v": "left"
+      },
+      "processing_time": 0.0010197162628173828,
+      "has_error": false
+    },
+    {
+      "sentence": "The way how he solved it was clever.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='was', 実際値=''",
+        "主節[C1]: 期待値='clever', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-m2]: 期待値='The way how', 実際値=''",
+        "関係節[sub-s]: 期待値='he', 実際値=''",
+        "関係節[sub-v]: 期待値='solved', 実際値=''",
+        "関係節[sub-o1]: 期待値='it', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "was",
+        "C1": "clever"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-m2": "The way how",
+        "sub-s": "he",
+        "sub-v": "solved",
+        "sub-o1": "it"
+      },
+      "processing_time": 0.0010180473327636719,
+      "has_error": false
+    },
+    {
+      "sentence": "The book I read yesterday was boring.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='was', 実際値=''",
+        "主節[C1]: 期待値='boring', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-o1]: 期待値='The book', 実際値=''",
+        "関係節[sub-s]: 期待値='I', 実際値=''",
+        "関係節[sub-v]: 期待値='read', 実際値=''",
+        "関係節[sub-m2]: 期待値='yesterday', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "was",
+        "C1": "boring"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-o1": "The book",
+        "sub-s": "I",
+        "sub-v": "read",
+        "sub-m2": "yesterday"
+      },
+      "processing_time": 0.0020503997802734375,
+      "has_error": false
+    },
+    {
+      "sentence": "He has finished his homework.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='He', 実際値=''",
+        "主節[Aux]: 期待値='has', 実際値=''",
+        "主節[V]: 期待値='finished', 実際値=''",
+        "主節[O1]: 期待値='his homework', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "He",
+        "Aux": "has",
+        "V": "finished",
+        "O1": "his homework"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0020411014556884766,
+      "has_error": false
+    },
+    {
+      "sentence": "The letter was written by John.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The letter', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='written', 実際値=''",
+        "主節[M2]: 期待値='by John', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The letter",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by John"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010170936584472656,
+      "has_error": false
+    },
+    {
+      "sentence": "The house was built in 1990.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The house', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='built', 実際値=''",
+        "主節[M2]: 期待値='in 1990', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The house",
+        "Aux": "was",
+        "V": "built",
+        "M2": "in 1990"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010318756103515625,
+      "has_error": false
+    },
+    {
+      "sentence": "The book was written by a famous author.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The book', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='written', 実際値=''",
+        "主節[M2]: 期待値='by a famous author', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The book",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by a famous author"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010249614715576172,
+      "has_error": false
+    },
+    {
+      "sentence": "The cake is being baked by my mother.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The cake', 実際値=''",
+        "主節[Aux]: 期待値='is being', 実際値=''",
+        "主節[V]: 期待値='baked', 実際値=''",
+        "主節[M2]: 期待値='by my mother', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.001016378402709961,
+      "has_error": false
+    },
+    {
+      "sentence": "The cake was eaten by the children.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The cake', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='eaten', 実際値=''",
+        "主節[M2]: 期待値='by the children', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The cake",
+        "Aux": "was",
+        "V": "eaten",
+        "M2": "by the children"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0020422935485839844,
+      "has_error": false
+    },
+    {
+      "sentence": "The door was opened by the key.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The door', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='opened', 実際値=''",
+        "主節[M2]: 期待値='by the key', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The door",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "by the key"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010128021240234375,
+      "has_error": false
+    },
+    {
+      "sentence": "The message was sent yesterday.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The message', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='sent', 実際値=''",
+        "主節[M2]: 期待値='yesterday', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The message",
+        "Aux": "was",
+        "V": "sent",
+        "M2": "yesterday"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0020313262939453125,
+      "has_error": false
+    },
+    {
+      "sentence": "She acts as if she knows everything.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[S]: 期待値='She', 実際値=''",
+        "主節[V]: 期待値='acts', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-m2]: 期待値='as if', 実際値=''",
+        "関係節[sub-s]: 期待値='she', 実際値=''",
+        "関係節[sub-v]: 期待値='knows', 実際値=''",
+        "関係節[sub-o1]: 期待値='everything', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "She",
+        "V": "acts",
+        "M2": ""
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-m2": "as if",
+        "sub-s": "she",
+        "sub-v": "knows",
+        "sub-o1": "everything"
+      },
+      "processing_time": 0.003036022186279297,
+      "has_error": false
+    },
+    {
+      "sentence": "The students study hard for exams.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The students', 実際値=''",
+        "主節[V]: 期待値='study', 実際値=''",
+        "主節[M2]: 期待値='hard', 実際値=''",
+        "主節[M3]: 期待値='for exams', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The students",
+        "V": "study",
+        "M2": "hard",
+        "M3": "for exams"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010232925415039062,
+      "has_error": false
+    },
+    {
+      "sentence": "The car was repaired last week.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The car', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='repaired', 実際値=''",
+        "主節[M2]: 期待値='last week', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The car",
+        "Aux": "was",
+        "V": "repaired",
+        "M2": "last week"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0006251335144042969,
+      "has_error": false
+    },
+    {
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='is', 実際値=''",
+        "主節[C1]: 期待値='famous', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The book which', 実際値=''",
+        "関係節[sub-v]: 期待値='written', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-m2]: 期待値='carefully', 実際値=''",
+        "関係節[sub-m3]: 期待値='by Shakespeare', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The book which",
+        "sub-v": "written",
+        "sub-aux": "was",
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare"
+      },
+      "processing_time": 0.00101470947265625,
+      "has_error": false
+    },
+    {
+      "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='runs', 実際値=''",
+        "主節[M2]: 期待値='smoothly', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The car that', 実際値=''",
+        "関係節[sub-v]: 期待値='repaired', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-m2]: 期待値='quickly', 実際値=''",
+        "関係節[sub-m3]: 期待値='yesterday', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The car that",
+        "sub-v": "repaired",
+        "sub-aux": "was",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday"
+      },
+      "processing_time": 0.0010166168212890625,
+      "has_error": false
+    },
+    {
+      "sentence": "The letter which was slowly typed by the secretary arrived today.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='arrived', 実際値=''",
+        "主節[M2]: 期待値='today', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The letter which', 実際値=''",
+        "関係節[sub-v]: 期待値='typed', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-m2]: 期待値='slowly', 実際値=''",
+        "関係節[sub-m3]: 期待値='by the secretary', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "arrived",
+        "M2": "today"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The letter which",
+        "sub-v": "typed",
+        "sub-aux": "was",
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary"
+      },
+      "processing_time": 0.0010173320770263672,
+      "has_error": false
+    },
+    {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='succeeds', 実際値=''",
+        "主節[M2]: 期待値='always', 実際値=''",
+        "主節[M3]: 期待値='academically', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The student who', 実際値=''",
+        "関係節[sub-v]: 期待値='studies', 実際値=''",
+        "関係節[sub-m2]: 期待値='diligently', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "always",
+        "M3": "academically"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "sub-m2": "diligently"
+      },
+      "processing_time": 0.0010247230529785156,
+      "has_error": false
+    },
+    {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='is', 実際値=''",
+        "主節[V]: 期待値='respected', 実際値=''",
+        "主節[M2]: 期待値='greatly', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The teacher whose class', 実際値=''",
+        "関係節[sub-v]: 期待値='runs', 実際値=''",
+        "関係節[sub-m2]: 期待値='efficiently', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "sub-m2": "efficiently"
+      },
+      "processing_time": 0.0010182857513427734,
+      "has_error": false
+    },
+    {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='saves', 実際値=''",
+        "主節[O1]: 期待値='lives', 実際値=''",
+        "主節[M2]: 期待値='successfully', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The doctor who', 実際値=''",
+        "関係節[sub-v]: 期待値='works', 実際値=''",
+        "関係節[sub-m2]: 期待値='carefully', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "saves",
+        "O1": "lives",
+        "M2": "successfully"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The doctor who",
+        "sub-v": "works",
+        "sub-m2": "carefully"
+      },
+      "processing_time": 0.0010173320770263672,
+      "has_error": false
+    },
+    {
+      "sentence": "The window was gently opened by the morning breeze.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The window', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='opened', 実際値=''",
+        "主節[M2]: 期待値='gently', 実際値=''",
+        "主節[M3]: 期待値='by the morning breeze', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "gently",
+        "M3": "by the morning breeze"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.002032041549682617,
+      "has_error": false
+    },
+    {
+      "sentence": "The message is being carefully written by the manager.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The message', 実際値=''",
+        "主節[Aux]: 期待値='is being', 実際値=''",
+        "主節[V]: 期待値='written', 実際値=''",
+        "主節[M2]: 期待値='carefully', 実際値=''",
+        "主節[M3]: 期待値='by the manager', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.001024007797241211,
+      "has_error": false
+    },
+    {
+      "sentence": "The problem was quickly solved by the expert team.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The problem', 実際値=''",
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='solved', 実際値=''",
+        "主節[M2]: 期待値='quickly', 実際値=''",
+        "主節[M3]: 期待値='by the expert team', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M2": "quickly",
+        "M3": "by the expert team"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010211467742919922,
+      "has_error": false
+    },
+    {
+      "sentence": "The house whose roof was damaged badly needs immediate repair.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='needs', 実際値=''",
+        "主節[O1]: 期待値='immediate repair', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The house whose roof', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='damaged', 実際値=''",
+        "関係節[sub-m2]: 期待値='badly', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "needs",
+        "O1": "immediate repair"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The house whose roof",
+        "sub-aux": "was",
+        "sub-v": "damaged",
+        "sub-m2": "badly"
+      },
+      "processing_time": 0.001020193099975586,
+      "has_error": false
+    },
+    {
+      "sentence": "The place where we met accidentally became our favorite spot.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='became', 実際値=''",
+        "主節[C1]: 期待値='our favorite spot', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='we', 実際値=''",
+        "関係節[sub-v]: 期待値='met', 実際値=''",
+        "関係節[sub-m2]: 期待値='The place where', 実際値=''",
+        "関係節[sub-m3]: 期待値='accidentally', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "became",
+        "C1": "our favorite spot"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "we",
+        "sub-v": "met",
+        "sub-m2": "The place where",
+        "sub-m3": "accidentally"
+      },
+      "processing_time": 0.001020193099975586,
+      "has_error": false
+    },
+    {
+      "sentence": "The time when everything changed dramatically was unexpected.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='unexpected', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='everything', 実際値=''",
+        "関係節[sub-v]: 期待値='changed', 実際値=''",
+        "関係節[sub-m2]: 期待値='The time when', 実際値=''",
+        "関係節[sub-m3]: 期待値='dramatically', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "was",
+        "V": "unexpected"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "everything",
+        "sub-v": "changed",
+        "sub-m2": "The time when",
+        "sub-m3": "dramatically"
+      },
+      "processing_time": 0.0010182857513427734,
+      "has_error": false
+    },
+    {
+      "sentence": "The building is being constructed very carefully by skilled workers.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The building', 実際値=''",
+        "主節[Aux]: 期待値='is being', 実際値=''",
+        "主節[V]: 期待値='constructed', 実際値=''",
+        "主節[M2]: 期待値='very carefully', 実際値=''",
+        "主節[M3]: 期待値='by skilled workers', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M2": "very carefully",
+        "M3": "by skilled workers"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0010187625885009766,
+      "has_error": false
+    },
+    {
+      "sentence": "The teacher explains grammar clearly to confused students daily.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The teacher', 実際値=''",
+        "主節[V]: 期待値='explains', 実際値=''",
+        "主節[O1]: 期待値='grammar', 実際値=''",
+        "主節[M1]: 期待値='clearly', 実際値=''",
+        "主節[M2]: 期待値='to confused students', 実際値=''",
+        "主節[M3]: 期待値='daily', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The teacher",
+        "V": "explains",
+        "O1": "grammar",
+        "M1": "clearly",
+        "M2": "to confused students",
+        "M3": "daily"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.0004999637603759766,
+      "has_error": false
+    },
+    {
+      "sentence": "The student writes essays carefully for better grades.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": true,
+      "main_errors": [
+        "主節[S]: 期待値='The student', 実際値=''",
+        "主節[V]: 期待値='writes', 実際値=''",
+        "主節[O1]: 期待値='essays', 実際値=''",
+        "主節[M2]: 期待値='carefully', 実際値=''",
+        "主節[M3]: 期待値='for better grades', 実際値=''"
+      ],
+      "sub_errors": [],
+      "actual_main": {},
+      "expected_main": {
+        "S": "The student",
+        "V": "writes",
+        "O1": "essays",
+        "M2": "carefully",
+        "M3": "for better grades"
+      },
+      "actual_sub": {},
+      "expected_sub": {},
+      "processing_time": 0.07668876647949219,
+      "has_error": false
+    },
+    {
+      "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='published', 実際値=''",
+        "主節[M2]: 期待値='successfully', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The report which', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='reviewed', 実際値=''",
+        "関係節[sub-m2]: 期待値='thoroughly', 実際値=''",
+        "関係節[sub-m3]: 期待値='by experts', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "was",
+        "V": "published",
+        "M2": "successfully"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The report which",
+        "sub-aux": "was",
+        "sub-v": "reviewed",
+        "sub-m2": "thoroughly",
+        "sub-m3": "by experts"
+      },
+      "processing_time": 0.0010151863098144531,
+      "has_error": false
+    },
+    {
+      "sentence": "The student whose essay was carefully corrected improved dramatically.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='improved', 実際値=''",
+        "主節[M2]: 期待値='dramatically', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The student whose essay', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='corrected', 実際値=''",
+        "関係節[sub-m2]: 期待値='carefully', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "improved",
+        "M2": "dramatically"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The student whose essay",
+        "sub-aux": "was",
+        "sub-v": "corrected",
+        "sub-m2": "carefully"
+      },
+      "processing_time": 0.0010173320770263672,
+      "has_error": false
+    },
+    {
+      "sentence": "The machine that was properly maintained works efficiently every day.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='works', 実際値=''",
+        "主節[M2]: 期待値='efficiently', 実際値=''",
+        "主節[M3]: 期待値='every day', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The machine that', 実際値=''",
+        "関係節[sub-aux]: 期待値='was', 実際値=''",
+        "関係節[sub-v]: 期待値='maintained', 実際値=''",
+        "関係節[sub-m2]: 期待値='properly', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "sub-m2": "properly"
+      },
+      "processing_time": 0.0020389556884765625,
+      "has_error": false
+    },
+    {
+      "sentence": "The team working overtime completed the project successfully yesterday.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='completed', 実際値=''",
+        "主節[O1]: 期待値='the project', 実際値=''",
+        "主節[M2]: 期待値='successfully', 実際値=''",
+        "主節[M3]: 期待値='yesterday', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-v]: 期待値='the team working', 実際値=''",
+        "関係節[sub-m2]: 期待値='overtime', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "completed",
+        "O1": "the project",
+        "M2": "successfully",
+        "M3": "yesterday"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-v": "the team working",
+        "sub-m2": "overtime"
+      },
+      "processing_time": 0.001018524169921875,
+      "has_error": false
+    },
+    {
+      "sentence": "The woman standing quietly near the door was waiting patiently.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='was', 実際値=''",
+        "主節[V]: 期待値='waiting', 実際値=''",
+        "主節[M2]: 期待値='patiently', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-v]: 期待値='the woman standing', 実際値=''",
+        "関係節[sub-m2]: 期待値='quietly', 実際値=''",
+        "関係節[sub-m3]: 期待値='near the door', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "was",
+        "V": "waiting",
+        "M2": "patiently"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-v": "the woman standing",
+        "sub-m2": "quietly",
+        "sub-m3": "near the door"
+      },
+      "processing_time": 0.0010290145874023438,
+      "has_error": false
+    },
+    {
+      "sentence": "The children playing happily in the garden were supervised carefully.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='were', 実際値=''",
+        "主節[V]: 期待値='supervised', 実際値=''",
+        "主節[M2]: 期待値='carefully', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-v]: 期待値='the children playing', 実際値=''",
+        "関係節[sub-m2]: 期待値='happily', 実際値=''",
+        "関係節[sub-m3]: 期待値='in the garden', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "were",
+        "V": "supervised",
+        "M2": "carefully"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-v": "the children playing",
+        "sub-m2": "happily",
+        "sub-m3": "in the garden"
+      },
+      "processing_time": 0.0030384063720703125,
+      "has_error": false
+    },
+    {
+      "sentence": "The documents being reviewed thoroughly will be approved soon.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[Aux]: 期待値='will be', 実際値=''",
+        "主節[V]: 期待値='approved', 実際値=''",
+        "主節[M2]: 期待値='soon', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-aux]: 期待値='The documents being', 実際値=''",
+        "関係節[sub-v]: 期待値='reviewed', 実際値=''",
+        "関係節[sub-m2]: 期待値='thoroughly', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "Aux": "will be",
+        "V": "approved",
+        "M2": "soon"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-aux": "The documents being",
+        "sub-v": "reviewed",
+        "sub-m2": "thoroughly"
+      },
+      "processing_time": 0.0020456314086914062,
+      "has_error": false
+    },
+    {
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "perfect_match": false,
+      "main_match": false,
+      "sub_match": false,
+      "main_errors": [
+        "主節[V]: 期待値='became', 実際値=''",
+        "主節[C1]: 期待値='famous', 実際値=''",
+        "主節[M2]: 期待値='rapidly', 実際値=''"
+      ],
+      "sub_errors": [
+        "関係節[sub-s]: 期待値='The artist whose paintings', 実際値=''",
+        "関係節[sub-aux]: 期待値='were', 実際値=''",
+        "関係節[sub-v]: 期待値='exhibited', 実際値=''",
+        "関係節[sub-m2]: 期待値='internationally', 実際値=''"
+      ],
+      "actual_main": {},
+      "expected_main": {
+        "S": "",
+        "V": "became",
+        "C1": "famous",
+        "M2": "rapidly"
+      },
+      "actual_sub": {},
+      "expected_sub": {
+        "sub-s": "The artist whose paintings",
+        "sub-aux": "were",
+        "sub-v": "exhibited",
+        "sub-m2": "internationally"
+      },
+      "processing_time": 0.0010302066802978516,
+      "has_error": false
+    }
+  ]
+}

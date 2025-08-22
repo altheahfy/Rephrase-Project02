@@ -18,6 +18,7 @@ from typing import Dict, List, Optional, Any, Tuple
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -50,7 +51,8 @@ class UnifiedStanzaRephraseMapper:
                  language='en', 
                  enable_gpu=False,
                  log_level='DEBUG',
-                 use_spacy_hybrid=True):
+                 use_spacy_hybrid=True,
+                 test_mode=None):
         """
         統合マッパー初期化
         
@@ -59,10 +61,12 @@ class UnifiedStanzaRephraseMapper:
             enable_gpu: GPU使用フラグ
             log_level: ログレベル
             use_spacy_hybrid: spaCyハイブリッド解析使用フラグ
+            test_mode: テストモード ('human_only', 'stanza_only', 'full', None)
         """
         self.language = language
         self.enable_gpu = enable_gpu
         self.use_spacy_hybrid = use_spacy_hybrid
+        self.test_mode = test_mode  # テストモード保存
         
         # ログ設定
         self._setup_logging(log_level)
@@ -185,6 +189,13 @@ class UnifiedStanzaRephraseMapper:
         try:
             self.logger.debug(f"Processing: {sentence}")
             
+            # テストモード処理
+            if self.test_mode == 'human_only':
+                return self._process_human_grammar_only(sentence)
+            elif self.test_mode == 'stanza_only':
+                return self._process_stanza_only(sentence)
+            
+            # 通常の統合処理
             # Stanza解析
             doc = self._analyze_with_stanza(sentence)
             if not doc or not doc.sentences:
@@ -1592,6 +1603,109 @@ class UnifiedStanzaRephraseMapper:
                 'empty_result': True
             }
         }
+    
+    def _process_human_grammar_only(self, sentence: str) -> Dict[str, Any]:
+        """人間文法認識のみの処理
+        
+        Args:
+            sentence (str): 処理対象の文
+            
+        Returns:
+            Dict[str, Any]: スロット分解結果
+        """
+        self.logger.info(f"🧠 人間文法認識のみでの処理開始: '{sentence}'")
+        start_time = time.time()
+        
+        # Document オブジェクトを作成（Stanzaを使わずに）
+        doc = type('Document', (), {
+            'text': sentence,
+            'sentences': [type('Sentence', (), {
+                'text': sentence,
+                'words': [],  # 空のワードリスト
+                'tokens': []  # 空のトークンリスト
+            })()]
+        })()
+        
+        # 人間文法認識パターンを適用
+        doc = self._apply_human_grammar_patterns(sentence, doc)
+        
+        # スロット情報を抽出
+        main_slots = {}
+        sub_slots = {}
+        
+        if hasattr(doc, '_human_grammar_corrections') and doc._human_grammar_corrections:
+            # 人間文法認識の結果からスロットを構築
+            corrections = doc._human_grammar_corrections
+            
+            # 主節スロット
+            if 'main_slots' in corrections:
+                main_slots = corrections['main_slots']
+            
+            # 関係節スロット  
+            if 'sub_slots' in corrections:
+                sub_slots = corrections['sub_slots']
+            
+            self.logger.debug(f"👤 人間文法認識結果: main_slots={main_slots}, sub_slots={sub_slots}")
+        else:
+            self.logger.warning(f"⚠️ 人間文法認識でパターンが検出されませんでした: '{sentence}'")
+        
+        processing_time = time.time() - start_time
+        
+        result = {
+            'sentence': sentence,
+            'slots': main_slots,
+            'sub_slots': sub_slots,
+            'grammar_info': {
+                'detected_patterns': getattr(doc, '_detected_patterns', []),
+                'handler_contributions': {'human_grammar': True}
+            },
+            'meta': {
+                'processing_time': processing_time,
+                'sentence_id': self.processing_count,
+                'human_only': True
+            }
+        }
+        
+        self.logger.info(f"✅ 人間文法認識のみでの処理完了 ({processing_time:.3f}s)")
+        return result
+    
+    def _process_stanza_only(self, sentence: str) -> Dict[str, Any]:
+        """Stanzaのみの処理（参考用）
+        
+        Args:
+            sentence (str): 処理対象の文
+            
+        Returns:
+            Dict[str, Any]: スロット分解結果
+        """
+        self.logger.info(f"🤖 Stanzaのみでの処理開始: '{sentence}'")
+        start_time = time.time()
+        
+        # Stanza処理
+        doc = self.nlp(sentence)
+        
+        # 従来のStanza処理フローを実行（人間文法認識パターンは適用しない）
+        doc = self._apply_patterns(doc)
+        
+        processing_time = time.time() - start_time
+        
+        result = {
+            'sentence': sentence,
+            'slots': getattr(doc, 'slots', {}),
+            'sub_slots': getattr(doc, 'sub_slots', {}),
+            'grammar_info': {
+                'detected_patterns': getattr(doc, '_detected_patterns', []),
+                'handler_contributions': {'stanza_only': True}
+            },
+            'meta': {
+                'processing_time': processing_time,
+                'sentence_id': self.processing_count,
+                'stanza_only': True
+            }
+        }
+        
+        self.logger.info(f"✅ Stanzaのみでの処理完了 ({processing_time:.3f}s)")
+        return result
     
     # =============================================================================
     # ハンドラー管理（Phase別機能追加用）
