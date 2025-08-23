@@ -158,23 +158,9 @@ class DynamicGrammarMapper:
             # 🔧 関係節内要素の事前除外（メイン文法解析用）
             excluded_indices = self._identify_relative_clause_elements(tokens, relative_clause_info)
             
-            # 2. 除外されていない要素のみでコア要素を特定（元のインデックス情報を保持）
-            filtered_tokens = []
-            original_indices = []
-            for i, token in enumerate(tokens):
-                if i not in excluded_indices:
-                    filtered_tokens.append(token)
-                    original_indices.append(i)
-            
+            # 2. 除外されていない要素のみでコア要素を特定
+            filtered_tokens = [token for i, token in enumerate(tokens) if i not in excluded_indices]
             core_elements = self._identify_core_elements(filtered_tokens)
-            
-            # 🔧 コア要素のインデックスを元のトークンリストのインデックスに変換
-            if core_elements['verb_indices']:
-                core_elements['verb_indices'] = [original_indices[i] for i in core_elements['verb_indices']]
-            if core_elements['subject_indices']:
-                core_elements['subject_indices'] = [original_indices[i] for i in core_elements['subject_indices']]
-            if core_elements['auxiliary_indices']:
-                core_elements['auxiliary_indices'] = [original_indices[i] for i in core_elements['auxiliary_indices']]
             
             # 3. 動詞の性質から文型を推定（除外されたトークンを使用）
             sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
@@ -701,15 +687,14 @@ class DynamicGrammarMapper:
                 if i < len(tokens):
                     excluded_indices.add(i)
             
-            # 🔧 先行詞句は5文型ハンドラーに渡すため除外しない（最終的に""にする）
-            # TODO: 最終変換時にSスロットを""に変更する
-            # if antecedent_idx >= 0:
-            #     # 先行詞句の開始位置を計算（限定詞、形容詞を含む）
-            #     antecedent_phrase_start = self._find_antecedent_phrase_start(tokens, antecedent_idx)
-            #     for i in range(antecedent_phrase_start, antecedent_idx + 1):
-            #         excluded_indices.add(i)
-            #         
-            #     self.logger.debug(f"先行詞句除外: インデックス {antecedent_phrase_start}-{antecedent_idx} ('{' '.join([tokens[i]['text'] for i in range(antecedent_phrase_start, antecedent_idx + 1)])}')")
+            # 🆕 先行詞句全体を除外対象に追加（関係節がある場合は空スロットで処理）
+            if antecedent_idx >= 0:
+                # 先行詞句の開始位置を計算（限定詞、形容詞を含む）
+                antecedent_phrase_start = self._find_antecedent_phrase_start(tokens, antecedent_idx)
+                for i in range(antecedent_phrase_start, antecedent_idx + 1):
+                    excluded_indices.add(i)
+                    
+                self.logger.debug(f"先行詞句除外: インデックス {antecedent_phrase_start}-{antecedent_idx} ('{' '.join([tokens[i]['text'] for i in range(antecedent_phrase_start, antecedent_idx + 1)])}')")
             
             self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end}")
         
@@ -904,25 +889,19 @@ class DynamicGrammarMapper:
         if relative_info['found']:
             relative_slot_to_empty = self._determine_chunk_grammatical_role(tokens, core_elements, relative_info)
         
-        # 主語処理（関係節がある場合は先行詞を主語として設定）
+        # 主語処理（関係節がある場合は強制的に主語要素を作成）
         if core_elements['subject_indices'] or (relative_info['found'] and relative_slot_to_empty == 'S'):
             if relative_slot_to_empty == 'S':
-                # 🔧 関係節がS位置にある場合：先行詞を主語として設定（後で""に変換）
-                antecedent_idx = relative_info.get('antecedent_idx', 0)
-                antecedent_text = tokens[antecedent_idx]['text'] if antecedent_idx < len(tokens) else ""
-                # 先行詞句全体を取得（限定詞も含む）
-                antecedent_phrase_start = self._find_antecedent_phrase_start(tokens, antecedent_idx)
-                antecedent_phrase = " ".join([tokens[i]['text'] for i in range(antecedent_phrase_start, antecedent_idx + 1)])
-                
+                # ④ 関係節がS位置にある場合：「後に""にすべき」情報を適用
                 subject_element = GrammarElement(
-                    text=antecedent_phrase,  # 🔧 先行詞句を設定（後で""に変換）
-                    tokens=[tokens[i] for i in range(antecedent_phrase_start, antecedent_idx + 1)],
+                    text="",  # 空文字列（ユーザー提案の④）
+                    tokens=[],
                     role='S',
-                    start_idx=antecedent_phrase_start,
-                    end_idx=antecedent_idx,
+                    start_idx=relative_info.get('antecedent_idx', 0),
+                    end_idx=relative_info.get('antecedent_idx', 0),
                     confidence=0.95
                 )
-                self.logger.debug(f"関係節主語設定: '{antecedent_phrase}' (最終的に''に変換予定)")
+                self.logger.debug(f"関係節主語を空スロットに変換: antecedent_idx={relative_info.get('antecedent_idx')}")
             elif core_elements['subject_indices']:
                 # 通常の主語処理
                 subject_text = self._clean_relative_clause_from_text(core_elements['subject'], relative_info)
@@ -936,12 +915,7 @@ class DynamicGrammarMapper:
                 )
             
             elements.append(subject_element)
-            if relative_slot_to_empty == 'S':
-                # 🔧 関係節主語の場合：先行詞句のインデックスを使用済みに追加
-                antecedent_idx = relative_info.get('antecedent_idx', 0)
-                antecedent_phrase_start = self._find_antecedent_phrase_start(tokens, antecedent_idx)
-                used_indices.update(range(antecedent_phrase_start, antecedent_idx + 1))
-            elif core_elements['subject_indices']:
+            if core_elements['subject_indices']:
                 used_indices.update(core_elements['subject_indices'])
         
         # 助動詞
@@ -1323,24 +1297,6 @@ class DynamicGrammarMapper:
                 phrase_types.append('修飾句')
             
             subslot_ids.append(i)
-        
-        # 🆕 サブスロットがある場合、対応する上位スロットを""に変更
-        if sub_slots:
-            # サブスロットのプレフィックスから上位スロットを特定
-            upper_slots_with_subs = set()
-            for sub_key in sub_slots.keys():
-                if sub_key.startswith('sub-'):
-                    upper_slot = sub_key[4:].upper()  # "sub-s" → "S"
-                    upper_slots_with_subs.add(upper_slot)
-            
-            # 該当する上位スロットを""に変更
-            for upper_slot in upper_slots_with_subs:
-                if upper_slot in main_slots:
-                    main_slots[upper_slot] = ""
-                    # slot_phrasesも更新
-                    for i, slot in enumerate(slots):
-                        if slot == upper_slot:
-                            slot_phrases[i] = ""
         
         return {
             'Slot': slots,
