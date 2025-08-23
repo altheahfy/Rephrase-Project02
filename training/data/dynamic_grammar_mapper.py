@@ -161,8 +161,9 @@ class DynamicGrammarMapper:
                 'pos': token.pos_,
                 'tag': token.tag_,
                 'lemma': token.lemma_,
-                'dep': token.dep_,  # 依存関係（参考のみ）
+                'dep': token.dep_,  # 依存関係
                 'head': token.head.text,
+                'head_idx': token.head.i,  # 🆕 依存関係のヘッドインデックス
                 'is_stop': token.is_stop,
                 'is_alpha': token.is_alpha,
                 'index': token.i
@@ -207,35 +208,47 @@ class DynamicGrammarMapper:
     
     def _find_main_verb(self, tokens: List[Dict]) -> Optional[int]:
         """
-        メイン動詞を特定
-        優先順位: 1) ROOT動詞, 2) 非関係節動詞, 3) その他の動詞
+        メイン動詞を特定（人間的文法認識）
+        品詞情報と語順のみを使用、依存関係は使わない
         """
         verb_candidates = []
         
         for i, token in enumerate(tokens):
-            # 動詞の品詞タグ（より広範囲に検出）
+            # 動詞の品詞タグ
             if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
                 verb_candidates.append((i, token))
         
         if not verb_candidates:
             return None
         
-        # 1. ROOT動詞を最優先
-        root_verbs = [(i, token) for i, token in verb_candidates if token['dep'] == 'ROOT']
-        if root_verbs:
-            self.logger.debug(f"ROOT動詞検出: {root_verbs[0][1]['text']} (position {root_verbs[0][0]})")
-            return root_verbs[0][0]
+        # 人間的判定：関係節を除外してメイン動詞を特定
+        non_relative_verbs = []
         
-        # 2. 関係節内動詞を除外（relcl依存関係の動詞は避ける）
-        non_relative_verbs = [(i, token) for i, token in verb_candidates if token['dep'] != 'relcl']
+        for i, token in verb_candidates:
+            # 関係代名詞の直後の動詞は関係節内動詞として除外
+            is_in_relative_clause = False
+            
+            # 前の単語を確認
+            for j in range(max(0, i-5), i):  # 5語前まで確認
+                prev_token = tokens[j]
+                if prev_token['text'].lower() in ['who', 'which', 'that', 'whose', 'where', 'when']:
+                    # 関係代名詞から動詞までの距離が近い場合、関係節内動詞
+                    if i - j <= 4:  # 4語以内なら関係節内
+                        is_in_relative_clause = True
+                        break
+            
+            if not is_in_relative_clause:
+                non_relative_verbs.append((i, token))
+        
         if non_relative_verbs:
-            # 助動詞でないメイン動詞を優先
+            # メイン動詞候補から助動詞でないものを優先
             main_verbs = [(i, token) for i, token in non_relative_verbs if not self._is_auxiliary_verb(token)]
             if main_verbs:
-                return main_verbs[-1][0]  # 最後の非助動詞を選択
+                # 文の後半にあるメイン動詞を優先（関係節の後）
+                return main_verbs[-1][0]
             return non_relative_verbs[-1][0]
         
-        # 3. 最後の手段として、どの動詞でも選択
+        # 最後の手段として、どの動詞でも選択
         return verb_candidates[-1][0]
     
     def _find_auxiliary(self, tokens: List[Dict], main_verb_idx: int) -> Optional[int]:
@@ -801,32 +814,74 @@ class DynamicGrammarMapper:
         return len(tokens) - 1
     
     def _find_whose_clause_end(self, tokens: List[Dict], whose_idx: int) -> int:
-        """whose構文の関係節終了位置を特定"""
+        """whose構文の関係節終了位置を特定（堅牢版）"""
         
-        # whose構文パターン: whose + [名詞] + [動詞/形容詞] + [補語等...]
-        # 例: "whose car is blue" -> whose(2) car(3) is(4) blue(5)
+        # 基本戦略: whose + [名詞] + [動詞] + [補語/目的語] のパターンマッチング
         
         clause_end = whose_idx
         
-        # whose の後の構造を解析
-        for i in range(whose_idx + 1, len(tokens)):
-            token = tokens[i]
-            
-            # 関係節内の動詞を発見したら、その補語/目的語も含める
-            if token['pos'] in ['VERB', 'AUX'] and token['dep'] == 'relcl':
-                # 関係節内動詞の補語/目的語を探す
-                for j in range(i + 1, len(tokens)):
-                    next_token = tokens[j]
-                    # メイン動詞(ROOT)に到達したら終了
-                    if next_token['dep'] == 'ROOT':
-                        clause_end = j - 1
-                        break
-                    # 関係節の補語/目的語も含める
-                    if next_token['pos'] in ['NOUN', 'ADJ', 'PROPN']:
-                        clause_end = j
+        # Step 1: whose の直後の名詞を探す
+        possessed_noun_idx = None
+        for i in range(whose_idx + 1, min(whose_idx + 3, len(tokens))):
+            if tokens[i]['pos'] in ['NOUN', 'PROPN']:
+                possessed_noun_idx = i
                 break
         
-        self.logger.debug(f"whose句終了位置: {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
+        if possessed_noun_idx is None:
+            self.logger.debug(f"whose構文: 所有される名詞が見つからない")
+            return whose_idx + 1
+        
+        # Step 2: その後の動詞を探す（be動詞または一般動詞）
+        relcl_verb_idx = None
+        for i in range(possessed_noun_idx + 1, min(possessed_noun_idx + 4, len(tokens))):
+            if tokens[i]['pos'] in ['VERB', 'AUX']:
+                relcl_verb_idx = i
+                break
+        
+        if relcl_verb_idx is None:
+            self.logger.debug(f"whose構文: 関係節動詞が見つからない")
+            return possessed_noun_idx
+        
+        # Step 3: 動詞の後の補語/目的語を探す（語順ベース）
+        clause_end = relcl_verb_idx
+        
+        # be動詞の場合：形容詞/名詞の補語を探す
+        if tokens[relcl_verb_idx]['lemma'].lower() in ['be', 'am', 'is', 'are', 'was', 'were']:
+            for i in range(relcl_verb_idx + 1, min(relcl_verb_idx + 4, len(tokens))):
+                token = tokens[i]
+                if token['pos'] in ['ADJ', 'NOUN', 'PROPN']:
+                    clause_end = i
+                elif token['pos'] in ['ADV'] and token['text'].lower() in ['always', 'very', 'quite', 'really']:
+                    # 修飾語は飛ばして次を確認
+                    continue
+                else:
+                    break
+        
+        # 一般動詞の場合：目的語を探す
+        else:
+            for i in range(relcl_verb_idx + 1, min(relcl_verb_idx + 3, len(tokens))):
+                token = tokens[i]
+                if token['pos'] in ['NOUN', 'PROPN']:
+                    clause_end = i
+                else:
+                    break
+        
+        # Step 4: 安全制限 - 明らかにメイン文の動詞を含まないように
+        # 位置的にROOT動詞より前で止める
+        for i, token in enumerate(tokens):
+            if (token['pos'] in ['VERB', 'AUX'] and 
+                i > clause_end and 
+                token['text'].lower() not in ['is', 'are', 'was', 'were', 'am'] and
+                len(token['text']) > 2):  # 短い補助動詞を除く
+                
+                # この動詞がメイン動詞の可能性が高い場合、その前で止める
+                clause_end = min(clause_end, i - 1)
+                break
+        
+        # 最小限の安全確保
+        clause_end = max(clause_end, whose_idx + 1)
+        
+        self.logger.debug(f"whose句終了位置(堅牢版): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}'), possessed: {possessed_noun_idx}, verb: {relcl_verb_idx}")
         return clause_end
     
     def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> List[Dict]:
