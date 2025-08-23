@@ -104,6 +104,12 @@ class DynamicGrammarMapper:
             'name', 'named', 'naming', 'names',
             'choose', 'chose', 'chosen', 'choosing', 'chooses'
         }
+        
+        # 動詞/名詞同形語リスト（stanzaシステムから継承）
+        self.ambiguous_verbs = {
+            'lives', 'works', 'runs', 'goes', 'comes', 'stays', 'plays', 'looks',
+            'walks', 'talks', 'moves', 'drives', 'flies', 'rides', 'sits'
+        }
     
     def analyze_sentence(self, sentence: str) -> Dict[str, Any]:
         """
@@ -212,11 +218,21 @@ class DynamicGrammarMapper:
         メイン動詞を特定（人間的文法認識）
         品詞情報と語順のみを使用、依存関係は使わない
         """
-        verb_candidates = []
-        
+        # POSベースと文脈ベースの両方を取得
+        pos_candidates = []
         for i, token in enumerate(tokens):
             # 動詞の品詞タグ
             if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
+                pos_candidates.append((i, token))
+        
+        # 文脈的動詞識別（POS誤認識対策）
+        contextual_candidates = self._find_contextual_verbs(tokens)
+        
+        # 両方を統合（重複除去）
+        verb_candidates = pos_candidates.copy()
+        for i, token in contextual_candidates:
+            # 既に存在しない場合のみ追加
+            if not any(existing_i == i for existing_i, _ in verb_candidates):
                 verb_candidates.append((i, token))
         
         if not verb_candidates:
@@ -232,7 +248,15 @@ class DynamicGrammarMapper:
             # 前の単語を確認
             for j in range(max(0, i-5), i):  # 5語前まで確認
                 prev_token = tokens[j]
-                if prev_token['text'].lower() in ['who', 'which', 'that', 'whose', 'where', 'when']:
+                if prev_token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']:
+                    # whose構文の特別処理: 動詞/名詞同形語は関係節外のメイン動詞として扱う
+                    if (prev_token['text'].lower() == 'whose' and 
+                        token['text'].lower() in self.ambiguous_verbs and
+                        token.get('contextual_override', False)):
+                        # whose構文での同形語動詞は関係節外として扱う
+                        is_in_relative_clause = False
+                        break
+                    
                     # 関係代名詞から動詞までの距離が近い場合、関係節内動詞
                     if i - j <= 4:  # 4語以内なら関係節内
                         is_in_relative_clause = True
@@ -251,6 +275,122 @@ class DynamicGrammarMapper:
         
         # 最後の手段として、どの動詞でも選択
         return verb_candidates[-1][0]
+
+    def _find_contextual_verbs(self, tokens: List[Dict]) -> List[Tuple[int, Dict]]:
+        """
+        文脈から動詞らしい語を識別（POS解析の誤認識対策）
+        stanzaシステムの知識を継承した文脈的動詞識別
+        """
+        contextual_verbs = []
+        sentence_text = ' '.join([token['text'] for token in tokens])
+        
+        for i, token in enumerate(tokens):
+            # 既に動詞として認識されているもの
+            if token['pos'] == 'VERB':
+                contextual_verbs.append((i, token))
+                continue
+            
+            # 動詞/名詞同形語の文脈的判定
+            if token['text'].lower() in self.ambiguous_verbs:
+                # whose構文でのlives問題対策
+                if self._is_verb_in_whose_context(token, tokens, i, sentence_text):
+                    # NOUNタグでも動詞として扱う
+                    verb_token = token.copy()
+                    verb_token['pos'] = 'VERB'  # 強制的に動詞に変更
+                    verb_token['contextual_override'] = True
+                    contextual_verbs.append((i, verb_token))
+                    continue
+            
+            # その他の動詞候補（aux, modal含む）
+            if token['pos'] in ['AUX', 'MODAL']:
+                contextual_verbs.append((i, token))
+        
+        return contextual_verbs
+    
+    def _is_verb_in_whose_context(self, token: Dict, tokens: List[Dict], 
+                                 position: int, sentence: str) -> bool:
+        """
+        whose構文での動詞/名詞同形語判定
+        stanzaシステムのパターン検出ロジックをPOSベースで再実装
+        """
+        import re
+        word = token['text'].lower()
+        
+        # パターン1: whose [名詞] is [形容詞] [動詞] (here|there|場所)
+        pattern1 = rf'whose\s+\w+\s+is\s+\w+\s+{word}\s+(here|there|in\s+\w+)'
+        
+        # パターン2: whose [名詞] [修飾語]* [動詞] (場所表現)
+        pattern2 = rf'whose\s+\w+.*?\s+{word}\s+(here|there|in|at|on)\s+\w+'
+        
+        if re.search(pattern1, sentence.lower()) or re.search(pattern2, sentence.lower()):
+            # 文中にwhoseがあり、該当パターンが見つかった場合
+            return True
+        
+        # より一般的な判定: whose後で、場所表現の前にある同形語
+        if 'whose' in sentence.lower():
+            # whose後の位置確認
+            whose_pos = None
+            for i, t in enumerate(tokens):
+                if t['text'].lower() == 'whose':
+                    whose_pos = i
+                    break
+            
+            if whose_pos is not None and position > whose_pos:
+                # whose後で、場所表現がある場合
+                for j in range(position + 1, len(tokens)):
+                    next_token = tokens[j]['text'].lower()
+                    if next_token in ['here', 'there', 'in', 'at', 'on']:
+                        return True
+        
+        return False
+        
+        # よく誤認識される動詞のリスト
+        common_verbs = {
+            'lives', 'live', 'lived', 'living',
+            'works', 'work', 'worked', 'working',
+            'runs', 'run', 'ran', 'running',
+            'goes', 'go', 'went', 'going',
+            'comes', 'come', 'came', 'coming',
+            'sits', 'sit', 'sat', 'sitting',
+            'stands', 'stand', 'stood', 'standing',
+            'plays', 'play', 'played', 'playing'
+        }
+        
+        for i, token in enumerate(tokens):
+            word = token['text'].lower()
+            
+            # 辞書に含まれる一般的な動詞
+            if word in common_verbs:
+                contextual_verbs.append((i, token))
+            
+            # 語尾による動詞判定（-s, -ed, -ing）
+            elif (word.endswith('s') and len(word) > 2 and 
+                  not word.endswith('ss') and not word.endswith('us')):
+                # 三人称単数形らしい語
+                if self._looks_like_verb_context(tokens, i):
+                    contextual_verbs.append((i, token))
+        
+        return contextual_verbs
+    
+    def _looks_like_verb_context(self, tokens: List[Dict], index: int) -> bool:
+        """
+        動詞らしい文脈かを判定
+        """
+        if index == 0:
+            return False
+        
+        # 前の語が名詞・代名詞なら動詞の可能性が高い
+        prev_token = tokens[index - 1]
+        if prev_token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+            return True
+        
+        # 後の語が副詞なら動詞の可能性が高い
+        if index < len(tokens) - 1:
+            next_token = tokens[index + 1]
+            if next_token['pos'] == 'ADV':
+                return True
+        
+        return False
     
     def _find_auxiliary(self, tokens: List[Dict], main_verb_idx: int) -> Optional[int]:
         """助動詞を特定"""
@@ -727,7 +867,7 @@ class DynamicGrammarMapper:
     
     def _can_be_complement(self, token: Dict) -> bool:
         """補語になれるかの判定"""
-        return token['pos'] in ['ADJ', 'NOUN', 'PROPN'] or token['tag'] in ['JJ', 'NN', 'NNS']
+        return token['pos'] in ['ADJ', 'NOUN', 'PROPN', 'PRON'] or token['tag'] in ['JJ', 'NN', 'NNS', 'PRP']
     
     def _convert_to_rephrase_format(self, elements: List[GrammarElement], pattern: str, sub_slots: Dict = None) -> Dict[str, Any]:
         """Rephraseスロット形式に変換"""
@@ -828,7 +968,7 @@ class DynamicGrammarMapper:
         sentence_lower = sentence.lower()
         
         # 関係代名詞の検出
-        relative_pronouns = ['who', 'which', 'that', 'whose', 'where', 'when', 'why', 'how']
+        relative_pronouns = ['who', 'whom', 'which', 'that', 'whose', 'where', 'when', 'why', 'how']
         
         for rel_pronoun in relative_pronouns:
             if rel_pronoun in sentence_lower:
@@ -1056,13 +1196,31 @@ class DynamicGrammarMapper:
         
         # 関係代名詞の役割を判定（主語か目的語か）
         rel_pronoun_role = self._determine_relative_pronoun_role(rel_tokens, verb_idx)
+        clause_type = rel_tokens[0]['text'].lower()
+        
+        # whoseの場合の特別処理
+        if clause_type == 'whose':
+            # whose + 名詞 の形を探す
+            whose_phrase = rel_tokens[0]['text']  # "whose"
+            next_idx = 1
+            while next_idx < len(rel_tokens) and next_idx < verb_idx:
+                if rel_tokens[next_idx]['pos'] in ['NOUN', 'PROPN']:
+                    whose_phrase += f" {rel_tokens[next_idx]['text']}"
+                    break
+                next_idx += 1
+            
+            # whose句の役割を判定
+            if rel_pronoun_role == 'subject':
+                sub_slots['sub-s'] = whose_phrase
+            else:
+                sub_slots['sub-o1'] = whose_phrase
         
         # 動詞前の要素を分析（主語）
         pre_verb_tokens = rel_tokens[:verb_idx]
         for token in pre_verb_tokens:
             if token['pos'] in ['NOUN', 'PRON', 'PROPN']:
                 # 関係代名詞が目的語の場合、ここに主語がある
-                if rel_pronoun_role == 'object':
+                if rel_pronoun_role == 'object' and clause_type != 'whose':
                     sub_slots['sub-s'] = token['text']
         
         # 動詞後の要素を分析
@@ -1070,27 +1228,45 @@ class DynamicGrammarMapper:
         modifier_count = 0
         
         for token in post_verb_tokens:
-            if token['pos'] in ['NOUN', 'PRON', 'PROPN']:
-                # 目的語
-                if 'sub-o1' not in sub_slots:
-                    sub_slots['sub-o1'] = token['text']
-                elif 'sub-o2' not in sub_slots:
-                    sub_slots['sub-o2'] = token['text']
-            elif token['pos'] == 'ADJ':
-                # 補語
-                sub_slots['sub-c1'] = token['text']
-            elif token['pos'] == 'ADV':
-                # 修飾語 - Rephrase仕様のM2優先ルール
+            if token['pos'] == 'ADV' or token['tag'] == 'EX':
+                # 副詞または存在there → 修飾語として処理（優先）
                 modifier_count += 1
                 if modifier_count == 1:
                     sub_slots['sub-m2'] = token['text']
                 elif modifier_count == 2:
                     sub_slots['sub-m3'] = token['text']
+            elif token['pos'] in ['NOUN', 'PRON', 'PROPN'] and token['tag'] != 'EX':
+                # 名詞類（存在there以外） → 目的語として処理
+                if 'sub-o1' not in sub_slots:
+                    sub_slots['sub-o1'] = token['text']
+                elif 'sub-o2' not in sub_slots:
+                    sub_slots['sub-o2'] = token['text']
+            elif token['pos'] == 'ADJ':
+                # 形容詞 → 補語として処理
+                sub_slots['sub-c1'] = token['text']
     
     def _determine_relative_pronoun_role(self, rel_tokens: List[Dict], verb_idx: int) -> str:
         """関係代名詞が主語か目的語かを判定"""
-        # 動詞の前に代名詞・名詞があるかチェック
-        pre_verb_tokens = rel_tokens[:verb_idx]
+        clause_type = rel_tokens[0]['text'].lower()
+        
+        # whoseの場合の特別処理
+        if clause_type == 'whose':
+            # whose + 名詞が動詞の前にあるかチェック
+            whose_noun_idx = None
+            for i in range(1, min(verb_idx, len(rel_tokens))):
+                if rel_tokens[i]['pos'] in ['NOUN', 'PROPN']:
+                    whose_noun_idx = i
+                    break
+            
+            if whose_noun_idx is not None:
+                # whose + 名詞が動詞前にあるなら主語
+                return 'subject'
+            else:
+                # whose + 名詞が動詞後にあるなら目的語
+                return 'object'
+        
+        # 動詞の前に代名詞・名詞があるかチェック（whose以外の場合）
+        pre_verb_tokens = rel_tokens[1:verb_idx]  # 関係代名詞自体は除外
         has_subject_before_verb = any(
             token['pos'] in ['NOUN', 'PRON', 'PROPN'] 
             for token in pre_verb_tokens
@@ -1158,7 +1334,7 @@ class DynamicGrammarMapper:
         sub_slots = {}
         
         # 関係代名詞をサブ主語として処理
-        if clause_type in ['who', 'which', 'that']:
+        if clause_type in ['who', 'whom', 'which', 'that']:
             sub_slots['sub-s'] = rel_tokens[0]['text']  # 関係代名詞
         elif clause_type == 'whose':
             # whose の場合は所有格なので特別処理
