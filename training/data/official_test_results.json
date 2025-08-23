@@ -59,6 +59,7 @@
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
+      "test_type": "基本5文型",
       "status": "success"
     },
     "2": {
@@ -120,6 +121,7 @@
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
+      "test_type": "基本5文型",
       "status": "success"
     },
     "55": {
@@ -172,6 +174,7 @@
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
+      "test_type": "基本5文型",
       "status": "success"
     },
     "58": {
@@ -233,6 +236,7 @@
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
+      "test_type": "基本5文型",
       "status": "success"
     },
     "64": {
@@ -303,6 +307,950 @@
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
+      "test_type": "基本5文型",
+      "status": "success"
+    },
+    "3": {
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "C1",
+          "S",
+          "M2",
+          "V",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The man",
+          "",
+          "fast",
+          "is",
+          "strong"
+        ],
+        "Slot_display_order": [
+          6,
+          1,
+          9,
+          3,
+          10
+        ],
+        "display_order": [
+          6,
+          1,
+          9,
+          3,
+          10
+        ],
+        "PhraseType": [
+          "補語句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "C1": "The man",
+          "S": "",
+          "M2": "fast",
+          "V": "is",
+          "M3": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs"
+        },
+        "slots": {
+          "C1": "The man",
+          "S": "",
+          "M2": "fast",
+          "V": "is",
+          "M3": "strong"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "4": {
+      "sentence": "The book which lies there is mine.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "mine"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "5": {
+      "sentence": "The person that works here is kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "C1",
+          "S",
+          "M2",
+          "V",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The person",
+          "",
+          "here",
+          "is",
+          "kind"
+        ],
+        "Slot_display_order": [
+          6,
+          1,
+          9,
+          3,
+          10
+        ],
+        "display_order": [
+          6,
+          1,
+          9,
+          3,
+          10
+        ],
+        "PhraseType": [
+          "補語句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "C1": "The person",
+          "S": "",
+          "M2": "here",
+          "V": "is",
+          "M3": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works"
+        },
+        "slots": {
+          "C1": "The person",
+          "S": "",
+          "M2": "here",
+          "V": "is",
+          "M3": "kind"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "6": {
+      "sentence": "The book which I bought is expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "bought",
+          "is",
+          "expensive"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "bought",
+          "M3": "expensive"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "",
+          "V": "bought",
+          "M3": "expensive"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "7": {
+      "sentence": "The man whom I met is tall.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "met",
+          "is",
+          "tall"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "met",
+          "M3": "tall"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "",
+          "V": "met",
+          "M3": "tall"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "8": {
+      "sentence": "The car that he drives is new.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "drives",
+          "is",
+          "new"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "drives",
+          "M3": "new"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "",
+          "V": "drives",
+          "M3": "new"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "12": {
+      "sentence": "The man whose car is red lives here.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M2"
+        ],
+        "SlotPhrase": [
+          "",
+          "lives",
+          "here"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          9
+        ],
+        "display_order": [
+          1,
+          3,
+          9
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red"
+        },
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "13": {
+      "sentence": "The student whose book I borrowed is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "borrowed",
+          "is",
+          "smart"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "borrowed",
+          "M3": "smart"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "",
+          "V": "borrowed",
+          "M3": "smart"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "14": {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "",
+          "barks",
+          "is",
+          "my neighbor"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "barks",
+          "M3": "is",
+          "O1": "my neighbor"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "",
+          "V": "barks",
+          "M3": "is",
+          "O1": "my neighbor"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "34": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "O1",
+          "S",
+          "M2",
+          "V",
+          "M2"
+        ],
+        "SlotPhrase": [
+          "The student",
+          "",
+          "always",
+          "succeeds",
+          "academically"
+        ],
+        "Slot_display_order": [
+          4,
+          1,
+          9,
+          3,
+          9
+        ],
+        "display_order": [
+          4,
+          1,
+          9,
+          3,
+          9
+        ],
+        "PhraseType": [
+          "名詞句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "O1": "The student",
+          "S": "",
+          "M2": "academically",
+          "V": "succeeds"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies"
+        },
+        "slots": {
+          "O1": "The student",
+          "S": "",
+          "M2": "academically",
+          "V": "succeeds"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "35": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "O1",
+          "S",
+          "M3",
+          "M1",
+          "Aux",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The teacher",
+          "",
+          "runs",
+          "efficiently",
+          "is",
+          "respected",
+          "greatly"
+        ],
+        "Slot_display_order": [
+          4,
+          1,
+          10,
+          8,
+          2,
+          3,
+          8
+        ],
+        "display_order": [
+          4,
+          1,
+          10,
+          8,
+          2,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "O1": "The teacher",
+          "S": "",
+          "M3": "runs",
+          "M1": "greatly",
+          "Aux": "is",
+          "V": "respected"
+        },
+        "sub_slots": {},
+        "slots": {
+          "O1": "The teacher",
+          "S": "",
+          "M3": "runs",
+          "M1": "greatly",
+          "Aux": "is",
+          "V": "respected"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
+      "status": "success"
+    },
+    "36": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "O1",
+          "S",
+          "M2",
+          "M3",
+          "V",
+          "M2"
+        ],
+        "SlotPhrase": [
+          "The doctor",
+          "",
+          "carefully",
+          "saves",
+          "lives",
+          "successfully"
+        ],
+        "Slot_display_order": [
+          4,
+          1,
+          9,
+          10,
+          3,
+          9
+        ],
+        "display_order": [
+          4,
+          1,
+          9,
+          10,
+          3,
+          9
+        ],
+        "PhraseType": [
+          "名詞句",
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "main_slots": {
+          "O1": "The doctor",
+          "S": "",
+          "M2": "successfully",
+          "M3": "saves",
+          "V": "lives"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works"
+        },
+        "slots": {
+          "O1": "The doctor",
+          "S": "",
+          "M2": "successfully",
+          "M3": "saves",
+          "V": "lives"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 6,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.9
+      },
+      "test_type": "関係節",
       "status": "success"
     }
   }
