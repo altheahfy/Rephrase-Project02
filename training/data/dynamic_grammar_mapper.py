@@ -725,6 +725,7 @@ class DynamicGrammarMapper:
             'PhraseType': phrase_types,
             'SubslotID': subslot_ids,
             'main_slots': main_slots,  # 🔧 辞書形式追加
+            'sub_slots': {},           # 🔧 サブスロット（現在は空）
             'slots': main_slots,       # 🔧 統一システム互換性
             'pattern_detected': pattern,
             'confidence': 0.9,
@@ -742,6 +743,7 @@ class DynamicGrammarMapper:
             'PhraseType': [],
             'SubslotID': [],
             'main_slots': {},    # 🔧 辞書形式追加
+            'sub_slots': {},     # 🔧 サブスロット（現在は空）
             'slots': {},         # 🔧 統一システム互換性
             'error': error,
             'sentence': sentence,
