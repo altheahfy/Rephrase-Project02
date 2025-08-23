@@ -126,9 +126,10 @@ class DynamicGrammarMapper:
             
             # 1.5. 関係節構造の検出と処理
             relative_clause_info = self._detect_relative_clause(tokens, sentence)
+            sub_slots = {}
             if relative_clause_info['found']:
                 self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
-                tokens = self._process_relative_clause(tokens, relative_clause_info)
+                tokens, sub_slots = self._process_relative_clause(tokens, relative_clause_info)
             
             # 2. 文の核要素を特定
             core_elements = self._identify_core_elements(tokens)
@@ -136,11 +137,11 @@ class DynamicGrammarMapper:
             # 3. 動詞の性質から文型を推定
             sentence_pattern = self._determine_sentence_pattern(core_elements, tokens)
             
-            # 4. 文法要素を動的に割り当て
-            grammar_elements = self._assign_grammar_roles(tokens, sentence_pattern, core_elements)
+            # 4. 文法要素を動的に割り当て（関係節情報も考慮）
+            grammar_elements = self._assign_grammar_roles(tokens, sentence_pattern, core_elements, relative_clause_info)
             
             # 5. Rephraseスロット形式に変換
-            rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern)
+            rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
             
             # 🆕 Phase 1.2: 文型情報を結果に追加
             rephrase_result['sentence_type'] = sentence_type
@@ -366,23 +367,45 @@ class DynamicGrammarMapper:
         # デフォルト → SV
         return 'SV'
     
-    def _assign_grammar_roles(self, tokens: List[Dict], pattern: str, core_elements: Dict) -> List[GrammarElement]:
+    def _assign_grammar_roles(self, tokens: List[Dict], pattern: str, core_elements: Dict, relative_info: Dict = None) -> List[GrammarElement]:
         """
         文型パターンに基づいて文法的役割を動的に割り当て
+        関係節がある場合は該当スロットを空にする
         """
+        if relative_info is None:
+            relative_info = {'found': False}
+            
         elements = []
         used_indices = set()
         
+        # 関係節がある場合の処理
+        relative_slot_to_empty = None
+        if relative_info['found']:
+            relative_slot_to_empty = self._determine_relative_slot_position(tokens, relative_info)
+        
         # 主語
         if core_elements['subject_indices']:
-            subject_element = GrammarElement(
-                text=core_elements['subject'],
-                tokens=[tokens[i] for i in core_elements['subject_indices']],
-                role='S',
-                start_idx=min(core_elements['subject_indices']),
-                end_idx=max(core_elements['subject_indices']),
-                confidence=0.95
-            )
+            # 関係節がS位置にある場合は空にする
+            if relative_slot_to_empty == 'S':
+                subject_element = GrammarElement(
+                    text="",  # 空文字列
+                    tokens=[],
+                    role='S',
+                    start_idx=min(core_elements['subject_indices']),
+                    end_idx=max(core_elements['subject_indices']),
+                    confidence=0.95
+                )
+            else:
+                # 通常の主語処理
+                subject_text = self._clean_relative_clause_from_text(core_elements['subject'], relative_info)
+                subject_element = GrammarElement(
+                    text=subject_text,
+                    tokens=[tokens[i] for i in core_elements['subject_indices']],
+                    role='S',
+                    start_idx=min(core_elements['subject_indices']),
+                    end_idx=max(core_elements['subject_indices']),
+                    confidence=0.95
+                )
             elements.append(subject_element)
             used_indices.update(core_elements['subject_indices'])
         
@@ -418,21 +441,21 @@ class DynamicGrammarMapper:
             if i not in used_indices and token['pos'] != 'PUNCT'
         ]
         
-        # 文型別の割り当て
+        # 文型別の割り当て（関係節情報を渡す）
         if pattern == 'SVC':
-            elements.extend(self._assign_svc_elements(remaining_tokens))
+            elements.extend(self._assign_svc_elements(remaining_tokens, relative_slot_to_empty))
         elif pattern == 'SVO':
-            elements.extend(self._assign_svo_elements(remaining_tokens))
+            elements.extend(self._assign_svo_elements(remaining_tokens, relative_slot_to_empty))
         elif pattern == 'SVOO':
-            elements.extend(self._assign_svoo_elements(remaining_tokens))
+            elements.extend(self._assign_svoo_elements(remaining_tokens, relative_slot_to_empty))
         elif pattern == 'SVOC':
-            elements.extend(self._assign_svoc_elements(remaining_tokens))
+            elements.extend(self._assign_svoc_elements(remaining_tokens, relative_slot_to_empty))
         else:  # SV or other
             elements.extend(self._assign_modifiers(remaining_tokens))
         
         return elements
     
-    def _assign_svc_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
+    def _assign_svc_elements(self, remaining_tokens: List[Tuple[int, Dict]], relative_slot_to_empty: str = None) -> List[GrammarElement]:
         """SVC文型の要素を割り当て - 複合句対応"""
         elements = []
         complement_assigned = False
@@ -472,29 +495,62 @@ class DynamicGrammarMapper:
         
         return elements
     
-    def _assign_svo_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
-        """SVO文型の要素を割り当て"""
+    def _assign_svo_elements(self, remaining_tokens: List[Tuple[int, Dict]], relative_slot_to_empty: str = None) -> List[GrammarElement]:
+        """SVO文型の要素を割り当て（関係節対応）"""
         elements = []
         object_assigned = False
         
-        for i, token in remaining_tokens:
-            if not object_assigned and self._can_be_object(token):
+        # 関係節により目的語スロットを抽出
+        object_text = ""
+        if relative_slot_to_empty == 'O1':
+            # O1に関係節がある場合は空文字列
+            object_text = ""
+        else:
+            # 通常の目的語処理 - 複数トークンをまとめる
+            object_tokens = []
+            for i, token in remaining_tokens:
+                if self._can_be_object(token) or token['pos'] in ['DET', 'ADJ']:
+                    object_tokens.append((i, token))
+                elif object_tokens:  # 目的語句が終了
+                    break
+            
+            if object_tokens:
+                object_text = ' '.join([token['text'] for _, token in object_tokens])
+                used_indices = {i for i, _ in object_tokens}
+                
                 elements.append(GrammarElement(
-                    text=token['text'],
-                    tokens=[token],
+                    text=object_text,
+                    tokens=[token for _, token in object_tokens],
                     role='O1',
-                    start_idx=i,
-                    end_idx=i,
+                    start_idx=object_tokens[0][0],
+                    end_idx=object_tokens[-1][0],
                     confidence=0.9
                 ))
                 object_assigned = True
-            else:
-                # 修飾語として処理
+                
+                # 残りの要素を修飾語として処理
+                for i, token in remaining_tokens:
+                    if i not in used_indices:
+                        elements.append(self._create_modifier_element(i, token))
+            
+        # 関係節がある場合は空のO1要素を作成
+        if relative_slot_to_empty == 'O1' and not object_assigned:
+            elements.append(GrammarElement(
+                text="",  # 空文字列
+                tokens=[],
+                role='O1',
+                start_idx=0,
+                end_idx=0,
+                confidence=0.9
+            ))
+            
+            # 残りを修飾語として処理
+            for i, token in remaining_tokens:
                 elements.append(self._create_modifier_element(i, token))
         
         return elements
     
-    def _assign_svoo_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
+    def _assign_svoo_elements(self, remaining_tokens: List[Tuple[int, Dict]], relative_slot_to_empty: str = None) -> List[GrammarElement]:
         """SVOO文型の要素を割り当て - O1/O2分離対応"""
         elements = []
         o1_assigned = False
@@ -563,7 +619,7 @@ class DynamicGrammarMapper:
         
         return elements
     
-    def _assign_svoc_elements(self, remaining_tokens: List[Tuple[int, Dict]]) -> List[GrammarElement]:
+    def _assign_svoc_elements(self, remaining_tokens: List[Tuple[int, Dict]], relative_slot_to_empty: str = None) -> List[GrammarElement]:
         """SVOC文型の要素を割り当て"""
         elements = []
         object_assigned = False
@@ -673,8 +729,11 @@ class DynamicGrammarMapper:
         """補語になれるかの判定"""
         return token['pos'] in ['ADJ', 'NOUN', 'PROPN'] or token['tag'] in ['JJ', 'NN', 'NNS']
     
-    def _convert_to_rephrase_format(self, elements: List[GrammarElement], pattern: str) -> Dict[str, Any]:
+    def _convert_to_rephrase_format(self, elements: List[GrammarElement], pattern: str, sub_slots: Dict = None) -> Dict[str, Any]:
         """Rephraseスロット形式に変換"""
+        if sub_slots is None:
+            sub_slots = {}
+            
         slots = []
         slot_phrases = []
         slot_display_order = []
@@ -725,7 +784,7 @@ class DynamicGrammarMapper:
             'PhraseType': phrase_types,
             'SubslotID': subslot_ids,
             'main_slots': main_slots,  # 🔧 辞書形式追加
-            'sub_slots': {},           # 🔧 サブスロット（現在は空）
+            'sub_slots': sub_slots,    # � サブスロット追加
             'slots': main_slots,       # 🔧 統一システム互換性
             'pattern_detected': pattern,
             'confidence': 0.9,
@@ -886,28 +945,312 @@ class DynamicGrammarMapper:
         self.logger.debug(f"whose句終了位置(堅牢版): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}'), possessed: {possessed_noun_idx}, verb: {relcl_verb_idx}")
         return clause_end
     
-    def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> List[Dict]:
-        """関係節の処理
+    def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> Tuple[List[Dict], Dict]:
+        """関係節の処理とサブスロット分解（Rephrase仕様準拠）
         
-        現在は検出のみを行い、トークンをそのまま返す
-        将来的にはメイン文と関係節を分離して処理
+        正しいRephrase的分解:
+        - 関係節を含む上位スロットは空文字列
+        - サブスロットに先行詞+関係代名詞、動詞、修飾語を格納
         """
         self.logger.debug(f"関係節処理: {relative_info['type']} (信頼度: {relative_info['confidence']})")
         
-        # 🔧 Phase 1: 基本的な関係節検出のみ
-        # トークンにマーカーを追加して、後の処理で参照できるようにする
+        # 関係節の範囲を特定
         rel_pronoun_idx = relative_info.get('relative_pronoun_idx')
-        if rel_pronoun_idx is not None:
-            tokens[rel_pronoun_idx]['is_relative_pronoun'] = True
-            tokens[rel_pronoun_idx]['relative_clause_type'] = relative_info['type']
-            # 🆕 関係節終了位置を追加
-            tokens[rel_pronoun_idx]['relative_clause_end'] = relative_info.get('clause_end_idx')
-        
+        clause_end_idx = relative_info.get('clause_end_idx')
         antecedent_idx = relative_info.get('antecedent_idx')
-        if antecedent_idx is not None:
-            tokens[antecedent_idx]['is_antecedent'] = True
         
-        return tokens
+        if rel_pronoun_idx is None or clause_end_idx is None or antecedent_idx is None:
+            return tokens, {}
+        
+        # トークンにマーカーを追加
+        tokens[rel_pronoun_idx]['is_relative_pronoun'] = True
+        tokens[rel_pronoun_idx]['relative_clause_type'] = relative_info['type']
+        tokens[rel_pronoun_idx]['relative_clause_end'] = clause_end_idx
+        tokens[antecedent_idx]['is_antecedent'] = True
+        
+        # Rephrase的サブスロット分解実装
+        sub_slots = self._create_rephrase_subslots(tokens, relative_info)
+        
+        self.logger.debug(f"生成されたサブスロット: {sub_slots}")
+        
+        return tokens, sub_slots
+
+    def _create_rephrase_subslots(self, tokens: List[Dict], relative_info: Dict) -> Dict:
+        """Rephrase仕様に準拠したサブスロット生成
+        
+        正しい分解例:
+        "I know the man who works here."
+        → sub-s: "the man who", sub-v: "works", sub-m2: "here"
+        """
+        rel_pronoun_idx = relative_info['relative_pronoun_idx']
+        clause_end_idx = relative_info['clause_end_idx']
+        antecedent_idx = relative_info['antecedent_idx']
+        
+        # 1. 先行詞 + 関係代名詞を取得
+        antecedent_text = self._extract_antecedent_phrase(tokens, antecedent_idx, rel_pronoun_idx)
+        rel_pronoun_text = tokens[rel_pronoun_idx]['text']
+        
+        # 2. 関係節内部の要素を分析
+        rel_clause_start = rel_pronoun_idx + 1  # 関係代名詞の次から
+        rel_clause_tokens = tokens[rel_clause_start:clause_end_idx + 1]
+        
+        # 3. Rephrase的サブスロット構造を構築
+        sub_slots = {}
+        
+        # sub-s: 先行詞 + 関係代名詞
+        sub_slots['sub-s'] = f"{antecedent_text} {rel_pronoun_text}"
+        
+        # 関係節内の動詞と修飾語を分析
+        self._analyze_relative_clause_elements(rel_clause_tokens, sub_slots)
+        
+        return sub_slots
+    
+    def _extract_antecedent_phrase(self, tokens: List[Dict], antecedent_idx: int, rel_pronoun_idx: int) -> str:
+        """先行詞句を抽出（冠詞・形容詞含む）"""
+        # 先行詞の前の修飾語も含めて抽出
+        start_idx = antecedent_idx
+        
+        # 前方の修飾語を探す
+        for i in range(antecedent_idx - 1, -1, -1):
+            if tokens[i]['pos'] in ['DET', 'ADJ']:  # 冠詞・形容詞
+                start_idx = i
+            else:
+                break
+        
+        # 先行詞句を構築
+        antecedent_phrase = ' '.join([tokens[i]['text'] for i in range(start_idx, rel_pronoun_idx)])
+        return antecedent_phrase.strip()
+    
+    def _analyze_relative_clause_elements(self, rel_tokens: List[Dict], sub_slots: Dict):
+        """関係節内の要素をRephrase的に分析"""
+        if not rel_tokens:
+            return
+        
+        # 動詞を探す
+        verb_idx = None
+        for i, token in enumerate(rel_tokens):
+            if token['tag'].startswith('VB') and token['pos'] == 'VERB':
+                verb_idx = i
+                sub_slots['sub-v'] = token['text']
+                break
+        
+        if verb_idx is None:
+            return
+        
+        # 動詞後の要素を分析
+        post_verb_tokens = rel_tokens[verb_idx + 1:]
+        modifier_count = 0
+        
+        for token in post_verb_tokens:
+            if token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                # 目的語
+                if 'sub-o1' not in sub_slots:
+                    sub_slots['sub-o1'] = token['text']
+                elif 'sub-o2' not in sub_slots:
+                    sub_slots['sub-o2'] = token['text']
+            elif token['pos'] == 'ADJ':
+                # 補語
+                sub_slots['sub-c1'] = token['text']
+            elif token['pos'] == 'ADV':
+                # 修飾語 - Rephrase仕様のM2優先ルール
+                modifier_count += 1
+                if modifier_count == 1:
+                    sub_slots['sub-m2'] = token['text']
+                elif modifier_count == 2:
+                    sub_slots['sub-m3'] = token['text']
+
+    def _determine_relative_slot_position(self, tokens: List[Dict], relative_info: Dict) -> str:
+        """関係節がどのスロット位置にあるかを判定"""
+        antecedent_idx = relative_info.get('antecedent_idx')
+        if antecedent_idx is None:
+            return None
+        
+        # 簡単な判定：動詞の前なら主語、後なら目的語
+        verb_indices = [i for i, token in enumerate(tokens) if token['tag'].startswith('VB') and token['pos'] == 'VERB']
+        if not verb_indices:
+            return 'O1'  # デフォルト
+        
+        main_verb_idx = verb_indices[0]  # 最初の動詞をメイン動詞とする
+        
+        if antecedent_idx < main_verb_idx:
+            return 'S'   # 主語位置
+        else:
+            return 'O1'  # 目的語位置
+    
+    def _clean_relative_clause_from_text(self, text: str, relative_info: Dict) -> str:
+        """テキストから関係節部分を除去"""
+        if not relative_info['found']:
+            return text
+        
+        # 簡易実装：関係代名詞以降を削除
+        rel_type = relative_info.get('type', '')
+        if rel_type in text:
+            parts = text.split(rel_type)
+            return parts[0].strip()
+        
+        return text
+
+    def _analyze_relative_clause_structure(self, rel_tokens: List[Dict], clause_type: str) -> Dict:
+        """関係節内部の構造を5文型で解析
+        
+        Args:
+            rel_tokens: 関係節のトークンリスト
+            clause_type: 関係節の種類（who, which, whose等）
+            
+        Returns:
+            Dict: サブスロット構造
+        """
+        if not rel_tokens:
+            return {}
+        
+        self.logger.debug(f"関係節構造解析開始: {[t['text'] for t in rel_tokens]}")
+        
+        # 1. 関係節内の動詞を特定
+        verb_idx = self._find_verb_in_relative_clause(rel_tokens)
+        if verb_idx is None:
+            return {}
+        
+        # 2. 5文型パターンを適用
+        sub_slots = {}
+        
+        # 関係代名詞をサブ主語として処理
+        if clause_type in ['who', 'which', 'that']:
+            sub_slots['sub-s'] = rel_tokens[0]['text']  # 関係代名詞
+        elif clause_type == 'whose':
+            # whose の場合は所有格なので特別処理
+            if len(rel_tokens) > 1 and rel_tokens[1]['pos'] == 'NOUN':
+                sub_slots['sub-s'] = f"{rel_tokens[0]['text']} {rel_tokens[1]['text']}"
+            else:
+                sub_slots['sub-s'] = rel_tokens[0]['text']
+        
+        # 動詞をサブ動詞として処理
+        sub_slots['sub-v'] = rel_tokens[verb_idx]['text']
+        
+        # 3. 動詞の後の要素を解析（目的語、補語、修飾語）
+        self._analyze_post_verb_elements_in_relative(rel_tokens, verb_idx, sub_slots)
+        
+        return sub_slots
+    
+    def _find_verb_in_relative_clause(self, rel_tokens: List[Dict]) -> Optional[int]:
+        """関係節内の動詞を特定
+        
+        5文型ハンドラーの動詞検出技術を適用
+        """
+        for i, token in enumerate(rel_tokens):
+            if token['tag'].startswith('VB') and token['pos'] == 'VERB':
+                return i
+        return None
+    
+    def _analyze_post_verb_elements_in_relative(self, rel_tokens: List[Dict], verb_idx: int, sub_slots: Dict):
+        """関係節内の動詞後要素を解析
+        
+        5文型パターン認識技術を適用
+        """
+        if verb_idx >= len(rel_tokens) - 1:
+            return
+        
+        post_verb_tokens = rel_tokens[verb_idx + 1:]
+        
+        # 目的語、補語、修飾語を順次解析
+        processed_positions = set()
+        
+        for i, token in enumerate(post_verb_tokens):
+            if i in processed_positions:
+                continue
+                
+            if token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                # 名詞類 → 目的語として処理
+                if 'sub-o1' not in sub_slots:
+                    sub_slots['sub-o1'] = token['text']
+                elif 'sub-o2' not in sub_slots:
+                    sub_slots['sub-o2'] = token['text']
+                processed_positions.add(i)
+            elif token['pos'] == 'ADJ':
+                # 形容詞 → 補語として処理
+                sub_slots['sub-c1'] = token['text']
+                processed_positions.add(i)
+            elif token['pos'] == 'ADV':
+                # 副詞 → 修飾語として処理
+                if 'sub-m' not in sub_slots:
+                    sub_slots['sub-m'] = token['text']
+                else:
+                    sub_slots['sub-m'] += f" {token['text']}"
+                processed_positions.add(i)
+        
+        # 連続する要素をまとめる（簡素化版）
+        self._consolidate_relative_clause_elements_simple(rel_tokens, verb_idx, sub_slots)
+
+    def _consolidate_relative_clause_elements_simple(self, rel_tokens: List[Dict], verb_idx: int, sub_slots: Dict):
+        """関係節内の要素を統合（簡素版）"""
+        # 現在は基本的な重複除去のみ
+        if 'sub-m' in sub_slots:
+            # 重複した修飾語を除去
+            m_words = sub_slots['sub-m'].split()
+            unique_words = []
+            for word in m_words:
+                if word not in unique_words:
+                    unique_words.append(word)
+            sub_slots['sub-m'] = ' '.join(unique_words)
+
+    def _consolidate_relative_clause_elements(self, rel_tokens: List[Dict], verb_idx: int, sub_slots: Dict):
+        """関係節内の要素を統合
+        
+        連続する名詞句や修飾語句を一つにまとめる
+        """
+        if verb_idx >= len(rel_tokens) - 1:
+            return
+        
+        post_verb_tokens = rel_tokens[verb_idx + 1:]
+        current_phrase = []
+        current_type = None
+        
+        for token in post_verb_tokens:
+            if token['pos'] in ['NOUN', 'PRON', 'PROPN', 'DET', 'ADJ']:
+                if current_type == 'noun_phrase':
+                    current_phrase.append(token['text'])
+                else:
+                    # 新しい名詞句の開始
+                    if current_phrase and current_type:
+                        self._assign_phrase_to_subslot(current_phrase, current_type, sub_slots)
+                    current_phrase = [token['text']]
+                    current_type = 'noun_phrase'
+            elif token['pos'] in ['ADV', 'ADP']:
+                if current_type == 'adverbial_phrase':
+                    current_phrase.append(token['text'])
+                else:
+                    # 新しい副詞句の開始
+                    if current_phrase and current_type:
+                        self._assign_phrase_to_subslot(current_phrase, current_type, sub_slots)
+                    current_phrase = [token['text']]
+                    current_type = 'adverbial_phrase'
+            else:
+                # その他の品詞で句が終了
+                if current_phrase and current_type:
+                    self._assign_phrase_to_subslot(current_phrase, current_type, sub_slots)
+                current_phrase = []
+                current_type = None
+        
+        # 最後の句を処理
+        if current_phrase and current_type:
+            self._assign_phrase_to_subslot(current_phrase, current_type, sub_slots)
+    
+    def _assign_phrase_to_subslot(self, phrase: List[str], phrase_type: str, sub_slots: Dict):
+        """句をサブスロットに割り当て"""
+        phrase_text = ' '.join(phrase)
+        
+        if phrase_type == 'noun_phrase':
+            if 'sub-o1' not in sub_slots:
+                sub_slots['sub-o1'] = phrase_text
+            elif 'sub-o2' not in sub_slots:
+                sub_slots['sub-o2'] = phrase_text
+            else:
+                # 補語として処理
+                sub_slots['sub-c1'] = phrase_text
+        elif phrase_type == 'adverbial_phrase':
+            if 'sub-m' not in sub_slots:
+                sub_slots['sub-m'] = phrase_text
+            else:
+                sub_slots['sub-m'] += f" {phrase_text}"
 
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
