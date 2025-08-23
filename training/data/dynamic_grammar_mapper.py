@@ -979,8 +979,8 @@ class DynamicGrammarMapper:
         """Rephrase仕様に準拠したサブスロット生成
         
         正しい分解例:
-        "I know the man who works here."
-        → sub-s: "the man who", sub-v: "works", sub-m2: "here"
+        "The man who runs fast" → sub-s: "The man who", sub-v: "runs", sub-m2: "fast"
+        "The book which I bought" → sub-o1: "The book which", sub-s: "I", sub-v: "bought"
         """
         rel_pronoun_idx = relative_info['relative_pronoun_idx']
         clause_end_idx = relative_info['clause_end_idx']
@@ -994,13 +994,30 @@ class DynamicGrammarMapper:
         rel_clause_start = rel_pronoun_idx + 1  # 関係代名詞の次から
         rel_clause_tokens = tokens[rel_clause_start:clause_end_idx + 1]
         
-        # 3. Rephrase的サブスロット構造を構築
+        # 3. 関係代名詞の役割を判定
+        verb_idx = None
+        for i, token in enumerate(rel_clause_tokens):
+            if token['tag'].startswith('VB') and token['pos'] == 'VERB':
+                verb_idx = i
+                break
+        
+        # 4. Rephrase的サブスロット構造を構築
         sub_slots = {}
         
-        # sub-s: 先行詞 + 関係代名詞
-        sub_slots['sub-s'] = f"{antecedent_text} {rel_pronoun_text}"
+        if verb_idx is not None:
+            rel_pronoun_role = self._determine_relative_pronoun_role(rel_clause_tokens, verb_idx)
+            
+            if rel_pronoun_role == 'subject':
+                # 関係代名詞が主語の場合
+                sub_slots['sub-s'] = f"{antecedent_text} {rel_pronoun_text}"
+            else:
+                # 関係代名詞が目的語の場合
+                sub_slots['sub-o1'] = f"{antecedent_text} {rel_pronoun_text}"
+        else:
+            # 動詞が見つからない場合はデフォルトで主語扱い
+            sub_slots['sub-s'] = f"{antecedent_text} {rel_pronoun_text}"
         
-        # 関係節内の動詞と修飾語を分析
+        # 5. 関係節内の他の要素を分析
         self._analyze_relative_clause_elements(rel_clause_tokens, sub_slots)
         
         return sub_slots
@@ -1037,6 +1054,17 @@ class DynamicGrammarMapper:
         if verb_idx is None:
             return
         
+        # 関係代名詞の役割を判定（主語か目的語か）
+        rel_pronoun_role = self._determine_relative_pronoun_role(rel_tokens, verb_idx)
+        
+        # 動詞前の要素を分析（主語）
+        pre_verb_tokens = rel_tokens[:verb_idx]
+        for token in pre_verb_tokens:
+            if token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                # 関係代名詞が目的語の場合、ここに主語がある
+                if rel_pronoun_role == 'object':
+                    sub_slots['sub-s'] = token['text']
+        
         # 動詞後の要素を分析
         post_verb_tokens = rel_tokens[verb_idx + 1:]
         modifier_count = 0
@@ -1058,6 +1086,22 @@ class DynamicGrammarMapper:
                     sub_slots['sub-m2'] = token['text']
                 elif modifier_count == 2:
                     sub_slots['sub-m3'] = token['text']
+    
+    def _determine_relative_pronoun_role(self, rel_tokens: List[Dict], verb_idx: int) -> str:
+        """関係代名詞が主語か目的語かを判定"""
+        # 動詞の前に代名詞・名詞があるかチェック
+        pre_verb_tokens = rel_tokens[:verb_idx]
+        has_subject_before_verb = any(
+            token['pos'] in ['NOUN', 'PRON', 'PROPN'] 
+            for token in pre_verb_tokens
+        )
+        
+        if has_subject_before_verb:
+            # 動詞前に主語があるなら、関係代名詞は目的語
+            return 'object'
+        else:
+            # 動詞前に主語がないなら、関係代名詞は主語
+            return 'subject'
 
     def _determine_relative_slot_position(self, tokens: List[Dict], relative_info: Dict) -> str:
         """関係節がどのスロット位置にあるかを判定"""
