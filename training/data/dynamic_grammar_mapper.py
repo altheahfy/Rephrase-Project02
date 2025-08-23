@@ -130,14 +130,18 @@ class DynamicGrammarMapper:
             doc = self.nlp(sentence)
             tokens = self._extract_tokens(doc)
             
-            # 1.5. 関係節構造の検出と処理
+            # 1.5. 関係節構造の検出
             relative_clause_info = self._detect_relative_clause(tokens, sentence)
+            
+            # 🔧 サブスロット生成を事前除外より前に実行（car等の要素を保持するため）
             sub_slots = {}
+            original_tokens = tokens.copy()  # 元のトークンを保存
             if relative_clause_info['found']:
                 self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
-                tokens, sub_slots = self._process_relative_clause(tokens, relative_clause_info)
+                # サブスロット生成（元のトークンを使用）
+                processed_tokens, sub_slots = self._process_relative_clause(original_tokens, relative_clause_info)
             
-            # 🔧 関係節内要素の事前除外（stanzaアプローチ継承）
+            # 🔧 関係節内要素の事前除外（メイン文法解析用）
             excluded_indices = self._identify_relative_clause_elements(tokens, relative_clause_info)
             
             # 2. 除外されていない要素のみでコア要素を特定
@@ -294,16 +298,15 @@ class DynamicGrammarMapper:
                 contextual_verbs.append((i, token))
                 continue
             
-            # 動詞/名詞同形語の文脈的判定
+            # 🔧 フィルタ後のトークンでambiguous_verbsを直接動詞として扱う
             if token['text'].lower() in self.ambiguous_verbs:
-                # whose構文でのlives問題対策
-                if self._is_verb_in_whose_context(token, tokens, i, sentence_text):
-                    # NOUNタグでも動詞として扱う
-                    verb_token = token.copy()
-                    verb_token['pos'] = 'VERB'  # 強制的に動詞に変更
-                    verb_token['contextual_override'] = True
-                    contextual_verbs.append((i, verb_token))
-                    continue
+                # フィルタ後の配列では関係節情報が失われているため、
+                # ambiguous_verbsは直接動詞として扱う（lives問題の解決）
+                verb_token = token.copy()
+                verb_token['pos'] = 'VERB'  # 強制的に動詞に変更
+                verb_token['contextual_override'] = True
+                contextual_verbs.append((i, verb_token))
+                continue
             
             # その他の動詞候補（aux, modal含む）
             if token['pos'] in ['AUX', 'MODAL']:
@@ -350,27 +353,30 @@ class DynamicGrammarMapper:
 
     def _identify_relative_clause_elements(self, tokens: List[Dict], relative_info: Dict) -> set:
         """
-        関係節内の要素を事前に特定（stanzaアプローチ継承）
-        メイン文法解析の前に関係節要素を除外するため
+        関係節内の要素を事前に特定（先行詞は保持、関係節部分のみ除外）
+        ユーザー提案の方法論：
+        ①関係節ハンドラーが関係節の部分を正しく切り取る
+        ②5文型ハンドラーの判断用に先行詞だけ残す（「後に""にすべき」情報付き）
         """
         excluded_indices = set()
         
         if not relative_info['found']:
             return excluded_indices
         
-        # 正しいキー名を使用
-        rel_start = relative_info.get('clause_start_idx', -1)
+        # 先行詞は保持し、関係節部分のみを除外
+        rel_start = relative_info.get('clause_start_idx', -1)  # 関係代名詞の位置
         rel_end = relative_info.get('clause_end_idx', -1)
+        antecedent_idx = relative_info.get('antecedent_idx', -1)  # 先行詞は保持
         
         if rel_start >= 0 and rel_end >= 0:
-            # 関係節の範囲内のすべての要素を除外（livesは除く）
-            for i in range(rel_start, rel_end):  # rel_endは含めない（livesはメイン動詞）
+            # 関係代名詞から関係節終了まで除外（先行詞とメイン動詞は保護）
+            for i in range(rel_start, rel_end):
                 if i < len(tokens):
-                    # whoseは残す（サブスロットで使用）、is/redは除外
-                    if tokens[i]['text'].lower() not in ['whose']:
+                    # 先行詞は保護（5文型ハンドラーで判断に使用）
+                    if i != antecedent_idx:
                         excluded_indices.add(i)
             
-            self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end-1} ({len(excluded_indices)}個の要素)")
+            self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end-1} (先行詞{antecedent_idx}は保持)")
         
         return excluded_indices
         
@@ -454,12 +460,12 @@ class DynamicGrammarMapper:
         
         # 関係節を含む主語の場合
         if antecedent_idx is not None and relative_clause_end_idx is not None:
-            # 🔧 Rephraseシステム仕様: 関係節がある場合はメイン主語を空にし、サブスロットに移動
-            # 主語は空文字列として扱い、実際の内容はsub_slotsで処理される
-            self.logger.debug(f"関係節検出: メイン主語を空にしてサブスロットに移動")
-            return []  # 空の主語を返す
+            # 🔧 Rephraseシステム仕様: 関係節がある場合でも通常の主語検出を行う
+            # _assign_grammar_rolesで「かたまり」判定により空にするかを決定
+            self.logger.debug(f"関係節検出: 通常の主語検出を継続（かたまり判定は後で実行）")
+            # return []  # この早期リターンを削除
         
-        # 通常の主語検出（関係節なし）
+        # 通常の主語検出（関係節あり・なし両対応）
         # 動詞の前を右から左に探す
         for i in range(verb_idx - 1, -1, -1):
             token = tokens[i]
@@ -543,24 +549,25 @@ class DynamicGrammarMapper:
         elements = []
         used_indices = set()
         
-        # 関係節がある場合の処理
+        # 🆕 関係節がある場合：「かたまり」の文法的役割を動詞との関係から推定
         relative_slot_to_empty = None
         if relative_info['found']:
-            relative_slot_to_empty = self._determine_relative_slot_position(tokens, relative_info)
+            relative_slot_to_empty = self._determine_chunk_grammatical_role(tokens, core_elements, relative_info)
         
-        # 主語
-        if core_elements['subject_indices']:
-            # 関係節がS位置にある場合は空にする
+        # 主語処理（関係節がある場合は強制的に主語要素を作成）
+        if core_elements['subject_indices'] or (relative_info['found'] and relative_slot_to_empty == 'S'):
             if relative_slot_to_empty == 'S':
+                # ④ 関係節がS位置にある場合：「後に""にすべき」情報を適用
                 subject_element = GrammarElement(
-                    text="",  # 空文字列
+                    text="",  # 空文字列（ユーザー提案の④）
                     tokens=[],
                     role='S',
-                    start_idx=min(core_elements['subject_indices']),
-                    end_idx=max(core_elements['subject_indices']),
+                    start_idx=relative_info.get('antecedent_idx', 0),
+                    end_idx=relative_info.get('antecedent_idx', 0),
                     confidence=0.95
                 )
-            else:
+                self.logger.debug(f"関係節主語を空スロットに変換: antecedent_idx={relative_info.get('antecedent_idx')}")
+            elif core_elements['subject_indices']:
                 # 通常の主語処理
                 subject_text = self._clean_relative_clause_from_text(core_elements['subject'], relative_info)
                 subject_element = GrammarElement(
@@ -571,8 +578,10 @@ class DynamicGrammarMapper:
                     end_idx=max(core_elements['subject_indices']),
                     confidence=0.95
                 )
+            
             elements.append(subject_element)
-            used_indices.update(core_elements['subject_indices'])
+            if core_elements['subject_indices']:
+                used_indices.update(core_elements['subject_indices'])
         
         # 助動詞
         if core_elements['auxiliary_indices']:
@@ -1315,23 +1324,86 @@ class DynamicGrammarMapper:
             # 動詞前に主語がないなら、関係代名詞は主語
             return 'subject'
 
+    def _determine_chunk_grammatical_role(self, tokens: List[Dict], core_elements: Dict, relative_info: Dict) -> str:
+        """関係節を含む「かたまり」の文法的役割を動詞との関係から推定
+        
+        人間的文法認識：
+        - 動詞の前の「かたまり」→ 主語（S）
+        - 動詞の後の「かたまり」→ 目的語（O1）または補語（C1）
+        - 文末の「かたまり」→ 修飾語（M）
+        """
+        if not relative_info['found']:
+            return None
+            
+        # 先行詞の位置と動詞の位置を比較
+        antecedent_idx = relative_info.get('antecedent_idx')
+        verb_indices = core_elements.get('verb_indices', [])
+        
+        if not antecedent_idx or not verb_indices:
+            return None
+            
+        main_verb_idx = verb_indices[0] if verb_indices else len(tokens)
+        
+        # 位置関係による文法的役割の判定
+        if antecedent_idx < main_verb_idx:
+            # 動詞より前 → 主語の可能性が高い
+            self.logger.debug(f"かたまり位置判定: 先行詞{antecedent_idx} < 動詞{main_verb_idx} → 主語(S)")
+            return 'S'
+        else:
+            # 動詞より後 → 目的語または補語
+            # 動詞の性質から判定
+            if core_elements.get('verb') and core_elements['verb'].get('text'):
+                verb_text = core_elements['verb']['text'].lower()
+                if verb_text in ['is', 'are', 'was', 'were', 'am', 'be', 'become', 'seem']:
+                    self.logger.debug(f"かたまり位置判定: be動詞 + 後続 → 補語(C1)")
+                    return 'C1'
+                else:
+                    self.logger.debug(f"かたまり位置判定: 一般動詞 + 後続 → 目的語(O1)")
+                    return 'O1'
+        
+        return None
+
     def _determine_relative_slot_position(self, tokens: List[Dict], relative_info: Dict) -> str:
-        """関係節がどのスロット位置にあるかを判定"""
+        """関係節がどのスロット位置にあるかを判定
+        
+        重要：関係節を含む「かたまり」がどの文法的役割を果たすかを判定し、
+        そのスロットを空にしてサブスロットに移動させる
+        """
+        if not relative_info['found']:
+            return None
+            
+        # 既に実装済みの「かたまり」文法的役割判定を使用
+        # この判定は_assign_grammar_rolesで取得する必要がある
+        # 現在は直接実装
         antecedent_idx = relative_info.get('antecedent_idx')
         if antecedent_idx is None:
             return None
+            
+        # 動詞位置を探す
+        main_verb_idx = None
+        for i, token in enumerate(tokens):
+            if token['pos'] in ['VERB', 'AUX'] and token['text'].lower() not in ['whose', 'which', 'who', 'that']:
+                # 関係節内の動詞を除外してメイン動詞を特定
+                rel_start = relative_info.get('relative_pronoun_idx', -1)
+                rel_end = relative_info.get('clause_end_idx', -1)
+                if rel_start <= i <= rel_end:
+                    continue  # 関係節内の動詞はスキップ
+                main_verb_idx = i
+                break
         
-        # 簡単な判定：動詞の前なら主語、後なら目的語
-        verb_indices = [i for i, token in enumerate(tokens) if token['tag'].startswith('VB') and token['pos'] == 'VERB']
-        if not verb_indices:
-            return 'O1'  # デフォルト
-        
-        main_verb_idx = verb_indices[0]  # 最初の動詞をメイン動詞とする
-        
+        if main_verb_idx is None:
+            return None
+            
+        # 位置関係による判定
         if antecedent_idx < main_verb_idx:
-            return 'S'   # 主語位置
+            return 'S'  # 主語
         else:
-            return 'O1'  # 目的語位置
+            # 動詞の性質から判定
+            verb_token = tokens[main_verb_idx]
+            if verb_token['text'].lower() in ['is', 'are', 'was', 'were', 'am', 'be', 'become', 'seem']:
+                return 'C1'  # 補語
+            else:
+                return 'O1'  # 目的語
     
     def _clean_relative_clause_from_text(self, text: str, relative_info: Dict) -> str:
         """テキストから関係節部分を除去"""
