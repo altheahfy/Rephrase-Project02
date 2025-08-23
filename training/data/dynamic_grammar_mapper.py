@@ -59,7 +59,20 @@ class DynamicGrammarMapper:
             print("❌ spaCy英語モデルが見つかりません")
             raise
         
+        # ログ設定を早期に行う
         self.logger = logging.getLogger(__name__)
+        
+        # 🔥 Phase 1.0: ハンドラー管理システム (Stanza Asset Migration)
+        self.active_handlers = []  # アクティブハンドラーリスト
+        self.handler_shared_context = {}  # ハンドラー間情報共有
+        self.handler_success_count = {}  # ハンドラー成功統計
+        
+        # 基本ハンドラーの初期化
+        self._initialize_basic_handlers()
+        
+        # ハンドラー管理システムの初期化完了をログ出力
+        print(f"🔥 Phase 1.0 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
+        print(f"   アクティブハンドラー: {', '.join(self.active_handlers)}")
         
         # 🆕 Phase 1.2: 文型認識エンジン初期化
         # self.sentence_type_detector = SentenceTypeDetector()  # 一時的にコメント化
@@ -2364,6 +2377,197 @@ class DynamicGrammarMapper:
         
         return ui_data
 
+    # =============================================================================
+    # 🔥 Phase 1.0: ハンドラー管理システム (from Stanza Asset Migration)
+    # =============================================================================
+    
+    def _initialize_basic_handlers(self):
+        """基本ハンドラーの初期化"""
+        basic_handlers = [
+            'basic_five_pattern',     # 基本5文型
+            'relative_clause',        # 関係節  
+            'passive_voice',          # 受動態
+            'auxiliary_complex',      # 助動詞
+        ]
+        
+        for handler in basic_handlers:
+            self.add_handler(handler)
+        
+        self.logger.info(f"基本ハンドラー初期化完了: {len(self.active_handlers)}個")
+    
+    def add_handler(self, handler_name: str):
+        """ハンドラーを追加（Phase別開発用）"""
+        if handler_name not in self.active_handlers:
+            self.active_handlers.append(handler_name)
+            self.logger.info(f"Handler追加: {handler_name}")
+        else:
+            self.logger.warning(f"⚠️ Handler already active: {handler_name}")
+    
+    def remove_handler(self, handler_name: str):
+        """ハンドラーを削除"""
+        if handler_name in self.active_handlers:
+            self.active_handlers.remove(handler_name)
+            self.logger.info(f"➖ Handler削除: {handler_name}")
+    
+    def list_active_handlers(self) -> List[str]:
+        """アクティブハンドラー一覧"""
+        return self.active_handlers.copy()
+    
+    def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
+        """
+        ハンドラー結果をベース結果にマージ
+        
+        Args:
+            base_result: ベース結果
+            handler_result: ハンドラー処理結果  
+            handler_name: ハンドラー名
+        """
+        # スロット情報マージ
+        if 'slots' in handler_result:
+            for slot_name, slot_data in handler_result['slots'].items():
+                if slot_name not in base_result['slots']:
+                    base_result['slots'][slot_name] = slot_data
+                else:
+                    # 競合解決：空文字や空値で既存の有効な値を上書きしない
+                    existing_value = base_result['slots'][slot_name]
+                    
+                    # 既存値が空で新値が有効な場合は上書き
+                    if not existing_value and slot_data:
+                        base_result['slots'][slot_name] = slot_data
+                    # 既存値が有効で新値も有効な場合は後勝ち
+                    elif existing_value and slot_data:
+                        base_result['slots'][slot_name] = slot_data
+                    # 既存値が有効で新値が空の場合は保持
+                    elif existing_value and not slot_data:
+                        pass  # 既存値を保持
+                    # 両方空の場合は後勝ち
+                    else:
+                        base_result['slots'][slot_name] = slot_data
+        
+        # サブスロット情報マージ
+        if 'sub_slots' in handler_result:
+            for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
+                base_result['sub_slots'][sub_slot_name] = sub_slot_data
+        
+        # 文法情報記録
+        if 'grammar_info' in handler_result:
+            grammar_info = handler_result['grammar_info']
+            if 'handler_contributions' not in base_result['grammar_info']:
+                base_result['grammar_info']['handler_contributions'] = {}
+            base_result['grammar_info']['handler_contributions'][handler_name] = grammar_info
+            
+            # 検出パターン追加
+            if 'patterns' in grammar_info:
+                if 'detected_patterns' not in base_result['grammar_info']:
+                    base_result['grammar_info']['detected_patterns'] = []
+                base_result['grammar_info']['detected_patterns'].extend(grammar_info['patterns'])
+        
+        return base_result
+
+    def _unified_mapping(self, sentence: str, doc) -> Dict[str, Any]:
+        """
+        統合マッピング処理 (from Stanza Asset Migration)
+        
+        全アクティブハンドラーが同時実行
+        各ハンドラーは独立してspaCy解析結果を処理
+        """
+        result = {
+            'sentence': sentence,
+            'slots': {},
+            'sub_slots': {},
+            'grammar_info': {
+                'detected_patterns': [],
+                'handler_contributions': {},
+                'control_flags': {}  # ハンドラー制御フラグ
+            }
+        }
+        
+        self.logger.debug(f"Unified mapping開始: {len(self.active_handlers)} handlers active")
+        
+        # ハンドラー間共有コンテキスト初期化
+        self.handler_shared_context = {
+            'predefined_slots': {},        # 事前確定スロット
+            'remaining_elements': {},      # 残り要素情報
+            'handler_metadata': {}         # ハンドラー別メタデータ
+        }
+        
+        # ハンドラー実行順序の制御
+        ordered_handlers = self._get_ordered_handlers()
+        
+        # 全アクティブハンドラーの同時実行（順序制御付き）
+        for handler_name in ordered_handlers:
+            try:
+                # ハンドラー制御フラグをチェック
+                control_flags = result.get('grammar_info', {}).get('control_flags', {})
+                if self._should_skip_handler(handler_name, control_flags):
+                    self.logger.debug(f"🚫 Handler スキップ: {handler_name} (制御フラグ)")
+                    continue
+                
+                self.logger.debug(f"Handler実行: {handler_name}")
+                
+                # 将来のハンドラーメソッド実装用プレースホルダー
+                # handler_method = getattr(self, f'_handle_{handler_name}', None)
+                # if handler_method:
+                #     handler_result = handler_method(doc, result, self.handler_shared_context)
+                #     if handler_result:
+                #         result = self._merge_handler_results(result, handler_result, handler_name)
+                
+                # 現在は既存のanalyze_sentenceロジックを統合使用
+                if handler_name == 'basic_five_pattern':
+                    # 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
+                    legacy_result = self._analyze_sentence_legacy(sentence, doc)
+                    if legacy_result and 'slots' in legacy_result:
+                        for slot_name, slot_value in legacy_result['slots'].items():
+                            if slot_value:  # 空でない値のみ
+                                result['slots'][slot_name] = slot_value
+                    
+                    # 成功カウント
+                    self.handler_success_count[handler_name] = \
+                        self.handler_success_count.get(handler_name, 0) + 1
+                        
+            except Exception as e:
+                self.logger.warning(f"Handler error ({handler_name}): {e}")
+                continue
+        
+        return result
+    
+    def _should_skip_handler(self, handler_name: str, control_flags: Dict) -> bool:
+        """ハンドラーをスキップすべきかチェック"""
+        # 将来の制御フラグ処理用
+        return False
+    
+    def _get_ordered_handlers(self) -> List[str]:
+        """ハンドラーの実行順序を制御"""
+        priority_order = [
+            'relative_clause',          # 関係節優先
+            'passive_voice',            # 受動態
+            'auxiliary_complex',        # 助動詞
+            'basic_five_pattern',       # 基本5文型（最後）
+        ]
+        
+        # アクティブハンドラーのうち、優先順位に従って並び替え
+        ordered = []
+        for handler in priority_order:
+            if handler in self.active_handlers:
+                ordered.append(handler)
+        
+        # 優先順位にないアクティブハンドラーを追加
+        for handler in self.active_handlers:
+            if handler not in ordered:
+                ordered.append(handler)
+        
+        return ordered
+    
+    def _analyze_sentence_legacy(self, sentence: str, doc) -> Dict:
+        """既存のanalyze_sentenceロジックをラップ"""
+        # 既存のanalyze_sentenceメソッドを呼び出し、結果を返す
+        # 現在は既存システムと統合ハンドラーシステムの橋渡し役
+        try:
+            return self.analyze_sentence(sentence)
+        except Exception as e:
+            self.logger.error(f"Legacy analysis error: {e}")
+            return {'slots': {}, 'error': str(e)}
+
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
     """
@@ -2514,29 +2718,6 @@ def main():
                 print(f"🎯 信頼度: {result.get('confidence', 0.0)}")
             
             print("-" * 50)
-
-    def _add_position_to_subslots(self, sub_slots: Dict, position: str) -> Dict:
-        """サブスロット名に位置情報を追加
-        
-        Args:
-            sub_slots: 既存のサブスロット辞書 (例: {'sub-s': 'The man who', 'sub-v': 'runs'})
-            position: 上位スロット位置 (例: 'S', 'O1', 'C1')
-            
-        Returns:
-            位置情報付きサブスロット辞書 (例: {'S-sub-s': 'The man who', 'S-sub-v': 'runs'})
-        """
-        positioned_slots = {}
-        for sub_slot_name, sub_slot_value in sub_slots.items():
-            if sub_slot_name.startswith('sub-'):
-                # sub-s → S-sub-s のように変換
-                positioned_name = f"{position}-{sub_slot_name}"
-                positioned_slots[positioned_name] = sub_slot_value
-                self.logger.debug(f"🏷️ サブスロット名変換: {sub_slot_name} → {positioned_name}")
-            else:
-                # sub-で始まらない場合はそのまま保持
-                positioned_slots[sub_slot_name] = sub_slot_value
-        
-        return positioned_slots
 
 if __name__ == "__main__":
     main()
