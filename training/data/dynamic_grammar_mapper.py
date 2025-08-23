@@ -1163,21 +1163,48 @@ class DynamicGrammarMapper:
     def _create_rephrase_subslots(self, tokens: List[Dict], relative_info: Dict) -> Dict:
         """Rephrase仕様に準拠したサブスロット生成
         
-        正しい分解例:
-        "The man who runs fast" → sub-s: "The man who", sub-v: "runs", sub-m2: "fast"
-        "The book which I bought" → sub-o1: "The book which", sub-s: "I", sub-v: "bought"
+        ユーザー提案の方法：5文型ハンドラーを直接使用
         """
         rel_pronoun_idx = relative_info['relative_pronoun_idx']
         clause_end_idx = relative_info['clause_end_idx']
         antecedent_idx = relative_info['antecedent_idx']
         
-        # 1. 先行詞 + 関係代名詞を取得
-        antecedent_text = self._extract_antecedent_phrase(tokens, antecedent_idx, rel_pronoun_idx)
-        rel_pronoun_text = tokens[rel_pronoun_idx]['text']
+        # 🆕 関係節トークンを抽出（関係代名詞から関係節終了まで）
+        rel_tokens = tokens[rel_pronoun_idx:clause_end_idx]
         
-        # 2. 関係節内部の要素を分析
-        rel_clause_start = rel_pronoun_idx + 1  # 関係代名詞の次から
-        rel_clause_tokens = tokens[rel_clause_start:clause_end_idx + 1]
+        # 🆕 5文型ハンドラーで関係節内を解析
+        clause_type = relative_info.get('type', '')
+        sub_slots = self._analyze_relative_clause_structure(rel_tokens, clause_type)
+        
+        # 🆕 先行詞句全体を取得（The man など）
+        antecedent_phrase = self._extract_full_antecedent_phrase(tokens, antecedent_idx)
+        
+        # 🆕 先行詞を正しく結合
+        if antecedent_idx is not None and 'sub-s' in sub_slots:
+            # whose caseは特別処理済み、他は先行詞を前置
+            if clause_type == 'whose_clause':
+                sub_slots['sub-s'] = f"{antecedent_phrase} {sub_slots['sub-s']}"
+            else:
+                # who, which, that の場合は先行詞 + 関係代名詞
+                sub_slots['sub-s'] = f"{antecedent_phrase} {rel_tokens[0]['text']}"
+        
+        return sub_slots
+    
+    def _extract_full_antecedent_phrase(self, tokens: List[Dict], antecedent_idx: int) -> str:
+        """先行詞句全体を抽出（限定詞、形容詞を含む）"""
+        if antecedent_idx <= 0:
+            return tokens[antecedent_idx]['text']
+        
+        # 先行詞の前の修飾語を含めて抽出
+        phrase_tokens = []
+        start_idx = max(0, antecedent_idx - 2)  # 最大2語前まで確認
+        
+        for i in range(start_idx, antecedent_idx + 1):
+            token = tokens[i]
+            if token['pos'] in ['DET', 'ADJ', 'NOUN', 'PROPN']:
+                phrase_tokens.append(token['text'])
+        
+        return ' '.join(phrase_tokens)
         
         # 3. 関係代名詞の役割を判定
         verb_idx = None
@@ -1419,11 +1446,15 @@ class DynamicGrammarMapper:
         return text
 
     def _analyze_relative_clause_structure(self, rel_tokens: List[Dict], clause_type: str) -> Dict:
-        """関係節内部の構造を5文型で解析
+        """関係節内部の構造を5文型ハンドラーで解析
+        
+        ユーザー提案の方法：
+        - 5文型ハンドラーの技術をそのまま関係節内に適用
+        - 関係代名詞との結合問題をルールで解決
         
         Args:
-            rel_tokens: 関係節のトークンリスト
-            clause_type: 関係節の種類（who, which, whose等）
+            rel_tokens: 関係節のトークンリスト  
+            clause_type: 関係節の種類（whose_clause等）
             
         Returns:
             Dict: サブスロット構造
@@ -1431,31 +1462,48 @@ class DynamicGrammarMapper:
         if not rel_tokens:
             return {}
         
-        self.logger.debug(f"関係節構造解析開始: {[t['text'] for t in rel_tokens]}")
+        self.logger.debug(f"5文型ハンドラーによる関係節解析: {[t['text'] for t in rel_tokens]}")
         
-        # 1. 関係節内の動詞を特定
-        verb_idx = self._find_verb_in_relative_clause(rel_tokens)
-        if verb_idx is None:
-            return {}
+        # 🆕 5文型ハンドラーを直接適用
+        core_elements = self._identify_core_elements(rel_tokens)
+        sentence_pattern = self._determine_sentence_pattern(core_elements, rel_tokens)
         
-        # 2. 5文型パターンを適用
+        self.logger.debug(f"関係節内文型: {sentence_pattern}")
+        self.logger.debug(f"関係節内コア要素: 主語={core_elements.get('subject')}, 動詞={core_elements.get('verb')}")
+        
+        # 🆕 5文型の結果をサブスロットに変換
         sub_slots = {}
         
-        # 関係代名詞をサブ主語として処理
-        if clause_type in ['who', 'whom', 'which', 'that']:
-            sub_slots['sub-s'] = rel_tokens[0]['text']  # 関係代名詞
-        elif clause_type == 'whose':
-            # whose の場合は所有格なので特別処理
-            if len(rel_tokens) > 1 and rel_tokens[1]['pos'] == 'NOUN':
-                sub_slots['sub-s'] = f"{rel_tokens[0]['text']} {rel_tokens[1]['text']}"
+        # 主語処理（関係代名詞との結合ルール）
+        if core_elements.get('subject_indices'):
+            rel_subject = core_elements['subject']
+            if clause_type == 'whose_clause':
+                # whose + 名詞 のパターン
+                sub_slots['sub-s'] = f"whose {rel_subject}"
             else:
-                sub_slots['sub-s'] = rel_tokens[0]['text']
+                # who, which, that のパターン
+                sub_slots['sub-s'] = rel_tokens[0]['text']  # 関係代名詞自体
         
-        # 動詞をサブ動詞として処理
-        sub_slots['sub-v'] = rel_tokens[verb_idx]['text']
+        # 動詞処理
+        if core_elements.get('verb'):
+            sub_slots['sub-v'] = core_elements['verb']['text']
         
-        # 3. 動詞の後の要素を解析（目的語、補語、修飾語）
-        self._analyze_post_verb_elements_in_relative(rel_tokens, verb_idx, sub_slots)
+        # 5文型パターンに基づく残り要素の処理
+        if sentence_pattern == 'SVC':
+            # be動詞 + 補語
+            # 残りの要素から補語を特定
+            used_indices = set(core_elements.get('subject_indices', []) + core_elements.get('verb_indices', []))
+            for i, token in enumerate(rel_tokens):
+                if i not in used_indices and token['pos'] in ['ADJ', 'NOUN', 'PROPN']:
+                    sub_slots['sub-c1'] = token['text']
+                    break
+        elif sentence_pattern == 'SVO':
+            # 一般動詞 + 目的語
+            used_indices = set(core_elements.get('subject_indices', []) + core_elements.get('verb_indices', []))
+            for i, token in enumerate(rel_tokens):
+                if i not in used_indices and token['pos'] in ['NOUN', 'PROPN']:
+                    sub_slots['sub-o1'] = token['text']
+                    break
         
         return sub_slots
     
