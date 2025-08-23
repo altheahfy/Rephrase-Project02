@@ -432,6 +432,7 @@
         },
         "sub_slots": {
           "sub-v": "lies",
+          "sub-m2": "there",
           "sub-s": "The book which"
         },
         "slots": {
@@ -780,7 +781,9 @@
           "M2": "here"
         },
         "sub_slots": {
-          "sub-s": "The man whose"
+          "sub-v": "is",
+          "sub-s": "The man whose car",
+          "sub-c1": "red"
         },
         "slots": {
           "S": "",
@@ -849,7 +852,7 @@
         },
         "sub_slots": {
           "sub-v": "borrowed",
-          "sub-s": "The student whose"
+          "sub-s": "The student whose book"
         },
         "slots": {
           "S": "",
@@ -917,7 +920,7 @@
         },
         "sub_slots": {
           "sub-v": "barks",
-          "sub-s": "The woman whose"
+          "sub-s": "The woman whose dog"
         },
         "slots": {
           "S": "",
@@ -1065,8 +1068,8 @@
         },
         "sub_slots": {
           "sub-v": "runs",
-          "sub-m2": "efficiently",
-          "sub-s": "The teacher whose"
+          "sub-s": "The teacher whose class",
+          "sub-m2": "efficiently"
         },
         "slots": {
           "S": "",

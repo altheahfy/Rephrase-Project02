@@ -1399,11 +1399,14 @@ class DynamicGrammarMapper:
                     break
                 
                 # 関係節内の要素として含める条件
-                if actual_pos in ['ADV', 'ADJ', 'NOUN', 'PROPN', 'NUM']:
+                # 🆕 'there'などの場所副詞も関係節に含める（Test 4対応）
+                if actual_pos in ['ADV', 'ADJ', 'NOUN', 'PROPN', 'NUM'] or \
+                   (actual_pos == 'PRON' and token['text'].lower() in ['there', 'here']):
                     clause_end = i
                     self.logger.debug(f"関係節に含める: '{token['text']}' (corrected_pos={actual_pos})")
                 else:
                     # その他の品詞で関係節終了
+                    self.logger.debug(f"関係節終了: '{token['text']}' (corrected_pos={actual_pos})")
                     break
         
         self.logger.debug(f"関係節終了位置({rel_type}): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
@@ -1580,13 +1583,17 @@ class DynamicGrammarMapper:
         rel_pronoun_role = self._determine_relative_pronoun_role_enhanced(rel_tokens, rel_clause_type)
         self.logger.debug(f"関係代名詞役割判定: {rel_pronoun_role}")
         
-        # 🆕 5文型ハンドラーで関係節内を解析
-        sub_slots = self._analyze_relative_clause_structure_enhanced(rel_tokens, rel_clause_type, rel_pronoun_role)
-        
         # 🆕 先行詞句全体を取得（The man など）
         antecedent_phrase = self._extract_full_antecedent_phrase(tokens, antecedent_idx)
         
-        # 🆕 関係代名詞の役割に基づく適切な配置
+        # 🆕 5文型ハンドラーで関係節内を解析（先行詞情報も渡す）
+        sub_slots = self._analyze_relative_clause_structure_enhanced(rel_tokens, rel_clause_type, rel_pronoun_role, antecedent_phrase)
+        
+        # 🆕 whose構文は専用処理で完了しているのでそのまま返す
+        if rel_clause_type == 'whose_clause':
+            return sub_slots
+        
+        # 🆕 関係代名詞の役割に基づく適切な配置（whose以外）
         rel_pronoun_text = rel_tokens[0]['text']
         if rel_pronoun_role == 'subject':
             # 関係代名詞が主語 → sub-s
@@ -1595,7 +1602,7 @@ class DynamicGrammarMapper:
             # 関係代名詞が目的語 → sub-o1  
             sub_slots['sub-o1'] = f"{antecedent_phrase} {rel_pronoun_text}"
         else:
-            # デフォルト（whose等）
+            # デフォルト
             if 'sub-s' in sub_slots:
                 sub_slots['sub-s'] = f"{antecedent_phrase} {sub_slots['sub-s']}"
         
@@ -1643,7 +1650,7 @@ class DynamicGrammarMapper:
             self.logger.debug(f"関係代名詞は主語: 動詞前に主語なし")
             return 'subject'
 
-    def _analyze_relative_clause_structure_enhanced(self, rel_tokens: List[Dict], clause_type: str, rel_pronoun_role: str) -> Dict:
+    def _analyze_relative_clause_structure_enhanced(self, rel_tokens: List[Dict], clause_type: str, rel_pronoun_role: str, antecedent_phrase: str = "") -> Dict:
         """関係節内部構造解析 - 強化版
         
         関係代名詞の役割を考慮した正確なサブスロット生成
@@ -1654,6 +1661,13 @@ class DynamicGrammarMapper:
         self.logger.debug(f"強化版関係節解析: {[t['text'] for t in rel_tokens]} (役割: {rel_pronoun_role})")
         
         sub_slots = {}
+        
+        # 🆕 whose構文の特別処理
+        if clause_type == 'whose_clause':
+            self.logger.debug(f"🔍 whose構文特別処理開始: {clause_type}")
+            return self._analyze_whose_clause_structure(rel_tokens, antecedent_phrase)
+        
+        self.logger.debug(f"🔍 一般的関係節処理: {clause_type}")
         
         # 動詞を特定
         verb_token = None
@@ -1687,6 +1701,73 @@ class DynamicGrammarMapper:
                     self.logger.debug(f"修飾語検出: '{token['text']}' (pos={token['pos']}, corrected={corrected_pos}) → sub-m2")
                     break
         
+        return sub_slots
+
+    def _analyze_whose_clause_structure(self, rel_tokens: List[Dict], antecedent_phrase: str = "") -> Dict:
+        """whose構文専用の構造解析
+        
+        パターン: whose + 名詞 + 動詞 + 補語/目的語
+        例: "whose car is red" → {'sub-s': 'The man whose car', 'sub-v': 'is', 'sub-c1': 'red'}
+        """
+        sub_slots = {}
+        
+        self.logger.debug(f"🚀 whose構文解析開始: {[t['text'] for t in rel_tokens]}, 先行詞: '{antecedent_phrase}'")
+        
+        if len(rel_tokens) < 3:  # 最低限: whose + 名詞 + 動詞
+            self.logger.debug(f"❌ whose構文要素不足: {len(rel_tokens)} < 3")
+            return sub_slots
+        
+        # 1. whose直後の名詞を特定
+        whose_noun = None
+        whose_noun_idx = -1
+        for i, token in enumerate(rel_tokens):
+            if i > 0 and token['pos'] in ['NOUN', 'PROPN']:  # whose以降の最初の名詞
+                whose_noun = token['text']
+                whose_noun_idx = i
+                self.logger.debug(f"✅ whose名詞発見: '{whose_noun}' at {i}")
+                break
+        
+        if not whose_noun:
+            self.logger.debug(f"❌ whose後の名詞が見つからない")
+            return sub_slots
+        
+        # 2. 関係節内の動詞を特定（VERBまたはAUX）
+        verb_token = None
+        verb_idx = -1
+        for i, token in enumerate(rel_tokens):
+            if i > whose_noun_idx and token['pos'] in ['VERB', 'AUX']:  # 🆕 AUXも含める
+                verb_token = token['text']
+                verb_idx = i
+                sub_slots['sub-v'] = verb_token
+                self.logger.debug(f"✅ whose動詞発見: '{verb_token}' (pos={token['pos']}) at {i}")
+                break
+        
+        if not verb_token:
+            self.logger.debug(f"❌ whose後の動詞が見つからない")
+            return sub_slots
+        
+        # 3. 先行詞フレーズを構築: "先行詞 + whose + 名詞"
+        if antecedent_phrase:
+            sub_slots['sub-s'] = f"{antecedent_phrase} whose {whose_noun}"
+            self.logger.debug(f"✅ sub-s構築: '{sub_slots['sub-s']}'")
+        else:
+            sub_slots['sub-s'] = f"whose {whose_noun}"
+        
+        # 4. 動詞後の要素を補語/目的語として処理
+        for i, token in enumerate(rel_tokens):
+            if i > verb_idx and token['pos'] not in ['PUNCT']:
+                # 補語か目的語として割り当て
+                if token['pos'] in ['ADJ', 'NOUN', 'PROPN']:
+                    if 'sub-c1' not in sub_slots:
+                        sub_slots['sub-c1'] = token['text']
+                        self.logger.debug(f"✅ sub-c1発見: '{token['text']}'")
+                        break
+                elif token['pos'] == 'ADV':
+                    sub_slots['sub-m2'] = token['text']
+                    self.logger.debug(f"✅ sub-m2発見: '{token['text']}'")
+                    break
+        
+        self.logger.debug(f"whose構文解析結果: {sub_slots}")
         return sub_slots
 
     def _extract_full_antecedent_phrase(self, tokens: List[Dict], antecedent_idx: int) -> str:
