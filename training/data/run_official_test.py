@@ -122,7 +122,7 @@ def run_official_test():
         {
             "id": "34",
             "sentence": "The student who studies diligently always succeeds academically.",
-            "expected": {"main_slots": {"S": "", "V": "succeeds", "M2": "academically"}, "sub_slots": {"sub-s": "The student who", "sub-v": "studies", "sub-m2": "diligently always"}}
+            "expected": {"main_slots": {"S": "", "V": "succeeds", "M2": "always", "M3": "academically"}, "sub_slots": {"sub-s": "The student who", "sub-v": "studies", "sub-m2": "diligently"}}
         },
         {
             "id": "35",
