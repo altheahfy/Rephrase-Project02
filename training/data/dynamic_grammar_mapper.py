@@ -1324,23 +1324,15 @@ class DynamicGrammarMapper:
             
             subslot_ids.append(i)
         
-        # 🆕 サブスロットがある場合、対応する上位スロットを""に変更
+        # 🔧 関係節がある場合、S位置のサブスロットなのでSスロットのみを""に変更
         if sub_slots:
-            # サブスロットのプレフィックスから上位スロットを特定
-            upper_slots_with_subs = set()
-            for sub_key in sub_slots.keys():
-                if sub_key.startswith('sub-'):
-                    upper_slot = sub_key[4:].upper()  # "sub-s" → "S"
-                    upper_slots_with_subs.add(upper_slot)
-            
-            # 該当する上位スロットを""に変更
-            for upper_slot in upper_slots_with_subs:
-                if upper_slot in main_slots:
-                    main_slots[upper_slot] = ""
-                    # slot_phrasesも更新
-                    for i, slot in enumerate(slots):
-                        if slot == upper_slot:
-                            slot_phrases[i] = ""
+            # 関係節はS位置に格納されるため、Sスロットのみを空化
+            if 'S' in main_slots:
+                main_slots['S'] = ""
+                # slot_phrasesも更新
+                for i, slot in enumerate(slots):
+                    if slot == 'S':
+                        slot_phrases[i] = ""
         
         return {
             'Slot': slots,
