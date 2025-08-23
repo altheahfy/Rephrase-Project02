@@ -22,7 +22,7 @@ from typing import Dict, List, Any, Optional, Tuple, Set
 from dataclasses import dataclass
 
 # 🆕 Phase 1.2: 文型認識エンジン追加
-from sentence_type_detector import SentenceTypeDetector
+# from sentence_type_detector import SentenceTypeDetector  # 一時的にコメント化
 
 @dataclass
 class GrammarElement:
@@ -62,8 +62,8 @@ class DynamicGrammarMapper:
         self.logger = logging.getLogger(__name__)
         
         # 🆕 Phase 1.2: 文型認識エンジン初期化
-        self.sentence_type_detector = SentenceTypeDetector()
-        print("✅ 文型認識エンジン初期化完了")
+        # self.sentence_type_detector = SentenceTypeDetector()  # 一時的にコメント化
+        # print("✅ 文型認識エンジン初期化完了")
         
         # 動詞分類辞書
         self.linking_verbs = {
@@ -137,8 +137,10 @@ class DynamicGrammarMapper:
         """
         try:
             # 🆕 Phase 1.2: 文型認識
-            sentence_type = self.sentence_type_detector.detect_sentence_type(sentence)
-            sentence_type_confidence = self.sentence_type_detector.get_detection_confidence(sentence)
+            # sentence_type = self.sentence_type_detector.detect_sentence_type(sentence)  # 一時的にコメント化
+            # sentence_type_confidence = self.sentence_type_detector.get_detection_confidence(sentence)  # 一時的にコメント化
+            sentence_type = "statement"  # 一時的にデフォルト値
+            sentence_type_confidence = 0.8  # 一時的にデフォルト値
             
             # 1. spaCy基本解析
             doc = self.nlp(sentence)
@@ -152,8 +154,10 @@ class DynamicGrammarMapper:
             original_tokens = tokens.copy()  # 元のトークンを保存
             if relative_clause_info['found']:
                 self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
+                # 🔧 Step2: 位置情報判定のために先にcore_elementsを生成
+                temp_core_elements = self._identify_core_elements(tokens)
                 # サブスロット生成（元のトークンを使用）
-                processed_tokens, sub_slots = self._process_relative_clause(original_tokens, relative_clause_info)
+                processed_tokens, sub_slots = self._process_relative_clause(original_tokens, relative_clause_info, temp_core_elements)
             
             # 🔧 関係節内要素の事前除外（メイン文法解析用）
             excluded_indices = self._identify_relative_clause_elements(tokens, relative_clause_info)
@@ -1535,7 +1539,7 @@ class DynamicGrammarMapper:
         self.logger.debug(f"who句終了位置(構造的): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
         return clause_end
     
-    def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> Tuple[List[Dict], Dict]:
+    def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict, core_elements: Dict = None) -> Tuple[List[Dict], Dict]:
         """関係節の処理とサブスロット分解（Rephrase仕様準拠）
         
         正しいRephrase的分解:
@@ -1561,7 +1565,15 @@ class DynamicGrammarMapper:
         # Rephrase的サブスロット分解実装
         sub_slots = self._create_rephrase_subslots(tokens, relative_info)
         
+        # 🔧 Step1: 関係節の位置情報をログ出力（機能変更なし）
+        relative_position = self._determine_chunk_grammatical_role(tokens, core_elements or {}, relative_info)
         self.logger.debug(f"生成されたサブスロット: {sub_slots}")
+        self.logger.debug(f"関係節位置: {relative_position} (先行詞: {relative_info.get('antecedent_idx', 'unknown')})")
+        
+        # 🔧 Step3: サブスロット名に位置情報を追加
+        if relative_position and sub_slots:
+            positioned_sub_slots = self._add_position_to_subslots(sub_slots, relative_position)
+            self.logger.debug(f"位置情報付きサブスロット: {positioned_sub_slots}")
         
         return tokens, sub_slots
 
@@ -2276,6 +2288,29 @@ class DynamicGrammarMapper:
             else:
                 sub_slots['sub-m'] += f" {phrase_text}"
 
+    def _add_position_to_subslots(self, sub_slots: Dict, position: str) -> Dict:
+        """サブスロット名に位置情報を追加
+        
+        Args:
+            sub_slots: 既存のサブスロット辞書 (例: {'sub-s': 'The man who', 'sub-v': 'runs'})
+            position: 上位スロット位置 (例: 'S', 'O1', 'C1')
+            
+        Returns:
+            位置情報付きサブスロット辞書 (例: {'S-sub-s': 'The man who', 'S-sub-v': 'runs'})
+        """
+        positioned_slots = {}
+        for sub_slot_name, sub_slot_value in sub_slots.items():
+            if sub_slot_name.startswith('sub-'):
+                # sub-s → S-sub-s のように変換
+                positioned_name = f"{position}-{sub_slot_name}"
+                positioned_slots[positioned_name] = sub_slot_value
+                self.logger.debug(f"🏷️ サブスロット名変換: {sub_slot_name} → {positioned_name}")
+            else:
+                # sub-で始まらない場合はそのまま保持
+                positioned_slots[sub_slot_name] = sub_slot_value
+        
+        return positioned_slots
+
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
     """
@@ -2426,6 +2461,29 @@ def main():
                 print(f"🎯 信頼度: {result.get('confidence', 0.0)}")
             
             print("-" * 50)
+
+    def _add_position_to_subslots(self, sub_slots: Dict, position: str) -> Dict:
+        """サブスロット名に位置情報を追加
+        
+        Args:
+            sub_slots: 既存のサブスロット辞書 (例: {'sub-s': 'The man who', 'sub-v': 'runs'})
+            position: 上位スロット位置 (例: 'S', 'O1', 'C1')
+            
+        Returns:
+            位置情報付きサブスロット辞書 (例: {'S-sub-s': 'The man who', 'S-sub-v': 'runs'})
+        """
+        positioned_slots = {}
+        for sub_slot_name, sub_slot_value in sub_slots.items():
+            if sub_slot_name.startswith('sub-'):
+                # sub-s → S-sub-s のように変換
+                positioned_name = f"{position}-{sub_slot_name}"
+                positioned_slots[positioned_name] = sub_slot_value
+                self.logger.debug(f"🏷️ サブスロット名変換: {sub_slot_name} → {positioned_name}")
+            else:
+                # sub-で始まらない場合はそのまま保持
+                positioned_slots[sub_slot_name] = sub_slot_value
+        
+        return positioned_slots
 
 if __name__ == "__main__":
     main()
