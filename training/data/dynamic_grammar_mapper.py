@@ -424,15 +424,10 @@ class DynamicGrammarMapper:
         
         # 関係節を含む主語の場合
         if antecedent_idx is not None and relative_clause_end_idx is not None:
-            # 先行詞の冠詞から関係節の最後まで全体を主語とする
-            subject_start = antecedent_idx
-            # 冠詞があれば含める
-            if subject_start > 0 and tokens[subject_start - 1]['pos'] == 'DET':
-                subject_start -= 1
-            
-            subject_indices = list(range(subject_start, relative_clause_end_idx + 1))
-            self.logger.debug(f"関係節含む主語検出: indices {subject_indices} -> '{' '.join([tokens[i]['text'] for i in subject_indices])}'")
-            return subject_indices
+            # 🔧 Rephraseシステム仕様: 関係節がある場合はメイン主語を空にし、サブスロットに移動
+            # 主語は空文字列として扱い、実際の内容はsub_slotsで処理される
+            self.logger.debug(f"関係節検出: メイン主語を空にしてサブスロットに移動")
+            return []  # 空の主語を返す
         
         # 通常の主語検出（関係節なし）
         # 動詞の前を右から左に探す
@@ -873,6 +868,17 @@ class DynamicGrammarMapper:
         """Rephraseスロット形式に変換"""
         if sub_slots is None:
             sub_slots = {}
+        
+        # 🔧 関係節の有無を確認してスロット番号を調整
+        has_relative_clause = bool(sub_slots)
+        
+        # 関係節がある場合は修飾語のスロット番号をシフト
+        if has_relative_clause:
+            for element in elements:
+                if element.role == 'M1':
+                    element.role = 'M2'  # M1 → M2
+                elif element.role == 'M2':
+                    element.role = 'M3'  # M2 → M3
             
         slots = []
         slot_phrases = []
