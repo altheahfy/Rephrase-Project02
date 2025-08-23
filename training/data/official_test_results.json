@@ -361,9 +361,9 @@
           "C1": "strong"
         },
         "sub_slots": {
-          "sub-s": "The man who",
           "sub-v": "runs",
-          "sub-m2": "fast"
+          "sub-m2": "fast",
+          "sub-s": "The man who"
         },
         "slots": {
           "S": "",
@@ -431,8 +431,8 @@
           "C1": "mine"
         },
         "sub_slots": {
-          "sub-s": "The book which",
-          "sub-v": "lies"
+          "sub-v": "lies",
+          "sub-s": "The book which"
         },
         "slots": {
           "S": "",
@@ -500,9 +500,9 @@
           "C1": "kind"
         },
         "sub_slots": {
-          "sub-s": "The person that",
           "sub-v": "works",
-          "sub-m2": "here"
+          "sub-m2": "here",
+          "sub-s": "The person that"
         },
         "slots": {
           "S": "",
@@ -570,8 +570,9 @@
           "C1": "expensive"
         },
         "sub_slots": {
-          "sub-s": "The book which",
-          "sub-v": "bought"
+          "sub-v": "bought",
+          "sub-s": "I",
+          "sub-o1": "The book which"
         },
         "slots": {
           "S": "",
@@ -639,8 +640,9 @@
           "C1": "tall"
         },
         "sub_slots": {
-          "sub-s": "The man whom",
-          "sub-v": "met"
+          "sub-v": "met",
+          "sub-s": "I",
+          "sub-o1": "The man whom"
         },
         "slots": {
           "S": "",
@@ -708,8 +710,9 @@
           "C1": "new"
         },
         "sub_slots": {
-          "sub-s": "The car that",
-          "sub-v": "drives"
+          "sub-v": "drives",
+          "sub-s": "he",
+          "sub-o1": "The car that"
         },
         "slots": {
           "S": "",
@@ -777,9 +780,7 @@
           "M2": "here"
         },
         "sub_slots": {
-          "sub-s": "The man whose car",
-          "sub-v": "is",
-          "sub-c1": "red"
+          "sub-s": "The man whose"
         },
         "slots": {
           "S": "",
@@ -847,8 +848,8 @@
           "C1": "smart"
         },
         "sub_slots": {
-          "sub-s": "The student whose book I",
-          "sub-v": "borrowed"
+          "sub-v": "borrowed",
+          "sub-s": "The student whose"
         },
         "slots": {
           "S": "",
@@ -915,8 +916,8 @@
           "C1": "my neighbor"
         },
         "sub_slots": {
-          "sub-s": "The woman whose dog",
-          "sub-v": "barks"
+          "sub-v": "barks",
+          "sub-s": "The woman whose"
         },
         "slots": {
           "S": "",
@@ -985,9 +986,9 @@
           "M2": "academically"
         },
         "sub_slots": {
-          "sub-s": "The student who",
           "sub-v": "studies",
-          "sub-m2": "diligently"
+          "sub-m2": "diligently",
+          "sub-s": "The student who"
         },
         "slots": {
           "S": "",
@@ -1063,9 +1064,9 @@
           "M2": "greatly"
         },
         "sub_slots": {
-          "sub-s": "The teacher whose class",
           "sub-v": "runs",
-          "sub-m2": "efficiently"
+          "sub-m2": "efficiently",
+          "sub-s": "The teacher whose"
         },
         "slots": {
           "S": "",
@@ -1142,9 +1143,9 @@
           "M2": "successfully"
         },
         "sub_slots": {
-          "sub-s": "The doctor who",
           "sub-v": "works",
-          "sub-m2": "carefully"
+          "sub-m2": "carefully",
+          "sub-s": "The doctor who"
         },
         "slots": {
           "S": "",

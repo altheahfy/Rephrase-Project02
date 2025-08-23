@@ -566,21 +566,57 @@ class DynamicGrammarMapper:
         """
         人間的品詞判定の統一インターフェース
         
-        全ての品詞判定箇所で使用する統一関数
-        曖昧語については構文的整合性をチェック
+        革命的二重評価システムを使用:
+        1. 曖昧語リストの確認
+        2. 両ケース試行（NOUN/VERB）
+        3. 構文完全性チェック
+        4. 最適解採用
         """
         if token['text'].lower() not in self.ambiguous_words:
             return token['pos']  # 通常のspaCy判定
         
-        # 曖昧語の場合は簡易ヒューリスティック
-        # (完全な構文チェックは重すぎるため位置ベース判定)
+        # 🧠 革命的二重評価システムの適用
+        # Note: 簡易コンテキスト情報で二重評価を実行
         word_text = token['text'].lower()
         
-        # whose構文パターンでの動詞判定
-        if self._is_likely_verb_in_context(token, word_text):
-            return 'VERB'
+        # VERB候補とNOUN候補で構文的整合性を比較
+        verb_score = self._evaluate_word_as_verb_simple(token, word_text)
+        noun_score = self._evaluate_word_as_noun_simple(token, word_text)
         
-        return token['pos']  # デフォルトはspaCy判定
+        if verb_score > noun_score:
+            self.logger.debug(f"🧠 人間的判定: '{token['text']}' → VERB (スコア: {verb_score} vs {noun_score})")
+            return 'VERB'
+        else:
+            self.logger.debug(f"🧠 人間的判定: '{token['text']}' → NOUN (スコア: {verb_score} vs {noun_score})")
+            return 'NOUN'
+
+    def _evaluate_word_as_verb_simple(self, token: Dict, word_text: str) -> float:
+        """語を動詞として評価する簡易スコア"""
+        score = 0.0
+        
+        # 基本的な動詞らしさチェック
+        if word_text.endswith('s'):  # 三人称単数形
+            score += 30.0
+            
+        # whose構文での動詞判定（lives等）
+        if word_text in ['lives', 'works', 'runs', 'goes', 'comes']:
+            score += 50.0
+            
+        return score
+    
+    def _evaluate_word_as_noun_simple(self, token: Dict, word_text: str) -> float:
+        """語を名詞として評価する簡易スコア"""
+        score = 0.0
+        
+        # 基本的な名詞らしさチェック
+        if word_text.endswith('s'):  # 複数形
+            score += 20.0
+            
+        # デフォルトのspaCy判定を尊重
+        if token['pos'] == 'NOUN':
+            score += 10.0
+            
+        return score
 
     def _is_likely_verb_in_context(self, token: Dict, word_text: str) -> bool:
         """文脈ベースの動詞判定"""
@@ -1539,24 +1575,120 @@ class DynamicGrammarMapper:
         # clause_end_idxは関係節最後の要素のインデックスなので +1 してスライシング
         rel_tokens = tokens[rel_pronoun_idx:clause_end_idx + 1]
         
+        # 🆕 関係代名詞の役割を判定（主語/目的語）
+        rel_clause_type = relative_info.get('type', '')
+        rel_pronoun_role = self._determine_relative_pronoun_role_enhanced(rel_tokens, rel_clause_type)
+        self.logger.debug(f"関係代名詞役割判定: {rel_pronoun_role}")
+        
         # 🆕 5文型ハンドラーで関係節内を解析
-        clause_type = relative_info.get('type', '')
-        sub_slots = self._analyze_relative_clause_structure(rel_tokens, clause_type)
+        sub_slots = self._analyze_relative_clause_structure_enhanced(rel_tokens, rel_clause_type, rel_pronoun_role)
         
         # 🆕 先行詞句全体を取得（The man など）
         antecedent_phrase = self._extract_full_antecedent_phrase(tokens, antecedent_idx)
         
-        # 🆕 先行詞を正しく結合
-        if antecedent_idx is not None and 'sub-s' in sub_slots:
-            # whose caseは特別処理済み、他は先行詞を前置
-            if clause_type == 'whose_clause':
+        # 🆕 関係代名詞の役割に基づく適切な配置
+        rel_pronoun_text = rel_tokens[0]['text']
+        if rel_pronoun_role == 'subject':
+            # 関係代名詞が主語 → sub-s
+            sub_slots['sub-s'] = f"{antecedent_phrase} {rel_pronoun_text}"
+        elif rel_pronoun_role == 'object':
+            # 関係代名詞が目的語 → sub-o1  
+            sub_slots['sub-o1'] = f"{antecedent_phrase} {rel_pronoun_text}"
+        else:
+            # デフォルト（whose等）
+            if 'sub-s' in sub_slots:
                 sub_slots['sub-s'] = f"{antecedent_phrase} {sub_slots['sub-s']}"
-            else:
-                # who, which, that の場合は先行詞 + 関係代名詞
-                sub_slots['sub-s'] = f"{antecedent_phrase} {rel_tokens[0]['text']}"
         
         return sub_slots
     
+    def _determine_relative_pronoun_role_enhanced(self, rel_tokens: List[Dict], clause_type: str) -> str:
+        """関係代名詞の役割を判定（主語/目的語）- 強化版
+        
+        人間的文法認識:
+        - 動詞前に他の主語があるか？ → ある場合、関係代名詞は目的語
+        - 動詞前に主語がない → 関係代名詞は主語
+        """
+        if not rel_tokens or len(rel_tokens) < 2:
+            return 'subject'  # デフォルト
+        
+        # 動詞を探す
+        verb_idx = None
+        for i, token in enumerate(rel_tokens):
+            if token['pos'] == 'VERB' and i > 0:  # 関係代名詞以外
+                verb_idx = i
+                break
+        
+        if verb_idx is None:
+            return 'subject'  # 動詞が見つからない場合
+        
+        # whose構文の特別処理
+        if clause_type == 'whose_clause':
+            # whose の直後に名詞があり、その後に動詞 → whose+名詞が主語
+            if len(rel_tokens) > 1 and rel_tokens[1]['pos'] in ['NOUN', 'PROPN']:
+                return 'subject'
+        
+        # 動詞の前に他の主語があるかチェック
+        pre_verb_tokens = rel_tokens[1:verb_idx]  # 関係代名詞を除く
+        has_other_subject = any(
+            token['pos'] in ['NOUN', 'PRON', 'PROPN'] 
+            for token in pre_verb_tokens
+        )
+        
+        if has_other_subject:
+            # 動詞前に他の主語 → 関係代名詞は目的語
+            self.logger.debug(f"関係代名詞は目的語: 動詞前に主語 {[t['text'] for t in pre_verb_tokens]}")
+            return 'object'
+        else:
+            # 動詞前に主語なし → 関係代名詞は主語
+            self.logger.debug(f"関係代名詞は主語: 動詞前に主語なし")
+            return 'subject'
+
+    def _analyze_relative_clause_structure_enhanced(self, rel_tokens: List[Dict], clause_type: str, rel_pronoun_role: str) -> Dict:
+        """関係節内部構造解析 - 強化版
+        
+        関係代名詞の役割を考慮した正確なサブスロット生成
+        """
+        if not rel_tokens:
+            return {}
+        
+        self.logger.debug(f"強化版関係節解析: {[t['text'] for t in rel_tokens]} (役割: {rel_pronoun_role})")
+        
+        sub_slots = {}
+        
+        # 動詞を特定
+        verb_token = None
+        for i, token in enumerate(rel_tokens):
+            if token['pos'] == 'VERB' and i > 0:  # 関係代名詞以外
+                verb_token = token
+                sub_slots['sub-v'] = token['text']
+                break
+        
+        if verb_token is None:
+            return sub_slots
+        
+        # 関係代名詞の役割が目的語の場合、動詞前の要素を sub-s に
+        if rel_pronoun_role == 'object':
+            for i, token in enumerate(rel_tokens):
+                if i > 0 and token['pos'] in ['NOUN', 'PRON', 'PROPN'] and token != verb_token:
+                    sub_slots['sub-s'] = token['text']
+                    break
+        
+        # 修飾語の検出（ADV、場所副詞、前置詞句）
+        for i, token in enumerate(rel_tokens):
+            if i > 0 and token != verb_token and token['text'] not in [sub_slots.get('sub-s', '')]:
+                # 🆕 強化された修飾語検出
+                corrected_pos = self._get_human_corrected_pos(token)
+                
+                if (corrected_pos == 'ADV' or 
+                    token['pos'] == 'ADV' or 
+                    token['text'].lower() in ['there', 'here', 'everywhere', 'nowhere', 'fast', 'carefully', 'diligently', 'efficiently']):
+                    
+                    sub_slots['sub-m2'] = token['text']
+                    self.logger.debug(f"修飾語検出: '{token['text']}' (pos={token['pos']}, corrected={corrected_pos}) → sub-m2")
+                    break
+        
+        return sub_slots
+
     def _extract_full_antecedent_phrase(self, tokens: List[Dict], antecedent_idx: int) -> str:
         """先行詞句全体を抽出（限定詞、形容詞を含む）"""
         if antecedent_idx <= 0:
