@@ -362,7 +362,8 @@
         },
         "sub_slots": {
           "sub-s": "The man who",
-          "sub-v": "runs"
+          "sub-v": "runs",
+          "sub-m2": "fast"
         },
         "slots": {
           "S": "",
@@ -429,7 +430,10 @@
           "V": "is",
           "C1": "mine"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -497,7 +501,8 @@
         },
         "sub_slots": {
           "sub-s": "The person that",
-          "sub-v": "works"
+          "sub-v": "works",
+          "sub-m2": "here"
         },
         "slots": {
           "S": "",
@@ -564,7 +569,10 @@
           "V": "is",
           "C1": "expensive"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "bought"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -630,7 +638,10 @@
           "V": "is",
           "C1": "tall"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The man whom",
+          "sub-v": "met"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -696,7 +707,10 @@
           "V": "is",
           "C1": "new"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The car that",
+          "sub-v": "drives"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -728,28 +742,28 @@
       },
       "analysis_result": {
         "Slot": [
-          "M3",
-          "M3",
+          "S",
+          "V",
           "M2"
         ],
         "SlotPhrase": [
-          "The",
-          "man",
+          "",
+          "lives",
           "here"
         ],
         "Slot_display_order": [
-          10,
-          10,
+          1,
+          3,
           9
         ],
         "display_order": [
-          10,
-          10,
+          1,
+          3,
           9
         ],
         "PhraseType": [
-          "修飾句",
-          "修飾句",
+          "名詞句",
+          "動詞句",
           "修飾句"
         ],
         "SubslotID": [
@@ -758,7 +772,8 @@
           2
         ],
         "main_slots": {
-          "M3": "man",
+          "S": "",
+          "V": "lives",
           "M2": "here"
         },
         "sub_slots": {
@@ -767,10 +782,11 @@
           "sub-c1": "red"
         },
         "slots": {
-          "M3": "man",
+          "S": "",
+          "V": "lives",
           "M2": "here"
         },
-        "pattern_detected": "UNKNOWN",
+        "pattern_detected": "SV",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
@@ -830,7 +846,10 @@
           "V": "is",
           "C1": "smart"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The student whose book I",
+          "sub-v": "borrowed"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -895,7 +914,10 @@
           "V": "is",
           "C1": "my neighbor"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks"
+        },
         "slots": {
           "S": "",
           "V": "is",
@@ -964,7 +986,8 @@
         },
         "sub_slots": {
           "sub-s": "The student who",
-          "sub-v": "studies"
+          "sub-v": "studies",
+          "sub-m2": "diligently"
         },
         "slots": {
           "S": "",
@@ -998,41 +1021,31 @@
       },
       "analysis_result": {
         "Slot": [
-          "O1",
           "S",
-          "M1",
           "Aux",
           "V",
-          "M1"
+          "M2"
         ],
         "SlotPhrase": [
-          "The teacher",
           "",
-          "efficiently",
           "is",
           "respected",
           "greatly"
         ],
         "Slot_display_order": [
-          4,
           1,
-          8,
           2,
           3,
-          8
+          9
         ],
         "display_order": [
-          4,
           1,
-          8,
           2,
           3,
-          8
+          9
         ],
         "PhraseType": [
           "名詞句",
-          "名詞句",
-          "修飾句",
           "修飾句",
           "動詞句",
           "修飾句"
@@ -1041,29 +1054,29 @@
           0,
           1,
           2,
-          3,
-          4,
-          5
+          3
         ],
         "main_slots": {
-          "O1": "The teacher",
           "S": "",
-          "M1": "greatly",
           "Aux": "is",
-          "V": "respected"
+          "V": "respected",
+          "M2": "greatly"
         },
-        "sub_slots": {},
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently"
+        },
         "slots": {
-          "O1": "The teacher",
           "S": "",
-          "M1": "greatly",
           "Aux": "is",
-          "V": "respected"
+          "V": "respected",
+          "M2": "greatly"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SV",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 6,
+        "lexical_tokens": 4,
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },
@@ -1087,69 +1100,62 @@
       },
       "analysis_result": {
         "Slot": [
-          "O1",
           "S",
-          "M3",
           "V",
+          "O1",
           "M2"
         ],
         "SlotPhrase": [
-          "The doctor",
           "",
           "saves",
           "lives",
           "successfully"
         ],
         "Slot_display_order": [
-          4,
           1,
-          10,
           3,
+          4,
           9
         ],
         "display_order": [
-          4,
           1,
-          10,
           3,
+          4,
           9
         ],
         "PhraseType": [
           "名詞句",
-          "名詞句",
-          "修飾句",
           "動詞句",
+          "名詞句",
           "修飾句"
         ],
         "SubslotID": [
           0,
           1,
           2,
-          3,
-          4
+          3
         ],
         "main_slots": {
-          "O1": "The doctor",
           "S": "",
-          "M3": "saves",
-          "V": "lives",
+          "V": "saves",
+          "O1": "lives",
           "M2": "successfully"
         },
         "sub_slots": {
           "sub-s": "The doctor who",
-          "sub-v": "works"
+          "sub-v": "works",
+          "sub-m2": "carefully"
         },
         "slots": {
-          "O1": "The doctor",
           "S": "",
-          "M3": "saves",
-          "V": "lives",
+          "V": "saves",
+          "O1": "lives",
           "M2": "successfully"
         },
         "pattern_detected": "SVO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 4,
         "sentence_type": "statement",
         "sentence_type_confidence": 0.9
       },

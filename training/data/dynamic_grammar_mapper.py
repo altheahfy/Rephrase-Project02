@@ -1322,13 +1322,17 @@ class DynamicGrammarMapper:
         return result
     
     def _find_relative_clause_end(self, tokens: List[Dict], rel_start_idx: int, rel_type: str) -> int:
-        """関係節の終了位置を特定（依存関係を使わない品詞ベース）"""
+        """関係節の終了位置を特定（人間的文法認識システム）"""
         
         # whose構文の特別処理
         if rel_type == 'whose':
             return self._find_whose_clause_end(tokens, rel_start_idx)
         
-        # 🆕 一般的な関係節（who/which/that）の終了位置を品詞ベースで特定
+        # 🆕 who構文の特別処理（Test 12成功手法を適用）
+        if rel_type == 'who':
+            return self._find_who_clause_end(tokens, rel_start_idx)
+        
+        # 🆕 一般的な関係節（which/that）の終了位置を品詞ベースで特定
         # 戦略: 関係代名詞 + 動詞 + [修飾語/目的語/補語] までを関係節とする
         
         clause_end = rel_start_idx
@@ -1434,6 +1438,62 @@ class DynamicGrammarMapper:
                 break
         
         self.logger.debug(f"whose句終了位置(構造的): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
+        return clause_end
+    
+    def _find_who_clause_end(self, tokens: List[Dict], who_idx: int) -> int:
+        """who構文の関係節終了位置を特定（Test 12成功手法を適用）
+        
+        Test 12パターン: The man whose car is red lives here.
+        → "The man who runs fast is strong."
+        
+        who構文の構造的ロジック：
+        who → 関係節内動詞 → 修飾語（副詞/形容詞） → 上位文動詞出現でストップ
+        
+        期待値: "The man who runs fast" → sub-s="The man who", sub-v="runs", sub-m2="fast"
+        """
+        
+        clause_end = who_idx
+        
+        # Step 1: who直後の動詞を探す（関係節内動詞）
+        relcl_verb_idx = None
+        for i in range(who_idx + 1, min(who_idx + 3, len(tokens))):
+            if i < len(tokens):
+                token = tokens[i]
+                # 🆕 人間的品詞判定を適用
+                corrected_pos = self._get_human_corrected_pos(token)
+                
+                if corrected_pos in ['VERB', 'AUX']:
+                    relcl_verb_idx = i
+                    clause_end = i
+                    self.logger.debug(f"who句内動詞発見: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
+                    break
+        
+        if relcl_verb_idx is None:
+            self.logger.debug("who句内動詞が見つからない")
+            return who_idx + 1
+        
+        # Step 2: 関係節内動詞の後の修飾語を関係節に含める（"fast"等）
+        for i in range(relcl_verb_idx + 1, len(tokens)):
+            if i < len(tokens):
+                token = tokens[i]
+                
+                # 🆕 人間的品詞判定を適用（曖昧語の場合）
+                corrected_pos = self._get_human_corrected_pos(token)
+                
+                # 🆕 構造的判定: 新しい動詞が出現したら上位文開始
+                if corrected_pos in ['VERB', 'AUX'] and i > relcl_verb_idx:
+                    self.logger.debug(f"上位文動詞検出によりwho句終了: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
+                    break
+                
+                # 関係節内要素として含める（副詞、形容詞、名詞）
+                if corrected_pos in ['ADV', 'ADJ', 'NOUN', 'PROPN']:
+                    clause_end = i
+                    self.logger.debug(f"who句内要素: '{token['text']}' at {i} (corrected_pos={corrected_pos})")
+                else:
+                    # その他の品詞で関係節終了
+                    break
+        
+        self.logger.debug(f"who句終了位置(構造的): {clause_end} ('{tokens[clause_end]['text'] if clause_end < len(tokens) else 'EOF'}')")
         return clause_end
     
     def _process_relative_clause(self, tokens: List[Dict], relative_info: Dict) -> Tuple[List[Dict], Dict]:
@@ -1811,6 +1871,37 @@ class DynamicGrammarMapper:
                 if i not in used_indices and token['pos'] in ['NOUN', 'PROPN']:
                     sub_slots['sub-o1'] = token['text']
                     break
+        elif sentence_pattern == 'SV':
+            # 🆕 自動詞パターン (SV) + 修飾語
+            # who節の修飾語（副詞）をsub-m2として特定
+            used_indices = set(core_elements.get('subject_indices', []) + core_elements.get('verb_indices', []))
+            for i, token in enumerate(rel_tokens):
+                if i not in used_indices:
+                    # 🆕 人間的品詞判定を適用
+                    corrected_pos = self._get_human_corrected_pos(token)
+                    if corrected_pos in ['ADV', 'ADJ']:
+                        sub_slots['sub-m2'] = token['text']
+                        self.logger.debug(f"who節修飾語検出: '{token['text']}' → sub-m2 (corrected_pos={corrected_pos})")
+                        break
+        
+        # 🆕 一般的な修飾語検出（文型パターンに関係なく）
+        if 'sub-m2' not in sub_slots and clause_type == 'who_clause':
+            # who節特有の修飾語検出
+            used_indices = set(core_elements.get('subject_indices', []) + core_elements.get('verb_indices', []))
+            if 'sub-c1' in sub_slots:
+                # 補語がある場合は補語のインデックスも除外
+                for i, token in enumerate(rel_tokens):
+                    if token['text'] == sub_slots['sub-c1']:
+                        used_indices.add(i)
+                        break
+            
+            for i, token in enumerate(rel_tokens):
+                if i not in used_indices and i > 0:  # 関係代名詞を除外
+                    corrected_pos = self._get_human_corrected_pos(token)
+                    if corrected_pos in ['ADV', 'ADJ']:
+                        sub_slots['sub-m2'] = token['text']
+                        self.logger.debug(f"who節追加修飾語検出: '{token['text']}' → sub-m2 (corrected_pos={corrected_pos})")
+                        break
         
         return sub_slots
     
