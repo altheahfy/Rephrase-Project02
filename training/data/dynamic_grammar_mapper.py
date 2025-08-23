@@ -137,14 +137,18 @@ class DynamicGrammarMapper:
                 self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
                 tokens, sub_slots = self._process_relative_clause(tokens, relative_clause_info)
             
-            # 2. 文の核要素を特定
-            core_elements = self._identify_core_elements(tokens)
+            # 🔧 関係節内要素の事前除外（stanzaアプローチ継承）
+            excluded_indices = self._identify_relative_clause_elements(tokens, relative_clause_info)
             
-            # 3. 動詞の性質から文型を推定
-            sentence_pattern = self._determine_sentence_pattern(core_elements, tokens)
+            # 2. 除外されていない要素のみでコア要素を特定
+            filtered_tokens = [token for i, token in enumerate(tokens) if i not in excluded_indices]
+            core_elements = self._identify_core_elements(filtered_tokens)
             
-            # 4. 文法要素を動的に割り当て（関係節情報も考慮）
-            grammar_elements = self._assign_grammar_roles(tokens, sentence_pattern, core_elements, relative_clause_info)
+            # 3. 動詞の性質から文型を推定（除外されたトークンを使用）
+            sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
+            
+            # 4. 文法要素を動的に割り当て（除外されたトークンを使用）
+            grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
             
             # 5. Rephraseスロット形式に変換
             rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
@@ -343,6 +347,32 @@ class DynamicGrammarMapper:
                         return True
         
         return False
+
+    def _identify_relative_clause_elements(self, tokens: List[Dict], relative_info: Dict) -> set:
+        """
+        関係節内の要素を事前に特定（stanzaアプローチ継承）
+        メイン文法解析の前に関係節要素を除外するため
+        """
+        excluded_indices = set()
+        
+        if not relative_info['found']:
+            return excluded_indices
+        
+        # 正しいキー名を使用
+        rel_start = relative_info.get('clause_start_idx', -1)
+        rel_end = relative_info.get('clause_end_idx', -1)
+        
+        if rel_start >= 0 and rel_end >= 0:
+            # 関係節の範囲内のすべての要素を除外（livesは除く）
+            for i in range(rel_start, rel_end):  # rel_endは含めない（livesはメイン動詞）
+                if i < len(tokens):
+                    # whoseは残す（サブスロットで使用）、is/redは除外
+                    if tokens[i]['text'].lower() not in ['whose']:
+                        excluded_indices.add(i)
+            
+            self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end-1} ({len(excluded_indices)}個の要素)")
+        
+        return excluded_indices
         
         # よく誤認識される動詞のリスト
         common_verbs = {
