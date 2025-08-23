@@ -1630,9 +1630,28 @@ class DynamicGrammarMapper:
         
         # whose構文の特別処理
         if clause_type == 'whose_clause':
-            # whose の直後に名詞があり、その後に動詞 → whose+名詞が主語
-            if len(rel_tokens) > 1 and rel_tokens[1]['pos'] in ['NOUN', 'PROPN']:
-                return 'subject'
+            # whose + 名詞の後に他の主語があるかチェック
+            # "whose book I borrowed" → Iが主語なのでwhose bookは目的語
+            # "whose car is red" → 他に主語がないのでwhose carは主語
+            whose_noun_idx = None
+            for i, token in enumerate(rel_tokens):
+                if i > 0 and token['pos'] in ['NOUN', 'PROPN']:
+                    whose_noun_idx = i
+                    break
+            
+            if whose_noun_idx is not None:
+                # whose名詞より後に他の主語があるかチェック
+                post_whose_tokens = rel_tokens[whose_noun_idx + 1:verb_idx]
+                has_other_subject = any(
+                    token['pos'] in ['NOUN', 'PRON', 'PROPN'] 
+                    for token in post_whose_tokens
+                )
+                if has_other_subject:
+                    self.logger.debug(f"whose構文: 他の主語発見 → whose句は目的語")
+                    return 'object'
+                else:
+                    self.logger.debug(f"whose構文: 他の主語なし → whose句は主語")
+                    return 'subject'
         
         # 動詞の前に他の主語があるかチェック
         pre_verb_tokens = rel_tokens[1:verb_idx]  # 関係代名詞を除く
@@ -1665,7 +1684,7 @@ class DynamicGrammarMapper:
         # 🆕 whose構文の特別処理
         if clause_type == 'whose_clause':
             self.logger.debug(f"🔍 whose構文特別処理開始: {clause_type}")
-            return self._analyze_whose_clause_structure(rel_tokens, antecedent_phrase)
+            return self._analyze_whose_clause_structure(rel_tokens, antecedent_phrase, rel_pronoun_role)
         
         self.logger.debug(f"🔍 一般的関係節処理: {clause_type}")
         
@@ -1703,7 +1722,7 @@ class DynamicGrammarMapper:
         
         return sub_slots
 
-    def _analyze_whose_clause_structure(self, rel_tokens: List[Dict], antecedent_phrase: str = "") -> Dict:
+    def _analyze_whose_clause_structure(self, rel_tokens: List[Dict], antecedent_phrase: str = "", rel_pronoun_role: str = "subject") -> Dict:
         """whose構文専用の構造解析
         
         パターン: whose + 名詞 + 動詞 + 補語/目的語
@@ -1746,14 +1765,32 @@ class DynamicGrammarMapper:
             self.logger.debug(f"❌ whose後の動詞が見つからない")
             return sub_slots
         
-        # 3. 先行詞フレーズを構築: "先行詞 + whose + 名詞"
+        # 3. 関係代名詞の役割に基づいて先行詞フレーズを配置
         if antecedent_phrase:
-            sub_slots['sub-s'] = f"{antecedent_phrase} whose {whose_noun}"
-            self.logger.debug(f"✅ sub-s構築: '{sub_slots['sub-s']}'")
+            whose_phrase = f"{antecedent_phrase} whose {whose_noun}"
+            if rel_pronoun_role == 'object':
+                sub_slots['sub-o1'] = whose_phrase
+                self.logger.debug(f"✅ sub-o1構築（目的語）: '{whose_phrase}'")
+            else:  # subject
+                sub_slots['sub-s'] = whose_phrase
+                self.logger.debug(f"✅ sub-s構築（主語）: '{whose_phrase}'")
         else:
-            sub_slots['sub-s'] = f"whose {whose_noun}"
+            whose_phrase = f"whose {whose_noun}"
+            if rel_pronoun_role == 'object':
+                sub_slots['sub-o1'] = whose_phrase
+            else:
+                sub_slots['sub-s'] = whose_phrase
         
-        # 4. 動詞後の要素を補語/目的語として処理
+        # 4. whose節内の他の主語を検出（objectの場合）
+        if rel_pronoun_role == 'object':
+            # whose名詞より後の主語を探す
+            for i, token in enumerate(rel_tokens):
+                if i > whose_noun_idx and i < verb_idx and token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                    sub_slots['sub-s'] = token['text']
+                    self.logger.debug(f"✅ whose節内主語発見: '{token['text']}'")
+                    break
+        
+        # 5. 動詞後の要素を補語/目的語として処理
         for i, token in enumerate(rel_tokens):
             if i > verb_idx and token['pos'] not in ['PUNCT']:
                 # 補語か目的語として割り当て
