@@ -2308,12 +2308,14 @@ class DynamicGrammarMapper:
         
         # メイン スロットの処理
         slot_order = ['M1', 'S', 'Aux', 'M2', 'V', 'C1', 'O1', 'O2', 'C2', 'M3']
-        display_order_counter = 0
         
         for slot_name in slot_order:
             # 関係節がある場合は空スロットも含める
             has_subslots = (slot_name == parent_slot and sub_slots and any(k.startswith('sub-') for k in sub_slots))
             if slot_name in slots and (slots[slot_name] or has_subslots):
+                # 🔧 Step5: スロット内display_order（リセット方式）
+                slot_display_order = 0
+                
                 # 関係節がある場合は空文字
                 phrase = "" if has_subslots else slots[slot_name]
                 phrase_type = "clause" if has_subslots else "word"
@@ -2330,15 +2332,19 @@ class DynamicGrammarMapper:
                     "SubslotElement": "",
                     "SubslotText": "",
                     "Slot_display_order": slot_order.index(slot_name) + 1,
-                    "display_order": display_order_counter,
+                    "display_order": slot_display_order,
                     "QuestionType": ""
                 })
-                display_order_counter += 1
+                slot_display_order += 1
                 
                 # サブスロットの追加
                 if has_subslots:
-                    for sub_slot_id, sub_slot_value in sub_slots.items():
-                        if sub_slot_id.startswith('sub-') and sub_slot_value:
+                    # 🔧 Step5.1: サブスロットの正しい順序を定義
+                    subslot_order = ['sub-s', 'sub-v', 'sub-o1', 'sub-o2', 'sub-c1', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
+                    
+                    # 順序に従ってサブスロットを追加
+                    for sub_slot_id in subslot_order:
+                        if sub_slot_id in sub_slots and sub_slots[sub_slot_id]:
                             ui_data.append({
                                 "構文ID": "",
                                 "V_group_key": result.get('pattern', ''),
@@ -2348,13 +2354,13 @@ class DynamicGrammarMapper:
                                 "SlotText": "",
                                 "PhraseType": "",
                                 "SubslotID": sub_slot_id,
-                                "SubslotElement": sub_slot_value,
+                                "SubslotElement": sub_slots[sub_slot_id],
                                 "SubslotText": "",
                                 "Slot_display_order": slot_order.index(slot_name) + 1,
-                                "display_order": display_order_counter,
+                                "display_order": slot_display_order,
                                 "QuestionType": ""
                             })
-                            display_order_counter += 1
+                            slot_display_order += 1
         
         return ui_data
 
