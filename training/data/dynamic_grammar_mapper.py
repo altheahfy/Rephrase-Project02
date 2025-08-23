@@ -681,17 +681,39 @@ class DynamicGrammarMapper:
         antecedent_idx = relative_info.get('antecedent_idx', -1)  # 先行詞は保持
         
         if rel_start >= 0 and rel_end >= 0:
-            # 関係代名詞から関係節終了まで除外（先行詞とメイン動詞は保護）
+            # 関係代名詞から関係節終了まで除外
             # rel_endはクラウズの最後のトークンのインデックスなので +1 する必要がある
             for i in range(rel_start, rel_end + 1):
                 if i < len(tokens):
-                    # 先行詞は保護（5文型ハンドラーで判断に使用）
-                    if i != antecedent_idx:
-                        excluded_indices.add(i)
+                    excluded_indices.add(i)
             
-            self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end} (先行詞{antecedent_idx}は保持)")
+            # 🆕 先行詞句全体を除外対象に追加（関係節がある場合は空スロットで処理）
+            if antecedent_idx >= 0:
+                # 先行詞句の開始位置を計算（限定詞、形容詞を含む）
+                antecedent_phrase_start = self._find_antecedent_phrase_start(tokens, antecedent_idx)
+                for i in range(antecedent_phrase_start, antecedent_idx + 1):
+                    excluded_indices.add(i)
+                    
+                self.logger.debug(f"先行詞句除外: インデックス {antecedent_phrase_start}-{antecedent_idx} ('{' '.join([tokens[i]['text'] for i in range(antecedent_phrase_start, antecedent_idx + 1)])}')")
+            
+            self.logger.debug(f"関係節要素除外: インデックス {rel_start}-{rel_end}")
         
         return excluded_indices
+    
+    def _find_antecedent_phrase_start(self, tokens: List[Dict], antecedent_idx: int) -> int:
+        """先行詞句の開始位置を特定（限定詞、形容詞を含む）"""
+        if antecedent_idx <= 0:
+            return antecedent_idx
+            
+        # 先行詞の前の修飾語を探す（最大2語前まで）
+        start_idx = max(0, antecedent_idx - 2)
+        
+        for i in range(start_idx, antecedent_idx):
+            token = tokens[i]
+            if token['pos'] in ['DET', 'ADJ']:
+                return i  # 最初の修飾語から開始
+                
+        return antecedent_idx  # 修飾語がない場合は先行詞のみ
         
         # よく誤認識される動詞のリスト
         common_verbs = {
@@ -1053,7 +1075,7 @@ class DynamicGrammarMapper:
                 i += 1
                 continue
             
-            if not o1_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
+            if not o1_assigned and self._can_be_object(token):
                 # SVOO文型のO1は通常単一語（代名詞など）
                 if token['pos'] == 'PRON':
                     # 代名詞の場合は単語のみでO1
@@ -1081,7 +1103,7 @@ class DynamicGrammarMapper:
                     used_indices.add(idx)
                     o1_assigned = True
                     i += 1
-            elif not o2_assigned and (self._can_be_object(token) or token['tag'] == 'DT'):
+            elif not o2_assigned and self._can_be_object(token):
                 # O2として複合句を検出（冠詞から始まる場合も含む）
                 phrase_indices, phrase_text = self._find_noun_phrase(remaining_tokens, i)
                 if phrase_indices:
@@ -1143,7 +1165,9 @@ class DynamicGrammarMapper:
         """修飾語を割り当て"""
         elements = []
         for i, token in remaining_tokens:
-            elements.append(self._create_modifier_element(i, token))
+            # 🆕 限定詞（DET）は無視
+            if token['pos'] != 'DET':
+                elements.append(self._create_modifier_element(i, token))
         return elements
     
     def _create_modifier_element(self, idx: int, token: Dict) -> GrammarElement:
@@ -1210,7 +1234,7 @@ class DynamicGrammarMapper:
 
     def _can_be_object(self, token: Dict) -> bool:
         """目的語になれるかの判定"""
-        return token['pos'] in ['NOUN', 'PROPN', 'PRON'] or token['tag'] in ['PRP', 'DT']
+        return token['pos'] in ['NOUN', 'PROPN', 'PRON'] or token['tag'] in ['PRP']  # DTを除去
     
     def _can_be_complement(self, token: Dict) -> bool:
         """補語になれるかの判定"""
@@ -1512,6 +1536,7 @@ class DynamicGrammarMapper:
             return who_idx + 1
         
         # Step 2: 関係節内動詞の後の修飾語を関係節に含める（"fast"等）
+        adverb_count = 0  # 🆕 副詞カウンター
         for i in range(relcl_verb_idx + 1, len(tokens)):
             if i < len(tokens):
                 token = tokens[i]
@@ -1524,8 +1549,17 @@ class DynamicGrammarMapper:
                     self.logger.debug(f"上位文動詞検出によりwho句終了: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
                     break
                 
-                # 関係節内要素として含める（副詞、形容詞、名詞）
-                if corrected_pos in ['ADV', 'ADJ', 'NOUN', 'PROPN']:
+                # 🆕 副詞の制限: 関係節内では1つまで
+                if corrected_pos == 'ADV':
+                    if adverb_count >= 1:
+                        self.logger.debug(f"🚫 副詞制限により関係節終了: '{token['text']}' (2個目の副詞)")
+                        break
+                    else:
+                        adverb_count += 1
+                        clause_end = i
+                        self.logger.debug(f"who句内要素: '{token['text']}' at {i} (corrected_pos={corrected_pos}) [副詞{adverb_count}個目]")
+                # 関係節内要素として含める（形容詞、名詞）
+                elif corrected_pos in ['ADJ', 'NOUN', 'PROPN']:
                     clause_end = i
                     self.logger.debug(f"who句内要素: '{token['text']}' at {i} (corrected_pos={corrected_pos})")
                 else:
@@ -1630,8 +1664,22 @@ class DynamicGrammarMapper:
         
         # whose構文の特別処理
         if clause_type == 'whose_clause':
-            # whose の直後に名詞があり、その後に動詞 → whose+名詞が主語
-            if len(rel_tokens) > 1 and rel_tokens[1]['pos'] in ['NOUN', 'PROPN']:
+            # 🆕 whose構文の役割判定: 動詞前に別の主語があるかチェック
+            whose_noun_idx = None
+            for i, token in enumerate(rel_tokens):
+                if i > 0 and token['pos'] in ['NOUN', 'PROPN']:
+                    whose_noun_idx = i
+                    break
+            
+            if whose_noun_idx is not None:
+                # whose+名詞の後、動詞前に他の主語があるかチェック
+                for i in range(whose_noun_idx + 1, verb_idx):
+                    if rel_tokens[i]['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                        # 他の主語発見 → whose+名詞は目的語
+                        self.logger.debug(f"🎯 whose構文目的語判定: '{rel_tokens[i]['text']}'が動詞前主語として発見")
+                        return 'object'
+                
+                # 他の主語なし → whose+名詞は主語
                 return 'subject'
         
         # 動詞の前に他の主語があるかチェック
@@ -1665,7 +1713,7 @@ class DynamicGrammarMapper:
         # 🆕 whose構文の特別処理
         if clause_type == 'whose_clause':
             self.logger.debug(f"🔍 whose構文特別処理開始: {clause_type}")
-            return self._analyze_whose_clause_structure(rel_tokens, antecedent_phrase)
+            return self._analyze_whose_clause_structure(rel_tokens, antecedent_phrase, rel_pronoun_role)
         
         self.logger.debug(f"🔍 一般的関係節処理: {clause_type}")
         
@@ -1703,7 +1751,7 @@ class DynamicGrammarMapper:
         
         return sub_slots
 
-    def _analyze_whose_clause_structure(self, rel_tokens: List[Dict], antecedent_phrase: str = "") -> Dict:
+    def _analyze_whose_clause_structure(self, rel_tokens: List[Dict], antecedent_phrase: str = "", rel_pronoun_role: str = "subject") -> Dict:
         """whose構文専用の構造解析
         
         パターン: whose + 名詞 + 動詞 + 補語/目的語
@@ -1746,12 +1794,28 @@ class DynamicGrammarMapper:
             self.logger.debug(f"❌ whose後の動詞が見つからない")
             return sub_slots
         
-        # 3. 先行詞フレーズを構築: "先行詞 + whose + 名詞"
-        if antecedent_phrase:
-            sub_slots['sub-s'] = f"{antecedent_phrase} whose {whose_noun}"
-            self.logger.debug(f"✅ sub-s構築: '{sub_slots['sub-s']}'")
+        # 3. 先行詞フレーズを構築（役割に応じて）
+        if rel_pronoun_role == 'object':
+            # whose構文が目的語の場合
+            if antecedent_phrase:
+                sub_slots['sub-o1'] = f"{antecedent_phrase} whose {whose_noun}"
+                self.logger.debug(f"✅ sub-o1構築(目的語): '{sub_slots['sub-o1']}'")
+            else:
+                sub_slots['sub-o1'] = f"whose {whose_noun}"
+            
+            # 動詞前の主語を探す
+            for i, token in enumerate(rel_tokens):
+                if i > whose_noun_idx and i < verb_idx and token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                    sub_slots['sub-s'] = token['text']
+                    self.logger.debug(f"✅ sub-s発見(目的語構文): '{token['text']}'")
+                    break
         else:
-            sub_slots['sub-s'] = f"whose {whose_noun}"
+            # whose構文が主語の場合（従来通り）
+            if antecedent_phrase:
+                sub_slots['sub-s'] = f"{antecedent_phrase} whose {whose_noun}"
+                self.logger.debug(f"✅ sub-s構築(主語): '{sub_slots['sub-s']}'")
+            else:
+                sub_slots['sub-s'] = f"whose {whose_noun}"
         
         # 4. 動詞後の要素を補語/目的語として処理
         for i, token in enumerate(rel_tokens):

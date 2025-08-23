@@ -852,7 +852,8 @@
         },
         "sub_slots": {
           "sub-v": "borrowed",
-          "sub-s": "The student whose book"
+          "sub-o1": "The student whose book",
+          "sub-s": "I"
         },
         "slots": {
           "S": "",
