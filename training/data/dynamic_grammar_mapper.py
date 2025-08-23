@@ -1570,10 +1570,10 @@ class DynamicGrammarMapper:
         self.logger.debug(f"生成されたサブスロット: {sub_slots}")
         self.logger.debug(f"関係節位置: {relative_position} (先行詞: {relative_info.get('antecedent_idx', 'unknown')})")
         
-        # 🔧 Step3: サブスロット名に位置情報を追加
+        # 🔧 Step4: UI形式対応 - parent_slot情報を記録
         if relative_position and sub_slots:
-            positioned_sub_slots = self._add_position_to_subslots(sub_slots, relative_position)
-            self.logger.debug(f"位置情報付きサブスロット: {positioned_sub_slots}")
+            sub_slots['_parent_slot'] = relative_position  # メタデータとして記録
+            self.logger.debug(f"🏷️ UI形式対応: parent_slot = {relative_position}")
         
         return tokens, sub_slots
 
@@ -2288,28 +2288,75 @@ class DynamicGrammarMapper:
             else:
                 sub_slots['sub-m'] += f" {phrase_text}"
 
-    def _add_position_to_subslots(self, sub_slots: Dict, position: str) -> Dict:
-        """サブスロット名に位置情報を追加
+    def generate_ui_format(self, sentence: str, example_id: str = "test") -> List[Dict]:
+        """UI形式のデータ構造を生成
         
         Args:
-            sub_slots: 既存のサブスロット辞書 (例: {'sub-s': 'The man who', 'sub-v': 'runs'})
-            position: 上位スロット位置 (例: 'S', 'O1', 'C1')
+            sentence: 解析する文
+            example_id: 例文ID
             
         Returns:
-            位置情報付きサブスロット辞書 (例: {'S-sub-s': 'The man who', 'S-sub-v': 'runs'})
+            UI形式のスロットデータ配列
         """
-        positioned_slots = {}
-        for sub_slot_name, sub_slot_value in sub_slots.items():
-            if sub_slot_name.startswith('sub-'):
-                # sub-s → S-sub-s のように変換
-                positioned_name = f"{position}-{sub_slot_name}"
-                positioned_slots[positioned_name] = sub_slot_value
-                self.logger.debug(f"🏷️ サブスロット名変換: {sub_slot_name} → {positioned_name}")
-            else:
-                # sub-で始まらない場合はそのまま保持
-                positioned_slots[sub_slot_name] = sub_slot_value
+        # 文法解析実行
+        result = self.analyze_sentence(sentence)
         
-        return positioned_slots
+        ui_data = []
+        slots = result.get('slots', {})
+        sub_slots = result.get('sub_slots', {})
+        parent_slot = sub_slots.get('_parent_slot', '')
+        
+        # メイン スロットの処理
+        slot_order = ['M1', 'S', 'Aux', 'M2', 'V', 'C1', 'O1', 'O2', 'C2', 'M3']
+        display_order_counter = 0
+        
+        for slot_name in slot_order:
+            # 関係節がある場合は空スロットも含める
+            has_subslots = (slot_name == parent_slot and sub_slots and any(k.startswith('sub-') for k in sub_slots))
+            if slot_name in slots and (slots[slot_name] or has_subslots):
+                # 関係節がある場合は空文字
+                phrase = "" if has_subslots else slots[slot_name]
+                phrase_type = "clause" if has_subslots else "word"
+                
+                ui_data.append({
+                    "構文ID": "",
+                    "V_group_key": result.get('pattern', ''),
+                    "例文ID": example_id,
+                    "Slot": slot_name,
+                    "SlotPhrase": phrase,
+                    "SlotText": "",
+                    "PhraseType": phrase_type,
+                    "SubslotID": "",
+                    "SubslotElement": "",
+                    "SubslotText": "",
+                    "Slot_display_order": slot_order.index(slot_name) + 1,
+                    "display_order": display_order_counter,
+                    "QuestionType": ""
+                })
+                display_order_counter += 1
+                
+                # サブスロットの追加
+                if has_subslots:
+                    for sub_slot_id, sub_slot_value in sub_slots.items():
+                        if sub_slot_id.startswith('sub-') and sub_slot_value:
+                            ui_data.append({
+                                "構文ID": "",
+                                "V_group_key": result.get('pattern', ''),
+                                "例文ID": example_id,
+                                "Slot": slot_name,
+                                "SlotPhrase": "",
+                                "SlotText": "",
+                                "PhraseType": "",
+                                "SubslotID": sub_slot_id,
+                                "SubslotElement": sub_slot_value,
+                                "SubslotText": "",
+                                "Slot_display_order": slot_order.index(slot_name) + 1,
+                                "display_order": display_order_counter,
+                                "QuestionType": ""
+                            })
+                            display_order_counter += 1
+        
+        return ui_data
 
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
