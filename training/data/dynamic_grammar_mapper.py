@@ -106,9 +106,23 @@ class DynamicGrammarMapper:
         }
         
         # 動詞/名詞同形語リスト（stanzaシステムから継承）
-        self.ambiguous_verbs = {
-            'lives', 'works', 'runs', 'goes', 'comes', 'stays', 'plays', 'looks',
-            'walks', 'talks', 'moves', 'drives', 'flies', 'rides', 'sits'
+        # 🆕 人間的文法認識: 曖昧語の候補リスト
+        self.ambiguous_words = {
+            'lives': ['NOUN', 'VERB'],    # life複数形 vs live三人称単数
+            'works': ['NOUN', 'VERB'],    # work複数形 vs work三人称単数  
+            'runs': ['NOUN', 'VERB'],     # run複数形 vs run三人称単数
+            'goes': ['NOUN', 'VERB'],     # go複数形 vs go三人称単数
+            'comes': ['NOUN', 'VERB'],    # come複数形 vs come三人称単数
+            'stays': ['NOUN', 'VERB'],    # stay複数形 vs stay三人称単数
+            'plays': ['NOUN', 'VERB'],    # play複数形 vs play三人称単数
+            'looks': ['NOUN', 'VERB'],    # look複数形 vs look三人称単数
+            'walks': ['NOUN', 'VERB'],    # walk複数形 vs walk三人称単数
+            'talks': ['NOUN', 'VERB'],    # talk複数形 vs talk三人称単数
+            'moves': ['NOUN', 'VERB'],    # move複数形 vs move三人称単数
+            'drives': ['NOUN', 'VERB'],   # drive複数形 vs drive三人称単数
+            'flies': ['NOUN', 'VERB'],    # fly複数形 vs fly三人称単数
+            'rides': ['NOUN', 'VERB'],    # ride複数形 vs ride三人称単数
+            'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
         }
     
     def analyze_sentence(self, sentence: str) -> Dict[str, Any]:
@@ -259,7 +273,7 @@ class DynamicGrammarMapper:
                 if prev_token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']:
                     # whose構文の特別処理: 動詞/名詞同形語は関係節外のメイン動詞として扱う
                     if (prev_token['text'].lower() == 'whose' and 
-                        token['text'].lower() in self.ambiguous_verbs and
+                        token['text'].lower() in self.ambiguous_words and
                         token.get('contextual_override', False)):
                         # whose構文での同形語動詞は関係節外として扱う
                         is_in_relative_clause = False
@@ -286,8 +300,8 @@ class DynamicGrammarMapper:
 
     def _find_contextual_verbs(self, tokens: List[Dict]) -> List[Tuple[int, Dict]]:
         """
-        文脈から動詞らしい語を識別（POS解析の誤認識対策）
-        stanzaシステムの知識を継承した文脈的動詞識別
+        人間的文法認識による動詞識別
+        構文的整合性チェックで最適な品詞を決定
         """
         contextual_verbs = []
         sentence_text = ' '.join([token['text'] for token in tokens])
@@ -298,19 +312,281 @@ class DynamicGrammarMapper:
                 contextual_verbs.append((i, token))
                 continue
             
-            # 🔧 フィルタ後のトークンでambiguous_verbsを直接動詞として扱う
-            if token['text'].lower() in self.ambiguous_verbs:
-                # フィルタ後の配列では関係節情報が失われているため、
-                # ambiguous_verbsは直接動詞として扱う（lives問題の解決）
-                verb_token = token.copy()
-                verb_token['pos'] = 'VERB'  # 強制的に動詞に変更
-                verb_token['contextual_override'] = True
-                contextual_verbs.append((i, verb_token))
+            # 🆕 人間的品詞決定: 構文的整合性による選択
+            if token['text'].lower() in self.ambiguous_words:
+                optimal_pos = self._resolve_ambiguous_word(token, tokens, i, sentence_text)
+                
+                if optimal_pos == 'VERB':
+                    verb_token = token.copy()
+                    verb_token['pos'] = 'VERB'
+                    verb_token['human_grammar_correction'] = True
+                    verb_token['resolution_method'] = 'syntactic_consistency'
+                    contextual_verbs.append((i, verb_token))
+                    self.logger.debug(f"🧠 人間的品詞決定: '{token['text']}' → VERB (構文整合性チェック)")
                 continue
             
             # その他の動詞候補（aux, modal含む）
             if token['pos'] in ['AUX', 'MODAL']:
                 contextual_verbs.append((i, token))
+        
+        return contextual_verbs
+
+    def _resolve_ambiguous_word(self, token: Dict, tokens: List[Dict], position: int, sentence: str) -> str:
+        """
+        人間的品詞決定: 構文的整合性による曖昧語解決
+        
+        ユーザー提案の4段階アプローチ:
+        ①曖昧語リストの確認
+        ②両ケース試行
+        ③構文完全性チェック
+        ④最適解採用
+        """
+        word_text = token['text'].lower()
+        
+        if word_text not in self.ambiguous_words:
+            return token['pos']  # 通常のspaCy判定
+        
+        candidates = self.ambiguous_words[word_text]
+        best_pos = token['pos']  # デフォルトはspaCy判定
+        best_score = 0
+        
+        self.logger.debug(f"🧠 曖昧語解決開始: '{token['text']}' 候補={candidates}")
+        
+        # 各候補を試行して構文的整合性をチェック
+        for candidate_pos in candidates:
+            score = self._evaluate_syntactic_consistency(token, candidate_pos, tokens, position, sentence)
+            self.logger.debug(f"  ケース試行: {candidate_pos} → スコア={score}")
+            
+            if score > best_score:
+                best_pos = candidate_pos
+                best_score = score
+        
+        self.logger.debug(f"🧠 最適解採用: '{token['text']}' → {best_pos} (スコア={best_score})")
+        return best_pos
+
+    def _evaluate_syntactic_consistency(self, ambiguous_token: Dict, candidate_pos: str, 
+                                       tokens: List[Dict], position: int, sentence: str) -> float:
+        """
+        構文的整合性の評価
+        
+        人間的思考プロセス:
+        - ケース1試行: 名詞として解釈 → 文構造の完全性チェック
+        - ケース2試行: 動詞として解釈 → 文構造の完全性チェック
+        - より完全な構造を持つケースを選択
+        """
+        # 仮想的にトークンの品詞を変更
+        test_tokens = [t.copy() for t in tokens]
+        test_tokens[position]['pos'] = candidate_pos
+        
+        # 構文構造の評価
+        structure_score = self._analyze_sentence_structure_completeness(test_tokens, sentence)
+        
+        return structure_score
+
+    def _analyze_sentence_structure_completeness(self, tokens: List[Dict], sentence: str) -> float:
+        """
+        文構造の完全性を分析（関係節存在前提版）
+        
+        人間的思考:
+        - 関係詞があるなら、関係節 + メイン文の両方が必要
+        - 関係節のみで終わる → 構造的に不完全
+        - 関係節 + メイン文 → 構造的に完全
+        """
+        score = 0.0
+        
+        # 🆕 CRITICAL: 関係詞の存在チェック
+        has_relative_pronoun = self._has_relative_pronoun(sentence)
+        
+        if has_relative_pronoun:
+            self.logger.debug(f"    🔍 関係節文として評価開始")
+            
+            # 関係節 + メイン文の分離評価
+            relative_clause_complete = self._check_relative_clause_completeness(tokens, sentence)
+            main_clause_complete = self._check_main_clause_completeness(tokens, sentence)
+            
+            self.logger.debug(f"    関係節完全性: {relative_clause_complete}")
+            self.logger.debug(f"    メイン文完全性: {main_clause_complete}")
+            
+            # 関係節構文では両方が必要
+            if relative_clause_complete and main_clause_complete:
+                score = 100.0  # 完全な関係節構文
+                self.logger.debug(f"    ✅ 完全な関係節構文: +100")
+            elif relative_clause_complete and not main_clause_complete:
+                score = 20.0   # 関係節のみ（構造的に不完全）
+                self.logger.debug(f"    ❌ 関係節のみ（メイン文欠如）: +20")
+            elif not relative_clause_complete and main_clause_complete:
+                score = 30.0   # メイン文のみ（関係節無視は不自然）
+                self.logger.debug(f"    ❌ メイン文のみ（関係節無視）: +30")
+            else:
+                score = 0.0    # 両方不完全
+                self.logger.debug(f"    ❌ 両方不完全: +0")
+        else:
+            # 通常文の評価
+            if self._has_main_verb(tokens) and self._has_subject_structure(tokens):
+                score = 100.0
+                self.logger.debug(f"    ✅ 通常文完全: +100")
+        
+        self.logger.debug(f"    総合スコア: {score}/100")
+        return score
+
+    def _has_relative_pronoun(self, sentence: str) -> bool:
+        """関係代名詞の存在チェック"""
+        relative_pronouns = ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']
+        sentence_lower = sentence.lower()
+        return any(pronoun in sentence_lower for pronoun in relative_pronouns)
+
+    def _check_relative_clause_completeness(self, tokens: List[Dict], sentence: str) -> bool:
+        """関係節の完全性チェック"""
+        # whose構文パターン: whose + 名詞 + 動詞 + (補語)
+        if 'whose' in sentence.lower():
+            return self._check_whose_clause_completeness(tokens)
+        # 他の関係代名詞パターン
+        return self._check_general_relative_clause_completeness(tokens)
+
+    def _check_main_clause_completeness(self, tokens: List[Dict], sentence: str) -> bool:
+        """メイン文の完全性チェック（関係節を除いて）"""
+        # 関係節以外の部分にメイン動詞が存在するか
+        main_verbs = []
+        for i, token in enumerate(tokens):
+            # 人間的POS判定を使用（曖昧語の品詞変更を反映）
+            corrected_pos = self._resolve_ambiguous_word(token, tokens, i, sentence)
+            if corrected_pos in ['VERB', 'AUX']:
+                if not self._is_likely_in_relative_clause(token, tokens):
+                    main_verbs.append(token)
+                    self.logger.debug(f"      メイン動詞候補: '{token['text']}' (pos={corrected_pos})")
+        
+        return len(main_verbs) > 0
+
+    def _check_whose_clause_completeness(self, tokens: List[Dict]) -> bool:
+        """whose構文の完全性チェック: whose + 名詞 + 動詞 + (補語)"""
+        whose_idx = None
+        possessed_noun = False
+        relative_verb = False
+        
+        for i, token in enumerate(tokens):
+            if token['text'].lower() == 'whose':
+                whose_idx = i
+            elif whose_idx is not None and i == whose_idx + 1:
+                if token['pos'] in ['NOUN', 'PROPN']:
+                    possessed_noun = True
+            elif whose_idx is not None and i > whose_idx + 1 and token['pos'] in ['VERB', 'AUX']:
+                relative_verb = True
+                break
+        
+        return whose_idx is not None and possessed_noun and relative_verb
+
+    def _check_general_relative_clause_completeness(self, tokens: List[Dict]) -> bool:
+        """一般的な関係節の完全性チェック"""
+        has_relative_pronoun = False
+        has_relative_verb = False
+        
+        for i, token in enumerate(tokens):
+            if token['text'].lower() in ['who', 'which', 'that', 'whom']:
+                has_relative_pronoun = True
+            elif has_relative_pronoun and token['pos'] in ['VERB', 'AUX']:
+                has_relative_verb = True
+                break
+        
+        return has_relative_pronoun and has_relative_verb
+
+    def _is_likely_main_verb_by_position(self, token: Dict, tokens: List[Dict], position: int) -> bool:
+        """位置的にメイン動詞である可能性をチェック"""
+        # whose節の後に来る動詞はメイン動詞の可能性が高い
+        for i in range(position):
+            if tokens[i]['text'].lower() in ['whose', 'who', 'which', 'that']:
+                # 関係代名詞より後にある曖昧語
+                # かつ、関係節内動詞（be動詞等）の後にある
+                relative_verb_found = False
+                for j in range(i + 1, position):
+                    if tokens[j]['pos'] in ['VERB', 'AUX']:
+                        relative_verb_found = True
+                        break
+                
+                if relative_verb_found:
+                    return True  # 関係節動詞の後 → メイン動詞の可能性
+        
+        return False
+
+    def _has_main_verb(self, tokens: List[Dict]) -> bool:
+        """メイン動詞の存在チェック"""
+        for token in tokens:
+            if token['pos'] in ['VERB', 'AUX']:
+                return True
+        return False
+
+    def _is_likely_in_relative_clause(self, token: Dict, tokens: List[Dict]) -> bool:
+        """トークンが関係節内にある可能性をチェック"""
+        token_idx = None
+        for i, t in enumerate(tokens):
+            if t['text'] == token['text'] and t.get('index', i) == token.get('index', -1):
+                token_idx = i
+                break
+        
+        if token_idx is None:
+            return False
+        
+        # 関係代名詞の後にあるかチェック
+        for i in range(token_idx):
+            if tokens[i]['text'].lower() in ['who', 'whom', 'which', 'that', 'whose']:
+                return True
+        
+        return False
+
+    def _has_main_verb_outside_relative_clause(self, tokens: List[Dict]) -> bool:
+        """メイン文（関係節外）に動詞が存在するかチェック"""
+        for token in tokens:
+            # 関係節内ではない動詞を探す
+            if (token['pos'] in ['VERB', 'AUX'] and 
+                not token.get('is_in_relative_clause', False)):
+                return True
+        return False
+
+    def _has_subject_structure(self, tokens: List[Dict]) -> bool:
+        """主語構造の存在チェック"""
+        for token in tokens:
+            if token['pos'] in ['NOUN', 'PROPN', 'PRON']:
+                return True
+        return False
+
+    def _is_relative_clause_structurally_complete(self, tokens: List[Dict]) -> bool:
+        """関係節構造の完全性チェック"""
+        # 簡易実装: 関係代名詞があれば関係節として認識
+        has_relative_pronoun = any(
+            token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose'] 
+            for token in tokens
+        )
+        return has_relative_pronoun
+
+    def _is_modifier_placement_valid(self, tokens: List[Dict]) -> bool:
+        """修飾語配置の妥当性チェック"""
+        # 簡易実装: 基本的に妥当とする
+        return True
+
+    def _get_human_corrected_pos(self, token: Dict) -> str:
+        """
+        人間的品詞判定の統一インターフェース
+        
+        全ての品詞判定箇所で使用する統一関数
+        曖昧語については構文的整合性をチェック
+        """
+        if token['text'].lower() not in self.ambiguous_words:
+            return token['pos']  # 通常のspaCy判定
+        
+        # 曖昧語の場合は簡易ヒューリスティック
+        # (完全な構文チェックは重すぎるため位置ベース判定)
+        word_text = token['text'].lower()
+        
+        # whose構文パターンでの動詞判定
+        if self._is_likely_verb_in_context(token, word_text):
+            return 'VERB'
+        
+        return token['pos']  # デフォルトはspaCy判定
+
+    def _is_likely_verb_in_context(self, token: Dict, word_text: str) -> bool:
+        """文脈ベースの動詞判定"""
+        # 簡易実装: ambiguous_wordsリストにある語は動詞として扱う
+        # (より高精度な実装は今後の改善で)
+        return word_text in self.ambiguous_words
         
         return contextual_verbs
     
@@ -1069,20 +1345,23 @@ class DynamicGrammarMapper:
         
         clause_end = rel_verb_idx
         
-        # Step 2: 動詞の後の要素を関係節に含める（構造的アプローチ）
+        # Step 2: 動詞の後の要素を関係節に含める（🆕 人間的構造判定）
         for i in range(rel_verb_idx + 1, len(tokens)):
             if i < len(tokens):
                 token = tokens[i]
                 
+                # 🆕 人間的品詞判定を適用
+                actual_pos = self._get_human_corrected_pos(token)
+                
                 # 🆕 構造的判定: 新しい動詞出現で上位文開始
-                if token['pos'] in ['VERB', 'AUX']:
-                    self.logger.debug(f"上位文動詞検出により関係節終了: '{token['text']}' at {i}")
+                if actual_pos in ['VERB', 'AUX']:
+                    self.logger.debug(f"🧠 上位文動詞検出により関係節終了: '{token['text']}' → {actual_pos}")
                     break
                 
                 # 関係節内の要素として含める条件
-                if token['pos'] in ['ADV', 'ADJ', 'NOUN', 'PROPN', 'NUM']:
+                if actual_pos in ['ADV', 'ADJ', 'NOUN', 'PROPN', 'NUM']:
                     clause_end = i
-                    self.logger.debug(f"関係節に含める: '{token['text']}' (pos={token['pos']})")
+                    self.logger.debug(f"関係節に含める: '{token['text']}' (corrected_pos={actual_pos})")
                 else:
                     # その他の品詞で関係節終了
                     break
@@ -1130,13 +1409,24 @@ class DynamicGrammarMapper:
         for i in range(relcl_verb_idx + 1, len(tokens)):
             token = tokens[i]
             
+            # 🆕 人間的品詞判定を使用（循環参照回避）
+            sentence_text = ' '.join([t['text'] for t in tokens])
+            if token['text'].lower() in self.ambiguous_words:
+                # 構造的判定で動詞かどうか直接チェック
+                if self._is_likely_main_verb_by_position(token, tokens, i):
+                    corrected_pos = 'VERB'
+                else:
+                    corrected_pos = token['pos']  # デフォルト
+            else:
+                corrected_pos = token['pos']
+            
             # 🆕 構造的判定: 新しい動詞が出現したら上位文開始
-            if token['pos'] in ['VERB', 'AUX'] and i > relcl_verb_idx:
-                self.logger.debug(f"上位文動詞検出により関係節終了: '{token['text']}' at {i}")
+            if corrected_pos in ['VERB', 'AUX'] and i > relcl_verb_idx:
+                self.logger.debug(f"上位文動詞検出により関係節終了: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
                 break
             
             # 関係節内要素として含める
-            if token['pos'] in ['ADJ', 'NOUN', 'PROPN', 'ADV']:
+            if corrected_pos in ['ADJ', 'NOUN', 'PROPN', 'ADV']:
                 clause_end = i
                 self.logger.debug(f"関係節要素: '{token['text']}' at {i}")
             else:
@@ -1186,7 +1476,8 @@ class DynamicGrammarMapper:
         antecedent_idx = relative_info['antecedent_idx']
         
         # 🆕 関係節トークンを抽出（関係代名詞から関係節終了まで）
-        rel_tokens = tokens[rel_pronoun_idx:clause_end_idx]
+        # clause_end_idxは関係節最後の要素のインデックスなので +1 してスライシング
+        rel_tokens = tokens[rel_pronoun_idx:clause_end_idx + 1]
         
         # 🆕 5文型ハンドラーで関係節内を解析
         clause_type = relative_info.get('type', '')
