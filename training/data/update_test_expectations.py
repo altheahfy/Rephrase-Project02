@@ -12,9 +12,9 @@ def update_test_expectations():
     
     # ファイルパス
     test_file = Path("final_test_system/final_54_test_data.json")
-    backup_file = Path("final_test_system/final_54_test_data_backup.json")
+    backup_file = Path("final_test_system/final_54_test_data_backup3.json")
     
-    print(f"📝 期待値更新開始: {test_file}")
+    print(f"📝 期待値更新開始（文法的正しい親スロット設定）: {test_file}")
     
     # バックアップ作成
     if test_file.exists():
@@ -28,20 +28,44 @@ def update_test_expectations():
         # 更新カウント
         updated_count = 0
         
+        # 親スロット判定ルール
+        def determine_parent_slot(sentence, main_slots, sub_slots):
+            """文法的に正しい親スロットを判定"""
+            
+            # 関係節（主語位置が空）
+            if main_slots.get("S") == "":
+                return "S"
+            
+            # 接続節（as if, when, where等）
+            if any(marker in sentence.lower() for marker in ["as if", "when", "where", "while", "because", "although"]):
+                return "M2"  # 修飾語位置
+            
+            # 分詞構文（working, standing等）
+            if any(word in sentence for word in ["working", "standing", "playing", "being"]):
+                return "S"   # 主語修飾
+                
+            # その他のサブスロットは文脈で判定
+            if "whose" in sentence.lower():
+                return "S"   # 所有格関係代名詞
+                
+            # デフォルト：主語修飾
+            return "S"
+        
         # 各テストケースを確認・更新
         for test_id, test_case in data["data"].items():
-            if "sub_slots" in test_case["expected"] and test_case["expected"]["sub_slots"]:
-                # sub_slotsが空でない場合、_parent_slotを追加
-                sub_slots = test_case["expected"]["sub_slots"]
+            sentence = test_case["sentence"]
+            expected = test_case["expected"]
+            
+            if "sub_slots" in expected and expected["sub_slots"]:
+                sub_slots = expected["sub_slots"]
                 
-                # 主語関係節なら_parent_slot: "S"を追加
-                if not "_parent_slot" in sub_slots:
-                    # 主語位置の関係節かどうかを判定
-                    main_slots = test_case["expected"]["main_slots"]
-                    if main_slots.get("S") == "":  # 空の主語 = 関係節が主語位置
-                        sub_slots["_parent_slot"] = "S"
-                        updated_count += 1
-                        print(f"✅ 更新: テスト{test_id} - {test_case['sentence']}")
+                if "_parent_slot" not in sub_slots:
+                    # 文法的に正しい親スロットを判定
+                    parent_slot = determine_parent_slot(sentence, expected["main_slots"], sub_slots)
+                    sub_slots["_parent_slot"] = parent_slot
+                    updated_count += 1
+                    print(f"✅ 更新: テスト{test_id} - {sentence}")
+                    print(f"   追加: _parent_slot = {parent_slot}")
         
         # 更新されたデータを保存
         with open(test_file, 'w', encoding='utf-8') as f:
