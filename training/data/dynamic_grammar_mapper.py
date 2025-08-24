@@ -18,6 +18,7 @@
 
 import spacy
 import logging
+from typing import Dict, List, Optional, Any, Tuple
 from typing import Dict, List, Any, Optional, Tuple, Set
 from dataclasses import dataclass
 
@@ -188,7 +189,34 @@ class DynamicGrammarMapper:
             # 5. Rephraseスロット形式に変換
             rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
             
-            # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation)
+            # 🔥 Phase 2: 統合ハンドラーシステム実行（受動態・助動詞・副詞処理）
+            try:
+                unified_result = self._unified_mapping(sentence, doc)
+                if unified_result and 'slots' in unified_result:
+                    # 統合ハンドラーの結果をマージ（優先度順）
+                    for slot_name, slot_value in unified_result['slots'].items():
+                        if slot_value:  # 空でない値のみマージ
+                            # 受動態・助動詞ハンドラーのV/Auxスロットは優先
+                            if slot_name in ['V', 'Aux'] and 'passive_voice' in str(unified_result.get('grammar_info', {})):
+                                rephrase_result['slots'][slot_name] = slot_value
+                                rephrase_result['main_slots'][slot_name] = slot_value
+                                print(f"🔥 統合ハンドラー優先マージ: {slot_name} = '{slot_value}'")
+                            # その他のスロットは既存値がない場合のみ
+                            elif not rephrase_result['slots'].get(slot_name):
+                                rephrase_result['slots'][slot_name] = slot_value
+                                rephrase_result['main_slots'][slot_name] = slot_value
+                    
+                    # 文法情報もマージ
+                    if 'grammar_info' in unified_result:
+                        if 'unified_handlers' not in rephrase_result:
+                            rephrase_result['unified_handlers'] = {}
+                        rephrase_result['unified_handlers'] = unified_result['grammar_info']
+                        
+                print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
+            except Exception as e:
+                self.logger.error(f"統合ハンドラーシステムエラー: {e}")
+            
+            # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation) - 後続処理として保持
             try:
                 additional_adverbs = self._detect_and_assign_adverbs_direct(doc, rephrase_result)
                 if additional_adverbs:
@@ -2688,6 +2716,19 @@ class DynamicGrammarMapper:
                     self.handler_success_count[handler_name] = \
                         self.handler_success_count.get(handler_name, 0) + 1
                 
+                elif handler_name == 'passive_voice':
+                    # 受動態ハンドラー (Phase 2実装)
+                    print(f"🔍 Executing passive_voice handler for: {sentence}")
+                    passive_result = self._handle_passive_voice(sentence, doc, result)
+                    print(f"🔍 Passive voice handler result: {passive_result}")
+                    if passive_result:
+                        result = self._merge_handler_results(result, passive_result, handler_name)
+                        print(f"🔍 Merged result after passive voice: {result}")
+                        self.handler_success_count[handler_name] = \
+                            self.handler_success_count.get(handler_name, 0) + 1
+                    else:
+                        print(f"🔍 Passive voice handler returned None")
+                
                 elif handler_name == 'adverbial_modifier':
                     # 副詞・修飾語ハンドラー (Phase 2実装)
                     print(f"🔍 Executing adverbial_modifier handler for: {sentence}")
@@ -3031,12 +3072,260 @@ def main():
             slots['M3'] = adverbs[1]['text']
             
         elif count >= 3:
-            # 3個以上: M1, M2, M3に配置 (位置順、3個目以降は無視)
+            # 3個以上: M1, M2, M3に配置 (位置順)
             slots['M1'] = adverbs[0]['text']
             slots['M2'] = adverbs[1]['text']
             slots['M3'] = adverbs[2]['text']
             
         return slots
+
+    # =================================
+    # Phase 2: 受動態ハンドラー実装
+    # =================================
+    
+    def _handle_passive_voice(self, sentence: str, doc, current_result: Dict) -> Optional[Dict]:
+        """
+        受動態ハンドラー (spaCyベース・ハードコーディング回避)
+        
+        人間的認識パターン:
+        - be動詞 + 過去分詞 → 受動態
+        - 語彙的形態論分析による過去分詞判定
+        - by句（行為者）の検出と配置
+        
+        Rephraseルール:
+        - be動詞: Aux スロットに配置（受動態のbe動詞はAuxに配置）
+        - 過去分詞: V スロットに配置
+        - by句: M1/M2/M3 スロットに配置（修飾語優先度による）
+        """
+        try:
+            # 1. 受動態パターン検出
+            passive_pattern = self._detect_passive_voice_pattern(doc, sentence)
+            
+            if not passive_pattern['found']:
+                print(f"🔍 受動態パターン未検出: {sentence}")
+                return None
+            
+            # 2. 構成要素の抽出
+            be_verb = passive_pattern['be_verb']
+            past_participle = passive_pattern['past_participle']
+            by_agent = passive_pattern.get('by_agent', '')
+            confidence = passive_pattern['confidence']
+            
+            print(f"🔥 受動態検出: '{be_verb}' + '{past_participle}' (by: '{by_agent}', 信頼度: {confidence:.2f})")
+            
+            # 3. Rephraseスロット構造生成
+            slots = {}
+            
+            # Rephraseスロット分解：be動詞はAuxに配置
+            if ' ' in be_verb:  # "will be"のような場合
+                aux_parts = be_verb.split()
+                if len(aux_parts) == 2:
+                    # 助動詞 + be動詞の場合：助動詞を優先してAuxに配置
+                    slots['Aux'] = aux_parts[0]  # will
+                    slots['V'] = past_participle  # written
+                    # be動詞は過去分詞と組み合わせて表現
+                    print(f"🔍 助動詞+be構成: Aux='{aux_parts[0]}', V='{past_participle}' (be動詞内包)")
+                else:
+                    # 複雑な場合は全体をAuxに配置
+                    slots['Aux'] = be_verb
+                    slots['V'] = past_participle
+            else:
+                # 単純なbe動詞の場合：be動詞をAuxに配置（Rephrase仕様）
+                slots['Aux'] = be_verb  # is, was, are, were
+                slots['V'] = past_participle  # written, done, etc.
+            
+            print(f"🔍 Rephrase受動態構成: Aux='{slots.get('Aux', '')}', V='{slots['V']}'")
+            
+            # M スロット: by句の配置（修飾語として扱う）
+            if by_agent:
+                # 既存のM1/M2/M3を確認して空いているスロットに配置
+                existing_modifiers = []
+                for m_slot in ['M1', 'M2', 'M3']:
+                    if current_result.get('slots', {}).get(m_slot):
+                        existing_modifiers.append(m_slot)
+                
+                # 最初の空きスロットに配置
+                assigned = False
+                for m_slot in ['M1', 'M2', 'M3']:
+                    if m_slot not in existing_modifiers:
+                        slots[m_slot] = by_agent
+                        assigned = True
+                        break
+                
+                if not assigned:
+                    # 全スロット埋まっている場合はM3を上書き
+                    slots['M3'] = by_agent
+            
+            # 4. ハンドラー結果構造
+            return {
+                'slots': slots,
+                'grammar_info': {
+                    'patterns': [{
+                        'type': 'passive_voice',
+                        'be_verb': be_verb,
+                        'past_participle': past_participle,
+                        'by_agent': by_agent,
+                        'confidence': confidence,
+                        'detection_method': 'spacy_morphological',
+                        'rephrase_allocation': f"Aux='{slots.get('Aux', '')}', V='{slots['V']}'"
+                    }],
+                    'handler_success': True,
+                    'processing_notes': f"Passive voice (Rephrase): be={be_verb}→Aux, pp={past_participle}→V"
+                }
+            }
+            
+        except Exception as e:
+            self.logger.error(f"受動態ハンドラーエラー: {e}")
+            return None
+    
+    def _detect_passive_voice_pattern(self, doc, sentence: str) -> Dict[str, Any]:
+        """
+        受動態パターン検出 (spaCyベース・形態論的分析)
+        
+        検出パターン:
+        1. be動詞 + 過去分詞（直後・近接）
+        2. be動詞 + 副詞 + 過去分詞
+        3. will/modal + be + 過去分詞
+        4. by句の検出（オプション）
+        """
+        result = {
+            'found': False,
+            'be_verb': '',
+            'past_participle': '',
+            'by_agent': '',
+            'confidence': 0.0
+        }
+        
+        tokens = list(doc)
+        
+        # 1. 各種受動態パターンの検出
+        for i in range(len(tokens)):
+            current_token = tokens[i]
+            
+            # パターン1: 単純なbe動詞 + 過去分詞
+            if self._is_be_verb_spacy(current_token):
+                be_verb = current_token.text
+                
+                # 直後の過去分詞
+                if i + 1 < len(tokens):
+                    next_token = tokens[i + 1]
+                    if self._is_past_participle_spacy(next_token):
+                        result.update({
+                            'found': True,
+                            'be_verb': be_verb,
+                            'past_participle': next_token.text,
+                            'confidence': 0.9
+                        })
+                        break
+                
+                # be動詞 + 副詞 + 過去分詞
+                if i + 2 < len(tokens):
+                    adv_token = tokens[i + 1]
+                    pp_token = tokens[i + 2]
+                    if (adv_token.pos_ == 'ADV' and 
+                        self._is_past_participle_spacy(pp_token)):
+                        result.update({
+                            'found': True,
+                            'be_verb': be_verb,
+                            'past_participle': pp_token.text,
+                            'confidence': 0.85
+                        })
+                        break
+            
+            # パターン2: modal + be + 過去分詞
+            if (current_token.pos_ == 'AUX' and 
+                current_token.text.lower() in ['will', 'would', 'can', 'could', 'should', 'may', 'might', 'must']):
+                
+                # modal + be + 過去分詞パターン
+                if i + 2 < len(tokens):
+                    be_token = tokens[i + 1]
+                    pp_token = tokens[i + 2]
+                    if (self._is_be_verb_spacy(be_token) and
+                        self._is_past_participle_spacy(pp_token)):
+                        result.update({
+                            'found': True,
+                            'be_verb': f"{current_token.text} {be_token.text}",
+                            'past_participle': pp_token.text,
+                            'confidence': 0.95
+                        })
+                        break
+        
+        # 2. by句の検出（受動態が見つかった場合のみ）
+        if result['found']:
+            by_agent = self._detect_by_agent_phrase_complete(tokens, sentence)
+            if by_agent:
+                result['by_agent'] = by_agent
+                result['confidence'] = min(result['confidence'] + 0.05, 1.0)
+        
+        return result
+    
+    def _is_be_verb_spacy(self, token) -> bool:
+        """spaCyベースのbe動詞判定"""
+        # lemma（原型）がbeで、助動詞タグ
+        return (token.lemma_.lower() == 'be' and 
+                token.pos_ in ['AUX', 'VERB'])
+    
+    def _is_past_participle_spacy(self, token) -> bool:
+        """spaCyベースの過去分詞判定"""
+        # 1. タグベース判定
+        if token.tag_ == 'VBN':  # Past participle
+            return True
+        
+        # 2. 形態論的パターン判定（be動詞直後の文脈）
+        if token.pos_ == 'ADJ':
+            return self._has_past_participle_morphology_spacy(token.text)
+        
+        # 3. 動詞の過去分詞形
+        if token.pos_ == 'VERB' and token.tag_ == 'VBN':
+            return True
+        
+        return False
+    
+    def _has_past_participle_morphology_spacy(self, text: str) -> bool:
+        """形態論的過去分詞パターン（語尾分析）"""
+        text_lower = text.lower()
+        
+        # 規則動詞の-ed語尾
+        if text_lower.endswith('ed') and len(text_lower) > 3:
+            # 純粋な形容詞を除外
+            if not text_lower.endswith(('red', 'ded', 'eed', 'ted')):
+                return True
+        
+        # -en語尾（broken, chosen等）
+        if text_lower.endswith('en') and len(text_lower) > 3:
+            if not text_lower.endswith(('tten', 'sten', 'chen', 'len')):
+                return True
+        
+        # 特徴的な過去分詞語尾
+        past_participle_endings = ['ated', 'ized', 'ified', 'ected', 'ested']
+        return any(text_lower.endswith(ending) for ending in past_participle_endings)
+    
+    def _detect_by_agent_phrase_complete(self, tokens: List, sentence: str) -> str:
+        """by句（行為者）の完全検出"""
+        by_phrase = ""
+        
+        for i, token in enumerate(tokens):
+            if token.text.lower() == 'by' and token.pos_ == 'ADP':
+                # by以降の名詞句を抽出
+                phrase_parts = ['by']
+                for j in range(i + 1, min(i + 5, len(tokens))):  # 最大4語まで拡張
+                    next_token = tokens[j]
+                    if next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON']:
+                        phrase_parts.append(next_token.text)
+                    elif next_token.pos_ == 'PUNCT':  # 句読点で終了
+                        break
+                    else:
+                        # その他の品詞でも短い語は含める（the, a等）
+                        if len(next_token.text) <= 3:
+                            phrase_parts.append(next_token.text)
+                        else:
+                            break
+                
+                if len(phrase_parts) > 1:
+                    by_phrase = ' '.join(phrase_parts)
+                    break
+        
+        return by_phrase
 
 if __name__ == "__main__":
     main()
