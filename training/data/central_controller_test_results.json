@@ -1,61 +1,7 @@
 {
   "total_tests": 5,
-  "successes": 3,
-  "failures": [
-    {
-      "test_id": 4,
-      "sentence": "The book which lies there is mine.",
-      "expected_main": {
-        "S": "",
-        "V": "is",
-        "C1": "mine"
-      },
-      "actual_main": {
-        "S": "",
-        "V": "is",
-        "C1": "mine"
-      },
-      "expected_sub": {
-        "sub-s": "The book which",
-        "sub-v": "lies",
-        "sub-m2": "there",
-        "_parent_slot": "S"
-      },
-      "actual_sub": {
-        "sub-v": "runs",
-        "sub-m2": "fast",
-        "sub-s": "The man who",
-        "_parent_slot": "S"
-      }
-    },
-    {
-      "test_id": 5,
-      "sentence": "The person that works here is kind.",
-      "expected_main": {
-        "S": "",
-        "V": "is",
-        "C1": "kind"
-      },
-      "actual_main": {
-        "S": "",
-        "V": "is",
-        "C1": "kind",
-        "M2": "here"
-      },
-      "expected_sub": {
-        "sub-s": "The person that",
-        "sub-v": "works",
-        "sub-m2": "here",
-        "_parent_slot": "S"
-      },
-      "actual_sub": {
-        "sub-v": "lies",
-        "sub-m2": "there",
-        "sub-s": "The book which",
-        "_parent_slot": "S"
-      }
-    }
-  ],
+  "successes": 5,
+  "failures": [],
   "details": [
     {
       "test_id": 1,
@@ -290,9 +236,9 @@
     {
       "test_id": 4,
       "sentence": "The book which lies there is mine.",
-      "success": false,
+      "success": true,
       "main_match": true,
-      "sub_match": false,
+      "sub_match": true,
       "result": {
         "Slot": [
           "S",
@@ -330,9 +276,9 @@
           "C1": "mine"
         },
         "sub_slots": {
-          "sub-v": "runs",
-          "sub-m2": "fast",
-          "sub-s": "The man who",
+          "sub-v": "lies",
+          "sub-m2": "there",
+          "sub-s": "The book which",
           "_parent_slot": "S"
         },
         "slots": {
@@ -398,9 +344,9 @@
     {
       "test_id": 5,
       "sentence": "The person that works here is kind.",
-      "success": false,
-      "main_match": false,
-      "sub_match": false,
+      "success": true,
+      "main_match": true,
+      "sub_match": true,
       "result": {
         "Slot": [
           "S",
@@ -435,20 +381,18 @@
         "main_slots": {
           "S": "",
           "V": "is",
-          "C1": "kind",
-          "M2": "here"
+          "C1": "kind"
         },
         "sub_slots": {
-          "sub-v": "lies",
-          "sub-m2": "there",
-          "sub-s": "The book which",
+          "sub-v": "works",
+          "sub-m2": "here",
+          "sub-s": "The person that",
           "_parent_slot": "S"
         },
         "slots": {
           "S": "",
           "V": "is",
-          "C1": "kind",
-          "M2": "here"
+          "C1": "kind"
         },
         "pattern_detected": "SVC",
         "confidence": 0.9,

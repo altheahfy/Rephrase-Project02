@@ -159,6 +159,10 @@ class DynamicGrammarMapper:
         Returns:
             Dict[str, Any]: Rephraseスロット構造
         """
+        # 🔧 累積バグ修正: 新しい分析開始時にlast_unified_resultをリセット
+        if allow_unified:
+            self.last_unified_result = None
+        
         # ChatGPT5 Step A: Re-entrancy Guard
         if not allow_unified:
             self._analysis_depth += 1

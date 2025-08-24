@@ -6,6 +6,7 @@
 """
 
 from dynamic_grammar_mapper import DynamicGrammarMapper
+from central_controller import CentralController
 import json
 import os
 import argparse
@@ -143,8 +144,10 @@ def run_official_test_with_selected_cases(selected_cases):
     """選択されたテストケースで正式テストを実行"""
     print("✅ spaCy動的文法認識システム初期化完了")
     
-    # DynamicGrammarMapperを初期化
+    # DynamicGrammarMapperを初期化してからCentral Controllerに渡す
     mapper = DynamicGrammarMapper()
+    controller = CentralController(mapper)
+    print("🎯 Central Controller初期化: Phase 2: Precision Enhancement Controller")
     print("🔥 Phase 1.0 ハンドラー管理システム初期化完了: 4個のハンドラーがアクティブ")
     print("   アクティブハンドラー: basic_five_pattern, relative_clause, passive_voice, auxiliary_complex")
     
@@ -170,8 +173,8 @@ def run_official_test_with_selected_cases(selected_cases):
         print(f"テスト {test_id} ({grammar_type}): {sentence}")
         
         try:
-            # dynamic_grammar_mapper.pyに直接入力
-            result = mapper.analyze_sentence(sentence)
+            # Central Controllerで分析実行
+            result = controller.analyze_sentence(sentence)
             
             # compare_results.pyが期待する形式で保存
             results["results"][test_id] = {

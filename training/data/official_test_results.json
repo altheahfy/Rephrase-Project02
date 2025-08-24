@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-24T23:11:26.120744",
+  "timestamp": "2025-08-24T23:30:38.894717",
   "total_tests": 24,
   "results": {
     "1": {
@@ -508,9 +508,9 @@
           "C1": "mine"
         },
         "sub_slots": {
-          "sub-v": "runs",
-          "sub-m2": "fast",
-          "sub-s": "The man who",
+          "sub-v": "lies",
+          "sub-m2": "there",
+          "sub-s": "The book which",
           "_parent_slot": "S"
         },
         "slots": {
@@ -624,20 +624,18 @@
         "main_slots": {
           "S": "",
           "V": "is",
-          "C1": "kind",
-          "M2": "here"
+          "C1": "kind"
         },
         "sub_slots": {
-          "sub-v": "lies",
-          "sub-m2": "there",
-          "sub-s": "The book which",
+          "sub-v": "works",
+          "sub-m2": "here",
+          "sub-s": "The person that",
           "_parent_slot": "S"
         },
         "slots": {
           "S": "",
           "V": "is",
-          "C1": "kind",
-          "M2": "here"
+          "C1": "kind"
         },
         "pattern_detected": "SVC",
         "confidence": 0.9,
@@ -748,11 +746,10 @@
           "C1": "expensive"
         },
         "sub_slots": {
-          "sub-v": "works",
-          "sub-s": "The person that",
+          "sub-v": "bought",
+          "sub-s": "I",
           "sub-o1": "The book which",
-          "_parent_slot": "S",
-          "sub-m2": "here"
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -868,9 +865,9 @@
           "C1": "tall"
         },
         "sub_slots": {
-          "sub-v": "bought",
+          "sub-v": "met",
           "sub-s": "I",
-          "sub-o1": "The book which",
+          "sub-o1": "The man whom",
           "_parent_slot": "S"
         },
         "slots": {
@@ -987,9 +984,9 @@
           "C1": "new"
         },
         "sub_slots": {
-          "sub-v": "met",
-          "sub-s": "I",
-          "sub-o1": "The man whom",
+          "sub-v": "drives",
+          "sub-s": "he",
+          "sub-o1": "The car that",
           "_parent_slot": "S"
         },
         "slots": {
@@ -1106,11 +1103,10 @@
           "M2": "here"
         },
         "sub_slots": {
-          "sub-v": "drives",
-          "sub-s": "he",
+          "sub-v": "is",
+          "sub-s": "The man whose car",
           "sub-c1": "red",
-          "_parent_slot": "S",
-          "sub-o1": "The car that"
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1226,11 +1222,10 @@
           "C1": "smart"
         },
         "sub_slots": {
-          "sub-v": "is",
+          "sub-v": "borrowed",
           "sub-o1": "The student whose book",
-          "sub-s": "The man whose car",
-          "_parent_slot": "S",
-          "sub-c1": "red"
+          "sub-s": "I",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1345,10 +1340,9 @@
           "C1": "my neighbor"
         },
         "sub_slots": {
-          "sub-v": "borrowed",
-          "sub-s": "I",
-          "_parent_slot": "S",
-          "sub-o1": "The student whose book"
+          "sub-v": "barks",
+          "sub-s": "The woman whose dog",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1466,9 +1460,9 @@
           "M3": "academically"
         },
         "sub_slots": {
-          "sub-v": "barks",
+          "sub-v": "studies",
           "sub-m2": "diligently",
-          "sub-s": "The woman whose dog",
+          "sub-s": "The student who",
           "_parent_slot": "S"
         },
         "slots": {
@@ -1591,21 +1585,19 @@
           "S": "",
           "Aux": "is",
           "V": "respected",
-          "M2": "efficiently",
-          "M3": "greatly"
+          "M2": "greatly"
         },
         "sub_slots": {
-          "sub-v": "studies",
-          "sub-s": "The student who",
-          "sub-m2": "diligently",
+          "sub-v": "runs",
+          "sub-s": "The teacher whose class",
+          "sub-m2": "efficiently",
           "_parent_slot": "S"
         },
         "slots": {
           "S": "",
           "Aux": "is",
           "V": "respected",
-          "M2": "efficiently",
-          "M3": "greatly"
+          "M2": "greatly"
         },
         "pattern_detected": "SV",
         "confidence": 0.9,
@@ -1721,21 +1713,19 @@
           "S": "",
           "V": "saves",
           "O1": "lives",
-          "M2": "carefully",
-          "M3": "successfully"
+          "M2": "successfully"
         },
         "sub_slots": {
-          "sub-v": "runs",
-          "sub-m2": "efficiently",
-          "sub-s": "The teacher whose class",
+          "sub-v": "works",
+          "sub-m2": "carefully",
+          "sub-s": "The doctor who",
           "_parent_slot": "S"
         },
         "slots": {
           "S": "",
           "V": "saves",
           "O1": "lives",
-          "M2": "carefully",
-          "M3": "successfully"
+          "M2": "successfully"
         },
         "pattern_detected": "SVO",
         "confidence": 0.9,
@@ -1852,10 +1842,8 @@
           "M3": "red"
         },
         "sub_slots": {
-          "sub-s": "The doctor who",
-          "_parent_slot": "S",
-          "sub-v": "works",
-          "sub-m2": "carefully"
+          "sub-s": "The car which",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1978,10 +1966,8 @@
           "Aux": "was"
         },
         "sub_slots": {
-          "sub-s": "The car which",
-          "_parent_slot": "S",
-          "sub-aux": "was",
-          "sub-v": "crashed"
+          "sub-s": "The book that",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -2105,7 +2091,7 @@
           "Aux": "was"
         },
         "sub_slots": {
-          "sub-s": "The book that",
+          "sub-s": "The letter which",
           "_parent_slot": "S"
         },
         "slots": {
@@ -2232,9 +2218,7 @@
           "V": "written",
           "M2": "by John"
         },
-        "sub_slots": {
-          "sub-s": "The letter which"
-        },
+        "sub_slots": {},
         "slots": {
           "S": "The letter",
           "Aux": "was",
