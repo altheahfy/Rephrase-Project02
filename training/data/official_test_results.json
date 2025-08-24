@@ -1,4 +1,6 @@
 {
+  "timestamp": "2025-08-24T11:19:29.893307",
+  "total_tests": 17,
   "results": {
     "1": {
       "sentence": "The car is red.",
@@ -57,9 +59,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "基本5文型",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
     "2": {
@@ -119,9 +121,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "基本5文型",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
     "55": {
@@ -172,9 +174,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 2,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "基本5文型",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
     "58": {
@@ -234,9 +236,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "基本5文型",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
     "64": {
@@ -305,9 +307,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 4,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "基本5文型",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
     "3": {
@@ -321,7 +323,8 @@
         "sub_slots": {
           "sub-s": "The man who",
           "sub-v": "runs",
-          "sub-m2": "fast"
+          "sub-m2": "fast",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -363,7 +366,8 @@
         "sub_slots": {
           "sub-v": "runs",
           "sub-m2": "fast",
-          "sub-s": "The man who"
+          "sub-s": "The man who",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -375,9 +379,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "4": {
@@ -391,7 +395,8 @@
         "sub_slots": {
           "sub-s": "The book which",
           "sub-v": "lies",
-          "sub-m2": "there"
+          "sub-m2": "there",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -433,7 +438,8 @@
         "sub_slots": {
           "sub-v": "lies",
           "sub-m2": "there",
-          "sub-s": "The book which"
+          "sub-s": "The book which",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -445,9 +451,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "5": {
@@ -461,7 +467,8 @@
         "sub_slots": {
           "sub-s": "The person that",
           "sub-v": "works",
-          "sub-m2": "here"
+          "sub-m2": "here",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -503,7 +510,8 @@
         "sub_slots": {
           "sub-v": "works",
           "sub-m2": "here",
-          "sub-s": "The person that"
+          "sub-s": "The person that",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -515,9 +523,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "6": {
@@ -531,7 +539,8 @@
         "sub_slots": {
           "sub-o1": "The book which",
           "sub-s": "I",
-          "sub-v": "bought"
+          "sub-v": "bought",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -573,7 +582,8 @@
         "sub_slots": {
           "sub-v": "bought",
           "sub-s": "I",
-          "sub-o1": "The book which"
+          "sub-o1": "The book which",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -585,9 +595,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "7": {
@@ -601,7 +611,8 @@
         "sub_slots": {
           "sub-o1": "The man whom",
           "sub-s": "I",
-          "sub-v": "met"
+          "sub-v": "met",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -643,7 +654,8 @@
         "sub_slots": {
           "sub-v": "met",
           "sub-s": "I",
-          "sub-o1": "The man whom"
+          "sub-o1": "The man whom",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -655,9 +667,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "8": {
@@ -671,7 +683,8 @@
         "sub_slots": {
           "sub-o1": "The car that",
           "sub-s": "he",
-          "sub-v": "drives"
+          "sub-v": "drives",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -713,7 +726,8 @@
         "sub_slots": {
           "sub-v": "drives",
           "sub-s": "he",
-          "sub-o1": "The car that"
+          "sub-o1": "The car that",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -725,9 +739,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "12": {
@@ -741,63 +755,25 @@
         "sub_slots": {
           "sub-s": "The man whose car",
           "sub-v": "is",
-          "sub-c1": "red"
+          "sub-c1": "red",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M2"
-        ],
-        "SlotPhrase": [
-          "",
-          "lives",
-          "here"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          9
-        ],
-        "display_order": [
-          1,
-          3,
-          9
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "sub_slots": {
-          "sub-v": "is",
-          "sub-s": "The man whose car",
-          "sub-c1": "red"
-        },
-        "slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
+        "main_slots": {},
+        "sub_slots": {},
+        "slots": {},
+        "error": "maximum recursion depth exceeded",
+        "sentence": "The man whose car is red lives here.",
+        "analysis_method": "dynamic_grammar"
       },
-      "test_type": "関係節",
+      "test_type": "relative_whose",
       "status": "success"
     },
     "13": {
@@ -811,7 +787,8 @@
         "sub_slots": {
           "sub-o1": "The student whose book",
           "sub-s": "I",
-          "sub-v": "borrowed"
+          "sub-v": "borrowed",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -853,7 +830,8 @@
         "sub_slots": {
           "sub-v": "borrowed",
           "sub-o1": "The student whose book",
-          "sub-s": "I"
+          "sub-s": "I",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -865,9 +843,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_whose",
       "status": "success"
     },
     "14": {
@@ -880,7 +858,8 @@
         },
         "sub_slots": {
           "sub-s": "The woman whose dog",
-          "sub-v": "barks"
+          "sub-v": "barks",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -921,7 +900,8 @@
         },
         "sub_slots": {
           "sub-v": "barks",
-          "sub-s": "The woman whose dog"
+          "sub-s": "The woman whose dog",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -933,9 +913,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_whose",
       "status": "success"
     },
     "34": {
@@ -950,7 +930,8 @@
         "sub_slots": {
           "sub-s": "The student who",
           "sub-v": "studies",
-          "sub-m2": "diligently"
+          "sub-m2": "diligently",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -992,7 +973,8 @@
         "sub_slots": {
           "sub-v": "studies",
           "sub-m2": "diligently",
-          "sub-s": "The student who"
+          "sub-s": "The student who",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1004,9 +986,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     },
     "35": {
@@ -1021,7 +1003,8 @@
         "sub_slots": {
           "sub-s": "The teacher whose class",
           "sub-v": "runs",
-          "sub-m2": "efficiently"
+          "sub-m2": "efficiently",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
@@ -1070,7 +1053,8 @@
         "sub_slots": {
           "sub-v": "runs",
           "sub-s": "The teacher whose class",
-          "sub-m2": "efficiently"
+          "sub-m2": "efficiently",
+          "_parent_slot": "S"
         },
         "slots": {
           "S": "",
@@ -1083,9 +1067,9 @@
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 4,
         "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "sentence_type_confidence": 0.8
       },
-      "test_type": "関係節",
+      "test_type": "relative_whose",
       "status": "success"
     },
     "36": {
@@ -1100,71 +1084,25 @@
         "sub_slots": {
           "sub-s": "The doctor who",
           "sub-v": "works",
-          "sub-m2": "carefully"
+          "sub-m2": "carefully",
+          "_parent_slot": "S"
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "M2"
-        ],
-        "SlotPhrase": [
-          "",
-          "saves",
-          "lives",
-          "successfully"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          9
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          9
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "sub_slots": {
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "sub-s": "The doctor who"
-        },
-        "slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.9
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
+        "main_slots": {},
+        "sub_slots": {},
+        "slots": {},
+        "error": "maximum recursion depth exceeded",
+        "sentence": "The doctor who works carefully saves lives successfully.",
+        "analysis_method": "dynamic_grammar"
       },
-      "test_type": "関係節",
+      "test_type": "relative_clause",
       "status": "success"
     }
   }
