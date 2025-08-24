@@ -68,6 +68,12 @@ class DynamicGrammarMapper:
         self.handler_shared_context = {}  # ハンドラー間情報共有
         self.handler_success_count = {}  # ハンドラー成功統計
         
+        # ChatGPT5診断: 再入ガード対策
+        self._analysis_depth = 0  # 解析深度カウンタ（無限ループ防止）
+        
+        # ChatGPT5 Step C: Token Consumption Tracking - 使用済みトークン管理
+        self._consumed_tokens = set()  # トークンインデックスのセット
+        
         # 基本ハンドラーの初期化
         self._initialize_basic_handlers()
         
@@ -139,16 +145,27 @@ class DynamicGrammarMapper:
             'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
         }
     
-    def analyze_sentence(self, sentence: str) -> Dict[str, Any]:
+    def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
         文章を動的に解析してRephraseスロット構造を生成
         
         Args:
             sentence (str): 解析対象の文章
+            allow_unified (bool): 統合ハンドラー処理の許可（再帰防止用）
             
         Returns:
             Dict[str, Any]: Rephraseスロット構造
         """
+        # ChatGPT5 Step A: Re-entrancy Guard
+        if not allow_unified:
+            self._analysis_depth += 1
+            if self._analysis_depth > 3:  # 深度制限
+                self.logger.warning(f"分析深度制限に達しました: {self._analysis_depth}")
+                return self._create_error_result(sentence, "recursion_depth_exceeded")
+        else:
+            # ChatGPT5 Step C: Token Consumption Tracking - 新しい分析開始時にリセット
+            self._consumed_tokens = set()
+        
         try:
             # 🆕 Phase 1.2: 文型認識
             # sentence_type = self.sentence_type_detector.detect_sentence_type(sentence)  # 一時的にコメント化
@@ -190,31 +207,35 @@ class DynamicGrammarMapper:
             rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
             
             # 🔥 Phase 2: 統合ハンドラーシステム実行（受動態・助動詞・副詞処理）
-            try:
-                unified_result = self._unified_mapping(sentence, doc)
-                if unified_result and 'slots' in unified_result:
-                    # 統合ハンドラーの結果をマージ（優先度順）
-                    for slot_name, slot_value in unified_result['slots'].items():
-                        if slot_value:  # 空でない値のみマージ
-                            # 受動態・助動詞ハンドラーのV/Auxスロットは優先
-                            if slot_name in ['V', 'Aux'] and 'passive_voice' in str(unified_result.get('grammar_info', {})):
-                                rephrase_result['slots'][slot_name] = slot_value
-                                rephrase_result['main_slots'][slot_name] = slot_value
-                                print(f"🔥 統合ハンドラー優先マージ: {slot_name} = '{slot_value}'")
-                            # その他のスロットは既存値がない場合のみ
-                            elif not rephrase_result['slots'].get(slot_name):
-                                rephrase_result['slots'][slot_name] = slot_value
-                                rephrase_result['main_slots'][slot_name] = slot_value
-                    
-                    # 文法情報もマージ
-                    if 'grammar_info' in unified_result:
-                        if 'unified_handlers' not in rephrase_result:
-                            rephrase_result['unified_handlers'] = {}
-                        rephrase_result['unified_handlers'] = unified_result['grammar_info']
+            if allow_unified:  # ChatGPT5 Step A: Re-entrancy Guard
+                try:
+                    unified_result = self._unified_mapping(sentence, doc)
+                    if unified_result and 'slots' in unified_result:
+                        # 統合ハンドラーの結果をマージ（優先度順）
+                        for slot_name, slot_value in unified_result['slots'].items():
+                            if slot_value:  # 空でない値のみマージ
+                                # ChatGPT5 Step D: 受動態ハンドラーは全スロット優先（Aux, V, M）
+                                if 'passive_voice' in str(unified_result.get('grammar_info', {})):
+                                    rephrase_result['slots'][slot_name] = slot_value
+                                    rephrase_result['main_slots'][slot_name] = slot_value
+                                    print(f"🔥 受動態優先マージ: {slot_name} = '{slot_value}'")
+                                # その他のスロットは既存値がない場合のみ
+                                elif not rephrase_result['slots'].get(slot_name):
+                                    rephrase_result['slots'][slot_name] = slot_value
+                                    rephrase_result['main_slots'][slot_name] = slot_value
                         
-                print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
-            except Exception as e:
-                self.logger.error(f"統合ハンドラーシステムエラー: {e}")
+                        # 文法情報もマージ
+                        if 'grammar_info' in unified_result:
+                            if 'unified_handlers' not in rephrase_result:
+                                rephrase_result['unified_handlers'] = {}
+                            rephrase_result['unified_handlers'] = unified_result['grammar_info']
+                        
+                        # ChatGPT5 Step D: Token consumptionベースで重複スロット削除
+                        self._cleanup_duplicate_slots_by_consumption(rephrase_result, doc)
+                            
+                    print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
+                except Exception as e:
+                    self.logger.error(f"統合ハンドラーシステムエラー: {e}")
             
             # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation) - 後続処理として保持
             try:
@@ -235,6 +256,46 @@ class DynamicGrammarMapper:
         except Exception as e:
             self.logger.error(f"動的文法解析エラー: {e}")
             return self._create_error_result(sentence, str(e))
+        finally:
+            # ChatGPT5 Step A: Re-entrancy Guard - カウンターリセット
+            if not allow_unified and hasattr(self, '_analysis_depth'):
+                self._analysis_depth = max(0, self._analysis_depth - 1)
+    
+    def _cleanup_duplicate_slots_by_consumption(self, rephrase_result: Dict, doc) -> None:
+        """
+        ChatGPT5 Step D: Token consumptionベースで重複スロットを削除
+        """
+        if not hasattr(self, '_consumed_tokens') or not self._consumed_tokens:
+            return
+            
+        slots_to_remove = []
+        
+        # 各スロットの値がconsumed tokenに対応するかチェック
+        for slot_name, slot_value in rephrase_result['slots'].items():
+            if not slot_value:
+                continue
+                
+            # スロット値に含まれるトークンがconsumedかチェック
+            slot_tokens = str(slot_value).split()
+            slot_token_indices = []
+            
+            for slot_token in slot_tokens:
+                for token in doc:
+                    if token.text == slot_token:
+                        slot_token_indices.append(token.i)
+                        break
+            
+            # すべてのトークンがconsumedならスロット削除対象
+            if slot_token_indices and all(idx in self._consumed_tokens for idx in slot_token_indices):
+                # ただし、consumedトークンを設定した元のスロットは保持
+                if slot_name not in ['M1']:  # M1='by John'は保持
+                    slots_to_remove.append(slot_name)
+                    print(f"🔥 ChatGPT5 Step D: Removing duplicate slot {slot_name}='{slot_value}' (consumed tokens)")
+        
+        # 重複スロット削除
+        for slot_name in slots_to_remove:
+            rephrase_result['slots'].pop(slot_name, None)
+            rephrase_result['main_slots'].pop(slot_name, None)
     
     def _extract_tokens(self, doc) -> List[Dict]:
         """spaCyドキュメントからトークン情報を抽出"""
@@ -1475,6 +1536,11 @@ class DynamicGrammarMapper:
             
             for token in doc:
                 if token.pos_ == 'ADV':
+                    # ChatGPT5 Step C: 消費済みトークンをスキップ
+                    if hasattr(self, '_consumed_tokens') and token.i in self._consumed_tokens:
+                        print(f"🔥 ChatGPT5 Step C: Adverb handler skipping consumed token {token.i}='{token.text}'")
+                        continue
+                        
                     # サブスロット内の副詞は除外（語単位の一致）
                     if token.text not in sub_words:
                         adverbs.append({
@@ -2597,7 +2663,7 @@ class DynamicGrammarMapper:
             'relative_clause',        # 関係節  
             'passive_voice',          # 受動態
             'auxiliary_complex',      # 助動詞
-            'adverbial_modifier',     # 副詞・修飾語 (Phase 2追加)
+            # 'adverbial_modifier',   # 副詞・修飾語 (未実装のため一時削除)
         ]
         
         for handler in basic_handlers:
@@ -2623,302 +2689,6 @@ class DynamicGrammarMapper:
         """アクティブハンドラー一覧"""
         return self.active_handlers.copy()
     
-    def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
-        """
-        ハンドラー結果をベース結果にマージ
-        
-        Args:
-            base_result: ベース結果
-            handler_result: ハンドラー処理結果  
-            handler_name: ハンドラー名
-        """
-        # スロット情報マージ
-        if 'slots' in handler_result:
-            for slot_name, slot_data in handler_result['slots'].items():
-                if slot_name not in base_result['slots']:
-                    base_result['slots'][slot_name] = slot_data
-                else:
-                    # 競合解決：空文字や空値で既存の有効な値を上書きしない
-                    existing_value = base_result['slots'][slot_name]
-                    
-                    # 既存値が空で新値が有効な場合は上書き
-                    if not existing_value and slot_data:
-                        base_result['slots'][slot_name] = slot_data
-                    # 既存値が有効で新値も有効な場合は後勝ち
-                    elif existing_value and slot_data:
-                        base_result['slots'][slot_name] = slot_data
-                    # 既存値が有効で新値が空の場合は保持
-                    elif existing_value and not slot_data:
-                        pass  # 既存値を保持
-                    # 両方空の場合は後勝ち
-                    else:
-                        base_result['slots'][slot_name] = slot_data
-        
-        # サブスロット情報マージ
-        if 'sub_slots' in handler_result:
-            for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
-                base_result['sub_slots'][sub_slot_name] = sub_slot_data
-        
-        # 文法情報記録
-        if 'grammar_info' in handler_result:
-            grammar_info = handler_result['grammar_info']
-            if 'handler_contributions' not in base_result['grammar_info']:
-                base_result['grammar_info']['handler_contributions'] = {}
-            base_result['grammar_info']['handler_contributions'][handler_name] = grammar_info
-            
-            # 検出パターン追加
-            if 'patterns' in grammar_info:
-                if 'detected_patterns' not in base_result['grammar_info']:
-                    base_result['grammar_info']['detected_patterns'] = []
-                base_result['grammar_info']['detected_patterns'].extend(grammar_info['patterns'])
-        
-        return base_result
-
-    def _unified_mapping(self, sentence: str, doc) -> Dict[str, Any]:
-        """
-        統合マッピング処理 (from Stanza Asset Migration)
-        
-        全アクティブハンドラーが同時実行
-        各ハンドラーは独立してspaCy解析結果を処理
-        """
-        result = {
-            'sentence': sentence,
-            'slots': {},
-            'sub_slots': {},
-            'grammar_info': {
-                'detected_patterns': [],
-                'handler_contributions': {},
-                'control_flags': {}  # ハンドラー制御フラグ
-            }
-        }
-        
-        self.logger.debug(f"Unified mapping開始: {len(self.active_handlers)} handlers active")
-        
-        # ハンドラー間共有コンテキスト初期化
-        self.handler_shared_context = {
-            'predefined_slots': {},        # 事前確定スロット
-            'remaining_elements': {},      # 残り要素情報
-            'handler_metadata': {}         # ハンドラー別メタデータ
-        }
-        
-        # ハンドラー実行順序の制御
-        ordered_handlers = self._get_ordered_handlers()
-        
-        # 全アクティブハンドラーの同時実行（順序制御付き）
-        for handler_name in ordered_handlers:
-            try:
-                # ハンドラー制御フラグをチェック
-                control_flags = result.get('grammar_info', {}).get('control_flags', {})
-                if self._should_skip_handler(handler_name, control_flags):
-                    self.logger.debug(f"🚫 Handler スキップ: {handler_name} (制御フラグ)")
-                    continue
-                
-                print(f"🎯 Handler実行: {handler_name}")
-                self.logger.debug(f"Handler実行: {handler_name}")
-                
-                # 将来のハンドラーメソッド実装用プレースホルダー
-                # handler_method = getattr(self, f'_handle_{handler_name}', None)
-                # if handler_method:
-                #     handler_result = handler_method(doc, result, self.handler_shared_context)
-                #     if handler_result:
-                #         result = self._merge_handler_results(result, handler_result, handler_name)
-                
-                # 現在は既存のanalyze_sentenceロジックを統合使用
-                if handler_name == 'basic_five_pattern':
-                    # 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
-                    legacy_result = self._analyze_sentence_legacy(sentence, doc)
-                    if legacy_result and 'slots' in legacy_result:
-                        for slot_name, slot_value in legacy_result['slots'].items():
-                            if slot_value:  # 空でない値のみ
-                                result['slots'][slot_name] = slot_value
-                    
-                    # 成功カウント
-                    self.handler_success_count[handler_name] = \
-                        self.handler_success_count.get(handler_name, 0) + 1
-                
-                elif handler_name == 'passive_voice':
-                    # 受動態ハンドラー (Phase 2実装)
-                    print(f"🔍 Executing passive_voice handler for: {sentence}")
-                    passive_result = self._handle_passive_voice(sentence, doc, result)
-                    print(f"🔍 Passive voice handler result: {passive_result}")
-                    if passive_result:
-                        result = self._merge_handler_results(result, passive_result, handler_name)
-                        print(f"🔍 Merged result after passive voice: {result}")
-                        self.handler_success_count[handler_name] = \
-                            self.handler_success_count.get(handler_name, 0) + 1
-                    else:
-                        print(f"🔍 Passive voice handler returned None")
-                
-                elif handler_name == 'adverbial_modifier':
-                    # 副詞・修飾語ハンドラー (Phase 2実装)
-                    print(f"🔍 Executing adverbial_modifier handler for: {sentence}")
-                    adverb_result = self._handle_adverbial_modifier(sentence, doc, result)
-                    print(f"🔍 Adverb handler result: {adverb_result}")
-                    if adverb_result:
-                        result = self._merge_handler_results(result, adverb_result, handler_name)
-                        print(f"🔍 Merged result: {result}")
-                        self.handler_success_count[handler_name] = \
-                            self.handler_success_count.get(handler_name, 0) + 1
-                    else:
-                        print(f"🔍 Adverb handler returned None")
-                        
-            except Exception as e:
-                self.logger.warning(f"Handler error ({handler_name}): {e}")
-                continue
-        
-        return result
-    
-    def _should_skip_handler(self, handler_name: str, control_flags: Dict) -> bool:
-        """ハンドラーをスキップすべきかチェック"""
-        # 将来の制御フラグ処理用
-        return False
-    
-    def _get_ordered_handlers(self) -> List[str]:
-        """ハンドラーの実行順序を制御"""
-        priority_order = [
-            'relative_clause',          # 関係節優先
-            'passive_voice',            # 受動態
-            'auxiliary_complex',        # 助動詞
-            'adverbial_modifier',       # 副詞・修飾語
-            'basic_five_pattern',       # 基本5文型（最後）
-        ]
-        
-        # アクティブハンドラーのうち、優先順位に従って並び替え
-        ordered = []
-        for handler in priority_order:
-            if handler in self.active_handlers:
-                ordered.append(handler)
-        
-        # 優先順位にないアクティブハンドラーを追加
-        for handler in self.active_handlers:
-            if handler not in ordered:
-                ordered.append(handler)
-        
-        return ordered
-    
-    def _analyze_sentence_legacy(self, sentence: str, doc) -> Dict:
-        """既存のanalyze_sentenceロジックをラップ"""
-        # 既存のanalyze_sentenceメソッドを呼び出し、結果を返す
-        # 現在は既存システムと統合ハンドラーシステムの橋渡し役
-        try:
-            return self.analyze_sentence(sentence)
-        except Exception as e:
-            self.logger.error(f"Legacy analysis error: {e}")
-            return {'slots': {}, 'error': str(e)}
-
-# テスト用のメイン関数とテストスイート
-def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
-    """
-    53例文の完全テストを実行
-    
-    Args:
-        test_data_path: テストデータファイルのパス
-        
-    Returns:
-        Dict: テスト結果
-    """
-    import json
-    import os
-    from datetime import datetime
-    
-    if test_data_path is None:
-        test_data_path = os.path.join(
-            os.path.dirname(__file__),
-            "final_test_system",
-            "final_54_test_data.json"
-        )
-    
-    try:
-        with open(test_data_path, 'r', encoding='utf-8') as f:
-            test_data = json.load(f)
-    except FileNotFoundError:
-        print(f"❌ テストデータファイルが見つかりません: {test_data_path}")
-        return {}
-    
-    mapper = DynamicGrammarMapper()
-    results = {
-        "timestamp": datetime.now().isoformat(),
-        "test_system": "dynamic_grammar_mapper",
-        "total_tests": len(test_data["data"]),
-        "successful_tests": 0,
-        "failed_tests": 0,
-        "test_results": {}
-    }
-    
-    print("=== 動的文法認識システム 53例文テスト ===\n")
-    
-    for test_id, test_case in test_data["data"].items():
-        sentence = test_case["sentence"]
-        expected = test_case["expected"]
-        
-        print(f"テスト {test_id}: {sentence}")
-        
-        try:
-            result = mapper.analyze_sentence(sentence)
-            
-            if 'error' in result:
-                print(f"❌ エラー: {result['error']}")
-                results["failed_tests"] += 1
-                status = "ERROR"
-            else:
-                print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
-                print(f"📊 スロット: {result['Slot']}")
-                results["successful_tests"] += 1
-                status = "SUCCESS"
-            
-            results["test_results"][test_id] = {
-                "sentence": sentence,
-                "expected": expected,
-                "actual": result,
-                "status": status
-            }
-            
-        except Exception as e:
-            print(f"❌ 例外エラー: {str(e)}")
-            results["failed_tests"] += 1
-            results["test_results"][test_id] = {
-                "sentence": sentence,
-                "expected": expected,
-                "actual": {"error": str(e)},
-                "status": "EXCEPTION"
-            }
-        
-        print("-" * 60)
-    
-    # 結果サマリー
-    success_rate = results["successful_tests"] / results["total_tests"] * 100
-    print(f"\n=== テスト結果サマリー ===")
-    print(f"総テスト数: {results['total_tests']}")
-    print(f"成功: {results['successful_tests']}")
-    print(f"失敗: {results['failed_tests']}")
-    print(f"成功率: {success_rate:.1f}%")
-    
-    return results
-
-def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
-    """
-    テスト結果をJSONファイルに保存
-    
-    Args:
-        results: テスト結果
-        output_path: 出力ファイルパス（None の場合は自動生成）
-        
-    Returns:
-        str: 保存されたファイルパス
-    """
-    import json
-    from datetime import datetime
-    
-    if output_path is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"dynamic_grammar_test_results_{timestamp}.json"
-    
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-    
-    print(f"📁 テスト結果を保存しました: {output_path}")
-    return output_path
-
     # =================================
     # Phase 2: 受動態ハンドラー実装
     # =================================
@@ -2999,8 +2769,16 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
                     print(f"🔍 by句配置: M3='{by_agent}' (上書き配置)")
             
             # 4. ハンドラー結果構造
-            return {
+            # ChatGPT5 Step C: Mark tokens as consumed for by-phrase
+            consumed_token_indices = []
+            for i, token in enumerate(doc):
+                if by_agent and token.text.lower() in by_agent.lower():
+                    consumed_token_indices.append(i)
+                    self._consumed_tokens.add(i)
+            
+            result = {
                 'slots': slots,
+                'consumed_tokens': consumed_token_indices,  # 使用済みトークンインデックス
                 'grammar_info': {
                     'patterns': [{
                         'type': 'passive_voice',
@@ -3015,6 +2793,11 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
                     'processing_notes': f"Passive voice (Rephrase): be={be_verb}→Aux, pp={past_participle}→V, by句→M(副詞句)"
                 }
             }
+            
+            if consumed_token_indices:
+                print(f"🔥 ChatGPT5 Step C: Passive voice consumed tokens {consumed_token_indices} for '{by_agent}'")
+            
+            return result
             
         except Exception as e:
             self.logger.error(f"受動態ハンドラーエラー: {e}")
@@ -3168,7 +2951,377 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
                     break
         
         return by_phrase
+    
+    # Phase 2 受動態ハンドラー実装終了
+    
+    def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
+        """
+        ハンドラー結果をベース結果にマージ
+        
+        Args:
+            base_result: ベース結果
+            handler_result: ハンドラー処理結果  
+            handler_name: ハンドラー名
+        """
+        # ハンドラー優先度定義（ChatGPT5思考診断による「後勝ち上書き」対策）
+        handler_priority = {
+            'passive_voice': 10,      # 受動態は最高優先度
+            'relative_clause': 9,     # 関係節
+            'auxiliary_complex': 8,   # 助動詞
+            'basic_five_pattern': 1   # 基本5文型は最低優先度
+        }
+        
+        current_priority = handler_priority.get(handler_name, 5)
+        
+        # スロット情報マージ
+        if 'slots' in handler_result:
+            for slot_name, slot_data in handler_result['slots'].items():
+                if slot_name not in base_result['slots']:
+                    base_result['slots'][slot_name] = slot_data
+                    # ChatGPT5 Step B: Slot Provenance Tracking
+                    if 'slot_provenance' not in base_result:
+                        base_result['slot_provenance'] = {}
+                    base_result['slot_provenance'][slot_name] = {
+                        'handler': handler_name,
+                        'priority': current_priority,
+                        'value': slot_data
+                    }
+                else:
+                    # 競合解決：優先度による保護
+                    existing_value = base_result['slots'][slot_name]
+                    
+                    # 既存値の優先度チェック（ChatGPT5 Step B: Provenance-based Priority）
+                    existing_priority = 1  # デフォルト
+                    if 'slot_provenance' in base_result and slot_name in base_result['slot_provenance']:
+                        existing_priority = base_result['slot_provenance'][slot_name]['priority']
+                        existing_handler = base_result['slot_provenance'][slot_name]['handler']
+                    else:
+                        # 既存システムのプライオリティチェック（後方互換性）
+                        if 'grammar_info' in base_result and 'handler_contributions' in base_result['grammar_info']:
+                            for prev_handler, _ in base_result['grammar_info']['handler_contributions'].items():
+                                if prev_handler in handler_priority:
+                                    existing_priority = max(existing_priority, handler_priority[prev_handler])
+                                    existing_handler = prev_handler
+                    
+                    # 既存値が空で新値が有効な場合は上書き
+                    if not existing_value and slot_data:
+                        base_result['slots'][slot_name] = slot_data
+                        # ChatGPT5 Step B: Provenance update
+                        if 'slot_provenance' not in base_result:
+                            base_result['slot_provenance'] = {}
+                        base_result['slot_provenance'][slot_name] = {
+                            'handler': handler_name,
+                            'priority': current_priority,
+                            'value': slot_data
+                        }
+                    # 新しいハンドラーの優先度が高い場合のみ上書き
+                    elif current_priority > existing_priority:
+                        print(f"🔥 ChatGPT5 Step B: Slot override - {slot_name}: '{existing_value}' ({existing_handler if 'existing_handler' in locals() else 'unknown'}) → '{slot_data}' ({handler_name})")
+                        base_result['slots'][slot_name] = slot_data
+                        # ChatGPT5 Step B: Provenance update
+                        if 'slot_provenance' not in base_result:
+                            base_result['slot_provenance'] = {}
+                        base_result['slot_provenance'][slot_name] = {
+                            'handler': handler_name,
+                            'priority': current_priority,
+                            'value': slot_data
+                        }
+                    # 優先度が同じ場合は既存値が有効なら保持
+                    elif current_priority == existing_priority and existing_value:
+                        pass  # 既存値を保持
+                    # 既存値が有効で新ハンドラーの優先度が低い場合は保持
+                    elif existing_value and current_priority <= existing_priority:
+                        pass  # 既存値を保持（受動態結果を保護）
+                    # 両方空の場合は後勝ち
+                    elif not existing_value and not slot_data:
+                        base_result['slots'][slot_name] = slot_data
+        
+        # サブスロット情報マージ
+        if 'sub_slots' in handler_result:
+            for sub_slot_name, sub_slot_data in handler_result['sub_slots'].items():
+                base_result['sub_slots'][sub_slot_name] = sub_slot_data
+        
+        # 文法情報記録
+        if 'grammar_info' in handler_result:
+            grammar_info = handler_result['grammar_info']
+            if 'handler_contributions' not in base_result['grammar_info']:
+                base_result['grammar_info']['handler_contributions'] = {}
+            base_result['grammar_info']['handler_contributions'][handler_name] = grammar_info
+            
+            # 検出パターン追加
+            if 'patterns' in grammar_info:
+                if 'detected_patterns' not in base_result['grammar_info']:
+                    base_result['grammar_info']['detected_patterns'] = []
+                base_result['grammar_info']['detected_patterns'].extend(grammar_info['patterns'])
+        
+        return base_result
 
+    def _unified_mapping(self, sentence: str, doc) -> Dict[str, Any]:
+        """
+        統合マッピング処理 (from Stanza Asset Migration)
+        
+        全アクティブハンドラーが同時実行
+        各ハンドラーは独立してspaCy解析結果を処理
+        """
+        result = {
+            'sentence': sentence,
+            'slots': {},
+            'sub_slots': {},
+            'grammar_info': {
+                'detected_patterns': [],
+                'handler_contributions': {},
+                'control_flags': {}  # ハンドラー制御フラグ
+            }
+        }
+        
+        self.logger.debug(f"Unified mapping開始: {len(self.active_handlers)} handlers active")
+        
+        # ハンドラー間共有コンテキスト初期化
+        self.handler_shared_context = {
+            'predefined_slots': {},        # 事前確定スロット
+            'remaining_elements': {},      # 残り要素情報
+            'handler_metadata': {}         # ハンドラー別メタデータ
+        }
+        
+        # ハンドラー実行順序の制御
+        ordered_handlers = self._get_ordered_handlers()
+        
+        # 全アクティブハンドラーの同時実行（順序制御付き）
+        for handler_name in ordered_handlers:
+            try:
+                # ハンドラー制御フラグをチェック
+                control_flags = result.get('grammar_info', {}).get('control_flags', {})
+                if self._should_skip_handler(handler_name, control_flags):
+                    self.logger.debug(f"🚫 Handler スキップ: {handler_name} (制御フラグ)")
+                    continue
+                
+                print(f"🎯 Handler実行: {handler_name}")
+                self.logger.debug(f"Handler実行: {handler_name}")
+                
+                # 将来のハンドラーメソッド実装用プレースホルダー
+                # handler_method = getattr(self, f'_handle_{handler_name}', None)
+                # if handler_method:
+                #     handler_result = handler_method(doc, result, self.handler_shared_context)
+                #     if handler_result:
+                #         result = self._merge_handler_results(result, handler_result, handler_name)
+                
+                # 現在は既存のanalyze_sentenceロジックを統合使用
+                if handler_name == 'basic_five_pattern':
+                    # ChatGPT5 Step C: Token Consumption - 使用済みトークンをフィルタ
+                    filtered_doc_tokens = []
+                    for i, token in enumerate(doc):
+                        if i not in self._consumed_tokens:
+                            filtered_doc_tokens.append(token)
+                    
+                    if len(filtered_doc_tokens) < len(doc):
+                        print(f"🔥 ChatGPT5 Step C: Filtered {len(doc) - len(filtered_doc_tokens)} consumed tokens for basic_five_pattern")
+                    
+                    # 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
+                    legacy_result = self._analyze_sentence_legacy(sentence, doc)
+                    if legacy_result and 'slots' in legacy_result:
+                        for slot_name, slot_value in legacy_result['slots'].items():
+                            if slot_value:  # 空でない値のみ
+                                # ChatGPT5 Step C: 使用済みトークンに関連するスロットはスキップ
+                                should_skip = False
+                                for consumed_idx in self._consumed_tokens:
+                                    if consumed_idx < len(doc) and doc[consumed_idx].text.lower() in str(slot_value).lower():
+                                        print(f"🔥 ChatGPT5 Step C: Skipping slot {slot_name}='{slot_value}' (token {consumed_idx} already consumed)")
+                                        should_skip = True
+                                        break
+                                
+                                if not should_skip:
+                                    result['slots'][slot_name] = slot_value
+                    
+                    # 成功カウント
+                    self.handler_success_count[handler_name] = \
+                        self.handler_success_count.get(handler_name, 0) + 1
+                
+                elif handler_name == 'passive_voice':
+                    # 受動態ハンドラー (Phase 2実装)
+                    print(f"🔍 Executing passive_voice handler for: {sentence}")
+                    passive_result = self._handle_passive_voice(sentence, doc, result)
+                    print(f"🔍 Passive voice handler result: {passive_result}")
+                    if passive_result:
+                        result = self._merge_handler_results(result, passive_result, handler_name)
+                        print(f"🔍 Merged result after passive voice: {result}")
+                        self.handler_success_count[handler_name] = \
+                            self.handler_success_count.get(handler_name, 0) + 1
+                    else:
+                        print(f"🔍 Passive voice handler returned None")
+                
+                elif handler_name == 'adverbial_modifier':
+                    # 副詞・修飾語ハンドラー (Phase 2実装)
+                    print(f"🔍 Executing adverbial_modifier handler for: {sentence}")
+                    adverb_result = self._handle_adverbial_modifier(sentence, doc, result)
+                    print(f"🔍 Adverb handler result: {adverb_result}")
+                    if adverb_result:
+                        result = self._merge_handler_results(result, adverb_result, handler_name)
+                        print(f"🔍 Merged result: {result}")
+                        self.handler_success_count[handler_name] = \
+                            self.handler_success_count.get(handler_name, 0) + 1
+                    else:
+                        print(f"🔍 Adverb handler returned None")
+                        
+            except Exception as e:
+                self.logger.warning(f"Handler error ({handler_name}): {e}")
+                continue
+        
+        return result
+    
+    def _should_skip_handler(self, handler_name: str, control_flags: Dict) -> bool:
+        """ハンドラーをスキップすべきかチェック"""
+        # 将来の制御フラグ処理用
+        return False
+    
+    def _get_ordered_handlers(self) -> List[str]:
+        """ハンドラーの実行順序を制御"""
+        priority_order = [
+            'relative_clause',          # 関係節優先
+            'passive_voice',            # 受動態
+            'auxiliary_complex',        # 助動詞
+            'adverbial_modifier',       # 副詞・修飾語
+            'basic_five_pattern',       # 基本5文型（最後）
+        ]
+        
+        # アクティブハンドラーのうち、優先順位に従って並び替え
+        ordered = []
+        for handler in priority_order:
+            if handler in self.active_handlers:
+                ordered.append(handler)
+        
+        # 優先順位にないアクティブハンドラーを追加
+        for handler in self.active_handlers:
+            if handler not in ordered:
+                ordered.append(handler)
+        
+        return ordered
+    
+    def _analyze_sentence_legacy(self, sentence: str, doc) -> Dict:
+        """既存のanalyze_sentenceロジックをラップ"""
+        # 既存のanalyze_sentenceメソッドを呼び出し、結果を返す
+        # 現在は既存システムと統合ハンドラーシステムの橋渡し役
+        try:
+            # ChatGPT5 Step A: Re-entrancy Guard - 再帰防止のためallow_unified=False
+            return self.analyze_sentence(sentence, allow_unified=False)
+        except Exception as e:
+            self.logger.error(f"Legacy analysis error: {e}")
+            return {'slots': {}, 'error': str(e)}
+
+# テスト用のメイン関数とテストスイート
+def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
+    """
+    53例文の完全テストを実行
+    
+    Args:
+        test_data_path: テストデータファイルのパス
+        
+    Returns:
+        Dict: テスト結果
+    """
+    import json
+    import os
+    from datetime import datetime
+    
+    if test_data_path is None:
+        test_data_path = os.path.join(
+            os.path.dirname(__file__),
+            "final_test_system",
+            "final_54_test_data.json"
+        )
+    
+    try:
+        with open(test_data_path, 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ テストデータファイルが見つかりません: {test_data_path}")
+        return {}
+    
+    mapper = DynamicGrammarMapper()
+    results = {
+        "timestamp": datetime.now().isoformat(),
+        "test_system": "dynamic_grammar_mapper",
+        "total_tests": len(test_data["data"]),
+        "successful_tests": 0,
+        "failed_tests": 0,
+        "test_results": {}
+    }
+    
+    print("=== 動的文法認識システム 53例文テスト ===\n")
+    
+    for test_id, test_case in test_data["data"].items():
+        sentence = test_case["sentence"]
+        expected = test_case["expected"]
+        
+        print(f"テスト {test_id}: {sentence}")
+        
+        try:
+            result = mapper.analyze_sentence(sentence)
+            
+            if 'error' in result:
+                print(f"❌ エラー: {result['error']}")
+                results["failed_tests"] += 1
+                status = "ERROR"
+            else:
+                print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
+                print(f"📊 スロット: {result['Slot']}")
+                results["successful_tests"] += 1
+                status = "SUCCESS"
+            
+            results["test_results"][test_id] = {
+                "sentence": sentence,
+                "expected": expected,
+                "actual": result,
+                "status": status
+            }
+            
+        except Exception as e:
+            print(f"❌ 例外エラー: {str(e)}")
+            results["failed_tests"] += 1
+            results["test_results"][test_id] = {
+                "sentence": sentence,
+                "expected": expected,
+                "actual": {"error": str(e)},
+                "status": "EXCEPTION"
+            }
+        
+        print("-" * 60)
+    
+    # 結果サマリー
+    success_rate = results["successful_tests"] / results["total_tests"] * 100
+    print(f"\n=== テスト結果サマリー ===")
+    print(f"総テスト数: {results['total_tests']}")
+    print(f"成功: {results['successful_tests']}")
+    print(f"失敗: {results['failed_tests']}")
+    print(f"成功率: {success_rate:.1f}%")
+    
+    return results
+
+def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
+    """
+    テスト結果をJSONファイルに保存
+    
+    Args:
+        results: テスト結果
+        output_path: 出力ファイルパス（None の場合は自動生成）
+        
+    Returns:
+        str: 保存されたファイルパス
+    """
+    import json
+    from datetime import datetime
+    
+    if output_path is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"dynamic_grammar_test_results_{timestamp}.json"
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    
+    print(f"📁 テスト結果を保存しました: {output_path}")
+    return output_path
+
+
+# クラス定義終了位置
 
 def main():
     """テスト用メイン関数"""
