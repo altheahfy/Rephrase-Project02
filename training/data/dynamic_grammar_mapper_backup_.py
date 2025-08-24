@@ -77,37 +77,8 @@ class DynamicGrammarMapper:
         # 🔥 Phase 2: 統合ハンドラー結果保存 (サブスロットマージ用)
         self.last_unified_result = None
         
-        # 🎯 Phase 2.5: 中央制御機構 (段階的導入)
-        self.central_controller_enabled = False  # 安全スイッチ
-        self.central_context = {
-            'structure': {
-                'main_sentence': '',
-                'sub_sentences': [],
-                'sentence_hierarchy': {}
-            },
-            'slot_management': {
-                'main_slots': {},
-                'sub_slots': {},
-                'slot_ownership': {},
-                'parent_child_map': {}
-            },
-            'processing': {
-                'current_stage': 'preprocessing',
-                'completed_handlers': [],
-                'active_mode': 'legacy'  # legacy or central
-            }
-        }
-        
         # 基本ハンドラーの初期化
         self._initialize_basic_handlers()
-        
-        # 🎯 中央制御機構の初期化 (安全モード)
-        if self.central_controller_enabled:
-            self.central_controller = CentralHandlerController(self)
-            print("🎯 中央制御機構初期化完了 (有効)")
-        else:
-            self.central_controller = None
-            print("🎯 中央制御機構初期化完了 (無効)")
         
         # ハンドラー管理システムの初期化完了をログ出力
         print(f"🔥 Phase 1.0 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
@@ -188,14 +159,6 @@ class DynamicGrammarMapper:
         Returns:
             Dict[str, Any]: Rephraseスロット構造
         """
-        # 🎯 中央制御機構チェック
-        if hasattr(self, 'central_controller_enabled') and self.central_controller_enabled:
-            if hasattr(self, 'central_controller') and self.central_controller:
-                print("🎯 中央制御機構で処理実行")
-                # docを生成してから中央制御機構に渡す
-                doc = self.nlp(sentence)
-                return self.central_controller.execute_controlled_pipeline(sentence, doc)
-        
         # ChatGPT5 Step A: Re-entrancy Guard
         if not allow_unified:
             self._analysis_depth += 1
@@ -2744,25 +2707,6 @@ class DynamicGrammarMapper:
         """アクティブハンドラー一覧"""
         return self.active_handlers.copy()
     
-    def enable_central_controller(self):
-        """🎯 中央制御機構を有効化 (テスト用)"""
-        try:
-            self.central_controller_enabled = True
-            if not hasattr(self, 'central_controller') or self.central_controller is None:
-                # CentralHandlerControllerクラスの初期化
-                self.central_controller = CentralHandlerController(self)
-            print("🎯 中央制御機構: 有効化")
-            return True
-        except Exception as e:
-            print(f"❌ 中央制御機構有効化エラー: {e}")
-            return False
-    
-    def disable_central_controller(self):
-        """🎯 中央制御機構を無効化 (安全モード)"""
-        self.central_controller_enabled = False
-        print("🎯 中央制御機構: 無効化")
-        return True
-    
     # =================================
     # Phase 2: 関係節ハンドラー実装
     # =================================
@@ -3641,187 +3585,6 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
     
     print(f"📁 テスト結果を保存しました: {output_path}")
     return output_path
-
-
-# ============================================================================
-# 🎯 Phase 2.5: 中央ハンドラー制御機構 (段階的導入)
-# ============================================================================
-
-class CentralHandlerController:
-    """
-    🎯 中央ハンドラー制御機構 (安全導入版)
-    
-    既存システムと並行動作し、段階的に機能を移行
-    """
-    
-    def __init__(self, parent_mapper):
-        self.parent = parent_mapper
-        self.context = {
-            'structure': {
-                'main_sentence': '',
-                'sub_sentences': [],
-                'hierarchy': {}
-            },
-            'processing': {
-                'stage': 'preprocessing',
-                'completed_handlers': [],
-                'handler_results': {}
-            },
-            'slots': {
-                'main_slots': {},
-                'sub_slots': {},
-                'final_result': {}
-            }
-        }
-    
-    def execute_controlled_pipeline(self, sentence: str, doc) -> dict:
-        """
-        🎯 制御された4段階パイプライン実行
-        """
-        try:
-            print(f"🎯 中央制御機構: パイプライン開始 - {sentence}")
-            
-            # Stage 1: 構造分析
-            self._stage1_structure_analysis(sentence, doc)
-            
-            # Stage 2: 文法分析
-            self._stage2_grammar_analysis(sentence, doc)
-            
-            # Stage 3: 基本パターン
-            self._stage3_basic_pattern(sentence, doc)
-            
-            # Stage 4: 統合・確定
-            result = self._stage4_finalization()
-            
-            print(f"🎯 中央制御機構: パイプライン完了")
-            return result
-            
-        except Exception as e:
-            print(f"❌ 中央制御機構エラー: {e}")
-            return self._fallback_to_legacy(sentence, doc)
-    
-    def _stage1_structure_analysis(self, sentence: str, doc):
-        """Stage 1: 構造分析段階"""
-        print(f"🔍 Stage 1: 構造分析開始")
-        
-        # 関係節ハンドラー実行
-        if hasattr(self.parent, '_handle_relative_clause'):
-            rel_result = self.parent._handle_relative_clause(sentence, doc, {})
-            if rel_result and rel_result.get('relative_clause_info'):
-                rel_info = rel_result['relative_clause_info']
-                self.context['structure']['main_sentence'] = rel_info.get('main_sentence', sentence)
-                self.context['structure']['sub_sentences'] = rel_info.get('sub_sentences', [])
-                self.context['processing']['handler_results']['relative_clause'] = rel_result
-                
-                # sub_slotsの情報も保存
-                if 'sub_slots' in rel_result:
-                    self.context['slots']['sub_slots'].update(rel_result['sub_slots'])
-                    print(f"🔍 関係節sub_slots保存: {rel_result['sub_slots']}")
-                
-                print(f"🔍 関係節分析完了: 主文='{self.context['structure']['main_sentence']}', サブ句={len(self.context['structure']['sub_sentences'])}個")
-        
-        print(f"✅ Stage 1: 構造分析完了")
-    
-    def _stage2_grammar_analysis(self, sentence: str, doc):
-        """Stage 2: 文法分析段階"""
-        print(f"🔍 Stage 2: 文法分析開始")
-        
-        # 受動態ハンドラー実行（スコープ限定）
-        if hasattr(self.parent, '_handle_passive_voice'):
-            # 中央制御からの関係節情報を渡す
-            current_result = {
-                'relative_clause_info': {
-                    'found': bool(self.context['structure']['sub_sentences']),
-                    'main_sentence': self.context['structure']['main_sentence'],
-                    'sub_sentences': self.context['structure']['sub_sentences']
-                }
-            }
-            
-            passive_result = self.parent._handle_passive_voice(sentence, doc, current_result)
-            if passive_result:
-                # 結果をマージ
-                self.context['slots']['main_slots'].update(passive_result.get('slots', {}))
-                self.context['slots']['sub_slots'].update(passive_result.get('sub_slots', {}))
-                self.context['processing']['handler_results']['passive_voice'] = passive_result
-                print(f"🔍 受動態分析完了: main={len(passive_result.get('slots', {}))}, sub={len(passive_result.get('sub_slots', {}))}")
-        
-        print(f"✅ Stage 2: 文法分析完了")
-    
-    def _stage3_basic_pattern(self, sentence: str, doc):
-        """Stage 3: 基本パターン段階"""
-        print(f"🔍 Stage 3: 基本パターン開始")
-        
-        # 主文のみで5文型分析
-        main_sentence = self.context['structure']['main_sentence'] or sentence
-        print(f"🔍 5文型対象: '{main_sentence}'")
-        
-        # 中央制御機構を一時的に無効化してレガシー分析を実行
-        original_flag = self.parent.central_controller_enabled
-        self.parent.central_controller_enabled = False
-        
-        try:
-            # 主文の基本5文型分析を実行
-            main_doc = self.parent.nlp(main_sentence)
-            legacy_result = self.parent._analyze_sentence_legacy(main_sentence, main_doc)
-            
-            print(f"🔍 Legacy分析結果: {legacy_result}")
-            
-            # 主文の結果をmain_slotsに格納
-            if legacy_result and 'slots' in legacy_result:
-                self.context['slots']['main_slots'].update(legacy_result['slots'])
-                print(f"🔍 5文型分析結果: {legacy_result['slots']}")
-            else:
-                print(f"❌ Legacy分析失敗または結果なし")
-        
-        finally:
-            # フラグを元に戻す
-            self.parent.central_controller_enabled = original_flag
-        
-        print(f"✅ Stage 3: 基本パターン完了")
-    
-    def _stage4_finalization(self) -> dict:
-        """Stage 4: 統合・確定段階"""
-        print(f"🔍 Stage 4: 統合・確定開始")
-        
-        # 親子関係自動設定
-        for i, sub_sentence in enumerate(self.context['structure']['sub_sentences']):
-            # 親スロット自動判定（簡易版）
-            parent_slot = 'S'  # デフォルト
-            self.context['slots']['sub_slots']['_parent_slot'] = parent_slot
-        
-        # 🎯 Rephrase大原則: サブスロットに要素が入った上位スロットは空文字にする
-        main_slots = self.context['slots']['main_slots'].copy()
-        sub_slots = self.context['slots']['sub_slots']
-        
-        # sub-s があれば main_slots の S を空文字にする
-        if 'sub-s' in sub_slots and sub_slots['sub-s']:
-            if 'S' in main_slots:
-                print(f"🎯 Rephrase大原則適用: S='{main_slots['S']}' → S='' (sub-s存在のため)")
-                main_slots['S'] = ''
-        
-        # 同様に他のスロットペアも処理（必要に応じて拡張）
-        if 'sub-v' in sub_slots and sub_slots['sub-v']:
-            if 'V' in main_slots:
-                # sub-vがある場合は通常main Vを保持（関係節内の動詞のため）
-                pass
-        
-        # 最終結果生成
-        final_result = {
-            'main_slots': main_slots,
-            'sub_slots': sub_slots,
-            'central_controller': True,
-            'processing_stages': list(self.context['processing']['completed_handlers'])
-        }
-        
-        print(f"✅ Stage 4: 統合・確定完了")
-        print(f"🎯 最終結果: main_slots={final_result['main_slots']}, sub_slots={final_result['sub_slots']}")
-        
-        return final_result
-    
-    def _fallback_to_legacy(self, sentence: str, doc) -> dict:
-        """レガシーシステムへのフォールバック"""
-        print(f"🔄 レガシーシステムにフォールバック")
-        return self.parent._analyze_sentence_legacy(sentence, doc)
 
 
 # クラス定義終了位置
