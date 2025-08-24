@@ -3938,6 +3938,9 @@ class CentralHandlerController:
                 # sub-vがある場合は通常main Vを保持（関係節内の動詞のため）
                 pass
         
+        # 🔧 Phase 2.1: 副詞重複問題の解決
+        main_slots = self._resolve_adverb_duplication_central(main_slots, sub_slots)
+        
         # 最終結果生成
         final_result = {
             'main_slots': main_slots,
@@ -3950,6 +3953,37 @@ class CentralHandlerController:
         print(f"🎯 最終結果: main_slots={final_result['main_slots']}, sub_slots={final_result['sub_slots']}")
         
         return final_result
+    
+    def _resolve_adverb_duplication_central(self, main_slots: dict, sub_slots: dict) -> dict:
+        """
+        Phase 2.1: 中央制御機構での副詞重複問題解決
+        
+        Args:
+            main_slots (dict): メインスロット
+            sub_slots (dict): サブスロット
+            
+        Returns:
+            dict: 副詞重複を解決したメインスロット
+        """
+        # サブスロットに副詞が存在する場合、メインスロットから同じ副詞を削除
+        adverb_slots = ['M1', 'M2', 'M3']
+        sub_adverb_slots = ['sub-m1', 'sub-m2', 'sub-m3']
+        
+        for i, adverb_slot in enumerate(adverb_slots):
+            sub_adverb_slot = sub_adverb_slots[i]
+            
+            # サブスロットに副詞が存在し、メインスロットにも同じ値がある場合
+            if (sub_adverb_slot in sub_slots and 
+                adverb_slot in main_slots and
+                sub_slots[sub_adverb_slot] == main_slots[adverb_slot]):
+                
+                print(f"🔧 副詞重複解決: {adverb_slot}='{main_slots[adverb_slot]}' をメインスロットから削除 (sub-slot存在)")
+                
+                # メインスロットから削除
+                main_slots.pop(adverb_slot, None)
+        
+        print(f"🎯 副詞重複解決完了: main_slots={main_slots}")
+        return main_slots
     
     def _fallback_to_legacy(self, sentence: str, doc) -> dict:
         """レガシーシステムへのフォールバック"""
