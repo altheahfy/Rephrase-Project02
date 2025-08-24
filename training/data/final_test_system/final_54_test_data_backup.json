@@ -39,8 +39,7 @@
         "sub_slots": {
           "sub-s": "The man who",
           "sub-v": "runs",
-          "sub-m2": "fast",
-          "_parent_slot": "S"
+          "sub-m2": "fast"
         }
       }
     },
@@ -55,8 +54,7 @@
         "sub_slots": {
           "sub-s": "The book which",
           "sub-v": "lies",
-          "sub-m2": "there",
-          "_parent_slot": "S"
+          "sub-m2": "there"
         }
       }
     },
@@ -71,8 +69,7 @@
         "sub_slots": {
           "sub-s": "The person that",
           "sub-v": "works",
-          "sub-m2": "here",
-          "_parent_slot": "S"
+          "sub-m2": "here"
         }
       }
     },
@@ -87,8 +84,7 @@
         "sub_slots": {
           "sub-o1": "The book which",
           "sub-s": "I",
-          "sub-v": "bought",
-          "_parent_slot": "S"
+          "sub-v": "bought"
         }
       }
     },
@@ -103,8 +99,7 @@
         "sub_slots": {
           "sub-o1": "The man whom",
           "sub-s": "I",
-          "sub-v": "met",
-          "_parent_slot": "S"
+          "sub-v": "met"
         }
       }
     },
@@ -119,8 +114,7 @@
         "sub_slots": {
           "sub-o1": "The car that",
           "sub-s": "he",
-          "sub-v": "drives",
-          "_parent_slot": "S"
+          "sub-v": "drives"
         }
       }
     },
@@ -135,8 +129,7 @@
         "sub_slots": {
           "sub-s": "The car which",
           "sub-aux": "was",
-          "sub-v": "crashed",
-          "_parent_slot": "S"
+          "sub-v": "crashed"
         }
       }
     },
@@ -151,8 +144,7 @@
         "sub_slots": {
           "sub-s": "The book that",
           "sub-aux": "was",
-          "sub-v": "written",
-          "_parent_slot": "S"
+          "sub-v": "written"
         }
       }
     },
@@ -166,8 +158,7 @@
         "sub_slots": {
           "sub-s": "The letter which",
           "sub-aux": "was",
-          "sub-v": "sent",
-          "_parent_slot": "S"
+          "sub-v": "sent"
         }
       }
     },
@@ -182,8 +173,7 @@
         "sub_slots": {
           "sub-s": "The man whose car",
           "sub-v": "is",
-          "sub-c1": "red",
-          "_parent_slot": "S"
+          "sub-c1": "red"
         }
       }
     },
@@ -198,8 +188,7 @@
         "sub_slots": {
           "sub-o1": "The student whose book",
           "sub-s": "I",
-          "sub-v": "borrowed",
-          "_parent_slot": "S"
+          "sub-v": "borrowed"
         }
       }
     },
@@ -213,8 +202,7 @@
         },
         "sub_slots": {
           "sub-s": "The woman whose dog",
-          "sub-v": "barks",
-          "_parent_slot": "S"
+          "sub-v": "barks"
         }
       }
     },
@@ -229,8 +217,7 @@
         "sub_slots": {
           "sub-m2": "The place where",
           "sub-s": "we",
-          "sub-v": "met",
-          "_parent_slot": "S"
+          "sub-v": "met"
         }
       }
     },
@@ -245,8 +232,7 @@
         "sub_slots": {
           "sub-m2": "The time when",
           "sub-s": "he",
-          "sub-v": "arrived",
-          "_parent_slot": "S"
+          "sub-v": "arrived"
         }
       }
     },
@@ -261,8 +247,7 @@
         "sub_slots": {
           "sub-m2": "The reason why",
           "sub-s": "she",
-          "sub-v": "left",
-          "_parent_slot": "S"
+          "sub-v": "left"
         }
       }
     },
@@ -278,8 +263,7 @@
           "sub-m2": "The way how",
           "sub-s": "he",
           "sub-v": "solved",
-          "sub-o1": "it",
-          "_parent_slot": "S"
+          "sub-o1": "it"
         }
       }
     },
@@ -295,8 +279,7 @@
           "sub-o1": "The book",
           "sub-s": "I",
           "sub-v": "read",
-          "sub-m2": "yesterday",
-          "_parent_slot": "S"
+          "sub-m2": "yesterday"
         }
       }
     },
@@ -449,8 +432,7 @@
           "sub-v": "written",
           "sub-aux": "was",
           "sub-m2": "carefully",
-          "sub-m3": "by Shakespeare",
-          "_parent_slot": "S"
+          "sub-m3": "by Shakespeare"
         }
       }
     },
@@ -467,8 +449,7 @@
           "sub-v": "repaired",
           "sub-aux": "was",
           "sub-m2": "quickly",
-          "sub-m3": "yesterday",
-          "_parent_slot": "S"
+          "sub-m3": "yesterday"
         }
       }
     },
@@ -485,8 +466,7 @@
           "sub-v": "typed",
           "sub-aux": "was",
           "sub-m2": "slowly",
-          "sub-m3": "by the secretary",
-          "_parent_slot": "S"
+          "sub-m3": "by the secretary"
         }
       }
     },
@@ -502,8 +482,7 @@
         "sub_slots": {
           "sub-s": "The student who",
           "sub-v": "studies",
-          "sub-m2": "diligently",
-          "_parent_slot": "S"
+          "sub-m2": "diligently"
         }
       }
     },
@@ -519,8 +498,7 @@
         "sub_slots": {
           "sub-s": "The teacher whose class",
           "sub-v": "runs",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
+          "sub-m2": "efficiently"
         }
       }
     },
@@ -536,8 +514,7 @@
         "sub_slots": {
           "sub-s": "The doctor who",
           "sub-v": "works",
-          "sub-m2": "carefully",
-          "_parent_slot": "S"
+          "sub-m2": "carefully"
         }
       }
     },
@@ -592,8 +569,7 @@
           "sub-s": "The house whose roof",
           "sub-aux": "was",
           "sub-v": "damaged",
-          "sub-m2": "badly",
-          "_parent_slot": "S"
+          "sub-m2": "badly"
         }
       }
     },
@@ -609,8 +585,7 @@
           "sub-s": "we",
           "sub-v": "met",
           "sub-m2": "The place where",
-          "sub-m3": "accidentally",
-          "_parent_slot": "S"
+          "sub-m3": "accidentally"
         }
       }
     },
@@ -626,8 +601,7 @@
           "sub-s": "everything",
           "sub-v": "changed",
           "sub-m2": "The time when",
-          "sub-m3": "dramatically",
-          "_parent_slot": "S"
+          "sub-m3": "dramatically"
         }
       }
     },
@@ -685,8 +659,7 @@
           "sub-aux": "was",
           "sub-v": "reviewed",
           "sub-m2": "thoroughly",
-          "sub-m3": "by experts",
-          "_parent_slot": "S"
+          "sub-m3": "by experts"
         }
       }
     },
@@ -702,8 +675,7 @@
           "sub-s": "The student whose essay",
           "sub-aux": "was",
           "sub-v": "corrected",
-          "sub-m2": "carefully",
-          "_parent_slot": "S"
+          "sub-m2": "carefully"
         }
       }
     },
@@ -720,8 +692,7 @@
           "sub-s": "The machine that",
           "sub-aux": "was",
           "sub-v": "maintained",
-          "sub-m2": "properly",
-          "_parent_slot": "S"
+          "sub-m2": "properly"
         }
       }
     },
@@ -737,8 +708,7 @@
         },
         "sub_slots": {
           "sub-v": "the team working",
-          "sub-m2": "overtime",
-          "_parent_slot": "S"
+          "sub-m2": "overtime"
         }
       }
     },
@@ -754,8 +724,7 @@
         "sub_slots": {
           "sub-v": "the woman standing",
           "sub-m2": "quietly",
-          "sub-m3": "near the door",
-          "_parent_slot": "S"
+          "sub-m3": "near the door"
         }
       }
     },
@@ -771,8 +740,7 @@
         "sub_slots": {
           "sub-v": "the children playing",
           "sub-m2": "happily",
-          "sub-m3": "in the garden",
-          "_parent_slot": "S"
+          "sub-m3": "in the garden"
         }
       }
     },
@@ -788,8 +756,7 @@
         "sub_slots": {
           "sub-aux": "The documents being",
           "sub-v": "reviewed",
-          "sub-m2": "thoroughly",
-          "_parent_slot": "S"
+          "sub-m2": "thoroughly"
         }
       }
     },
@@ -806,8 +773,7 @@
           "sub-s": "The artist whose paintings",
           "sub-aux": "were",
           "sub-v": "exhibited",
-          "sub-m2": "internationally",
-          "_parent_slot": "S"
+          "sub-m2": "internationally"
         }
       }
     },
