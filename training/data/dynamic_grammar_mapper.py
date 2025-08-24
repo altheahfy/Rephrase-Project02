@@ -2695,7 +2695,12 @@ class DynamicGrammarMapper:
     
     def _handle_passive_voice(self, sentence: str, doc, current_result: Dict) -> Optional[Dict]:
         """
-        受動態ハンドラー (spaCyベース・ハードコーディング回避)
+        受動態ハンドラー (関係節対応2段階処理)
+        
+        🎯 設計仕様: 全ハンドラー共通の関係節対応アーキテクチャ
+        1. 関係節分離情報を取得
+        2. 主文とサブ句を別々に受動態処理
+        3. 結果を適切なスロット（main_slots/sub_slots）に配置
         
         人間的認識パターン:
         - be動詞 + 過去分詞 → 受動態
@@ -2705,86 +2710,182 @@ class DynamicGrammarMapper:
         Rephraseルール:
         - be動詞: Aux スロットに配置（受動態のbe動詞はAuxに配置）
         - 過去分詞: V スロットに配置
-        - by句: M1/M2/M3 スロットに配置（修飾語優先度による）
+        - by句: M2 スロットに配置（Rephrase副詞ルール：単独副詞句→M2）
         """
         try:
-            # 1. 受動態パターン検出
-            passive_pattern = self._detect_passive_voice_pattern(doc, sentence)
+            print(f"🔍 Executing passive_voice handler for: {sentence}")
             
-            if not passive_pattern['found']:
+            # 🎯 Step 1: 関係節分離情報の取得
+            relative_info = current_result.get('relative_clause_info', {})
+            main_sentence = relative_info.get('main_sentence', sentence)
+            sub_sentences = relative_info.get('sub_sentences', [])
+            
+            result_slots = {}
+            result_sub_slots = current_result.get('sub_slots', {})
+            consumed_tokens = []
+            
+            print(f"🔍 関係節分離: 主文='{main_sentence}', サブ句={len(sub_sentences)}個")
+            
+            # 🎯 Step 2a: 主文の受動態処理
+            main_passive = self._detect_passive_in_text(main_sentence, doc)
+            if main_passive and main_passive['found']:
+                print(f"🔥 主文受動態検出: {main_passive['be_verb']} + {main_passive['past_participle']}")
+                main_slots = self._create_passive_slots(main_passive)
+                result_slots.update(main_slots)
+                
+                # Token consumption for main sentence
+                if main_passive.get('by_agent'):
+                    main_consumed = self._get_tokens_for_phrase(main_passive['by_agent'], doc)
+                    consumed_tokens.extend(main_consumed)
+            
+            # 🎯 Step 2b: サブ句の受動態処理
+            for i, sub_sentence in enumerate(sub_sentences):
+                sub_passive = self._detect_passive_in_text(sub_sentence, doc)
+                if sub_passive and sub_passive['found']:
+                    print(f"🔥 サブ句{i+1}受動態検出: {sub_passive['be_verb']} + {sub_passive['past_participle']}")
+                    
+                    # サブスロットに配置
+                    if sub_passive['be_verb']:
+                        result_sub_slots[f'sub-aux'] = sub_passive['be_verb']
+                    if sub_passive['past_participle']:
+                        result_sub_slots[f'sub-v'] = sub_passive['past_participle']
+                    if sub_passive.get('by_agent'):
+                        result_sub_slots[f'sub-m2'] = sub_passive['by_agent']
+                        
+                        # Token consumption for sub sentence
+                        sub_consumed = self._get_tokens_for_phrase(sub_passive['by_agent'], doc)
+                        consumed_tokens.extend(sub_consumed)
+            
+            # 結果がない場合はNone
+            if not result_slots and not any(key.startswith('sub-') for key in result_sub_slots.keys() if key not in current_result.get('sub_slots', {})):
                 print(f"🔍 受動態パターン未検出: {sentence}")
                 return None
             
-            # 2. 構成要素の抽出
-            be_verb = passive_pattern['be_verb']
-            past_participle = passive_pattern['past_participle']
-            by_agent = passive_pattern.get('by_agent', '')
-            confidence = passive_pattern['confidence']
-            
-            print(f"🔥 受動態検出: '{be_verb}' + '{past_participle}' (by: '{by_agent}', 信頼度: {confidence:.2f})")
-            
-            # 3. Rephraseスロット構造生成
-            slots = {}
-            
-            # Rephraseスロット分解：be動詞はAuxに配置
-            if ' ' in be_verb:  # "will be"のような場合
-                aux_parts = be_verb.split()
-                if len(aux_parts) == 2:
-                    # 助動詞 + be動詞の場合：助動詞を優先してAuxに配置
-                    slots['Aux'] = aux_parts[0]  # will
-                    slots['V'] = past_participle  # written
-                    # be動詞は過去分詞と組み合わせて表現
-                    print(f"🔍 助動詞+be構成: Aux='{aux_parts[0]}', V='{past_participle}' (be動詞内包)")
-                else:
-                    # 複雑な場合は全体をAuxに配置
-                    slots['Aux'] = be_verb
-                    slots['V'] = past_participle
-            else:
-                # 単純なbe動詞の場合：be動詞をAuxに配置（Rephrase仕様）
-                slots['Aux'] = be_verb  # is, was, are, were
-                slots['V'] = past_participle  # written, done, etc.
-            
-            print(f"🔍 Rephrase受動態構成: Aux='{slots.get('Aux', '')}', V='{slots['V']}'")
-            
-            # M スロット: by句の配置（Rephrase仕様：「～によって」全体が副詞句）
-            if by_agent:
-                # Rephrase副詞配置ルール: 単独副詞句はM2に配置
-                # （複数副詞がある場合は副詞ハンドラーが後で調整）
-                slots['M2'] = by_agent  # "by John" 全体を副詞句としてM2配置
-                print(f"🔍 by句配置: M2='{by_agent}' (Rephrase副詞ルール：単独副詞句→M2)")
-            
-            # 4. ハンドラー結果構造
-            # ChatGPT5 Step C: Mark tokens as consumed for by-phrase
-            consumed_token_indices = []
-            for i, token in enumerate(doc):
-                if by_agent and token.text.lower() in by_agent.lower():
-                    consumed_token_indices.append(i)
-                    self._consumed_tokens.add(i)
-            
-            result = {
-                'slots': slots,
-                'consumed_tokens': consumed_token_indices,  # 使用済みトークンインデックス
+            # 🎯 統合結果の準備
+            return {
+                'slots': result_slots,
+                'sub_slots': result_sub_slots, 
+                'consumed_tokens': consumed_tokens,
                 'grammar_info': {
                     'patterns': [{
-                        'type': 'passive_voice',
-                        'be_verb': be_verb,
-                        'past_participle': past_participle,
-                        'by_agent': by_agent,
-                        'confidence': confidence,
-                        'detection_method': 'spacy_morphological',
-                        'rephrase_allocation': f"Aux='{slots.get('Aux', '')}', V='{slots['V']}', M(by句)='{by_agent}'"
+                        'type': 'passive_voice_2stage',
+                        'main_sentence': main_sentence,
+                        'sub_sentences_count': len(sub_sentences),
+                        'detection_method': '関係節対応2段階処理',
+                        'rephrase_allocation': 'be→Aux, past_participle→V, by句→M2'
                     }],
                     'handler_success': True,
-                    'processing_notes': f"Passive voice (Rephrase): be={be_verb}→Aux, pp={past_participle}→V, by句→M(副詞句)"
+                    'processing_notes': f"Passive voice 2-stage: main={bool(result_slots)}, sub={len([k for k in result_sub_slots if k.startswith('sub-')])}"
                 }
             }
+        
+        except Exception as e:
+            self.logger.error(f"受動態ハンドラーエラー: {e}")
+            return None
+    
+    def _detect_passive_in_text(self, text: str, doc) -> Dict[str, Any]:
+        """
+        🎯 関係節対応2段階処理用：特定テキスト内の受動態検出
+        
+        Args:
+            text: 検査対象テキスト（主文またはサブ句）
+            doc: spaCy解析済み文書（全体）
+        
+        Returns:
+            Dict: 受動態検出結果
+        """
+        try:
+            # テキストが空の場合は検出なし
+            if not text.strip():
+                return {'found': False}
             
-            if consumed_token_indices:
-                print(f"🔥 ChatGPT5 Step C: Passive voice consumed tokens {consumed_token_indices} for '{by_agent}'")
+            # 指定テキストのspaCy解析
+            text_doc = self.nlp(text.strip())
             
-            return result
+            # 既存の検出ロジックを使用
+            return self._detect_passive_voice_pattern(text_doc, text)
             
         except Exception as e:
+            self.logger.error(f"テキスト内受動態検出エラー: {e}")
+            return {'found': False}
+    
+    def _create_passive_slots(self, passive_info: Dict) -> Dict[str, str]:
+        """
+        🎯 関係節対応2段階処理用：受動態情報からスロット生成
+        
+        Args:
+            passive_info: 受動態検出結果
+        
+        Returns:
+            Dict: Rephraseスロット構造
+        """
+        slots = {}
+        
+        if not passive_info.get('found', False):
+            return slots
+        
+        be_verb = passive_info.get('be_verb', '')
+        past_participle = passive_info.get('past_participle', '')
+        by_agent = passive_info.get('by_agent', '')
+        
+        # Rephraseスロット分解：be動詞はAuxに配置
+        if ' ' in be_verb:  # "will be"のような場合
+            aux_parts = be_verb.split()
+            if len(aux_parts) == 2:
+                # 助動詞 + be動詞の場合：助動詞を優先してAuxに配置
+                slots['Aux'] = aux_parts[0]  # will
+                slots['V'] = past_participle  # written
+                print(f"🔍 助動詞+be構成: Aux='{aux_parts[0]}', V='{past_participle}' (be動詞内包)")
+            else:
+                # 複雑な場合は全体をAuxに配置
+                slots['Aux'] = be_verb
+                slots['V'] = past_participle
+        else:
+            # 単純なbe動詞の場合：be動詞をAuxに配置（Rephrase仕様）
+            slots['Aux'] = be_verb  # is, was, are, were
+            slots['V'] = past_participle  # written, done, etc.
+        
+        # M スロット: by句の配置（Rephrase仕様：「～によって」全体が副詞句）
+        if by_agent:
+            # Rephrase副詞配置ルール: 単独副詞句はM2に配置
+            slots['M2'] = by_agent  # "by John" 全体を副詞句としてM2配置
+            print(f"🔍 by句配置: M2='{by_agent}' (Rephrase副詞ルール：単独副詞句→M2)")
+        
+        return slots
+    
+    def _get_tokens_for_phrase(self, phrase: str, doc) -> List[int]:
+        """
+        🎯 関係節対応2段階処理用：フレーズに対応するトークンインデックス取得
+        
+        Args:
+            phrase: 対象フレーズ（例: "by John"）
+            doc: spaCy解析済み文書
+        
+        Returns:
+            List[int]: 対応するトークンインデックスリスト
+        """
+        consumed_indices = []
+        
+        if not phrase:
+            return consumed_indices
+        
+        try:
+            # フレーズの単語を空白で分割
+            phrase_words = phrase.lower().split()
+            
+            for i, token in enumerate(doc):
+                if token.text.lower() in phrase_words:
+                    consumed_indices.append(i)
+                    self._consumed_tokens.add(i)
+            
+            if consumed_indices:
+                print(f"🔥 Token consumption: インデックス {consumed_indices} for フレーズ '{phrase}'")
+            
+            return consumed_indices
+            
+        except Exception as e:
+            self.logger.error(f"トークン取得エラー: {e}")
+            return consumed_indices
             self.logger.error(f"受動態ハンドラーエラー: {e}")
             return None
     
