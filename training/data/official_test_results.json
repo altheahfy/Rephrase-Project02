@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-24T11:19:29.893307",
+  "timestamp": "2025-08-24T13:17:39.768562",
   "total_tests": 17,
   "results": {
     "1": {
@@ -760,18 +760,58 @@
         }
       },
       "analysis_result": {
-        "Slot": [],
-        "SlotPhrase": [],
-        "Slot_display_order": [],
-        "display_order": [],
-        "PhraseType": [],
-        "SubslotID": [],
-        "main_slots": {},
-        "sub_slots": {},
-        "slots": {},
-        "error": "maximum recursion depth exceeded",
-        "sentence": "The man whose car is red lives here.",
-        "analysis_method": "dynamic_grammar"
+        "Slot": [
+          "S",
+          "V",
+          "M2"
+        ],
+        "SlotPhrase": [
+          "",
+          "lives",
+          "here"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          9
+        ],
+        "display_order": [
+          1,
+          3,
+          9
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-v": "is",
+          "sub-s": "The man whose car",
+          "sub-c1": "red",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
       },
       "test_type": "relative_whose",
       "status": "success"
@@ -1089,18 +1129,74 @@
         }
       },
       "analysis_result": {
-        "Slot": [],
-        "SlotPhrase": [],
-        "Slot_display_order": [],
-        "display_order": [],
-        "PhraseType": [],
-        "SubslotID": [],
-        "main_slots": {},
-        "sub_slots": {},
-        "slots": {},
-        "error": "maximum recursion depth exceeded",
-        "sentence": "The doctor who works carefully saves lives successfully.",
-        "analysis_method": "dynamic_grammar"
+        "Slot": [
+          "O1",
+          "S",
+          "M3",
+          "V",
+          "M2"
+        ],
+        "SlotPhrase": [
+          "The doctor",
+          "",
+          "saves",
+          "lives",
+          "successfully"
+        ],
+        "Slot_display_order": [
+          4,
+          1,
+          10,
+          3,
+          9
+        ],
+        "display_order": [
+          4,
+          1,
+          10,
+          3,
+          9
+        ],
+        "PhraseType": [
+          "名詞句",
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "O1": "The doctor",
+          "S": "",
+          "M3": "saves",
+          "V": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-v": "works",
+          "sub-m2": "carefully",
+          "sub-s": "The doctor who",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "O1": "The doctor",
+          "S": "",
+          "M3": "saves",
+          "V": "lives",
+          "M2": "successfully"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
       },
       "test_type": "relative_clause",
       "status": "success"
