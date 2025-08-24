@@ -55,7 +55,7 @@ class DynamicGrammarMapper:
         """初期化"""
         try:
             self.nlp = spacy.load("en_core_web_sm")
-            print("✅ spaCy動的文法認識システム初期化完了")
+            print("spaCy動的文法認識システム初期化完了")
         except OSError:
             print("❌ spaCy英語モデルが見つかりません")
             raise
@@ -77,8 +77,8 @@ class DynamicGrammarMapper:
         # 🔥 Phase 2: 統合ハンドラー結果保存 (サブスロットマージ用)
         self.last_unified_result = None
         
-        # 🎯 Phase 2.5: 中央制御機構 (段階的導入)
-        self.central_controller_enabled = False  # 安全スイッチ
+        # 🎯 Phase 2.5: 中央制御機構 (本格運用開始 - 2025年8月24日)
+        self.central_controller_enabled = True  # 標準システムとして運用
         self.central_context = {
             'structure': {
                 'main_sentence': '',
@@ -104,7 +104,7 @@ class DynamicGrammarMapper:
         # 🎯 中央制御機構の初期化 (安全モード)
         if self.central_controller_enabled:
             self.central_controller = CentralHandlerController(self)
-            print("🎯 中央制御機構初期化完了 (有効)")
+            print("中央制御機構初期化完了 (有効)")
         else:
             self.central_controller = None
             print("🎯 中央制御機構初期化完了 (無効)")
@@ -1048,8 +1048,13 @@ class DynamicGrammarMapper:
             if (token['pos'] in ['NOUN', 'PROPN', 'PRON'] or 
                 token['tag'] in ['DT', 'PRP', 'PRP$', 'WP']):
                 subject_indices.insert(0, i)  # 順序を保つため前に挿入
+                # 🔧 修正: 連続する主語要素のみ収集し、境界で停止しない
+                # 例: "The tall man" → 全て主語として収集
+            elif not subject_indices:
+                # まだ主語要素が見つかっていない場合は継続
+                continue
             else:
-                # 主語の境界に到達
+                # 主語要素が既に見つかっており、非主語要素に遭遇 → 主語の境界
                 break
         
         return subject_indices
@@ -1563,12 +1568,51 @@ class DynamicGrammarMapper:
 
     def _detect_and_assign_adverbs_direct(self, doc, current_result: Dict) -> Dict:
         """
-        直接的な副詞検出と配置 (Phase 2簡易実装)
+        Enhanced Adverb Precision System統合版
         
-        Rephraseルール（正しい理解）:
-        - 1個: M2
-        - 2個: 動詞より前 → M1,M2 / 動詞より後 → M2,M3
-        - 3個: M1, M2, M3 (位置順)
+        Phase A副詞配置精密化：
+        - spaCy依存構造解析による正確な動詞特定
+        - 複合副詞句（"very carefully"）の統合処理
+        - 時間副詞（"Yesterday"）の正確な検出
+        - 動詞位置ベースのM1/M2/M3配置
+        
+        🔧 重要: 処理前にM1/M2/M3を完全クリア
+        """
+        try:
+            # 🔧 ステップ0: M1/M2/M3の完全クリア（処理前）
+            for k in ('M1', 'M2', 'M3'):
+                current_result.get('main_slots', {}).pop(k, None)
+                current_result.get('slots', {}).pop(k, None)
+            
+            # Enhanced Adverb Precision Systemを使用
+            from enhanced_adverb_precision_system import EnhancedAdverbSystem
+            
+            enhanced_system = EnhancedAdverbSystem()
+            
+            # 文の復元（docから）
+            sentence = ' '.join([token.text for token in doc])
+            
+            # 精密副詞解析実行
+            enhanced_result = enhanced_system.analyze_adverb_precision(sentence, current_result)
+            
+            if enhanced_result:
+                print(f"🔥 Enhanced Adverb System結果: {enhanced_result}")
+                return enhanced_result
+            
+            # フォールバック: 既存システム
+            return self._detect_and_assign_adverbs_direct_fallback(doc, current_result)
+            
+        except ImportError:
+            # Enhanced systemが利用できない場合は既存システム使用
+            print("🔍 Enhanced Adverb System利用不可、既存システム使用")
+            return self._detect_and_assign_adverbs_direct_fallback(doc, current_result)
+        except Exception as e:
+            self.logger.error(f"Enhanced副詞処理エラー: {e}")
+            return self._detect_and_assign_adverbs_direct_fallback(doc, current_result)
+
+    def _detect_and_assign_adverbs_direct_fallback(self, doc, current_result: Dict) -> Dict:
+        """
+        フォールバック: 既存の副詞検出システム（元のロジック保持）
         """
         try:
             # spaCyから副詞を抽出 (関係節処理は既存システムに任せる)
@@ -1675,7 +1719,7 @@ class DynamicGrammarMapper:
             return result
             
         except Exception as e:
-            self.logger.error(f"直接副詞処理エラー: {e}")
+            self.logger.error(f"フォールバック副詞処理エラー: {e}")
             return {}
 
     def _create_error_result(self, sentence: str, error: str) -> Dict[str, Any]:
