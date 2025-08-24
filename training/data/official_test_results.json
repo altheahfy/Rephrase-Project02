@@ -1,7 +1,858 @@
 {
-  "timestamp": "2025-08-24T20:20:24.568030",
-  "total_tests": 1,
+  "timestamp": "2025-08-24T20:35:48.071298",
+  "total_tests": 10,
   "results": {
+    "1": {
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "The car",
+          "is",
+          "red"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "2": {
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "I",
+          "love",
+          "you"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "3": {
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "strong"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "sub-s": "The man who",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The man who runs fast is strong.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "who_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The man who runs fast is strong.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The man who runs fast is strong.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "who_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The man who runs fast is strong.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The man who runs fast is strong.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "4": {
+      "sentence": "The book which lies there is mine.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "mine"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "sub-s": "The man who",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The book is mine.",
+              "sub_sentences_count": 1,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "which_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The book is mine.",
+              "sub_sentences_count": 1,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The book is mine.",
+                  "sub_sentences_count": 1,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "which_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The book is mine.', sub=1"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The book is mine.",
+                  "sub_sentences_count": 1,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "5": {
+      "sentence": "The person that works here is kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "kind"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-v": "lies",
+          "sub-m2": "there",
+          "sub-s": "The book which",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind",
+          "M2": "here"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The person that works here is kind.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "that_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The person that works here is kind.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The person that works here is kind.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "that_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The person that works here is kind.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The person that works here is kind.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "6": {
+      "sentence": "The book which I bought is expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "expensive"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-v": "works",
+          "sub-s": "The person that",
+          "sub-o1": "The book which",
+          "_parent_slot": "S",
+          "sub-m2": "here"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The book is expensive.",
+              "sub_sentences_count": 1,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "which_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The book is expensive.",
+              "sub_sentences_count": 1,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The book is expensive.",
+                  "sub_sentences_count": 1,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "which_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The book is expensive.', sub=1"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The book is expensive.",
+                  "sub_sentences_count": 1,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "7": {
+      "sentence": "The man whom I met is tall.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "tall"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-v": "bought",
+          "sub-s": "I",
+          "sub-o1": "The book which",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The man whom I met is tall.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "whom_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The man whom I met is tall.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The man whom I met is tall.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "whom_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The man whom I met is tall.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The man whom I met is tall.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "8": {
+      "sentence": "The car that he drives is new.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "new"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-v": "met",
+          "sub-s": "I",
+          "sub-o1": "The man whom",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The car that he drives is new.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "that_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The car that he drives is new.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The car that he drives is new.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "that_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The car that he drives is new.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The car that he drives is new.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
     "9": {
       "sentence": "The car which was crashed is red.",
       "expected": {
@@ -60,8 +911,10 @@
           "M3": "red"
         },
         "sub_slots": {
-          "sub-s": "The car which",
-          "_parent_slot": "S"
+          "sub-s": "he",
+          "_parent_slot": "S",
+          "sub-v": "drives",
+          "sub-o1": "The car that"
         },
         "slots": {
           "S": "",
@@ -115,6 +968,133 @@
               ],
               "handler_success": true,
               "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "10": {
+      "sentence": "The book that was written is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "written",
+          "is",
+          "famous"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "written",
+          "M3": "famous",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "_parent_slot": "S",
+          "sub-aux": "was",
+          "sub-v": "crashed"
+        },
+        "slots": {
+          "S": "",
+          "V": "written",
+          "M3": "famous",
+          "Aux": "was"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The book that was written is famous.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "that_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The book that was written is famous.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The book that was written is famous.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "that_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The book that was written is famous.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The book that was written is famous.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=True, sub=1"
             }
           },
           "control_flags": {}

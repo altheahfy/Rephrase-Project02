@@ -3662,6 +3662,14 @@ class CentralHandlerController:
                 'sub_sentences': [],
                 'hierarchy': {}
             },
+            'grammar': {
+                'passive_voice': {
+                    'main_detected': False,
+                    'sub_detected': False,
+                    'main_slots': {},
+                    'sub_slots': {}
+                }
+            },
             'processing': {
                 'stage': 'preprocessing',
                 'completed_handlers': [],
@@ -3726,26 +3734,54 @@ class CentralHandlerController:
         """Stage 2: 文法分析段階"""
         print(f"🔍 Stage 2: 文法分析開始")
         
-        # 受動態ハンドラー実行（スコープ限定）
-        if hasattr(self.parent, '_handle_passive_voice'):
-            # 中央制御からの関係節情報を渡す
-            current_result = {
-                'relative_clause_info': {
-                    'found': bool(self.context['structure']['sub_sentences']),
-                    'main_sentence': self.context['structure']['main_sentence'],
-                    'sub_sentences': self.context['structure']['sub_sentences']
-                }
-            }
-            
-            passive_result = self.parent._handle_passive_voice(sentence, doc, current_result)
-            if passive_result:
-                # 結果をマージ
-                self.context['slots']['main_slots'].update(passive_result.get('slots', {}))
-                self.context['slots']['sub_slots'].update(passive_result.get('sub_slots', {}))
-                self.context['processing']['handler_results']['passive_voice'] = passive_result
-                print(f"🔍 受動態分析完了: main={len(passive_result.get('slots', {}))}, sub={len(passive_result.get('sub_slots', {}))}")
+        # 受動態分析（中央制御での直接実装、無限再帰回避）
+        main_sentence = self.context['structure']['main_sentence'] or sentence
+        sub_sentences = self.context['structure']['sub_sentences']
+        
+        # 主文受動態チェック
+        main_passive = self._check_passive_voice_direct(main_sentence)
+        if main_passive:
+            self.context['grammar']['passive_voice']['main_detected'] = True
+            self.context['grammar']['passive_voice']['main_slots'] = main_passive
+            self.context['slots']['main_slots'].update(main_passive)
+            print(f"🔍 主文受動態検出: {main_passive}")
+        
+        # サブ句受動態チェック
+        for i, sub_sentence in enumerate(sub_sentences):
+            sub_passive = self._check_passive_voice_direct(sub_sentence)
+            if sub_passive:
+                self.context['grammar']['passive_voice']['sub_detected'] = True
+                # sub_passive の各要素をsub-プレフィックス付きで保存
+                for key, value in sub_passive.items():
+                    if key == 'Aux':
+                        self.context['slots']['sub_slots']['sub-aux'] = value
+                    elif key == 'V':
+                        self.context['slots']['sub_slots']['sub-v'] = value
+                    # 他の要素も必要に応じて追加
+                print(f"🔍 サブ句{i+1}受動態検出: {sub_passive}")
         
         print(f"✅ Stage 2: 文法分析完了")
+    
+    def _check_passive_voice_direct(self, text: str) -> dict:
+        """直接的な受動態チェック（無限再帰回避版）"""
+        import re
+        
+        # be動詞 + 過去分詞のパターンをチェック
+        be_verbs = ['is', 'was', 'are', 'were', 'be', 'been', 'being']
+        words = text.split()
+        
+        for i, word in enumerate(words):
+            if word.lower() in be_verbs and i + 1 < len(words):
+                next_word = words[i + 1]
+                # 過去分詞の簡易判定（-ed, 不規則動詞の一部）
+                if (next_word.endswith('ed') or 
+                    next_word in ['written', 'broken', 'spoken', 'taken', 'given', 'driven', 'crashed']):
+                    return {
+                        'Aux': word,
+                        'V': next_word
+                    }
+        
+        return {}
     
     def _stage3_basic_pattern(self, sentence: str, doc):
         """Stage 3: 基本パターン段階"""
@@ -3755,43 +3791,96 @@ class CentralHandlerController:
         main_sentence = self.context['structure']['main_sentence'] or sentence
         print(f"🔍 5文型対象: '{main_sentence}'")
         
-        # 中央制御機構を一時的に無効化してレガシー分析を実行
-        original_flag = self.parent.central_controller_enabled
-        self.parent.central_controller_enabled = False
-        
-        try:
-            # 主文の基本5文型分析を実行
-            main_doc = self.parent.nlp(main_sentence)
-            legacy_result = self.parent._analyze_sentence_legacy(main_sentence, main_doc)
+        # 🆕 Stage 2で受動態が検出された場合の特別処理
+        if self.context['grammar']['passive_voice']['main_detected']:
+            # 受動態構造は既にSlot格納済み
+            passive_slots = self.context['grammar']['passive_voice']['main_slots']
+            print(f"🔍 受動態構造検出: {passive_slots}")
             
-            print(f"🔍 Legacy分析結果: {legacy_result}")
+            # 補語句の分析が必要な場合は追加
+            # 例: "The book that was written is famous." → V='is', C1='famous'にすべき
+            # 現在の実装は全文分析のため、主文のみ再分析が必要
             
-            # 主文の結果をmain_slotsに格納
-            if legacy_result and 'slots' in legacy_result:
-                self.context['slots']['main_slots'].update(legacy_result['slots'])
-                print(f"🔍 5文型分析結果: {legacy_result['slots']}")
-            else:
-                print(f"❌ Legacy分析失敗または結果なし")
-        
-        finally:
-            # フラグを元に戻す
-            self.parent.central_controller_enabled = original_flag
+            # TODO: より精密な主文抽出とC1分析
+            # 暫定的に関係節があれば主文を再特定
+            if self.context['structure']['sub_sentences']:
+                # 関係節除去して主文を特定
+                simplified_main = self._extract_true_main_sentence(main_sentence)
+                print(f"🔍 簡素化主文: '{simplified_main}'")
+                
+                # 簡素化された主文で再分析
+                if simplified_main and simplified_main != main_sentence:
+                    main_doc = self.parent.nlp(simplified_main)
+                    original_flag = self.parent.central_controller_enabled
+                    self.parent.central_controller_enabled = False
+                    
+                    try:
+                        legacy_result = self.parent._analyze_sentence_legacy(simplified_main, main_doc)
+                        if legacy_result and 'slots' in legacy_result:
+                            # 受動態情報は保持しつつ、他の要素を更新
+                            for key, value in legacy_result['slots'].items():
+                                if key not in ['Aux', 'V']:  # 受動態のAux, Vは保持
+                                    self.context['slots']['main_slots'][key] = value
+                            print(f"🔍 補完分析結果: {legacy_result['slots']}")
+                    finally:
+                        self.parent.central_controller_enabled = original_flag
+        else:
+            # 通常の5文型分析
+            original_flag = self.parent.central_controller_enabled
+            self.parent.central_controller_enabled = False
+            
+            try:
+                main_doc = self.parent.nlp(main_sentence)
+                legacy_result = self.parent._analyze_sentence_legacy(main_sentence, main_doc)
+                
+                print(f"🔍 Legacy分析結果: {legacy_result}")
+                
+                if legacy_result and 'slots' in legacy_result:
+                    self.context['slots']['main_slots'].update(legacy_result['slots'])
+                    print(f"🔍 5文型分析結果: {legacy_result['slots']}")
+                else:
+                    print(f"❌ Legacy分析失敗または結果なし")
+            
+            finally:
+                self.parent.central_controller_enabled = original_flag
         
         print(f"✅ Stage 3: 基本パターン完了")
+    
+    def _extract_true_main_sentence(self, sentence: str) -> str:
+        """関係節を除去して真の主文を抽出"""
+        # 簡易実装: 関係代名詞からbe動詞までを除去
+        import re
+        
+        # "The book that was written is famous." → "The book is famous."
+        # 関係節パターンを除去
+        patterns = [
+            r'\s+(which|that|who|whom)\s+[^,]*?\s+(is|was|are|were)\s+\w+',
+            r'\s+(which|that|who|whom)\s+[^,]*?\s+(was|were)\s+\w+'
+        ]
+        
+        simplified = sentence
+        for pattern in patterns:
+            simplified = re.sub(pattern, '', simplified)
+        
+        # 連続スペースを単一スペースに
+        simplified = re.sub(r'\s+', ' ', simplified).strip()
+        
+        return simplified
     
     def _stage4_finalization(self) -> dict:
         """Stage 4: 統合・確定段階"""
         print(f"🔍 Stage 4: 統合・確定開始")
         
-        # 親子関係自動設定
-        for i, sub_sentence in enumerate(self.context['structure']['sub_sentences']):
-            # 親スロット自動判定（簡易版）
-            parent_slot = 'S'  # デフォルト
-            self.context['slots']['sub_slots']['_parent_slot'] = parent_slot
-        
         # 🎯 Rephrase大原則: サブスロットに要素が入った上位スロットは空文字にする
         main_slots = self.context['slots']['main_slots'].copy()
-        sub_slots = self.context['slots']['sub_slots']
+        sub_slots = self.context['slots']['sub_slots'].copy()
+        
+        # 親子関係自動設定 - サブスロットが存在する場合のみ
+        if sub_slots and any(key.startswith('sub-') for key in sub_slots.keys() if key != '_parent_slot'):
+            # 関係節の場合、通常は主語（S）が関係している
+            if 'sub-s' in sub_slots or 'sub-o1' in sub_slots:
+                sub_slots['_parent_slot'] = 'S'
+                print(f"🎯 _parent_slot自動設定: S (関係節検出)")
         
         # sub-s があれば main_slots の S を空文字にする
         if 'sub-s' in sub_slots and sub_slots['sub-s']:
