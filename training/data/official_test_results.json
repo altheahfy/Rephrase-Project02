@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-24T23:30:38.894717",
+  "timestamp": "2025-08-24T23:38:10.299981",
   "total_tests": 24,
   "results": {
     "1": {
@@ -2320,16 +2320,14 @@
           "S": "The house",
           "Aux": "was",
           "V": "built",
-          "M2": "in",
-          "M3": "1990"
+          "M2": "in 1990"
         },
         "sub_slots": {},
         "slots": {
           "S": "The house",
           "Aux": "was",
           "V": "built",
-          "M2": "in",
-          "M3": "1990"
+          "M2": "in 1990"
         },
         "pattern_detected": "SV",
         "confidence": 0.9,
@@ -2534,16 +2532,14 @@
         ],
         "main_slots": {
           "S": "The cake",
-          "Aux": "is",
-          "M3": "being",
+          "Aux": "is being",
           "V": "baked",
           "M2": "by my mother"
         },
         "sub_slots": {},
         "slots": {
           "S": "The cake",
-          "Aux": "is",
-          "M3": "being",
+          "Aux": "is being",
           "V": "baked",
           "M2": "by my mother"
         },
