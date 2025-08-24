@@ -26,8 +26,8 @@ def select_test_cases(test_cases, test_selection):
     selected_ids = set()
     
     if test_selection.lower() == "basic":
-        # 基本5文型のテストID
-        selected_ids = {1, 2, 55, 58, 64}
+        # 基本5文型のテストID（17件）
+        selected_ids = {1, 2, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69}
     elif test_selection.lower() == "relation":
         # 関係節のテストID
         selected_ids = {3, 4, 5, 6, 7, 8, 12, 13, 14, 34, 35, 36}

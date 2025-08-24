@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-08-24T23:49:38.965368",
-  "total_tests": 24,
+  "timestamp": "2025-08-25T00:19:36.660114",
+  "total_tests": 36,
   "results": {
     "1": {
       "sentence": "The car is red.",
@@ -125,207 +125,6 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "55": {
-      "sentence": "Birds fly.",
-      "expected": {
-        "main_slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "Birds",
-          "fly"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
-        "main_slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 2,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "58": {
-      "sentence": "She looks happy.",
-      "expected": {
-        "main_slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "She",
-          "looks",
-          "happy"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "64": {
-      "sentence": "I gave him a book.",
-      "expected": {
-        "main_slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "O2"
-        ],
-        "SlotPhrase": [
-          "I",
-          "gave",
-          "him",
-          "a book"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "pattern_detected": "SVOO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
         "unified_handlers": {
           "detected_patterns": [],
           "handler_contributions": {},
@@ -1051,739 +850,6 @@
       "test_type": "relative_clause",
       "status": "success"
     },
-    "12": {
-      "sentence": "The man whose car is red lives here.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "sub_slots": {
-          "sub-s": "The man whose car",
-          "sub-v": "is",
-          "sub-c1": "red",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "lives",
-          "here"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "sub_slots": {
-          "sub-v": "is",
-          "sub-s": "The man whose car",
-          "sub-c1": "red",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The man whose car is red lives here.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The man whose car is red lives here.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The man whose car is red lives here.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The man whose car is red lives here.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The man whose car is red lives here.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_whose",
-      "status": "success"
-    },
-    "13": {
-      "sentence": "The student whose book I borrowed is smart.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "smart"
-        },
-        "sub_slots": {
-          "sub-o1": "The student whose book",
-          "sub-s": "I",
-          "sub-v": "borrowed",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "smart"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "smart"
-        },
-        "sub_slots": {
-          "sub-v": "borrowed",
-          "sub-o1": "The student whose book",
-          "sub-s": "I",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "smart"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The student whose book I borrowed is smart.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The student whose book I borrowed is smart.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The student whose book I borrowed is smart.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The student whose book I borrowed is smart.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The student whose book I borrowed is smart.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_whose",
-      "status": "success"
-    },
-    "14": {
-      "sentence": "The woman whose dog barks is my neighbor.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "my neighbor"
-        },
-        "sub_slots": {
-          "sub-s": "The woman whose dog",
-          "sub-v": "barks",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "my neighbor"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "my neighbor"
-        },
-        "sub_slots": {
-          "sub-v": "barks",
-          "sub-s": "The woman whose dog",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "my neighbor"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The woman whose dog barks is my neighbor.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The woman whose dog barks is my neighbor.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The woman whose dog barks is my neighbor.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The woman whose dog barks is my neighbor.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The woman whose dog barks is my neighbor.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=2"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_whose",
-      "status": "success"
-    },
-    "34": {
-      "sentence": "The student who studies diligently always succeeds academically.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
-        },
-        "sub_slots": {
-          "sub-s": "The student who",
-          "sub-v": "studies",
-          "sub-m2": "diligently",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "succeeds",
-          "academically"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
-        },
-        "sub_slots": {
-          "sub-v": "studies",
-          "sub-m2": "diligently",
-          "sub-s": "The student who",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The student who studies diligently always succeeds academically.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "who_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The student who studies diligently always succeeds academically.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The student who studies diligently always succeeds academically.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "who_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The student who studies diligently always succeeds academically.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The student who studies diligently always succeeds academically.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_clause",
-      "status": "success"
-    },
-    "35": {
-      "sentence": "The teacher whose class runs efficiently is respected greatly.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
-        },
-        "sub_slots": {
-          "sub-s": "The teacher whose class",
-          "sub-v": "runs",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "respected",
-          "greatly"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          2,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
-        },
-        "sub_slots": {
-          "sub-v": "runs",
-          "sub-s": "The teacher whose class",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The teacher whose class runs efficiently is respected greatly.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_whose",
-      "status": "success"
-    },
-    "36": {
-      "sentence": "The doctor who works carefully saves lives successfully.",
-      "expected": {
-        "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "sub_slots": {
-          "sub-s": "The doctor who",
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "_parent_slot": "S"
-        }
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "saves",
-          "lives",
-          "successfully"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "sub_slots": {
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "sub-s": "The doctor who",
-          "_parent_slot": "S"
-        },
-        "slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The doctor who works carefully saves lives successfully.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "who_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The doctor who works carefully saves lives successfully.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The doctor who works carefully saves lives successfully.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "who_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The doctor who works carefully saves lives successfully.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The doctor who works carefully saves lives successfully.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "relative_clause",
-      "status": "success"
-    },
     "9": {
       "sentence": "The car which was crashed is red.",
       "expected": {
@@ -2156,6 +1222,361 @@
         "sentence_type_confidence": 0.8
       },
       "test_type": "relative_clause",
+      "status": "success"
+    },
+    "12": {
+      "sentence": "The man whose car is red lives here.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "",
+          "lives",
+          "here"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8
+        ],
+        "display_order": [
+          1,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-v": "is",
+          "sub-s": "The man whose car",
+          "sub-c1": "red",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The man whose car is red lives here.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "whose_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The man whose car is red lives here.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The man whose car is red lives here.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "whose_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The man whose car is red lives here.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The man whose car is red lives here.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_whose",
+      "status": "success"
+    },
+    "13": {
+      "sentence": "The student whose book I borrowed is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "smart"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-v": "borrowed",
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The student whose book I borrowed is smart.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "whose_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The student whose book I borrowed is smart.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The student whose book I borrowed is smart.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "whose_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The student whose book I borrowed is smart.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The student whose book I borrowed is smart.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_whose",
+      "status": "success"
+    },
+    "14": {
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "my neighbor"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-v": "barks",
+          "sub-s": "The woman whose dog",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The woman whose dog barks is my neighbor.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "whose_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The woman whose dog barks is my neighbor.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The woman whose dog barks is my neighbor.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "whose_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The woman whose dog barks is my neighbor.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The woman whose dog barks is my neighbor.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=2"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_whose",
       "status": "success"
     },
     "21": {
@@ -2578,6 +1999,1416 @@
         "sentence_type_confidence": 0.8
       },
       "test_type": "passive_voice",
+      "status": "success"
+    },
+    "34": {
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "",
+          "succeeds",
+          "academically"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          8
+        ],
+        "display_order": [
+          1,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-v": "studies",
+          "sub-m2": "diligently",
+          "sub-s": "The student who",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The student who studies diligently always succeeds academically.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "who_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The student who studies diligently always succeeds academically.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The student who studies diligently always succeeds academically.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "who_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The student who studies diligently always succeeds academically.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The student who studies diligently always succeeds academically.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "35": {
+      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-s": "The teacher whose class",
+          "sub-v": "runs",
+          "sub-m2": "efficiently",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "",
+          "is",
+          "respected",
+          "greatly"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          8
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "sub_slots": {
+          "sub-v": "runs",
+          "sub-s": "The teacher whose class",
+          "sub-m2": "efficiently",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "respected",
+          "M2": "greatly"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "whose_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "whose_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The teacher whose class runs efficiently is respected greatly.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=True, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_whose",
+      "status": "success"
+    },
+    "36": {
+      "sentence": "The doctor who works carefully saves lives successfully.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-s": "The doctor who",
+          "sub-v": "works",
+          "sub-m2": "carefully",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "",
+          "saves",
+          "lives",
+          "successfully"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          8
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          8
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "sub_slots": {
+          "sub-v": "works",
+          "sub-m2": "carefully",
+          "sub-s": "The doctor who",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "saves",
+          "O1": "lives",
+          "M2": "successfully"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "relative_clause_2stage",
+              "main_sentence": "The doctor who works carefully saves lives successfully.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "clause_type": "who_clause"
+            },
+            {
+              "type": "passive_voice_2stage",
+              "main_sentence": "The doctor who works carefully saves lives successfully.",
+              "sub_sentences_count": 0,
+              "detection_method": "関係節対応2段階処理",
+              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+            }
+          ],
+          "handler_contributions": {
+            "relative_clause": {
+              "patterns": [
+                {
+                  "type": "relative_clause_2stage",
+                  "main_sentence": "The doctor who works carefully saves lives successfully.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "clause_type": "who_clause"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Relative clause 2-stage: main='The doctor who works carefully saves lives successfully.', sub=0"
+            },
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice_2stage",
+                  "main_sentence": "The doctor who works carefully saves lives successfully.",
+                  "sub_sentences_count": 0,
+                  "detection_method": "関係節対応2段階処理",
+                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "55": {
+      "sentence": "Birds fly.",
+      "expected": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Birds",
+          "fly"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "56": {
+      "sentence": "Children play.",
+      "expected": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Children",
+          "play"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "57": {
+      "sentence": "Time passes.",
+      "expected": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Time",
+          "passes"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "58": {
+      "sentence": "She looks happy.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "She",
+          "looks",
+          "happy"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "59": {
+      "sentence": "He became a doctor.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "He",
+          "became",
+          "a doctor"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "60": {
+      "sentence": "The food tastes good.",
+      "expected": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "The food",
+          "tastes",
+          "good"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "61": {
+      "sentence": "I read books.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "I",
+          "read",
+          "books"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "62": {
+      "sentence": "She plays piano.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "She",
+          "plays",
+          "piano"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "63": {
+      "sentence": "We study English.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "We",
+          "study",
+          "English"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "64": {
+      "sentence": "I gave him a book.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "O2"
+        ],
+        "SlotPhrase": [
+          "I",
+          "gave",
+          "him",
+          "a book"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "65": {
+      "sentence": "She told me a story.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "O2"
+        ],
+        "SlotPhrase": [
+          "She",
+          "told",
+          "me",
+          "a story"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "66": {
+      "sentence": "He bought her flowers.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "O2"
+        ],
+        "SlotPhrase": [
+          "He",
+          "bought",
+          "her",
+          "flowers"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "67": {
+      "sentence": "We call him Tom.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "C2"
+        ],
+        "SlotPhrase": [
+          "We",
+          "call",
+          "him",
+          "Tom"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "68": {
+      "sentence": "I found it interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "C2"
+        ],
+        "SlotPhrase": [
+          "I",
+          "found",
+          "it",
+          "interesting"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "69": {
+      "sentence": "They made her happy.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "C2"
+        ],
+        "SlotPhrase": [
+          "They",
+          "made",
+          "her",
+          "happy"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
       "status": "success"
     }
   }
