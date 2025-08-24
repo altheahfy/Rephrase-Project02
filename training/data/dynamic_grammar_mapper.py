@@ -2899,186 +2899,6 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
     print(f"📁 テスト結果を保存しました: {output_path}")
     return output_path
 
-def main():
-    """動的文法認識システムのテスト"""
-    import sys
-    
-    if len(sys.argv) > 1 and sys.argv[1] == "--full-test":
-        # 53例文の完全テスト
-        results = run_full_test_suite()
-        save_test_results(results)
-    else:
-        # 簡易テスト
-        mapper = DynamicGrammarMapper()
-        
-        test_sentences = [
-            "The car is red.",
-            "I love you.",
-            "He has finished his homework.",
-            "The students study hard for exams.",
-            "The teacher explains grammar clearly to confused students daily.",
-            "She made him very happy yesterday.",
-            "The man who runs fast is strong."
-        ]
-        
-        print("=== 動的文法認識システム 簡易テスト ===\n")
-        
-        for sentence in test_sentences:
-            print(f"📝 テスト文: '{sentence}'")
-            result = mapper.analyze_sentence(sentence)
-            
-            if 'error' in result:
-                print(f"❌ エラー: {result['error']}")
-            else:
-                print(f"✅ 文型: {result.get('pattern_detected', 'UNKNOWN')}")
-                print(f"📊 スロット: {result['Slot']}")
-                print(f"📄 フレーズ: {result['SlotPhrase']}")
-                print(f"🎯 信頼度: {result.get('confidence', 0.0)}")
-            
-            print("-" * 50)
-
-    # =============================================================================
-    # Phase 2: 副詞・修飾語ハンドラー (Stanza資産移植版)
-    # =============================================================================
-    
-    def _handle_adverbial_modifier(self, sentence: str, tokens: List[Dict], base_result: Dict) -> Dict:
-        """
-        副詞・修飾語ハンドラー (Phase 2実装)
-        
-        Rephraseルール:
-        - 1個: M2
-        - 2個: M2, M3 (位置順)  
-        - 3個: M1, M2, M3 (位置順)
-        - Agent句(by句)も修飾語として扱う
-        """
-        try:
-            self.logger.debug(f"副詞ハンドラー開始: {sentence}")
-            
-            # 副詞・修飾語を検出
-            adverbs = self._detect_adverbs_and_modifiers(tokens)
-            
-            if not adverbs:
-                self.logger.debug("副詞・修飾語なし")
-                return {}
-                
-            self.logger.debug(f"検出された副詞・修飾語: {len(adverbs)}個 - {[adv['text'] for adv in adverbs]}")
-            
-            # Rephraseルールに基づく配置
-            modifier_slots = self._assign_modifier_slots(adverbs)
-            
-            if modifier_slots:
-                self.logger.debug(f"副詞配置結果: {modifier_slots}")
-                return {
-                    'slots': modifier_slots,
-                    'handler_info': {
-                        'name': 'adverbial_modifier',
-                        'detected_count': len(adverbs),
-                        'assignments': modifier_slots
-                    }
-                }
-                
-        except Exception as e:
-            self.logger.error(f"副詞ハンドラーエラー: {e}")
-            
-        return {}
-    
-    def _detect_adverbs_and_modifiers(self, tokens: List[Dict]) -> List[Dict]:
-        """副詞・修飾語を検出"""
-        adverbs = []
-        
-        for i, token in enumerate(tokens):
-            # 副詞を検出
-            if token.get('pos') == 'ADV':
-                adverbs.append({
-                    'text': token['text'],
-                    'index': i,
-                    'type': 'adverb',
-                    'pos': token['pos']
-                })
-            
-            # Agent句(by句)を検出
-            elif token.get('text', '').lower() == 'by' and token.get('pos') == 'ADP':
-                # "by"以降の名詞句を取得
-                by_phrase = self._extract_by_phrase(tokens, i)
-                if by_phrase:
-                    adverbs.append({
-                        'text': by_phrase,
-                        'index': i,
-                        'type': 'by_phrase',
-                        'pos': 'ADP'
-                    })
-            
-            # 前置詞句も修飾語として検出 (簡易版)
-            elif token.get('pos') == 'ADP' and token.get('text', '').lower() != 'by':
-                prep_phrase = self._extract_prep_phrase(tokens, i)
-                if prep_phrase and len(prep_phrase.split()) > 1:  # 単語数2以上
-                    adverbs.append({
-                        'text': prep_phrase,
-                        'index': i,
-                        'type': 'prep_phrase',
-                        'pos': 'ADP'
-                    })
-        
-        # 位置順にソート
-        adverbs.sort(key=lambda x: x['index'])
-        return adverbs
-    
-    def _extract_by_phrase(self, tokens: List[Dict], by_index: int) -> str:
-        """by句を抽出"""
-        phrase_parts = ['by']
-        
-        for i in range(by_index + 1, len(tokens)):
-            token = tokens[i]
-            pos = token.get('pos', '')
-            
-            # 名詞、形容詞、冠詞を含める
-            if pos in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON']:
-                phrase_parts.append(token['text'])
-            else:
-                break
-                
-        return ' '.join(phrase_parts) if len(phrase_parts) > 1 else ''
-    
-    def _extract_prep_phrase(self, tokens: List[Dict], prep_index: int) -> str:
-        """前置詞句を抽出"""
-        phrase_parts = [tokens[prep_index]['text']]
-        
-        for i in range(prep_index + 1, min(prep_index + 4, len(tokens))):  # 最大3語まで
-            token = tokens[i]
-            pos = token.get('pos', '')
-            
-            if pos in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON']:
-                phrase_parts.append(token['text'])
-            elif pos in ['PUNCT', 'CONJ', 'CCONJ']:  # 句切り文字で終了
-                break
-                
-        return ' '.join(phrase_parts)
-    
-    def _assign_modifier_slots(self, adverbs: List[Dict]) -> Dict:
-        """Rephraseルールに基づく副詞配置"""
-        if not adverbs:
-            return {}
-            
-        slots = {}
-        count = len(adverbs)
-        
-        if count == 1:
-            # 1個: M2に配置
-            slots['M2'] = adverbs[0]['text']
-            
-        elif count == 2:
-            # 2個: M2, M3に配置 (位置順)
-            slots['M2'] = adverbs[0]['text']
-            slots['M3'] = adverbs[1]['text']
-            
-        elif count >= 3:
-            # 3個以上: M1, M2, M3に配置 (位置順)
-            slots['M1'] = adverbs[0]['text']
-            slots['M2'] = adverbs[1]['text']
-            slots['M3'] = adverbs[2]['text']
-            
-        return slots
-
     # =================================
     # Phase 2: 受動態ハンドラー実装
     # =================================
@@ -3136,7 +2956,7 @@ def main():
             
             print(f"🔍 Rephrase受動態構成: Aux='{slots.get('Aux', '')}', V='{slots['V']}'")
             
-            # M スロット: by句の配置（修飾語として扱う）
+            # M スロット: by句の配置（Rephrase仕様：「～によって」全体が副詞句）
             if by_agent:
                 # 既存のM1/M2/M3を確認して空いているスロットに配置
                 existing_modifiers = []
@@ -3144,17 +2964,19 @@ def main():
                     if current_result.get('slots', {}).get(m_slot):
                         existing_modifiers.append(m_slot)
                 
-                # 最初の空きスロットに配置
+                # 最初の空きスロットにby句全体を配置（Rephrase仕様）
                 assigned = False
                 for m_slot in ['M1', 'M2', 'M3']:
                     if m_slot not in existing_modifiers:
-                        slots[m_slot] = by_agent
+                        slots[m_slot] = by_agent  # "by John" 全体を副詞句として配置
                         assigned = True
+                        print(f"🔍 by句配置: {m_slot}='{by_agent}' (副詞句として全体配置)")
                         break
                 
                 if not assigned:
                     # 全スロット埋まっている場合はM3を上書き
                     slots['M3'] = by_agent
+                    print(f"🔍 by句配置: M3='{by_agent}' (上書き配置)")
             
             # 4. ハンドラー結果構造
             return {
@@ -3167,10 +2989,10 @@ def main():
                         'by_agent': by_agent,
                         'confidence': confidence,
                         'detection_method': 'spacy_morphological',
-                        'rephrase_allocation': f"Aux='{slots.get('Aux', '')}', V='{slots['V']}'"
+                        'rephrase_allocation': f"Aux='{slots.get('Aux', '')}', V='{slots['V']}', M(by句)='{by_agent}'"
                     }],
                     'handler_success': True,
-                    'processing_notes': f"Passive voice (Rephrase): be={be_verb}→Aux, pp={past_participle}→V"
+                    'processing_notes': f"Passive voice (Rephrase): be={be_verb}→Aux, pp={past_participle}→V, by句→M(副詞句)"
                 }
             }
             
@@ -3326,6 +3148,14 @@ def main():
                     break
         
         return by_phrase
+
+
+def main():
+    """テスト用メイン関数"""
+    mapper = DynamicGrammarMapper()
+    test_sentence = "The book was written by John."
+    result = mapper.analyze_sentence(test_sentence)
+    print(f"テスト結果: {result}")
 
 if __name__ == "__main__":
     main()
