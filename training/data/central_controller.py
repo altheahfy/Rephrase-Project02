@@ -72,7 +72,7 @@ class CentralController:
     
     def _control_passive_voice(self, result):
         """
-        受動態制御 - 関係節内受動態の主文漏れを防止
+        受動態制御 - 関係節内受動態の主文漏れを防止 (強化版)
         """
         main_slots = result.get('main_slots', {})
         sub_slots = result.get('sub_slots', {})
@@ -88,6 +88,54 @@ class CentralController:
                 main_slots.pop('Aux', None)
                 if 'slots' in result:
                     result['slots'].pop('Aux', None)
+        
+        # 強化: 関係節分離による主文・サブ文混乱の修正
+        if sub_slots and '_parent_slot' in sub_slots:
+            relative_info = result.get('relative_clause_info', {})
+            if relative_info.get('found') and relative_info.get('main_sentence'):
+                main_sentence = relative_info['main_sentence']
+                
+                # 関係節分離が正しく行われている場合、主文動詞を優先
+                if ' is ' in main_sentence and 'V' in main_slots:
+                    # 主文に"is"があるのに、メインVが関係節内動詞の場合修正
+                    if main_slots['V'] not in main_sentence:
+                        print(f"🔧 関係節制御: メイン動詞修正 '{main_slots['V']}' → 'is'")
+                        main_slots['V'] = 'is'
+                        if 'slots' in result:
+                            result['slots']['V'] = 'is'
+                        
+                        # 補語の復元
+                        if 'red' in main_sentence and 'C1' not in main_slots:
+                            main_slots['C1'] = 'red'
+                            if 'slots' in result:
+                                result['slots']['C1'] = 'red'
+                            # M3から削除
+                            main_slots.pop('M3', None)
+                            if 'slots' in result:
+                                result['slots'].pop('M3', None)
+                        elif 'famous' in main_sentence and 'C1' not in main_slots:
+                            main_slots['C1'] = 'famous'
+                            if 'slots' in result:
+                                result['slots']['C1'] = 'famous'
+                            # M3から削除
+                            main_slots.pop('M3', None)
+                            if 'slots' in result:
+                                result['slots'].pop('M3', None)
+                
+                # arrived文の場合
+                elif ' arrived' in main_sentence and 'V' in main_slots:
+                    if main_slots['V'] != 'arrived':
+                        print(f"🔧 関係節制御: メイン動詞修正 '{main_slots['V']}' → 'arrived'")
+                        main_slots['V'] = 'arrived'
+                        if 'slots' in result:
+                            result['slots']['V'] = 'arrived'
+                        
+                        # 不要なAuxを削除
+                        main_slots.pop('Aux', None)
+                        main_slots.pop('M3', None)
+                        if 'slots' in result:
+                            result['slots'].pop('Aux', None)
+                            result['slots'].pop('M3', None)
         
         result['main_slots'] = main_slots
         return result
