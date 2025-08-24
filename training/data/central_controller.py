@@ -314,6 +314,31 @@ class CentralController:
                 if 'slots' in result:
                     result['slots'].pop(adverb_slot, None)
         
+        # 🎯 Central Controller: C1/M3重複解決
+        if 'C1' in main_slots and 'M3' in main_slots:
+            c1_value = main_slots['C1']
+            m3_value = main_slots['M3']
+            
+            # 同じ値の場合はM3を削除（C1が優先）
+            if c1_value == m3_value:
+                print(f"🔧 C1/M3重複解決: M3='{m3_value}' をメインスロットから削除 (C1='{c1_value}'と重複)")
+                main_slots.pop('M3', None)
+                if 'slots' in result:
+                    result['slots'].pop('M3', None)
+        
+        # 🎯 Central Controller: サブスロットとメインスロット重複解決
+        for main_slot_name, main_slot_value in list(main_slots.items()):
+            if not main_slot_value:
+                continue
+                
+            for sub_slot_name, sub_slot_value in sub_slots.items():
+                if sub_slot_value and str(main_slot_value).lower() == str(sub_slot_value).lower():
+                    print(f"🔧 サブスロット重複解決: {main_slot_name}='{main_slot_value}' をメインスロットから削除 ({sub_slot_name}='{sub_slot_value}'と重複)")
+                    main_slots.pop(main_slot_name, None)
+                    if 'slots' in result:
+                        result['slots'].pop(main_slot_name, None)
+                    break
+        
         # 結果を更新
         result['main_slots'] = main_slots
         

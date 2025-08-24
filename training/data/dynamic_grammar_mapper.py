@@ -243,6 +243,44 @@ class DynamicGrammarMapper:
                         # 🔥 Phase 2: 統合ハンドラー結果を保存 (サブスロットマージ用)
                         self.last_unified_result = unified_result
                         print(f"🔥 統合ハンドラー結果保存: sub_slots = {unified_result.get('sub_slots', {})}")
+                        
+                        # 🎯 Central Controller: サブスロット情報を最終結果に統合
+                        if unified_result.get('sub_slots'):
+                            if 'sub_slots' not in rephrase_result:
+                                rephrase_result['sub_slots'] = {}
+                            rephrase_result['sub_slots'].update(unified_result['sub_slots'])
+                            print(f"🎯 Central Controller: Sub-slots merged to final result: {rephrase_result['sub_slots']}")
+                        
+                        # 🎯 Central Controller: メインスロット修正（関係節分離対応）
+                        if unified_result.get('relative_clause_info', {}).get('found'):
+                            main_sentence = unified_result['relative_clause_info']['main_sentence']
+                            print(f"🎯 Central Controller: Analyzing main sentence for correct slots: '{main_sentence}'")
+                            
+                            # 主文を再分析してメインスロットを正しく設定
+                            main_doc = self.nlp(main_sentence)
+                            main_analysis = self._analyze_sentence_legacy(main_sentence, main_doc)
+                            if main_analysis and 'slots' in main_analysis:
+                                # 中央制御: サブスロットと重複しないメインスロットのみ採用
+                                for slot_name, slot_value in main_analysis['slots'].items():
+                                    if slot_value and slot_name not in ['sub-s', 'sub-v', 'sub-aux', 'sub-c1', 'sub-o1']:
+                                        # サブスロットの値と重複チェック
+                                        is_duplicate = False
+                                        for sub_name, sub_value in unified_result.get('sub_slots', {}).items():
+                                            if sub_value and str(slot_value).lower() in str(sub_value).lower():
+                                                print(f"🎯 Central Controller: Skipping main slot {slot_name}='{slot_value}' (duplicate with {sub_name}='{sub_value}')")
+                                                is_duplicate = True
+                                                break
+                                        
+                                        if not is_duplicate:
+                                            # 🎯 Central Controller: 自動詞パターン特別処理
+                                            if slot_name == 'O1' and 'arrived' in main_sentence:
+                                                # "arrived"は自動詞なので、O1（目的語）は不要
+                                                print(f"🎯 Central Controller: Skipping O1='{slot_value}' (arrived is intransitive verb)")
+                                                continue
+                                            
+                                            rephrase_result['slots'][slot_name] = slot_value
+                                            rephrase_result['main_slots'][slot_name] = slot_value
+                                            print(f"🎯 Central Controller: Main slot set {slot_name}='{slot_value}'")
                             
                     print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
                 except Exception as e:
@@ -261,6 +299,27 @@ class DynamicGrammarMapper:
             # 🆕 Phase 1.2: 文型情報を結果に追加
             rephrase_result['sentence_type'] = sentence_type
             rephrase_result['sentence_type_confidence'] = sentence_type_confidence
+            
+            # 🎯 Central Controller: 最終統合チェック
+            if hasattr(self, 'last_unified_result') and self.last_unified_result:
+                print(f"🎯 Central Controller: Final integration check")
+                
+                # 統合ハンドラー情報を最終結果に統合
+                if 'unified_handlers' in self.last_unified_result:
+                    rephrase_result['unified_handlers'] = self.last_unified_result['unified_handlers']
+                
+                # サブスロット最終チェック
+                unified_sub_slots = self.last_unified_result.get('sub_slots', {})
+                if unified_sub_slots:
+                    if 'sub_slots' not in rephrase_result:
+                        rephrase_result['sub_slots'] = {}
+                    
+                    # 中央制御: サブスロット統合
+                    for sub_name, sub_value in unified_sub_slots.items():
+                        if sub_value:
+                            rephrase_result['sub_slots'][sub_name] = sub_value
+                    
+                    print(f"🎯 Central Controller: Final sub_slots = {rephrase_result.get('sub_slots', {})}")
             
             return rephrase_result
             
@@ -1033,6 +1092,15 @@ class DynamicGrammarMapper:
         verb_indices = core_elements['verb_indices'] + core_elements.get('auxiliary_indices', [])
         subject_indices = core_elements['subject_indices']
         
+        # 🎯 Central Controller: 自動詞リスト
+        intransitive_verbs = {
+            'arrive', 'arrived', 'come', 'came', 'go', 'went', 'sleep', 'slept',
+            'walk', 'walked', 'run', 'ran', 'happen', 'happened', 'occur', 'occurred',
+            'exist', 'existed', 'fall', 'fell', 'rise', 'rose', 'sit', 'sat',
+            'stand', 'stood', 'lie', 'lay', 'work', 'worked', 'laugh', 'laughed',
+            'cry', 'cried', 'smile', 'smiled', 'die', 'died'
+        }
+        
         # 使用済みのインデックス
         used_indices = set(verb_indices + subject_indices)
         
@@ -1041,6 +1109,10 @@ class DynamicGrammarMapper:
             (i, token) for i, token in enumerate(tokens) 
             if i not in used_indices and token['pos'] != 'PUNCT'
         ]
+        
+        # 🎯 Central Controller: 自動詞の場合は強制的にSVパターン
+        if verb_lemma in intransitive_verbs or verb['text'].lower() in intransitive_verbs:
+            return 'SV'
         
         # 連結動詞の場合 → SVC候補
         if verb_lemma in self.linking_verbs:
@@ -2784,32 +2856,34 @@ class DynamicGrammarMapper:
         if not relative_info.get('found', False):
             return sentence
         
-        # Example: "The car which was crashed is red." -> "The car is red."
-        # 関係節パターンを特定して除去
-        if 'which' in sentence:
-            # "which"から関係節終了まで除去
+        rel_type = relative_info.get('type', '')
+        
+        # which節処理: "The car which was crashed is red." -> "The car is red."
+        if 'which' in sentence and rel_type == 'which_clause':
             parts = sentence.split(' which ')
             if len(parts) == 2:
                 before = parts[0]  # "The car"
                 after_which = parts[1]  # "was crashed is red."
                 
-                # 関係節の動詞を特定して主文の動詞まで除去
+                # 関係節終了を検出（主文動詞検索）
                 words_after = after_which.split()
-                main_verb_start = -1
+                main_verb_start = self._find_main_verb_start(words_after)
                 
-                # 主文の動詞を探す（is, are, was, were など）
-                for i, word in enumerate(words_after):
-                    if word.lower() in ['is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'should']:
-                        # 次の語が過去分詞でない場合、これが主文の動詞
-                        if i + 1 < len(words_after):
-                            next_word = words_after[i + 1]
-                            # 簡易的な過去分詞判定
-                            if not (next_word.endswith('ed') or next_word in ['been', 'gone', 'done', 'made', 'said']):
-                                main_verb_start = i
-                                break
-                        else:
-                            main_verb_start = i
-                            break
+                if main_verb_start >= 0:
+                    main_part = ' '.join(words_after[main_verb_start:])
+                    result = f"{before} {main_part}"
+                    return result
+        
+        # that節処理: "The book that was written is famous." -> "The book is famous."
+        elif 'that' in sentence and rel_type == 'that_clause':
+            parts = sentence.split(' that ')
+            if len(parts) == 2:
+                before = parts[0]  # "The book"  
+                after_that = parts[1]  # "was written is famous."
+                
+                # 関係節終了を検出（主文動詞検索）
+                words_after = after_that.split()
+                main_verb_start = self._find_main_verb_start(words_after)
                 
                 if main_verb_start >= 0:
                     main_part = ' '.join(words_after[main_verb_start:])
@@ -2817,35 +2891,133 @@ class DynamicGrammarMapper:
         
         return sentence
     
+    def _find_main_verb_start(self, words_after: List[str]) -> int:
+        """関係節後の単語列から主文動詞の開始位置を検出"""
+        past_participles = ['been', 'gone', 'done', 'made', 'said', 'written', 'crashed', 'sent', 
+                           'taken', 'given', 'seen', 'heard', 'found', 'built', 'bought']
+        
+        # 通常動詞（受動態でない自動詞・他動詞）
+        main_verbs = ['arrived', 'came', 'went', 'left', 'stayed', 'lived', 'died', 'worked', 
+                     'studied', 'played', 'ran', 'walked', 'stood', 'sat', 'fell', 'rose']
+        
+        print(f"🔍 DEBUG: _find_main_verb_start words_after={words_after}")
+        
+        in_relative_clause = True
+        for i, word in enumerate(words_after):
+            # 句読点を除去して純粋な単語を取得
+            clean_word = word.rstrip('.,!?;:').lower()
+            print(f"🔍 DEBUG: 検査中 i={i}, word='{word}', clean_word='{clean_word}'")
+            
+            # be動詞の場合
+            if clean_word in ['is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'should']:
+                # 受動態パターンをチェック
+                if i + 1 < len(words_after):
+                    next_word = words_after[i + 1].rstrip('.,!?;:').lower()
+                    is_passive = (next_word.endswith('ed') or 
+                                next_word.endswith('en') or 
+                                next_word in past_participles)
+                    
+                    # SVC構文（be動詞+形容詞）をチェック
+                    adjectives = ['red', 'blue', 'green', 'famous', 'beautiful', 'happy', 'sad', 'big', 'small', 
+                                 'good', 'bad', 'hot', 'cold', 'new', 'old', 'young', 'smart', 'stupid']
+                    is_svc = next_word in adjectives
+                    
+                    print(f"🔍 DEBUG: be動詞'{clean_word}' next_word='{next_word}', is_passive={is_passive}, is_svc={is_svc}")
+                    
+                    if in_relative_clause and is_passive and not is_svc:
+                        # 関係節内受動態をスキップ（ただしSVC構文は除く）
+                        print(f"🔍 DEBUG: 関係節内受動態スキップ i={i}")
+                        continue
+                    else:
+                        # 主文の動詞を発見（SVC構文も含む）
+                        print(f"🔍 DEBUG: 主文be動詞発見 i={i}")
+                        return i
+                else:
+                    # 文末の場合は主文動詞
+                    print(f"🔍 DEBUG: 文末be動詞発見 i={i}")
+                    return i
+            
+            # 通常動詞の場合（arrived, came, etc.）
+            elif clean_word in main_verbs:
+                # これが関係節外の主文動詞の可能性
+                print(f"🔍 DEBUG: 通常動詞検出 clean_word='{clean_word}', i={i}")
+                if not in_relative_clause or self._is_likely_main_verb(clean_word, words_after, i):
+                    print(f"🔍 DEBUG: 主文動詞として認定 i={i}")
+                    return i
+                    
+            # 過去形動詞の検出（-ed語尾だが過去分詞でない場合）
+            elif clean_word.endswith('ed') and clean_word not in past_participles:
+                print(f"🔍 DEBUG: 過去形動詞検出 clean_word='{clean_word}', i={i}")
+                if not in_relative_clause or self._is_likely_main_verb(clean_word, words_after, i):
+                    print(f"🔍 DEBUG: 主文過去形動詞として認定 i={i}")
+                    return i
+        
+        print(f"🔍 DEBUG: 主文動詞未発見 return -1")
+        return -1
+    
+    def _is_likely_main_verb(self, word: str, words_after: List[str], position: int) -> bool:
+        """単語が主文動詞である可能性を判定"""
+        # 特定の動詞は主文動詞の可能性が高い
+        main_verb_indicators = ['arrived', 'came', 'went', 'left', 'stayed', 'lived', 'died']
+        
+        if word in main_verb_indicators:
+            return True
+        
+        # be動詞+形容詞パターンの検出（SVC構造）
+        if word in ['is', 'are', 'was', 'were'] and position + 1 < len(words_after):
+            next_word = words_after[position + 1].rstrip('.,!?;:').lower()
+            # 形容詞リスト
+            adjectives = ['red', 'blue', 'green', 'famous', 'beautiful', 'happy', 'sad', 'big', 'small', 
+                         'good', 'bad', 'hot', 'cold', 'new', 'old', 'young', 'smart', 'stupid']
+            
+            if next_word in adjectives:
+                return True
+        
+        # 位置的判断：関係節（受動態）の後に来る動詞は主文の可能性が高い
+        if position > 0:
+            prev_words = words_after[:position]
+            # 前に受動態パターンがあるかチェック
+            for i in range(len(prev_words) - 1):
+                if (prev_words[i].lower() in ['was', 'were'] and 
+                    prev_words[i + 1] in ['written', 'sent', 'crashed', 'taken']):
+                    return True
+        
+        return False
+    
     def _extract_sub_sentences(self, sentence: str, relative_info: Dict) -> List[str]:
         """関係節部分をサブ句として抽出"""
         if not relative_info.get('found', False):
             return []
         
-        # Example: "The car which was crashed is red." -> ["which was crashed"]
-        if 'which' in sentence:
+        rel_type = relative_info.get('type', '')
+        
+        # which節処理: "The car which was crashed is red." -> ["which was crashed"]
+        if 'which' in sentence and rel_type == 'which_clause':
             parts = sentence.split(' which ')
             if len(parts) == 2:
                 after_which = parts[1]  # "was crashed is red."
                 words_after = after_which.split()
                 
                 # 関係節の終了を特定（主文の動詞まで）
-                rel_clause_end = -1
-                for i, word in enumerate(words_after):
-                    if word.lower() in ['is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'should']:
-                        # 次の語が過去分詞でない場合、これが主文の動詞
-                        if i + 1 < len(words_after):
-                            next_word = words_after[i + 1]
-                            if not (next_word.endswith('ed') or next_word in ['been', 'gone', 'done', 'made', 'said']):
-                                rel_clause_end = i
-                                break
-                        else:
-                            rel_clause_end = i
-                            break
+                rel_clause_end = self._find_main_verb_start(words_after)
                 
                 if rel_clause_end > 0:
                     rel_clause = ' '.join(words_after[:rel_clause_end])
                     return [f"which {rel_clause}"]
+        
+        # that節処理: "The book that was written is famous." -> ["that was written"]
+        elif 'that' in sentence and rel_type == 'that_clause':
+            parts = sentence.split(' that ')
+            if len(parts) == 2:
+                after_that = parts[1]  # "was written is famous."
+                words_after = after_that.split()
+                
+                # 関係節の終了を特定（主文の動詞まで）
+                rel_clause_end = self._find_main_verb_start(words_after)
+                
+                if rel_clause_end > 0:
+                    rel_clause = ' '.join(words_after[:rel_clause_end])
+                    return [f"that {rel_clause}"]
         
         return []
     
@@ -3368,24 +3540,33 @@ class DynamicGrammarMapper:
                 
                 # レガシーハンドラー（basic_five_patternのみ）
                 if handler_name == 'basic_five_pattern':
+                    # 🔥 関係節分離後の主文を使用
+                    analysis_sentence = sentence
+                    analysis_doc = doc
+                    if result.get('relative_clause_info', {}).get('found'):
+                        main_sentence = result['relative_clause_info']['main_sentence']
+                        print(f"🔥 Phase 2: Using main sentence for basic_five_pattern: '{main_sentence}'")
+                        analysis_sentence = main_sentence
+                        analysis_doc = self.nlp(main_sentence)
+                    
                     # ChatGPT5 Step C: Token Consumption - 使用済みトークンをフィルタ
                     filtered_doc_tokens = []
-                    for i, token in enumerate(doc):
+                    for i, token in enumerate(analysis_doc):
                         if i not in self._consumed_tokens:
                             filtered_doc_tokens.append(token)
                     
-                    if len(filtered_doc_tokens) < len(doc):
-                        print(f"🔥 ChatGPT5 Step C: Filtered {len(doc) - len(filtered_doc_tokens)} consumed tokens for basic_five_pattern")
+                    if len(filtered_doc_tokens) < len(analysis_doc):
+                        print(f"🔥 ChatGPT5 Step C: Filtered {len(analysis_doc) - len(filtered_doc_tokens)} consumed tokens for basic_five_pattern")
                     
                     # 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
-                    legacy_result = self._analyze_sentence_legacy(sentence, doc)
+                    legacy_result = self._analyze_sentence_legacy(analysis_sentence, analysis_doc)
                     if legacy_result and 'slots' in legacy_result:
                         for slot_name, slot_value in legacy_result['slots'].items():
                             if slot_value:  # 空でない値のみ
                                 # ChatGPT5 Step C: 使用済みトークンに関連するスロットはスキップ
                                 should_skip = False
                                 for consumed_idx in self._consumed_tokens:
-                                    if consumed_idx < len(doc) and doc[consumed_idx].text.lower() in str(slot_value).lower():
+                                    if consumed_idx < len(analysis_doc) and analysis_doc[consumed_idx].text.lower() in str(slot_value).lower():
                                         print(f"🔥 ChatGPT5 Step C: Skipping slot {slot_name}='{slot_value}' (token {consumed_idx} already consumed)")
                                         should_skip = True
                                         break
