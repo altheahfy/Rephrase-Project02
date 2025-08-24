@@ -30,6 +30,9 @@ def select_test_cases(test_cases, test_selection):
     elif test_selection.lower() == "relation":
         # 関係節のテストID
         selected_ids = {3, 4, 5, 6, 7, 8, 12, 13, 14, 34, 35, 36}
+    elif test_selection.lower() == "passive":
+        # 受動態のテストID
+        selected_ids = {9, 10, 11, 21, 22, 23, 24}
     else:
         # 数値指定の解析
         parts = test_selection.split(',')
@@ -221,7 +224,7 @@ def main():
     parser = argparse.ArgumentParser(description='正式テスト手順実行（動的版）')
     parser.add_argument('--tests', '-t', 
                        type=str,
-                       help='実行するテスト番号（例: "1,2,3-5,8" または "basic" または "relation"）')
+                       help='実行するテスト番号（例: "1,2,3-5,8" または "basic" または "relation" または "passive"）')
     parser.add_argument('--all', action='store_true', help='全てのテストケースを実行')
     
     args = parser.parse_args()
@@ -238,9 +241,12 @@ def main():
         selected_cases = select_test_cases(test_cases, args.tests)
         print(f"🎯 選択されたテスト: {args.tests}")
     else:
-        # デフォルト: 基本5文型 + 関係節
-        selected_cases = select_test_cases(test_cases, "basic") + select_test_cases(test_cases, "relation")
-        print("🎯 デフォルト実行: 基本5文型 + 関係節")
+        # デフォルト: 基本5文型 + 関係節 + 受動態 (24件)
+        basic_cases = select_test_cases(test_cases, "basic")
+        relation_cases = select_test_cases(test_cases, "relation") 
+        passive_cases = select_test_cases(test_cases, "passive")
+        selected_cases = basic_cases + relation_cases + passive_cases
+        print("🎯 デフォルト実行: 基本5文型 + 関係節 + 受動態 (24件)")
     
     run_official_test_with_selected_cases(selected_cases)
 
