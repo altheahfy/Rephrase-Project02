@@ -507,33 +507,6 @@ def _auto_assign_hierarchy(self):
 
 ## 📊 **品質保証戦略**
 
-### **📋 正規テスト定義（重要：忘れやすい項目）**
-
-**⚠️ 「正規テスト」の完全定義 - 何百回も忘れられるため明記**
-
-```bash
-# 正規テスト = 以下の2段階プロセスを完了すること
-# 1段階目だけでは「正規テスト」ではない！
-
-# STEP 1: テスト実行
-cd training/data
-python run_official_test.py  # または --all, --tests "1-10" 等
-
-# STEP 2: 期待値照合（これが無いと正規テストではない！）
-python compare_results.py   # official_test_results.jsonと期待値を照合
-
-# 完了条件: compare_results.pyで精度パーセンテージが表示されること
-```
-
-**正規テスト構成要素:**
-- ✅ **テストデータ**: `final_test_system/final_54_test_data.json` (68テストケース)
-- ✅ **実行**: `run_official_test.py` → `official_test_results.json`生成
-- ✅ **検証**: `compare_results.py` → 期待値照合・精度計算
-- ✅ **判定**: 精度パーセンテージによる合格/不合格判定
-
-**⚠️ よくある間違い**: `run_official_test.py`実行だけで「正規テスト完了」と誤解する  
-**✅ 正しい理解**: `compare_results.py`まで実行して初めて「正規テスト完了」
-
 ### **🧪 段階的テスト戦略**
 
 #### **Phase 1: 移植基盤テスト**
@@ -606,30 +579,6 @@ class HybridSystemTestSuite:
 🎯 Phase 3完了時: 100%精度達成 (全文法項目対応)
 ```
 
-#### **正規テスト実行手順（精度測定方法）**
-```bash
-# ⚠️ 重要: 以下の2ステップ両方を実行すること
-# STEP1だけでは「正規テスト」ではない！
-
-# STEP 1: テスト実行
-cd training/data
-python run_official_test.py [--all | --tests "範囲"]
-
-# STEP 2: 期待値照合・精度計算（必須！）
-python compare_results.py
-
-# 出力例:
-# 基本5文型: 5/5 = 100.0%
-# 関係節: 12/12 = 100.0%  
-# 受動態: 7/7 = 100.0%
-# 総合精度: 24/24 = 100.0%
-```
-
-#### **精度判定基準**
-- ✅ **合格**: `compare_results.py`で表示される精度が目標値以上
-- ❌ **不合格**: 精度が目標値未満、またはエラーで実行不可
-- ⚠️ **無効**: `run_official_test.py`のみ実行（照合未実施）
-
 #### **開発効率指標**
 ```
 🎯 開発行数: 2,500行以下 (50%+短縮達成)
@@ -641,9 +590,8 @@ python compare_results.py
 
 #### **技術的完成条件**
 ```
-✅ 正規テスト完了: run_official_test.py + compare_results.py 両方実行
-✅ 17テストケース 100%精度達成 (compare_results.pyで確認)
-✅ 追加テストケース 95%+精度 (compare_results.pyで確認)
+✅ 17テストケース 100%精度達成
+✅ 追加テストケース 95%+精度
 ✅ パフォーマンス劣化10%以内
 ✅ メモリ使用量1.5倍以内
 ✅ 全文法項目ハンドラー実装完了
