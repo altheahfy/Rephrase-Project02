@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-24T13:17:39.768562",
+  "timestamp": "2025-08-24T13:50:03.338632",
   "total_tests": 17,
   "results": {
     "1": {
@@ -1130,52 +1130,45 @@
       },
       "analysis_result": {
         "Slot": [
-          "O1",
           "S",
-          "M3",
           "V",
+          "O1",
           "M2"
         ],
         "SlotPhrase": [
-          "The doctor",
           "",
           "saves",
           "lives",
           "successfully"
         ],
         "Slot_display_order": [
-          4,
           1,
-          10,
           3,
+          4,
           9
         ],
         "display_order": [
-          4,
           1,
-          10,
           3,
+          4,
           9
         ],
         "PhraseType": [
           "名詞句",
-          "名詞句",
-          "修飾句",
           "動詞句",
+          "名詞句",
           "修飾句"
         ],
         "SubslotID": [
           0,
           1,
           2,
-          3,
-          4
+          3
         ],
         "main_slots": {
-          "O1": "The doctor",
           "S": "",
-          "M3": "saves",
-          "V": "lives",
+          "V": "saves",
+          "O1": "lives",
           "M2": "successfully"
         },
         "sub_slots": {
@@ -1185,16 +1178,15 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "O1": "The doctor",
           "S": "",
-          "M3": "saves",
-          "V": "lives",
+          "V": "saves",
+          "O1": "lives",
           "M2": "successfully"
         },
         "pattern_detected": "SVO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 4,
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },

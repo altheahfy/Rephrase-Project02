@@ -350,49 +350,133 @@ class DynamicGrammarMapper:
 
     def _resolve_ambiguous_word(self, token: Dict, tokens: List[Dict], position: int, sentence: str) -> str:
         """
-        人間的品詞決定: 構文的整合性による曖昧語解決（再帰エラー修正版）
+        人間的品詞決定: 構文的整合性による曖昧語解決（安全版）
         
-        無限再帰を回避するため、一時的に簡素化
+        ユーザー提案の4段階アプローチ:
+        ①曖昧語リストの確認 ✅
+        ②両ケース試行 ✅
+        ③構文完全性チェック ✅（循環参照回避版）
+        ④最適解採用 ✅
         """
         word_text = token['text'].lower()
         
-        # 再帰エラー回避のため、デフォルトでspaCy判定を使用
         if word_text not in self.ambiguous_words:
-            return token['pos']
+            return token['pos']  # 通常のspaCy判定
         
-        # 特定の語については人間的判定を適用
-        if word_text == 'lives':
-            # 文脈に基づく詳細判定
-            prev_token = tokens[position - 1] if position > 0 else None
-            next_token = tokens[position + 1] if position < len(tokens) - 1 else None
+        candidates = self.ambiguous_words[word_text]
+        best_pos = token['pos']  # デフォルトはspaCy判定
+        best_score = 0
+        
+        self.logger.debug(f"🧠 曖昧語解決開始: '{token['text']}' 候補={candidates}")
+        
+        # 各候補を試行して構文的整合性をチェック（循環参照回避版）
+        for candidate_pos in candidates:
+            score = self._evaluate_syntactic_consistency_safe(token, candidate_pos, tokens, position, sentence)
+            self.logger.debug(f"  ケース試行: {candidate_pos} → スコア={score}")
             
-            # "lives here/there" のパターンは動詞として判定
-            if next_token and next_token['text'].lower() in ['here', 'there']:
-                self.logger.debug(f"🧠 lives → VERB (後続: {next_token['text']})")
-                return 'VERB'
-            # 前置詞の後なら名詞
-            elif prev_token and prev_token['pos'] == 'ADP':
-                self.logger.debug(f"🧠 lives → NOUN (前置詞後)")
-                return 'NOUN'
-            # メイン動詞が既に存在する場合、livesは名詞として扱う
-            elif self._has_main_verb_in_sentence(tokens, position):
-                self.logger.debug(f"🧠 lives → NOUN (メイン動詞存在)")
-                return 'NOUN'
-            # その他の場合はspaCy判定をそのまま使用
-            else:
-                self.logger.debug(f"🧠 lives → {token['pos']} (spaCy判定維持)")
-                return token['pos']
+            if score > best_score:
+                best_pos = candidate_pos
+                best_score = score
         
-        # その他の曖昧語はspaCy判定をそのまま使用
-        return token['pos']
+        self.logger.debug(f"🧠 最適解採用: '{token['text']}' → {best_pos} (スコア={best_score})")
+        return best_pos
 
-    def _has_main_verb_in_sentence(self, tokens: List[Dict], current_position: int) -> bool:
-        """文中に既にメイン動詞が存在するかチェック"""
-        for i, token in enumerate(tokens):
-            if i != current_position and token['pos'] == 'VERB' and token['dep'] in ['ROOT', 'relcl']:
-                self.logger.debug(f"  メイン動詞発見: '{token['text']}' at {i}")
-                return True
-        return False
+    def _evaluate_syntactic_consistency_safe(self, ambiguous_token: Dict, candidate_pos: str, 
+                                           tokens: List[Dict], position: int, sentence: str) -> float:
+        """
+        構文的整合性の評価（循環参照回避版）
+        
+        人間的思考プロセス:
+        - ケース1試行: 名詞として解釈 → 文構造の完全性チェック
+        - ケース2試行: 動詞として解釈 → 文構造の完全性チェック
+        - より完全な構造を持つケースを選択
+        """
+        # 仮想的にトークンの品詞を変更
+        test_tokens = [t.copy() for t in tokens]
+        test_tokens[position]['pos'] = candidate_pos
+        
+        # 循環参照を回避した構文構造の評価
+        structure_score = self._analyze_sentence_structure_completeness_safe(test_tokens, sentence)
+        
+        return structure_score
+
+    def _analyze_sentence_structure_completeness_safe(self, tokens: List[Dict], sentence: str) -> float:
+        """
+        文構造の完全性を分析（循環参照回避版）
+        
+        人間的思考:
+        - 関係詞があるなら、関係節 + メイン文の両方が必要
+        - 関係節のみで終わる → 構造的に不完全
+        - 関係節 + メイン文 → 構造的に完全
+        """
+        score = 0.0
+        
+        # 関係詞の存在チェック
+        has_relative_pronoun = self._has_relative_pronoun(sentence)
+        
+        if has_relative_pronoun:
+            self.logger.debug(f"    🔍 関係節文として評価開始")
+            
+            # 関係節 + メイン文の分離評価（循環参照回避版）
+            relative_clause_complete = self._check_relative_clause_completeness_safe(tokens)
+            main_clause_complete = self._check_main_clause_completeness_safe(tokens)
+            
+            self.logger.debug(f"    関係節完全性: {relative_clause_complete}")
+            self.logger.debug(f"    メイン文完全性: {main_clause_complete}")
+            
+            # 関係節構文では両方が必要
+            if relative_clause_complete and main_clause_complete:
+                score = 100.0  # 完全な関係節構文
+                self.logger.debug(f"    ✅ 完全な関係節構文: +100")
+            elif relative_clause_complete and not main_clause_complete:
+                score = 20.0   # 関係節のみ（構造的に不完全）
+                self.logger.debug(f"    ❌ 関係節のみ（メイン文欠如）: +20")
+            elif not relative_clause_complete and main_clause_complete:
+                score = 30.0   # メイン文のみ（関係節無視は不自然）
+                self.logger.debug(f"    ❌ メイン文のみ（関係節無視）: +30")
+            else:
+                score = 0.0    # 両方不完全
+                self.logger.debug(f"    ❌ 両方不完全: +0")
+        else:
+            # 通常文の評価
+            if self._has_main_verb_simple(tokens) and self._has_subject_structure_simple(tokens):
+                score = 100.0
+                self.logger.debug(f"    ✅ 通常文完全: +100")
+        
+        self.logger.debug(f"    総合スコア: {score}/100")
+        return score
+
+    def _check_main_clause_completeness_safe(self, tokens: List[Dict]) -> bool:
+        """メイン文の完全性チェック（循環参照回避版）"""
+        # 関係節以外の部分にメイン動詞が存在するか（曖昧語解決は使わない）
+        main_verbs = []
+        for token in tokens:
+            if token['pos'] in ['VERB', 'AUX'] and token['dep'] in ['ROOT']:
+                main_verbs.append(token)
+                self.logger.debug(f"      メイン動詞候補: '{token['text']}' (pos={token['pos']})")
+        
+        return len(main_verbs) > 0
+
+    def _check_relative_clause_completeness_safe(self, tokens: List[Dict]) -> bool:
+        """関係節の完全性チェック（循環参照回避版）"""
+        has_relative_pronoun = False
+        has_relative_verb = False
+        
+        for token in tokens:
+            if token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose']:
+                has_relative_pronoun = True
+            elif token['pos'] in ['VERB', 'AUX'] and token['dep'] in ['relcl']:
+                has_relative_verb = True
+        
+        return has_relative_pronoun and has_relative_verb
+
+    def _has_main_verb_simple(self, tokens: List[Dict]) -> bool:
+        """簡易メイン動詞チェック"""
+        return any(token['pos'] == 'VERB' for token in tokens)
+
+    def _has_subject_structure_simple(self, tokens: List[Dict]) -> bool:
+        """簡易主語構造チェック"""
+        return any(token['pos'] in ['NOUN', 'PRON', 'PROPN'] for token in tokens)
 
     def _evaluate_syntactic_consistency(self, ambiguous_token: Dict, candidate_pos: str, 
                                        tokens: List[Dict], position: int, sentence: str) -> float:
