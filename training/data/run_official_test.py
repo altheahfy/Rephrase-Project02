@@ -183,10 +183,11 @@ def run_official_test_with_selected_cases(selected_cases):
             }
             
             print(f"期待値: {expected}")
-            print(f"実際値: {result.get('main_slots', {})}")
+            print(f"実際値: {result.get('slots', {})}")  # main_slots -> slots
             if expected.get('sub_slots'):
                 print(f"サブ期待: {expected.get('sub_slots', {})}")
                 print(f"サブ実際: {result.get('sub_slots', {})}")
+                print(f"🔍 DEBUG: 完全なresult構造: {result}")  # デバッグ用
             
         except Exception as e:
             print(f"動的文法解析エラー: {e}")
