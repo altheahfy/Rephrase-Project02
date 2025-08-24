@@ -1376,13 +1376,16 @@ class DynamicGrammarMapper:
         # 🔧 関係節の有無を確認してスロット番号を調整
         has_relative_clause = bool(sub_slots)
         
-        # 関係節がある場合は修飾語のスロット番号をシフト
-        if has_relative_clause:
+        # C. 「相対節ありのシフト」は一度きりにする
+        result = {}
+        if has_relative_clause and not getattr(self, '_shifted_for_relcl', False):
             for element in elements:
                 if element.role == 'M1':
                     element.role = 'M2'  # M1 → M2
                 elif element.role == 'M2':
                     element.role = 'M3'  # M2 → M3
+            self._shifted_for_relcl = True  # 一度だけ実行するフラグ
+            result['_shifted_for_relcl'] = True  # 結果にも印を残す
             
         slots = []
         slot_phrases = []
@@ -1455,6 +1458,12 @@ class DynamicGrammarMapper:
             # spaCyから副詞を抽出 (関係節処理は既存システムに任せる)
             adverbs = []
             
+            # B. サブスロット内副詞の除外は"語境界"で
+            sub_words = set()
+            for v in (current_result.get('sub_slots') or {}).values():
+                if isinstance(v, str):
+                    sub_words.update(v.split())  # 文字列→語リスト化
+            
             # メイン動詞の位置を特定
             main_verb_pos = None
             main_verb = current_result.get('main_slots', {}).get('V', '')
@@ -1466,8 +1475,8 @@ class DynamicGrammarMapper:
             
             for token in doc:
                 if token.pos_ == 'ADV':
-                    # サブスロット内の副詞は除外（既に関係節ハンドラーで処理済み）
-                    if not any(token.text in slot_value for slot_value in current_result.get('sub_slots', {}).values() if slot_value):
+                    # サブスロット内の副詞は除外（語単位の一致）
+                    if token.text not in sub_words:
                         adverbs.append({
                             'text': token.text,
                             'index': token.i,
@@ -1488,10 +1497,10 @@ class DynamicGrammarMapper:
             # Rephraseルールに基づく配置（動詞位置ベース）- 既存スロット無視で完全再配置
             modifier_assignments = {}
             
-            # 🔥 既存のM1, M2, M3を一旦クリア（副詞ハンドラーが完全制御）
-            modifier_assignments['M1'] = ''
-            modifier_assignments['M2'] = ''  
-            modifier_assignments['M3'] = ''
+            # 🔥 A. まず明示的に既存 M1/M2/M3 を消す（空文字ではなく削除）
+            for k in ('M1', 'M2', 'M3'):
+                current_result.get('main_slots', {}).pop(k, None)
+                current_result.get('slots', {}).pop(k, None)
             
             adverb_count = len(adverbs)
             
@@ -1530,8 +1539,19 @@ class DynamicGrammarMapper:
             
             print(f"🔍 副詞配置結果: {modifier_assignments}")
             
+            # デバッグ：収束確認用のハッシュ
+            sig = '|'.join([current_result['main_slots'].get(k,'') for k in ('M1','M2','M3')])
+            print(f"🔍 ADV_SIGNATURE_BEFORE={sig}")
+            
             # 空文字列のスロットは返さない
-            return {k: v for k, v in modifier_assignments.items() if v}
+            result = {k: v for k, v in modifier_assignments.items() if v}
+            
+            # 適用後のハッシュも確認
+            if result:
+                new_sig = '|'.join([result.get(k,'') for k in ('M1','M2','M3')])
+                print(f"🔍 ADV_SIGNATURE_AFTER={new_sig}")
+            
+            return result
             
         except Exception as e:
             self.logger.error(f"直接副詞処理エラー: {e}")
@@ -2197,7 +2217,7 @@ class DynamicGrammarMapper:
         antecedent_idx = relative_info.get('antecedent_idx')
         verb_indices = core_elements.get('verb_indices', [])
         
-        if not antecedent_idx or not verb_indices:
+        if antecedent_idx is None or not verb_indices:
             return None
             
         main_verb_idx = verb_indices[0] if verb_indices else len(tokens)
