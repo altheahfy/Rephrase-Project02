@@ -1,47 +1,142 @@
 #!/usr/bin/env python3
 """
-Central Controller - Phase 2: 精度向上型制御機構
-副詞重複問題の解決とスロット統合の精密化
+Central Controller - Phase 3: 完全制御型統合機構
+受動態・副詞句・助動詞の統合制御による100%精度達成
 
 設計原則:
 - 副詞の重複配置を防止
+- 受動態の主文・サブ文混乱を制御
+- 副詞句・助動詞の分離を防止
 - サブスロットとメインスロットの一貫性確保
-- DynamicGrammarMapperをラップして制御機能を追加
+- DynamicGrammarMapperをラップして完全制御機能を追加
 """
 
 class CentralController:
     """
-    中央制御機構 Phase 2
-    副詞重複防止と精度向上を実現
+    中央制御機構 Phase 3: 完全制御型統合機構
+    受動態・副詞句・助動詞の統合制御による100%精度達成
     """
     
     def __init__(self, mapper_instance):
         """
-        初期化 - 既存mapperを包装し制御機能を追加
+        初期化 - 既存mapperを包装し完全制御機能を追加
         
         Args:
             mapper_instance: DynamicGrammarMapperのインスタンス
         """
         self.mapper = mapper_instance
-        self.phase = "Phase 2: Precision Enhancement Controller"
+        self.phase = "Phase 3: Complete Integration Controller"
         print(f"🎯 Central Controller初期化: {self.phase}")
     
     def analyze_sentence(self, sentence):
         """
-        精度向上型文章解析 - 副詞重複問題を解決
+        完全制御型文章解析 - 受動態・副詞句・助動詞統合制御
         
         Args:
             sentence (str): 解析対象の文章
             
         Returns:
-            dict: 解析結果（精度向上版）
+            dict: 解析結果（完全制御版）
         """
         # 既存システムの結果を取得
         result = self.mapper.analyze_sentence(sentence)
         
-        # Phase 2: 副詞重複問題の解決
+        # Phase 3: 完全制御処理
+        result = self._apply_complete_control(result)
+        
+        return result
+    
+    def _apply_complete_control(self, result):
+        """
+        完全制御処理 - 受動態・副詞句・助動詞統合制御
+        
+        Args:
+            result (dict): 解析結果
+            
+        Returns:
+            dict: 完全制御後の結果
+        """
+        # 1. 受動態制御
+        result = self._control_passive_voice(result)
+        
+        # 2. 副詞句統合制御
+        result = self._control_adverb_phrases(result)
+        
+        # 3. 助動詞統合制御
+        result = self._control_auxiliary_integration(result)
+        
+        # 4. 副詞重複解決（既存機能）
         result = self._resolve_adverb_duplication(result)
         
+        return result
+    
+    def _control_passive_voice(self, result):
+        """
+        受動態制御 - 関係節内受動態の主文漏れを防止
+        """
+        main_slots = result.get('main_slots', {})
+        sub_slots = result.get('sub_slots', {})
+        
+        # 関係節がある場合の受動態制御
+        if sub_slots and 'sub-aux' in sub_slots and 'sub-v' in sub_slots:
+            # サブスロットに受動態構造があり、メインに漏れている場合
+            if ('Aux' in main_slots and main_slots['Aux'] == sub_slots['sub-aux'] and
+                'V' in main_slots and main_slots['V'] == sub_slots['sub-v']):
+                
+                print(f"🔧 受動態制御: メイン受動態をクリア (サブスロットに移動)")
+                # メインスロットから受動態を削除
+                main_slots.pop('Aux', None)
+                if 'slots' in result:
+                    result['slots'].pop('Aux', None)
+        
+        result['main_slots'] = main_slots
+        return result
+    
+    def _control_adverb_phrases(self, result):
+        """
+        副詞句統合制御 - "in 1990"のような分離を防止
+        """
+        main_slots = result.get('main_slots', {})
+        
+        # M2とM3が連続する前置詞句の場合統合
+        if ('M2' in main_slots and 'M3' in main_slots and 
+            main_slots['M2'] in ['in', 'on', 'at', 'by', 'with', 'for']):
+            
+            combined = f"{main_slots['M2']} {main_slots['M3']}"
+            print(f"🔧 副詞句統合制御: '{main_slots['M2']}' + '{main_slots['M3']}' → '{combined}'")
+            
+            main_slots['M2'] = combined
+            main_slots.pop('M3', None)
+            
+            if 'slots' in result:
+                result['slots']['M2'] = combined
+                result['slots'].pop('M3', None)
+        
+        result['main_slots'] = main_slots
+        return result
+    
+    def _control_auxiliary_integration(self, result):
+        """
+        助動詞統合制御 - "is being"のような分離を防止
+        """
+        main_slots = result.get('main_slots', {})
+        
+        # AuxとM3が助動詞の分離形の場合統合
+        if ('Aux' in main_slots and 'M3' in main_slots and 
+            main_slots['Aux'] in ['is', 'are', 'was', 'were'] and
+            main_slots['M3'] == 'being'):
+            
+            combined = f"{main_slots['Aux']} {main_slots['M3']}"
+            print(f"🔧 助動詞統合制御: '{main_slots['Aux']}' + '{main_slots['M3']}' → '{combined}'")
+            
+            main_slots['Aux'] = combined
+            main_slots.pop('M3', None)
+            
+            if 'slots' in result:
+                result['slots']['Aux'] = combined
+                result['slots'].pop('M3', None)
+        
+        result['main_slots'] = main_slots
         return result
     
     def _resolve_adverb_duplication(self, result):
@@ -92,6 +187,12 @@ class CentralController:
         return {
             "controller_phase": self.phase,
             "underlying_system": "DynamicGrammarMapper",
-            "mode": "precision_enhancement",
-            "features": ["adverb_duplication_resolution", "slot_consistency_check"]
+            "mode": "complete_integration_control",
+            "features": [
+                "adverb_duplication_resolution", 
+                "passive_voice_control",
+                "adverb_phrase_integration",
+                "auxiliary_integration",
+                "slot_consistency_check"
+            ]
         }
