@@ -288,7 +288,7 @@ class DynamicGrammarMapper:
             # すべてのトークンがconsumedならスロット削除対象
             if slot_token_indices and all(idx in self._consumed_tokens for idx in slot_token_indices):
                 # ただし、consumedトークンを設定した元のスロットは保持
-                if slot_name not in ['M1']:  # M1='by John'は保持
+                if slot_name not in ['M2']:  # M2='by John'は保持（Rephrase副詞ルール）
                     slots_to_remove.append(slot_name)
                     print(f"🔥 ChatGPT5 Step D: Removing duplicate slot {slot_name}='{slot_value}' (consumed tokens)")
         
@@ -2748,25 +2748,10 @@ class DynamicGrammarMapper:
             
             # M スロット: by句の配置（Rephrase仕様：「～によって」全体が副詞句）
             if by_agent:
-                # 既存のM1/M2/M3を確認して空いているスロットに配置
-                existing_modifiers = []
-                for m_slot in ['M1', 'M2', 'M3']:
-                    if current_result.get('slots', {}).get(m_slot):
-                        existing_modifiers.append(m_slot)
-                
-                # 最初の空きスロットにby句全体を配置（Rephrase仕様）
-                assigned = False
-                for m_slot in ['M1', 'M2', 'M3']:
-                    if m_slot not in existing_modifiers:
-                        slots[m_slot] = by_agent  # "by John" 全体を副詞句として配置
-                        assigned = True
-                        print(f"🔍 by句配置: {m_slot}='{by_agent}' (副詞句として全体配置)")
-                        break
-                
-                if not assigned:
-                    # 全スロット埋まっている場合はM3を上書き
-                    slots['M3'] = by_agent
-                    print(f"🔍 by句配置: M3='{by_agent}' (上書き配置)")
+                # Rephrase副詞配置ルール: 単独副詞句はM2に配置
+                # （複数副詞がある場合は副詞ハンドラーが後で調整）
+                slots['M2'] = by_agent  # "by John" 全体を副詞句としてM2配置
+                print(f"🔍 by句配置: M2='{by_agent}' (Rephrase副詞ルール：単独副詞句→M2)")
             
             # 4. ハンドラー結果構造
             # ChatGPT5 Step C: Mark tokens as consumed for by-phrase

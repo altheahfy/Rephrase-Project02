@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-08-24T15:41:18.442716",
-  "total_tests": 17,
+  "timestamp": "2025-08-24T17:56:40.544030",
+  "total_tests": 35,
   "results": {
     "1": {
       "sentence": "The car is red.",
@@ -58,6 +58,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -120,192 +125,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "55": {
-      "sentence": "Birds fly.",
-      "expected": {
-        "main_slots": {
-          "S": "Birds",
-          "V": "fly"
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
         },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "Birds",
-          "fly"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
-        "main_slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 2,
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "58": {
-      "sentence": "She looks happy.",
-      "expected": {
-        "main_slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "She",
-          "looks",
-          "happy"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
-    "64": {
-      "sentence": "I gave him a book.",
-      "expected": {
-        "main_slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "O2"
-        ],
-        "SlotPhrase": [
-          "I",
-          "gave",
-          "him",
-          "a book"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "pattern_detected": "SVOO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -378,6 +202,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -450,6 +279,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -522,6 +356,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -594,6 +433,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -666,6 +510,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -738,6 +587,339 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "9": {
+      "sentence": "The car which was crashed is red.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "crashed",
+          "is",
+          "red"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "crashed",
+          "M3": "red",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "crashed",
+          "M3": "red",
+          "Aux": "was"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "crashed",
+              "by_agent": "",
+              "confidence": 0.9,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='crashed', M(by句)=''"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "crashed",
+                  "by_agent": "",
+                  "confidence": 0.9,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='crashed', M(by句)=''"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=crashed→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "10": {
+      "sentence": "The book that was written is famous.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "M3",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "",
+          "written",
+          "is",
+          "famous"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "display_order": [
+          1,
+          3,
+          10,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "",
+          "V": "written",
+          "M3": "famous",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "S": "",
+          "V": "written",
+          "M3": "famous",
+          "Aux": "was"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "written",
+              "by_agent": "",
+              "confidence": 0.9,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='written', M(by句)=''"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "written",
+                  "by_agent": "",
+                  "confidence": 0.9,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='written', M(by句)=''"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=written→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "relative_clause",
+      "status": "success"
+    },
+    "11": {
+      "sentence": "The letter which was sent arrived.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "O1",
+          "S",
+          "M3",
+          "V"
+        ],
+        "SlotPhrase": [
+          "The letter",
+          "",
+          "sent",
+          "arrived"
+        ],
+        "Slot_display_order": [
+          4,
+          1,
+          10,
+          3
+        ],
+        "display_order": [
+          4,
+          1,
+          10,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "名詞句",
+          "修飾句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "O1": "The letter",
+          "S": "",
+          "M3": "sent",
+          "V": "arrived",
+          "Aux": "was"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "O1": "The letter",
+          "S": "",
+          "M3": "sent",
+          "V": "arrived",
+          "Aux": "was"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "sent",
+              "by_agent": "",
+              "confidence": 0.9,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='sent', M(by句)=''"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "sent",
+                  "by_agent": "",
+                  "confidence": 0.9,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='sent', M(by句)=''"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=sent→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -763,7 +945,7 @@
         "Slot": [
           "S",
           "V",
-          "M2"
+          "M1"
         ],
         "SlotPhrase": [
           "",
@@ -773,12 +955,12 @@
         "Slot_display_order": [
           1,
           3,
-          9
+          8
         ],
         "display_order": [
           1,
           3,
-          9
+          8
         ],
         "PhraseType": [
           "名詞句",
@@ -810,6 +992,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -882,6 +1069,11 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
@@ -952,25 +1144,29 @@
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
       "test_type": "relative_whose",
       "status": "success"
     },
-    "34": {
-      "sentence": "The student who studies diligently always succeeds academically.",
+    "15": {
+      "sentence": "The place where we met is beautiful.",
       "expected": {
         "main_slots": {
           "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
+          "V": "is",
+          "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-s": "The student who",
-          "sub-v": "studies",
-          "sub-m2": "diligently",
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met",
           "_parent_slot": "S"
         }
       },
@@ -978,27 +1174,27 @@
         "Slot": [
           "S",
           "V",
-          "M2"
+          "C1"
         ],
         "SlotPhrase": [
           "",
-          "succeeds",
-          "academically"
+          "is",
+          "beautiful"
         ],
         "Slot_display_order": [
           1,
           3,
-          9
+          6
         ],
         "display_order": [
           1,
           3,
-          9
+          6
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
-          "修飾句"
+          "補語句"
         ],
         "SubslotID": [
           0,
@@ -1007,159 +1203,1336 @@
         ],
         "main_slots": {
           "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
+          "V": "is",
+          "C1": "beautiful"
         },
         "sub_slots": {
-          "sub-v": "studies",
-          "sub-m2": "diligently",
-          "sub-s": "The student who",
+          "sub-v": "met",
+          "sub-s": "we",
+          "sub-o1": "The place where",
           "_parent_slot": "S"
         },
         "slots": {
           "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
+          "V": "is",
+          "C1": "beautiful"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
-      "test_type": "relative_clause",
+      "test_type": "basic_five_pattern",
       "status": "success"
     },
-    "35": {
-      "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "21": {
+      "sentence": "The letter was written by John.",
       "expected": {
         "main_slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
         },
-        "sub_slots": {
-          "sub-s": "The teacher whose class",
-          "sub-v": "runs",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
-        }
+        "sub_slots": {}
       },
       "analysis_result": {
         "Slot": [
           "S",
           "Aux",
           "V",
-          "M2"
+          "M2",
+          "O1"
         ],
         "SlotPhrase": [
-          "",
-          "is",
-          "respected",
-          "greatly"
+          "The letter",
+          "was",
+          "written",
+          "by",
+          "John"
         ],
         "Slot_display_order": [
           1,
           2,
           3,
-          9
+          9,
+          4
         ],
         "display_order": [
           1,
           2,
           3,
-          9
+          9,
+          4
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
           "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "written",
+              "by_agent": "by John",
+              "confidence": 0.9500000000000001,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='written', M(by句)='by John'"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "written",
+                  "by_agent": "by John",
+                  "confidence": 0.9500000000000001,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='written', M(by句)='by John'"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=written→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "passive_voice",
+      "status": "success"
+    },
+    "22": {
+      "sentence": "The house was built in 1990.",
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "M3"
+        ],
+        "SlotPhrase": [
+          "The house",
+          "was",
+          "built",
+          "in",
+          "1990"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          10
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          10
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
           "修飾句"
         ],
         "SubslotID": [
           0,
           1,
           2,
-          3
+          3,
+          4
         ],
         "main_slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in",
+          "M3": "1990"
         },
-        "sub_slots": {
-          "sub-v": "runs",
-          "sub-s": "The teacher whose class",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
-        },
+        "sub_slots": {},
         "slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in",
+          "M3": "1990"
         },
         "pattern_detected": "SV",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 5,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "built",
+              "by_agent": "",
+              "confidence": 0.9,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='built', M(by句)=''"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "built",
+                  "by_agent": "",
+                  "confidence": 0.9,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='built', M(by句)=''"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=built→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "23": {
+      "sentence": "The book was written by a famous author.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "The book",
+          "was",
+          "written",
+          "by",
+          "a famous author"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "written",
+              "by_agent": "by a famous author",
+              "confidence": 0.9500000000000001,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='written', M(by句)='by a famous author'"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "written",
+                  "by_agent": "by a famous author",
+                  "confidence": 0.9500000000000001,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='written', M(by句)='by a famous author'"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=written→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "passive_voice",
+      "status": "success"
+    },
+    "24": {
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "Aux",
+          "M3",
+          "V",
+          "M2",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "The cake",
+          "is",
+          "being",
+          "baked",
+          "by",
+          "my mother"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          10,
+          3,
+          9,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          10,
+          3,
+          9,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is",
+          "M3": "being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The cake",
+          "Aux": "is",
+          "M3": "being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 6,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "being",
+              "past_participle": "baked",
+              "by_agent": "by my mother",
+              "confidence": 0.9500000000000001,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='being', V='baked', M(by句)='by my mother'"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "being",
+                  "past_participle": "baked",
+                  "by_agent": "by my mother",
+                  "confidence": 0.9500000000000001,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='being', V='baked', M(by句)='by my mother'"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=being→Aux, pp=baked→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "passive_voice",
+      "status": "success"
+    },
+    "25": {
+      "sentence": "The cake was eaten by the children.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "Aux",
+          "V",
+          "M2",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "The cake",
+          "was",
+          "eaten",
+          "by",
+          "the children"
+        ],
+        "Slot_display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "display_order": [
+          1,
+          2,
+          3,
+          9,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 5,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "was",
+              "past_participle": "eaten",
+              "by_agent": "by the children",
+              "confidence": 0.9500000000000001,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='was', V='eaten', M(by句)='by the children'"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "was",
+                  "past_participle": "eaten",
+                  "by_agent": "by the children",
+                  "confidence": 0.9500000000000001,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='was', V='eaten', M(by句)='by the children'"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=was→Aux, pp=eaten→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "passive_voice",
+      "status": "success"
+    },
+    "53": {
+      "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "famous",
+          "M2": "rapidly"
+        },
+        "sub_slots": {
+          "sub-s": "The artist whose paintings",
+          "sub-aux": "were",
+          "sub-v": "exhibited",
+          "sub-m2": "internationally",
+          "_parent_slot": "S"
+        }
+      },
+      "analysis_result": {
+        "Slot": [
+          "C1",
+          "S",
+          "M3",
+          "M1",
+          "V",
+          "M3",
+          "M1"
+        ],
+        "SlotPhrase": [
+          "The artist",
+          "",
+          "exhibited",
+          "internationally",
+          "became",
+          "famous",
+          "rapidly"
+        ],
+        "Slot_display_order": [
+          6,
+          1,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "display_order": [
+          6,
+          1,
+          10,
+          8,
+          3,
+          10,
+          8
+        ],
+        "PhraseType": [
+          "補語句",
+          "名詞句",
+          "修飾句",
+          "修飾句",
+          "動詞句",
+          "修飾句",
+          "修飾句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "main_slots": {
+          "C1": "The artist",
+          "S": "",
+          "V": "became",
+          "Aux": "were",
+          "M2": "internationally",
+          "M3": "rapidly"
+        },
+        "sub_slots": {
+          "sub-v": "were",
+          "sub-s": "The artist whose paintings",
+          "_parent_slot": "S"
+        },
+        "slots": {
+          "C1": "The artist",
+          "S": "",
+          "V": "became",
+          "Aux": "were",
+          "M2": "internationally",
+          "M3": "rapidly"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 7,
+        "unified_handlers": {
+          "detected_patterns": [
+            {
+              "type": "passive_voice",
+              "be_verb": "were",
+              "past_participle": "exhibited",
+              "by_agent": "",
+              "confidence": 0.9,
+              "detection_method": "spacy_morphological",
+              "rephrase_allocation": "Aux='were', V='exhibited', M(by句)=''"
+            }
+          ],
+          "handler_contributions": {
+            "passive_voice": {
+              "patterns": [
+                {
+                  "type": "passive_voice",
+                  "be_verb": "were",
+                  "past_participle": "exhibited",
+                  "by_agent": "",
+                  "confidence": 0.9,
+                  "detection_method": "spacy_morphological",
+                  "rephrase_allocation": "Aux='were', V='exhibited', M(by句)=''"
+                }
+              ],
+              "handler_success": true,
+              "processing_notes": "Passive voice (Rephrase): be=were→Aux, pp=exhibited→V, by句→M(副詞句)"
+            }
+          },
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
       "test_type": "relative_whose",
       "status": "success"
     },
-    "36": {
-      "sentence": "The doctor who works carefully saves lives successfully.",
+    "55": {
+      "sentence": "Birds fly.",
       "expected": {
         "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
+          "S": "Birds",
+          "V": "fly"
         },
-        "sub_slots": {
-          "sub-s": "The doctor who",
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "_parent_slot": "S"
-        }
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Birds",
+          "fly"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "56": {
+      "sentence": "Children play.",
+      "expected": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Children",
+          "play"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "57": {
+      "sentence": "Time passes.",
+      "expected": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V"
+        ],
+        "SlotPhrase": [
+          "Time",
+          "passes"
+        ],
+        "Slot_display_order": [
+          1,
+          3
+        ],
+        "display_order": [
+          1,
+          3
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句"
+        ],
+        "SubslotID": [
+          0,
+          1
+        ],
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "pattern_detected": "SV",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 2,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "58": {
+      "sentence": "She looks happy.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "She",
+          "looks",
+          "happy"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "59": {
+      "sentence": "He became a doctor.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "He",
+          "became",
+          "a doctor"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "60": {
+      "sentence": "The food tastes good.",
+      "expected": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "C1"
+        ],
+        "SlotPhrase": [
+          "The food",
+          "tastes",
+          "good"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          6
+        ],
+        "display_order": [
+          1,
+          3,
+          6
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "pattern_detected": "SVC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "61": {
+      "sentence": "I read books.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "I",
+          "read",
+          "books"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "62": {
+      "sentence": "She plays piano.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "She",
+          "plays",
+          "piano"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "63": {
+      "sentence": "We study English.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1"
+        ],
+        "SlotPhrase": [
+          "We",
+          "study",
+          "English"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4
+        ],
+        "display_order": [
+          1,
+          3,
+          4
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2
+        ],
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "pattern_detected": "SVO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 3,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "64": {
+      "sentence": "I gave him a book.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
       },
       "analysis_result": {
         "Slot": [
           "S",
           "V",
           "O1",
-          "M2"
+          "O2"
         ],
         "SlotPhrase": [
-          "",
-          "saves",
-          "lives",
-          "successfully"
+          "I",
+          "gave",
+          "him",
+          "a book"
         ],
         "Slot_display_order": [
           1,
           3,
           4,
-          9
+          5
         ],
         "display_order": [
           1,
           3,
           4,
-          9
+          5
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
           "名詞句",
-          "修飾句"
+          "名詞句"
         ],
         "SubslotID": [
           0,
@@ -1168,31 +2541,335 @@
           3
         ],
         "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
         },
-        "sub_slots": {
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "sub-s": "The doctor who",
-          "_parent_slot": "S"
-        },
+        "sub_slots": {},
         "slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SVOO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
         "sentence_type": "statement",
         "sentence_type_confidence": 0.8
       },
-      "test_type": "relative_clause",
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "65": {
+      "sentence": "She told me a story.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "O2"
+        ],
+        "SlotPhrase": [
+          "She",
+          "told",
+          "me",
+          "a story"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "66": {
+      "sentence": "He bought her flowers.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "O2"
+        ],
+        "SlotPhrase": [
+          "He",
+          "bought",
+          "her",
+          "flowers"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "名詞句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "pattern_detected": "SVOO",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "67": {
+      "sentence": "We call him Tom.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "C2"
+        ],
+        "SlotPhrase": [
+          "We",
+          "call",
+          "him",
+          "Tom"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
+      "status": "success"
+    },
+    "68": {
+      "sentence": "I found it interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      },
+      "analysis_result": {
+        "Slot": [
+          "S",
+          "V",
+          "O1",
+          "C2"
+        ],
+        "SlotPhrase": [
+          "I",
+          "found",
+          "it",
+          "interesting"
+        ],
+        "Slot_display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "display_order": [
+          1,
+          3,
+          4,
+          7
+        ],
+        "PhraseType": [
+          "名詞句",
+          "動詞句",
+          "名詞句",
+          "補語句"
+        ],
+        "SubslotID": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {},
+        "slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "pattern_detected": "SVOC",
+        "confidence": 0.9,
+        "analysis_method": "dynamic_grammar",
+        "lexical_tokens": 4,
+        "unified_handlers": {
+          "detected_patterns": [],
+          "handler_contributions": {},
+          "control_flags": {}
+        },
+        "sentence_type": "statement",
+        "sentence_type_confidence": 0.8
+      },
+      "test_type": "basic_five_pattern",
       "status": "success"
     }
   }
