@@ -208,11 +208,20 @@ class DynamicGrammarMapper:
             # 3. 動詞の性質から文型を推定（除外されたトークンを使用）
             sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
             
-            # 4. 文法要素を動的に割り当て（除外されたトークンを使用）
-            grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
-            
-            # 5. Rephraseスロット形式に変換
-            rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
+            # 🔥 依存関係厳禁システム：レガシー分析スキップ、統合ハンドラー専用
+            if allow_unified:  # 統合ハンドラーのみ使用
+                # 空の初期結果を準備
+                rephrase_result = {
+                    'sentence': sentence, 
+                    'slots': {}, 
+                    'sub_slots': sub_slots or {},
+                    'grammar_info': {'detected_patterns': [], 'handler_contributions': {}, 'control_flags': {}},
+                    'slot_provenance': {}
+                }
+            else:
+                # レガシー分析（依存関係使用、当システムでは厳禁）
+                grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
+                rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
             
             # 🔥 Phase 2: 統合ハンドラーシステム実行（受動態・助動詞・副詞処理）
             if allow_unified:  # ChatGPT5 Step A: Re-entrancy Guard
@@ -4198,15 +4207,10 @@ class DynamicGrammarMapper:
             return {}
     
     def _analyze_sentence_legacy(self, sentence: str, doc) -> Dict:
-        """既存のanalyze_sentenceロジックをラップ"""
-        # 既存のanalyze_sentenceメソッドを呼び出し、結果を返す
-        # 現在は既存システムと統合ハンドラーシステムの橋渡し役
-        try:
-            # ChatGPT5 Step A: Re-entrancy Guard - 再帰防止のためallow_unified=False
-            return self.analyze_sentence(sentence, allow_unified=False)
-        except Exception as e:
-            self.logger.error(f"Legacy analysis error: {e}")
-            return {'slots': {}, 'error': str(e)}
+        """レガシーシステム完全除去：依存関係厳禁システムでは使用不可"""
+        # 🚫 依存関係使用レガシーシステムは当該システムでは厳禁
+        self.logger.warning("⚠️ レガシーシステム呼び出し試行：依存関係厳禁システムでは使用不可")
+        return {'slots': {}, 'error': 'Legacy system disabled: dependency parsing forbidden'}
 
 # テスト用のメイン関数とテストスイート
 def run_full_test_suite(test_data_path: str = None) -> Dict[str, Any]:
