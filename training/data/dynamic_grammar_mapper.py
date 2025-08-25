@@ -68,8 +68,7 @@ class DynamicGrammarMapper:
         self.handler_shared_context = {}  # ハンドラー間情報共有
         self.handler_success_count = {}  # ハンドラー成功統計
         
-        # 🔥 Phase 1.1: 段階的依存関係削除制御フラグ
-        self._use_dependency_info = False  # True=従来通り, False=品詞ベース分析
+        # 🔥 Phase 1.3: 依存関係削除完了 - 品詞ベース分析に完全移行
         
         # ChatGPT5診断: 再入ガード対策
         self._analysis_depth = 0  # 解析深度カウンタ（無限ループ防止）
@@ -84,9 +83,9 @@ class DynamicGrammarMapper:
         self._initialize_basic_handlers()
         
         # ハンドラー管理システムの初期化完了をログ出力
-        print(f"🔥 Phase 1.1 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
+        print(f"🔥 Phase 1.3 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
         print(f"   アクティブハンドラー: {', '.join(self.active_handlers)}")
-        print(f"   依存関係使用フラグ: {self._use_dependency_info}")  # Phase 1.1追加
+        print(f"   依存関係削除: 完了（品詞ベース分析に完全移行）")  # Phase 1.3完了
         
         # 🆕 Phase 1.2: 文型認識エンジン初期化
         # self.sentence_type_detector = SentenceTypeDetector()  # 一時的にコメント化
@@ -380,10 +379,10 @@ class DynamicGrammarMapper:
                 'pos': token.pos_,
                 'tag': token.tag_,
                 'lemma': token.lemma_,
-                # Phase 1: 品詞ベース分析への段階移行 - 依存関係情報の条件付き保持
-                'dep': token.dep_ if hasattr(self, '_use_dependency_info') and self._use_dependency_info else 'UNKNOWN',  # 依存関係
-                'head': token.head.text if hasattr(self, '_use_dependency_info') and self._use_dependency_info else '',
-                'head_idx': token.head.i if hasattr(self, '_use_dependency_info') and self._use_dependency_info else -1,  # 🆕 依存関係のヘッドインデックス
+                # Phase 1.3: 依存関係情報を完全に除去し、品詞ベース分析に完全移行
+                'dep': 'UNKNOWN',  # 依存関係情報は使用しない
+                'head': '',  # ヘッド情報は使用しない
+                'head_idx': -1,  # ヘッドインデックスは使用しない
                 'is_stop': token.is_stop,
                 'is_alpha': token.is_alpha,
                 'index': token.i
