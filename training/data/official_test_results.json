@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-25T18:32:31.588340",
+  "timestamp": "2025-08-25T19:42:11.519408",
   "total_tests": 36,
   "results": {
     "1": {
@@ -396,7 +396,7 @@
         "SlotPhrase": [
           "He",
           "became",
-          "a doctor"
+          "a"
         ],
         "Slot_display_order": [
           1,
@@ -421,13 +421,13 @@
         "main_slots": {
           "S": "He",
           "V": "became",
-          "C1": "a doctor"
+          "C1": "a"
         },
         "sub_slots": {},
         "slots": {
           "S": "He",
           "V": "became",
-          "C1": "a doctor"
+          "C1": "a"
         },
         "pattern_detected": "SVC",
         "confidence": 0.9,
@@ -734,7 +734,7 @@
           "I",
           "gave",
           "him",
-          "a book"
+          "a"
         ],
         "Slot_display_order": [
           1,
@@ -764,14 +764,14 @@
           "S": "I",
           "V": "gave",
           "O1": "him",
-          "O2": "a book"
+          "O2": "a"
         },
         "sub_slots": {},
         "slots": {
           "S": "I",
           "V": "gave",
           "O1": "him",
-          "O2": "a book"
+          "O2": "a"
         },
         "pattern_detected": "SVOO",
         "confidence": 0.9,
@@ -810,7 +810,7 @@
           "She",
           "told",
           "me",
-          "a story"
+          "a"
         ],
         "Slot_display_order": [
           1,
@@ -840,14 +840,14 @@
           "S": "She",
           "V": "told",
           "O1": "me",
-          "O2": "a story"
+          "O2": "a"
         },
         "sub_slots": {},
         "slots": {
           "S": "She",
           "V": "told",
           "O1": "me",
-          "O2": "a story"
+          "O2": "a"
         },
         "pattern_detected": "SVOO",
         "confidence": 0.9,
@@ -954,57 +954,41 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "O1",
-          "C2"
+          "V"
         ],
         "SlotPhrase": [
           "We",
-          "call",
-          "him",
-          "Tom"
+          "call"
         ],
         "Slot_display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
           "S": "We",
-          "V": "call",
-          "O1": "him",
-          "C2": "Tom"
+          "V": "call"
         },
         "sub_slots": {},
         "slots": {
           "S": "We",
-          "V": "call",
-          "O1": "him",
-          "C2": "Tom"
+          "V": "call"
         },
         "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [],
           "handler_contributions": {},
@@ -1030,57 +1014,41 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "O1",
-          "C2"
+          "V"
         ],
         "SlotPhrase": [
           "I",
-          "found",
-          "it",
-          "interesting"
+          "found"
         ],
         "Slot_display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
           "S": "I",
-          "V": "found",
-          "O1": "it",
-          "C2": "interesting"
+          "V": "found"
         },
         "sub_slots": {},
         "slots": {
           "S": "I",
-          "V": "found",
-          "O1": "it",
-          "C2": "interesting"
+          "V": "found"
         },
         "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [],
           "handler_contributions": {},
@@ -1106,57 +1074,41 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "O1",
-          "C2"
+          "V"
         ],
         "SlotPhrase": [
           "They",
-          "made",
-          "her",
-          "happy"
+          "made"
         ],
         "Slot_display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "display_order": [
           1,
-          3,
-          4,
-          7
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
           "S": "They",
-          "V": "made",
-          "O1": "her",
-          "C2": "happy"
+          "V": "made"
         },
         "sub_slots": {},
         "slots": {
           "S": "They",
-          "V": "made",
-          "O1": "her",
-          "C2": "happy"
+          "V": "made"
         },
         "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [],
           "handler_contributions": {},
@@ -1190,7 +1142,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The man",
           "is",
           "strong"
         ],
@@ -1215,7 +1167,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The man",
           "V": "is",
           "C1": "strong"
         },
@@ -1226,7 +1178,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The man",
           "V": "is",
           "C1": "strong"
         },
@@ -1309,7 +1261,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The book",
           "is",
           "mine"
         ],
@@ -1334,7 +1286,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "mine"
         },
@@ -1345,7 +1297,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "mine"
         },
@@ -1428,7 +1380,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The person",
           "is",
           "kind"
         ],
@@ -1453,7 +1405,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The person",
           "V": "is",
           "C1": "kind"
         },
@@ -1464,7 +1416,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The person",
           "V": "is",
           "C1": "kind"
         },
@@ -1547,7 +1499,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The book",
           "is",
           "expensive"
         ],
@@ -1572,7 +1524,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "expensive"
         },
@@ -1583,7 +1535,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "expensive"
         },
@@ -1666,7 +1618,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The man",
           "is",
           "tall"
         ],
@@ -1691,7 +1643,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The man",
           "V": "is",
           "C1": "tall"
         },
@@ -1702,7 +1654,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The man",
           "V": "is",
           "C1": "tall"
         },
@@ -1785,7 +1737,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The car",
           "is",
           "new"
         ],
@@ -1810,7 +1762,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The car",
           "V": "is",
           "C1": "new"
         },
@@ -1821,7 +1773,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The car",
           "V": "is",
           "C1": "new"
         },
@@ -1901,27 +1853,27 @@
         "Slot": [
           "S",
           "V",
-          "M1"
+          "O1"
         ],
         "SlotPhrase": [
-          "",
+          "The man",
           "lives",
           "here"
         ],
         "Slot_display_order": [
           1,
           3,
-          8
+          4
         ],
         "display_order": [
           1,
           3,
-          8
+          4
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
-          "修飾句"
+          "名詞句"
         ],
         "SubslotID": [
           0,
@@ -1929,8 +1881,9 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The man",
           "V": "lives",
+          "O1": "here",
           "M2": "here"
         },
         "sub_slots": {
@@ -1940,11 +1893,12 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The man",
           "V": "lives",
+          "O1": "here",
           "M2": "here"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
@@ -2023,7 +1977,7 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The student",
           "is",
           "smart"
         ],
@@ -2048,7 +2002,7 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The student",
           "V": "is",
           "C1": "smart"
         },
@@ -2059,7 +2013,7 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The student",
           "V": "is",
           "C1": "smart"
         },
@@ -2141,9 +2095,9 @@
           "C1"
         ],
         "SlotPhrase": [
-          "",
+          "The woman",
           "is",
-          "my neighbor"
+          "my"
         ],
         "Slot_display_order": [
           1,
@@ -2166,9 +2120,9 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The woman",
           "V": "is",
-          "C1": "my neighbor"
+          "C1": "my"
         },
         "sub_slots": {
           "sub-v": "barks",
@@ -2176,9 +2130,9 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The woman",
           "V": "is",
-          "C1": "my neighbor"
+          "C1": "my"
         },
         "pattern_detected": "SVC",
         "confidence": 0.9,
@@ -2257,27 +2211,27 @@
         "Slot": [
           "S",
           "V",
-          "M1"
+          "O1"
         ],
         "SlotPhrase": [
-          "",
+          "The student",
           "succeeds",
           "academically"
         ],
         "Slot_display_order": [
           1,
           3,
-          8
+          4
         ],
         "display_order": [
           1,
           3,
-          8
+          4
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
-          "修飾句"
+          "名詞句"
         ],
         "SubslotID": [
           0,
@@ -2285,8 +2239,9 @@
           2
         ],
         "main_slots": {
-          "S": "",
+          "S": "The student",
           "V": "succeeds",
+          "O1": "academically",
           "M2": "always",
           "M3": "academically"
         },
@@ -2297,12 +2252,13 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The student",
           "V": "succeeds",
+          "O1": "academically",
           "M2": "always",
           "M3": "academically"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 3,
@@ -2380,10 +2336,10 @@
           "S",
           "Aux",
           "V",
-          "M1"
+          "O1"
         ],
         "SlotPhrase": [
-          "",
+          "The teacher",
           "is",
           "respected",
           "greatly"
@@ -2392,19 +2348,19 @@
           1,
           2,
           3,
-          8
+          4
         ],
         "display_order": [
           1,
           2,
           3,
-          8
+          4
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
           "動詞句",
-          "修飾句"
+          "名詞句"
         ],
         "SubslotID": [
           0,
@@ -2413,9 +2369,10 @@
           3
         ],
         "main_slots": {
-          "S": "",
+          "S": "The teacher",
           "Aux": "is",
           "V": "respected",
+          "O1": "greatly",
           "M2": "greatly"
         },
         "sub_slots": {
@@ -2425,12 +2382,13 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
+          "S": "The teacher",
           "Aux": "is",
           "V": "respected",
+          "O1": "greatly",
           "M2": "greatly"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVO",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
         "lexical_tokens": 4,
@@ -2506,44 +2464,31 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "O1",
-          "M1"
+          "V"
         ],
         "SlotPhrase": [
-          "",
-          "saves",
-          "lives",
-          "successfully"
+          "The doctor",
+          "lives"
         ],
         "Slot_display_order": [
           1,
-          3,
-          4,
-          8
+          3
         ],
         "display_order": [
           1,
-          3,
-          4,
-          8
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "名詞句",
-          "修飾句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
+          "S": "The doctor",
+          "V": "lives",
           "M2": "successfully"
         },
         "sub_slots": {
@@ -2553,15 +2498,14 @@
           "_parent_slot": "S"
         },
         "slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
+          "S": "The doctor",
+          "V": "lives",
           "M2": "successfully"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -2633,42 +2577,30 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "M3",
-          "M3"
+          "V"
         ],
         "SlotPhrase": [
-          "",
-          "crashed",
-          "is",
-          "red"
+          "The car",
+          "crashed"
         ],
         "Slot_display_order": [
           1,
-          3,
-          10,
-          10
+          3
         ],
         "display_order": [
           1,
-          3,
-          10,
-          10
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
-          "S": "",
+          "S": "The car",
           "V": "is",
           "C1": "red"
         },
@@ -2679,14 +2611,14 @@
           "sub-v": "crashed"
         },
         "slots": {
-          "S": "",
+          "S": "The car",
           "V": "is",
           "C1": "red"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -2758,42 +2690,30 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V",
-          "M3",
-          "M3"
+          "V"
         ],
         "SlotPhrase": [
-          "",
-          "written",
-          "is",
-          "famous"
+          "The book",
+          "written"
         ],
         "Slot_display_order": [
           1,
-          3,
-          10,
-          10
+          3
         ],
         "display_order": [
           1,
-          3,
-          10,
-          10
+          3
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "main_slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "famous"
         },
@@ -2804,14 +2724,14 @@
           "sub-v": "written"
         },
         "slots": {
-          "S": "",
+          "S": "The book",
           "V": "is",
           "C1": "famous"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -2881,49 +2801,31 @@
       },
       "analysis_result": {
         "Slot": [
-          "M3",
           "S",
-          "M3",
-          "M3",
           "V"
         ],
         "SlotPhrase": [
-          "The",
-          "",
-          "letter",
-          "sent",
+          "The letter",
           "arrived"
         ],
         "Slot_display_order": [
-          10,
           1,
-          10,
-          10,
           3
         ],
         "display_order": [
-          10,
           1,
-          10,
-          10,
           3
         ],
         "PhraseType": [
-          "修飾句",
           "名詞句",
-          "修飾句",
-          "修飾句",
           "動詞句"
         ],
         "SubslotID": [
           0,
-          1,
-          2,
-          3,
-          4
+          1
         ],
         "main_slots": {
-          "S": "",
+          "S": "The letter",
           "V": "arrived"
         },
         "sub_slots": {
@@ -2933,13 +2835,13 @@
           "sub-v": "sent"
         },
         "slots": {
-          "S": "",
+          "S": "The letter",
           "V": "arrived"
         },
         "pattern_detected": "SV",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 2,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -3008,44 +2910,32 @@
         "Slot": [
           "S",
           "Aux",
-          "V",
-          "M2",
-          "O1"
+          "V"
         ],
         "SlotPhrase": [
           "The letter",
           "was",
-          "written",
-          "by",
-          "John"
+          "written"
         ],
         "Slot_display_order": [
           1,
           2,
-          3,
-          9,
-          4
+          3
         ],
         "display_order": [
           1,
           2,
-          3,
-          9,
-          4
+          3
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
           1,
-          2,
-          3,
-          4
+          2
         ],
         "main_slots": {
           "S": "The letter",
@@ -3060,10 +2950,10 @@
           "V": "written",
           "M2": "by John"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 3,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -3112,62 +3002,48 @@
         "Slot": [
           "S",
           "Aux",
-          "V",
-          "M2",
-          "M3"
+          "V"
         ],
         "SlotPhrase": [
           "The house",
           "was",
-          "built",
-          "in",
-          "1990"
+          "built"
         ],
         "Slot_display_order": [
           1,
           2,
-          3,
-          9,
-          10
+          3
         ],
         "display_order": [
           1,
           2,
-          3,
-          9,
-          10
+          3
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
           1,
-          2,
-          3,
-          4
+          2
         ],
         "main_slots": {
           "S": "The house",
           "Aux": "was",
-          "V": "built",
-          "M2": "in 1990"
+          "V": "built"
         },
         "sub_slots": {},
         "slots": {
           "S": "The house",
           "Aux": "was",
-          "V": "built",
-          "M2": "in 1990"
+          "V": "built"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 3,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -3216,44 +3092,32 @@
         "Slot": [
           "S",
           "Aux",
-          "V",
-          "M2",
-          "O1"
+          "V"
         ],
         "SlotPhrase": [
           "The book",
           "was",
-          "written",
-          "by",
-          "a famous author"
+          "written"
         ],
         "Slot_display_order": [
           1,
           2,
-          3,
-          9,
-          4
+          3
         ],
         "display_order": [
           1,
           2,
-          3,
-          9,
-          4
+          3
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
           1,
-          2,
-          3,
-          4
+          2
         ],
         "main_slots": {
           "S": "The book",
@@ -3268,10 +3132,10 @@
           "V": "written",
           "M2": "by a famous author"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
+        "lexical_tokens": 3,
         "unified_handlers": {
           "detected_patterns": [
             {
@@ -3320,68 +3184,50 @@
         "Slot": [
           "S",
           "Aux",
-          "M3",
-          "V",
-          "M2",
-          "O1"
+          "V"
         ],
         "SlotPhrase": [
           "The cake",
-          "is",
           "being",
-          "baked",
-          "by",
-          "my mother"
+          "baked"
         ],
         "Slot_display_order": [
           1,
           2,
-          10,
-          3,
-          9,
-          4
+          3
         ],
         "display_order": [
           1,
           2,
-          10,
-          3,
-          9,
-          4
+          3
         ],
         "PhraseType": [
           "名詞句",
           "修飾句",
-          "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
+          "動詞句"
         ],
         "SubslotID": [
           0,
           1,
-          2,
-          3,
-          4,
-          5
+          2
         ],
         "main_slots": {
           "S": "The cake",
-          "Aux": "is being",
+          "Aux": "being",
           "V": "baked",
           "M2": "by my mother"
         },
         "sub_slots": {},
         "slots": {
           "S": "The cake",
-          "Aux": "is being",
+          "Aux": "being",
           "V": "baked",
           "M2": "by my mother"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "SVOC",
         "confidence": 0.9,
         "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 6,
+        "lexical_tokens": 3,
         "unified_handlers": {
           "detected_patterns": [
             {

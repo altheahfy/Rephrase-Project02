@@ -4103,7 +4103,9 @@ class UnifiedStanzaRephraseMapper:
         else:
             self.logger.debug("分詞構文保護: S 空文字保持 (by participle_construction)")
             
-        slots['Aux'] = auxiliary.text
+        # 連続助動詞の処理 ("is being" → "is being"のまま統合)
+        auxiliary_phrase = self._build_auxiliary_phrase(sentence, auxiliary)
+        slots['Aux'] = auxiliary_phrase
         slots['V'] = main_verb.text
         
         # ✅ 副詞処理を除去：by句は副詞ハンドラーに委譲
@@ -4111,6 +4113,21 @@ class UnifiedStanzaRephraseMapper:
         # agent_phraseの情報は文法情報として記録するが、スロットには設定しない
         
         return {'slots': slots, 'sub_slots': sub_slots}
+    
+    def _build_auxiliary_phrase(self, sentence, main_auxiliary) -> str:
+        """助動詞フレーズ構築（is being等の連続助動詞対応）"""
+        auxiliary_words = [main_auxiliary]
+        
+        # 主助動詞の前にある他の助動詞を探す（"is being"の"is"）
+        for word in sentence.words:
+            if (word.id < main_auxiliary.id and 
+                word.deprel in ['aux', 'cop'] and
+                word.lemma in ['be', 'do', 'have', 'will', 'would', 'can', 'could', 'may', 'might', 'must', 'shall', 'should']):
+                auxiliary_words.append(word)
+        
+        # ID順ソート（語順保持）
+        auxiliary_words.sort(key=lambda w: w.id)
+        return ' '.join(w.text for w in auxiliary_words)
     
     def _build_agent_phrase(self, sentence, agent_word) -> str:
         """by句全体の構築"""

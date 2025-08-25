@@ -3,7 +3,20 @@ Phase A2: 真のBasicFivePatternHandler実装
 レガシー分解機能をハンドラー内に完全移行
 
 作成日: 2025年8月25日
-目的: Central Controllerから分解機能を移行し、純粋中央管理を実現
+目的: Central Control            # 1. コア要素特定（レガシー機能移行）
+            self.logger.debug("🔍 Step 1: Starting core elements identification")
+            core_elements = self.identify_core_elements_enhanced(filtered_tokens)
+            self.logger.debug(f"🔍 Step 1 complete: {core_elements}")
+            
+            # 2. 文型パターン判定（レガシー機能移行）
+            self.logger.debug("🔍 Step 2: Starting pattern determination")
+            sentence_pattern = self.determine_pattern_enhanced(filtered_tokens, core_elements)
+            self.logger.debug(f"🔍 Step 2 complete: {sentence_pattern}")
+            
+            # 3. 文法役割割り当て（レガシー機能移行）
+            self.logger.debug("🔍 Step 3: Starting roles assignment")
+            grammar_elements = self.assign_roles_enhanced(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
+            self.logger.debug(f"🔍 Step 3 complete: {len(grammar_elements) if grammar_elements else 0} elements")能を移行し、純粋中央管理を実現
 """
 
 from typing import Dict, List, Any, Optional, Tuple
@@ -50,6 +63,80 @@ class BasicFivePatternHandler:
             'pass', 'passed', 'throw', 'threw', 'thrown'
         }
         
+        self.objective_complement_verbs = {
+            'make', 'made', 'making', 'makes',
+            'call', 'called', 'calling', 'calls',
+            'consider', 'considered', 'considering', 'considers',
+            'find', 'found', 'finding', 'finds',
+            'keep', 'kept', 'keeping', 'keeps',
+            'leave', 'left', 'leaving', 'leaves',
+            'elect', 'elected', 'electing', 'elects',
+            'name', 'named', 'naming', 'names',
+            'choose', 'chose', 'chosen', 'choosing', 'chooses'
+        }
+        
+        # レガシー機能移行: 曖昧語辞書
+        self.ambiguous_words = {
+            'lives': ['NOUN', 'VERB'],    # life複数形 vs live三人称単数
+            'works': ['NOUN', 'VERB'],    # work複数形 vs work三人称単数  
+            'runs': ['NOUN', 'VERB'],     # run複数形 vs run三人称単数
+            'goes': ['NOUN', 'VERB'],     # go複数形 vs go三人称単数
+            'comes': ['NOUN', 'VERB'],    # come複数形 vs come三人称単数
+            'stays': ['NOUN', 'VERB'],    # stay複数形 vs stay三人称単数
+            'plays': ['NOUN', 'VERB'],    # play複数形 vs play三人称単数
+            'looks': ['NOUN', 'VERB'],    # look複数形 vs look三人称単数
+            'walks': ['NOUN', 'VERB'],    # walk複数形 vs walk三人称単数
+            'talks': ['NOUN', 'VERB'],    # talk複数形 vs talk三人称単数
+            'moves': ['NOUN', 'VERB'],    # move複数形 vs move三人称単数
+            'drives': ['NOUN', 'VERB'],   # drive複数形 vs drive三人称単数
+            'flies': ['NOUN', 'VERB'],    # fly複数形 vs fly三人称単数
+            'rides': ['NOUN', 'VERB'],    # ride複数形 vs ride三人称単数
+            'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
+        }
+    
+    def analyze_basic_pattern(self, filtered_tokens: List[Dict], relative_clause_info: Dict) -> Dict[str, Any]:
+        """
+        🎯 Phase A3: 統合エントリーポイント
+        レガシー分解機能を統合した文型解析
+        
+        Args:
+            filtered_tokens: 関係節要素を除外した解析対象トークン
+            relative_clause_info: 関係節情報
+            
+        Returns:
+            Dict containing:
+            - core_elements: 特定されたコア要素
+            - sentence_pattern: 判定された文型パターン  
+            - grammar_elements: 文法役割が割り当てられた要素
+        """
+        try:
+            # 1. コア要素特定（レガシー機能移行）
+            core_elements = self.identify_core_elements_enhanced(filtered_tokens)
+            
+            # 2. 文型パターン判定（レガシー機能移行）
+            sentence_pattern = self.determine_pattern_enhanced(filtered_tokens, core_elements)
+            
+            # 3. 文法役割割り当て（レガシー機能移行）
+            grammar_elements = self.assign_roles_enhanced(filtered_tokens, sentence_pattern, core_elements)
+            
+            return {
+                'core_elements': core_elements,
+                'sentence_pattern': sentence_pattern,
+                'grammar_elements': grammar_elements,
+                'handler_success': True,
+                'analysis_method': 'basic_five_pattern_enhanced'
+            }
+            
+        except Exception as e:
+            self.logger.error(f"BasicFivePatternHandler.analyze_basic_pattern error: {e}")
+            return {
+                'core_elements': {},
+                'sentence_pattern': 'unknown',
+                'grammar_elements': [],
+                'handler_success': False,
+                'error': str(e)
+            }
+        
         # 同形語処理（既存ロジック継承）
         self.ambiguous_words = {
             'works': ['NOUN', 'VERB'],   # work複数形 vs work三人称単数
@@ -95,35 +182,50 @@ class BasicFivePatternHandler:
         
         旧_identify_core_elements()ロジックを完全移行・強化
         """
-        core = {
-            'subject': None,
-            'verb': None,
-            'subject_indices': [],
-            'verb_indices': [],
-            'auxiliary': None,
-            'auxiliary_indices': []
-        }
-        
-        # 動詞を探す（最も重要）
-        main_verb_idx = self._find_main_verb_enhanced(tokens)
-        if main_verb_idx is not None:
-            core['verb'] = tokens[main_verb_idx]
-            core['verb_indices'] = [main_verb_idx]
+        try:
+            # デバッグ：トークンの検証
+            if not isinstance(tokens, list):
+                raise TypeError(f"Expected list of tokens, got {type(tokens)}")
+                
+            for i, token in enumerate(tokens):
+                if not isinstance(token, dict):
+                    raise TypeError(f"Token at index {i} is not a dict: {type(token)} = {token}")
+                if 'text' not in token:
+                    self.logger.warning(f"Token at index {i} missing 'text' field: {token}")
+                    
+            core = {
+                'subject': None,
+                'verb': None,
+                'subject_indices': [],
+                'verb_indices': [],
+                'auxiliary': None,
+                'auxiliary_indices': []
+            }
             
-            # 助動詞を探す
-            aux_idx = self._find_auxiliary_enhanced(tokens, main_verb_idx)
-            if aux_idx is not None:
-                core['auxiliary'] = tokens[aux_idx]
-                core['auxiliary_indices'] = [aux_idx]
-        
-        # 主語を探す（動詞の前で最も適切な名詞句）
-        if main_verb_idx is not None:
-            subject_indices = self._find_subject_enhanced(tokens, main_verb_idx)
-            if subject_indices:
-                core['subject_indices'] = subject_indices
-                core['subject'] = ' '.join([tokens[i]['text'] for i in subject_indices])
-        
-        return core
+            # 動詞を探す（最も重要）
+            main_verb_idx = self._find_main_verb_enhanced(tokens)
+            if main_verb_idx is not None:
+                core['verb'] = tokens[main_verb_idx]
+                core['verb_indices'] = [main_verb_idx]
+                
+                # 助動詞を探す
+                aux_idx = self._find_auxiliary_enhanced(tokens, main_verb_idx)
+                if aux_idx is not None:
+                    core['auxiliary'] = tokens[aux_idx]
+                    core['auxiliary_indices'] = [aux_idx]
+            
+            # 主語を探す（動詞の前で最も適切な名詞句）
+            if main_verb_idx is not None:
+                subject_indices = self._find_subject_enhanced(tokens, main_verb_idx)
+                if subject_indices:
+                    core['subject_indices'] = subject_indices
+                    core['subject'] = ' '.join([tokens[i]['text'] for i in subject_indices])
+            
+            return core
+            
+        except Exception as e:
+            self.logger.error(f"identify_core_elements_enhanced error: {e}")
+            raise
     
     def determine_pattern_enhanced(self, tokens: List[Dict], core_elements: Dict) -> str:
         """
@@ -253,17 +355,29 @@ class BasicFivePatternHandler:
             elements.append(obj_element)
         
         elif pattern == 'SVC' and len(remaining_tokens) >= 1:
-            # 補語
-            comp_idx, comp_token = remaining_tokens[0]
-            comp_element = GrammarElement(
-                text=comp_token['text'],
-                tokens=[comp_token],
-                role='C1',
-                start_idx=comp_idx,
-                end_idx=comp_idx,
-                confidence=0.8
-            )
-            elements.append(comp_element)
+            # 補語（フレーズ全体を取得）
+            comp_tokens = []
+            comp_indices = []
+            
+            # 補語として適切なすべてのトークンを取得
+            for i, (idx, token) in enumerate(remaining_tokens):
+                if self._can_be_complement_enhanced(token):
+                    comp_tokens.append(token)
+                    comp_indices.append(idx)
+                elif comp_tokens:  # 既に補語があり、補語でない場合は停止
+                    break
+            
+            if comp_tokens:
+                comp_text = ' '.join(t['text'] for t in comp_tokens)
+                comp_element = GrammarElement(
+                    text=comp_text,
+                    tokens=comp_tokens,
+                    role='C1',
+                    start_idx=comp_indices[0],
+                    end_idx=comp_indices[-1],
+                    confidence=0.8
+                )
+                elements.append(comp_element)
         
         elif pattern == 'SVOO' and len(remaining_tokens) >= 2:
             # 間接目的語
@@ -296,64 +410,200 @@ class BasicFivePatternHandler:
         """
         レガシー機能移行: メイン動詞特定
         既存ロジックを継承・強化
+        曖昧語解決4段階プロセス実装
         """
-        # POSベースと文脈ベースの両方を取得
-        pos_candidates = []
-        for i, token in enumerate(tokens):
-            # 動詞の品詞タグ
-            if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
-                pos_candidates.append((i, token))
-        
-        # 文脈的動詞識別（POS誤認識対策）
-        contextual_candidates = self._find_contextual_verbs_enhanced(tokens)
-        
-        # 両方を統合（重複除去）
-        verb_candidates = pos_candidates.copy()
-        for i, token in contextual_candidates:
-            # 既に存在しない場合のみ追加
-            if not any(existing_i == i for existing_i, _ in verb_candidates):
-                verb_candidates.append((i, token))
-        
-        if not verb_candidates:
-            return None
-        
-        # 人間的判定：関係節を除外してメイン動詞を特定
-        non_relative_verbs = []
-        
-        for i, token in verb_candidates:
-            # 関係代名詞の直後の動詞は関係節内動詞として除外
-            is_in_relative_clause = False
+        try:
+            # 🎯 Step 1: ハードコーディングリスト化による曖昧語認識
+            self.logger.debug(f"🔍 [曖昧語解決] Step 1: 曖昧語候補検索開始")
+            ambiguous_candidates = []
+            for i, token in enumerate(tokens):
+                if token['text'].lower() in self.ambiguous_words:
+                    ambiguous_candidates.append((i, token))
+                    self.logger.debug(f"🔍 [曖昧語解決] 曖昧語発見: {token['text']} (位置{i})")
             
-            # 前の単語を確認
-            for j in range(max(0, i-5), i):  # 5語前まで確認
-                prev_token = tokens[j]
-                if prev_token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']:
-                    # whose構文の特別処理: 動詞/名詞同形語は関係節外のメイン動詞として扱う
-                    if (prev_token['text'].lower() == 'whose' and 
-                        token['text'].lower() in self.ambiguous_words and
-                        token.get('contextual_override', False)):
-                        # whose構文での同形語動詞は関係節外として扱う
-                        is_in_relative_clause = False
-                        break
+            # POSベースと文脈ベースの両方を取得
+            pos_candidates = []
+            for i, token in enumerate(tokens):
+                # 動詞の品詞タグ
+                if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
+                    pos_candidates.append((i, token))
                     
-                    # 関係代名詞から動詞までの距離が近い場合、関係節内動詞
-                    if i - j <= 4:  # 4語以内なら関係節内
-                        is_in_relative_clause = True
-                        break
+            self.logger.debug(f"🔍 [曖昧語解決] POS動詞候補: {[(i, t['text'], t['pos'], t['tag']) for i, t in pos_candidates]}")
             
-            if not is_in_relative_clause:
-                non_relative_verbs.append((i, token))
+            # 文脈的動詞識別（POS誤認識対策）
+            contextual_candidates = self._find_contextual_verbs_enhanced(tokens)
+            
+            # 両方を統合（重複除去）
+            verb_candidates = pos_candidates.copy()
+            for i, token in contextual_candidates:
+                # 既に存在しない場合のみ追加
+                if not any(existing_i == i for existing_i, _ in verb_candidates):
+                    verb_candidates.append((i, token))
+            
+            self.logger.debug(f"🔍 [曖昧語解決] 全動詞候補: {[(i, t['text']) for i, t in verb_candidates]}")
+            
+            if not verb_candidates:
+                return None
+            
+            # 🎯 Step 2-4: 曖昧語の両ケース検証プロセス
+            if ambiguous_candidates:
+                resolved_verb = self._resolve_ambiguous_words(tokens, verb_candidates, ambiguous_candidates)
+                if resolved_verb is not None:
+                    self.logger.debug(f"🔥 [曖昧語解決] 文法的完整性により解決: 位置{resolved_verb} = '{tokens[resolved_verb]['text']}'")
+                    return resolved_verb
+            
+            # 🔥 Phase A3: spaCy POSタグを優先（曖昧語解決後）
+            # VERBタグの動詞を優先選択
+            verb_tagged_candidates = [(i, token) for i, token in verb_candidates if token['pos'] == 'VERB']
+            if verb_tagged_candidates:
+                # 最後のVERBタグ動詞を選択（メイン動詞として）
+                return verb_tagged_candidates[-1][0]
+            
+            # 人間的判定：関係節を除外してメイン動詞を特定
+            non_relative_verbs = []
+            
+            for i, token in verb_candidates:
+                # 関係代名詞の直後の動詞は関係節内動詞として除外
+                is_in_relative_clause = False
+                
+                # 🔥 Phase A3: filtered_tokensでは関係節は既に除外済み
+                # 追加の関係節検出は不要（重複処理回避）
+                
+                # 前の単語を確認（filtered_tokensでない場合のみ）
+                # Phase A3では関係節処理は中央管理で実行済み
+                
+                if not is_in_relative_clause:
+                    non_relative_verbs.append((i, token))
+            
+            if non_relative_verbs:
+                # メイン動詞候補から助動詞でないものを優先
+                main_verbs = [(i, token) for i, token in non_relative_verbs if not self._is_auxiliary_verb_enhanced(token)]
+                if main_verbs:
+                    # 文の後半にあるメイン動詞を優先（関係節の後）
+                    return main_verbs[-1][0]
+                return non_relative_verbs[-1][0]
+            
+            # 最後の手段として、どの動詞でも選択
+            return verb_candidates[-1][0]
+            
+        except Exception as e:
+            self.logger.error(f"_find_main_verb_enhanced error: {e}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            raise
+    
+    def _resolve_ambiguous_words(self, tokens: List[Dict], verb_candidates: List[Tuple[int, Dict]], 
+                                ambiguous_candidates: List[Tuple[int, Dict]]) -> Optional[int]:
+        """
+        曖昧語解決4段階プロセス実装
+        文法的完整性をケース選択の最終判定基準とする
+        """
+        self.logger.debug(f"🔍 [曖昧語解決] Step 2: 両ケース可能性付与開始")
         
-        if non_relative_verbs:
-            # メイン動詞候補から助動詞でないものを優先
-            main_verbs = [(i, token) for i, token in non_relative_verbs if not self._is_auxiliary_verb_enhanced(token)]
-            if main_verbs:
-                # 文の後半にあるメイン動詞を優先（関係節の後）
-                return main_verbs[-1][0]
-            return non_relative_verbs[-1][0]
+        for amb_idx, amb_token in ambiguous_candidates:
+            word = amb_token['text'].lower()
+            self.logger.debug(f"🔍 [曖昧語解決] 検証対象: '{word}' (位置{amb_idx})")
+            
+            # Step 3: ケース1検証（名詞解釈）
+            noun_case_valid = self._validate_noun_case(tokens, amb_idx, word)
+            self.logger.debug(f"🔍 [曖昧語解決] ケース1（名詞解釈）: {noun_case_valid}")
+            
+            # Step 4: ケース2検証（動詞解釈）  
+            verb_case_valid = self._validate_verb_case(tokens, amb_idx, word)
+            self.logger.debug(f"🔍 [曖昧語解決] ケース2（動詞解釈）: {verb_case_valid}")
+            
+            # 文法的完整性による最終判定
+            if verb_case_valid and not noun_case_valid:
+                # 動詞として解釈することで文が完成する場合
+                return amb_idx
+            elif not verb_case_valid and noun_case_valid:
+                # 名詞として解釈すべき場合、他の動詞を探す
+                continue
+                
+        # 曖昧語解決に失敗した場合、従来ロジックに戻る
+        return None
+    
+    def _validate_noun_case(self, tokens: List[Dict], amb_idx: int, word: str) -> bool:
+        """
+        Step 3: 名詞解釈での文法的完整性検証
+        例：lives → life複数形（名詞）として扱った場合の文の完整性
+        """
+        # spaCy POS解析結果を重視：NOUNとタグ付けされているものは名詞として扱う
+        actual_pos = tokens[amb_idx]['pos']
+        if actual_pos == 'NOUN':
+            self.logger.debug(f"🔍 [曖昧語解決] spaCy解析: '{word}' は NOUN タグ → 名詞解釈有効")
+            return True
+            
+        # 名詞として扱った場合、主語・動詞・目的語が適切に配置されているかチェック
+        sentence_tokens = [t['text'] for t in tokens]
         
-        # 最後の手段として、どの動詞でも選択
-        return verb_candidates[-1][0]
+        # 関係節の境界を認識
+        relative_pronouns = ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']
+        relative_start = None
+        
+        for i, token in enumerate(tokens):
+            if token['text'].lower() in relative_pronouns:
+                relative_start = i
+                break
+        
+        if relative_start is not None and amb_idx > relative_start:
+            # 関係節内の語として名詞解釈の場合
+            # 関係節だけで完結した文になるかチェック
+            relative_clause_tokens = tokens[relative_start:amb_idx+1]
+            
+            # 関係節内に動詞があるかチェック
+            has_relative_verb = any(t['pos'] == 'VERB' and t['tag'].startswith('VB') 
+                                  for t in relative_clause_tokens if t != tokens[amb_idx])
+            
+            if has_relative_verb:
+                # 関係節内に他の動詞があり、この語を名詞とすると関係節が完結
+                # しかし主文の動詞がない状態 → 文法的に不完全
+                main_clause_tokens = tokens[amb_idx+1:]
+                has_main_verb = any(t['pos'] == 'VERB' and t['tag'].startswith('VB') 
+                                  for t in main_clause_tokens)
+                
+                if not has_main_verb:
+                    self.logger.debug(f"🔍 [曖昧語解決] 名詞解釈→関係節完結するが主文に動詞なし → 不完整")
+                    return False
+                    
+        return True
+    
+    def _validate_verb_case(self, tokens: List[Dict], amb_idx: int, word: str) -> bool:
+        """
+        Step 4: 動詞解釈での文法的完整性検証
+        例：lives → 動詞として扱った場合の文の完整性
+        """
+        # spaCy POS解析結果を重視：NOUNとタグ付けされているものは動詞解釈無効
+        actual_pos = tokens[amb_idx]['pos']
+        if actual_pos == 'NOUN':
+            self.logger.debug(f"🔍 [曖昧語解決] spaCy解析: '{word}' は NOUN タグ → 動詞解釈無効")
+            return False
+            
+        # 動詞として扱った場合の文の構造チェック
+        sentence_tokens = [t['text'] for t in tokens]
+        
+        # 関係節の境界を認識
+        relative_pronouns = ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']
+        relative_start = None
+        
+        for i, token in enumerate(tokens):
+            if token['text'].lower() in relative_pronouns:
+                relative_start = i
+                break
+                
+        if relative_start is not None and amb_idx > relative_start:
+            # 関係節の後の位置での動詞解釈
+            # 主文の動詞として機能するかチェック
+            
+            # 主語の存在確認（関係節より前）
+            has_subject = any(t['dep'] in ['nsubj', 'nsubj:pass'] 
+                            for t in tokens[:relative_start])
+            
+            if has_subject:
+                self.logger.debug(f"🔍 [曖昧語解決] 動詞解釈→主語あり、完全な文として成立")
+                return True
+                
+        return True  # デフォルトで有効とする
     
     def _find_contextual_verbs_enhanced(self, tokens: List[Dict]) -> List[Tuple[int, Dict]]:
         """

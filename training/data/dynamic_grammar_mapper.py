@@ -211,26 +211,55 @@ class DynamicGrammarMapper:
             original_tokens = tokens.copy()  # 元のトークンを保存
             if relative_clause_info['found']:
                 self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
-                # 🔧 Step2: 位置情報判定のために先にcore_elementsを生成
-                temp_core_elements = self._identify_core_elements(tokens)
-                # サブスロット生成（元のトークンを使用）
-                processed_tokens, sub_slots = self._process_relative_clause(original_tokens, relative_clause_info, temp_core_elements)
+                
+                # � Phase A3: 関係節処理もBasicFivePatternHandlerが担当
+                if hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler:
+                    self.logger.debug(f"🔥 Phase A3: 関係節処理もBasicFivePatternHandlerに委譲")
+                    # BasicFivePatternHandlerが関係節も含めて解析するため、ここではスキップ
+                else:
+                    # レガシー関係節処理（Phase A3以外）
+                    temp_core_elements = self._identify_core_elements(tokens)
+                    processed_tokens, sub_slots = self._process_relative_clause(original_tokens, relative_clause_info, temp_core_elements)
             
             # 🔧 関係節内要素の事前除外（メイン文法解析用）
             excluded_indices = self._identify_relative_clause_elements(tokens, relative_clause_info)
             
             # 2. 除外されていない要素のみでコア要素を特定
             filtered_tokens = [token for i, token in enumerate(tokens) if i not in excluded_indices]
-            core_elements = self._identify_core_elements(filtered_tokens)
             
-            # 3. 動詞の性質から文型を推定（除外されたトークンを使用）
-            sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
-            
-            # 4. 文法要素を動的に割り当て（除外されたトークンを使用）
-            grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
+            # 🔥 Phase A3: レガシー分解機能をBasicFivePatternHandlerに完全移譲
+            if hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler:
+                pattern_analysis = self.basic_five_pattern_handler.analyze_basic_pattern(filtered_tokens, relative_clause_info)
+                
+                if pattern_analysis.get('handler_success'):
+                    core_elements = pattern_analysis['core_elements']
+                    sentence_pattern = pattern_analysis['sentence_pattern']
+                    grammar_elements = pattern_analysis['grammar_elements']
+                    print(f"🔥 Phase A3: BasicFivePatternHandler による文型解析完了: {sentence_pattern}")
+                    print(f"🔧 Phase A3: grammar_elements取得: {[{'role': e.role, 'text': e.text} for e in grammar_elements]}")
+                else:
+                    # フォールバック: レガシー機能を使用
+                    print("⚠️ Phase A3: BasicFivePatternHandler失敗、レガシー機能にフォールバック")
+                    core_elements = self._identify_core_elements(filtered_tokens)
+                    sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
+                    grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
+            else:
+                # フォールバック: レガシー機能を使用（ハンドラー未初期化時）
+                print("⚠️ Phase A3: BasicFivePatternHandler未初期化、レガシー機能使用")
+                core_elements = self._identify_core_elements(filtered_tokens)
+                sentence_pattern = self._determine_sentence_pattern(core_elements, filtered_tokens)
+                grammar_elements = self._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
             
             # 5. Rephraseスロット形式に変換
             rephrase_result = self._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
+            
+            # 🔥 Phase A3: 真の中央管理 - 統合ハンドラーシステムも BasicFivePatternHandler で処理済み
+            if hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler and pattern_analysis.get('handler_success'):
+                print(f"🔥 Phase A3: 統合ハンドラーシステムスキップ（BasicFivePatternHandlerで処理済み）")
+                allow_unified = False  # Phase A3では統合ハンドラーを無効化
+                # 🔧 Phase A3: 統合ハンドラーの既存結果をクリア
+                self.last_unified_result = None
+                print(f"🔧 Phase A3: 統合ハンドラー結果クリア（純粋BasicFivePatternHandler使用）")
             
             # 🔥 Phase 2: 統合ハンドラーシステム実行（受動態・助動詞・副詞処理）
             if allow_unified:  # ChatGPT5 Step A: Re-entrancy Guard
@@ -305,15 +334,18 @@ class DynamicGrammarMapper:
                 except Exception as e:
                     self.logger.error(f"統合ハンドラーシステムエラー: {e}")
             
-            # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation) - 後続処理として保持
-            try:
-                additional_adverbs = self._detect_and_assign_adverbs_direct(doc, rephrase_result)
-                if additional_adverbs:
-                    print(f"🔥 Phase 2: 副詞処理により {len(additional_adverbs)}個の副詞を追加")
-                    rephrase_result['main_slots'].update(additional_adverbs)
-                    rephrase_result['slots'].update(additional_adverbs)
-            except Exception as e:
-                self.logger.error(f"副詞処理エラー: {e}")
+            # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation) - Phase A3では除外
+            if not (hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler and pattern_analysis.get('handler_success')):
+                try:
+                    additional_adverbs = self._detect_and_assign_adverbs_direct(doc, rephrase_result)
+                    if additional_adverbs:
+                        print(f"🔥 Phase 2: 副詞処理により {len(additional_adverbs)}個の副詞を追加")
+                        rephrase_result['main_slots'].update(additional_adverbs)
+                        rephrase_result['slots'].update(additional_adverbs)
+                except Exception as e:
+                    self.logger.error(f"副詞処理エラー: {e}")
+            else:
+                print(f"🔥 Phase A3: 副詞処理もBasicFivePatternHandlerで処理済み（重複処理回避）")
             
             # 🆕 Phase 1.2: 文型情報を結果に追加
             rephrase_result['sentence_type'] = sentence_type
@@ -885,12 +917,15 @@ class DynamicGrammarMapper:
         """
         人間的品詞判定の統一インターフェース
         
-        革命的二重評価システムを使用:
-        1. 曖昧語リストの確認
-        2. 両ケース試行（NOUN/VERB）
-        3. 構文完全性チェック
-        4. 最適解採用
+        🔥 Phase A3: BasicFivePatternHandlerが曖昧語解決を担当
+        レガシーシステムをスキップしてspaCy判定を使用
         """
+        # 🔥 Phase A3: BasicFivePatternHandlerによる曖昧語解決を優先
+        if hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler:
+            # Phase A3では純粋にspaCy判定を使用（重複処理回避）
+            return token['pos']
+        
+        # レガシー処理（Phase A3以外でのフォールバック）
         if token['text'].lower() not in self.ambiguous_words:
             return token['pos']  # 通常のspaCy判定
         
@@ -918,7 +953,10 @@ class DynamicGrammarMapper:
             score += 30.0
             
         # whose構文での動詞判定（lives等）
-        if word_text in ['lives', 'works', 'runs', 'goes', 'comes']:
+        # 🔥 Phase A3: レガシー動詞判定を無効化
+        if hasattr(self, 'basic_five_pattern_handler') and self.basic_five_pattern_handler:
+            pass  # Phase A3では使用しない
+        elif word_text in ['lives', 'works', 'runs', 'goes', 'comes']:
             score += 50.0
             
         return score
@@ -1553,7 +1591,13 @@ class DynamicGrammarMapper:
         if sub_slots is None:
             sub_slots = {}
         
-        # 🔧 関係節の有無を確認してスロット番号を調整
+        # � デバッグ: 入力された要素を確認
+        print(f"🔧 _convert_to_rephrase_format入力:")
+        print(f"  elements: {[{'role': e.role, 'text': e.text} for e in elements]}")
+        print(f"  pattern: {pattern}")
+        print(f"  sub_slots: {sub_slots}")
+        
+        # �🔧 関係節の有無を確認してスロット番号を調整
         has_relative_clause = bool(sub_slots)
         
         # C. 「相対節ありのシフト」は一度きりにする
