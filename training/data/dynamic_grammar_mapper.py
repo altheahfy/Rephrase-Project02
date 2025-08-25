@@ -1580,15 +1580,24 @@ class DynamicGrammarMapper:
         
         role_order = {'S': 1, 'Aux': 2, 'V': 3, 'O1': 4, 'O2': 5, 'C1': 6, 'C2': 7, 'M1': 8, 'M2': 9, 'M3': 10}
         
+        # 🔥 責任分離原則: 統合ハンドラーシステムがある場合、レガシーシステムは副詞処理をスキップ
+        adverb_slots = ['M1', 'M2', 'M3']
+        
         for i, element in enumerate(elements):
             # スロット名の調整
             slot_name = element.role
+            
+            # 🔥 責任分離: 副詞スロットは統合ハンドラーが担当（レガシーシステムは除外）
+            if slot_name in adverb_slots:
+                print(f"🔥 レガシーシステム: 副詞スロット {slot_name}='{element.text}' をスキップ（統合ハンドラーが担当）")
+                continue
+            
             # 統一形式: 常にO1, O2, C1, C2を使用
             
             slots.append(slot_name)
             slot_phrases.append(element.text)
             
-            # 🔧 main_slots辞書に追加
+            # 🔧 main_slots辞書に追加（副詞以外のみ）
             main_slots[element.role] = element.text
             
             order = role_order.get(element.role, 99)
@@ -3942,32 +3951,33 @@ class DynamicGrammarMapper:
                         analysis_sentence = main_sentence
                         analysis_doc = self.nlp(main_sentence)
                     
-                    # 🔥 統合ハンドラーシステム: 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
-                    legacy_result = self._analyze_sentence_legacy(analysis_sentence, analysis_doc)
-                    if legacy_result and 'slots' in legacy_result:
-                        for slot_name, slot_value in legacy_result['slots'].items():
-                            if slot_value:  # 空でない値のみ
+                    # 🔥 統合ハンドラーシステム: 5文型ハンドラーは S, V, O1, O2, C1 のみ処理
+                    # 副詞（M1, M2, M3）は専用ハンドラーが担当（責任分離の原則）
+                    basic_slots = self._extract_basic_five_pattern_only(analysis_sentence, analysis_doc)
+                    if basic_slots:
+                        for slot_name, slot_value in basic_slots.items():
+                            if slot_value and slot_name in ['S', 'V', 'O1', 'O2', 'C1']:  # 副詞以外のみ
                                 # 🔥 統合ハンドラーシステム: 高優先度ハンドラーの結果を保護
-                                # 既にスロットが設定されていて、優先度が低い場合はスキップ
                                 if slot_name in result['slots'] and result['slots'][slot_name]:
                                     existing_priority = 1  # basic_five_patternの優先度
                                     if 'slot_provenance' in result and slot_name in result['slot_provenance']:
                                         existing_priority = result['slot_provenance'][slot_name]['priority']
                                     
                                     if existing_priority > 1:  # 高優先度ハンドラーの結果が既に存在
-                                        print(f"🔥 統合ハンドラーシステム: Skipping slot {slot_name}='{slot_value}' (高優先度ハンドラー保護)")
+                                        print(f"🔥 5文型ハンドラー: Skipping slot {slot_name}='{slot_value}' (高優先度ハンドラー保護)")
                                         continue
                                 
                                 # 🔥 Phase 2: サブ句受動態保護ロジック
                                 should_skip = False
                                 for sub_key, sub_value in result.get('sub_slots', {}).items():
                                     if sub_key.startswith('sub-') and sub_value and str(slot_value).lower() in str(sub_value).lower():
-                                        print(f"🔥 Phase 2: Skipping main slot {slot_name}='{slot_value}' (already in sub-slot {sub_key}='{sub_value}')")
+                                        print(f"🔥 5文型ハンドラー: Skipping main slot {slot_name}='{slot_value}' (already in sub-slot {sub_key}='{sub_value}')")
                                         should_skip = True
                                         break
                                 
                                 if not should_skip:
                                     result['slots'][slot_name] = slot_value
+                                    print(f"🔥 5文型ハンドラー: Setting {slot_name}='{slot_value}'")
                     
                     # 成功カウント
                     self.handler_success_count[handler_name] = \
@@ -4051,6 +4061,108 @@ class DynamicGrammarMapper:
                 ordered.append(handler)
         
         return ordered
+    
+    def _extract_basic_five_pattern_only(self, sentence: str, doc) -> Dict[str, str]:
+        """
+        純粋な5文型ハンドラー - S, V, O1, O2, C1のみ処理
+        副詞（M1, M2, M3）は一切処理しない（責任分離の原則）
+        
+        Args:
+            sentence: 解析対象文
+            doc: spaCy解析結果
+            
+        Returns:
+            Dict: S, V, O1, O2, C1のみを含むスロット
+        """
+        slots = {}
+        
+        try:
+            tokens = [token.text for token in doc]
+            
+            # 主語検出（名詞句の最初の部分）
+            subject_found = False
+            for i, token in enumerate(doc):
+                if not subject_found and token.dep_ in ['nsubj', 'nsubjpass']:
+                    # 主語名詞句を構築
+                    subject_tokens = []
+                    
+                    # 修飾語を含めた主語の構築
+                    for j in range(max(0, i-3), min(len(doc), i+2)):
+                        if j == i or doc[j].head == token or (doc[j].dep_ in ['det', 'amod'] and doc[j].head.i == i):
+                            subject_tokens.append((j, doc[j].text))
+                    
+                    subject_tokens.sort()  # 位置順にソート
+                    if subject_tokens:
+                        slots['S'] = ' '.join([text for _, text in subject_tokens])
+                        subject_found = True
+                        print(f"🔥 5文型ハンドラー: 主語検出 S='{slots['S']}'")
+            
+            # 動詞検出
+            verb_found = False
+            for token in doc:
+                if not verb_found and token.pos_ == 'VERB' and token.dep_ in ['ROOT', 'aux', 'auxpass', 'cop']:
+                    # 助動詞+動詞の組み合わせを処理
+                    verb_phrase = []
+                    
+                    # 助動詞を探す
+                    for child in token.children:
+                        if child.dep_ in ['aux', 'auxpass'] and child.i < token.i:
+                            verb_phrase.append((child.i, child.text))
+                    
+                    verb_phrase.append((token.i, token.text))
+                    verb_phrase.sort()
+                    
+                    if verb_phrase:
+                        slots['V'] = ' '.join([text for _, text in verb_phrase])
+                        verb_found = True
+                        print(f"🔥 5文型ハンドラー: 動詞検出 V='{slots['V']}'")
+            
+            # 目的語・補語検出
+            obj_found = False
+            comp_found = False
+            
+            for token in doc:
+                # 消費済みトークンをスキップ（責任分離原則）
+                if hasattr(self, '_consumed_tokens') and token.i in self._consumed_tokens:
+                    print(f"🔥 5文型ハンドラー: 消費済みトークン {token.i}='{token.text}' をスキップ")
+                    continue
+                    
+                # 直接目的語のみ（前置詞の目的語 pobj は除外）
+                if not obj_found and token.dep_ in ['dobj']:
+                    # 目的語名詞句を構築
+                    obj_tokens = []
+                    for j in range(max(0, token.i-2), min(len(doc), token.i+3)):
+                        if j == token.i or (doc[j].head == token and doc[j].dep_ in ['det', 'amod']):
+                            obj_tokens.append((j, doc[j].text))
+                    
+                    obj_tokens.sort()
+                    if obj_tokens:
+                        slots['O1'] = ' '.join([text for _, text in obj_tokens])
+                        obj_found = True
+                        print(f"🔥 5文型ハンドラー: 目的語検出 O1='{slots['O1']}'")
+                
+                # 補語
+                elif not comp_found and token.dep_ in ['attr', 'acomp']:
+                    # 消費済みトークンをスキップ
+                    if hasattr(self, '_consumed_tokens') and token.i in self._consumed_tokens:
+                        continue
+                    comp_tokens = []
+                    for j in range(max(0, token.i-1), min(len(doc), token.i+2)):
+                        if j == token.i or (doc[j].head == token and doc[j].dep_ in ['det', 'amod']):
+                            comp_tokens.append((j, doc[j].text))
+                    
+                    comp_tokens.sort()
+                    if comp_tokens:
+                        slots['C1'] = ' '.join([text for _, text in comp_tokens])
+                        comp_found = True
+                        print(f"🔥 5文型ハンドラー: 補語検出 C1='{slots['C1']}'")
+            
+            print(f"🔥 5文型ハンドラー結果: {slots}")
+            return slots
+            
+        except Exception as e:
+            self.logger.error(f"5文型ハンドラーエラー: {e}")
+            return {}
     
     def _analyze_sentence_legacy(self, sentence: str, doc) -> Dict:
         """既存のanalyze_sentenceロジックをラップ"""

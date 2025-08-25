@@ -60,17 +60,25 @@ class CentralController:
         handler_info = result.get('handler_info', {})
         print(f"🔧 Central Controller: Handler info received: {handler_info}")
         
+        # 🔧 入力時点のスロット状況をデバッグ
+        input_main_slots = result.get('main_slots', {})
+        print(f"🔧 Central Controller: Input main_slots: {input_main_slots}")
+        
         # 1. 受動態制御
         result = self._control_passive_voice(result)
+        print(f"🔧 Central Controller: After _control_passive_voice: {result.get('main_slots', {})}")
         
         # 2. 副詞句統合制御
         result = self._control_adverb_phrases(result)
+        print(f"🔧 Central Controller: After _control_adverb_phrases: {result.get('main_slots', {})}")
         
         # 3. 助動詞統合制御
         result = self._control_auxiliary_integration(result)
+        print(f"🔧 Central Controller: After _control_auxiliary_integration: {result.get('main_slots', {})}")
         
         # 4. 副詞重複解決（既存機能）
         result = self._resolve_adverb_duplication(result)
+        print(f"🔧 Central Controller: After _resolve_adverb_duplication: {result.get('main_slots', {})}")
         
         return result
     
