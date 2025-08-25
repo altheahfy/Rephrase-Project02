@@ -1,107 +1,7 @@
 {
-  "timestamp": "2025-08-25T12:42:26.678228",
-  "total_tests": 3,
+  "timestamp": "2025-08-25T12:47:44.599277",
+  "total_tests": 2,
   "results": {
-    "79": {
-      "sentence": "She studies hardest of all students.",
-      "expected": {
-        "main_slots": {
-          "S": "She",
-          "V": "studies",
-          "M2": "hardest",
-          "M3": "of all students"
-        },
-        "sub_slots": {}
-      },
-      "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "She",
-          "studies",
-          "all students"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4
-        ],
-        "display_order": [
-          1,
-          3,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          4
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "studies",
-          "M2": "hardest",
-          "M3": "of all students"
-        },
-        "sub_slots": {},
-        "slots": {
-          "S": "She",
-          "V": "studies",
-          "M2": "hardest",
-          "M3": "of all students"
-        },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {
-            "comparative_superlative": {
-              "detected_patterns": [
-                {
-                  "type": "comparative_superlative",
-                  "structure": "hardest",
-                  "comparison_type": "superlative",
-                  "detection_method": "比較級・最上級構文解析"
-                }
-              ],
-              "handler_contributions": {
-                "comparative_superlative": {
-                  "patterns": [
-                    {
-                      "type": "comparative_superlative",
-                      "structure": "hardest",
-                      "comparison_type": "superlative",
-                      "detection_method": "比較級・最上級構文解析"
-                    }
-                  ],
-                  "handler_success": true,
-                  "processing_notes": "Comparative/Superlative: superlative form detected"
-                }
-              },
-              "control_flags": {}
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8,
-        "handler_info": {
-          "winning_handler": "comparative_superlative",
-          "priority": 9
-        }
-      },
-      "test_type": "basic_five_pattern",
-      "status": "success"
-    },
     "80": {
       "sentence": "He works most efficiently in the morning.",
       "expected": {
@@ -114,46 +14,28 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "He",
-          "works"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
         "main_slots": {
-          "S": "He",
-          "V": "works",
           "M2": "most efficiently",
-          "M3": "in the morning"
+          "M3": "in the morning",
+          "S": "He",
+          "V": "works"
         },
         "sub_slots": {},
         "slots": {
-          "S": "He",
-          "V": "works",
           "M2": "most efficiently",
-          "M3": "in the morning"
+          "M3": "in the morning",
+          "S": "He",
+          "V": "works"
         },
-        "pattern_detected": "SV",
+        "pattern_detected": "comparative_superlative_pattern",
         "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
+        "analysis_method": "unified_handler",
         "lexical_tokens": 7,
         "unified_handlers": {
           "detected_patterns": [],
@@ -208,49 +90,29 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "This machine",
-          "operates",
-          "all models"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
+        "Slot": [],
+        "SlotPhrase": [],
+        "Slot_display_order": [],
+        "display_order": [],
+        "PhraseType": [],
+        "SubslotID": [],
         "main_slots": {
-          "S": "This machine",
-          "V": "operates",
           "M2": "most smoothly",
-          "M3": "among all models"
+          "M3": "among all models",
+          "S": "This machine",
+          "V": "operates"
         },
         "sub_slots": {},
         "slots": {
-          "S": "This machine",
-          "V": "operates",
           "M2": "most smoothly",
-          "M3": "among all models"
+          "M3": "among all models",
+          "S": "This machine",
+          "V": "operates"
         },
-        "pattern_detected": "SVO",
+        "pattern_detected": "comparative_superlative_pattern",
         "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 6,
+        "analysis_method": "unified_handler",
+        "lexical_tokens": 8,
         "unified_handlers": {
           "detected_patterns": [],
           "handler_contributions": {
