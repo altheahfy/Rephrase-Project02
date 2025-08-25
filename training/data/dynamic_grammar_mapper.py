@@ -159,25 +159,26 @@ class DynamicGrammarMapper:
     
     def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
-        🔧 Phase A3-2 慎重再実装: PureCentralController統合（レガシー互換）
+        🎯 Phase A3-2 完全実装: PureCentralController完全委譲
         
         文章を動的に解析してRephraseスロット構造を生成
-        内部処理はPureCentralControllerに委譲、外部インターフェースは不変
+        全ての処理をPureCentralControllerに委譲し、レガシー処理を完全除去
         
         Args:
             sentence (str): 解析対象の文章
             allow_unified (bool): 統合ハンドラー処理の許可（再帰防止用）
             
         Returns:
-            Dict[str, Any]: Rephraseスロット構造（レガシー互換）
+            Dict[str, Any]: Rephraseスロット構造（完全統合）
         """
-        # 🚀 Phase A3-2 慎重実装: PureCentralControllerに委譲（レガシー互換）
-        if hasattr(self, 'pure_central_controller') and self.pure_central_controller and allow_unified:
-            self.logger.debug(f"🔥 Phase A3-2: PureCentralController使用（レガシー互換）")
+        # 🚀 Phase A3-2 完全実装: 全処理をPureCentralControllerに委譲
+        if hasattr(self, 'pure_central_controller') and self.pure_central_controller:
+            self.logger.debug(f"🎯 Phase A3-2: PureCentralController完全委譲実行")
             return self.pure_central_controller.analyze_sentence_pure_management(sentence)
         
-        # 📜 レガシーフォールバック: PureCentralControllerが無い場合の従来処理
-        self.logger.debug(f"📜 Phase A3-2: レガシーフォールバック実行")
+        # � エラー：PureCentralControllerが無い場合は初期化エラー
+        self.logger.error(f"� Phase A3-2: PureCentralController未初期化エラー")
+        return self._create_error_result(sentence, "pure_central_controller_not_initialized")
         
         # 🔧 累積バグ修正: 新しい分析開始時にlast_unified_resultをリセット
         if allow_unified:
