@@ -148,6 +148,36 @@ class DynamicGrammarMapper:
             'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
         }
     
+    def _is_direct_object_of_main_verb(self, doc, span_text, main_verb_lemma=None):
+        """
+        レガシーO1厳格ガード：前置詞句内名詞の目的語誤認識を防止
+        
+        Args:
+            doc: spaCy解析結果
+            span_text: チェック対象のスパンテキスト
+            main_verb_lemma: 主動詞の原形（オプション）
+            
+        Returns:
+            bool: 直接目的語として有効かどうか
+        """
+        # spanの代表トークンをdocから逆引き（単純一致で十分）
+        tokens = [t for t in doc if t.text in span_text.split()]
+        if not tokens:
+            return False
+        # 代表を最後の名詞トークンに
+        head = next((t for t in reversed(tokens) if t.pos_ in ("NOUN","PROPN","PRON")), None)
+        if not head:
+            return False
+        # pobj/ADP直下を排除（前置詞句内名詞の除外）
+        if head.dep_ == "pobj" or head.head.pos_ == "ADP":
+            print(f"🛑 Legacy O1 rejection: '{span_text}' is pobj or under ADP (dep_={head.dep_}, head.pos_={head.head.pos_})")
+            return False
+        # 主文V直下のobj/dobjなら可（必要なら main_verb_lemma で更に厳格化）
+        is_valid = head.dep_ in ("obj", "dobj") and head.head.pos_ == "VERB"
+        if not is_valid:
+            print(f"🛑 Legacy O1 rejection: '{span_text}' not direct object (dep_={head.dep_}, head.pos_={head.head.pos_})")
+        return is_valid
+
     def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
         文章を動的に解析してRephraseスロット構造を生成
@@ -219,29 +249,6 @@ class DynamicGrammarMapper:
                 try:
                     unified_result = self._unified_mapping(sentence, doc)
                     if unified_result and 'slots' in unified_result:
-                        # 🔧 根本修正: 統合ハンドラーが勝った場合、レガシー結果をクリーンアップ
-                        handler_info = unified_result.get('handler_info', {})
-                        winning_handler = handler_info.get('winning_handler', '')
-                        
-                        if winning_handler in ['comparative_superlative', 'passive_voice', 'relative_clause']:
-                            # 高優先度ハンドラーが勝った場合、レガシー結果をリセット
-                            print(f"🔥 High-priority handler '{winning_handler}' won: resetting legacy results")
-                            rephrase_result = {
-                                'Slot': [],
-                                'SlotPhrase': [],
-                                'Slot_display_order': [],
-                                'display_order': [],
-                                'PhraseType': [],
-                                'SubslotID': [],
-                                'main_slots': {},
-                                'sub_slots': sub_slots,
-                                'slots': {},
-                                'pattern_detected': f'{winning_handler}_pattern',
-                                'confidence': 0.9,
-                                'analysis_method': 'unified_handler',
-                                'lexical_tokens': len([token for token in tokens if token.get('pos') not in ['PUNCT', 'SPACE']])
-                            }
-                        
                         # 統合ハンドラーの結果をマージ（優先度順）
                         for slot_name, slot_value in unified_result['slots'].items():
                             if slot_value:  # 空でない値のみマージ
@@ -280,14 +287,13 @@ class DynamicGrammarMapper:
                             main_sentence = unified_result['relative_clause_info']['main_sentence']
                             print(f"🎯 Central Controller: Analyzing main sentence for correct slots: '{main_sentence}'")
                             
-                            # 🔧 根本修正: レガシーシステム除去、統合ハンドラーの5文型のみ使用
+                            # 主文を再分析してメインスロットを正しく設定
                             main_doc = self.nlp(main_sentence)
-                            main_analysis_slots = self._extract_basic_five_pattern_only(main_sentence, main_doc)
-                            
-                            if main_analysis_slots:
+                            main_analysis = self._analyze_sentence_legacy(main_sentence, main_doc)
+                            if main_analysis and 'slots' in main_analysis:
                                 # 中央制御: サブスロットと重複しないメインスロットのみ採用
-                                for slot_name, slot_value in main_analysis_slots.items():
-                                    if slot_value and slot_name in ['S', 'V', 'O1', 'O2', 'C1']:  # 5文型のみ
+                                for slot_name, slot_value in main_analysis['slots'].items():
+                                    if slot_value and slot_name not in ['sub-s', 'sub-v', 'sub-aux', 'sub-c1', 'sub-o1']:
                                         # サブスロットの値と重複チェック
                                         is_duplicate = False
                                         for sub_name, sub_value in unified_result.get('sub_slots', {}).items():
@@ -297,6 +303,19 @@ class DynamicGrammarMapper:
                                                 break
                                         
                                         if not is_duplicate:
+                                            # 🛑 レガシーO1厳格ガード：前置詞句内名詞の目的語誤認識を防止
+                                            if slot_name == 'O1':
+                                                # 依存関係チェック：直接目的語のみ許可
+                                                if not self._is_direct_object_of_main_verb(main_doc, str(slot_value)):
+                                                    print(f"🛑 Skip legacy O1='{slot_value}' (not a direct object of main verb)")
+                                                    continue
+                                                # 消費済みトークンチェック
+                                                if hasattr(self, '_consumed_tokens') and any(
+                                                    t.i in self._consumed_tokens for t in main_doc if t.text in str(slot_value).split()
+                                                ):
+                                                    print(f"🛑 Skip legacy O1='{slot_value}' (uses consumed tokens)")
+                                                    continue
+                                            
                                             # 🎯 Central Controller: 自動詞パターン特別処理
                                             if slot_name == 'O1' and 'arrived' in main_sentence:
                                                 # "arrived"は自動詞なので、O1（目的語）は不要
@@ -305,7 +324,7 @@ class DynamicGrammarMapper:
                                             
                                             rephrase_result['slots'][slot_name] = slot_value
                                             rephrase_result['main_slots'][slot_name] = slot_value
-                                            print(f"🎯 Central Controller: Main slot set {slot_name}='{slot_value}' (via unified basic_five_pattern)")
+                                            print(f"🎯 Central Controller: Main slot set {slot_name}='{slot_value}'")
                             
                     print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
                 except Exception as e:
