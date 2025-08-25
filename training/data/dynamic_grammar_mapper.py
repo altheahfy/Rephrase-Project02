@@ -148,6 +148,36 @@ class DynamicGrammarMapper:
             'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
         }
     
+    def _is_direct_object_of_main_verb(self, doc, span_text, main_verb_lemma=None):
+        """
+        レガシーO1厳格ガード：前置詞句内名詞の目的語誤認識を防止
+        
+        Args:
+            doc: spaCy解析結果
+            span_text: チェック対象のスパンテキスト
+            main_verb_lemma: 主動詞の原形（オプション）
+            
+        Returns:
+            bool: 直接目的語として有効かどうか
+        """
+        # spanの代表トークンをdocから逆引き（単純一致で十分）
+        tokens = [t for t in doc if t.text in span_text.split()]
+        if not tokens:
+            return False
+        # 代表を最後の名詞トークンに
+        head = next((t for t in reversed(tokens) if t.pos_ in ("NOUN","PROPN","PRON")), None)
+        if not head:
+            return False
+        # pobj/ADP直下を排除（前置詞句内名詞の除外）
+        if head.dep_ == "pobj" or head.head.pos_ == "ADP":
+            print(f"🛑 Legacy O1 rejection: '{span_text}' is pobj or under ADP (dep_={head.dep_}, head.pos_={head.head.pos_})")
+            return False
+        # 主文V直下のobj/dobjなら可（必要なら main_verb_lemma で更に厳格化）
+        is_valid = head.dep_ in ("obj", "dobj") and head.head.pos_ == "VERB"
+        if not is_valid:
+            print(f"🛑 Legacy O1 rejection: '{span_text}' not direct object (dep_={head.dep_}, head.pos_={head.head.pos_})")
+        return is_valid
+
     def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
         文章を動的に解析してRephraseスロット構造を生成
@@ -273,6 +303,19 @@ class DynamicGrammarMapper:
                                                 break
                                         
                                         if not is_duplicate:
+                                            # 🛑 レガシーO1厳格ガード：前置詞句内名詞の目的語誤認識を防止
+                                            if slot_name == 'O1':
+                                                # 依存関係チェック：直接目的語のみ許可
+                                                if not self._is_direct_object_of_main_verb(main_doc, str(slot_value)):
+                                                    print(f"🛑 Skip legacy O1='{slot_value}' (not a direct object of main verb)")
+                                                    continue
+                                                # 消費済みトークンチェック
+                                                if hasattr(self, '_consumed_tokens') and any(
+                                                    t.i in self._consumed_tokens for t in main_doc if t.text in str(slot_value).split()
+                                                ):
+                                                    print(f"🛑 Skip legacy O1='{slot_value}' (uses consumed tokens)")
+                                                    continue
+                                            
                                             # 🎯 Central Controller: 自動詞パターン特別処理
                                             if slot_name == 'O1' and 'arrived' in main_sentence:
                                                 # "arrived"は自動詞なので、O1（目的語）は不要
@@ -1598,6 +1641,15 @@ class DynamicGrammarMapper:
             slot_phrases.append(element.text)
             
             # 🔧 main_slots辞書に追加（副詞以外のみ）
+            # 🛑 レガシーO1厳格ガード：前置詞句内名詞の目的語誤認識を防止
+            if element.role == 'O1':
+                # 消費済みトークンチェック
+                if hasattr(self, '_consumed_tokens') and any(
+                    element.start_idx + j in self._consumed_tokens for j in range(len(element.text.split()))
+                ):
+                    print(f"🛑 Skip legacy O1='{element.text}' from _convert_to_rephrase_format (uses consumed tokens)")
+                    continue
+            
             main_slots[element.role] = element.text
             
             order = role_order.get(element.role, 99)
