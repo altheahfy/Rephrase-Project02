@@ -2756,6 +2756,7 @@ class DynamicGrammarMapper:
             'basic_five_pattern',     # 基本5文型
             'relative_clause',        # 関係節  
             'passive_voice',          # 受動態
+            'comparative_superlative', # 比較級・最上級
             'auxiliary_complex',      # 助動詞
             # 'adverbial_modifier',   # 副詞・修飾語 (未実装のため一時削除)
         ]
@@ -3380,6 +3381,286 @@ class DynamicGrammarMapper:
     
     # Phase 2 受動態ハンドラー実装終了
     
+    def _handle_comparative_superlative(self, sentence: str, doc, current_result: Dict) -> Optional[Dict]:
+        """
+        🎯 比較級・最上級ハンドラー
+        
+        比較級（-er, more）・最上級（-est, most）構文を検出・処理
+        than句、of句をM2/M3スロットに配置
+        
+        Args:
+            sentence: 解析対象文
+            doc: spaCy解析結果
+            current_result: 現在の解析結果
+            
+        Returns:
+            Dict: ハンドラー結果（None=未検出）
+        """
+        print(f"🔍 Executing comparative_superlative handler for: {sentence}")
+        
+        try:
+            # 比較級・最上級構文の検出
+            comparative_info = self._detect_comparative_superlative(sentence, doc)
+            
+            if not comparative_info['found']:
+                print(f"🔍 比較級・最上級未検出: {sentence}")
+                return None
+            
+            print(f"🔥 比較級・最上級検出: {comparative_info}")
+            
+            # スロット生成
+            slots = self._create_comparative_slots(comparative_info, doc)
+            
+            # トークン消費記録
+            if comparative_info.get('consumed_tokens'):
+                for token_idx in comparative_info['consumed_tokens']:
+                    self._consumed_tokens.add(token_idx)
+                print(f"🔥 Token consumption: インデックス {comparative_info['consumed_tokens']} for 比較級・最上級")
+            
+            result = {
+                'sentence': sentence,
+                'slots': slots,
+                'sub_slots': {},
+                'grammar_info': {
+                    'detected_patterns': [{
+                        'type': 'comparative_superlative',
+                        'structure': comparative_info.get('structure', ''),
+                        'comparison_type': comparative_info.get('comparison_type', ''),
+                        'detection_method': '比較級・最上級構文解析'
+                    }],
+                    'handler_contributions': {
+                        'comparative_superlative': {
+                            'patterns': [{
+                                'type': 'comparative_superlative',
+                                'structure': comparative_info.get('structure', ''),
+                                'comparison_type': comparative_info.get('comparison_type', ''),
+                                'detection_method': '比較級・最上級構文解析'
+                            }],
+                            'handler_success': True,
+                            'processing_notes': f"Comparative/Superlative: {comparative_info.get('comparison_type', '')} form detected"
+                        }
+                    },
+                    'control_flags': {}
+                },
+                'slot_provenance': {slot: {'handler': 'comparative_superlative', 'priority': 8, 'value': value} 
+                                  for slot, value in slots.items() if value}
+            }
+            
+            print(f"🔥 比較級・最上級ハンドラー成功: {comparative_info.get('comparison_type', '')}構文検出")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"比較級・最上級ハンドラーエラー: {e}")
+            return None
+    
+    def _detect_comparative_superlative(self, sentence: str, doc) -> Dict:
+        """
+        🎯 比較級・最上級構文の検出
+        
+        Returns:
+            Dict: {
+                'found': bool,
+                'comparison_type': str,  # 'comparative' or 'superlative'
+                'structure': str,        # 比較語
+                'than_phrase': str,      # than句 (比較級のみ)
+                'of_phrase': str,        # of句 (最上級のみ)
+                'consumed_tokens': List[int]
+            }
+        """
+        result = {
+            'found': False,
+            'comparison_type': '',
+            'structure': '',
+            'than_phrase': '',
+            'of_phrase': '',
+            'consumed_tokens': []
+        }
+        
+        try:
+            tokens = list(doc)
+            
+            # 比較級パターンの検出
+            comparative_detected = self._detect_comparative_pattern(tokens, result)
+            if comparative_detected:
+                result['found'] = True
+                return result
+            
+            # 最上級パターンの検出
+            superlative_detected = self._detect_superlative_pattern(tokens, result)
+            if superlative_detected:
+                result['found'] = True
+                return result
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"比較級・最上級検出エラー: {e}")
+            return {'found': False}
+    
+    def _detect_comparative_pattern(self, tokens: List, result: Dict) -> bool:
+        """比較級パターンの検出"""
+        # 比較級語尾パターン
+        comparative_endings = ['er', 'ier']
+        comparative_words = ['more', 'less', 'better', 'worse', 'bigger', 'smaller', 'faster', 'slower']
+        
+        for i, token in enumerate(tokens):
+            token_text = token.text.lower()
+            
+            # -er語尾の検出
+            if any(token_text.endswith(ending) for ending in comparative_endings):
+                result['comparison_type'] = 'comparative'
+                result['structure'] = token.text
+                self._find_than_phrase(tokens, i, result)
+                return True
+            
+            # more/less + 形容詞パターン
+            if token_text in ['more', 'less'] and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.pos_ in ['ADJ', 'ADV']:
+                    result['comparison_type'] = 'comparative'
+                    result['structure'] = f"{token.text} {next_token.text}"
+                    self._find_than_phrase(tokens, i + 1, result)
+                    return True
+            
+            # 既知の比較級語
+            if token_text in comparative_words:
+                result['comparison_type'] = 'comparative'
+                result['structure'] = token.text
+                self._find_than_phrase(tokens, i, result)
+                return True
+        
+        return False
+    
+    def _detect_superlative_pattern(self, tokens: List, result: Dict) -> bool:
+        """最上級パターンの検出"""
+        # 最上級語尾パターン
+        superlative_endings = ['est', 'iest']
+        superlative_words = ['most', 'least', 'best', 'worst', 'biggest', 'smallest']
+        
+        for i, token in enumerate(tokens):
+            token_text = token.text.lower()
+            
+            # the + -est語尾の検出
+            if any(token_text.endswith(ending) for ending in superlative_endings):
+                # theの確認
+                if i > 0 and tokens[i-1].text.lower() == 'the':
+                    result['comparison_type'] = 'superlative'
+                    result['structure'] = f"the {token.text}"
+                    self._find_of_phrase(tokens, i, result)
+                    return True
+            
+            # the most/least + 形容詞パターン
+            if token_text in ['most', 'least'] and i > 0 and tokens[i-1].text.lower() == 'the':
+                if i + 1 < len(tokens) and tokens[i + 1].pos_ in ['ADJ', 'ADV']:
+                    next_token = tokens[i + 1]
+                    result['comparison_type'] = 'superlative'
+                    result['structure'] = f"the {token.text} {next_token.text}"
+                    self._find_of_phrase(tokens, i + 1, result)
+                    return True
+            
+            # 既知の最上級語
+            if token_text in superlative_words and i > 0 and tokens[i-1].text.lower() == 'the':
+                result['comparison_type'] = 'superlative'
+                result['structure'] = f"the {token.text}"
+                self._find_of_phrase(tokens, i, result)
+                return True
+        
+        return False
+    
+    def _find_than_phrase(self, tokens: List, start_idx: int, result: Dict):
+        """than句の検出と抽出"""
+        for i in range(start_idx + 1, len(tokens)):
+            if tokens[i].text.lower() == 'than':
+                # than以降の句を抽出
+                than_parts = ['than']
+                consumed_indices = [i]
+                
+                for j in range(i + 1, min(i + 6, len(tokens))):  # 最大5語まで
+                    next_token = tokens[j]
+                    if next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON', 'NUM']:
+                        than_parts.append(next_token.text)
+                        consumed_indices.append(j)
+                    elif next_token.pos_ == 'PUNCT':
+                        break
+                    else:
+                        if len(next_token.text) <= 3:  # 短い語は含める
+                            than_parts.append(next_token.text)
+                            consumed_indices.append(j)
+                        else:
+                            break
+                
+                if len(than_parts) > 1:
+                    result['than_phrase'] = ' '.join(than_parts)
+                    result['consumed_tokens'].extend(consumed_indices)
+                break
+    
+    def _find_of_phrase(self, tokens: List, start_idx: int, result: Dict):
+        """of句の検出と抽出"""
+        for i in range(start_idx + 1, len(tokens)):
+            if tokens[i].text.lower() == 'of':
+                # of以降の句を抽出
+                of_parts = ['of']
+                consumed_indices = [i]
+                
+                for j in range(i + 1, min(i + 8, len(tokens))):  # 最大7語まで
+                    next_token = tokens[j]
+                    if next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON', 'NUM']:
+                        of_parts.append(next_token.text)
+                        consumed_indices.append(j)
+                    elif next_token.pos_ == 'PUNCT':
+                        break
+                    else:
+                        if len(next_token.text) <= 3:  # 短い語は含める
+                            of_parts.append(next_token.text)
+                            consumed_indices.append(j)
+                        else:
+                            break
+                
+                if len(of_parts) > 1:
+                    result['of_phrase'] = ' '.join(of_parts)
+                    result['consumed_tokens'].extend(consumed_indices)
+                break
+    
+    def _create_comparative_slots(self, comparative_info: Dict, doc) -> Dict[str, str]:
+        """
+        🎯 比較級・最上級情報からRephraseスロット生成
+        
+        Args:
+            comparative_info: 比較級・最上級検出結果
+            doc: spaCy解析結果
+            
+        Returns:
+            Dict: Rephraseスロット構造
+        """
+        slots = {}
+        
+        if not comparative_info.get('found', False):
+            return slots
+        
+        comparison_type = comparative_info.get('comparison_type', '')
+        structure = comparative_info.get('structure', '')
+        than_phrase = comparative_info.get('than_phrase', '')
+        of_phrase = comparative_info.get('of_phrase', '')
+        
+        # 比較語はC1スロットに配置
+        if structure:
+            slots['C1'] = structure
+            print(f"🔍 比較級・最上級構造: C1='{structure}' ({comparison_type})")
+        
+        # than句はM2スロットに配置（Rephraseルール）
+        if than_phrase:
+            slots['M2'] = than_phrase
+            print(f"🔍 than句配置: M2='{than_phrase}' (Rephrase修飾句ルール)")
+        
+        # of句はM2スロットに配置（Rephraseルール）
+        if of_phrase:
+            slots['M2'] = of_phrase
+            print(f"🔍 of句配置: M2='{of_phrase}' (Rephrase修飾句ルール)")
+        
+        return slots
+    
+    # Phase 2 比較級・最上級ハンドラー実装終了
+    
     def _merge_handler_results(self, base_result: Dict, handler_result: Dict, handler_name: str) -> Dict:
         """
         ハンドラー結果をベース結果にマージ
@@ -3393,7 +3674,8 @@ class DynamicGrammarMapper:
         handler_priority = {
             'passive_voice': 10,      # 受動態は最高優先度
             'relative_clause': 9,     # 関係節
-            'auxiliary_complex': 8,   # 助動詞
+            'comparative_superlative': 8, # 比較級・最上級
+            'auxiliary_complex': 7,   # 助動詞
             'basic_five_pattern': 1   # 基本5文型は最低優先度
         }
         
@@ -3629,6 +3911,7 @@ class DynamicGrammarMapper:
         priority_order = [
             'relative_clause',          # 関係節優先
             'passive_voice',            # 受動態
+            'comparative_superlative',  # 比較級・最上級
             'auxiliary_complex',        # 助動詞
             'adverbial_modifier',       # 副詞・修飾語
             'basic_five_pattern',       # 基本5文型（最後）
