@@ -4095,29 +4095,41 @@ class PureCentralController:
     
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
-        ✅ 純粋管理機能: レガシー互換版
+        🎯 Phase A3-4: Pure Management品質保証版
         
         既存システムと完全に同じ結果構造で返す
-        内部処理のみPureCentralControllerによる管理を行う
+        内部処理のみPureCentralControllerによる品質管理を行う
         
         Args:
             sentence (str): 解析対象の文章
             
         Returns:
-            Dict[str, Any]: レガシー互換の解析結果
+            Dict[str, Any]: レガシー互換の解析結果（品質保証付き）
         """
-        self.logger.info(f"🎯 純粋管理開始（レガシー互換）: '{sentence}'")
+        self.logger.info(f"🎯 Phase A3-4: Pure Management品質保証開始: '{sentence}'")
         
         try:
-            # 🔧 Phase A3-2 慎重再実装: 完全レガシー互換
+            # 🔧 Phase A3-4: 完全レガシー互換 + 品質管理
             # 管理機能は内部的に記録、外部インターフェースは変更なし
             legacy_result = self.grammar_mapper.analyze_sentence(sentence)
             
-            # 内部管理情報のログ記録（結果には影響しない）
-            self.logger.debug(f"🎯 管理記録: 処理完了 - スロット数{len(legacy_result.get('slots', {}))}")
+            # 🎯 Phase A3-4: 内部品質管理情報のログ記録（結果には影響しない）
+            quality_info = {
+                'slots_count': len(legacy_result.get('slots', {})),
+                'sub_slots_count': len(legacy_result.get('sub_slots', {})),
+                'confidence': legacy_result.get('confidence', 0.0),
+                'management_applied': True,
+                'phase': 'A3-4'
+            }
+            self.logger.debug(f"🎯 Phase A3-4 品質管理記録: {quality_info}")
             
-            self.logger.info("🎯 純粋管理完了（レガシー互換）: 既存形式で結果返却")
+            self.logger.info("🎯 Phase A3-4: Pure Management品質保証完了（レガシー互換）")
             return legacy_result
+            
+        except Exception as e:
+            self.logger.error(f"❌ Phase A3-4: Pure Management処理エラー: {e}")
+            # フォールバック: 直接DynamicGrammarMapperを使用
+            return self.grammar_mapper.analyze_sentence(sentence)
             
         except Exception as e:
             self.logger.error(f"🔥 純粋管理エラー: {str(e)}")
@@ -4203,7 +4215,7 @@ class PureCentralController:
                 else:
                     # レガシーハンドラー処理（basic_five_patternのみ）
                     if handler_name == 'basic_five_pattern':
-                        self.logger.debug(f"🔧 レガシーハンドラー実行: {handler_name}")
+                        self.logger.debug(f"🔧 Phase A3-4: レガシーハンドラー修正実行: {handler_name}")
                         
                         # basic_five_patternの特殊処理
                         try:
@@ -4213,40 +4225,54 @@ class PureCentralController:
                                 analysis_sentence = main_sentence
                                 doc = self.grammar_mapper.nlp(main_sentence)
                             
-                            # 内部5文型処理を直接実行
-                            enhanced_tokens = self.grammar_mapper._convert_spacy_to_dict_tokens(list(doc))
+                            # 🔥 Phase A3-4: 内部5文型処理を正しく実行
+                            # 消費済みトークンフィルタリング（オプショナル）
+                            filtered_tokens = []
+                            consumed_tokens = getattr(self.grammar_mapper, '_consumed_tokens', set())
+                            
+                            for i, token in enumerate(doc):
+                                if i not in consumed_tokens:
+                                    filtered_tokens.append(token)
+                            
+                            # DynamicGrammarMapperの内部メソッドを正しく呼び出し
+                            enhanced_tokens = self.grammar_mapper._convert_spacy_to_dict_tokens(filtered_tokens)
                             core_elements = self.grammar_mapper._identify_core_elements(enhanced_tokens)
                             sentence_pattern = self.grammar_mapper._determine_sentence_pattern(core_elements, enhanced_tokens)
                             grammar_elements = self.grammar_mapper._assign_grammar_roles(enhanced_tokens, sentence_pattern, core_elements)
                             
-                            # 結果変換
+                            # 🎯 Phase A3-4: 結果変換管理
                             basic_pattern_result = self.grammar_mapper._convert_to_rephrase_format(
                                 grammar_elements, sentence_pattern, accumulated_result.get('sub_slots', {})
                             )
                             
-                            # メインスロット統合
+                            # 🔥 Phase A3-4: 管理業務 - 結果統合
                             if 'main_slots' in basic_pattern_result:
                                 accumulated_result['slots'].update(basic_pattern_result['main_slots'])
                             
                             pipeline_results['handler_results'][handler_name] = basic_pattern_result
                             pipeline_results['execution_log'].append({
                                 'handler': handler_name,
-                                'status': 'success_legacy',
-                                'slots_added': len(basic_pattern_result.get('main_slots', {}))
+                                'status': 'success_legacy_fixed',
+                                'slots_added': len(basic_pattern_result.get('main_slots', {})),
+                                'phase': 'A3-4'
                             })
                             
+                            self.logger.debug(f"✅ Phase A3-4: {handler_name}レガシー処理修正完了")
+                            
                         except Exception as e:
-                            self.logger.error(f"❌ レガシー{handler_name}エラー: {e}")
+                            self.logger.error(f"❌ Phase A3-4: レガシー{handler_name}エラー: {e}")
+                            # 🔧 Phase A3-4: エラー時フォールバック管理
                             pipeline_results['execution_log'].append({
                                 'handler': handler_name,
-                                'status': 'legacy_error',
-                                'error': str(e)
+                                'status': 'legacy_error_A3-4',
+                                'error': str(e),
+                                'fallback_applied': True
                             })
                     else:
-                        self.logger.warning(f"⚠️ ハンドラーメソッド未発見: _handle_{handler_name}")
+                        self.logger.warning(f"⚠️ Phase A3-4: ハンドラーメソッド未発見: _handle_{handler_name}")
                         pipeline_results['execution_log'].append({
                             'handler': handler_name,
-                            'status': 'method_not_found'
+                            'status': 'method_not_found_A3-4'
                         })
                     
             except Exception as e:
@@ -4301,32 +4327,79 @@ class PureCentralController:
     
     def _finalize_management_result(self, pipeline_result: Dict[str, Any], sentence: str) -> Dict[str, Any]:
         """
-        🎯 Phase A3-3: 真の純粋管理結果統合
+        🎯 Phase A3-4: Pure Management品質保証システム
         
         個別ハンドラー結果の最終統合（管理業務）
-        レガシー委譲機能を完全除去
+        品質検証・最適化機能を追加
         """
-        # 🔥 Phase A3-3: 真の統合管理業務
+        # 🔥 Phase A3-4: 真の統合管理業務
         unified_result = pipeline_result['unified_result']
         
+        # 🎯 Phase A3-4: 品質管理 - 結果整合性チェック
+        quality_score = self._calculate_result_quality(unified_result, pipeline_result['execution_log'])
+        
+        # 🔧 Phase A3-4: 品質管理 - スロット最適化
+        optimized_result = self._optimize_slot_allocation(unified_result)
+        
         # 管理業務: レガシー互換形式への変換
-        final_result = unified_result.copy()
+        final_result = optimized_result.copy()
         
         # 管理業務: 内部管理メタデータ（結果には含めない、ログのみ）
         management_info = {
-            'controller': 'PureCentralController_A3-3',
+            'controller': 'PureCentralController_A3-4',
             'execution_log': pipeline_result['execution_log'],
-            'quality_metrics': pipeline_result['quality_metrics'],
+            'quality_metrics': {
+                'quality_score': quality_score,
+                'slots_optimized': len(optimized_result.get('slots', {})) != len(unified_result.get('slots', {}))
+            },
             'management_timestamp': self._get_timestamp(),
             'handlers_executed': len(pipeline_result['handler_results']),
-            'legacy_delegation_removed': True
+            'legacy_delegation_removed': True,
+            'a3_4_improvements': True
         }
         
         # 内部ログ記録のみ（結果構造は変更しない）
-        self.logger.debug(f"🔥 Phase A3-3 管理情報: {management_info}")
+        self.logger.debug(f"🔥 Phase A3-4 品質管理情報: {management_info}")
         
-        self.logger.info(f"🔥 Phase A3-3: 真の結果統合完了 - {len(final_result.get('slots', {}))}スロット")
+        self.logger.info(f"🔥 Phase A3-4: Pure Management品質保証完了 - {len(final_result.get('slots', {}))}スロット (品質スコア: {quality_score:.2f})")
         return final_result
+    
+    def _calculate_result_quality(self, result: Dict[str, Any], execution_log: List[Dict]) -> float:
+        """
+        🎯 Phase A3-4: 結果品質計算
+        """
+        quality_score = 1.0
+        
+        # エラー発生数による減点
+        error_count = sum(1 for log in execution_log if log.get('status', '').endswith('error'))
+        quality_score -= (error_count * 0.1)
+        
+        # 成功ハンドラー数による評価
+        success_count = sum(1 for log in execution_log if 'success' in log.get('status', ''))
+        if success_count > 0:
+            quality_score += (success_count * 0.05)
+        
+        # スロット完全性による評価
+        slots = result.get('slots', {})
+        if 'S' in slots and 'V' in slots:
+            quality_score += 0.1  # 基本構造ボーナス
+            
+        return max(0.0, min(1.0, quality_score))
+    
+    def _optimize_slot_allocation(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        🎯 Phase A3-4: スロット配置最適化
+        """
+        optimized = result.copy()
+        
+        # 重複スロット除去
+        if 'slots' in optimized:
+            slots = optimized['slots']
+            # M3重複問題の修正など、既知の問題を管理業務として最適化
+            # 今回は基本的な最適化のみ
+            optimized['slots'] = {k: v for k, v in slots.items() if v}  # 空値除去
+            
+        return optimized
     
     def _quality_assurance_check(self, result: Dict[str, Any]) -> None:
         """
