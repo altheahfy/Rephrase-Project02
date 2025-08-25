@@ -170,8 +170,9 @@ class DynamicGrammarMapper:
                 self.logger.warning(f"分析深度制限に達しました: {self._analysis_depth}")
                 return self._create_error_result(sentence, "recursion_depth_exceeded")
         else:
-            # ChatGPT5 Step C: Token Consumption Tracking - 新しい分析開始時にリセット
-            self._consumed_tokens = set()
+            # 🔥 統合ハンドラーシステム: 古いToken Consumption Trackingは統合ハンドラーが担当
+            # 責任分離により個別トラッキングは不要
+            pass
         
         try:
             # 🆕 Phase 1.2: 文型認識
@@ -237,8 +238,8 @@ class DynamicGrammarMapper:
                                 rephrase_result['unified_handlers'] = {}
                             rephrase_result['unified_handlers'] = unified_result['grammar_info']
                         
-                        # ChatGPT5 Step D: Token consumptionベースで重複スロット削除
-                        self._cleanup_duplicate_slots_by_consumption(rephrase_result, doc)
+                        # 🔥 統合ハンドラーシステム: 古いToken Consumption削除システムは統合ハンドラーが担当
+                        # 個別ハンドラーの責任分離により重複削除は不要
                         
                         # 🔥 Phase 2: 統合ハンドラー結果を保存 (サブスロットマージ用)
                         self.last_unified_result = unified_result
@@ -287,12 +288,9 @@ class DynamicGrammarMapper:
                     self.logger.error(f"統合ハンドラーシステムエラー: {e}")
             
             # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation) - 後続処理として保持
+            # 🚫 責任分離原則: 副詞処理は統合ハンドラーが担当（重複処理を防止）
             try:
-                additional_adverbs = self._detect_and_assign_adverbs_direct(doc, rephrase_result)
-                if additional_adverbs:
-                    print(f"🔥 Phase 2: 副詞処理により {len(additional_adverbs)}個の副詞を追加")
-                    rephrase_result['main_slots'].update(additional_adverbs)
-                    rephrase_result['slots'].update(additional_adverbs)
+                print(f"🔥 Phase 2: 副詞処理スキップ（統合ハンドラーが担当）")
             except Exception as e:
                 self.logger.error(f"副詞処理エラー: {e}")
             
@@ -304,9 +302,14 @@ class DynamicGrammarMapper:
             if hasattr(self, 'last_unified_result') and self.last_unified_result:
                 print(f"🎯 Central Controller: Final integration check")
                 
-                # 統合ハンドラー情報を最終結果に統合
+                # 🔧 統合ハンドラー情報とhandler_infoを最終結果に統合
                 if 'unified_handlers' in self.last_unified_result:
                     rephrase_result['unified_handlers'] = self.last_unified_result['unified_handlers']
+                
+                # 🎯 Handler情報を最終結果にマージ
+                if 'handler_info' in self.last_unified_result:
+                    rephrase_result['handler_info'] = self.last_unified_result['handler_info']
+                    print(f"🔧 Handler info merged to final result: {self.last_unified_result['handler_info']}")
                 
                 # サブスロット最終チェック
                 unified_sub_slots = self.last_unified_result.get('sub_slots', {})
@@ -331,19 +334,39 @@ class DynamicGrammarMapper:
             if not allow_unified and hasattr(self, '_analysis_depth'):
                 self._analysis_depth = max(0, self._analysis_depth - 1)
     
-    def _cleanup_duplicate_slots_by_consumption(self, rephrase_result: Dict, doc) -> None:
+    def _cleanup_duplicate_slots_by_consumption(self, rephrase_result: Dict, doc, unified_result: Dict = None) -> None:
         """
-        ChatGPT5 Step D: Token consumptionベースで重複スロットを削除
+        ChatGPT5 Step D: Token consumptionベースで重複スロットを削除 - 高優先度ハンドラー保護機能付き
         """
         if not hasattr(self, '_consumed_tokens') or not self._consumed_tokens:
             return
-            
+        
+        # 🛡️ 高優先度ハンドラー保護チェック - 統合結果から取得
+        slot_provenance = {}
+        if unified_result and 'slot_provenance' in unified_result:
+            slot_provenance = unified_result['slot_provenance']
+        else:
+            slot_provenance = rephrase_result.get('slot_provenance', {})
+        
+        protected_handlers = ['comparative_superlative', 'passive_voice', 'relative_clause']
+        
         slots_to_remove = []
         
         # 各スロットの値がconsumed tokenに対応するかチェック
         for slot_name, slot_value in rephrase_result['slots'].items():
             if not slot_value:
                 continue
+            
+            # 🛡️ スロット保護チェック
+            is_protected = False
+            if slot_name in slot_provenance:
+                handler_name = slot_provenance[slot_name]['handler']
+                if handler_name in protected_handlers:
+                    is_protected = True
+                    print(f"🛡️ Token consumption保護: {slot_name}='{slot_value}' (handler: {handler_name})")
+            
+            if is_protected:
+                continue  # 保護対象スロットはスキップ
                 
             # スロット値に含まれるトークンがconsumedかチェック
             slot_tokens = str(slot_value).split()
@@ -1654,62 +1677,20 @@ class DynamicGrammarMapper:
             print(f"🔍 検出された副詞: {[adv['text'] for adv in adverbs]}")
             print(f"🔍 メイン動詞 '{main_verb}' の位置: {main_verb_pos}")
             
-            # Rephraseルールに基づく配置（動詞位置ベース）- 既存スロット無視で完全再配置
+            # � 責任分離原則: 5文型ハンドラーは副詞処理を行わない
+            # 副詞は専用ハンドラー（比較級・最上級、副詞ハンドラー）が担当
             modifier_assignments = {}
             
-            # 🔥 A. まず明示的に既存 M1/M2/M3 を消す（空文字ではなく削除）
-            for k in ('M1', 'M2', 'M3'):
-                current_result.get('main_slots', {}).pop(k, None)
-                current_result.get('slots', {}).pop(k, None)
-            
-            adverb_count = len(adverbs)
-            
-            if adverb_count == 1:
-                # 1個の場合: M2に配置
-                modifier_assignments['M2'] = adverbs[0]['text']
-                    
-            elif adverb_count == 2:
-                # 2個の場合: 動詞位置で判定
-                if main_verb_pos is not None:
-                    pre_verb_adverbs = [adv for adv in adverbs if adv['index'] < main_verb_pos]
-                    post_verb_adverbs = [adv for adv in adverbs if adv['index'] > main_verb_pos]
-                    
-                    if len(pre_verb_adverbs) == 1 and len(post_verb_adverbs) == 1:
-                        # 前1個、後1個 → M2(前), M3(後)
-                        modifier_assignments['M2'] = pre_verb_adverbs[0]['text']
-                        modifier_assignments['M3'] = post_verb_adverbs[0]['text']
-                    elif len(pre_verb_adverbs) == 2:
-                        # 前2個 → M1, M2
-                        modifier_assignments['M1'] = pre_verb_adverbs[0]['text']
-                        modifier_assignments['M2'] = pre_verb_adverbs[1]['text']
-                    elif len(post_verb_adverbs) == 2:
-                        # 後2個 → M2, M3
-                        modifier_assignments['M2'] = post_verb_adverbs[0]['text']
-                        modifier_assignments['M3'] = post_verb_adverbs[1]['text']
-                else:
-                    # 動詞位置不明の場合は位置順でM2, M3
-                    modifier_assignments['M2'] = adverbs[0]['text']
-                    modifier_assignments['M3'] = adverbs[1]['text']
-                    
-            elif adverb_count >= 3:
-                # 3個以上の場合: M1, M2, M3に配置（位置順）
-                modifier_assignments['M1'] = adverbs[0]['text']
-                modifier_assignments['M2'] = adverbs[1]['text']
-                modifier_assignments['M3'] = adverbs[2]['text']
-            
-            print(f"🔍 副詞配置結果: {modifier_assignments}")
+            print(f"🔍 5文型ハンドラー: 副詞処理をスキップ（責任分離原則）")
             
             # デバッグ：収束確認用のハッシュ
             sig = '|'.join([current_result['main_slots'].get(k,'') for k in ('M1','M2','M3')])
             print(f"🔍 ADV_SIGNATURE_BEFORE={sig}")
             
-            # 空文字列のスロットは返さない
-            result = {k: v for k, v in modifier_assignments.items() if v}
+            # 🚫 責任分離原則: 5文型ハンドラーは副詞を返さない
+            result = {}
             
-            # 適用後のハッシュも確認
-            if result:
-                new_sig = '|'.join([result.get(k,'') for k in ('M1','M2','M3')])
-                print(f"🔍 ADV_SIGNATURE_AFTER={new_sig}")
+            print(f"🔍 5文型ハンドラー: 副詞結果なし（責任分離原則）")
             
             return result
             
@@ -3442,7 +3423,7 @@ class DynamicGrammarMapper:
                     },
                     'control_flags': {}
                 },
-                'slot_provenance': {slot: {'handler': 'comparative_superlative', 'priority': 8, 'value': value} 
+                'slot_provenance': {slot: {'handler': 'comparative_superlative', 'priority': 9, 'value': value} 
                                   for slot, value in slots.items() if value}
             }
             
@@ -3499,71 +3480,116 @@ class DynamicGrammarMapper:
     
     def _detect_comparative_pattern(self, tokens: List, result: Dict) -> bool:
         """比較級パターンの検出"""
-        # 比較級語尾パターン
-        comparative_endings = ['er', 'ier']
-        comparative_words = ['more', 'less', 'better', 'worse', 'bigger', 'smaller', 'faster', 'slower']
+        # 比較級語尾パターン（より厳密に）
+        comparative_endings = ['er']
+        comparative_words = ['more', 'less', 'better', 'worse', 'bigger', 'smaller', 'faster', 'slower', 'clearer', 'earlier']
         
         for i, token in enumerate(tokens):
             token_text = token.text.lower()
             
-            # -er語尾の検出
-            if any(token_text.endswith(ending) for ending in comparative_endings):
-                result['comparison_type'] = 'comparative'
-                result['structure'] = token.text
-                self._find_than_phrase(tokens, i, result)
-                return True
+            # -er語尾の検出（長さ4文字以上で誤検出防止）
+            if len(token_text) >= 4 and any(token_text.endswith(ending) for ending in comparative_endings):
+                # 'than'句があることを確認
+                has_than = any(t.text.lower() == 'than' for t in tokens[i+1:])
+                if has_than and token.pos_ in ['ADJ', 'ADV']:
+                    result['comparison_type'] = 'comparative'
+                    result['structure'] = token.text
+                    self._find_than_phrase(tokens, i, result)
+                    return True
             
             # more/less + 形容詞パターン
             if token_text in ['more', 'less'] and i + 1 < len(tokens):
                 next_token = tokens[i + 1]
                 if next_token.pos_ in ['ADJ', 'ADV']:
-                    result['comparison_type'] = 'comparative'
-                    result['structure'] = f"{token.text} {next_token.text}"
-                    self._find_than_phrase(tokens, i + 1, result)
-                    return True
+                    # 'than'句があることを確認
+                    has_than = any(t.text.lower() == 'than' for t in tokens[i+2:])
+                    if has_than:
+                        result['comparison_type'] = 'comparative'
+                        result['structure'] = f"{token.text} {next_token.text}"
+                        self._find_than_phrase(tokens, i + 1, result)
+                        return True
             
-            # 既知の比較級語
-            if token_text in comparative_words:
-                result['comparison_type'] = 'comparative'
-                result['structure'] = token.text
-                self._find_than_phrase(tokens, i, result)
-                return True
+            # 既知の比較級語（厳密チェック）
+            if token_text in comparative_words and token.pos_ in ['ADJ', 'ADV']:
+                # 'than'句があることを確認
+                has_than = any(t.text.lower() == 'than' for t in tokens[i+1:])
+                if has_than:
+                    result['comparison_type'] = 'comparative'
+                    result['structure'] = token.text
+                    self._find_than_phrase(tokens, i, result)
+                    return True
         
         return False
     
     def _detect_superlative_pattern(self, tokens: List, result: Dict) -> bool:
         """最上級パターンの検出"""
         # 最上級語尾パターン
-        superlative_endings = ['est', 'iest']
-        superlative_words = ['most', 'least', 'best', 'worst', 'biggest', 'smallest']
+        superlative_endings = ['est']
+        superlative_words = ['most', 'least', 'best', 'worst', 'biggest', 'smallest', 'fastest', 'slowest', 'smartest', 'highest', 'hardest']
         
         for i, token in enumerate(tokens):
             token_text = token.text.lower()
             
+            # 単独のest語尾最上級（"hardest"など）
+            if len(token_text) >= 5 and any(token_text.endswith(ending) for ending in superlative_endings):
+                if token.pos_ in ['ADJ', 'ADV']:
+                    # of句があることを確認
+                    has_of_phrase = any(t.text.lower() in ['of', 'among', 'in'] for t in tokens[i+1:])
+                    if has_of_phrase:
+                        result['comparison_type'] = 'superlative'
+                        result['structure'] = token.text
+                        result['consumed_tokens'].append(i)
+                        self._find_superlative_phrase(tokens, i, result)
+                        return True
+            
             # the + -est語尾の検出
-            if any(token_text.endswith(ending) for ending in superlative_endings):
+            if len(token_text) >= 5 and any(token_text.endswith(ending) for ending in superlative_endings):
                 # theの確認
-                if i > 0 and tokens[i-1].text.lower() == 'the':
+                if i > 0 and tokens[i-1].text.lower() == 'the' and token.pos_ in ['ADJ', 'ADV']:
                     result['comparison_type'] = 'superlative'
                     result['structure'] = f"the {token.text}"
-                    self._find_of_phrase(tokens, i, result)
+                    result['consumed_tokens'].extend([i-1, i])
+                    self._find_superlative_phrase(tokens, i, result)
                     return True
             
             # the most/least + 形容詞パターン
             if token_text in ['most', 'least'] and i > 0 and tokens[i-1].text.lower() == 'the':
                 if i + 1 < len(tokens) and tokens[i + 1].pos_ in ['ADJ', 'ADV']:
                     next_token = tokens[i + 1]
+                    # 名詞も含める場合（"the most beautiful flower"）
+                    phrase_parts = [f"the {token.text} {next_token.text}"]
+                    consumed_indices = [i-1, i, i+1]
+                    
+                    # 続く名詞があれば追加
+                    if i + 2 < len(tokens) and tokens[i + 2].pos_ in ['NOUN', 'PROPN']:
+                        phrase_parts[0] += f" {tokens[i + 2].text}"
+                        consumed_indices.append(i + 2)
+                    
                     result['comparison_type'] = 'superlative'
-                    result['structure'] = f"the {token.text} {next_token.text}"
-                    self._find_of_phrase(tokens, i + 1, result)
+                    result['structure'] = phrase_parts[0]
+                    result['consumed_tokens'].extend(consumed_indices)
+                    self._find_superlative_phrase(tokens, i + 2 if len(consumed_indices) > 3 else i + 1, result)
                     return True
             
-            # 既知の最上級語
-            if token_text in superlative_words and i > 0 and tokens[i-1].text.lower() == 'the':
-                result['comparison_type'] = 'superlative'
-                result['structure'] = f"the {token.text}"
-                self._find_of_phrase(tokens, i, result)
-                return True
+            # 単独のmost + 副詞パターン（"most efficiently"など）
+            if token_text == 'most' and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.pos_ == 'ADV' and next_token.text.endswith('ly'):
+                    result['comparison_type'] = 'superlative'
+                    result['structure'] = f"most {next_token.text}"
+                    result['consumed_tokens'].extend([i, i+1])
+                    # among句やin句の検索
+                    self._find_superlative_phrase(tokens, i + 1, result)
+                    return True
+            
+            # 既知の最上級語（厳密チェック）
+            if token_text in superlative_words and token.pos_ in ['ADJ', 'ADV']:
+                if i > 0 and tokens[i-1].text.lower() == 'the':
+                    result['comparison_type'] = 'superlative'
+                    result['structure'] = f"the {token.text}"
+                    result['consumed_tokens'].extend([i-1, i])
+                    self._find_superlative_phrase(tokens, i, result)
+                    return True
         
         return False
     
@@ -3571,19 +3597,23 @@ class DynamicGrammarMapper:
         """than句の検出と抽出"""
         for i in range(start_idx + 1, len(tokens)):
             if tokens[i].text.lower() == 'than':
-                # than以降の句を抽出
+                # than以降の句を抽出（より柔軟に）
                 than_parts = ['than']
                 consumed_indices = [i]
                 
-                for j in range(i + 1, min(i + 6, len(tokens))):  # 最大5語まで
+                for j in range(i + 1, min(i + 10, len(tokens))):  # 最大9語まで
                     next_token = tokens[j]
-                    if next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON', 'NUM']:
+                    if next_token.pos_ == 'PUNCT' and next_token.text in ['.', '!', '?']:
+                        break
+                    elif next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON', 'NUM', 'ADV']:
                         than_parts.append(next_token.text)
                         consumed_indices.append(j)
-                    elif next_token.pos_ == 'PUNCT':
-                        break
+                    elif next_token.text.lower() in ['else', 'other', 'all', 'any', 'some']:
+                        than_parts.append(next_token.text)
+                        consumed_indices.append(j)
                     else:
-                        if len(next_token.text) <= 3:  # 短い語は含める
+                        # 短い語（前置詞、接続詞など）は含める
+                        if len(next_token.text) <= 4:
                             than_parts.append(next_token.text)
                             consumed_indices.append(j)
                         else:
@@ -3591,6 +3621,40 @@ class DynamicGrammarMapper:
                 
                 if len(than_parts) > 1:
                     result['than_phrase'] = ' '.join(than_parts)
+                    result['consumed_tokens'].extend(consumed_indices)
+                break
+    
+    def _find_superlative_phrase(self, tokens: List, start_idx: int, result: Dict):
+        """最上級の修飾句（among, in句など）の検出と抽出"""
+        for i in range(start_idx + 1, len(tokens)):
+            token_text = tokens[i].text.lower()
+            if token_text in ['among', 'in', 'of']:
+                # 修飾句を抽出
+                phrase_parts = [tokens[i].text]
+                consumed_indices = [i]
+                
+                for j in range(i + 1, min(i + 8, len(tokens))):  # 最大7語まで
+                    next_token = tokens[j]
+                    if next_token.pos_ == 'PUNCT' and next_token.text in ['.', '!', '?']:
+                        break
+                    elif next_token.pos_ in ['NOUN', 'PROPN', 'ADJ', 'DET', 'PRON', 'NUM']:
+                        phrase_parts.append(next_token.text)
+                        consumed_indices.append(j)
+                    elif next_token.text.lower() in ['all', 'the', 'every', 'most']:
+                        phrase_parts.append(next_token.text)
+                        consumed_indices.append(j)
+                    else:
+                        if len(next_token.text) <= 4:
+                            phrase_parts.append(next_token.text)
+                            consumed_indices.append(j)
+                        else:
+                            break
+                
+                if len(phrase_parts) > 1:
+                    if token_text == 'of':
+                        result['of_phrase'] = ' '.join(phrase_parts)
+                    else:
+                        result['of_phrase'] = ' '.join(phrase_parts)  # among, in句もof_phraseとして処理
                     result['consumed_tokens'].extend(consumed_indices)
                 break
     
@@ -3642,22 +3706,67 @@ class DynamicGrammarMapper:
         than_phrase = comparative_info.get('than_phrase', '')
         of_phrase = comparative_info.get('of_phrase', '')
         
-        # 比較語はC1スロットに配置
-        if structure:
-            slots['C1'] = structure
-            print(f"🔍 比較級・最上級構造: C1='{structure}' ({comparison_type})")
+        # 構造の品詞判定（形容詞 vs 副詞）
+        is_adverb = self._is_adverbial_comparative(structure, doc)
         
-        # than句はM2スロットに配置（Rephraseルール）
-        if than_phrase:
-            slots['M2'] = than_phrase
-            print(f"🔍 than句配置: M2='{than_phrase}' (Rephrase修飾句ルール)")
+        if is_adverb:
+            # 副詞比較級・最上級：M2,M3スロット配置
+            if structure:
+                slots['M2'] = structure
+                print(f"🔍 副詞比較級・最上級構造: M2='{structure}' ({comparison_type})")
+                print(f"🔧 DEBUG: Setting M2='{structure}' from structure")
+            
+            # than句/of句はM3スロットに配置
+            if than_phrase:
+                slots['M3'] = than_phrase
+                print(f"🔍 than句配置: M3='{than_phrase}' (Rephrase副詞ルール)")
+            elif of_phrase:
+                slots['M3'] = of_phrase
+                print(f"🔍 of句配置: M3='{of_phrase}' (Rephrase副詞ルール)")
+                print(f"🔧 DEBUG: Setting M3='{of_phrase}' from of_phrase")
+        else:
+            # 形容詞比較級・最上級：C1,M2スロット配置
+            if structure:
+                slots['C1'] = structure
+                print(f"🔍 形容詞比較級・最上級構造: C1='{structure}' ({comparison_type})")
+            
+            # than句/of句はM2スロットに配置
+            if than_phrase:
+                slots['M2'] = than_phrase
+                print(f"🔍 than句配置: M2='{than_phrase}' (Rephrase修飾句ルール)")
+            elif of_phrase:
+                slots['M2'] = of_phrase
+                print(f"🔍 of句配置: M2='{of_phrase}' (Rephrase修飾句ルール)")
         
-        # of句はM2スロットに配置（Rephraseルール）
-        if of_phrase:
-            slots['M2'] = of_phrase
-            print(f"🔍 of句配置: M2='{of_phrase}' (Rephrase修飾句ルール)")
-        
+        print(f"🔧 DEBUG: Final comparative slots created: {slots}")
         return slots
+    
+    def _is_adverbial_comparative(self, structure: str, doc) -> bool:
+        """比較級・最上級が副詞かどうかを判定"""
+        # 語尾による判定
+        adverb_patterns = ['ly', 'er', 'est']
+        structure_lower = structure.lower()
+        
+        # "more clearly", "most efficiently" などのパターン
+        if 'ly' in structure_lower:
+            return True
+        
+        # 単語の副詞チェック
+        for token in doc:
+            if token.text.lower() in structure_lower:
+                if token.pos_ == 'ADV':
+                    return True
+        
+        # 既知の副詞比較級・最上級
+        adverb_comparatives = [
+            'faster', 'slower', 'earlier', 'later',
+            'harder', 'easier', 'clearer', 'harder',
+            'more clearly', 'more efficiently', 'more frequently',
+            'most clearly', 'most efficiently', 'most frequently',
+            'hardest', 'fastest', 'slowest'
+        ]
+        
+        return any(pattern in structure_lower for pattern in adverb_comparatives)
     
     # Phase 2 比較級・最上級ハンドラー実装終了
     
@@ -3673,8 +3782,8 @@ class DynamicGrammarMapper:
         # ハンドラー優先度定義（ChatGPT5思考診断による「後勝ち上書き」対策）
         handler_priority = {
             'passive_voice': 10,      # 受動態は最高優先度
-            'relative_clause': 9,     # 関係節
-            'comparative_superlative': 8, # 比較級・最上級
+            'comparative_superlative': 9, # 比較級・最上級
+            'relative_clause': 8,     # 関係節
             'auxiliary_complex': 7,   # 助動詞
             'basic_five_pattern': 1   # 基本5文型は最低優先度
         }
@@ -3822,45 +3931,40 @@ class DynamicGrammarMapper:
                 
                 # レガシーハンドラー（basic_five_patternのみ）
                 if handler_name == 'basic_five_pattern':
-                    # 🔥 関係節分離後の主文を使用
+                    # 🔥 Phase 2: 変数初期化
                     analysis_sentence = sentence
                     analysis_doc = doc
+                    
+                    # 🔥 Phase 2: Using main sentence for basic_five_pattern: '{main_sentence}'
                     if result.get('relative_clause_info', {}).get('found'):
                         main_sentence = result['relative_clause_info']['main_sentence']
                         print(f"🔥 Phase 2: Using main sentence for basic_five_pattern: '{main_sentence}'")
                         analysis_sentence = main_sentence
                         analysis_doc = self.nlp(main_sentence)
                     
-                    # ChatGPT5 Step C: Token Consumption - 使用済みトークンをフィルタ
-                    filtered_doc_tokens = []
-                    for i, token in enumerate(analysis_doc):
-                        if i not in self._consumed_tokens:
-                            filtered_doc_tokens.append(token)
-                    
-                    if len(filtered_doc_tokens) < len(analysis_doc):
-                        print(f"🔥 ChatGPT5 Step C: Filtered {len(analysis_doc) - len(filtered_doc_tokens)} consumed tokens for basic_five_pattern")
-                    
-                    # 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
+                    # 🔥 統合ハンドラーシステム: 既存の5文型ロジックを呼び出し、結果を統合フォーマットに変換
                     legacy_result = self._analyze_sentence_legacy(analysis_sentence, analysis_doc)
                     if legacy_result and 'slots' in legacy_result:
                         for slot_name, slot_value in legacy_result['slots'].items():
                             if slot_value:  # 空でない値のみ
-                                # ChatGPT5 Step C: 使用済みトークンに関連するスロットはスキップ
-                                should_skip = False
-                                for consumed_idx in self._consumed_tokens:
-                                    if consumed_idx < len(analysis_doc) and analysis_doc[consumed_idx].text.lower() in str(slot_value).lower():
-                                        print(f"🔥 ChatGPT5 Step C: Skipping slot {slot_name}='{slot_value}' (token {consumed_idx} already consumed)")
-                                        should_skip = True
-                                        break
+                                # 🔥 統合ハンドラーシステム: 高優先度ハンドラーの結果を保護
+                                # 既にスロットが設定されていて、優先度が低い場合はスキップ
+                                if slot_name in result['slots'] and result['slots'][slot_name]:
+                                    existing_priority = 1  # basic_five_patternの優先度
+                                    if 'slot_provenance' in result and slot_name in result['slot_provenance']:
+                                        existing_priority = result['slot_provenance'][slot_name]['priority']
+                                    
+                                    if existing_priority > 1:  # 高優先度ハンドラーの結果が既に存在
+                                        print(f"🔥 統合ハンドラーシステム: Skipping slot {slot_name}='{slot_value}' (高優先度ハンドラー保護)")
+                                        continue
                                 
                                 # 🔥 Phase 2: サブ句受動態保護ロジック
-                                if not should_skip:
-                                    # サブ句で処理済みのトークンをメインスロットから除外
-                                    for sub_key, sub_value in result.get('sub_slots', {}).items():
-                                        if sub_key.startswith('sub-') and sub_value and str(slot_value).lower() in str(sub_value).lower():
-                                            print(f"🔥 Phase 2: Skipping main slot {slot_name}='{slot_value}' (already in sub-slot {sub_key}='{sub_value}')")
-                                            should_skip = True
-                                            break
+                                should_skip = False
+                                for sub_key, sub_value in result.get('sub_slots', {}).items():
+                                    if sub_key.startswith('sub-') and sub_value and str(slot_value).lower() in str(sub_value).lower():
+                                        print(f"🔥 Phase 2: Skipping main slot {slot_name}='{slot_value}' (already in sub-slot {sub_key}='{sub_value}')")
+                                        should_skip = True
+                                        break
                                 
                                 if not should_skip:
                                     result['slots'][slot_name] = slot_value
@@ -3898,6 +4002,24 @@ class DynamicGrammarMapper:
             except Exception as e:
                 self.logger.warning(f"Handler error ({handler_name}): {e}")
                 continue
+        
+        # 🎯 Central Controller用ハンドラー情報を追加
+        winning_handler = None
+        winning_priority = 0
+        
+        # 最高優先度のハンドラーを特定
+        if 'slot_provenance' in result:
+            for slot_name, provenance_info in result['slot_provenance'].items():
+                if provenance_info['priority'] > winning_priority:
+                    winning_priority = provenance_info['priority']
+                    winning_handler = provenance_info['handler']
+        
+        if winning_handler:
+            result['handler_info'] = {
+                'winning_handler': winning_handler,
+                'priority': winning_priority
+            }
+            print(f"🎯 Winning handler: {winning_handler} (priority={winning_priority})")
         
         return result
     

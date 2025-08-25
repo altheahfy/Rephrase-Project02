@@ -56,6 +56,10 @@ class CentralController:
         Returns:
             dict: 完全制御後の結果
         """
+        # 🔧 ハンドラー情報デバッグ
+        handler_info = result.get('handler_info', {})
+        print(f"🔧 Central Controller: Handler info received: {handler_info}")
+        
         # 1. 受動態制御
         result = self._control_passive_voice(result)
         
@@ -284,7 +288,7 @@ class CentralController:
     
     def _resolve_adverb_duplication(self, result):
         """
-        副詞重複問題を解決
+        副詞重複問題を解決 - ハンドラー優先度を考慮
         
         Args:
             result (dict): 解析結果
@@ -295,7 +299,19 @@ class CentralController:
         main_slots = result.get('main_slots', {})
         sub_slots = result.get('sub_slots', {})
         
-        # サブスロットに副詞が存在する場合、メインスロットから同じ副詞を削除
+        # 🔧 ハンドラー優先度情報を取得
+        handler_info = result.get('handler_info', {})
+        winning_handler = handler_info.get('winning_handler', '')
+        handler_priority = handler_info.get('priority', 0)
+        
+        # 高優先度ハンドラー（比較級・最上級など）の結果を保護
+        protected_handlers = ['comparative_superlative', 'passive_voice', 'relative_clause']
+        is_protected = winning_handler in protected_handlers
+        
+        if is_protected:
+            print(f"🛡️ 高優先度ハンドラー保護: {winning_handler} (priority={handler_priority}) の結果を保持")
+        
+        # サブスロットに副詞が存在する場合、メインスロットから同じ副詞を削除（保護対象外のみ）
         adverb_slots = ['M1', 'M2', 'M3']
         sub_adverb_slots = ['sub-m1', 'sub-m2', 'sub-m3']
         
@@ -307,32 +323,45 @@ class CentralController:
                 adverb_slot in main_slots and
                 sub_slots[sub_adverb_slot] == main_slots[adverb_slot]):
                 
-                print(f"🔧 副詞重複解決: {adverb_slot}='{main_slots[adverb_slot]}' をメインスロットから削除 (sub-slot存在)")
+                # 保護対象の場合はスキップ
+                if is_protected:
+                    print(f"�️ 保護スキップ: {adverb_slot}='{main_slots[adverb_slot]}' (高優先度ハンドラー結果)")
+                    continue
+                
+                print(f"�🔧 副詞重複解決: {adverb_slot}='{main_slots[adverb_slot]}' をメインスロットから削除 (sub-slot存在)")
                 
                 # メインスロットから削除
                 main_slots.pop(adverb_slot, None)
                 if 'slots' in result:
                     result['slots'].pop(adverb_slot, None)
         
-        # 🎯 Central Controller: C1/M3重複解決
+        # 🎯 Central Controller: C1/M3重複解決（保護対象外のみ）
         if 'C1' in main_slots and 'M3' in main_slots:
             c1_value = main_slots['C1']
             m3_value = main_slots['M3']
             
-            # 同じ値の場合はM3を削除（C1が優先）
+            # 同じ値の場合はM3を削除（C1が優先）- ただし保護対象は除外
             if c1_value == m3_value:
-                print(f"🔧 C1/M3重複解決: M3='{m3_value}' をメインスロットから削除 (C1='{c1_value}'と重複)")
-                main_slots.pop('M3', None)
-                if 'slots' in result:
-                    result['slots'].pop('M3', None)
+                if is_protected:
+                    print(f"�️ 保護スキップ: M3='{m3_value}' (高優先度ハンドラー結果)")
+                else:
+                    print(f"�🔧 C1/M3重複解決: M3='{m3_value}' をメインスロットから削除 (C1='{c1_value}'と重複)")
+                    main_slots.pop('M3', None)
+                    if 'slots' in result:
+                        result['slots'].pop('M3', None)
         
-        # 🎯 Central Controller: サブスロットとメインスロット重複解決
+        # 🎯 Central Controller: サブスロットとメインスロット重複解決（保護対象外のみ）
         for main_slot_name, main_slot_value in list(main_slots.items()):
             if not main_slot_value:
                 continue
                 
             for sub_slot_name, sub_slot_value in sub_slots.items():
                 if sub_slot_value and str(main_slot_value).lower() == str(sub_slot_value).lower():
+                    # 保護対象の場合はスキップ
+                    if is_protected:
+                        print(f"🛡️ 保護スキップ: {main_slot_name}='{main_slot_value}' (高優先度ハンドラー結果)")
+                        continue
+                    
                     print(f"🔧 サブスロット重複解決: {main_slot_name}='{main_slot_value}' をメインスロットから削除 ({sub_slot_name}='{sub_slot_value}'と重複)")
                     main_slots.pop(main_slot_name, None)
                     if 'slots' in result:
