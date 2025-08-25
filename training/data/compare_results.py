@@ -204,16 +204,10 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
     
     # 各テストケース分析
     slot_stats = {}
-    results_updated = False  # 更新フラグ
     
     for test_id, result in results.items():
         if result["status"] != "success":
             analysis_report["meta"]["failures"] += 1
-            # 失敗ケースにもmatch_statusを設定
-            if "match_status" not in result:
-                result["match_status"] = "failure"
-                result["mismatches"] = [f"Status: {result['status']}"]
-                results_updated = True
             continue
         
         # 期待値取得 (results内 または expected_data から)
@@ -226,41 +220,15 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
         if not actual:
             # analysis_resultがnullの場合、結果を再処理
             print(f"⚠️ Test[{test_id}]: analysis_result is null, attempting direct processing...")
-            if "match_status" not in result:
-                result["match_status"] = "no_result"
-                result["mismatches"] = ["No analysis result available"]
-                results_updated = True
             continue
         
         if not expected:
             # 期待値がない場合はスキップ
             print(f"⚠️ Test[{test_id}]: No expected data found")
-            if "match_status" not in result:
-                result["match_status"] = "no_expected"
-                result["mismatches"] = ["No expected data found"]
-                results_updated = True
             continue
         
         # スロット比較実行
         is_perfect, detail_analysis = compare_slots(actual, expected)
-        
-        # 🔧 match_statusとmismatchesを結果に書き戻し
-        if "match_status" not in result or result["match_status"] != ("complete_match" if is_perfect else "partial_match"):
-            if is_perfect:
-                result["match_status"] = "complete_match"
-                result["mismatches"] = []
-            else:
-                result["match_status"] = "partial_match"
-                # 不一致の詳細を生成
-                mismatches = []
-                for slot_name, slot_info in detail_analysis["main_slots_match"].items():
-                    if not slot_info["match"]:
-                        mismatches.append(f"{slot_name}: '{slot_info['actual']}' ≠ '{slot_info['expected']}'")
-                for slot_name, slot_info in detail_analysis["sub_slots_match"].items():
-                    if not slot_info["match"]:
-                        mismatches.append(f"{slot_name}: '{slot_info['actual']}' ≠ '{slot_info['expected']}'")
-                result["mismatches"] = mismatches
-            results_updated = True
         
         if is_perfect:
             analysis_report["meta"]["perfect_matches"] += 1
@@ -281,15 +249,6 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
             slot_stats[slot_name]["total"] += 1
             if slot_info["match"]:
                 slot_stats[slot_name]["correct"] += 1
-    
-    # 🔧 結果が更新された場合、ファイルに書き戻し
-    if results_updated:
-        try:
-            with open(results_file, 'w', encoding='utf-8') as f:
-                json.dump(results_data, f, ensure_ascii=False, indent=2)
-            print(f"✅ 比較結果をファイルに更新: {results_file}")
-        except Exception as e:
-            print(f"⚠️ ファイル更新エラー: {e}")
     
     # 精度計算
     valid_cases = analysis_report["meta"]["perfect_matches"] + analysis_report["meta"]["partial_matches"]
@@ -344,12 +303,6 @@ def print_analysis_report(report: Dict[str, Any], show_details: bool = False):
                 for slot_name, slot_info in analysis["main_slots_match"].items():
                     if not slot_info["match"]:
                         print(f"   {slot_name}: '{slot_info['actual']}' ≠ '{slot_info['expected']}'")
-                
-                for slot_name, slot_info in analysis["sub_slots_match"].items():
-                    if not slot_info["match"]:
-                        print(f"   {slot_name}: '{slot_info['actual']}' ≠ '{slot_info['expected']}'")
-    
-    print(f"\n🎯 完全一致率: {meta['accuracy']:.1f}%")
 
 def main():
     parser = argparse.ArgumentParser(
