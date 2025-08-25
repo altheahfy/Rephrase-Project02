@@ -25,6 +25,14 @@ from dataclasses import dataclass
 # 🆕 Phase 1.2: 文型認識エンジン追加
 # from sentence_type_detector import SentenceTypeDetector  # 一時的にコメント化
 
+# 🆕 Phase A2: 新しいBasicFivePatternHandler統合
+try:
+    from basic_five_pattern_handler import BasicFivePatternHandler
+    BASIC_FIVE_PATTERN_HANDLER_AVAILABLE = True
+except ImportError:
+    BASIC_FIVE_PATTERN_HANDLER_AVAILABLE = False
+    print("⚠️  BasicFivePatternHandler not available - using legacy implementation")
+
 @dataclass
 class GrammarElement:
     """文法要素の定義"""
@@ -81,6 +89,14 @@ class DynamicGrammarMapper:
         
         # 基本ハンドラーの初期化
         self._initialize_basic_handlers()
+        
+        # 🔥 Phase A2: Enhanced BasicFivePatternHandler initialization
+        try:
+            self.basic_five_pattern_handler = BasicFivePatternHandler()
+            print("✅ BasicFivePatternHandler初期化完了")
+        except Exception as e:
+            print(f"⚠️ BasicFivePatternHandler初期化失敗: {e}")
+            self.basic_five_pattern_handler = None
         
         # ハンドラー管理システムの初期化完了をログ出力
         print(f"🔥 Phase 1.3 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
