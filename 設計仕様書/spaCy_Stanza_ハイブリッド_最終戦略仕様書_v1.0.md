@@ -37,144 +37,289 @@
 
 # 🎯 **真の中央管理アーキテクチャ移行計画 - Phase A**
 
-## 📋 **根本的問題認識と解決方針**
+## 📋 **重要修正: システム構成の正確な理解**
 
-### **🔍 現在のアーキテクチャ問題**
+### **🔍 現在の実際のアーキテクチャ**
 
-現在のシステムは「中央管理」と称しているが、実際は**混在アーキテクチャ**となっている:
+**現在のシステム構成**（中央管理は`dynamic_grammar_mapper.py`内で実現）:
 
 ```python
-# 現在の analyze_sentence() の問題構造
+# 実際の現在の構造
+dynamic_grammar_mapper.py (統合ハンドラー本体)
+├── BasicFivePatternHandler (5文型処理)
+├── PassiveVoiceHandler (受動態処理)  
+├── AdverbHandler (副詞処理)
+├── AuxiliaryVerbHandler (助動詞処理)
+└── その他個別ハンドラー
+
+# 🚨 問題: 旧Stanzaシステム（UnifiedStanzaRephraseMapper）の混在
 def analyze_sentence(self, sentence):
-    # 🚨 問題: Central Controller自体が文の分解作業を実行
-    tokens = self._extract_tokens_spacy(sentence)
-    core_elements = self._identify_core_elements(tokens)      # ← レガシー分解処理
-    pattern = self._determine_sentence_pattern(tokens)       # ← レガシー分解処理  
-    base_result = self._assign_grammar_roles(tokens, pattern) # ← レガシー分解処理
+    # ✅ 正常: BasicFivePatternHandlerによる正確な分析
+    if hasattr(self, 'basic_five_pattern_handler'):
+        pattern_analysis = self.basic_five_pattern_handler.analyze_basic_pattern(...)
     
-    # その後に統合ハンドラーを実行してレガシー結果を上書き
-    final_result = self._execute_handlers(tokens, base_result)
-    return final_result
+    # 🚨 問題: 旧Stanzaシステム（_unified_mapping）の干渉
+    if allow_unified:
+        unified_result = self._unified_mapping(sentence, doc)  # ← 旧Stanzaレガシー
+        # レガシー結果で正確な結果を上書きしてしまう
 ```
 
-### **🎯 理想的な中央管理アーキテクチャ**
+### **🎯 正しい理解: 中央管理は既に存在**
 
-**真の中央管理**: Central Controllerは分解作業を行わず、純粋に**管理・調整のみ**を担当
+**中央管理システム**: `dynamic_grammar_mapper.py`内の統合ハンドラー
+- 個別ハンドラーを統合管理する設計
+- 1ファイル内で完結する統合システム
+- `central_controller.py`は誤って作成された余計なファイル
+
+### **🎯 理想的な統合ハンドラーアーキテクチャ**
+
+**真の統合ハンドラー**: `dynamic_grammar_mapper.py`が純粋に**統合管理のみ**を担当
 
 ```python
-# 理想的な真の中央管理構造
+# 理想的な統合ハンドラー構造 (dynamic_grammar_mapper.py内)
 def analyze_sentence(self, sentence):
-    # ✅ Central Controllerは管理のみ実行
+    # ✅ 統合ハンドラーは管理のみ実行
     tokens = self._extract_tokens_spacy(sentence)
     
-    # ✅ 全ての分解作業は各ハンドラーに委譲
-    context = self._initialize_central_context(tokens)
+    # ✅ 全ての分解作業は各個別ハンドラーに委譲
+    context = self._initialize_handler_context(tokens)
     
-    # ✅ 純粋な管理・調整機能
-    result = self._execute_managed_pipeline(context)
+    # ✅ 純粋な統合・調整機能
+    result = self._execute_integrated_pipeline(context)
     return result
 
-def _execute_managed_pipeline(self, context):
-    # Stage 1: 基本文型判定 → basic_five_pattern_handler
-    # Stage 2: 構造分析 → relative_clause_handler, passive_voice_handler
-    # Stage 3: 特殊構文 → その他ハンドラー
-    # Stage 4: 統合・最終調整 → Central Controllerの管理機能
+def _execute_integrated_pipeline(self, context):
+    # Stage 1: 基本文型判定 → basic_five_pattern_handler (内部メソッド)
+    # Stage 2: 構造分析 → relative_clause_handler, passive_voice_handler (内部メソッド)
+    # Stage 3: 特殊構文 → その他ハンドラー (内部メソッド)
+    # Stage 4: 統合・最終調整 → 統合ハンドラーの管理機能
 ```
 
-## 🏗️ **Phase A: 真の中央管理移行計画**
+## 🏗️ **Phase A: 旧Stanzaレガシー撤去計画**
 
-### **Phase A1: レガシー分解機能の特定と分析**
+### **Phase A1: UnifiedStanzaRephraseMapper（旧Stanza）レガシーシステム撤去**
 
-#### **移行対象機能の詳細調査**
+#### **撤去対象の詳細調査**
 
-現在のCentral Controllerが実行している分解機能:
+現在の`dynamic_grammar_mapper.py`内に混在している旧Stanzaレガシー:
 
 ```python
-# A1-1: _identify_core_elements() 
-# 📍 現在の機能: 主語・動詞・目的語の基本要素を特定
-# 🎯 移行先: basic_five_pattern_handler
-# 📊 重要度: 高（基本5文型判定の核心機能）
+# A1-1: _unified_mapping() メソッド
+# 📍 現在の問題: 旧Stanza Asset Migrationからの統合マッピング処理
+# 🎯 撤去理由: BasicFivePatternHandlerの正確な結果を上書きしている
+# 📊 重要度: 高（"V: lives"問題の根本原因）
 
-# A1-2: _determine_sentence_pattern()
-# 📍 現在の機能: SV, SVO, SVC等の文型パターン判定  
-# 🎯 移行先: basic_five_pattern_handler
-# 📊 重要度: 高（文型判定の核心機能）
-
-# A1-3: _assign_grammar_roles()
-# 📍 現在の機能: 各要素への文法的役割割り当て
-# 🎯 移行先: basic_five_pattern_handler
-# 📊 重要度: 高（スロット配置の核心機能）
+# A1-2: allow_unified フラグとその判定処理
+# 📍 現在の問題: 旧Stanzaシステムの実行を制御するフラグ
+# 🎯 撤去理由: 純粋な統合ハンドラーには不要
+# 📊 重要度: 高（レガシー制御の除去）  
+# A1-3: 統合ハンドラー結果マージ処理
+# 📍 現在の問題: Lines 268-282での旧Stanza結果マージ処理
+# 🎯 撤去理由: BasicFivePatternHandlerの正確な結果を汚染
+# 📊 重要度: 高（正確な結果の保護）
 ```
 
-#### **詳細移行戦略**
+#### **詳細撤去戦略**
 
 ```
 🔄 Phase A1詳細計画:
-├─ A1-1: 現在のレガシー分解機能の完全調査
-├─ A1-2: 各機能のハンドラー移行可能性分析
-├─ A1-3: basic_five_pattern_handlerの拡張設計
-└─ A1-4: 移行テスト戦略策定
+├─ A1-1: _unified_mapping()メソッドの完全削除
+├─ A1-2: allow_unifiedフラグとその判定処理削除
+├─ A1-3: 統合ハンドラー結果マージ処理削除
+└─ A1-4: 撤去後のテスト実行・精度確認
 
-期間: 1週間
-目標: レガシー機能の完全把握と移行設計完了
+期間: 1日
+目標: 旧Stanzaレガシーの完全撤去とBasicFivePatternHandler結果の純粋化
 ```
 
-### **Phase A2: basic_five_pattern_handler 大幅拡張**
+### **Phase A2: 個別ハンドラーの統合ハンドラー内実装強化**
 
-#### **ハンドラー機能拡張仕様**
+#### **統合ハンドラー内実装仕様**
 
 ```python
-class BasicFivePatternHandler:
+# dynamic_grammar_mapper.py 内の実装強化
+class DynamicGrammarMapper:
     """
-    🎯 拡張版基本5文型ハンドラー
+    🎯 統合ハンドラーシステム
     
-    新機能:
-    ├─ レガシー分解機能の完全統合
-    ├─ 主語・動詞・目的語・補語の精密特定
-    ├─ 文型パターン自動判定
-    └─ スロット配置の完全自動化
+    設計原則:
+    ├─ 個別ハンドラーを内部メソッドとして実装
+    ├─ 1ファイル内で完結する統合システム
+    ├─ 外部ファイル依存を最小化
+    └─ 純粋な統合管理機能の実現
     """
     
-    def handle(self, tokens, context):
-        # Step 1: 基本要素特定（旧_identify_core_elements統合）
-        core_elements = self._identify_core_elements_enhanced(tokens)
+    def analyze_sentence(self, sentence):
+        """✅ 統合管理機能: 個別ハンドラーを順次実行・統合"""
+        tokens = self._extract_tokens_spacy(sentence)
+        context = self._initialize_handler_context(tokens)
         
-        # Step 2: 文型判定（旧_determine_sentence_pattern統合）
-        pattern = self._determine_pattern_enhanced(tokens, core_elements)
+        # Step 1: 基本5文型処理（内部実装）
+        basic_result = self._handle_basic_five_pattern(tokens, context)
         
-        # Step 3: 役割割り当て（旧_assign_grammar_roles統合）
-        result = self._assign_roles_enhanced(tokens, pattern, core_elements)
+        # Step 2: 受動態処理（内部実装）
+        passive_result = self._handle_passive_voice(tokens, context)
         
-        return result
+        # Step 3: 副詞処理（内部実装）
+        adverb_result = self._handle_adverbs(tokens, context)
+        
+        # Step 4: 結果統合
+        final_result = self._integrate_handler_results([
+            basic_result, passive_result, adverb_result
+        ])
+        
+        return final_result
     
-    def _identify_core_elements_enhanced(self, tokens):
-        """レガシー機能統合版: 基本要素特定"""
-        # 旧Central Controllerの_identify_core_elements()ロジックを
-        # ハンドラー内に完全移行・強化
+    def _handle_basic_five_pattern(self, tokens, context):
+        """内部実装: 基本5文型処理"""
+        # basic_five_pattern_handler.pyの機能をここに統合実装
         
-    def _determine_pattern_enhanced(self, tokens, core_elements):
-        """レガシー機能統合版: 文型パターン判定"""
-        # 旧Central Controllerの_determine_sentence_pattern()ロジックを
-        # ハンドラー内に完全移行・強化
+    def _handle_passive_voice(self, tokens, context):
+        """内部実装: 受動態処理"""
+        # 受動態ハンドラー機能を内部実装
         
-    def _assign_roles_enhanced(self, tokens, pattern, core_elements):
-        """レガシー機能統合版: 文法的役割割り当て"""
-        # 旧Central Controllerの_assign_grammar_roles()ロジックを  
-        # ハンドラー内に完全移行・強化
+    def _handle_adverbs(self, tokens, context):
+        """内部実装: 副詞処理"""
+        # 副詞ハンドラー機能を内部実装
 ```
 
-#### **移行詳細計画**
+### **Phase A2: 個別ハンドラーの統合ハンドラー内実装強化**
 
-```
-🔄 Phase A2詳細計画:
-├─ A2-1: basic_five_pattern_handlerクラス拡張
-├─ A2-2: レガシー機能のハンドラー内移行
-├─ A2-3: 強化版機能の実装・テスト
-└─ A2-4: 移行後精度検証
+#### **統合ハンドラー内実装仕様**
 
-期間: 2週間
-目標: レガシー分解機能の完全ハンドラー移行
+参考: `UnifiedStanzaRephraseMapper_v1.0_Spec.md`から以下の設計原則を統合
+
+```python
+# dynamic_grammar_mapper.py 内の実装強化
+class DynamicGrammarMapper:
+    """
+    🎯 統合ハンドラーシステム v3.0
+    
+    設計原則（UnifiedStanzaRephraseMapperから継承）:
+    ├─ 🧠 人間的文法認識システム: 構造的整合性チェック・動的品詞決定
+    ├─ ⚡ 同時処理型アーキテクチャ: 全ハンドラーが並行動作して協調
+    ├─ 🔄 段階的ハイブリッド解析: 確実パターン優先、複雑パターンは補完
+    ├─ 📊 ハンドラー間連携システム: handler_shared_context による情報共有
+    └─ 🎯 1ファイル完結設計: 外部ファイル依存を最小化
+    """
+    
+    def __init__(self):
+        """初期化: UnifiedStanzaRephraseMapperの成功要素を継承"""
+        # 🧠 人間的判定プロセス実装
+        self.ambiguous_word_resolver = self._init_ambiguous_word_resolver()
+        self.syntactic_evaluator = self._init_syntactic_evaluator()
+        
+        # 📊 ハンドラー間共有コンテキスト
+        self.handler_shared_context = {
+            'predefined_slots': {},
+            'remaining_elements': [],
+            'handler_metadata': {},
+            'control_flags': {}
+        }
+    
+    def analyze_sentence(self, sentence):
+        """✅ 統合管理機能: UnifiedStanzaRephraseMapperの成功パターンを適用"""
+        tokens = self._extract_tokens_spacy(sentence)
+        
+        # 🧠 人間的文法認識: 曖昧語彙の動的解決
+        tokens = self._resolve_ambiguous_words(tokens, sentence)
+        
+        # 🔄 段階的ハイブリッド解析
+        context = self._initialize_handler_context(tokens)
+        
+        # ⚡ 同時処理型ハンドラー実行
+        results = self._execute_parallel_handlers(tokens, context)
+        
+        # 📊 結果統合（構造的整合性チェック付き）
+        final_result = self._integrate_with_consistency_check(results)
+        
+        return final_result
+    
+    def _resolve_ambiguous_words(self, tokens, sentence):
+        """🧠 人間的判定: UnifiedStanzaRephraseMapperの核心技術"""
+        # 例: "lives" の NOUN→VERB 動的修正
+        # 2ケース試行システム（名詞解釈 vs 動詞解釈）
+        # 構文完全性ベースの最適解選択
+        return self._apply_human_corrected_pos(tokens, sentence)
+    
+    def _execute_parallel_handlers(self, tokens, context):
+        """⚡ 同時処理型: 全ハンドラー並行実行"""
+        results = {}
+        
+        # 確実パターン（優先度高）
+        results['basic_five'] = self._handle_basic_five_pattern(tokens, context)
+        results['relative_clause'] = self._handle_relative_clause(tokens, context)
+        
+        # 補完パターン（確実パターンで不足分を補完）
+        if self._needs_passive_analysis(results):
+            results['passive'] = self._handle_passive_voice(tokens, context)
+            
+        if self._needs_adverb_analysis(results):
+            results['adverbs'] = self._handle_adverbs(tokens, context)
+        
+        return results
 ```
+
+## 🚨 **重要: ファイル構成の正確な理解**
+
+### **❌ 誤解していたファイル構成**
+```
+central_controller.py (誤って作成されたファイル)
+├── DynamicGrammarMapperをラップ
+└── 完全制御機能追加
+```
+
+### **✅ 正しいファイル構成（ユーザー本来の設計）**
+```
+dynamic_grammar_mapper.py (統合ハンドラー本体)
+├── def _handle_basic_five_pattern():     # 内部メソッド
+├── def _handle_passive_voice():          # 内部メソッド  
+├── def _handle_adverbs():               # 内部メソッド
+├── def _handle_auxiliary_verbs():       # 内部メソッド
+└── def _handle_relative_clause():       # 内部メソッド
+
+# basic_five_pattern_handler.py も誤って作成された別ファイル
+# → 本来は dynamic_grammar_mapper.py 内の内部メソッドとして実装予定
+```
+
+### **🎯 Phase A実行優先順位**
+
+1. **即座実行**: 旧Stanza（UnifiedStanzaRephraseMapper）レガシー撤去
+   - `_unified_mapping()` メソッド削除
+   - `allow_unified` フラグ削除
+   - レガシー結果マージ処理削除
+
+2. **後で実行**: 外部ファイルの統合化
+   - `basic_five_pattern_handler.py` → `dynamic_grammar_mapper.py` 内実装
+   - `central_controller.py` → アーカイブ移動（既に実行済み）
+
+## 📋 **UnifiedStanzaRephraseMapperから継承すべき成功技術**
+
+UnifiedStanzaRephraseMapper_v1.0_Spec.mdから抽出した成功要素:
+
+### **🧠 人間的文法認識システム**
+```python
+def _resolve_ambiguous_word(self, word, sentence_context):
+    """2ケース試行システム: UnifiedStanzaRephraseMapperの核心技術"""
+    # ケース1: 名詞として解釈
+    case1_result = self._try_noun_interpretation(word, sentence_context)
+    
+    # ケース2: 動詞として解釈  
+    case2_result = self._try_verb_interpretation(word, sentence_context)
+    
+    # 構文完全性評価による最適解選択
+    return self._select_best_case_by_syntactic_completeness(case1_result, case2_result)
+```
+
+### **⚡ 同時処理型アーキテクチャ**
+- 全ハンドラーが並行動作
+- handler_shared_context による情報共有
+- 確実パターン優先、複雑パターン補完方式
+
+### **🔍 構造的整合性チェック**
+- 関係節境界の新動詞出現検出
+- 文構造完全性による品詞動的修正
+- spaCy誤認識の人間的判定による修正
 
 ### **Phase A3: Central Controller純粋管理化**
 
