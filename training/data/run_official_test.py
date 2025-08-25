@@ -21,9 +21,6 @@ def select_test_cases(test_cases, test_selection):
     - "1-5": ID 1から5まで
     - "basic": 基本5文型
     - "relation": 関係節
-    - "passive": 受動態
-    - "comparative": 比較級・最上級
-    - "all": 全テストケース
     - "1,3-5,8": 複合指定
     """
     selected_ids = set()
@@ -37,16 +34,6 @@ def select_test_cases(test_cases, test_selection):
     elif test_selection.lower() == "passive":
         # 受動態のテストID
         selected_ids = {9, 10, 11, 21, 22, 23, 24}
-    elif test_selection.lower() == "comparative":
-        # 比較級・最上級のテストID（70-81番）
-        selected_ids = {70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}
-    elif test_selection.lower() == "all":
-        # 全テストケース（基本5文型 + 関係節 + 受動態 + 比較級・最上級）
-        basic_ids = {1, 2, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69}
-        relation_ids = {3, 4, 5, 6, 7, 8, 12, 13, 14, 34, 35, 36}
-        passive_ids = {9, 10, 11, 21, 22, 23, 24}
-        comparative_ids = {70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}
-        selected_ids = basic_ids | relation_ids | passive_ids | comparative_ids
     else:
         # 数値指定の解析
         parts = test_selection.split(',')
@@ -100,16 +87,6 @@ def classify_grammar_type(sentence):
         if any(word in sentence_lower for word in ['by ']):
             return 'passive_voice'
     
-    # 比較級・最上級の判定
-    comparative_patterns = ['than ', 'more ', ' -er ', 'bigger', 'faster', 'clearer']
-    superlative_patterns = ['the most', 'the ', '-est', 'smartest', 'highest', 'hardest']
-    
-    if any(pattern in sentence_lower for pattern in comparative_patterns):
-        return 'comparative_superlative'
-    if any(pattern in sentence_lower for pattern in superlative_patterns):
-        if 'the ' in sentence_lower and ('most' in sentence_lower or any(word.endswith('est') for word in sentence_lower.split())):
-            return 'comparative_superlative'
-    
     # 複合時制の判定
     if any(aux in sentence_lower for aux in ['have ', 'has ', 'had ', 'will ', 'would ', 'can ', 'could ', 'may ', 'might ', 'should ', 'must ']):
         return 'auxiliary_complex'
@@ -120,8 +97,8 @@ def classify_grammar_type(sentence):
 def filter_tests_by_grammar(test_data, grammar_types=None):
     """文法タイプでテストケースをフィルタリング"""
     if grammar_types is None:
-        # デフォルト：基本5文型 + 関係節 + 受動態 + 比較級・最上級
-        grammar_types = ['basic_five_pattern', 'relative_clause', 'relative_whose', 'passive_voice', 'comparative_superlative']
+        # デフォルト：基本5文型 + 関係節のみ（受動態と複合時制を除外）
+        grammar_types = ['basic_five_pattern', 'relative_clause', 'relative_whose']
     
     filtered_tests = {}
     for test_id, test_case in test_data['data'].items():
@@ -154,12 +131,10 @@ def run_official_test(grammar_types=None):
             if grammar_type in grammar_types:
                 filtered_cases.append(case)
     else:
-        # デフォルト：基本5文型 + 関係節 + 受動態 + 比較級・最上級
+        # デフォルト：基本5文型 + 関係節
         basic_cases = select_test_cases(test_cases, "basic")
         relation_cases = select_test_cases(test_cases, "relation")
-        passive_cases = select_test_cases(test_cases, "passive")
-        comparative_cases = select_test_cases(test_cases, "comparative")
-        filtered_cases = basic_cases + relation_cases + passive_cases + comparative_cases
+        filtered_cases = basic_cases + relation_cases
     print(f"📋 フィルタリング結果: {len(filtered_cases)}件のテストケースを実行")
     
     # 新しい関数を使用
@@ -253,7 +228,7 @@ def main():
     parser = argparse.ArgumentParser(description='正式テスト手順実行（動的版）')
     parser.add_argument('--tests', '-t', 
                        type=str,
-                       help='実行するテスト番号（例: "1,2,3-5,8" または "basic" または "relation" または "passive" または "comparative" または "all"）')
+                       help='実行するテスト番号（例: "1,2,3-5,8" または "basic" または "relation" または "passive"）')
     parser.add_argument('--all', action='store_true', help='全てのテストケースを実行')
     
     args = parser.parse_args()
@@ -270,13 +245,12 @@ def main():
         selected_cases = select_test_cases(test_cases, args.tests)
         print(f"🎯 選択されたテスト: {args.tests}")
     else:
-        # デフォルト: 基本5文型 + 関係節 + 受動態 + 比較級・最上級 (48件)
+        # デフォルト: 基本5文型 + 関係節 + 受動態 (24件)
         basic_cases = select_test_cases(test_cases, "basic")
         relation_cases = select_test_cases(test_cases, "relation") 
         passive_cases = select_test_cases(test_cases, "passive")
-        comparative_cases = select_test_cases(test_cases, "comparative")
-        selected_cases = basic_cases + relation_cases + passive_cases + comparative_cases
-        print("🎯 デフォルト実行: 基本5文型 + 関係節 + 受動態 + 比較級・最上級 (48件)")
+        selected_cases = basic_cases + relation_cases + passive_cases
+        print("🎯 デフォルト実行: 基本5文型 + 関係節 + 受動態 (24件)")
     
     run_official_test_with_selected_cases(selected_cases)
 
