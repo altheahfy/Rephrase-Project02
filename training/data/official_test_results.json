@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-25T12:31:21.723174",
+  "timestamp": "2025-08-25T11:47:20.087449",
   "total_tests": 3,
   "results": {
     "79": {
@@ -17,46 +17,60 @@
         "Slot": [
           "S",
           "V",
+          "M1",
+          "M2",
           "O1"
         ],
         "SlotPhrase": [
           "She",
           "studies",
+          "hardest",
+          "of",
           "all students"
         ],
         "Slot_display_order": [
           1,
           3,
+          8,
+          9,
           4
         ],
         "display_order": [
           1,
           3,
+          8,
+          9,
           4
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
+          "修飾句",
+          "修飾句",
           "名詞句"
         ],
         "SubslotID": [
           0,
           1,
+          2,
+          3,
           4
         ],
         "main_slots": {
           "S": "She",
           "V": "studies",
+          "M1": "hardest",
+          "M2": "of",
           "O1": "all students",
-          "M2": "hardest",
           "M3": "of all students"
         },
         "sub_slots": {},
         "slots": {
           "S": "She",
           "V": "studies",
+          "M1": "hardest",
+          "M2": "of",
           "O1": "all students",
-          "M2": "hardest",
           "M3": "of all students"
         },
         "pattern_detected": "SVO",
@@ -118,40 +132,70 @@
       "analysis_result": {
         "Slot": [
           "S",
-          "V"
+          "V",
+          "M1",
+          "M1",
+          "M2",
+          "M3",
+          "M3"
         ],
         "SlotPhrase": [
           "He",
-          "works"
+          "works",
+          "most",
+          "efficiently",
+          "in",
+          "the",
+          "morning"
         ],
         "Slot_display_order": [
           1,
-          3
+          3,
+          8,
+          8,
+          9,
+          10,
+          10
         ],
         "display_order": [
           1,
-          3
+          3,
+          8,
+          8,
+          9,
+          10,
+          10
         ],
         "PhraseType": [
           "名詞句",
-          "動詞句"
+          "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
+          "修飾句"
         ],
         "SubslotID": [
           0,
-          1
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
         ],
         "main_slots": {
           "S": "He",
           "V": "works",
-          "M2": "most efficiently",
-          "M3": "in the morning"
+          "M1": "efficiently",
+          "M2": "in morning"
         },
         "sub_slots": {},
         "slots": {
           "S": "He",
           "V": "works",
-          "M2": "most efficiently",
-          "M3": "in the morning"
+          "M1": "efficiently",
+          "M2": "in morning"
         },
         "pattern_detected": "SV",
         "confidence": 0.9,
@@ -213,46 +257,66 @@
         "Slot": [
           "S",
           "V",
+          "M1",
+          "M1",
+          "M2",
           "O1"
         ],
         "SlotPhrase": [
           "This machine",
           "operates",
+          "most",
+          "smoothly",
+          "among",
           "all models"
         ],
         "Slot_display_order": [
           1,
           3,
+          8,
+          8,
+          9,
           4
         ],
         "display_order": [
           1,
           3,
+          8,
+          8,
+          9,
           4
         ],
         "PhraseType": [
           "名詞句",
           "動詞句",
+          "修飾句",
+          "修飾句",
+          "修飾句",
           "名詞句"
         ],
         "SubslotID": [
           0,
           1,
+          2,
+          3,
+          4,
           5
         ],
         "main_slots": {
           "S": "This machine",
           "V": "operates",
+          "M1": "smoothly",
+          "M2": "among",
           "O1": "all models",
-          "M2": "most smoothly",
           "M3": "among all models"
         },
         "sub_slots": {},
         "slots": {
           "S": "This machine",
           "V": "operates",
+          "M1": "smoothly",
+          "M2": "among",
           "O1": "all models",
-          "M2": "most smoothly",
           "M3": "among all models"
         },
         "pattern_detected": "SVO",
