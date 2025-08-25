@@ -318,17 +318,6 @@ class CentralController:
         
         if is_protected:
             print(f"🛡️ 高優先度ハンドラー保護: {winning_handler} (priority={handler_priority}) の結果を保持")
-            
-            # 🛑 追加保護：比較級・最上級ハンドラーが勝った場合、レガシーO1を除去
-            if winning_handler == 'comparative_superlative' and 'O1' in main_slots:
-                o1_value = main_slots['O1']
-                # M3（of/among句）の値と重複チェック
-                m3_value = main_slots.get('M3', '')
-                if o1_value and m3_value and o1_value in m3_value:
-                    print(f"🛑 Central Controller: Removing legacy O1='{o1_value}' (duplicate with M3='{m3_value}' in comparative context)")
-                    del main_slots['O1']
-                    if 'O1' in result.get('slots', {}):
-                        del result['slots']['O1']
         
         # サブスロットに副詞が存在する場合、メインスロットから同じ副詞を削除（保護対象外のみ）
         adverb_slots = ['M1', 'M2', 'M3']
