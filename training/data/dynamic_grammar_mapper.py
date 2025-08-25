@@ -2825,8 +2825,8 @@ class DynamicGrammarMapper:
         try:
             print(f"🔍 Executing relative_clause handler for: {sentence}")
             
-            # 既存の関係節検出ロジックを使用
-            tokens = [{'text': token.text, 'pos': token.pos_, 'dep': token.dep_, 'head': token.head, 'lemma': token.lemma_} for token in doc]
+            # Phase 1.2: レガシー依存関係削除 - 統一トークン抽出使用
+            tokens = self._extract_tokens(doc)  # 既存の段階的削除対応メソッド使用
             relative_info = self._detect_relative_clause(tokens, sentence)
             
             if not relative_info.get('found', False):
