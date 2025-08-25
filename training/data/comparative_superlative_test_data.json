@@ -1,0 +1,188 @@
+{
+  "comparative_superlative_test_data": {
+    "description": "比較級・最上級テストデータ - 形容詞・副詞各3例文ずつ（計12例文）",
+    "test_cases": {
+      "comparative_adjective_1": {
+        "sentence": "This book is bigger than that one.",
+        "grammar_type": "comparative_adjective",
+        "expected": {
+          "main_slots": {
+            "S": "This book",
+            "V": "is",
+            "C1": "bigger",
+            "M2": "than that one"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞比較級: bigger (-er語尾) + than句をM2配置"
+      },
+      "comparative_adjective_2": {
+        "sentence": "Today is more interesting than yesterday.",
+        "grammar_type": "comparative_adjective", 
+        "expected": {
+          "main_slots": {
+            "S": "Today",
+            "V": "is",
+            "C1": "more interesting",
+            "M2": "than yesterday"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞比較級: more + 形容詞 + than句をM2配置"
+      },
+      "comparative_adjective_3": {
+        "sentence": "She looks more beautiful than her sister.",
+        "grammar_type": "comparative_adjective",
+        "expected": {
+          "main_slots": {
+            "S": "She",
+            "V": "looks",
+            "C1": "more beautiful",
+            "M2": "than her sister"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞比較級: more + 形容詞 + than句をM2配置"
+      },
+      "superlative_adjective_1": {
+        "sentence": "She is the smartest of all the students.",
+        "grammar_type": "superlative_adjective",
+        "expected": {
+          "main_slots": {
+            "S": "She",
+            "V": "is", 
+            "C1": "the smartest",
+            "M2": "of all the students"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞最上級: the + -est語尾 + of句をM2配置"
+      },
+      "superlative_adjective_2": {
+        "sentence": "This is the most beautiful flower in the garden.",
+        "grammar_type": "superlative_adjective",
+        "expected": {
+          "main_slots": {
+            "S": "This",
+            "V": "is",
+            "C1": "the most beautiful flower",
+            "M2": "in the garden"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞最上級: the most + 形容詞 + 場所句をM2配置"
+      },
+      "superlative_adjective_3": {
+        "sentence": "Mount Everest is the highest mountain in the world.",
+        "grammar_type": "superlative_adjective",
+        "expected": {
+          "main_slots": {
+            "S": "Mount Everest",
+            "V": "is",
+            "C1": "the highest mountain",
+            "M2": "in the world"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "形容詞最上級: the + -est語尾 + 名詞 + 場所句をM2配置"
+      },
+      "comparative_adverb_1": {
+        "sentence": "He runs faster than anyone else.",
+        "grammar_type": "comparative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "He",
+            "V": "runs",
+            "M2": "faster",
+            "M3": "than anyone else"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞比較級: faster (-er語尾) をM2、than句をM3配置"
+      },
+      "comparative_adverb_2": {
+        "sentence": "She speaks more clearly than before.",
+        "grammar_type": "comparative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "She",
+            "V": "speaks",
+            "M2": "more clearly",
+            "M3": "than before"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞比較級: more + 副詞をM2、than句をM3配置"
+      },
+      "comparative_adverb_3": {
+        "sentence": "The train arrives more frequently than the bus.",
+        "grammar_type": "comparative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "The train",
+            "V": "arrives",
+            "M2": "more frequently",
+            "M3": "than the bus"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞比較級: more + 副詞をM2、than句をM3配置"
+      },
+      "superlative_adverb_1": {
+        "sentence": "She studies hardest of all students.",
+        "grammar_type": "superlative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "She",
+            "V": "studies",
+            "M2": "hardest",
+            "M3": "of all students"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞最上級: -est語尾をM2、of句をM3配置"
+      },
+      "superlative_adverb_2": {
+        "sentence": "He works most efficiently in the morning.",
+        "grammar_type": "superlative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "He",
+            "V": "works",
+            "M2": "most efficiently",
+            "M3": "in the morning"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞最上級: most + 副詞をM2、場所・時間句をM3配置"
+      },
+      "superlative_adverb_3": {
+        "sentence": "This machine operates most smoothly among all models.",
+        "grammar_type": "superlative_adverb",
+        "expected": {
+          "main_slots": {
+            "S": "This machine",
+            "V": "operates",
+            "M2": "most smoothly",
+            "M3": "among all models"
+          },
+          "sub_slots": {}
+        },
+        "explanation": "副詞最上級: most + 副詞をM2、among句をM3配置"
+      }
+    },
+    "summary": {
+      "total_cases": 12,
+      "comparative_adjective": 3,
+      "superlative_adjective": 3,
+      "comparative_adverb": 3,
+      "superlative_adverb": 3,
+      "rephrase_slot_rules": {
+        "comparative_adjective": "C1スロット（補語）+ M2スロット（than句）",
+        "superlative_adjective": "C1スロット（補語）+ M2スロット（of句・場所句）",
+        "comparative_adverb": "M2スロット（副詞）+ M3スロット（than句）",
+        "superlative_adverb": "M2スロット（副詞）+ M3スロット（of句・場所句）"
+      }
+    }
+  }
+}
