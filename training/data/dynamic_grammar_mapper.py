@@ -4147,54 +4147,185 @@ class PureCentralController:
     
     def _execute_pure_management_pipeline(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        ✅ 純粋管理機能: ハンドラー実行制御のみ
+        🎯 Phase A3-3: 真の純粋管理機能実装
         
-        各ハンドラーを順次実行し、結果を管理・統合
-        分解作業は一切実行しない
+        各ハンドラーを個別実行し、結果を管理・統合
+        レガシー分解機能への委譲を完全除去
         """
         pipeline_results = {
             'sentence': context['sentence'],
             'handler_results': {},
             'execution_log': context['handler_execution_log'],
-            'quality_metrics': context['quality_metrics']
+            'quality_metrics': context['quality_metrics'],
+            'unified_result': {}
         }
         
-        self.logger.info(f"🎯 管理パイプライン開始: {len(self.handler_execution_order)}ハンドラー実行")
+        self.logger.info(f"🔥 Phase A3-3: 真の管理パイプライン開始 - {len(self.handler_execution_order)}ハンドラー個別実行")
         
-        # 既存のDynamicGrammarMapperを使用してハンドラー実行を管理
-        # 分解作業は全てDynamicGrammarMapperに委譲
-        handler_result = self.grammar_mapper.analyze_sentence(context['sentence'])
+        # 🎯 真の中央管理: 各ハンドラーを個別実行・管理
+        sentence = context['sentence']
+        accumulated_result = {
+            'sentence': sentence,
+            'slots': {},
+            'sub_slots': {},
+            'grammar_info': {
+                'detected_patterns': [],
+                'handler_contributions': {},
+                'control_flags': {}
+            }
+        }
         
-        pipeline_results['handler_results']['unified'] = handler_result
-        pipeline_results['execution_log'].append({
-            'handler': 'unified_dynamic_grammar_mapper',
-            'status': 'success',
-            'result_slots': len(handler_result.get('slots', {}))
-        })
+        # 🔥 Phase A3-3: ハンドラー個別実行ループ（レガシー委譲廃止）
+        doc = self.grammar_mapper.nlp(sentence)  # 必要なNLP前処理
         
-        self.logger.info("🎯 管理パイプライン完了: 統合ハンドラー実行成功")
+        for handler_name in self.handler_execution_order:
+            try:
+                self.logger.debug(f"🎯 実行中: {handler_name}ハンドラー")
+                
+                # 新ハンドラーシステム実行（_handle_* パターン）
+                handler_method = getattr(self.grammar_mapper, f'_handle_{handler_name}', None)
+                if handler_method:
+                    handler_result = handler_method(sentence, doc, accumulated_result)
+                    
+                    # 結果統合管理
+                    if handler_result:
+                        accumulated_result = self._merge_handler_result(accumulated_result, handler_result, handler_name)
+                        
+                    pipeline_results['handler_results'][handler_name] = handler_result
+                    pipeline_results['execution_log'].append({
+                        'handler': handler_name,
+                        'status': 'success',
+                        'slots_added': len(handler_result.get('slots', {})) if handler_result else 0
+                    })
+                    
+                    self.logger.debug(f"✅ {handler_name}ハンドラー完了")
+                    
+                else:
+                    # レガシーハンドラー処理（basic_five_patternのみ）
+                    if handler_name == 'basic_five_pattern':
+                        self.logger.debug(f"🔧 レガシーハンドラー実行: {handler_name}")
+                        
+                        # basic_five_patternの特殊処理
+                        try:
+                            analysis_sentence = sentence
+                            if accumulated_result.get('relative_clause_info', {}).get('found'):
+                                main_sentence = accumulated_result['relative_clause_info']['main_sentence']
+                                analysis_sentence = main_sentence
+                                doc = self.grammar_mapper.nlp(main_sentence)
+                            
+                            # 内部5文型処理を直接実行
+                            enhanced_tokens = self.grammar_mapper._convert_spacy_to_dict_tokens(list(doc))
+                            core_elements = self.grammar_mapper._identify_core_elements(enhanced_tokens)
+                            sentence_pattern = self.grammar_mapper._determine_sentence_pattern(core_elements, enhanced_tokens)
+                            grammar_elements = self.grammar_mapper._assign_grammar_roles(enhanced_tokens, sentence_pattern, core_elements)
+                            
+                            # 結果変換
+                            basic_pattern_result = self.grammar_mapper._convert_to_rephrase_format(
+                                grammar_elements, sentence_pattern, accumulated_result.get('sub_slots', {})
+                            )
+                            
+                            # メインスロット統合
+                            if 'main_slots' in basic_pattern_result:
+                                accumulated_result['slots'].update(basic_pattern_result['main_slots'])
+                            
+                            pipeline_results['handler_results'][handler_name] = basic_pattern_result
+                            pipeline_results['execution_log'].append({
+                                'handler': handler_name,
+                                'status': 'success_legacy',
+                                'slots_added': len(basic_pattern_result.get('main_slots', {}))
+                            })
+                            
+                        except Exception as e:
+                            self.logger.error(f"❌ レガシー{handler_name}エラー: {e}")
+                            pipeline_results['execution_log'].append({
+                                'handler': handler_name,
+                                'status': 'legacy_error',
+                                'error': str(e)
+                            })
+                    else:
+                        self.logger.warning(f"⚠️ ハンドラーメソッド未発見: _handle_{handler_name}")
+                        pipeline_results['execution_log'].append({
+                            'handler': handler_name,
+                            'status': 'method_not_found'
+                        })
+                    
+            except Exception as e:
+                self.logger.error(f"❌ {handler_name}ハンドラーエラー: {e}")
+                pipeline_results['execution_log'].append({
+                    'handler': handler_name,
+                    'status': 'error',
+                    'error': str(e)
+                })
+        
+        # 🎯 管理業務: 最終結果統合
+        pipeline_results['unified_result'] = accumulated_result
+        
+        self.logger.info("🔥 Phase A3-3: 真の管理パイプライン完了 - レガシー委譲廃止")
         return pipeline_results
+    
+    def _merge_handler_result(self, accumulated_result: Dict[str, Any], handler_result: Dict[str, Any], handler_name: str) -> Dict[str, Any]:
+        """
+        🎯 Phase A3-3: ハンドラー結果統合管理
+        
+        各ハンドラーの結果を適切に統合する管理機能
+        """
+        if not handler_result:
+            return accumulated_result
+            
+        # スロット統合管理
+        if 'slots' in handler_result:
+            accumulated_result['slots'].update(handler_result['slots'])
+            
+        # サブスロット統合管理  
+        if 'sub_slots' in handler_result:
+            accumulated_result['sub_slots'].update(handler_result['sub_slots'])
+            
+        # 文法情報統合管理
+        if 'grammar_info' in handler_result:
+            grammar_info = handler_result['grammar_info']
+            
+            # パターン情報統合
+            if 'detected_patterns' in grammar_info:
+                accumulated_result['grammar_info']['detected_patterns'].extend(grammar_info['detected_patterns'])
+                
+            # ハンドラー貢献情報統合
+            if 'handler_contributions' in grammar_info:
+                accumulated_result['grammar_info']['handler_contributions'].update(grammar_info['handler_contributions'])
+                
+            # 制御フラグ統合
+            if 'control_flags' in grammar_info:
+                accumulated_result['grammar_info']['control_flags'].update(grammar_info['control_flags'])
+        
+        self.logger.debug(f"🎯 {handler_name}結果統合完了: {len(accumulated_result['slots'])}スロット")
+        return accumulated_result
     
     def _finalize_management_result(self, pipeline_result: Dict[str, Any], sentence: str) -> Dict[str, Any]:
         """
-        ✅ 純粋管理機能: 結果統合業務
+        🎯 Phase A3-3: 真の純粋管理結果統合
         
-        ハンドラー結果の統合・競合解決（管理業務）
-        分解作業は一切行わない
+        個別ハンドラー結果の最終統合（管理業務）
+        レガシー委譲機能を完全除去
         """
-        # 統合ハンドラーの結果をそのまま使用（管理業務として品質向上処理のみ）
-        unified_result = pipeline_result['handler_results']['unified']
+        # 🔥 Phase A3-3: 真の統合管理業務
+        unified_result = pipeline_result['unified_result']
         
-        # 管理業務: メタデータ追加
+        # 管理業務: レガシー互換形式への変換
         final_result = unified_result.copy()
-        final_result['management_info'] = {
-            'controller': 'PureCentralController',
+        
+        # 管理業務: 内部管理メタデータ（結果には含めない、ログのみ）
+        management_info = {
+            'controller': 'PureCentralController_A3-3',
             'execution_log': pipeline_result['execution_log'],
             'quality_metrics': pipeline_result['quality_metrics'],
-            'management_timestamp': self._get_timestamp()
+            'management_timestamp': self._get_timestamp(),
+            'handlers_executed': len(pipeline_result['handler_results']),
+            'legacy_delegation_removed': True
         }
         
-        self.logger.info(f"🎯 結果統合完了: {len(final_result.get('slots', {}))}スロット")
+        # 内部ログ記録のみ（結果構造は変更しない）
+        self.logger.debug(f"🔥 Phase A3-3 管理情報: {management_info}")
+        
+        self.logger.info(f"🔥 Phase A3-3: 真の結果統合完了 - {len(final_result.get('slots', {}))}スロット")
         return final_result
     
     def _quality_assurance_check(self, result: Dict[str, Any]) -> None:
