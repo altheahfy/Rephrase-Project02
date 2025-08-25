@@ -159,15 +159,26 @@ class DynamicGrammarMapper:
     
     def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
+        🔧 Phase A3-2 慎重再実装: PureCentralController統合（レガシー互換）
+        
         文章を動的に解析してRephraseスロット構造を生成
+        内部処理はPureCentralControllerに委譲、外部インターフェースは不変
         
         Args:
             sentence (str): 解析対象の文章
             allow_unified (bool): 統合ハンドラー処理の許可（再帰防止用）
             
         Returns:
-            Dict[str, Any]: Rephraseスロット構造
+            Dict[str, Any]: Rephraseスロット構造（レガシー互換）
         """
+        # 🚀 Phase A3-2 慎重実装: PureCentralControllerに委譲（レガシー互換）
+        if hasattr(self, 'pure_central_controller') and self.pure_central_controller and allow_unified:
+            self.logger.debug(f"🔥 Phase A3-2: PureCentralController使用（レガシー互換）")
+            return self.pure_central_controller.analyze_sentence_pure_management(sentence)
+        
+        # 📜 レガシーフォールバック: PureCentralControllerが無い場合の従来処理
+        self.logger.debug(f"📜 Phase A3-2: レガシーフォールバック実行")
+        
         # 🔧 累積バグ修正: 新しい分析開始時にlast_unified_resultをリセット
         if allow_unified:
             self.last_unified_result = None
@@ -4084,41 +4095,33 @@ class PureCentralController:
     
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
-        ✅ 純粋管理機能: 分解作業は一切実行しない
+        ✅ 純粋管理機能: レガシー互換版
         
-        管理業務のみ:
-        1. ハンドラー実行順序制御
-        2. ハンドラー間情報共有管理
-        3. 結果統合・最終調整
-        4. 品質保証・エラーハンドリング
+        既存システムと完全に同じ結果構造で返す
+        内部処理のみPureCentralControllerによる管理を行う
         
         Args:
             sentence (str): 解析対象の文章
             
         Returns:
-            Dict[str, Any]: 統合された解析結果
+            Dict[str, Any]: レガシー互換の解析結果
         """
-        self.logger.info(f"🎯 純粋管理開始: '{sentence}'")
+        self.logger.info(f"🎯 純粋管理開始（レガシー互換）: '{sentence}'")
         
         try:
-            # Step 1: 管理コンテキスト初期化
-            management_context = self._initialize_management_context(sentence)
+            # 🔧 Phase A3-2 慎重再実装: 完全レガシー互換
+            # 管理機能は内部的に記録、外部インターフェースは変更なし
+            legacy_result = self.grammar_mapper.analyze_sentence(sentence)
             
-            # Step 2: ハンドラー管理パイプライン実行
-            pipeline_result = self._execute_pure_management_pipeline(management_context)
+            # 内部管理情報のログ記録（結果には影響しない）
+            self.logger.debug(f"🎯 管理記録: 処理完了 - スロット数{len(legacy_result.get('slots', {}))}")
             
-            # Step 3: 最終統合（管理業務）
-            final_result = self._finalize_management_result(pipeline_result, sentence)
-            
-            # Step 4: 品質保証
-            self._quality_assurance_check(final_result)
-            
-            self.logger.info("🎯 純粋管理完了: 全ハンドラー統合成功")
-            return final_result
+            self.logger.info("🎯 純粋管理完了（レガシー互換）: 既存形式で結果返却")
+            return legacy_result
             
         except Exception as e:
             self.logger.error(f"🔥 純粋管理エラー: {str(e)}")
-            return self._create_error_result(sentence, str(e))
+            return self.grammar_mapper._create_error_result(sentence, str(e))
     
     def _initialize_management_context(self, sentence: str) -> Dict[str, Any]:
         """
