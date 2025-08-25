@@ -68,6 +68,9 @@ class DynamicGrammarMapper:
         self.handler_shared_context = {}  # ハンドラー間情報共有
         self.handler_success_count = {}  # ハンドラー成功統計
         
+        # 🔥 Phase 1.1: 段階的依存関係削除制御フラグ
+        self._use_dependency_info = False  # True=従来通り, False=品詞ベース分析
+        
         # ChatGPT5診断: 再入ガード対策
         self._analysis_depth = 0  # 解析深度カウンタ（無限ループ防止）
         
@@ -81,8 +84,9 @@ class DynamicGrammarMapper:
         self._initialize_basic_handlers()
         
         # ハンドラー管理システムの初期化完了をログ出力
-        print(f"🔥 Phase 1.0 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
+        print(f"🔥 Phase 1.1 ハンドラー管理システム初期化完了: {len(self.active_handlers)}個のハンドラーがアクティブ")
         print(f"   アクティブハンドラー: {', '.join(self.active_handlers)}")
+        print(f"   依存関係使用フラグ: {self._use_dependency_info}")  # Phase 1.1追加
         
         # 🆕 Phase 1.2: 文型認識エンジン初期化
         # self.sentence_type_detector = SentenceTypeDetector()  # 一時的にコメント化
@@ -368,7 +372,7 @@ class DynamicGrammarMapper:
             rephrase_result['main_slots'].pop(slot_name, None)
     
     def _extract_tokens(self, doc) -> List[Dict]:
-        """spaCyドキュメントからトークン情報を抽出"""
+        """spaCyドキュメントからトークン情報を抽出（段階的依存関係削除）"""
         tokens = []
         for token in doc:
             token_info = {
@@ -376,9 +380,10 @@ class DynamicGrammarMapper:
                 'pos': token.pos_,
                 'tag': token.tag_,
                 'lemma': token.lemma_,
-                'dep': token.dep_,  # 依存関係
-                'head': token.head.text,
-                'head_idx': token.head.i,  # 🆕 依存関係のヘッドインデックス
+                # Phase 1: 品詞ベース分析への段階移行 - 依存関係情報の条件付き保持
+                'dep': token.dep_ if hasattr(self, '_use_dependency_info') and self._use_dependency_info else 'UNKNOWN',  # 依存関係
+                'head': token.head.text if hasattr(self, '_use_dependency_info') and self._use_dependency_info else '',
+                'head_idx': token.head.i if hasattr(self, '_use_dependency_info') and self._use_dependency_info else -1,  # 🆕 依存関係のヘッドインデックス
                 'is_stop': token.is_stop,
                 'is_alpha': token.is_alpha,
                 'index': token.i
@@ -617,12 +622,22 @@ class DynamicGrammarMapper:
 
     def _check_main_clause_completeness_safe(self, tokens: List[Dict]) -> bool:
         """メイン文の完全性チェック（循環参照回避版）"""
-        # 関係節以外の部分にメイン動詞が存在するか（曖昧語解決は使わない）
+        # 品詞ベースでメイン動詞を特定（依存関係に依存しない）
         main_verbs = []
-        for token in tokens:
-            if token['pos'] in ['VERB', 'AUX'] and token['dep'] in ['ROOT']:
-                main_verbs.append(token)
-                self.logger.debug(f"      メイン動詞候補: '{token['text']}' (pos={token['pos']})")
+        for i, token in enumerate(tokens):
+            if token['pos'] in ['VERB', 'AUX']:
+                # 品詞ベース判定: 文頭付近の動詞、またはAuxの後の動詞をメイン動詞とみなす
+                is_main_verb = False
+                if i == 0 or token['pos'] == 'AUX':  # 文頭動詞またはAux
+                    is_main_verb = True
+                elif i > 0 and tokens[i-1]['pos'] == 'AUX':  # Auxの直後の動詞
+                    is_main_verb = True
+                elif i < len(tokens)-1 and any(t['pos'] in ['NOUN', 'PRON'] for t in tokens[:i]):  # 主語の後の動詞
+                    is_main_verb = True
+                
+                if is_main_verb:
+                    main_verbs.append(token)
+                    self.logger.debug(f"      メイン動詞候補: '{token['text']}' (pos={token['pos']}) - 品詞ベース判定")
         
         return len(main_verbs) > 0
 
@@ -631,11 +646,17 @@ class DynamicGrammarMapper:
         has_relative_pronoun = False
         has_relative_verb = False
         
-        for token in tokens:
+        for i, token in enumerate(tokens):
             if token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose']:
                 has_relative_pronoun = True
-            elif token['pos'] in ['VERB', 'AUX'] and token['dep'] in ['relcl']:
-                has_relative_verb = True
+            elif token['pos'] in ['VERB', 'AUX']:
+                # 品詞ベース関係節動詞判定: 関係代名詞の後にある動詞
+                if has_relative_pronoun and i > 0:
+                    # 関係代名詞が既に見つかっていて、その後の動詞
+                    prev_tokens = tokens[:i]
+                    if any(t['text'].lower() in ['who', 'whom', 'which', 'that', 'whose'] for t in prev_tokens):
+                        has_relative_verb = True
+                        self.logger.debug(f"      関係節動詞候補: '{token['text']}' (pos={token['pos']}) - 品詞ベース判定")
         
         return has_relative_pronoun and has_relative_verb
 
