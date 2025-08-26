@@ -42,10 +42,10 @@ class BasicFivePatternHandler:
         
         # 文型判定用動詞分類
         self.verb_types = {
-            'linking': ['be', 'seem', 'become', 'appear', 'look', 'sound', 'feel', 'taste', 'smell'],
-            'transitive': ['love', 'like', 'see', 'hear', 'make', 'take', 'give', 'send', 'show'],
-            'ditransitive': ['give', 'send', 'show', 'tell', 'teach', 'buy', 'make', 'get'],
-            'causative': ['make', 'let', 'have', 'get', 'help', 'see', 'hear', 'watch']
+            'linking': ['be', 'seem', 'become', 'appear', 'look', 'sound', 'feel', 'taste', 'smell', 'remain', 'stay', 'turn', 'grow'],
+            'transitive': ['love', 'like', 'see', 'hear', 'make', 'take', 'give', 'send', 'show', 'read', 'play', 'study'],
+            'ditransitive': ['give', 'send', 'show', 'tell', 'teach', 'buy', 'make', 'get', 'find', 'offer'],
+            'causative': ['make', 'let', 'have', 'get', 'help', 'see', 'hear', 'watch', 'call', 'find', 'consider']
         }
     
     def process(self, text: str) -> Dict[str, Any]:
@@ -110,7 +110,7 @@ class BasicFivePatternHandler:
         if subject_tokens:
             elements['S'] = ' '.join(subject_tokens)
         
-        # 動詞抽出
+        # 動詞抽出と位置特定
         verb_idx = None
         for i, token in enumerate(doc):
             if token.pos_ == 'VERB' and not token.lemma_ in ['be']:
@@ -125,59 +125,137 @@ class BasicFivePatternHandler:
         if verb_idx is None:
             return elements
         
-        # 動詞後の要素を分析
-        post_verb_tokens = list(doc[verb_idx + 1:])
+        # 動詞後の要素を詳細分析
+        post_verb_tokens = [token for token in doc[verb_idx + 1:] if token.pos_ != 'PUNCT']
         
         if not post_verb_tokens:
             return elements
         
-        # パターン分析
-        noun_positions = []
-        adj_positions = []
+        # 動詞の種類判定（連結動詞かどうか）
+        verb_lemma = doc[verb_idx].lemma_
+        is_linking_verb = verb_lemma in self.verb_types['linking']
+        is_causative_verb = verb_lemma in self.verb_types['causative']
+        is_ditransitive_verb = verb_lemma in self.verb_types['ditransitive']
         
-        for i, token in enumerate(post_verb_tokens):
-            if token.pos_ in ['NOUN', 'PRON', 'PROPN']:
-                noun_positions.append(i)
-            elif token.pos_ == 'ADJ':
-                adj_positions.append(i)
+        # 要素分類（動詞の種類に応じて処理）
+        elements_found = []
         
-        # 文型別処理
-        if len(noun_positions) == 0 and len(adj_positions) > 0:
-            # 第2文型: 形容詞のみ
-            elements['C1'] = post_verb_tokens[adj_positions[0]].text
+        if is_causative_verb or is_ditransitive_verb:
+            # 使役動詞・授与動詞の場合：特別な処理
+            current_phrase = []
             
-        elif len(noun_positions) == 1 and len(adj_positions) == 0:
-            # 第3文型: 名詞1つ
-            elements['O1'] = post_verb_tokens[noun_positions[0]].text
-            
-        elif len(noun_positions) == 2 and len(adj_positions) == 0:
-            # 第4文型: 名詞2つ
-            elements['O1'] = post_verb_tokens[noun_positions[0]].text
-            elements['O2'] = post_verb_tokens[noun_positions[1]].text
-            
-        elif len(noun_positions) == 1 and len(adj_positions) == 1:
-            # 第5文型: 名詞+形容詞
-            if noun_positions[0] < adj_positions[0]:
-                elements['O1'] = post_verb_tokens[noun_positions[0]].text
-                elements['C2'] = post_verb_tokens[adj_positions[0]].text
-            
-        elif len(noun_positions) == 1 and len(adj_positions) == 0:
-            # 名詞句として処理（冠詞含む）
-            noun_phrase = []
-            start_collecting = False
             for token in post_verb_tokens:
-                if token.pos_ in ['DET', 'ADJ'] and not start_collecting:
-                    start_collecting = True
-                    noun_phrase.append(token.text)
-                elif token.pos_ in ['NOUN', 'PRON', 'PROPN']:
-                    if not start_collecting:
-                        start_collecting = True
-                    noun_phrase.append(token.text)
-                elif start_collecting:
-                    break
+                if token.pos_ in ['DET', 'ADJ', 'NOUN', 'PRON', 'PROPN']:
+                    if token.pos_ == 'PRON' and current_phrase:
+                        # 代名詞が来た場合、前の句を終了して新しい句を開始
+                        if current_phrase:
+                            phrase_text = ' '.join(current_phrase)
+                            elements_found.append(('NOUN', phrase_text))
+                        current_phrase = [token.text]
+                    elif token.pos_ == 'PRON':
+                        # 単独の代名詞
+                        elements_found.append(('NOUN', token.text))
+                    elif token.pos_ == 'ADJ':
+                        # 単独の形容詞
+                        if current_phrase:
+                            phrase_text = ' '.join(current_phrase)
+                            elements_found.append(('NOUN', phrase_text))
+                            current_phrase = []
+                        elements_found.append(('ADJ', token.text))
+                    else:
+                        current_phrase.append(token.text)
+                elif current_phrase:
+                    # 句の終了
+                    phrase_text = ' '.join(current_phrase)
+                    elements_found.append(('NOUN', phrase_text))
+                    current_phrase = []
             
-            if noun_phrase:
-                elements['O1'] = ' '.join(noun_phrase)
+            # 最後の句を処理
+            if current_phrase:
+                phrase_text = ' '.join(current_phrase)
+                elements_found.append(('NOUN', phrase_text))
+        else:
+            # 通常の場合：句ベースで処理
+            current_phrase = []
+            
+            for token in post_verb_tokens:
+                if token.pos_ in ['DET', 'ADJ', 'NOUN', 'PRON', 'PROPN']:
+                    current_phrase.append(token.text)
+                elif current_phrase:  # 句の終了
+                    phrase_text = ' '.join(current_phrase)
+                    
+                    # 最後のトークンのPOSで判定
+                    last_token_pos = None
+                    for t in post_verb_tokens:
+                        if t.text == current_phrase[-1]:
+                            last_token_pos = t.pos_
+                            break
+                    
+                    if last_token_pos == 'ADJ':
+                        elements_found.append(('ADJ', phrase_text))
+                    else:
+                        elements_found.append(('NOUN', phrase_text))
+                    current_phrase = []
+            
+            # 最後の句を処理
+            if current_phrase:
+                phrase_text = ' '.join(current_phrase)
+                
+                # 最後のトークンのPOSで判定
+                last_token_pos = None
+                for t in post_verb_tokens:
+                    if t.text == current_phrase[-1]:
+                        last_token_pos = t.pos_
+                        break
+                
+                if last_token_pos == 'ADJ':
+                    elements_found.append(('ADJ', phrase_text))
+                else:
+                    elements_found.append(('NOUN', phrase_text))
+        
+        # 文型判定とスロット配置
+        noun_count = len([e for e in elements_found if e[0] == 'NOUN'])
+        adj_count = len([e for e in elements_found if e[0] == 'ADJ'])
+        
+        if is_linking_verb and adj_count > 0:
+            # 第2文型: 連結動詞 + 形容詞
+            adj_elements = [e[1] for e in elements_found if e[0] == 'ADJ']
+            elements['C1'] = adj_elements[0]
+            
+        elif is_linking_verb and noun_count > 0:
+            # 第2文型: 連結動詞 + 名詞（補語）
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            elements['C1'] = noun_elements[0]
+            
+        elif is_ditransitive_verb and noun_count == 2:
+            # 第4文型: 授与動詞 + 間接目的語 + 直接目的語
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            elements['O1'] = noun_elements[0]
+            elements['O2'] = noun_elements[1]
+            
+        elif is_causative_verb and noun_count == 2:
+            # 第5文型: 使役動詞 + 目的語 + 補語（名詞）
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            elements['O1'] = noun_elements[0]
+            elements['C2'] = noun_elements[1]
+            
+        elif is_causative_verb and noun_count == 1 and adj_count == 1:
+            # 第5文型: 使役動詞 + 目的語 + 補語（形容詞）
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            adj_elements = [e[1] for e in elements_found if e[0] == 'ADJ']
+            elements['O1'] = noun_elements[0]
+            elements['C2'] = adj_elements[0]
+            
+        elif noun_count == 1 and adj_count == 0:
+            # 第3文型: 他動詞 + 目的語
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            elements['O1'] = noun_elements[0]
+            
+        elif noun_count == 2 and adj_count == 0:
+            # 第4文型: 授与動詞 + 間接目的語 + 直接目的語
+            noun_elements = [e[1] for e in elements_found if e[0] == 'NOUN']
+            elements['O1'] = noun_elements[0]
+            elements['O2'] = noun_elements[1]
                 
         return elements
     
@@ -195,10 +273,17 @@ class BasicFivePatternHandler:
         if not elements.get('S') or not elements.get('V'):
             return None
         
-        verb = elements['V'].lower()
+        # 動詞の連結動詞判定
+        verb_lemma = None
+        for token in doc:
+            if token.pos_ in ['VERB', 'AUX'] and token.text.lower() == elements['V'].lower():
+                verb_lemma = token.lemma_
+                break
         
-        # 第2文型: be動詞 + 補語
-        if any(token.lemma_ == 'be' for token in doc) and elements.get('C1'):
+        is_linking_verb = verb_lemma in self.verb_types['linking'] if verb_lemma else False
+        
+        # 第2文型: 連結動詞 + 補語
+        if is_linking_verb and elements.get('C1'):
             return 'SVC'
         
         # 第5文型: 使役動詞 + O + C
