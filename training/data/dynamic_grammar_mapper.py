@@ -4171,9 +4171,9 @@ class PureCentralController:
             sentence_type = "statement"  # 一時的にデフォルト値
             sentence_type_confidence = 0.8  # 一時的にデフォルト値
             
-            # 1. spaCy基本解析
+            # 1. spaCy基本解析（純粋品詞情報のみ）
             doc = self.grammar_mapper.nlp(sentence)
-            tokens = self.grammar_mapper._extract_tokens(doc)
+            tokens = self._pure_extract_tokens(doc)  # 🎯 独立実装使用
             
             # 1.5. 関係節構造の検出
             relative_clause_info = self.grammar_mapper._detect_relative_clause(tokens, sentence)
@@ -4335,6 +4335,100 @@ class PureCentralController:
         except Exception as e:
             self.logger.error(f"PureCentralController解析エラー: {e}")
             return self.grammar_mapper._create_error_result(sentence, str(e))
+
+    def _pure_extract_tokens(self, doc) -> List[Dict]:
+        """
+        🎯 Phase A3-2b: 独立spaCyトークン抽出（技術的負債除去版）
+        
+        純粋なspaCyベースのトークン抽出
+        - Stanza依存関係を完全除去
+        - 不要な依存関係情報を削除
+        - クリーンな品詞ベース分析に特化
+        
+        Args:
+            doc: spaCy document
+            
+        Returns:
+            List[Dict]: クリーンなトークン情報リスト
+        """
+        tokens = []
+        for token in doc:
+            # 🔥 クリーン実装: 必要最小限の情報のみ抽出
+            token_info = {
+                'text': token.text,
+                'pos': token.pos_,      # 主要品詞
+                'tag': token.tag_,      # 詳細品詞タグ
+                'lemma': token.lemma_,  # 基本形
+                'is_stop': token.is_stop,  # ストップワード判定
+                'is_alpha': token.is_alpha,  # アルファベット判定
+                'index': token.i,       # トークンインデックス
+                # 🚫 技術的負債除去: 依存関係情報は一切使用しない
+            }
+            tokens.append(token_info)
+        return tokens
+
+    def _pure_extract_tokens(self, doc) -> List[Dict]:
+        """
+        🎯 Phase A3-2b: 純粋品詞+人間的認識によるトークン抽出
+        
+        spaCyの依存関係を一切使用せず、品詞情報のみで
+        人間的な文法認識システムを構築
+        
+        Args:
+            doc: spaCyドキュメント
+            
+        Returns:
+            List[Dict]: 純粋品詞ベースのトークン情報
+        """
+        tokens = []
+        for token in doc:
+            token_info = {
+                'text': token.text,
+                'pos': token.pos_,           # ✅ 品詞情報のみ使用
+                'tag': token.tag_,           # ✅ 詳細品詞タグのみ使用
+                'lemma': token.lemma_,       # ✅ 語幹情報のみ使用
+                # 🎯 Pure Central: 依存関係完全除去（人間的認識システムへ）
+                'dep': 'PURE_ANALYSIS',      # 依存関係は人間的文法で代替
+                'head': '',                  # ヘッド情報は語順+品詞で代替
+                'head_idx': -1,              # インデックスは位置関係で代替
+                'is_stop': token.is_stop,    # ✅ 基本属性のみ使用
+                'is_alpha': token.is_alpha,  # ✅ 基本属性のみ使用
+                'index': token.i             # ✅ 位置情報のみ使用
+            }
+            tokens.append(token_info)
+        return tokens
+
+    def _pure_convert_spacy_to_dict_tokens(self, spacy_tokens):
+        """
+        🎯 Phase A3-2b: spaCyトークンを辞書形式に変換（純粋POS+人間的認識）
+        
+        制約:
+        - 依存関係情報を使用しない
+        - POS情報のみで辞書形式トークンを作成
+        - 人間的文法認識システム対応
+        
+        Args:
+            spacy_tokens: spaCyトークンのリスト
+            
+        Returns:
+            List[Dict]: 純粋POS辞書形式トークン
+        """
+        dict_tokens = []
+        for i, token in enumerate(spacy_tokens):
+            dict_token = {
+                'id': i,
+                'text': token.text,
+                'pos': token.pos_,           # ✅ POS分析のみ使用
+                'tag': token.tag_,           # ✅ 詳細品詞タグ
+                'dep': 'PURE_ANALYSIS',      # 🎯 依存関係は使わない
+                'lemma': token.lemma_,
+                'is_alpha': token.is_alpha,
+                'is_stop': token.is_stop,
+                'is_punct': token.is_punct,
+                'idx': getattr(token, 'idx', i)
+            }
+            dict_tokens.append(dict_token)
+        return dict_tokens
 
     def _init_ambiguous_word_resolver(self):
         """
@@ -4713,8 +4807,8 @@ class PureCentralController:
                                 if i not in consumed_tokens:
                                     filtered_tokens.append(token)
                             
-                            # DynamicGrammarMapperの内部メソッドを正しく呼び出し
-                            enhanced_tokens = self.grammar_mapper._convert_spacy_to_dict_tokens(filtered_tokens)
+                            # 🎯 Phase A3-2b: 独立実装メソッド使用（Pure Central Controller）
+                            enhanced_tokens = self._pure_convert_spacy_to_dict_tokens(filtered_tokens)
                             core_elements = self.grammar_mapper._identify_core_elements(enhanced_tokens)
                             sentence_pattern = self.grammar_mapper._determine_sentence_pattern(core_elements, enhanced_tokens)
                             grammar_elements = self.grammar_mapper._assign_grammar_roles(enhanced_tokens, sentence_pattern, core_elements)
