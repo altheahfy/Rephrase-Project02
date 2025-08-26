@@ -5058,6 +5058,167 @@ class PureCentralController:
                         if roles[i]['role'] in ['POST_VERBAL_ADVERB', 'ADVERB']:
                             roles[i]['role'] = 'VERBAL_MODIFIER'
     
+    def _pure_detect_sentence_patterns(self, roles, tokens):
+        """
+        独立メソッド: 文型パターンを検出（POS分析のみ使用）
+        依存構文解析を使わずに文法役割から5文型を識別
+        """
+        pattern_info = {
+            'pattern': 'UNKNOWN',
+            'confidence': 0.0,
+            'elements': [],
+            'main_verb_idx': None,
+            'subject_found': False,
+            'object_count': 0,
+            'complement_found': False
+        }
+        
+        # 基本要素の検出
+        subject_roles = []
+        verb_roles = []
+        object_roles = []
+        complement_roles = []
+        auxiliary_roles = []
+        
+        for role_info in roles:
+            role = role_info['role']
+            
+            if role in ['SUBJECT', 'SUBJECT_PART']:
+                subject_roles.append(role_info)
+                pattern_info['subject_found'] = True
+            elif role == 'MAIN_VERB':
+                verb_roles.append(role_info)
+                pattern_info['main_verb_idx'] = role_info['index']
+            elif role == 'AUXILIARY':
+                auxiliary_roles.append(role_info)
+            elif role in ['DIRECT_OBJECT', 'OBJECT_PART']:
+                object_roles.append(role_info)
+                pattern_info['object_count'] += 1
+            elif role == 'INDIRECT_OBJECT':
+                object_roles.append(role_info)
+                pattern_info['object_count'] += 1
+            elif role in ['ADJECTIVE_COMPLEMENT', 'NOUN_COMPLEMENT']:
+                complement_roles.append(role_info)
+                pattern_info['complement_found'] = True
+        
+        # メイン動詞の特定
+        main_verb = None
+        if verb_roles:
+            main_verb = verb_roles[0]  # 最初のメイン動詞を使用
+        elif auxiliary_roles:
+            # 助動詞のみの場合、最後の助動詞をメイン動詞として扱う
+            main_verb = auxiliary_roles[-1]
+            pattern_info['main_verb_idx'] = main_verb['index']
+        
+        if not main_verb:
+            pattern_info['pattern'] = 'NO_VERB'
+            pattern_info['confidence'] = 0.1
+            return pattern_info
+        
+        # be動詞の特定
+        is_be_verb = False
+        if main_verb:
+            verb_token = tokens[main_verb['index']]
+            if verb_token.get('lemma_', '').lower() == 'be':
+                is_be_verb = True
+        
+        # 5文型の判定
+        if pattern_info['subject_found'] and main_verb:
+            # 第1文型: SV (主語 + 動詞)
+            if pattern_info['object_count'] == 0 and not pattern_info['complement_found']:
+                pattern_info['pattern'] = 'SV'
+                pattern_info['confidence'] = 0.9
+                pattern_info['elements'] = ['S', 'V']
+            
+            # 第2文型: SVC (主語 + 動詞 + 補語)
+            elif pattern_info['complement_found'] and is_be_verb:
+                pattern_info['pattern'] = 'SVC'
+                pattern_info['confidence'] = 0.95
+                pattern_info['elements'] = ['S', 'V', 'C']
+            
+            # 第3文型: SVO (主語 + 動詞 + 目的語)
+            elif pattern_info['object_count'] == 1 and not pattern_info['complement_found']:
+                pattern_info['pattern'] = 'SVO'
+                pattern_info['confidence'] = 0.9
+                pattern_info['elements'] = ['S', 'V', 'O']
+            
+            # 第4文型: SVOO (主語 + 動詞 + 間接目的語 + 直接目的語)
+            elif pattern_info['object_count'] >= 2:
+                pattern_info['pattern'] = 'SVOO'
+                pattern_info['confidence'] = 0.85
+                pattern_info['elements'] = ['S', 'V', 'O1', 'O2']
+            
+            # 第5文型: SVOC (主語 + 動詞 + 目的語 + 補語)
+            elif pattern_info['object_count'] >= 1 and pattern_info['complement_found']:
+                pattern_info['pattern'] = 'SVOC'
+                pattern_info['confidence'] = 0.85
+                pattern_info['elements'] = ['S', 'V', 'O', 'C']
+            
+            else:
+                # デフォルト判定
+                if pattern_info['object_count'] > 0:
+                    pattern_info['pattern'] = 'SVO'
+                    pattern_info['confidence'] = 0.7
+                    pattern_info['elements'] = ['S', 'V', 'O']
+                else:
+                    pattern_info['pattern'] = 'SV'
+                    pattern_info['confidence'] = 0.7
+                    pattern_info['elements'] = ['S', 'V']
+        
+        # 動詞のみの場合
+        elif main_verb and not pattern_info['subject_found']:
+            if pattern_info['object_count'] > 0:
+                pattern_info['pattern'] = 'VO'  # 命令文など
+                pattern_info['confidence'] = 0.6
+                pattern_info['elements'] = ['V', 'O']
+            else:
+                pattern_info['pattern'] = 'V'  # 単純動詞文
+                pattern_info['confidence'] = 0.5
+                pattern_info['elements'] = ['V']
+        
+        # 特殊パターンの調整
+        self._adjust_pattern_confidence(pattern_info, roles, tokens)
+        
+        return pattern_info
+    
+    def _adjust_pattern_confidence(self, pattern_info, roles, tokens):
+        """パターン信頼度の調整"""
+        
+        # 受動態の検出
+        for i, token in enumerate(tokens):
+            if (token.get('tag_') in ['VBN'] and 
+                i > 0 and tokens[i-1].get('lemma_', '').lower() in ['be', 'get']):
+                # 受動態の場合、信頼度を上げる
+                if pattern_info['pattern'] in ['SV', 'SVO']:
+                    pattern_info['confidence'] = min(0.95, pattern_info['confidence'] + 0.1)
+                break
+        
+        # 助動詞の存在確認
+        has_auxiliary = any(role['role'] == 'AUXILIARY' for role in roles)
+        if has_auxiliary:
+            pattern_info['confidence'] = min(0.95, pattern_info['confidence'] + 0.05)
+        
+        # 前置詞句の存在確認
+        has_preposition = any(role['role'] == 'PREPOSITION' for role in roles)
+        if has_preposition:
+            # 前置詞句がある場合、複雑な構造として信頼度を微調整
+            if pattern_info['pattern'] in ['SV', 'SVO']:
+                pattern_info['confidence'] = min(0.9, pattern_info['confidence'] + 0.02)
+        
+        # 関係代名詞の存在確認
+        has_relative = any(role['role'] == 'RELATIVE_PRONOUN' for role in roles)
+        if has_relative:
+            # 関係節がある場合、複雑な構造として信頼度を調整
+            pattern_info['confidence'] = max(0.6, pattern_info['confidence'] - 0.1)
+        
+        # 複数の動詞がある場合
+        verb_count = sum(1 for role in roles if role['role'] in ['MAIN_VERB', 'AUXILIARY'])
+        if verb_count > 2:
+            pattern_info['confidence'] = max(0.5, pattern_info['confidence'] - 0.15)
+        
+        # 最終的な信頼度の制限
+        pattern_info['confidence'] = max(0.1, min(0.95, pattern_info['confidence']))
+    
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
         🎯 Phase A3-5: Pure Management完全版
