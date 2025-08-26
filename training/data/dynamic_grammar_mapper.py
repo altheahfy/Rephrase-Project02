@@ -4534,6 +4534,376 @@ class PureCentralController:
             }
         }
     
+    def _pure_find_main_verb(self, tokens: List[Dict]) -> Optional[int]:
+        """
+        メイン動詞を特定（独立版・品詞のみ使用）
+        依存関係解析を使わず、品詞情報と語順のみでメイン動詞を特定
+        """
+        # 🎯 Step 1: 品詞ベースの動詞候補を収集
+        pos_candidates = []
+        for i, token in enumerate(tokens):
+            # 動詞の品詞タグ
+            if (token['tag'].startswith('VB') and token['pos'] == 'VERB') or token['pos'] == 'AUX':
+                pos_candidates.append((i, token))
+        
+        # 🎯 Step 2: 文脈的動詞識別（POS誤認識対策）
+        contextual_candidates = self._pure_find_contextual_verbs(tokens)
+        
+        # 🎯 Step 3: 両方を統合（重複除去）
+        verb_candidates = pos_candidates.copy()
+        for i, token in contextual_candidates:
+            # 既に存在しない場合のみ追加
+            if not any(existing_i == i for existing_i, _ in verb_candidates):
+                verb_candidates.append((i, token))
+        
+        if not verb_candidates:
+            return None
+        
+        # 🎯 Step 4: 人間的判定：関係節を除外してメイン動詞を特定
+        non_relative_verbs = []
+        
+        for i, token in verb_candidates:
+            # 関係代名詞の直後の動詞は関係節内動詞として除外
+            is_in_relative_clause = False
+            
+            # 前の単語を確認（関係節判定）
+            for j in range(max(0, i-5), i):  # 5語前まで確認
+                prev_token = tokens[j]
+                if prev_token['text'].lower() in ['who', 'whom', 'which', 'that', 'whose', 'where', 'when']:
+                    # whose構文の特別処理: 動詞/名詞同形語は関係節外のメイン動詞として扱う
+                    if (prev_token['text'].lower() == 'whose' and 
+                        token['text'].lower() in getattr(self, 'ambiguous_words', []) and
+                        token.get('contextual_override', False)):
+                        # whose構文での同形語動詞は関係節外として扱う
+                        is_in_relative_clause = False
+                        break
+                    
+                    # 関係代名詞から動詞までの距離が近い場合、関係節内動詞
+                    if i - j <= 4:  # 4語以内なら関係節内
+                        is_in_relative_clause = True
+                        break
+            
+            if not is_in_relative_clause:
+                non_relative_verbs.append((i, token))
+        
+        # 🎯 Step 5: メイン動詞を決定
+        if non_relative_verbs:
+            # メイン動詞候補から助動詞でないものを優先
+            main_verbs = [(i, token) for i, token in non_relative_verbs if not self._pure_is_auxiliary_verb(token)]
+            if main_verbs:
+                # 文の後半にあるメイン動詞を優先（関係節の後）
+                return main_verbs[-1][0]
+            return non_relative_verbs[-1][0]
+        
+        # 最後の手段として、どの動詞でも選択
+        return verb_candidates[-1][0]
+
+    def _pure_find_contextual_verbs(self, tokens: List[Dict]) -> List[Tuple[int, Dict]]:
+        """
+        人間的文法認識による動詞識別（独立版）
+        構文的整合性チェックで最適な品詞を決定
+        """
+        contextual_verbs = []
+        sentence_text = ' '.join([token['text'] for token in tokens])
+        
+        # よく誤認識される動詞のリスト
+        common_verbs = {
+            'lives', 'live', 'lived', 'living',
+            'works', 'work', 'worked', 'working',
+            'runs', 'run', 'ran', 'running',
+            'goes', 'go', 'went', 'going',
+            'comes', 'come', 'came', 'coming',
+            'sits', 'sit', 'sat', 'sitting',
+            'stands', 'stand', 'stood', 'standing',
+            'plays', 'play', 'played', 'playing'
+        }
+        
+        for i, token in enumerate(tokens):
+            # 既に動詞として認識されているもの
+            if token['pos'] == 'VERB':
+                contextual_verbs.append((i, token))
+                continue
+            
+            # 🆕 人間的品詞決定: 構文的整合性による選択
+            word = token['text'].lower()
+            if word in getattr(self, 'ambiguous_words', []):
+                optimal_pos = self._pure_resolve_ambiguous_word(token, tokens, i, sentence_text)
+                
+                if optimal_pos == 'VERB':
+                    verb_token = token.copy()
+                    verb_token['pos'] = 'VERB'
+                    verb_token['human_grammar_correction'] = True
+                    verb_token['resolution_method'] = 'syntactic_consistency'
+                    contextual_verbs.append((i, verb_token))
+                continue
+            
+            # 辞書に含まれる一般的な動詞
+            if word in common_verbs:
+                contextual_verbs.append((i, token))
+            
+            # 語尾による動詞判定（-s, -ed, -ing）
+            elif (word.endswith('s') and len(word) > 2 and 
+                  not word.endswith('ss') and not word.endswith('us')):
+                # 三人称単数形らしい語
+                if self._pure_looks_like_verb_context(tokens, i):
+                    contextual_verbs.append((i, token))
+            
+            # その他の動詞候補（aux, modal含む）
+            elif token['pos'] in ['AUX', 'MODAL']:
+                contextual_verbs.append((i, token))
+        
+        return contextual_verbs
+
+    def _pure_resolve_ambiguous_word(self, token: Dict, tokens: List[Dict], position: int, sentence: str) -> str:
+        """
+        人間的品詞決定: 構文的整合性による曖昧語解決（独立版）
+        """
+        word_text = token['text'].lower()
+        
+        # 基本的な文脈チェック
+        # 前の語が名詞・代名詞なら動詞の可能性が高い
+        if position > 0:
+            prev_token = tokens[position - 1]
+            if prev_token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+                return 'VERB'
+        
+        # 後の語が副詞なら動詞の可能性が高い
+        if position < len(tokens) - 1:
+            next_token = tokens[position + 1]
+            if next_token['pos'] == 'ADV':
+                return 'VERB'
+        
+        # デフォルトは元の品詞
+        return token['pos']
+
+    def _pure_looks_like_verb_context(self, tokens: List[Dict], index: int) -> bool:
+        """
+        動詞らしい文脈かを判定（独立版）
+        """
+        if index == 0:
+            return False
+        
+        # 前の語が名詞・代名詞なら動詞の可能性が高い
+        prev_token = tokens[index - 1]
+        if prev_token['pos'] in ['NOUN', 'PRON', 'PROPN']:
+            return True
+        
+        # 後の語が副詞なら動詞の可能性が高い
+        if index < len(tokens) - 1:
+            next_token = tokens[index + 1]
+            if next_token['pos'] == 'ADV':
+                return True
+        
+        return False
+    
+    def _pure_identify_core_elements(self, tokens: List[Dict]) -> Dict[str, Any]:
+        """
+        文の核要素（主語・動詞）を特定（独立版）
+        これが全ての文型認識の基盤となる
+        """
+        core = {
+            'subject': None,
+            'verb': None,
+            'subject_indices': [],
+            'verb_indices': [],
+            'auxiliary': None,
+            'auxiliary_indices': []
+        }
+        
+        # 🎯 Step 1: 動詞を探す（最も重要）
+        main_verb_idx = self._pure_find_main_verb(tokens)
+        if main_verb_idx is not None:
+            core['verb'] = tokens[main_verb_idx]
+            core['verb_indices'] = [main_verb_idx]
+            
+            # 🎯 Step 2: 助動詞を探す
+            aux_idx = self._pure_find_auxiliary(tokens, main_verb_idx)
+            if aux_idx is not None:
+                core['auxiliary'] = tokens[aux_idx]
+                core['auxiliary_indices'] = [aux_idx]
+        
+        # 🎯 Step 3: 主語を探す（動詞の前で最も適切な名詞句）
+        if main_verb_idx is not None:
+            subject_indices = self._pure_find_subject(tokens, main_verb_idx)
+            if subject_indices:
+                core['subject_indices'] = subject_indices
+                core['subject'] = ' '.join([tokens[i]['text'] for i in subject_indices])
+        
+        return core
+
+    def _pure_find_auxiliary(self, tokens: List[Dict], main_verb_idx: int) -> Optional[int]:
+        """助動詞を特定（独立版）"""
+        # メイン動詞の前を探す
+        for i in range(main_verb_idx):
+            token = tokens[i]
+            if self._pure_is_auxiliary_verb(token):
+                return i
+        return None
+
+    def _pure_find_subject(self, tokens: List[Dict], verb_idx: int) -> List[int]:
+        """
+        主語を特定（独立版・動詞の前の名詞句）
+        複数語の名詞句に対応
+        関係節を含む場合は関係節全体を主語に含める
+        """
+        subject_indices = []
+        
+        # 🆕 関係節を含む主語の特定（改良版）
+        # トークンに関係節マーカーがある場合の処理
+        antecedent_idx = None
+        relative_clause_end_idx = None
+        
+        for i, token in enumerate(tokens):
+            if token.get('is_antecedent', False):
+                antecedent_idx = i
+            if token.get('is_relative_pronoun', False):
+                # 関係節の実際の終了位置を使用
+                relative_clause_end_idx = token.get('relative_clause_end', verb_idx - 1)
+                break
+        
+        # 関係節を含む主語の場合
+        if antecedent_idx is not None and relative_clause_end_idx is not None:
+            # 🔧 Rephraseシステム仕様: 関係節がある場合でも通常の主語検出を行う
+            # _assign_grammar_rolesで「かたまり」判定により空にするかを決定
+            pass  # 通常の主語検出を継続
+        
+        # 通常の主語検出（関係節あり・なし両対応）
+        # 動詞の前を右から左に探す
+        for i in range(verb_idx - 1, -1, -1):
+            token = tokens[i]
+            
+            # 助動詞は飛ばす
+            if self._pure_is_auxiliary_verb(token):
+                continue
+            
+            # 名詞・代名詞・冠詞を主語の一部として収集
+            if (token['pos'] in ['NOUN', 'PROPN', 'PRON'] or 
+                token['tag'] in ['DT', 'PRP', 'PRP$', 'WP']):
+                subject_indices.insert(0, i)  # 順序を保つため前に挿入
+            else:
+                # 主語の境界に到達
+                break
+        
+        return subject_indices
+    
+    def _pure_extract_phrase_boundaries(self, tokens):
+        """
+        独立メソッド: 句境界を抽出（POS分析のみ使用）
+        依存構文解析を使わずにPOSパターンのみで句境界を識別
+        """
+        phrases = []
+        current_phrase = None
+        
+        for i, token in enumerate(tokens):
+            pos = token.get('pos_', '')
+            tag = token.get('tag_', '')
+            text = token.get('text', '')
+            
+            # 名詞句の開始
+            if pos in ['DET', 'ADJ'] or tag in ['DT', 'JJ', 'JJR', 'JJS', 'PRP$']:
+                if current_phrase and current_phrase['type'] != 'noun_phrase':
+                    phrases.append(current_phrase)
+                    current_phrase = None
+                
+                if not current_phrase:
+                    current_phrase = {
+                        'type': 'noun_phrase',
+                        'start': i,
+                        'tokens': [token],
+                        'text': text
+                    }
+                else:
+                    current_phrase['tokens'].append(token)
+                    current_phrase['text'] += ' ' + text
+            
+            # 名詞句の継続
+            elif pos in ['NOUN', 'PROPN', 'PRON'] or tag in ['NN', 'NNS', 'NNP', 'NNPS', 'PRP']:
+                if current_phrase and current_phrase['type'] == 'noun_phrase':
+                    current_phrase['tokens'].append(token)
+                    current_phrase['text'] += ' ' + text
+                else:
+                    if current_phrase:
+                        phrases.append(current_phrase)
+                    current_phrase = {
+                        'type': 'noun_phrase',
+                        'start': i,
+                        'tokens': [token],
+                        'text': text
+                    }
+            
+            # 動詞句の開始
+            elif pos in ['VERB', 'AUX'] or tag in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'MD']:
+                if current_phrase:
+                    phrases.append(current_phrase)
+                
+                current_phrase = {
+                    'type': 'verb_phrase',
+                    'start': i,
+                    'tokens': [token],
+                    'text': text
+                }
+            
+            # 副詞句の開始
+            elif pos == 'ADV' or tag in ['RB', 'RBR', 'RBS']:
+                if current_phrase and current_phrase['type'] == 'verb_phrase':
+                    # 動詞句に副詞を追加
+                    current_phrase['tokens'].append(token)
+                    current_phrase['text'] += ' ' + text
+                else:
+                    if current_phrase:
+                        phrases.append(current_phrase)
+                    current_phrase = {
+                        'type': 'adverb_phrase',
+                        'start': i,
+                        'tokens': [token],
+                        'text': text
+                    }
+            
+            # 前置詞句の開始
+            elif pos == 'ADP' or tag in ['IN', 'TO']:
+                if current_phrase:
+                    phrases.append(current_phrase)
+                
+                current_phrase = {
+                    'type': 'prepositional_phrase',
+                    'start': i,
+                    'tokens': [token],
+                    'text': text
+                }
+            
+            # 形容詞句の開始
+            elif pos == 'ADJ' or tag in ['JJ', 'JJR', 'JJS']:
+                if current_phrase and current_phrase['type'] in ['noun_phrase']:
+                    # 名詞句に形容詞を追加
+                    current_phrase['tokens'].append(token)
+                    current_phrase['text'] += ' ' + text
+                else:
+                    if current_phrase:
+                        phrases.append(current_phrase)
+                    current_phrase = {
+                        'type': 'adjective_phrase',
+                        'start': i,
+                        'tokens': [token],
+                        'text': text
+                    }
+            
+            # その他のトークン（句境界の終了）
+            else:
+                if current_phrase:
+                    phrases.append(current_phrase)
+                    current_phrase = None
+        
+        # 最後の句を追加
+        if current_phrase:
+            phrases.append(current_phrase)
+        
+        # 句境界情報を追加
+        for phrase in phrases:
+            phrase['end'] = phrase['start'] + len(phrase['tokens']) - 1
+            phrase['length'] = len(phrase['tokens'])
+        
+        return phrases
+    
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
         🎯 Phase A3-5: Pure Management完全版
