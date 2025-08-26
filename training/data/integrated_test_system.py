@@ -1,13 +1,13 @@
 """
-統合テストシステム - Phase 1対応
+統合テストシステム - Phase 2対応
 final_54_test_data.json使用の例文選択→期待値照合システム
 
 機能:
-1. 文法別例文フィルタリング
+1. Phase別文法例文フィルタリング
 2. 新規システムでの処理実行
-3. 期待値との照合
+3. sub_slots対応期待値照合
 4. 詳細な結果分析
-5. 一本化された実行フロー
+5. 段階的実行フロー（Phase 1→2→3）
 """
 
 import json
@@ -46,6 +46,18 @@ class IntegratedTestSystem:
             67, 68, 69,  # We call him Tom, I found it interesting, They made her happy
             # 基本文型（関係詞なし）
             1, 2         # The car is red, I love you
+        ]
+        
+        # Phase 2: 関係節テストケース（基本5文型+関係節）
+        self.phase2_cases = [
+            # 主格関係代名詞
+            3, 4, 5,     # The man who runs fast, The book which lies there, The person that works here
+            # 目的格関係代名詞  
+            6, 7, 8,     # The book which I bought, The man whom I met, The car that he drives
+            # 所有格関係代名詞
+            12, 13, 14,  # The man whose car is red, The student whose book I borrowed, The woman whose dog barks
+            # 受動態+関係節（Phase 2で対応可能な範囲）
+            9, 10, 11    # The car which was crashed, The book that was written, The letter which was sent
         ]
     
     def _load_test_data(self) -> Dict[str, Any]:
@@ -245,6 +257,183 @@ class IntegratedTestSystem:
         
         self.phase1_cases = original_cases
         return results
+    
+    def run_phase2_tests(self) -> Dict[str, Any]:
+        """
+        Phase 2テスト実行
+        関係節+基本5文型のテストケースを実行し、期待値と照合
+        
+        Returns:
+            Dict: テスト結果サマリー
+        """
+        print("🚀 Phase 2 統合テスト開始")
+        print("=" * 50)
+        
+        results = {
+            'total': 0,
+            'passed': 0,
+            'failed': 0,
+            'details': [],
+            'errors': []
+        }
+        
+        for case_id in self.phase2_cases:
+            case_id_str = str(case_id)
+            
+            if case_id_str not in self.test_data['data']:
+                print(f"⚠️  テストケース {case_id} が見つかりません")
+                continue
+            
+            test_case = self.test_data['data'][case_id_str]
+            sentence = test_case['sentence']
+            expected = test_case['expected']
+            
+            results['total'] += 1
+            
+            print(f"\n📝 テストケース {case_id}: {sentence}")
+            
+            # システム実行
+            actual = self.controller.process_sentence(sentence)
+            
+            # 期待値比較（sub_slots対応）
+            comparison = self._compare_results_with_subs(actual, expected)
+            
+            if comparison['passed']:
+                print("✅ PASS")
+                results['passed'] += 1
+            else:
+                print("❌ FAIL")
+                print(f"   原因: {comparison['reason']}")
+                results['failed'] += 1
+                results['errors'].append({
+                    'case_id': case_id,
+                    'sentence': sentence,
+                    'reason': comparison['reason']
+                })
+            
+            results['details'].append({
+                'case_id': case_id,
+                'sentence': sentence,
+                'passed': comparison['passed'],
+                'comparison': comparison
+            })
+        
+        # サマリー表示
+        self._print_phase2_summary(results)
+        return results
+    
+    def _compare_results_with_subs(self, actual: Dict, expected: Dict) -> Dict[str, Any]:
+        """
+        sub_slots対応の結果比較
+        
+        Args:
+            actual: システム出力結果
+            expected: 期待値（main_slots + sub_slots）
+            
+        Returns:
+            Dict: 比較結果詳細
+        """
+        comparison = {
+            'passed': False,
+            'reason': '',
+            'main_slot_matches': {},
+            'sub_slot_matches': {},
+            'missing_main_slots': [],
+            'missing_sub_slots': [],
+            'extra_slots': [],
+            'value_mismatches': []
+        }
+        
+        if not actual.get('success'):
+            comparison['reason'] = f"システム処理失敗: {actual.get('error', '不明')}"
+            return comparison
+        
+        # メインスロット比較
+        actual_main = actual.get('slots', {})
+        expected_main = expected.get('main_slots', {})
+        
+        # サブスロット比較  
+        actual_sub = actual.get('sub_slots', {})
+        expected_sub = expected.get('sub_slots', {})
+        
+        # メインスロット照合
+        for slot, expected_value in expected_main.items():
+            if slot in actual_main:
+                if actual_main[slot] == expected_value:
+                    comparison['main_slot_matches'][slot] = True
+                else:
+                    comparison['main_slot_matches'][slot] = False
+                    comparison['value_mismatches'].append({
+                        'type': 'main',
+                        'slot': slot,
+                        'expected': expected_value,
+                        'actual': actual_main[slot]
+                    })
+            else:
+                comparison['missing_main_slots'].append(slot)
+        
+        # サブスロット照合
+        for slot, expected_value in expected_sub.items():
+            if slot in actual_sub:
+                if actual_sub[slot] == expected_value:
+                    comparison['sub_slot_matches'][slot] = True
+                else:
+                    comparison['sub_slot_matches'][slot] = False
+                    comparison['value_mismatches'].append({
+                        'type': 'sub',
+                        'slot': slot,
+                        'expected': expected_value,
+                        'actual': actual_sub[slot]
+                    })
+            else:
+                comparison['missing_sub_slots'].append(slot)
+        
+        # 総合判定
+        if (not comparison['missing_main_slots'] and 
+            not comparison['missing_sub_slots'] and 
+            not comparison['value_mismatches']):
+            comparison['passed'] = True
+            comparison['reason'] = 'Perfect match'
+        else:
+            reasons = []
+            if comparison['missing_main_slots']:
+                reasons.append(f"欠損メインスロット: {comparison['missing_main_slots']}")
+            if comparison['missing_sub_slots']:
+                reasons.append(f"欠損サブスロット: {comparison['missing_sub_slots']}")
+            if comparison['value_mismatches']:
+                mismatches = [f"{m['type']}-{m['slot']}(期待:{m['expected']}→実際:{m['actual']})" 
+                             for m in comparison['value_mismatches']]
+                reasons.append(f"値不一致: {mismatches}")
+            comparison['reason'] = '; '.join(reasons)
+        
+        return comparison
+    
+    def _print_phase2_summary(self, results: Dict[str, Any]):
+        """Phase 2テスト結果サマリー表示"""
+        print("\n" + "=" * 50)
+        print("📊 Phase 2 テスト結果サマリー")
+        print("=" * 50)
+        print(f"総テスト数: {results['total']}")
+        print(f"✅ 成功: {results['passed']}")
+        print(f"❌ 失敗: {results['failed']}")
+        
+        if results['total'] > 0:
+            success_rate = (results['passed'] / results['total']) * 100
+            print(f"🎯 成功率: {success_rate:.1f}%")
+            
+            if results['failed'] == 0:
+                print("🎉 Phase 2 完全達成！")
+            elif success_rate >= 80:
+                print("⚡ 良好！改善の余地あり")
+            else:
+                print("🔧 要改善")
+            
+            # 失敗ケース詳細
+            if results['errors']:
+                print(f"\n❌ 失敗ケース詳細:")
+                for error in results['errors']:
+                    print(f"  ケース{error['case_id']}: {error['sentence']}")
+                    print(f"    理由: {error['reason']}")
 
 
 def main():
@@ -256,11 +445,15 @@ def main():
         if sys.argv[1] == 'specific':
             case_ids = [int(x) for x in sys.argv[2:]]
             test_system.run_specific_cases(case_ids)
+        elif sys.argv[1] == 'phase1':
+            test_system.run_phase1_tests()
+        elif sys.argv[1] == 'phase2':
+            test_system.run_phase2_tests()
         else:
-            print("使用法: python integrated_test_system.py [specific case_id1 case_id2 ...]")
+            print("使用法: python integrated_test_system.py [phase1|phase2|specific case_id1 case_id2 ...]")
     else:
-        # 全Phase1テスト実行
-        test_system.run_phase1_tests()
+        # デフォルトはPhase 2テスト実行
+        test_system.run_phase2_tests()
 
 
 if __name__ == "__main__":
