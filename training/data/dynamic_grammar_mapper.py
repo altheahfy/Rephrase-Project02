@@ -4904,6 +4904,160 @@ class PureCentralController:
         
         return phrases
     
+    def _pure_assign_grammar_roles(self, tokens, phrases):
+        """
+        独立メソッド: 文法的役割を割り当て（POS分析のみ使用）
+        依存構文解析を使わずにPOSパターンのみで文法役割を識別
+        """
+        roles = []
+        verb_indices = []
+        
+        # 動詞インデックスを事前に収集
+        for i, token in enumerate(tokens):
+            if token.get('pos_') in ['VERB', 'AUX'] or token.get('tag_') in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+                verb_indices.append(i)
+        
+        main_verb_idx = None
+        if verb_indices:
+            # 最初の主要動詞を特定
+            for idx in verb_indices:
+                token = tokens[idx]
+                if not self._pure_is_auxiliary_verb(token):
+                    main_verb_idx = idx
+                    break
+            
+            # 助動詞のみの場合は最後の動詞を使用
+            if main_verb_idx is None:
+                main_verb_idx = verb_indices[-1]
+        
+        # 各トークンに文法的役割を割り当て
+        for i, token in enumerate(tokens):
+            pos = token.get('pos_', '')
+            tag = token.get('tag_', '')
+            text = token.get('text', '')
+            
+            role_info = {
+                'index': i,
+                'text': text,
+                'pos': pos,
+                'tag': tag,
+                'role': 'OTHER'  # デフォルト役割
+            }
+            
+            # 主語の特定
+            if main_verb_idx is not None and i < main_verb_idx:
+                if pos in ['NOUN', 'PROPN', 'PRON'] or tag in ['NN', 'NNS', 'NNP', 'NNPS', 'PRP']:
+                    # 動詞の直前の名詞句を主語とする
+                    if i == main_verb_idx - 1 or (i < main_verb_idx and tokens[i+1].get('pos_') not in ['NOUN', 'PROPN']):
+                        role_info['role'] = 'SUBJECT'
+                    else:
+                        role_info['role'] = 'SUBJECT_PART'
+                elif pos in ['DET', 'ADJ'] or tag in ['DT', 'JJ', 'JJR', 'JJS']:
+                    role_info['role'] = 'SUBJECT_MODIFIER'
+            
+            # 動詞の特定
+            elif i == main_verb_idx:
+                if self._pure_is_auxiliary_verb(token):
+                    role_info['role'] = 'AUXILIARY'
+                else:
+                    role_info['role'] = 'MAIN_VERB'
+            
+            # 助動詞の特定
+            elif main_verb_idx is not None and i < main_verb_idx:
+                if self._pure_is_auxiliary_verb(token):
+                    role_info['role'] = 'AUXILIARY'
+            
+            # 目的語の特定
+            elif main_verb_idx is not None and i > main_verb_idx:
+                if pos in ['NOUN', 'PROPN', 'PRON'] or tag in ['NN', 'NNS', 'NNP', 'NNPS', 'PRP']:
+                    # 動詞の直後の名詞句を目的語とする
+                    if i == main_verb_idx + 1:
+                        role_info['role'] = 'DIRECT_OBJECT'
+                    else:
+                        # 前置詞の後の名詞句は間接目的語
+                        if i > 0 and tokens[i-1].get('pos_') == 'ADP':
+                            role_info['role'] = 'INDIRECT_OBJECT'
+                        else:
+                            role_info['role'] = 'OBJECT_PART'
+                elif pos in ['DET', 'ADJ'] or tag in ['DT', 'JJ', 'JJR', 'JJS']:
+                    role_info['role'] = 'OBJECT_MODIFIER'
+            
+            # 修飾語の特定
+            if pos == 'ADV' or tag in ['RB', 'RBR', 'RBS']:
+                if main_verb_idx is not None:
+                    if i < main_verb_idx:
+                        role_info['role'] = 'PRE_VERBAL_ADVERB'
+                    else:
+                        role_info['role'] = 'POST_VERBAL_ADVERB'
+                else:
+                    role_info['role'] = 'ADVERB'
+            
+            # 前置詞の特定
+            elif pos == 'ADP' or tag in ['IN', 'TO']:
+                role_info['role'] = 'PREPOSITION'
+            
+            # 補語の特定（be動詞の後の形容詞・名詞）
+            elif main_verb_idx is not None and i > main_verb_idx:
+                main_verb_token = tokens[main_verb_idx]
+                if main_verb_token.get('lemma_', '').lower() == 'be':
+                    if pos in ['ADJ'] or tag in ['JJ', 'JJR', 'JJS']:
+                        role_info['role'] = 'ADJECTIVE_COMPLEMENT'
+                    elif pos in ['NOUN', 'PROPN'] or tag in ['NN', 'NNS', 'NNP', 'NNPS']:
+                        role_info['role'] = 'NOUN_COMPLEMENT'
+            
+            # 関係代名詞の特定
+            elif tag in ['WP', 'WDT', 'WRB']:
+                role_info['role'] = 'RELATIVE_PRONOUN'
+            
+            # 接続詞の特定
+            elif pos == 'CCONJ' or tag in ['CC']:
+                role_info['role'] = 'CONJUNCTION'
+            
+            # 感嘆詞の特定
+            elif pos == 'INTJ' or tag in ['UH']:
+                role_info['role'] = 'INTERJECTION'
+            
+            roles.append(role_info)
+        
+        # 句レベルでの役割統合
+        if phrases:
+            self._integrate_phrase_roles(roles, phrases)
+        
+        return roles
+    
+    def _integrate_phrase_roles(self, roles, phrases):
+        """句レベルでの役割統合"""
+        for phrase in phrases:
+            start_idx = phrase['start']
+            end_idx = phrase['end']
+            phrase_type = phrase['type']
+            
+            # 句タイプに基づく役割の統合
+            if phrase_type == 'noun_phrase':
+                # 名詞句内の最初の要素が主要役割を持つ
+                primary_role = None
+                for i in range(start_idx, end_idx + 1):
+                    if i < len(roles):
+                        if roles[i]['role'] in ['SUBJECT', 'DIRECT_OBJECT', 'INDIRECT_OBJECT']:
+                            primary_role = roles[i]['role']
+                            break
+                
+                # 句内の他の要素を修飾語として統合
+                if primary_role:
+                    for i in range(start_idx, end_idx + 1):
+                        if i < len(roles) and roles[i]['role'] != primary_role:
+                            if primary_role == 'SUBJECT':
+                                roles[i]['role'] = 'SUBJECT_MODIFIER'
+                            else:
+                                roles[i]['role'] = 'OBJECT_MODIFIER'
+            
+            elif phrase_type == 'verb_phrase':
+                # 動詞句内の役割を統合
+                for i in range(start_idx, end_idx + 1):
+                    if i < len(roles):
+                        if roles[i]['role'] in ['POST_VERBAL_ADVERB', 'ADVERB']:
+                            roles[i]['role'] = 'VERBAL_MODIFIER'
+    
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
         🎯 Phase A3-5: Pure Management完全版
