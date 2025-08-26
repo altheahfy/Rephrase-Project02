@@ -4030,27 +4030,6 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
         
         return result
 
-    def _convert_spacy_to_dict_tokens(self, spacy_tokens):
-        """
-        spaCyトークンをDict形式に変換
-        内部5文型処理で使用する形式に合わせる
-        """
-        dict_tokens = []
-        for i, token in enumerate(spacy_tokens):
-            dict_token = {
-                'id': i,
-                'text': token.text,
-                'pos': token.pos_,
-                'tag': token.tag_,
-                'lemma': token.lemma_,
-                'is_alpha': token.is_alpha,
-                'is_stop': token.is_stop,
-                'is_punct': token.is_punct,
-                'idx': token.idx if hasattr(token, 'idx') else i
-            }
-            dict_tokens.append(dict_token)
-        return dict_tokens
-
     def _integrate_internal_pattern_result(self, result, grammar_elements, sentence_pattern):
         """
         内部5文型処理の結果を統合フォーマットに統合
@@ -4428,9 +4407,9 @@ class PureCentralController:
             tokens.append(token_info)
         return tokens
 
-    def _pure_convert_spacy_to_dict_tokens(self, spacy_tokens):
+    def _convert_spacy_to_dict_tokens(self, spacy_tokens):
         """
-        🎯 Phase A3-2b: spaCyトークンを辞書形式に変換（純粋POS+人間的認識）
+        🎯 Phase A4-1: spaCyトークンを辞書形式に変換（純粋POS+人間的認識）移植完了
         
         制約:
         - 依存関係情報を使用しない
