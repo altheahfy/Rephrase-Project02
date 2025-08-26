@@ -11,24 +11,46 @@ import spacy
 from typing import Dict, Any, Tuple
 
 class RelativeClauseHandler:
-    """関係節処理ハンドラー（spaCy POS判定ベース）"""
+    """関係節処理ハンドラー（協力アプローチ版）"""
     
-    def __init__(self):
-        """初期化"""
-        self.name = "RelativeClauseHandler"
-        self.version = "spaCy_v1.0"
-        self.nlp = spacy.load('en_core_web_sm')  # spaCy品詞判定用
-    
-    def process(self, text: str) -> Dict[str, Any]:
+    def __init__(self, collaborators=None):
         """
-        関係節処理メイン
+        初期化
         
         Args:
-            text: 処理対象の英語文
+            collaborators: 協力者ハンドラー辞書
+                - 'adverb': AdverbHandler（修飾語分離）
+                - 'five_pattern': BasicFivePatternHandler（5文型分析）
+                - 'passive': PassiveVoiceHandler（受動態理解）
+        """
+        self.name = "RelativeClauseHandler"
+        self.version = "cooperation_v1.0"
+        self.nlp = spacy.load('en_core_web_sm')  # spaCy品詞判定用
+        
+        # 協力者ハンドラーたち（Dependency Injection）
+        if collaborators:
+            self.adverb_handler = collaborators.get('adverb')
+            self.five_pattern_handler = collaborators.get('five_pattern')  
+            self.passive_handler = collaborators.get('passive')
+        else:
+            self.adverb_handler = None
+            self.five_pattern_handler = None
+            self.passive_handler = None
+    
+    def process(self, text: str, original_text: str = None) -> Dict[str, Any]:
+        """
+        関係節処理メイン（協力アプローチ版）
+        
+        Args:
+            text: 処理対象の英語文（修飾語分離済み可能性あり）
+            original_text: オリジナルテキスト（修飾語情報保持用）
             
         Returns:
             Dict: 処理結果
         """
+        # オリジナルテキストの決定
+        self.original_text = original_text if original_text else text
+        
         try:
             # 基本的な関係代名詞検出（優先順位順）
             if ' whose ' in text.lower():
@@ -48,57 +70,29 @@ class RelativeClauseHandler:
             return {'success': False, 'error': f'処理エラー: {str(e)}'}
     
     def _process_who(self, text: str) -> Dict[str, Any]:
-        """who関係節処理（spaCy文脈解析ベース）"""
+        """who関係節処理（協力アプローチ版）"""
         
-        # spaCy文脈解析で関係節を分析
+        # spaCy文脈解析で関係節を分析（協力者情報を含む）
         analysis = self._analyze_relative_clause(text, 'who')
         if not analysis['success']:
             return analysis
         
-        doc = analysis['doc']
         antecedent = analysis['antecedent']
         rel_verb = analysis['relative_verb']
-        main_clause_start = analysis['main_clause_start']
         
-        # 関係節の修飾語を特定（動詞の後続要素）
-        rel_verb_idx = None
-        for i, token in enumerate(doc):
-            if token.text == rel_verb:
-                rel_verb_idx = i
-                break
+        # 修飾語情報（協力者 AdverbHandler の結果を活用）
+        modifiers_info = analysis.get('modifiers', {})
+        sub_m2 = ""
         
-        # 関係節部分の完全な動詞句を構築
-        rel_verb_phrase = rel_verb
-        rel_modifiers = []  # 修飾語を別途記録
-        
-        if rel_verb_idx is not None:
-            # 動詞の後続修飾語を収集（位置ベース）
-            for i in range(rel_verb_idx + 1, len(doc)):
-                if doc[i].dep_ == 'ROOT':  # 主節に達したら停止
-                    break
-                # 副詞(fast, here等)を修飾語として収集
-                if doc[i].pos_ == 'ADV':
-                    rel_modifiers.append(doc[i].text)
-                # 前置詞句も修飾語として収集
-                elif doc[i].pos_ == 'ADP':
-                    prep_phrase = [doc[i].text]
-                    # 前置詞句の構成要素を収集
-                    for j in range(i + 1, len(doc)):
-                        if doc[j].dep_ == 'ROOT':
-                            break
-                        if doc[j].pos_ in ['DET', 'ADJ', 'NOUN', 'PROPN']:
-                            prep_phrase.append(doc[j].text)
-                        else:
-                            break
-                    rel_modifiers.extend(prep_phrase)
-                    break  # 前置詞句処理後は終了
-        
-        # 修飾語がある場合はsub-m2に設定
-        sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
+        # 協力者から修飾語情報を取得
+        if modifiers_info and 'M2' in modifiers_info:
+            sub_m2 = modifiers_info['M2']
         
         # 主節を構築
+        main_clause_start = analysis.get('main_clause_start')
         main_clause = ""
         if main_clause_start is not None:
+            doc = analysis['doc']
             main_tokens = [token.text for token in doc[main_clause_start:]]
             main_clause = " ".join(main_tokens)
         
@@ -127,13 +121,154 @@ class RelativeClauseHandler:
             }
         }
     
-    def _analyze_relative_clause(self, text: str, relative_pronoun: str) -> Dict[str, Any]:
-        """spaCy文脈解析による関係節分析"""
+    def _extract_relative_clause_text_original(self, text: str, relative_pronoun: str) -> str:
+        """オリジナルテキストから関係節部分のテキストを抽出（修飾語込み）"""
         try:
-            # 文全体をspaCyで解析
             doc = self.nlp(text)
             
-            # 関係代名詞の位置を特定
+            rel_start = None
+            rel_end = len(doc)
+            
+            # Step 1: 関係代名詞の位置を特定
+            for i, token in enumerate(doc):
+                if token.text.lower() == relative_pronoun.lower():
+                    rel_start = i
+                    break
+            
+            if rel_start is None:
+                return text
+            
+            # Step 2: 文全体のメイン動詞（真のROOT）を特定
+            main_root_idx = None
+            for i, token in enumerate(doc):
+                if token.dep_ == 'ROOT':
+                    main_root_idx = i
+                    break
+            
+            # Step 3: 関係節の終了位置を決定
+            # - 関係代名詞以降で主節動詞より前まで
+            if main_root_idx is not None and main_root_idx > rel_start:
+                rel_end = main_root_idx
+            else:
+                # フォールバック: 品詞パターンで判定
+                for i in range(rel_start + 1, len(doc)):
+                    token = doc[i]
+                    # 主語的語句（名詞＋動詞）に遭遇したら関係節終了
+                    if (token.pos_ in ['NOUN', 'PROPN'] and 
+                        i + 1 < len(doc) and 
+                        doc[i + 1].pos_ in ['VERB', 'AUX']):
+                        rel_end = i
+                        break
+            
+            # Step 4: 関係節テキストを抽出
+            if rel_start is not None:
+                clause_tokens = doc[rel_start:rel_end]
+                extracted = ' '.join([t.text for t in clause_tokens])
+                return extracted
+            
+            return text
+            
+        except Exception as e:
+            return text
+
+    def _extract_relative_clause_text(self, text: str, relative_pronoun: str) -> str:
+        """関係節部分のテキストを抽出（修飾語込み）"""
+        try:
+            doc = self.nlp(text)
+            
+            rel_start = None
+            rel_end = len(doc)
+            
+            # Step 1: 関係代名詞の位置を特定
+            for i, token in enumerate(doc):
+                if token.text.lower() == relative_pronoun.lower():
+                    rel_start = i
+                    break
+            
+            if rel_start is None:
+                return text
+            
+            # Step 2: 文全体のメイン動詞（真のROOT）を特定
+            main_root_idx = None
+            for i, token in enumerate(doc):
+                if token.dep_ == 'ROOT':
+                    main_root_idx = i
+                    break
+            
+            # Step 3: 関係節の終了位置を決定
+            # - 関係代名詞以降で主節動詞より前まで
+            if main_root_idx is not None and main_root_idx > rel_start:
+                rel_end = main_root_idx
+            else:
+                # フォールバック: 品詞パターンで判定
+                for i in range(rel_start + 1, len(doc)):
+                    token = doc[i]
+                    # 主語的語句（名詞＋動詞）に遭遇したら関係節終了
+                    if (token.pos_ in ['NOUN', 'PROPN'] and 
+                        i + 1 < len(doc) and 
+                        doc[i + 1].pos_ in ['VERB', 'AUX']):
+                        rel_end = i
+                        break
+            
+            # Step 4: 関係節テキストを抽出
+            if rel_start is not None:
+                clause_tokens = doc[rel_start:rel_end]
+                extracted = ' '.join([t.text for t in clause_tokens])
+                print(f"[DEBUG] 関係節抽出: '{text}' → '{extracted}'")
+                return extracted
+            
+            return text
+            
+        except Exception as e:
+            print(f"[DEBUG] 関係節抽出エラー: {str(e)}")
+            return text
+            return text
+
+    def _analyze_relative_clause(self, text: str, relative_pronoun: str) -> Dict[str, Any]:
+        """spaCy文脈解析による関係節分析（協力アプローチ版）"""
+        try:
+            # Step 1: オリジナルテキストから関係節部分を抽出（修飾語込み）
+            original_clause_text = self._extract_relative_clause_text_original(
+                getattr(self, 'original_text', text), relative_pronoun
+            )
+            
+            # Step 2: 協力者（副詞ハンドラー）と連携：修飾語分離
+            cleaned_clause = original_clause_text
+            modifiers = {}
+            
+            if self.adverb_handler and original_clause_text:
+                adverb_result = self.adverb_handler.process(original_clause_text)
+                
+                if adverb_result.get('success'):
+                    cleaned_clause = adverb_result.get('separated_text', original_clause_text)
+                    
+                    # AdverbHandlerの結果を5文型システム形式に変換
+                    raw_modifiers = adverb_result.get('modifiers', {})
+                    
+                    if raw_modifiers:
+                        # 位置インデックスキーから修飾語テキストを抽出してM2に統合
+                        modifier_texts = []
+                        for pos_idx, modifier_list in raw_modifiers.items():
+                            if isinstance(modifier_list, list):
+                                for modifier_info in modifier_list:
+                                    if isinstance(modifier_info, dict) and 'text' in modifier_info:
+                                        modifier_texts.append(modifier_info['text'])
+                        
+                        # M2キーとして統合
+                        if modifier_texts:
+                            modifiers['M2'] = ' '.join(modifier_texts)
+            
+            # Step 3: 協力者（5文型ハンドラー）と連携：構造分析
+            structure_analysis = None
+            if self.five_pattern_handler and cleaned_clause:
+                structure_result = self.five_pattern_handler.process(cleaned_clause)
+                if structure_result.get('success'):
+                    structure_analysis = structure_result
+            
+            # Step 4: 文全体をspaCyで解析（フォールバック・詳細情報用）
+            doc = self.nlp(text)
+            
+            # Step 5: 関係代名詞の位置を特定
             rel_pronoun_idx = None
             for i, token in enumerate(doc):
                 if token.text.lower() == relative_pronoun.lower():
@@ -143,26 +278,32 @@ class RelativeClauseHandler:
             if rel_pronoun_idx is None:
                 return {'success': False, 'error': f'{relative_pronoun}が見つかりません'}
             
-            # 関係節内の動詞を特定
+            # Step 6: 関係節内の動詞を特定（協力者の結果を優先、フォールバック有り）
             rel_verb_token = None
-            for i in range(rel_pronoun_idx + 1, len(doc)):
-                token = doc[i]
-                if token.pos_ in ['VERB', 'AUX']:
-                    rel_verb_token = token
-                    break
-                # 主節の動詞に達したら停止
-                if token.dep_ == 'ROOT':
-                    break
+            if structure_analysis and structure_analysis.get('slots', {}).get('V'):
+                # 協力者からの5文型分析結果を使用
+                rel_verb = structure_analysis['slots']['V']
+            else:
+                # フォールバック: spaCy直接分析
+                for i in range(rel_pronoun_idx + 1, len(doc)):
+                    token = doc[i]
+                    if token.pos_ in ['VERB', 'AUX']:
+                        rel_verb_token = token
+                        rel_verb = token.text
+                        break
+                    # 主節の動詞に達したら停止
+                    if token.dep_ == 'ROOT':
+                        break
             
-            if rel_verb_token is None:
+            if not rel_verb_token and not rel_verb:
                 return {'success': False, 'error': '関係節内に動詞が見つかりません'}
             
-            # 先行詞を特定
+            # Step 7: 先行詞を特定
             antecedent_tokens = []
             for i in range(rel_pronoun_idx):
                 antecedent_tokens.append(doc[i])
             
-            # 主節部分を特定
+            # Step 8: 主節部分を特定
             main_clause_start = None
             for i in range(rel_pronoun_idx + 1, len(doc)):
                 if doc[i].dep_ == 'ROOT':
@@ -172,11 +313,13 @@ class RelativeClauseHandler:
             result = {
                 'success': True,
                 'antecedent': ' '.join([t.text for t in antecedent_tokens]).strip(),
-                'relative_verb': rel_verb_token.text,
-                'relative_verb_pos': rel_verb_token.pos_,
-                'relative_verb_lemma': rel_verb_token.lemma_,
+                'relative_verb': rel_verb,
+                'relative_verb_pos': rel_verb_token.pos_ if rel_verb_token else 'VERB',
+                'relative_verb_lemma': rel_verb_token.lemma_ if rel_verb_token else rel_verb,
                 'main_clause_start': main_clause_start,
-                'doc': doc  # 後続処理用
+                'doc': doc,
+                'modifiers': modifiers,  # 協力者からの修飾語情報
+                'structure_analysis': structure_analysis  # 協力者からの5文型分析
             }
             
             return result

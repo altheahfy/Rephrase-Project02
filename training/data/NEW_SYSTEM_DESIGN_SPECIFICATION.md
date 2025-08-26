@@ -97,17 +97,85 @@
 - **whose複雑構文**: ケース12,13,14（構造理解の改善必要）
 
 ### 🎯 次期開発方針（責任分担原則の徹底）
-**重要な設計判断**: 関係節ハンドラー内での修飾語処理実装を**責任分担原則違反**として却下
+**重要な設計判断**: 関係節ハンドラー内での修飾語処理実装を**責任分団原則違反**として却下
+
+#### 🤝 ハンドラー協力アプローチの採用（重要な設計改善）
+**実装段階での重要な発見**: 関係節の正確な境界決定には関係節内部の完全な5文型理解が必要
+
+**新設計: ハンドラー協力パターン**
+```python
+class RelativeClauseHandler:
+    def __init__(self, five_pattern_handler=None, adverb_handler=None):
+        # 協力者への参照（Dependency Injection）
+        self.five_pattern_handler = five_pattern_handler
+        self.adverb_handler = adverb_handler
+        
+    def _analyze_relative_clause_structure(self, clause_text):
+        # 協力者に関係節内部の5文型分析を依頼
+        if self.five_pattern_handler:
+            structure = self.five_pattern_handler.process(clause_text)
+            return self._interpret_for_relative_context(structure)
+```
+
+**協力アプローチの利点:**
+- ✅ **Dependency Injection**: 依存性注入による疎結合設計
+- ✅ **単一インスタンス**: メモリ効率的な設計
+- ✅ **責任分担維持**: 各ハンドラーの専門性を保持
+- ✅ **テスト容易性**: Mock オブジェクトによるテスト可能
+- ✅ **拡張性**: 他のハンドラーとの協力も同様に実装可能
+
+**従来の「内包」アプローチとの比較:**
+- ❌ 内包: `self.five_pattern = BasicFivePatternHandler()` → 重複インスタンス
+- ✅ 協力: `self.five_pattern_handler = five_pattern_handler` → 参照渡し
 
 #### 即時実施予定
-1. **AdverbHandler/ModifierHandler 優先開発**
+1. **AdverbHandler/ModifierHandler 優先開発** ✅ **完了**
    - 目的: `runs fast`/`lies there`/`works here` の適切な分離
    - 効果: 関係節ハンドラーが修飾語の正確な分離結果を利用可能
 
-2. **設計仕様書準拠の実装順序**
+2. **ハンドラー協力アプローチの実装** 🔄 **実施中**
+   - **設計思想**: Dependency Injection による協力関係構築
+   - **実装方針**: 内包ではなく参照渡しによる疎結合設計
+   
+   **関係節ハンドラーの協力関係:**
+   ```python
+   class RelativeClauseHandler:
+       def __init__(self, collaborators=None):
+           self.adverb_handler = collaborators.get('adverb')      # 修飾語分離協力
+           self.five_pattern_handler = collaborators.get('five_pattern')  # 5文型分析協力
+           self.passive_handler = collaborators.get('passive')    # 受動態理解協力
+           
+       def _analyze_relative_clause_structure(self, clause_text):
+           # 1. 副詞ハンドラーと協力：修飾語分離
+           if self.adverb_handler:
+               adverb_result = self.adverb_handler.process(clause_text)
+           
+           # 2. 5文型ハンドラーと協力：構造分析
+           if self.five_pattern_handler:
+               structure = self.five_pattern_handler.process(cleaned_clause)
+           
+           # 3. 統合された完全な関係節理解を構築
+           return self._integrate_analysis_results(adverb_result, structure)
    ```
-   関係節Handler → 5文型Handler → 受動態Handler → 修飾語Handler
+
+   **CentralController での協力者注入:**
+   ```python
+   class CentralController:
+       def __init__(self):
+           self.adverb_handler = AdverbHandler()
+           self.five_pattern_handler = BasicFivePatternHandler()
+           
+           collaborators = {
+               'adverb': self.adverb_handler,
+               'five_pattern': self.five_pattern_handler
+           }
+           self.relative_handler = RelativeClauseHandler(collaborators)
    ```
+
+3. **修正された実装順序** 🔄 **設計検討中**
+   - **従来順序**: `関係節 → 5文型 → 受動態 → 修飾語`
+   - **改善提案**: `修飾語 → 関係節 → 5文型 → 受動態` (依存関係順)
+   - **協力アプローチ**: 順序に依存せず、必要時に協力者を呼び出し
    
 ### 📋 技術的成果・教訓
 1. **spaCy活用方針の確立**: 単語単位→文脈解析への移行成功

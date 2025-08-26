@@ -13,6 +13,7 @@ import json
 from typing import Dict, List, Any, Optional
 from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
+from adverb_handler import AdverbHandler
 
 
 class CentralController:
@@ -31,13 +32,25 @@ class CentralController:
     """
     
     def __init__(self):
-        """初期化: spaCy POS解析器とハンドラー群の設定"""
+        """初期化: spaCy POS解析器とハンドラー群の設定（協力アプローチ版）"""
         self.nlp = spacy.load('en_core_web_sm')
         
-        # Phase 2: 5文型 + 関係節ハンドラー
+        # Phase 2: 基本ハンドラーたちを先に初期化
+        basic_five_pattern_handler = BasicFivePatternHandler()
+        adverb_handler = AdverbHandler()
+        
+        # 関係節ハンドラーに協力者を注入（Dependency Injection）
+        collaborators = {
+            'adverb': adverb_handler,
+            'five_pattern': basic_five_pattern_handler
+        }
+        relative_clause_handler = RelativeClauseHandler(collaborators)
+        
+        # ハンドラー辞書に登録
         self.handlers = {
-            'basic_five_pattern': BasicFivePatternHandler(),
-            'relative_clause': RelativeClauseHandler()
+            'basic_five_pattern': basic_five_pattern_handler,
+            'relative_clause': relative_clause_handler,
+            'adverb': adverb_handler
         }
         
         # Rephraseスロット定義読み込み
@@ -97,27 +110,41 @@ class CentralController:
         if not grammar_patterns:
             return self._create_error_result(text, "文法パターンが検出されませんでした")
         
-        # 2. Phase 2順次処理: 関係節→5文型の順
+        # 2. Phase 2順次処理: 修飾語分離→関係節→5文型の順
         final_result = {}
+        processing_text = text  # 段階的に処理されるテキスト
         
-        # Step 1: 関係節処理（優先）
+        # Step 0: 修飾語処理（最初に実施）
+        adverb_handler = self.handlers['adverb']
+        adverb_result = adverb_handler.process(processing_text)
+        
+        if adverb_result['success']:
+            # 修飾語分離結果を保存
+            final_result['modifier_info'] = adverb_result
+            processing_text = adverb_result['separated_text']
+            print(f"🔧 修飾語分離: '{text}' → '{processing_text}'")
+        else:
+            print(f"ℹ️ 修飾語なし、元の文を継続使用")
+        
+        # Step 1: 関係節処理
         if 'relative_clause' in grammar_patterns:
             rel_handler = self.handlers['relative_clause']
-            rel_result = rel_handler.process(text)
+            # オリジナルテキストも渡して修飾語情報を保持
+            rel_result = rel_handler.process(processing_text, text)
             
             if rel_result['success']:
                 # 関係節処理結果を保存
                 final_result.update(rel_result)
                 
                 # 関係節を除去した簡略文を作成
-                simplified_text = self._create_simplified_text(text, rel_result)
+                simplified_text = self._create_simplified_text(processing_text, rel_result)
                 print(f"🔄 Phase 2 処理: 関係節検出 → 簡略文: '{simplified_text}'")
             else:
-                simplified_text = text
-                print(f"⚠️ 関係節処理失敗、元の文を使用")
+                simplified_text = processing_text
+                print(f"⚠️ 関係節処理失敗、修飾語分離済み文を使用")
         else:
-            simplified_text = text
-            print(f"📝 関係節なし、元の文で5文型処理: '{simplified_text}'")
+            simplified_text = processing_text
+            print(f"📝 関係節なし、修飾語分離済み文で5文型処理: '{simplified_text}'")
         
         # Step 2: 5文型処理
         if 'basic_five_pattern' in grammar_patterns:
