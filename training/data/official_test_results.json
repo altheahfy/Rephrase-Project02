@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-26T01:24:24.969095",
+  "timestamp": "2025-08-26T11:28:41.245138",
   "total_tests": 36,
   "results": {
     "1": {
@@ -13,58 +13,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "The car",
-          "is",
-          "red"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "The car",
-          "V": "is",
-          "C1": "red"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The car",
+          "M1": "",
+          "S": "car",
+          "Aux": "",
+          "M2": "",
           "V": "is",
-          "C1": "red"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The car is red.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -80,58 +60,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "I",
-          "love",
-          "you"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4
-        ],
-        "display_order": [
-          1,
-          3,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "love",
-          "O1": "you"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "I",
+          "Aux": "",
+          "M2": "",
           "V": "love",
-          "O1": "you"
+          "C1": "",
+          "O1": "you",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "I love you.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -146,50 +106,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "Birds",
-          "fly"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
-        "main_slots": {
-          "S": "Birds",
-          "V": "fly"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "Birds",
-          "V": "fly"
+          "Aux": "",
+          "M2": "",
+          "V": "fly",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 2,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "Birds fly.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -204,50 +152,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "Children",
-          "play"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
-        "main_slots": {
-          "S": "Children",
-          "V": "play"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "Children",
-          "V": "play"
+          "Aux": "",
+          "M2": "",
+          "V": "play",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 2,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "Children play.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -262,50 +198,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V"
-        ],
-        "SlotPhrase": [
-          "Time",
-          "passes"
-        ],
-        "Slot_display_order": [
-          1,
-          3
-        ],
-        "display_order": [
-          1,
-          3
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1
-        ],
-        "main_slots": {
-          "S": "Time",
-          "V": "passes"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "Time",
-          "V": "passes"
+          "Aux": "",
+          "M2": "",
+          "V": "passes",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 2,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "Time passes.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -321,58 +245,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "She",
-          "looks",
-          "happy"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "looks",
-          "C1": "happy"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "She",
+          "Aux": "",
+          "M2": "",
           "V": "looks",
-          "C1": "happy"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "She looks happy.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -388,58 +292,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "He",
-          "became",
-          "a doctor"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "He",
-          "V": "became",
-          "C1": "a doctor"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "He",
+          "Aux": "",
+          "M2": "",
           "V": "became",
-          "C1": "a doctor"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "He became a doctor.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -455,58 +339,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "The food",
-          "tastes",
-          "good"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "The food",
-          "V": "tastes",
-          "C1": "good"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The food",
+          "M1": "",
+          "S": "food",
+          "Aux": "",
+          "M2": "",
           "V": "tastes",
-          "C1": "good"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The food tastes good.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -522,58 +386,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "I",
-          "read",
-          "books"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4
-        ],
-        "display_order": [
-          1,
-          3,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "read",
-          "O1": "books"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "I",
+          "Aux": "",
+          "M2": "",
           "V": "read",
-          "O1": "books"
+          "C1": "",
+          "O1": "books",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "I read books.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -589,58 +433,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "She",
-          "plays",
-          "piano"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4
-        ],
-        "display_order": [
-          1,
-          3,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "plays",
-          "O1": "piano"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "She",
+          "Aux": "",
+          "M2": "",
           "V": "plays",
-          "O1": "piano"
+          "C1": "",
+          "O1": "piano",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "She plays piano.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -656,58 +480,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "We",
-          "study",
-          "English"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4
-        ],
-        "display_order": [
-          1,
-          3,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "We",
-          "V": "study",
-          "O1": "English"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "We",
+          "Aux": "",
+          "M2": "",
           "V": "study",
-          "O1": "English"
+          "C1": "",
+          "O1": "English",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "We study English.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -724,66 +528,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "O2"
-        ],
-        "SlotPhrase": [
-          "I",
-          "gave",
-          "him",
-          "a book"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "gave",
-          "O1": "him",
-          "O2": "a book"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "I",
+          "Aux": "",
+          "M2": "",
           "V": "gave",
-          "O1": "him",
-          "O2": "a book"
+          "C1": "",
+          "O1": "book",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "I gave him a book.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -800,66 +576,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "O2"
-        ],
-        "SlotPhrase": [
-          "She",
-          "told",
-          "me",
-          "a story"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "She",
-          "V": "told",
-          "O1": "me",
-          "O2": "a story"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "She",
+          "Aux": "",
+          "M2": "",
           "V": "told",
-          "O1": "me",
-          "O2": "a story"
+          "C1": "",
+          "O1": "story",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "She told me a story.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -876,66 +624,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "O2"
-        ],
-        "SlotPhrase": [
-          "He",
-          "bought",
-          "her",
-          "flowers"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          5
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "He",
-          "V": "bought",
-          "O1": "her",
-          "O2": "flowers"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "He",
+          "Aux": "",
+          "M2": "",
           "V": "bought",
-          "O1": "her",
-          "O2": "flowers"
+          "C1": "",
+          "O1": "flowers",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "He bought her flowers.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -952,66 +672,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "C2"
-        ],
-        "SlotPhrase": [
-          "We",
-          "call",
-          "him",
-          "Tom"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "We",
-          "V": "call",
-          "O1": "him",
-          "C2": "Tom"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "We",
+          "Aux": "",
+          "M2": "",
           "V": "call",
+          "C1": "",
           "O1": "him",
-          "C2": "Tom"
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "We call him Tom.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -1028,66 +720,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "C2"
-        ],
-        "SlotPhrase": [
-          "I",
-          "found",
-          "it",
-          "interesting"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "I",
-          "V": "found",
-          "O1": "it",
-          "C2": "interesting"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "I",
+          "Aux": "",
+          "M2": "",
           "V": "found",
-          "O1": "it",
-          "C2": "interesting"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "I found it interesting.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -1104,66 +768,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "C2"
-        ],
-        "SlotPhrase": [
-          "They",
-          "made",
-          "her",
-          "happy"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          7
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "They",
-          "V": "made",
-          "O1": "her",
-          "C2": "happy"
-        },
-        "sub_slots": {},
         "slots": {
+          "M1": "",
           "S": "They",
+          "Aux": "",
+          "M2": "",
           "V": "made",
-          "O1": "her",
-          "C2": "happy"
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVOC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [],
-          "handler_contributions": {},
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "They made her happy.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -1184,105 +820,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "strong"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "strong"
+        "slots": {
+          "M1": "",
+          "S": "man",
+          "Aux": "",
+          "M2": "",
+          "V": "runs",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "runs",
-          "sub-m2": "fast",
-          "sub-s": "The man who",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "strong"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The man who runs fast is strong.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "who_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The man who runs fast is strong.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The man who runs fast is strong.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "who_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The man who runs fast is strong.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The man who runs fast is strong.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The man who runs fast is strong.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1303,105 +872,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "mine"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "mine"
+        "slots": {
+          "M1": "",
+          "S": "book",
+          "Aux": "",
+          "M2": "",
+          "V": "lies",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "lies",
-          "sub-m2": "there",
-          "sub-s": "The book which",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "mine"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The book is mine.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "which_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The book is mine.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The book is mine.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "which_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The book is mine.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The book is mine.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The book which lies there is mine.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1422,105 +924,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "kind"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "kind"
+        "slots": {
+          "M1": "",
+          "S": "person",
+          "Aux": "",
+          "M2": "",
+          "V": "works",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "works",
-          "sub-m2": "here",
-          "sub-s": "The person that",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "kind"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The person is kind.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "that_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The person is kind.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The person is kind.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "that_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The person is kind.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The person is kind.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The person that works here is kind.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1541,105 +976,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "expensive"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "expensive"
+        "slots": {
+          "M1": "",
+          "S": "book",
+          "Aux": "",
+          "M2": "",
+          "V": "bought",
+          "C1": "",
+          "O1": "which",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "bought",
-          "sub-s": "I",
-          "sub-o1": "The book which",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "expensive"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The book is expensive.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "which_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The book is expensive.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The book is expensive.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "which_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The book is expensive.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The book is expensive.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The book which I bought is expensive.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1660,105 +1028,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "tall"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "tall"
+        "slots": {
+          "M1": "",
+          "S": "man",
+          "Aux": "",
+          "M2": "",
+          "V": "met",
+          "C1": "",
+          "O1": "whom",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "met",
-          "sub-s": "I",
-          "sub-o1": "The man whom",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "tall"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The man whom I met is tall.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whom_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The man whom I met is tall.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The man whom I met is tall.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whom_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The man whom I met is tall.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The man whom I met is tall.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The man whom I met is tall.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1779,105 +1080,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "new"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "new"
+        "slots": {
+          "M1": "",
+          "S": "car",
+          "Aux": "",
+          "M2": "",
+          "V": "drives",
+          "C1": "",
+          "O1": "that",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "drives",
-          "sub-s": "he",
-          "sub-o1": "The car that",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "new"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The car is new.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "that_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The car is new.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The car is new.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "that_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The car is new.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The car is new.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The car that he drives is new.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -1898,105 +1132,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "lives",
-          "here"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
+        "slots": {
+          "M1": "",
+          "S": "car",
+          "Aux": "",
+          "M2": "",
+          "V": "is",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "is",
-          "sub-s": "The man whose car",
-          "sub-c1": "red",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "lives",
-          "M2": "here"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The man whose car is red lives here.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The man whose car is red lives here.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The man whose car is red lives here.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The man whose car is red lives here.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The man whose car is red lives here.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The man whose car is red lives here.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_whose",
       "status": "success"
@@ -2017,105 +1184,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "smart"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "smart"
+        "slots": {
+          "M1": "",
+          "S": "student",
+          "Aux": "",
+          "M2": "",
+          "V": "borrowed",
+          "C1": "",
+          "O1": "book",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "borrowed",
-          "sub-o1": "The student whose book",
-          "sub-s": "I",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "smart"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The student whose book I borrowed is smart.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The student whose book I borrowed is smart.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The student whose book I borrowed is smart.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The student whose book I borrowed is smart.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The student whose book I borrowed is smart.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The student whose book I borrowed is smart.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_whose",
       "status": "success"
@@ -2135,104 +1235,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "C1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "my neighbor"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          6
-        ],
-        "display_order": [
-          1,
-          3,
-          6
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "補語句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "C1": "my neighbor"
+        "slots": {
+          "M1": "",
+          "S": "woman",
+          "Aux": "",
+          "M2": "",
+          "V": "barks",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "barks",
-          "sub-s": "The woman whose dog",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "C1": "my neighbor"
-        },
-        "pattern_detected": "SVC",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The woman whose dog barks is my neighbor.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The woman whose dog barks is my neighbor.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The woman whose dog barks is my neighbor.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The woman whose dog barks is my neighbor.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The woman whose dog barks is my neighbor.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=2"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The woman whose dog barks is my neighbor.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_whose",
       "status": "success"
@@ -2254,107 +1288,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "succeeds",
-          "academically"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
+        "slots": {
+          "M1": "",
+          "S": "student",
+          "Aux": "",
+          "M2": "",
+          "V": "studies",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "studies",
-          "sub-m2": "diligently",
-          "sub-s": "The student who",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 3,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The student who studies diligently always succeeds academically.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "who_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The student who studies diligently always succeeds academically.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The student who studies diligently always succeeds academically.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "who_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The student who studies diligently always succeeds academically.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The student who studies diligently always succeeds academically.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The student who studies diligently always succeeds academically.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -2376,113 +1341,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "V",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "is",
-          "respected",
-          "greatly"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          3,
-          8
-        ],
-        "display_order": [
-          1,
-          2,
-          3,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "動詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
+        "slots": {
+          "M1": "",
+          "S": "teacher",
+          "Aux": "",
+          "M2": "",
+          "V": "runs",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "runs",
-          "sub-s": "The teacher whose class",
-          "sub-m2": "efficiently",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "Aux": "is",
-          "V": "respected",
-          "M2": "greatly"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "whose_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "whose_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The teacher whose class runs efficiently is respected greatly.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The teacher whose class runs efficiently is respected greatly.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The teacher whose class runs efficiently is respected greatly.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_whose",
       "status": "success"
@@ -2504,113 +1394,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "O1",
-          "M1"
-        ],
-        "SlotPhrase": [
-          "",
-          "saves",
-          "lives",
-          "successfully"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          4,
-          8
-        ],
-        "display_order": [
-          1,
-          3,
-          4,
-          8
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "名詞句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "saves",
+        "slots": {
+          "M1": "",
+          "S": "doctor",
+          "Aux": "",
+          "M2": "",
+          "V": "works",
+          "C1": "",
           "O1": "lives",
-          "M2": "successfully"
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-v": "works",
-          "sub-m2": "carefully",
-          "sub-s": "The doctor who",
-          "_parent_slot": "S"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "saves",
-          "O1": "lives",
-          "M2": "successfully"
-        },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The doctor who works carefully saves lives successfully.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "who_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The doctor who works carefully saves lives successfully.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The doctor who works carefully saves lives successfully.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "who_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The doctor who works carefully saves lives successfully.', sub=0"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The doctor who works carefully saves lives successfully.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The doctor who works carefully saves lives successfully.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -2631,113 +1446,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M3",
-          "M3"
-        ],
-        "SlotPhrase": [
-          "",
-          "crashed",
-          "is",
-          "red"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          10,
-          10
-        ],
-        "display_order": [
-          1,
-          3,
-          10,
-          10
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "M3": "red",
-          "C1": "red"
+        "slots": {
+          "M1": "",
+          "S": "car",
+          "Aux": "",
+          "M2": "",
+          "V": "crashed",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-s": "The car which",
-          "_parent_slot": "S",
-          "sub-aux": "was",
-          "sub-v": "crashed"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "M3": "red",
-          "C1": "red"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The car is red.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "which_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The car is red.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The car is red.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "which_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The car is red.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The car is red.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The car which was crashed is red.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -2758,113 +1498,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "V",
-          "M3",
-          "M3"
-        ],
-        "SlotPhrase": [
-          "",
-          "written",
-          "is",
-          "famous"
-        ],
-        "Slot_display_order": [
-          1,
-          3,
-          10,
-          10
-        ],
-        "display_order": [
-          1,
-          3,
-          10,
-          10
-        ],
-        "PhraseType": [
-          "名詞句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "main_slots": {
-          "S": "",
-          "V": "is",
-          "M3": "famous",
-          "C1": "famous"
+        "slots": {
+          "M1": "",
+          "S": "book",
+          "Aux": "",
+          "M2": "",
+          "V": "written",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-s": "The book that",
-          "_parent_slot": "S",
-          "sub-aux": "was",
-          "sub-v": "written"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "S": "",
-          "V": "is",
-          "M3": "famous",
-          "C1": "famous"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 4,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The book is famous.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "that_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The book is famous.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The book is famous.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "that_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The book is famous.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The book is famous.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The book that was written is famous.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -2884,117 +1549,38 @@
         }
       },
       "analysis_result": {
-        "Slot": [
-          "M3",
-          "S",
-          "M3",
-          "M3",
-          "V"
-        ],
-        "SlotPhrase": [
-          "The",
-          "",
-          "letter",
-          "sent",
-          "arrived"
-        ],
-        "Slot_display_order": [
-          10,
-          1,
-          10,
-          10,
-          3
-        ],
-        "display_order": [
-          10,
-          1,
-          10,
-          10,
-          3
-        ],
-        "PhraseType": [
-          "修飾句",
-          "名詞句",
-          "修飾句",
-          "修飾句",
-          "動詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ],
-        "main_slots": {
-          "M3": "sent",
-          "S": "",
-          "V": "arrived"
+        "slots": {
+          "M1": "",
+          "S": "letter",
+          "Aux": "",
+          "M2": "",
+          "V": "sent",
+          "C1": "",
+          "O1": "",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-s": "The letter which",
-          "_parent_slot": "S",
-          "sub-aux": "was",
-          "sub-v": "sent"
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "slots": {
-          "M3": "sent",
-          "S": "",
-          "V": "arrived"
-        },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "relative_clause_2stage",
-              "main_sentence": "The letter arrived.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "clause_type": "which_clause"
-            },
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The letter arrived.",
-              "sub_sentences_count": 1,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "relative_clause": {
-              "patterns": [
-                {
-                  "type": "relative_clause_2stage",
-                  "main_sentence": "The letter arrived.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "clause_type": "which_clause"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Relative clause 2-stage: main='The letter arrived.', sub=1"
-            },
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The letter arrived.",
-                  "sub_sentences_count": 1,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=False, sub=3"
-            }
-          },
-          "control_flags": {}
-        },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The letter which was sent arrived.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "relative_clause",
       "status": "success"
@@ -3011,94 +1597,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "V",
-          "M2",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "The letter",
-          "was",
-          "written",
-          "by",
-          "John"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          3,
-          9,
-          4
-        ],
-        "display_order": [
-          1,
-          2,
-          3,
-          9,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ],
-        "main_slots": {
-          "S": "The letter",
-          "Aux": "was",
-          "V": "written",
-          "M2": "by John"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The letter",
-          "Aux": "was",
+          "M1": "",
+          "S": "letter",
+          "Aux": "",
+          "M2": "",
           "V": "written",
-          "M2": "by John"
+          "C1": "",
+          "O1": "John",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The letter was written by John.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The letter was written by John.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=0"
-            }
-          },
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The letter was written by John.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "passive_voice",
       "status": "success"
@@ -3115,96 +1645,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "V",
-          "M2",
-          "M3"
-        ],
-        "SlotPhrase": [
-          "The house",
-          "was",
-          "built",
-          "in",
-          "1990"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          3,
-          9,
-          10
-        ],
-        "display_order": [
-          1,
-          2,
-          3,
-          9,
-          10
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "動詞句",
-          "修飾句",
-          "修飾句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ],
-        "main_slots": {
-          "S": "The house",
-          "Aux": "was",
-          "V": "built",
-          "M2": "in",
-          "M3": "1990"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The house",
-          "Aux": "was",
+          "M1": "",
+          "S": "house",
+          "Aux": "",
+          "M2": "",
           "V": "built",
-          "M2": "in",
-          "M3": "1990"
+          "C1": "",
+          "O1": "1990",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SV",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The house was built in 1990.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The house was built in 1990.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=0"
-            }
-          },
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The house was built in 1990.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "basic_five_pattern",
       "status": "success"
@@ -3221,94 +1693,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "V",
-          "M2",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "The book",
-          "was",
-          "written",
-          "by",
-          "a famous author"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          3,
-          9,
-          4
-        ],
-        "display_order": [
-          1,
-          2,
-          3,
-          9,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ],
-        "main_slots": {
-          "S": "The book",
-          "Aux": "was",
-          "V": "written",
-          "M2": "by a famous author"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The book",
-          "Aux": "was",
+          "M1": "",
+          "S": "book",
+          "Aux": "",
+          "M2": "",
           "V": "written",
-          "M2": "by a famous author"
+          "C1": "",
+          "O1": "author",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 5,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The book was written by a famous author.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The book was written by a famous author.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=0"
-            }
-          },
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The book was written by a famous author.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "passive_voice",
       "status": "success"
@@ -3325,102 +1741,38 @@
         "sub_slots": {}
       },
       "analysis_result": {
-        "Slot": [
-          "S",
-          "Aux",
-          "M3",
-          "V",
-          "M2",
-          "O1"
-        ],
-        "SlotPhrase": [
-          "The cake",
-          "is",
-          "being",
-          "baked",
-          "by",
-          "my mother"
-        ],
-        "Slot_display_order": [
-          1,
-          2,
-          10,
-          3,
-          9,
-          4
-        ],
-        "display_order": [
-          1,
-          2,
-          10,
-          3,
-          9,
-          4
-        ],
-        "PhraseType": [
-          "名詞句",
-          "修飾句",
-          "修飾句",
-          "動詞句",
-          "修飾句",
-          "名詞句"
-        ],
-        "SubslotID": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5
-        ],
-        "main_slots": {
-          "S": "The cake",
-          "Aux": "being",
-          "M3": "being",
-          "V": "baked",
-          "M2": "by my mother"
-        },
-        "sub_slots": {},
         "slots": {
-          "S": "The cake",
-          "Aux": "being",
-          "M3": "being",
+          "M1": "",
+          "S": "cake",
+          "Aux": "",
+          "M2": "",
           "V": "baked",
-          "M2": "by my mother"
+          "C1": "",
+          "O1": "mother",
+          "O2": "",
+          "C2": "",
+          "M3": ""
         },
-        "pattern_detected": "SVO",
-        "confidence": 0.9,
-        "analysis_method": "dynamic_grammar",
-        "lexical_tokens": 6,
-        "unified_handlers": {
-          "detected_patterns": [
-            {
-              "type": "passive_voice_2stage",
-              "main_sentence": "The cake is being baked by my mother.",
-              "sub_sentences_count": 0,
-              "detection_method": "関係節対応2段階処理",
-              "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-            }
-          ],
-          "handler_contributions": {
-            "passive_voice": {
-              "patterns": [
-                {
-                  "type": "passive_voice_2stage",
-                  "main_sentence": "The cake is being baked by my mother.",
-                  "sub_sentences_count": 0,
-                  "detection_method": "関係節対応2段階処理",
-                  "rephrase_allocation": "be→Aux, past_participle→V, by句→M2"
-                }
-              ],
-              "handler_success": true,
-              "processing_notes": "Passive voice 2-stage: main=True, sub=0"
-            }
-          },
-          "control_flags": {}
+        "sub_slots": {
+          "sub-m1": "",
+          "sub-s": "",
+          "sub-aux": "",
+          "sub-m2": "",
+          "sub-v": "",
+          "sub-c1": "",
+          "sub-o1": "",
+          "sub-o2": "",
+          "sub-c2": "",
+          "sub-m3": ""
         },
-        "sentence_type": "statement",
-        "sentence_type_confidence": 0.8
+        "analysis_type": "simple_legacy",
+        "sentence": "The cake is being baked by my mother.",
+        "pure_central_controller": {
+          "analysis_method": "complete_delegation",
+          "phase": "A3-2_clean_slate",
+          "legacy_integration": true,
+          "quality_assured": true
+        }
       },
       "test_type": "passive_voice",
       "status": "success"
