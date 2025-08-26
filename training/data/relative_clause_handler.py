@@ -29,9 +29,9 @@ class RelativeClauseHandler:
         
         # 協力者ハンドラーたち（Dependency Injection）
         if collaborators:
-            self.adverb_handler = collaborators.get('adverb')
-            self.five_pattern_handler = collaborators.get('five_pattern')  
-            self.passive_handler = collaborators.get('passive')
+            self.adverb_handler = collaborators.get('adverb') or collaborators.get('AdverbHandler')
+            self.five_pattern_handler = collaborators.get('five_pattern') or collaborators.get('FivePatternHandler')
+            self.passive_handler = collaborators.get('passive') or collaborators.get('PassiveHandler')
         else:
             self.adverb_handler = None
             self.five_pattern_handler = None
@@ -328,69 +328,33 @@ class RelativeClauseHandler:
             return {'success': False, 'error': f'spaCy解析エラー: {str(e)}'}
     
     def _process_which(self, text: str) -> Dict[str, Any]:
-        """which関係節処理（spaCy文脈解析ベース）"""
+        """which関係節処理（協力アプローチ版）"""
         
-        # spaCy文脈解析で関係節を分析
+        # spaCy文脈解析で関係節を分析（協力者情報を含む）
         analysis = self._analyze_relative_clause(text, 'which')
         if not analysis['success']:
             return analysis
         
-        doc = analysis['doc']
         antecedent = analysis['antecedent']
         rel_verb = analysis['relative_verb']
-        main_clause_start = analysis['main_clause_start']
         
-        # 関係節の修飾語を特定
-        rel_verb_idx = None
-        for i, token in enumerate(doc):
-            if token.text == rel_verb:
-                rel_verb_idx = i
-                break
+        # 修飾語情報（協力者 AdverbHandler の結果を活用）
+        modifiers_info = analysis.get('modifiers', {})
+        sub_m2 = ""
         
-        # 関係節部分の完全な動詞句を構築
-        rel_verb_phrase = rel_verb
-        rel_modifiers = []  # 修飾語を別途記録
-        
-        if rel_verb_idx is not None:
-            # 動詞の後続修飾語を収集（位置ベース）
-            for i in range(rel_verb_idx + 1, len(doc)):
-                if doc[i].dep_ == 'ROOT':
-                    break
-                # 副詞(there, here, fast等)を修飾語として収集
-                if doc[i].pos_ == 'ADV':
-                    rel_modifiers.append(doc[i].text)
-                # 前置詞句も修飾語として収集
-                elif doc[i].pos_ == 'ADP':
-                    prep_phrase = [doc[i].text]
-                    # 前置詞句の構成要素を収集
-                    for j in range(i + 1, len(doc)):
-                        if doc[j].dep_ == 'ROOT':
-                            break
-                        if doc[j].pos_ in ['DET', 'ADJ', 'NOUN', 'PROPN']:
-                            prep_phrase.append(doc[j].text)
-                        else:
-                            break
-                    rel_modifiers.extend(prep_phrase)
-                    break  # 前置詞句処理後は終了
-        
-        # 修飾語がある場合はsub-m2に設定
-        sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
-        
-        # 主節を構築
-        main_clause = ""
-        if main_clause_start is not None:
-            main_tokens = [token.text for token in doc[main_clause_start:]]
-            main_clause = " ".join(main_tokens)
+        # 協力者から修飾語情報を取得
+        if modifiers_info and 'M2' in modifiers_info:
+            sub_m2 = modifiers_info['M2']
         
         # whichは主語・目的語を文脈で判定
-        # 簡略判定：which直後に動詞があれば主語、名詞があれば目的語
-        is_subject = True
+        doc = analysis['doc']  # _analyze_relative_clauseから取得
         which_idx = None
         for i, token in enumerate(doc):
             if token.text.lower() == 'which':
                 which_idx = i
                 break
         
+        is_subject = True
         if which_idx is not None and which_idx + 1 < len(doc):
             next_token = doc[which_idx + 1]
             if next_token.pos_ in ['PRON', 'NOUN', 'PROPN']:
@@ -430,7 +394,7 @@ class RelativeClauseHandler:
             'pattern_type': 'which_object' if not is_subject else 'which_subject',
             'relative_pronoun': 'which',
             'antecedent': antecedent,
-            'main_continuation': main_clause.strip(),
+            'main_continuation': analysis.get('main_clause', ''),
             'spacy_analysis': {
                 'relative_verb_pos': analysis['relative_verb_pos'],
                 'relative_verb_lemma': analysis['relative_verb_lemma']
