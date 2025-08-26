@@ -4026,7 +4026,7 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
             }
             dict_tokens.append(dict_token)
         return dict_tokens
-    
+
     def _integrate_internal_pattern_result(self, result, grammar_elements, sentence_pattern):
         """
         内部5文型処理の結果を統合フォーマットに統合
@@ -4046,6 +4046,8 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
                 print(f"🎯 統合スロット設定: {slot_name} = '{slot_value.strip()}'")
         
         return result
+
+
 
 
 # クラス定義終了位置
