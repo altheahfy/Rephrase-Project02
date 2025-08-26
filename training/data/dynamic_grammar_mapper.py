@@ -5219,6 +5219,210 @@ class PureCentralController:
         # 最終的な信頼度の制限
         pattern_info['confidence'] = max(0.1, min(0.95, pattern_info['confidence']))
     
+    def _pure_detect_complex_structures(self, tokens, roles):
+        """
+        独立メソッド: 複雑な文構造を検出（POS分析のみ使用）
+        複合文、複文、並列構造、従属節などを識別
+        """
+        complex_info = {
+            'has_compound': False,          # 複合文（and, or, but等）
+            'has_complex': False,           # 複文（従属節あり）
+            'has_coordination': False,      # 並列構造
+            'has_subordination': False,     # 従属構造
+            'conjunctions': [],             # 接続詞一覧
+            'clause_count': 1,              # 節の数
+            'structure_type': 'simple',     # simple/compound/complex/compound-complex
+            'complexity_score': 0.0,        # 複雑度スコア
+            'detected_patterns': []         # 検出されたパターン
+        }
+        
+        # 接続詞の検出
+        coordinating_conjunctions = ['and', 'or', 'but', 'yet', 'so', 'for', 'nor']
+        subordinating_conjunctions = ['because', 'since', 'while', 'although', 'though', 
+                                    'if', 'unless', 'when', 'where', 'before', 'after', 
+                                    'until', 'as', 'than', 'that']
+        relative_pronouns = ['who', 'whom', 'whose', 'which', 'that']
+        
+        # トークン解析
+        for i, token in enumerate(tokens):
+            text = token.get('text', '').lower()
+            pos = token.get('pos_', '')
+            lemma = token.get('lemma_', '').lower()
+            
+            # 等位接続詞の検出
+            if lemma in coordinating_conjunctions:
+                complex_info['has_compound'] = True
+                complex_info['has_coordination'] = True
+                complex_info['conjunctions'].append({
+                    'type': 'coordinating',
+                    'word': text,
+                    'position': i,
+                    'connects': 'clauses'
+                })
+                complex_info['clause_count'] += 1
+                complex_info['detected_patterns'].append(f'coordinating_conjunction:{text}')
+            
+            # 従属接続詞の検出
+            elif lemma in subordinating_conjunctions:
+                complex_info['has_complex'] = True
+                complex_info['has_subordination'] = True
+                complex_info['conjunctions'].append({
+                    'type': 'subordinating',
+                    'word': text,
+                    'position': i,
+                    'connects': 'dependent_clause'
+                })
+                complex_info['clause_count'] += 1
+                complex_info['detected_patterns'].append(f'subordinating_conjunction:{text}')
+            
+            # 関係代名詞の検出
+            elif lemma in relative_pronouns:
+                complex_info['has_complex'] = True
+                complex_info['has_subordination'] = True
+                complex_info['conjunctions'].append({
+                    'type': 'relative',
+                    'word': text,
+                    'position': i,
+                    'connects': 'relative_clause'
+                })
+                complex_info['detected_patterns'].append(f'relative_pronoun:{text}')
+            
+            # カンマによる並列構造の検出
+            elif text == ',':
+                # カンマ前後の構造をチェック
+                if self._check_comma_coordination(tokens, i):
+                    complex_info['has_coordination'] = True
+                    complex_info['conjunctions'].append({
+                        'type': 'comma_coordination',
+                        'word': ',',
+                        'position': i,
+                        'connects': 'coordinated_elements'
+                    })
+                    complex_info['detected_patterns'].append('comma_coordination')
+        
+        # 動詞の数による節数の推定
+        verb_count = self._count_main_verbs(tokens, roles)
+        if verb_count > 1:
+            complex_info['clause_count'] = max(complex_info['clause_count'], verb_count)
+            if not complex_info['has_compound'] and not complex_info['has_complex']:
+                # 明示的な接続詞がないが動詞が複数ある場合
+                complex_info['detected_patterns'].append('implicit_multiple_clauses')
+        
+        # 文構造タイプの決定
+        complex_info['structure_type'] = self._determine_structure_type(complex_info)
+        
+        # 複雑度スコアの計算
+        complex_info['complexity_score'] = self._calculate_complexity_score(complex_info)
+        
+        # 特殊パターンの検出
+        self._detect_special_patterns(tokens, complex_info)
+        
+        return complex_info
+    
+    def _check_comma_coordination(self, tokens, comma_pos):
+        """カンマによる並列構造かどうかをチェック"""
+        if comma_pos == 0 or comma_pos >= len(tokens) - 1:
+            return False
+        
+        # カンマ前後の品詞をチェック
+        before_token = tokens[comma_pos - 1]
+        after_token = tokens[comma_pos + 1]
+        
+        before_pos = before_token.get('pos_', '')
+        after_pos = after_token.get('pos_', '')
+        
+        # 同じ品詞クラスの並列
+        noun_tags = ['NN', 'NNS', 'NNP', 'NNPS']
+        verb_tags = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+        adj_tags = ['JJ', 'JJR', 'JJS']
+        
+        if (before_pos in noun_tags and after_pos in noun_tags) or \
+           (before_pos in verb_tags and after_pos in verb_tags) or \
+           (before_pos in adj_tags and after_pos in adj_tags):
+            return True
+        
+        return False
+    
+    def _count_main_verbs(self, tokens, roles):
+        """主要動詞の数をカウント"""
+        main_verb_count = 0
+        for role_info in roles:
+            if role_info['role'] in ['MAIN_VERB', 'PRIMARY_VERB']:
+                main_verb_count += 1
+        
+        # rolesが不完全な場合、POSタグから推定
+        if main_verb_count == 0:
+            for token in tokens:
+                pos = token.get('pos_', '')
+                if pos in ['VBD', 'VBP', 'VBZ']:  # 過去形、現在形
+                    main_verb_count += 1
+        
+        return main_verb_count
+    
+    def _determine_structure_type(self, complex_info):
+        """文構造タイプを決定"""
+        has_compound = complex_info['has_compound']
+        has_complex = complex_info['has_complex']
+        
+        if has_compound and has_complex:
+            return 'compound-complex'
+        elif has_compound:
+            return 'compound'
+        elif has_complex:
+            return 'complex'
+        else:
+            return 'simple'
+    
+    def _calculate_complexity_score(self, complex_info):
+        """複雑度スコアを計算"""
+        score = 0.0
+        
+        # 基本スコア
+        if complex_info['structure_type'] == 'simple':
+            score = 1.0
+        elif complex_info['structure_type'] == 'compound':
+            score = 2.0
+        elif complex_info['structure_type'] == 'complex':
+            score = 2.5
+        elif complex_info['structure_type'] == 'compound-complex':
+            score = 3.5
+        
+        # 節数による調整
+        score += (complex_info['clause_count'] - 1) * 0.5
+        
+        # 接続詞数による調整
+        score += len(complex_info['conjunctions']) * 0.3
+        
+        # パターン数による調整
+        score += len(complex_info['detected_patterns']) * 0.2
+        
+        return min(5.0, score)  # 最大5.0に制限
+    
+    def _detect_special_patterns(self, tokens, complex_info):
+        """特殊パターンの検出"""
+        text_tokens = [token.get('text', '').lower() for token in tokens]
+        
+        # 条件文パターン
+        if any(word in text_tokens for word in ['if', 'unless', 'provided', 'supposing']):
+            complex_info['detected_patterns'].append('conditional_structure')
+        
+        # 比較構文パターン
+        if any(word in text_tokens for word in ['than', 'as...as', 'more', 'less']):
+            complex_info['detected_patterns'].append('comparative_structure')
+        
+        # 時間的関係パターン
+        if any(word in text_tokens for word in ['when', 'while', 'before', 'after', 'during']):
+            complex_info['detected_patterns'].append('temporal_structure')
+        
+        # 因果関係パターン
+        if any(word in text_tokens for word in ['because', 'since', 'so', 'therefore', 'thus']):
+            complex_info['detected_patterns'].append('causal_structure')
+        
+        # 並列リストパターン
+        comma_count = sum(1 for token in text_tokens if token == ',')
+        if comma_count >= 2:
+            complex_info['detected_patterns'].append('list_structure')
+    
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
         🎯 Phase A3-5: Pure Management完全版
