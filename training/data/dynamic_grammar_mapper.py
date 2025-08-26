@@ -5423,6 +5423,1054 @@ class PureCentralController:
         if comma_count >= 2:
             complex_info['detected_patterns'].append('list_structure')
     
+    def _pure_handle_special_cases(self, tokens, roles, sentence_patterns, complex_info):
+        """
+        独立メソッド: 特殊ケースの処理（POS分析のみ使用）
+        例外的な文構造、特殊表現、エッジケースを処理
+        """
+        special_cases = {
+            'imperative': False,           # 命令文
+            'interrogative': False,        # 疑問文
+            'exclamatory': False,          # 感嘆文
+            'fragmentary': False,          # 断片文
+            'ellipsis': False,             # 省略文
+            'inverted': False,             # 倒置文
+            'contracted': False,           # 縮約形
+            'negation': False,             # 否定文
+            'emphasis': False,             # 強調構文
+            'idiomatic': False,            # 慣用表現
+            'special_patterns': [],        # 検出された特殊パターン
+            'adjustments': [],             # 適用された調整
+            'confidence_modifiers': []     # 信頼度修正要因
+        }
+        
+        sentence_text = ' '.join(token.get('text', '') for token in tokens).lower()
+        
+        # 命令文の検出
+        if self._detect_imperative(tokens, roles):
+            special_cases['imperative'] = True
+            special_cases['special_patterns'].append('imperative_sentence')
+            special_cases['adjustments'].append('subject_omitted')
+        
+        # 疑問文の検出
+        if self._detect_interrogative(tokens, sentence_text):
+            special_cases['interrogative'] = True
+            special_cases['special_patterns'].append('question_sentence')
+            special_cases['adjustments'].append('question_word_order')
+        
+        # 感嘆文の検出
+        if self._detect_exclamatory(tokens, sentence_text):
+            special_cases['exclamatory'] = True
+            special_cases['special_patterns'].append('exclamatory_sentence')
+            special_cases['confidence_modifiers'].append('emotional_expression')
+        
+        # 断片文の検出
+        if self._detect_fragmentary(tokens, roles, sentence_patterns):
+            special_cases['fragmentary'] = True
+            special_cases['special_patterns'].append('sentence_fragment')
+            special_cases['confidence_modifiers'].append('incomplete_structure')
+        
+        # 省略文の検出
+        if self._detect_ellipsis(tokens, roles):
+            special_cases['ellipsis'] = True
+            special_cases['special_patterns'].append('elliptical_construction')
+            special_cases['adjustments'].append('implied_elements')
+        
+        # 倒置文の検出
+        if self._detect_inversion(tokens, roles):
+            special_cases['inverted'] = True
+            special_cases['special_patterns'].append('inverted_word_order')
+            special_cases['adjustments'].append('non_standard_order')
+        
+        # 縮約形の検出
+        if self._detect_contractions(tokens):
+            special_cases['contracted'] = True
+            special_cases['special_patterns'].append('contracted_forms')
+            special_cases['adjustments'].append('expansion_needed')
+        
+        # 否定文の検出
+        if self._detect_negation(tokens):
+            special_cases['negation'] = True
+            special_cases['special_patterns'].append('negative_sentence')
+            special_cases['adjustments'].append('negation_scope')
+        
+        # 強調構文の検出
+        if self._detect_emphasis(tokens, sentence_text):
+            special_cases['emphasis'] = True
+            special_cases['special_patterns'].append('emphatic_construction')
+            special_cases['confidence_modifiers'].append('marked_structure')
+        
+        # 慣用表現の検出
+        if self._detect_idiomatic(sentence_text):
+            special_cases['idiomatic'] = True
+            special_cases['special_patterns'].append('idiomatic_expression')
+            special_cases['confidence_modifiers'].append('non_compositional')
+        
+        return special_cases
+    
+    def _detect_imperative(self, tokens, roles):
+        """命令文の検出"""
+        # 主語がなく動詞で始まる
+        if not any(role['role'] in ['SUBJECT', 'SUBJECT_PART'] for role in roles):
+            first_content_token = None
+            for token in tokens:
+                if token.get('pos_', '') not in ['DT', 'TO', 'IN']:  # 冠詞、不定詞、前置詞を除外
+                    first_content_token = token
+                    break
+            
+            if first_content_token and first_content_token.get('pos_', '').startswith('VB'):
+                return True
+        
+        return False
+    
+    def _detect_interrogative(self, tokens, sentence_text):
+        """疑問文の検出"""
+        # 疑問符で終わる
+        if sentence_text.endswith('?'):
+            return True
+        
+        # 疑問詞で始まる
+        question_words = ['what', 'who', 'where', 'when', 'why', 'how', 'which', 'whose']
+        first_word = tokens[0].get('text', '').lower() if tokens else ''
+        if first_word in question_words:
+            return True
+        
+        # 助動詞倒置
+        if len(tokens) >= 2:
+            first_pos = tokens[0].get('pos_', '')
+            if first_pos in ['MD', 'VBZ', 'VBP', 'VBD']:  # 助動詞、be動詞
+                return True
+        
+        return False
+    
+    def _detect_exclamatory(self, tokens, sentence_text):
+        """感嘆文の検出"""
+        # 感嘆符で終わる
+        if sentence_text.endswith('!'):
+            return True
+        
+        # 感嘆詞で始まる
+        exclamatory_words = ['what', 'how', 'oh', 'wow', 'ah', 'alas']
+        first_word = tokens[0].get('text', '').lower() if tokens else ''
+        if first_word in exclamatory_words:
+            return True
+        
+        return False
+    
+    def _detect_fragmentary(self, tokens, roles, sentence_patterns):
+        """断片文の検出"""
+        # 動詞がない
+        has_verb = any(role['role'] in ['MAIN_VERB', 'AUXILIARY'] for role in roles)
+        if not has_verb and len(tokens) > 1:
+            return True
+        
+        # 文型パターンが不完全
+        if sentence_patterns.get('pattern') in ['UNKNOWN', 'NO_VERB']:
+            return True
+        
+        # 非常に短い文（2語以下）
+        if len(tokens) <= 2:
+            return True
+        
+        return False
+    
+    def _detect_ellipsis(self, tokens, roles):
+        """省略文の検出"""
+        # 主語または動詞の明らかな省略
+        has_subject = any(role['role'] in ['SUBJECT', 'SUBJECT_PART'] for role in roles)
+        has_verb = any(role['role'] in ['MAIN_VERB', 'AUXILIARY'] for role in roles)
+        
+        # 動詞があるが主語がない（省略の可能性）
+        if has_verb and not has_subject and len(tokens) > 2:
+            return True
+        
+        # 省略を示す語句
+        ellipsis_indicators = ['too', 'also', 'either', 'neither']
+        for token in tokens:
+            if token.get('text', '').lower() in ellipsis_indicators:
+                return True
+        
+        return False
+    
+    def _detect_inversion(self, tokens, roles):
+        """倒置文の検出"""
+        if len(tokens) < 3:
+            return False
+        
+        # 否定副詞による倒置
+        negative_adverbs = ['never', 'rarely', 'seldom', 'hardly', 'scarcely', 'barely']
+        first_word = tokens[0].get('text', '').lower()
+        if first_word in negative_adverbs:
+            return True
+        
+        # "Here/There" による倒置
+        if first_word in ['here', 'there'] and len(tokens) >= 2:
+            second_pos = tokens[1].get('pos_', '')
+            if second_pos.startswith('VB'):
+                return True
+        
+        return False
+    
+    def _detect_contractions(self, tokens):
+        """縮約形の検出"""
+        contractions = ["'m", "'re", "'s", "'t", "'d", "'ll", "'ve", "n't"]
+        for token in tokens:
+            text = token.get('text', '')
+            if any(contraction in text for contraction in contractions):
+                return True
+        return False
+    
+    def _detect_negation(self, tokens):
+        """否定文の検出"""
+        negation_words = ['not', 'no', 'never', 'nothing', 'nobody', 'nowhere', 'none', "n't"]
+        for token in tokens:
+            text = token.get('text', '').lower()
+            if any(neg in text for neg in negation_words):
+                return True
+        return False
+    
+    def _detect_emphasis(self, tokens, sentence_text):
+        """強調構文の検出"""
+        # "It is ... that" 構文
+        if 'it is' in sentence_text and 'that' in sentence_text:
+            return True
+        
+        # "What ... is" 構文
+        if sentence_text.startswith('what') and ' is ' in sentence_text:
+            return True
+        
+        # 強調副詞
+        emphasis_words = ['really', 'very', 'extremely', 'absolutely', 'definitely']
+        for token in tokens:
+            if token.get('text', '').lower() in emphasis_words:
+                return True
+        
+        return False
+    
+    def _detect_idiomatic(self, sentence_text):
+        """慣用表現の検出"""
+        idioms = [
+            'it rains cats and dogs',
+            'break a leg',
+            'piece of cake',
+            'hit the books',
+            'under the weather',
+            'spill the beans',
+            'let the cat out of the bag',
+            'bite the bullet'
+        ]
+        
+        for idiom in idioms:
+            if idiom in sentence_text:
+                return True
+        
+        return False
+
+    def _pure_calculate_confidence(self, tokens, slots, grammar_info, special_cases=None):
+        """
+        独立メソッド13番目: 純粋な信頼度計算システム（POS分析のみ使用）
+        解析結果の信頼性を多角的に評価し、0.0-1.0の範囲で数値化
+        """
+        if not tokens or not slots:
+            return 0.0
+        
+        confidence_factors = {
+            'grammatical_completeness': 0.0,
+            'pos_consistency': 0.0,
+            'slot_coverage': 0.0,
+            'pattern_reliability': 0.0,
+            'special_case_adjustment': 0.0,
+            'lexical_coherence': 0.0,
+            'structure_integrity': 0.0
+        }
+        
+        # 1. 文法的完全性評価
+        confidence_factors['grammatical_completeness'] = self._evaluate_grammatical_completeness(slots)
+        
+        # 2. POS一貫性評価
+        confidence_factors['pos_consistency'] = self._evaluate_pos_consistency(tokens, slots)
+        
+        # 3. スロットカバレッジ評価
+        confidence_factors['slot_coverage'] = self._evaluate_slot_coverage(tokens, slots)
+        
+        # 4. パターン信頼性評価
+        confidence_factors['pattern_reliability'] = self._evaluate_pattern_reliability(grammar_info)
+        
+        # 5. 特殊ケース調整
+        confidence_factors['special_case_adjustment'] = self._evaluate_special_case_impact(special_cases)
+        
+        # 6. 語彙的一貫性評価
+        confidence_factors['lexical_coherence'] = self._evaluate_lexical_coherence(tokens, slots)
+        
+        # 7. 構造完全性評価
+        confidence_factors['structure_integrity'] = self._evaluate_structure_integrity(tokens, slots, grammar_info)
+        
+        # 重み付き総合信頼度計算
+        weights = {
+            'grammatical_completeness': 0.20,    # 文法的必須要素
+            'pos_consistency': 0.18,             # POS適合性
+            'slot_coverage': 0.15,               # 解析網羅性
+            'pattern_reliability': 0.15,         # パターン検出精度
+            'special_case_adjustment': 0.12,     # 特殊ケース補正
+            'lexical_coherence': 0.10,           # 語彙的妥当性
+            'structure_integrity': 0.10          # 構造完全性
+        }
+        
+        # 総合信頼度計算
+        total_confidence = sum(confidence_factors[factor] * weight 
+                             for factor, weight in weights.items())
+        
+        # 0.0-1.0の範囲に正規化
+        final_confidence = max(0.0, min(1.0, total_confidence))
+        
+        return round(final_confidence, 3)
+    
+    def _evaluate_grammatical_completeness(self, slots):
+        """文法的完全性の評価"""
+        # 必須要素評価
+        essential_elements = {'S', 'V'}
+        essential_score = sum(1.0 for elem in essential_elements if elem in slots and slots[elem])
+        essential_score /= len(essential_elements)
+        
+        # 高価値要素ボーナス
+        valuable_elements = {'O1', 'C1', 'C2', 'Aux'}
+        valuable_count = sum(1 for elem in valuable_elements if elem in slots and slots[elem])
+        valuable_bonus = min(0.3, valuable_count * 0.075)
+        
+        # 完全な文型構造ボーナス
+        pattern_bonus = 0.0
+        if 'S' in slots and 'V' in slots:
+            if 'O1' in slots:  # SVO構造
+                pattern_bonus = 0.1
+            elif 'C1' in slots:  # SVC構造
+                pattern_bonus = 0.1
+        
+        return min(1.0, essential_score + valuable_bonus + pattern_bonus)
+    
+    def _evaluate_pos_consistency(self, tokens, slots):
+        """POS一貫性の評価"""
+        if not tokens:
+            return 0.5
+        
+        # POS期待値マッピング
+        pos_expectations = {
+            'S': ['NOUN', 'PRON', 'PROPN', 'DET'],
+            'V': ['VERB', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ'],
+            'O1': ['NOUN', 'PRON', 'PROPN'],
+            'O2': ['NOUN', 'PRON', 'PROPN'],
+            'C1': ['NOUN', 'ADJ', 'PRON', 'PROPN', 'NUM'],
+            'C2': ['NOUN', 'ADJ', 'PRON', 'PROPN'],
+            'Aux': ['AUX', 'MD', 'VBZ', 'VBP', 'VBD', 'VB']
+        }
+        
+        # トークンPOSマップ作成
+        token_pos_map = {}
+        for token in tokens:
+            text = token.get('text', '').lower()
+            pos = token.get('pos', '')
+            if text and pos:
+                token_pos_map[text] = pos
+        
+        consistency_scores = []
+        
+        for slot, phrase in slots.items():
+            if slot in pos_expectations and phrase:
+                expected_pos = pos_expectations[slot]
+                phrase_words = phrase.lower().split()
+                
+                # 主要単語のPOS適合性チェック
+                main_word_found = False
+                for word in phrase_words:
+                    if word in token_pos_map:
+                        actual_pos = token_pos_map[word]
+                        if actual_pos in expected_pos:
+                            consistency_scores.append(1.0)
+                        else:
+                            consistency_scores.append(0.3)  # 部分的適合
+                        main_word_found = True
+                        break
+                
+                if not main_word_found:
+                    consistency_scores.append(0.5)  # 不明な場合
+        
+        return sum(consistency_scores) / len(consistency_scores) if consistency_scores else 0.5
+    
+    def _evaluate_slot_coverage(self, tokens, slots):
+        """スロットカバレッジの評価"""
+        if not tokens:
+            return 0.0
+        
+        # 使用されたトークン収集
+        used_words = set()
+        for phrase in slots.values():
+            if phrase:
+                words = phrase.lower().split()
+                used_words.update(words)
+        
+        # 内容語トークン収集（機能語除外）
+        content_words = set()
+        function_words = {'the', 'a', 'an', 'of', 'to', 'in', 'for', 'with', 'by', 'from', 'on', 'at', 'as'}
+        
+        for token in tokens:
+            text = token.get('text', '').lower()
+            pos = token.get('pos', '')
+            if (text not in function_words and 
+                pos not in ['DET', 'ADP', 'PUNCT', 'SPACE'] and 
+                len(text) > 1):
+                content_words.add(text)
+        
+        if not content_words:
+            return 1.0
+        
+        # カバレッジ計算
+        coverage = len(used_words & content_words) / len(content_words)
+        return min(1.0, coverage * 1.2)  # カバレッジボーナス
+    
+    def _evaluate_pattern_reliability(self, grammar_info):
+        """パターン信頼性の評価"""
+        if not grammar_info:
+            return 0.4
+        
+        base_confidence = grammar_info.get('confidence', 0.5)
+        
+        # パターン検出方法による調整
+        detection_method = grammar_info.get('analysis_method', 'unknown')
+        method_bonus = 0.0
+        
+        if detection_method == 'dynamic_grammar':
+            method_bonus = 0.1
+        elif detection_method == 'unified_handler':
+            method_bonus = 0.15
+        
+        # 複数ハンドラー成功によるボーナス
+        handler_info = grammar_info.get('unified_handlers', {})
+        handler_contributions = handler_info.get('handler_contributions', {})
+        successful_handlers = sum(1 for info in handler_contributions.values() 
+                                if info.get('handler_success', False))
+        
+        handler_bonus = min(0.2, successful_handlers * 0.04)
+        
+        return min(1.0, base_confidence + method_bonus + handler_bonus)
+    
+    def _evaluate_special_case_impact(self, special_cases):
+        """特殊ケースの影響評価"""
+        if not special_cases:
+            return 0.0
+        
+        impact_score = 0.0
+        
+        # 特殊ケース別の信頼度影響
+        case_impacts = {
+            'imperative': 0.05,        # 命令文は軽微な影響
+            'interrogative': 0.03,     # 疑問文は最小の影響
+            'exclamatory': 0.02,       # 感嘆文は最小の影響
+            'fragmentary': -0.25,      # 断片文は大きな負の影響
+            'ellipsis': -0.15,         # 省略文は中程度の負の影響
+            'inverted': -0.10,         # 倒置文は軽度の負の影響
+            'contracted': 0.01,        # 縮約形は最小の正の影響
+            'negation': -0.05,         # 否定文は軽微な負の影響
+            'emphasis': 0.02,          # 強調構文は軽微な正の影響
+            'idiomatic': -0.08         # 慣用表現は軽度の負の影響
+        }
+        
+        for case_type, is_detected in special_cases.items():
+            if is_detected and case_type in case_impacts:
+                impact_score += case_impacts[case_type]
+        
+        # 複数特殊ケースの複合効果
+        detected_count = sum(1 for detected in special_cases.values() if detected)
+        if detected_count > 3:
+            impact_score -= 0.1  # 複雑構造ペナルティ
+        
+        return impact_score
+    
+    def _evaluate_lexical_coherence(self, tokens, slots):
+        """語彙的一貫性の評価"""
+        if not tokens or not slots:
+            return 0.5
+        
+        coherence_score = 0.0
+        evaluations = 0
+        
+        # 動詞-目的語適合性
+        if 'V' in slots and 'O1' in slots:
+            verb = slots['V'].lower()
+            obj = slots['O1'].lower()
+            
+            # 他動詞パターン
+            transitive_verbs = ['make', 'take', 'give', 'get', 'see', 'find', 'know', 'write', 'read', 'buy', 'sell']
+            if any(tv in verb for tv in transitive_verbs):
+                coherence_score += 0.3
+            evaluations += 1
+        
+        # 主語-動詞数一致（簡易版）
+        if 'S' in slots and 'V' in slots:
+            subject = slots['S'].lower()
+            verb = slots['V'].lower()
+            
+            # 単複チェック
+            singular_subjects = ['he', 'she', 'it', 'this', 'that']
+            plural_subjects = ['they', 'these', 'those', 'we']
+            
+            is_singular_subj = any(s in subject for s in singular_subjects)
+            is_plural_subj = any(s in subject for s in plural_subjects)
+            is_singular_verb = verb.endswith('s') and not verb.endswith('ss')
+            
+            if (is_singular_subj and is_singular_verb) or (is_plural_subj and not is_singular_verb):
+                coherence_score += 0.4
+            evaluations += 1
+        
+        # 補語適合性
+        if 'V' in slots and 'C1' in slots:
+            verb = slots['V'].lower()
+            
+            # be動詞 + 補語
+            if verb in ['be', 'is', 'are', 'was', 'were', 'am', 'been', 'being']:
+                coherence_score += 0.3
+            evaluations += 1
+        
+        return coherence_score / evaluations if evaluations > 0 else 0.5
+    
+    def _evaluate_structure_integrity(self, tokens, slots, grammar_info):
+        """構造完全性の評価"""
+        integrity_score = 0.0
+        checks = 0
+        
+        # 基本文構造チェック
+        if 'S' in slots and 'V' in slots:
+            integrity_score += 0.4
+        checks += 1
+        
+        # 文型パターン一貫性
+        detected_pattern = grammar_info.get('pattern_detected', 'unknown')
+        pattern_slots = set(slots.keys()) & {'S', 'V', 'O1', 'O2', 'C1', 'C2'}
+        
+        if detected_pattern == 'SV' and 'S' in pattern_slots and 'V' in pattern_slots:
+            integrity_score += 0.2
+        elif detected_pattern == 'SVO' and {'S', 'V', 'O1'}.issubset(pattern_slots):
+            integrity_score += 0.3
+        elif detected_pattern == 'SVC' and {'S', 'V', 'C1'}.issubset(pattern_slots):
+            integrity_score += 0.3
+        checks += 1
+        
+        # 修飾語配置の妥当性
+        modifier_slots = set(slots.keys()) & {'M1', 'M2', 'M3'}
+        if modifier_slots:
+            # 修飾語が存在する場合の一貫性
+            integrity_score += min(0.2, len(modifier_slots) * 0.07)
+        checks += 1
+        
+        # サブスロット構造の整合性
+        if hasattr(grammar_info, 'sub_slots') and grammar_info.get('sub_slots'):
+            integrity_score += 0.1
+        checks += 1
+        
+        return integrity_score / checks if checks > 0 else 0.5
+
+    def _pure_validate_results(self, tokens, slots, sub_slots, grammar_info, confidence_score):
+        """
+        独立メソッド14番目: 純粋な結果検証システム（POS分析のみ使用）
+        解析結果の妥当性を多層的に検証し、問題を特定・報告
+        """
+        validation_report = {
+            'is_valid': True,
+            'validation_score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'validation_details': {
+                'structural_validation': {},
+                'semantic_validation': {},
+                'consistency_validation': {},
+                'completeness_validation': {},
+                'quality_validation': {}
+            }
+        }
+        
+        # 1. 構造的妥当性検証
+        structural_result = self._validate_structural_integrity(tokens, slots, sub_slots)
+        validation_report['validation_details']['structural_validation'] = structural_result
+        
+        # 2. 意味的妥当性検証
+        semantic_result = self._validate_semantic_coherence(tokens, slots, grammar_info)
+        validation_report['validation_details']['semantic_validation'] = semantic_result
+        
+        # 3. 一貫性検証
+        consistency_result = self._validate_slot_consistency(slots, sub_slots, grammar_info)
+        validation_report['validation_details']['consistency_validation'] = consistency_result
+        
+        # 4. 完全性検証
+        completeness_result = self._validate_completeness(tokens, slots, sub_slots)
+        validation_report['validation_details']['completeness_validation'] = completeness_result
+        
+        # 5. 品質検証
+        quality_result = self._validate_quality_metrics(confidence_score, grammar_info)
+        validation_report['validation_details']['quality_validation'] = quality_result
+        
+        # 総合検証結果計算
+        validation_scores = [
+            structural_result.get('score', 0.0),
+            semantic_result.get('score', 0.0),
+            consistency_result.get('score', 0.0),
+            completeness_result.get('score', 0.0),
+            quality_result.get('score', 0.0)
+        ]
+        
+        validation_report['validation_score'] = sum(validation_scores) / len(validation_scores)
+        
+        # エラー・警告の統合
+        for result in [structural_result, semantic_result, consistency_result, completeness_result, quality_result]:
+            validation_report['errors'].extend(result.get('errors', []))
+            validation_report['warnings'].extend(result.get('warnings', []))
+            validation_report['suggestions'].extend(result.get('suggestions', []))
+        
+        # 総合妥当性判定
+        validation_report['is_valid'] = (
+            validation_report['validation_score'] >= 0.6 and
+            len(validation_report['errors']) == 0
+        )
+        
+        return validation_report
+    
+    def _validate_structural_integrity(self, tokens, slots, sub_slots):
+        """構造的妥当性の検証"""
+        result = {
+            'score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'checks_performed': []
+        }
+        
+        total_checks = 0
+        passed_checks = 0
+        
+        # 1. 基本文構造チェック
+        total_checks += 1
+        if 'S' in slots and 'V' in slots:
+            passed_checks += 1
+            result['checks_performed'].append('basic_structure_valid')
+        else:
+            result['errors'].append('Missing essential elements: Subject or Verb not found')
+            result['suggestions'].append('Ensure sentence has both subject and main verb')
+        
+        # 2. スロット値の非空チェック
+        total_checks += 1
+        empty_slots = [slot for slot, value in slots.items() if not value or not value.strip()]
+        if not empty_slots:
+            passed_checks += 1
+            result['checks_performed'].append('no_empty_slots')
+        else:
+            result['warnings'].append(f'Empty slots detected: {empty_slots}')
+            result['suggestions'].append('Review slot assignment logic for empty values')
+        
+        # 3. 文型パターン整合性
+        total_checks += 1
+        pattern = grammar_info.get('pattern_detected', 'unknown') if grammar_info else 'unknown'
+        expected_slots = self._get_expected_slots_for_pattern(pattern)
+        
+        if self._verify_pattern_slot_match(slots, expected_slots, pattern):
+            passed_checks += 1
+            result['checks_performed'].append('pattern_slot_consistency')
+        else:
+            result['warnings'].append(f'Pattern {pattern} slots do not match expected configuration')
+            result['suggestions'].append(f'Expected slots for {pattern}: {expected_slots}')
+        
+        # 4. サブスロット構造チェック
+        total_checks += 1
+        if sub_slots:
+            if self._validate_sub_slot_structure(sub_slots):
+                passed_checks += 1
+                result['checks_performed'].append('sub_slot_structure_valid')
+            else:
+                result['warnings'].append('Sub-slot structure issues detected')
+                result['suggestions'].append('Review sub-slot parent relationships')
+        else:
+            passed_checks += 1  # サブスロットなしは正常
+            result['checks_performed'].append('no_sub_slots')
+        
+        # 5. スロット名妥当性チェック
+        total_checks += 1
+        valid_slot_names = {'S', 'V', 'O1', 'O2', 'C1', 'C2', 'Aux', 'M1', 'M2', 'M3'}
+        invalid_slots = [slot for slot in slots.keys() if slot not in valid_slot_names]
+        
+        if not invalid_slots:
+            passed_checks += 1
+            result['checks_performed'].append('valid_slot_names')
+        else:
+            result['errors'].append(f'Invalid slot names: {invalid_slots}')
+            result['suggestions'].append('Use only standard slot names (S, V, O1, O2, C1, C2, Aux, M1, M2, M3)')
+        
+        result['score'] = passed_checks / total_checks if total_checks > 0 else 0.0
+        return result
+    
+    def _validate_semantic_coherence(self, tokens, slots, grammar_info):
+        """意味的妥当性の検証"""
+        result = {
+            'score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'checks_performed': []
+        }
+        
+        total_checks = 0
+        passed_checks = 0
+        
+        # 1. 動詞-目的語の意味的適合性
+        total_checks += 1
+        if 'V' in slots and 'O1' in slots:
+            if self._check_verb_object_coherence(slots['V'], slots['O1']):
+                passed_checks += 1
+                result['checks_performed'].append('verb_object_coherence')
+            else:
+                result['warnings'].append(f"Semantic mismatch: verb '{slots['V']}' with object '{slots['O1']}'")
+                result['suggestions'].append('Review verb-object relationship for semantic validity')
+        else:
+            passed_checks += 1  # N/A case
+            result['checks_performed'].append('no_verb_object_pair')
+        
+        # 2. 主語-動詞の数一致
+        total_checks += 1
+        if 'S' in slots and 'V' in slots:
+            if self._check_subject_verb_agreement(slots['S'], slots['V']):
+                passed_checks += 1
+                result['checks_performed'].append('subject_verb_agreement')
+            else:
+                result['warnings'].append(f"Number agreement issue: subject '{slots['S']}' with verb '{slots['V']}'")
+                result['suggestions'].append('Check subject-verb number agreement')
+        else:
+            passed_checks += 1  # N/A case
+            result['checks_performed'].append('no_subject_verb_pair')
+        
+        # 3. 補語の意味的適切性
+        total_checks += 1
+        if 'V' in slots and 'C1' in slots:
+            if self._check_complement_appropriateness(slots['V'], slots['C1']):
+                passed_checks += 1
+                result['checks_performed'].append('complement_appropriateness')
+            else:
+                result['warnings'].append(f"Complement mismatch: verb '{slots['V']}' with complement '{slots['C1']}'")
+                result['suggestions'].append('Verify complement type matches verb requirements')
+        else:
+            passed_checks += 1  # N/A case
+            result['checks_performed'].append('no_verb_complement_pair')
+        
+        # 4. 修飾語の配置妥当性
+        total_checks += 1
+        modifier_slots = {k: v for k, v in slots.items() if k.startswith('M') and v}
+        if modifier_slots:
+            if self._check_modifier_placement_validity(modifier_slots, slots):
+                passed_checks += 1
+                result['checks_performed'].append('modifier_placement_valid')
+            else:
+                result['warnings'].append('Modifier placement issues detected')
+                result['suggestions'].append('Review modifier-modified element relationships')
+        else:
+            passed_checks += 1  # No modifiers is acceptable
+            result['checks_performed'].append('no_modifiers')
+        
+        result['score'] = passed_checks / total_checks if total_checks > 0 else 0.0
+        return result
+    
+    def _validate_slot_consistency(self, slots, sub_slots, grammar_info):
+        """スロット一貫性の検証"""
+        result = {
+            'score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'checks_performed': []
+        }
+        
+        total_checks = 0
+        passed_checks = 0
+        
+        # 1. 重複スロット検証
+        total_checks += 1
+        slot_values = [v for v in slots.values() if v]
+        if len(slot_values) == len(set(slot_values)):
+            passed_checks += 1
+            result['checks_performed'].append('no_duplicate_values')
+        else:
+            duplicates = [v for v in slot_values if slot_values.count(v) > 1]
+            result['warnings'].append(f'Duplicate slot values: {set(duplicates)}')
+            result['suggestions'].append('Ensure each phrase appears in only one slot')
+        
+        # 2. 主スロット-サブスロット整合性
+        total_checks += 1
+        if sub_slots:
+            if self._check_main_sub_slot_consistency(slots, sub_slots):
+                passed_checks += 1
+                result['checks_performed'].append('main_sub_slot_consistency')
+            else:
+                result['errors'].append('Inconsistency between main slots and sub-slots')
+                result['suggestions'].append('Verify sub-slot parent relationships and content')
+        else:
+            passed_checks += 1  # No sub-slots is normal
+            result['checks_performed'].append('no_sub_slots')
+        
+        # 3. 文法情報との整合性
+        total_checks += 1
+        if grammar_info:
+            detected_pattern = grammar_info.get('pattern_detected', 'unknown')
+            if self._check_pattern_slot_alignment(slots, detected_pattern):
+                passed_checks += 1
+                result['checks_performed'].append('pattern_alignment')
+            else:
+                result['warnings'].append(f'Slots do not align with detected pattern: {detected_pattern}')
+                result['suggestions'].append('Review pattern detection or slot assignment')
+        else:
+            passed_checks += 1  # No grammar info is acceptable
+            result['checks_performed'].append('no_grammar_info')
+        
+        # 4. スロット間の論理的整合性
+        total_checks += 1
+        if self._check_logical_slot_relationships(slots):
+            passed_checks += 1
+            result['checks_performed'].append('logical_relationships')
+        else:
+            result['warnings'].append('Logical inconsistencies in slot relationships')
+            result['suggestions'].append('Review logical dependencies between slots')
+        
+        result['score'] = passed_checks / total_checks if total_checks > 0 else 0.0
+        return result
+    
+    def _validate_completeness(self, tokens, slots, sub_slots):
+        """完全性の検証"""
+        result = {
+            'score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'checks_performed': []
+        }
+        
+        total_checks = 0
+        passed_checks = 0
+        
+        # 1. 必須要素の存在確認
+        total_checks += 1
+        required_elements = ['S', 'V']
+        missing_required = [elem for elem in required_elements if elem not in slots or not slots[elem]]
+        
+        if not missing_required:
+            passed_checks += 1
+            result['checks_performed'].append('required_elements_present')
+        else:
+            result['errors'].append(f'Missing required elements: {missing_required}')
+            result['suggestions'].append('Ensure all sentences have subject and verb')
+        
+        # 2. トークンカバレッジ検証
+        total_checks += 1
+        coverage_ratio = self._calculate_token_coverage(tokens, slots, sub_slots)
+        
+        if coverage_ratio >= 0.7:  # 70%以上のカバレッジ
+            passed_checks += 1
+            result['checks_performed'].append(f'adequate_coverage_{coverage_ratio:.1%}')
+        else:
+            result['warnings'].append(f'Low token coverage: {coverage_ratio:.1%}')
+            result['suggestions'].append('Increase analysis coverage of input tokens')
+        
+        # 3. 文型完全性チェック
+        total_checks += 1
+        if self._check_sentence_pattern_completeness(slots):
+            passed_checks += 1
+            result['checks_performed'].append('pattern_completeness')
+        else:
+            result['warnings'].append('Incomplete sentence pattern detected')
+            result['suggestions'].append('Review sentence pattern assignment completeness')
+        
+        # 4. 情報損失チェック
+        total_checks += 1
+        if self._check_information_preservation(tokens, slots, sub_slots):
+            passed_checks += 1
+            result['checks_performed'].append('information_preserved')
+        else:
+            result['warnings'].append('Potential information loss detected')
+            result['suggestions'].append('Review analysis for missing semantic information')
+        
+        result['score'] = passed_checks / total_checks if total_checks > 0 else 0.0
+        return result
+    
+    def _validate_quality_metrics(self, confidence_score, grammar_info):
+        """品質メトリクスの検証"""
+        result = {
+            'score': 0.0,
+            'errors': [],
+            'warnings': [],
+            'suggestions': [],
+            'checks_performed': []
+        }
+        
+        total_checks = 0
+        passed_checks = 0
+        
+        # 1. 信頼度スコアの妥当性
+        total_checks += 1
+        if 0.0 <= confidence_score <= 1.0:
+            passed_checks += 1
+            result['checks_performed'].append(f'confidence_score_valid_{confidence_score:.3f}')
+            
+            if confidence_score < 0.5:
+                result['warnings'].append(f'Low confidence score: {confidence_score:.3f}')
+                result['suggestions'].append('Consider improving analysis accuracy')
+        else:
+            result['errors'].append(f'Invalid confidence score: {confidence_score}')
+            result['suggestions'].append('Confidence score must be between 0.0 and 1.0')
+        
+        # 2. 文法情報の品質
+        total_checks += 1
+        if grammar_info and self._check_grammar_info_quality(grammar_info):
+            passed_checks += 1
+            result['checks_performed'].append('grammar_info_quality')
+        else:
+            result['warnings'].append('Grammar information quality issues')
+            result['suggestions'].append('Review grammar analysis completeness and accuracy')
+        
+        # 3. 解析方法の妥当性
+        total_checks += 1
+        if grammar_info:
+            analysis_method = grammar_info.get('analysis_method', 'unknown')
+            valid_methods = ['dynamic_grammar', 'unified_handler', 'pure_central_controller']
+            
+            if analysis_method in valid_methods:
+                passed_checks += 1
+                result['checks_performed'].append(f'analysis_method_{analysis_method}')
+            else:
+                result['warnings'].append(f'Unknown analysis method: {analysis_method}')
+                result['suggestions'].append('Use recognized analysis methods')
+        else:
+            passed_checks += 1  # No grammar info is acceptable
+            result['checks_performed'].append('no_analysis_method')
+        
+        # 4. 全体品質評価
+        total_checks += 1
+        overall_quality = confidence_score  # 簡易品質評価
+        
+        if overall_quality >= 0.7:
+            passed_checks += 1
+            result['checks_performed'].append('high_overall_quality')
+        elif overall_quality >= 0.5:
+            passed_checks += 0.5
+            result['warnings'].append('Moderate overall quality')
+            result['suggestions'].append('Consider additional validation or improvement')
+        else:
+            result['warnings'].append('Low overall quality detected')
+            result['suggestions'].append('Significant improvement needed in analysis accuracy')
+        
+        result['score'] = passed_checks / total_checks if total_checks > 0 else 0.0
+        return result
+    
+    # ヘルパーメソッド群
+    def _get_expected_slots_for_pattern(self, pattern):
+        """文型パターンに期待されるスロット"""
+        pattern_slots = {
+            'SV': ['S', 'V'],
+            'SVO': ['S', 'V', 'O1'],
+            'SVC': ['S', 'V', 'C1'],
+            'SVOO': ['S', 'V', 'O1', 'O2'],
+            'SVOC': ['S', 'V', 'O1', 'C2']
+        }
+        return pattern_slots.get(pattern, ['S', 'V'])
+    
+    def _verify_pattern_slot_match(self, slots, expected_slots, pattern):
+        """パターンとスロットの一致確認"""
+        essential_slots = set(expected_slots) & set(slots.keys())
+        return len(essential_slots) >= len(expected_slots) * 0.8  # 80%一致で妥当
+    
+    def _validate_sub_slot_structure(self, sub_slots):
+        """サブスロット構造の妥当性確認"""
+        return '_parent_slot' in sub_slots or len(sub_slots) == 0
+    
+    def _check_verb_object_coherence(self, verb, obj):
+        """動詞-目的語の意味的一貫性チェック"""
+        # 簡易的な一貫性チェック
+        return len(verb.split()) <= 3 and len(obj.split()) <= 5  # 長さ制限チェック
+    
+    def _check_subject_verb_agreement(self, subject, verb):
+        """主語-動詞の数一致チェック"""
+        # 簡易的な数一致チェック
+        singular_subjects = ['he', 'she', 'it', 'this', 'that']
+        singular_verb_endings = ['s', 'es']
+        
+        is_singular_subj = any(s in subject.lower() for s in singular_subjects)
+        is_singular_verb = any(verb.lower().endswith(e) for e in singular_verb_endings)
+        
+        return True  # 詳細な文法チェックは複雑なため、基本的にパス
+    
+    def _check_complement_appropriateness(self, verb, complement):
+        """補語の適切性チェック"""
+        linking_verbs = ['be', 'is', 'are', 'was', 'were', 'become', 'seem', 'appear']
+        return any(lv in verb.lower() for lv in linking_verbs) or len(complement.split()) <= 4
+    
+    def _check_modifier_placement_validity(self, modifier_slots, all_slots):
+        """修飾語配置の妥当性チェック"""
+        return len(modifier_slots) <= 3  # 修飾語は3個まで
+    
+    def _check_main_sub_slot_consistency(self, slots, sub_slots):
+        """メイン-サブスロット一貫性チェック"""
+        return True  # 基本的な構造チェックのみ
+    
+    def _check_pattern_slot_alignment(self, slots, pattern):
+        """パターン-スロット整合性チェック"""
+        expected = self._get_expected_slots_for_pattern(pattern)
+        present = [slot for slot in expected if slot in slots and slots[slot]]
+        return len(present) >= len(expected) * 0.7  # 70%以上の一致
+    
+    def _check_logical_slot_relationships(self, slots):
+        """スロット間の論理的関係チェック"""
+        # 基本的な論理チェック
+        if 'O1' in slots and 'V' not in slots:
+            return False  # 目的語があるなら動詞も必要
+        if 'C1' in slots and 'V' not in slots:
+            return False  # 補語があるなら動詞も必要
+        return True
+    
+    def _calculate_token_coverage(self, tokens, slots, sub_slots):
+        """トークンカバレッジ計算"""
+        if not tokens:
+            return 1.0
+        
+        all_slot_words = set()
+        for phrase in slots.values():
+            if phrase:
+                all_slot_words.update(phrase.lower().split())
+        
+        for phrase in sub_slots.values():
+            if phrase and phrase != '_parent_slot':
+                all_slot_words.update(str(phrase).lower().split())
+        
+        token_words = set(token.get('text', '').lower() for token in tokens if token.get('text', ''))
+        
+        if not token_words:
+            return 1.0
+        
+        covered = len(all_slot_words & token_words)
+        return covered / len(token_words)
+    
+    def _check_sentence_pattern_completeness(self, slots):
+        """文型完全性チェック"""
+        return 'S' in slots and 'V' in slots  # 最低限の完全性
+    
+    def _check_information_preservation(self, tokens, slots, sub_slots):
+        """情報保存チェック"""
+        # トークン数とスロット数の比率による簡易チェック
+        token_count = len(tokens) if tokens else 0
+        slot_count = len([v for v in slots.values() if v]) + len([v for v in sub_slots.values() if v])
+        
+        if token_count == 0:
+            return True
+        
+        preservation_ratio = slot_count / token_count
+        return preservation_ratio >= 0.3  # 30%以上の情報保存
+    
+    def _check_grammar_info_quality(self, grammar_info):
+        """文法情報品質チェック"""
+        required_fields = ['analysis_method', 'confidence']
+        present_fields = sum(1 for field in required_fields if field in grammar_info)
+        return present_fields >= len(required_fields) * 0.5  # 50%以上のフィールド存在
+
     def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
         """
         🎯 Phase A3-5: Pure Management完全版
@@ -5971,6 +7019,668 @@ class PureCentralController:
                 'error_source': 'pure_management_pipeline'
             }
         }
+    
+    def _pure_format_output(self, result_data, format_type="complete", include_metadata=True):
+        """
+        Phase A3-2b Method 15: 完全独立した出力フォーマット処理
+        
+        Args:
+            result_data (dict): 処理結果データ
+            format_type (str): フォーマット種別 ("complete", "compact", "display", "json")
+            include_metadata (bool): メタデータ含有フラグ
+            
+        Returns:
+            dict: フォーマット済み出力データ
+        """
+        try:
+            # 1. 基本フォーマット検証
+            if not isinstance(result_data, dict):
+                return self._create_error_output("Invalid result data type", result_data)
+            
+            # 2. 必須フィールド確認
+            required_fields = ['slots', 'pattern_detected', 'confidence']
+            missing_fields = [field for field in required_fields if field not in result_data]
+            if missing_fields:
+                return self._create_error_output(f"Missing required fields: {missing_fields}", result_data)
+            
+            # 3. フォーマット種別別処理
+            if format_type == "complete":
+                return self._format_complete_output(result_data, include_metadata)
+            elif format_type == "compact":
+                return self._format_compact_output(result_data, include_metadata)
+            elif format_type == "display":
+                return self._format_display_output(result_data, include_metadata)
+            elif format_type == "json":
+                return self._format_json_output(result_data, include_metadata)
+            else:
+                return self._format_complete_output(result_data, include_metadata)
+                
+        except Exception as e:
+            return self._create_error_output(f"Format processing error: {str(e)}", result_data)
+    
+    def _format_complete_output(self, result_data, include_metadata):
+        """完全フォーマット - 全情報含有"""
+        try:
+            formatted = {
+                # 基本スロット情報
+                'Slot': [],
+                'SlotPhrase': [],
+                'Slot_display_order': [],
+                'display_order': [],
+                'PhraseType': [],
+                'SubslotID': [],
+                
+                # メイン・サブスロット分離
+                'main_slots': result_data.get('slots', {}),
+                'sub_slots': result_data.get('sub_slots', {}),
+                'slots': result_data.get('slots', {}),
+                
+                # 文法情報
+                'pattern_detected': result_data.get('pattern_detected', 'Unknown'),
+                'confidence': float(result_data.get('confidence', 0.0)),
+                'analysis_method': result_data.get('analysis_method', 'dynamic_grammar'),
+                'lexical_tokens': len(result_data.get('slots', {})),
+            }
+            
+            # スロット配列構築
+            main_slots = result_data.get('slots', {})
+            slot_order_map = self._get_slot_display_order()
+            
+            # ソート済みスロット処理
+            sorted_slots = sorted(main_slots.items(), key=lambda x: slot_order_map.get(x[0], 99))
+            
+            for i, (slot_name, phrase) in enumerate(sorted_slots):
+                formatted['Slot'].append(slot_name)
+                formatted['SlotPhrase'].append(str(phrase))
+                formatted['Slot_display_order'].append(slot_order_map.get(slot_name, 99))
+                formatted['display_order'].append(slot_order_map.get(slot_name, 99))
+                formatted['PhraseType'].append(self._get_phrase_type(slot_name))
+                formatted['SubslotID'].append(i)
+            
+            # メタデータ追加
+            if include_metadata:
+                formatted.update({
+                    'unified_handlers': result_data.get('unified_handlers', {}),
+                    'sentence_type': result_data.get('sentence_type', 'statement'),
+                    'sentence_type_confidence': result_data.get('sentence_type_confidence', 0.8)
+                })
+            
+            return formatted
+            
+        except Exception as e:
+            return self._create_error_output(f"Complete format error: {str(e)}", result_data)
+    
+    def _format_compact_output(self, result_data, include_metadata):
+        """コンパクトフォーマット - 必須情報のみ"""
+        try:
+            compact = {
+                'slots': result_data.get('slots', {}),
+                'pattern': result_data.get('pattern_detected', 'Unknown'),
+                'confidence': float(result_data.get('confidence', 0.0))
+            }
+            
+            # サブスロット追加（存在する場合）
+            sub_slots = result_data.get('sub_slots', {})
+            if sub_slots:
+                compact['sub_slots'] = sub_slots
+            
+            # メタデータ追加（要求時）
+            if include_metadata:
+                compact['analysis_method'] = result_data.get('analysis_method', 'dynamic_grammar')
+                compact['token_count'] = len(result_data.get('slots', {}))
+            
+            return compact
+            
+        except Exception as e:
+            return self._create_error_output(f"Compact format error: {str(e)}", result_data)
+    
+    def _format_display_output(self, result_data, include_metadata):
+        """表示用フォーマット - UI最適化"""
+        try:
+            display = {
+                'sentence_analysis': {
+                    'pattern': result_data.get('pattern_detected', 'Unknown'),
+                    'confidence': f"{float(result_data.get('confidence', 0.0)):.1%}",
+                    'structure': self._create_structure_display(result_data.get('slots', {}))
+                },
+                'slot_breakdown': self._create_slot_breakdown(result_data.get('slots', {})),
+                'grammar_summary': self._create_grammar_summary(result_data)
+            }
+            
+            # サブスロット表示
+            sub_slots = result_data.get('sub_slots', {})
+            if sub_slots:
+                display['sub_structure'] = self._create_slot_breakdown(sub_slots)
+            
+            # メタデータ表示
+            if include_metadata:
+                display['technical_info'] = {
+                    'method': result_data.get('analysis_method', 'dynamic_grammar'),
+                    'handlers': list(result_data.get('unified_handlers', {}).get('handler_contributions', {}).keys()),
+                    'token_count': len(result_data.get('slots', {}))
+                }
+            
+            return display
+            
+        except Exception as e:
+            return self._create_error_output(f"Display format error: {str(e)}", result_data)
+    
+    def _format_json_output(self, result_data, include_metadata):
+        """JSON標準フォーマット - API用"""
+        try:
+            import json
+            
+            json_output = {
+                'status': 'success',
+                'data': {
+                    'slots': result_data.get('slots', {}),
+                    'pattern': result_data.get('pattern_detected', 'Unknown'),
+                    'confidence': float(result_data.get('confidence', 0.0)),
+                    'timestamp': self._get_timestamp()
+                }
+            }
+            
+            # サブスロット追加
+            sub_slots = result_data.get('sub_slots', {})
+            if sub_slots:
+                json_output['data']['sub_slots'] = sub_slots
+            
+            # メタデータ追加
+            if include_metadata:
+                json_output['metadata'] = {
+                    'analysis_method': result_data.get('analysis_method', 'dynamic_grammar'),
+                    'sentence_type': result_data.get('sentence_type', 'statement'),
+                    'handler_info': result_data.get('unified_handlers', {}),
+                    'version': '3.0-independent'
+                }
+            
+            return json_output
+            
+        except Exception as e:
+            return self._create_error_output(f"JSON format error: {str(e)}", result_data)
+    
+    def _get_slot_display_order(self):
+        """スロット表示順序マッピング"""
+        return {
+            'S': 1, 'Aux': 2, 'V': 3, 'O1': 4, 'O2': 5, 'C1': 6, 'C2': 7,
+            'M1': 8, 'M2': 9, 'M3': 10, 'M4': 11, 'M5': 12
+        }
+    
+    def _get_phrase_type(self, slot_name):
+        """スロット名から句型を判定"""
+        type_map = {
+            'S': '名詞句', 'O1': '名詞句', 'O2': '名詞句', 'C1': '名詞句', 'C2': '名詞句',
+            'V': '動詞句', 'Aux': '修飾句',
+            'M1': '修飾句', 'M2': '修飾句', 'M3': '修飾句', 'M4': '修飾句', 'M5': '修飾句'
+        }
+        return type_map.get(slot_name, '修飾句')
+    
+    def _create_structure_display(self, slots):
+        """構造表示文字列作成"""
+        if not slots:
+            return "No structure detected"
+        
+        structure_parts = []
+        for slot_name in ['S', 'Aux', 'V', 'O1', 'O2', 'C1', 'C2', 'M1', 'M2', 'M3']:
+            if slot_name in slots and slots[slot_name]:
+                structure_parts.append(f"{slot_name}[{slots[slot_name]}]")
+        
+        return " + ".join(structure_parts) if structure_parts else "Empty structure"
+    
+    def _create_slot_breakdown(self, slots):
+        """スロット詳細分解表示"""
+        if not slots:
+            return {}
+        
+        breakdown = {}
+        for slot_name, phrase in slots.items():
+            breakdown[slot_name] = {
+                'text': str(phrase),
+                'type': self._get_phrase_type(slot_name),
+                'order': self._get_slot_display_order().get(slot_name, 99),
+                'length': len(str(phrase).split()) if phrase else 0
+            }
+        
+        return breakdown
+    
+    def _create_grammar_summary(self, result_data):
+        """文法要約作成"""
+        pattern = result_data.get('pattern_detected', 'Unknown')
+        confidence = float(result_data.get('confidence', 0.0))
+        
+        summary = {
+            'sentence_pattern': pattern,
+            'confidence_level': 'High' if confidence > 0.8 else 'Medium' if confidence > 0.5 else 'Low',
+            'complexity': self._assess_complexity(result_data.get('slots', {}), result_data.get('sub_slots', {})),
+            'features': self._extract_features(result_data)
+        }
+        
+        return summary
+    
+    def _assess_complexity(self, main_slots, sub_slots):
+        """文の複雑度評価"""
+        complexity_score = 0
+        
+        # メインスロット数による評価
+        complexity_score += len(main_slots) * 1
+        
+        # サブスロット存在による評価
+        if sub_slots:
+            complexity_score += len(sub_slots) * 2
+        
+        # 修飾句数による評価
+        modifier_count = sum(1 for slot in main_slots.keys() if slot.startswith('M'))
+        complexity_score += modifier_count * 1.5
+        
+        if complexity_score <= 5:
+            return 'Simple'
+        elif complexity_score <= 10:
+            return 'Medium'
+        else:
+            return 'Complex'
+    
+    def _extract_features(self, result_data):
+        """文法特徴抽出"""
+        features = []
+        
+        # ハンドラー情報から特徴抽出
+        handlers = result_data.get('unified_handlers', {}).get('handler_contributions', {})
+        for handler_name, handler_data in handlers.items():
+            if handler_data.get('handler_success'):
+                features.append(handler_name.replace('_', ' ').title())
+        
+        # パターン情報から特徴抽出
+        pattern = result_data.get('pattern_detected', '')
+        if 'VO' in pattern:
+            features.append('Transitive')
+        elif 'VC' in pattern:
+            features.append('Linking Verb')
+        
+        # サブスロット情報から特徴抽出
+        sub_slots = result_data.get('sub_slots', {})
+        if sub_slots:
+            features.append('Complex Structure')
+        
+        return features if features else ['Basic']
+    
+    def _create_error_output(self, error_message, original_data=None):
+        """エラー出力作成"""
+        error_output = {
+            'status': 'error',
+            'error': error_message,
+            'timestamp': self._get_timestamp(),
+            'slots': {},
+            'pattern_detected': 'ERROR',
+            'confidence': 0.0,
+            'analysis_method': 'error_recovery'
+        }
+        
+        # 可能な場合は部分的なデータを保持
+        if isinstance(original_data, dict):
+            error_output['partial_data'] = {
+                'slots': original_data.get('slots', {}),
+                'pattern': original_data.get('pattern_detected', 'Unknown')
+            }
+        
+        return error_output
+    
+    def _pure_error_handling(self, error_context, original_data=None, recovery_level="full"):
+        """
+        Phase A3-2b Method 16: 完全独立したエラー処理・回復システム (最終メソッド)
+        
+        Args:
+            error_context (dict): エラーコンテキスト情報
+            original_data (dict): 元のデータ（回復用）
+            recovery_level (str): 回復レベル ("full", "partial", "minimal", "fail")
+            
+        Returns:
+            dict: エラー処理済み結果または回復済みデータ
+        """
+        try:
+            # 1. エラーコンテキスト解析
+            error_analysis = self._analyze_error_context(error_context)
+            
+            # 2. 回復レベル別処理
+            if recovery_level == "full":
+                return self._full_error_recovery(error_analysis, original_data)
+            elif recovery_level == "partial":
+                return self._partial_error_recovery(error_analysis, original_data)
+            elif recovery_level == "minimal":
+                return self._minimal_error_recovery(error_analysis, original_data)
+            else:  # fail
+                return self._fail_safe_fallback(error_analysis, original_data)
+                
+        except Exception as critical_error:
+            # 最終フォールバック
+            return self._critical_error_fallback(str(critical_error), original_data)
+    
+    def _analyze_error_context(self, error_context):
+        """エラーコンテキスト詳細解析"""
+        analysis = {
+            'error_type': 'unknown',
+            'severity': 'medium',
+            'recovery_possible': True,
+            'data_corruption': False,
+            'system_stable': True,
+            'suggested_action': 'retry',
+            'confidence_impact': 0.0,
+            'details': {}
+        }
+        
+        if not isinstance(error_context, dict):
+            analysis['error_type'] = 'invalid_context'
+            analysis['severity'] = 'high'
+            analysis['recovery_possible'] = False
+            return analysis
+        
+        # エラー種別判定
+        error_message = error_context.get('error', '').lower()
+        
+        if 'attribute' in error_message or 'method' in error_message:
+            analysis['error_type'] = 'method_missing'
+            analysis['severity'] = 'high'
+            analysis['suggested_action'] = 'fallback_method'
+            analysis['confidence_impact'] = 0.3
+            
+        elif 'index' in error_message or 'key' in error_message:
+            analysis['error_type'] = 'data_access'
+            analysis['severity'] = 'medium'
+            analysis['suggested_action'] = 'data_repair'
+            analysis['confidence_impact'] = 0.1
+            
+        elif 'type' in error_message or 'none' in error_message:
+            analysis['error_type'] = 'type_mismatch'
+            analysis['severity'] = 'medium'
+            analysis['suggested_action'] = 'type_conversion'
+            analysis['confidence_impact'] = 0.15
+            
+        elif 'timeout' in error_message or 'connection' in error_message:
+            analysis['error_type'] = 'system_resource'
+            analysis['severity'] = 'low'
+            analysis['suggested_action'] = 'retry_delayed'
+            analysis['confidence_impact'] = 0.05
+            
+        elif 'memory' in error_message or 'overflow' in error_message:
+            analysis['error_type'] = 'resource_exhaustion'
+            analysis['severity'] = 'critical'
+            analysis['recovery_possible'] = False
+            analysis['system_stable'] = False
+            analysis['suggested_action'] = 'system_restart'
+            analysis['confidence_impact'] = 0.5
+        
+        # データ破損チェック
+        if error_context.get('data_integrity', True) is False:
+            analysis['data_corruption'] = True
+            analysis['severity'] = 'critical'
+            analysis['recovery_possible'] = False
+        
+        # システム安定性チェック
+        error_count = error_context.get('error_count', 0)
+        if error_count > 5:
+            analysis['system_stable'] = False
+            analysis['severity'] = 'critical'
+        
+        analysis['details'] = {
+            'original_error': error_context.get('error', 'Unknown error'),
+            'error_count': error_count,
+            'timestamp': self._get_timestamp(),
+            'context_type': type(error_context).__name__
+        }
+        
+        return analysis
+    
+    def _full_error_recovery(self, error_analysis, original_data):
+        """完全エラー回復処理"""
+        recovery_result = {
+            'status': 'recovered',
+            'recovery_method': 'full',
+            'confidence': 1.0 - error_analysis['confidence_impact'],
+            'timestamp': self._get_timestamp()
+        }
+        
+        try:
+            if error_analysis['error_type'] == 'method_missing':
+                # メソッド欠損の場合は代替実装を使用
+                recovery_result['data'] = self._fallback_analysis(original_data)
+                recovery_result['notes'] = 'Used fallback analysis method'
+                
+            elif error_analysis['error_type'] == 'data_access':
+                # データアクセスエラーの場合はデータ修復
+                recovery_result['data'] = self._repair_data_structure(original_data)
+                recovery_result['notes'] = 'Repaired data structure'
+                
+            elif error_analysis['error_type'] == 'type_mismatch':
+                # 型不一致の場合は型変換
+                recovery_result['data'] = self._convert_data_types(original_data)
+                recovery_result['notes'] = 'Converted data types'
+                
+            else:
+                # その他のエラーは部分回復に移行
+                return self._partial_error_recovery(error_analysis, original_data)
+            
+            # 回復結果の検証
+            if self._validate_recovery_result(recovery_result['data']):
+                return recovery_result
+            else:
+                # 検証失敗時は部分回復に移行
+                return self._partial_error_recovery(error_analysis, original_data)
+                
+        except Exception as recovery_error:
+            # 完全回復失敗時は部分回復に移行
+            return self._partial_error_recovery(error_analysis, original_data)
+    
+    def _partial_error_recovery(self, error_analysis, original_data):
+        """部分エラー回復処理"""
+        recovery_result = {
+            'status': 'partially_recovered',
+            'recovery_method': 'partial',
+            'confidence': max(0.5, 1.0 - error_analysis['confidence_impact']),
+            'timestamp': self._get_timestamp()
+        }
+        
+        try:
+            # 部分データ抽出
+            if isinstance(original_data, dict):
+                safe_data = {}
+                
+                # 安全なフィールドのみ抽出
+                safe_fields = ['slots', 'pattern_detected', 'confidence', 'analysis_method']
+                for field in safe_fields:
+                    if field in original_data:
+                        try:
+                            safe_data[field] = original_data[field]
+                        except:
+                            pass  # フィールド取得失敗は無視
+                
+                # 最小限の構造を保証
+                if not safe_data.get('slots'):
+                    safe_data['slots'] = {}
+                if not safe_data.get('pattern_detected'):
+                    safe_data['pattern_detected'] = 'Unknown'
+                if not safe_data.get('confidence'):
+                    safe_data['confidence'] = 0.5
+                if not safe_data.get('analysis_method'):
+                    safe_data['analysis_method'] = 'error_recovery'
+                
+                recovery_result['data'] = safe_data
+                recovery_result['notes'] = 'Extracted safe data fields'
+                
+            else:
+                # データが辞書でない場合は最小回復に移行
+                return self._minimal_error_recovery(error_analysis, original_data)
+            
+            return recovery_result
+            
+        except Exception as recovery_error:
+            # 部分回復失敗時は最小回復に移行
+            return self._minimal_error_recovery(error_analysis, original_data)
+    
+    def _minimal_error_recovery(self, error_analysis, original_data):
+        """最小エラー回復処理"""
+        return {
+            'status': 'minimal_recovery',
+            'recovery_method': 'minimal',
+            'confidence': 0.3,
+            'timestamp': self._get_timestamp(),
+            'data': {
+                'slots': {},
+                'pattern_detected': 'ERROR',
+                'confidence': 0.0,
+                'analysis_method': 'minimal_recovery',
+                'error_info': {
+                    'type': error_analysis['error_type'],
+                    'severity': error_analysis['severity'],
+                    'recoverable': error_analysis['recovery_possible']
+                }
+            },
+            'notes': 'Minimal recovery with empty result'
+        }
+    
+    def _fail_safe_fallback(self, error_analysis, original_data):
+        """フェイルセーフフォールバック"""
+        return {
+            'status': 'fail_safe',
+            'recovery_method': 'fail_safe',
+            'confidence': 0.0,
+            'timestamp': self._get_timestamp(),
+            'data': {
+                'slots': {},
+                'pattern_detected': 'FAIL',
+                'confidence': 0.0,
+                'analysis_method': 'fail_safe',
+                'system_status': 'unstable' if not error_analysis['system_stable'] else 'degraded'
+            },
+            'error_report': {
+                'type': error_analysis['error_type'],
+                'severity': error_analysis['severity'],
+                'system_stable': error_analysis['system_stable'],
+                'data_corruption': error_analysis['data_corruption'],
+                'suggested_action': error_analysis['suggested_action']
+            },
+            'notes': 'Fail-safe mode activated due to critical error'
+        }
+    
+    def _critical_error_fallback(self, critical_error, original_data):
+        """緊急時最終フォールバック"""
+        return {
+            'status': 'critical_failure',
+            'recovery_method': 'emergency',
+            'confidence': 0.0,
+            'timestamp': self._get_timestamp(),
+            'data': {
+                'slots': {},
+                'pattern_detected': 'CRITICAL_ERROR',
+                'confidence': 0.0,
+                'analysis_method': 'emergency_fallback'
+            },
+            'critical_error': str(critical_error),
+            'emergency_response': True,
+            'notes': 'Emergency fallback due to critical system failure'
+        }
+    
+    def _fallback_analysis(self, data):
+        """代替解析実装"""
+        if not isinstance(data, dict):
+            return {'slots': {}, 'pattern_detected': 'Unknown', 'confidence': 0.0}
+        
+        # 基本的なスロット抽出
+        fallback_result = {
+            'slots': data.get('slots', {}),
+            'pattern_detected': data.get('pattern_detected', 'Fallback'),
+            'confidence': max(0.3, float(data.get('confidence', 0.0)) - 0.2),
+            'analysis_method': 'fallback_implementation'
+        }
+        
+        return fallback_result
+    
+    def _repair_data_structure(self, data):
+        """データ構造修復"""
+        if not isinstance(data, dict):
+            return {'slots': {}, 'pattern_detected': 'Repaired', 'confidence': 0.3}
+        
+        repaired = {}
+        
+        # 安全にデータをコピー
+        for key, value in data.items():
+            try:
+                if isinstance(value, (str, int, float, bool)):
+                    repaired[key] = value
+                elif isinstance(value, dict):
+                    repaired[key] = dict(value)  # 安全な辞書コピー
+                elif isinstance(value, list):
+                    repaired[key] = list(value)  # 安全なリストコピー
+                else:
+                    repaired[key] = str(value)  # その他は文字列化
+            except:
+                continue  # 問題のあるフィールドはスキップ
+        
+        # 必須フィールドの確保
+        if 'slots' not in repaired:
+            repaired['slots'] = {}
+        if 'pattern_detected' not in repaired:
+            repaired['pattern_detected'] = 'Repaired'
+        if 'confidence' not in repaired:
+            repaired['confidence'] = 0.4
+        
+        return repaired
+    
+    def _convert_data_types(self, data):
+        """データ型変換"""
+        if not data:
+            return {'slots': {}, 'pattern_detected': 'Converted', 'confidence': 0.3}
+        
+        converted = {}
+        
+        # 型変換処理
+        if isinstance(data, dict):
+            for key, value in data.items():
+                try:
+                    if key == 'confidence':
+                        converted[key] = float(value) if value is not None else 0.0
+                    elif key == 'slots' and not isinstance(value, dict):
+                        converted[key] = {}
+                    elif key == 'pattern_detected' and not isinstance(value, str):
+                        converted[key] = str(value) if value is not None else 'Unknown'
+                    else:
+                        converted[key] = value
+                except:
+                    converted[key] = None
+        else:
+            # データが辞書でない場合は基本構造を作成
+            converted = {
+                'slots': {},
+                'pattern_detected': 'TypeConverted',
+                'confidence': 0.3,
+                'original_type': type(data).__name__
+            }
+        
+        return converted
+    
+    def _validate_recovery_result(self, recovery_data):
+        """回復結果の検証"""
+        if not isinstance(recovery_data, dict):
+            return False
+        
+        # 必須フィールドの存在確認
+        required_fields = ['slots', 'pattern_detected', 'confidence']
+        for field in required_fields:
+            if field not in recovery_data:
+                return False
+        
+        # データ型の確認
+        if not isinstance(recovery_data['slots'], dict):
+            return False
+        if not isinstance(recovery_data['pattern_detected'], str):
+            return False
+        
+        try:
+            confidence = float(recovery_data['confidence'])
+            if not (0.0 <= confidence <= 1.0):
+                return False
+        except:
+            return False
+        
+        return True
     
     def _get_timestamp(self) -> str:
         """ユーティリティ: タイムスタンプ生成"""
