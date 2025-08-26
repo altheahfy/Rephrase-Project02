@@ -72,13 +72,26 @@ class RelativeClauseHandler:
         rel_modifiers = []  # 修飾語を別途記録
         
         if rel_verb_idx is not None:
-            # 動詞の後続修飾語を収集
+            # 動詞の後続修飾語を収集（位置ベース）
             for i in range(rel_verb_idx + 1, len(doc)):
                 if doc[i].dep_ == 'ROOT':  # 主節に達したら停止
                     break
-                # 動詞に依存する要素を追加
-                if doc[i].head.i == rel_verb_idx:
+                # 副詞(fast, here等)を修飾語として収集
+                if doc[i].pos_ == 'ADV':
                     rel_modifiers.append(doc[i].text)
+                # 前置詞句も修飾語として収集
+                elif doc[i].pos_ == 'ADP':
+                    prep_phrase = [doc[i].text]
+                    # 前置詞句の構成要素を収集
+                    for j in range(i + 1, len(doc)):
+                        if doc[j].dep_ == 'ROOT':
+                            break
+                        if doc[j].pos_ in ['DET', 'ADJ', 'NOUN', 'PROPN']:
+                            prep_phrase.append(doc[j].text)
+                        else:
+                            break
+                    rel_modifiers.extend(prep_phrase)
+                    break  # 前置詞句処理後は終了
         
         # 修飾語がある場合はsub-m2に設定
         sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
@@ -193,12 +206,32 @@ class RelativeClauseHandler:
         
         # 関係節部分の完全な動詞句を構築
         rel_verb_phrase = rel_verb
+        rel_modifiers = []  # 修飾語を別途記録
+        
         if rel_verb_idx is not None:
+            # 動詞の後続修飾語を収集（位置ベース）
             for i in range(rel_verb_idx + 1, len(doc)):
                 if doc[i].dep_ == 'ROOT':
                     break
-                if doc[i].head.i == rel_verb_idx:
-                    rel_verb_phrase += " " + doc[i].text
+                # 副詞(there, here, fast等)を修飾語として収集
+                if doc[i].pos_ == 'ADV':
+                    rel_modifiers.append(doc[i].text)
+                # 前置詞句も修飾語として収集
+                elif doc[i].pos_ == 'ADP':
+                    prep_phrase = [doc[i].text]
+                    # 前置詞句の構成要素を収集
+                    for j in range(i + 1, len(doc)):
+                        if doc[j].dep_ == 'ROOT':
+                            break
+                        if doc[j].pos_ in ['DET', 'ADJ', 'NOUN', 'PROPN']:
+                            prep_phrase.append(doc[j].text)
+                        else:
+                            break
+                    rel_modifiers.extend(prep_phrase)
+                    break  # 前置詞句処理後は終了
+        
+        # 修飾語がある場合はsub-m2に設定
+        sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
         
         # 主節を構築
         main_clause = ""
@@ -206,14 +239,52 @@ class RelativeClauseHandler:
             main_tokens = [token.text for token in doc[main_clause_start:]]
             main_clause = " ".join(main_tokens)
         
+        # whichは主語・目的語を文脈で判定
+        # 簡略判定：which直後に動詞があれば主語、名詞があれば目的語
+        is_subject = True
+        which_idx = None
+        for i, token in enumerate(doc):
+            if token.text.lower() == 'which':
+                which_idx = i
+                break
+        
+        if which_idx is not None and which_idx + 1 < len(doc):
+            next_token = doc[which_idx + 1]
+            if next_token.pos_ in ['PRON', 'NOUN', 'PROPN']:
+                is_subject = False  # which + 名詞 = 目的格
+        
+        # サブスロット構築
+        if is_subject:
+            sub_slots = {
+                'sub-s': f"{antecedent} which",
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
+            }
+        else:
+            # 目的格whichの場合、関係節内の主語を特定
+            rel_subject = ""
+            if which_idx is not None:
+                for i in range(which_idx + 1, len(doc)):
+                    if doc[i].pos_ in ['PRON', 'NOUN', 'PROPN'] and doc[i].text != rel_verb:
+                        rel_subject = doc[i].text
+                        break
+            
+            sub_slots = {
+                'sub-o1': f"{antecedent} which",
+                'sub-s': rel_subject,
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
+            }
+        
+        # 修飾語がある場合は追加
+        if sub_m2:
+            sub_slots['sub-m2'] = sub_m2
+        
         return {
             'success': True,
             'main_slots': {'S': ''},
-            'sub_slots': {
-                'sub-o1': f"{antecedent} which",  # whichは通常目的格
-                'sub-v': rel_verb_phrase.strip()
-            },
-            'pattern_type': 'which_object',
+            'sub_slots': sub_slots,
+            'pattern_type': 'which_object' if not is_subject else 'which_subject',
             'relative_pronoun': 'which',
             'antecedent': antecedent,
             'main_continuation': main_clause.strip(),
@@ -245,12 +316,17 @@ class RelativeClauseHandler:
         
         # 関係節部分の完全な動詞句を構築
         rel_verb_phrase = rel_verb
+        rel_modifiers = []  # 修飾語を別途記録
+        
         if rel_verb_idx is not None:
             for i in range(rel_verb_idx + 1, len(doc)):
                 if doc[i].dep_ == 'ROOT':
                     break
                 if doc[i].head.i == rel_verb_idx:
-                    rel_verb_phrase += " " + doc[i].text
+                    rel_modifiers.append(doc[i].text)
+        
+        # 修飾語がある場合はsub-m2に設定
+        sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
         
         # 主節を構築
         main_clause = ""
@@ -258,16 +334,52 @@ class RelativeClauseHandler:
             main_tokens = [token.text for token in doc[main_clause_start:]]
             main_clause = " ".join(main_tokens)
         
-        # thatは主格・目的格両方の可能性があるため文脈で判断
-        # 簡略化：主格として扱う
+        # thatは主語・目的語を文脈で判定
+        # 簡略判定：that直後に動詞があれば主語、名詞があれば目的語
+        is_subject = True
+        that_idx = None
+        for i, token in enumerate(doc):
+            if token.text.lower() == 'that':
+                that_idx = i
+                break
+        
+        if that_idx is not None and that_idx + 1 < len(doc):
+            next_token = doc[that_idx + 1]
+            if next_token.pos_ in ['PRON', 'NOUN', 'PROPN']:
+                is_subject = False  # that + 名詞 = 目的格
+        
+        # サブスロット構築
+        if is_subject:
+            sub_slots = {
+                'sub-s': f"{antecedent} that",
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
+            }
+        else:
+            # 目的格thatの場合、関係節内の主語を特定
+            rel_subject = ""
+            if that_idx is not None:
+                for i in range(that_idx + 1, len(doc)):
+                    if doc[i].pos_ in ['PRON', 'NOUN', 'PROPN'] and doc[i].text != rel_verb:
+                        rel_subject = doc[i].text
+                        break
+            
+            sub_slots = {
+                'sub-o1': f"{antecedent} that",
+                'sub-s': rel_subject,
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
+            }
+        
+        # 修飾語がある場合は追加
+        if sub_m2:
+            sub_slots['sub-m2'] = sub_m2
+        
         return {
             'success': True,
             'main_slots': {'S': ''},
-            'sub_slots': {
-                'sub-s': f"{antecedent} that",
-                'sub-v': rel_verb_phrase.strip()
-            },
-            'pattern_type': 'that_subject',
+            'sub_slots': sub_slots,
+            'pattern_type': 'that_subject' if is_subject else 'that_object',
             'relative_pronoun': 'that',
             'antecedent': antecedent,
             'main_continuation': main_clause.strip(),
@@ -322,7 +434,8 @@ class RelativeClauseHandler:
             'sub_slots': {
                 'sub-o1': f"{antecedent} whom",  # whomは目的格
                 'sub-s': rel_subject,
-                'sub-v': rel_verb
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
             },
             'pattern_type': 'whom_object',
             'relative_pronoun': 'whom',
@@ -373,7 +486,8 @@ class RelativeClauseHandler:
             'main_slots': {'S': ''},
             'sub_slots': {
                 'sub-s': rel_subject,
-                'sub-v': rel_verb
+                'sub-v': rel_verb,
+                '_parent_slot': 'S'
             },
             'pattern_type': 'whose_possessive',
             'relative_pronoun': 'whose',
