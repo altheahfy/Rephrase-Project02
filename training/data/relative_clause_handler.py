@@ -44,17 +44,45 @@ class RelativeClauseHandler:
             return {'success': False, 'error': f'処理エラー: {str(e)}'}
     
     def _process_who(self, text: str) -> Dict[str, Any]:
-        """who関係節処理（Legacy正規表現パターン）"""
-        # Legacy パターン: (.+?)\s+who\s+(\w+(?:\s+\w+)*?)\s+(.+)
-        pattern = r'(.+?)\s+who\s+(\w+(?:\s+\w+)*?)\s+(.+)'
+        """who関係節処理（Legacy正規表現パターン改良版）"""
+        # パターン1: 関係節が修飾語を含む場合
+        # The man who runs fast is strong. → antecedent="The man", rel_verb="runs", modifiers="fast", rest="is strong."
+        pattern = r'(.+?)\s+who\s+(\w+(?:\s+\w+)*?)\s+(.+?)\s+(is|was|are|were|will|would|can|could|has|have|had)\s+(.+)'
         match = re.match(pattern, text, re.IGNORECASE)
         
         if match:
             antecedent = match.group(1).strip()
-            rel_verb = match.group(2).strip() 
-            rest = match.group(3).strip()
+            rel_verb_and_modifiers = match.group(2).strip() + " " + match.group(3).strip()
+            main_verb = match.group(4).strip()
+            rest_after_verb = match.group(5).strip()
             
-            # 動詞確認（Legacy方式）
+            # 関係節内動詞を特定
+            rel_verb = rel_verb_and_modifiers.split()[0]  # 最初の単語が動詞
+            
+            if self._is_likely_verb(rel_verb):
+                return {
+                    'success': True,
+                    'main_slots': {'S': ''},  # Legacy戦略: 主語スロット空文字列
+                    'sub_slots': {
+                        'sub-s': f"{antecedent} who",
+                        'sub-v': rel_verb_and_modifiers
+                    },
+                    'pattern_type': 'who_subject',
+                    'relative_pronoun': 'who',
+                    'antecedent': antecedent,
+                    'main_continuation': f"{main_verb} {rest_after_verb}"  # 主節のみ
+                }
+        
+        # パターン2: 元のシンプルなパターン（フォールバック）
+        pattern_simple = r'(.+?)\s+who\s+(\w+(?:\s+\w+)*?)\s+(.+)'
+        match_simple = re.match(pattern_simple, text, re.IGNORECASE)
+        
+        if match_simple:
+            antecedent = match_simple.group(1).strip()
+            rel_verb = match_simple.group(2).strip() 
+            rest = match_simple.group(3).strip()
+            
+            # 動詞確認
             if self._is_likely_verb(rel_verb.split()[0]):
                 return {
                     'success': True,

@@ -109,17 +109,15 @@ class CentralController:
                 # 関係節処理結果を保存
                 final_result.update(rel_result)
                 
-                # 関係節が処理した代表語句をBasicFivePatternHandlerに渡す
-                representative_subject = rel_result.get('main_slots', {}).get('_representative_subject', '')
-                if representative_subject:
-                    # 代表語句で置き換えた文を作成
-                    simplified_text = self._create_simplified_text(text, rel_result)
-                else:
-                    simplified_text = text
+                # 関係節を除去した簡略文を作成
+                simplified_text = self._create_simplified_text(text, rel_result)
+                print(f"🔄 Phase 2 処理: 関係節検出 → 簡略文: '{simplified_text}'")
             else:
                 simplified_text = text
+                print(f"⚠️ 関係節処理失敗、元の文を使用")
         else:
             simplified_text = text
+            print(f"📝 関係節なし、元の文で5文型処理: '{simplified_text}'")
         
         # Step 2: 5文型処理
         if 'basic_five_pattern' in grammar_patterns:
@@ -148,23 +146,28 @@ class CentralController:
             relative_result: 関係節処理結果
             
         Returns:
-            str: 代表語句で置き換えた簡略文
+            str: 関係節を除去した簡略文
         """
-        # 現在は代表語句をそのまま使用（改善余地あり）
-        representative = relative_result.get('main_slots', {}).get('_representative_subject', '')
-        if representative:
-            # 簡易的な置き換え（より精密な実装は今後の課題）
-            segments = relative_result.get('segments', {})
-            main_clause_tokens = segments.get('main_clause', [])
-            if main_clause_tokens:
-                main_clause_text = ' '.join([t.text for t in main_clause_tokens])
-                return f"{representative} {main_clause_text}"
+        # RelativeClauseHandlerの結果から代表語句と主節継続部分を取得
+        detection_result = relative_result.get('detection_result', {})
+        antecedent = relative_result.get('antecedent', '')
+        main_continuation = relative_result.get('main_continuation', '')
         
+        if antecedent and main_continuation:
+            # 代表語句 + 主節継続部分で簡略文作成
+            simplified = f"{antecedent} {main_continuation}"
+            print(f"🔄 簡略文作成: '{original_text}' → '{simplified}'")
+            return simplified
+        
+        # フォールバック: 元の文をそのまま返す
+        print(f"⚠️ 簡略文作成失敗、元の文を使用: '{original_text}'")
         return original_text
     
     def _merge_results(self, text: str, relative_result: Dict, five_result: Dict) -> Dict[str, Any]:
         """
-        関係節結果と5文型結果の統合
+        関係節結果と5文型結果の統合（設計仕様書準拠）
+        
+        設計仕様: → 中央管理システム: サブ要素がある上位Sを""に設定
         
         Args:
             text: 元の文
@@ -180,10 +183,14 @@ class CentralController:
         # サブスロット: 関係節結果から
         sub_slots = relative_result.get('sub_slots', {})
         
-        # 代表語句で主語を更新
-        representative = relative_result.get('main_slots', {}).get('_representative_subject', '')
-        if representative and main_slots.get('S') == '':
-            main_slots['S'] = representative
+        # 🎯 設計仕様書ルール: 「サブ要素がある上位Sを""に設定」
+        if sub_slots:
+            # サブスロットがある場合、対応するメインスロットを空文字列に
+            if any(slot.startswith('sub-') for slot in sub_slots.keys()):
+                # 関係節の場合、主にSスロットが影響を受ける
+                if 'sub-s' in sub_slots or 'sub-o1' in sub_slots:
+                    main_slots['S'] = ''
+                    print(f"🎯 設計仕様適用: S スロットを空文字列に設定 (sub-slots存在)")
         
         return {
             'original_text': text,
