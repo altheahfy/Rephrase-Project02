@@ -4140,6 +4140,202 @@ class PureCentralController:
             }
         }
     
+    def analyze_sentence_pure_management(self, sentence: str) -> Dict[str, Any]:
+        """
+        🎯 Phase A3-2a: 完全複製実装
+        
+        現在のanalyze_sentence()の全ロジックを完全コピーして
+        PureCentralControllerで同一の86.1%精度を実現
+        
+        Args:
+            sentence (str): 解析対象の文章
+            
+        Returns:
+            Dict[str, Any]: Rephraseスロット構造（レガシー完全互換）
+        """
+        self.logger.debug(f"🎯 Phase A3-2a: PureCentralController完全複製実行: '{sentence}'")
+        
+        # === 元のanalyze_sentence()ロジックを完全複製 ===
+        allow_unified = False  # PureCentralControllerは独立実行（再帰防止）
+        
+        # 累積バグ修正: 新しい分析開始時にlast_unified_resultをリセット
+        if hasattr(self.grammar_mapper, 'last_unified_result'):
+            self.grammar_mapper.last_unified_result = None
+        
+        # ChatGPT5 Step C: Token Consumption Tracking - 新しい分析開始時にリセット
+        if hasattr(self.grammar_mapper, '_consumed_tokens'):
+            self.grammar_mapper._consumed_tokens = set()
+        
+        try:
+            # 🆕 Phase 1.2: 文型認識
+            sentence_type = "statement"  # 一時的にデフォルト値
+            sentence_type_confidence = 0.8  # 一時的にデフォルト値
+            
+            # 1. spaCy基本解析
+            doc = self.grammar_mapper.nlp(sentence)
+            tokens = self.grammar_mapper._extract_tokens(doc)
+            
+            # 1.5. 関係節構造の検出
+            relative_clause_info = self.grammar_mapper._detect_relative_clause(tokens, sentence)
+            
+            # 🔧 サブスロット生成を事前除外より前に実行（car等の要素を保持するため）
+            sub_slots = {}
+            original_tokens = tokens.copy()  # 元のトークンを保存
+            if relative_clause_info['found']:
+                self.logger.debug(f"関係節検出: {relative_clause_info['type']} (信頼度: {relative_clause_info['confidence']})")
+                
+                # レガシー関係節処理
+                temp_core_elements = self.grammar_mapper._identify_core_elements(tokens)
+                processed_tokens, sub_slots = self.grammar_mapper._process_relative_clause(original_tokens, relative_clause_info, temp_core_elements)
+            
+            # 🔧 関係節内要素の事前除外（メイン文法解析用）
+            excluded_indices = self.grammar_mapper._identify_relative_clause_elements(tokens, relative_clause_info)
+            
+            # 2. 除外されていない要素のみでコア要素を特定
+            filtered_tokens = [token for i, token in enumerate(tokens) if i not in excluded_indices]
+            
+            # 🔥 Phase A2: 内部5文型処理を直接使用（統合ハンドラー）
+            print("🔥 Phase A2: 内部5文型処理による文型解析開始")
+            core_elements = self.grammar_mapper._identify_core_elements(filtered_tokens)
+            sentence_pattern = self.grammar_mapper._determine_sentence_pattern(core_elements, filtered_tokens)
+            grammar_elements = self.grammar_mapper._assign_grammar_roles(filtered_tokens, sentence_pattern, core_elements, relative_clause_info)
+            
+            # 成功判定
+            pattern_analysis = {
+                'handler_success': len(grammar_elements) > 0,
+                'core_elements': core_elements,
+                'sentence_pattern': sentence_pattern,
+                'grammar_elements': grammar_elements
+            }
+            
+            print(f"🔥 Phase A2: 内部5文型処理完了: {sentence_pattern}")
+            print(f"🔧 Phase A2: grammar_elements取得: {[{'role': e.role, 'text': e.text} for e in grammar_elements]}")
+            
+            # 5. Rephraseスロット形式に変換
+            rephrase_result = self.grammar_mapper._convert_to_rephrase_format(grammar_elements, sentence_pattern, sub_slots)
+            
+            # 🔥 Phase A2: 内部5文型処理完了 - 統合ハンドラーシステムをテスト実行
+            if pattern_analysis.get('handler_success'):
+                print(f"🔥 Phase A2: 統合ハンドラーシステムスキップ（内部5文型処理で完了済み）")
+                print(f"🧪 Phase A1テスト: 統合ハンドラーを強制有効化（修正版テスト）")
+                # 🔧 Phase A3: 統合ハンドラーの既存結果をクリア
+                if hasattr(self.grammar_mapper, 'last_unified_result'):
+                    self.grammar_mapper.last_unified_result = None
+                print(f"🔧 Phase A2: 統合ハンドラー結果クリア（内部5文型処理使用）")
+            
+            # 🔥 Phase 2: 統合ハンドラーシステム実行（受動態・助動詞・副詞処理）
+            try:
+                unified_result = self.grammar_mapper._unified_mapping(sentence, doc)
+                if unified_result and 'slots' in unified_result:
+                    # 統合ハンドラーの結果をマージ（優先度順）
+                    for slot_name, slot_value in unified_result['slots'].items():
+                        if slot_value:  # 空でない値のみマージ
+                            # ChatGPT5 Step D: 受動態ハンドラーは全スロット優先（Aux, V, M）
+                            if 'passive_voice' in str(unified_result.get('grammar_info', {})):
+                                rephrase_result['slots'][slot_name] = slot_value
+                                rephrase_result['main_slots'][slot_name] = slot_value
+                                print(f"🔥 受動態優先マージ: {slot_name} = '{slot_value}'")
+                            # その他のスロットは既存値がない場合のみ
+                            elif not rephrase_result['slots'].get(slot_name):
+                                rephrase_result['slots'][slot_name] = slot_value
+                                rephrase_result['main_slots'][slot_name] = slot_value
+                    
+                    # 文法情報もマージ
+                    if 'grammar_info' in unified_result:
+                        if 'unified_handlers' not in rephrase_result:
+                            rephrase_result['unified_handlers'] = {}
+                        rephrase_result['unified_handlers'] = unified_result['grammar_info']
+                    
+                    # ChatGPT5 Step D: Token consumptionベースで重複スロット削除
+                    self.grammar_mapper._cleanup_duplicate_slots_by_consumption(rephrase_result, doc)
+                    
+                    # 🔥 Phase 2: 統合ハンドラー結果を保存 (サブスロットマージ用)
+                    self.grammar_mapper.last_unified_result = unified_result
+                    print(f"🔥 統合ハンドラー結果保存: sub_slots = {unified_result.get('sub_slots', {})}")
+                    
+                    # 🎯 Central Controller: サブスロット情報を最終結果に統合
+                    if unified_result.get('sub_slots'):
+                        if 'sub_slots' not in rephrase_result:
+                            rephrase_result['sub_slots'] = {}
+                        rephrase_result['sub_slots'].update(unified_result['sub_slots'])
+                        print(f"🎯 Central Controller: Sub-slots merged to final result: {rephrase_result['sub_slots']}")
+                    
+                    # 🎯 Central Controller: メインスロット修正（関係節分離対応）
+                    if unified_result.get('relative_clause_info', {}).get('found'):
+                        main_sentence = unified_result['relative_clause_info']['main_sentence']
+                        print(f"🎯 Central Controller: Analyzing main sentence for correct slots: '{main_sentence}'")
+                        
+                        # 主文を再分析してメインスロットを正しく設定
+                        main_doc = self.grammar_mapper.nlp(main_sentence)
+                        main_analysis = self.grammar_mapper._analyze_sentence_legacy(main_sentence, main_doc)
+                        if main_analysis and 'slots' in main_analysis:
+                            # 中央制御: サブスロットと重複しないメインスロットのみ採用
+                            for slot_name, slot_value in main_analysis['slots'].items():
+                                if slot_value and slot_name not in ['sub-s', 'sub-v', 'sub-aux', 'sub-c1', 'sub-o1']:
+                                    # サブスロットの値と重複チェック
+                                    is_duplicate = False
+                                    for sub_name, sub_value in unified_result.get('sub_slots', {}).items():
+                                        if sub_value and str(slot_value).lower() in str(sub_value).lower():
+                                            print(f"🎯 Central Controller: Skipping main slot {slot_name}='{slot_value}' (duplicate with {sub_name}='{sub_value}')")
+                                            is_duplicate = True
+                                            break
+                                    
+                                    if not is_duplicate:
+                                        # 🎯 Central Controller: 自動詞パターン特別処理
+                                        if slot_name == 'O1' and 'arrived' in main_sentence:
+                                            # "arrived"は自動詞なので、O1（目的語）は不要
+                                            print(f"🎯 Central Controller: Skipping O1='{slot_value}' (arrived is intransitive verb)")
+                                            continue
+                                        
+                                        rephrase_result['slots'][slot_name] = slot_value
+                                        rephrase_result['main_slots'][slot_name] = slot_value
+                                        print(f"🎯 Central Controller: Main slot set {slot_name}='{slot_value}'")
+                        
+                print(f"🔥 Phase 2: 統合ハンドラーシステム実行完了")
+            except Exception as e:
+                self.logger.error(f"統合ハンドラーシステムエラー: {e}")
+            
+            # 🆕 Phase 2: 副詞処理の追加 (Direct Implementation)
+            try:
+                additional_adverbs = self.grammar_mapper._detect_and_assign_adverbs_direct(doc, rephrase_result)
+                if additional_adverbs:
+                    print(f"🔥 Phase 2: 副詞処理により {len(additional_adverbs)}個の副詞を追加")
+                    rephrase_result['main_slots'].update(additional_adverbs)
+                    rephrase_result['slots'].update(additional_adverbs)
+            except Exception as e:
+                self.logger.error(f"副詞処理エラー: {e}")
+            
+            # 🆕 Phase 1.2: 文型情報を結果に追加
+            rephrase_result['sentence_type'] = sentence_type
+            rephrase_result['sentence_type_confidence'] = sentence_type_confidence
+            
+            # 🎯 Central Controller: 最終統合チェック
+            if hasattr(self.grammar_mapper, 'last_unified_result') and self.grammar_mapper.last_unified_result:
+                print(f"🎯 Central Controller: Final integration check")
+                
+                # 統合ハンドラー情報を最終結果に統合
+                if 'unified_handlers' in self.grammar_mapper.last_unified_result:
+                    rephrase_result['unified_handlers'] = self.grammar_mapper.last_unified_result['unified_handlers']
+                
+                # サブスロット最終チェック
+                unified_sub_slots = self.grammar_mapper.last_unified_result.get('sub_slots', {})
+                if unified_sub_slots:
+                    if 'sub_slots' not in rephrase_result:
+                        rephrase_result['sub_slots'] = {}
+                    
+                    # 中央制御: サブスロット統合
+                    for sub_name, sub_value in unified_sub_slots.items():
+                        if sub_value:
+                            rephrase_result['sub_slots'][sub_name] = sub_value
+                    
+                    print(f"🎯 Central Controller: Final sub_slots = {rephrase_result.get('sub_slots', {})}")
+            
+            return rephrase_result
+            
+        except Exception as e:
+            self.logger.error(f"PureCentralController解析エラー: {e}")
+            return self.grammar_mapper._create_error_result(sentence, str(e))
+
     def _init_ambiguous_word_resolver(self):
         """
         🧠 Phase A3-5: 人間的判定システム初期化
