@@ -1597,16 +1597,16 @@ class DynamicGrammarMapper:
         # �🔧 関係節の有無を確認してスロット番号を調整
         has_relative_clause = bool(sub_slots)
         
-        # C. 「相対節ありのシフト」は一度きりにする
+        # C. 関係節による修飾語シフト処理（一度きり実行）
         result = {}
-        if has_relative_clause and not getattr(self, '_shifted_for_relcl', False):
+        if has_relative_clause and not getattr(self, '_shifted_for_clause', False):
             for element in elements:
                 if element.role == 'M1':
                     element.role = 'M2'  # M1 → M2
                 elif element.role == 'M2':
                     element.role = 'M3'  # M2 → M3
-            self._shifted_for_relcl = True  # 一度だけ実行するフラグ
-            result['_shifted_for_relcl'] = True  # 結果にも印を残す
+            self._shifted_for_clause = True  # 一度だけ実行するフラグ
+            result['_shifted_for_clause'] = True  # 結果にも印を残す
             
         slots = []
         slot_phrases = []
@@ -1938,22 +1938,21 @@ class DynamicGrammarMapper:
             self.logger.debug(f"whose構文: 修飾対象名詞が見つからない")
             return whose_idx + 1
         
-        # Step 2: 関係節内動詞を探す
-        relcl_verb_idx = None
+        # Step 2: 関係節内動詞を探す（品詞ベース検出）
+        clause_verb_idx = None
         for i in range(possessed_noun_idx + 1, min(possessed_noun_idx + 4, len(tokens))):
             if tokens[i]['pos'] in ['VERB', 'AUX']:
-                relcl_verb_idx = i
+                clause_verb_idx = i
                 self.logger.debug(f"関係節内動詞: '{tokens[i]['text']}' at {i}")
                 break
         
-        if relcl_verb_idx is None:
-            self.logger.debug(f"whose構文: 関係節動詞が見つからない")
+        if clause_verb_idx is None:
             return possessed_noun_idx
         
-        # Step 3: 関係節内の補語/目的語を順次処理
-        clause_end = relcl_verb_idx
+        # Step 3: 関係節内の補語/目的語を順次処理（品詞ベース境界検出）
+        clause_end = clause_verb_idx
         
-        for i in range(relcl_verb_idx + 1, len(tokens)):
+        for i in range(clause_verb_idx + 1, len(tokens)):
             token = tokens[i]
             
             # 🆕 人間的品詞判定を使用（循環参照回避）
@@ -1968,7 +1967,7 @@ class DynamicGrammarMapper:
                 corrected_pos = token['pos']
             
             # 🆕 構造的判定: 新しい動詞が出現したら上位文開始
-            if corrected_pos in ['VERB', 'AUX'] and i > relcl_verb_idx:
+            if corrected_pos in ['VERB', 'AUX'] and i > clause_verb_idx:
                 self.logger.debug(f"上位文動詞検出により関係節終了: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
                 break
             
@@ -1997,8 +1996,8 @@ class DynamicGrammarMapper:
         
         clause_end = who_idx
         
-        # Step 1: who直後の動詞を探す（関係節内動詞）
-        relcl_verb_idx = None
+        # Step 1: who直後の動詞を探す（関係節内動詞、品詞ベース検出）
+        clause_verb_idx = None
         for i in range(who_idx + 1, min(who_idx + 3, len(tokens))):
             if i < len(tokens):
                 token = tokens[i]
@@ -2006,17 +2005,17 @@ class DynamicGrammarMapper:
                 corrected_pos = self._get_human_corrected_pos(token)
                 
                 if corrected_pos in ['VERB', 'AUX']:
-                    relcl_verb_idx = i
+                    clause_verb_idx = i
                     clause_end = i
                     self.logger.debug(f"who句内動詞発見: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
                     break
         
-        if relcl_verb_idx is None:
+        if clause_verb_idx is None:
             self.logger.debug("who句内動詞が見つからない")
             return who_idx + 1
         
-        # Step 2: 関係節内動詞の後の修飾語を関係節に含める（"fast"等）
-        for i in range(relcl_verb_idx + 1, len(tokens)):
+        # Step 2: 関係節内動詞の後の修飾語を関係節に含める（"fast"等、品詞ベース境界検出）
+        for i in range(clause_verb_idx + 1, len(tokens)):
             if i < len(tokens):
                 token = tokens[i]
                 
@@ -2024,7 +2023,7 @@ class DynamicGrammarMapper:
                 corrected_pos = self._get_human_corrected_pos(token)
                 
                 # 🆕 構造的判定: 新しい動詞が出現したら上位文開始
-                if corrected_pos in ['VERB', 'AUX'] and i > relcl_verb_idx:
+                if corrected_pos in ['VERB', 'AUX'] and i > clause_verb_idx:
                     self.logger.debug(f"上位文動詞検出によりwho句終了: '{token['text']}' at {i} (人間的判定: {corrected_pos})")
                     break
                 
@@ -4017,7 +4016,6 @@ def save_test_results(results: Dict[str, Any], output_path: str = None) -> str:
                 'text': token.text,
                 'pos': token.pos_,
                 'tag': token.tag_,
-                'dep': token.dep_,
                 'lemma': token.lemma_,
                 'is_alpha': token.is_alpha,
                 'is_stop': token.is_stop,
