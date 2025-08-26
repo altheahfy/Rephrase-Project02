@@ -1,0 +1,877 @@
+# 新規文法分解システム 設計仕様書 v1.0
+
+**作成日**: 2025年8月26日  
+**対象**: Rephrase文法分解システム 完全新規実装  
+**目標精度**: 段階的100%達成（5文型→関係節→受動態の順）
+
+---
+
+## 1. 開発思想・方針
+
+### 1.1 核心思想
+**「中央管理システム + 個別文法ハンドラー」による効率的Rephrase文法分解システム**
+
+- **Central Controller**: 文法解析実施→使用文法項目特定→各ハンドラーに順次分解指示→結果統合・order管理
+- **Specialized Handlers**: 各文法要素の専門分解のみ担当（中央管理システムとのみ接続）
+- **Human Grammar Recognition**: spaCyの品詞分析結果を情報源に、人間がパターン認識で文法体系を構築しそれに沿って言語を理解するように、文の全体構造からパターンと照合して分解する汎用的機能の集合体
+
+（具体例）
+「文法解析を実施し、使われている文法項目を特定、それぞれのハンドラーに順次分解を指示。まずは関係節ハンドラーに指示して節構造を分ける」「関係節ハンドラーが分解したサブスロット（代表語句以外にマスク）と上位スロットの対応構造を整理・保存」「order管理」「5文型ハンドラーにそれぞれをフラットに処理させ、上位とサブの配置、サブ要素がある上位を””にする、などの整理」「各個別ハンドラーは中央管理システムとのみ接続し、情報は中央管理システムのみから取得、処理結果も中央管理システムに渡す」
+
+### 1.2 設計原則
+1. **Single Responsibility Principle**: 各コンポーネントは単一の責任のみ
+2. **Human Grammar Pattern**: spaCy品詞分析を情報源とし、人間が文法体系を構築するように全体構造からパターン照合
+3. **Generic Design**: 個別事例対応ではなく同種ケース全てに機能する汎用設計
+4. **Hard-coding Prohibition**: どうしても他に方法がない場合以外はハードコーディング禁止
+5. **Zero Technical Debt**: 技術負債を発生させない
+
+---
+
+## 2. システム要件（既存システム分析結果）
+
+### 2.1 機能要件
+- **入力**: 英語文（文字列）
+- **出力**: Rephraseスロット形式のJSONオブジェクト（slot_order_data.json準拠）
+  ```json
+  {
+    "main_slots": {"S": "主語", "V": "動詞", "O1": "目的語", "M2": "修飾語"},
+    "sub_slots": {"sub-s": "関係節主語", "sub-v": "関係節動詞", "_parent_slot": "S"}
+  }
+
+  （最終成果物具体例）
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M1",
+    "SlotPhrase": "that afternoon at the crucial point in the presentation",
+    "SlotText": "あの、～の時点・地点で、～の中に、～の中で",
+    "PhraseType": "word",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 1,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "the manager who had recently taken charge of the project",
+    "SlotText": "最近",
+    "PhraseType": "clause",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 2,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-s",
+    "SubslotElement": "the manager who",
+    "SubslotText": "",
+    "Slot_display_order": 2,
+    "display_order": 1,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-aux",
+    "SubslotElement": "had",
+    "SubslotText": "過去完了",
+    "Slot_display_order": 2,
+    "display_order": 2,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-m2",
+    "SubslotElement": "recently",
+    "SubslotText": "最近",
+    "Slot_display_order": 2,
+    "display_order": 3,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-v",
+    "SubslotElement": "taken",
+    "SubslotText": "",
+    "Slot_display_order": 2,
+    "display_order": 4,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "S",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-o1",
+    "SubslotElement": "charge of the project",
+    "SubslotText": "",
+    "Slot_display_order": 2,
+    "display_order": 5,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "Aux",
+    "SlotPhrase": "had to",
+    "SlotText": "～しなければならなかった",
+    "PhraseType": "word",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 3,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "V",
+    "SlotPhrase": "make",
+    "SlotText": "",
+    "PhraseType": "word",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 4,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "O1",
+    "SlotPhrase": "the committee responsible for implementation",
+    "SlotText": "～のために",
+    "PhraseType": "word",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 6,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "C2",
+    "SlotPhrase": "deliver the final proposal flawlessly",
+    "SlotText": "",
+    "PhraseType": "phrase",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 7,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "C2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-v",
+    "SubslotElement": "deliver",
+    "SubslotText": "",
+    "Slot_display_order": 7,
+    "display_order": 1,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "C2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-o1",
+    "SubslotElement": "the final proposal",
+    "SubslotText": "",
+    "Slot_display_order": 7,
+    "display_order": 2,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "C2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-m3",
+    "SubslotElement": "flawlessly",
+    "SubslotText": "",
+    "Slot_display_order": 7,
+    "display_order": 3,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M2",
+    "SlotPhrase": "even though he was under intense pressure",
+    "SlotText": "たとえ～でも、～の下・元で",
+    "PhraseType": "clause",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 5,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-m1",
+    "SubslotElement": "even though",
+    "SubslotText": "たとえ～でも",
+    "Slot_display_order": 5,
+    "display_order": 1,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-s",
+    "SubslotElement": "he",
+    "SubslotText": "",
+    "Slot_display_order": 5,
+    "display_order": 2,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-v",
+    "SubslotElement": "was",
+    "SubslotText": "be動詞過去、進行形のbe動詞",
+    "Slot_display_order": 5,
+    "display_order": 3,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M2",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-m2",
+    "SubslotElement": "under intense pressure",
+    "SubslotText": "～の下・元で",
+    "Slot_display_order": 5,
+    "display_order": 4,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "so the outcome would reflect their full potential",
+    "SlotText": "だから、過去から未来を推量、彼らの",
+    "PhraseType": "clause",
+    "SubslotID": "",
+    "SubslotElement": "",
+    "SubslotText": "",
+    "Slot_display_order": 8,
+    "display_order": 0,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-m1",
+    "SubslotElement": "so",
+    "SubslotText": "だから",
+    "Slot_display_order": 8,
+    "display_order": 1,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-s",
+    "SubslotElement": "the outcome",
+    "SubslotText": "",
+    "Slot_display_order": 8,
+    "display_order": 2,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-aux",
+    "SubslotElement": "would",
+    "SubslotText": "過去から未来を推量",
+    "Slot_display_order": 8,
+    "display_order": 3,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-v",
+    "SubslotElement": "reflect",
+    "SubslotText": "",
+    "Slot_display_order": 8,
+    "display_order": 4,
+    "QuestionType": ""
+  },
+  {
+    "構文ID": "",
+    "V_group_key": "make",
+    "例文ID": "ex007",
+    "Slot": "M3",
+    "SlotPhrase": "",
+    "SlotText": "",
+    "PhraseType": "",
+    "SubslotID": "sub-o1",
+    "SubslotElement": "the full potential",
+    "SubslotText": "",
+    "Slot_display_order": 8,
+    "display_order": 5,
+    "QuestionType": ""
+  },
+  ```
+
+### 2.2 Rephrase的スロット構造（絶対遵守）
+#### 上位スロット（固定10スロット）
+【S位置のサブスロット群】
+S-sub-m1, S-sub-s, S-sub-aux, S-sub-m2, S-sub-v, S-sub-c1, S-sub-o1, S-sub-o2, S-sub-c2, S-sub-m3
+
+【M1位置のサブスロット群】  
+M1-sub-m1, M1-sub-s, M1-sub-aux, M1-sub-m2, M1-sub-v, M1-sub-c1, M1-sub-o1, M1-sub-o2, M1-sub-c2, M1-sub-m3
+
+【M2位置のサブスロット群】
+M2-sub-m1, M2-sub-s, M2-sub-aux, M2-sub-m2, M2-sub-v, M2-sub-c1, M2-sub-o1, M2-sub-o2, M2-sub-c2, M2-sub-m3
+
+... (O1, O2, C1, C2, M3も同様)
+```
+
+**❌ 絶対に間違った理解：**
+- `sub-m2` がM2のサブスロット ← **大間違い！**
+- `sub-v` がVのサブスロット ← **大間違い！**
+- 全スロットで共通のサブスロット群 ← **大間違い！**
+
+**✅ 正しい理解：**
+- `S-sub-m2` はSスロットのサブスロット
+- `M2-sub-v` はM2スロットのサブスロット  
+- `O1-sub-s` はO1スロットのサブスロット
+- **各上位スロットが独立した10個のサブスロットを持つ**
+
+#### 重要なRephrase的ルール
+1. **関係詞処理**: 先行詞と関係代名詞をセットでsub-sに格納
+   - ❌ 間違い: `S: "The man", sub-s: "who"`
+   - ✅ 正解: `S: "", sub-s: "The man who"`
+
+2. **重複排除**: サブスロット要素がある上位スロットは`""`とする（Rephraseではスロットに入れた要素を並べて例文を表示するので、重複や抜けがあると成立しない）
+   - 例: `"The man who runs"` → `S: "", sub-s: "The man who", sub-v: "runs"`
+
+3. **Mスロット配置**: 個数ベース超シンプルルール
+   - 1個のみ → M2
+   - 2個 → 動詞前後で M1+M2 または M2+M3
+   - 3個 → M1, M2, M3
+
+### 2.3 性能要件
+- **精度**: 段階的100%達成
+  - Phase 1: 5文型のみで100%
+  - Phase 2: 5文型+関係節で100%  
+  - Phase 3: 5文型+関係節+受動態で100%
+- **処理時間**: 文あたり1秒以内
+- **メモリ使用量**: 1GB以内
+
+### 2.4 対応文法要素（全文法対応）
+
+#### Phase 1実装（参考設計有り）
+1. **基本5文型**: SV, SVC, SVO, SVOO, SVOC
+2. **関係節**: who/which/that節  
+3. **受動態**: be + 過去分詞構造
+4. **修飾語**: 副詞・前置詞句の適切な配置
+
+#### 既存エンジン参考可能（dynamic_grammar_mapper.py未実装だがunified_stanza_rephrase_mapper.pyには実装していた）
+5. **接続詞**: stanza_based_conjunction_engine
+6. **前置詞句**: prepositional_phrase_engine  
+7. **不定詞**: infinitive_engine
+8. **動名詞**: gerund_engine
+9. **分詞**: participle_engine
+10. **完了進行**: perfect_progressive_engine
+11. **モーダル**: modal_engine
+12. **比較級**: comparative_superlative_engine
+13. **倒置**: inversion_engine
+14. **疑問文**: question_formation_engine
+15. **命令文**: imperative_engine
+16. **仮定法**: subjunctive_conditional_engine
+17. **存在文**: existential_there_engine
+
+---
+
+## 3. アーキテクチャ設計
+
+### 3.1 Central Controller詳細責任
+1. **文法解析実施**: spaCy解析で使用文法項目を特定
+2. **順次分解指示**: まず関係節ハンドラーで節構造分離
+3. **構造整理保存**: 関係節分解結果（サブスロット+代表語句マスク）保存
+4. **order管理**: スロット表示順序の管理
+5. **5文型処理**: 各文をフラットに5文型ハンドラーに処理指示
+6. **結果統合**: サブ要素がある上位スロットを`""`に設定等の最終整理
+
+### 3.2 データフロー
+```
+Input → spaCy Parse → 文法項目特定 → 関係節Handler → 構造保存 → 
+5文型Handler → 受動態Handler → 修飾語Handler → 結果統合 → Output
+```
+
+### 3.3 ハンドラー接続原則
+- **各ハンドラーは中央管理システムとのみ接続**
+- **情報は中央管理システムのみから取得**
+- **処理結果も中央管理システムに渡す**
+- **ハンドラー間の直接通信は禁止**
+
+---
+
+## 4. 人間文法認識の具体的実装思想
+
+### 4.1 人間的パターン認識例
+#### 例1: 関係節境界認識
+```
+"The man who has a red car lives here."
+
+→ spaCy解析: who_sub-s → has_sub-v → a red car_sub-o1 → lives
+
+→ 人間的判断: またVが出現 → その一つ前のcarで関係節終了 → 主部動詞に復帰
+```
+
+#### 例2: 曖昧語句解決
+```
+"The man whose car is red lives here."
+
+→ spaCy誤判定: livesを名詞life複数形と判定
+→ システム警戒: 曖昧語句として2選択肢を準備
+→ 第1候補: lives_名詞 → 上位スロットゼロで文法破綻
+→ 第2候補: lives_動詞 → redで関係節終了 → lives_V, here_M2で文成立
+→ 判断: 第2候補が正しい
+```
+
+#### 例3: マスク処理による5文型ハンドラー支援
+```
+"The man who runs fast lives here."
+
+→ 関係節ハンドラー処理: 代表語句"The man"選定 → 他をマスク
+→ 中央管理システム: "The man lives here."を5文型ハンドラーに渡す
+→ 5文型ハンドラー: 混乱なく S="The man", V="lives", M2="here"と分解
+→ 中央管理システム: サブ要素がある上位Sを""に設定
+```
+
+### 4.2 有用な手法抽出（コードではなく考え方）
+
+#### 従来システムから学ぶ手法
+1. **段階的処理順序**: 関係節除外→コア要素特定→修飾語配置
+2. **テストケース網羅性**: 基本文型・関係節・受動態の組み合わせ
+3. **エラーハンドリング**: 個別ハンドラー失敗が全体に影響しない設計
+4. **結果形式**: main_slots + sub_slotsの分離構造
+
+#### 回避すべき問題
+- **依存関係解析の使用**: spaCy dep_関係はRephrase翻訳が困難なため使用禁止
+- **二重処理**: 同一処理を複数箇所で実行
+- **責任境界の曖昧さ**: Central Controllerでの直接文法処理
+- **ハードコーディング**: 個別事例対応の固定値
+
+---
+
+## 5. 実装工程計画
+
+### Phase 1: 基盤構築（2日）
+- [ ] spaCy統合・基本クラス設計
+- [ ] CentralController基本フレームワーク
+- [ ] テストハーネス構築
+- [ ] 既存テストケース移行
+
+### Phase 2: コアハンドラー実装（4日）
+- [ ] BasicFivePatternHandler実装
+- [ ] 基本5文型テストケース検証
+- [ ] 精度測定システム構築
+
+### Phase 3: 拡張ハンドラー実装（3日）
+- [ ] RelativeClauseHandler実装
+- [ ] PassiveVoiceHandler実装
+- [ ] 関係節・受動態テストケース検証
+
+### Phase 4: 統合・最適化（2日）
+- [ ] ModifierHandler実装
+- [ ] ResultIntegrator完成
+- [ ] 全テストケース検証
+- [ ] 100%精度達成確認
+
+### Phase 5: 品質保証（1日）
+- [ ] コードレビュー
+- [ ] パフォーマンステスト
+- [ ] ドキュメント整備
+
+**総開発期間: 12日**
+
+## 5. 既存エンジンの設計コンセプト参考（技術実装ではなく発想のみ）
+
+### 5.1 Basic Five Pattern Engine のコンセプト
+**核心アイデア**: 
+- **統一境界拡張の概念**: 単語レベル検出から適切な句レベルへの拡張処理
+- **スロット別最適化**: S、V、O、Cごとに異なる拡張ルール適用
+- **知識ベース継承方式**: 過去エンジンの成功パターンを体系的に集約
+
+**新システムへの応用価値**:
+- 単語→句への2段階拡張処理の考え方
+- スロット特性に応じた処理分岐設計
+- 成功パターンの体系的蓄積・活用手法
+
+### 5.2 Simple Relative Engine のコンセプト
+**核心アイデア**:
+- **先行詞+関係代名詞結合原則**: 分離せずセットで管理
+- **余計な再帰処理排除**: シンプルな直接処理による複雑性回避
+- **段階的処理**: 関係節検出→要素特定→結合の明確な処理段階
+
+**新システムへの応用価値**:
+- 関係節境界の明確な特定手法の考え方
+- 先行詞保持とマスキング処理の概念
+- 段階的処理による複雑性管理手法
+
+### 5.3 Passive Voice Engine のコンセプト  
+**核心アイデア**:
+- **統合処理方式**: 上位スロット配置+サブスロット分解を単一処理で実行
+- **受動態タイプ別分岐**: 単純受動態 vs by句付きで処理方法変更
+- **Auxスロット活用**: 助動詞の独立スロット管理による明確な構造化
+
+**新システムへの応用価値**:
+- 文法タイプ別の処理分岐設計思想
+- 助動詞の独立管理による構造明確化
+- 統合処理による情報保持とデバッグ効率両立
+
+### 5.4 Modal Engine のコンセプト
+**核心アイデア**:
+- **段階的モーダル処理**: 検出→分類→配置の3段階
+- **意味カテゴリ別分類**: possibility, necessity, permission等での体系化
+- **複合モーダル対応**: 複数モーダルの組み合わせへの対応
+
+**新システムへの応用価値**:
+- 意味的分類による処理分岐の考え方
+- 複合構造への段階的アプローチ
+- 文脈依存処理の体系化手法
+
+### 5.5 Question Formation Engine のコンセプト
+**核心アイデア**:
+- **疑問文タイプ体系化**: Wh疑問文、Yes/No疑問文等の明確な分類
+- **倒置構造正規化**: 語順変更された構造の標準形への変換
+- **疑問詞スロット配置**: 疑問詞の適切な位置への体系的配置
+
+**新システムへの応用価値**:
+- 構造変化への対応方式の考え方
+- 語順変更の系統的処理手法
+- 特殊構造の正規化アプローチ
+
+---
+
+## 6. 厳格な禁止事項
+
+### 6.1 技術的禁止事項
+❌ **既存システムからのコード直接コピペ**
+❌ **既存クラス・メソッドの継承・依存**
+❌ **spaCy依存関係解析（dep_関係）の使用**
+❌ **Phase A2等の設計違反概念の導入**
+❌ **Central Controllerでの直接文法処理**
+❌ **ハードコーディング（個別事例対応の固定値）**
+❌ **テストケース・期待値の変更**
+
+### 6.2 プロセス禁止事項
+❌ **設計仕様書の無承認変更**
+❌ **責任分離原則の違反**
+❌ **技術負債の導入**
+❌ **一時的な「Phase」概念の導入**
+❌ **ハンドラー間の直接通信**
+
+### 6.3 テスト禁止事項
+❌ **official_test_results.jsonの変更**
+❌ **compare_results.pyの変更**
+❌ **テスト条件・期待値の調整**
+❌ **新規テストスクリプトの作成**
+
+---
+
+## 7. 成功基準
+
+### 7.1 機能基準
+✅ **段階的100%精度達成**
+  - Phase 1: 基本5文型のみで100%
+  - Phase 2: 5文型+関係節で100%  
+  - Phase 3: 5文型+関係節+受動態で100%
+✅ **全テストケースの自動実行**
+✅ **既存compare_results.pyでの検証パス**
+✅ **Rephraseスロット構造の完全遵守**
+
+### 7.2 設計基準
+✅ **責任分離原則の完全遵守**
+✅ **各コンポーネントの単体テスト可能性**
+✅ **技術負債ゼロ**
+✅ **拡張性の確保**
+
+### 7.3 保守性基準
+✅ **コード行数500行以内**（既存7707行の大幅削減）
+✅ **循環的複雑度10以下**
+✅ **依存関係の最小化**
+
+---
+
+## 8. 既存エンジン・ハンドラーの参考構造詳細
+
+### 8.1 BasicFivePatternEngine（基本5文型）
+#### 核心アーキテクチャ
+```python
+class BasicFivePatternEngine:
+    def __init__(self):
+        self.nlp = spacy.load('en_core_web_sm')
+        self.boundary_lib = BoundaryExpansionLib()  # 境界拡張
+        self.sentence_patterns = self._load_sentence_patterns()
+        
+    def process(self, text: str) -> Dict[str, str]:
+        # 1. spaCy POS解析（情報源のみ）
+        # 2. 人間文法パターンマッチング（優先度順）
+        # 3. スロット配置
+        # 4. 境界拡張
+        # 5. 100%精度検証
+```
+
+#### 文型パターン構造（優先度順）
+```python
+patterns = {
+    "SVOO": {  # 最高優先度（最も具体的）
+        "required_relations": ["nsubj", "iobj", "obj", "root"],
+        "mapping": {"nsubj": "S", "iobj": "O1", "obj": "O2", "root": "V"},
+        "priority": 1
+    },
+    "SVOC": {
+        "required_relations": ["nsubj", "obj", "xcomp", "root"],
+        "mapping": {"nsubj": "S", "obj": "O1", "xcomp": "C2", "root": "V"},
+        "priority": 2
+    },
+    "SVO": {"priority": 3},
+    "SVC": {"priority": 4},
+    "SV": {"priority": 5}  # 最も汎用的なので最低優先度
+}
+```
+
+#### 参考にすべき手法
+- **優先度ベースパターンマッチング**: 具体的な文型から汎用的な文型へ
+- **境界拡張技術**: 単語レベルから句レベルへの自動拡張
+- **人間文法認識**: POSタグを情報源とした文法パターン識別
+
+### 8.2 SimpleRelativeEngine（関係節）
+#### 核心アーキテクチャ
+```python
+class SimpleRelativeEngine:
+    def process(self, text: str) -> Dict[str, str]:
+        # 1. 関係節検出（acl:relcl, acl）
+        # 2. 先行詞特定（関係動詞の頭）
+        # 3. 関係代名詞特定（obj, nsubj, advmod, nmod:poss）
+        # 4. 先行詞+関係代名詞結合
+        # 5. サブスロット生成
+```
+
+#### 関係詞検出ロジック
+```python
+def _detect_relative_pronoun(self, sent, rel_verb):
+    # 1. 関係副詞優先（where, when, why, how）
+    advmod = find_by_deprel(rel_verb, 'advmod')
+    
+    # 2. 目的格関係代名詞（that, which）
+    if not advmod:
+        obj_rel = find_by_deprel(rel_verb, 'obj')
+    
+    # 3. 主格関係代名詞（who, which）
+    if not obj_rel:
+        subj_rel = find_by_deprel(rel_verb, 'nsubj')
+    
+    # 4. 所有格関係代名詞（whose）
+    if whose_word and whose_word.deprel == 'nmod:poss':
+        possessed_noun = find_by_id(whose_word.head)
+```
+
+#### 参考にすべき手法
+- **段階的関係詞検出**: 関係副詞 → 目的格 → 主格 → 所有格の順
+- **先行詞+関係詞結合**: "The man who", "The book which"形式
+- **所有格特別処理**: "whose car" → sub-s含有、possessed_noun管理
+
+### 8.3 PassiveVoiceEngine（受動態）
+#### 核心アーキテクチャ
+```python
+class PassiveVoiceEngine:
+    def process(self, text: str) -> Dict[str, str]:
+        # 1. 受動態構造検出（aux + past_participle）
+        # 2. 要素特定（subject, auxiliary, main_verb, agent）
+        # 3. スロット配置（S, Aux, V, M1-by句）
+        # 4. サブスロット対応
+```
+
+#### 受動態検出パターン
+```python
+def _analyze_passive_structure(self, sent):
+    # be動詞 + 過去分詞の検出
+    for word in sent.words:
+        if word.deprel == 'aux:pass':  # 受動態助動詞
+            main_verb = find_by_id(word.head)  # 過去分詞
+            if main_verb.xpos in ['VBN']:  # 過去分詞確認
+                return {
+                    'auxiliary': word,      # "was", "is", "been"
+                    'main_verb': main_verb, # "written", "built"
+                    'subject': find_subject(main_verb),
+                    'agent': find_agent(main_verb)  # by句
+                }
+```
+
+#### 参考にすべき手法
+- **受動態パターン認識**: POS_TAG=VBN + 助動詞パターンの検出
+- **by句処理**: agent検出とM1スロット配置
+- **サブスロット対応**: sub-aux, sub-v分離
+
+### 8.4 ModifierEngine（修飾語）
+#### 参考パターン（複数エンジンから抽出）
+```python
+# 前置詞句エンジンから
+class PrepositionalPhraseEngine:
+    def _detect_prep_phrases(self, sent):
+        # nmod, obl, advmod関係の前置詞句検出
+        # 位置ベース配置（動詞前後でM1/M2/M3判定）
+        
+# 副詞エンジンから  
+class AdverbEngine:
+    def _classify_adverbs(self, sent):
+        # 頻度副詞、様態副詞、時間副詞の分類
+        # 個数ベース配置ルール適用
+```
+
+#### 参考にすべき手法
+- **個数ベース配置**: 1個→M2、2個→M1+M2またはM2+M3、3個→M1+M2+M3
+- **前置詞句検出**: POS_TAG=IN + 名詞句パターンの識別
+- **動詞中心配置**: 動詞を基準とした前後判定
+
+### 8.5 NewSystemIntegratedMapper（新統合システム）
+#### 統合アーキテクチャ
+```python
+class NewSystemIntegratedMapper:
+    def __init__(self):
+        self.handlers = [
+            'relative_clause',    # 最優先
+            'passive_voice', 
+            'basic_five_pattern',
+            'modifier_handler'    # 最後
+        ]
+        
+    def process(self, text: str):
+        # 1. 全ハンドラー同時実行
+        # 2. 結果統合・優先度管理
+        # 3. スロット重複解決
+        # 4. 最終フォーマット生成
+```
+
+#### 参考にすべき手法
+- **順次ハンドラー実行**: 関係節 → 受動態 → 5文型 → 修飾語
+- **結果統合技術**: 複数ハンドラー結果のマージ処理
+- **優先度管理**: ハンドラー間のスロット競合解決
+
+---
+
+## 9. 承認・変更管理
+
+### 9.1 仕様変更プロセス
+1. **変更提案**: 具体的な理由と影響範囲を明記
+2. **ユーザー承認**: 明示的な承認なしに変更不可
+3. **影響評価**: 精度・性能・保守性への影響評価
+4. **文書更新**: 承認後の仕様書更新
+
+### 9.2 実装原則
+- **この仕様書に基づく実装のみ許可**
+- **仕様書に記載のない機能追加は禁止**
+- **問題発生時は仕様書の見直しを優先**
+
+---
+
+**本仕様書は開発の絶対基準であり、これに反する実装は一切認められない。**
+**精度86.1%達成と責任分離設計の両立が本プロジェクトの成功条件である。**
