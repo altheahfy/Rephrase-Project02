@@ -1,0 +1,267 @@
+"""
+Basic Five Pattern Handler - 5文型専門処理ハンドラー
+Phase 1: 100%精度目標
+
+Human Grammar Pattern:
+- spaCy POS解析を情報源とした文法パターン認識
+- 人間が文法体系を理解するように全体構造からパターン照合
+- 依存関係解析は使用せず、POSタグベースの認識
+"""
+
+import spacy
+from typing import Dict, List, Any, Optional
+
+
+class BasicFivePatternHandler:
+    """
+    5文型専門ハンドラー
+    
+    責任:
+    - 5文型の識別・分解処理
+    - Rephraseスロット配置
+    - 100%精度の実現
+    
+    禁止:
+    - 依存関係解析の使用
+    - 他ハンドラーとの直接通信
+    - ハードコーディング
+    """
+    
+    def __init__(self):
+        """初期化"""
+        self.nlp = spacy.load('en_core_web_sm')
+        
+        # 5文型パターン定義
+        self.patterns = {
+            'SV': ['S', 'V'],                    # 第1文型
+            'SVC': ['S', 'V', 'C1'],             # 第2文型  
+            'SVO': ['S', 'V', 'O1'],             # 第3文型
+            'SVOO': ['S', 'V', 'O1', 'O2'],      # 第4文型
+            'SVOC': ['S', 'V', 'O1', 'C2']       # 第5文型
+        }
+        
+        # 文型判定用動詞分類
+        self.verb_types = {
+            'linking': ['be', 'seem', 'become', 'appear', 'look', 'sound', 'feel', 'taste', 'smell'],
+            'transitive': ['love', 'like', 'see', 'hear', 'make', 'take', 'give', 'send', 'show'],
+            'ditransitive': ['give', 'send', 'show', 'tell', 'teach', 'buy', 'make', 'get'],
+            'causative': ['make', 'let', 'have', 'get', 'help', 'see', 'hear', 'watch']
+        }
+    
+    def process(self, text: str) -> Dict[str, Any]:
+        """
+        5文型処理メイン
+        
+        Args:
+            text: 処理対象の英語文
+            
+        Returns:
+            Dict: 処理結果（success, slots, error）
+        """
+        try:
+            doc = self.nlp(text)
+            
+            # 1. 基本要素抽出（POS解析ベース）
+            elements = self._extract_basic_elements(doc)
+            
+            if not elements:
+                return {'success': False, 'error': '基本要素が抽出できませんでした'}
+            
+            # 2. 文型判定
+            pattern_type = self._identify_pattern(elements, doc)
+            
+            if not pattern_type:
+                return {'success': False, 'error': '文型を判定できませんでした'}
+            
+            # 3. スロット配置
+            slots = self._assign_slots(elements, pattern_type)
+            
+            return {
+                'success': True,
+                'slots': slots,
+                'pattern_type': pattern_type
+            }
+            
+        except Exception as e:
+            return {'success': False, 'error': f'処理エラー: {str(e)}'}
+    
+    def _extract_basic_elements(self, doc) -> Dict[str, str]:
+        """
+        基本要素抽出: S, V, O, C の候補を抽出
+        
+        Args:
+            doc: spaCy Doc オブジェクト
+            
+        Returns:
+            Dict: 抽出された要素
+        """
+        elements = {}
+        
+        # 主語候補（文頭の名詞句全体を抽出）
+        subject_tokens = []
+        for token in doc:
+            if token.pos_ in ['DET', 'ADJ', 'NOUN', 'PRON', 'PROPN']:
+                subject_tokens.append(token.text)
+            elif token.pos_ in ['VERB', 'AUX']:
+                break  # 動詞に到達したら主語終了
+            elif subject_tokens:  # 主語候補があり、動詞以外に到達したら終了
+                break
+        
+        if subject_tokens:
+            elements['S'] = ' '.join(subject_tokens)
+        
+        # 動詞抽出
+        verb_idx = None
+        for i, token in enumerate(doc):
+            if token.pos_ == 'VERB' and not token.lemma_ in ['be']:
+                elements['V'] = token.text
+                verb_idx = i
+                break
+            elif token.pos_ == 'AUX' and token.lemma_ == 'be':
+                elements['V'] = token.text
+                verb_idx = i
+                break
+        
+        if verb_idx is None:
+            return elements
+        
+        # 動詞後の要素を分析
+        post_verb_tokens = list(doc[verb_idx + 1:])
+        
+        if not post_verb_tokens:
+            return elements
+        
+        # パターン分析
+        noun_positions = []
+        adj_positions = []
+        
+        for i, token in enumerate(post_verb_tokens):
+            if token.pos_ in ['NOUN', 'PRON', 'PROPN']:
+                noun_positions.append(i)
+            elif token.pos_ == 'ADJ':
+                adj_positions.append(i)
+        
+        # 文型別処理
+        if len(noun_positions) == 0 and len(adj_positions) > 0:
+            # 第2文型: 形容詞のみ
+            elements['C1'] = post_verb_tokens[adj_positions[0]].text
+            
+        elif len(noun_positions) == 1 and len(adj_positions) == 0:
+            # 第3文型: 名詞1つ
+            elements['O1'] = post_verb_tokens[noun_positions[0]].text
+            
+        elif len(noun_positions) == 2 and len(adj_positions) == 0:
+            # 第4文型: 名詞2つ
+            elements['O1'] = post_verb_tokens[noun_positions[0]].text
+            elements['O2'] = post_verb_tokens[noun_positions[1]].text
+            
+        elif len(noun_positions) == 1 and len(adj_positions) == 1:
+            # 第5文型: 名詞+形容詞
+            if noun_positions[0] < adj_positions[0]:
+                elements['O1'] = post_verb_tokens[noun_positions[0]].text
+                elements['C2'] = post_verb_tokens[adj_positions[0]].text
+            
+        elif len(noun_positions) == 1 and len(adj_positions) == 0:
+            # 名詞句として処理（冠詞含む）
+            noun_phrase = []
+            start_collecting = False
+            for token in post_verb_tokens:
+                if token.pos_ in ['DET', 'ADJ'] and not start_collecting:
+                    start_collecting = True
+                    noun_phrase.append(token.text)
+                elif token.pos_ in ['NOUN', 'PRON', 'PROPN']:
+                    if not start_collecting:
+                        start_collecting = True
+                    noun_phrase.append(token.text)
+                elif start_collecting:
+                    break
+            
+            if noun_phrase:
+                elements['O1'] = ' '.join(noun_phrase)
+                
+        return elements
+    
+    def _identify_pattern(self, elements: Dict[str, str], doc) -> Optional[str]:
+        """
+        文型判定: 抽出された要素から5文型を判定
+        
+        Args:
+            elements: 抽出された基本要素
+            doc: spaCy Doc オブジェクト
+            
+        Returns:
+            Optional[str]: 判定された文型
+        """
+        if not elements.get('S') or not elements.get('V'):
+            return None
+        
+        verb = elements['V'].lower()
+        
+        # 第2文型: be動詞 + 補語
+        if any(token.lemma_ == 'be' for token in doc) and elements.get('C1'):
+            return 'SVC'
+        
+        # 第5文型: 使役動詞 + O + C
+        if elements.get('O1') and elements.get('C2'):
+            return 'SVOC'
+        
+        # 第4文型: 授与動詞 + O1 + O2
+        if elements.get('O1') and elements.get('O2'):
+            return 'SVOO'
+        
+        # 第3文型: 他動詞 + O
+        if elements.get('O1'):
+            return 'SVO'
+        
+        # 第1文型: 自動詞のみ
+        return 'SV'
+    
+    def _assign_slots(self, elements: Dict[str, str], pattern_type: str) -> Dict[str, str]:
+        """
+        スロット配置: 文型に応じたRephraseスロット配置
+        
+        Args:
+            elements: 抽出された要素
+            pattern_type: 判定された文型
+            
+        Returns:
+            Dict: スロット配置結果
+        """
+        slots = {}
+        pattern = self.patterns[pattern_type]
+        
+        for slot in pattern:
+            if slot == 'S' and elements.get('S'):
+                slots['S'] = elements['S']
+            elif slot == 'V' and elements.get('V'):
+                slots['V'] = elements['V']
+            elif slot == 'O1' and elements.get('O1'):
+                slots['O1'] = elements['O1']
+            elif slot == 'O2' and elements.get('O2'):
+                slots['O2'] = elements['O2']
+            elif slot == 'C1' and elements.get('C1'):
+                slots['C1'] = elements['C1']
+            elif slot == 'C2' and elements.get('C2'):
+                slots['C2'] = elements['C2']
+        
+        return slots
+
+
+if __name__ == "__main__":
+    # 基本テスト
+    handler = BasicFivePatternHandler()
+    
+    test_cases = [
+        ("She is happy.", "SVC"),
+        ("I love you.", "SVO"),
+        ("He gave me a book.", "SVOO"),
+        ("We made him happy.", "SVOC"),
+        ("Birds fly.", "SV")
+    ]
+    
+    print("=== BasicFivePatternHandler テスト ===")
+    for sentence, expected in test_cases:
+        print(f"\n入力: {sentence}")
+        print(f"期待: {expected}")
+        result = handler.process(sentence)
+        print(f"結果: {result}")
