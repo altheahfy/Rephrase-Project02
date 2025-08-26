@@ -36,7 +36,13 @@ class AdverbHandler:
             verb_modifier_pairs = self._identify_verb_modifier_pairs(doc)
             
             if not verb_modifier_pairs:
-                return {'success': False, 'error': '修飾語が見つかりませんでした'}
+                # 修飾語がない場合も成功として扱う（元のテキストをそのまま返す）
+                return {
+                    'success': True,
+                    'separated_text': text,
+                    'modifiers': {},
+                    'verb_positions': {}
+                }
             
             # 修飾語を分離したテキストと修飾語情報を返す
             result = self._separate_modifiers(doc, verb_modifier_pairs)
