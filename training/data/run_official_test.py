@@ -145,7 +145,7 @@ def run_official_test_with_selected_cases(selected_cases):
     
     # DynamicGrammarMapper（統合ハンドラー）を直接使用 - Phase A2アーキテクチャ
     mapper = DynamicGrammarMapper()
-    print("🎯 Phase A2: 内部統合ハンドラーシステム初期化完了")
+    print("[TARGET] Phase A2: 内部統合ハンドラーシステム初期化完了")
     print("🔥 Phase 1.0 ハンドラー管理システム初期化完了: 4個のハンドラーがアクティブ")
     print("   アクティブハンドラー: basic_five_pattern, relative_clause, passive_voice, auxiliary_complex")
     
@@ -241,14 +241,14 @@ def main():
     elif args.tests:
         # 指定されたテストケースを実行
         selected_cases = select_test_cases(test_cases, args.tests)
-        print(f"🎯 選択されたテスト: {args.tests}")
+        print(f"[TARGET] 選択されたテスト: {args.tests}")
     else:
         # デフォルト: 基本5文型 + 関係節 + 受動態 (24件)
         basic_cases = select_test_cases(test_cases, "basic")
         relation_cases = select_test_cases(test_cases, "relation") 
         passive_cases = select_test_cases(test_cases, "passive")
         selected_cases = basic_cases + relation_cases + passive_cases
-        print("🎯 デフォルト実行: 基本5文型 + 関係節 + 受動態 (24件)")
+        print("[TARGET] デフォルト実行: 基本5文型 + 関係節 + 受動態 (24件)")
     
     run_official_test_with_selected_cases(selected_cases)
 

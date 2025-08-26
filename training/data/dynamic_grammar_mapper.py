@@ -4432,6 +4432,73 @@ class PureCentralController:
             dict_tokens.append(dict_token)
         return dict_tokens
 
+    def _pure_is_auxiliary_verb(self, token: Dict) -> bool:
+        """
+        🎯 Phase A3-2b: 助動詞判定 - 独立実装版
+        
+        制約:
+        - POS情報のみを使用
+        - 依存関係情報は使用しない
+        - 人間的文法認識システム準拠
+        
+        Args:
+            token (Dict): 辞書形式トークン
+            
+        Returns:
+            bool: 助動詞の場合True
+        """
+        aux_words = {
+            'be', 'am', 'is', 'are', 'was', 'were', 'being', 'been',
+            'have', 'has', 'had', 'having',
+            'do', 'does', 'did', 'doing',
+            'will', 'would', 'shall', 'should', 'can', 'could',
+            'may', 'might', 'must', 'ought'
+        }
+        
+        # lemma基準での判定
+        if 'lemma' in token and token['lemma'].lower() in aux_words:
+            return True
+            
+        # text基準での判定（lemmaがない場合）
+        if token['text'].lower() in aux_words:
+            return True
+            
+        # 品詞タグでの判定
+        if 'tag' in token and token['tag'] == 'MD':  # Modal verbs
+            return True
+            
+        return False
+
+    def _pure_can_be_complement(self, token: Dict) -> bool:
+        """
+        🎯 Phase A3-2b: 補語判定 - 独立実装版
+        
+        制約:
+        - POS情報のみを使用
+        - 依存関係情報は使用しない
+        - 人間的文法認識システム準拠
+        
+        Args:
+            token (Dict): 辞書形式トークン
+            
+        Returns:
+            bool: 補語になり得る場合True
+        """
+        # 形容詞は補語になれる
+        if token['pos'] == 'ADJ':
+            return True
+            
+        # 名詞類も補語になれる  
+        if token['pos'] in ['NOUN', 'PROPN', 'PRON']:
+            return True
+            
+        # 詳細品詞タグでの判定
+        if 'tag' in token:
+            if token['tag'] in ['JJ', 'NN', 'NNS', 'PRP']:
+                return True
+                
+        return False
+
     def _init_ambiguous_word_resolver(self):
         """
         🧠 Phase A3-5: 人間的判定システム初期化

@@ -157,7 +157,7 @@ def analyze_results(results_file: str, show_details: bool = False) -> Dict[str, 
     """
     結果ファイルの精度分析
     """
-    print(f"📊 結果解析開始: {results_file}")
+    print(f"[ANALYSIS] 結果解析開始: {results_file}")
     
     # 結果ファイル読み込み
     try:
@@ -274,21 +274,21 @@ def print_analysis_report(report: Dict[str, Any], show_details: bool = False):
     meta = report["meta"]
     
     print("\n" + "="*60)
-    print("📊 精度分析レポート")
+    print("[ANALYSIS] 精度分析レポート")
     print("="*60)
-    print(f"📁 対象ファイル: {meta['source_file']}")
-    print(f"⏰ 分析時刻: {meta['analyzed_at']}")
+    print(f"[FILE] 対象ファイル: {meta['source_file']}")
+    print(f"[TIME] 分析時刻: {meta['analyzed_at']}")
     print()
-    print(f"📈 全体統計:")
+    print(f"[STATS] 全体統計:")
     print(f"   総ケース数: {meta['total_cases']}")
     print(f"   完全一致: {meta['perfect_matches']}")
     print(f"   部分一致: {meta['partial_matches']}")
     print(f"   失敗: {meta['failures']}")
-    print(f"   🎯 完全一致率: {meta['accuracy']:.1f}%")
+    print(f"   [TARGET] 完全一致率: {meta['accuracy']:.1f}%")
     
     # スロット別精度
     if report["slot_analysis"]["main_slot_accuracy"]:
-        print(f"\n🔍 スロット別精度:")
+        print(f"\n[DETAILS] スロット別精度:")
         for slot_name, stats in sorted(report["slot_analysis"]["main_slot_accuracy"].items()):
             print(f"   {slot_name}: {stats['accuracy']:.1f}% ({stats['correct']}/{stats['total']})")
     
@@ -359,7 +359,7 @@ def main():
         except Exception as e:
             print(f"\n❌ レポート保存エラー: {e}")
     
-    print(f"\n🎯 完全一致率: {report['meta']['accuracy']:.1f}%")
+    print(f"\n[TARGET] 完全一致率: {report['meta']['accuracy']:.1f}%")
 
 if __name__ == "__main__":
     main()
