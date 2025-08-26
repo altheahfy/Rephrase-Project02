@@ -222,6 +222,7 @@ class CentralController:
         return {
             'original_text': text,
             'success': True,
+            'main_slots': main_slots,  # 修正: main_slotsキーを追加
             'slots': main_slots,
             'sub_slots': sub_slots,
             'grammar_pattern': 'relative_clause + basic_five_pattern',
@@ -242,6 +243,7 @@ class CentralController:
         return {
             'original_text': text,
             'success': True,
+            'main_slots': slots,  # 修正: main_slotsキーを追加
             'slots': slots,
             'grammar_pattern': 'basic_five_pattern',
             'phase': 2  # Phase 2に更新
