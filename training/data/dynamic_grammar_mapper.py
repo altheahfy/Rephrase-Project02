@@ -85,6 +85,10 @@ class DynamicGrammarMapper:
         # 基本ハンドラーの初期化
         self._initialize_basic_handlers()
         
+        # 🔥 Phase A3-4: PureCentralController遅延初期化（循環参照回避）
+        self.pure_central_controller = None  # 遅延初期化
+        self._pure_controller_initialized = False
+        
         # 🔥 Phase A2: 内部5文型処理を使用（統合ハンドラー完全実装）
         print("✅ 内部5文型処理システム準備完了")
         
@@ -157,6 +161,28 @@ class DynamicGrammarMapper:
             'sits': ['NOUN', 'VERB']      # sit複数形 vs sit三人称単数
         }
     
+    def _ensure_pure_controller(self) -> bool:
+        """
+        🔧 Phase A3-4: PureCentralController遅延初期化（循環参照回避）
+        
+        Returns:
+            bool: 初期化成功時True
+        """
+        if self._pure_controller_initialized and self.pure_central_controller:
+            return True
+            
+        try:
+            self.logger.debug("🔄 PureCentralController遅延初期化開始")
+            self.pure_central_controller = PureCentralController(self)
+            self._pure_controller_initialized = True
+            self.logger.debug("✅ PureCentralController遅延初期化完了（16独立メソッド準備完了）")
+            return True
+        except Exception as e:
+            self.logger.error(f"❌ PureCentralController初期化失敗: {e}")
+            self.pure_central_controller = None
+            self._pure_controller_initialized = False
+            return False
+    
     def analyze_sentence(self, sentence: str, allow_unified: bool = True) -> Dict[str, Any]:
         """
         🔧 Phase A3-2 慎重再実装: PureCentralController統合（レガシー互換）
@@ -171,13 +197,13 @@ class DynamicGrammarMapper:
         Returns:
             Dict[str, Any]: Rephraseスロット構造（レガシー互換）
         """
-        # 🚀 Phase A3-2 慎重実装: PureCentralControllerに委譲（レガシー互換）
-        if hasattr(self, 'pure_central_controller') and self.pure_central_controller and allow_unified:
-            self.logger.debug(f"🔥 Phase A3-2: PureCentralController使用（レガシー互換）")
+        # 🚀 Phase A3-4: PureCentralController遅延初期化 + 委譲（循環参照回避）
+        if allow_unified and self._ensure_pure_controller():
+            self.logger.debug(f"🔥 Phase A3-4: PureCentralController使用（遅延初期化完了）")
             return self.pure_central_controller.analyze_sentence_pure_management(sentence)
         
         # 📜 レガシーフォールバック: PureCentralControllerが無い場合の従来処理
-        self.logger.debug(f"📜 Phase A3-2: レガシーフォールバック実行")
+        self.logger.debug(f"📜 Phase A3-4: レガシーフォールバック実行")
         
         # 🔧 累積バグ修正: 新しい分析開始時にlast_unified_resultをリセット
         if allow_unified:
@@ -4076,15 +4102,19 @@ class PureCentralController:
     A3-5: 理念的機能100%実装（今回）
     """
     
-    def __init__(self, grammar_mapper: 'DynamicGrammarMapper'):
+    def __init__(self, nlp_instance, logger_instance):
         """
-        🎯 Phase A3-5: 完全統合ハンドラー初期化
+        🎯 Phase A3-4: 循環参照回避型初期化（必要な機能のみ注入）
         
         Args:
-            grammar_mapper: 既存のDynamicGrammarMapperインスタンス
+            nlp_instance: spaCyインスタンス
+            logger_instance: ロガーインスタンス
         """
-        self.grammar_mapper = grammar_mapper
-        self.logger = logging.getLogger(__name__)
+        self.nlp = nlp_instance
+        self.logger = logger_instance
+        
+        # 🚨 循環参照回避: grammar_mapperの直接参照を削除
+        # 必要な機能は個別に注入される設計に変更
         
         # ✅ 純粋管理機能: ハンドラー実行制御設定
         self.handler_execution_order = [
