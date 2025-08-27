@@ -1,9 +1,10 @@
 {
   "meta": {
-    "total_count": 68,
-    "valid_count": 45,
-    "new_count": 38,
-    "basic_pattern_count": 15
+    "total_count": 82,
+    "valid_count": 59,
+    "new_count": 52,
+    "basic_pattern_count": 29,
+    "adverb_test_count": 14
   },
   "data": {
     "1": {
@@ -976,6 +977,174 @@
           "V": "made",
           "O1": "her",
           "C2": "happy"
+        },
+        "sub_slots": {}
+      }
+    },
+    "70": {
+      "sentence": "She sings beautifully.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M2": "beautifully"
+        },
+        "sub_slots": {}
+      }
+    },
+    "71": {
+      "sentence": "Tomorrow I study.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "study",
+          "M2": "Tomorrow"
+        },
+        "sub_slots": {}
+      }
+    },
+    "72": {
+      "sentence": "He slowly opened the door.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "opened",
+          "O1": "the door",
+          "M2": "slowly"
+        },
+        "sub_slots": {}
+      }
+    },
+    "73": {
+      "sentence": "We always eat breakfast together.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "eat",
+          "O1": "breakfast",
+          "M2": "always"
+        },
+        "sub_slots": {}
+      }
+    },
+    "74": {
+      "sentence": "The cat quietly sat on the mat.",
+      "expected": {
+        "main_slots": {
+          "S": "The cat",
+          "V": "sat",
+          "M2": "quietly"
+        },
+        "sub_slots": {}
+      }
+    },
+    "75": {
+      "sentence": "Students often study here.",
+      "expected": {
+        "main_slots": {
+          "S": "Students",
+          "V": "study",
+          "M2": "often"
+        },
+        "sub_slots": {}
+      }
+    },
+    "76": {
+      "sentence": "She carefully reads books.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "reads",
+          "O1": "books",
+          "M2": "carefully"
+        },
+        "sub_slots": {}
+      }
+    },
+    "77": {
+      "sentence": "Yesterday he became tired.",
+      "expected": {
+        "main_slots": {
+          "S": "he",
+          "V": "became",
+          "C1": "tired",
+          "M1": "Yesterday"
+        },
+        "sub_slots": {}
+      }
+    },
+    "78": {
+      "sentence": "They run fast.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "run",
+          "M2": "fast"
+        },
+        "sub_slots": {}
+      }
+    },
+    "79": {
+      "sentence": "I gave him the book yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "the book",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      }
+    },
+    "80": {
+      "sentence": "Actually, she works very hard.",
+      "expected": {
+        "main_slots": {
+          "S": "she",
+          "V": "works",
+          "M2": "Actually",
+          "M3": "very hard"
+        },
+        "sub_slots": {}
+      }
+    },
+    "81": {
+      "sentence": "He quickly and carefully solved the problem.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "solved",
+          "O1": "the problem",
+          "M2": "quickly",
+          "M3": "and carefully"
+        },
+        "sub_slots": {}
+      }
+    },
+    "82": {
+      "sentence": "She always speaks English fluently at work.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "speaks",
+          "O1": "English",
+          "M1": "always",
+          "M2": "fluently",
+          "M3": "at work"
+        },
+        "sub_slots": {}
+      }
+    },
+    "83": {
+      "sentence": "Every morning, he jogs slowly in the park.",
+      "expected": {
+        "main_slots": {
+          "S": "he",
+          "V": "jogs",
+          "M1": "Every morning",
+          "M2": "slowly",
+          "M3": "in the park"
         },
         "sub_slots": {}
       }
