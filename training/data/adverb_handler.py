@@ -289,7 +289,8 @@ class AdverbHandler:
                 modifiers_info[verb_idx].append({
                     'text': modifier['text'],
                     'type': modifier['type'],
-                    'pos': modifier['pos']
+                    'pos': modifier['pos'],
+                    'idx': modifier['idx']  # インデックス情報を保持
                 })
                 
                 verb_positions[verb_idx]['modifiers'].append(modifier['text'])
