@@ -196,7 +196,7 @@ class IntegratedTestSystem:
                 'success': False
             }
     
-    def filter_test_cases(self, phase: Optional[str] = None, case_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def filter_test_cases(self, phase: Optional[str] = None, case_id: Optional[str] = None, case_number: Optional[int] = None, case_range: Optional[str] = None) -> List[Dict[str, Any]]:
         """テストケースをフィルタリング"""
         if not self.test_data:
             return []
@@ -205,6 +205,36 @@ class IntegratedTestSystem:
         
         if case_id:
             filtered = [case for case in filtered if case.get('例文ID') == case_id]
+        elif case_number is not None:
+            # 番号での選択（1から開始）
+            if 1 <= case_number <= len(filtered):
+                filtered = [filtered[case_number - 1]]
+            else:
+                print(f"❌ 無効な番号: {case_number} (有効範囲: 1-{len(filtered)})")
+                filtered = []
+        elif case_range:
+            # 範囲での選択（例: "1-5", "10-15"）
+            try:
+                if '-' in case_range:
+                    start, end = map(int, case_range.split('-'))
+                    start = max(1, start)
+                    end = min(len(filtered), end)
+                    if start <= end:
+                        filtered = filtered[start-1:end]
+                    else:
+                        print(f"❌ 無効な範囲: {case_range}")
+                        filtered = []
+                else:
+                    # 単一番号として処理
+                    num = int(case_range)
+                    if 1 <= num <= len(filtered):
+                        filtered = [filtered[num - 1]]
+                    else:
+                        print(f"❌ 無効な番号: {num} (有効範囲: 1-{len(filtered)})")
+                        filtered = []
+            except ValueError:
+                print(f"❌ 無効な範囲形式: {case_range} (例: '1-5' または '10')")
+                filtered = []
         elif phase:
             # Phase1/Phase2の分類ロジック（実装に応じて調整）
             if phase.lower() == 'phase1':
@@ -226,7 +256,7 @@ class IntegratedTestSystem:
         # 実装に応じて調整
         return True  # プレースホルダー
     
-    def run_tests(self, phase: Optional[str] = None, case_id: Optional[str] = None) -> Dict[str, Any]:
+    def run_tests(self, phase: Optional[str] = None, case_id: Optional[str] = None, case_number: Optional[int] = None, case_range: Optional[str] = None) -> Dict[str, Any]:
         """テストを実行"""
         print("🎯 統合テストシステム開始")
         print("=" * 50)
@@ -241,7 +271,7 @@ class IntegratedTestSystem:
             return {'error': 'Failed to import required modules'}
         
         # テストケースフィルタリング
-        test_cases = self.filter_test_cases(phase, case_id)
+        test_cases = self.filter_test_cases(phase, case_id, case_number, case_range)
         print(f"📊 実行対象: {len(test_cases)} ケース")
         
         if not test_cases:
@@ -305,20 +335,37 @@ def main():
     parser.add_argument('--phase1', action='store_true', help='Phase1のみ実行')
     parser.add_argument('--phase2', action='store_true', help='Phase2のみ実行')
     parser.add_argument('--case', type=str, help='特定ケースのみ実行 (例: ex001)')
+    parser.add_argument('--number', type=int, help='番号で特定ケースを実行 (例: 1, 2, 3...)')
+    parser.add_argument('--range', type=str, help='範囲でケースを実行 (例: "1-5", "10-15")')
+    parser.add_argument('--list', action='store_true', help='利用可能なテストケース一覧を表示')
     
     args = parser.parse_args()
     
-    # 引数チェック
-    if not any([args.all, args.phase1, args.phase2, args.case]):
-        print("使用方法:")
-        print("  python integrated_test_system.py --all")
-        print("  python integrated_test_system.py --phase1")
-        print("  python integrated_test_system.py --phase2")
-        print("  python integrated_test_system.py --case ex001")
-        return
-    
     # テストシステム初期化
     test_system = IntegratedTestSystem()
+    
+    # リスト表示
+    if args.list:
+        if test_system.load_test_data():
+            print("📋 利用可能なテストケース:")
+            print("=" * 50)
+            for i, case in enumerate(test_system.test_data, 1):
+                case_id = case.get('例文ID', 'unknown')
+                print(f"{i:3d}. {case_id}")
+            print(f"\n総計: {len(test_system.test_data)} ケース")
+        return
+    
+    # 引数チェック
+    if not any([args.all, args.phase1, args.phase2, args.case, args.number, args.range]):
+        print("使用方法:")
+        print("  python integrated_test_system.py --all              # 全テスト実行")
+        print("  python integrated_test_system.py --phase1           # Phase1のみ")
+        print("  python integrated_test_system.py --phase2           # Phase2のみ")
+        print("  python integrated_test_system.py --case ex001       # 特定ケース（ID指定）")
+        print("  python integrated_test_system.py --number 5         # 特定ケース（番号指定）")
+        print("  python integrated_test_system.py --range 1-10       # 範囲指定")
+        print("  python integrated_test_system.py --list             # ケース一覧表示")
+        return
     
     # テスト実行
     if args.all:
@@ -329,6 +376,10 @@ def main():
         results = test_system.run_tests(phase='phase2')
     elif args.case:
         results = test_system.run_tests(case_id=args.case)
+    elif args.number:
+        results = test_system.run_tests(case_number=args.number)
+    elif args.range:
+        results = test_system.run_tests(case_range=args.range)
     
     # 結果表示
     test_system.print_summary()
