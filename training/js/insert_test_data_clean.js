@@ -911,11 +911,19 @@ function syncUpperSlotsFromJson(data) {
       // 上位スロット自体が空かどうかを判定
       const phraseEmpty = !phraseDiv || !phraseDiv.textContent || phraseDiv.textContent.trim() === '';
       const textEmpty = !textDiv || !textDiv.textContent || textDiv.textContent.trim() === '';
-      const upperSlotEmpty = phraseEmpty && textEmpty;
+      let upperSlotEmpty = phraseEmpty && textEmpty;
       
-      // 関連するサブスロットに内容があるかチェック（表示用サブスロットのみ対象）
-      const subContainer = document.querySelector(`#slot-${slotName}-sub`);
-      const relatedSubSlots = subContainer ? subContainer.querySelectorAll(`[id^="slot-${slotName}-sub-"]`) : [];
+      // 🔥 M2スロット特別処理: PhraseType="clause"の場合、サブスロットありなら上位空でも表示
+      if (slotName === 'm2' && upperSlotEmpty) {
+        const relatedM2SubSlots = document.querySelectorAll(`[id^="slot-m2-sub-"]`);
+        if (relatedM2SubSlots.length > 0) {
+          console.log(`🔥 M2スロット特別処理: サブスロット${relatedM2SubSlots.length}個検出のため上位空でも表示対象とします`);
+          upperSlotEmpty = false; // 強制的に表示対象にする
+        }
+      }
+      
+      // 関連するサブスロットに内容があるかチェック
+      const relatedSubSlots = document.querySelectorAll(`[id^="slot-${slotName}-sub-"]`);
       let hasNonEmptySubslots = false;
       
       relatedSubSlots.forEach(subSlot => {
@@ -1200,61 +1208,6 @@ function syncSubslotsFromJson(data) {
   });
   
   console.log("✅ サブスロット同期完了（完全リセット＋再構築）");
-  
-  // 🆕 サブスロット生成後に空スロット非表示判定を再実行
-  setTimeout(() => {
-    console.log("🔄 サブスロット生成後の空スロット非表示判定を開始");
-    const allSlots = ['c1', 'm1', 's', 'v', 'o1', 'o2', 'm2', 'c2', 'm3', 'aux'];
-    
-    allSlots.forEach(slotName => {
-      const slot = document.querySelector(`#slot-${slotName}`);
-      if (!slot) return;
-      
-      const phraseDiv = slot.querySelector('.slot-phrase');
-      const textDiv = slot.querySelector('.slot-text');
-      
-      // 上位スロット自体が空かどうかを判定
-      const phraseEmpty = !phraseDiv || !phraseDiv.textContent || phraseDiv.textContent.trim() === '';
-      const textEmpty = !textDiv || !textDiv.textContent || textDiv.textContent.trim() === '';
-      const upperSlotEmpty = phraseEmpty && textEmpty;
-      
-      // 関連するサブスロットに内容があるかチェック（表示用サブスロットのみ対象）
-      const subContainer = document.querySelector(`#slot-${slotName}-sub`);
-      const relatedSubSlots = subContainer ? subContainer.querySelectorAll(`[id^="slot-${slotName}-sub-"]`) : [];
-      let hasNonEmptySubslots = false;
-      
-      relatedSubSlots.forEach(subSlot => {
-        const subPhraseDiv = subSlot.querySelector('.slot-phrase');
-        const subTextDiv = subSlot.querySelector('.slot-text');
-        const subPhraseEmpty = !subPhraseDiv || !subPhraseDiv.textContent || subPhraseDiv.textContent.trim() === '';
-        const subTextEmpty = !subTextDiv || !subTextDiv.textContent || subTextDiv.textContent.trim() === '';
-        
-        if (!subPhraseEmpty || !subTextEmpty) {
-          hasNonEmptySubslots = true;
-        }
-      });
-      
-      console.log(`🔍 再判定 ${slot.id}:`);
-      console.log(`  - 上位スロット空: ${upperSlotEmpty} (phrase="${phraseDiv?.textContent}", text="${textDiv?.textContent}")`);
-      console.log(`  - 関連サブスロット: ${relatedSubSlots.length}件`);
-      console.log(`  - 空でないサブスロットあり: ${hasNonEmptySubslots}`);
-      
-      // 判定: 上位スロットが空 かつ 空でないサブスロットがない場合のみ非表示
-      const shouldHide = upperSlotEmpty && !hasNonEmptySubslots;
-      
-      if (shouldHide) {
-        slot.style.display = 'none';
-        slot.classList.add('empty-slot-hidden', 'hidden');
-        console.log(`👻 再判定で ${slot.id}を非表示にしました`);
-      } else {
-        slot.style.display = '';
-        slot.classList.remove('empty-slot-hidden', 'hidden');
-        const reason = !upperSlotEmpty ? '上位スロットに内容あり' : 'サブスロットに内容あり';
-        console.log(`👁 再判定で ${slot.id}を表示状態にしました (理由: ${reason})`);
-      }
-    });
-    console.log("✅ サブスロット生成後の空スロット非表示判定完了");
-  }, 100);
   
   // 🆕 サブスロット同期後にスロット幅調整を実行
   setTimeout(() => {
@@ -2290,8 +2243,7 @@ function forceHideEmptySlots() {
     
     // この上位スロットに関連するサブスロットを確認
     const slotName = slot.id.replace('slot-', '');
-    const subContainer = document.querySelector(`#slot-${slotName}-sub`);
-    const relatedSubSlots = subContainer ? subContainer.querySelectorAll(`[id^="slot-${slotName}-sub-"]`) : [];
+    const relatedSubSlots = document.querySelectorAll(`[id^="slot-${slotName}-sub-"]`);
     
     // 関連サブスロットに内容があるかチェック
     let hasNonEmptySubslots = false;
