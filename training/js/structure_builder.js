@@ -212,7 +212,8 @@ function buildStructure(selectedSlots) {
     
     // 差分追加: 安全なM2サブスロット書き込み
     if (sub.Slot === "M2") {
-      console.log(`🔍 M2サブスロット処理開始:`, sub);
+      console.log(`� ===== M2サブスロット処理開始 =====`);
+      console.log(`�🔍 M2サブスロット処理開始:`, sub);
       // SubslotIDから'sub-'プレフィックスを除去
       const cleanSubslotId = sub.SubslotID.replace(/^sub-/, '').toLowerCase();
       console.log(`🔍 cleanSubslotId: '${cleanSubslotId}'`);
@@ -220,7 +221,9 @@ function buildStructure(selectedSlots) {
       console.log(`🔍 探している要素ID: '${expectedId}'`);
       const target = document.getElementById(expectedId);
       console.log(`🔍 見つかった要素:`, target);
+      console.log(`🔥 ===== M2サブスロット処理状況確認 =====`);
       if (target) {
+        console.log(`✅ 要素が見つかりました: ${expectedId}`);
         const phrase = target.querySelector(".slot-phrase");
         const text = target.querySelector(".slot-text");
         console.log(`🔍 phrase要素:`, phrase);
@@ -233,21 +236,26 @@ function buildStructure(selectedSlots) {
           text.textContent = sub.SubslotText || ""; 
           console.log(`✅ M2 text書き込み完了: ${target.id} = '${sub.SubslotText}'`); 
         }
+        console.log(`🔥 ===== M2サブスロット処理完了（既存要素） =====`);
       } else {
-        console.warn(`⚠ M2サブスロットが見つからない: ${expectedId}`);
+        console.warn(`❌ M2サブスロットが見つからない: ${expectedId}`);
         // 実際に存在するM2サブスロット要素を調べる
         const allM2Subs = document.querySelectorAll('[id^="slot-m2-sub-"]');
         console.log(`🔍 実際に存在するM2サブスロット要素:`, Array.from(allM2Subs).map(el => el.id));
         
         // 🔧 動的作成: M2サブスロットコンテナが存在する場合は要素を作成
         const m2Container = document.getElementById('slot-m2-sub');
+        console.log(`🔍 M2コンテナ検索結果:`, m2Container);
         if (m2Container) {
-          console.log(`🛠 M2サブスロット要素を動的作成: ${expectedId}`);
+          console.log(`🛠 M2サブスロット要素を動的作成開始: ${expectedId}`);
           const newSubslot = renderSubslot(sub);
+          console.log(`🔍 作成されたサブスロット要素:`, newSubslot);
           m2Container.appendChild(newSubslot);
           console.log(`✅ M2サブスロット動的作成完了: ${expectedId}`);
+          console.log(`🔥 ===== M2サブスロット処理完了（動的作成） =====`);
         } else {
           console.error(`❌ M2サブスロットコンテナが見つかりません: slot-m2-sub`);
+          console.log(`🔥 ===== M2サブスロット処理失敗 =====`);
         }
       }
     }
