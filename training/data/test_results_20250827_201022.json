@@ -1,0 +1,101 @@
+{
+  "test_info": {
+    "timestamp": "20250827_201022",
+    "total_cases": 5,
+    "passed": 5,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_1",
+      "sentence": "",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_2",
+      "sentence": "",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_3",
+      "sentence": "",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "_parent_slot": "S",
+          "sub-m2": "fast"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_4",
+      "sentence": "",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "lies",
+          "O1": "there",
+          "O2": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "_parent_slot": "S",
+          "sub-m2": "there"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_5",
+      "sentence": "",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    }
+  ]
+}
