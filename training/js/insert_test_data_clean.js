@@ -1057,10 +1057,12 @@ function syncSubslotsFromJson(data) {
         return;
       }
 
-      // スロット要素ID構築（slot-[親スロット名]-[サブスロットID]形式）
+      // スロット要素ID構築（slot-[親スロット名]-sub-[サブスロットID]形式）
       const parentSlot = item.Slot.toLowerCase();
-      const subslotId = item.SubslotID.toLowerCase();
-      const fullSlotId = `slot-${parentSlot}-${subslotId}`;
+      // 🔧 修正：SubslotIDから'sub-'プレフィックスを除去
+      const cleanSubslotId = item.SubslotID.replace(/^sub-/, '');
+      const subslotId = cleanSubslotId.toLowerCase();
+      const fullSlotId = `slot-${parentSlot}-sub-${subslotId}`;
       console.log(` サブスロット生成: ${fullSlotId}`);
       
       // 親コンテナを検索（slot-[親スロット名]-sub）
@@ -1371,7 +1373,9 @@ function syncSubslotsWithCorrectOrder(jsonData) {
 
     // 各サブスロットを順序通りに静的エリアに書き込み
     subslots.forEach(item => {
-      const fullSlotId = `slot-${parentSlot}-${item.SubslotID.toLowerCase()}`;
+      // 🔧 修正：SubslotIDから'sub-'プレフィックスを除去
+      const cleanSubslotId = item.SubslotID.replace(/^sub-/, '');
+      const fullSlotId = `slot-${parentSlot}-sub-${cleanSubslotId.toLowerCase()}`;
       const slotElement = document.getElementById(fullSlotId);
 
       if (slotElement) {
@@ -1720,7 +1724,9 @@ function applyDisplayOrder(data) {
   const subSlots = data.filter(item => item.SubslotID && item.SubslotID !== "");
   subSlots.forEach(item => {
     if (item.Slot && item.SubslotID && typeof item.display_order !== 'undefined') {
-      const subSlotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}-sub-${item.SubslotID.toLowerCase()}`);
+      // 🔧 修正：SubslotIDから'sub-'プレフィックスを除去
+      const cleanSubslotId = item.SubslotID.replace(/^sub-/, '');
+      const subSlotElement = document.getElementById(`slot-${item.Slot.toLowerCase()}-sub-${cleanSubslotId.toLowerCase()}`);
       // 要素が存在し、かつ動的エリアの子要素ではない場合にのみ処理
       if (subSlotElement && !dynamicArea.contains(subSlotElement)) {
         subSlotElement.style.order = item.display_order;
