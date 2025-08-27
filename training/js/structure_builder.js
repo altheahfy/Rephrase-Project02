@@ -81,9 +81,11 @@ function renderSubslot(sub) {
 }
 
 function buildStructure(selectedSlots) {
-  console.log("buildStructure called with selectedSlots:", selectedSlots);
+  console.log("🏗️ buildStructure called with selectedSlots:", selectedSlots);
   console.log("🔍 buildStructure受信データの件数:", selectedSlots.length);
   console.log("🔍 buildStructure受信データのM1スロット:", selectedSlots.filter(item => item.Slot === 'M1' && !item.SubslotID));
+  console.log("🔍 buildStructure受信データのM2スロット:", selectedSlots.filter(item => item.Slot === 'M2' && !item.SubslotID));
+  console.log("🔍 buildStructure受信データのM2サブスロット:", selectedSlots.filter(item => item.Slot === 'M2' && item.SubslotID));
   
   let wrapper = document.querySelector('.slot-wrapper');
   if (!wrapper) {
@@ -190,14 +192,47 @@ function buildStructure(selectedSlots) {
       dynamicArea.appendChild(subDiv);
     // 差分追加: 安全なM1サブスロット書き込み
     if (sub.Slot === "M1") {
-      const target = document.getElementById(`slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+      // SubslotIDから'sub-'プレフィックスを除去
+      const cleanSubslotId = sub.SubslotID.replace(/^sub-/, '').toLowerCase();
+      const target = document.getElementById(`slot-m1-sub-${cleanSubslotId}`);
       if (target) {
         const phrase = target.querySelector(".slot-phrase");
         if (phrase) { phrase.textContent = sub.SubslotElement || ""; console.log(`✅ phrase書き込み: ${target.id}`); }
         const text = target.querySelector(".slot-text");
         if (text) { text.textContent = sub.SubslotText || ""; console.log(`✅ text書き込み: ${target.id}`); }
       } else {
-        console.warn(`⚠ サブスロットが見つからない: slot-m1-sub-${sub.SubslotID.toLowerCase()}`);
+        console.warn(`⚠ サブスロットが見つからない: slot-m1-sub-${cleanSubslotId}`);
+      }
+    }
+    
+    // 差分追加: 安全なM2サブスロット書き込み
+    if (sub.Slot === "M2") {
+      console.log(`🔍 M2サブスロット処理開始:`, sub);
+      // SubslotIDから'sub-'プレフィックスを除去
+      const cleanSubslotId = sub.SubslotID.replace(/^sub-/, '').toLowerCase();
+      console.log(`🔍 cleanSubslotId: '${cleanSubslotId}'`);
+      const expectedId = `slot-m2-sub-${cleanSubslotId}`;
+      console.log(`🔍 探している要素ID: '${expectedId}'`);
+      const target = document.getElementById(expectedId);
+      console.log(`🔍 見つかった要素:`, target);
+      if (target) {
+        const phrase = target.querySelector(".slot-phrase");
+        const text = target.querySelector(".slot-text");
+        console.log(`🔍 phrase要素:`, phrase);
+        console.log(`🔍 text要素:`, text);
+        if (phrase) { 
+          phrase.textContent = sub.SubslotElement || ""; 
+          console.log(`✅ M2 phrase書き込み完了: ${target.id} = '${sub.SubslotElement}'`); 
+        }
+        if (text) { 
+          text.textContent = sub.SubslotText || ""; 
+          console.log(`✅ M2 text書き込み完了: ${target.id} = '${sub.SubslotText}'`); 
+        }
+      } else {
+        console.warn(`⚠ M2サブスロットが見つからない: ${expectedId}`);
+        // 実際に存在するM2サブスロット要素を調べる
+        const allM2Subs = document.querySelectorAll('[id^="slot-m2-sub-"]');
+        console.log(`🔍 実際に存在するM2サブスロット要素:`, Array.from(allM2Subs).map(el => el.id));
       }
     }
     });
