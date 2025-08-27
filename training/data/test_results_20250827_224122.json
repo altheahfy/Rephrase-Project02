@@ -1,0 +1,45 @@
+{
+  "test_info": {
+    "timestamp": "20250827_224122",
+    "total_cases": 1,
+    "passed": 0,
+    "failed": 1,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_3",
+      "sentence": "The man who runs fast is strong.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong",
+          "M2": "fast"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "_parent_slot": "S",
+          "sub-m2": "fast"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    }
+  ]
+}

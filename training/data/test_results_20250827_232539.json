@@ -1,0 +1,45 @@
+{
+  "test_info": {
+    "timestamp": "20250827_232539",
+    "total_cases": 1,
+    "passed": 0,
+    "failed": 1,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_34",
+      "sentence": "The student who studies diligently always succeeds academically.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "_parent_slot": "S",
+          "sub-m2": "diligently"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "succeeds",
+          "M2": "always",
+          "M3": "academically"
+        },
+        "sub_slots": {
+          "sub-s": "The student who",
+          "sub-v": "studies",
+          "sub-m2": "diligently",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    }
+  ]
+}

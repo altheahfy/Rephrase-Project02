@@ -80,7 +80,7 @@ class CentralController:
         detected_patterns = []
         
         # 関係節検出（優先度最高）
-        has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
+        has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom', 'where', 'when', 'why', 'how'] 
                           for token in doc)
         if has_relative:
             detected_patterns.append('relative_clause')
@@ -110,8 +110,52 @@ class CentralController:
         if not grammar_patterns:
             return self._create_error_result(text, "文法パターンが検出されませんでした")
         
-        # 2. Phase 2順次処理: 修飾語分離→関係節→5文型の順
+        # 2. Phase 2順次処理: 関係節優先→主節処理の順
         final_result = {}
+        
+        # 🎯 アーキテクチャ修正: 関係節優先処理
+        # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
+        
+        if 'relative_clause' in grammar_patterns:
+            # Step 1: 関係節ハンドラー（協力者と連携して境界認識）
+            rel_handler = self.handlers['relative_clause']
+            rel_result = rel_handler.process(text)
+            
+            if rel_result['success']:
+                # 関係節処理結果を保存
+                final_result.update(rel_result)
+                
+                # 関係節を除去した簡略文を作成
+                simplified_text = self._create_simplified_text(text, rel_result)
+                print(f"🔄 Phase 2 処理: 関係節検出 → 簡略文: '{simplified_text}'")
+                
+                # Step 2: 主節に対してのみ副詞ハンドラーを適用
+                adverb_handler = self.handlers['adverb']
+                adverb_result = adverb_handler.process(simplified_text)
+                
+                modifier_slots = {}
+                if adverb_result['success']:
+                    modifier_slots = adverb_result.get('modifier_slots', {})
+                    final_simplified_text = adverb_result['separated_text']
+                    for slot, value in modifier_slots.items():
+                        print(f"📍 主節修飾語: {slot} = '{value}'")
+                else:
+                    final_simplified_text = simplified_text
+                
+                # Step 3: 5文型処理（主節のみ）
+                if 'basic_five_pattern' in grammar_patterns:
+                    five_handler = self.handlers['basic_five_pattern']
+                    five_result = five_handler.process(final_simplified_text)
+                    
+                    if five_result['success']:
+                        return self._merge_results(text, final_result, five_result, modifier_slots)
+                    else:
+                        return self._create_error_result(text, five_result['error'])
+                        
+            else:
+                print(f"⚠️ 関係節処理失敗、通常の処理フローに移行")
+        
+        # 関係節がない場合の通常処理フロー
         processing_text = text  # 段階的に処理されるテキスト
         
         # Step 0: 修飾語処理（最初に実施）
@@ -133,40 +177,15 @@ class CentralController:
             print(f"🔧 修飾語分離: '{text}' → '{processing_text}'")
         else:
             print(f"ℹ️ 修飾語なし、元の文を継続使用")
-        
-        # Step 1: 関係節処理
-        if 'relative_clause' in grammar_patterns:
-            rel_handler = self.handlers['relative_clause']
-            # オリジナルテキストも渡して修飾語情報を保持
-            rel_result = rel_handler.process(processing_text, text)
             
-            if rel_result['success']:
-                # 関係節処理結果を保存
-                final_result.update(rel_result)
-                
-                # 関係節を除去した簡略文を作成
-                simplified_text = self._create_simplified_text(processing_text, rel_result)
-                print(f"🔄 Phase 2 処理: 関係節検出 → 簡略文: '{simplified_text}'")
-            else:
-                simplified_text = processing_text
-                print(f"⚠️ 関係節処理失敗、修飾語分離済み文を使用")
-        else:
-            simplified_text = processing_text
-            print(f"📝 関係節なし、修飾語分離済み文で5文型処理: '{simplified_text}'")
-        
-        # Step 2: 5文型処理
+        # Step 2: 5文型処理（関係節がない場合）
         if 'basic_five_pattern' in grammar_patterns:
             five_handler = self.handlers['basic_five_pattern']
-            five_result = five_handler.process(simplified_text)
+            five_result = five_handler.process(processing_text)
             
             if five_result['success']:
-                # 5文型結果をメインスロットとして統合
-                if 'relative_clause' in grammar_patterns and final_result:
-                    # 関係節結果と5文型結果を統合（修飾語スロット含む）
-                    return self._merge_results(text, final_result, five_result, modifier_slots)
-                else:
-                    # 5文型のみの場合（修飾語スロット含む）
-                    return self._format_result(text, five_result['slots'], modifier_slots)
+                # 5文型のみの場合（修飾語スロット含む）
+                return self._format_result(text, five_result['slots'], modifier_slots)
             else:
                 return self._create_error_result(text, five_result['error'])
         
@@ -217,8 +236,25 @@ class CentralController:
         main_slots = five_result['slots'].copy()
         
         # 🎯 Central Controller責任: 修飾語スロットを統合
+        # 関係節ケースでは、関係節内修飾語は除外
         if modifier_slots:
-            main_slots.update(modifier_slots)
+            # 関係節内修飾語をチェック
+            sub_slots = relative_result.get('sub_slots', {})
+            filtered_modifiers = {}
+            
+            for slot_key, modifier_value in modifier_slots.items():
+                # 関係節内修飾語は主節に統合しない
+                sub_modifier_found = False
+                for sub_key, sub_value in sub_slots.items():
+                    if sub_key.startswith('sub-m') and sub_value == modifier_value:
+                        sub_modifier_found = True
+                        print(f"🔍 関係節内修飾語 '{modifier_value}' を主節から除外")
+                        break
+                
+                if not sub_modifier_found:
+                    filtered_modifiers[slot_key] = modifier_value
+            
+            main_slots.update(filtered_modifiers)
         
         # サブスロット: 関係節結果から
         sub_slots = relative_result.get('sub_slots', {})

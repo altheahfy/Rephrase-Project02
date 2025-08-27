@@ -1,0 +1,48 @@
+{
+  "test_info": {
+    "timestamp": "20250827_230859",
+    "total_cases": 1,
+    "passed": 0,
+    "failed": 1,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_31",
+      "sentence": "The book which was carefully written by Shakespeare is famous.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous",
+          "M2": "carefully",
+          "M3": "by Shakespeare"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "was",
+          "_parent_slot": "S",
+          "sub-m2": "carefully by Shakespeare"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "written",
+          "sub-aux": "was",
+          "sub-m2": "carefully",
+          "sub-m3": "by Shakespeare",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    }
+  ]
+}
