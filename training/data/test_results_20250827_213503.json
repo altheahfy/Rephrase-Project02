@@ -1,0 +1,35 @@
+{
+  "test_info": {
+    "timestamp": "20250827_213503",
+    "total_cases": 1,
+    "passed": 0,
+    "failed": 1,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_29",
+      "sentence": "The students study hard for exams.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "O1": "exams"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}

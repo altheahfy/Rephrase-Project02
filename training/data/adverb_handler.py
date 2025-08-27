@@ -41,7 +41,8 @@ class AdverbHandler:
                     'success': True,
                     'separated_text': text,
                     'modifiers': {},
-                    'verb_positions': {}
+                    'verb_positions': {},
+                    'modifier_slots': {}
                 }
             
             # 修飾語を分離したテキストと修飾語情報を返す
@@ -51,7 +52,8 @@ class AdverbHandler:
                 'success': True,
                 'separated_text': result['separated_text'],
                 'modifiers': result['modifiers'],
-                'verb_positions': result['verb_positions']
+                'verb_positions': result['verb_positions'],
+                'modifier_slots': self._assign_modifier_slots(result['modifiers'], verb_modifier_pairs)
             }
             
         except Exception as e:
@@ -80,7 +82,7 @@ class AdverbHandler:
         return pairs
     
     def _collect_verb_modifiers(self, doc, verb_idx: int) -> List[Dict]:
-        """動詞の修飾語を収集"""
+        """動詞の修飾語を収集（保守的アプローチ）"""
         modifiers = []
         
         # 動詞の直後から文末まで（または次の主要要素まで）を検索
@@ -95,32 +97,54 @@ class AdverbHandler:
             if token.pos_ in ['VERB', 'AUX'] and self._is_main_clause_verb(doc, i):
                 break
             
-            # 修飾語として識別
+            # 修飾語として識別（保守的判定）
             if self._is_modifier(token):
-                modifier_info = {
-                    'text': token.text,
-                    'pos': token.pos_,
-                    'tag': token.tag_,
-                    'idx': i,
-                    'type': self._classify_modifier_type(token)
-                }
-                modifiers.append(modifier_info)
+                # 前置詞句の場合は全体をチェック
+                if token.pos_ == 'ADP':
+                    prep_phrase = self._get_prepositional_phrase(doc, i)
+                    if prep_phrase['is_modifiable']:
+                        modifier_info = {
+                            'text': prep_phrase['text'],
+                            'pos': token.pos_,
+                            'tag': token.tag_,
+                            'idx': i,
+                            'type': 'prepositional_phrase',
+                            'phrase_end': prep_phrase['end_idx']
+                        }
+                        modifiers.append(modifier_info)
+                        # 前置詞句の残りの部分をスキップ
+                        i = prep_phrase['end_idx']
+                        continue
+                else:
+                    modifier_info = {
+                        'text': token.text,
+                        'pos': token.pos_,
+                        'tag': token.tag_,
+                        'idx': i,
+                        'type': self._classify_modifier_type(token)
+                    }
+                    modifiers.append(modifier_info)
         
         return modifiers
     
     def _is_modifier(self, token) -> bool:
-        """トークンが修飾語かどうか判定"""
-        # 副詞
+        """トークンが修飾語かどうか判定（適切なバランス）"""
+        # 副詞は基本的に修飾語として扱う（5文型の核心要素ではない）
         if token.pos_ == 'ADV':
-            return True
+            # ただし、文法的に必須の副詞は除外
+            essential_adverbs = ['not', "n't", 'never', 'always', 'here', 'there']
+            return token.text.lower() not in essential_adverbs
         
-        # 前置詞句（前置詞で始まる）
+        # 前置詞句は修飾語として扱う（ただし基本的な前置詞のみ）
         if token.pos_ == 'ADP':
-            return True
+            # 5文型の核心でない前置詞句は修飾語
+            modifier_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'besides', 'except']
+            return token.text.lower() in modifier_preps
         
-        # 場所・時間を表す名詞
+        # 明確な時間・場所副詞
         if token.pos_ in ['NOUN', 'PROPN'] and self._is_adverbial_noun(token):
-            return True
+            temporal_locative = ['yesterday', 'today', 'tomorrow', 'here', 'there']
+            return token.text.lower() in temporal_locative
         
         return False
     
@@ -134,6 +158,51 @@ class AdverbHandler:
         ]
         
         return token.text.lower() in adverbial_patterns
+    
+    def _get_prepositional_phrase(self, doc, prep_idx: int) -> Dict:
+        """前置詞句全体を取得し、分離可能かどうか判定"""
+        prep_token = doc[prep_idx]
+        phrase_tokens = [prep_token.text]
+        end_idx = prep_idx
+        
+        # 前置詞の後続要素を収集
+        for i in range(prep_idx + 1, len(doc)):
+            token = doc[i]
+            
+            # 句読点や次の前置詞、動詞で停止
+            if token.pos_ in ['PUNCT', 'ADP', 'VERB', 'AUX']:
+                break
+                
+            phrase_tokens.append(token.text)
+            end_idx = i
+        
+        phrase_text = ' '.join(phrase_tokens)
+        
+        # 前置詞句が修飾語として分離可能かどうか判定
+        is_modifiable = self._is_prepositional_phrase_modifiable(prep_token.text, phrase_tokens)
+        
+        return {
+            'text': phrase_text,
+            'end_idx': end_idx,
+            'is_modifiable': is_modifiable
+        }
+    
+    def _is_prepositional_phrase_modifiable(self, preposition: str, phrase_tokens: List[str]) -> bool:
+        """前置詞句が修飾語として分離可能かどうか判定"""
+        prep_lower = preposition.lower()
+        
+        # 修飾語として分離可能な前置詞句
+        # 基本5文型の核心構造でない場合は分離対象
+        modifiable_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'without', 'besides', 'except']
+        
+        # ただし、動詞の目的語を導く基本的な前置詞は除外
+        # 例: look at, listen to, think of など
+        essential_for_verbs = ['to', 'of', 'from']
+        
+        if prep_lower in essential_for_verbs:
+            return False
+            
+        return prep_lower in modifiable_preps
     
     def _classify_modifier_type(self, token) -> str:
         """修飾語の種類を分類"""
@@ -198,7 +267,20 @@ class AdverbHandler:
             
             for modifier in pair['modifiers']:
                 modifier_idx = modifier['idx']
-                modifier_indices.add(modifier_idx)
+                modifier_text = modifier['text']
+                
+                # 前置詞句の場合、句全体のインデックスを収集
+                if modifier['type'] == 'prepositional_phrase':
+                    # 前置詞句のすべてのトークンを削除対象にする
+                    phrase_parts = modifier_text.split()
+                    current_idx = modifier_idx
+                    for part in phrase_parts:
+                        if current_idx < len(doc) and doc[current_idx].text == part:
+                            modifier_indices.add(current_idx)
+                            current_idx += 1
+                else:
+                    # 単一語の修飾語
+                    modifier_indices.add(modifier_idx)
                 
                 # 修飾語情報を記録
                 if verb_idx not in modifiers_info:
@@ -224,3 +306,72 @@ class AdverbHandler:
             'modifiers': modifiers_info,
             'verb_positions': verb_positions
         }
+    
+    def _assign_modifier_slots(self, modifiers_info: Dict, verb_modifier_pairs: List[Dict]) -> Dict[str, str]:
+        """
+        Rephraseスロット構造仕様に従って修飾語をMスロットに配置
+        
+        1個のみ使われているとき → M2（どこにあってもM2、位置は無関係）
+        2個使われているとき:
+          - ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用
+          - ケース2: 動詞中心(M2)より後に1つある場合 → M2, M3の2つ使用
+        3個使われているとき → 位置順でM1, M2, M3
+        """
+        modifier_slots = {}
+        
+        if not modifiers_info:
+            return modifier_slots
+        
+        # 全修飾語を収集（順序保持）
+        all_modifiers = []
+        for verb_idx, modifier_list in modifiers_info.items():
+            for modifier_info in modifier_list:
+                all_modifiers.append({
+                    'text': modifier_info['text'],
+                    'verb_idx': verb_idx,
+                    'modifier_idx': modifier_info.get('idx', 0)
+                })
+        
+        # 修飾語を文中の位置順でソート
+        all_modifiers.sort(key=lambda x: x['modifier_idx'])
+        
+        modifier_count = len(all_modifiers)
+        
+        if modifier_count == 1:
+            # 1個のみ → M2
+            modifier_slots['M2'] = all_modifiers[0]['text']
+        elif modifier_count == 2:
+            # 2個の場合 → 動詞位置を考慮してM1,M2またはM2,M3を決定
+            verb_positions = self._get_verb_positions(verb_modifier_pairs)
+            if verb_positions:
+                main_verb_pos = min(verb_positions)  # 主動詞の位置
+                
+                # 動詞より前に修飾語があるかチェック
+                pre_verb_modifiers = [m for m in all_modifiers if m['modifier_idx'] < main_verb_pos]
+                
+                if pre_verb_modifiers:
+                    # ケース1: 動詞より前に修飾語がある → M1, M2
+                    modifier_slots['M1'] = all_modifiers[0]['text']
+                    modifier_slots['M2'] = all_modifiers[1]['text']
+                else:
+                    # ケース2: 全て動詞より後 → M2, M3
+                    modifier_slots['M2'] = all_modifiers[0]['text']
+                    modifier_slots['M3'] = all_modifiers[1]['text']
+            else:
+                # フォールバック: M2, M3
+                modifier_slots['M2'] = all_modifiers[0]['text']
+                modifier_slots['M3'] = all_modifiers[1]['text']
+        elif modifier_count == 3:
+            # 3個 → M1, M2, M3
+            modifier_slots['M1'] = all_modifiers[0]['text']
+            modifier_slots['M2'] = all_modifiers[1]['text']
+            modifier_slots['M3'] = all_modifiers[2]['text']
+        
+        return modifier_slots
+    
+    def _get_verb_positions(self, verb_modifier_pairs: List[Dict]) -> List[int]:
+        """動詞の位置リストを取得"""
+        positions = []
+        for pair in verb_modifier_pairs:
+            positions.append(pair['verb_idx'])
+        return positions

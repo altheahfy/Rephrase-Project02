@@ -118,10 +118,18 @@ class CentralController:
         adverb_handler = self.handlers['adverb']
         adverb_result = adverb_handler.process(processing_text)
         
+        modifier_slots = {}  # 副詞ハンドラーから受け取る
+        
         if adverb_result['success']:
             # 修飾語分離結果を保存
             final_result['modifier_info'] = adverb_result
             processing_text = adverb_result['separated_text']
+            
+            # 🎯 責任分担原則: 副詞ハンドラーが配置済みのMスロットを受け取る
+            modifier_slots = adverb_result.get('modifier_slots', {})
+            for slot, value in modifier_slots.items():
+                print(f"📍 修飾語受信: {slot} = '{value}'")
+            
             print(f"🔧 修飾語分離: '{text}' → '{processing_text}'")
         else:
             print(f"ℹ️ 修飾語なし、元の文を継続使用")
@@ -154,11 +162,11 @@ class CentralController:
             if five_result['success']:
                 # 5文型結果をメインスロットとして統合
                 if 'relative_clause' in grammar_patterns and final_result:
-                    # 関係節結果と5文型結果を統合
-                    return self._merge_results(text, final_result, five_result)
+                    # 関係節結果と5文型結果を統合（修飾語スロット含む）
+                    return self._merge_results(text, final_result, five_result, modifier_slots)
                 else:
-                    # 5文型のみの場合
-                    return self._format_result(text, five_result['slots'])
+                    # 5文型のみの場合（修飾語スロット含む）
+                    return self._format_result(text, five_result['slots'], modifier_slots)
             else:
                 return self._create_error_result(text, five_result['error'])
         
@@ -190,7 +198,7 @@ class CentralController:
         print(f"⚠️ 簡略文作成失敗、元の文を使用: '{original_text}'")
         return original_text
     
-    def _merge_results(self, text: str, relative_result: Dict, five_result: Dict) -> Dict[str, Any]:
+    def _merge_results(self, text: str, relative_result: Dict, five_result: Dict, modifier_slots: Dict = None) -> Dict[str, Any]:
         """
         関係節結果と5文型結果の統合（設計仕様書準拠）
         
@@ -200,12 +208,17 @@ class CentralController:
             text: 元の文
             relative_result: 関係節処理結果
             five_result: 5文型処理結果
+            modifier_slots: 修飾語スロット（Central Controllerが配置）
             
         Returns:
             Dict: 統合済み結果
         """
         # メインスロット: 5文型結果をベースに
         main_slots = five_result['slots'].copy()
+        
+        # 🎯 Central Controller責任: 修飾語スロットを統合
+        if modifier_slots:
+            main_slots.update(modifier_slots)
         
         # サブスロット: 関係節結果から
         sub_slots = relative_result.get('sub_slots', {})
@@ -229,22 +242,28 @@ class CentralController:
             'phase': 2
         }
     
-    def _format_result(self, text: str, slots: Dict[str, str]) -> Dict[str, Any]:
+    def _format_result(self, text: str, slots: Dict[str, str], modifier_slots: Dict = None) -> Dict[str, Any]:
         """
         結果フォーマット: Rephraseスロット形式に整形
         
         Args:
             text: 元の文
             slots: ハンドラーからの結果
+            modifier_slots: 修飾語スロット（Central Controllerが配置）
             
         Returns:
             Dict: 整形済み結果
         """
+        # メインスロットに修飾語スロットを統合
+        final_slots = slots.copy()
+        if modifier_slots:
+            final_slots.update(modifier_slots)
+            
         return {
             'original_text': text,
             'success': True,
-            'main_slots': slots,  # 修正: main_slotsキーを追加
-            'slots': slots,
+            'main_slots': final_slots,  # 修正: main_slotsキーを追加
+            'slots': final_slots,
             'grammar_pattern': 'basic_five_pattern',
             'phase': 2  # Phase 2に更新
         }
@@ -257,6 +276,58 @@ class CentralController:
             'error': error_message,
             'phase': 1
         }
+    
+    def _extract_modifier_list(self, adverb_result: Dict) -> List[str]:
+        """
+        AdverbHandlerの複雑な結果から修飾語のリストを抽出
+        （廃止予定: 副詞ハンドラーが直接スロット配置を行うため不要）
+        
+        Args:
+            adverb_result: AdverbHandlerの結果
+            
+        Returns:
+            List[str]: 修飾語のテキストリスト
+        """
+        # この機能は副詞ハンドラーに移行済み
+        return []
+    
+    def _assign_modifier_slots(self, modifiers: List[str]) -> Dict[str, str]:
+        """
+        REPHRASE仕様に基づく修飾語スロット配置
+        
+        ルール（REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md準拠）:
+        - 1個のみ → M2
+        - 2個 → M2, M3 
+        - 3個 → M1, M2, M3
+        
+        Args:
+            modifiers: 修飾語のリスト
+            
+        Returns:
+            Dict[str, str]: スロット名と修飾語のマッピング
+        """
+        slots = {}
+        
+        if len(modifiers) == 1:
+            # 1個のみ → M2
+            slots['M2'] = modifiers[0]
+        elif len(modifiers) == 2:
+            # 2個 → M2, M3
+            slots['M2'] = modifiers[0]
+            slots['M3'] = modifiers[1]
+        elif len(modifiers) == 3:
+            # 3個 → M1, M2, M3
+            slots['M1'] = modifiers[0]
+            slots['M2'] = modifiers[1]
+            slots['M3'] = modifiers[2]
+        elif len(modifiers) > 3:
+            # 4個以上は最初の3個のみ使用
+            slots['M1'] = modifiers[0]
+            slots['M2'] = modifiers[1]
+            slots['M3'] = modifiers[2]
+            print(f"⚠️ 修飾語が3個を超過: {len(modifiers)}個 → 最初の3個のみ使用")
+        
+        return slots
 
 
 if __name__ == "__main__":
