@@ -36,7 +36,10 @@ function renderSubslot(sub) {
   const subDiv = document.createElement('div');
   subDiv.className = 'subslot';
   if (sub.SubslotID) {
-    subDiv.id = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
+    // 🔧 修正：SubslotIDから'sub-'プレフィックスを除去してからIDを生成
+    const cleanSubslotId = sub.SubslotID.replace(/^sub-/, '');
+    subDiv.id = `slot-${sub.Slot.toLowerCase()}-sub-${cleanSubslotId.toLowerCase()}`;
+    console.log(`🔧 renderSubslot ID生成: ${sub.SubslotID} → ${cleanSubslotId} → ${subDiv.id}`);
   }
   if (typeof sub.display_order !== 'undefined') {
     subDiv.dataset.displayOrder = sub.display_order;
@@ -61,7 +64,9 @@ function renderSubslot(sub) {
     if (saved) {
       try {
         const visibilityState = JSON.parse(saved);
-        const elementId = `slot-${sub.Slot.toLowerCase()}-sub-${sub.SubslotID.toLowerCase()}`;
+        // 🔧 修正：SubslotIDから'sub-'プレフィックスを除去してからキーを生成
+        const cleanSubslotId = sub.SubslotID.replace(/^sub-/, '');
+        const elementId = `slot-${sub.Slot.toLowerCase()}-sub-${cleanSubslotId.toLowerCase()}`;
         const elementState = visibilityState[elementId];
         
         if (elementState && elementState.text === false) {
