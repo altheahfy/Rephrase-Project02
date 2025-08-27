@@ -9,7 +9,7 @@
     {
       "id": "dataset2",
       "name": "第4文型と極性活用",
-      "file": "data/slot_order_data2.json",
+      "file": "data/slot_order_data_第4文型と極性.json",
       "description": "1とは逆にシンプルな上位スロット主体のデータセット"
     },
     {
