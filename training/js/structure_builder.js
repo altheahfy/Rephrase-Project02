@@ -238,6 +238,17 @@ function buildStructure(selectedSlots) {
         // 実際に存在するM2サブスロット要素を調べる
         const allM2Subs = document.querySelectorAll('[id^="slot-m2-sub-"]');
         console.log(`🔍 実際に存在するM2サブスロット要素:`, Array.from(allM2Subs).map(el => el.id));
+        
+        // 🔧 動的作成: M2サブスロットコンテナが存在する場合は要素を作成
+        const m2Container = document.getElementById('slot-m2-sub');
+        if (m2Container) {
+          console.log(`🛠 M2サブスロット要素を動的作成: ${expectedId}`);
+          const newSubslot = renderSubslot(sub);
+          m2Container.appendChild(newSubslot);
+          console.log(`✅ M2サブスロット動的作成完了: ${expectedId}`);
+        } else {
+          console.error(`❌ M2サブスロットコンテナが見つかりません: slot-m2-sub`);
+        }
       }
     }
     });
