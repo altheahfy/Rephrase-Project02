@@ -114,10 +114,12 @@ class IntegratedTestSystem:
     def run_single_test(self, test_case: Dict[str, Any], modules: Dict[str, Any]) -> Dict[str, Any]:
         """単一テストケースを実行"""
         case_id = test_case.get('例文ID', 'unknown')
-        expected = test_case.get('期待値', {})
+        sentence = test_case.get('sentence', '')
+        expected = test_case.get('expected', {})
         
         result = {
             'case_id': case_id,
+            'sentence': sentence,
             'status': 'unknown',
             'expected': expected,
             'actual': {},
@@ -232,7 +234,9 @@ class IntegratedTestSystem:
                     sub_match = False
                     break
             
-            return main_match and sub_match
+            final_result = main_match and sub_match
+            
+            return final_result
             
         except Exception as e:
             print(f"   ⚠️ 比較エラー: {e}")
@@ -366,27 +370,33 @@ class IntegratedTestSystem:
                 print(f"❌ 無効な番号: {case_number} (有効範囲: 1-{len(filtered)})")
                 filtered = []
         elif case_range:
-            # 範囲での選択（例: "1-5", "10-15"）
+            # 範囲での選択（例: "1-5", "10-15", "1,2,3", "1-5,10-15"）
             try:
-                if '-' in case_range:
-                    start, end = map(int, case_range.split('-'))
-                    start = max(1, start)
-                    end = min(len(filtered), end)
-                    if start <= end:
-                        filtered = filtered[start-1:end]
+                target_numbers = []
+                # カンマ区切りの複数範囲をサポート
+                for part in case_range.split(','):
+                    part = part.strip()
+                    if '-' in part:
+                        start, end = map(int, part.split('-'))
+                        target_numbers.extend(range(start, end + 1))
                     else:
-                        print(f"❌ 無効な範囲: {case_range}")
-                        filtered = []
+                        target_numbers.append(int(part))
+                
+                # 重複除去とソート
+                target_numbers = sorted(set(target_numbers))
+                
+                # 有効な番号のみフィルタ
+                valid_numbers = [n for n in target_numbers if 1 <= n <= len(filtered)]
+                
+                if not valid_numbers:
+                    print(f"❌ 無効な範囲: {case_range} (有効範囲: 1-{len(filtered)})")
+                    filtered = []
                 else:
-                    # 単一番号として処理
-                    num = int(case_range)
-                    if 1 <= num <= len(filtered):
-                        filtered = [filtered[num - 1]]
-                    else:
-                        print(f"❌ 無効な番号: {num} (有効範囲: 1-{len(filtered)})")
-                        filtered = []
+                    # case_numberでフィルタリング
+                    filtered = [case for case in filtered if case.get('case_number') in valid_numbers]
+                    
             except ValueError:
-                print(f"❌ 無効な範囲形式: {case_range} (例: '1-5' または '10')")
+                print(f"❌ 無効な範囲形式: {case_range} (例: '1-5' または '10' または '1,2,3')")
                 filtered = []
         elif phase:
             # Phase1/Phase2の分類ロジック（実装に応じて調整）

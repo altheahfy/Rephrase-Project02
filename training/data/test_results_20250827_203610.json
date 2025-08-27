@@ -1,0 +1,383 @@
+{
+  "test_info": {
+    "timestamp": "20250827_203610",
+    "total_cases": 16,
+    "passed": 16,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_1",
+      "sentence": "The car is red.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_2",
+      "sentence": "I love you.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_55",
+      "sentence": "Birds fly.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_56",
+      "sentence": "Children play.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_57",
+      "sentence": "Time passes.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_58",
+      "sentence": "She looks happy.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_59",
+      "sentence": "He became a doctor.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_60",
+      "sentence": "The food tastes good.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_61",
+      "sentence": "I read books.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_62",
+      "sentence": "She plays piano.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_63",
+      "sentence": "We study English.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_64",
+      "sentence": "I gave him a book.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_65",
+      "sentence": "She told me a story.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_66",
+      "sentence": "He bought her flowers.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_67",
+      "sentence": "We call him Tom.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_68",
+      "sentence": "I found it interesting.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}

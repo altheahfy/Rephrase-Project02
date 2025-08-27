@@ -1,0 +1,443 @@
+{
+  "test_info": {
+    "timestamp": "20250827_203017",
+    "total_cases": 14,
+    "passed": 5,
+    "failed": 9,
+    "success_rate": 35.714285714285715
+  },
+  "test_details": [
+    {
+      "case_id": "case_1",
+      "sentence": "The car is red.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_2",
+      "sentence": "I love you.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_3",
+      "sentence": "The man who runs fast is strong.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "_parent_slot": "S",
+          "sub-m2": "fast"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_4",
+      "sentence": "The book which lies there is mine.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "lies",
+          "O1": "there",
+          "O2": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "_parent_slot": "S",
+          "sub-m2": "there"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "mine"
+        },
+        "sub_slots": {
+          "sub-s": "The book which",
+          "sub-v": "lies",
+          "sub-m2": "there",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_5",
+      "sentence": "The person that works here is kind.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-s": "The person that",
+          "sub-v": "works",
+          "sub-m2": "here",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_6",
+      "sentence": "The book which I bought is expensive.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "bought"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The book which",
+          "sub-s": "I",
+          "sub-v": "bought",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_7",
+      "sentence": "The man whom I met is tall.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "tall"
+        },
+        "sub_slots": {
+          "sub-o1": "The man whom",
+          "sub-s": "I",
+          "sub-v": "met",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_8",
+      "sentence": "The car that he drives is new.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "new"
+        },
+        "sub_slots": {
+          "sub-o1": "The car that",
+          "sub-s": "he",
+          "sub-v": "drives",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_9",
+      "sentence": "The car which was crashed is red.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-v": "was",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {
+          "sub-s": "The car which",
+          "sub-aux": "was",
+          "sub-v": "crashed",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_10",
+      "sentence": "The book that was written is famous.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-v": "was",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "famous"
+        },
+        "sub_slots": {
+          "sub-s": "The book that",
+          "sub-aux": "was",
+          "sub-v": "written",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_11",
+      "sentence": "The letter which was sent arrived.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "was"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-v": "was",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "arrived"
+        },
+        "sub_slots": {
+          "sub-s": "The letter which",
+          "sub-aux": "was",
+          "sub-v": "sent",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_12",
+      "sentence": "The man whose car is red lives here.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "red lives"
+        },
+        "sub_slots": {
+          "sub-s": "whose car",
+          "sub-v": "is",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "lives",
+          "M2": "here"
+        },
+        "sub_slots": {
+          "sub-s": "The man whose car",
+          "sub-v": "is",
+          "sub-c1": "red",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_13",
+      "sentence": "The student whose book I borrowed is smart.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-s": "whose book",
+          "sub-v": "borrowed",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "smart"
+        },
+        "sub_slots": {
+          "sub-o1": "The student whose book",
+          "sub-s": "I",
+          "sub-v": "borrowed",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_14",
+      "sentence": "The woman whose dog barks is my neighbor.",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "whose dog",
+          "sub-v": "barks",
+          "_parent_slot": "S"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "my neighbor"
+        },
+        "sub_slots": {
+          "sub-s": "The woman whose dog",
+          "sub-v": "barks",
+          "_parent_slot": "S"
+        }
+      },
+      "errors": []
+    }
+  ]
+}
