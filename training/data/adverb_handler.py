@@ -82,12 +82,39 @@ class AdverbHandler:
         return pairs
     
     def _collect_verb_modifiers(self, doc, verb_idx: int) -> List[Dict]:
-        """動詞の修飾語を収集（前後両方向から）"""
+        """動詞の修飾語を収集（前後両方向から）- 専門分担型ハイブリッド解析"""
         modifiers = []
+        
+        # 文頭副詞の特別処理（専門分担: 依存関係で検出）
+        if verb_idx > 0:  # 動詞が文頭でない場合
+            first_token = doc[0]
+            # 文頭副詞を検出（npadvmod または advmod）
+            is_sentence_initial_adverb = (
+                (first_token.dep_ == 'npadvmod' and first_token.head.i == verb_idx) or
+                (first_token.dep_ == 'advmod' and first_token.head.i == verb_idx and first_token.pos_ == 'ADV')
+            )
+            
+            if is_sentence_initial_adverb:
+                modifier_info = {
+                    'text': first_token.text,
+                    'pos': first_token.pos_,
+                    'tag': first_token.tag_,
+                    'idx': 0,
+                    'type': 'sentence_adverb' if first_token.dep_ == 'advmod' else 'temporal',
+                    'position': 'sentence-initial',  # 文頭位置
+                    'method': 'dependency_analysis'  # 使用手法明示
+                }
+                modifiers.append(modifier_info)
+                print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
         
         # Part 1: 動詞の前にある修飾語を検索（逆順）
         for i in range(verb_idx - 1, -1, -1):
             token = doc[i]
+            
+            # 文頭副詞は既に処理済みなのでスキップ
+            if i == 0 and (token.dep_ == 'npadvmod' or 
+                          (token.dep_ == 'advmod' and token.pos_ == 'ADV')):
+                continue
             
             # 修飾語として識別（この動詞を修飾しているか確認）
             if self._is_modifier(token) and token.head.i == verb_idx:
@@ -97,7 +124,8 @@ class AdverbHandler:
                     'tag': token.tag_,
                     'idx': i,
                     'type': self._classify_modifier_type(token),
-                    'position': 'pre-verb'  # 動詞前修飾語
+                    'position': 'pre-verb',  # 動詞前修飾語
+                    'method': 'pos_analysis'  # 使用手法明示
                 }
                 modifiers.append(modifier_info)
             
@@ -365,14 +393,31 @@ class AdverbHandler:
         modifier_count = len(all_modifiers)
         
         if modifier_count == 1:
-            # 1個のみ → M2
+            # 1個のみ → M2（公式仕様）
             modifier_slots['M2'] = all_modifiers[0]['text']
         elif modifier_count == 2:
-            # 2個の場合 → 常にM2, M3を使用（期待値との整合性）
-            modifier_slots['M2'] = all_modifiers[0]['text']
-            modifier_slots['M3'] = all_modifiers[1]['text']
+            # 2個の場合 → 動詞との位置関係で決定（公式仕様）
+            verb_positions = self._get_verb_positions(verb_modifier_pairs)
+            main_verb_idx = verb_positions[0] if verb_positions else 0
+            
+            # 修飾語の動詞に対する位置を判定
+            pre_verb_modifiers = [m for m in all_modifiers if m['modifier_idx'] < main_verb_idx]
+            post_verb_modifiers = [m for m in all_modifiers if m['modifier_idx'] > main_verb_idx]
+            
+            if len(pre_verb_modifiers) == 1 and len(post_verb_modifiers) == 1:
+                # ケース1: 動詞より前に1つ、後に1つ → M1, M2
+                modifier_slots['M1'] = pre_verb_modifiers[0]['text']
+                modifier_slots['M2'] = post_verb_modifiers[0]['text']
+            elif len(pre_verb_modifiers) == 2:
+                # ケース2: 動詞より前に2つ → M1, M2
+                modifier_slots['M1'] = all_modifiers[0]['text']
+                modifier_slots['M2'] = all_modifiers[1]['text']
+            else:
+                # ケース3: 動詞より後に2つ → M2, M3
+                modifier_slots['M2'] = all_modifiers[0]['text']
+                modifier_slots['M3'] = all_modifiers[1]['text']
         elif modifier_count == 3:
-            # 3個 → M1, M2, M3
+            # 3個 → M1, M2, M3（公式仕様）
             modifier_slots['M1'] = all_modifiers[0]['text']
             modifier_slots['M2'] = all_modifiers[1]['text']
             modifier_slots['M3'] = all_modifiers[2]['text']

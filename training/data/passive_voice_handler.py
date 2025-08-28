@@ -79,7 +79,7 @@ class PassiveVoiceHandler:
     
     def _find_next_verb(self, doc, start_idx: int) -> Optional[int]:
         """
-        次の動詞を探す（副詞をスキップ）
+        次の動詞を探す（副詞をスキップ）- 専門分担型ハイブリッド解析
         
         Args:
             doc: spaCy Docオブジェクト
@@ -93,9 +93,13 @@ class PassiveVoiceHandler:
             # 副詞はスキップ
             if token.pos_ == 'ADV':
                 continue
-            # 動詞が見つかった
+            # 動詞が見つかった（真の動詞のみ、形容詞は除外）
             if token.pos_ == 'VERB' or token.tag_ == 'VBN':
                 return i
+            # 形容詞（ADJ）は受動態の過去分詞ではないので除外
+            if token.pos_ == 'ADJ':
+                print(f"🔍 形容詞検出: {token.text} (POS=ADJ) - 受動態ではない")
+                break
             # 他の品詞に達したら停止
             if token.pos_ in ['NOUN', 'PRON', 'PROPN']:
                 break

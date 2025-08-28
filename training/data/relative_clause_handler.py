@@ -224,19 +224,20 @@ class RelativeClauseHandler:
                     main_root_idx = i
                     break
             
-            # Step 3: 関係節の終了位置を決定
-            # - 関係代名詞以降で主節動詞より前まで
+            # Step 3: 関係節の終了位置を決定（専門分担型ハイブリッド解析）
+            # 依存関係で正確な主節動詞を検出（複文構造のため）
             if main_root_idx is not None and main_root_idx > rel_start:
                 rel_end = main_root_idx
+                print(f"🔍 _extract_relative_clause_text: 依存関係による境界検出 = {rel_end} (主動詞: {doc[main_root_idx].text})")
             else:
                 # フォールバック: 品詞パターンで判定
+                rel_end = len(doc) - 1  # 最後まで関係節として扱う
                 for i in range(rel_start + 1, len(doc)):
                     token = doc[i]
-                    # 主語的語句（名詞＋動詞）に遭遇したら関係節終了
-                    if (token.pos_ in ['NOUN', 'PROPN'] and 
-                        i + 1 < len(doc) and 
-                        doc[i + 1].pos_ in ['VERB', 'AUX']):
+                    # be動詞やメイン動詞を検出したら関係節終了
+                    if token.pos_ in ['VERB', 'AUX'] and token.text.lower() in ['is', 'are', 'was', 'were']:
                         rel_end = i
+                        print(f"🔍 _extract_relative_clause_text: 品詞による境界検出 = {rel_end} ({token.text})")
                         break
             
             # Step 4: 関係節テキストを抽出
@@ -366,13 +367,9 @@ class RelativeClauseHandler:
                         break
                 
                 # 関係節終了後から ROOT動詞の間の修飾語を含める
-                main_clause_start = rel_clause_end
-                for i in range(rel_clause_end, root_verb_idx):
-                    token = doc[i]
-                    # 主節の修飾語（ROOT動詞を修飾）なら主節開始位置を更新
-                    if token.head.i == root_verb_idx and token.pos_ == 'ADV':
-                        main_clause_start = i
-                        break
+                # 専門分担型ハイブリッド解析: 主節はROOT動詞から開始（関係節後の副詞等は除去）
+                main_clause_start = root_verb_idx  # ROOT動詞から開始
+                print(f"🔍 主節開始位置決定: ROOT動詞 {root_verb_idx} ({doc[root_verb_idx].text}) から開始")
                 
                 # フォールバック: ROOT動詞から開始
                 if main_clause_start == rel_clause_end and main_clause_start == root_verb_idx:
