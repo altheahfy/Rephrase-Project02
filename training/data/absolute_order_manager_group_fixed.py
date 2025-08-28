@@ -91,80 +91,179 @@ class AbsoluteOrderManager:
     
     def _apply_group_fixed_position_system(self, slots, v_group_key, wh_word, group_population):
         """
-        汎用的絶対位置システム（登場順序ベース）
-        ①グループ内全要素を登場順に並べてorder付与
-        ②異なる要素が同じorderを持たない  
-        ③同一スロットが疑問詞なら早い位置、標準なら後の位置
+        汎用的絶対位置システム（母集団要素リストベース）
+        group_populationから要素リストを作成し、各文でマッチング
         """
-        print("🎯 Using Universal Order System (登場順序ベース)")
+        print("🎯 Using Group Population Element List System")
         
-        # wh-word自動検出
-        detected_wh_word = self.detect_wh_word(slots)
-        if detected_wh_word:
-            wh_word = detected_wh_word
-            print(f"📍 Detected wh-word: {wh_word}")
+        # group_populationが提供されていない場合のフォールバック
+        if not group_population:
+            print("⚠️ No group_population provided, using fallback system")
+            return self._apply_fallback_system(slots)
         
-        # Step 1: 疑問詞の特別位置を先に決定
-        wh_positions = {}
-        if wh_word:
-            # where系疑問詞は位置1
-            if wh_word in ["where", "when", "why", "how"]:
-                for slot_name, slot_value in slots.items():
-                    if slot_value and slot_value.lower().startswith(wh_word.lower()):
-                        wh_positions[slot_name] = 1
-                        print(f"📍 {slot_name}({slot_value}) → position 1 (where系疑問詞)")
-                        break
-            
-            # what疑問詞は位置2
-            elif wh_word == "what":
-                for slot_name, slot_value in slots.items():
-                    if slot_value and slot_value.lower().startswith("what"):
-                        wh_positions[slot_name] = 2
-                        print(f"📍 {slot_name}({slot_value}) → position 2 (what疑問詞)")
-                        break
+        # Step 1: group_populationから要素リストを作成
+        element_list = self._create_element_list_from_population(group_population, v_group_key)
+        print(f"📋 Group element list: {element_list}")
         
-        # Step 2: 標準順序での存在スロット収集
-        present_slots = []
-        for slot_name in self.STANDARD_SLOT_ORDER:
-            if slot_name in slots and slots[slot_name]:
-                present_slots.append(slot_name)
-        
-        # M3がある場合は追加
-        if "M3" in slots and slots["M3"]:
-            present_slots.append("M3")
-        
-        print(f"📋 Present slots in standard order: {present_slots}")
-        
-        # Step 3: 登場順序に基づく連続位置付与
+        # Step 2: 各文のスロットを要素リストとマッチング
         slot_positions = []
-        current_position = 1
-        
-        for slot_name in present_slots:
-            slot_value = slots[slot_name]
-            
-            # 疑問詞として既に位置が決まっている場合
-            if slot_name in wh_positions:
-                slot_positions.append({
-                    "slot": slot_name,
-                    "value": slot_value,
-                    "absolute_position": wh_positions[slot_name]
-                })
-                print(f"  ✅ {slot_name}({slot_value}) → position {wh_positions[slot_name]} (疑問詞)")
+        for position, element_key in enumerate(element_list, 1):
+            # 要素キーを解析 (例: "M1_where", "O2_what", "Aux_standard")
+            if "_" in element_key:
+                slot_name, element_type = element_key.split("_", 1)
             else:
-                # 疑問詞位置（1,2）をスキップして連続番号付与
-                while current_position in wh_positions.values():
-                    current_position += 1
-                
+                slot_name = element_key
+                element_type = "standard"
+            
+            slot_value = slots.get(slot_name)
+            
+            # スロットが存在し、要素タイプが一致する場合のみ位置を割り当て
+            if slot_value and self._matches_element_type(slot_value, element_type):
                 slot_positions.append({
                     "slot": slot_name,
                     "value": slot_value,
-                    "absolute_position": current_position
+                    "absolute_position": position
                 })
-                print(f"  ✅ {slot_name}({slot_value}) → position {current_position} (標準順序)")
-                current_position += 1
+                print(f"  ✅ {slot_name}({slot_value}) → position {position} (element: {element_key})")
+            elif slot_value:
+                print(f"  ⏭️ {slot_name}({slot_value}) → skipped (element type mismatch: {element_type})")
+            else:
+                print(f"  ⭕ {slot_name} → empty (position {position} reserved for {element_key})")
         
         print(f"📋 Final slot positions: {[(sp['slot'], sp['absolute_position']) for sp in slot_positions]}")
         return slot_positions
+    
+    def _create_element_list_from_population(self, group_population, v_group_key):
+        """
+        group_populationからグループの要素リストを作成
+        """
+        element_set = set()
+        
+        # 母集団の全文を調査して要素を抽出
+        for sentence_data in group_population:
+            slots = sentence_data.get("slots", {})
+            
+            for slot_name, slot_value in slots.items():
+                if slot_value:
+                    # 疑問詞の判定
+                    if self.is_wh_word_content(slot_value):
+                        detected_wh = self.detect_wh_word({slot_name: slot_value})
+                        if detected_wh:
+                            element_set.add(f"{slot_name}_{detected_wh}")
+                        else:
+                            element_set.add(f"{slot_name}_standard")
+                    else:
+                        element_set.add(f"{slot_name}_standard")
+        
+        # 要素を順序付け（疑問詞優先、その後標準順序）
+        element_list = []
+        wh_elements = []
+        standard_elements = []
+        
+        for element in sorted(element_set):
+            if "_where" in element or "_what" in element or "_when" in element or "_why" in element or "_how" in element:
+                wh_elements.append(element)
+            else:
+                standard_elements.append(element)
+        
+        # where系疑問詞とwhat疑問詞を先頭に配置
+        wh_elements.sort(key=lambda x: (0 if "where" in x else 1 if "what" in x else 2))
+        
+        element_list.extend(wh_elements)
+        element_list.extend(standard_elements)
+        
+        return element_list
+    
+    def _matches_element_type(self, slot_value, element_type):
+        """
+        スロット値が要素タイプと一致するかチェック
+        """
+        if element_type == "standard":
+            return not self.is_wh_word_content(slot_value)
+        else:
+            # 疑問詞タイプ (where, what, etc.)
+            return self.is_wh_word_content(slot_value) and slot_value.lower().startswith(element_type.lower())
+    
+    def _apply_fallback_system(self, slots):
+        """
+        group_populationがない場合のフォールバックシステム
+        tellグループ要素リストを暫定的に使用
+        """
+        print("🔧 Using fallback system with known element lists")
+        
+        # tellグループの既知要素リスト（暫定）
+        tell_elements = [
+            "M1_where",    # 1_Where (M1のwhere)
+            "O2_what",     # 2_What (O2のwhat)  
+            "Aux_standard", # 3_did
+            "S_standard",   # 4_S
+            "V_standard",   # 5_V
+            "O1_standard",  # 6_O1
+            "O2_standard",  # 7_O2 (標準)
+            "M2_standard"   # 8_M2 (標準)
+        ]
+        
+        # 特別処理: M2にwhere疑問詞がある場合、M1_whereとして位置1に配置
+        m2_where_override = False
+        if slots.get("M2") and self.is_wh_word_content(slots["M2"], "where"):
+            m2_where_override = True
+            print(f"🔍 Special case: M2 contains where → treating as position 1")
+        
+        slot_positions = []
+        for position, element_key in enumerate(tell_elements, 1):
+            slot_name, element_type = element_key.split("_", 1)
+            slot_value = slots.get(slot_name)
+            
+            # M2のwhere疑問詞特別処理
+            if element_key == "M1_where" and m2_where_override:
+                # M1_whereの位置にM2のwhereを配置
+                m2_value = slots.get("M2")
+                if m2_value and self._matches_element_type(m2_value, "where"):
+                    slot_positions.append({
+                        "slot": "M2",
+                        "value": m2_value,
+                        "absolute_position": position
+                    })
+                    print(f"  ✅ M2({m2_value}) → position {position} (where override)")
+                continue
+            
+            # M2_standardの処理で、既にwhere疑問詞として使われている場合はスキップ
+            if element_key == "M2_standard" and m2_where_override:
+                print(f"  ⏭️ M2 → skipped (already assigned as where)")
+                continue
+            
+            # 通常の処理
+            if slot_value and self._matches_element_type(slot_value, element_type):
+                slot_positions.append({
+                    "slot": slot_name,
+                    "value": slot_value,
+                    "absolute_position": position
+                })
+                print(f"  ✅ {slot_name}({slot_value}) → position {position} (element: {element_key})")
+            elif slot_value:
+                print(f"  ⏭️ {slot_name}({slot_value}) → skipped (element type mismatch: {element_type})")
+            else:
+                print(f"  ⭕ {slot_name} → empty (position {position} reserved for {element_key})")
+        
+        return slot_positions
+    
+    def is_wh_word_content(self, slot_value, expected_wh=None):
+        """
+        スロット内容が指定された疑問詞かどうか判定
+        """
+        if not slot_value:
+            return False
+        
+        value_lower = slot_value.lower().strip()
+        
+        if expected_wh:
+            return value_lower.startswith(expected_wh.lower())
+        else:
+            wh_words = ["what", "where", "when", "why", "how", "who", "whom", "whose", "which"]
+            for wh_word in wh_words:
+                if value_lower.startswith(wh_word):
+                    return True
+            return False
 
     def assign_absolute_order(self, decomposed_list):
         """
