@@ -6,71 +6,7 @@
 
 class AbsoluteOrderManager:
     def __init__(self):
-        # V_group_key別固定位置テーブル（期待値データに基づく正確な実装）
-        self.FIXED_POSITIONS = {
-            "tell": {
-                # tellグループの固定位置（Cases 83-86より）
-                # wh-word特別位置
-                "M2_wh": 1,     # where, when疑問詞専用
-                "O2_wh": 2,     # what疑問詞専用
-                # 標準位置（飛び番号）
-                "Aux": 3,       # 助動詞
-                "S": 4,         # 主語
-                "V": 5,         # 動詞
-                "O1": 6,        # 間接目的語
-                "O2": 7,        # 直接目的語（標準位置）
-                "M2": 8         # 場所・時間（標準位置）
-            },
-            "give": {
-                # giveグループ（tellと同様の授受動詞）
-                "M2_wh": 1, "O2_wh": 2, "Aux": 3, "S": 4, 
-                "V": 5, "O1": 6, "O2": 7, "M2": 8
-            },
-            "action": {
-                # actionグループ
-                "M1": 1, "Aux": 2, "S": 3, "V": 4, 
-                "O1": 5, "O2": 6, "M2": 7, "C1": 8, "C2": 9, "M3": 10
-            },
-            "passive": {
-                # passiveグループ
-                "M1": 1, "M2": 2, "Aux": 3, "S": 4, 
-                "V": 5, "C2": 6, "M2_END": 7
-            },
-            "communication": {
-                # communicationグループ
-                "M1": 1, "M2": 2, "Aux": 3, "S": 4, 
-                "V": 5, "O1": 6, "O2": 7, "C1": 8, "C2": 9, "M2_END": 10
-            },
-            "default": {
-                # デフォルトグループ
-                "M1": 1, "M2": 2, "Aux": 3, "S": 4, 
-                "V": 5, "O1": 6, "O2": 7, "C1": 8, "C2": 9, "M2_END": 10
-            }
-        }
-        
-        # レガシー互換性のための旧ルール（廃止予定）
-        self.group_rules = {
-            "tell": {
-                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "M2_END"]
-            },
-            "give": {
-                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "M2_END"]
-            },
-            "passive": {
-                "relative_order": ["M1", "M2", "Aux", "S", "V", "C2", "M2_END"]
-            },
-            "action": {
-                "relative_order": ["M1", "Aux", "S", "V", "O1", "O2", "M2", "C1", "C2", "M2_END"]
-            },
-            "communication": {
-                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "C1", "C2", "M2_END"]
-            },
-            "default": {
-                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "C1", "C2", "M2_END"]
-            }
-        }
-        
-        # wh-word→スロットマッピング
+        # wh-word→スロットマッピング（変更なし）
         self.wh_word_slots = {
             "what": "O2",
             "where": "M2", 
@@ -80,6 +16,11 @@ class AbsoluteOrderManager:
             "who": "S",
             "whom": "O1"
         }
+        
+        # 標準スロット順序（汎用システム用）
+        self.STANDARD_SLOT_ORDER = [
+            "M1", "M2", "Aux", "S", "V", "C1", "O1", "O2", "C2", "M3"
+        ]
     
     def detect_wh_word(self, slots):
         """
@@ -150,54 +91,59 @@ class AbsoluteOrderManager:
     
     def _apply_group_fixed_position_system(self, slots, v_group_key, wh_word, group_population):
         """
-        固定位置テーブルシステム（期待値データに厳密準拠）
+        汎用的絶対位置システム
+        V_group_key内の全要素を登場順序でソートし、連続したorder番号を付与
         """
-        print("🎯 Using Fixed Position Table System (corrected implementation)")
+        print("🎯 Using Universal Order System (登場順序ベース)")
         
-        # wh-word自動検出（引数より優先）
+        # wh-word自動検出
         detected_wh_word = self.detect_wh_word(slots)
         if detected_wh_word:
             wh_word = detected_wh_word
-            print(f"📍 Using detected wh-word: {wh_word}")
+            print(f"📍 Detected wh-word: {wh_word}")
         
-        # 固定位置テーブル取得
-        if v_group_key in self.FIXED_POSITIONS:
-            position_table = self.FIXED_POSITIONS[v_group_key]
-            print(f"📋 Using position table for '{v_group_key}': {position_table}")
-        else:
-            position_table = self.FIXED_POSITIONS["default"]
-            print(f"📋 Using default position table: {position_table}")
+        # Step 1: 存在するスロットを標準順序でソート
+        present_slots = []
+        for slot_name in self.STANDARD_SLOT_ORDER:
+            if slot_name in slots and slots[slot_name]:
+                present_slots.append(slot_name)
         
-        # スロット別絶対位置決定
+        # M3がある場合はM3も追加（標準順序の最後）
+        if "M3" in slots and slots["M3"]:
+            present_slots.append("M3")
+        
+        print(f"📋 Present slots in standard order: {present_slots}")
+        
+        # Step 2: wh-word特別処理の位置決定
+        wh_word_positions = {}
+        if wh_word:
+            for slot_name, slot_value in slots.items():
+                if slot_value and slot_value.lower().startswith(wh_word.lower()):
+                    wh_override_position = self.get_wh_position_override(wh_word, slot_name)
+                    if wh_override_position:
+                        wh_word_positions[slot_name] = wh_override_position
+                        print(f"📍 wh-word override: {slot_name}({slot_value}) → position {wh_override_position}")
+        
+        # Step 3: 連続位置番号付与（wh-word以外）
         slot_positions = []
+        current_position = 1
         
-        for slot_name, slot_value in slots.items():
-            if not slot_value:  # 空の値をスキップ
-                continue
-                
-            absolute_position = None
-            position_reason = ""
+        # wh-word特別位置をスキップしながら連続番号付与
+        for slot_name in present_slots:
+            slot_value = slots[slot_name]
             
-            # Step 1: wh-word特別処理チェック
-            if wh_word:
-                wh_override_position = self.get_wh_position_override(wh_word, slot_name)
-                if wh_override_position and slot_value.lower().startswith(wh_word.lower()):
-                    absolute_position = wh_override_position
-                    position_reason = f"wh-word({wh_word}) override"
-            
-            # Step 2: 固定位置テーブル参照
-            if absolute_position is None:
-                # スロット名マッピング（M3 → M2等の調整）
-                mapped_slot_name = slot_name
-                if slot_name == "M3":
-                    mapped_slot_name = "M2"  # M3はM2として扱う
+            if slot_name in wh_word_positions:
+                # wh-word特別位置を使用
+                absolute_position = wh_word_positions[slot_name]
+                position_reason = f"wh-word({wh_word}) override"
+            else:
+                # wh-word特別位置（1,2）をスキップして連続番号付与
+                while current_position in [1, 2] and any(pos == current_position for pos in wh_word_positions.values()):
+                    current_position += 1
                 
-                if mapped_slot_name in position_table:
-                    absolute_position = position_table[mapped_slot_name]
-                    position_reason = f"fixed table({v_group_key}.{mapped_slot_name})"
-                else:
-                    absolute_position = 999  # フォールバック
-                    position_reason = "fallback"
+                absolute_position = current_position
+                position_reason = f"standard order position"
+                current_position += 1
             
             slot_positions.append({
                 "slot": slot_name,
@@ -210,11 +156,12 @@ class AbsoluteOrderManager:
         # 絶対位置でソート
         slot_positions.sort(key=lambda x: x["absolute_position"])
         
-        # 結果表示を簡潔に
+        # 結果表示
         result_summary = []
         for item in slot_positions:
             result_summary.append(f"{item['slot']}({item['value']})_{item['absolute_position']}")
-        print(f"✅ Fixed position result: {result_summary}")
+        print(f"✅ Universal order result: {result_summary}")
+        
         return slot_positions
     
     def validate_wh_word_consistency(self, slots, wh_word):
