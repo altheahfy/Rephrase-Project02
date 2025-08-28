@@ -430,6 +430,15 @@ class CentralController:
             slots['V'] = passive_result.get('verb', '')
             print(f"🎯 受動態処理: Aux='{slots['Aux']}', V='{slots['V']}'")
         
+        # 🎯 Rephrase絶対ルール: サブスロットがあれば対応する上位スロットを空化
+        sub_slots = rel_result.get('sub_slots', {})
+        if sub_slots:
+            # サブスロットの親スロットを確認
+            parent_slot = sub_slots.get('_parent_slot', 'S')
+            if parent_slot in slots:
+                slots[parent_slot] = ""
+                print(f"🎯 Rephrase空化ルール適用: {parent_slot} → '' (サブスロット存在)")
+        
         # 修飾語スロットを統合
         final_slots = slots.copy()
         if modifier_slots:
@@ -440,7 +449,7 @@ class CentralController:
             'success': True,
             'main_slots': final_slots,
             'slots': final_slots,
-            'sub_slots': rel_result.get('sub_slots', {}),
+            'sub_slots': sub_slots,
             'grammar_pattern': 'relative_clause + basic_five_pattern + passive_voice',
             'phase': 3  # Phase 3（受動態対応）
         }

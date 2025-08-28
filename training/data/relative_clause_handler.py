@@ -52,8 +52,10 @@ class RelativeClauseHandler:
         self.original_text = original_text if original_text else text
         
         try:
+            print(f"🔍 関係節処理開始: '{text}'")
             # 基本的な関係代名詞検出（優先順位順）
             if ' whose ' in text.lower():
+                print(f"🎯 whose検出")
                 return self._process_whose(text)
             elif ' whom ' in text.lower():
                 return self._process_whom(text)
@@ -72,6 +74,7 @@ class RelativeClauseHandler:
             elif ' how ' in text.lower():
                 return self._process_relative_adverb(text, 'how')
             else:
+                print(f"⚠️ 関係節が見つかりませんでした: '{text}'")
                 return {'success': False, 'error': '関係節が見つかりませんでした'}
                 
         except Exception as e:
@@ -693,18 +696,22 @@ class RelativeClauseHandler:
     def _process_whose(self, text: str) -> Dict[str, Any]:
         """whose関係節処理（特化型解析）"""
         
+        print(f"🔍 whose処理開始: '{text}'")
+        
         # whoseは特殊なので専用解析
         doc = self.nlp(text)
         
         # Step 1: whose構造の詳細解析
         whose_info = self._analyze_whose_structure(doc)
         if not whose_info['success']:
+            print(f"⚠️ whose解析失敗: {whose_info}")
             return whose_info
         
         antecedent = whose_info['antecedent']
         rel_verb = whose_info['relative_verb']
         whose_noun = whose_info['whose_noun']
         main_verb_idx = whose_info['main_verb_idx']
+        whose_idx = whose_info.get('whose_idx')  # whose位置を取得
         
         # 主節を構築
         main_clause = ""
@@ -712,14 +719,27 @@ class RelativeClauseHandler:
             main_tokens = [token.text for token in doc[main_verb_idx:]]
             main_clause = " ".join(main_tokens)
         
-        return {
+        # 🎯 副詞修飾語処理を追加
+        sub_slots = {
+            'sub-s': f"{antecedent} whose {whose_noun}",  # 🎯 Rephrase準拠: 先行詞+関係代名詞+関係節主語
+            'sub-v': rel_verb,
+            '_parent_slot': 'S'
+        }
+        
+        # 関係節内の副詞修飾語を検出
+        if whose_idx is not None and main_verb_idx is not None:
+            # whose ... main_verb の間で副詞を探す
+            for i in range(whose_idx, main_verb_idx):
+                token = doc[i]
+                if token.pos_ == 'ADV':
+                    sub_slots['sub-m2'] = token.text
+                    print(f"🎯 関係節内副詞検出: sub-m2 = '{token.text}'")
+                    break
+        
+        result = {
             'success': True,
             'main_slots': {'S': ''},
-            'sub_slots': {
-                'sub-s': f"whose {whose_noun}",
-                'sub-v': rel_verb,
-                '_parent_slot': 'S'
-            },
+            'sub_slots': sub_slots,
             'pattern_type': 'whose_possessive',
             'relative_pronoun': 'whose',
             'antecedent': antecedent,
@@ -729,10 +749,13 @@ class RelativeClauseHandler:
                 'relative_verb_lemma': rel_verb
             }
         }
+        print(f"🎯 whose処理完了: {result}")
+        return result
 
     def _analyze_whose_structure(self, doc) -> Dict[str, Any]:
         """whose構造専用解析"""
         try:
+            print(f"🔍 whose構造解析開始")
             # Step 1: whose位置を特定
             whose_idx = None
             for i, token in enumerate(doc):
@@ -741,18 +764,23 @@ class RelativeClauseHandler:
                     break
             
             if whose_idx is None:
+                print(f"⚠️ whoseが見つからない")
                 return {'success': False, 'error': 'whose not found'}
+            
+            print(f"🎯 whose位置: {whose_idx}")
             
             # Step 2: 先行詞を特定（whoseより前）
             antecedent_tokens = []
             for i in range(whose_idx):
                 antecedent_tokens.append(doc[i].text)
             antecedent = " ".join(antecedent_tokens).strip()
+            print(f"🎯 先行詞: '{antecedent}'")
             
             # Step 3: whose + 名詞を特定
             whose_noun = ""
             if whose_idx + 1 < len(doc):
                 whose_noun = doc[whose_idx + 1].text
+            print(f"🎯 whose名詞: '{whose_noun}'")
             
             # Step 4: 関係節内の動詞を特定（whose + 名詞の後の最初の動詞）
             rel_verb = ""
@@ -762,6 +790,7 @@ class RelativeClauseHandler:
                 if token.pos_ in ['VERB', 'AUX']:
                     rel_verb = token.text
                     rel_verb_idx = i
+                    print(f"🎯 関係節動詞: '{rel_verb}' at {i}")
                     break
             
             # Step 5: 主節動詞を特定（関係節後の最初の動詞）
@@ -774,27 +803,34 @@ class RelativeClauseHandler:
                     # 通常の動詞検出
                     if token.pos_ in ['VERB', 'AUX'] and token.dep_ != 'relcl':
                         main_verb_idx = i
+                        print(f"🎯 主節動詞: '{token.text}' at {i}")
                         break
                     
                     # spaCy誤判定修正: 動詞的な単語が名詞として判定される場合
                     if token.pos_ == 'NOUN' and token.text.lower() in ['lives', 'works', 'runs', 'goes', 'comes', 'stays']:
                         main_verb_idx = i
+                        print(f"🎯 主節動詞(修正): '{token.text}' at {i}")
                         break
                     
                     # 形容詞の後に続く語句で動詞を探す
                     if i > 0 and doc[i-1].pos_ == 'ADJ' and token.pos_ in ['NOUN'] and token.text.lower() in ['lives', 'works']:
                         main_verb_idx = i
+                        print(f"🎯 主節動詞(ADJ後): '{token.text}' at {i}")
                         break
             
-            return {
+            result = {
                 'success': True,
                 'antecedent': antecedent,
                 'whose_noun': whose_noun,
                 'relative_verb': rel_verb,
-                'main_verb_idx': main_verb_idx
+                'main_verb_idx': main_verb_idx,
+                'whose_idx': whose_idx  # whose位置を追加
             }
+            print(f"🎯 whose解析結果: {result}")
+            return result
             
         except Exception as e:
+            print(f"❌ whose解析エラー: {str(e)}")
             return {'success': False, 'error': f'whose解析エラー: {str(e)}'}
 
     def _process_relative_adverb(self, text: str, relative_adverb: str) -> Dict[str, Any]:
