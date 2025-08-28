@@ -94,10 +94,13 @@ class RelativeClauseHandler:
         # 修飾語情報（協力者 AdverbHandler の結果を活用）
         modifiers_info = analysis.get('modifiers', {})
         sub_m2 = ""
+        sub_m3 = ""
         
-        # 協力者から修飾語情報を取得
+        # 協力者から修飾語情報を取得（M2, M3対応）
         if modifiers_info and 'M2' in modifiers_info:
             sub_m2 = modifiers_info['M2']
+        if modifiers_info and 'M3' in modifiers_info:
+            sub_m3 = modifiers_info['M3']
         
         # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
         passive_info = analysis.get('passive_analysis', {})
@@ -123,6 +126,8 @@ class RelativeClauseHandler:
         # 修飾語がある場合は追加
         if sub_m2:
             sub_slots['sub-m2'] = sub_m2
+        if sub_m3:
+            sub_slots['sub-m3'] = sub_m3
         
         # 主節を構築
         main_clause_start = analysis.get('main_clause_start')
@@ -546,10 +551,13 @@ class RelativeClauseHandler:
         # 修飾語情報（協力者 AdverbHandler の結果を活用）
         modifiers_info = analysis.get('modifiers', {})
         sub_m2 = ""
+        sub_m3 = ""
         
-        # 協力者から修飾語情報を取得
+        # 協力者から修飾語情報を取得（M2, M3対応）
         if modifiers_info and 'M2' in modifiers_info:
             sub_m2 = modifiers_info['M2']
+        if modifiers_info and 'M3' in modifiers_info:
+            sub_m3 = modifiers_info['M3']
         
         # whichは主語・目的語を文脈で判定
         doc = analysis['doc']  # _analyze_relative_clauseから取得
@@ -616,6 +624,8 @@ class RelativeClauseHandler:
         # 修飾語がある場合は追加
         if sub_m2:
             sub_slots['sub-m2'] = sub_m2
+        if sub_m3:
+            sub_slots['sub-m3'] = sub_m3
         
         # 主節を構築
         main_clause_start = analysis.get('main_clause_start')
@@ -867,6 +877,10 @@ class RelativeClauseHandler:
                 print(f"🎯 whose目的語型検出: {next_after_noun.text}")
         
         # 🎯 whose型に応じたサブスロット構築
+        # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
+        passive_info = analysis.get('passive_analysis', {})
+        is_passive = passive_info.get('is_passive', False) if passive_info else False
+        
         if whose_type == 'object':
             # 目的語型: whose句 + 主語 + 動詞
             rel_subject = ""
@@ -877,17 +891,38 @@ class RelativeClauseHandler:
                     print(f"🎯 関係節主語検出: '{rel_subject}'")
                     break
             
-            sub_slots = {
-                'sub-o1': f"{antecedent} whose {whose_noun}",  # 目的語
-                'sub-s': rel_subject,  # 主語
-                'sub-v': rel_verb,  # 動詞
-                '_parent_slot': 'S'
-            }
+            if is_passive and passive_info:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-o1': f"{antecedent} whose {whose_noun}",  # 目的語
+                    'sub-s': rel_subject,  # 主語
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-o1': f"{antecedent} whose {whose_noun}",  # 目的語
+                    'sub-s': rel_subject,  # 主語
+                    'sub-v': rel_verb,  # 動詞
+                    '_parent_slot': 'S'
+                }
         else:
             # 主語型: whose句が主語
-            sub_slots = {
-                'sub-s': f"{antecedent} whose {whose_noun}",  # 主語
-                'sub-v': rel_verb,  # 動詞
+            if is_passive and passive_info:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-s': f"{antecedent} whose {whose_noun}",  # 主語
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-s': f"{antecedent} whose {whose_noun}",  # 主語
+                    'sub-v': rel_verb,  # 動詞
                 '_parent_slot': 'S'
             }
         
