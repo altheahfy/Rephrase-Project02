@@ -187,52 +187,28 @@ class AbsoluteOrderManager:
     def _apply_fallback_system(self, slots):
         """
         group_populationがない場合のフォールバックシステム
-        tellグループ要素リストを暫定的に使用
+        tellグループ要素リストを暫定的に使用（正しいMスロット配置ルール適用）
         """
         print("🔧 Using fallback system with known element lists")
         
-        # tellグループの既知要素リスト（暫定）
+        # tellグループの正しい要素リスト（Mスロット配置ルール準拠）
         tell_elements = [
-            "M1_where",    # 1_Where (M1のwhere)
-            "O2_what",     # 2_What (O2のwhat)  
-            "Aux_standard", # 3_did
-            "S_standard",   # 4_S
-            "V_standard",   # 5_V
-            "O1_standard",  # 6_O1
-            "O2_standard",  # 7_O2 (標準)
-            "M2_standard"   # 8_M2 (標準)
+            "M2_where",     # 1_M2_where (修飾語1個なのでM2に配置)
+            "O2_what",      # 2_O2_what (O2のwhat疑問詞)  
+            "Aux_standard", # 3_Aux_standard
+            "S_standard",   # 4_S_standard
+            "V_standard",   # 5_V_standard
+            "O1_standard",  # 6_O1_standard
+            "O2_standard",  # 7_O2_standard (標準)
+            "M2_standard"   # 8_M2_standard (標準)
         ]
-        
-        # 特別処理: M2にwhere疑問詞がある場合、M1_whereとして位置1に配置
-        m2_where_override = False
-        if slots.get("M2") and self.is_wh_word_content(slots["M2"], "where"):
-            m2_where_override = True
-            print(f"🔍 Special case: M2 contains where → treating as position 1")
         
         slot_positions = []
         for position, element_key in enumerate(tell_elements, 1):
             slot_name, element_type = element_key.split("_", 1)
             slot_value = slots.get(slot_name)
             
-            # M2のwhere疑問詞特別処理
-            if element_key == "M1_where" and m2_where_override:
-                # M1_whereの位置にM2のwhereを配置
-                m2_value = slots.get("M2")
-                if m2_value and self._matches_element_type(m2_value, "where"):
-                    slot_positions.append({
-                        "slot": "M2",
-                        "value": m2_value,
-                        "absolute_position": position
-                    })
-                    print(f"  ✅ M2({m2_value}) → position {position} (where override)")
-                continue
-            
-            # M2_standardの処理で、既にwhere疑問詞として使われている場合はスキップ
-            if element_key == "M2_standard" and m2_where_override:
-                print(f"  ⏭️ M2 → skipped (already assigned as where)")
-                continue
-            
-            # 通常の処理
+            # スロットが存在し、要素タイプが一致する場合のみ位置を割り当て
             if slot_value and self._matches_element_type(slot_value, element_type):
                 slot_positions.append({
                     "slot": slot_name,
