@@ -1334,9 +1334,9 @@
       "V_group_key": "tell",
       "grammar_category": "absolute_order_test",
       "sentence": "What did he tell her at the store?",
-      "description": "M2(what)-1, Aux(did)-3, S(he)-4, V(tell)-5, O1(her)-6, M3(at the store)-8",
+      "description": "O2(what)-1, Aux(did)-3, S(he)-4, V(tell)-5, O1(her)-6, M3(at the store)-8",
       "absolute_order": {
-        "M2": 1,
+        "O2": 1,
         "Aux": 3,
         "S": 4,
         "V": 5,
@@ -1346,7 +1346,7 @@
       "wh_word": "what",
       "expected": {
         "main_slots": {
-          "M2": "What",
+          "O2": "What",
           "Aux": "did",
           "S": "he",
           "V": "tell",
