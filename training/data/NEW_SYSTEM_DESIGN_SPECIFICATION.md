@@ -1045,5 +1045,121 @@ class NewSystemIntegratedMapper:
 
 ---
 
+## 10. 実装済み機能テストケース管理
+
+### 10.1 目的・重要性
+新ハンドラー実装時には、既存実装済み機能への悪影響（デグレード）を確認する必要がある。
+そのため、実装済み機能のテストケースを常に把握し、新機能追加後に必ずリグレッションテストを実施する。
+
+### 10.2 実装済み機能対応テストケース（final_54_test_data.json）
+
+#### 10.2.1 基本5文型（単文）
+**対象ケース**: `1, 2, 55-69`
+- **ケース1**: `"The car is red."` - 第2文型（SVC）
+- **ケース2**: `"I love you."` - 第3文型（SVO）
+- **ケース55**: `"Birds fly."` - 第1文型（SV）
+- **ケース58**: `"She looks happy."` - 第2文型（SVC）
+- **ケース61**: `"I read books."` - 第3文型（SVO）
+- **ケース64**: `"I gave him a book."` - 第4文型（SVOO）
+- **ケース67**: `"We call him Tom."` - 第5文型（SVOC）
+- **ケース55-69**: その他基本5文型バリエーション
+
+#### 10.2.2 関係節（who, which, that, whose）
+**対象ケース**: `3-14`
+- **ケース3**: `"The man who runs fast is strong."` - who主語関係節 + 副詞
+- **ケース4**: `"The book which lies there is mine."` - which主語関係節 + 副詞
+- **ケース5**: `"The person that works here is kind."` - that主語関係節 + 副詞
+- **ケース6**: `"The book which I bought is expensive."` - which目的語関係節
+- **ケース7**: `"The man whom I met is tall."` - whom目的語関係節
+- **ケース8**: `"The car that he drives is new."` - that目的語関係節
+- **ケース12**: `"The man whose car is red lives here."` - whose所有格関係節 + 副詞
+- **ケース13**: `"The student whose book I borrowed is smart."` - whose目的語関係節
+- **ケース14**: `"The woman whose dog barks is my neighbor."` - whose主語関係節
+
+#### 10.2.3 受動態（単文）
+**対象ケース**: `20-22, 35`
+- **ケース20**: `"He has finished his homework."` - 完了時制（has + 過去分詞）
+- **ケース21**: `"The letter was written by John."` - 基本受動態
+- **ケース22**: `"The house was built in 1990."` - 基本受動態
+- **ケース35**: `"The teacher whose class runs efficiently is respected greatly."` - 主節受動態 + whose関係節
+
+#### 10.2.4 関係節内受動態
+**対象ケース**: `9-11, 46-47`
+- **ケース9**: `"The car which was crashed is red."` - 関係節内受動態
+- **ケース10**: `"The book that was written is famous."` - 関係節内受動態
+- **ケース11**: `"The letter which was sent arrived."` - 関係節内受動態
+- **ケース46**: `"The report which was thoroughly reviewed by experts was published successfully."` - 複合受動態
+- **ケース47**: `"The student whose essay was carefully corrected improved dramatically."` - whose + 受動態
+
+#### 10.2.5 副詞修飾語（単文）
+**対象ケース**: `70-79`
+- **ケース70**: `"She sings beautifully."` - 様態副詞
+- **ケース71**: `"Tomorrow I study."` - 時副詞
+- **ケース72**: `"He slowly opened the door."` - 様態副詞
+- **ケース73**: `"We always eat breakfast together."` - 頻度副詞
+- **ケース74**: `"The cat quietly sat on the mat."` - 様態副詞
+- **ケース75**: `"Students often study here."` - 頻度副詞
+- **ケース76**: `"She carefully reads books."` - 様態副詞
+- **ケース77**: `"Yesterday he became tired."` - 時副詞
+- **ケース78**: `"They run fast."` - 様態副詞
+- **ケース79**: `"I gave him the book yesterday."` - 時副詞
+
+### 10.3 リグレッションテスト実行方法
+
+#### 10.3.1 実装済み全機能テスト
+```bash
+# 実装済み全機能（基本5文型 + 関係節 + 受動態 + 副詞）
+python fast_test.py 1 2 3 4 5 6 7 8 9 10 11 12 13 14 20 21 22 35 46 47 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
+```
+
+#### 10.3.2 機能別テスト
+```bash
+# 基本5文型のみ
+python fast_test.py 1 2 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69
+
+# 関係節のみ
+python fast_test.py 3 4 5 6 7 8 12 13 14
+
+# 受動態のみ（単文 + 関係節内）
+python fast_test.py 9 10 11 20 21 22 35 46 47
+
+# 副詞修飾語のみ
+python fast_test.py 70 71 72 73 74 75 76 77 78 79
+```
+
+### 10.4 新ハンドラー開発時の必須手順
+
+#### 10.4.1 実装前確認
+1. **現在の実装済み機能リスト確認**
+2. **既存テストケースの実行・成功率確認**
+3. **新機能のテストケース追加計画**
+
+#### 10.4.2 実装中確認
+1. **段階的実装とテスト実行**
+2. **既存機能への影響確認**
+3. **デグレード発生時の即座対応**
+
+#### 10.4.3 実装後確認
+1. **全実装済み機能のリグレッションテスト**
+2. **成功率の維持確認**
+3. **本設計仕様書への新テストケース追加**
+
+### 10.5 テストケース拡張ルール
+
+#### 10.5.1 新機能実装時
+新ハンドラー実装時は、対応する例文を上記リストに追加し、以降のリグレッションテストに含める。
+
+#### 10.5.2 例文追加基準
+- **実装済み機能**: 100%成功が期待されるケース
+- **未実装機能**: 将来実装予定のケース（現在はテスト対象外）
+- **複合機能**: 複数ハンドラーが連携するケース
+
+### 10.6 品質保証
+- **新機能実装**: 既存機能への悪影響ゼロが必須条件
+- **リグレッション**: 実装済み機能の成功率低下は即座修正対象
+- **継続改善**: 新例文追加により品質向上を図る
+
+---
+
 **本仕様書は開発の絶対基準であり、これに反する実装は一切認められない。**
-**精度86.1%達成と責任分離設計の両立が本プロジェクトの成功条件である。**
+**段階的100%精度達成と継続的品質保証が本プロジェクトの成功条件である。**

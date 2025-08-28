@@ -358,6 +358,7 @@ class CentralController:
         return {
             'original_text': text,
             'success': True,
+            'main_slots': final_slots,  # main_slotsを追加
             'slots': final_slots,
             'grammar_pattern': 'basic_five_pattern + passive_voice',
             'phase': 1  # 基本処理 + 受動態
