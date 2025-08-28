@@ -354,26 +354,43 @@ class RelativeClauseHandler:
                     break
             
             if root_verb_idx is not None:
-                # ROOT動詞の前にある主節修飾語を探す
-                # 関係節の終了位置から ROOT動詞の間にある修飾語を含める
+                # 🎯 精密な境界判定: 関係節の範囲を正確に特定
                 rel_clause_end = rel_pronoun_idx + 1
                 
-                # 関係節の終了位置を特定（関係節内の最後の要素）
-                for i in range(rel_pronoun_idx + 1, root_verb_idx):
-                    token = doc[i]
-                    # 関係節内の要素（関係代名詞に依存）かチェック
-                    if token.head.i <= rel_pronoun_idx or token.head.i >= root_verb_idx:
-                        rel_clause_end = i + 1
+                # relcl動詞を特定
+                rel_verb_idx = None
+                for i, token in enumerate(doc):
+                    if token.dep_ == 'relcl' and i > rel_pronoun_idx:
+                        rel_verb_idx = i
                         break
                 
-                # 関係節終了後から ROOT動詞の間の修飾語を含める
-                # 専門分担型ハイブリッド解析: 主節はROOT動詞から開始（関係節後の副詞等は除去）
-                main_clause_start = root_verb_idx  # ROOT動詞から開始
-                print(f"🔍 主節開始位置決定: ROOT動詞 {root_verb_idx} ({doc[root_verb_idx].text}) から開始")
+                if rel_verb_idx is not None:
+                    # 関係節内の全要素を含める（依存関係に基づく）
+                    max_rel_idx = rel_verb_idx
+                    for i in range(rel_verb_idx + 1, len(doc)):
+                        token = doc[i]
+                        # 関係節動詞に直接または間接的に依存する要素
+                        if (token.head.i == rel_verb_idx or 
+                            (token.head.i > rel_pronoun_idx and token.head.i <= max_rel_idx)):
+                            max_rel_idx = i
+                        else:
+                            break
+                    rel_clause_end = max_rel_idx + 1
+                
+                # 🎯 主節開始位置: 関係節終了後かつROOT動詞周辺の動詞/助動詞
+                main_clause_start = None
+                
+                # 関係節終了後からROOT動詞までの範囲で動詞/助動詞を探す
+                for i in range(rel_clause_end, len(doc)):
+                    if doc[i].pos_ in ['VERB', 'AUX'] and i >= root_verb_idx - 1:
+                        main_clause_start = i
+                        print(f"🔍 主節開始位置決定: 関係節終了後の動詞/助動詞 {i} ({doc[i].text}) から開始")
+                        break
                 
                 # フォールバック: ROOT動詞から開始
-                if main_clause_start == rel_clause_end and main_clause_start == root_verb_idx:
+                if main_clause_start is None:
                     main_clause_start = root_verb_idx
+                    print(f"🔍 フォールバック: ROOT動詞 {root_verb_idx} ({doc[root_verb_idx].text}) から開始")
             
             result = {
                 'success': True,
