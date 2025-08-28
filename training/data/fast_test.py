@@ -107,15 +107,26 @@ def run_fast_test(case_range=None, output_results=False, output_file=None):
     return results
 
 def compare_simple(expected, actual):
-    """簡易比較"""
+    """包括的比較 - main_slots と sub_slots 両方をチェック"""
     if 'error' in actual:
         return False
         
-    # メインスロット比較のみ
+    # main_slots比較
     exp_main = expected.get('main_slots', {})
     act_main = actual.get('main_slots', {})
     
-    return exp_main == act_main
+    if exp_main != act_main:
+        return False
+    
+    # sub_slots比較（重要！）
+    exp_sub = expected.get('sub_slots', {})
+    act_sub = actual.get('sub_slots', {})
+    
+    # _parent_slotは無視して比較
+    exp_sub_filtered = {k: v for k, v in exp_sub.items() if k != '_parent_slot'}
+    act_sub_filtered = {k: v for k, v in act_sub.items() if k != '_parent_slot'}
+    
+    return exp_sub_filtered == act_sub_filtered
 
 if __name__ == "__main__":
     import argparse

@@ -1,0 +1,41 @@
+{
+  "case_13": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The student whose book I borrowed is smart.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  }
+}

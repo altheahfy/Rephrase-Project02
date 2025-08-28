@@ -175,8 +175,55 @@ class RelativeClauseHandler:
                     break
             
             # Step 3: 関係節の終了位置を決定
-            # - 関係代名詞以降で主節動詞より前まで
-            if main_root_idx is not None and main_root_idx > rel_start:
+            # whose の場合は特別処理：設計仕様書の人間的パターン認識準拠
+            if relative_pronoun.lower() == 'whose':
+                print(f"🔍 whose境界認識（設計仕様書準拠）")
+                
+                # "The man whose car is red lives here." の例に従って処理
+                whose_noun = None
+                rel_verb = None
+                boundary_pos = rel_start + 1  # デフォルト境界
+                
+                # whose直後の名詞を特定
+                if rel_start + 1 < len(doc):
+                    whose_noun = doc[rel_start + 1].text
+                    print(f"📍 whose名詞: '{whose_noun}'")
+                
+                # 関係節内の動詞とその後続要素を分析
+                for i in range(rel_start + 2, len(doc)):
+                    token = doc[i]
+                    
+                    # 関係節内の動詞を特定
+                    if token.pos_ in ['VERB', 'AUX'] and rel_verb is None:
+                        rel_verb = token.text
+                        print(f"📍 関係節動詞: '{rel_verb}'")
+                        continue
+                    
+                    # 動詞の後の形容詞で関係節終了（設計仕様書例: "redで関係節終了"）
+                    if rel_verb and token.pos_ == 'ADJ':
+                        print(f"🎯 形容詞 '{token.text}' で関係節終了（設計仕様書準拠）")
+                        boundary_pos = i + 1
+                        break
+                    
+                    # ROOT動詞に到達したら主節開始
+                    if token.dep_ == 'ROOT':
+                        print(f"🔍 ROOT動詞 '{token.text}' で主節開始")
+                        boundary_pos = i
+                        break
+                
+                rel_end = boundary_pos
+                print(f"📊 whose関係節境界: {rel_start} → {rel_end}")
+                
+                # 関係節テキスト抽出（whose以降の部分のみ）
+                if rel_start + 1 < rel_end:
+                    clause_tokens = doc[rel_start + 1:rel_end]  # whoseは除外
+                    extracted = ' '.join([t.text for t in clause_tokens])
+                    print(f"📊 whose関係節抽出: '{extracted}'")
+                    return extracted
+                else:
+                    return ""
+            # その他の関係代名詞の場合
+            elif main_root_idx is not None and main_root_idx > rel_start:
                 rel_end = main_root_idx
             else:
                 # フォールバック: 品詞パターンで判定
@@ -401,7 +448,8 @@ class RelativeClauseHandler:
                 'main_clause_start': main_clause_start,
                 'doc': doc,
                 'modifiers': modifiers,  # 協力者からの修飾語情報
-                'structure_analysis': structure_analysis  # 協力者からの5文型分析
+                'structure_analysis': structure_analysis,  # 協力者からの5文型分析
+                'passive_analysis': passive_analysis  # 協力者からの受動態分析
             }
             
             return result
@@ -505,13 +553,27 @@ class RelativeClauseHandler:
             if next_token.pos_ in ['PRON', 'NOUN', 'PROPN']:
                 is_subject = False  # which + 名詞 = 目的格
         
-        # サブスロット構築
+        # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
+        passive_info = analysis.get('passive_analysis', {})
+        is_passive = passive_info.get('is_passive', False)
+        
+        # サブスロット構築（受動態考慮）
         if is_subject:
-            sub_slots = {
-                'sub-s': f"{antecedent} which",
-                'sub-v': rel_verb,
-                '_parent_slot': 'S'
-            }
+            if is_passive:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-s': f"{antecedent} which",
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-s': f"{antecedent} which",
+                    'sub-v': rel_verb,
+                    '_parent_slot': 'S'
+                }
         else:
             # 目的格whichの場合、関係節内の主語を特定
             rel_subject = ""
@@ -521,12 +583,23 @@ class RelativeClauseHandler:
                         rel_subject = doc[i].text
                         break
             
-            sub_slots = {
-                'sub-o1': f"{antecedent} which",
-                'sub-s': rel_subject,
-                'sub-v': rel_verb,
-                '_parent_slot': 'S'
-            }
+            if is_passive:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-o1': f"{antecedent} which",
+                    'sub-s': rel_subject,
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-o1': f"{antecedent} which",
+                    'sub-s': rel_subject,
+                    'sub-v': rel_verb,
+                    '_parent_slot': 'S'
+                }
         
         # 修飾語がある場合は追加
         if sub_m2:
@@ -608,13 +681,27 @@ class RelativeClauseHandler:
             if next_token.pos_ in ['PRON', 'NOUN', 'PROPN']:
                 is_subject = False  # that + 名詞 = 目的格
         
-        # サブスロット構築
+        # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
+        passive_info = analysis.get('passive_analysis', {})
+        is_passive = passive_info.get('is_passive', False)
+        
+        # サブスロット構築（受動態考慮）
         if is_subject:
-            sub_slots = {
-                'sub-s': f"{antecedent} that",
-                'sub-v': rel_verb,
-                '_parent_slot': 'S'
-            }
+            if is_passive:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-s': f"{antecedent} that",
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-s': f"{antecedent} that",
+                    'sub-v': rel_verb,
+                    '_parent_slot': 'S'
+                }
         else:
             # 目的格thatの場合、関係節内の主語を特定
             rel_subject = ""
@@ -624,12 +711,23 @@ class RelativeClauseHandler:
                         rel_subject = doc[i].text
                         break
             
-            sub_slots = {
-                'sub-o1': f"{antecedent} that",
-                'sub-s': rel_subject,
-                'sub-v': rel_verb,
-                '_parent_slot': 'S'
-            }
+            if is_passive:
+                # 受動態の場合: Aux + V に分離
+                sub_slots = {
+                    'sub-o1': f"{antecedent} that",
+                    'sub-s': rel_subject,
+                    'sub-aux': passive_info.get('aux', ''),  # be動詞
+                    'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                    '_parent_slot': 'S'
+                }
+            else:
+                # 通常の場合
+                sub_slots = {
+                    'sub-o1': f"{antecedent} that",
+                    'sub-s': rel_subject,
+                    'sub-v': rel_verb,
+                    '_parent_slot': 'S'
+                }
         
         # 修飾語がある場合は追加
         if sub_m2:
@@ -708,14 +806,18 @@ class RelativeClauseHandler:
         }
 
     def _process_whose(self, text: str) -> Dict[str, Any]:
-        """whose関係節処理（特化型解析）"""
+        """whose関係節処理（協力アプローチ版）"""
         
         print(f"🔍 whose処理開始: '{text}'")
         
-        # whoseは特殊なので専用解析
-        doc = self.nlp(text)
+        # spaCy文脈解析で関係節を分析（協力者情報を含む）
+        analysis = self._analyze_relative_clause(text, 'whose')
+        if not analysis['success']:
+            print(f"⚠️ whose解析失敗: {analysis}")
+            return analysis
         
-        # Step 1: whose構造の詳細解析
+        # whoseは特殊なので専用解析も併用
+        doc = self.nlp(text)
         whose_info = self._analyze_whose_structure(doc)
         if not whose_info['success']:
             print(f"⚠️ whose解析失敗: {whose_info}")
@@ -733,22 +835,70 @@ class RelativeClauseHandler:
             main_tokens = [token.text for token in doc[main_verb_idx:]]
             main_clause = " ".join(main_tokens)
         
-        # 🎯 副詞修飾語処理を追加
-        sub_slots = {
-            'sub-s': f"{antecedent} whose {whose_noun}",  # 🎯 Rephrase準拠: 先行詞+関係代名詞+関係節主語
-            'sub-v': rel_verb,
-            '_parent_slot': 'S'
-        }
+        # 構造分析結果（協力者 BasicFivePatternHandler の結果を活用）
+        structure_analysis = analysis.get('structure_analysis', {})
+        structure_slots = structure_analysis.get('slots', {}) if structure_analysis else {}
         
-        # 関係節内の副詞修飾語を検出
-        if whose_idx is not None and main_verb_idx is not None:
-            # whose ... main_verb の間で副詞を探す
-            for i in range(whose_idx, main_verb_idx):
+        # 🎯 whose構造の文脈判定（主語型 vs 目的語型）
+        # whose + 名詞 + 人称代名詞（I, you, he, she, etc.) → 目的語型
+        # whose + 名詞 + 動詞 → 主語型
+        doc = analysis['doc']
+        whose_type = 'subject'  # デフォルト: 主語型
+        
+        # whose位置から分析
+        if whose_idx is not None and whose_idx + 2 < len(doc):
+            # whose + 名詞 + 次の語を確認
+            next_after_noun = doc[whose_idx + 2]
+            if next_after_noun.pos_ == 'PRON' and next_after_noun.text.lower() in ['i', 'you', 'he', 'she', 'we', 'they']:
+                whose_type = 'object'  # 目的語型
+                print(f"🎯 whose目的語型検出: {next_after_noun.text}")
+        
+        # 🎯 whose型に応じたサブスロット構築
+        if whose_type == 'object':
+            # 目的語型: whose句 + 主語 + 動詞
+            rel_subject = ""
+            for i in range(whose_idx + 2, len(doc)):
                 token = doc[i]
-                if token.pos_ == 'ADV':
-                    sub_slots['sub-m2'] = token.text
-                    print(f"🎯 関係節内副詞検出: sub-m2 = '{token.text}'")
+                if token.pos_ == 'PRON' and token.text.lower() in ['i', 'you', 'he', 'she', 'we', 'they']:
+                    rel_subject = token.text
+                    print(f"🎯 関係節主語検出: '{rel_subject}'")
                     break
+            
+            sub_slots = {
+                'sub-o1': f"{antecedent} whose {whose_noun}",  # 目的語
+                'sub-s': rel_subject,  # 主語
+                'sub-v': rel_verb,  # 動詞
+                '_parent_slot': 'S'
+            }
+        else:
+            # 主語型: whose句が主語
+            sub_slots = {
+                'sub-s': f"{antecedent} whose {whose_noun}",  # 主語
+                'sub-v': rel_verb,  # 動詞
+                '_parent_slot': 'S'
+            }
+        
+        # 🎯 協力者からの構造情報を統合（補語・目的語など）
+        if structure_slots:
+            # C1（補語）がある場合
+            if 'C1' in structure_slots:
+                sub_slots['sub-c1'] = structure_slots['C1']
+                print(f"🎯 構造分析から補語取得: sub-c1 = '{structure_slots['C1']}'")
+            
+            # O1（目的語）がある場合（主語型の場合のみ）
+            if whose_type == 'subject' and 'O1' in structure_slots:
+                sub_slots['sub-o1'] = structure_slots['O1']
+                print(f"🎯 構造分析から目的語取得: sub-o1 = '{structure_slots['O1']}'")
+        
+        # 関係節内の副詞修飾語を検出（whose目的語型の場合は除外）
+        is_object_type = (whose_type == 'object')
+        modifiers_info = analysis.get('modifiers', {})
+        if modifiers_info and 'M2' in modifiers_info and not is_object_type:
+            # whose主語型の場合のみ修飾語を追加
+            sub_slots['sub-m2'] = modifiers_info['M2']
+            print(f"🎯 協力者から修飾語取得: sub-m2 = '{modifiers_info['M2']}'")
+        elif is_object_type and modifiers_info and 'M2' in modifiers_info:
+            print(f"🎯 whose目的語型では修飾語除外: '{modifiers_info['M2']}' を無視")
         
         result = {
             'success': True,
