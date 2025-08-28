@@ -14,6 +14,7 @@ from typing import Dict, List, Any, Optional
 from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
+from passive_voice_handler import PassiveVoiceHandler
 
 
 class CentralController:
@@ -35,14 +36,16 @@ class CentralController:
         """初期化: spaCy POS解析器とハンドラー群の設定（協力アプローチ版）"""
         self.nlp = spacy.load('en_core_web_sm')
         
-        # Phase 2: 基本ハンドラーたちを先に初期化
+        # Phase 3: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
         adverb_handler = AdverbHandler()
+        passive_voice_handler = PassiveVoiceHandler()
         
         # 関係節ハンドラーに協力者を注入（Dependency Injection）
         collaborators = {
             'adverb': adverb_handler,
-            'five_pattern': basic_five_pattern_handler
+            'five_pattern': basic_five_pattern_handler,
+            'passive': passive_voice_handler
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
         
@@ -50,7 +53,8 @@ class CentralController:
         self.handlers = {
             'basic_five_pattern': basic_five_pattern_handler,
             'relative_clause': relative_clause_handler,
-            'adverb': adverb_handler
+            'adverb': adverb_handler,
+            'passive_voice': passive_voice_handler
         }
         
         # Rephraseスロット定義読み込み
@@ -142,13 +146,17 @@ class CentralController:
                 else:
                     final_simplified_text = simplified_text
                 
-                # Step 3: 5文型処理（主節のみ）
+                # Step 3: 受動態処理（主節）
+                passive_handler = self.handlers['passive_voice']
+                passive_result = passive_handler.process(final_simplified_text)
+                
+                # Step 4: 5文型処理（主節のみ）
                 if 'basic_five_pattern' in grammar_patterns:
                     five_handler = self.handlers['basic_five_pattern']
                     five_result = five_handler.process(final_simplified_text)
                     
                     if five_result['success']:
-                        return self._merge_results(text, final_result, five_result, modifier_slots)
+                        return self._merge_results_with_passive(text, final_result, five_result, modifier_slots, passive_result)
                     else:
                         return self._create_error_result(text, five_result['error'])
                         
@@ -178,14 +186,18 @@ class CentralController:
         else:
             print(f"ℹ️ 修飾語なし、元の文を継続使用")
             
+        # Step 1: 受動態処理（通常フロー）
+        passive_handler = self.handlers['passive_voice']
+        passive_result = passive_handler.process(processing_text)
+        
         # Step 2: 5文型処理（関係節がない場合）
         if 'basic_five_pattern' in grammar_patterns:
             five_handler = self.handlers['basic_five_pattern']
             five_result = five_handler.process(processing_text)
             
             if five_result['success']:
-                # 5文型のみの場合（修飾語スロット含む）
-                return self._format_result(text, five_result['slots'], modifier_slots)
+                # 受動態対応版の結果作成
+                return self._format_result_with_passive(text, five_result['slots'], modifier_slots, passive_result)
             else:
                 return self._create_error_result(text, five_result['error'])
         
@@ -312,6 +324,44 @@ class CentralController:
             'error': error_message,
             'phase': 1
         }
+
+    def _format_result_with_passive(self, text: str, slots: Dict[str, str], modifier_slots: Dict = None, 
+                                   passive_result: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        結果フォーマット: 受動態対応版
+        
+        Args:
+            text: 元の文
+            slots: ハンドラーからの結果
+            modifier_slots: 修飾語スロット
+            passive_result: 受動態処理結果
+            
+        Returns:
+            Dict: 整形済み結果（受動態対応）
+        """
+        # 基本スロットをコピー
+        final_slots = slots.copy()
+        
+        # 受動態の場合、VをAux+Vに分離
+        if passive_result and passive_result.get('is_passive'):
+            # 元のVを削除してAux+Vに分離
+            if 'V' in final_slots:
+                del final_slots['V']
+            final_slots['Aux'] = passive_result.get('aux', '')
+            final_slots['V'] = passive_result.get('verb', '')
+            print(f"🎯 通常フロー受動態処理: Aux='{final_slots['Aux']}', V='{final_slots['V']}'")
+        
+        # 修飾語スロット統合
+        if modifier_slots:
+            final_slots.update(modifier_slots)
+        
+        return {
+            'original_text': text,
+            'success': True,
+            'slots': final_slots,
+            'grammar_pattern': 'basic_five_pattern + passive_voice',
+            'phase': 1  # 基本処理 + 受動態
+        }
     
     def _extract_modifier_list(self, adverb_result: Dict) -> List[str]:
         """
@@ -364,6 +414,36 @@ class CentralController:
             print(f"⚠️ 修飾語が3個を超過: {len(modifiers)}個 → 最初の3個のみ使用")
         
         return slots
+
+    def _merge_results_with_passive(self, text: str, rel_result: Dict, five_result: Dict, 
+                                  modifier_slots: Dict, passive_result: Optional[Dict]) -> Dict[str, Any]:
+        """関係節、5文型、修飾語、受動態の結果を統合（受動態対応版）"""
+        # 基本の5文型結果を取得
+        slots = five_result.get('slots', {})
+        
+        # 受動態の場合、VをAux+Vに分離
+        if passive_result and passive_result.get('is_passive'):
+            # 元のVを削除してAux+Vに分離
+            if 'V' in slots:
+                del slots['V']
+            slots['Aux'] = passive_result.get('aux', '')
+            slots['V'] = passive_result.get('verb', '')
+            print(f"🎯 受動態処理: Aux='{slots['Aux']}', V='{slots['V']}'")
+        
+        # 修飾語スロットを統合
+        final_slots = slots.copy()
+        if modifier_slots:
+            final_slots.update(modifier_slots)
+            
+        return {
+            'original_text': text,
+            'success': True,
+            'main_slots': final_slots,
+            'slots': final_slots,
+            'sub_slots': rel_result.get('sub_slots', {}),
+            'grammar_pattern': 'relative_clause + basic_five_pattern + passive_voice',
+            'phase': 3  # Phase 3（受動態対応）
+        }
 
 
 if __name__ == "__main__":

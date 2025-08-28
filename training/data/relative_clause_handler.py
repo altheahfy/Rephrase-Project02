@@ -96,6 +96,31 @@ class RelativeClauseHandler:
         if modifiers_info and 'M2' in modifiers_info:
             sub_m2 = modifiers_info['M2']
         
+        # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
+        passive_info = analysis.get('passive_analysis', {})
+        is_passive = passive_info.get('is_passive', False)
+        
+        # サブスロット構築（受動態考慮）
+        if is_passive:
+            # 受動態の場合: Aux + V に分離
+            sub_slots = {
+                'sub-s': f"{antecedent} who",
+                'sub-aux': passive_info.get('aux', ''),  # be動詞
+                'sub-v': passive_info.get('verb', ''),   # 過去分詞
+                '_parent_slot': 'S'
+            }
+        else:
+            # 通常の場合
+            sub_slots = {
+                'sub-s': f"{antecedent} who",
+                'sub-v': rel_verb,  # 動詞のみ
+                '_parent_slot': 'S'  # 必須フィールド
+            }
+        
+        # 修飾語がある場合は追加
+        if sub_m2:
+            sub_slots['sub-m2'] = sub_m2
+        
         # 主節を構築
         main_clause_start = analysis.get('main_clause_start')
         main_clause = ""
@@ -103,17 +128,6 @@ class RelativeClauseHandler:
             doc = analysis['doc']
             main_tokens = [token.text for token in doc[main_clause_start:]]
             main_clause = " ".join(main_tokens)
-        
-        # サブスロット構築
-        sub_slots = {
-            'sub-s': f"{antecedent} who",
-            'sub-v': rel_verb,  # 動詞のみ
-            '_parent_slot': 'S'  # 必須フィールド
-        }
-        
-        # 修飾語がある場合は追加
-        if sub_m2:
-            sub_slots['sub-m2'] = sub_m2
         
         return {
             'success': True,
@@ -126,6 +140,10 @@ class RelativeClauseHandler:
             'spacy_analysis': {
                 'relative_verb_pos': analysis['relative_verb_pos'],
                 'relative_verb_lemma': analysis['relative_verb_lemma']
+            },
+            'cooperation_details': {
+                'passive_analysis': passive_info,
+                'modifiers_analysis': modifiers_info
             }
         }
     
@@ -272,6 +290,13 @@ class RelativeClauseHandler:
                 structure_result = self.five_pattern_handler.process(cleaned_clause)
                 if structure_result.get('success'):
                     structure_analysis = structure_result
+            
+            # Step 3.5: 協力者（受動態ハンドラー）と連携：受動態検出
+            passive_analysis = None
+            if self.passive_handler and cleaned_clause:
+                passive_result = self.passive_handler.process(cleaned_clause)
+                if passive_result:
+                    passive_analysis = passive_result
             
             # Step 4: 文全体をspaCyで解析（フォールバック・詳細情報用）
             doc = self.nlp(text)

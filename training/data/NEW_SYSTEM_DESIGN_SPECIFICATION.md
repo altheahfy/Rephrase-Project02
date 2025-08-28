@@ -44,12 +44,15 @@
 （具体例）
 「文法解析を実施し、使われている文法項目を特定、それぞれのハンドラーに順次分解を指示。まずは関係節ハンドラーに指示して節構造を分ける」「関係節ハンドラーが分解したサブスロット（代表語句以外にマスク）と上位スロットの対応構造を整理・保存」「order管理」「5文型ハンドラーにそれぞれをフラットに処理させ、上位とサブの配置、サブ要素がある上位を””にする、などの整理」「各個別ハンドラーは中央管理システムとのみ接続し、情報は中央管理システムのみから取得、処理結果も中央管理システムに渡す」
 
-### 1.2 設計原則
-1. **Single Responsibility Principle**: 各コンポーネントは単一の責任のみ
-2. **Human Grammar Pattern**: spaCy品詞分析を情報源とし、人間が文法体系を構築するように全体構造からパターン照合
-3. **Generic Design**: 個別事例対応ではなく同種ケース全てに機能する汎用設計
-4. **Hard-coding Prohibition**: どうしても他に方法がない場合以外はハードコーディング禁止
-5. **Zero Technical Debt**: 技術負債を発生させない
+### 1.2 設計原則（修正版 - 協力アプローチ採用）
+1. **Single Responsibility Principle**: 各コンポーネントは単一の責任のみ（協力は例外として許可）
+2. **Controlled Cooperation**: 必要時のみハンドラー間協力、完了後は中央報告
+3. **Information Centralization**: 最終的に全情報はCentralControllerが管理
+4. **Dependency Injection**: 協力者はコンストラクタで注入、疎結合を維持
+5. **Human Grammar Pattern**: spaCy品詞分析を情報源とし、人間が文法体系を構築するように全体構造からパターン照合
+6. **Generic Design**: 個別事例対応ではなく同種ケース全てに機能する汎用設計
+7. **Hard-coding Prohibition**: どうしても他に方法がない場合以外はハードコーディング禁止
+8. **Zero Technical Debt**: 技術負債を発生させない
 
 ---
 
@@ -99,30 +102,41 @@
 ### 🎯 次期開発方針（責任分担原則の徹底）
 **重要な設計判断**: 関係節ハンドラー内での修飾語処理実装を**責任分団原則違反**として却下
 
-#### 🤝 ハンドラー協力アプローチの採用（重要な設計改善）
-**実装段階での重要な発見**: 関係節の正確な境界決定には関係節内部の完全な5文型理解が必要
+#### 🤝 ハンドラー協力アプローチの正式採用（設計方針確定）
+**実装検証の結果**: 関係節の正確な境界決定には関係節内部の完全な5文型理解と受動態処理が必要
 
-**新設計: ハンドラー協力パターン**
+**確定設計: ハンドラー協力パターン + 中央報告**
 ```python
 class RelativeClauseHandler:
-    def __init__(self, five_pattern_handler=None, adverb_handler=None):
+    def __init__(self, collaborators=None):
         # 協力者への参照（Dependency Injection）
-        self.five_pattern_handler = five_pattern_handler
-        self.adverb_handler = adverb_handler
+        self.five_pattern_handler = collaborators.get('five_pattern')
+        self.adverb_handler = collaborators.get('adverb')
+        self.passive_handler = collaborators.get('passive')  # 追加
         
-    def _analyze_relative_clause_structure(self, clause_text):
-        # 協力者に関係節内部の5文型分析を依頼
-        if self.five_pattern_handler:
-            structure = self.five_pattern_handler.process(clause_text)
-            return self._interpret_for_relative_context(structure)
+    def process(self, text):
+        # 協力者と連携して複雑な文法構造を処理
+        # ...協力処理...
+        
+        # 重要: 全情報をCentralControllerに報告
+        return {
+            'success': True,
+            'main_slots': {...},
+            'sub_slots': {...},
+            'cooperation_details': {
+                'adverb_analysis': {...},
+                'passive_analysis': {...},
+                'structure_analysis': {...}
+            }
+        }
 ```
 
-**協力アプローチの利点:**
+**協力アプローチの利点（実証済み）:**
 - ✅ **Dependency Injection**: 依存性注入による疎結合設計
-- ✅ **単一インスタンス**: メモリ効率的な設計
+- ✅ **情報統合**: 協力結果の完全な中央報告
 - ✅ **責任分担維持**: 各ハンドラーの専門性を保持
-- ✅ **テスト容易性**: Mock オブジェクトによるテスト可能
-- ✅ **拡張性**: 他のハンドラーとの協力も同様に実装可能
+- ✅ **効率性**: 自然言語処理の並行処理に適合
+- ✅ **拡張性**: 新しい協力関係の容易な追加
 
 **従来の「内包」アプローチとの比較:**
 - ❌ 内包: `self.five_pattern = BasicFivePatternHandler()` → 重複インスタンス
