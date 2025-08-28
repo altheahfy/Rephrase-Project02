@@ -9,27 +9,28 @@ class AbsoluteOrderManager:
         # グループ別相対順序ルール定義（動的絶対位置計算用）
         self.group_rules = {
             "tell": {
-                # tellグループの固定絶対位置（期待値から正確にマッピング）
-                "fixed_positions": {
-                    "M1": 1,      # M1冒頭（ないことが多い）
-                    "M2": 1,      # M2疑問詞（Where等、M1がない場合の冒頭）
-                    "SPACER": 2,  # 空きポジション
-                    "Aux": 3,
-                    "S": 4,
-                    "V": 5,
-                    "O1": 6,
-                    "O2": 7,
-                    "M2_END": 8   # M3の場所
-                },
-                "description": "tellグループの固定絶対位置システム"
+                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "M2_END"],
+                "description": "tell系動詞: M1冒頭 < M2疑問詞 < Aux < S < V < O1 < O2 < M2文末"
             },
             "give": {
-                "relative_order": ["M1", "M2", "O", "O2", "Aux", "S", "V", "O1", "M2"],
-                "description": "M1(冒頭) < M2(疑問詞) < O < O2 < Aux < S < V < O1 < M2(最後)"
+                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "M2_END"],
+                "description": "give系動詞: S V O1 O2 の語順"
+            },
+            "be": {
+                "relative_order": ["M1", "M2", "Aux", "S", "V", "C1", "C2", "M2_END"],
+                "description": "be動詞: Aux S V C1 の語順"
+            },
+            "action": {
+                "relative_order": ["M1", "Aux", "S", "V", "O1", "O2", "M2", "C1", "C2", "M2_END"],
+                "description": "一般動詞: M1(時間) S V O1 O2 M2(様態) M2_END(場所)"
+            },
+            "passive": {
+                "relative_order": ["M1", "M2", "Aux", "S", "V", "C2", "M2_END"],
+                "description": "受動態: S be V C2 の語順"
             },
             # 他のグループは後で追加
             "default": {
-                "relative_order": ["M1", "S", "Aux", "V", "O1", "O2", "C1", "C2", "M2"],
+                "relative_order": ["M1", "M2", "Aux", "S", "V", "O1", "O2", "C1", "C2", "M2_END"],
                 "description": "デフォルト相対順序"
             }
         }
@@ -47,7 +48,7 @@ class AbsoluteOrderManager:
     
     def apply_absolute_order(self, slots, v_group_key, wh_word=None, group_population=None):
         """
-        グループ別絶対順序を適用してslot_orderを生成（グループ人口分析対応）
+        汎用グループ人口分析による絶対順序計算
         
         Args:
             slots (dict): スロット情報 {"S": "he", "V": "tell", "O1": "her", ...}
@@ -58,26 +59,32 @@ class AbsoluteOrderManager:
         Returns:
             list: 絶対順序でソートされたスロット配列
         """
-        print(f"=== AbsoluteOrderManager.apply_absolute_order (Group Population Analysis) ===")
+        print(f"=== AbsoluteOrderManager.apply_absolute_order (Universal Group Population Analysis) ===")
         print(f"Input slots: {slots}")
         print(f"V_group_key: {v_group_key}")
         print(f"wh_word: {wh_word}")
         print(f"Group population: {group_population}")
         
-        # tellグループ固定位置システム（期待値ベース）
-        if v_group_key == "tell":
-            return self._apply_tell_group_fixed_positions(slots, wh_word, group_population)
-        
-        # その他のグループは相対順序システム
-        return self._apply_relative_order_system(slots, v_group_key, wh_word, group_population)
+        # 汎用相対順序システムで処理
+        return self._apply_universal_relative_order_system(slots, v_group_key, wh_word, group_population)
     
-    def _apply_tell_group_fixed_positions(self, slots, wh_word, group_population):
+    def _apply_universal_relative_order_system(self, slots, v_group_key, wh_word, group_population):
         """
-        tellグループ専用固定位置システム（期待値から逆算）
+        汎用相対順序システム（全V_group_key対応）
         """
-        print("Using tell group fixed position system")
+        print("Using universal relative order system")
         
-        # スロット名マッピング（M3 → M2_END）
+        # グループルールを取得
+        if v_group_key in self.group_rules:
+            group_rule = self.group_rules[v_group_key]
+            relative_order = group_rule.get("relative_order", [])
+        else:
+            group_rule = self.group_rules["default"]
+            relative_order = group_rule.get("relative_order", [])
+        
+        print(f"Using relative order: {relative_order}")
+        
+        # スロット名マッピング（M3 → M2_END等）
         mapped_slots = {}
         original_slot_names = {}
         for slot_name, slot_value in slots.items():
@@ -88,42 +95,55 @@ class AbsoluteOrderManager:
                 mapped_slots[slot_name] = slot_value
                 original_slot_names[slot_name] = slot_name
         
-        # tellグループ固定位置定義（期待値から正確に逆算）
-        fixed_positions = {
-            "M2": 1,      # wh-word冒頭位置（Where等）
-            "Aux": 3,     # 常にposition 3（M1,M2予約分を考慮）
-            "S": 4,
-            "V": 5,
-            "O1": 6,
-            "O2": 7,      # 通常位置
-            "M2_END": 8   # 文末M2（場所副詞等）
-        }
+        # グループ人口分析に基づく絶対位置計算
+        if group_population:
+            # グループ全体に存在する要素を考慮した位置計算
+            present_slots = group_population
+            print(f"Using group population: {present_slots}")
+        else:
+            # 個別文の要素のみ考慮
+            present_slots = set(mapped_slots.keys())
+            print(f"Present slots in sentence: {present_slots}")
         
-        # wh-word特別処理
-        if wh_word:
-            if wh_word.lower() in ["what"]:
-                # What = O2だが、期待値では冒頭のため位置調整
-                fixed_positions["O2"] = 2  # Case 83期待値: O2が2
-            elif wh_word.lower() in ["where", "when", "why", "how"]:
-                # M2疑問詞は冒頭位置（Case 86では正しく動作）
-                fixed_positions["M2"] = 1  # Case 86期待値: M2が1
+        # 相対順序から動的絶対位置を計算
+        absolute_positions = {}
+        current_position = 1
         
-        # 絶対位置マッピング
+        for slot_type in relative_order:
+            if slot_type in present_slots or slot_type in mapped_slots:
+                absolute_positions[slot_type] = current_position
+                print(f"  {slot_type} → position {current_position}")
+                current_position += 1
+            else:
+                print(f"  {slot_type} → skipped (not present)")
+        
+        # スロット別絶対位置マッピング
         slot_positions = []
+        
         for slot_name, slot_value in mapped_slots.items():
-            if slot_name in fixed_positions:
-                absolute_position = fixed_positions[slot_name]
+            if slot_name in absolute_positions:
+                absolute_position = absolute_positions[slot_name]
                 original_name = original_slot_names[slot_name]
                 slot_positions.append({
                     "slot": original_name,
                     "value": slot_value,
                     "absolute_position": absolute_position
                 })
-                print(f"  {original_name}({slot_value}) → position {absolute_position}")
+                print(f"  Final: {original_name}({slot_value}) → position {absolute_position}")
+            else:
+                # グループルールにないスロットは最後に追加
+                original_name = original_slot_names[slot_name]
+                slot_positions.append({
+                    "slot": original_name,
+                    "value": slot_value,
+                    "absolute_position": 999  # 最後に配置
+                })
+                print(f"  Final: {original_name}({slot_value}) → position 999 (fallback)")
         
-        # 位置順でソート
+        # 絶対位置でソート
         slot_positions.sort(key=lambda x: x["absolute_position"])
-        print(f"Tell group fixed result: {slot_positions}")
+        
+        print(f"Universal relative order result: {slot_positions}")
         return slot_positions
     
     def _apply_relative_order_system(self, slots, v_group_key, wh_word, group_population):
@@ -201,7 +221,7 @@ class AbsoluteOrderManager:
         # 絶対位置でソート
         slot_positions.sort(key=lambda x: x["absolute_position"])
         
-        print(f"Relative order result: {slot_positions}")
+        print(f"Universal relative order result: {slot_positions}")
         return slot_positions
     
     def validate_wh_word_consistency(self, slots, wh_word):
