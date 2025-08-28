@@ -7,6 +7,7 @@
 import json
 import sys
 import os
+import argparse
 from pathlib import Path
 
 # パス設定
@@ -18,7 +19,28 @@ def load_test_data():
     with open('final_54_test_data.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
-def run_fast_test(case_range=None, output_results=False, output_file=None):
+def parse_range(case_range: str):
+    """ケース範囲文字列から数値リストを取得"""
+    # テストデータ読み込み
+    with open('final_54_test_data.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    test_cases = data['data']
+    
+    if case_range:
+        if '-' in case_range:
+            start, end = map(int, case_range.split('-'))
+            target_cases = [int(i) for i in range(start, end + 1) if str(i) in test_cases]
+        elif ',' in case_range:
+            target_cases = [int(c.strip()) for c in case_range.split(',') if c.strip() in test_cases]
+        else:
+            target_cases = [int(case_range)] if case_range in test_cases else []
+    else:
+        target_cases = list(map(int, test_cases.keys()))
+    
+    return target_cases
+
+
+def run_fast_test(case_range=None, show_details=False, output_file="decomposition_results.json"):
     """高速テスト実行 - 分解結果出力対応"""
     # データ読み込み
     data = load_test_data()
@@ -67,7 +89,7 @@ def run_fast_test(case_range=None, output_results=False, output_file=None):
             }
             
             if is_match:
-                if output_results:
+                if show_details:
                     print(f"\n✅ case_{case_id}: 一致")
                     print(f"例文: {sentence}")
                     print(f"分解結果:")
@@ -76,7 +98,7 @@ def run_fast_test(case_range=None, output_results=False, output_file=None):
                     print(f"✅ case_{case_id}: {sentence}")
                 success += 1
             else:
-                if output_results:
+                if show_details:
                     print(f"\n❌ case_{case_id}: 不一致")
                     print(f"例文: {sentence}")
                     print(f"実際: {actual.get('main_slots', {})}")
@@ -138,10 +160,25 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # デフォルトの出力ファイル名
+    # デフォルトの出力ファイル名（長いファイル名を避ける）
     output_file = args.output
     if not output_file and args.range:
-        output_file = f"decomposition_results_{args.range.replace(',', '_').replace('-', '_')}.json"
+        # ケース数に応じてファイル名を短縮
+        case_numbers = parse_range(args.range)
+        case_count = len(case_numbers)
+        
+        if case_count == 1:
+            # 単一ケース：そのまま表示
+            output_file = f"decomposition_results_{case_numbers[0]}.json"
+        elif case_count <= 5:
+            # 少数ケース：すべて表示
+            case_str = '_'.join(map(str, case_numbers))
+            output_file = f"decomposition_results_{case_str}.json"
+        else:
+            # 多数ケース：範囲表示+ケース数
+            min_case = min(case_numbers)
+            max_case = max(case_numbers)
+            output_file = f"decomposition_results_{min_case}-{max_case}_{case_count}cases.json"
     elif not output_file:
         output_file = "decomposition_results_all.json"
     
