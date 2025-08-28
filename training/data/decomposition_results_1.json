@@ -1,0 +1,30 @@
+{
+  "case_1": {
+    "sentence": "The car is red.",
+    "expected": {
+      "main_slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The car is red.",
+      "success": true,
+      "main_slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  }
+}

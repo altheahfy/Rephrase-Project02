@@ -319,7 +319,8 @@
       },
       "sub_slots": {
         "sub-s": "The car which",
-        "sub-v": "was",
+        "sub-aux": "was",
+        "sub-v": "crashed",
         "_parent_slot": "S"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
@@ -357,7 +358,8 @@
       },
       "sub_slots": {
         "sub-s": "The book that",
-        "sub-v": "was",
+        "sub-aux": "was",
+        "sub-v": "written",
         "_parent_slot": "S"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
@@ -392,7 +394,8 @@
       },
       "sub_slots": {
         "sub-s": "The letter which",
-        "sub-v": "was",
+        "sub-aux": "was",
+        "sub-v": "sent",
         "_parent_slot": "S"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
@@ -431,7 +434,8 @@
       "sub_slots": {
         "sub-s": "The man whose car",
         "sub-v": "is",
-        "_parent_slot": "S"
+        "_parent_slot": "S",
+        "sub-c1": "red"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3
@@ -467,7 +471,8 @@
         "C1": "smart"
       },
       "sub_slots": {
-        "sub-s": "The student whose book",
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
         "sub-v": "borrowed",
         "_parent_slot": "S"
       },
@@ -681,14 +686,15 @@
       },
       "sub_slots": {
         "sub-s": "The report which",
-        "sub-v": "was",
+        "sub-aux": "was",
+        "sub-v": "reviewed",
         "_parent_slot": "S",
-        "sub-m2": "thoroughly thoroughly by experts"
+        "sub-m2": "thoroughly"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3
     },
-    "match": true
+    "match": false
   },
   "case_47": {
     "sentence": "The student whose essay was carefully corrected improved dramatically.",
@@ -728,7 +734,7 @@
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3
     },
-    "match": true
+    "match": false
   },
   "case_55": {
     "sentence": "Birds fly.",

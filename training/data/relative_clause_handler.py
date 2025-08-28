@@ -101,10 +101,10 @@ class RelativeClauseHandler:
         
         # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
         passive_info = analysis.get('passive_analysis', {})
-        is_passive = passive_info.get('is_passive', False)
+        is_passive = passive_info.get('is_passive', False) if passive_info else False
         
         # サブスロット構築（受動態考慮）
-        if is_passive:
+        if is_passive and passive_info:
             # 受動態の場合: Aux + V に分離
             sub_slots = {
                 'sub-s': f"{antecedent} who",
@@ -208,6 +208,12 @@ class RelativeClauseHandler:
                     # ROOT動詞に到達したら主節開始
                     if token.dep_ == 'ROOT':
                         print(f"🔍 ROOT動詞 '{token.text}' で主節開始")
+                        boundary_pos = i
+                        break
+                    
+                    # 🎯 助動詞（is, are, was, were）で主節開始（whose構造特化）
+                    if token.pos_ == 'AUX' and token.text.lower() in ['is', 'are', 'was', 'were']:
+                        print(f"🔍 助動詞 '{token.text}' で主節開始（whose特化）")
                         boundary_pos = i
                         break
                 
@@ -319,21 +325,27 @@ class RelativeClauseHandler:
                 if adverb_result.get('success'):
                     cleaned_clause = adverb_result.get('separated_text', original_clause_text)
                     
-                    # AdverbHandlerの結果を5文型システム形式に変換
-                    raw_modifiers = adverb_result.get('modifiers', {})
+                    # 🎯 AdverbHandlerが直接提供するmodifier_slotsを使用（最適化）
+                    modifier_slots = adverb_result.get('modifier_slots', {})
+                    if modifier_slots:
+                        modifiers.update(modifier_slots)
+                        print(f"🎯 協力者から修飾語取得: {modifier_slots}")
                     
-                    if raw_modifiers:
-                        # 位置インデックスキーから修飾語テキストを抽出してM2に統合
-                        modifier_texts = []
-                        for pos_idx, modifier_list in raw_modifiers.items():
-                            if isinstance(modifier_list, list):
-                                for modifier_info in modifier_list:
-                                    if isinstance(modifier_info, dict) and 'text' in modifier_info:
-                                        modifier_texts.append(modifier_info['text'])
-                        
-                        # M2キーとして統合
-                        if modifier_texts:
-                            modifiers['M2'] = ' '.join(modifier_texts)
+                    # フォールバック: 旧式の変換処理
+                    if not modifiers:
+                        raw_modifiers = adverb_result.get('modifiers', {})
+                        if raw_modifiers:
+                            # 位置インデックスキーから修飾語テキストを抽出してM2に統合
+                            modifier_texts = []
+                            for pos_idx, modifier_list in raw_modifiers.items():
+                                if isinstance(modifier_list, list):
+                                    for modifier_info in modifier_list:
+                                        if isinstance(modifier_info, dict) and 'text' in modifier_info:
+                                            modifier_texts.append(modifier_info['text'])
+                            
+                            # M2キーとして統合
+                            if modifier_texts:
+                                modifiers['M2'] = ' '.join(modifier_texts)
             
             # Step 3: 協力者（5文型ハンドラー）と連携：構造分析
             structure_analysis = None
@@ -555,11 +567,11 @@ class RelativeClauseHandler:
         
         # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
         passive_info = analysis.get('passive_analysis', {})
-        is_passive = passive_info.get('is_passive', False)
+        is_passive = passive_info.get('is_passive', False) if passive_info else False
         
         # サブスロット構築（受動態考慮）
         if is_subject:
-            if is_passive:
+            if is_passive and passive_info:
                 # 受動態の場合: Aux + V に分離
                 sub_slots = {
                     'sub-s': f"{antecedent} which",
@@ -632,8 +644,9 @@ class RelativeClauseHandler:
         
         # spaCy文脈解析で関係節を分析
         analysis = self._analyze_relative_clause(text, 'that')
-        if not analysis['success']:
-            return analysis
+        if not analysis or not analysis.get('success'):
+            print(f"⚠️ _analyze_relative_clause失敗: {analysis}")
+            return analysis if analysis else {'success': False, 'error': 'analysis is None'}
         
         doc = analysis['doc']
         antecedent = analysis['antecedent']
@@ -682,8 +695,8 @@ class RelativeClauseHandler:
                 is_subject = False  # that + 名詞 = 目的格
         
         # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
-        passive_info = analysis.get('passive_analysis', {})
-        is_passive = passive_info.get('is_passive', False)
+        passive_info = analysis.get('passive_analysis') or {}
+        is_passive = passive_info.get('is_passive', False) if passive_info else False
         
         # サブスロット構築（受動態考慮）
         if is_subject:

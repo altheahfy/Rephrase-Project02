@@ -1,37 +1,37 @@
 {
-  "case_13": {
-    "sentence": "The student whose book I borrowed is smart.",
+  "case_4": {
+    "sentence": "The book which lies there is mine.",
     "expected": {
       "main_slots": {
         "S": "",
         "V": "is",
-        "C1": "smart"
+        "C1": "mine"
       },
       "sub_slots": {
-        "sub-o1": "The student whose book",
-        "sub-s": "I",
-        "sub-v": "borrowed",
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "sub-m2": "there",
         "_parent_slot": "S"
       }
     },
     "actual": {
-      "original_text": "The student whose book I borrowed is smart.",
+      "original_text": "The book which lies there is mine.",
       "success": true,
       "main_slots": {
         "S": "",
         "V": "is",
-        "C1": "smart"
+        "C1": "mine"
       },
       "slots": {
         "S": "",
         "V": "is",
-        "C1": "smart"
+        "C1": "mine"
       },
       "sub_slots": {
-        "sub-o1": "The student whose book",
-        "sub-s": "I",
-        "sub-v": "borrowed",
-        "_parent_slot": "S"
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "_parent_slot": "S",
+        "sub-m2": "there"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3

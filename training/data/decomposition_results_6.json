@@ -1,0 +1,41 @@
+{
+  "case_6": {
+    "sentence": "The book which I bought is expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The book which I bought is expensive.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  }
+}

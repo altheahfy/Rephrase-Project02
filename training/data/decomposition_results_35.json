@@ -1,0 +1,44 @@
+{
+  "case_35": {
+    "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "sub-m2": "efficiently",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The teacher whose class runs efficiently is respected greatly.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "_parent_slot": "S",
+        "sub-m2": "efficiently"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  }
+}
