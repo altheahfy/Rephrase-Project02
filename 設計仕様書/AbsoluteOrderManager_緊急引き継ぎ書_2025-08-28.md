@@ -10,16 +10,16 @@
 
 ### 問題1: 絶対順序の期待値と実際の出力が全く異なる
 
-#### 期待値（テストデータより）
+#### 期待値（corrected版より）
 ```json
 Case 83: "What did he tell her at the store?"
 期待値: {
-  "O2": 1,    // What → position 1
+  "O2": 2,    // What → position 2
   "Aux": 3,   // did → position 3  
   "S": 4,     // he → position 4
   "V": 5,     // tell → position 5
   "O1": 6,    // her → position 6
-  "M3": 8     // at the store → position 8
+  "M2": 8     // at the store → position 8
 }
 ```
 
@@ -29,9 +29,10 @@ Case 83: "What did he tell her at the store?"
 ```
 
 **問題点**:
-- O2(What)が期待値1に対して実際は6
+- O2(What)が期待値2に対して実際は6
 - Aux(did)が期待値3に対して実際は2
-- 位置番号が連続（1,2,3,4,5,6,7）になっているが、期待値は飛び番（1,3,4,5,6,8）
+- M2(at the store)が期待値8に対して実際は7（M3として処理）
+- 位置番号が連続（1,2,3,4,5,6,7）になっているが、期待値は飛び番（2,3,4,5,6,8）
 - **根本的にアルゴリズムが異なる**
 
 ---
@@ -56,25 +57,29 @@ Case 83: "What did he tell her at the store?"
 
 ## 📋 正しい仕様の解析
 
-### Case 83-86の期待値パターン分析
+### Case 83-86の期待値パターン分析（corrected版）
 
 | Case | 文 | 期待される絶対位置 |
 |------|---|-------------------|
-| 83 | What did he tell her at the store? | O2:1, Aux:3, S:4, V:5, O1:6, M3:8 |
-| 84 | Did he tell her a secret there? | Aux:3, S:4, V:5, O1:6, O2:7, M3:8 |
-| 85 | Did I tell him a truth in the kitchen? | Aux:3, S:4, V:5, O1:6, O2:7, M3:8 |
+| 83 | What did he tell her at the store? | O2:2, Aux:3, S:4, V:5, O1:6, M2:8 |
+| 84 | Did he tell her a secret there? | Aux:3, S:4, V:5, O1:6, O2:7, M2:8 |
+| 85 | Did I tell him a truth in the kitchen? | Aux:3, S:4, V:5, O1:6, O2:7, M2:8 |
 | 86 | Where did you tell me a story? | M2:1, Aux:3, S:4, V:5, O1:6, O2:7 |
 
 #### パターン発見:
-1. **wh-word → position 1**（疑問詞が文頭）
-2. **Aux → position 3**（固定位置）
-3. **S → position 4**（固定位置）
-4. **V → position 5**（固定位置）
-5. **O1 → position 6**（固定位置）
-6. **O2 → position 7**（疑問詞がない場合の標準位置）
-7. **M3 → position 8**（場所・時間の固定位置）
+1. **M2(where) → position 1**（場所疑問詞が文頭）
+2. **O2(what) → position 2**（what疑問詞の特別位置）
+3. **Aux → position 3**（固定位置）
+4. **S → position 4**（固定位置）
+5. **V → position 5**（固定位置）
+6. **O1 → position 6**（固定位置）
+7. **O2 → position 7**（疑問詞でない場合の標準位置）
+8. **M2 → position 8**（疑問詞でない場合の標準位置）
 
-**重要**: 位置2は使用されていない（予約済み？）
+**重要**: 
+- position 1は場所・時間疑問詞（where, when）専用
+- position 2はwhat疑問詞専用
+- position 7はフォールバック位置なし
 
 ---
 
@@ -85,14 +90,14 @@ Case 83: "What did he tell her at the store?"
 ```python
 # 正しい絶対位置テーブル（tellグループ）
 TELL_ABSOLUTE_POSITIONS = {
-    'wh_word': 1,      # What, Where, When, Why, How
-    'position_2': None, # 予約済み（未使用）
+    'M2_wh': 1,        # Where, When (疑問詞)
+    'O2_wh': 2,        # What (疑問詞)
     'Aux': 3,          # did, do, does, will, would
     'S': 4,            # 主語
     'V': 5,            # 動詞
     'O1': 6,           # 間接目的語
     'O2': 7,           # 直接目的語（標準位置）
-    'M3': 8            # 場所・時間・方法
+    'M2': 8            # 場所・時間（標準位置）
 }
 ```
 
@@ -102,13 +107,16 @@ TELL_ABSOLUTE_POSITIONS = {
 def apply_wh_word_override(slots, positions):
     """
     wh-wordがある場合の特別処理
-    - wh-wordを含むスロットを position 1 に移動
-    - 該当スロットの元の位置は空ける
+    - where, when → position 1
+    - what → position 2
+    - 該当スロットの元の位置は使用しない
     """
     for slot, value in slots.items():
-        if self.is_wh_word(value):
-            positions[slot] = 1  # 強制的に position 1
-            break
+        wh_word = self.detect_wh_word({slot: value})
+        if wh_word in ['where', 'when']:
+            positions[slot] = 1  # 場所・時間疑問詞
+        elif wh_word == 'what':
+            positions[slot] = 2  # what疑問詞
 ```
 
 ### 3. 固定位置システムの実装
@@ -185,7 +193,8 @@ training/data/
 ## ⚠️ 重要な注意事項
 
 ### データの信頼性
-- `final_54_test_data_with_absolute_order.json`の期待値が正解
+- `final_54_test_data_with_absolute_order_corrected.json`の期待値が正解
+- original版は間違いで、corrected版を使用すること
 - 現在の実装は推測ベースで作成されており、実際の仕様と乖離
 
 ### 作業優先度
@@ -204,16 +213,17 @@ training/data/
 ## 📞 引き継ぎ時の確認事項
 
 1. **期待値データの最新性確認**
-   - `final_54_test_data_with_absolute_order.json`が最新版か
-   - 他に参照すべき仕様書があるか
+   - `final_54_test_data_with_absolute_order_corrected.json`が正解版
+   - original版は使用しないこと
 
 2. **固定位置テーブルの正確性**
-   - tellグループ以外の期待値パターン調査
-   - position 2が全グループで未使用かの確認
+   - tellグループ: M2(where)→1, O2(what)→2, その他標準位置
+   - position 7にフォールバック位置なし（連続配置禁止）
 
 3. **wh-word処理の詳細**
-   - position 1への配置が全文法グループ共通ルールか
-   - 例外的なケースがあるか
+   - where, when → position 1
+   - what → position 2
+   - 疑問詞タイプ別の位置分けが必要
 
 ---
 
