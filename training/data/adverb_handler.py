@@ -107,7 +107,8 @@ class AdverbHandler:
                 modifiers.append(modifier_info)
                 print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
         
-        # Part 1: 動詞の前にある修飾語を検索（逆順）
+        # Part 1: 動詞の前にある修飾語を検索（複合修飾語対応）
+        pre_verb_modifiers = []
         for i in range(verb_idx - 1, -1, -1):
             token = doc[i]
             
@@ -127,11 +128,15 @@ class AdverbHandler:
                     'position': 'pre-verb',  # 動詞前修飾語
                     'method': 'pos_analysis'  # 使用手法明示
                 }
-                modifiers.append(modifier_info)
+                pre_verb_modifiers.append(modifier_info)
             
             # 主語に達したら停止（動詞前修飾語の範囲を制限）
             if token.dep_ in ['nsubj', 'nsubjpass']:
                 break
+        
+        # 複合修飾語の結合処理（例: "very carefully"）
+        pre_verb_modifiers = self._merge_compound_modifiers(doc, pre_verb_modifiers)
+        modifiers.extend(pre_verb_modifiers)
         
         # Part 2: 動詞の直後から文末まで（または次の主要要素まで）を検索
         for i in range(verb_idx + 1, len(doc)):
@@ -175,8 +180,83 @@ class AdverbHandler:
                     }
                     modifiers.append(modifier_info)
         
+        # 複合修飾語の結合処理（post-verb修飾語にも適用）
+        modifiers = self._merge_compound_modifiers(doc, modifiers)
+        
         return modifiers
     
+    def _merge_compound_modifiers(self, doc, modifiers: List[Dict]) -> List[Dict]:
+        """適切な修飾語のみを結合（例: "very carefully" → 1つの修飾語）"""
+        if len(modifiers) <= 1:
+            return modifiers
+        
+        # インデックス順でソート
+        modifiers.sort(key=lambda x: x['idx'])
+        
+        merged = []
+        i = 0
+        
+        while i < len(modifiers):
+            current = modifiers[i]
+            
+            # 次の修飾語と隣接しているかチェック
+            if i + 1 < len(modifiers):
+                next_mod = modifiers[i + 1]
+                
+                # 隣接している（間に1トークンまで許容）
+                if next_mod['idx'] - current['idx'] <= 2:
+                    # 結合可能かチェック
+                    if self._can_merge_modifiers(doc, current, next_mod):
+                        # 複合修飾語として結合
+                        start_idx = current['idx']
+                        end_idx = next_mod['idx']
+                        
+                        # 結合テキストを作成
+                        compound_text = ' '.join([doc[j].text for j in range(start_idx, end_idx + 1)])
+                        
+                        merged_modifier = {
+                            'text': compound_text,
+                            'pos': next_mod['pos'],  # メインの修飾語のPOSを使用
+                            'tag': next_mod['tag'],
+                            'idx': start_idx,
+                            'type': next_mod['type'],
+                            'position': current['position'],
+                            'method': 'compound_merge'
+                        }
+                        
+                        merged.append(merged_modifier)
+                        i += 2  # 両方の修飾語をスキップ
+                        continue
+            
+            # 結合しない場合はそのまま追加
+            merged.append(current)
+            i += 1
+        
+        return merged
+    
+    def _can_merge_modifiers(self, doc, first_mod: Dict, second_mod: Dict) -> bool:
+        """2つの修飾語が結合可能かチェック"""
+        first_token = doc[first_mod['idx']]
+        second_token = doc[second_mod['idx']]
+        
+        # 程度副詞 + 副詞 の組み合わせ
+        degree_adverbs = ['very', 'quite', 'rather', 'extremely', 'incredibly', 'really', 'truly', 'highly', 'perfectly', 'completely']
+        
+        if (first_token.text.lower() in degree_adverbs and 
+            first_token.pos_ == 'ADV' and 
+            second_token.pos_ == 'ADV'):
+            return True
+        
+        # 時間表現の結合（last week, next month, etc.）
+        time_determiners = ['last', 'next', 'this', 'every']
+        time_nouns = ['week', 'month', 'year', 'day', 'morning', 'afternoon', 'evening', 'night']
+        
+        if (first_token.text.lower() in time_determiners and 
+            second_token.text.lower() in time_nouns):
+            return True
+        
+        return False
+
     def _is_modifier(self, token) -> bool:
         """トークンが修飾語かどうか判定（適切なバランス）"""
         # 副詞は基本的に修飾語として扱う（5文型の核心要素ではない）
@@ -188,13 +268,18 @@ class AdverbHandler:
         # 前置詞句は修飾語として扱う（ただし基本的な前置詞のみ）
         if token.pos_ == 'ADP':
             # 5文型の核心でない前置詞句は修飾語
-            modifier_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'besides', 'except']
+            modifier_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'besides', 'except', 'to']
             return token.text.lower() in modifier_preps
         
         # 明確な時間・場所副詞（場所副詞here/thereは修飾語として扱う）
-        if token.pos_ in ['NOUN', 'PROPN'] and self._is_adverbial_noun(token):
-            temporal_locative = ['yesterday', 'today', 'tomorrow', 'here', 'there']
+        if token.pos_ in ['NOUN', 'PROPN']:
+            temporal_locative = ['yesterday', 'today', 'tomorrow', 'here', 'there', 'week', 'month', 'year', 'morning', 'afternoon', 'evening', 'night']
             return token.text.lower() in temporal_locative
+        
+        # 形容詞が副詞的に使われている場合（時間表現など）
+        if token.pos_ == 'ADJ':
+            time_adjectives = ['last', 'next', 'daily', 'weekly', 'monthly', 'yearly']
+            return token.text.lower() in time_adjectives
         
         # 場所副詞here/thereは修飾語として扱う
         if token.pos_ == 'ADV' and token.text.lower() in ['here', 'there']:
@@ -247,14 +332,15 @@ class AdverbHandler:
         
         # 修飾語として分離可能な前置詞句
         # 基本5文型の核心構造でない場合は分離対象
-        modifiable_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'without', 'besides', 'except']
+        modifiable_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'without', 'besides', 'except', 'to']
         
-        # ただし、動詞の目的語を導く基本的な前置詞は除外
-        # 例: look at, listen to, think of など
-        essential_for_verbs = ['to', 'of', 'from']
-        
-        if prep_lower in essential_for_verbs:
-            return False
+        # 「to」の場合、特定パターンで修飾語として扱う
+        if prep_lower == 'to':
+            # 「to + 形容詞 + 名詞」のパターンは修飾語として扱う
+            if len(phrase_tokens) >= 3:  # to + adj + noun
+                return True
+            # 動詞の直接目的語でない場合は修飾語として扱う
+            return True
             
         return prep_lower in modifiable_preps
     
@@ -366,24 +452,41 @@ class AdverbHandler:
         """
         REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md仕様に従って修飾語をMスロットに配置
         
-        個数ベース配置（位置無関係）:
-        1個のみ使われているとき → M2
-        2個使われているとき → 左からM2, M3の順
-        3個使われているとき → 位置順でM1, M2, M3
+        【前後分散配置ルール】（2025年8月確定版）:
+        1個のみ → M2（位置無関係）
+        2個の場合：
+        - 前に1つ、後に1つ → M1（前）, M3（後）, M2は空
+        - 前のみ2つ → M1, M2
+        - 後のみ2つ → M2, M3
+        3個 → M1, M2, M3（位置順）
         """
         modifier_slots = {}
         
         if not modifiers_info:
             return modifier_slots
         
-        # 全修飾語を収集（順序保持）
+        # 全修飾語を収集（重複除去付き）
         all_modifiers = []
+        seen_modifiers = set()  # 重複防止
+        
         for verb_idx, modifier_list in modifiers_info.items():
             for modifier_info in modifier_list:
+                modifier_text = modifier_info['text']
+                
+                # 重複チェック
+                if modifier_text in seen_modifiers:
+                    continue
+                seen_modifiers.add(modifier_text)
+                
+                # 動詞位置を取得
+                verb_position = verb_idx
+                modifier_position = modifier_info.get('idx', 0)
+                
                 all_modifiers.append({
-                    'text': modifier_info['text'],
+                    'text': modifier_text,
                     'verb_idx': verb_idx,
-                    'modifier_idx': modifier_info.get('idx', 0)
+                    'modifier_idx': modifier_position,
+                    'position_type': 'pre-verb' if modifier_position < verb_position else 'post-verb'
                 })
         
         # 修飾語を文中の位置順でソート
@@ -392,14 +495,31 @@ class AdverbHandler:
         modifier_count = len(all_modifiers)
         
         if modifier_count == 1:
-            # 1個のみ → M2（仕様通り）
+            # 1個のみ → M2（位置無関係）
             modifier_slots['M2'] = all_modifiers[0]['text']
+            
         elif modifier_count == 2:
-            # 2個使われているとき → 左からM2, M3の順（仕様通り）
-            modifier_slots['M2'] = all_modifiers[0]['text']
-            modifier_slots['M3'] = all_modifiers[1]['text']
+            # 2個の場合：前後の分布をチェック
+            pre_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'pre-verb']
+            post_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'post-verb']
+            
+            if len(pre_verb_modifiers) == 1 and len(post_verb_modifiers) == 1:
+                # 前に1つ、後に1つ → M1（前）, M3（後）, M2は空
+                modifier_slots['M1'] = pre_verb_modifiers[0]['text']
+                modifier_slots['M3'] = post_verb_modifiers[0]['text']
+                
+            elif len(pre_verb_modifiers) >= 1 and len(post_verb_modifiers) == 0:
+                # 前のみ2つ → M1, M2
+                modifier_slots['M1'] = all_modifiers[0]['text']
+                modifier_slots['M2'] = all_modifiers[1]['text']
+                
+            elif len(pre_verb_modifiers) == 0 and len(post_verb_modifiers) >= 1:
+                # 後のみ2つ → M2, M3
+                modifier_slots['M2'] = all_modifiers[0]['text']
+                modifier_slots['M3'] = all_modifiers[1]['text']
+                
         elif modifier_count == 3:
-            # 3個 → M1, M2, M3（公式仕様）
+            # 3個 → M1, M2, M3（位置順）
             modifier_slots['M1'] = all_modifiers[0]['text']
             modifier_slots['M2'] = all_modifiers[1]['text']
             modifier_slots['M3'] = all_modifiers[2]['text']
