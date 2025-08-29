@@ -33,21 +33,17 @@ class QuestionHandler:
         except OSError:
             raise RuntimeError("spaCy英語モデル 'en_core_web_sm' が見つかりません")
     
-    # 疑問詞の基本分類（修飾語スロットは除外、責任分担原則遵守）
+    # 疑問詞の分類（Human Grammar Pattern）
     WH_WORDS = {
         'what': 'O2',      # 目的語として質問: What did he tell her?
         'who': 'S',        # 主語として質問: Who called you?
         'whom': 'O1',      # 目的語として質問: Whom did you see?
+        'where': 'M2',     # 場所修飾語: Where did he go?
+        'when': 'M2',      # 時間修飾語: When did he arrive?
+        'why': 'M2',       # 理由修飾語: Why did he leave?
+        'how': 'M2',       # 方法修飾語: How did he do it?
         'which': 'O2',     # 選択目的語: Which book did you read?
         'whose': 'O2'      # 所有目的語: Whose car is this?
-    }
-    
-    # 修飾語系疑問詞（AdverbHandlerとの協力で処理）
-    MODIFIER_WH_WORDS = {
-        'where',           # 場所修飾語: Where did he go?
-        'when',            # 時間修飾語: When did he arrive?
-        'why',             # 理由修飾語: Why did he leave?
-        'how'              # 方法修飾語: How did he do it?
     }
     
     def is_question(self, text: str) -> bool:
