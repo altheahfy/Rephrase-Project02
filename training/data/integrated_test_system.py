@@ -314,6 +314,10 @@ class IntegratedTestSystem:
                     actual_norm = self.normalize_slot_data(detail['actual'])
                     case_detail['actual_result'] = actual_norm
                     
+                    # absolute_order情報も保存
+                    if 'absolute_order' in detail['actual']:
+                        case_detail['absolute_order'] = detail['actual']['absolute_order']
+                    
                 if 'expected' in detail and detail['expected']:
                     expected_norm = self.normalize_slot_data(detail['expected'])
                     case_detail['expected_result'] = expected_norm
