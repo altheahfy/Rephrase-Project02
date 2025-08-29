@@ -21,19 +21,15 @@
       "success": true,
       "main_slots": {
         "S": "",
-        "C1": "works every day",
-        "Aux": "was",
-        "V": "maintained",
-        "M2": "properly",
-        "M3": "efficiently"
+        "V": "works",
+        "O1": "every day",
+        "M2": "efficiently"
       },
       "slots": {
         "S": "",
-        "C1": "works every day",
-        "Aux": "was",
-        "V": "maintained",
-        "M2": "properly",
-        "M3": "efficiently"
+        "V": "works",
+        "O1": "every day",
+        "M2": "efficiently"
       },
       "sub_slots": {
         "sub-s": "The machine that",
