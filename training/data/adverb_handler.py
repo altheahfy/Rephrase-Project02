@@ -117,6 +117,54 @@ class AdverbHandler:
                     print(f"🔍 文頭時間表現検出: {time_text} (依存関係: {token.dep_})")
                     break  # 最初の時間表現のみ処理
         
+        # 文頭副詞の特別処理（「Actually」などの文副詞）
+        if verb_idx > 0:  # 動詞が文頭でない場合
+            first_token = doc[0]
+            # 文頭副詞を検出（advmod または 一般的な文副詞）
+            sentence_adverbs = ['actually', 'honestly', 'frankly', 'clearly', 'obviously', 'certainly', 'definitely', 'unfortunately', 'fortunately', 'hopefully']
+            
+            is_sentence_adverb = (
+                (first_token.dep_ == 'advmod' and first_token.head.i == verb_idx and first_token.pos_ == 'ADV') or
+                (first_token.text.lower() in sentence_adverbs and first_token.pos_ == 'ADV')
+            )
+            
+            if is_sentence_adverb and not any(mod for mod in modifiers if mod['idx'] == 0):
+                modifier_info = {
+                    'text': first_token.text,
+                    'pos': first_token.pos_,
+                    'tag': first_token.tag_,
+                    'idx': 0,
+                    'type': 'sentence_adverb',
+                    'position': 'sentence-initial',
+                    'method': 'dependency_analysis'
+                }
+                modifiers.append(modifier_info)
+                print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
+        
+        
+        # 文頭副詞の特別処理（Actually, Fortunately等）
+        if verb_idx > 0:
+            first_token = doc[0]
+            # 文頭副詞として明示的に検出
+            sentence_adverbs = ['actually', 'fortunately', 'unfortunately', 'honestly', 'basically', 'obviously', 'clearly', 'frankly', 'seriously', 'literally']
+            
+            if (first_token.text.lower() in sentence_adverbs and 
+                first_token.pos_ == 'ADV' and
+                first_token.dep_ == 'advmod'):
+                
+                modifier_info = {
+                    'text': first_token.text,
+                    'pos': first_token.pos_,
+                    'tag': first_token.tag_,
+                    'idx': 0,
+                    'type': 'sentence_adverb',
+                    'position': 'sentence-initial',
+                    'method': 'dependency_analysis'
+                }
+                modifiers.append(modifier_info)
+                print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
+        
+        
         # Part 1: 動詞の前にある修飾語を検索（複合修飾語対応）
         pre_verb_modifiers = []
         for i in range(verb_idx - 1, -1, -1):

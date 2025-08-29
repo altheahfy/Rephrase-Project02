@@ -1,0 +1,33 @@
+{
+  "case_39": {
+    "sentence": "Actually, she works very hard.",
+    "expected": {
+      "main_slots": {
+        "S": "she",
+        "V": "works",
+        "M1": "Actually",
+        "M2": "very hard"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Actually, she works very hard.",
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "V": "works",
+        "M1": "Actually",
+        "M2": "very hard"
+      },
+      "slots": {
+        "S": "she",
+        "V": "works",
+        "M1": "Actually",
+        "M2": "very hard"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  }
+}
