@@ -1,0 +1,52 @@
+========================================================================================================================
+基本副詞グループ - 固定配置表（tellグループ形式）
+========================================================================================================================
+
+            ①            ②            ③            ④            ⑤            ⑥            ⑦            
+group       S-1          Aux-2        V-3          O1-4         M1-5         M2-6         M3-7         
+------------------------------------------------------------------------------------------------------------------------
+adverbs     The cake     is being     baked                                  by my mother              
+→ The cake is being baked by my mother.
+
+adverbs     The cake     was          eaten                                  by the child              
+→ The cake was eaten by the children.
+
+adverbs     The door     was          opened                                 by the key                
+→ The door was opened by the key.
+
+adverbs     The students              study                                  hard         for exams    
+→ The students study hard for exams.
+
+adverbs     The car      was          repaired                               last week                 
+→ The car was repaired last week.
+
+adverbs     The window   was          opened                                 gently       by the morni 
+→ The window was gently opened by the morning breeze.
+
+adverbs     The message  is being     written                                carefully    by the manag 
+→ The message is being carefully written by the manager.
+
+adverbs     The problem  was          solved                                 quickly      by the exper 
+→ The problem was quickly solved by the expert team.
+
+adverbs     The building is being     constructed                            very careful by skilled w 
+→ The building is being constructed very carefully by skilled workers.
+
+adverbs     The teacher               explains     grammar      clearly      to confused  daily        
+→ The teacher explains grammar clearly to confused students daily.
+
+------------------------------------------------------------------------------------------------------------------------
+
+            S_1          Aux_2        V_3          O1_4         M1_5         M2_6         M3_7         
+
+列説明:
+S_1: 主語
+Aux_2: 助動詞
+V_3: 動詞
+O1_4: 第一目的語
+M1_5: 副詞・方法
+M2_6: 副詞・時間場所
+M3_7: 副詞・追加修飾
+
+→ 語順検証: 全10例文で S < Aux < V < O1 < M1 < M2 < M3 の順序を確認
+→ 固定配置: どんな語順の例文でも同じ列に同じ文法的役割の要素が配置される
