@@ -1,0 +1,127 @@
+{
+  "test_info": {
+    "timestamp": "20250830_003046",
+    "total_cases": 4,
+    "passed": 4,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_83",
+      "sentence": "What did he tell her at the store?",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "O2": "What",
+          "Aux": "did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "M2": "at the store"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "O2": "What",
+          "Aux": "did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "M2": "at the store"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_84",
+      "sentence": "Did he tell her a secret there?",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "O2": "a secret",
+          "M2": "there"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "O2": "a secret",
+          "M2": "there"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_85",
+      "sentence": "Did I tell him a truth in the kitchen?",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "I",
+          "V": "tell",
+          "O1": "him",
+          "O2": "a truth",
+          "M2": "in the kitchen"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "I",
+          "V": "tell",
+          "O1": "him",
+          "O2": "a truth",
+          "M2": "in the kitchen"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_86",
+      "sentence": "Where did you tell me a story?",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "M2": "Where",
+          "Aux": "did",
+          "S": "you",
+          "V": "tell",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "M2": "Where",
+          "Aux": "did",
+          "S": "you",
+          "V": "tell",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}
