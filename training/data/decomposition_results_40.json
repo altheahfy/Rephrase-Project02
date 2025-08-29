@@ -1,0 +1,36 @@
+{
+  "case_40": {
+    "sentence": "He quickly and carefully solved the problem.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M2": "quickly",
+        "M3": "and carefully"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "He quickly and carefully solved the problem.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M1": "quickly",
+        "M2": "carefully"
+      },
+      "slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M1": "quickly",
+        "M2": "carefully"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": false
+  }
+}

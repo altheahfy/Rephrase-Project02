@@ -139,7 +139,8 @@ class AdverbHandler:
         modifiers.extend(pre_verb_modifiers)
         
         # Part 2: 動詞の直後から文末まで（または次の主要要素まで）を検索
-        for i in range(verb_idx + 1, len(doc)):
+        i = verb_idx + 1
+        while i < len(doc):
             token = doc[i]
             
             # 句読点で停止
@@ -167,7 +168,7 @@ class AdverbHandler:
                         }
                         modifiers.append(modifier_info)
                         # 前置詞句の残りの部分をスキップ
-                        i = prep_phrase['end_idx']
+                        i = prep_phrase['end_idx'] + 1
                         continue
                 else:
                     modifier_info = {
@@ -179,6 +180,8 @@ class AdverbHandler:
                         'position': 'post-verb'  # 動詞後修飾語
                     }
                     modifiers.append(modifier_info)
+            
+            i += 1
         
         # 複合修飾語の結合処理（post-verb修飾語にも適用）
         modifiers = self._merge_compound_modifiers(doc, modifiers)
@@ -205,7 +208,7 @@ class AdverbHandler:
                 
                 # 隣接している（間に1トークンまで許容）
                 if next_mod['idx'] - current['idx'] <= 2:
-                    # 結合可能かチェック
+                    # 結合可能かチェック（厳格な条件）
                     if self._can_merge_modifiers(doc, current, next_mod):
                         # 複合修飾語として結合
                         start_idx = current['idx']
@@ -235,9 +238,13 @@ class AdverbHandler:
         return merged
     
     def _can_merge_modifiers(self, doc, first_mod: Dict, second_mod: Dict) -> bool:
-        """2つの修飾語が結合可能かチェック"""
+        """2つの修飾語が結合可能かチェック（厳格な条件）"""
         first_token = doc[first_mod['idx']]
         second_token = doc[second_mod['idx']]
+        
+        # 前置詞句は他の修飾語と結合しない
+        if first_mod['type'] == 'prepositional_phrase' or second_mod['type'] == 'prepositional_phrase':
+            return False
         
         # 程度副詞 + 副詞 の組み合わせ
         degree_adverbs = ['very', 'quite', 'rather', 'extremely', 'incredibly', 'really', 'truly', 'highly', 'perfectly', 'completely']
@@ -252,7 +259,8 @@ class AdverbHandler:
         time_nouns = ['week', 'month', 'year', 'day', 'morning', 'afternoon', 'evening', 'night']
         
         if (first_token.text.lower() in time_determiners and 
-            second_token.text.lower() in time_nouns):
+            second_token.text.lower() in time_nouns and
+            second_mod['idx'] - first_mod['idx'] == 1):  # 厳密に隣接
             return True
         
         return False
@@ -310,6 +318,10 @@ class AdverbHandler:
             
             # 句読点や次の前置詞、動詞で停止
             if token.pos_ in ['PUNCT', 'ADP', 'VERB', 'AUX']:
+                break
+            
+            # 単独の修飾語として認識される可能性のある副詞で停止
+            if token.pos_ == 'ADV' and self._is_modifier(token):
                 break
                 
             phrase_tokens.append(token.text)
@@ -409,8 +421,16 @@ class AdverbHandler:
                 modifier_idx = modifier['idx']
                 modifier_text = modifier['text']
                 
-                # 前置詞句の場合、句全体のインデックスを収集
-                if modifier['type'] == 'prepositional_phrase':
+                # 結合された修飾語の場合、すべてのトークンインデックスを収集
+                if modifier.get('method') == 'compound_merge':
+                    # 結合された修飾語のすべてのトークンを削除対象にする
+                    phrase_parts = modifier_text.split()
+                    current_idx = modifier_idx
+                    for part in phrase_parts:
+                        if current_idx < len(doc):
+                            modifier_indices.add(current_idx)
+                            current_idx += 1
+                elif modifier['type'] == 'prepositional_phrase':
                     # 前置詞句のすべてのトークンを削除対象にする
                     phrase_parts = modifier_text.split()
                     current_idx = modifier_idx
@@ -499,24 +519,23 @@ class AdverbHandler:
             modifier_slots['M2'] = all_modifiers[0]['text']
             
         elif modifier_count == 2:
-            # 2個の場合：前後の分布をチェック
+            # 2個の場合：REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md 仕様に従う
             pre_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'pre-verb']
             post_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'post-verb']
             
-            if len(pre_verb_modifiers) == 1 and len(post_verb_modifiers) == 1:
-                # 前に1つ、後に1つ → M1（前）, M3（後）, M2は空
+            if len(pre_verb_modifiers) >= 1:
+                # ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用
                 modifier_slots['M1'] = pre_verb_modifiers[0]['text']
-                modifier_slots['M3'] = post_verb_modifiers[0]['text']
-                
-            elif len(pre_verb_modifiers) >= 1 and len(post_verb_modifiers) == 0:
-                # 前のみ2つ → M1, M2
-                modifier_slots['M1'] = all_modifiers[0]['text']
-                modifier_slots['M2'] = all_modifiers[1]['text']
-                
-            elif len(pre_verb_modifiers) == 0 and len(post_verb_modifiers) >= 1:
-                # 後のみ2つ → M2, M3
-                modifier_slots['M2'] = all_modifiers[0]['text']
-                modifier_slots['M3'] = all_modifiers[1]['text']
+                if len(post_verb_modifiers) >= 1:
+                    modifier_slots['M2'] = post_verb_modifiers[0]['text']
+                else:
+                    # 前に2つある場合
+                    modifier_slots['M2'] = pre_verb_modifiers[1]['text'] if len(pre_verb_modifiers) > 1 else all_modifiers[1]['text']
+                    
+            elif len(post_verb_modifiers) >= 1:
+                # ケース2: 動詞中心(M2)より後に1つある場合 → M2, M3の2つ使用
+                modifier_slots['M2'] = post_verb_modifiers[0]['text']
+                modifier_slots['M3'] = post_verb_modifiers[1]['text'] if len(post_verb_modifiers) > 1 else all_modifiers[1]['text']
                 
         elif modifier_count == 3:
             # 3個 → M1, M2, M3（位置順）

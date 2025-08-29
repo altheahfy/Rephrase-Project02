@@ -1,0 +1,33 @@
+{
+  "case_33": {
+    "sentence": "The cat quietly sat on the mat.",
+    "expected": {
+      "main_slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M1": "quietly",
+        "M2": "on the mat"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The cat quietly sat on the mat.",
+      "success": true,
+      "main_slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M1": "quietly",
+        "M2": "on the mat"
+      },
+      "slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M1": "quietly",
+        "M2": "on the mat"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  }
+}
