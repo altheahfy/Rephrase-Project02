@@ -1,0 +1,158 @@
+{
+  "case_83": {
+    "sentence": "What did he tell her at the store?",
+    "expected": {
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "What did he tell her at the store?",
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      }
+    },
+    "match": true
+  },
+  "case_84": {
+    "sentence": "Did he tell her a secret there?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Did he tell her a secret there?",
+      "main_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      }
+    },
+    "match": true
+  },
+  "case_85": {
+    "sentence": "Did I tell him a truth in the kitchen?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Did",
+        "S": "I",
+        "V": "tell",
+        "O1": "him",
+        "O2": "a truth",
+        "M2": "in the kitchen"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Did I tell him a truth in the kitchen?",
+      "main_slots": {
+        "Aux": "Did",
+        "S": "I",
+        "V": "tell",
+        "O1": "him",
+        "O2": "a truth",
+        "M2": "in the kitchen"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      }
+    },
+    "match": true
+  },
+  "case_86": {
+    "sentence": "Where did you tell me a story?",
+    "expected": {
+      "main_slots": {
+        "M2": "Where",
+        "Aux": "did",
+        "S": "you",
+        "V": "tell",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Where did you tell me a story?",
+      "main_slots": {
+        "M2": "Where",
+        "Aux": "did",
+        "S": "you",
+        "V": "tell",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      }
+    },
+    "match": true
+  }
+}
