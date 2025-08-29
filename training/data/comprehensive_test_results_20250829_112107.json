@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "test_timestamp": "2025-08-29T11:21:07.080026",
+    "total_groups": 1,
+    "total_cases": 4,
+    "total_success": 4
+  },
+  "results": {
+    "tell_group": {
+      "description": "tellグループ（Cases 83-86）",
+      "success_count": 4,
+      "total_count": 4,
+      "success_rate": 100.0,
+      "cases": [
+        {
+          "case_id": "83",
+          "sentence": "What did he tell her at the store?",
+          "v_group_key": "tell",
+          "wh_word": "what",
+          "expected_order": {
+            "O2": 2,
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "M2": 8
+          },
+          "main_slots": {
+            "O2": "What",
+            "Aux": "did",
+            "S": "he",
+            "V": "tell",
+            "O1": "her",
+            "M2": "at the store"
+          },
+          "status": "SUCCESS",
+          "actual_order": {
+            "O2": 2,
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "M2": 8
+          }
+        },
+        {
+          "case_id": "84",
+          "sentence": "Did he tell her a secret there?",
+          "v_group_key": "tell",
+          "wh_word": null,
+          "expected_order": {
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7,
+            "M2": 8
+          },
+          "main_slots": {
+            "Aux": "Did",
+            "S": "he",
+            "V": "tell",
+            "O1": "her",
+            "O2": "a secret",
+            "M2": "there"
+          },
+          "status": "SUCCESS",
+          "actual_order": {
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7,
+            "M2": 8
+          }
+        },
+        {
+          "case_id": "85",
+          "sentence": "Did I tell him a truth in the kitchen?",
+          "v_group_key": "tell",
+          "wh_word": null,
+          "expected_order": {
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7,
+            "M2": 8
+          },
+          "main_slots": {
+            "Aux": "Did",
+            "S": "I",
+            "V": "tell",
+            "O1": "him",
+            "O2": "a truth",
+            "M2": "in the kitchen"
+          },
+          "status": "SUCCESS",
+          "actual_order": {
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7,
+            "M2": 8
+          }
+        },
+        {
+          "case_id": "86",
+          "sentence": "Where did you tell me a story?",
+          "v_group_key": "tell",
+          "wh_word": "where",
+          "expected_order": {
+            "M2": 1,
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7
+          },
+          "main_slots": {
+            "M2": "Where",
+            "Aux": "did",
+            "S": "you",
+            "V": "tell",
+            "O1": "me",
+            "O2": "a story"
+          },
+          "status": "SUCCESS",
+          "actual_order": {
+            "M2": 1,
+            "Aux": 3,
+            "S": 4,
+            "V": 5,
+            "O1": 6,
+            "O2": 7
+          }
+        }
+      ]
+    }
+  }
+}

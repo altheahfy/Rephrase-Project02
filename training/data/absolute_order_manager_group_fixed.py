@@ -136,43 +136,58 @@ class AbsoluteOrderManager:
     def _create_element_list_from_population(self, group_population, v_group_key):
         """
         group_populationからグループの要素リストを作成
+        実際の登場順序に基づいて要素リストを構築
         """
-        element_set = set()
+        element_order = []  # 登場順序を保持
+        seen_elements = set()
         
-        # 母集団の全文を調査して要素を抽出
+        # 母集団の全文を調査して要素を登場順で抽出
         for sentence_data in group_population:
             slots = sentence_data.get("slots", {})
             
-            for slot_name, slot_value in slots.items():
-                if slot_value:
-                    # 疑問詞の判定
-                    if self.is_wh_word_content(slot_value):
-                        detected_wh = self.detect_wh_word({slot_name: slot_value})
-                        if detected_wh:
-                            element_set.add(f"{slot_name}_{detected_wh}")
-                        else:
-                            element_set.add(f"{slot_name}_standard")
-                    else:
-                        element_set.add(f"{slot_name}_standard")
+            # 標準スロット順序でスロットを処理
+            for slot_name in self.STANDARD_SLOT_ORDER:
+                if slot_name in slots:
+                    slot_value = slots[slot_name]
+                    if slot_value:
+                        # 疑問詞の判定
+                        if self.is_wh_word_content(slot_value):
+                            detected_wh = self.detect_wh_word({slot_name: slot_value})
+                            if detected_wh:
+                                element_key = f"{slot_name}_{detected_wh}"
+                                if element_key not in seen_elements:
+                                    element_order.append(element_key)
+                                    seen_elements.add(element_key)
+                                    print(f"  📍 Found wh-element: {element_key}")
+                        
+                        # 標準要素も追加
+                        element_key = f"{slot_name}_standard"
+                        if element_key not in seen_elements:
+                            element_order.append(element_key)
+                            seen_elements.add(element_key)
+                            print(f"  📋 Found standard element: {element_key}")
         
-        # 要素を順序付け（疑問詞優先、その後標準順序）
-        element_list = []
-        wh_elements = []
-        standard_elements = []
+        # where系疑問詞を位置1、what疑問詞を位置2に移動
+        final_element_list = []
+        wh_where_elements = []
+        wh_what_elements = []
+        other_elements = []
         
-        for element in sorted(element_set):
-            if "_where" in element or "_what" in element or "_when" in element or "_why" in element or "_how" in element:
-                wh_elements.append(element)
+        for element in element_order:
+            if "_where" in element or "_when" in element or "_why" in element or "_how" in element:
+                wh_where_elements.append(element)
+            elif "_what" in element:
+                wh_what_elements.append(element)
             else:
-                standard_elements.append(element)
+                other_elements.append(element)
         
-        # where系疑問詞とwhat疑問詞を先頭に配置
-        wh_elements.sort(key=lambda x: (0 if "where" in x else 1 if "what" in x else 2))
+        # 組み立て: where系(位置1) + what系(位置2) + その他
+        final_element_list.extend(wh_where_elements)
+        final_element_list.extend(wh_what_elements)
+        final_element_list.extend(other_elements)
         
-        element_list.extend(wh_elements)
-        element_list.extend(standard_elements)
-        
-        return element_list
+        print(f"📋 Final element order: {final_element_list}")
+        return final_element_list
     
     def _matches_element_type(self, slot_value, element_type):
         """
