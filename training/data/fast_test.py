@@ -16,13 +16,13 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 def load_test_data():
     """テストデータ読み込み"""
-    with open('final_54_test_data.json', 'r', encoding='utf-8') as f:
+    with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def parse_range(case_range: str):
     """ケース範囲文字列から数値リストを取得"""
     # テストデータ読み込み
-    with open('final_54_test_data.json', 'r', encoding='utf-8') as f:
+    with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     test_cases = data['data']
     

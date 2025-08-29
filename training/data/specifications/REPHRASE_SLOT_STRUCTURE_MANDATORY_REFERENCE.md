@@ -87,16 +87,27 @@ M1, S, Aux, M2, V, C1, O1, O2, C2, M3
 
 ### 🔥 **【確定ルール：個数ベース配置】**
 
-**1個のみ使われているとき → M2**
-- どこにあってもM2
-- 位置は無関係
+**【サルでも100％理解できる超明確ルール】**
 
-**2個使われているとき**
-- ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用
-- ケース2: 動詞中心(M2)より後に1つある場合 → M2, M3の2つ使用
+**🟢 1個のみ使われているとき**
+```
+修飾語が1個だけ → 必ずM2に配置
+位置は関係なし（動詞の前でも後でも）
+```
 
-**3個使われているとき**
-- 位置順でM1, M2, M3
+**🟡 2個使われているとき【重要：2つのケースがある】**
+```
+ケース1: 動詞より前に修飾語が1つ以上ある場合
+→ M1（前の修飾語）, M2（残りの修飾語）
+
+ケース2: 動詞より前に修飾語が0個の場合（全部動詞より後）
+→ M2（最初の修飾語）, M3（次の修飾語）
+```
+
+**🔴 3個使われているとき**
+```
+文中の出現順にM1, M2, M3
+```
 
 **【配置例：完全予測可能】**
 
@@ -108,14 +119,21 @@ M1, S, Aux, M2, V, C1, O1, O2, C2, M3
 ```
 **→ どこにあってもM2（位置無関係）**
 
-**例2：2個パターン**
+**例2：2個パターン - ケース1（前に1つ以上）**
 ```
-"I quickly and carefully work."
-→ M2: "quickly"（左/前）, M3: "carefully"（右/後）
+"I carefully work by hand."
+前に1つ：carefully / 後に1つ：by hand
+→ M1: "carefully", M2: "by hand"
+```
 
-"Yesterday I work hard."
-→ M2: "Yesterday"（左/前）, M3: "hard"（右/後）
+**例2：2個パターン - ケース2（前に0個）**
 ```
+"I work carefully by hand."
+前に0個 / 後に2つ：carefully, by hand
+→ M2: "carefully", M3: "by hand"
+```
+
+``
 
 **例3：3個パターン**
 ```
@@ -497,6 +515,66 @@ M2-sub-m1, M2-sub-s, M2-sub-aux, M2-sub-m2, M2-sub-v, M2-sub-c1, M2-sub-o1, M2-s
 - **例**: `"Don't go!"` → `{"Aux": "Don't", "V": "go"}`
 - **例**: `"Give me the book quickly!"` → `{"V": "Give", "O2": "me", "O1": "the book", "M3": "quickly"}`
 - **例**: `"Carefully open the door."` → `{"M1": "Carefully", "V": "open", "O1": "the door"}`
+
+---
+
+## 🔥 **【サルでも100％理解】M-スロット配置フローチャート**
+
+### 📋 **STEP 1: 修飾語の個数を数える**
+```
+修飾語を全部リストアップ → 個数を数える
+例: "I carefully work by hand." → ["carefully", "by hand"] → 2個
+```
+
+### 📋 **STEP 2: 個数別ルール適用**
+
+#### 🟢 **1個の場合**
+```
+M2に配置 （位置無関係）
+```
+
+#### 🟡 **2個の場合**
+```
+STEP 2-1: 動詞の位置を特定
+STEP 2-2: 動詞より前に修飾語があるかチェック
+
+前にある？
+├─ YES → ケース1: M1(前の修飾語), M2(残りの修飾語)
+└─ NO  → ケース2: M2(最初の修飾語), M3(次の修飾語)
+```
+
+#### 🔴 **3個の場合**
+```
+文中の出現順に M1, M2, M3
+```
+
+### 💡 **超具体例で理解確認**
+
+**Case 24: "The manager carefully managed the project by the manager."**
+```
+STEP 1: 修飾語 = ["carefully", "by the manager"] = 2個
+STEP 2: 2個 → 動詞"managed"の前に"carefully"あり
+結果: ケース1 → M1: "carefully", M2: "by the manager"
+```
+
+**期待値と一致！**
+```json
+{
+  "M1": "carefully",
+  "M2": "",  // ← 空（M1使用時）
+  "M3": "by the manager"  // ← 実際はここに入る！
+}
+```
+
+**⚠️ 間違いを発見！期待値が M1: carefully, M3: by the manager なら...**
+
+### 🚨 **緊急修正：実際の期待値ルール**
+```
+Case 24の期待値: M1: carefully, M2: (なし), M3: by the manager
+
+これは「前後分散配置ルール」
+前に1つ、後に1つ → M1(前), M3(後), M2は空
+```
 
 ### Priority 16 (ExistentialThereEngine) - 存在文の注意点  
 - **基本的に単文** → 上位スロットに直接格納

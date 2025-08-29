@@ -46,6 +46,14 @@ class QuestionHandler:
         'whose': 'O2'      # 所有目的語: Whose car is this?
     }
     
+    # 修飾語系疑問詞（副詞ハンドラー連携用）
+    MODIFIER_WH_WORDS = {
+        'where': 'M2',     # 場所修飾語
+        'when': 'M2',      # 時間修飾語  
+        'why': 'M2',       # 理由修飾語
+        'how': 'M2'        # 方法修飾語
+    }
+    
     def is_question(self, text: str) -> bool:
         """
         疑問文判定
@@ -61,7 +69,7 @@ class QuestionHandler:
             
         text = text.strip()
         
-        # 疑問符チェック
+        # 疑問符チェック（最優先）
         if text.endswith('?'):
             return True
             
@@ -76,12 +84,8 @@ class QuestionHandler:
         if doc and doc[0].text.lower() in self.MODIFIER_WH_WORDS:
             return True
             
-        # 助動詞倒置パターン検出（依存関係専門分野）
-        for token in doc:
-            if (token.pos_ == 'AUX' and token.i == 0 and 
-                token.dep_ in ['aux', 'cop'] and token.head.pos_ == 'VERB'):
-                return True
-                
+        # ⚠️ 厳格化：疑問符がない場合は疑問文と判定しない
+        # 助動詞倒置は疑問符と組み合わせでのみ有効
         return False
     
     def process(self, text: str) -> Dict[str, Any]:

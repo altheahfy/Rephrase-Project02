@@ -45,7 +45,7 @@ class PassiveVoiceHandler:
     
     def _detect_passive_pattern(self, doc) -> Optional[Dict[str, Any]]:
         """
-        be動詞 + 過去分詞のパターンを検出
+        be動詞 + 過去分詞のパターンを検出（現在進行受動態対応）
         
         Args:
             doc: spaCy Docオブジェクト
@@ -58,14 +58,31 @@ class PassiveVoiceHandler:
         for i, token in enumerate(doc):
             # be動詞をチェック
             if token.text.lower() in self.be_verbs:
-                # 次のトークンが過去分詞かチェック（副詞があってもスキップ）
-                next_idx = self._find_next_verb(doc, i + 1)
                 
+                # 現在進行受動態チェック: be + being + 過去分詞
+                if i + 2 < len(doc) and doc[i + 1].text.lower() == 'being':
+                    next_idx = self._find_next_verb(doc, i + 2)
+                    if next_idx is not None:
+                        past_participle = doc[next_idx]
+                        if self._is_past_participle(past_participle):
+                            # 現在進行受動態パターン発見
+                            return {
+                                'is_passive': True,
+                                'aux': f"{token.text} being",  # "is being"として結合
+                                'verb': past_participle.text,
+                                'pattern_type': 'progressive_passive',
+                                'be_index': i,
+                                'being_index': i + 1,
+                                'participle_index': next_idx
+                            }
+                
+                # 通常の受動態チェック: be + 過去分詞
+                next_idx = self._find_next_verb(doc, i + 1)
                 if next_idx is not None:
                     past_participle = doc[next_idx]
                     
                     if self._is_past_participle(past_participle):
-                        # 受動態パターン発見
+                        # 通常の受動態パターン発見
                         return {
                             'is_passive': True,
                             'aux': token.text,

@@ -364,12 +364,11 @@ class AdverbHandler:
     
     def _assign_modifier_slots(self, modifiers_info: Dict, verb_modifier_pairs: List[Dict]) -> Dict[str, str]:
         """
-        Rephraseスロット構造仕様に従って修飾語をMスロットに配置
+        REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md仕様に従って修飾語をMスロットに配置
         
-        1個のみ使われているとき → M2（どこにあってもM2、位置は無関係）
-        2個使われているとき:
-          - ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用
-          - ケース2: 動詞中心(M2)より後に1つある場合 → M2, M3の2つ使用
+        個数ベース配置（位置無関係）:
+        1個のみ使われているとき → M2
+        2個使われているとき → 左からM2, M3の順
         3個使われているとき → 位置順でM1, M2, M3
         """
         modifier_slots = {}
@@ -393,29 +392,12 @@ class AdverbHandler:
         modifier_count = len(all_modifiers)
         
         if modifier_count == 1:
-            # 1個のみ → M2（公式仕様）
+            # 1個のみ → M2（仕様通り）
             modifier_slots['M2'] = all_modifiers[0]['text']
         elif modifier_count == 2:
-            # 2個の場合 → 動詞との位置関係で決定（公式仕様）
-            verb_positions = self._get_verb_positions(verb_modifier_pairs)
-            main_verb_idx = verb_positions[0] if verb_positions else 0
-            
-            # 修飾語の動詞に対する位置を判定
-            pre_verb_modifiers = [m for m in all_modifiers if m['modifier_idx'] < main_verb_idx]
-            post_verb_modifiers = [m for m in all_modifiers if m['modifier_idx'] > main_verb_idx]
-            
-            if len(pre_verb_modifiers) == 1 and len(post_verb_modifiers) == 1:
-                # ケース1: 動詞より前に1つ、後に1つ → M1, M2
-                modifier_slots['M1'] = pre_verb_modifiers[0]['text']
-                modifier_slots['M2'] = post_verb_modifiers[0]['text']
-            elif len(pre_verb_modifiers) == 2:
-                # ケース2: 動詞より前に2つ → M1, M2
-                modifier_slots['M1'] = all_modifiers[0]['text']
-                modifier_slots['M2'] = all_modifiers[1]['text']
-            else:
-                # ケース3: 動詞より後に2つ → M2, M3
-                modifier_slots['M2'] = all_modifiers[0]['text']
-                modifier_slots['M3'] = all_modifiers[1]['text']
+            # 2個使われているとき → 左からM2, M3の順（仕様通り）
+            modifier_slots['M2'] = all_modifiers[0]['text']
+            modifier_slots['M3'] = all_modifiers[1]['text']
         elif modifier_count == 3:
             # 3個 → M1, M2, M3（公式仕様）
             modifier_slots['M1'] = all_modifiers[0]['text']

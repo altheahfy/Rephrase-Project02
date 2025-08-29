@@ -1,0 +1,105 @@
+{
+  "case_18": {
+    "sentence": "The cake is being baked by my mother.",
+    "expected": {
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The cake is being baked by my mother.",
+      "success": true,
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  },
+  "case_24": {
+    "sentence": "The message is being carefully written by the manager.",
+    "expected": {
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The message is being carefully written by the manager.",
+      "success": true,
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M1": "carefully",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M1": "carefully",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": false
+  },
+  "case_26": {
+    "sentence": "The building is being constructed very carefully by skilled workers.",
+    "expected": {
+      "main_slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M2": "very carefully",
+        "M3": "by skilled workers"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The building is being constructed very carefully by skilled workers.",
+      "success": true,
+      "main_slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M1": "very",
+        "M2": "carefully",
+        "M3": "by skilled workers"
+      },
+      "slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M1": "very",
+        "M2": "carefully",
+        "M3": "by skilled workers"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": false
+  }
+}
