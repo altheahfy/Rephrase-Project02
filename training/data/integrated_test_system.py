@@ -33,7 +33,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent.parent
 DATA_DIR = SCRIPT_DIR
 
 # 必要なファイルパス
-FINAL_TEST_DATA = DATA_DIR / "final_54_test_data.json"
+FINAL_TEST_DATA = DATA_DIR / "final_54_test_data_with_absolute_order_corrected.json"
 CENTRAL_CONTROLLER = DATA_DIR / "central_controller.py"
 RUN_OFFICIAL = DATA_DIR / "run_official.py"
 

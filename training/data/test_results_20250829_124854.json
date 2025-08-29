@@ -1,0 +1,40 @@
+{
+  "test_info": {
+    "timestamp": "20250829_124854",
+    "total_cases": 1,
+    "passed": 0,
+    "failed": 1,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_83",
+      "sentence": "What did he tell her at the store?",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "O2": "What",
+          "Aux": "did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "M2": "at store"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "O2": "What",
+          "Aux": "did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "M2": "at the store"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}

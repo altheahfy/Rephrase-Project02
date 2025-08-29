@@ -15,6 +15,7 @@ from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
+from question_handler import QuestionHandler
 
 
 class CentralController:
@@ -40,6 +41,7 @@ class CentralController:
         basic_five_pattern_handler = BasicFivePatternHandler()
         adverb_handler = AdverbHandler()
         passive_voice_handler = PassiveVoiceHandler()
+        question_handler = QuestionHandler()
         
         # 関係節ハンドラーに協力者を注入（Dependency Injection）
         collaborators = {
@@ -54,7 +56,8 @@ class CentralController:
             'basic_five_pattern': basic_five_pattern_handler,
             'relative_clause': relative_clause_handler,
             'adverb': adverb_handler,
-            'passive_voice': passive_voice_handler
+            'passive_voice': passive_voice_handler,
+            'question': question_handler
         }
         
         # Rephraseスロット定義読み込み
@@ -80,10 +83,14 @@ class CentralController:
         """
         doc = self.nlp(text)
         
-        # Phase 2: 関係節 + 5文型の検出
+        # Phase 3: 疑問文 + 関係節 + 5文型の検出
         detected_patterns = []
         
-        # 関係節検出（優先度最高）
+        # 疑問文検出（最優先）
+        if self.handlers['question'].is_question(text):
+            detected_patterns.append('question')
+        
+        # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom', 'where', 'when', 'why', 'how'] 
                           for token in doc)
         if has_relative:
@@ -114,8 +121,52 @@ class CentralController:
         if not grammar_patterns:
             return self._create_error_result(text, "文法パターンが検出されませんでした")
         
-        # 2. Phase 2順次処理: 関係節優先→主節処理の順
+        # 2. Phase 3順次処理: 疑問文優先→関係節→主節処理の順
         final_result = {}
+        
+        # 🎯 疑問文処理（最優先 + AdverbHandlerとの協力）
+        if 'question' in grammar_patterns:
+            # Step 1: AdverbHandlerで修飾語分離
+            adverb_handler = self.handlers['adverb']
+            adverb_result = adverb_handler.process(text)
+            
+            modifier_slots = {}
+            processing_text = text
+            
+            if adverb_result['success']:
+                modifier_slots = adverb_result.get('modifier_slots', {})
+                processing_text = adverb_result['separated_text']
+                print(f"🔧 疑問文修飾語分離: '{text}' → '{processing_text}'")
+                for slot, value in modifier_slots.items():
+                    print(f"📍 修飾語検出: {slot} = '{value}'")
+            
+            # Step 2: QuestionHandlerで疑問文構造処理
+            question_handler = self.handlers['question']
+            question_result = question_handler.process(processing_text)
+            
+            if question_result['success']:
+                # 疑問文処理成功 - 修飾語と統合
+                question_slots = question_result['slots']
+                
+                # 修飾語スロットを統合
+                final_slots = {**question_slots, **modifier_slots}
+                print(f"✅ 疑問文+修飾語統合成功: {final_slots}")
+                
+                return {
+                    'success': True,
+                    'text': text,
+                    'main_slots': final_slots,
+                    'sub_slots': {},
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'question',
+                        'collaboration': 'adverb',
+                        'question_type': question_result.get('question_type'),
+                        'confidence': question_result['metadata']['confidence']
+                    }
+                }
+            else:
+                print(f"⚠️ 疑問文処理失敗、通常の処理フローに移行")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
