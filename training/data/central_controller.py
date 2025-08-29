@@ -16,6 +16,7 @@ from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
+from absolute_order_manager import AbsoluteOrderManager
 
 
 class CentralController:
@@ -36,6 +37,9 @@ class CentralController:
     def __init__(self):
         """初期化: spaCy POS解析器とハンドラー群の設定（協力アプローチ版）"""
         self.nlp = spacy.load('en_core_web_sm')
+        
+        # AbsoluteOrderManager初期化
+        self.absolute_order_manager = AbsoluteOrderManager()
         
         # Phase 3: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
@@ -250,11 +254,15 @@ class CentralController:
                 
                 print(f"✅ 疑問文+5文型+修飾語統合成功: {final_slots}")
                 
+                # 🎯 AbsoluteOrderManager統合: 疑問文でも固定列マッピング適用
+                absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text)
+                
                 return {
                     'success': True,
                     'text': text,
                     'main_slots': final_slots,
                     'sub_slots': {},
+                    'absolute_order': absolute_result,  # 絶対順序結果を追加
                     'metadata': {
                         'controller': 'central',
                         'primary_handler': 'question',
@@ -510,11 +518,15 @@ class CentralController:
         if modifier_slots:
             final_slots.update(modifier_slots)
         
+        # 🎯 AbsoluteOrderManager統合: 固定列マッピング適用
+        absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text)
+        
         return {
             'original_text': text,
             'success': True,
             'main_slots': final_slots,  # main_slotsを追加
             'slots': final_slots,
+            'absolute_order': absolute_result,  # 絶対順序結果を追加
             'grammar_pattern': 'basic_five_pattern + passive_voice',
             'phase': 1  # 基本処理 + 受動態
         }
@@ -642,6 +654,10 @@ class CentralController:
                 'detected_patterns': ['relative_clause', 'basic_five_pattern']
             }
         }
+        
+        # 🎯 AbsoluteOrderManager統合: 固定列マッピング適用
+        absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text)
+        result['absolute_order'] = absolute_result
         
         return result
 
