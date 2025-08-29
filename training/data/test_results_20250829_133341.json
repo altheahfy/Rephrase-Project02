@@ -1,0 +1,106 @@
+{
+  "test_info": {
+    "timestamp": "20250829_133341",
+    "total_cases": 4,
+    "passed": 0,
+    "failed": 4,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_83",
+      "sentence": "What did he tell her at the store?",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {
+          "O2": "What",
+          "S": "What",
+          "V": "tell",
+          "O1": "her",
+          "Aux": "did",
+          "M2": "at the store"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "O2": "What",
+          "Aux": "did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "M2": "at the store"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_84",
+      "sentence": "Did he tell her a secret there?",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {},
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "he",
+          "V": "tell",
+          "O1": "her",
+          "O2": "a secret",
+          "M2": "there"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_85",
+      "sentence": "Did I tell him a truth in the kitchen?",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {},
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "Aux": "Did",
+          "S": "I",
+          "V": "tell",
+          "O1": "him",
+          "O2": "a truth",
+          "M2": "in the kitchen"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    },
+    {
+      "case_id": "case_86",
+      "sentence": "Where did you tell me a story?",
+      "status": "failed",
+      "match": false,
+      "actual_result": {
+        "main_slots": {},
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "M2": "Where",
+          "Aux": "did",
+          "S": "you",
+          "V": "tell",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}

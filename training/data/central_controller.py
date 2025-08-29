@@ -105,6 +105,70 @@ class CentralController:
             
         return detected_patterns
     
+    def _normalize_question_to_statement(self, question_text: str, question_result: Dict) -> str:
+        """
+        疑問文を平叙文に正規化してBasicFivePatternHandlerで処理可能にする
+        
+        Args:
+            question_text: 疑問文テキスト
+            question_result: QuestionHandlerの処理結果
+            
+        Returns:
+            str: 正規化された平叙文
+        """
+        if not question_result.get('success'):
+            return question_text
+        
+        question_type = question_result.get('question_type')
+        slots = question_result.get('slots', {})
+        
+        # Yes/No疑問文の正規化: "Did he tell her a secret ?" → "He tell her a secret"
+        if question_type == 'yes_no_question':
+            text = question_text.strip()
+            if text.endswith('?'):
+                text = text[:-1].strip()
+            
+            # 助動詞を除去して語順を調整
+            if 'Aux' in slots and 'S' in slots:
+                aux = slots['Aux'].lower()
+                subject = slots['S']
+                
+                # "Did/Do/Does" + 主語 → 主語のみ
+                if aux in ['did', 'do', 'does']:
+                    # "Did he tell" → "He tell"
+                    pattern = f"{slots['Aux']} {subject}"
+                    if pattern in text:
+                        normalized = text.replace(pattern, subject, 1)
+                        return normalized.strip()
+                
+                # その他の助動詞も同様に処理
+                pattern = f"{slots['Aux']} {subject}"
+                if pattern in text:
+                    normalized = text.replace(pattern, subject, 1) 
+                    return normalized.strip()
+        
+        # WH疑問文の正規化: "What did he tell her ?" → "He tell her what"
+        elif question_type == 'wh_question':
+            text = question_text.strip()
+            if text.endswith('?'):
+                text = text[:-1].strip()
+            
+            # WH語と助動詞を除去して語順調整
+            wh_word = None
+            for slot, value in slots.items():
+                if slot in ['O2', 'M2'] and value.lower() in self.handlers['question'].WH_WORDS:
+                    wh_word = value
+                    break
+            
+            if wh_word and 'Aux' in slots and 'S' in slots:
+                # "What did he tell" → "He tell"
+                pattern = f"{wh_word} {slots['Aux']} {slots['S']}"
+                if pattern in text:
+                    remaining = text.replace(pattern, slots['S'], 1)
+                    return remaining.strip()
+        
+        return question_text
+    
     def process_sentence(self, text: str) -> Dict[str, Any]:
         """
         文の処理: 文法分析→ハンドラー委任→結果統合
@@ -124,7 +188,7 @@ class CentralController:
         # 2. Phase 3順次処理: 疑問文優先→関係節→主節処理の順
         final_result = {}
         
-        # 🎯 疑問文処理（最優先 + AdverbHandlerとの協力）
+        # 🎯 疑問文処理（最優先 + AdverbHandler + BasicFivePatternHandlerとの協力）
         if 'question' in grammar_patterns:
             # Step 1: AdverbHandlerで修飾語分離
             adverb_handler = self.handlers['adverb']
@@ -144,13 +208,47 @@ class CentralController:
             question_handler = self.handlers['question']
             question_result = question_handler.process(processing_text)
             
-            if question_result['success']:
-                # 疑問文処理成功 - 修飾語と統合
+            # Step 3: BasicFivePatternHandlerで5文型構造処理
+            # 疑問文を平叙文に正規化してから処理
+            normalized_text = self._normalize_question_to_statement(processing_text, question_result)
+            print(f"🔄 疑問文正規化: '{processing_text}' → '{normalized_text}'")
+            
+            five_pattern_handler = self.handlers['basic_five_pattern']
+            five_pattern_result = five_pattern_handler.process(normalized_text)
+            
+            if question_result['success'] and five_pattern_result['success']:
+                # 疑問文+5文型+修飾語統合
                 question_slots = question_result['slots']
+                five_pattern_slots = five_pattern_result['slots']
                 
-                # 修飾語スロットを統合
-                final_slots = {**question_slots, **modifier_slots}
-                print(f"✅ 疑問文+修飾語統合成功: {final_slots}")
+                # スロット統合（疑問詞優先、5文型で補完）
+                final_slots = {}
+                
+                # 疑問詞スロット（QuestionHandlerから優先取得）
+                wh_slots = {}
+                for slot, value in question_slots.items():
+                    if slot in ['O2', 'M2'] and value.lower() in question_handler.WH_WORDS:
+                        wh_slots[slot] = value  # WH語は疑問文ハンドラー優先
+                        final_slots[slot] = value
+                
+                # 助動詞はQuestionHandlerから
+                if 'Aux' in question_slots:
+                    final_slots['Aux'] = question_slots['Aux']
+                
+                # 5文型スロット（疑問詞と競合しない場合のみ）
+                for slot, value in five_pattern_slots.items():
+                    if slot not in final_slots:  # 疑問詞・助動詞と重複しない場合のみ
+                        # WH語が主語位置の場合の特別処理
+                        if slot == 'S' and any(wh_slot == 'S' for wh_slot in wh_slots):
+                            continue  # WH語が主語の場合は5文型の主語をスキップ
+                        final_slots[slot] = value
+                
+                # 修飾語スロットを統合（WH語でない修飾語のみ）
+                for slot, value in modifier_slots.items():
+                    if slot not in final_slots:
+                        final_slots[slot] = value
+                
+                print(f"✅ 疑問文+5文型+修飾語統合成功: {final_slots}")
                 
                 return {
                     'success': True,
@@ -160,13 +258,19 @@ class CentralController:
                     'metadata': {
                         'controller': 'central',
                         'primary_handler': 'question',
-                        'collaboration': 'adverb',
+                        'collaboration': ['adverb', 'basic_five_pattern'],
                         'question_type': question_result.get('question_type'),
-                        'confidence': question_result['metadata']['confidence']
+                        'sentence_pattern': five_pattern_result.get('pattern'),
+                        'confidence': (question_result['metadata']['confidence'] + 
+                                     five_pattern_result.get('confidence', 0.5)) / 2
                     }
                 }
             else:
-                print(f"⚠️ 疑問文処理失敗、通常の処理フローに移行")
+                print(f"⚠️ 疑問文または5文型処理失敗、通常の処理フローに移行")
+                if not question_result['success']:
+                    print(f"  QuestionHandler error: {question_result.get('error')}")
+                if not five_pattern_result['success']:
+                    print(f"  BasicFivePatternHandler error: {five_pattern_result.get('error')}")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
