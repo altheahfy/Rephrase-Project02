@@ -136,17 +136,20 @@ class AbsoluteOrderManager:
     def _create_element_list_from_population(self, group_population, v_group_key):
         """
         group_populationからグループの要素リストを作成
-        実際の登場順序に基づいて要素リストを構築
+        tellグループの正しい順序: wh疑問詞 + Aux + S + V + O1 + O2 + M2(最後尾)
         """
         element_order = []  # 登場順序を保持
         seen_elements = set()
+        
+        # tellグループの正しいスロット順序（M2は最後尾）
+        TELL_GROUP_SLOT_ORDER = ["Aux", "S", "V", "O1", "O2", "M2"]
         
         # 母集団の全文を調査して要素を登場順で抽出
         for sentence_data in group_population:
             slots = sentence_data.get("slots", {})
             
-            # 標準スロット順序でスロットを処理
-            for slot_name in self.STANDARD_SLOT_ORDER:
+            # tellグループ専用の順序でスロットを処理
+            for slot_name in TELL_GROUP_SLOT_ORDER:
                 if slot_name in slots:
                     slot_value = slots[slot_name]
                     if slot_value:
