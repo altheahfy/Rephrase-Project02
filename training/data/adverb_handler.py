@@ -53,7 +53,7 @@ class AdverbHandler:
                 'separated_text': result['separated_text'],
                 'modifiers': result['modifiers'],
                 'verb_positions': result['verb_positions'],
-                'modifier_slots': self._assign_modifier_slots(result['modifiers'], verb_modifier_pairs)
+                'modifier_slots': self._assign_modifier_slots(result['modifiers'], verb_modifier_pairs, doc)
             }
             
         except Exception as e:
@@ -85,36 +85,45 @@ class AdverbHandler:
         """動詞の修飾語を収集（前後両方向から）- 専門分担型ハイブリッド解析"""
         modifiers = []
         
-        # 文頭副詞の特別処理（専門分担: 依存関係で検出）
-        if verb_idx > 0:  # 動詞が文頭でない場合
-            first_token = doc[0]
-            # 文頭副詞を検出（npadvmod または advmod）
-            is_sentence_initial_adverb = (
-                (first_token.dep_ == 'npadvmod' and first_token.head.i == verb_idx) or
-                (first_token.dep_ == 'advmod' and first_token.head.i == verb_idx and first_token.pos_ == 'ADV')
-            )
-            
-            if is_sentence_initial_adverb:
-                modifier_info = {
-                    'text': first_token.text,
-                    'pos': first_token.pos_,
-                    'tag': first_token.tag_,
-                    'idx': 0,
-                    'type': 'sentence_adverb' if first_token.dep_ == 'advmod' else 'temporal',
-                    'position': 'sentence-initial',  # 文頭位置
-                    'method': 'dependency_analysis'  # 使用手法明示
-                }
-                modifiers.append(modifier_info)
-                print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
+        # 文頭時間表現の特別処理（「Every morning」などの複合表現）
+        if verb_idx > 1:  # 動詞が複合表現の後に位置する場合
+            # npadvmodとして分析される時間表現を検索
+            for i in range(min(verb_idx, 3)):  # 文頭から3語程度をチェック
+                token = doc[i]
+                if token.dep_ == 'npadvmod' and token.head.i == verb_idx:
+                    # 時間表現の開始位置を特定（決定詞があるかチェック）
+                    start_idx = i
+                    if i > 0 and doc[i-1].dep_ == 'det' and doc[i-1].head.i == i:
+                        start_idx = i - 1  # 決定詞から開始
+                    
+                    # 時間表現のテキストを構築
+                    time_tokens = []
+                    for j in range(start_idx, i + 1):
+                        if doc[j].pos_ not in ['PUNCT']:  # 句読点を除く
+                            time_tokens.append(doc[j].text)
+                    
+                    time_text = ' '.join(time_tokens)
+                    
+                    modifier_info = {
+                        'text': time_text,
+                        'pos': token.pos_,
+                        'tag': token.tag_,
+                        'idx': start_idx,
+                        'type': 'temporal',
+                        'position': 'sentence-initial',
+                        'method': 'dependency_analysis'
+                    }
+                    modifiers.append(modifier_info)
+                    print(f"🔍 文頭時間表現検出: {time_text} (依存関係: {token.dep_})")
+                    break  # 最初の時間表現のみ処理
         
         # Part 1: 動詞の前にある修飾語を検索（複合修飾語対応）
         pre_verb_modifiers = []
         for i in range(verb_idx - 1, -1, -1):
             token = doc[i]
             
-            # 文頭副詞は既に処理済みなのでスキップ
-            if i == 0 and (token.dep_ == 'npadvmod' or 
-                          (token.dep_ == 'advmod' and token.pos_ == 'ADV')):
+            # 既に処理済みの文頭時間表現はスキップ
+            if any(mod for mod in modifiers if mod['idx'] <= i <= mod['idx'] + len(mod['text'].split()) - 1):
                 continue
             
             # 修飾語として識別（この動詞を修飾しているか確認）
@@ -262,6 +271,8 @@ class AdverbHandler:
             second_token.text.lower() in time_nouns and
             second_mod['idx'] - first_mod['idx'] == 1):  # 厳密に隣接
             return True
+        
+        # 注意: 副詞 + and + 副詞 は結合しない（分離してM-slotに個別に割り当てる）
         
         return False
 
@@ -438,6 +449,14 @@ class AdverbHandler:
                         if current_idx < len(doc) and doc[current_idx].text == part:
                             modifier_indices.add(current_idx)
                             current_idx += 1
+                elif ' ' in modifier_text:
+                    # 複数語の修飾語（時間表現などを含む）
+                    phrase_parts = modifier_text.split()
+                    current_idx = modifier_idx
+                    for part in phrase_parts:
+                        if current_idx < len(doc) and doc[current_idx].text == part:
+                            modifier_indices.add(current_idx)
+                            current_idx += 1
                 else:
                     # 単一語の修飾語
                     modifier_indices.add(modifier_idx)
@@ -455,6 +474,14 @@ class AdverbHandler:
                 
                 verb_positions[verb_idx]['modifiers'].append(modifier['text'])
         
+        # 副詞間の接続詞「and」を削除対象に追加
+        for i in range(len(doc) - 2):
+            if (i in modifier_indices and  # 最初の副詞
+                i + 1 < len(doc) and doc[i + 1].text.lower() == 'and' and
+                i + 2 in modifier_indices and  # 次の副詞
+                doc[i].pos_ == 'ADV' and doc[i + 2].pos_ == 'ADV'):
+                modifier_indices.add(i + 1)  # 「and」を削除対象に追加
+        
         # 修飾語を除いたテキストを構築
         for i, token in enumerate(doc):
             if i not in modifier_indices:
@@ -468,7 +495,7 @@ class AdverbHandler:
             'verb_positions': verb_positions
         }
     
-    def _assign_modifier_slots(self, modifiers_info: Dict, verb_modifier_pairs: List[Dict]) -> Dict[str, str]:
+    def _assign_modifier_slots(self, modifiers_info: Dict, verb_modifier_pairs: List[Dict], doc) -> Dict[str, str]:
         """
         REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md仕様に従って修飾語をMスロットに配置
         
@@ -522,6 +549,17 @@ class AdverbHandler:
             # 2個の場合：REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md 仕様に従う
             pre_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'pre-verb']
             post_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'post-verb']
+            
+            # 特別ケース: 「副詞 and 副詞」パターンの処理
+            if (len(all_modifiers) == 2 and 
+                all_modifiers[1]['modifier_idx'] - all_modifiers[0]['modifier_idx'] == 2):
+                # 間に「and」があるかチェック
+                and_idx = all_modifiers[0]['modifier_idx'] + 1
+                if and_idx < len(doc) and doc[and_idx].text.lower() == 'and':
+                    # 「quickly」と「and carefully」として分割
+                    modifier_slots['M2'] = all_modifiers[0]['text']
+                    modifier_slots['M3'] = f"and {all_modifiers[1]['text']}"
+                    return modifier_slots
             
             if len(pre_verb_modifiers) >= 1:
                 # ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用

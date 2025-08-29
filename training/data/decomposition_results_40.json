@@ -18,19 +18,19 @@
         "S": "He",
         "V": "solved",
         "O1": "the problem",
-        "M1": "quickly",
-        "M2": "carefully"
+        "M2": "quickly",
+        "M3": "and carefully"
       },
       "slots": {
         "S": "He",
         "V": "solved",
         "O1": "the problem",
-        "M1": "quickly",
-        "M2": "carefully"
+        "M2": "quickly",
+        "M3": "and carefully"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1
     },
-    "match": false
+    "match": true
   }
 }
