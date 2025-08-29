@@ -886,13 +886,13 @@
         "main_slots": {
           "S": "",
           "V": "succeeds",
-          "M2": "always",
-          "M3": "academically"
+          "M2": "academically"
         },
         "sub_slots": {
           "sub-s": "The student who",
           "sub-v": "studies",
           "sub-m2": "diligently",
+          "sub-m3": "always",
           "_parent_slot": "S"
         }
       }

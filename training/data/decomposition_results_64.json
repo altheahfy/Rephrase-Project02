@@ -1,0 +1,51 @@
+{
+  "case_64": {
+    "sentence": "The machine that was properly maintained works efficiently every day.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "sub-m2": "properly",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The machine that was properly maintained works efficiently every day.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "C1": "works every day",
+        "Aux": "was",
+        "V": "maintained",
+        "M2": "properly",
+        "M3": "efficiently"
+      },
+      "slots": {
+        "S": "",
+        "C1": "works every day",
+        "Aux": "was",
+        "V": "maintained",
+        "M2": "properly",
+        "M3": "efficiently"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "_parent_slot": "S",
+        "sub-m2": "properly",
+        "sub-m3": "efficiently"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": false
+  }
+}

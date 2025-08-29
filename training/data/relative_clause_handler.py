@@ -93,14 +93,37 @@ class RelativeClauseHandler:
         
         # 修飾語情報（協力者 AdverbHandler の結果を活用）
         modifiers_info = analysis.get('modifiers', {})
-        sub_m2 = ""
-        sub_m3 = ""
+        print(f"🔍 DEBUG: 受信したmodifiers_info = {modifiers_info}")
         
-        # 協力者から修飾語情報を取得（M2, M3対応）
-        if modifiers_info and 'M2' in modifiers_info:
-            sub_m2 = modifiers_info['M2']
-        if modifiers_info and 'M3' in modifiers_info:
-            sub_m3 = modifiers_info['M3']
+        # 🎯 修飾語の位置分離: 関係節内 vs 主節
+        rel_modifiers = {}
+        main_modifiers = {}
+        
+        if modifiers_info:
+            # 関係節境界を取得
+            rel_boundary = analysis.get('relative_clause_end', len(text.split()))
+            doc = analysis.get('doc')
+            
+            # 修飾語の位置を判定
+            if doc:
+                for slot, modifier_text in modifiers_info.items():
+                    # 修飾語の位置を特定
+                    modifier_pos = None
+                    for i, token in enumerate(doc):
+                        if modifier_text.lower() in token.text.lower():
+                            modifier_pos = i
+                            break
+                    
+                    # 位置に基づいて分離
+                    if modifier_pos is not None and modifier_pos < rel_boundary:
+                        rel_modifiers[slot] = modifier_text
+                        print(f"🔍 DEBUG: 関係節内修飾語 {slot} = {modifier_text}")
+                    else:
+                        main_modifiers[slot] = modifier_text
+                        print(f"🔍 DEBUG: 主節修飾語 {slot} = {modifier_text}")
+        
+        sub_m2 = rel_modifiers.get('M2', "")
+        sub_m3 = rel_modifiers.get('M3', "")
         
         # 受動態情報（協力者 PassiveVoiceHandler の結果を活用）
         passive_info = analysis.get('passive_analysis', {})
@@ -145,6 +168,7 @@ class RelativeClauseHandler:
             'relative_pronoun': 'who',
             'antecedent': antecedent,
             'main_continuation': main_clause.strip(),
+            'main_modifiers': main_modifiers,  # 主節用修飾語を追加
             'spacy_analysis': {
                 'relative_verb_pos': analysis['relative_verb_pos'],
                 'relative_verb_lemma': analysis['relative_verb_lemma']
@@ -672,17 +696,20 @@ class RelativeClauseHandler:
         
         # 関係節部分の完全な動詞句を構築
         rel_verb_phrase = rel_verb
-        rel_modifiers = []  # 修飾語を別途記録
         
-        if rel_verb_idx is not None:
-            for i in range(rel_verb_idx + 1, len(doc)):
-                if doc[i].dep_ == 'ROOT':
-                    break
-                if doc[i].head.i == rel_verb_idx:
-                    rel_modifiers.append(doc[i].text)
+        # 修飾語情報（協力者 AdverbHandler の結果を活用）
+        modifiers_info = analysis.get('modifiers', {})
+        print(f"🔍 DEBUG _process_that: 受信したmodifiers_info = {modifiers_info}")
+        sub_m2 = ""
+        sub_m3 = ""
         
-        # 修飾語がある場合はsub-m2に設定
-        sub_m2 = " ".join(rel_modifiers) if rel_modifiers else ""
+        # 協力者から修飾語情報を取得（M2, M3対応）
+        if modifiers_info and 'M2' in modifiers_info:
+            sub_m2 = modifiers_info['M2']
+            print(f"🔍 DEBUG _process_that: sub_m2設定 = {sub_m2}")
+        if modifiers_info and 'M3' in modifiers_info:
+            sub_m3 = modifiers_info['M3']
+            print(f"🔍 DEBUG _process_that: sub_m3設定 = {sub_m3}")
         
         # 主節を構築
         main_clause = ""
@@ -755,6 +782,8 @@ class RelativeClauseHandler:
         # 修飾語がある場合は追加
         if sub_m2:
             sub_slots['sub-m2'] = sub_m2
+        if sub_m3:
+            sub_slots['sub-m3'] = sub_m3
         
         return {
             'success': True,

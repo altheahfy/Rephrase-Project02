@@ -33,11 +33,13 @@
         "sub-s": "The car that",
         "sub-aux": "was",
         "sub-v": "repaired",
-        "_parent_slot": "S"
+        "_parent_slot": "S",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3
     },
-    "match": false
+    "match": true
   }
 }
