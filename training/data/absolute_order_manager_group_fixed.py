@@ -135,72 +135,144 @@ class AbsoluteOrderManager:
     
     def _create_element_list_from_population(self, group_population, v_group_key):
         """
-        group_populationからグループの要素リストを作成
-        tellグループの正しい順序: wh疑問詞 + Aux + S + V + O1 + O2 + M2(最後尾)
+        group_populationから語順ベースの重複回避要素リストを作成
+        例文の語順通りに処理し、バッティングを回避して配置
         """
-        element_order = []  # 登場順序を保持
-        seen_elements = set()
+        print("🔧 語順ベース要素分析開始")
         
-        # tellグループの正しいスロット順序（M2は最後尾）
-        TELL_GROUP_SLOT_ORDER = ["Aux", "S", "V", "O1", "O2", "M2"]
-        
-        # 母集団の全文を調査して要素を登場順で抽出
+        # Step 1: 各文の語順情報を取得
+        sentence_word_orders = []
         for sentence_data in group_population:
+            case = sentence_data.get("case", "unknown")
             slots = sentence_data.get("slots", {})
+            sentence = sentence_data.get("sentence", "")
             
-            # tellグループ専用の順序でスロットを処理
-            for slot_name in TELL_GROUP_SLOT_ORDER:
-                if slot_name in slots:
-                    slot_value = slots[slot_name]
-                    if slot_value:
-                        # 疑問詞の判定
-                        if self.is_wh_word_content(slot_value):
-                            detected_wh = self.detect_wh_word({slot_name: slot_value})
-                            if detected_wh:
-                                element_key = f"{slot_name}_{detected_wh}"
-                                if element_key not in seen_elements:
-                                    element_order.append(element_key)
-                                    seen_elements.add(element_key)
-                                    print(f"  📍 Found wh-element: {element_key}")
-                        
-                        # 標準要素も追加
-                        element_key = f"{slot_name}_standard"
-                        if element_key not in seen_elements:
-                            element_order.append(element_key)
-                            seen_elements.add(element_key)
-                            print(f"  📋 Found standard element: {element_key}")
+            print(f"📝 語順分析: {case} - {sentence}")
+            
+            # 文を単語に分割して語順を取得
+            word_order = self._extract_word_order_from_sentence(sentence, slots)
+            sentence_word_orders.append({
+                "case": case,
+                "sentence": sentence,
+                "slots": slots,
+                "word_order": word_order
+            })
+            
+            print(f"  語順: {word_order}")
         
-        # where系疑問詞を位置1、what疑問詞を位置2に移動
-        final_element_list = []
-        wh_where_elements = []
-        wh_what_elements = []
-        other_elements = []
+        # Step 2: 語順通りに要素を配置（バッティング回避）
+        element_position_map = {}  # element_key -> position
+        used_positions = set()
+        next_available_position = 1
         
-        for element in element_order:
-            if "_where" in element or "_when" in element or "_why" in element or "_how" in element:
-                wh_where_elements.append(element)
-            elif "_what" in element:
-                wh_what_elements.append(element)
-            else:
-                other_elements.append(element)
+        # 各文を語順通りに処理
+        for sentence_info in sentence_word_orders:
+            word_order = sentence_info["word_order"]
+            case = sentence_info["case"]
+            
+            print(f"📋 {case} の要素配置:")
+            
+            for word_pos, (slot_name, slot_value) in enumerate(word_order, 1):
+                # 要素タイプを判定
+                if self.is_wh_word_content(slot_value):
+                    detected_wh = self.detect_wh_word({slot_name: slot_value})
+                    if detected_wh:
+                        element_key = f"{slot_name}_{detected_wh}"
+                    else:
+                        element_key = f"{slot_name}_wh_unknown"
+                else:
+                    element_key = f"{slot_name}_standard"
+                
+                # 既に配置済みかチェック
+                if element_key not in element_position_map:
+                    # 新しい要素なので配置
+                    target_position = next_available_position
+                    element_position_map[element_key] = target_position
+                    used_positions.add(target_position)
+                    next_available_position += 1
+                    
+                    print(f"  新規配置: {element_key} → position {target_position}")
+                else:
+                    print(f"  既存要素: {element_key} → position {element_position_map[element_key]} (スキップ)")
         
-        # 組み立て: where系(位置1) + what系(位置2) + その他
-        final_element_list.extend(wh_where_elements)
-        final_element_list.extend(wh_what_elements)
-        final_element_list.extend(other_elements)
+        # Step 3: position順でソートして要素リスト作成
+        sorted_elements = sorted(element_position_map.items(), key=lambda x: x[1])
+        final_element_list = [element_key for element_key, position in sorted_elements]
         
-        print(f"📋 Final element order: {final_element_list}")
+        print(f"📊 最終要素配置:")
+        for element_key, position in sorted_elements:
+            print(f"  position {position}: {element_key}")
+        
+        print(f"📋 要素リスト: {final_element_list}")
         return final_element_list
+    
+    def _extract_word_order_from_sentence(self, sentence, slots):
+        """
+        例文とスロット情報から語順を抽出
+        """
+        import re
+        
+        # 句読点を除去
+        clean_sentence = re.sub(r'[?!.,]', '', sentence)
+        words = clean_sentence.split()
+        
+        word_order = []
+        used_words = set()
+        
+        # 各単語がどのスロットに対応するかマッチング
+        for word in words:
+            best_match = None
+            best_slot = None
+            
+            # 完全一致を優先
+            for slot_name, slot_value in slots.items():
+                if slot_value and word.lower() == slot_value.lower():
+                    if word.lower() not in used_words:
+                        best_match = slot_value
+                        best_slot = slot_name
+                        used_words.add(word.lower())
+                        break
+            
+            # 部分一致をチェック（フレーズの場合）
+            if not best_match:
+                for slot_name, slot_value in slots.items():
+                    if slot_value and word.lower() in slot_value.lower():
+                        # フレーズ全体をマッチング
+                        phrase_words = slot_value.split()
+                        if word == phrase_words[0]:  # フレーズの最初の単語
+                            best_match = slot_value
+                            best_slot = slot_name
+                            # フレーズの全単語を使用済みに
+                            for phrase_word in phrase_words:
+                                used_words.add(phrase_word.lower())
+                            break
+            
+            if best_match and best_slot:
+                word_order.append((best_slot, best_match))
+        
+        return word_order
     
     def _matches_element_type(self, slot_value, element_type):
         """
         スロット値が要素タイプと一致するかチェック
+        新しい要素キー形式に対応: "slot_name_type"
         """
-        if element_type == "standard":
-            return not self.is_wh_word_content(slot_value)
+        if "_" in element_type:
+            slot_name, type_suffix = element_type.split("_", 1)
+            
+            if type_suffix == "standard":
+                return not self.is_wh_word_content(slot_value)
+            else:
+                # 疑問詞タイプ (where, what, etc.)
+                return (self.is_wh_word_content(slot_value) and 
+                       slot_value.lower().startswith(type_suffix.lower()))
         else:
-            # 疑問詞タイプ (where, what, etc.)
-            return self.is_wh_word_content(slot_value) and slot_value.lower().startswith(element_type.lower())
+            # 旧形式の互換性
+            if element_type == "standard":
+                return not self.is_wh_word_content(slot_value)
+            else:
+                return (self.is_wh_word_content(slot_value) and 
+                       slot_value.lower().startswith(element_type.lower()))
     
     def _apply_fallback_system(self, slots):
         """
