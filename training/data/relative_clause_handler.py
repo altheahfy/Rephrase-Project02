@@ -172,6 +172,65 @@ class RelativeClauseHandler:
             
         return analysis
 
+    def _separate_clause_modifiers(self, text: str, modifiers_info: Dict, rel_verb_idx: int, main_clause_start: int) -> Tuple[Dict, Dict]:
+        """修飾語を関係節と主節に分離"""
+        doc = self.nlp(text)
+        rel_modifiers = {}
+        main_modifiers = {}
+        
+        print(f"🔍 修飾語分離: rel_verb_idx={rel_verb_idx}, main_clause_start={main_clause_start}")
+        
+        # AdverbHandlerの結果から個別の修飾語の位置を特定
+        for slot, modifier_text in modifiers_info.items():
+            if not modifier_text:
+                continue
+                
+            # 修飾語の位置を文中で検索
+            modifier_pos = self._find_modifier_position(doc, modifier_text)
+            
+            if modifier_pos is not None:
+                print(f"🔍 修飾語位置特定: '{modifier_text}' at {modifier_pos}")
+                
+                # 位置に基づいて関係節か主節かを判定
+                if rel_verb_idx is not None and modifier_pos < main_clause_start:
+                    # 関係節内の修飾語
+                    if not rel_modifiers.get('M2'):
+                        rel_modifiers['M2'] = modifier_text
+                    elif not rel_modifiers.get('M3'):
+                        rel_modifiers['M3'] = modifier_text
+                    print(f"📍 関係節内修飾語: '{modifier_text}'")
+                else:
+                    # 主節内の修飾語
+                    if not main_modifiers.get('M2'):
+                        main_modifiers['M2'] = modifier_text
+                    elif not main_modifiers.get('M3'):
+                        main_modifiers['M3'] = modifier_text
+                    print(f"📍 主節内修飾語: '{modifier_text}'")
+        
+        return rel_modifiers, main_modifiers
+    
+    def _find_modifier_position(self, doc, modifier_text: str) -> int:
+        """修飾語の文中での位置を特定"""
+        modifier_words = modifier_text.lower().split()
+        
+        # 複合修飾語の場合（"every day"など）
+        if len(modifier_words) > 1:
+            for i in range(len(doc) - len(modifier_words) + 1):
+                match = True
+                for j, word in enumerate(modifier_words):
+                    if i + j >= len(doc) or doc[i + j].text.lower() != word:
+                        match = False
+                        break
+                if match:
+                    return i
+        else:
+            # 単一語の修飾語
+            for i, token in enumerate(doc):
+                if token.text.lower() == modifier_text.lower():
+                    return i
+        
+        return None
+
     def _process_who(self, text: str) -> Dict[str, Any]:
         """who関係節処理（協力アプローチ版）"""
         
@@ -797,15 +856,21 @@ class RelativeClauseHandler:
         # 修飾語情報（協力者 AdverbHandler の結果を活用）
         modifiers_info = analysis.get('modifiers', {})
         print(f"🔍 DEBUG _process_that: 受信したmodifiers_info = {modifiers_info}")
-        sub_m2 = ""
-        sub_m3 = ""
         
-        # 協力者から修飾語情報を取得（M2, M3対応）
-        if modifiers_info and 'M2' in modifiers_info:
-            sub_m2 = modifiers_info['M2']
+        # 修飾語を関係節と主節に分離
+        rel_modifiers, main_modifiers = self._separate_clause_modifiers(
+            text, modifiers_info, rel_verb_idx, main_clause_start
+        )
+        
+        sub_m2 = rel_modifiers.get('M2', "")
+        sub_m3 = rel_modifiers.get('M3', "")
+        
+        print(f"🔍 DEBUG _process_that: 関係節修飾語 = {rel_modifiers}")
+        print(f"🔍 DEBUG _process_that: 主節修飾語 = {main_modifiers}")
+        
+        if sub_m2:
             print(f"🔍 DEBUG _process_that: sub_m2設定 = {sub_m2}")
-        if modifiers_info and 'M3' in modifiers_info:
-            sub_m3 = modifiers_info['M3']
+        if sub_m3:
             print(f"🔍 DEBUG _process_that: sub_m3設定 = {sub_m3}")
         
         # 主節を構築

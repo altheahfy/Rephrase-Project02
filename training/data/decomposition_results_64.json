@@ -22,26 +22,25 @@
       "main_slots": {
         "S": "",
         "V": "works",
-        "O1": "every day",
-        "M2": "efficiently"
+        "M2": "efficiently",
+        "M3": "every day"
       },
       "slots": {
         "S": "",
         "V": "works",
-        "O1": "every day",
-        "M2": "efficiently"
+        "M2": "efficiently",
+        "M3": "every day"
       },
       "sub_slots": {
         "sub-s": "The machine that",
         "sub-aux": "was",
         "sub-v": "maintained",
         "_parent_slot": "S",
-        "sub-m2": "properly",
-        "sub-m3": "efficiently"
+        "sub-m2": "properly"
       },
       "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
       "phase": 3
     },
-    "match": false
+    "match": true
   }
 }

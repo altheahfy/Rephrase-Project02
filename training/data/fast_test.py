@@ -20,20 +20,44 @@ def load_test_data():
         return json.load(f)
 
 def parse_range(case_range: str):
-    """ケース範囲文字列から数値リストを取得"""
+    """ケース範囲文字列から数値リストを取得（複合範囲対応）"""
     # テストデータ読み込み
     with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     test_cases = data['data']
     
+    # プリセット範囲定義
+    presets = {
+        'all': '1-70,83-86',    # 対象例文全て
+        'basic': '1-17',        # 基本5文型
+        'adverbs': '18-42',     # 基本副詞
+        'relative': '56,58,64', # 関係節
+        'passive': '66-69',     # 受動態
+        'tell': '83-86'         # tellグループ
+    }
+    
+    # プリセット確認
+    if case_range in presets:
+        case_range = presets[case_range]
+    
     if case_range:
-        if '-' in case_range:
-            start, end = map(int, case_range.split('-'))
-            target_cases = [int(i) for i in range(start, end + 1) if str(i) in test_cases]
-        elif ',' in case_range:
-            target_cases = [int(c.strip()) for c in case_range.split(',') if c.strip() in test_cases]
-        else:
-            target_cases = [int(case_range)] if case_range in test_cases else []
+        target_cases = []
+        
+        # カンマで分割して各部分を処理
+        for part in case_range.split(','):
+            part = part.strip()
+            
+            if '-' in part:
+                # 範囲指定 (例: "1-70")
+                start, end = map(int, part.split('-'))
+                target_cases.extend([int(i) for i in range(start, end + 1) if str(i) in test_cases])
+            else:
+                # 単一ケース (例: "83")
+                if part in test_cases:
+                    target_cases.append(int(part))
+        
+        # 重複除去とソート
+        target_cases = sorted(list(set(target_cases)))
     else:
         target_cases = list(map(int, test_cases.keys()))
     
@@ -50,17 +74,8 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
     from central_controller import CentralController
     controller = CentralController()
     
-    # 対象ケース決定
-    if case_range:
-        if '-' in case_range:
-            start, end = map(int, case_range.split('-'))
-            target_cases = [str(i) for i in range(start, end + 1) if str(i) in test_cases]
-        elif ',' in case_range:
-            target_cases = [c.strip() for c in case_range.split(',') if c.strip() in test_cases]
-        else:
-            target_cases = [case_range] if case_range in test_cases else []
-    else:
-        target_cases = list(test_cases.keys())
+    # 対象ケース決定（parse_range関数を使用）
+    target_cases = parse_range(case_range)
     
     print(f"🎯 分解結果出力実行: {len(target_cases)} ケース")
     
@@ -69,7 +84,7 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
     failed = 0
     
     for case_id in target_cases:
-        case_data = test_cases[case_id]
+        case_data = test_cases[str(case_id)]  # 文字列キーに変換
         sentence = case_data['sentence']
         expected = case_data['expected']
         

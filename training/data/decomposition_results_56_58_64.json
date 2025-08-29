@@ -1,0 +1,130 @@
+{
+  "case_56": {
+    "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-v": "repaired",
+        "sub-aux": "was",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The car that was quickly repaired yesterday runs smoothly.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-aux": "was",
+        "sub-v": "repaired",
+        "_parent_slot": "S",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  },
+  "case_58": {
+    "sentence": "The student who studies diligently always succeeds academically.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "sub-m2": "diligently",
+        "sub-m3": "always",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The student who studies diligently always succeeds academically.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "_parent_slot": "S",
+        "sub-m2": "diligently",
+        "sub-m3": "always"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  },
+  "case_64": {
+    "sentence": "The machine that was properly maintained works efficiently every day.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "sub-m2": "properly",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The machine that was properly maintained works efficiently every day.",
+      "success": true,
+      "main_slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "_parent_slot": "S",
+        "sub-m2": "properly"
+      },
+      "grammar_pattern": "relative_clause + basic_five_pattern + passive_voice",
+      "phase": 3
+    },
+    "match": true
+  }
+}

@@ -208,6 +208,29 @@ class AdverbHandler:
             if token.pos_ in ['VERB', 'AUX'] and self._is_main_clause_verb(doc, i):
                 break
             
+            # 時間表現の特別処理（"every day", "last week", "next month"など）
+            if token.text.lower() in ['every', 'each', 'last', 'next', 'this', 'that'] and i + 1 < len(doc):
+                next_token = doc[i + 1]
+                # 時間名詞をチェック
+                time_nouns = ['day', 'week', 'month', 'year', 'morning', 'afternoon', 'evening', 'night', 'time', 'moment']
+                if next_token.text.lower() in time_nouns:
+                    time_phrase = f"{token.text} {next_token.text}"
+                    modifier_info = {
+                        'text': time_phrase,
+                        'pos': 'ADV',  # 時間副詞句として扱う
+                        'tag': 'RB',
+                        'idx': i,
+                        'type': 'temporal_phrase',
+                        'phrase_end': i + 1,
+                        'position': 'post-verb',
+                        'method': 'compound_detection'
+                    }
+                    modifiers.append(modifier_info)
+                    print(f"🔍 時間副詞句検出: {time_phrase}")
+                    # 前置詞句の残りの部分をスキップ
+                    i = i + 2
+                    continue
+            
             # 修飾語として識別（保守的判定）
             if self._is_modifier(token):
                 # 前置詞句の場合は全体をチェック
@@ -495,6 +518,16 @@ class AdverbHandler:
                     current_idx = modifier_idx
                     for part in phrase_parts:
                         if current_idx < len(doc) and doc[current_idx].text == part:
+                            modifier_indices.add(current_idx)
+                            current_idx += 1
+                elif modifier['type'] == 'temporal_phrase':
+                    # 時間副詞句のすべてのトークンを削除対象にする（"every day"など）
+                    phrase_parts = modifier_text.split()
+                    current_idx = modifier_idx
+                    for part in phrase_parts:
+                        if current_idx < len(doc) and doc[current_idx].text.lower() == part.lower():
+                            modifier_indices.add(current_idx)
+                            current_idx += 1
                             modifier_indices.add(current_idx)
                             current_idx += 1
                 elif ' ' in modifier_text:
