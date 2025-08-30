@@ -1,0 +1,225 @@
+{
+  "metadata": {
+    "processing_method": "CentralController → PureDataDriven (正しい実装)",
+    "target_group": "tell",
+    "total_processed": 4
+  },
+  "results": [
+    {
+      "key": "83",
+      "sentence": "What did he tell her at the store?",
+      "decomposed_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "absolute_order_result": {
+        "success": true,
+        "v_group_key": "tell",
+        "standard_order": [
+          "O2_0",
+          "Aux_1",
+          "S_2",
+          "V_3",
+          "O1_4",
+          "Aux_0",
+          "S_1",
+          "V_2",
+          "O1_3",
+          "O2_4",
+          "M2_0"
+        ],
+        "ordered_slots": {
+          "1": "What",
+          "2": "did",
+          "3": "he",
+          "4": "tell",
+          "5": "her"
+        },
+        "confidence": 1.0,
+        "analysis_stats": {
+          "total_examples": 4,
+          "valid_patterns": 1,
+          "most_common_pattern": [
+            "O2_0",
+            "Aux_1",
+            "S_2",
+            "V_3",
+            "O1_4",
+            "Aux_0",
+            "S_1",
+            "V_2",
+            "O1_3",
+            "O2_4",
+            "M2_0"
+          ]
+        }
+      }
+    },
+    {
+      "key": "84",
+      "sentence": "Did he tell her a secret there?",
+      "decomposed_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "absolute_order_result": {
+        "success": true,
+        "v_group_key": "tell",
+        "standard_order": [
+          "O2_0",
+          "Aux_1",
+          "S_2",
+          "V_3",
+          "O1_4",
+          "Aux_0",
+          "S_1",
+          "V_2",
+          "O1_3",
+          "O2_4",
+          "M2_0"
+        ],
+        "ordered_slots": {
+          "6": "Did",
+          "7": "he",
+          "8": "tell",
+          "9": "her",
+          "10": "a secret"
+        },
+        "confidence": 1.0,
+        "analysis_stats": {
+          "total_examples": 4,
+          "valid_patterns": 1,
+          "most_common_pattern": [
+            "O2_0",
+            "Aux_1",
+            "S_2",
+            "V_3",
+            "O1_4",
+            "Aux_0",
+            "S_1",
+            "V_2",
+            "O1_3",
+            "O2_4",
+            "M2_0"
+          ]
+        }
+      }
+    },
+    {
+      "key": "85",
+      "sentence": "Did I tell him a truth in the kitchen?",
+      "decomposed_slots": {
+        "Aux": "Did",
+        "S": "I",
+        "V": "tell",
+        "O1": "him",
+        "O2": "a truth",
+        "M2": "in the kitchen"
+      },
+      "absolute_order_result": {
+        "success": true,
+        "v_group_key": "tell",
+        "standard_order": [
+          "O2_0",
+          "Aux_1",
+          "S_2",
+          "V_3",
+          "O1_4",
+          "Aux_0",
+          "S_1",
+          "V_2",
+          "O1_3",
+          "O2_4",
+          "M2_0"
+        ],
+        "ordered_slots": {
+          "6": "Did",
+          "7": "I",
+          "8": "tell",
+          "9": "him",
+          "10": "a truth"
+        },
+        "confidence": 1.0,
+        "analysis_stats": {
+          "total_examples": 4,
+          "valid_patterns": 1,
+          "most_common_pattern": [
+            "O2_0",
+            "Aux_1",
+            "S_2",
+            "V_3",
+            "O1_4",
+            "Aux_0",
+            "S_1",
+            "V_2",
+            "O1_3",
+            "O2_4",
+            "M2_0"
+          ]
+        }
+      }
+    },
+    {
+      "key": "86",
+      "sentence": "Where did you tell me a story?",
+      "decomposed_slots": {
+        "M2": "Where",
+        "Aux": "did",
+        "S": "you",
+        "V": "tell",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "absolute_order_result": {
+        "success": true,
+        "v_group_key": "tell",
+        "standard_order": [
+          "O2_0",
+          "Aux_1",
+          "S_2",
+          "V_3",
+          "O1_4",
+          "Aux_0",
+          "S_1",
+          "V_2",
+          "O1_3",
+          "O2_4",
+          "M2_0"
+        ],
+        "ordered_slots": {
+          "11": "Where",
+          "2": "did",
+          "3": "you",
+          "4": "tell",
+          "5": "me"
+        },
+        "confidence": 1.0,
+        "analysis_stats": {
+          "total_examples": 4,
+          "valid_patterns": 1,
+          "most_common_pattern": [
+            "O2_0",
+            "Aux_1",
+            "S_2",
+            "V_3",
+            "O1_4",
+            "Aux_0",
+            "S_1",
+            "V_2",
+            "O1_3",
+            "O2_4",
+            "M2_0"
+          ]
+        }
+      }
+    }
+  ]
+}
