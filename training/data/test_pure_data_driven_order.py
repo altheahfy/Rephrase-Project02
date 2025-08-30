@@ -6,7 +6,7 @@
 """
 
 import json
-from pure_data_driven_order_manager import AdverbPositionAnalyzer
+from pure_data_driven_order_manager import PureDataDrivenOrderManager
 
 def test_action_group():
     """actionグループの修正版テスト"""
@@ -44,7 +44,7 @@ def test_action_group():
         }
     ]
     
-    analyzer = AdverbPositionAnalyzer()
+    analyzer = PureDataDrivenOrderManager()
     
     print(f"\n📚 actionグループ例文 ({len(action_sentences)}件):")
     for i, data in enumerate(action_sentences, 1):
@@ -55,7 +55,7 @@ def test_action_group():
     results = analyzer.process_adverb_group('action_fixed', action_sentences)
     
     # 結果を保存
-    output_file = 'action_group_fixed_results.json'
+    output_file = 'results/action_group_fixed_results.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     

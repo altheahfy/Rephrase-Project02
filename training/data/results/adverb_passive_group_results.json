@@ -10,8 +10,8 @@
     "ordered_slots": {
       "1": "The cake",
       "2": "is being",
-      "3": "baked",
-      "4": "by my mother"
+      "4": "baked",
+      "5": "by my mother"
     }
   },
   {
@@ -25,8 +25,8 @@
     "ordered_slots": {
       "1": "The cake",
       "2": "was",
-      "3": "eaten",
-      "4": "by the children"
+      "4": "eaten",
+      "5": "by the children"
     }
   },
   {
@@ -40,8 +40,8 @@
     "ordered_slots": {
       "1": "The door",
       "2": "was",
-      "3": "opened",
-      "4": "by the key"
+      "4": "opened",
+      "5": "by the key"
     }
   },
   {
@@ -55,8 +55,8 @@
     "ordered_slots": {
       "1": "The car",
       "2": "was",
-      "3": "repaired",
-      "4": "last week"
+      "4": "repaired",
+      "5": "last week"
     }
   },
   {
@@ -71,9 +71,9 @@
     "ordered_slots": {
       "1": "The window",
       "2": "was",
-      "3": "opened",
-      "4": "gently",
-      "6": "by the morning breeze"
+      "4": "opened",
+      "3": "gently",
+      "7": "by the morning breeze"
     }
   },
   {
@@ -88,9 +88,9 @@
     "ordered_slots": {
       "1": "The message",
       "2": "is being",
-      "3": "written",
-      "4": "carefully",
-      "6": "by the manager"
+      "4": "written",
+      "3": "carefully",
+      "7": "by the manager"
     }
   },
   {
@@ -103,9 +103,9 @@
     },
     "ordered_slots": {
       "1": "He",
-      "3": "opened",
-      "5": "the door",
-      "4": "slowly"
+      "4": "opened",
+      "6": "the door",
+      "3": "slowly"
     }
   }
 ]

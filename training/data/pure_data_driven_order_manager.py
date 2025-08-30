@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 """
 副詞位置分析専用システム
-様々な位置に副詞が登場するグループをまとめて処理
+Pure Data-Driven Absolute Order Manager
+完全にデータ駆動型の汎用語順分析システム
 """
 
 import json
-from central_controller import CentralController
 
-class AdverbPositionAnalyzer:
+class PureDataDrivenOrderManager:
     """
     副詞位置分析システム
-    M1, M2, M3など様々な位置の副詞を含むグループを分析
+    Pure Data-Driven: 実際の例文データから語順パターンを学習
+    汎用性: 任意のスロット構造と例文群に対応
     """
     
     def __init__(self):
-        self.controller = CentralController()
+        # 汎用疑問詞セット（拡張可能）
         self.question_words = {'What', 'Where', 'When', 'Why', 'How', 'Who', 'Which', 'Whose', 'Whom'}
         
     def extract_adverb_groups(self):
@@ -485,7 +486,7 @@ def main():
     """メイン関数 - 副詞を含むグループを一括処理"""
     print("🚀 副詞位置分析システム開始")
     
-    analyzer = AdverbPositionAnalyzer()
+    analyzer = PureDataDrivenOrderManager()
     
     # 副詞を含むグループを抽出
     adverb_groups = analyzer.extract_adverb_groups()
@@ -507,7 +508,7 @@ def main():
             all_results[v_group_key] = results
             
             # 結果を保存
-            output_file = f'adverb_{v_group_key}_group_results.json'
+            output_file = f'results/adverb_{v_group_key}_group_results.json'
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(results, f, ensure_ascii=False, indent=2)
             
@@ -525,12 +526,12 @@ def main():
     
     # 全結果を統合保存
     if all_results:
-        with open('all_adverb_groups_analysis.json', 'w', encoding='utf-8') as f:
+        with open('results/all_adverb_groups_analysis.json', 'w', encoding='utf-8') as f:
             json.dump(all_results, f, ensure_ascii=False, indent=2)
         
         print(f"\n🎉 全副詞グループ分析完了")
         print(f"📊 分析したグループ: {list(all_results.keys())}")
-        print(f"💾 統合結果を all_adverb_groups_analysis.json に保存しました")
+        print(f"💾 統合結果を results/all_adverb_groups_analysis.json に保存しました")
 
 if __name__ == "__main__":
     main()

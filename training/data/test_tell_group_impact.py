@@ -9,7 +9,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from adverb_position_analyzer import AdverbPositionAnalyzer
+from pure_data_driven_order_manager import PureDataDrivenOrderManager
 
 def test_tell_group_impact():
     """tellグループへの影響をテスト"""
@@ -42,7 +42,7 @@ def test_tell_group_impact():
         print(f"     スロット: {data['slots']}")
     
     # AdverbPositionAnalyzerで処理
-    analyzer = AdverbPositionAnalyzer()
+    analyzer = PureDataDrivenOrderManager()
     
     # tellグループを処理
     print(f"\n🔍 tellグループの副詞位置分析開始")

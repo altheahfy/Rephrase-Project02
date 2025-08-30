@@ -8,10 +8,10 @@
       "M3": "for exams"
     },
     "ordered_slots": {
-      "1": "The students",
-      "3": "study",
-      "4": "hard",
-      "5": "for exams"
+      "2": "The students",
+      "4": "study",
+      "5": "hard",
+      "6": "for exams"
     }
   },
   {
@@ -22,9 +22,9 @@
       "M2": "Tomorrow"
     },
     "ordered_slots": {
-      "1": "I",
-      "3": "study",
-      "4": "Tomorrow"
+      "2": "I",
+      "4": "study",
+      "1": "Tomorrow"
     }
   },
   {
@@ -36,10 +36,10 @@
       "M2": "here"
     },
     "ordered_slots": {
-      "1": "Students",
-      "3": "study",
-      "2": "often",
-      "4": "here"
+      "2": "Students",
+      "4": "study",
+      "3": "often",
+      "5": "here"
     }
   }
 ]
