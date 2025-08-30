@@ -249,36 +249,54 @@ class IntegratedTestSystem:
         if isinstance(data, dict):
             # central_controllerの出力形式
             if "main_slots" in data and "success" in data:
-                return {
+                result = {
                     "main_slots": data.get("main_slots", {}),
                     "sub_slots": data.get("sub_slots", {})
                 }
+                # ordered_slotsがあれば保存
+                if "ordered_slots" in data:
+                    result["ordered_slots"] = data["ordered_slots"]
+                return result
             
             # すでにnested形式の場合（expected値）
             if "main_slots" in data and "sub_slots" in data:
-                return data
+                result = data.copy()
+                # ordered_slotsがあれば保存
+                if "ordered_slots" in data:
+                    result["ordered_slots"] = data["ordered_slots"]
+                return result
             
             # flat形式をnested形式に変換（actual値）
             if "slots" in data and "sub_slots" in data:
-                return {
+                result = {
                     "main_slots": data.get("slots", {}),
                     "sub_slots": data.get("sub_slots", {})
                 }
+                # ordered_slotsがあれば保存
+                if "ordered_slots" in data:
+                    result["ordered_slots"] = data["ordered_slots"]
+                return result
             
             # 直接スロット形式の場合
             main_slots = {}
             sub_slots = {}
+            ordered_slots = {}
             
             for key, value in data.items():
                 if key.startswith("sub-"):
                     sub_slots[key] = value
                 elif key in ["S", "V", "O1", "O2", "C1", "C2", "Aux", "M1", "M2", "M3", "Adv"]:
                     main_slots[key] = value
+                elif key == "ordered_slots":
+                    ordered_slots = value
             
-            return {
+            result = {
                 "main_slots": main_slots,
                 "sub_slots": sub_slots
             }
+            if ordered_slots:
+                result["ordered_slots"] = ordered_slots
+            return result
         
         return {"main_slots": {}, "sub_slots": {}}
 

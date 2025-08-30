@@ -1,0 +1,32 @@
+{
+  "test_info": {
+    "timestamp": "20250830_165946",
+    "total_cases": 1,
+    "passed": 1,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_5",
+      "sentence": "Time passes.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}

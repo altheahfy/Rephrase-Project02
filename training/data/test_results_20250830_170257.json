@@ -1,0 +1,39 @@
+{
+  "test_info": {
+    "timestamp": "20250830_170257",
+    "total_cases": 1,
+    "passed": 1,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "test_details": [
+    {
+      "case_id": "case_1",
+      "sentence": "The car is red.",
+      "status": "passed",
+      "match": true,
+      "actual_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {},
+        "ordered_slots": {
+          "1": "The car",
+          "2": "is",
+          "3": "red"
+        }
+      },
+      "expected_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "errors": []
+    }
+  ]
+}
