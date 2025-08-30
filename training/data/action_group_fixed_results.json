@@ -9,7 +9,7 @@
     "ordered_slots": {
       "2": "She",
       "4": "sings",
-      "5": "beautifully"
+      "6": "beautifully"
     }
   },
   {
@@ -24,9 +24,9 @@
     "ordered_slots": {
       "2": "We",
       "4": "eat",
-      "6": "breakfast",
+      "5": "breakfast",
       "3": "always",
-      "5": "together"
+      "6": "together"
     }
   },
   {
@@ -41,7 +41,7 @@
       "2": "The cat",
       "4": "sat",
       "3": "quietly",
-      "5": "on the mat"
+      "6": "on the mat"
     }
   },
   {
@@ -55,8 +55,8 @@
     "ordered_slots": {
       "2": "She",
       "4": "reads",
-      "6": "books",
-      "5": "carefully"
+      "5": "books",
+      "3": "carefully"
     }
   },
   {
@@ -69,7 +69,7 @@
     "ordered_slots": {
       "2": "They",
       "4": "run",
-      "5": "fast"
+      "6": "fast"
     }
   },
   {
@@ -84,7 +84,7 @@
       "2": "she",
       "4": "works",
       "1": "Actually",
-      "5": "very hard"
+      "6": "very hard"
     }
   },
   {
@@ -100,7 +100,7 @@
       "2": "he",
       "4": "jogs",
       "1": "Every morning",
-      "5": "slowly",
+      "6": "slowly",
       "7": "in the park"
     }
   }
