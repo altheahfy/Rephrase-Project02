@@ -194,9 +194,37 @@ class HumanLikeOrderMapper:
                 new_row["positions"][new_pos] = element
                 print(f"  📝 例文{new_row['sentence_num']}: {element} を位置{old_pos}→{new_pos}に移動")
             
+            # 空きスロットを詰める処理
+            self._fill_gaps(new_row)
+            
             adjusted_grid.append(new_row)
         
         return adjusted_grid
+    
+    def _fill_gaps(self, row):
+        """空きスロットを詰める"""
+        positions = row["positions"]
+        if not positions:
+            return
+        
+        # 現在の位置をソート
+        sorted_positions = sorted(positions.keys())
+        
+        # 連続した位置に再配置
+        new_positions = {}
+        new_pos = 1
+        
+        for old_pos in sorted_positions:
+            element = positions[old_pos]
+            new_positions[new_pos] = element
+            
+            # 位置が変わった場合のログ
+            if new_pos != old_pos:
+                print(f"    🔧 例文{row['sentence_num']}: {element} を位置{old_pos}→{new_pos}に詰める")
+            
+            new_pos += 1
+        
+        row["positions"] = new_positions
     
     def display_final_grid(self, adjusted_grid):
         """最終調整済みグリッドを表示"""
