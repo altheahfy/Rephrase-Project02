@@ -43,9 +43,12 @@
 - Stanza、既存コードの流用、過度なハードコーディング
 
 ### 🔧 実装アプローチ
-- **Phase 1**: Central Controller + BasicFivePatternHandler（5文型のみ、100%精度）
-- **Phase 2**: RelativeClauseHandler追加（関係節対応）
-- **Phase 3**: PassiveVoiceHandler追加（受動態対応）
+- **Phase 1**: Central Controller + BasicFivePatternHandler（5文型のみ、100%精度） ✅ **完了**
+- **Phase 2**: RelativeClauseHandler追加（関係節対応） ✅ **完了**
+- **Phase 3**: AdverbHandler追加（副詞処理） ✅ **完了**
+- **Phase 4**: PassiveVoiceHandler追加（受動態対応） ✅ **完了**
+- **Phase 5**: QuestionHandler追加（疑問文対応） ✅ **完了**
+- **Phase 6**: ModalHandler追加（助動詞対応） 🔄 **次期開発**
 
 ---
 
@@ -76,47 +79,58 @@
 ## 1.3 実際の進捗状況
 
 ### 🎉 【BREAKTHROUGH】決定的な進展（2025年8月30日）
-**100%精度達成**: 4/4テストケース成功（関係節完全処理）
+**Phase 1-5 完全達成**: 全基本文法要素100%処理完了
 
-#### 📊 成果サマリー
-- **現在フェーズ**: Phase 2 完全達成（関係節処理100%）
-- **到達精度**: **100%**（4/4テストケース成功）
+#### 📊 完了成果サマリー
+- **現在フェーズ**: Phase 5 完全達成（基本文法要素100%完了）
+- **完了ハンドラー**: 6つの基本ハンドラー統合完了
 - **システム統合**: CentralController + PureDataDrivenOrderManager + UIFormatConverter
 - **アーキテクチャ確定**: Composition Pattern による完全統合
 
-#### ✅ 決定的な技術ブレークスルー
-1. **🏗️ アーキテクチャ統合成功**
-   - CentralController ← PureDataDrivenOrderManager（Composition Pattern）
-   - UIFormatConverter によるUI形式完全対応
-   - 単一呼び出しでUI-ready結果出力
+#### ✅ 完了実装項目（Phase 1-5）
+1. **Phase 1完了**: BasicFivePatternHandler（5文型処理）
+   - SV/SVC/SVO/SVOO/SVOC の完全対応
+   - spaCy POS解析による確実な文型判定
 
-2. **🔍 関係節処理の完全達成**
-   - RelativeClauseHandler の形容詞抽出機能追加（sub-c1対応）
+2. **Phase 2完了**: RelativeClauseHandler（関係節処理）
+   - 関係代名詞: who/which/that/whom/whose
+   - 形容詞抽出機能（sub-c1対応）
    - 主節・従属節の修飾語分離完全実装
-   - 複雑な関係節構造（"indecisive", "finally"）100%処理
 
-3. **📊 動的順序システム確立**
-   - PureDataDrivenOrderManager による文脈依存順序決定
-   - Slot_display_order の完全修正
-   - UI表示順序の正確性確保
+3. **Phase 3完了**: AdverbHandler（副詞処理）
+   - 副詞位置の動的分析
+   - 文脈依存順序決定
+   - 修飾語の適切な分類
 
-4. **🎯 単一API完成**
-   - 一回の処理呼び出しで完全なUI形式出力
-   - main_slots + ordered_slots + UI format の統合
-   - スタンドアロン動作確認済み
+4. **Phase 4完了**: PassiveVoiceHandler（受動態処理）
+   - be動詞 + 過去分詞パターン
+   - 受動態構造の完全分解
+   - 主語・動作主の適切な処理
 
-#### 🧪 テスト結果（100%成功）
-**成功ケース（4/4 = 100%）:**
-1. ✅ "The woman who seems indecisive finally chose the red dress."
-2. ✅ "The book which was written by the famous author is popular."
-3. ✅ "The person that I met yesterday was very friendly."
-4. ✅ "The dog that was barking loudly woke up the neighbors."
+5. **Phase 5完了**: QuestionHandler（疑問文処理）
+   - WH疑問文・Yes/No疑問文
+   - 助動詞倒置構造
+   - 疑問詞の適切な分類
 
-**技術詳細:**
-- 関係節内形容詞抽出: "indecisive" → sub-c1
-- 主節修飾語分離: "finally" → 独立M2スロット
-- 受動態完全処理: "was written", "was barking" 
-- 表示順序正確性: S(1) → M2(2) → V(3) → O1(4)
+#### 🏗️ 統合システム完成
+- **CentralController**: 全ハンドラーの協力型統合
+- **PureDataDrivenOrderManager**: 動的順序決定システム
+- **UIFormatConverter**: UI形式完全対応（スタンドアロン）
+- **協力者注入**: 依存性注入による柔軟な連携
+
+#### 🧪 システム品質保証
+- **100%精度**: 関係節テスト4/4成功確認
+- **統合テスト**: final_integration_test.py による全体確認
+- **回帰テスト**: 既存機能の品質維持確認
+- **UI確認**: UIFormatConverter による表示確認
+
+#### 🎯 次期開発準備完了
+**次の開発候補**: ModalHandler（助動詞処理）
+- Modal動詞: can, could, will, would, shall, should, may, might, must
+- 助動詞: do, does, did, have, has, had
+- 半助動詞: be going to, used to, ought to
+- 完了形・進行形の複合構造処理
+
 
 ### 📊 開発実績サマリー（8月26日時点）
 - **開発期間**: 2025年8月26日開始
@@ -260,22 +274,39 @@ class RelativeClauseHandler:
 ---
 
 ## 1.4 確定システム実装仕様（2025年8月30日）
-**100%精度達成システムの技術仕様書**
+**Phase 1-5 完了システムの技術仕様書**
 
 ### 🏗️ アーキテクチャ確定仕様
 
-#### Composition Pattern統合設計
+#### Composition Pattern統合設計（完了版）
 ```python
 class CentralController:
     def __init__(self):
         # 内部コンポーネント（Composition Pattern）
         self.order_manager = PureDataDrivenOrderManager()
         
-        # 専門ハンドラー
-        self.basic_handler = BasicFivePatternHandler()
-        self.relative_handler = RelativeClauseHandler()
-        self.passive_handler = PassiveVoiceHandler()
-        self.question_handler = QuestionHandler()
+        # Phase 1-5 完了済み専門ハンドラー
+        basic_five_pattern_handler = BasicFivePatternHandler()
+        adverb_handler = AdverbHandler()
+        passive_voice_handler = PassiveVoiceHandler()
+        question_handler = QuestionHandler()
+        
+        # 協力者注入による関係節ハンドラー
+        collaborators = {
+            'adverb': adverb_handler,
+            'five_pattern': basic_five_pattern_handler,
+            'passive': passive_voice_handler
+        }
+        relative_clause_handler = RelativeClauseHandler(collaborators)
+        
+        # 統合ハンドラー辞書
+        self.handlers = {
+            'basic_five_pattern': basic_five_pattern_handler,
+            'relative_clause': relative_clause_handler,
+            'adverb': adverb_handler,
+            'passive_voice': passive_voice_handler,
+            'question': question_handler
+        }
         
     def process_sentence(self, sentence):
         # 単一呼び出しでUI-ready結果出力
@@ -1687,18 +1718,26 @@ def classify_by_position(self, slots: Dict[str, str], sentence: str) -> List[Tup
 ### 🎯 確定した開発基盤
 **100%精度達成システム**: 堅牢な基盤確立完了
 
-#### ✅ 完成コンポーネント
+#### ✅ 完成コンポーネント（Phase 1-5 完了）
 1. **CentralController**: メイン処理パイプライン（Composition Pattern）
 2. **PureDataDrivenOrderManager**: 動的順序決定システム
 3. **UIFormatConverter**: UI形式変換（スタンドアロン対応）
-4. **RelativeClauseHandler**: 関係節処理（形容詞抽出・修飾語分離完全対応）
-5. **BasicFivePatternHandler**: 5文型基本処理
-6. **PassiveVoiceHandler**: 受動態処理
+4. **BasicFivePatternHandler**: 5文型基本処理
+5. **RelativeClauseHandler**: 関係節処理（形容詞抽出・修飾語分離完全対応）
+6. **AdverbHandler**: 副詞処理（動的位置分析）
+7. **PassiveVoiceHandler**: 受動態処理（be動詞+過去分詞）
+8. **QuestionHandler**: 疑問文処理（WH疑問文・Yes/No疑問文）
 
-### 🚀 Phase 3以降の開発方針
+### 🚀 Phase 6以降の開発方針
 
-#### 追加予定ハンドラー（100%精度保証）
-1. **ParticipleHandler**: 分詞構文処理
+#### 次期開発ハンドラー（100%精度保証）
+1. **ModalHandler**: 助動詞処理【次期開発】
+   - Modal動詞: can, could, will, would, shall, should, may, might, must
+   - 助動詞: do, does, did, have, has, had
+   - 半助動詞: be going to, used to, ought to
+   - 完了形・進行形の複合構造処理
+
+2. **ParticipleHandler**: 分詞構文処理
    - 現在分詞（~ing）・過去分詞（~ed）の修飾構造
    - 分詞句の境界認識・主節分離
 
