@@ -222,12 +222,36 @@ class PureDataDrivenAbsoluteOrderManager:
                             element_key = elem_key
                             break
                     
+                    print(f"[DEBUG] スロット {slot_type}={slot_value} → 要素キー: {element_key}")
+                    
                     if element_key:
                         # まだ列が割り当てられていない場合、新しい列を割り当て
                         if element_key not in column_assignments:
-                            # 使用されていない最小の列番号を見つける
-                            col_num = 0
-                            while col_num in used_columns or col_num in column_assignments.values():
+                            # 優先順位による列割り当て
+                            if element_key == 'M2_question':
+                                col_num = 0  # 疑問詞M2は最初
+                            elif element_key == 'O2_question':
+                                col_num = 1  # 疑問詞O2は2番目
+                            elif element_key == 'Aux':
+                                col_num = 2  # 助動詞は3番目
+                            elif element_key == 'S':
+                                col_num = 3  # 主語は4番目
+                            elif element_key == 'V':
+                                col_num = 4  # 動詞は5番目
+                            elif element_key == 'O1':
+                                col_num = 5  # 間接目的語は6番目
+                            elif element_key == 'O2_normal':
+                                col_num = 6  # 通常O2は7番目
+                            elif element_key == 'M2_normal':
+                                col_num = 7  # 通常M2は8番目
+                            else:
+                                # その他は使用されていない最小番号
+                                col_num = 0
+                                while col_num in column_assignments.values():
+                                    col_num += 1
+                            
+                            # 既に使用されている場合は次の番号を探す
+                            while col_num in column_assignments.values():
                                 col_num += 1
                             column_assignments[element_key] = col_num
                         

@@ -20,33 +20,33 @@
         "success": true,
         "v_group_key": "tell",
         "standard_order": [
+          "M2_question",
           "O2_question",
           "Aux",
           "S",
           "V",
           "O1",
-          "O2_normal",
-          "M2_question"
+          "O2_normal"
         ],
         "ordered_slots": {
-          "1": "What",
-          "2": "did",
-          "3": "he",
-          "4": "tell",
-          "5": "her"
+          "2": "What",
+          "3": "did",
+          "4": "he",
+          "5": "tell",
+          "6": "her"
         },
         "confidence": 1.0,
         "analysis_stats": {
           "total_examples": 4,
           "valid_patterns": 1,
           "most_common_pattern": [
+            "M2_question",
             "O2_question",
             "Aux",
             "S",
             "V",
             "O1",
-            "O2_normal",
-            "M2_question"
+            "O2_normal"
           ]
         }
       }
@@ -66,33 +66,33 @@
         "success": true,
         "v_group_key": "tell",
         "standard_order": [
+          "M2_question",
           "O2_question",
           "Aux",
           "S",
           "V",
           "O1",
-          "O2_normal",
-          "M2_question"
+          "O2_normal"
         ],
         "ordered_slots": {
-          "2": "Did",
-          "3": "he",
-          "4": "tell",
-          "5": "her",
-          "6": "a secret"
+          "3": "Did",
+          "4": "he",
+          "5": "tell",
+          "6": "her",
+          "7": "a secret"
         },
         "confidence": 1.0,
         "analysis_stats": {
           "total_examples": 4,
           "valid_patterns": 1,
           "most_common_pattern": [
+            "M2_question",
             "O2_question",
             "Aux",
             "S",
             "V",
             "O1",
-            "O2_normal",
-            "M2_question"
+            "O2_normal"
           ]
         }
       }
@@ -112,33 +112,33 @@
         "success": true,
         "v_group_key": "tell",
         "standard_order": [
+          "M2_question",
           "O2_question",
           "Aux",
           "S",
           "V",
           "O1",
-          "O2_normal",
-          "M2_question"
+          "O2_normal"
         ],
         "ordered_slots": {
-          "2": "Did",
-          "3": "I",
-          "4": "tell",
-          "5": "him",
-          "6": "a truth"
+          "3": "Did",
+          "4": "I",
+          "5": "tell",
+          "6": "him",
+          "7": "a truth"
         },
         "confidence": 1.0,
         "analysis_stats": {
           "total_examples": 4,
           "valid_patterns": 1,
           "most_common_pattern": [
+            "M2_question",
             "O2_question",
             "Aux",
             "S",
             "V",
             "O1",
-            "O2_normal",
-            "M2_question"
+            "O2_normal"
           ]
         }
       }
@@ -158,34 +158,34 @@
         "success": true,
         "v_group_key": "tell",
         "standard_order": [
+          "M2_question",
           "O2_question",
           "Aux",
           "S",
           "V",
           "O1",
-          "O2_normal",
-          "M2_question"
+          "O2_normal"
         ],
         "ordered_slots": {
-          "7": "Where",
-          "2": "did",
-          "3": "you",
-          "4": "tell",
-          "5": "me",
-          "6": "a story"
+          "1": "Where",
+          "3": "did",
+          "4": "you",
+          "5": "tell",
+          "6": "me",
+          "7": "a story"
         },
         "confidence": 1.0,
         "analysis_stats": {
           "total_examples": 4,
           "valid_patterns": 1,
           "most_common_pattern": [
+            "M2_question",
             "O2_question",
             "Aux",
             "S",
             "V",
             "O1",
-            "O2_normal",
-            "M2_question"
+            "O2_normal"
           ]
         }
       }

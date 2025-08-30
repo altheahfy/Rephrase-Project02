@@ -1,0 +1,78 @@
+[
+  {
+    "sentence": "What did he tell her at the store?",
+    "original_slots": {
+      "O2": "What",
+      "Aux": "did",
+      "S": "he",
+      "V": "tell",
+      "O1": "her",
+      "M2": "at the store"
+    },
+    "ordered_slots": {
+      "4": "What",
+      "1": "did",
+      "2": "he",
+      "3": "tell",
+      "5": "her",
+      "6": "at the store"
+    }
+  },
+  {
+    "sentence": "Did he tell her a secret there?",
+    "original_slots": {
+      "Aux": "Did",
+      "S": "he",
+      "V": "tell",
+      "O1": "her",
+      "O2": "a secret",
+      "M2": "there"
+    },
+    "ordered_slots": {
+      "1": "Did",
+      "2": "he",
+      "3": "tell",
+      "5": "her",
+      "4": "a secret",
+      "6": "there"
+    }
+  },
+  {
+    "sentence": "Did I tell him a truth in the kitchen?",
+    "original_slots": {
+      "Aux": "Did",
+      "S": "I",
+      "V": "tell",
+      "O1": "him",
+      "O2": "a truth",
+      "M2": "in the kitchen"
+    },
+    "ordered_slots": {
+      "1": "Did",
+      "2": "I",
+      "3": "tell",
+      "5": "him",
+      "4": "a truth",
+      "6": "in the kitchen"
+    }
+  },
+  {
+    "sentence": "Where did you tell me a story?",
+    "original_slots": {
+      "M2": "Where",
+      "Aux": "did",
+      "S": "you",
+      "V": "tell",
+      "O1": "me",
+      "O2": "a story"
+    },
+    "ordered_slots": {
+      "6": "Where",
+      "1": "did",
+      "2": "you",
+      "3": "tell",
+      "5": "me",
+      "4": "a story"
+    }
+  }
+]
