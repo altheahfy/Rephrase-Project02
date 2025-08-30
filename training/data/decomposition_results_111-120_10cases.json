@@ -19,14 +19,14 @@
       "text": "The house where they lived was demolished.",
       "main_slots": {
         "S": "",
-        "V": "was",
-        "C1": "demolished"
+        "Aux": "was",
+        "V": "demolished"
       },
       "sub_slots": {
-        "sub-m2": "The house where",
-        "_parent_slot": "S",
         "sub-s": "they",
-        "sub-v": "lived"
+        "sub-v": "lived",
+        "sub-m2": "The house where",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -40,7 +40,7 @@
         "3": "demolished"
       }
     },
-    "match": false
+    "match": true
   },
   "case_112": {
     "sentence": "The day when we graduated was memorable.",
@@ -66,10 +66,10 @@
         "C1": "memorable"
       },
       "sub_slots": {
-        "sub-m2": "The day when",
-        "_parent_slot": "S",
         "sub-s": "we",
-        "sub-v": "graduated"
+        "sub-v": "graduated",
+        "sub-m2": "The day when",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -109,10 +109,10 @@
         "C1": "personal"
       },
       "sub_slots": {
-        "sub-m2": "The reason why",
-        "_parent_slot": "S",
         "sub-s": "he",
-        "sub-v": "quit"
+        "sub-v": "quit",
+        "sub-m2": "The reason why",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -145,30 +145,33 @@
       }
     },
     "actual": {
-      "original_text": "The way how she explained it helped everyone.",
       "success": true,
+      "text": "The way how she explained it helped everyone.",
       "main_slots": {
-        "S": "The way",
-        "V": "explained",
-        "O1": "it",
-        "O2": "everyone"
+        "S": "",
+        "V": "helped",
+        "O1": "everyone"
       },
-      "slots": {
-        "S": "The way",
-        "V": "explained",
-        "O1": "it",
-        "O2": "everyone"
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "explained",
+        "sub-o1": "it",
+        "sub-m2": "The way how",
+        "_parent_slot": "S"
       },
-      "grammar_pattern": "basic_five_pattern + passive_voice",
-      "phase": 1,
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
       "ordered_slots": {
-        "1": "The way",
-        "2": "explained",
-        "3": "it",
-        "4": "everyone"
+        "1": "",
+        "2": "helped",
+        "3": "everyone"
       }
     },
-    "match": false
+    "match": true
   },
   "case_115": {
     "sentence": "The place where we first met holds special memories.",
@@ -187,30 +190,33 @@
       }
     },
     "actual": {
-      "original_text": "The place where we first met holds special memories.",
       "success": true,
+      "text": "The place where we first met holds special memories.",
       "main_slots": {
-        "S": "The place",
-        "V": "met",
-        "O1": "special memories",
-        "M2": "first"
+        "S": "",
+        "V": "holds",
+        "O1": "special memories"
       },
-      "slots": {
-        "S": "The place",
-        "V": "met",
-        "O1": "special memories",
-        "M2": "first"
+      "sub_slots": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met",
+        "_parent_slot": "S",
+        "sub-m3": "first"
       },
-      "grammar_pattern": "basic_five_pattern + passive_voice",
-      "phase": 1,
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
       "ordered_slots": {
-        "1": "The place",
-        "3": "met",
-        "4": "special memories",
-        "2": "first"
+        "1": "",
+        "2": "holds",
+        "3": "special memories"
       }
     },
-    "match": false
+    "match": true
   },
   "case_116": {
     "sentence": "The time when everything will change is approaching.",
@@ -232,34 +238,30 @@
       "success": true,
       "text": "The time when everything will change is approaching.",
       "main_slots": {
-        "Aux": "will",
-        "S": "The time when everything will change",
-        "V": "change"
+        "S": "",
+        "V": "approaching",
+        "Aux": "is"
       },
-      "sub_slots": {},
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-v": "change",
+        "_parent_slot": "S",
+        "sub-aux": "will"
+      },
       "metadata": {
         "controller": "central",
-        "primary_handler": "modal",
-        "collaboration": [
-          "adverb"
-        ],
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "will",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
         "confidence": 0.9
       },
       "ordered_slots": {
-        "1": "will",
-        "2": "change"
+        "1": "",
+        "3": "approaching",
+        "2": "is"
       }
     },
-    "match": false
+    "match": true
   },
   "case_117": {
     "sentence": "The moment when he told her the truth changed everything.",
@@ -279,24 +281,34 @@
       }
     },
     "actual": {
-      "original_text": "The moment when he told her the truth changed everything.",
       "success": true,
+      "text": "The moment when he told her the truth changed everything.",
       "main_slots": {
-        "S": "The moment",
-        "V": "told"
+        "S": "",
+        "V": "changed",
+        "O1": "everything"
       },
-      "slots": {
-        "S": "The moment",
-        "V": "told"
+      "sub_slots": {
+        "sub-m2": "The moment when",
+        "sub-s": "he",
+        "sub-v": "told",
+        "_parent_slot": "S",
+        "sub-o1": "her",
+        "sub-o2": "the truth"
       },
-      "grammar_pattern": "basic_five_pattern + passive_voice",
-      "phase": 1,
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
       "ordered_slots": {
-        "1": "The moment",
-        "2": "told"
+        "1": "",
+        "2": "changed",
+        "3": "everything"
       }
     },
-    "match": false
+    "match": true
   },
   "case_118": {
     "sentence": "The reason why she was upset became clear.",
@@ -319,13 +331,15 @@
       "text": "The reason why she was upset became clear.",
       "main_slots": {
         "S": "",
-        "V": "was",
-        "C1": "upset"
+        "V": "became",
+        "C1": "clear"
       },
       "sub_slots": {
         "sub-m2": "The reason why",
-        "_parent_slot": "S",
-        "sub-s": "she"
+        "sub-s": "she",
+        "sub-aux": "was",
+        "sub-v": "upset",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -335,11 +349,11 @@
       },
       "ordered_slots": {
         "1": "",
-        "2": "was",
-        "3": "upset"
+        "2": "became",
+        "3": "clear"
       }
     },
-    "match": false
+    "match": true
   },
   "case_119": {
     "sentence": "The city where we spent our honeymoon is in Italy.",
@@ -363,14 +377,14 @@
       "main_slots": {
         "S": "",
         "V": "is",
-        "C1": "in"
+        "M2": "in Italy"
       },
       "sub_slots": {
-        "sub-m2": "The city where",
-        "_parent_slot": "S",
         "sub-s": "we",
         "sub-v": "spent",
-        "sub-o1": "our honeymoon"
+        "sub-o1": "our honeymoon",
+        "sub-m2": "The city where",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -381,10 +395,10 @@
       "ordered_slots": {
         "1": "",
         "2": "is",
-        "3": "in"
+        "3": "in Italy"
       }
     },
-    "match": false
+    "match": true
   },
   "case_120": {
     "sentence": "The method how they solved the problem was innovative.",
@@ -411,11 +425,11 @@
         "C1": "innovative"
       },
       "sub_slots": {
-        "sub-m2": "The method how",
-        "_parent_slot": "S",
         "sub-s": "they",
         "sub-v": "solved",
-        "sub-o1": "problem"
+        "sub-o1": "the problem",
+        "sub-m2": "The method how",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -429,6 +443,6 @@
         "3": "innovative"
       }
     },
-    "match": false
+    "match": true
   }
 }

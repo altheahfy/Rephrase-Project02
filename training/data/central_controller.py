@@ -417,6 +417,37 @@ class CentralController:
                 if not five_pattern_result['success']:
                     print(f"  BasicFivePatternHandler error: {five_pattern_result.get('error')}")
         
+        # 🎯 関係副詞処理（助動詞より優先）
+        if 'relative_adverb' in grammar_patterns:
+            # Step 1: 関係副詞ハンドラー
+            rel_adv_handler = self.handlers['relative_adverb']
+            rel_adv_result = rel_adv_handler.detect_relative_adverb(text)
+            
+            if rel_adv_result and rel_adv_result.get('success'):
+                print(f"✅ 関係副詞処理成功: {rel_adv_result['relative_adverb']}")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': rel_adv_result['main_slots'],
+                    'sub_slots': rel_adv_result['sub_slots'],
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'relative_adverb',
+                        'relative_adverb': rel_adv_result['relative_adverb'],
+                        'confidence': 0.9
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 関係副詞処理失敗、通常の処理フローに移行")
+                if rel_adv_result:
+                    print(f"  RelativeAdverbHandler error: {rel_adv_result.get('reason')}")
+                else:
+                    print(f"  関係副詞が検出されませんでした")
+        
         # 🎯 Phase 6: 助動詞処理（疑問文でない場合に適用）
         if 'modal' in grammar_patterns and 'question' not in grammar_patterns:
             # Step 1: AdverbHandlerで修飾語分離
@@ -468,37 +499,6 @@ class CentralController:
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
-        
-        # 🎯 関係副詞処理（関係節より優先）
-        if 'relative_adverb' in grammar_patterns:
-            # Step 1: 関係副詞ハンドラー
-            rel_adv_handler = self.handlers['relative_adverb']
-            rel_adv_result = rel_adv_handler.detect_relative_adverb(text)
-            
-            if rel_adv_result and rel_adv_result.get('success'):
-                print(f"✅ 関係副詞処理成功: {rel_adv_result['relative_adverb']}")
-                
-                # 順序情報を追加
-                result = {
-                    'success': True,
-                    'text': text,
-                    'main_slots': rel_adv_result['main_slots'],
-                    'sub_slots': rel_adv_result['sub_slots'],
-                    'metadata': {
-                        'controller': 'central',
-                        'primary_handler': 'relative_adverb',
-                        'relative_adverb': rel_adv_result['relative_adverb'],
-                        'confidence': 0.9
-                    }
-                }
-                
-                return self._apply_order_to_result(result)
-            else:
-                print(f"⚠️ 関係副詞処理失敗、通常の処理フローに移行")
-                if rel_adv_result:
-                    print(f"  RelativeAdverbHandler error: {rel_adv_result.get('reason')}")
-                else:
-                    print(f"  RelativeAdverbHandler: 関係副詞が検出されませんでした")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識

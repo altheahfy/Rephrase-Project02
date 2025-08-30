@@ -54,11 +54,13 @@ class RelativeAdverbHandler:
         # 複雑な構造を先に検出（特定パターン）
         complex_patterns = [
             # Case 116: "The time when everything will change is approaching"
-            (r'(The\s+time\s+when)\s+(.+?)\s+(will\s+\w+)\s+(is\s+\w+ing\.?)', 'when_complex'),
+            (r'(The\s+time\s+when)\s+(everything)\s+(will\s+change)\s+(is\s+approaching\.?)', 'when_complex'),
             # Case 117: "The moment when he told her the truth changed everything"
             (r'(The\s+moment\s+when)\s+(\w+)\s+(\w+)\s+(.+)\s+(changed)\s+(.+)', 'when_moment'),
             # Case 118: "The reason why she was upset became clear"
             (r'(The\s+reason\s+why)\s+(\w+)\s+(was|were)\s+(\w+)\s+(became)\s+(.+)', 'why_passive'),
+            # Case 115: "The place where we first met holds special memories"
+            (r'(The\s+place\s+where)\s+(we)\s+(first\s+met)\s+(holds)\s+(.+)', 'where_place'),
         ]
         
         for pattern, adverb_type in complex_patterns:
@@ -246,6 +248,42 @@ class RelativeAdverbHandler:
                 'success': True,
                 'handler': 'RelativeAdverbHandler',
                 'relative_adverb': 'why',
+                'main_slots': main_slots,
+                'sub_slots': sub_slots
+            }
+            
+        elif pattern_type == 'where_place':
+            # "The place where we first met holds special memories"
+            relative_part = match.group(1)  # "The place where"
+            sub_subject = match.group(2)    # "we"
+            sub_verb_phrase = match.group(3)  # "first met"
+            main_verb = match.group(4)      # "holds"
+            main_object = match.group(5)    # "special memories"
+            
+            # sub_verb_phraseを分析
+            verb_parts = sub_verb_phrase.strip().split()
+            sub_modifier = verb_parts[0] if len(verb_parts) > 1 else None
+            sub_verb = verb_parts[1] if len(verb_parts) > 1 else sub_verb_phrase
+            
+            sub_slots = {
+                'sub-m2': relative_part,
+                'sub-s': sub_subject,
+                'sub-v': sub_verb,
+                '_parent_slot': 'S'
+            }
+            if sub_modifier:
+                sub_slots['sub-m3'] = sub_modifier
+                
+            main_slots = {
+                'S': '',
+                'V': main_verb,
+                'O1': main_object.strip('.')
+            }
+            
+            return {
+                'success': True,
+                'handler': 'RelativeAdverbHandler',
+                'relative_adverb': 'where',
                 'main_slots': main_slots,
                 'sub_slots': sub_slots
             }

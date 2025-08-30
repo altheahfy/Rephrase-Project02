@@ -4866,10 +4866,11 @@
         "O1": "special memories"
       },
       "sub_slots": {
+        "sub-m2": "The place where",
         "sub-s": "we",
         "sub-v": "met",
-        "sub-m2": "The place where",
-        "_parent_slot": "S"
+        "_parent_slot": "S",
+        "sub-m3": "first"
       },
       "metadata": {
         "controller": "central",
@@ -4883,7 +4884,7 @@
         "3": "special memories"
       }
     },
-    "match": false
+    "match": true
   },
   "case_116": {
     "sentence": "The time when everything will change is approaching.",
@@ -4905,34 +4906,30 @@
       "success": true,
       "text": "The time when everything will change is approaching.",
       "main_slots": {
-        "Aux": "will",
-        "S": "The time when everything will change",
-        "V": "change"
+        "S": "",
+        "V": "approaching",
+        "Aux": "is"
       },
-      "sub_slots": {},
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-v": "change",
+        "_parent_slot": "S",
+        "sub-aux": "will"
+      },
       "metadata": {
         "controller": "central",
-        "primary_handler": "modal",
-        "collaboration": [
-          "adverb"
-        ],
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "will",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
         "confidence": 0.9
       },
       "ordered_slots": {
-        "1": "will",
-        "2": "change"
+        "1": "",
+        "3": "approaching",
+        "2": "is"
       }
     },
-    "match": false
+    "match": true
   },
   "case_117": {
     "sentence": "The moment when he told her the truth changed everything.",
