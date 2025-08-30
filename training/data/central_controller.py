@@ -13,6 +13,7 @@ import json
 from typing import Dict, List, Any, Optional
 from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
+from relative_adverb_handler import RelativeAdverbHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
@@ -57,14 +58,17 @@ class CentralController:
         collaborators = {
             'adverb': adverb_handler,
             'five_pattern': basic_five_pattern_handler,
-            'passive': passive_voice_handler
+            'passive': passive_voice_handler,
+            'modal': modal_handler
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
+        relative_adverb_handler = RelativeAdverbHandler(collaborators)
         
         # ハンドラー辞書に登録
         self.handlers = {
             'basic_five_pattern': basic_five_pattern_handler,
             'relative_clause': relative_clause_handler,
+            'relative_adverb': relative_adverb_handler,
             'adverb': adverb_handler,
             'passive_voice': passive_voice_handler,
             'question': question_handler,
@@ -216,9 +220,15 @@ class CentralController:
             detected_patterns.append('modal')
         
         # 関係節検出（優先度高）
-        has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom', 'where', 'when', 'why', 'how'] 
+        has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
                           for token in doc)
-        if has_relative:
+        # 関係副詞検出（関係節より優先）
+        has_relative_adverb = any(token.text.lower() in ['where', 'when', 'why', 'how'] 
+                                 for token in doc) and any(token.text.lower() in ['the'] for token in doc)
+        
+        if has_relative_adverb:
+            detected_patterns.append('relative_adverb')
+        elif has_relative:
             detected_patterns.append('relative_clause')
         
         # 基本5文型の存在確認（POS解析ベース）
@@ -452,6 +462,34 @@ class CentralController:
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
+        
+        # 🎯 関係副詞処理（関係節より優先）
+        if 'relative_adverb' in grammar_patterns:
+            # Step 1: 関係副詞ハンドラー
+            rel_adv_handler = self.handlers['relative_adverb']
+            rel_adv_result = rel_adv_handler.process(text)
+            
+            if rel_adv_result['success']:
+                print(f"✅ 関係副詞処理成功: {rel_adv_result['relative_adverb']}")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': rel_adv_result['main_slots'],
+                    'sub_slots': rel_adv_result['sub_slots'],
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'relative_adverb',
+                        'relative_adverb': rel_adv_result['relative_adverb'],
+                        'confidence': 0.9
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 関係副詞処理失敗、通常の処理フローに移行")
+                print(f"  RelativeAdverbHandler error: {rel_adv_result.get('reason')}")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
