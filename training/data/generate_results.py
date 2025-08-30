@@ -2,129 +2,87 @@
 # -*- coding: utf-8 -*-
 """
 現在のDynamicAbsoluteOrderManagerでの分解・番号付与結果を出力
+JSONファイルから例文番号を指定してテスト実行
 """
 
 import json
 from datetime import datetime
 from central_controller import CentralController
 
+def load_test_data_from_json():
+    """JSONファイルからテストデータを読み込み"""
+    with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def get_test_cases_by_ids(test_data, test_ids):
+    """指定されたIDの例文を取得"""
+    test_cases = []
+    
+    for test_id in test_ids:
+        test_id_str = str(test_id)
+        if test_id_str in test_data['data']:
+            test_case = test_data['data'][test_id_str]
+            test_cases.append({
+                "id": test_id,
+                "sentence": test_case['sentence'],
+                "category": f"{test_case.get('V_group_key', 'unknown')}_group",
+                "grammar_category": test_case.get('grammar_category', 'unknown'),
+                "expected": test_case.get('expected', {})
+            })
+        else:
+            print(f"⚠️ 警告: ID {test_id} がJSONファイルに見つかりません")
+    
+    return test_cases
+
 def generate_current_results():
     """現在のシステムで分解・番号付与結果を生成"""
     
-    controller = CentralController()
+    # JSONファイルから全データを読み込み
+    test_data = load_test_data_from_json()
     
-    # tellグループのテストケース
-    test_cases = [
-        {
-            "id": 83,
-            "sentence": "What did he tell her at the store?",
-            "category": "tell_group"
-        },
-        {
-            "id": 84, 
-            "sentence": "Did he tell her a secret there?",
-            "category": "tell_group"
-        },
-        {
-            "id": 85,
-            "sentence": "Did I tell him a truth in the kitchen?", 
-            "category": "tell_group"
-        },
-        {
-            "id": 86,
-            "sentence": "Where did you tell me a story?",
-            "category": "tell_group"
-        },
-        # 追加のtellグループテスト
-        {
-            "id": 87,
-            "sentence": "He told me the truth yesterday.",
-            "category": "tell_group"
-        },
-        {
-            "id": 88,
-            "sentence": "I will tell him a story tomorrow.",
-            "category": "tell_group"
-        },
-        {
-            "id": 89,
-            "sentence": "Did you tell her the secret?",
-            "category": "tell_group"
-        },
+    # テスト対象の例文番号を指定
+    test_ids = [
+        # tellグループ (basic_5_patterns)
+        83, 84, 85, 86,
         
-        # basic_adverbsグループ - passiveグループ
-        {
-            "id": 18,
-            "sentence": "The cake is being baked by my mother.",
-            "category": "passive_group"
-        },
-        {
-            "id": 19,
-            "sentence": "The cake was eaten by the children.",
-            "category": "passive_group"
-        },
-        {
-            "id": 20,
-            "sentence": "The door was opened by the key.",
-            "category": "passive_group"
-        },
+        # basic_adverbsグループ - passiveグループ  
+        18, 19, 20,
         
         # basic_adverbsグループ - studyグループ
-        {
-            "id": 21,
-            "sentence": "The students study hard for exams.",
-            "category": "study_group"
-        },
-        {
-            "id": 22,
-            "sentence": "Tomorrow I study.",
-            "category": "study_group"
-        },
-        {
-            "id": 23,
-            "sentence": "Students often study here.",
-            "category": "study_group"
-        },
+        21, 22, 23,
         
         # basic_adverbsグループ - actionグループ
-        {
-            "id": 32,
-            "sentence": "She sings beautifully.",
-            "category": "action_group"
-        },
-        {
-            "id": 33,
-            "sentence": "We always eat breakfast together.",
-            "category": "action_group"
-        },
-        {
-            "id": 38,
-            "sentence": "Every morning, he jogs slowly in the park.",
-            "category": "action_group"
-        },
+        32, 33, 34, 35, 36, 37, 38,
         
         # basic_adverbsグループ - communicationグループ
-        {
-            "id": 29,
-            "sentence": "The teacher explains grammar clearly to confused students daily.",
-            "category": "communication_group"
-        },
-        {
-            "id": 30,
-            "sentence": "The student writes essays carefully for better grades.",
-            "category": "communication_group"
-        },
-        {
-            "id": 31,
-            "sentence": "She always speaks English fluently at work.",
-            "category": "communication_group"
-        }
+        29, 30, 31,
+        
+        # basic_adverbsグループ - completionグループ
+        24, 25,
+        
+        # basic_adverbsグループ - becomeグループ
+        39,
+        
+        # basic_adverbsグループ - transactionグループ
+        42
     ]
+    
+    # 指定IDの例文を取得
+    test_cases = get_test_cases_by_ids(test_data, test_ids)
+    
+    print(f"=== JSONファイルから{len(test_cases)}件のテストケースを読み込み ===")
+    for case in test_cases:
+        print(f"ID {case['id']}: {case['sentence']} ({case['grammar_category']} - {case['category']})")
+    print()
+
+    controller = CentralController()
     
     results = {
         "timestamp": datetime.now().isoformat(),
         "system": "DynamicAbsoluteOrderManager",
         "total_tests": len(test_cases),
+        "test_source": "final_54_test_data_with_absolute_order_corrected.json",
+        "test_ids": test_ids,
         "tell_group_mapping": None,
         "results": {}
     }
@@ -143,6 +101,7 @@ def generate_current_results():
         sentence = test_case["sentence"]
         
         print(f"【テスト{case_id}】: {sentence}")
+        print(f"  カテゴリ: {test_case['grammar_category']} - {test_case['category']}")
         
         try:
             result = controller.process_sentence(sentence)
@@ -153,6 +112,8 @@ def generate_current_results():
                 case_result = {
                     "sentence": sentence,
                     "category": test_case["category"],
+                    "grammar_category": test_case["grammar_category"],
+                    "expected": test_case["expected"],
                     "success": True,
                     "main_slots": result.get('main_slots', {}),
                     "absolute_order": abs_order.get('absolute_order', {}),
@@ -170,7 +131,9 @@ def generate_current_results():
             else:
                 case_result = {
                     "sentence": sentence,
-                    "category": test_case["category"], 
+                    "category": test_case["category"],
+                    "grammar_category": test_case["grammar_category"],
+                    "expected": test_case["expected"],
                     "success": False,
                     "error": "Processing failed",
                     "raw_result": result
@@ -181,6 +144,8 @@ def generate_current_results():
             case_result = {
                 "sentence": sentence,
                 "category": test_case["category"],
+                "grammar_category": test_case["grammar_category"],
+                "expected": test_case["expected"],
                 "success": False, 
                 "error": str(e),
                 "raw_result": None
