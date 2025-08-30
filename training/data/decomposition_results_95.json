@@ -1,0 +1,49 @@
+{
+  "case_95": {
+    "sentence": "I have completed the project.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "have",
+        "V": "completed",
+        "O1": "the project"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I have completed the project.",
+      "main_slots": {
+        "Aux": "have",
+        "S": "I",
+        "V": "completed",
+        "O1": "the project"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "have",
+        "1": "I",
+        "3": "completed",
+        "4": "the project"
+      }
+    },
+    "match": true
+  }
+}

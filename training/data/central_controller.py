@@ -403,21 +403,46 @@ class CentralController:
         
         # 🎯 Phase 6: 助動詞処理（疑問文でない場合に適用）
         if 'modal' in grammar_patterns and 'question' not in grammar_patterns:
+            # Step 1: AdverbHandlerで修飾語分離
+            adverb_handler = self.handlers['adverb']
+            adverb_result = adverb_handler.process(text)
+            
+            modifier_slots = {}
+            processing_text = text
+            
+            if adverb_result['success']:
+                modifier_slots = adverb_result.get('modifier_slots', {})
+                processing_text = adverb_result['separated_text']
+                print(f"🔧 助動詞文修飾語分離: '{text}' → '{processing_text}'")
+                for slot, value in modifier_slots.items():
+                    print(f"📍 修飾語検出: {slot} = '{value}'")
+            
+            # Step 2: ModalHandlerで助動詞構造処理
             modal_handler = self.handlers['modal']
-            modal_result = modal_handler.process(text)
+            modal_result = modal_handler.process(processing_text)
             
             if modal_result['success']:
-                print(f"✅ 助動詞処理成功: {modal_result.get('main_slots', {})}")
+                # 助動詞+修飾語統合
+                modal_slots = modal_result['main_slots']
+                
+                # 修飾語スロットを統合
+                final_slots = modal_slots.copy()
+                for slot, value in modifier_slots.items():
+                    if slot not in final_slots:
+                        final_slots[slot] = value
+                
+                print(f"✅ 助動詞+修飾語統合成功: {final_slots}")
                 
                 # 順序情報を追加
                 result = {
                     'success': True,
                     'text': text,
-                    'main_slots': modal_result['main_slots'],
+                    'main_slots': final_slots,
                     'sub_slots': modal_result.get('sub_slots', {}),
                     'metadata': {
                         'controller': 'central',
                         'primary_handler': 'modal',
+                        'collaboration': ['adverb'],
                         'modal_info': modal_result.get('modal_info', {}),
                         'confidence': 0.9
                     }

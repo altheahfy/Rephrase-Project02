@@ -124,26 +124,30 @@ class ModalHandler:
         return result
     
     def _detect_complex_modal(self, text: str) -> Optional[Dict[str, Any]]:
-        """複合助動詞の検出"""
+        """複合助動詞の検出（実際の動詞形を返す）"""
         import re
         
         text_lower = text.lower()
         
         for modal_phrase, pattern in self.complex_modals.items():
-            if re.search(pattern, text_lower):
+            match = re.search(pattern, text_lower)
+            if match:
+                # 実際にマッチした部分を取得
+                actual_auxiliary = match.group(0)
+                
                 return {
                     'has_modal': True,
                     'modal_type': 'complex',
-                    'auxiliary': modal_phrase,
+                    'auxiliary': actual_auxiliary,
                     'structure_type': 'complex_modal'
                 }
         
         return None
     
     def _detect_basic_modal(self, doc) -> Optional[Dict[str, Any]]:
-        """基本助動詞の検出"""
+        """基本助動詞の検出（否定形対応）"""
         
-        for token in doc:
+        for i, token in enumerate(doc):
             token_lower = token.text.lower()
             
             # 法助動詞
@@ -155,14 +159,23 @@ class ModalHandler:
                     'structure_type': 'modal'
                 }
             
-            # do系助動詞
-            if token_lower in self.do_auxiliaries:
+            # do系助動詞（否定形チェック）
+            if token_lower in {'do', 'does', 'did'}:
+                # 次のトークンが"n't"かチェック
+                auxiliary_text = token.text
+                is_negative = False
+                
+                if (i + 1 < len(doc) and 
+                    doc[i + 1].text.lower() in {"n't", "not"}):
+                    auxiliary_text = token.text + "n't"
+                    is_negative = True
+                
                 return {
                     'has_modal': True,
                     'modal_type': 'do_auxiliary',
-                    'auxiliary': token.text,
+                    'auxiliary': auxiliary_text,
                     'is_question': self._is_question_structure(doc),
-                    'is_negative': "'t" in token.text or 'not' in token.text,
+                    'is_negative': is_negative,
                     'structure_type': 'auxiliary'
                 }
             
@@ -185,18 +198,32 @@ class ModalHandler:
                     for token in doc[:2]))
     
     def _is_perfect_tense(self, doc, have_token) -> bool:
-        """完了形の判定（have/has/had + 過去分詞）"""
+        """完了形の判定（have/has/had + 過去分詞）副詞介在対応"""
         have_idx = have_token.i
         
-        # have/has/hadの次のトークンを確認
-        if have_idx + 1 < len(doc):
-            next_token = doc[have_idx + 1]
-            # 過去分詞の判定
-            if next_token.tag_ in ['VBN']:  # past participle
+        # have/has/hadの後のトークンを順番に確認（副詞をスキップ）
+        for i in range(have_idx + 1, len(doc)):
+            token = doc[i]
+            
+            # 句読点や接続詞で区切られたら停止
+            if token.pos_ in ['PUNCT', 'CCONJ']:
+                break
+                
+            # 副詞はスキップして継続
+            if token.pos_ == 'ADV':
+                continue
+                
+            # 過去分詞を発見
+            if token.tag_ in ['VBN']:  # past participle
                 return True
+                
             # beenの場合（完了進行形）
-            if next_token.text.lower() == 'been':
+            if token.text.lower() == 'been':
                 return True
+                
+            # 動詞以外の品詞が来たら完了形ではない
+            if token.pos_ not in ['VERB', 'AUX']:
+                break
         
         return False
     
@@ -272,9 +299,9 @@ class ModalHandler:
         auxiliary = modal_info.get('auxiliary', '').lower()
         
         for token in doc:
-            # 主語の抽出
+            # 主語の抽出（修飾語を含めた完全な名詞句）
             if token.dep_ == 'nsubj' and 'S' not in main_slots:
-                main_slots['S'] = token.text
+                main_slots['S'] = self._extract_noun_phrase(token)
             
             # 動詞の抽出（助動詞以外）
             elif (token.pos_ == 'VERB' and 
@@ -282,17 +309,31 @@ class ModalHandler:
                   'V' not in main_slots):
                 main_slots['V'] = token.text
             
-            # 目的語の抽出
+            # 目的語の抽出（修飾語を含めた完全な名詞句）
             elif token.dep_ == 'dobj' and 'O1' not in main_slots:
-                main_slots['O1'] = token.text
+                main_slots['O1'] = self._extract_noun_phrase(token)
             
-            # 間接目的語
+            # 間接目的語（修飾語を含めた完全な名詞句）
             elif token.dep_ == 'iobj' and 'O2' not in main_slots:
-                main_slots['O2'] = token.text
+                main_slots['O2'] = self._extract_noun_phrase(token)
             
-            # 補語の抽出
+            # 補語の抽出（修飾語を含めた完全な名詞句）
             elif token.dep_ in ['attr', 'acomp'] and 'C1' not in main_slots:
-                main_slots['C1'] = token.text
+                main_slots['C1'] = self._extract_noun_phrase(token)
+    
+    def _extract_noun_phrase(self, head_token) -> str:
+        """名詞句の抽出（修飾語を含めた完全な句を取得）"""
+        phrase_tokens = []
+        
+        # 主要な名詞から始まる句を語順通りに収集
+        for token in head_token.subtree:
+            if token.pos_ not in ['PUNCT']:  # 句読点を除く
+                phrase_tokens.append((token.i, token.text))
+        
+        # インデックス順でソートして正しい語順に
+        phrase_tokens.sort(key=lambda x: x[0])
+        
+        return ' '.join([text for _, text in phrase_tokens])
     
     def _extract_modifiers(self, doc, main_slots: Dict, modal_info: Dict):
         """修飾語の抽出（Rephrase副詞配置ルール準拠）"""

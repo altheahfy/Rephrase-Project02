@@ -21,6 +21,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -66,6 +69,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -111,6 +117,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -150,12 +159,16 @@
         "Aux": "would",
         "S": "We",
         "V": "visit",
-        "O1": "Paris"
+        "O1": "Paris",
+        "M2": "every summer"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -171,10 +184,11 @@
         "2": "would",
         "1": "We",
         "3": "visit",
-        "4": "Paris"
+        "4": "Paris",
+        "5": "every summer"
       }
     },
-    "match": false
+    "match": true
   },
   "case_91": {
     "sentence": "They should study harder.",
@@ -200,6 +214,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -244,6 +261,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -281,12 +301,16 @@
       "main_slots": {
         "Aux": "might",
         "S": "It",
-        "V": "rain"
+        "V": "rain",
+        "M2": "tomorrow"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -301,10 +325,11 @@
       "ordered_slots": {
         "2": "might",
         "1": "It",
-        "3": "rain"
+        "3": "rain",
+        "4": "tomorrow"
       }
     },
-    "match": false
+    "match": true
   },
   "case_94": {
     "sentence": "You must finish your homework.",
@@ -324,12 +349,15 @@
         "Aux": "must",
         "S": "You",
         "V": "finish",
-        "O1": "homework"
+        "O1": "your homework"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -345,10 +373,10 @@
         "2": "must",
         "1": "You",
         "3": "finish",
-        "4": "homework"
+        "4": "your homework"
       }
     },
-    "match": false
+    "match": true
   },
   "case_95": {
     "sentence": "I have completed the project.",
@@ -368,12 +396,15 @@
         "Aux": "have",
         "S": "I",
         "V": "completed",
-        "O1": "project"
+        "O1": "the project"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "perfect_auxiliary",
@@ -389,10 +420,10 @@
         "2": "have",
         "1": "I",
         "3": "completed",
-        "4": "project"
+        "4": "the project"
       }
     },
-    "match": false
+    "match": true
   },
   "case_96": {
     "sentence": "She has lived here for ten years.",
@@ -420,6 +451,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "perfect_auxiliary",
@@ -454,30 +488,42 @@
       "sub_slots": {}
     },
     "actual": {
-      "original_text": "They had already left the building.",
       "success": true,
+      "text": "They had already left the building.",
       "main_slots": {
+        "Aux": "had",
         "S": "They",
         "V": "left",
         "O1": "the building",
         "M2": "already"
       },
-      "slots": {
-        "S": "They",
-        "V": "left",
-        "O1": "the building",
-        "M2": "already"
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "had",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
       },
-      "grammar_pattern": "basic_five_pattern + passive_voice",
-      "phase": 1,
       "ordered_slots": {
+        "2": "had",
         "1": "They",
-        "3": "left",
-        "4": "the building",
-        "2": "already"
+        "4": "left",
+        "5": "the building",
+        "3": "already"
       }
     },
-    "match": false
+    "match": true
   },
   "case_98": {
     "sentence": "Do you understand the question?",
@@ -575,32 +621,35 @@
       "success": true,
       "text": "Don't touch that button!",
       "main_slots": {
-        "Aux": "Do",
+        "Aux": "Don't",
         "V": "touch",
-        "O1": "button"
+        "O1": "that button"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "do_auxiliary",
-          "auxiliary": "Do",
+          "auxiliary": "Don't",
           "main_verb": null,
           "is_question": false,
-          "is_negative": false,
+          "is_negative": true,
           "structure_type": "auxiliary"
         },
         "confidence": 0.9
       },
       "ordered_slots": {
-        "1": "Do",
+        "1": "Don't",
         "2": "touch",
-        "3": "button"
+        "3": "that button"
       }
     },
-    "match": false
+    "match": true
   },
   "case_101": {
     "sentence": "Can you help me with this problem?",
@@ -704,12 +753,16 @@
       "main_slots": {
         "Aux": "shall",
         "S": "I",
-        "V": "return"
+        "V": "return",
+        "M2": "tomorrow"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -724,10 +777,11 @@
       "ordered_slots": {
         "2": "shall",
         "1": "I",
-        "3": "return"
+        "3": "return",
+        "4": "tomorrow"
       }
     },
-    "match": false
+    "match": true
   },
   "case_104": {
     "sentence": "We ought to start immediately.",
@@ -753,6 +807,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -792,12 +849,16 @@
         "Aux": "used to",
         "S": "They",
         "V": "play",
-        "M2": "here"
+        "M2": "here",
+        "M3": "every day"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -813,10 +874,11 @@
         "2": "used to",
         "1": "They",
         "3": "play",
-        "4": "here"
+        "4": "here",
+        "5": "every day"
       }
     },
-    "match": false
+    "match": true
   },
   "case_106": {
     "sentence": "He is going to study abroad.",
@@ -833,7 +895,7 @@
       "success": true,
       "text": "He is going to study abroad.",
       "main_slots": {
-        "Aux": "be going to",
+        "Aux": "is going to",
         "S": "He",
         "V": "study",
         "M2": "abroad"
@@ -842,10 +904,13 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
-          "auxiliary": "be going to",
+          "auxiliary": "is going to",
           "main_verb": null,
           "is_question": false,
           "is_negative": false,
@@ -854,12 +919,13 @@
         "confidence": 0.9
       },
       "ordered_slots": {
+        "2": "is going to",
         "1": "He",
-        "2": "study",
-        "3": "abroad"
+        "3": "study",
+        "4": "abroad"
       }
     },
-    "match": false
+    "match": true
   },
   "case_107": {
     "sentence": "I have been waiting for an hour.",
@@ -885,6 +951,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -931,6 +1000,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -976,6 +1048,9 @@
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -1014,12 +1089,15 @@
         "Aux": "might have",
         "S": "She",
         "V": "forgotten",
-        "O1": "appointment"
+        "O1": "the appointment"
       },
       "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
         "modal_info": {
           "has_modal": true,
           "modal_type": "complex",
@@ -1035,9 +1113,9 @@
         "2": "might have",
         "1": "She",
         "3": "forgotten",
-        "4": "appointment"
+        "4": "the appointment"
       }
     },
-    "match": false
+    "match": true
   }
 }

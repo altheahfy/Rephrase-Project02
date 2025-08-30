@@ -212,7 +212,8 @@ class AdverbHandler:
             if token.text.lower() in ['every', 'each', 'last', 'next', 'this', 'that'] and i + 1 < len(doc):
                 next_token = doc[i + 1]
                 # 時間名詞をチェック
-                time_nouns = ['day', 'week', 'month', 'year', 'morning', 'afternoon', 'evening', 'night', 'time', 'moment']
+                time_nouns = ['day', 'week', 'month', 'year', 'morning', 'afternoon', 'evening', 'night', 'time', 'moment', 
+                             'summer', 'winter', 'spring', 'autumn', 'fall', 'season', 'today', 'tomorrow', 'yesterday']
                 if next_token.text.lower() in time_nouns:
                     time_phrase = f"{token.text} {next_token.text}"
                     modifier_info = {

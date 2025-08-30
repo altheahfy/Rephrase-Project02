@@ -1,0 +1,52 @@
+{
+  "case_90": {
+    "sentence": "We would visit Paris every summer.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "Aux": "would",
+        "V": "visit",
+        "O1": "Paris",
+        "M2": "every summer"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "We would visit Paris every summer.",
+      "main_slots": {
+        "Aux": "would",
+        "S": "We",
+        "V": "visit",
+        "O1": "Paris",
+        "M2": "every summer"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "would",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "would",
+        "1": "We",
+        "3": "visit",
+        "4": "Paris",
+        "5": "every summer"
+      }
+    },
+    "match": true
+  }
+}
