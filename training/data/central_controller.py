@@ -784,12 +784,10 @@ class CentralController:
                     print(f"🎯 関係節main_slotsから統合: {slot} = '{value}'")
         
         # 🎯 受動態処理結果を統合
-        if passive_result and passive_result['success']:
-            passive_info = passive_result.get('passive_info', {})
-            if passive_info.get('is_passive', False):
-                print(f"🎯 受動態処理: Aux='{passive_info.get('auxiliary')}', V='{passive_info.get('main_verb')}'")
-                main_slots['Aux'] = passive_info.get('auxiliary', '')
-                main_slots['V'] = passive_info.get('main_verb', '')
+        if passive_result and passive_result.get('is_passive', False):
+            print(f"🎯 受動態処理: Aux='{passive_result.get('aux')}', V='{passive_result.get('verb')}'")
+            main_slots['Aux'] = passive_result.get('aux', '')
+            main_slots['V'] = passive_result.get('verb', '')
         
         # 🎯 Central Controller責任: 修飾語スロットを統合
         if modifier_slots:
@@ -832,7 +830,7 @@ class CentralController:
             'pattern_type': rel_result.get('pattern_type', 'unknown'),
             'grammar_analysis': {
                 'relative_clause': True,
-                'passive_voice': passive_result['success'] if passive_result else False,
+                'passive_voice': passive_result.get('is_passive', False) if passive_result else False,
                 'detected_patterns': ['relative_clause', 'basic_five_pattern']
             }
         }
