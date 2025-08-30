@@ -1,23 +1,23 @@
 {
   "meta": {
-    "total_count": 82,
-    "valid_count": 59,
+    "total_count": 86,
+    "valid_count": 86,
     "new_count": 52,
-    "basic_pattern_count": 29,
+    "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
     "category_counts": {
-      "basic_5_patterns": 17,
+      "basic_5_patterns": 21,
       "basic_adverbs": 25,
       "relative_clauses": 23,
       "passive_voice": 4,
       "perfect_tense": 1,
       "modal_verbs": 0,
       "complex_constructions": 12,
-      "absolute_order_test": 4
+      "absolute_order_test": 0
     },
     "total_reorganized": 86,
-    "tell_group_added": true
+    "tell_group_normalized": true
   },
   "data": {
     "1": {
@@ -1331,22 +1331,12 @@
     },
     "83": {
       "V_group_key": "tell",
-      "grammar_category": "absolute_order_test",
+      "grammar_category": "basic_5_patterns",
       "sentence": "What did he tell her at the store?",
-      "description": "O2(what)-2, Aux(did)-3, S(he)-4, V(tell)-5, O1(her)-6, M2(at the store)-8",
-      "absolute_order": {
-        "O2": 2,
-        "Aux": 3,
-        "S": 4,
-        "V": 5,
-        "O1": 6,
-        "M2": 8
-      },
-      "wh_word": "what",
       "expected": {
         "main_slots": {
           "O2": "What",
-          "Aux": "did",
+          "Aux": "did", 
           "S": "he",
           "V": "tell",
           "O1": "her",
@@ -1357,22 +1347,12 @@
     },
     "84": {
       "V_group_key": "tell",
-      "grammar_category": "absolute_order_test",
+      "grammar_category": "basic_5_patterns", 
       "sentence": "Did he tell her a secret there?",
-      "description": "Aux(did)-3, S(he)-4, V(tell)-5, O1(her)-6, O2(a secret)-7, M2(there)-8",
-      "absolute_order": {
-        "Aux": 3,
-        "S": 4,
-        "V": 5,
-        "O1": 6,
-        "O2": 7,
-        "M2": 8
-      },
-      "wh_word": null,
       "expected": {
         "main_slots": {
           "Aux": "Did",
-          "S": "he",
+          "S": "he", 
           "V": "tell",
           "O1": "her",
           "O2": "a secret",
@@ -1383,23 +1363,13 @@
     },
     "85": {
       "V_group_key": "tell",
-      "grammar_category": "absolute_order_test",
-      "sentence": "Did I tell him a truth in the kitchen?",
-      "description": "Aux(did)-3, S(I)-4, V(tell)-5, O1(him)-6, O2(a truth)-7, M2(in the kitchen)-8",
-      "absolute_order": {
-        "Aux": 3,
-        "S": 4,
-        "V": 5,
-        "O1": 6,
-        "O2": 7,
-        "M2": 8
-      },
-      "wh_word": null,
+      "grammar_category": "basic_5_patterns",
+      "sentence": "Did I tell him a truth in the kitchen?", 
       "expected": {
         "main_slots": {
           "Aux": "Did",
           "S": "I",
-          "V": "tell",
+          "V": "tell", 
           "O1": "him",
           "O2": "a truth",
           "M2": "in the kitchen"
@@ -1409,23 +1379,13 @@
     },
     "86": {
       "V_group_key": "tell",
-      "grammar_category": "absolute_order_test",
+      "grammar_category": "basic_5_patterns",
       "sentence": "Where did you tell me a story?",
-      "description": "M2(where)-1, Aux(did)-3, S(you)-4, V(tell)-5, O1(me)-6, O2(a story)-7",
-      "absolute_order": {
-        "M2": 1,
-        "Aux": 3,
-        "S": 4,
-        "V": 5,
-        "O1": 6,
-        "O2": 7
-      },
-      "wh_word": "where",
       "expected": {
         "main_slots": {
           "M2": "Where",
           "Aux": "did",
-          "S": "you",
+          "S": "you", 
           "V": "tell",
           "O1": "me",
           "O2": "a story"

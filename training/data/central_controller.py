@@ -71,35 +71,51 @@ class CentralController:
         self.slot_structure = self._load_slot_structure()
         
     def _initialize_group_mappings(self):
-        """動的分析用のグループマッピングを初期化"""
-        # tellグループの例文群
-        tell_examples = [
-            "What did he tell her at the store?",
-            "Did he tell her a secret there?", 
-            "Where did you tell me a story?",
-            "Yesterday what did he tell her?",
-            "Did I tell him a truth in the kitchen?"
-        ]
+        """動的分析用のグループマッピングを初期化 - 実際のデータから読み込み"""
         
-        # gaveグループの例文群
-        gave_examples = [
-            "he gave me a message",
-            "she gave him a money",
-            "Tom gave her ticket",
-            "I gave Tom that"
-        ]
+        # 実際のデータファイルからtellグループを抽出
+        tell_examples = self._extract_real_group_data("tell")
+        gave_examples = self._extract_real_group_data("gave")
+        
+        if not tell_examples:
+            print("⚠️ tellグループのデータが見つかりません。スキップします。")
+            return
+            
+        print(f"📚 実際のtellグループ例文 ({len(tell_examples)}件):")
+        for i, example in enumerate(tell_examples, 1):
+            print(f"  {i}. {example}")
         
         # 動的分析実行
         try:
             tell_mapping = self.absolute_order_manager.analyze_group_elements("tell", tell_examples)
             self.absolute_order_manager.register_group_mapping("tell", tell_mapping)
             
-            gave_mapping = self.absolute_order_manager.analyze_group_elements("gave", gave_examples)
-            self.absolute_order_manager.register_group_mapping("gave", gave_mapping)
+            if gave_examples:
+                gave_mapping = self.absolute_order_manager.analyze_group_elements("gave", gave_examples)
+                self.absolute_order_manager.register_group_mapping("gave", gave_mapping)
             
             print("✅ 動的絶対順序マッピングの初期化完了")
         except Exception as e:
             print(f"⚠️ 動的マッピング初期化エラー: {e}")
+    
+    def _extract_real_group_data(self, group_key: str) -> List[str]:
+        """実際のデータファイルから指定グループの例文を抽出"""
+        try:
+            with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            examples = []
+            for key, item in data['data'].items():
+                if item.get('V_group_key') == group_key:
+                    # basic_5_patternsカテゴリのみを使用（テスト用は除外）
+                    category = item.get('grammar_category', 'unknown')
+                    if category == 'basic_5_patterns':
+                        examples.append(item['sentence'])
+            
+            return examples
+        except Exception as e:
+            print(f"⚠️ {group_key}グループデータ抽出エラー: {e}")
+            return []
         
     def _load_slot_structure(self) -> Dict[str, Any]:
         """slot_order_data.jsonからRephraseスロット構造を読み込み"""
