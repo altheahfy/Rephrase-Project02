@@ -223,8 +223,14 @@ class CentralController:
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
                           for token in doc)
         # 関係副詞検出（関係節より優先）
-        has_relative_adverb = any(token.text.lower() in ['where', 'when', 'why', 'how'] 
-                                 for token in doc) and any(token.text.lower() in ['the'] for token in doc)
+        import re
+        relative_adverb_patterns = [
+            r'\bthe\s+\w+\s+where\b',
+            r'\bthe\s+\w+\s+when\b', 
+            r'\bthe\s+\w+\s+why\b',
+            r'\bthe\s+\w+\s+how\b'
+        ]
+        has_relative_adverb = any(re.search(pattern, text.lower()) for pattern in relative_adverb_patterns)
         
         if has_relative_adverb:
             detected_patterns.append('relative_adverb')

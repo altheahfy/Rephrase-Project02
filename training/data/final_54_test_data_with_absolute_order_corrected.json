@@ -1,8 +1,8 @@
 {
   "meta": {
-    "total_count": 110,
-    "valid_count": 110,
-    "new_count": 76,
+    "total_count": 120,
+    "valid_count": 120,
+    "new_count": 86,
     "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
@@ -14,9 +14,10 @@
       "perfect_tense": 1,
       "modal_verbs": 24,
       "complex_constructions": 12,
+      "relative_adverbs": 10,
       "absolute_order_test": 0
     },
-    "total_reorganized": 110,
+    "total_reorganized": 120,
     "tell_group_normalized": true,
     "modal_handler_test_added": true
   },
