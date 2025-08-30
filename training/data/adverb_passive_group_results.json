@@ -1,0 +1,111 @@
+[
+  {
+    "sentence": "The cake is being baked by my mother.",
+    "original_slots": {
+      "S": "The cake",
+      "Aux": "is being",
+      "V": "baked",
+      "M2": "by my mother"
+    },
+    "ordered_slots": {
+      "1": "The cake",
+      "2": "is being",
+      "3": "baked",
+      "4": "by my mother"
+    }
+  },
+  {
+    "sentence": "The cake was eaten by the children.",
+    "original_slots": {
+      "S": "The cake",
+      "Aux": "was",
+      "V": "eaten",
+      "M2": "by the children"
+    },
+    "ordered_slots": {
+      "1": "The cake",
+      "2": "was",
+      "3": "eaten",
+      "4": "by the children"
+    }
+  },
+  {
+    "sentence": "The door was opened by the key.",
+    "original_slots": {
+      "S": "The door",
+      "Aux": "was",
+      "V": "opened",
+      "M2": "by the key"
+    },
+    "ordered_slots": {
+      "1": "The door",
+      "2": "was",
+      "3": "opened",
+      "4": "by the key"
+    }
+  },
+  {
+    "sentence": "The car was repaired last week.",
+    "original_slots": {
+      "S": "The car",
+      "Aux": "was",
+      "V": "repaired",
+      "M2": "last week"
+    },
+    "ordered_slots": {
+      "1": "The car",
+      "2": "was",
+      "3": "repaired",
+      "4": "last week"
+    }
+  },
+  {
+    "sentence": "The window was gently opened by the morning breeze.",
+    "original_slots": {
+      "S": "The window",
+      "Aux": "was",
+      "V": "opened",
+      "M2": "gently",
+      "M3": "by the morning breeze"
+    },
+    "ordered_slots": {
+      "1": "The window",
+      "2": "was",
+      "3": "opened",
+      "4": "gently",
+      "6": "by the morning breeze"
+    }
+  },
+  {
+    "sentence": "The message is being carefully written by the manager.",
+    "original_slots": {
+      "S": "The message",
+      "Aux": "is being",
+      "V": "written",
+      "M2": "carefully",
+      "M3": "by the manager"
+    },
+    "ordered_slots": {
+      "1": "The message",
+      "2": "is being",
+      "3": "written",
+      "4": "carefully",
+      "6": "by the manager"
+    }
+  },
+  {
+    "sentence": "He slowly opened the door.",
+    "original_slots": {
+      "S": "He",
+      "V": "opened",
+      "O1": "the door",
+      "M2": "slowly"
+    },
+    "ordered_slots": {
+      "1": "He",
+      "3": "opened",
+      "5": "the door",
+      "4": "slowly"
+    }
+  }
+]

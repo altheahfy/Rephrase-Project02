@@ -1,0 +1,36 @@
+[
+  {
+    "sentence": "The problem was quickly solved by the expert team.",
+    "original_slots": {
+      "S": "The problem",
+      "Aux": "was",
+      "V": "solved",
+      "M2": "quickly",
+      "M3": "by the expert team"
+    },
+    "ordered_slots": {
+      "1": "The problem",
+      "2": "was",
+      "4": "solved",
+      "3": "quickly",
+      "5": "by the expert team"
+    }
+  },
+  {
+    "sentence": "He quickly and carefully solved the problem.",
+    "original_slots": {
+      "S": "He",
+      "V": "solved",
+      "O1": "the problem",
+      "M2": "quickly",
+      "M3": "and carefully"
+    },
+    "ordered_slots": {
+      "1": "He",
+      "4": "solved",
+      "6": "the problem",
+      "3": "quickly",
+      "5": "and carefully"
+    }
+  }
+]

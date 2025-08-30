@@ -1,0 +1,17 @@
+[
+  {
+    "sentence": "Yesterday he became tired.",
+    "original_slots": {
+      "S": "he",
+      "V": "became",
+      "C1": "tired",
+      "M2": "Yesterday"
+    },
+    "ordered_slots": {
+      "2": "he",
+      "3": "became",
+      "4": "tired",
+      "1": "Yesterday"
+    }
+  }
+]

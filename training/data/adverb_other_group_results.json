@@ -1,0 +1,19 @@
+[
+  {
+    "sentence": "The building is being constructed very carefully by skilled workers.",
+    "original_slots": {
+      "S": "The building",
+      "Aux": "is being",
+      "V": "constructed",
+      "M2": "very carefully",
+      "M3": "by skilled workers"
+    },
+    "ordered_slots": {
+      "1": "The building",
+      "2": "is being",
+      "3": "constructed",
+      "4": "very carefully",
+      "5": "by skilled workers"
+    }
+  }
+]

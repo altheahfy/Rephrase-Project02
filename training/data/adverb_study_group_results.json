@@ -1,0 +1,45 @@
+[
+  {
+    "sentence": "The students study hard for exams.",
+    "original_slots": {
+      "S": "The students",
+      "V": "study",
+      "M2": "hard",
+      "M3": "for exams"
+    },
+    "ordered_slots": {
+      "1": "The students",
+      "3": "study",
+      "4": "hard",
+      "5": "for exams"
+    }
+  },
+  {
+    "sentence": "Tomorrow I study.",
+    "original_slots": {
+      "S": "I",
+      "V": "study",
+      "M2": "Tomorrow"
+    },
+    "ordered_slots": {
+      "1": "I",
+      "3": "study",
+      "4": "Tomorrow"
+    }
+  },
+  {
+    "sentence": "Students often study here.",
+    "original_slots": {
+      "S": "Students",
+      "V": "study",
+      "M1": "often",
+      "M2": "here"
+    },
+    "ordered_slots": {
+      "1": "Students",
+      "3": "study",
+      "2": "often",
+      "4": "here"
+    }
+  }
+]
