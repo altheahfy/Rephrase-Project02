@@ -1,0 +1,21 @@
+{
+  "case_59": {
+    "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "sub-m2": "efficiently",
+        "_parent_slot": "S"
+      }
+    },
+    "error": "'success'",
+    "match": false
+  }
+}
