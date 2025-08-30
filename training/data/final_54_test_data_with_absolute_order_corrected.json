@@ -1,8 +1,8 @@
 {
   "meta": {
-    "total_count": 86,
-    "valid_count": 86,
-    "new_count": 52,
+    "total_count": 110,
+    "valid_count": 110,
+    "new_count": 76,
     "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
@@ -12,12 +12,13 @@
       "relative_clauses": 23,
       "passive_voice": 4,
       "perfect_tense": 1,
-      "modal_verbs": 0,
+      "modal_verbs": 24,
       "complex_constructions": 12,
       "absolute_order_test": 0
     },
-    "total_reorganized": 86,
-    "tell_group_normalized": true
+    "total_reorganized": 110,
+    "tell_group_normalized": true,
+    "modal_handler_test_added": true
   },
   "data": {
     "1": {
@@ -1389,6 +1390,347 @@
           "V": "tell",
           "O1": "me",
           "O2": "a story"
+        },
+        "sub_slots": {}
+      }
+    },
+    "87": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "I can swim.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "can",
+          "V": "swim"
+        },
+        "sub_slots": {}
+      }
+    },
+    "88": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "She could speak English fluently.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "could",
+          "V": "speak",
+          "O1": "English",
+          "M2": "fluently"
+        },
+        "sub_slots": {}
+      }
+    },
+    "89": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "You will succeed in your career.",
+      "expected": {
+        "main_slots": {
+          "S": "You",
+          "Aux": "will",
+          "V": "succeed",
+          "M2": "in your career"
+        },
+        "sub_slots": {}
+      }
+    },
+    "90": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "We would visit Paris every summer.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "Aux": "would",
+          "V": "visit",
+          "O1": "Paris",
+          "M2": "every summer"
+        },
+        "sub_slots": {}
+      }
+    },
+    "91": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "They should study harder.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "should",
+          "V": "study",
+          "M2": "harder"
+        },
+        "sub_slots": {}
+      }
+    },
+    "92": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "You may leave now.",
+      "expected": {
+        "main_slots": {
+          "S": "You",
+          "Aux": "may",
+          "V": "leave",
+          "M2": "now"
+        },
+        "sub_slots": {}
+      }
+    },
+    "93": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "It might rain tomorrow.",
+      "expected": {
+        "main_slots": {
+          "S": "It",
+          "Aux": "might",
+          "V": "rain",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {}
+      }
+    },
+    "94": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "You must finish your homework.",
+      "expected": {
+        "main_slots": {
+          "S": "You",
+          "Aux": "must",
+          "V": "finish",
+          "O1": "your homework"
+        },
+        "sub_slots": {}
+      }
+    },
+    "95": {
+      "V_group_key": "perfect",
+      "grammar_category": "modal_verbs",
+      "sentence": "I have completed the project.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "have",
+          "V": "completed",
+          "O1": "the project"
+        },
+        "sub_slots": {}
+      }
+    },
+    "96": {
+      "V_group_key": "perfect",
+      "grammar_category": "modal_verbs",
+      "sentence": "She has lived here for ten years.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "has",
+          "V": "lived",
+          "M2": "here",
+          "M3": "for ten years"
+        },
+        "sub_slots": {}
+      }
+    },
+    "97": {
+      "V_group_key": "perfect",
+      "grammar_category": "modal_verbs",
+      "sentence": "They had already left the building.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "had",
+          "M2": "already",
+          "V": "left",
+          "O1": "the building"
+        },
+        "sub_slots": {}
+      }
+    },
+    "98": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "Do you understand the question?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Do",
+          "S": "you",
+          "V": "understand",
+          "O1": "the question"
+        },
+        "sub_slots": {}
+      }
+    },
+    "99": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "Does she work at the hospital?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Does",
+          "S": "she",
+          "V": "work",
+          "M2": "at the hospital"
+        },
+        "sub_slots": {}
+      }
+    },
+    "100": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "Don't touch that button!",
+      "expected": {
+        "main_slots": {
+          "Aux": "Don't",
+          "V": "touch",
+          "O1": "that button"
+        },
+        "sub_slots": {}
+      }
+    },
+    "101": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "Can you help me with this problem?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Can",
+          "S": "you",
+          "V": "help",
+          "O1": "me",
+          "M2": "with this problem"
+        },
+        "sub_slots": {}
+      }
+    },
+    "102": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "Would you like some coffee?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Would",
+          "S": "you",
+          "V": "like",
+          "O1": "some coffee"
+        },
+        "sub_slots": {}
+      }
+    },
+    "103": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "I shall return tomorrow.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "shall",
+          "V": "return",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {}
+      }
+    },
+    "104": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "We ought to start immediately.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "Aux": "ought to",
+          "V": "start",
+          "M2": "immediately"
+        },
+        "sub_slots": {}
+      }
+    },
+    "105": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "They used to play here every day.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "used to",
+          "V": "play",
+          "M2": "here",
+          "M3": "every day"
+        },
+        "sub_slots": {}
+      }
+    },
+    "106": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "He is going to study abroad.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "is going to",
+          "V": "study",
+          "M2": "abroad"
+        },
+        "sub_slots": {}
+      }
+    },
+    "107": {
+      "V_group_key": "perfect",
+      "grammar_category": "modal_verbs",
+      "sentence": "I have been waiting for an hour.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "have been",
+          "V": "waiting",
+          "M2": "for an hour"
+        },
+        "sub_slots": {}
+      }
+    },
+    "108": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "You should have called me earlier.",
+      "expected": {
+        "main_slots": {
+          "S": "You",
+          "Aux": "should have",
+          "V": "called",
+          "O1": "me",
+          "M2": "earlier"
+        },
+        "sub_slots": {}
+      }
+    },
+    "109": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "They will be arriving at noon.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "will be",
+          "V": "arriving",
+          "M2": "at noon"
+        },
+        "sub_slots": {}
+      }
+    },
+    "110": {
+      "V_group_key": "modal",
+      "grammar_category": "modal_verbs",
+      "sentence": "She might have forgotten the appointment.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "might have",
+          "V": "forgotten",
+          "O1": "the appointment"
         },
         "sub_slots": {}
       }
