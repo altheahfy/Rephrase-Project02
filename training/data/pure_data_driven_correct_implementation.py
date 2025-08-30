@@ -88,7 +88,9 @@ class PureDataDrivenAbsoluteOrderManager:
                 'v_group_key': v_group_key,
                 'standard_order': order_result['standard_order'],
                 'element_to_order': order_result['element_to_order'],
-                'position_elements': order_result['position_elements'],
+                'meta_table': order_result['meta_table'],
+                'column_assignments': order_result['column_assignments'],
+                'unique_elements': order_result['unique_elements'],
                 'confidence': order_result['confidence'],
                 'total_examples': len(decomposed_examples)
             }
@@ -101,15 +103,16 @@ class PureDataDrivenAbsoluteOrderManager:
     
     def _build_standard_order(self, decomposed_examples):
         """
-        正しい4ステップアルゴリズム：
-        ②全要素抽出（位置別に区別）
-        ③語順に沿って並べ（重複なし、共通項で整列）
-        ④番号付与
+        正しい4ステップアルゴリズム：エクセル表構造による横断的分析
+        ②全要素抽出（グループ横断的に）
+        ③メタ表構造作成（エクセルのセル的視点）
+        ④列番号 = order番号付与
         """
-        print(f"[DEBUG] 正しい4ステップアルゴリズム開始")
+        print(f"[DEBUG] エクセル表構造による横断的分析開始")
         
-        # ②全要素抽出 - 位置別に区別してスロット要素を抽出
-        all_elements_by_position = []  # [(position, slot_type, value, example_idx)]
+        # ②全要素抽出 - グループ全体から全ての要素を識別
+        all_slot_values = {}  # {slot_type: set(values)}
+        sentence_grids = []   # 各例文をグリッド形式で記録
         
         for idx, example in enumerate(decomposed_examples):
             sentence = example['sentence']
@@ -118,53 +121,144 @@ class PureDataDrivenAbsoluteOrderManager:
             print(f"[DEBUG] 例文{idx}: {sentence}")
             print(f"[DEBUG] 分解結果: {decomposed}")
             
-            # 文を単語に分割
-            words = sentence.split()
-            
-            # 各スロットが文中のどの位置にあるかを特定
+            # 全スロット値を収集
             for slot_type, slot_value in decomposed.items():
-                slot_words = slot_value.split()
-                
-                # スロット値の最初の単語が文中のどの位置にあるかを探す
-                for word_idx, word in enumerate(words):
+                if slot_type not in all_slot_values:
+                    all_slot_values[slot_type] = set()
+                all_slot_values[slot_type].add(slot_value)
+            
+            # 文を単語に分割してグリッド記録
+            words = sentence.split()
+            sentence_grid = []
+            
+            # 各位置のスロット情報を記録
+            for word_idx, word in enumerate(words):
+                found_slot = None
+                for slot_type, slot_value in decomposed.items():
+                    slot_words = slot_value.split()
                     if word in slot_words:
                         # 完全一致確認
                         remaining_words = words[word_idx:word_idx+len(slot_words)]
                         if len(remaining_words) >= len(slot_words):
                             if ' '.join(remaining_words[:len(slot_words)]) == slot_value:
-                                all_elements_by_position.append((word_idx, slot_type, slot_value, idx))
+                                found_slot = (slot_type, slot_value)
                                 break
-        
-        print(f"[DEBUG] 全要素（位置別）: {all_elements_by_position}")
-        
-        # ③語順に沿って並べ - 例文の語順を保持しながら全体順序を構築
-        # 位置でソートして、重複しないよう順序を決定
-        sorted_elements = sorted(all_elements_by_position, key=lambda x: (x[3], x[0]))  # 例文順、位置順
-        
-        unique_element_keys = []
-        element_to_order = {}
-        order_num = 1
-        
-        seen_element_keys = set()
-        
-        for position, slot_type, slot_value, example_idx in sorted_elements:
-            # 同じスロットでも位置が違えば別要素として扱う
-            element_key = f"{slot_type}_{position}"
+                
+                sentence_grid.append({
+                    'position': word_idx,
+                    'word': word,
+                    'slot_info': found_slot
+                })
             
-            if element_key not in seen_element_keys:
-                seen_element_keys.add(element_key)
-                unique_element_keys.append(element_key)
-                element_to_order[element_key] = order_num
-                print(f"[DEBUG] 要素 {element_key} → order {order_num}")
-                order_num += 1
+            sentence_grids.append(sentence_grid)
         
-        print(f"[DEBUG] 最終順序: {unique_element_keys}")
-        print(f"[DEBUG] 要素→order番号: {element_to_order}")
+        print(f"[DEBUG] 全スロット値: {all_slot_values}")
+        
+        # ③メタ表構造作成 - 各スロット要素を適切な列に配置
+        # 同じスロットでも異なる用途（疑問詞 vs 通常位置）は別列
+        unique_elements = []  # [(element_key, slot_type, typical_values)]
+        
+        # M2の分析：疑問詞 vs 通常位置
+        if 'M2' in all_slot_values:
+            m2_values = all_slot_values['M2']
+            question_words = {'Where', 'When', 'How', 'Why'}
+            m2_question = set()
+            m2_normal = set()
+            
+            for value in m2_values:
+                if value in question_words:
+                    m2_question.add(value)
+                else:
+                    m2_normal.add(value)
+            
+            if m2_question:
+                unique_elements.append(('M2_question', 'M2', m2_question))
+            if m2_normal:
+                unique_elements.append(('M2_normal', 'M2', m2_normal))
+        
+        # O2の分析：疑問詞 vs 通常位置
+        if 'O2' in all_slot_values:
+            o2_values = all_slot_values['O2']
+            question_words = {'What', 'Who', 'Which'}
+            o2_question = set()
+            o2_normal = set()
+            
+            for value in o2_values:
+                if value in question_words:
+                    o2_question.add(value)
+                else:
+                    o2_normal.add(value)
+            
+            if o2_question:
+                unique_elements.append(('O2_question', 'O2', o2_question))
+            if o2_normal:
+                unique_elements.append(('O2_normal', 'O2', o2_normal))
+        
+        # その他のスロット（通常は単一用途）
+        for slot_type in ['Aux', 'S', 'V', 'O1']:
+            if slot_type in all_slot_values:
+                unique_elements.append((slot_type, slot_type, all_slot_values[slot_type]))
+        
+        print(f"[DEBUG] 識別された要素: {unique_elements}")
+        
+        # ④エクセル表形式での配置と列番号付与
+        meta_table = []  # 各行は1つの例文
+        column_assignments = {}  # {element_key: column_number}
+        
+        # 各例文をメタ表に配置
+        for idx, sentence_grid in enumerate(sentence_grids):
+            row = [''] * 20  # 十分な列数を確保
+            used_columns = set()
+            
+            # 各スロット要素を適切な列に配置
+            for grid_item in sentence_grid:
+                if grid_item['slot_info']:
+                    slot_type, slot_value = grid_item['slot_info']
+                    
+                    # 適切な要素キーを特定
+                    element_key = None
+                    for elem_key, elem_slot_type, elem_values in unique_elements:
+                        if slot_type == elem_slot_type and slot_value in elem_values:
+                            element_key = elem_key
+                            break
+                    
+                    if element_key:
+                        # まだ列が割り当てられていない場合、新しい列を割り当て
+                        if element_key not in column_assignments:
+                            # 使用されていない最小の列番号を見つける
+                            col_num = 0
+                            while col_num in used_columns or col_num in column_assignments.values():
+                                col_num += 1
+                            column_assignments[element_key] = col_num
+                        
+                        col_num = column_assignments[element_key]
+                        row[col_num] = slot_value
+                        used_columns.add(col_num)
+            
+            meta_table.append(row)
+        
+        print(f"[DEBUG] 列割り当て: {column_assignments}")
+        print(f"[DEBUG] メタ表:")
+        for i, row in enumerate(meta_table):
+            non_empty = [f"列{j}:{val}" for j, val in enumerate(row) if val]
+            print(f"[DEBUG] 行{i}: {non_empty}")
+        
+        # 最終的な要素→order番号マッピング
+        element_to_order = {}
+        standard_order = []
+        
+        for element_key, col_num in sorted(column_assignments.items(), key=lambda x: x[1]):
+            order_num = col_num + 1  # 1ベースの番号
+            element_to_order[element_key] = order_num
+            standard_order.append(element_key)
+            print(f"[DEBUG] 要素 {element_key} → order {order_num}")
         
         return {
-            'standard_order': unique_element_keys,
+            'standard_order': standard_order,
             'element_to_order': element_to_order,
-            'position_elements': all_elements_by_position,
+            'meta_table': meta_table,
+            'column_assignments': column_assignments,
+            'unique_elements': unique_elements,
             'confidence': 1.0
         }
     
@@ -233,30 +327,35 @@ class PureDataDrivenAbsoluteOrderManager:
     
     def _apply_order_to_sentence(self, slots: Dict[str, str], text: str, group_analysis: Dict) -> Dict:
         """
-        分解された文に順序番号を適用
+        分解された文に順序番号を適用（エクセル表構造対応版）
         """
         try:
             ordered_slots = {}
             element_to_order = group_analysis['element_to_order']
+            unique_elements = group_analysis['unique_elements']
             
-            # 入力文を単語に分割
-            words = text.split()
+            print(f"[DEBUG] 順序適用: 文 = {text}")
+            print(f"[DEBUG] 順序適用: スロット = {slots}")
+            print(f"[DEBUG] 順序適用: 要素→order = {element_to_order}")
             
-            # 各スロットの位置を特定して順序番号を付与
+            # 各スロットを適切な要素キーにマッピングして順序付与
             for slot_type, slot_value in slots.items():
-                slot_words = slot_value.split()
+                print(f"[DEBUG] 処理中: {slot_type} = {slot_value}")
                 
-                # スロット値が文中のどの位置にあるかを探す
-                for word_idx, word in enumerate(words):
-                    if word in slot_words:
-                        remaining_words = words[word_idx:word_idx+len(slot_words)]
-                        if len(remaining_words) >= len(slot_words):
-                            if ' '.join(remaining_words[:len(slot_words)]) == slot_value:
-                                element_key = f"{slot_type}_{word_idx}"
-                                if element_key in element_to_order:
-                                    order_num = element_to_order[element_key]
-                                    ordered_slots[str(order_num)] = slot_value
-                                break
+                # 適切な要素キーを特定
+                element_key = None
+                for elem_key, elem_slot_type, elem_values in unique_elements:
+                    if slot_type == elem_slot_type and slot_value in elem_values:
+                        element_key = elem_key
+                        print(f"[DEBUG] マッチした要素キー: {element_key}")
+                        break
+                
+                if element_key and element_key in element_to_order:
+                    order_num = element_to_order[element_key]
+                    ordered_slots[str(order_num)] = slot_value
+                    print(f"[DEBUG] 順序付与: {slot_value} → order {order_num}")
+                else:
+                    print(f"[DEBUG] 要素キー {element_key} が見つかりません")
             
             return {'ordered_slots': ordered_slots}
             
