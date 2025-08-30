@@ -1834,8 +1834,8 @@
       "expected": {
         "main_slots": {
           "S": "",
-          "V": "is",
-          "C1": "approaching"
+          "Aux": "is",
+          "V": "approaching"
         },
         "sub_slots": {
           "sub-m2": "The time when",
