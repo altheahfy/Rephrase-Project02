@@ -1,0 +1,1040 @@
+{
+  "case_87": {
+    "sentence": "I can swim.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "can",
+        "V": "swim"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I can swim.",
+      "main_slots": {
+        "Aux": "can",
+        "S": "I",
+        "V": "swim"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "can",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "can",
+        "1": "I",
+        "3": "swim"
+      }
+    },
+    "match": true
+  },
+  "case_88": {
+    "sentence": "She could speak English fluently.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "could",
+        "V": "speak",
+        "O1": "English",
+        "M2": "fluently"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She could speak English fluently.",
+      "main_slots": {
+        "Aux": "could",
+        "S": "She",
+        "V": "speak",
+        "O1": "English",
+        "M2": "fluently"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "could",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "could",
+        "1": "She",
+        "3": "speak",
+        "4": "English",
+        "5": "fluently"
+      }
+    },
+    "match": true
+  },
+  "case_89": {
+    "sentence": "You will succeed in your career.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "will",
+        "V": "succeed",
+        "M2": "in your career"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You will succeed in your career.",
+      "main_slots": {
+        "Aux": "will",
+        "S": "You",
+        "V": "succeed",
+        "M2": "in career your"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "will",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "will",
+        "1": "You",
+        "3": "succeed"
+      }
+    },
+    "match": false
+  },
+  "case_90": {
+    "sentence": "We would visit Paris every summer.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "Aux": "would",
+        "V": "visit",
+        "O1": "Paris",
+        "M2": "every summer"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "We would visit Paris every summer.",
+      "main_slots": {
+        "Aux": "would",
+        "S": "We",
+        "V": "visit",
+        "O1": "Paris"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "would",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "would",
+        "1": "We",
+        "3": "visit",
+        "4": "Paris"
+      }
+    },
+    "match": false
+  },
+  "case_91": {
+    "sentence": "They should study harder.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "should",
+        "V": "study",
+        "M2": "harder"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They should study harder.",
+      "main_slots": {
+        "Aux": "should",
+        "S": "They",
+        "V": "study",
+        "M2": "harder"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "should",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "should",
+        "1": "They",
+        "3": "study",
+        "4": "harder"
+      }
+    },
+    "match": true
+  },
+  "case_92": {
+    "sentence": "You may leave now.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "may",
+        "V": "leave",
+        "M2": "now"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You may leave now.",
+      "main_slots": {
+        "Aux": "may",
+        "S": "You",
+        "V": "leave",
+        "M2": "now"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "may",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "may",
+        "1": "You",
+        "3": "leave",
+        "4": "now"
+      }
+    },
+    "match": true
+  },
+  "case_93": {
+    "sentence": "It might rain tomorrow.",
+    "expected": {
+      "main_slots": {
+        "S": "It",
+        "Aux": "might",
+        "V": "rain",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "It might rain tomorrow.",
+      "main_slots": {
+        "Aux": "might",
+        "S": "It",
+        "V": "rain"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "might",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "might",
+        "1": "It",
+        "3": "rain"
+      }
+    },
+    "match": false
+  },
+  "case_94": {
+    "sentence": "You must finish your homework.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "must",
+        "V": "finish",
+        "O1": "your homework"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You must finish your homework.",
+      "main_slots": {
+        "Aux": "must",
+        "S": "You",
+        "V": "finish",
+        "O1": "homework"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "must",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "must",
+        "1": "You",
+        "3": "finish",
+        "4": "homework"
+      }
+    },
+    "match": false
+  },
+  "case_95": {
+    "sentence": "I have completed the project.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "have",
+        "V": "completed",
+        "O1": "the project"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I have completed the project.",
+      "main_slots": {
+        "Aux": "have",
+        "S": "I",
+        "V": "completed",
+        "O1": "project"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "have",
+        "1": "I",
+        "3": "completed",
+        "4": "project"
+      }
+    },
+    "match": false
+  },
+  "case_96": {
+    "sentence": "She has lived here for ten years.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "has",
+        "V": "lived",
+        "M2": "here",
+        "M3": "for ten years"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She has lived here for ten years.",
+      "main_slots": {
+        "Aux": "has",
+        "S": "She",
+        "V": "lived",
+        "M2": "here",
+        "M3": "for years ten"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "has",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "has",
+        "1": "She",
+        "3": "lived",
+        "4": "here"
+      }
+    },
+    "match": false
+  },
+  "case_97": {
+    "sentence": "They had already left the building.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "had",
+        "M2": "already",
+        "V": "left",
+        "O1": "the building"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "They had already left the building.",
+      "success": true,
+      "main_slots": {
+        "S": "They",
+        "V": "left",
+        "O1": "the building",
+        "M2": "already"
+      },
+      "slots": {
+        "S": "They",
+        "V": "left",
+        "O1": "the building",
+        "M2": "already"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "They",
+        "3": "left",
+        "4": "the building",
+        "2": "already"
+      }
+    },
+    "match": false
+  },
+  "case_98": {
+    "sentence": "Do you understand the question?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Do",
+        "S": "you",
+        "V": "understand",
+        "O1": "the question"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Do you understand the question?",
+      "main_slots": {
+        "Aux": "Do",
+        "S": "you",
+        "V": "understand",
+        "O1": "the question"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "Do",
+        "2": "you",
+        "3": "understand",
+        "4": "the question"
+      }
+    },
+    "match": true
+  },
+  "case_99": {
+    "sentence": "Does she work at the hospital?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Does",
+        "S": "she",
+        "V": "work",
+        "M2": "at the hospital"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Does she work at the hospital?",
+      "main_slots": {
+        "Aux": "Does",
+        "S": "she",
+        "V": "work",
+        "M2": "at the hospital"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "Does",
+        "2": "she",
+        "3": "work",
+        "4": "at the hospital"
+      }
+    },
+    "match": true
+  },
+  "case_100": {
+    "sentence": "Don't touch that button!",
+    "expected": {
+      "main_slots": {
+        "Aux": "Don't",
+        "V": "touch",
+        "O1": "that button"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Don't touch that button!",
+      "main_slots": {
+        "Aux": "Do",
+        "V": "touch",
+        "O1": "button"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "do_auxiliary",
+          "auxiliary": "Do",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "auxiliary"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "Do",
+        "2": "touch",
+        "3": "button"
+      }
+    },
+    "match": false
+  },
+  "case_101": {
+    "sentence": "Can you help me with this problem?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Can",
+        "S": "you",
+        "V": "help",
+        "O1": "me",
+        "M2": "with this problem"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Can you help me with this problem?",
+      "main_slots": {
+        "Aux": "Can",
+        "S": "you",
+        "V": "help",
+        "O1": "me",
+        "M2": "with this problem"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "Can",
+        "2": "you",
+        "3": "help",
+        "4": "me",
+        "5": "with this problem"
+      }
+    },
+    "match": true
+  },
+  "case_102": {
+    "sentence": "Would you like some coffee?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Would",
+        "S": "you",
+        "V": "like",
+        "O1": "some coffee"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Would you like some coffee?",
+      "main_slots": {
+        "Aux": "Would",
+        "S": "you",
+        "V": "like",
+        "O1": "some coffee"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "Would",
+        "2": "you",
+        "3": "like",
+        "4": "some coffee"
+      }
+    },
+    "match": true
+  },
+  "case_103": {
+    "sentence": "I shall return tomorrow.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "shall",
+        "V": "return",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I shall return tomorrow.",
+      "main_slots": {
+        "Aux": "shall",
+        "S": "I",
+        "V": "return"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "shall",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "shall",
+        "1": "I",
+        "3": "return"
+      }
+    },
+    "match": false
+  },
+  "case_104": {
+    "sentence": "We ought to start immediately.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "Aux": "ought to",
+        "V": "start",
+        "M2": "immediately"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "We ought to start immediately.",
+      "main_slots": {
+        "Aux": "ought to",
+        "S": "We",
+        "V": "start",
+        "M2": "immediately"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "ought to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "ought to",
+        "1": "We",
+        "3": "start",
+        "4": "immediately"
+      }
+    },
+    "match": true
+  },
+  "case_105": {
+    "sentence": "They used to play here every day.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "used to",
+        "V": "play",
+        "M2": "here",
+        "M3": "every day"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They used to play here every day.",
+      "main_slots": {
+        "Aux": "used to",
+        "S": "They",
+        "V": "play",
+        "M2": "here"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "used to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "used to",
+        "1": "They",
+        "3": "play",
+        "4": "here"
+      }
+    },
+    "match": false
+  },
+  "case_106": {
+    "sentence": "He is going to study abroad.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "Aux": "is going to",
+        "V": "study",
+        "M2": "abroad"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "He is going to study abroad.",
+      "main_slots": {
+        "Aux": "be going to",
+        "S": "He",
+        "V": "study",
+        "M2": "abroad"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "be going to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "He",
+        "2": "study",
+        "3": "abroad"
+      }
+    },
+    "match": false
+  },
+  "case_107": {
+    "sentence": "I have been waiting for an hour.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "have been",
+        "V": "waiting",
+        "M2": "for an hour"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I have been waiting for an hour.",
+      "main_slots": {
+        "Aux": "have been",
+        "S": "I",
+        "V": "waiting",
+        "M2": "for hour an"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "have been",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "have been",
+        "1": "I",
+        "3": "waiting"
+      }
+    },
+    "match": false
+  },
+  "case_108": {
+    "sentence": "You should have called me earlier.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "should have",
+        "V": "called",
+        "O1": "me",
+        "M2": "earlier"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You should have called me earlier.",
+      "main_slots": {
+        "Aux": "should have",
+        "S": "You",
+        "V": "called",
+        "O1": "me",
+        "M2": "earlier"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "should have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "should have",
+        "1": "You",
+        "3": "called",
+        "4": "me",
+        "5": "earlier"
+      }
+    },
+    "match": true
+  },
+  "case_109": {
+    "sentence": "They will be arriving at noon.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "will be",
+        "V": "arriving",
+        "M2": "at noon"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They will be arriving at noon.",
+      "main_slots": {
+        "Aux": "will be",
+        "S": "They",
+        "V": "arriving",
+        "M2": "at noon"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "will be",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "will be",
+        "1": "They",
+        "3": "arriving",
+        "4": "at noon"
+      }
+    },
+    "match": true
+  },
+  "case_110": {
+    "sentence": "She might have forgotten the appointment.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "might have",
+        "V": "forgotten",
+        "O1": "the appointment"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She might have forgotten the appointment.",
+      "main_slots": {
+        "Aux": "might have",
+        "S": "She",
+        "V": "forgotten",
+        "O1": "appointment"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "might have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "2": "might have",
+        "1": "She",
+        "3": "forgotten",
+        "4": "appointment"
+      }
+    },
+    "match": false
+  }
+}

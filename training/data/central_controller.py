@@ -16,6 +16,7 @@ from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
+from modal_handler import ModalHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -42,11 +43,12 @@ class CentralController:
         # 動的分析用のグループマッピングを初期化
         self._initialize_group_mappings()
         
-        # Phase 3: 基本ハンドラーたちを先に初期化
+        # Phase 6: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
         adverb_handler = AdverbHandler()
         passive_voice_handler = PassiveVoiceHandler()
         question_handler = QuestionHandler()
+        modal_handler = ModalHandler(self.nlp)  # Phase 6: ModalHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -65,7 +67,8 @@ class CentralController:
             'relative_clause': relative_clause_handler,
             'adverb': adverb_handler,
             'passive_voice': passive_voice_handler,
-            'question': question_handler
+            'question': question_handler,
+            'modal': modal_handler  # Phase 6: ModalHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -200,12 +203,17 @@ class CentralController:
         """
         doc = self.nlp(text)
         
-        # Phase 3: 疑問文 + 関係節 + 5文型の検出
+        # Phase 6: 疑問文 + 助動詞 + 関係節 + 5文型の検出
         detected_patterns = []
         
         # 疑問文検出（最優先）
         if self.handlers['question'].is_question(text):
             detected_patterns.append('question')
+        
+        # 助動詞検出（高優先度）
+        modal_info = self.handlers['modal'].detect_modal_structure(text)
+        if modal_info.get('has_modal', False):
+            detected_patterns.append('modal')
         
         # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom', 'where', 'when', 'why', 'how'] 
@@ -392,6 +400,33 @@ class CentralController:
                     print(f"  QuestionHandler error: {question_result.get('error')}")
                 if not five_pattern_result['success']:
                     print(f"  BasicFivePatternHandler error: {five_pattern_result.get('error')}")
+        
+        # 🎯 Phase 6: 助動詞処理（疑問文でない場合に適用）
+        if 'modal' in grammar_patterns and 'question' not in grammar_patterns:
+            modal_handler = self.handlers['modal']
+            modal_result = modal_handler.process(text)
+            
+            if modal_result['success']:
+                print(f"✅ 助動詞処理成功: {modal_result.get('main_slots', {})}")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': modal_result['main_slots'],
+                    'sub_slots': modal_result.get('sub_slots', {}),
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'modal',
+                        'modal_info': modal_result.get('modal_info', {}),
+                        'confidence': 0.9
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
+                print(f"  ModalHandler error: {modal_result.get('error')}")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
