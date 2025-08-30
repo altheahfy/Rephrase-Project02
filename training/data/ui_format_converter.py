@@ -185,13 +185,44 @@ class UIFormatConverter:
         }
     
     def _get_display_order(self, slot: str, phrase: str, ordered_slots: Dict[str, str]) -> int:
-        """表示順序を決定"""
-        # ordered_slotsから順序を探す
+        """表示順序を決定（ordered_slotsの順序を直接使用）"""
+        
+        # 🎯 まずordered_slotsから直接順序を検索
+        # 1. フレーズで完全一致
         for order_num, order_phrase in ordered_slots.items():
             if order_phrase == phrase:
                 return int(order_num)
         
-        # フォールバック: デフォルト順序
+        # 2. 空文字列の場合、対応するスロットタイプの順序を取得
+        if phrase == "":
+            # メインスロットから対応する順序を特定
+            main_slot_order_map = {
+                'S': '1',  # 通常Sは1番目
+                'V': '3',  # 通常Vは3番目（M2が2番目の場合）
+                'O1': '4', # 通常O1は4番目
+                'M2': '2'  # 通常M2は2番目（動詞前）
+            }
+            
+            # 実際のordered_slotsから逆引き
+            for order_num, order_phrase in ordered_slots.items():
+                if order_phrase == "" and slot in ['S'] and order_num == '1':
+                    return int(order_num)
+            
+            # フォールバック：スロット名から推定
+            if slot in main_slot_order_map:
+                expected_order = main_slot_order_map[slot]
+                if expected_order in ordered_slots:
+                    return int(expected_order)
+        
+        # 3. サブスロットを持つ上位スロット（関係節など）の場合
+        if phrase and slot == 'S':
+            # Sスロットの順序を探す（通常は1）
+            for order_num, order_phrase in ordered_slots.items():
+                if order_phrase == "" and order_num == '1':
+                    return 1  # Sは常に1番目
+        
+        # フォールバック: デフォルト順序マッピング
+        return self.slot_order_mapping.get(slot, 99)
         return self.slot_order_mapping.get(slot, 99)
     
     def _estimate_phrase_type(self, phrase: str, has_subslots: bool = False) -> str:
