@@ -1,0 +1,107 @@
+[
+  {
+    "sentence": "She sings beautifully.",
+    "original_slots": {
+      "S": "She",
+      "V": "sings",
+      "M2": "beautifully"
+    },
+    "ordered_slots": {
+      "3": "She",
+      "4": "sings",
+      "10": "beautifully"
+    }
+  },
+  {
+    "sentence": "We always eat breakfast together.",
+    "original_slots": {
+      "S": "We",
+      "V": "eat",
+      "O1": "breakfast",
+      "M1": "always",
+      "M2": "together"
+    },
+    "ordered_slots": {
+      "3": "We",
+      "4": "eat",
+      "8": "breakfast",
+      "5": "always",
+      "11": "together"
+    }
+  },
+  {
+    "sentence": "The cat quietly sat on the mat.",
+    "original_slots": {
+      "S": "The cat",
+      "V": "sat",
+      "M1": "quietly",
+      "M2": "on the mat"
+    },
+    "ordered_slots": {
+      "3": "The cat",
+      "4": "sat",
+      "6": "quietly",
+      "12": "on the mat"
+    }
+  },
+  {
+    "sentence": "She carefully reads books.",
+    "original_slots": {
+      "S": "She",
+      "V": "reads",
+      "O1": "books",
+      "M2": "carefully"
+    },
+    "ordered_slots": {
+      "3": "She",
+      "4": "reads",
+      "8": "books",
+      "7": "carefully"
+    }
+  },
+  {
+    "sentence": "They run fast.",
+    "original_slots": {
+      "S": "They",
+      "V": "run",
+      "M2": "fast"
+    },
+    "ordered_slots": {
+      "3": "They",
+      "4": "run",
+      "13": "fast"
+    }
+  },
+  {
+    "sentence": "Actually, she works very hard.",
+    "original_slots": {
+      "S": "she",
+      "V": "works",
+      "M1": "Actually",
+      "M2": "very hard"
+    },
+    "ordered_slots": {
+      "3": "she",
+      "4": "works",
+      "1": "Actually",
+      "14": "very hard"
+    }
+  },
+  {
+    "sentence": "Every morning, he jogs slowly in the park.",
+    "original_slots": {
+      "S": "he",
+      "V": "jogs",
+      "M1": "Every morning",
+      "M2": "slowly",
+      "M3": "in the park"
+    },
+    "ordered_slots": {
+      "3": "he",
+      "4": "jogs",
+      "2": "Every morning",
+      "9": "slowly",
+      "15": "in the park"
+    }
+  }
+]
