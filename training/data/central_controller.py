@@ -16,7 +16,7 @@ from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
-from absolute_order_manager import AbsoluteOrderManager
+from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager
 
 
 class CentralController:
@@ -38,8 +38,11 @@ class CentralController:
         """初期化: spaCy POS解析器とハンドラー群の設定（協力アプローチ版）"""
         self.nlp = spacy.load('en_core_web_sm')
         
-        # AbsoluteOrderManager初期化
-        self.absolute_order_manager = AbsoluteOrderManager()
+        # DynamicAbsoluteOrderManager初期化
+        self.absolute_order_manager = DynamicAbsoluteOrderManager()
+        
+        # 動的分析用のグループマッピングを初期化
+        self._initialize_group_mappings()
         
         # Phase 3: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
@@ -67,6 +70,37 @@ class CentralController:
         # Rephraseスロット定義読み込み
         self.slot_structure = self._load_slot_structure()
         
+    def _initialize_group_mappings(self):
+        """動的分析用のグループマッピングを初期化"""
+        # tellグループの例文群
+        tell_examples = [
+            "What did he tell her at the store?",
+            "Did he tell her a secret there?", 
+            "Where did you tell me a story?",
+            "Yesterday what did he tell her?",
+            "Did I tell him a truth in the kitchen?"
+        ]
+        
+        # gaveグループの例文群
+        gave_examples = [
+            "he gave me a message",
+            "she gave him a money",
+            "Tom gave her ticket",
+            "I gave Tom that"
+        ]
+        
+        # 動的分析実行
+        try:
+            tell_mapping = self.absolute_order_manager.analyze_group_elements("tell", tell_examples)
+            self.absolute_order_manager.register_group_mapping("tell", tell_mapping)
+            
+            gave_mapping = self.absolute_order_manager.analyze_group_elements("gave", gave_examples)
+            self.absolute_order_manager.register_group_mapping("gave", gave_mapping)
+            
+            print("✅ 動的絶対順序マッピングの初期化完了")
+        except Exception as e:
+            print(f"⚠️ 動的マッピング初期化エラー: {e}")
+        
     def _load_slot_structure(self) -> Dict[str, Any]:
         """slot_order_data.jsonからRephraseスロット構造を読み込み"""
         try:
@@ -74,6 +108,25 @@ class CentralController:
                 return json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError("slot_order_data.json が見つかりません")
+    
+    def _determine_group_key(self, slots: Dict[str, str], text: str) -> str:
+        """スロットと文章から動詞グループキーを決定"""
+        if 'V' in slots:
+            verb = slots['V'].lower()
+            if 'tell' in verb:
+                return 'tell'
+            elif 'gave' in verb or 'give' in verb:
+                return 'gave'
+        
+        # 文章からも動詞を検出
+        text_lower = text.lower()
+        if 'tell' in text_lower or 'told' in text_lower:
+            return 'tell'
+        elif 'gave' in text_lower or 'give' in text_lower:
+            return 'gave'
+        
+        # デフォルト
+        return 'basic'
     
     def analyze_grammar_structure(self, text: str) -> List[str]:
         """
@@ -254,8 +307,9 @@ class CentralController:
                 
                 print(f"✅ 疑問文+5文型+修飾語統合成功: {final_slots}")
                 
-                # 🎯 AbsoluteOrderManager統合: 疑問文でも固定列マッピング適用
-                absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text)
+                # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
+                v_group_key = self._determine_group_key(final_slots, text)
+                absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
                 
                 return {
                     'success': True,
@@ -518,8 +572,9 @@ class CentralController:
         if modifier_slots:
             final_slots.update(modifier_slots)
         
-        # 🎯 AbsoluteOrderManager統合: 固定列マッピング適用
-        absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text)
+        # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
+        v_group_key = self._determine_group_key(final_slots, text)
+        absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
         
         return {
             'original_text': text,
@@ -655,8 +710,9 @@ class CentralController:
             }
         }
         
-        # 🎯 AbsoluteOrderManager統合: 固定列マッピング適用
-        absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text)
+        # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
+        v_group_key = self._determine_group_key(main_slots, text)
+        absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text, v_group_key)
         result['absolute_order'] = absolute_result
         
         return result
