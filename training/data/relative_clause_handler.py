@@ -81,6 +81,12 @@ class RelativeClauseHandler:
             elif ' how ' in text.lower():
                 return self._process_relative_adverb(text, 'how')
             else:
+                # ゼロ関係代名詞の検出
+                zero_rel_result = self._detect_zero_relative_clause(resolved_text)
+                if zero_rel_result and zero_rel_result.get('success'):
+                    print(f"🎯 ゼロ関係代名詞検出")
+                    return zero_rel_result
+                    
                 print(f"⚠️ 関係節が見つかりませんでした: '{text}'")
                 return {'success': False, 'error': '関係節が見つかりませんでした'}
                 
