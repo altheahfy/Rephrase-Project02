@@ -1734,6 +1734,194 @@
         },
         "sub_slots": {}
       }
+    },
+    "111": {
+      "V_group_key": "action",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The house where they lived was demolished.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "demolished"
+        },
+        "sub_slots": {
+          "sub-m2": "The house where",
+          "sub-s": "they",
+          "sub-v": "lived",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "112": {
+      "V_group_key": "be",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The day when we graduated was memorable.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "memorable"
+        },
+        "sub_slots": {
+          "sub-m2": "The day when",
+          "sub-s": "we",
+          "sub-v": "graduated",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "113": {
+      "V_group_key": "be",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The reason why he quit is personal.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "personal"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "he",
+          "sub-v": "quit",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "114": {
+      "V_group_key": "action",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The way how she explained it helped everyone.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "helped",
+          "O1": "everyone"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "she",
+          "sub-v": "explained",
+          "sub-o1": "it",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "115": {
+      "V_group_key": "action",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The place where we first met holds special memories.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "holds",
+          "O1": "special memories"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m3": "first",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "116": {
+      "V_group_key": "modal",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The time when everything will change is approaching.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "approaching"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "everything",
+          "sub-aux": "will",
+          "sub-v": "change",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "117": {
+      "V_group_key": "tell",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The moment when he told her the truth changed everything.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "changed",
+          "O1": "everything"
+        },
+        "sub_slots": {
+          "sub-m2": "The moment when",
+          "sub-s": "he",
+          "sub-v": "told",
+          "sub-o1": "her",
+          "sub-o2": "the truth",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "118": {
+      "V_group_key": "be",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The reason why she was upset became clear.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "clear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-aux": "was",
+          "sub-v": "upset",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "119": {
+      "V_group_key": "action",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The city where we spent our honeymoon is in Italy.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "M2": "in Italy"
+        },
+        "sub_slots": {
+          "sub-m2": "The city where",
+          "sub-s": "we",
+          "sub-v": "spent",
+          "sub-o1": "our honeymoon",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "120": {
+      "V_group_key": "action",
+      "grammar_category": "relative_adverbs",
+      "sentence": "The method how they solved the problem was innovative.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "innovative"
+        },
+        "sub_slots": {
+          "sub-m2": "The method how",
+          "sub-s": "they",
+          "sub-v": "solved",
+          "sub-o1": "the problem",
+          "_parent_slot": "S"
+        }
+      }
     }
   }
 }
