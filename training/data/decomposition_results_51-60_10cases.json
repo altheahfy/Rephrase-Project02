@@ -1,0 +1,477 @@
+{
+  "case_51": {
+    "sentence": "The letter which was sent arrived.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The letter which was sent arrived.",
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "arrived"
+      }
+    },
+    "match": true
+  },
+  "case_52": {
+    "sentence": "The man whose car is red lives here.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "sub-c1": "red",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man whose car is red lives here.",
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "_parent_slot": "S",
+        "sub-c1": "red"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "lives",
+        "3": "here"
+      }
+    },
+    "match": true
+  },
+  "case_53": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student whose book I borrowed is smart.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "is",
+        "3": "smart"
+      }
+    },
+    "match": true
+  },
+  "case_54": {
+    "sentence": "The woman whose dog barks is my neighbor.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The woman whose dog barks is my neighbor.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "is",
+        "3": "my neighbor"
+      }
+    },
+    "match": true
+  },
+  "case_55": {
+    "sentence": "The book which was carefully written by Shakespeare is famous.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "written",
+        "sub-aux": "was",
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which was carefully written by Shakespeare is famous.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S",
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "is",
+        "3": "famous"
+      }
+    },
+    "match": true
+  },
+  "case_56": {
+    "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-v": "repaired",
+        "sub-aux": "was",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car that was quickly repaired yesterday runs smoothly.",
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-aux": "was",
+        "sub-v": "repaired",
+        "_parent_slot": "S",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "runs",
+        "3": "smoothly"
+      }
+    },
+    "match": true
+  },
+  "case_57": {
+    "sentence": "The letter which was slowly typed by the secretary arrived today.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "arrived",
+        "M2": "today"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-v": "typed",
+        "sub-aux": "was",
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The letter which was slowly typed by the secretary arrived today.",
+      "main_slots": {
+        "S": "",
+        "V": "arrived",
+        "M2": "today"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "typed",
+        "_parent_slot": "S",
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "arrived",
+        "3": "today"
+      }
+    },
+    "match": true
+  },
+  "case_58": {
+    "sentence": "The student who studies diligently always succeeds academically.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "sub-m2": "diligently",
+        "sub-m3": "always",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student who studies diligently always succeeds academically.",
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "_parent_slot": "S",
+        "sub-m2": "diligently",
+        "sub-m3": "always"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "succeeds",
+        "3": "academically"
+      }
+    },
+    "match": true
+  },
+  "case_59": {
+    "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "sub-m2": "efficiently",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The teacher whose class runs efficiently is respected greatly.",
+      "main_slots": {
+        "S": "",
+        "V": "respected",
+        "Aux": "is",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "_parent_slot": "S",
+        "sub-m2": "efficiently"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": true,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "3": "respected",
+        "2": "is",
+        "4": "greatly"
+      }
+    },
+    "match": true
+  },
+  "case_60": {
+    "sentence": "The doctor who works carefully saves lives successfully.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "saves",
+        "O1": "lives",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The doctor who",
+        "sub-v": "works",
+        "sub-m2": "carefully",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The doctor who works carefully saves lives successfully.",
+      "main_slots": {
+        "S": "",
+        "V": "saves",
+        "O1": "lives",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The doctor who",
+        "sub-v": "works",
+        "_parent_slot": "S",
+        "sub-m2": "carefully"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "saves",
+        "3": "lives",
+        "4": "successfully"
+      }
+    },
+    "match": true
+  }
+}

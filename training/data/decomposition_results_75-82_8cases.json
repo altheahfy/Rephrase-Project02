@@ -1,0 +1,362 @@
+{
+  "case_75": {
+    "sentence": "The book I read yesterday was boring.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "boring"
+      },
+      "sub_slots": {
+        "sub-o1": "The book",
+        "sub-s": "I",
+        "sub-v": "read",
+        "sub-m2": "yesterday",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The book I read yesterday was boring.",
+      "success": true,
+      "main_slots": {
+        "S": "The book I",
+        "V": "read",
+        "M2": "yesterday"
+      },
+      "slots": {
+        "S": "The book I",
+        "V": "read",
+        "M2": "yesterday"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "The book I",
+        "2": "read",
+        "3": "yesterday"
+      }
+    },
+    "match": false
+  },
+  "case_76": {
+    "sentence": "She acts as if she knows everything.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "acts",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-m2": "as if",
+        "sub-s": "she",
+        "sub-v": "knows",
+        "sub-o1": "everything",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "original_text": "She acts as if she knows everything.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "acts",
+        "O1": "she",
+        "O2": "everything"
+      },
+      "slots": {
+        "S": "She",
+        "V": "acts",
+        "O1": "she",
+        "O2": "everything"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "She",
+        "2": "acts",
+        "3": "she",
+        "4": "everything"
+      }
+    },
+    "match": false
+  },
+  "case_77": {
+    "sentence": "The place where we met accidentally became our favorite spot.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "our favorite spot"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "met",
+        "sub-m2": "The place where",
+        "sub-m3": "accidentally",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The place where we met accidentally became our favorite spot.",
+      "main_slots": {
+        "S": "",
+        "V": "met",
+        "O1": "accidentally became our favorite spot"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-m2": "The place where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "met",
+        "3": "accidentally became our favorite spot"
+      }
+    },
+    "match": false
+  },
+  "case_78": {
+    "sentence": "The time when everything changed dramatically was unexpected.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "unexpected"
+      },
+      "sub_slots": {
+        "sub-s": "everything",
+        "sub-v": "changed",
+        "sub-m2": "The time when",
+        "sub-m3": "dramatically",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The time when everything changed dramatically was unexpected.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "unexpected"
+      },
+      "sub_slots": {
+        "sub-s": "everything",
+        "sub-v": "changed",
+        "sub-m2": "The time when",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "was",
+        "3": "unexpected"
+      }
+    },
+    "match": false
+  },
+  "case_79": {
+    "sentence": "The team working overtime completed the project successfully yesterday.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "completed",
+        "O1": "the project",
+        "M2": "successfully",
+        "M3": "yesterday"
+      },
+      "sub_slots": {
+        "sub-v": "the team working",
+        "sub-m2": "overtime",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The team working overtime completed the project successfully yesterday.",
+      "success": true,
+      "main_slots": {
+        "S": "The team",
+        "V": "working",
+        "O1": "overtime",
+        "O2": "the project",
+        "M2": "successfully",
+        "M3": "yesterday"
+      },
+      "slots": {
+        "S": "The team",
+        "V": "working",
+        "O1": "overtime",
+        "O2": "the project",
+        "M2": "successfully",
+        "M3": "yesterday"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "The team",
+        "2": "working",
+        "3": "overtime",
+        "4": "the project",
+        "5": "successfully",
+        "6": "yesterday"
+      }
+    },
+    "match": false
+  },
+  "case_80": {
+    "sentence": "The woman standing quietly near the door was waiting patiently.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "waiting",
+        "M2": "patiently"
+      },
+      "sub_slots": {
+        "sub-v": "the woman standing",
+        "sub-m2": "quietly",
+        "sub-m3": "near the door",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The woman standing quietly near the door was waiting patiently.",
+      "success": true,
+      "main_slots": {
+        "S": "The woman",
+        "V": "standing",
+        "O1": "the door",
+        "M2": "quietly",
+        "M3": "patiently"
+      },
+      "slots": {
+        "S": "The woman",
+        "V": "standing",
+        "O1": "the door",
+        "M2": "quietly",
+        "M3": "patiently"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "The woman",
+        "2": "standing",
+        "4": "the door",
+        "3": "quietly",
+        "5": "patiently"
+      }
+    },
+    "match": false
+  },
+  "case_81": {
+    "sentence": "The children playing happily in the garden were supervised carefully.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "were",
+        "V": "supervised",
+        "M2": "carefully"
+      },
+      "sub_slots": {
+        "sub-v": "the children playing",
+        "sub-m2": "happily",
+        "sub-m3": "in the garden",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "The children playing happily in the garden were supervised carefully.",
+      "success": true,
+      "main_slots": {
+        "S": "The children",
+        "Aux": "were",
+        "V": "supervised",
+        "M1": "happily",
+        "M2": "in the garden",
+        "M3": "carefully"
+      },
+      "slots": {
+        "S": "The children",
+        "Aux": "were",
+        "V": "supervised",
+        "M1": "happily",
+        "M2": "in the garden",
+        "M3": "carefully"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "1": "The children",
+        "3": "were",
+        "4": "supervised",
+        "2": "in the garden",
+        "5": "carefully"
+      }
+    },
+    "match": false
+  },
+  "case_82": {
+    "sentence": "The documents being reviewed thoroughly will be approved soon.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "will be",
+        "V": "approved",
+        "M2": "soon"
+      },
+      "sub_slots": {
+        "sub-aux": "The documents being",
+        "sub-v": "reviewed",
+        "sub-m2": "thoroughly",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The documents being reviewed thoroughly will be approved soon.",
+      "main_slots": {
+        "Aux": "will be",
+        "V": "reviewed",
+        "M2": "thoroughly",
+        "M3": "soon"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "will be",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "3": "will be",
+        "1": "reviewed",
+        "2": "thoroughly",
+        "4": "soon"
+      }
+    },
+    "match": false
+  }
+}

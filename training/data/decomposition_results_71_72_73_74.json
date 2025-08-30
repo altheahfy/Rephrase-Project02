@@ -1,0 +1,176 @@
+{
+  "case_71": {
+    "sentence": "The place where we met is beautiful.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The place where we met is beautiful.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "met",
+        "sub-m2": "The place where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "is",
+        "3": "beautiful"
+      }
+    },
+    "match": true
+  },
+  "case_72": {
+    "sentence": "The time when he arrived was late.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "late"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "he",
+        "sub-v": "arrived",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The time when he arrived was late.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "late"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "arrived",
+        "sub-m2": "The time when",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "was",
+        "3": "late"
+      }
+    },
+    "match": true
+  },
+  "case_73": {
+    "sentence": "The reason why she left is unclear.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "unclear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-v": "left",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The reason why she left is unclear.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "unclear"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "left",
+        "sub-m2": "The reason why",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "why",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "is",
+        "3": "unclear"
+      }
+    },
+    "match": true
+  },
+  "case_74": {
+    "sentence": "The way how he solved it was clever.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "clever"
+      },
+      "sub_slots": {
+        "sub-m2": "The way how",
+        "sub-s": "he",
+        "sub-v": "solved",
+        "sub-o1": "it",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The way how he solved it was clever.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "clever"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "solved",
+        "sub-o1": "it",
+        "sub-m2": "The way how",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "1": "",
+        "2": "was",
+        "3": "clever"
+      }
+    },
+    "match": true
+  }
+}
