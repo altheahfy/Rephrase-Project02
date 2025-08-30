@@ -314,18 +314,18 @@ class ModalHandler:
         self._apply_modifier_placement_rules(modifiers, main_slots)
     
     def _extract_prepositional_phrase(self, prep_token) -> str:
-        """前置詞句の抽出"""
-        phrase_parts = [prep_token.text]
+        """前置詞句の抽出（正しい語順で）"""
+        phrase_tokens = []
         
-        for child in prep_token.children:
-            if child.dep_ == 'pobj':
-                phrase_parts.append(child.text)
-                # 前置詞句内の修飾語も含める
-                for subchild in child.subtree:
-                    if subchild != child and subchild != prep_token:
-                        phrase_parts.append(subchild.text)
+        # 前置詞から始まる句を語順通りに収集
+        for token in prep_token.subtree:
+            if token.pos_ not in ['PUNCT']:  # 句読点を除く
+                phrase_tokens.append((token.i, token.text))
         
-        return ' '.join(phrase_parts) if len(phrase_parts) > 1 else ''
+        # インデックス順でソートして正しい語順に
+        phrase_tokens.sort(key=lambda x: x[0])
+        
+        return ' '.join([text for _, text in phrase_tokens])
     
     def _apply_modifier_placement_rules(self, modifiers: List[str], main_slots: Dict):
         """Rephrase副詞配置ルール適用（個数ベース配置）"""
