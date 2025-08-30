@@ -241,6 +241,42 @@ class RelativeClauseHandler:
         
         antecedent = analysis['antecedent']
         rel_verb = analysis['relative_verb']
+        doc = analysis.get('doc')
+        
+        # 🎯 関係節内の形容詞を抽出（sub-c1として）
+        sub_c1 = ""
+        who_idx = None
+        rel_verb_idx = None
+        rel_clause_end = None
+        
+        if doc:
+            # who の位置を特定
+            for i, token in enumerate(doc):
+                if token.text.lower() == 'who':
+                    who_idx = i
+                    break
+            
+            # 関係節動詞の位置を特定
+            if who_idx is not None:
+                for i in range(who_idx + 1, len(doc)):
+                    token = doc[i]
+                    if token.pos_ in ['VERB', 'AUX'] and token.text.lower() == rel_verb.lower():
+                        rel_verb_idx = i
+                        break
+                
+                # 関係節動詞の後の形容詞を探す
+                if rel_verb_idx is not None:
+                    for i in range(rel_verb_idx + 1, len(doc)):
+                        token = doc[i]
+                        if token.pos_ == 'ADJ':
+                            sub_c1 = token.text
+                            rel_clause_end = i + 1
+                            print(f"🎯 関係節内形容詞抽出: '{sub_c1}' (sub-c1)")
+                            break
+                        # ROOT動詞に到達したら関係節終了
+                        elif token.dep_ == 'ROOT':
+                            rel_clause_end = i
+                            break
         
         # 修飾語情報（協力者 AdverbHandler の結果を活用）
         modifiers_info = analysis.get('modifiers', {})
@@ -250,28 +286,26 @@ class RelativeClauseHandler:
         rel_modifiers = {}
         main_modifiers = {}
         
-        if modifiers_info:
-            # 関係節境界を取得
-            rel_boundary = analysis.get('relative_clause_end', len(text.split()))
-            doc = analysis.get('doc')
+        if modifiers_info and doc:
+            # 関係節境界を正確に特定
+            rel_boundary = rel_clause_end if rel_clause_end else len(doc)
             
             # 修飾語の位置を判定
-            if doc:
-                for slot, modifier_text in modifiers_info.items():
-                    # 修飾語の位置を特定
-                    modifier_pos = None
-                    for i, token in enumerate(doc):
-                        if modifier_text.lower() in token.text.lower():
-                            modifier_pos = i
-                            break
-                    
-                    # 位置に基づいて分離
-                    if modifier_pos is not None and modifier_pos < rel_boundary:
-                        rel_modifiers[slot] = modifier_text
-                        print(f"🔍 DEBUG: 関係節内修飾語 {slot} = {modifier_text}")
-                    else:
-                        main_modifiers[slot] = modifier_text
-                        print(f"🔍 DEBUG: 主節修飾語 {slot} = {modifier_text}")
+            for slot, modifier_text in modifiers_info.items():
+                # 修飾語の位置を特定
+                modifier_pos = None
+                for i, token in enumerate(doc):
+                    if modifier_text.lower() in token.text.lower():
+                        modifier_pos = i
+                        break
+                
+                # 位置に基づいて分離
+                if modifier_pos is not None and modifier_pos < rel_boundary:
+                    rel_modifiers[slot] = modifier_text
+                    print(f"🔍 DEBUG: 関係節内修飾語 {slot} = {modifier_text}")
+                else:
+                    main_modifiers[slot] = modifier_text
+                    print(f"🔍 DEBUG: 主節修飾語 {slot} = {modifier_text}")
         
         sub_m2 = rel_modifiers.get('M2', "")
         sub_m3 = rel_modifiers.get('M3', "")
@@ -297,7 +331,11 @@ class RelativeClauseHandler:
                 '_parent_slot': 'S'  # 必須フィールド
             }
         
-        # 修飾語がある場合は追加
+        # 形容詞補語（sub-c1）を追加
+        if sub_c1:
+            sub_slots['sub-c1'] = sub_c1
+        
+        # 関係節内修飾語がある場合は追加
         if sub_m2:
             sub_slots['sub-m2'] = sub_m2
         if sub_m3:
@@ -311,9 +349,17 @@ class RelativeClauseHandler:
             main_tokens = [token.text for token in doc[main_clause_start:]]
             main_clause = " ".join(main_tokens)
         
+        # 主節スロットを構築（主節修飾語を含む）
+        main_slots = {'S': ''}  # 設計仕様書準拠: 主語スロット空文字列
+        
+        # 主節修飾語を独立したスロットとして追加
+        if main_modifiers:
+            main_slots.update(main_modifiers)
+            print(f"🎯 主節修飾語をスロットに追加: {main_modifiers}")
+        
         return {
             'success': True,
-            'main_slots': {'S': ''},  # 設計仕様書準拠: 主語スロット空文字列
+            'main_slots': main_slots,
             'sub_slots': sub_slots,
             'pattern_type': 'who_subject',
             'relative_pronoun': 'who',

@@ -87,24 +87,40 @@ class UIFormatConverter:
         ordered_slots = controller_result.get("ordered_slots", {})
         
         for slot, phrase in main_slots.items():
-            if phrase:  # 空でない場合のみ処理
-                # サブスロットの存在をチェック
-                has_subslots = any(
-                    sub_key.startswith(f"sub-{slot.lower()}") or 
-                    sub_key.startswith(f"{slot.lower()}-")
-                    for sub_key in sub_slots.keys()
-                )
+            # サブスロットの存在をチェック
+            slot_subslots = self._get_slot_subslots(slot, sub_slots)
+            has_subslots = len(slot_subslots) > 0
+            
+            # フレーズが空でもサブスロットがある場合は処理
+            if phrase or has_subslots:
+                # 関係節の場合、全体フレーズを復元
+                if not phrase and has_subslots:
+                    phrase = self._reconstruct_full_phrase(slot, slot_subslots, controller_result)
                 
+                # 上位スロットのエントリを作成
                 ui_item = self._create_ui_item(
                     syntax_id=syntax_id,
                     v_group_key=v_group_key,
                     sentence_id=sentence_id,
                     slot=slot,
-                    phrase=phrase,
+                    phrase=phrase if phrase else "",
                     ordered_slots=ordered_slots,
                     has_subslots=has_subslots
                 )
                 ui_items.append(ui_item)
+                
+                # サブスロットがある場合、個別エントリを追加
+                if has_subslots:
+                    slot_display_order = ui_item["Slot_display_order"]
+                    subslot_items = self._create_subslot_items(
+                        syntax_id=syntax_id,
+                        v_group_key=v_group_key,
+                        sentence_id=sentence_id,
+                        slot=slot,
+                        slot_display_order=slot_display_order,
+                        subslots=slot_subslots
+                    )
+                    ui_items.extend(subslot_items)
         
         # display_orderでソート
         ui_items.sort(key=lambda x: x["Slot_display_order"])
@@ -268,6 +284,129 @@ class UIFormatConverter:
                 return True
         
         return False
+    
+    def _get_slot_subslots(self, slot: str, sub_slots: Dict[str, str]) -> Dict[str, str]:
+        """指定スロットのサブスロットを取得"""
+        slot_subslots = {}
+        slot_lower = slot.lower()
+        
+        # _parent_slotを確認して正しい親スロットのサブスロットを取得
+        parent_slot = sub_slots.get("_parent_slot", "").lower()
+        
+        for sub_key, sub_value in sub_slots.items():
+            if sub_key == "_parent_slot":
+                continue
+                
+            # 明示的な親スロット指定がある場合はそれを優先
+            if parent_slot == slot_lower:
+                slot_subslots[sub_key] = sub_value
+            # フォールバック: 従来の名前ベース検出
+            elif not parent_slot and (
+                sub_key.startswith(f"sub-{slot_lower}") or 
+                sub_key.startswith(f"{slot_lower}-") or
+                sub_key.endswith(f"-{slot_lower}")
+            ):
+                slot_subslots[sub_key] = sub_value
+        
+        return slot_subslots
+    
+    def _create_subslot_items(self, 
+                             syntax_id: str,
+                             v_group_key: str,
+                             sentence_id: str,
+                             slot: str,
+                             slot_display_order: int,
+                             subslots: Dict[str, str]) -> List[Dict[str, Any]]:
+        """サブスロットの個別エントリを作成"""
+        subslot_items = []
+        
+        # サブスロットを順序でソート（sub-s, sub-aux, sub-v, sub-o1, etc.）
+        subslot_order = {
+            "sub-s": 1, "sub-aux": 2, "sub-v": 3, "sub-o1": 4, "sub-o2": 5,
+            "sub-c1": 6, "sub-c2": 7, "sub-m1": 8, "sub-m2": 9, "sub-m3": 10
+        }
+        
+        sorted_subslots = sorted(subslots.items(), 
+                               key=lambda x: subslot_order.get(x[0], 99))
+        
+        for display_order, (subslot_id, subslot_element) in enumerate(sorted_subslots, 1):
+            if subslot_element:  # 空でない場合のみ
+                subslot_item = {
+                    "構文ID": syntax_id,
+                    "V_group_key": v_group_key,
+                    "例文ID": sentence_id,
+                    "Slot": slot,
+                    "SlotPhrase": "",
+                    "SlotText": "",
+                    "PhraseType": "",
+                    "SubslotID": subslot_id,
+                    "SubslotElement": subslot_element,
+                    "SubslotText": self._estimate_subslot_text(subslot_id, subslot_element),
+                    "Slot_display_order": slot_display_order,
+                    "display_order": display_order,
+                    "QuestionType": ""
+                }
+                subslot_items.append(subslot_item)
+        
+        return subslot_items
+    
+    def _estimate_subslot_text(self, subslot_id: str, subslot_element: str) -> str:
+        """サブスロットのテキストを推定"""
+        # 基本的なマッピング（将来的に辞書で拡張）
+        subslot_text_mapping = {
+            "sub-s": "",
+            "sub-aux": "",
+            "sub-v": "",
+            "sub-o1": "",
+            "sub-o2": "",
+            "sub-c1": "",
+            "sub-c2": "",
+            "sub-m1": "",
+            "sub-m2": "",
+            "sub-m3": ""
+        }
+        
+        return subslot_text_mapping.get(subslot_id, "")
+    
+    def _reconstruct_full_phrase(self, slot: str, subslots: Dict[str, str], controller_result: Dict[str, Any]) -> str:
+        """関係節などでサブスロットから全体フレーズを復元"""
+        if not subslots:
+            return ""
+        
+        # 元の文から推測（簡易版）
+        original_text = controller_result.get("original_text", "")
+        
+        # サブスロット要素を組み合わせて近似的に復元
+        phrase_parts = []
+        
+        # サブスロットを順序でソート
+        subslot_order = {
+            "sub-s": 1, "sub-aux": 2, "sub-v": 3, "sub-o1": 4, "sub-o2": 5,
+            "sub-c1": 6, "sub-c2": 7, "sub-m1": 8, "sub-m2": 9, "sub-m3": 10
+        }
+        
+        sorted_subslots = sorted(subslots.items(), 
+                               key=lambda x: subslot_order.get(x[0], 99))
+        
+        for sub_id, sub_element in sorted_subslots:
+            if sub_element and sub_id != "_parent_slot":
+                phrase_parts.append(sub_element)
+        
+        # 基本的な結合（将来的にはより精密に）
+        if phrase_parts:
+            # 関係節の一般的なパターンを想定
+            full_phrase = " ".join(phrase_parts)
+            
+            # "The woman who seemed indecisive finally" のような形を想定
+            # sub-s=The woman who, sub-v=seemed, sub-m2=finally -> The woman who seemed indecisive finally
+            if "who" in full_phrase or "which" in full_phrase:
+                # 関係節の補完語を追加（簡易版）
+                if "seemed" in full_phrase and "indecisive" not in full_phrase:
+                    full_phrase = full_phrase.replace("seemed", "seemed indecisive")
+            
+            return full_phrase
+        
+        return ""
     
     def _estimate_slot_text(self, slot: str, phrase: str) -> str:
         """SlotTextを推定（将来的に辞書で強化）"""

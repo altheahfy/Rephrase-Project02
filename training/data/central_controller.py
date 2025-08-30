@@ -711,8 +711,17 @@ class CentralController:
         Returns:
             Dict: 統合済み結果
         """
-        # メインスロット: 5文型結果をベースに
+        # メインスロット: 5文型結果をベースにして、関係節のmain_slotsも統合
         main_slots = five_result['slots'].copy()
+        
+        # 🎯 関係節処理結果のmain_slotsを統合（主節修飾語含む）
+        rel_main_slots = rel_result.get('main_slots', {})
+        if rel_main_slots:
+            # 関係節から取得した主節修飾語を統合
+            for slot, value in rel_main_slots.items():
+                if slot != 'S' and value:  # S以外の非空スロットを統合
+                    main_slots[slot] = value
+                    print(f"🎯 関係節main_slotsから統合: {slot} = '{value}'")
         
         # 🎯 受動態処理結果を統合
         if passive_result and passive_result['success']:
@@ -768,51 +777,8 @@ class CentralController:
             }
         }
         
-        # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-        # v_group_key = self._determine_group_key(main_slots, text)
-        # absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text, v_group_key)
-        # result['absolute_order'] = absolute_result
-        
-        return result
-
-    def _merge_results_with_passive(self, text: str, rel_result: Dict, five_result: Dict, 
-                                  modifier_slots: Dict, passive_result: Optional[Dict]) -> Dict[str, Any]:
-        """関係節、5文型、修飾語、受動態の結果を統合（受動態対応版）"""
-        # 基本の5文型結果を取得
-        slots = five_result.get('slots', {})
-        
-        # 受動態の場合、VをAux+Vに分離
-        if passive_result and passive_result.get('is_passive'):
-            # 元のVを削除してAux+Vに分離
-            if 'V' in slots:
-                del slots['V']
-            slots['Aux'] = passive_result.get('aux', '')
-            slots['V'] = passive_result.get('verb', '')
-            print(f"🎯 受動態処理: Aux='{slots['Aux']}', V='{slots['V']}'")
-        
-        # 🎯 Rephrase絶対ルール: サブスロットがあれば対応する上位スロットを空化
-        sub_slots = rel_result.get('sub_slots', {})
-        if sub_slots:
-            # サブスロットの親スロットを確認
-            parent_slot = sub_slots.get('_parent_slot', 'S')
-            if parent_slot in slots:
-                slots[parent_slot] = ""
-                print(f"🎯 Rephrase空化ルール適用: {parent_slot} → '' (サブスロット存在)")
-        
-        # 修飾語スロットを統合
-        final_slots = slots.copy()
-        if modifier_slots:
-            final_slots.update(modifier_slots)
-            
-        return {
-            'original_text': text,
-            'success': True,
-            'main_slots': final_slots,
-            'slots': final_slots,
-            'sub_slots': sub_slots,
-            'grammar_pattern': 'relative_clause + basic_five_pattern + passive_voice',
-            'phase': 3  # Phase 3（受動態対応）
-        }
+        # 順序情報を追加
+        return self._apply_order_to_result(result)
 
 
 if __name__ == "__main__":
