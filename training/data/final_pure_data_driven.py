@@ -206,27 +206,43 @@ class FinalPureDataDrivenAbsoluteOrderManager:
         return results
 
 def main():
-    """メイン関数 - tellグループでテスト"""
-    print("🚀 最終版Pure Data-Driven Absolute Order Manager テスト開始")
+    """メイン関数 - 複数のグループでテスト（汎用性確認）"""
+    print("🚀 最終版Pure Data-Driven Absolute Order Manager 汎用性テスト開始")
     
     manager = FinalPureDataDrivenAbsoluteOrderManager()
     
-    # tellグループをテスト
-    results = manager.process_v_group('tell')
+    # 複数のグループをテストして汎用性を確認
+    test_groups = ['tell', 'action', 'be']
     
-    # 結果を保存
-    output_file = 'final_tell_group_results.json'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+    for group in test_groups:
+        print(f"\n" + "="*80)
+        print(f"🎯 {group}グループのテスト開始")
+        print("="*80)
+        
+        try:
+            results = manager.process_v_group(group)
+            
+            if results:
+                # 結果を保存
+                output_file = f'final_{group}_group_results.json'
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(results, f, ensure_ascii=False, indent=2)
+                
+                print(f"\n💾 結果を {output_file} に保存しました")
+                
+                # 結果の確認
+                print(f"\n📊 {group}グループ結果サマリー:")
+                for i, result in enumerate(results):
+                    print(f"例文{i+1}: {result['sentence']}")
+                    print(f"順序: {result['ordered_slots']}")
+                    print()
+            else:
+                print(f"⚠️ {group}グループの例文が見つかりませんでした")
+                
+        except Exception as e:
+            print(f"❌ {group}グループのテストでエラー: {e}")
     
-    print(f"\n💾 結果を {output_file} に保存しました")
-    
-    # 結果の確認
-    print(f"\n📊 最終結果サマリー:")
-    for i, result in enumerate(results):
-        print(f"例文{i+1}: {result['sentence']}")
-        print(f"順序: {result['ordered_slots']}")
-        print()
+    print("\n🎉 全グループテスト完了 - 汎用性確認終了")
 
 if __name__ == "__main__":
     main()
