@@ -237,7 +237,7 @@ class AdverbPositionAnalyzer:
     
     def _assign_adverb_numbers(self, sentences_data, common_order, element_groups):
         """
-        副詞位置を考慮した番号付与（人間的判断ロジック組み込み版）
+        副詞位置を考慮した番号付与
         """
         print(f"🔍 副詞位置を考慮した最終番号を付与")
         
@@ -268,9 +268,6 @@ class AdverbPositionAnalyzer:
                     ordered_slots[str(order_num)] = slot_value
                     print(f"  📝 {slot_key}={slot_value} → {matched_group} → 順序{order_num}")
             
-            # 人間的判断による位置調整を適用
-            ordered_slots = self._apply_human_adjustments(sentence, ordered_slots)
-            
             result = {
                 'sentence': sentence,
                 'original_slots': slots,
@@ -282,108 +279,6 @@ class AdverbPositionAnalyzer:
             print(f"  🎯 副詞位置結果: {ordered_slots}")
         
         return results
-    
-    def _apply_human_adjustments(self, sentence, ordered_slots):
-        """
-        真に汎用的な人間的判断による位置調整
-        元の例文の語順を完全に尊重し、計算結果との大きな乖離のみ修正
-        """
-        print(f"  🎯 真汎用的人間判断調整適用: {sentence}")
-        
-        # 元の例文での実際の位置を取得
-        actual_positions = self._get_actual_positions_in_sentence(sentence, ordered_slots)
-        
-        print(f"    📋 実際の位置: {actual_positions}")
-        
-        # 実際の位置順で並べ直し
-        position_based_order = []
-        for element in ordered_slots.values():
-            actual_pos = actual_positions.get(element, 999)  # 見つからない場合は最後
-            position_based_order.append((actual_pos, element))
-        
-        # 実際の位置順でソート
-        position_based_order.sort(key=lambda x: x[0])
-        
-        # 新しい順序を作成
-        adjusted_slots = {}
-        for new_order, (actual_pos, element) in enumerate(position_based_order, 1):
-            adjusted_slots[str(new_order)] = element
-            
-        print(f"    ✅ 実際語順ベース調整完了: {adjusted_slots}")
-        
-        return adjusted_slots
-    
-    def _check_if_adjustment_needed(self, element, actual_pos, calculated_pos, sentence):
-        """調整が本当に必要かどうかを判定"""
-        # 特定の問題パターンのみ調整対象とする
-        
-        print(f"    🔍 調整チェック: {element}, 実際位置:{actual_pos}, 計算位置:{calculated_pos}")
-        
-        # 1. togetherの特別処理：目的語より後に来る必要がある
-        if element == 'together':
-            print(f"    📋 together検出 - breakfast含有: {'breakfast' in sentence}, 計算位置: {calculated_pos}")
-            # breakfastと一緒に出現する文で、togetherがbreakfastより前に配置されている場合
-            if 'breakfast' in sentence and calculated_pos <= 6:  # breakfastは通常6番目
-                print(f"    ✅ together調整必要: breakfast後に移動")
-                return True
-        
-        # 2. 動詞直前に来るべき副詞が動詞より後に配置されている場合  
-        if element in ['carefully'] and actual_pos < 3 and calculated_pos > actual_pos + 2:
-            print(f"    ✅ carefully調整必要: 動詞直前に移動")
-            return True
-            
-        # 3. 場所副詞句が適切でない位置にある場合
-        if ('park' in element or 'kitchen' in element) and actual_pos > 5 and calculated_pos < actual_pos:
-            print(f"    ✅ 場所副詞句調整必要")
-            return True
-            
-        print(f"    ❌ 調整不要")
-        return False
-    
-    def _determine_conservative_position(self, element, actual_pos, current_slots):
-        """より保守的な位置決定"""
-        # 既存の位置を確認
-        occupied_positions = set(int(pos) for pos in current_slots.keys() if pos.isdigit())
-        
-        # 実際の位置に近い位置を優先的に選択
-        candidates = [actual_pos, actual_pos + 1, actual_pos - 1]
-        
-        # 空いている位置の中から選択
-        for candidate in candidates:
-            if candidate > 0 and candidate not in occupied_positions:
-                return candidate
-        
-        # 全て埋まっている場合は、実際の位置+適切なオフセット
-        if actual_pos > 5:  # 文末系
-            return max(occupied_positions) + 1
-        else:  # 文中系
-            return actual_pos
-    
-    def _get_actual_positions_in_sentence(self, sentence, ordered_slots):
-        """元の例文での各要素の実際の位置を取得"""
-        normalized_sentence = sentence.replace(",", "").replace(".", "").replace("?", "")
-        words = normalized_sentence.split()
-        
-        actual_positions = {}
-        
-        for element in ordered_slots.values():
-            if " " in element:  # 複数単語の場合
-                element_words = element.split()
-                for i in range(len(words) - len(element_words) + 1):
-                    if words[i:i+len(element_words)] == element_words:
-                        actual_positions[element] = i + 1
-                        break
-            else:  # 単語の場合
-                for i, word in enumerate(words):
-                    if word.lower() == element.lower():
-                        actual_positions[element] = i + 1
-                        break
-        
-        return actual_positions
-    
-    def _determine_appropriate_position(self, element, actual_pos, current_slots):
-        """要素の適切な位置を決定（旧メソッド名維持）"""
-        return self._determine_conservative_position(element, actual_pos, current_slots)
 
 def main():
     """メイン関数 - 副詞を含むグループを一括処理"""
