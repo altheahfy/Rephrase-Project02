@@ -16,6 +16,7 @@ from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
+from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
 
@@ -47,6 +48,9 @@ class CentralController:
         passive_voice_handler = PassiveVoiceHandler()
         question_handler = QuestionHandler()
         
+        # Pure Data-Driven Order Manager を初期化
+        self.order_manager = PureDataDrivenOrderManager()
+        
         # 関係節ハンドラーに協力者を注入（Dependency Injection）
         collaborators = {
             'adverb': adverb_handler,
@@ -66,6 +70,59 @@ class CentralController:
         
         # Rephraseスロット定義読み込み
         self.slot_structure = self._load_slot_structure()
+    
+    def _apply_order_to_result(self, result_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        処理結果に順序情報を追加
+        """
+        if not result_dict.get('success', False):
+            return result_dict
+        
+        main_slots = result_dict.get('main_slots', {})
+        text = result_dict.get('text', '') or result_dict.get('original_text', '')
+        
+        if not main_slots or not text:
+            print(f"⚠️ 順序付与スキップ: main_slots={bool(main_slots)}, text='{text}'")
+            return result_dict
+        
+        try:
+            # V_group_keyを推定（簡単な実装）
+            v_group_key = self._determine_v_group_key(main_slots, text)
+            print(f"🔍 推定V_group_key: {v_group_key}")
+            
+            # 例文データ構造を作成
+            sentence_data = [{
+                'sentence': text,
+                'slots': main_slots
+            }]
+            
+            # Pure Data-Driven Order Manager で順序を取得
+            order_results = self.order_manager.process_adverb_group(v_group_key, sentence_data)
+            
+            if order_results and len(order_results) > 0:
+                ordered_slots = order_results[0].get('ordered_slots', {})
+                result_dict['ordered_slots'] = ordered_slots
+                print(f"✅ 順序付与成功: {ordered_slots}")
+            else:
+                print(f"⚠️ 順序付与結果が空です")
+            
+        except Exception as e:
+            print(f"⚠️ 順序付与エラー: {e}")
+            # エラーでも基本結果は返す
+        
+        return result_dict
+    
+    def _determine_v_group_key(self, main_slots: Dict, text: str) -> str:
+        """
+        V_group_keyを推定（簡単な実装）
+        """
+        verb = main_slots.get('V', '').lower()
+        if 'tell' in verb:
+            return 'tell'
+        elif 'give' in verb or 'gave' in verb:
+            return 'give'
+        else:
+            return 'action'  # デフォルト
         
     def _initialize_group_mappings(self):
         """動的分析用のグループマッピングを初期化 - 実際のデータから読み込み"""
@@ -82,18 +139,8 @@ class CentralController:
         for i, example in enumerate(tell_examples, 1):
             print(f"  {i}. {example}")
         
-        # 動的分析実行
-        try:
-            tell_mapping = self.absolute_order_manager.analyze_group_elements("tell", tell_examples)
-            self.absolute_order_manager.register_group_mapping("tell", tell_mapping)
-            
-            if gave_examples:
-                gave_mapping = self.absolute_order_manager.analyze_group_elements("gave", gave_examples)
-                self.absolute_order_manager.register_group_mapping("gave", gave_mapping)
-            
-            print("✅ 動的絶対順序マッピングの初期化完了")
-        except Exception as e:
-            print(f"⚠️ 動的マッピング初期化エラー: {e}")
+        # 注意: 動的分析は現在PureDataDrivenOrderManagerで処理
+        print("✅ グループマッピングの初期化完了（PureDataDrivenOrderManager使用）")
     
     def _extract_real_group_data(self, group_key: str) -> List[str]:
         """実際のデータファイルから指定グループの例文を抽出"""
@@ -320,16 +367,12 @@ class CentralController:
                 
                 print(f"✅ 疑問文+5文型+修飾語統合成功: {final_slots}")
                 
-                # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-                # v_group_key = self._determine_group_key(final_slots, text)
-                # absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
-                
-                return {
+                # 🎯 Pure Data-Driven Order Manager統合: 順序付与
+                result = {
                     'success': True,
                     'text': text,
                     'main_slots': final_slots,
                     'sub_slots': {},
-                    # 'absolute_order': absolute_result,  # 絶対順序結果を追加
                     'metadata': {
                         'controller': 'central',
                         'primary_handler': 'question',
@@ -340,6 +383,9 @@ class CentralController:
                                      five_pattern_result.get('confidence', 0.5)) / 2
                     }
                 }
+                
+                # 順序情報を追加
+                return self._apply_order_to_result(result)
             else:
                 print(f"⚠️ 疑問文または5文型処理失敗、通常の処理フローに移行")
                 if not question_result['success']:
@@ -585,19 +631,18 @@ class CentralController:
         if modifier_slots:
             final_slots.update(modifier_slots)
         
-        # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-        # v_group_key = self._determine_group_key(final_slots, text)
-        # absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
-        
-        return {
+        # 🎯 Pure Data-Driven Order Manager統合: 順序付与
+        result = {
             'original_text': text,
             'success': True,
             'main_slots': final_slots,  # main_slotsを追加
             'slots': final_slots,
-            # 'absolute_order': absolute_result,  # 絶対順序結果を追加
             'grammar_pattern': 'basic_five_pattern + passive_voice',
             'phase': 1  # 基本処理 + 受動態
         }
+        
+        # 順序情報を追加
+        return self._apply_order_to_result(result)
     
     def _extract_modifier_list(self, adverb_result: Dict) -> List[str]:
         """
