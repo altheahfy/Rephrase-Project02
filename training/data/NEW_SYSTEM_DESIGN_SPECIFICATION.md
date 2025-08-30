@@ -1342,3 +1342,176 @@ python fast_test.py 70 71 72 73 74 75 76 77 78 79
 **段階的100%精度達成と継続的品質保証が本プロジェクトの成功条件である。**
 
 ---
+
+## 11. 絶対順序システム - 動的要素分析による位置決定
+
+### 11.1 絶対順序の定義
+
+絶対順序とは、V_group_key（動詞グループ）ごとに、そのグループに属する**全例文に登場する全ての要素**を動的に分析し、語順に従って一意の位置番号を割り当てるシステムである。
+
+### 11.2 核心原理
+
+#### 11.2.1 動的分析プロセス
+1. **グループ内全例文の収集**: 指定されたV_group_keyに属する全ての例文を収集
+2. **位置別要素の完全列挙**: 各例文に登場する全ての要素を、出現位置別に分類
+3. **語順による位置決定**: 文の語順に従って、全要素に連続した位置番号を割り当て
+
+#### 11.2.2 位置別要素の分類ルール
+- **同一文法役割でも出現位置が異なれば別要素として扱う**
+  - `M2-wh`: where（疑問詞として文頭）
+  - `M2-normal`: at the store（標準位置として文末）
+  - `O2-wh`: what（疑問詞として文頭近く）
+  - `O2-normal`: a secret（標準位置として動詞後）
+
+- **同一位置に出現する同一要素は同一位置番号**
+  - `S`: he/you/I（全て主語位置）→ 同一位置番号
+  - `Aux`: did/Did（全て助動詞位置）→ 同一位置番号
+
+### 11.3 tellグループの実例分析
+
+#### 11.3.1 例文群の収集
+```
+例文1: "What did he tell her at the store?"
+例文2: "Did he tell her a secret there?"
+例文3: "Where did you tell me a story?"
+例文4: "Yesterday what did he tell her?"
+```
+
+#### 11.3.2 位置別要素の完全列挙
+```
+語順分析結果:
+位置1: M1 (Yesterday)
+位置2: M2-wh (Where)
+位置3: O2-wh (What)
+位置4: Aux (did/Did)
+位置5: S (he/you)
+位置6: V (tell)
+位置7: O1 (her/me)
+位置8: O2-normal (a secret/a story)
+位置9: M2-normal (at the store/there)
+```
+
+#### 11.3.3 動的テンプレート生成
+分析結果から以下のテンプレートが自動生成される：
+```python
+tell_group_dynamic_mapping = {
+    "M1": 1,           # Yesterday等の時間副詞（文頭）
+    "M2_wh": 2,        # Where等の疑問詞（文頭）
+    "O2_wh": 3,        # What等の疑問詞（文頭近く）
+    "Aux": 4,          # did/Did等の助動詞
+    "S": 5,            # he/you等の主語
+    "V": 6,            # tell等の動詞
+    "O1": 7,           # her/me等の第一目的語
+    "O2_normal": 8,    # a secret等の第二目的語（標準位置）
+    "M2_normal": 9     # at the store等の修飾語（標準位置）
+}
+```
+
+### 11.4 gaveグループの実例分析
+
+#### 11.4.1 例文群の収集
+```
+例文1: "he gave me a message"
+例文2: "she gave him a money"
+例文3: "Tom gave her ticket"
+例文4: "I gave Tom that"
+```
+
+#### 11.4.2 位置別要素の完全列挙
+```
+語順分析結果:
+位置1: S (he/she/Tom/I)
+位置2: V (gave)
+位置3: O1 (me/him/her/Tom)
+位置4: O2 (a message/a money/ticket/that)
+```
+
+#### 11.4.3 動的テンプレート生成
+```python
+gave_group_dynamic_mapping = {
+    "S": 1,      # 主語
+    "V": 2,      # 動詞gave
+    "O1": 3,     # 第一目的語
+    "O2": 4      # 第二目的語
+}
+```
+
+### 11.5 実装要件
+
+#### 11.5.1 動的分析エンジン
+```python
+class DynamicAbsoluteOrderManager:
+    def analyze_group_elements(self, v_group_key: str, example_sentences: List[str]) -> Dict[str, int]:
+        """グループの全例文を分析して動的テンプレートを生成"""
+        
+        # 1. 全例文の解析
+        all_elements = []
+        for sentence in example_sentences:
+            parsed_slots = self.parse_sentence(sentence)
+            positioned_elements = self.classify_by_position(parsed_slots, sentence)
+            all_elements.extend(positioned_elements)
+        
+        # 2. 位置別要素の統合
+        unique_elements = self.merge_positional_elements(all_elements)
+        
+        # 3. 語順による位置決定
+        ordered_mapping = self.assign_absolute_positions(unique_elements)
+        
+        return ordered_mapping
+```
+
+#### 11.5.2 位置分類ロジック
+```python
+def classify_by_position(self, slots: Dict[str, str], sentence: str) -> List[Tuple[str, int]]:
+    """要素を出現位置別に分類"""
+    
+    elements = []
+    words = sentence.split()
+    
+    for slot_key, slot_value in slots.items():
+        position_in_sentence = self.find_word_position(slot_value, words)
+        
+        # 位置別分類
+        if slot_key == "M2":
+            if position_in_sentence <= 2:  # 文頭近く
+                element_type = "M2_wh"
+            else:  # 文末近く
+                element_type = "M2_normal"
+        elif slot_key == "O2":
+            if position_in_sentence <= 2:  # 文頭近く
+                element_type = "O2_wh"
+            else:  # 標準位置
+                element_type = "O2_normal"
+        else:
+            element_type = slot_key
+            
+        elements.append((element_type, position_in_sentence))
+    
+    return elements
+```
+
+### 11.6 適用効果
+
+#### 11.6.1 問題解決
+- **M1（Yesterday）の消失問題**: tellグループにYesterdayを含む例文があれば、自動的に位置1に配置
+- **固定テンプレートの限界**: グループごとの実際の要素構成に完全対応
+- **拡張性の確保**: 新しい例文追加時の自動的なテンプレート更新
+
+#### 11.6.2 品質保証
+- **完全性**: グループ内の全要素が必ず位置を持つ
+- **一意性**: 同一グループ内で重複位置は発生しない
+- **予測可能性**: 同じ例文群なら常に同じ絶対順序
+
+### 11.7 実装プライオリティ
+
+#### 11.7.1 Phase 1: 動的分析エンジンの実装
+1. 例文群の自動収集機能
+2. 位置別要素分類システム
+3. 動的テンプレート生成
+
+#### 11.7.2 Phase 2: CentralController統合
+1. 既存の固定テンプレートシステムからの移行
+2. 動的分析結果のキャッシュ機能
+3. 性能最適化
+
+---
