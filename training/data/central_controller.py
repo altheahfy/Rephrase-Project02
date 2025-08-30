@@ -16,7 +16,7 @@ from relative_clause_handler import RelativeClauseHandler
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
-from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager
+# from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
 
 class CentralController:
@@ -37,9 +37,6 @@ class CentralController:
     def __init__(self):
         """初期化: spaCy POS解析器とハンドラー群の設定（協力アプローチ版）"""
         self.nlp = spacy.load('en_core_web_sm')
-        
-        # DynamicAbsoluteOrderManager初期化
-        self.absolute_order_manager = DynamicAbsoluteOrderManager()
         
         # 動的分析用のグループマッピングを初期化
         self._initialize_group_mappings()
@@ -324,15 +321,15 @@ class CentralController:
                 print(f"✅ 疑問文+5文型+修飾語統合成功: {final_slots}")
                 
                 # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-                v_group_key = self._determine_group_key(final_slots, text)
-                absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
+                # v_group_key = self._determine_group_key(final_slots, text)
+                # absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
                 
                 return {
                     'success': True,
                     'text': text,
                     'main_slots': final_slots,
                     'sub_slots': {},
-                    'absolute_order': absolute_result,  # 絶対順序結果を追加
+                    # 'absolute_order': absolute_result,  # 絶対順序結果を追加
                     'metadata': {
                         'controller': 'central',
                         'primary_handler': 'question',
@@ -589,15 +586,15 @@ class CentralController:
             final_slots.update(modifier_slots)
         
         # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-        v_group_key = self._determine_group_key(final_slots, text)
-        absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
+        # v_group_key = self._determine_group_key(final_slots, text)
+        # absolute_result = self.absolute_order_manager.apply_absolute_order(final_slots, text, v_group_key)
         
         return {
             'original_text': text,
             'success': True,
             'main_slots': final_slots,  # main_slotsを追加
             'slots': final_slots,
-            'absolute_order': absolute_result,  # 絶対順序結果を追加
+            # 'absolute_order': absolute_result,  # 絶対順序結果を追加
             'grammar_pattern': 'basic_five_pattern + passive_voice',
             'phase': 1  # 基本処理 + 受動態
         }
@@ -727,9 +724,9 @@ class CentralController:
         }
         
         # 🎯 DynamicAbsoluteOrderManager統合: 動的分析による絶対順序適用
-        v_group_key = self._determine_group_key(main_slots, text)
-        absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text, v_group_key)
-        result['absolute_order'] = absolute_result
+        # v_group_key = self._determine_group_key(main_slots, text)
+        # absolute_result = self.absolute_order_manager.apply_absolute_order(main_slots, text, v_group_key)
+        # result['absolute_order'] = absolute_result
         
         return result
 
