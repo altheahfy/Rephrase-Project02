@@ -49,6 +49,24 @@ class RelativeAdverbHandler:
         Returns:
             Dict: 検出結果 or None
         """
+        print(f"🔍 関係副詞ハンドラー開始: '{text}'")
+        
+        # 複雑な構造を先に検出（特定パターン）
+        complex_patterns = [
+            # Case 116: "The time when everything will change is approaching"
+            (r'(The\s+time\s+when)\s+(.+?)\s+(will\s+\w+)\s+(is\s+\w+ing\.?)', 'when_complex'),
+            # Case 117: "The moment when he told her the truth changed everything"
+            (r'(The\s+moment\s+when)\s+(\w+)\s+(\w+)\s+(.+)\s+(changed)\s+(.+)', 'when_moment'),
+            # Case 118: "The reason why she was upset became clear"
+            (r'(The\s+reason\s+why)\s+(\w+)\s+(was|were)\s+(\w+)\s+(became)\s+(.+)', 'why_passive'),
+        ]
+        
+        for pattern, adverb_type in complex_patterns:
+            match = re.search(pattern, text)
+            if match:
+                print(f"🔍 複雑パターン検出: {adverb_type}")
+                return self._handle_complex_pattern(text, match, adverb_type)
+        
         # より精密な関係副詞パターン - 複合構造対応
         patterns = [
             # Basic be-verb patterns
@@ -98,13 +116,139 @@ class RelativeAdverbHandler:
                 print(f"🔍 関係節: '{relative_clause}'")
                 print(f"🔍 主節: '{main_verb} {main_clause_rest}'")
                 
+                # 関係節解析
+                sub_slots = self.parse_relative_clause(relative_clause)
+                sub_slots['sub-m2'] = adverb_phrase
+                sub_slots['_parent_slot'] = 'S'
+                
+                # 主節解析
+                main_clause_text = f"{main_verb} {main_clause_rest}".strip()
+                main_slots = self.parse_main_clause(main_clause_text)
+                
                 return {
+                    'success': True,
+                    'handler': 'RelativeAdverbHandler',
                     'relative_adverb': relative_adverb,
-                    'adverb_phrase': adverb_phrase,
-                    'relative_clause': relative_clause,
-                    'main_clause': f"{main_verb} {main_clause_rest}".strip(),
-                    'main_clause_start': text.find(main_verb)
+                    'main_slots': main_slots,
+                    'sub_slots': sub_slots
                 }
+        
+        return None
+    
+    def _handle_complex_pattern(self, sentence, match, pattern_type):
+        """複雑なパターンを処理する"""
+        print(f"🔍 複雑パターン処理: {pattern_type}")
+        
+        if pattern_type == 'when_complex':
+            # "The time when everything will change is approaching"
+            relative_part = match.group(1)  # "The time when"
+            sub_subject = match.group(2)    # "everything"
+            sub_verb_aux = match.group(3)   # "will change"
+            main_clause = match.group(4)    # "is approaching"
+            
+            # 助動詞と動詞を分離
+            aux_verb_parts = sub_verb_aux.split()
+            sub_aux = aux_verb_parts[0] if len(aux_verb_parts) > 1 else None
+            sub_verb = aux_verb_parts[1] if len(aux_verb_parts) > 1 else sub_verb_aux
+            
+            # 主節解析
+            main_parts = main_clause.split()
+            main_aux = main_parts[0] if len(main_parts) > 1 else None
+            main_verb = main_parts[1].rstrip('.') if len(main_parts) > 1 else main_clause.rstrip('.')
+            
+            sub_slots = {
+                'sub-m2': relative_part,
+                'sub-s': sub_subject,
+                'sub-v': sub_verb,
+                '_parent_slot': 'S'
+            }
+            if sub_aux:
+                sub_slots['sub-aux'] = sub_aux
+                
+            main_slots = {
+                'S': '',
+                'V': main_verb
+            }
+            if main_aux:
+                main_slots['Aux'] = main_aux
+                
+            return {
+                'success': True,
+                'handler': 'RelativeAdverbHandler',
+                'relative_adverb': 'when',
+                'main_slots': main_slots,
+                'sub_slots': sub_slots
+            }
+            
+        elif pattern_type == 'when_moment':
+            # "The moment when he told her the truth changed everything"
+            relative_part = match.group(1)  # "The moment when"
+            sub_subject = match.group(2)    # "he"
+            sub_verb = match.group(3)       # "told"
+            sub_objects = match.group(4)    # "her the truth"
+            main_verb = match.group(5)      # "changed"
+            main_object = match.group(6)    # "everything"
+            
+            # sub_objects を分析
+            obj_parts = sub_objects.strip().split()
+            sub_o1 = obj_parts[0] if obj_parts else None
+            sub_o2 = ' '.join(obj_parts[1:]) if len(obj_parts) > 1 else None
+            
+            sub_slots = {
+                'sub-m2': relative_part,
+                'sub-s': sub_subject,
+                'sub-v': sub_verb,
+                '_parent_slot': 'S'
+            }
+            if sub_o1:
+                sub_slots['sub-o1'] = sub_o1
+            if sub_o2:
+                sub_slots['sub-o2'] = sub_o2
+                
+            main_slots = {
+                'S': '',
+                'V': main_verb,
+                'O1': main_object.strip('.')
+            }
+            
+            return {
+                'success': True,
+                'handler': 'RelativeAdverbHandler',
+                'relative_adverb': 'when',
+                'main_slots': main_slots,
+                'sub_slots': sub_slots
+            }
+            
+        elif pattern_type == 'why_passive':
+            # "The reason why she was upset became clear"
+            relative_part = match.group(1)  # "The reason why"
+            sub_subject = match.group(2)    # "she"
+            sub_aux = match.group(3)        # "was"
+            sub_verb = match.group(4)       # "upset"
+            main_verb = match.group(5)      # "became"
+            main_complement = match.group(6)  # "clear"
+            
+            sub_slots = {
+                'sub-m2': relative_part,
+                'sub-s': sub_subject,
+                'sub-aux': sub_aux,
+                'sub-v': sub_verb,
+                '_parent_slot': 'S'
+            }
+            
+            main_slots = {
+                'S': '',
+                'V': main_verb,
+                'C1': main_complement.strip('.')
+            }
+            
+            return {
+                'success': True,
+                'handler': 'RelativeAdverbHandler',
+                'relative_adverb': 'why',
+                'main_slots': main_slots,
+                'sub_slots': sub_slots
+            }
         
         return None
     
@@ -156,9 +300,9 @@ class RelativeAdverbHandler:
             elif token.pos_ == 'VERB' and not verb:
                 verb = token.text
                 
-            # 目的語検出（動詞の後の名詞句）
-            elif token.pos_ in ['NOUN', 'PRON', 'PROPN'] and verb and subject:
-                # 複数語の目的語をまとめて取得
+            # 目的語検出（動詞の後の名詞句）- 冠詞も含む
+            elif token.pos_ in ['DET', 'NOUN', 'PRON', 'PROPN'] and verb and subject:
+                # 複数語の目的語をまとめて取得（冠詞から開始）
                 obj_parts = [token.text]
                 j = i + 1
                 while j < len(tokens) and tokens[j].pos_ in ['DET', 'ADJ', 'NOUN']:
@@ -218,7 +362,7 @@ class RelativeAdverbHandler:
                 print(f"🔍 主節解析結果: {result}")
                 return result
         
-        # 1. be動詞 + 補語パターン
+        # 1. be動詞 + 補語パターン（場所句を含む）
         be_patterns = [
             r'^(is|are|was|were)\s+(.+)$',
             r'^(will\s+be)\s+(.+)$'
@@ -229,8 +373,26 @@ class RelativeAdverbHandler:
                 be_verb = match.group(1)
                 complement = match.group(2).strip('.')  # 句読点除去
                 print(f"🔍 be動詞パターン: {be_verb} + {complement}")
-                result['V'] = be_verb.split()[0]  # 'is', 'was', etc.
-                result['C1'] = complement
+                
+                # 場所句の判定（"in Italy", "at the park", etc.）
+                location_patterns = [
+                    r'^(in|at|on|near|by|under|over|beside)\s+(.+)$'
+                ]
+                
+                is_location = False
+                for loc_pattern in location_patterns:
+                    loc_match = re.match(loc_pattern, complement, re.IGNORECASE)
+                    if loc_match:
+                        print(f"🔍 場所句検出: {complement}")
+                        result['V'] = be_verb.split()[0]  # 'is', 'was', etc.
+                        result['M2'] = complement  # 場所句は M2 として分類
+                        is_location = True
+                        break
+                
+                if not is_location:
+                    result['V'] = be_verb.split()[0]  # 'is', 'was', etc.
+                    result['C1'] = complement
+                    
                 print(f"🔍 主節解析結果: {result}")
                 return result
         

@@ -142,7 +142,7 @@ class CentralController:
             print("⚠️ tellグループのデータが見つかりません。スキップします。")
             return
             
-        print(f"📚 実際のtellグループ例文 ({len(tell_examples)}件):")
+        print(f"実際のtellグループ例文 ({len(tell_examples)}件):")
         for i, example in enumerate(tell_examples, 1):
             print(f"  {i}. {example}")
         
@@ -473,9 +473,9 @@ class CentralController:
         if 'relative_adverb' in grammar_patterns:
             # Step 1: 関係副詞ハンドラー
             rel_adv_handler = self.handlers['relative_adverb']
-            rel_adv_result = rel_adv_handler.process(text)
+            rel_adv_result = rel_adv_handler.detect_relative_adverb(text)
             
-            if rel_adv_result['success']:
+            if rel_adv_result and rel_adv_result.get('success'):
                 print(f"✅ 関係副詞処理成功: {rel_adv_result['relative_adverb']}")
                 
                 # 順序情報を追加
@@ -495,7 +495,10 @@ class CentralController:
                 return self._apply_order_to_result(result)
             else:
                 print(f"⚠️ 関係副詞処理失敗、通常の処理フローに移行")
-                print(f"  RelativeAdverbHandler error: {rel_adv_result.get('reason')}")
+                if rel_adv_result:
+                    print(f"  RelativeAdverbHandler error: {rel_adv_result.get('reason')}")
+                else:
+                    print(f"  RelativeAdverbHandler: 関係副詞が検出されませんでした")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
