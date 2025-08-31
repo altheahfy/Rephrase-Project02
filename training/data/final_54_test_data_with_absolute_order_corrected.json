@@ -2023,10 +2023,10 @@
           "C1": "expensive"
         },
         "sub_slots": {
-          "sub-o1": "The gift [that]",
+          "sub-o1": "her",
+          "sub-o2": "The gift [that]",
           "sub-s": "he",
           "sub-v": "bought",
-          "sub-o2": "her",
           "_parent_slot": "S"
         }
       }
@@ -2042,10 +2042,10 @@
           "C1": "valuable"
         },
         "sub_slots": {
-          "sub-o1": "The lesson [that]",
+          "sub-o1": "me",
+          "sub-o2": "The lesson [that]",
           "sub-s": "you",
           "sub-v": "taught",
-          "sub-o2": "me",
           "_parent_slot": "S"
         }
       }
@@ -2099,10 +2099,10 @@
           "C1": "incredible"
         },
         "sub_slots": {
-          "sub-o1": "The story [that]",
+          "sub-o1": "us",
+          "sub-o2": "The story [that]",
           "sub-s": "she",
           "sub-v": "told",
-          "sub-o2": "us",
           "_parent_slot": "S"
         }
       }
