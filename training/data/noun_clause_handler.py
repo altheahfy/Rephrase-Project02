@@ -163,6 +163,12 @@ class NounClauseHandler:
                     connector = token.text.lower()
                     print(f"   wh-要素検出: '{connector}'")
                     break
+                # 追加: where, how, when等の副詞系wh-語
+                elif (token.pos_ in ['SCONJ', 'ADV'] and 
+                      token.text.lower() in ['where', 'when', 'how', 'why']):
+                    connector = token.text.lower()
+                    print(f"   wh-副詞検出: '{connector}'")
+                    break
         
         return {
             'type': self._determine_clause_type(connector),
@@ -249,6 +255,8 @@ class NounClauseHandler:
             return 'that_clause'
         elif connector in self.noun_clause_connectors['wh_clause']:
             return 'wh_clause'
+        elif connector in ['where', 'when', 'how', 'why']:
+            return 'wh_clause'  # where, how等も名詞節として処理
         elif connector == 'whether':
             return 'whether_clause'
         elif connector == 'if':
@@ -358,6 +366,8 @@ class NounClauseHandler:
         connector = noun_clause_info.get('connector', '')
         if connector in ['what']:
             clause_structure['sub-o1'] = connector
+        elif connector in ['who', 'whom']:
+            clause_structure['sub-s'] = connector
         elif connector in ['where', 'when', 'why', 'how']:
             clause_structure['sub-m2'] = connector
         
@@ -429,8 +439,9 @@ class NounClauseHandler:
         if noun_clause_info.get('preposition'):
             preposition = noun_clause_info['preposition']
             connector = noun_clause_info.get('connector', 'if')
-            # "on if you" の形式
-            clause_structure['sub-s'] = f"{preposition} {connector} " + clause_structure.get('sub-s', '')
+            # "on if you" の形式（重複回避）
+            subject_part = clause_structure.get('sub-s', '').replace(f'{connector} ', '')
+            clause_structure['sub-s'] = f"{preposition} {connector} {subject_part}"
         
         # サブスロットに統合
         sub_slots.update(clause_structure)
@@ -474,6 +485,18 @@ class NounClauseHandler:
             return main_slots, sub_slots
         
         main_slots['V'] = main_verb.text
+        
+        # 助動詞検出（主動詞の子として）
+        for child in main_verb.children:
+            if child.dep_ == 'aux':
+                # 否定の場合は結合（doesn't, won't等）
+                aux_text = child.text
+                for grandchild in child.children:
+                    if grandchild.dep_ == 'neg':
+                        aux_text += grandchild.text
+                main_slots['Aux'] = aux_text
+                print(f"   助動詞検出: '{aux_text}'")
+                break
         
         # 主語検出
         for child in main_verb.children:
@@ -544,28 +567,62 @@ class NounClauseHandler:
         clause_subject = None
         clause_verb = None
         clause_complement = None
+        clause_aux = None
         
         for token in clause_tokens:
+            # 主文の要素は節内に含めない（主語節の場合の 'wonderful' 等）
+            if token.dep_ in ['acomp', 'attr'] and token.head.dep_ == 'ROOT':
+                continue  # 主文の補語はスキップ
+                
             if token.dep_ in ['nsubj', 'nsubjpass'] and not clause_subject:
-                if connector and connector not in ['what', 'who', 'whom']:
-                    clause_structure['sub-s'] = f"{connector} {token.text}"
-                else:
+                # wh-語が主語の場合は除外、目的語wh-語（what）の場合は主語として処理
+                if connector not in ['who', 'whom']:
                     clause_structure['sub-s'] = token.text
-                clause_subject = token
-                print(f"   節内主語: '{token.text}'")
-            elif token.pos_ in ['VERB', 'AUX'] and not clause_verb:
+                    clause_subject = token
+                    print(f"   節内主語: '{token.text}'")
+            elif token.pos_ in ['VERB'] and not clause_verb:
                 clause_structure['sub-v'] = token.text
                 clause_verb = token
                 print(f"   節内動詞: '{token.text}'")
+            elif token.pos_ in ['AUX'] and not clause_verb:
+                # be動詞等は動詞として優先処理
+                if token.text.lower() in ['is', 'are', 'was', 'were', 'am']:
+                    clause_structure['sub-v'] = token.text
+                    clause_verb = token
+                    print(f"   節内動詞(be): '{token.text}'")
+                elif not clause_aux:
+                    # 助動詞として処理（will, can等）
+                    clause_structure['sub-aux'] = token.text
+                    clause_aux = token
+                    print(f"   節内助動詞: '{token.text}'")
             elif token.dep_ in ['acomp', 'attr'] and not clause_complement:
                 clause_structure['sub-c1'] = token.text
                 clause_complement = token
                 print(f"   節内補語: '{token.text}'")
+            elif token.dep_ in ['advmod'] and token.pos_ in ['ADV']:
+                clause_structure['sub-m2'] = token.text
+                print(f"   節内副詞: '{token.text}'")
+            elif token.dep_ in ['prep'] and token.pos_ in ['ADP']:
+                # 前置詞句の検出（"to the party"等）
+                prep_phrase = token.text
+                for child in token.children:
+                    if child.dep_ == 'pobj':
+                        prep_phrase += f" {child.text}"
+                        # さらにその修飾語も追加
+                        for grandchild in child.children:
+                            if grandchild.dep_ == 'det':
+                                prep_phrase = token.text + f" {grandchild.text} {child.text}"
+                clause_structure['sub-m2'] = prep_phrase
+                print(f"   節内前置詞句: '{prep_phrase}'")
         
-        # 接続詞のみが主語に含まれていない場合の修正
-        if connector and clause_subject and 'sub-s' in clause_structure:
-            if connector not in clause_structure['sub-s']:
-                clause_structure['sub-s'] = f"{connector} {clause_structure['sub-s']}"
+        # 接続詞のみが主語に含まれていない場合の修正（that節等）
+        if connector in ['that', 'whether'] and clause_subject and 'sub-s' in clause_structure:
+            clause_structure['sub-s'] = f"{connector} {clause_structure['sub-s']}"
+        
+        # if節の場合は前置詞句で処理済みなので重複回避
+        if connector == 'if' and clause_subject and 'sub-s' in clause_structure:
+            # 既に前置詞句として処理済みの場合はそのまま
+            pass
         
         return clause_structure
     

@@ -40,7 +40,7 @@ class ModalHandler:
         # 助動詞分類マッピング
         self._initialize_modal_patterns()
         
-        print("✅ ModalHandler初期化完了")
+        # デバッグメッセージ削除済み
     
     def _initialize_modal_patterns(self):
         """助動詞パターンの初期化"""
@@ -85,7 +85,7 @@ class ModalHandler:
             'will be': r'\bwill\s+be\b'
         }
         
-        print("🔧 助動詞パターン初期化完了")
+        # デバッグメッセージ削除済み
     
     def detect_modal_structure(self, text: str) -> Dict[str, Any]:
         """

@@ -146,16 +146,8 @@ class CentralController:
         tell_examples = self._extract_real_group_data("tell")
         gave_examples = self._extract_real_group_data("gave")
         
-        if not tell_examples:
-            print("⚠️ tellグループのデータが見つかりません。スキップします。")
-            return
-            
-        print(f"実際のtellグループ例文 ({len(tell_examples)}件):")
-        for i, example in enumerate(tell_examples, 1):
-            print(f"  {i}. {example}")
-        
         # 注意: 動的分析は現在PureDataDrivenOrderManagerで処理
-        print("✅ グループマッピングの初期化完了（PureDataDrivenOrderManager使用）")
+        # デバッグ出力は削除済み
     
     def _extract_real_group_data(self, group_key: str) -> List[str]:
         """実際のデータファイルから指定グループの例文を抽出"""
