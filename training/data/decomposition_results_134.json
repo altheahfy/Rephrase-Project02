@@ -1,0 +1,65 @@
+{
+  "case_134": {
+    "sentence": "The gift he bought her was expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "her",
+        "sub-o2": "The gift [that]",
+        "sub-s": "he",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The gift he bought her was expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "bought",
+        "sub-o1": "her",
+        "sub-o2": "The gift [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "bought",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "her",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The gift [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "expensive"
+      }
+    },
+    "match": true
+  }
+}

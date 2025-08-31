@@ -1,0 +1,230 @@
+{
+  "case_46": {
+    "sentence": "The book which I bought is expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which I bought is expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "bought",
+        "sub-o1": "The book which",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "bought",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The book which",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "expensive"
+      }
+    },
+    "match": true
+  },
+  "case_47": {
+    "sentence": "The man whom I met is tall.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "tall"
+      },
+      "sub_slots": {
+        "sub-o1": "The man whom",
+        "sub-s": "I",
+        "sub-v": "met",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man whom I met is tall.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "tall"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "met",
+        "sub-o1": "The man whom",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "met",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The man whom",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "tall"
+      }
+    },
+    "match": true
+  },
+  "case_48": {
+    "sentence": "The car that he drives is new.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "new"
+      },
+      "sub_slots": {
+        "sub-o1": "The car that",
+        "sub-s": "he",
+        "sub-v": "drives",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car that he drives is new.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "new"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "drives",
+        "sub-o1": "The car that",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "drives",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The car that",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "new"
+      }
+    },
+    "match": true
+  },
+  "case_53": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student whose book I borrowed is smart.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "sub-o1": "The student whose book",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "borrowed",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The student whose book",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "smart"
+      }
+    },
+    "match": true
+  }
+}

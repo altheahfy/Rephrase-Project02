@@ -219,14 +219,29 @@ class OmittedRelativePronounHandler:
         # 関係節の動詞
         elements['sub-v'] = relative_verb.text
         
+        # 関係詞が目的語の役割をしているかどうかを検出
+        relative_as_object = False
+        for token in doc:
+            if token.dep_ == 'dobj' and token.head == relative_verb and token.pos_ in ['PRON']:
+                if token.text.lower() in ['which', 'whom', 'that', 'whose']:
+                    relative_as_object = True
+                    break
+        
+        # 直接目的語の検出
+        direct_object = None
+        for child in relative_verb.children:
+            if child.dep_ == 'dobj':
+                direct_object = child.text
+                break
+        
         # 関係節の目的語・修飾語を検出
         for child in relative_verb.children:
             if child.dep_ == 'dobj':
-                # 直接目的語の位置に応じてスロット決定
-                if restored_relative.endswith('[that]') or restored_relative.endswith('[which]'):
-                    elements['sub-o1'] = child.text
+                if relative_as_object:
+                    # 関係詞が目的語の場合、先行詞+関係詞をsub-o1に統合
+                    antecedent = restored_relative.replace(' [that]', '').replace(' [which]', '').replace(' [whom]', '')
+                    elements['sub-o1'] = antecedent
                 else:
-                    elements['sub-o2'] = restored_relative
                     elements['sub-o1'] = child.text
             elif child.dep_ == 'iobj':
                 elements['sub-o1'] = child.text
@@ -238,11 +253,28 @@ class OmittedRelativePronounHandler:
                 else:
                     elements['sub-m3'] = modifier_text
         
-        # 先行詞を適切なスロットに配置
-        if 'sub-o1' not in elements:
+        # whose bookのような構造を特別処理
+        if 'whose' in restored_relative.lower():
+            # whose book構造の場合、"whose book"を目的語として扱う
+            whose_phrase = restored_relative.replace(' [that]', '')
+            elements['sub-o1'] = whose_phrase
+            # sub-o1の内容を修正（"book"ではなく全体）
+            for key in list(elements.keys()):
+                if key == 'sub-o1' and elements[key] != whose_phrase:
+                    del elements[key]
+            elements['sub-o1'] = whose_phrase
+        
+        # SVOO構造の特別処理: 関係詞が間接目的語（O2）として機能する場合
+        if direct_object and not relative_as_object and 'whose' not in restored_relative.lower():
+            # 第4文型構造: S + V + O1 + O2 (関係詞=O2)
+            # 例: "The gift he bought her" → he bought [the gift] her
+            #     sub-s=he, sub-v=bought, sub-o1=her, sub-o2=The gift [that]
+            elements['sub-o1'] = direct_object  # 直接目的語 (her, me, us)
+            elements['sub-o2'] = restored_relative  # 関係詞+先行詞 (The gift [that])
+        
+        # 先行詞を適切なスロットに配置（上記の特別処理がない場合のみ）
+        elif not relative_as_object and 'whose' not in restored_relative.lower() and 'sub-o1' not in elements:
             elements['sub-o1'] = restored_relative
-        elif 'sub-o2' not in elements:
-            elements['sub-o2'] = restored_relative
         
         elements['_parent_slot'] = 'S'
         

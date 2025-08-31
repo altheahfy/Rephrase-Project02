@@ -1,0 +1,128 @@
+{
+  "case_135": {
+    "sentence": "The lesson you taught me was valuable.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "valuable"
+      },
+      "sub_slots": {
+        "sub-o1": "me",
+        "sub-o2": "The lesson [that]",
+        "sub-s": "you",
+        "sub-v": "taught",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The lesson you taught me was valuable.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "valuable"
+      },
+      "sub_slots": {
+        "sub-s": "you",
+        "sub-v": "taught",
+        "sub-o1": "me",
+        "sub-o2": "The lesson [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "taught",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "me",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The lesson [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "valuable"
+      }
+    },
+    "match": true
+  },
+  "case_138": {
+    "sentence": "The story she told us was incredible.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "incredible"
+      },
+      "sub_slots": {
+        "sub-o1": "us",
+        "sub-o2": "The story [that]",
+        "sub-s": "she",
+        "sub-v": "told",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The story she told us was incredible.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "incredible"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "told",
+        "sub-o1": "us",
+        "sub-o2": "The story [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "told",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "us",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The story [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "incredible"
+      }
+    },
+    "match": true
+  }
+}
