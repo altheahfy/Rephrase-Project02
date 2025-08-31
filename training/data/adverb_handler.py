@@ -689,6 +689,17 @@ class AdverbHandler:
             modifier_slots['M2'] = all_modifiers[0]['text']
             
         elif modifier_count == 2:
+            # 特別ケース: 「副詞 and 副詞」パターンを先にチェック
+            if (all_modifiers[1]['modifier_idx'] - all_modifiers[0]['modifier_idx'] == 2):
+                # 間に「and」があるかチェック
+                and_idx = all_modifiers[0]['modifier_idx'] + 1
+                if and_idx < len(doc) and doc[and_idx].text.lower() == 'and':
+                    # 「quickly」と「and carefully」として分割
+                    modifier_slots['M2'] = all_modifiers[0]['text']
+                    modifier_slots['M3'] = f"and {all_modifiers[1]['text']}"
+                    print(f"🔧 「副詞 and 副詞」パターン検出: M2='{all_modifiers[0]['text']}', M3='and {all_modifiers[1]['text']}'")
+                    return modifier_slots
+                    
             # 2個の場合：距離ベースルール適用
             
             # 動詞位置を取得（最初の動詞を使用）
@@ -736,17 +747,6 @@ class AdverbHandler:
             else:
                 modifier_slots['M3'] = farther_modifier['text']  # 動詞より後
             
-            # 特別ケース: 「副詞 and 副詞」パターンの処理
-            if (len(all_modifiers) == 2 and 
-                all_modifiers[1]['modifier_idx'] - all_modifiers[0]['modifier_idx'] == 2):
-                # 間に「and」があるかチェック
-                and_idx = all_modifiers[0]['modifier_idx'] + 1
-                if and_idx < len(doc) and doc[and_idx].text.lower() == 'and':
-                    # 「quickly」と「and carefully」として分割
-                    modifier_slots['M2'] = all_modifiers[0]['text']
-                    modifier_slots['M3'] = f"and {all_modifiers[1]['text']}"
-                    return modifier_slots
-                
         elif modifier_count == 3:
             # 3個 → M1, M2, M3（位置順）
             modifier_slots['M1'] = all_modifiers[0]['text']

@@ -27,7 +27,7 @@
       "ordered_slots": {
         "3": "The car",
         "5": "is",
-        "7": "red"
+        "8": "red"
       }
     },
     "match": true
@@ -180,7 +180,7 @@
       "ordered_slots": {
         "3": "She",
         "5": "looks",
-        "7": "happy"
+        "8": "happy"
       }
     },
     "match": true
@@ -213,7 +213,7 @@
       "ordered_slots": {
         "3": "He",
         "5": "became",
-        "7": "a doctor"
+        "8": "a doctor"
       }
     },
     "match": true
@@ -246,7 +246,7 @@
       "ordered_slots": {
         "3": "The food",
         "5": "tastes",
-        "7": "good"
+        "8": "good"
       }
     },
     "match": true
@@ -593,7 +593,7 @@
         "3": "The cake",
         "4": "is being",
         "5": "baked",
-        "8": "by my mother"
+        "7": "by my mother"
       }
     },
     "match": true
@@ -630,7 +630,7 @@
         "3": "The cake",
         "4": "was",
         "5": "eaten",
-        "8": "by the children"
+        "7": "by the children"
       }
     },
     "match": true
@@ -667,7 +667,7 @@
         "3": "The door",
         "4": "was",
         "5": "opened",
-        "8": "by the key"
+        "7": "by the key"
       }
     },
     "match": true
@@ -703,7 +703,7 @@
       "ordered_slots": {
         "3": "The students",
         "5": "study",
-        "8": "hard",
+        "7": "hard",
         "9": "for exams"
       }
     },
@@ -741,7 +741,7 @@
         "3": "The car",
         "4": "was",
         "5": "repaired",
-        "8": "last week"
+        "7": "last week"
       }
     },
     "match": true
@@ -781,7 +781,7 @@
         "3": "The window",
         "4": "was",
         "5": "opened",
-        "8": "gently",
+        "7": "gently",
         "9": "by the morning breeze"
       }
     },
@@ -822,7 +822,7 @@
         "3": "The message",
         "4": "is being",
         "5": "written",
-        "8": "carefully",
+        "7": "carefully",
         "9": "by the manager"
       }
     },
@@ -863,7 +863,7 @@
         "3": "The problem",
         "4": "was",
         "5": "solved",
-        "8": "quickly",
+        "7": "quickly",
         "9": "by the expert team"
       }
     },
@@ -904,7 +904,7 @@
         "3": "The building",
         "4": "is being",
         "5": "constructed",
-        "8": "very carefully",
+        "7": "very carefully",
         "9": "by skilled workers"
       }
     },
@@ -948,7 +948,7 @@
         "3": "The teacher",
         "5": "explains",
         "6": "grammar",
-        "8": "to confused students",
+        "7": "to confused students",
         "9": "daily"
       }
     },
@@ -989,7 +989,7 @@
         "3": "The student",
         "5": "writes",
         "6": "essays",
-        "8": "carefully",
+        "7": "carefully",
         "9": "for better grades"
       }
     },
@@ -1023,7 +1023,7 @@
       "ordered_slots": {
         "3": "She",
         "5": "sings",
-        "8": "beautifully"
+        "7": "beautifully"
       }
     },
     "match": true
@@ -1056,7 +1056,7 @@
       "ordered_slots": {
         "3": "I",
         "5": "study",
-        "8": "Tomorrow"
+        "7": "Tomorrow"
       }
     },
     "match": true
@@ -1093,7 +1093,7 @@
         "3": "He",
         "5": "opened",
         "6": "the door",
-        "8": "slowly"
+        "7": "slowly"
       }
     },
     "match": true
@@ -1105,8 +1105,8 @@
         "S": "We",
         "V": "eat",
         "O1": "breakfast",
-        "M1": "always",
-        "M2": "together"
+        "M2": "always",
+        "M3": "together"
       },
       "sub_slots": {}
     },
@@ -1133,11 +1133,11 @@
         "3": "We",
         "5": "eat",
         "6": "breakfast",
-        "8": "always",
+        "7": "always",
         "9": "together"
       }
     },
-    "match": false
+    "match": true
   },
   "case_33": {
     "sentence": "The cat quietly sat on the mat.",
@@ -1145,8 +1145,8 @@
       "main_slots": {
         "S": "The cat",
         "V": "sat",
-        "M1": "quietly",
-        "M2": "on the mat"
+        "M2": "quietly",
+        "M3": "on the mat"
       },
       "sub_slots": {}
     },
@@ -1170,11 +1170,11 @@
       "ordered_slots": {
         "3": "The cat",
         "5": "sat",
-        "8": "quietly",
+        "7": "quietly",
         "9": "on the mat"
       }
     },
-    "match": false
+    "match": true
   },
   "case_34": {
     "sentence": "Students often study here.",
@@ -1182,8 +1182,8 @@
       "main_slots": {
         "S": "Students",
         "V": "study",
-        "M1": "often",
-        "M2": "here"
+        "M2": "often",
+        "M3": "here"
       },
       "sub_slots": {}
     },
@@ -1207,11 +1207,11 @@
       "ordered_slots": {
         "3": "Students",
         "5": "study",
-        "8": "often",
+        "7": "often",
         "9": "here"
       }
     },
-    "match": false
+    "match": true
   },
   "case_35": {
     "sentence": "She carefully reads books.",
@@ -1245,7 +1245,7 @@
         "3": "She",
         "5": "reads",
         "6": "books",
-        "8": "carefully"
+        "7": "carefully"
       }
     },
     "match": true
@@ -1281,8 +1281,8 @@
       "ordered_slots": {
         "3": "he",
         "5": "became",
-        "7": "tired",
-        "8": "Yesterday"
+        "8": "tired",
+        "7": "Yesterday"
       }
     },
     "match": true
@@ -1315,7 +1315,7 @@
       "ordered_slots": {
         "3": "They",
         "5": "run",
-        "8": "fast"
+        "7": "fast"
       }
     },
     "match": true
@@ -1385,7 +1385,7 @@
       "ordered_slots": {
         "3": "she",
         "5": "works",
-        "8": "very hard"
+        "7": "very hard"
       }
     },
     "match": true
@@ -1409,7 +1409,6 @@
         "S": "He",
         "V": "solved",
         "O1": "the problem",
-        "M1": "quickly",
         "M2": "quickly",
         "M3": "and carefully"
       },
@@ -1418,7 +1417,6 @@
         "V": "solved",
         "O1": "the problem",
         "M2": "quickly",
-        "M1": "quickly",
         "M3": "and carefully"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
@@ -1427,11 +1425,11 @@
         "3": "He",
         "5": "solved",
         "6": "the problem",
-        "8": "quickly",
+        "7": "quickly",
         "9": "and carefully"
       }
     },
-    "match": false
+    "match": true
   },
   "case_41": {
     "sentence": "She always speaks English fluently at work.",
@@ -1471,7 +1469,7 @@
         "3": "She",
         "5": "speaks",
         "6": "English",
-        "8": "fluently",
+        "7": "fluently",
         "9": "at work"
       }
     },
@@ -1511,7 +1509,7 @@
       "ordered_slots": {
         "3": "he",
         "5": "jogs",
-        "8": "slowly",
+        "7": "slowly",
         "9": "in the park"
       }
     },
@@ -1573,7 +1571,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "strong"
+        "8": "strong"
       }
     },
     "match": true
@@ -1634,7 +1632,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "mine"
+        "8": "mine"
       }
     },
     "match": true
@@ -1695,7 +1693,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "kind"
+        "8": "kind"
       }
     },
     "match": true
@@ -1756,7 +1754,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "expensive"
+        "8": "expensive"
       }
     },
     "match": true
@@ -1817,7 +1815,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "tall"
+        "8": "tall"
       }
     },
     "match": true
@@ -1878,7 +1876,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "new"
+        "8": "new"
       }
     },
     "match": true
@@ -1939,7 +1937,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "red"
+        "8": "red"
       }
     },
     "match": true
@@ -2000,7 +1998,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "famous"
+        "8": "famous"
       }
     },
     "match": true
@@ -2119,7 +2117,7 @@
       "ordered_slots": {
         "3": "",
         "5": "lives",
-        "8": "here"
+        "7": "here"
       }
     },
     "match": true
@@ -2180,7 +2178,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "smart"
+        "8": "smart"
       }
     },
     "match": true
@@ -2235,7 +2233,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "my neighbor"
+        "8": "my neighbor"
       }
     },
     "match": true
@@ -2308,7 +2306,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "famous"
+        "8": "famous"
       }
     },
     "match": true
@@ -2381,7 +2379,7 @@
       "ordered_slots": {
         "3": "",
         "5": "runs",
-        "8": "smoothly"
+        "7": "smoothly"
       }
     },
     "match": true
@@ -2454,7 +2452,7 @@
       "ordered_slots": {
         "3": "",
         "5": "arrived",
-        "8": "today"
+        "7": "today"
       }
     },
     "match": true
@@ -2521,7 +2519,7 @@
       "ordered_slots": {
         "3": "",
         "5": "succeeds",
-        "8": "academically"
+        "7": "academically"
       }
     },
     "match": true
@@ -2585,7 +2583,7 @@
         "3": "",
         "5": "respected",
         "4": "is",
-        "8": "greatly"
+        "7": "greatly"
       }
     },
     "match": true
@@ -2649,7 +2647,7 @@
         "3": "",
         "5": "saves",
         "6": "lives",
-        "8": "successfully"
+        "7": "successfully"
       }
     },
     "match": true
@@ -2792,7 +2790,7 @@
         "3": "",
         "5": "published",
         "4": "was",
-        "8": "successfully"
+        "7": "successfully"
       }
     },
     "match": true
@@ -2859,7 +2857,7 @@
       "ordered_slots": {
         "3": "",
         "5": "improved",
-        "8": "dramatically"
+        "7": "dramatically"
       }
     },
     "match": true
@@ -2928,7 +2926,7 @@
       "ordered_slots": {
         "3": "",
         "5": "works",
-        "8": "efficiently",
+        "7": "efficiently",
         "9": "every day"
       }
     },
@@ -2998,8 +2996,8 @@
       "ordered_slots": {
         "3": "",
         "5": "became",
-        "7": "famous",
-        "8": "rapidly"
+        "8": "famous",
+        "7": "rapidly"
       }
     },
     "match": true
@@ -3036,7 +3034,7 @@
         "3": "The letter",
         "4": "was",
         "5": "written",
-        "8": "by John"
+        "7": "by John"
       }
     },
     "match": true
@@ -3073,7 +3071,7 @@
         "3": "The house",
         "4": "was",
         "5": "built",
-        "8": "in 1990"
+        "7": "in 1990"
       }
     },
     "match": true
@@ -3110,7 +3108,7 @@
         "3": "The book",
         "4": "was",
         "5": "written",
-        "8": "by a famous author"
+        "7": "by a famous author"
       }
     },
     "match": true
@@ -3147,7 +3145,7 @@
         "3": "The message",
         "4": "was",
         "5": "sent",
-        "8": "yesterday"
+        "7": "yesterday"
       }
     },
     "match": true
@@ -3252,7 +3250,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "beautiful"
+        "8": "beautiful"
       }
     },
     "match": true
@@ -3310,7 +3308,7 @@
       "ordered_slots": {
         "3": "",
         "5": "was",
-        "7": "late"
+        "8": "late"
       }
     },
     "match": true
@@ -3368,7 +3366,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "unclear"
+        "8": "unclear"
       }
     },
     "match": true
@@ -3432,7 +3430,7 @@
       "ordered_slots": {
         "3": "",
         "5": "was",
-        "7": "clever"
+        "8": "clever"
       }
     },
     "match": true
@@ -3474,7 +3472,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "1": "What",
+        "2": "What",
         "3": "did",
         "4": "he",
         "5": "tell",
@@ -3615,7 +3613,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "2": "Where",
+        "1": "Where",
         "3": "did",
         "4": "you",
         "5": "tell",
@@ -3714,7 +3712,7 @@
         "3": "She",
         "5": "speak",
         "6": "English",
-        "8": "fluently"
+        "7": "fluently"
       }
     },
     "match": true
@@ -3761,7 +3759,7 @@
         "4": "will",
         "3": "You",
         "5": "succeed",
-        "8": "in your career"
+        "7": "in your career"
       }
     },
     "match": true
@@ -3811,7 +3809,7 @@
         "3": "We",
         "5": "visit",
         "6": "Paris",
-        "8": "every summer"
+        "7": "every summer"
       }
     },
     "match": true
@@ -3858,7 +3856,7 @@
         "4": "should",
         "3": "They",
         "5": "study",
-        "8": "harder"
+        "7": "harder"
       }
     },
     "match": true
@@ -3905,7 +3903,7 @@
         "4": "may",
         "3": "You",
         "5": "leave",
-        "8": "now"
+        "7": "now"
       }
     },
     "match": true
@@ -3952,7 +3950,7 @@
         "4": "might",
         "3": "It",
         "5": "rain",
-        "8": "tomorrow"
+        "7": "tomorrow"
       }
     },
     "match": true
@@ -4095,7 +4093,7 @@
         "4": "has",
         "3": "She",
         "5": "lived",
-        "8": "here",
+        "7": "here",
         "9": "for ten years"
       }
     },
@@ -4146,7 +4144,7 @@
         "3": "They",
         "5": "left",
         "6": "the building",
-        "8": "already"
+        "7": "already"
       }
     },
     "match": true
@@ -4228,7 +4226,7 @@
         "4": "Does",
         "3": "she",
         "5": "work",
-        "8": "at the hospital"
+        "7": "at the hospital"
       }
     },
     "match": true
@@ -4316,7 +4314,7 @@
         "3": "you",
         "5": "help",
         "6": "me",
-        "8": "with this problem"
+        "7": "with this problem"
       }
     },
     "match": true
@@ -4404,7 +4402,7 @@
         "4": "shall",
         "3": "I",
         "5": "return",
-        "8": "tomorrow"
+        "7": "tomorrow"
       }
     },
     "match": true
@@ -4451,7 +4449,7 @@
         "4": "ought to",
         "3": "We",
         "5": "start",
-        "8": "immediately"
+        "7": "immediately"
       }
     },
     "match": true
@@ -4500,7 +4498,7 @@
         "4": "used to",
         "3": "They",
         "5": "play",
-        "8": "here",
+        "7": "here",
         "9": "every day"
       }
     },
@@ -4548,7 +4546,7 @@
         "4": "is going to",
         "3": "He",
         "5": "study",
-        "8": "abroad"
+        "7": "abroad"
       }
     },
     "match": true
@@ -4595,7 +4593,7 @@
         "4": "have been",
         "3": "I",
         "5": "waiting",
-        "8": "for an hour"
+        "7": "for an hour"
       }
     },
     "match": true
@@ -4645,7 +4643,7 @@
         "3": "You",
         "5": "called",
         "6": "me",
-        "8": "earlier"
+        "7": "earlier"
       }
     },
     "match": true
@@ -4692,7 +4690,7 @@
         "4": "will be",
         "3": "They",
         "5": "arriving",
-        "8": "at noon"
+        "7": "at noon"
       }
     },
     "match": true
@@ -4855,7 +4853,7 @@
       "ordered_slots": {
         "3": "",
         "5": "was",
-        "7": "memorable"
+        "8": "memorable"
       }
     },
     "match": true
@@ -4913,7 +4911,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "personal"
+        "8": "personal"
       }
     },
     "match": true
@@ -5239,7 +5237,7 @@
       "ordered_slots": {
         "3": "",
         "5": "became",
-        "7": "clear"
+        "8": "clear"
       }
     },
     "match": true
@@ -5303,7 +5301,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "8": "in Italy"
+        "7": "in Italy"
       }
     },
     "match": true
@@ -5367,7 +5365,7 @@
       "ordered_slots": {
         "3": "",
         "5": "was",
-        "7": "innovative"
+        "8": "innovative"
       }
     },
     "match": true
@@ -5689,7 +5687,7 @@
       "ordered_slots": {
         "3": "",
         "5": "is",
-        "7": "wonderful"
+        "8": "wonderful"
       }
     },
     "match": true
@@ -5807,7 +5805,7 @@
       "ordered_slots": {
         "3": "It",
         "5": "depends",
-        "8": ""
+        "7": ""
       }
     },
     "match": true

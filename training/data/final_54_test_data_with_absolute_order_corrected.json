@@ -458,8 +458,8 @@
           "S": "We",
           "V": "eat",
           "O1": "breakfast",
-          "M1": "always",
-          "M2": "together"
+          "M2": "always",
+          "M3": "together"
         },
         "sub_slots": {}
       }
@@ -472,8 +472,8 @@
         "main_slots": {
           "S": "The cat",
           "V": "sat",
-          "M1": "quietly",
-          "M2": "on the mat"
+          "M2": "quietly",
+          "M3": "on the mat"
         },
         "sub_slots": {}
       }
@@ -486,8 +486,8 @@
         "main_slots": {
           "S": "Students",
           "V": "study",
-          "M1": "often",
-          "M2": "here"
+          "M2": "often",
+          "M3": "here"
         },
         "sub_slots": {}
       }
