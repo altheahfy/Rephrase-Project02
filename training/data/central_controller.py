@@ -4,7 +4,8 @@ Phase 2: RelativeClauseHandler統合
 
 設計方針:
 - Central Controllerは文法処理を直接行わず、ハンドラーに委任
-- Human Grammar Pattern: spaCy POS解析を情報源とした文法パターン認識
+- 専門分担型ハイブリッド解析: 品詞分析と依存関係を得意分野で活用
+- Human Grammar Pattern: spaCy解析結果を情報源とした文法パターン認識
 - 段階的100%精度達成（Phase 1: 5文型 → Phase 2: 関係節対応）
 """
 
@@ -31,9 +32,12 @@ class CentralController:
     - 適切なハンドラーへの処理委任
     - 結果統合・order管理
     
+    技術方針（専門分担型ハイブリッド解析）:
+    - 品詞分析: 副詞検出、受動態パターン等
+    - 依存関係: 複文主動詞、関係節構造等（透明性確保）
+    
     禁止:
     - 直接的な文法処理
-    - spaCy依存関係解析の使用
     - ハードコーディング
     """
     

@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "title": "名詞節テストケース - NounClauseHandler機能検証用",
+    "total_count": 8,
+    "grammar_category": "noun_clauses",
+    "patterns": [
+      "that節（目的語）",
+      "that節（主語）", 
+      "wh-節（目的語）",
+      "wh-節（主語）",
+      "間接疑問文",
+      "whether節",
+      "if節（名詞用法）",
+      "複合名詞節"
+    ],
+    "note": "各パターンでNounClauseHandlerの専門分解機能をテスト"
+  },
+  "test_cases": {
+    "113": {
+      "V_group_key": "think",
+      "grammar_category": "noun_clauses",
+      "pattern": "that節（目的語）",
+      "sentence": "I think that he is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "think",
+          "O1": "that he is smart"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "that_clause",
+            "role": "object",
+            "content": "he is smart",
+            "connector": "that",
+            "internal_structure": {
+              "S": "he",
+              "V": "is", 
+              "C1": "smart"
+            }
+          }
+        }
+      }
+    },
+    "114": {
+      "V_group_key": "be",
+      "grammar_category": "noun_clauses", 
+      "pattern": "that節（主語）",
+      "sentence": "That he succeeded surprised everyone.",
+      "expected": {
+        "main_slots": {
+          "S": "That he succeeded",
+          "V": "surprised",
+          "O1": "everyone"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "that_clause",
+            "role": "subject",
+            "content": "he succeeded",
+            "connector": "that",
+            "internal_structure": {
+              "S": "he",
+              "V": "succeeded"
+            }
+          }
+        }
+      }
+    },
+    "115": {
+      "V_group_key": "know",
+      "grammar_category": "noun_clauses",
+      "pattern": "wh-節（目的語）",
+      "sentence": "I know what you mean.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "know",
+          "O1": "what you mean"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "wh_clause",
+            "role": "object",
+            "content": "you mean",
+            "connector": "what",
+            "wh_word": "what",
+            "internal_structure": {
+              "S": "you",
+              "V": "mean",
+              "O1": "what"
+            }
+          }
+        }
+      }
+    },
+    "116": {
+      "V_group_key": "be",
+      "grammar_category": "noun_clauses",
+      "pattern": "wh-節（主語）", 
+      "sentence": "Where he lives is unknown.",
+      "expected": {
+        "main_slots": {
+          "S": "Where he lives",
+          "V": "is",
+          "C1": "unknown"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "wh_clause",
+            "role": "subject",
+            "content": "he lives",
+            "connector": "where",
+            "wh_word": "where",
+            "internal_structure": {
+              "S": "he",
+              "V": "lives",
+              "Adv": "where"
+            }
+          }
+        }
+      }
+    },
+    "117": {
+      "V_group_key": "ask",
+      "grammar_category": "noun_clauses",
+      "pattern": "間接疑問文",
+      "sentence": "She asked me why I was late.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "asked",
+          "O1": "me",
+          "O2": "why I was late"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "indirect_question",
+            "role": "object2",
+            "content": "I was late",
+            "connector": "why",
+            "wh_word": "why",
+            "internal_structure": {
+              "S": "I",
+              "V": "was",
+              "C1": "late",
+              "Adv": "why"
+            }
+          }
+        }
+      }
+    },
+    "118": {
+      "V_group_key": "wonder",
+      "grammar_category": "noun_clauses",
+      "pattern": "whether節",
+      "sentence": "I wonder whether he will come.",
+      "expected": {
+        "main_slots": {
+          "S": "I", 
+          "V": "wonder",
+          "O1": "whether he will come"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "whether_clause",
+            "role": "object",
+            "content": "he will come",
+            "connector": "whether",
+            "internal_structure": {
+              "S": "he",
+              "V": "will come"
+            }
+          }
+        }
+      }
+    },
+    "119": {
+      "V_group_key": "depend",
+      "grammar_category": "noun_clauses",
+      "pattern": "if節（名詞用法）",
+      "sentence": "It depends on if you agree.",
+      "expected": {
+        "main_slots": {
+          "S": "It",
+          "V": "depends",
+          "Prep": "on if you agree"
+        },
+        "sub_slots": {
+          "noun_clause": {
+            "type": "if_clause_noun",
+            "role": "prepositional_object",
+            "content": "you agree",
+            "connector": "if",
+            "internal_structure": {
+              "S": "you",
+              "V": "agree"
+            }
+          }
+        }
+      }
+    },
+    "120": {
+      "V_group_key": "believe",
+      "grammar_category": "noun_clauses",
+      "pattern": "複合名詞節",
+      "sentence": "I believe what he told me that she is coming.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "believe",
+          "O1": "what he told me that she is coming"
+        },
+        "sub_slots": {
+          "noun_clause_primary": {
+            "type": "wh_clause",
+            "role": "object",
+            "content": "he told me that she is coming",
+            "connector": "what",
+            "wh_word": "what",
+            "internal_structure": {
+              "S": "he",
+              "V": "told",
+              "O1": "me",
+              "O2": "that she is coming"
+            }
+          },
+          "noun_clause_nested": {
+            "type": "that_clause",
+            "role": "nested_object",
+            "content": "she is coming",
+            "connector": "that",
+            "internal_structure": {
+              "S": "she",
+              "V": "is coming"
+            }
+          }
+        }
+      }
+    }
+  }
+}
