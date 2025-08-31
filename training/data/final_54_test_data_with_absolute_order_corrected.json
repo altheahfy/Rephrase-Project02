@@ -1,8 +1,8 @@
 {
   "meta": {
-    "total_count": 128,
-    "valid_count": 128,
-    "new_count": 102,
+    "total_count": 138,
+    "valid_count": 138,
+    "new_count": 112,
     "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
@@ -16,12 +16,14 @@
       "complex_constructions": 12,
       "relative_adverbs": 10,
       "noun_clauses": 8,
+      "omitted_relative_pronouns": 10,
       "absolute_order_test": 0
     },
-    "total_reorganized": 120,
+    "total_reorganized": 130,
     "tell_group_normalized": true,
     "modal_handler_test_added": true,
-    "note": "実装済み範囲のみ（100%スコア維持用）"
+    "omitted_relative_pronoun_added": true,
+    "note": "実装済み範囲のみ（100%スコア維持用）+ 省略関係詞ハンドラー用例文追加"
   },
   "data": {
     "1": {
@@ -1915,6 +1917,193 @@
           "sub-s": "this",
           "sub-v": "is",
           "_parent_slot": "O1"
+        }
+      }
+    },
+    "129": {
+      "V_group_key": "be",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The book I read was interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "interesting"
+        },
+        "sub_slots": {
+          "sub-o1": "The book [that]",
+          "sub-s": "I",
+          "sub-v": "read",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "130": {
+      "V_group_key": "be",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The man I met yesterday was kind.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "kind"
+        },
+        "sub_slots": {
+          "sub-o1": "The man [whom]",
+          "sub-s": "I",
+          "sub-v": "met",
+          "sub-m2": "yesterday",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "131": {
+      "V_group_key": "action",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The car she drives looks expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "looks",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The car [that]",
+          "sub-s": "she",
+          "sub-v": "drives",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "132": {
+      "V_group_key": "be",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The movie we watched last night was amazing.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "amazing"
+        },
+        "sub_slots": {
+          "sub-o1": "The movie [that]",
+          "sub-s": "we",
+          "sub-v": "watched",
+          "sub-m2": "last night",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "133": {
+      "V_group_key": "action",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The place they visited seems beautiful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "seems",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-o1": "The place [that]",
+          "sub-s": "they",
+          "sub-v": "visited",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "134": {
+      "V_group_key": "transaction",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The gift he bought her was expensive.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "expensive"
+        },
+        "sub_slots": {
+          "sub-o1": "The gift [that]",
+          "sub-s": "he",
+          "sub-v": "bought",
+          "sub-o2": "her",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "135": {
+      "V_group_key": "be",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The lesson you taught me was valuable.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "valuable"
+        },
+        "sub_slots": {
+          "sub-o1": "The lesson [that]",
+          "sub-s": "you",
+          "sub-v": "taught",
+          "sub-o2": "me",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "136": {
+      "V_group_key": "action",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The house we built together stands strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "stands",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-o1": "The house [that]",
+          "sub-s": "we",
+          "sub-v": "built",
+          "sub-m2": "together",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "137": {
+      "V_group_key": "be",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The song I heard this morning was beautiful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "beautiful"
+        },
+        "sub_slots": {
+          "sub-o1": "The song [that]",
+          "sub-s": "I",
+          "sub-v": "heard",
+          "sub-m2": "this morning",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "138": {
+      "V_group_key": "communication",
+      "grammar_category": "omitted_relative_pronouns",
+      "sentence": "The story she told us was incredible.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "incredible"
+        },
+        "sub_slots": {
+          "sub-o1": "The story [that]",
+          "sub-s": "she",
+          "sub-v": "told",
+          "sub-o2": "us",
+          "_parent_slot": "S"
         }
       }
     }
