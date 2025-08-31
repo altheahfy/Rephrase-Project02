@@ -113,13 +113,17 @@ class CentralController:
             ordered_slots = self._get_unified_absolute_order(v_group_key, merged_slots, text)
             
             if ordered_slots:
+                # 🎯 main_slotsを正しい順序で再構築
+                ordered_main_slots = self._create_ordered_main_slots(main_slots, v_group_key)
+                result_dict['main_slots'] = ordered_main_slots
+                
                 # サブスロット内部の順序付けを追加
                 if sub_slots:
                     ordered_sub_slots = self._create_ordered_sub_slots(sub_slots)
                     result_dict['ordered_sub_slots'] = ordered_sub_slots
                 
                 result_dict['ordered_slots'] = ordered_slots
-                print(f"✅ 順序付与成功: {ordered_slots}")
+                print(f"✅ 順序付与成功: ordered_main_slots={ordered_main_slots}, ordered_slots={ordered_slots}")
             else:
                 print(f"⚠️ 順序付与結果が空です")
             
@@ -160,14 +164,11 @@ class CentralController:
                         print(f"🔧 統合完了: {parent_slot} = '{merged_slots[parent_slot]}'")
             else:
                 print(f"🔧 統合スキップ: 名詞節の場合はmain_slots空のまま維持")
-            # 特別処理: 名詞節のwh-句など、独立したサブ要素
-            for sub_key, sub_value in sub_slots.items():
-                if sub_key.startswith('sub-') and sub_key != '_parent_slot' and sub_value:
-                    # サブ要素を独立したスロットとして追加
-                    base_key = sub_key.replace('sub-', '').upper()
-                    if base_key not in merged_slots:
-                        merged_slots[base_key] = sub_value
-                        print(f"🔧 独立サブ要素追加: {base_key} = '{sub_value}'")
+            
+            # 🎯 設計修正: サブスロットはmain_slotsに統合しない
+            # サブスロットは独立して管理し、main_slotsとの混在を防ぐ
+            parent_slot = sub_slots.get('_parent_slot', '')
+            print(f"🔧 サブスロット独立管理: parent_slot={parent_slot}, sub_slots数={len([k for k in sub_slots.keys() if k.startswith('sub-')])}")
         
         return merged_slots
     
@@ -193,6 +194,30 @@ class CentralController:
         
         print(f"🔧 サブスロット順序付け完了: {len(ordered_sub_slots)-1 if '_parent_slot' in ordered_sub_slots else len(ordered_sub_slots)}要素")
         return ordered_sub_slots
+
+    def _create_ordered_main_slots(self, main_slots: Dict, v_group_key: str) -> Dict:
+        """
+        main_slotsを正しい順序で再構築
+        期待される辞書順序: S, Aux, V, O1, O2, C1, C2, M1, M2, M3
+        """
+        # 基本的な順序定義
+        main_slot_order = ['S', 'Aux', 'V', 'O1', 'O2', 'C1', 'C2', 'M1', 'M2', 'M3']
+        
+        # 順序付きの新しい辞書を作成
+        ordered_main_slots = {}
+        
+        # 定義された順序に従ってスロットを配置
+        for slot in main_slot_order:
+            if slot in main_slots:
+                ordered_main_slots[slot] = main_slots[slot]
+        
+        # 定義されていないスロットも追加（アルファベット順）
+        for slot in sorted(main_slots.keys()):
+            if slot not in ordered_main_slots:
+                ordered_main_slots[slot] = main_slots[slot]
+        
+        print(f"🔧 main_slots順序付け: {list(ordered_main_slots.keys())}")
+        return ordered_main_slots
 
     def _determine_v_group_key(self, main_slots: Dict, text: str) -> str:
         """
@@ -619,6 +644,13 @@ class CentralController:
                 if modal_success_result:
                     # 助動詞結果と名詞節結果を統合（関係節と同じパターン）
                     final_main_slots = modal_success_result['main_slots'].copy()
+                    
+                    # 名詞節のmain_slotsから不足するスロットを追加（特にO1の空スロット）
+                    for slot, value in noun_clause_slots.items():
+                        if slot not in final_main_slots or (slot == 'O1' and value == ''):
+                            final_main_slots[slot] = value
+                            print(f"🔧 名詞節スロット追加: {slot} = '{value}'")
+                    
                     final_sub_slots = noun_clause_result.get('sub_slots', {})
                     
                     collaboration_list = modal_success_result['collaboration'] + ['noun_clause']
@@ -650,11 +682,7 @@ class CentralController:
                             if slot not in final_main_slots:
                                 final_main_slots[slot] = value
                     
-                    # sub-sの大文字化処理
-                    if 'sub-s' in final_sub_slots and final_sub_slots['sub-s']:
-                        sub_s = final_sub_slots['sub-s']
-                        if sub_s.lower().startswith('that '):
-                            final_sub_slots['sub-s'] = 'That' + sub_s[4:]  # 'that' → 'That'
+                    # sub-sの大文字化処理は削除（期待値が小文字のため）
                     
                     collaboration_list = ['adverb']
                     primary_handler = 'noun_clause'

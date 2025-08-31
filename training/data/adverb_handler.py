@@ -85,6 +85,15 @@ class AdverbHandler:
         """動詞の修飾語を収集（前後両方向から）- 専門分担型ハイブリッド解析"""
         modifiers = []
         
+        # 🎯 名詞節境界を先にチェック（that節、wh節、whether節、if節）
+        noun_clause_boundaries = self._detect_noun_clause_boundaries(doc)
+        main_clause_verb_idx = self._find_main_clause_verb(doc)
+        
+        # 現在の動詞が主文の動詞でない場合、修飾語分離をスキップ
+        if verb_idx != main_clause_verb_idx:
+            print(f"🔧 名詞節内動詞検出: verb_idx={verb_idx}, main_verb_idx={main_clause_verb_idx} → 修飾語分離スキップ")
+            return modifiers
+        
         # 文頭時間表現の特別処理（「Every morning」などの複合表現）
         if verb_idx > 1:  # 動詞が複合表現の後に位置する場合
             # npadvmodとして分析される時間表現を検索
@@ -425,6 +434,14 @@ class AdverbHandler:
         """前置詞句が修飾語として分離可能かどうか判定"""
         prep_lower = preposition.lower()
         
+        # 名詞節接続詞を含む場合は分離不可（名詞節として処理）
+        noun_clause_markers = ['that', 'whether', 'if', 'what', 'who', 'which', 'when', 'where', 'why', 'how']
+        phrase_text = ' '.join(phrase_tokens).lower()
+        for marker in noun_clause_markers:
+            if marker in phrase_text:
+                print(f"🔧 名詞節接続詞検出 '{marker}' in '{phrase_text}' - 分離不可")
+                return False
+        
         # 修飾語として分離可能な前置詞句
         # 基本5文型の核心構造でない場合は分離対象
         modifiable_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'without', 'besides', 'except', 'to']
@@ -671,3 +688,42 @@ class AdverbHandler:
         for pair in verb_modifier_pairs:
             positions.append(pair['verb_idx'])
         return positions
+    
+    def _detect_noun_clause_boundaries(self, doc) -> List[Dict]:
+        """名詞節の境界を検出"""
+        boundaries = []
+        
+        for i, token in enumerate(doc):
+            # that節の検出
+            if token.text.lower() == 'that' and token.dep_ == 'mark':
+                boundaries.append({
+                    'type': 'that_clause',
+                    'start': i,
+                    'connector': 'that'
+                })
+            
+            # wh節の検出
+            elif token.text.lower() in ['what', 'who', 'whom', 'whose', 'which', 'where', 'when', 'why', 'how']:
+                if token.dep_ in ['nsubj', 'dobj', 'pobj', 'advmod']:
+                    boundaries.append({
+                        'type': 'wh_clause',
+                        'start': i,
+                        'connector': token.text.lower()
+                    })
+            
+            # whether/if節の検出
+            elif token.text.lower() in ['whether', 'if'] and token.dep_ == 'mark':
+                boundaries.append({
+                    'type': 'whether_if_clause',
+                    'start': i,
+                    'connector': token.text.lower()
+                })
+        
+        return boundaries
+    
+    def _find_main_clause_verb(self, doc) -> int:
+        """主文の動詞位置を特定"""
+        for i, token in enumerate(doc):
+            if token.dep_ == 'ROOT':
+                return i
+        return -1

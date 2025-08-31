@@ -1,0 +1,250 @@
+{
+  "case_121": {
+    "sentence": "I believe that he is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "believe",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "that he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I believe that he is smart.",
+      "main_slots": {
+        "S": "I",
+        "V": "believe",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "that he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "that he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "smart",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "believe",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_124": {
+    "sentence": "I wonder where she lives.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wonder",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-m2": "where",
+        "sub-s": "she",
+        "sub-v": "lives",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wonder where she lives.",
+      "main_slots": {
+        "S": "I",
+        "V": "wonder",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "lives",
+        "sub-m2": "where",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lives",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "where",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wonder",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_126": {
+    "sentence": "Tell me who came to the party.",
+    "expected": {
+      "main_slots": {
+        "V": "Tell",
+        "O1": "me",
+        "O2": ""
+      },
+      "sub_slots": {
+        "sub-s": "who",
+        "sub-v": "came",
+        "sub-m2": "to the party",
+        "_parent_slot": "O2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "Tell me who came to the party.",
+      "main_slots": {
+        "V": "Tell",
+        "O1": "me",
+        "O2": ""
+      },
+      "sub_slots": {
+        "sub-v": "came",
+        "sub-s": "who",
+        "_parent_slot": "O1",
+        "sub-m2": "to the party"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "came",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "who",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "to the party",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "5": "Tell",
+        "6": "me",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_128": {
+    "sentence": "I understand how important this is.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "understand",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-m2": "how important",
+        "sub-s": "this",
+        "sub-v": "is",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I understand how important this is.",
+      "main_slots": {
+        "S": "I",
+        "V": "understand",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "this",
+        "sub-v": "is",
+        "sub-m2": "how important",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "this",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "how important",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "understand",
+        "6": ""
+      }
+    },
+    "match": true
+  }
+}

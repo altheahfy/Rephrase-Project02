@@ -9,7 +9,9 @@
 - 基本5文型、基本副詞、関係節、受動態、tellグループ完全制覇
 - 曖昧語句解決システム実装完了
 - 修飾語分離アルゴリズム完成
-- AbsoluteOrderManager開発準備完了
+- AbsoluteOrderManage        print(f"📁 分解結果を保存: {output_file}")
+    
+    return results準備完了
 """
 
 import json
@@ -153,6 +155,7 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
     results = {}
     success = 0
     failed = 0
+    failed_cases = []  # 失敗ケースを記録
     
     for case_id in target_cases:
         case_data = test_cases[str(case_id)]  # 文字列キーに変換
@@ -184,6 +187,7 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
                     print(f"✅ case_{case_id}: {sentence}")
                 success += 1
             else:
+                failed_cases.append(case_id)  # 失敗ケースを記録
                 if show_details:
                     print(f"\n❌ case_{case_id}: 不一致")
                     print(f"例文: {sentence}")
@@ -194,6 +198,7 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
                 failed += 1
                 
         except Exception as e:
+            failed_cases.append(case_id)  # エラーケースも記録
             results[f"case_{case_id}"] = {
                 "sentence": sentence,
                 "expected": expected,
@@ -205,6 +210,12 @@ def run_fast_test(case_range=None, show_details=False, output_file="decompositio
     
     success_rate = (success / len(target_cases) * 100) if len(target_cases) > 0 else 0
     print(f"\n📊 処理完了: {success}成功 / {failed}失敗 / {len(target_cases)}総計 ({success_rate:.1f}%)")
+    
+    # 失敗ケースのリストを表示
+    if failed_cases:
+        print(f"❌ 失敗ケース: {', '.join(map(str, failed_cases))}")
+    else:
+        print("🎉 全ケース成功！")
     
     # ファイル出力
     if output_file:

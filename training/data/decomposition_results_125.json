@@ -1,32 +1,32 @@
 {
-  "case_121": {
-    "sentence": "I believe that he is smart.",
+  "case_125": {
+    "sentence": "That you are here is wonderful.",
     "expected": {
       "main_slots": {
-        "S": "I",
-        "V": "believe",
-        "O1": ""
+        "S": "",
+        "V": "is",
+        "C1": "wonderful"
       },
       "sub_slots": {
-        "sub-s": "that he",
-        "sub-v": "is",
-        "sub-c1": "smart",
-        "_parent_slot": "O1"
+        "sub-s": "That you",
+        "sub-v": "are",
+        "sub-m2": "here",
+        "_parent_slot": "S"
       }
     },
     "actual": {
       "success": true,
-      "text": "I believe that he is smart.",
+      "text": "That you are here is wonderful.",
       "main_slots": {
-        "V": "believe",
-        "S": "I",
-        "O1": ""
+        "S": "",
+        "V": "is",
+        "C1": "wonderful"
       },
       "sub_slots": {
-        "sub-s": "That he",
-        "sub-v": "is",
-        "sub-c1": "smart",
-        "_parent_slot": "O1"
+        "sub-s": "That you",
+        "sub-v": "are",
+        "sub-m2": "here",
+        "_parent_slot": "S"
       },
       "metadata": {
         "controller": "central",
@@ -40,26 +40,25 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "That he",
+          "value": "That you",
           "display_order": 1
         },
         "sub-v": {
-          "value": "is",
+          "value": "are",
           "display_order": 2
         },
-        "sub-c1": {
-          "value": "smart",
+        "sub-m2": {
+          "value": "here",
           "display_order": 3
         },
-        "_parent_slot": "O1"
+        "_parent_slot": "S"
       },
       "ordered_slots": {
-        "5": "believe",
-        "3": "I",
-        "6": "",
-        "7": "smart"
+        "3": "",
+        "5": "is",
+        "7": "wonderful"
       }
     },
-    "match": false
+    "match": true
   }
 }

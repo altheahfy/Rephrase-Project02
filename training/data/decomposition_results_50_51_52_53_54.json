@@ -1,0 +1,300 @@
+{
+  "case_50": {
+    "sentence": "The book that was written is famous.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book that",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book that was written is famous.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book that",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The book that",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "written",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "7": "famous"
+      }
+    },
+    "match": true
+  },
+  "case_51": {
+    "sentence": "The letter which was sent arrived.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The letter which was sent arrived.",
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The letter which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "sent",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "arrived"
+      }
+    },
+    "match": true
+  },
+  "case_52": {
+    "sentence": "The man whose car is red lives here.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "sub-c1": "red",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man whose car is red lives here.",
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "_parent_slot": "S",
+        "sub-c1": "red"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The man whose car",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "red",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "lives",
+        "8": "here",
+        "7": "red"
+      }
+    },
+    "match": true
+  },
+  "case_53": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student whose book I borrowed is smart.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-o1": {
+          "value": "The student whose book",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "borrowed",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "7": "smart",
+        "6": "The student whose book"
+      }
+    },
+    "match": true
+  },
+  "case_54": {
+    "sentence": "The woman whose dog barks is my neighbor.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The woman whose dog barks is my neighbor.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The woman whose dog",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "barks",
+          "display_order": 2
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "7": "my neighbor"
+      }
+    },
+    "match": true
+  }
+}

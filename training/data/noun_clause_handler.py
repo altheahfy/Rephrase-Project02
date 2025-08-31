@@ -396,7 +396,14 @@ class NounClauseHandler:
         elif connector in ['who', 'whom']:
             clause_structure['sub-s'] = connector
         elif connector in ['where', 'when', 'why', 'how']:
-            clause_structure['sub-m2'] = connector
+            # howの場合、形容詞と結合して処理
+            if connector == 'how' and 'sub-c1' in clause_structure:
+                clause_structure['sub-m2'] = f"{connector} {clause_structure['sub-c1']}"
+                # sub-c1は既にsub-m2に含まれたので削除
+                del clause_structure['sub-c1']
+                print(f"   how+形容詞結合: sub-m2='{clause_structure['sub-m2']}'")
+            else:
+                clause_structure['sub-m2'] = connector
         
         # サブスロットに統合
         sub_slots.update(clause_structure)
@@ -497,6 +504,11 @@ class NounClauseHandler:
             sub_slots['_parent_slot'] = 'S'
         elif position == 'object':
             sub_slots['_parent_slot'] = 'O1'
+        elif position == 'prepositional_object':
+            sub_slots['_parent_slot'] = 'M2'
+            # 前置詞+if節の場合、M2を空にする
+            main_slots['M2'] = ""
+            print(f"   前置詞+if節検出: M2空化")
         else:
             sub_slots['_parent_slot'] = 'O1'  # デフォルト
         
@@ -583,8 +595,44 @@ class NounClauseHandler:
                 else:
                     main_slots['O2'] = ""
                     print(f"   補語節検出: O2空化")
+            elif child.dep_ == 'prep':
+                # 前置詞句検出（名詞節がある場合のM2対応）
+                prep_phrase_text = self._extract_prep_phrase(child, noun_clause_info)
+                if prep_phrase_text and 'if' in prep_phrase_text.lower():
+                    # if節を含む前置詞句の場合はM2空化
+                    main_slots['M2'] = ""
+                    print(f"   前置詞句節検出: M2空化")
+                elif prep_phrase_text:
+                    main_slots['M2'] = prep_phrase_text
+                    print(f"   前置詞句検出: '{prep_phrase_text}'")
         
         return main_slots, sub_slots
+    
+    def _extract_prep_phrase(self, prep_token, noun_clause_info: Dict[str, Any]) -> str:
+        """
+        前置詞句の抽出（名詞節対応）
+        
+        Args:
+            prep_token: spaCy前置詞トークン
+            noun_clause_info: 名詞節情報
+            
+        Returns:
+            str: 前置詞句テキスト（節を含む場合は空文字）
+        """
+        prep_phrase_parts = [prep_token.text]
+        
+        # 前置詞の子要素（目的語等）を収集
+        for child in prep_token.children:
+            if child.dep_ == 'pobj':
+                # 前置詞の目的語が名詞節の場合は空にする
+                connector = noun_clause_info.get('connector', '')
+                if connector in child.subtree:
+                    # 名詞節が含まれる場合は空文字を返す
+                    return ""
+                else:
+                    prep_phrase_parts.append(child.text)
+        
+        return ' '.join(prep_phrase_parts) if len(prep_phrase_parts) > 1 else ""
     
     def _analyze_clause_internal_structure(self, doc, noun_clause_info: Dict[str, Any]) -> Dict[str, str]:
         """
@@ -603,6 +651,7 @@ class NounClauseHandler:
         
         # 簡単な実装: 接続詞以降の基本要素を抽出
         connector = noun_clause_info.get('connector', '')
+        position = noun_clause_info.get('position', 'object')  # 位置情報を取得
         
         # 節内の主語・動詞・補語検出
         clause_tokens = []
@@ -671,7 +720,11 @@ class NounClauseHandler:
         
         # 接続詞のみが主語に含まれていない場合の修正（that節等）
         if connector in ['that', 'whether'] and clause_subject and 'sub-s' in clause_structure:
-            clause_structure['sub-s'] = f"{connector.lower()} {clause_structure['sub-s']}"
+            # 主語節の場合は大文字化、目的語節の場合は小文字
+            if position == 'subject':
+                clause_structure['sub-s'] = f"{connector.capitalize()} {clause_structure['sub-s']}"
+            else:
+                clause_structure['sub-s'] = f"{connector.lower()} {clause_structure['sub-s']}"
         
         # if節の場合は前置詞句で処理済みなので重複回避
         if connector == 'if' and clause_subject and 'sub-s' in clause_structure:
