@@ -109,18 +109,10 @@ class CentralController:
             # main_slots + sub_slotsを統合
             merged_slots = self._merge_slots_for_ordering(main_slots, sub_slots, text)
             
-            # 例文データ構造を作成
-            sentence_data = [{
-                'sentence': text,
-                'slots': merged_slots
-            }]
+            # グループ全体の統一絶対順序を取得
+            ordered_slots = self._get_unified_absolute_order(v_group_key, merged_slots, text)
             
-            # Pure Data-Driven Order Manager で順序を取得
-            order_results = self.order_manager.process_adverb_group(v_group_key, sentence_data)
-            
-            if order_results and len(order_results) > 0:
-                ordered_slots = order_results[0].get('ordered_slots', {})
-                
+            if ordered_slots:
                 # サブスロット内部の順序付けを追加
                 if sub_slots:
                     ordered_sub_slots = self._create_ordered_sub_slots(sub_slots)
@@ -179,7 +171,7 @@ class CentralController:
     
     def _create_ordered_sub_slots(self, sub_slots: Dict) -> Dict:
         """
-        サブスロット内部の順序付けを作成
+        サブスロット内部の順序付けを作成（PureDataDriven使用）
         
         Args:
             sub_slots: サブスロット辞書
@@ -190,26 +182,14 @@ class CentralController:
         if not sub_slots:
             return {}
         
-        ordered_sub_slots = {}
-        order_counter = 0
-        
-        # サブスロットの標準順序
-        sub_slot_order = ['sub-s', 'sub-aux', 'sub-v', 'sub-o1', 'sub-o2', 'sub-c1', 'sub-c2', 'sub-m1', 'sub-m2', 'sub-m3']
-        
-        for sub_key in sub_slot_order:
-            if sub_key in sub_slots and sub_slots[sub_key]:
-                ordered_sub_slots[str(order_counter)] = {
-                    'slot_type': sub_key,
-                    'value': sub_slots[sub_key],
-                    'display_order': order_counter
-                }
-                order_counter += 1
+        # PureDataDrivenOrderManagerでサブスロット順序付け
+        ordered_sub_slots = self.order_manager.apply_sub_slot_order(sub_slots)
         
         # _parent_slot情報も保持
         if '_parent_slot' in sub_slots:
             ordered_sub_slots['_parent_slot'] = sub_slots['_parent_slot']
         
-        print(f"🔧 サブスロット順序付け完了: {len(ordered_sub_slots)-1}要素")
+        print(f"🔧 サブスロット順序付け完了: {len(ordered_sub_slots)-1 if '_parent_slot' in ordered_sub_slots else len(ordered_sub_slots)}要素")
         return ordered_sub_slots
 
     def _determine_v_group_key(self, main_slots: Dict, text: str) -> str:
@@ -1091,6 +1071,106 @@ class CentralController:
         # 順序情報を追加
         return self._apply_order_to_result(result)
 
+    def _get_unified_absolute_order(self, v_group_key: str, merged_slots: Dict, text: str) -> Dict:
+        """
+        グループ全体の統一絶対順序マッピングを使用して、現在の例文に順序を適用
+        """
+        try:
+            # キャッシュされた統一順序マッピングを取得
+            if not hasattr(self, '_group_order_cache'):
+                self._group_order_cache = {}
+            
+            # キャッシュから統一順序マッピングを取得
+            if v_group_key not in self._group_order_cache:
+                # グループ全体のデータを取得して統一分析
+                group_data = self._get_group_data(v_group_key)
+                if group_data:
+                    # グループ全体で統一分析を実行
+                    order_results = self.order_manager.process_adverb_group(v_group_key, group_data)
+                    if order_results and len(order_results) > 0:
+                        # 最初の結果から順序マッピングを抽出
+                        first_result = order_results[0]
+                        if hasattr(self.order_manager, '_group_order_mapping'):
+                            # PureDataDrivenから順序マッピングを取得
+                            self._group_order_cache[v_group_key] = getattr(self.order_manager, '_group_order_mapping', {})
+                        else:
+                            print(f"⚠️ グループ順序マッピングが見つかりません: {v_group_key}")
+                            return {}
+                    else:
+                        print(f"⚠️ グループ分析結果が空: {v_group_key}")
+                        return {}
+                else:
+                    print(f"⚠️ グループデータが見つかりません: {v_group_key}")
+                    return {}
+            
+            # キャッシュされた統一順序マッピングを使用して現在の例文に適用
+            group_mapping = self._group_order_cache.get(v_group_key, {})
+            if not group_mapping:
+                print(f"⚠️ キャッシュされた順序マッピングが空: {v_group_key}")
+                return {}
+            
+            # 現在の例文のスロットを統一順序マッピングに基づいて並べ替え
+            ordered_slots = {}
+            for slot_key, slot_value in merged_slots.items():
+                if slot_value:  # 空でない値のみ
+                    # スロットキーを分類して適切な順序番号を取得
+                    classified_key = self._classify_slot_for_ordering(slot_key, slot_value, text)
+                    if classified_key in group_mapping:
+                        order_num = group_mapping[classified_key]
+                        ordered_slots[str(order_num)] = slot_value
+                        print(f"  📝 {slot_key}={slot_value} → {classified_key} → 順序{order_num}")
+                    else:
+                        print(f"  ❓ {slot_key}={slot_value} → マッチするグループが見つかりません")
+            
+            return ordered_slots
+            
+        except Exception as e:
+            print(f"❌ 統一絶対順序取得エラー: {e}")
+            return {}
+    
+    def _get_group_data(self, v_group_key: str) -> list:
+        """
+        指定されたV_group_keyのグループ全体データを取得
+        """
+        try:
+            # JSONファイルから該当グループのデータを抽出
+            import json
+            with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # dataセクションを取得
+            cases = data.get('data', {})
+            
+            # テストデータから該当グループを抽出
+            group_sentences = []
+            for key, value in cases.items():
+                if isinstance(value, dict) and value.get('V_group_key') == v_group_key:
+                    sentence = value.get('sentence', '')
+                    expected_slots = value.get('expected', {}).get('main_slots', {})
+                    if sentence and expected_slots:
+                        group_sentences.append({
+                            'sentence': sentence,
+                            'slots': expected_slots
+                        })
+            
+            print(f"🔍 {v_group_key}グループデータ: {len(group_sentences)}例文")
+            return group_sentences
+            
+        except Exception as e:
+            print(f"❌ グループデータ取得エラー: {e}")
+            return []
+    
+    def _classify_slot_for_ordering(self, slot_key: str, slot_value: str, text: str) -> str:
+        """
+        スロットキーと値を絶対順序分類システム用に分類
+        """
+        # 疑問詞の判定
+        question_words = {'What', 'Where', 'When', 'Why', 'How', 'Who', 'Which', 'Whose', 'Whom'}
+        if any(word in slot_value for word in question_words):
+            return f"{slot_key}_question"
+        else:
+            return f"{slot_key}_normal"
+
 
 if __name__ == "__main__":
     # Phase 1テスト
@@ -1108,3 +1188,25 @@ if __name__ == "__main__":
         print(f"\n入力: {sentence}")
         result = controller.process_sentence(sentence)
         print(f"結果: {result}")
+
+def main():
+    """単体テスト実行"""
+    controller = CentralController()
+    
+    # 基本文型テスト
+    test_sentences = [
+        "The cat is here.",        # 第1文型
+        "She is happy.",           # 第2文型
+        "I love you.",             # 第3文型  
+        "He gave me a book.",      # 第4文型
+        "We made him happy."       # 第5文型
+    ]
+    
+    print("=== Phase 1: Central Controller テスト ===")
+    for sentence in test_sentences:
+        print(f"\n入力: {sentence}")
+        result = controller.process_sentence(sentence)
+        print(f"結果: {result}")
+
+if __name__ == "__main__":
+    main()

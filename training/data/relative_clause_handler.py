@@ -327,14 +327,12 @@ class RelativeClauseHandler:
                 'sub-s': f"{antecedent} who",
                 'sub-aux': passive_info.get('aux', ''),  # be動詞
                 'sub-v': passive_info.get('verb', ''),   # 過去分詞
-                '_parent_slot': 'S'
             }
         else:
             # 通常の場合
             sub_slots = {
                 'sub-s': f"{antecedent} who",
                 'sub-v': rel_verb,  # 動詞のみ
-                '_parent_slot': 'S'  # 必須フィールド
             }
         
         # 形容詞補語（sub-c1）を追加
@@ -346,6 +344,9 @@ class RelativeClauseHandler:
             sub_slots['sub-m2'] = sub_m2
         if sub_m3:
             sub_slots['sub-m3'] = sub_m3
+        
+        # メタ情報を最後に追加
+        sub_slots['_parent_slot'] = 'S'
         
         # 主節を構築
         main_clause_start = analysis.get('main_clause_start')

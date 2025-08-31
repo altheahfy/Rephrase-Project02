@@ -1,0 +1,49 @@
+{
+  "case_83": {
+    "sentence": "What did he tell her at the store?",
+    "expected": {
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "What did he tell her at the store?",
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "What",
+        "2": "did",
+        "3": "he",
+        "4": "tell",
+        "5": "her",
+        "6": "at the store"
+      }
+    },
+    "match": true
+  }
+}

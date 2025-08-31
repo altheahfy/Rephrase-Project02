@@ -1,0 +1,96 @@
+{
+  "case_83": {
+    "sentence": "What did he tell her at the store?",
+    "expected": {
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "What did he tell her at the store?",
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "What",
+        "3": "did",
+        "4": "he",
+        "5": "tell",
+        "6": "her",
+        "8": "at the store"
+      }
+    },
+    "match": true
+  },
+  "case_84": {
+    "sentence": "Did he tell her a secret there?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Did he tell her a secret there?",
+      "main_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "3": "Did",
+        "4": "he",
+        "5": "tell",
+        "6": "her",
+        "7": "a secret",
+        "8": "there"
+      }
+    },
+    "match": true
+  }
+}

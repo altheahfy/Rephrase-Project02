@@ -411,10 +411,15 @@ class PureDataDrivenOrderManager:
         # 制約を満たすように順序を調整
         adjusted_order = initial_order.copy()
         
-        # 制約違反をチェックして修正
+        # 制約違反をチェックして修正（無限ループ防止）
         made_changes = True
-        while made_changes:
+        max_iterations = 50  # 最大試行回数
+        iteration_count = 0
+        
+        while made_changes and iteration_count < max_iterations:
             made_changes = False
+            iteration_count += 1
+            
             for before_group, after_group in constraints:
                 if before_group in adjusted_order and after_group in adjusted_order:
                     before_idx = adjusted_order.index(before_group)
@@ -422,10 +427,15 @@ class PureDataDrivenOrderManager:
                     
                     if before_idx > after_idx:
                         # 制約違反を修正
-                        print(f"    🔧 制約違反修正: {before_group} と {after_group} の順序を調整")
+                        print(f"    🔧 制約違反修正 (試行{iteration_count}): {before_group} と {after_group} の順序を調整")
                         adjusted_order.remove(before_group)
                         adjusted_order.insert(after_idx, before_group)
                         made_changes = True
+                        
+        if iteration_count >= max_iterations:
+            print(f"⚠️ 制約調整が最大試行回数({max_iterations})に達しました。循環参照の可能性があります。")
+            print(f"📋 現在の順序: {adjusted_order}")
+            print(f"📋 制約一覧: {constraints}")
         
         return adjusted_order
     
@@ -441,6 +451,9 @@ class PureDataDrivenOrderManager:
             group_to_order[group_name] = i + 1
         
         print(f"📊 グループ→順序マッピング: {group_to_order}")
+        
+        # 順序マッピングを保存（CentralControllerから参照用）
+        self._group_order_mapping = group_to_order
         
         results = []
         for i, data in enumerate(sentences_data):
@@ -481,6 +494,36 @@ class PureDataDrivenOrderManager:
             print(f"  🎯 副詞位置結果: {ordered_slots}")
         
         return results
+    
+    def apply_sub_slot_order(self, sub_slots: dict) -> dict:
+        """
+        サブスロットに文法的語順でdisplay_orderを付与
+        
+        Args:
+            sub_slots: サブスロット辞書 {'sub-s': 'value', 'sub-v': 'value', ...}
+            
+        Returns:
+            dict: ordered_sub_slots形式 {'sub-s': {'value': 'text', 'display_order': 1}, ...}
+        """
+        if not sub_slots:
+            return {}
+        
+        print(f"🔧 サブスロット順序付け開始: {len(sub_slots)}要素")
+        
+        ordered_sub_slots = {}
+        display_order = 1
+        
+        # _parent_slotを除外してサブスロット要素のみ処理
+        for key, value in sub_slots.items():
+            if not key.startswith('_') and value:  # メタ情報と空値を除外
+                ordered_sub_slots[key] = {
+                    'value': value,
+                    'display_order': display_order
+                }
+                display_order += 1
+        
+        print(f"🔧 サブスロット順序付け完了: {len(ordered_sub_slots)}要素")
+        return ordered_sub_slots
 
 def main():
     """メイン関数 - 副詞を含むグループを一括処理"""
@@ -524,11 +567,40 @@ def main():
         except Exception as e:
             print(f"❌ {v_group_key}グループの処理でエラー: {e}")
     
+def main():
+    """実行メイン関数"""
+    order_manager = PureDataDrivenOrderManager()
+    
+    all_results = {}
+    
+    # 副詞グループを取得
+    groups = order_manager.extract_adverb_groups()
+    
+    for v_group_key, examples in groups.items():
+        print(f"\n{'='*50}")
+        print(f"🎯 グループ: {v_group_key}")
+        print(f"{'='*50}")
+        
+        try:
+            results = order_manager.process_adverb_group(v_group_key, examples)
+            
+            if results:
+                all_results[v_group_key] = results
+                
+                print(f"\n🎉 分析完了: {v_group_key}グループ ({len(examples)}例文)")
+                for i, result in enumerate(results):
+                    print(f"例文{i+1}: {result['sentence']}")
+                    print(f"順序: {result['ordered_slots']}")
+                    print()
+                    
+        except Exception as e:
+            print(f"❌ {v_group_key}グループの処理でエラー: {e}")
+    
     # 全結果を統合保存
     if all_results:
         with open('results/all_adverb_groups_analysis.json', 'w', encoding='utf-8') as f:
             json.dump(all_results, f, ensure_ascii=False, indent=2)
-        
+            
         print(f"\n🎉 全副詞グループ分析完了")
         print(f"📊 分析したグループ: {list(all_results.keys())}")
         print(f"💾 統合結果を results/all_adverb_groups_analysis.json に保存しました")

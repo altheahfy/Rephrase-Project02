@@ -1,0 +1,188 @@
+{
+  "case_43": {
+    "sentence": "The man who runs fast is strong.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man who runs fast is strong.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The man who",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "runs",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "fast",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "The man who runs fast",
+        "5": "is",
+        "7": "strong",
+        "8": "fast"
+      }
+    },
+    "match": true
+  },
+  "case_44": {
+    "sentence": "The book which lies there is mine.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "sub-m2": "there",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which lies there is mine.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "_parent_slot": "S",
+        "sub-m2": "there"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The book which",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lies",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "there",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "The book which lies there",
+        "5": "is",
+        "7": "mine",
+        "8": "there"
+      }
+    },
+    "match": true
+  },
+  "case_45": {
+    "sentence": "The person that works here is kind.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "sub-m2": "here",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The person that works here is kind.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "_parent_slot": "S",
+        "sub-m2": "here"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The person that",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "works",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "here",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "The person that works here",
+        "5": "is",
+        "7": "kind",
+        "8": "here"
+      }
+    },
+    "match": true
+  }
+}

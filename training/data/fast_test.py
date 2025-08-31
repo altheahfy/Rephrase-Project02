@@ -74,6 +74,67 @@ def parse_range(case_range: str):
     return target_cases
 
 
+def run_single_case(case_id, show_output=False):
+    """個別ケース実行 - サブスロット詳細表示対応"""
+    try:
+        # JSON データを読み込み
+        with open('final_54_test_data_with_absolute_order_corrected.json', 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+        
+        # dataキーの中のケースを取得
+        case_data = test_data['data'].get(str(case_id))
+        if not case_data:
+            print(f"❌ ケース {case_id} が見つかりません")
+            return None
+        
+        input_sentence = case_data['sentence']
+        print(f"\n🔍 ケース {case_id}: {input_sentence}")
+        
+        # CentralController でテスト実行
+        from central_controller import CentralController
+        controller = CentralController()
+        result = controller.process_sentence(input_sentence)
+        
+        # サブスロット分解が含まれている場合の詳細表示
+        if show_output:
+            print(f"📊 実行結果:")
+            
+            # サブスロット詳細表示
+            if 'sub_slots' in result and result['sub_slots']:
+                print("\n📝 サブスロット分解:")
+                for slot_type, content in result['sub_slots'].items():
+                    if slot_type != '_parent_slot':
+                        if isinstance(content, dict):
+                            order = content.get('order', 'N/A')
+                            text = content.get('text', str(content))
+                            print(f"  📝 {slot_type}: '{text}' → order: {order}")
+                        else:
+                            print(f"  📝 {slot_type}: '{content}' → order: N/A")
+            else:
+                print("\n📝 サブスロット: なし")
+                        
+            # メインスロット詳細表示
+            if 'main_slots' in result and result['main_slots']:
+                print("\n📝 メインスロット:")
+                for slot_type, content in result['main_slots'].items():
+                    if isinstance(content, dict):
+                        order = content.get('order', 'N/A')
+                        text = content.get('text', str(content))
+                        print(f"  📝 {slot_type}: '{text}' → order: {order}")
+                    else:
+                        print(f"  📝 {slot_type}: '{content}' → order: N/A")
+            
+            # 完全な JSON 出力
+            print(f"\n🗂️ 完全な分解結果:")
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        
+        return {'case_id': case_id, 'input_sentence': input_sentence, 'result': result}
+        
+    except Exception as e:
+        print(f"❌ ケース {case_id} の実行エラー: {e}")
+        return {'case_id': case_id, 'error': str(e)}
+
+
 def run_fast_test(case_range=None, show_details=False, output_file="decomposition_results.json"):
     """高速テスト実行 - 分解結果出力対応"""
     # データ読み込み

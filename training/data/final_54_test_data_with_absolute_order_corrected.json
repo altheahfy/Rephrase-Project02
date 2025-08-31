@@ -1698,7 +1698,7 @@
       }
     },
     "117": {
-      "V_group_key": "tell",
+      "V_group_key": "change",
       "grammar_category": "relative_adverbs",
       "sentence": "The moment when he told her the truth changed everything.",
       "expected": {
@@ -1866,7 +1866,7 @@
       }
     },
     "126": {
-      "V_group_key": "tell",
+      "V_group_key": "tell2",
       "grammar_category": "noun_clauses",
       "sentence": "Tell me who came to the party.",
       "expected": {

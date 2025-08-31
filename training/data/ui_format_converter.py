@@ -112,13 +112,19 @@ class UIFormatConverter:
                 # サブスロットがある場合、個別エントリを追加
                 if has_subslots:
                     slot_display_order = ui_item["Slot_display_order"]
+                    
+                    # ordered_sub_slotsが存在する場合はそれを使用、そうでなければ従来のサブスロット
+                    ordered_sub_slots = controller_result.get('ordered_sub_slots', {})
+                    subslots_to_use = ordered_sub_slots if ordered_sub_slots else slot_subslots
+                    
                     subslot_items = self._create_subslot_items(
                         syntax_id=syntax_id,
                         v_group_key=v_group_key,
                         sentence_id=sentence_id,
                         slot=slot,
                         slot_display_order=slot_display_order,
-                        subslots=slot_subslots
+                        subslots=subslots_to_use,
+                        is_ordered=bool(ordered_sub_slots)
                     )
                     ui_items.extend(subslot_items)
         
@@ -347,37 +353,63 @@ class UIFormatConverter:
                              sentence_id: str,
                              slot: str,
                              slot_display_order: int,
-                             subslots: Dict[str, str]) -> List[Dict[str, Any]]:
+                             subslots: Dict[str, Any],
+                             is_ordered: bool = False) -> List[Dict[str, Any]]:
         """サブスロットの個別エントリを作成"""
         subslot_items = []
         
-        # サブスロットを順序でソート（sub-s, sub-aux, sub-v, sub-o1, etc.）
-        subslot_order = {
-            "sub-s": 1, "sub-aux": 2, "sub-v": 3, "sub-o1": 4, "sub-o2": 5,
-            "sub-c1": 6, "sub-c2": 7, "sub-m1": 8, "sub-m2": 9, "sub-m3": 10
-        }
-        
-        sorted_subslots = sorted(subslots.items(), 
-                               key=lambda x: subslot_order.get(x[0], 99))
-        
-        for display_order, (subslot_id, subslot_element) in enumerate(sorted_subslots, 1):
-            if subslot_element:  # 空でない場合のみ
-                subslot_item = {
-                    "構文ID": syntax_id,
-                    "V_group_key": v_group_key,
-                    "例文ID": sentence_id,
-                    "Slot": slot,
-                    "SlotPhrase": "",
-                    "SlotText": "",
-                    "PhraseType": "",
-                    "SubslotID": subslot_id,
-                    "SubslotElement": subslot_element,
-                    "SubslotText": self._estimate_subslot_text(subslot_id, subslot_element),
-                    "Slot_display_order": slot_display_order,
-                    "display_order": display_order,
-                    "QuestionType": ""
-                }
-                subslot_items.append(subslot_item)
+        if is_ordered:
+            # PureDataDrivenOrderManagerで処理されたordered_sub_slotsを使用
+            for subslot_id, subslot_data in subslots.items():
+                if not subslot_id.startswith('_') and subslot_data:  # メタ情報を除外
+                    value = subslot_data.get('value', subslot_data) if isinstance(subslot_data, dict) else subslot_data
+                    display_order = subslot_data.get('display_order', 1) if isinstance(subslot_data, dict) else 1
+                    
+                    if value:  # 空でない場合のみ
+                        subslot_item = {
+                            "構文ID": syntax_id,
+                            "V_group_key": v_group_key,
+                            "例文ID": sentence_id,
+                            "Slot": slot,
+                            "SlotPhrase": "",
+                            "SlotText": "",
+                            "PhraseType": "",
+                            "SubslotID": subslot_id,
+                            "SubslotElement": value,
+                            "SubslotText": self._estimate_subslot_text(subslot_id, value),
+                            "Slot_display_order": slot_display_order,
+                            "display_order": display_order,
+                            "QuestionType": ""
+                        }
+                        subslot_items.append(subslot_item)
+        else:
+            # 従来の独自順序付け（後方互換性用）
+            subslot_order = {
+                "sub-s": 1, "sub-aux": 2, "sub-v": 3, "sub-o1": 4, "sub-o2": 5,
+                "sub-c1": 6, "sub-c2": 7, "sub-m1": 8, "sub-m2": 9, "sub-m3": 10
+            }
+            
+            sorted_subslots = sorted(subslots.items(), 
+                                   key=lambda x: subslot_order.get(x[0], 99))
+            
+            for display_order, (subslot_id, subslot_element) in enumerate(sorted_subslots, 1):
+                if subslot_element:  # 空でない場合のみ
+                    subslot_item = {
+                        "構文ID": syntax_id,
+                        "V_group_key": v_group_key,
+                        "例文ID": sentence_id,
+                        "Slot": slot,
+                        "SlotPhrase": "",
+                        "SlotText": "",
+                        "PhraseType": "",
+                        "SubslotID": subslot_id,
+                        "SubslotElement": subslot_element,
+                        "SubslotText": self._estimate_subslot_text(subslot_id, subslot_element),
+                        "Slot_display_order": slot_display_order,
+                        "display_order": display_order,
+                        "QuestionType": ""
+                    }
+                    subslot_items.append(subslot_item)
         
         return subslot_items
     
