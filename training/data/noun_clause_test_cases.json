@@ -13,228 +13,161 @@
       "if節（名詞用法）",
       "複合名詞節"
     ],
-    "note": "各パターンでNounClauseHandlerの専門分解機能をテスト"
+    "note": "final_54_test_data_with_absolute_order_corrected.json に追加予定。既存フォーマット準拠"
   },
   "test_cases": {
     "113": {
       "V_group_key": "think",
       "grammar_category": "noun_clauses",
-      "pattern": "that節（目的語）",
       "sentence": "I think that he is smart.",
       "expected": {
         "main_slots": {
           "S": "I",
           "V": "think",
-          "O1": "that he is smart"
+          "O1": ""
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "that_clause",
-            "role": "object",
-            "content": "he is smart",
-            "connector": "that",
-            "internal_structure": {
-              "S": "he",
-              "V": "is", 
-              "C1": "smart"
-            }
-          }
+          "sub-o1": "that he is smart",
+          "sub-s": "he",
+          "sub-v": "is",
+          "sub-c1": "smart",
+          "_parent_slot": "O1"
         }
       }
     },
     "114": {
-      "V_group_key": "be",
+      "V_group_key": "surprise",
       "grammar_category": "noun_clauses", 
-      "pattern": "that節（主語）",
       "sentence": "That he succeeded surprised everyone.",
       "expected": {
         "main_slots": {
-          "S": "That he succeeded",
+          "S": "",
           "V": "surprised",
           "O1": "everyone"
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "that_clause",
-            "role": "subject",
-            "content": "he succeeded",
-            "connector": "that",
-            "internal_structure": {
-              "S": "he",
-              "V": "succeeded"
-            }
-          }
+          "sub-s": "that he succeeded",
+          "sub-s2": "he",
+          "sub-v2": "succeeded",
+          "_parent_slot": "S"
         }
       }
     },
     "115": {
       "V_group_key": "know",
       "grammar_category": "noun_clauses",
-      "pattern": "wh-節（目的語）",
       "sentence": "I know what you mean.",
       "expected": {
         "main_slots": {
           "S": "I",
           "V": "know",
-          "O1": "what you mean"
+          "O1": ""
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "wh_clause",
-            "role": "object",
-            "content": "you mean",
-            "connector": "what",
-            "wh_word": "what",
-            "internal_structure": {
-              "S": "you",
-              "V": "mean",
-              "O1": "what"
-            }
-          }
+          "sub-o1": "what you mean",
+          "sub-s": "you",
+          "sub-v": "mean",
+          "sub-o1-2": "what",
+          "_parent_slot": "O1"
         }
       }
     },
     "116": {
       "V_group_key": "be",
       "grammar_category": "noun_clauses",
-      "pattern": "wh-節（主語）", 
       "sentence": "Where he lives is unknown.",
       "expected": {
         "main_slots": {
-          "S": "Where he lives",
+          "S": "",
           "V": "is",
           "C1": "unknown"
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "wh_clause",
-            "role": "subject",
-            "content": "he lives",
-            "connector": "where",
-            "wh_word": "where",
-            "internal_structure": {
-              "S": "he",
-              "V": "lives",
-              "Adv": "where"
-            }
-          }
+          "sub-s": "where he lives",
+          "sub-s2": "he",
+          "sub-v2": "lives",
+          "sub-m2": "where",
+          "_parent_slot": "S"
         }
       }
     },
     "117": {
       "V_group_key": "ask",
       "grammar_category": "noun_clauses",
-      "pattern": "間接疑問文",
       "sentence": "She asked me why I was late.",
       "expected": {
         "main_slots": {
           "S": "She",
           "V": "asked",
           "O1": "me",
-          "O2": "why I was late"
+          "O2": ""
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "indirect_question",
-            "role": "object2",
-            "content": "I was late",
-            "connector": "why",
-            "wh_word": "why",
-            "internal_structure": {
-              "S": "I",
-              "V": "was",
-              "C1": "late",
-              "Adv": "why"
-            }
-          }
+          "sub-o2": "why I was late",
+          "sub-s": "I",
+          "sub-v": "was",
+          "sub-c1": "late",
+          "sub-m2": "why",
+          "_parent_slot": "O2"
         }
       }
     },
     "118": {
       "V_group_key": "wonder",
       "grammar_category": "noun_clauses",
-      "pattern": "whether節",
       "sentence": "I wonder whether he will come.",
       "expected": {
         "main_slots": {
           "S": "I", 
           "V": "wonder",
-          "O1": "whether he will come"
+          "O1": ""
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "whether_clause",
-            "role": "object",
-            "content": "he will come",
-            "connector": "whether",
-            "internal_structure": {
-              "S": "he",
-              "V": "will come"
-            }
-          }
+          "sub-o1": "whether he will come",
+          "sub-s": "he",
+          "sub-v": "will come",
+          "_parent_slot": "O1"
         }
       }
     },
     "119": {
       "V_group_key": "depend",
       "grammar_category": "noun_clauses",
-      "pattern": "if節（名詞用法）",
       "sentence": "It depends on if you agree.",
       "expected": {
         "main_slots": {
           "S": "It",
           "V": "depends",
-          "Prep": "on if you agree"
+          "M2": ""
         },
         "sub_slots": {
-          "noun_clause": {
-            "type": "if_clause_noun",
-            "role": "prepositional_object",
-            "content": "you agree",
-            "connector": "if",
-            "internal_structure": {
-              "S": "you",
-              "V": "agree"
-            }
-          }
+          "sub-m2": "on if you agree",
+          "sub-s": "you",
+          "sub-v": "agree",
+          "_parent_slot": "M2"
         }
       }
     },
     "120": {
       "V_group_key": "believe",
       "grammar_category": "noun_clauses",
-      "pattern": "複合名詞節",
-      "sentence": "I believe what he told me that she is coming.",
+      "sentence": "I believe what he told me is true.",
       "expected": {
         "main_slots": {
           "S": "I",
           "V": "believe",
-          "O1": "what he told me that she is coming"
+          "O1": ""
         },
         "sub_slots": {
-          "noun_clause_primary": {
-            "type": "wh_clause",
-            "role": "object",
-            "content": "he told me that she is coming",
-            "connector": "what",
-            "wh_word": "what",
-            "internal_structure": {
-              "S": "he",
-              "V": "told",
-              "O1": "me",
-              "O2": "that she is coming"
-            }
-          },
-          "noun_clause_nested": {
-            "type": "that_clause",
-            "role": "nested_object",
-            "content": "she is coming",
-            "connector": "that",
-            "internal_structure": {
-              "S": "she",
-              "V": "is coming"
-            }
-          }
+          "sub-o1": "what he told me is true",
+          "sub-s": "what he told me",
+          "sub-v": "is",
+          "sub-c1": "true",
+          "sub-s2": "he",
+          "sub-v2": "told",
+          "sub-o1-2": "me",
+          "sub-o2-2": "what",
+          "_parent_slot": "O1"
         }
       }
     }
