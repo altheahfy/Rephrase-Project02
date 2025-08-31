@@ -19,6 +19,7 @@ from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
 from modal_handler import ModalHandler
+from noun_clause_handler import NounClauseHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -54,6 +55,7 @@ class CentralController:
         passive_voice_handler = PassiveVoiceHandler()
         question_handler = QuestionHandler()
         modal_handler = ModalHandler(self.nlp)  # Phase 6: ModalHandler追加
+        noun_clause_handler = NounClauseHandler(self.nlp)  # Phase 7: NounClauseHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -63,7 +65,8 @@ class CentralController:
             'adverb': adverb_handler,
             'five_pattern': basic_five_pattern_handler,
             'passive': passive_voice_handler,
-            'modal': modal_handler
+            'modal': modal_handler,
+            'noun_clause': noun_clause_handler
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
         relative_adverb_handler = RelativeAdverbHandler(collaborators)
@@ -76,7 +79,8 @@ class CentralController:
             'adverb': adverb_handler,
             'passive_voice': passive_voice_handler,
             'question': question_handler,
-            'modal': modal_handler  # Phase 6: ModalHandler追加
+            'modal': modal_handler,  # Phase 6: ModalHandler追加
+            'noun_clause': noun_clause_handler  # Phase 7: NounClauseHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -222,6 +226,11 @@ class CentralController:
         modal_info = self.handlers['modal'].detect_modal_structure(text)
         if modal_info.get('has_modal', False):
             detected_patterns.append('modal')
+        
+        # 名詞節検出（高優先度）- that節、wh節、whether節、if節
+        noun_clauses = self.handlers['noun_clause'].detect_noun_clauses(text)
+        if noun_clauses:
+            detected_patterns.append('noun_clause')
         
         # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
@@ -503,6 +512,58 @@ class CentralController:
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
+        
+        # 🎯 Phase 7: 名詞節処理（疑問文でない場合に適用）
+        if 'noun_clause' in grammar_patterns and 'question' not in grammar_patterns:
+            # Step 1: AdverbHandlerで修飾語分離
+            adverb_handler = self.handlers['adverb']
+            adverb_result = adverb_handler.process(text)
+            
+            modifier_slots = {}
+            processing_text = text
+            
+            if adverb_result['success']:
+                modifier_slots = adverb_result.get('modifier_slots', {})
+                processing_text = adverb_result['separated_text']
+                print(f"🔧 名詞節文修飾語分離: '{text}' → '{processing_text}'")
+                for slot, value in modifier_slots.items():
+                    print(f"📍 修飾語検出: {slot} = '{value}'")
+            
+            # Step 2: NounClauseHandlerで名詞節構造処理
+            noun_clause_handler = self.handlers['noun_clause']
+            noun_clause_result = noun_clause_handler.process(processing_text)
+            
+            if noun_clause_result['success']:
+                # 名詞節+修飾語統合
+                noun_clause_slots = noun_clause_result['main_slots']
+                
+                # 修飾語スロットを統合
+                final_slots = noun_clause_slots.copy()
+                for slot, value in modifier_slots.items():
+                    if slot not in final_slots:
+                        final_slots[slot] = value
+                
+                print(f"✅ 名詞節+修飾語統合成功: {final_slots}")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': final_slots,
+                    'sub_slots': noun_clause_result.get('sub_slots', {}),
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'noun_clause',
+                        'collaboration': ['adverb'],
+                        'noun_clause_info': noun_clause_result.get('noun_clause_info', {}),
+                        'confidence': 0.9
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 名詞節処理失敗、通常の処理フローに移行")
+                print(f"  NounClauseHandler error: {noun_clause_result.get('error')}")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識

@@ -1,8 +1,8 @@
 {
   "meta": {
-    "total_count": 112,
-    "valid_count": 112,
-    "new_count": 86,
+    "total_count": 128,
+    "valid_count": 128,
+    "new_count": 102,
     "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
@@ -15,6 +15,7 @@
       "modal_verbs": 24,
       "complex_constructions": 12,
       "relative_adverbs": 10,
+      "noun_clauses": 8,
       "absolute_order_test": 0
     },
     "total_reorganized": 120,
@@ -1770,6 +1771,150 @@
           "sub-v": "solved",
           "sub-o1": "the problem",
           "_parent_slot": "S"
+        }
+      }
+    },
+    "121": {
+      "V_group_key": "be",
+      "grammar_category": "noun_clauses",
+      "sentence": "I believe that he is smart.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "believe",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "that he",
+          "sub-v": "is",
+          "sub-c1": "smart",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "122": {
+      "V_group_key": "action",
+      "grammar_category": "noun_clauses",
+      "sentence": "I know what you mean.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "know",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-o1": "what",
+          "sub-s": "you",
+          "sub-v": "mean",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "123": {
+      "V_group_key": "action",
+      "grammar_category": "noun_clauses",
+      "sentence": "She doesn't know whether he will come.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "doesn't",
+          "V": "know",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "whether he",
+          "sub-aux": "will",
+          "sub-v": "come",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "124": {
+      "V_group_key": "action",
+      "grammar_category": "noun_clauses",
+      "sentence": "I wonder where she lives.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "wonder",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-m2": "where",
+          "sub-s": "she",
+          "sub-v": "lives",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "125": {
+      "V_group_key": "be",
+      "grammar_category": "noun_clauses",
+      "sentence": "That you are here is wonderful.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "wonderful"
+        },
+        "sub_slots": {
+          "sub-s": "That you",
+          "sub-v": "are",
+          "sub-m2": "here",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "126": {
+      "V_group_key": "tell",
+      "grammar_category": "noun_clauses",
+      "sentence": "Tell me who came to the party.",
+      "expected": {
+        "main_slots": {
+          "V": "Tell",
+          "O1": "me",
+          "O2": ""
+        },
+        "sub_slots": {
+          "sub-s": "who",
+          "sub-v": "came",
+          "sub-m2": "to the party",
+          "_parent_slot": "O2"
+        }
+      }
+    },
+    "127": {
+      "V_group_key": "depend",
+      "grammar_category": "noun_clauses",
+      "sentence": "It depends on if you agree.",
+      "expected": {
+        "main_slots": {
+          "S": "It",
+          "V": "depends",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-s": "on if you",
+          "sub-v": "agree",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "128": {
+      "V_group_key": "action",
+      "grammar_category": "noun_clauses",
+      "sentence": "I understand how important this is.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "understand",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-m2": "how important",
+          "sub-s": "this",
+          "sub-v": "is",
+          "_parent_slot": "O1"
         }
       }
     }
