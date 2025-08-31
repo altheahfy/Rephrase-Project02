@@ -582,16 +582,49 @@ class CentralController:
                     modal_info = modal_success_result['modal_info']
                     print(f"✅ 助動詞+名詞節統合成功: {final_slots}")
                 else:
-                    # 修飾語スロットを統合
+                    # 名詞節のみの場合: メインスロット+サブスロットを統合
                     final_slots = noun_clause_slots.copy()
+                    
+                    # 修飾語スロットを統合
                     for slot, value in modifier_slots.items():
                         if slot not in final_slots:
                             final_slots[slot] = value
                     
+                    # サブスロット（名詞節内容）を番号付きスロットに統合
+                    noun_clause_sub_slots = noun_clause_result.get('sub_slots', {})
+                    
+                    # 基本スロット（S, V等）から空でないものを抽出
+                    base_elements = []
+                    if final_slots.get('S') and final_slots['S'].strip():
+                        base_elements.append(final_slots['S'])
+                    if final_slots.get('V') and final_slots['V'].strip():
+                        base_elements.append(final_slots['V'])
+                    if final_slots.get('O1') and final_slots['O1'].strip():
+                        base_elements.append(final_slots['O1'])
+                    if final_slots.get('O2') and final_slots['O2'].strip():
+                        base_elements.append(final_slots['O2'])
+                    
+                    # サブスロットを適切な順序で追加
+                    sub_elements = []
+                    if 'sub-m2' in noun_clause_sub_slots:  # where, when等のwh-副詞
+                        sub_elements.append(noun_clause_sub_slots['sub-m2'])
+                    if 'sub-s' in noun_clause_sub_slots:  # 節内主語
+                        sub_elements.append(noun_clause_sub_slots['sub-s'])
+                    if 'sub-aux' in noun_clause_sub_slots:  # 節内助動詞
+                        sub_elements.append(noun_clause_sub_slots['sub-aux'])
+                    if 'sub-v' in noun_clause_sub_slots:  # 節内動詞
+                        sub_elements.append(noun_clause_sub_slots['sub-v'])
+                    
+                    # 全要素を統合して番号付きスロットを作成
+                    all_elements = base_elements + sub_elements
+                    final_slots = {}
+                    for i, element in enumerate(all_elements, 1):
+                        final_slots[str(i)] = element
+                    
                     collaboration_list = ['adverb']
                     primary_handler = 'noun_clause'
                     modal_info = {}
-                    print(f"✅ 名詞節+修飾語統合成功: {final_slots}")
+                    print(f"✅ 名詞節+サブスロット統合成功: {final_slots}")
                 
                 # 順序情報を追加
                 result = {
