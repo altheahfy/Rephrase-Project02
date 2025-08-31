@@ -531,16 +531,33 @@ class PureDataDrivenOrderManager:
                 # このスロット値がどのグループに属するかを特定
                 matched_group = None
                 
-                # 統合グループM_pre_verbを優先的にチェック
-                if 'M_pre_verb' in element_groups and slot_value in element_groups['M_pre_verb']['values']:
-                    matched_group = 'M_pre_verb'
+                # 空のスロットも基本的な順序付けを行う
+                if not slot_value or slot_value.strip() == '':
+                    # 空のスロットは基本的なスロット名で順序決定
+                    slot_group_mapping = {
+                        'S': 'S_normal',
+                        'V': 'V_normal', 
+                        'O1': 'O1_normal',
+                        'O2': 'O2_normal',
+                        'C1': 'C1_normal',
+                        'C2': 'C2_normal',
+                        'M1': 'M1_sentence_initial',
+                        'M2': 'M2_normal',
+                        'M3': 'M3_normal',
+                        'Aux': 'Aux_normal'
+                    }
+                    matched_group = slot_group_mapping.get(slot_key)
                 else:
-                    # 通常のグループ検索
-                    for group_name, group_info in element_groups.items():
-                        if group_name != 'M_pre_verb' and (group_info['original_slot'] == slot_key and 
-                            slot_value in group_info['values']):
-                            matched_group = group_name
-                            break
+                    # 統合グループM_pre_verbを優先的にチェック
+                    if 'M_pre_verb' in element_groups and slot_value in element_groups['M_pre_verb']['values']:
+                        matched_group = 'M_pre_verb'
+                    else:
+                        # 通常のグループ検索
+                        for group_name, group_info in element_groups.items():
+                            if group_name != 'M_pre_verb' and (group_info['original_slot'] == slot_key and 
+                                slot_value in group_info['values']):
+                                matched_group = group_name
+                                break
                 
                 if matched_group and matched_group in group_to_order:
                     order_num = group_to_order[matched_group]

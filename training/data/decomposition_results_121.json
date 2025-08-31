@@ -1,0 +1,65 @@
+{
+  "case_121": {
+    "sentence": "I believe that he is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "believe",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "that he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I believe that he is smart.",
+      "main_slots": {
+        "V": "believe",
+        "S": "I",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "That he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "That he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "smart",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "5": "believe",
+        "3": "I",
+        "6": "",
+        "7": "smart"
+      }
+    },
+    "match": false
+  }
+}

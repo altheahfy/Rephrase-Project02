@@ -1,0 +1,334 @@
+{
+  "case_116": {
+    "sentence": "The time when everything will change is approaching.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "approaching"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-aux": "will",
+        "sub-v": "change",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The time when everything will change is approaching.",
+      "main_slots": {
+        "S": "",
+        "V": "approaching",
+        "Aux": "is"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-v": "change",
+        "_parent_slot": "S",
+        "sub-aux": "will"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The time when",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "everything",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "change",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "will",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "everything will change The time when",
+        "5": "approaching",
+        "4": "is",
+        "8": "The time when"
+      }
+    },
+    "match": true
+  },
+  "case_117": {
+    "sentence": "The moment when he told her the truth changed everything.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "changed",
+        "O1": "everything"
+      },
+      "sub_slots": {
+        "sub-m2": "The moment when",
+        "sub-s": "he",
+        "sub-v": "told",
+        "sub-o1": "her",
+        "sub-o2": "the truth",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The moment when he told her the truth changed everything.",
+      "main_slots": {
+        "S": "",
+        "V": "changed",
+        "O1": "everything"
+      },
+      "sub_slots": {
+        "sub-m2": "The moment when",
+        "sub-s": "he",
+        "sub-v": "told",
+        "_parent_slot": "S",
+        "sub-o1": "her",
+        "sub-o2": "the truth"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The moment when",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "he",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "told",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "her",
+          "display_order": 4
+        },
+        "sub-o2": {
+          "value": "the truth",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "he told her the truth The moment when",
+        "5": "changed",
+        "6": "everything",
+        "8": "The moment when"
+      }
+    },
+    "match": true
+  },
+  "case_118": {
+    "sentence": "The reason why she was upset became clear.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "clear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-aux": "was",
+        "sub-v": "upset",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The reason why she was upset became clear.",
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "clear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-aux": "was",
+        "sub-v": "upset",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "why",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The reason why",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "she",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 3
+        },
+        "sub-v": {
+          "value": "upset",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "she was upset The reason why",
+        "5": "became",
+        "7": "clear",
+        "8": "The reason why"
+      }
+    },
+    "match": true
+  },
+  "case_119": {
+    "sentence": "The city where we spent our honeymoon is in Italy.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "M2": "in Italy"
+      },
+      "sub_slots": {
+        "sub-m2": "The city where",
+        "sub-s": "we",
+        "sub-v": "spent",
+        "sub-o1": "our honeymoon",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The city where we spent our honeymoon is in Italy.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "M2": "in Italy"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "spent",
+        "sub-o1": "our honeymoon",
+        "sub-m2": "The city where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "spent",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "our honeymoon",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The city where",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "we spent our honeymoon The city where",
+        "5": "is",
+        "8": "in Italy",
+        "6": "our honeymoon"
+      }
+    },
+    "match": true
+  },
+  "case_120": {
+    "sentence": "The method how they solved the problem was innovative.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "innovative"
+      },
+      "sub_slots": {
+        "sub-m2": "The method how",
+        "sub-s": "they",
+        "sub-v": "solved",
+        "sub-o1": "the problem",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The method how they solved the problem was innovative.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "innovative"
+      },
+      "sub_slots": {
+        "sub-s": "they",
+        "sub-v": "solved",
+        "sub-o1": "the problem",
+        "sub-m2": "The method how",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "solved",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "the problem",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The method how",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "they solved the problem The method how",
+        "5": "was",
+        "7": "innovative",
+        "6": "the problem",
+        "8": "The method how"
+      }
+    },
+    "match": true
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "case_111": {
+    "sentence": "The house where they lived was demolished.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "demolished"
+      },
+      "sub_slots": {
+        "sub-m2": "The house where",
+        "sub-s": "they",
+        "sub-v": "lived",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The house where they lived was demolished.",
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "demolished"
+      },
+      "sub_slots": {
+        "sub-s": "they",
+        "sub-v": "lived",
+        "sub-m2": "The house where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lived",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The house where",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "they lived The house where",
+        "4": "was",
+        "5": "demolished",
+        "8": "The house where"
+      }
+    },
+    "match": true
+  }
+}

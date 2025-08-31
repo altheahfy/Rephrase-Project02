@@ -351,6 +351,15 @@ class NounClauseHandler:
         # サブスロットに統合
         sub_slots.update(clause_structure)
         
+        # _parent_slot設定（that節は通常目的語位置）
+        position = noun_clause_info.get('position', 'object')
+        if position == 'subject':
+            sub_slots['_parent_slot'] = 'S'
+        elif position == 'object':
+            sub_slots['_parent_slot'] = 'O1'
+        else:
+            sub_slots['_parent_slot'] = 'O1'  # デフォルト
+        
         return {
             'success': True,
             'text': sentence,
@@ -392,6 +401,15 @@ class NounClauseHandler:
         # サブスロットに統合
         sub_slots.update(clause_structure)
         
+        # _parent_slot設定
+        position = noun_clause_info.get('position', 'object')
+        if position == 'subject':
+            sub_slots['_parent_slot'] = 'S'
+        elif position == 'object':
+            sub_slots['_parent_slot'] = 'O1'
+        else:
+            sub_slots['_parent_slot'] = 'O1'  # デフォルト
+        
         return {
             'success': True,
             'text': sentence,
@@ -423,6 +441,15 @@ class NounClauseHandler:
         
         # サブスロットに統合
         sub_slots.update(clause_structure)
+        
+        # _parent_slot設定
+        position = noun_clause_info.get('position', 'object')
+        if position == 'subject':
+            sub_slots['_parent_slot'] = 'S'
+        elif position == 'object':
+            sub_slots['_parent_slot'] = 'O1'
+        else:
+            sub_slots['_parent_slot'] = 'O1'  # デフォルト
         
         return {
             'success': True,
@@ -463,6 +490,15 @@ class NounClauseHandler:
         
         # サブスロットに統合
         sub_slots.update(clause_structure)
+        
+        # _parent_slot設定
+        position = noun_clause_info.get('position', 'object')
+        if position == 'subject':
+            sub_slots['_parent_slot'] = 'S'
+        elif position == 'object':
+            sub_slots['_parent_slot'] = 'O1'
+        else:
+            sub_slots['_parent_slot'] = 'O1'  # デフォルト
         
         return {
             'success': True,
@@ -635,7 +671,7 @@ class NounClauseHandler:
         
         # 接続詞のみが主語に含まれていない場合の修正（that節等）
         if connector in ['that', 'whether'] and clause_subject and 'sub-s' in clause_structure:
-            clause_structure['sub-s'] = f"{connector} {clause_structure['sub-s']}"
+            clause_structure['sub-s'] = f"{connector.lower()} {clause_structure['sub-s']}"
         
         # if節の場合は前置詞句で処理済みなので重複回避
         if connector == 'if' and clause_subject and 'sub-s' in clause_structure:
