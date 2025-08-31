@@ -20,6 +20,7 @@ from passive_voice_handler import PassiveVoiceHandler
 from question_handler import QuestionHandler
 from modal_handler import ModalHandler
 from noun_clause_handler import NounClauseHandler
+from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -56,6 +57,7 @@ class CentralController:
         question_handler = QuestionHandler()
         modal_handler = ModalHandler(self.nlp)  # Phase 6: ModalHandler追加
         noun_clause_handler = NounClauseHandler(self.nlp)  # Phase 7: NounClauseHandler追加
+        omitted_relative_pronoun_handler = OmittedRelativePronounHandler()  # Phase 8: OmittedRelativePronounHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -80,7 +82,8 @@ class CentralController:
             'passive_voice': passive_voice_handler,
             'question': question_handler,
             'modal': modal_handler,  # Phase 6: ModalHandler追加
-            'noun_clause': noun_clause_handler  # Phase 7: NounClauseHandler追加
+            'noun_clause': noun_clause_handler,  # Phase 7: NounClauseHandler追加
+            'omitted_relative_pronoun': omitted_relative_pronoun_handler  # Phase 8: OmittedRelativePronounHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -319,6 +322,11 @@ class CentralController:
         # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
                           for token in doc)
+        
+        # 省略関係詞検出（関係節検出の前にチェック）
+        omitted_rel_handler = self.handlers['omitted_relative_pronoun']
+        has_omitted_relative = omitted_rel_handler.can_handle(text)
+        
         # 関係副詞検出（関係節より優先）
         import re
         relative_adverb_patterns = [
@@ -331,6 +339,8 @@ class CentralController:
         
         if has_relative_adverb:
             detected_patterns.append('relative_adverb')
+        elif has_omitted_relative:
+            detected_patterns.append('omitted_relative_pronoun')
         elif has_relative:
             detected_patterns.append('relative_clause')
         
@@ -715,6 +725,32 @@ class CentralController:
             else:
                 print(f"⚠️ 名詞節処理失敗、通常の処理フローに移行")
                 print(f"  NounClauseHandler error: {noun_clause_result.get('error')}")
+        
+        # 🎯 省略関係詞処理（関係節処理の前に検出）
+        if 'omitted_relative_pronoun' in grammar_patterns:
+            omitted_rel_handler = self.handlers['omitted_relative_pronoun']
+            omitted_rel_result = omitted_rel_handler.handle(text)
+            
+            if omitted_rel_result['success']:
+                print(f"✅ 省略関係詞処理成功")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': omitted_rel_result['main_slots'],
+                    'sub_slots': omitted_rel_result['sub_slots'],
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'omitted_relative_pronoun',
+                        'confidence': omitted_rel_result['metadata']['confidence']
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 省略関係詞処理失敗、通常の処理フローに移行")
+                print(f"  OmittedRelativePronounHandler error: {omitted_rel_result.get('error')}")
         
         # 🎯 アーキテクチャ修正: 関係節優先処理
         # 関係節がある場合は、まず関係節ハンドラーが協力者を使って境界認識
