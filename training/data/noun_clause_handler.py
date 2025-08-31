@@ -20,7 +20,25 @@ class NounClauseHandler:
         Args:
             nlp_model: spaCyモデル（オプション）
             collaborators: 協力者ハンドラー辞書
-                - 'adverb': AdverbHandler（修飾語分離）
+             # 助動詞と否定を同時検出
+        aux_token = None
+        neg_token = None
+        for child in main_verb.children:
+            if child.dep_ == 'aux':
+                aux_token = child
+                print(f"   助動詞候補: '{child.text}'")
+            elif child.dep_ == 'neg':
+                neg_token = child
+                print(f"   否定候補: '{child.text}'")
+        
+        if aux_token:
+            # 否定の場合は結合（doesn't, won't等）
+            aux_text = aux_token.text
+            if neg_token:
+                aux_text += neg_token.text
+                print(f"   否定結合: '{aux_token.text}' + '{neg_token.text}' = '{aux_text}'")
+            main_slots['Aux'] = aux_text
+            print(f"   助動詞検出: '{aux_text}'")- 'adverb': AdverbHandler（修飾語分離）
                 - 'five_pattern': BasicFivePatternHandler（5文型分析）
                 - 'passive': PassiveVoiceHandler（受動態理解）
                 - 'modal': ModalHandler（助動詞処理）

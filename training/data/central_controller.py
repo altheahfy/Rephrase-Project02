@@ -485,41 +485,60 @@ class CentralController:
                 
                 print(f"✅ 助動詞+修飾語統合成功: {final_slots}")
                 
-                # 順序情報を追加
-                result = {
-                    'success': True,
-                    'text': text,
-                    'main_slots': final_slots,
-                    'sub_slots': modal_result.get('sub_slots', {}),
-                    'metadata': {
-                        'controller': 'central',
-                        'primary_handler': 'modal',
-                        'collaboration': ['adverb'],
+                # 🔍 名詞節も検出されている場合は継続処理
+                if 'noun_clause' in grammar_patterns and 'question' not in grammar_patterns:
+                    print(f"🔄 助動詞処理後、名詞節部分も処理します")
+                    # 名詞節処理に進む（Phaseを継続）
+                    modal_success_result = {
+                        'main_slots': final_slots,
                         'modal_info': modal_result.get('modal_info', {}),
-                        'confidence': 0.9
+                        'collaboration': ['adverb']
                     }
-                }
-                
-                return self._apply_order_to_result(result)
+                else:
+                    # 名詞節がない場合は助動詞処理のみで終了
+                    result = {
+                        'success': True,
+                        'text': text,
+                        'main_slots': final_slots,
+                        'sub_slots': modal_result.get('sub_slots', {}),
+                        'metadata': {
+                            'controller': 'central',
+                            'primary_handler': 'modal',
+                            'collaboration': ['adverb'],
+                            'modal_info': modal_result.get('modal_info', {}),
+                            'confidence': 0.9
+                        }
+                    }
+                    
+                    return self._apply_order_to_result(result)
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
         
         # 🎯 Phase 7: 名詞節処理（疑問文でない場合に適用）
         if 'noun_clause' in grammar_patterns and 'question' not in grammar_patterns:
-            # Step 1: AdverbHandlerで修飾語分離
-            adverb_handler = self.handlers['adverb']
-            adverb_result = adverb_handler.process(text)
+            # 助動詞処理の結果があるかチェック
+            modal_success_result = locals().get('modal_success_result')
             
-            modifier_slots = {}
-            processing_text = text
-            
-            if adverb_result['success']:
-                modifier_slots = adverb_result.get('modifier_slots', {})
-                processing_text = adverb_result['separated_text']
-                print(f"🔧 名詞節文修飾語分離: '{text}' → '{processing_text}'")
-                for slot, value in modifier_slots.items():
-                    print(f"📍 修飾語検出: {slot} = '{value}'")
+            # Step 1: AdverbHandlerで修飾語分離（助動詞処理済みでない場合のみ）
+            if not modal_success_result:
+                adverb_handler = self.handlers['adverb']
+                adverb_result = adverb_handler.process(text)
+                
+                modifier_slots = {}
+                processing_text = text
+                
+                if adverb_result['success']:
+                    modifier_slots = adverb_result.get('modifier_slots', {})
+                    processing_text = adverb_result['separated_text']
+                    print(f"🔧 名詞節文修飾語分離: '{text}' → '{processing_text}'")
+                    for slot, value in modifier_slots.items():
+                        print(f"📍 修飾語検出: {slot} = '{value}'")
+            else:
+                # 助動詞処理済みの場合、その結果を使用
+                modifier_slots = {}  # 助動詞処理で既に統合済み
+                processing_text = text
+                print(f"🔄 助動詞処理結果を利用して名詞節処理を継続")
             
             # Step 2: NounClauseHandlerで名詞節構造処理
             noun_clause_handler = self.handlers['noun_clause']
@@ -529,13 +548,50 @@ class CentralController:
                 # 名詞節+修飾語統合
                 noun_clause_slots = noun_clause_result['main_slots']
                 
-                # 修飾語スロットを統合
-                final_slots = noun_clause_slots.copy()
-                for slot, value in modifier_slots.items():
-                    if slot not in final_slots:
-                        final_slots[slot] = value
-                
-                print(f"✅ 名詞節+修飾語統合成功: {final_slots}")
+                # 助動詞処理結果がある場合は統合
+                if modal_success_result:
+                    # 助動詞結果と名詞節結果を統合
+                    modal_slots = modal_success_result['main_slots']
+                    
+                    # 助動詞の結果をベースに、名詞節部分を追加
+                    final_slots = modal_slots.copy()
+                    
+                    # 名詞節のサブスロット（sub-s, sub-aux, sub-v）を直接的に統合
+                    noun_clause_sub_slots = noun_clause_result.get('sub_slots', {})
+                    
+                    # サブスロットを番号付きスロットに変換
+                    if 'sub-s' in noun_clause_sub_slots:
+                        sub_s_value = noun_clause_sub_slots['sub-s']
+                        if sub_s_value.startswith('whether'):
+                            # "whether he" → "whether", "he"に分割
+                            final_slots['4'] = 'whether'
+                            final_slots['5'] = sub_s_value.replace('whether ', '')
+                        else:
+                            final_slots['4'] = sub_s_value
+                    
+                    if 'sub-aux' in noun_clause_sub_slots:
+                        next_slot = '6' if '5' in final_slots else '5'
+                        final_slots[next_slot] = noun_clause_sub_slots['sub-aux']
+                    
+                    if 'sub-v' in noun_clause_sub_slots:
+                        next_slot = '7' if '6' in final_slots else ('6' if '5' in final_slots else '5')
+                        final_slots[next_slot] = noun_clause_sub_slots['sub-v']
+                    
+                    collaboration_list = modal_success_result['collaboration'] + ['noun_clause']
+                    primary_handler = 'modal'  # 助動詞が主処理
+                    modal_info = modal_success_result['modal_info']
+                    print(f"✅ 助動詞+名詞節統合成功: {final_slots}")
+                else:
+                    # 修飾語スロットを統合
+                    final_slots = noun_clause_slots.copy()
+                    for slot, value in modifier_slots.items():
+                        if slot not in final_slots:
+                            final_slots[slot] = value
+                    
+                    collaboration_list = ['adverb']
+                    primary_handler = 'noun_clause'
+                    modal_info = {}
+                    print(f"✅ 名詞節+修飾語統合成功: {final_slots}")
                 
                 # 順序情報を追加
                 result = {
@@ -545,9 +601,10 @@ class CentralController:
                     'sub_slots': noun_clause_result.get('sub_slots', {}),
                     'metadata': {
                         'controller': 'central',
-                        'primary_handler': 'noun_clause',
-                        'collaboration': ['adverb'],
+                        'primary_handler': primary_handler,
+                        'collaboration': collaboration_list,
                         'noun_clause_info': noun_clause_result.get('noun_clause_info', {}),
+                        'modal_info': modal_info,
                         'confidence': 0.9
                     }
                 }
