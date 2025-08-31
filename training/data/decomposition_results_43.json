@@ -1,0 +1,48 @@
+{
+  "case_43": {
+    "sentence": "The man who runs fast is strong.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man who runs fast is strong.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "_parent_slot": "S",
+        "sub-m2": "fast"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "The man who runs fast",
+        "2": "is",
+        "3": "strong"
+      }
+    },
+    "match": true
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "case_43": {
+    "sentence": "The man who runs fast is strong.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man who runs fast is strong.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "_parent_slot": "S",
+        "sub-m2": "fast"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "The man who runs fast",
+        "2": "is",
+        "3": "strong"
+      }
+    },
+    "match": true
+  },
+  "case_44": {
+    "sentence": "The book which lies there is mine.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "sub-m2": "there",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which lies there is mine.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "_parent_slot": "S",
+        "sub-m2": "there"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "The book which lies there",
+        "2": "is",
+        "3": "mine"
+      }
+    },
+    "match": true
+  },
+  "case_45": {
+    "sentence": "The person that works here is kind.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "sub-m2": "here",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The person that works here is kind.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "_parent_slot": "S",
+        "sub-m2": "here"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "1": "The person that works here",
+        "2": "is",
+        "3": "kind"
+      }
+    },
+    "match": true
+  },
+  "case_46": {
+    "sentence": "The book which I bought is expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which I bought is expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "which_object",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_slots": {
+        "2": "is",
+        "3": "expensive",
+        "1": "The book which"
+      }
+    },
+    "match": true
+  }
+}
