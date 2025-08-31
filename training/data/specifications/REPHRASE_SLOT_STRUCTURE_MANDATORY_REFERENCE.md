@@ -95,13 +95,18 @@ M1, S, Aux, M2, V, C1, O1, O2, C2, M3
 位置は関係なし（動詞の前でも後でも）
 ```
 
-**🟡 2個使われているとき【重要：2つのケースがある】**
+**🟡 2個使われているとき【重要：動詞との距離で判定】**
 ```
-ケース1: 動詞より前に修飾語が1つ以上ある場合
-→ M1（前の修飾語）, M2（残りの修飾語）
+ケース1: 受動態でAgent句（by句）がある場合
+→ M2（動詞修飾語）, M3（Agent句）
 
-ケース2: 動詞より前に修飾語が0個の場合（全部動詞より後）
-→ M2（最初の修飾語）, M3（次の修飾語）
+ケース2: 修飾語が動詞の前後に分散している場合
+→ M2（動詞に近い修飾語）, M1または M3（動詞から遠い修飾語）
+　　- 動詞から遠い修飾語が前方 → M1
+　　- 動詞から遠い修飾語が後方 → M3
+
+ケース3: 修飾語が同じ側（前または後）に集中している場合
+→ M1, M2（前方集中） または M2, M3（後方集中）
 ```
 
 **🔴 3個使われているとき**
@@ -119,18 +124,31 @@ M1, S, Aux, M2, V, C1, O1, O2, C2, M3
 ```
 **→ どこにあってもM2（位置無関係）**
 
-**例2：2個パターン - ケース1（前に1つ以上）**
+**例2：2個パターン - ケース1（受動態 + Agent句）**
 ```
-"I carefully work by hand."
-前に1つ：carefully / 後に1つ：by hand
-→ M1: "carefully", M2: "by hand"
+"The window was gently opened by the breeze."
+修飾語: gently（動詞修飾語）, by the breeze（Agent句）
+→ M2: "gently", M3: "by the breeze"
 ```
 
-**例2：2個パターン - ケース2（前に0個）**
+**例2：2個パターン - ケース2（前後分散）**
 ```
-"I work carefully by hand."
-前に0個 / 後に2つ：carefully, by hand
+"Yesterday I work hard."
+修飾語: Yesterday（動詞から遠い・前方）, hard（動詞に近い・後方）
+→ M1: "Yesterday", M2: "hard"
+
+"I carefully work by hand."
+修飾語: carefully（動詞に近い・前方）, by hand（動詞から遠い・後方）
 → M2: "carefully", M3: "by hand"
+```
+
+**例2：2個パターン - ケース3（同側集中）**
+```
+"Yesterday morning I work."
+修飾語2個とも前方集中 → M1: "Yesterday", M2: "morning"
+
+"I work carefully by hand."
+修飾語2個とも後方集中 → M2: "carefully", M3: "by hand"
 ```
 
 ``
@@ -141,14 +159,22 @@ M1, S, Aux, M2, V, C1, O1, O2, C2, M3
 → M1: "Yesterday", M2: "quickly", M3: "hard"（位置順）
 ```
 
-**【Agent句（by句）の扱い】**
+**【Agent句（by句）の特別扱い - 最優先ルール】**
 ```
+受動態でAgent句（by句）がある場合は常に:
+→ 他の修飾語をM2, Agent句をM3に配置
+
 "The letter was written by John."
 → 修飾語1個 → M2: "by John"
 
 "The window was gently opened by the breeze."
-→ 修飾語2個 → M2: "gently", M3: "by the breeze"
+→ 修飾語2個（受動態+Agent句） → M2: "gently", M3: "by the breeze"
+
+"The book was carefully and thoroughly reviewed by experts."
+→ 修飾語3個（受動態+Agent句） → M1: "carefully", M2: "thoroughly", M3: "by experts"
 ```
+
+**【重要】Agent句がある場合は距離ベース判定よりも優先される**
 
 **❌ 従来の複雑ルール**：距離・意味・位置を複合判定
 **✅ 新シンプルルール**：個数のみで機械的に判定
