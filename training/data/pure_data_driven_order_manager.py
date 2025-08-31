@@ -392,52 +392,118 @@ class PureDataDrivenOrderManager:
             order_sequence = [slot_k for pos, slot_k in slot_positions]
             
             # 各スロットがどのグループに属するかを特定
+            sentence_element_groups = {}
             for i, slot_key in enumerate(order_sequence):
                 slot_value = slots[slot_key]
                 for group_name, group_info in element_groups.items():
                     if (group_info['original_slot'] == slot_key and 
                         slot_value in group_info['values']):
-                        sentence_groups[group_name] = i + 1
+                        sentence_element_groups[group_name] = i + 1
                         break
             
+            # 名詞節構造の検出
+            is_noun_clause = self._detect_noun_clause_structure(sentence, slots)
+            
             # この例文内でのグループ間制約を生成
-            group_list = sorted(sentence_groups.items(), key=lambda x: x[1])
+            group_list = sorted(sentence_element_groups.items(), key=lambda x: x[1])
+            
+            # 名詞節の場合は問題のある制約をスキップ
+            if is_noun_clause:
+                print(f"    🔍 名詞節構造検出: '{sentence}' - O1→S制約をスキップ")
+                group_list = [(g, p) for g, p in group_list if not (g == 'O1_normal' and any(gg == 'S_normal' for gg, pp in group_list))]
+            
             for i in range(len(group_list) - 1):
                 before_group = group_list[i][0]
                 after_group = group_list[i + 1][0]
+                
+                # 名詞節での問題のある制約をスキップ
+                if is_noun_clause and before_group == 'O1_normal' and after_group == 'S_normal':
+                    print(f"    ⚠️ スキップ: O1_normal < S_normal (名詞節: '{sentence}')")
+                    continue
+                    
                 constraints.append((before_group, after_group))
                 print(f"    📏 制約: {before_group} < {after_group} (例文: '{sentence}')")
         
-        # 制約を満たすように順序を調整
-        adjusted_order = initial_order.copy()
-        
-        # 制約違反をチェックして修正（無限ループ防止）
-        made_changes = True
-        max_iterations = 50  # 最大試行回数
-        iteration_count = 0
-        
-        while made_changes and iteration_count < max_iterations:
-            made_changes = False
-            iteration_count += 1
-            
-            for before_group, after_group in constraints:
-                if before_group in adjusted_order and after_group in adjusted_order:
-                    before_idx = adjusted_order.index(before_group)
-                    after_idx = adjusted_order.index(after_group)
-                    
-                    if before_idx > after_idx:
-                        # 制約違反を修正
-                        print(f"    🔧 制約違反修正 (試行{iteration_count}): {before_group} と {after_group} の順序を調整")
-                        adjusted_order.remove(before_group)
-                        adjusted_order.insert(after_idx, before_group)
-                        made_changes = True
-                        
-        if iteration_count >= max_iterations:
-            print(f"⚠️ 制約調整が最大試行回数({max_iterations})に達しました。循環参照の可能性があります。")
-            print(f"📋 現在の順序: {adjusted_order}")
-            print(f"📋 制約一覧: {constraints}")
+        # 制約を満たすように順序を調整（トポロジカルソート使用）
+        adjusted_order = self._apply_topological_sort(initial_order, constraints)
         
         return adjusted_order
+    
+    def _apply_topological_sort(self, base_order, constraints):
+        """
+        トポロジカルソートを使用して制約を満たす順序を計算
+        """
+        from collections import defaultdict, deque
+        
+        # グラフと入次数を初期化
+        graph = defaultdict(list)
+        in_degree = defaultdict(int)
+        all_nodes = set(base_order)
+        
+        # 制約からグラフを構築
+        for before_group, after_group in constraints:
+            if before_group in all_nodes and after_group in all_nodes:
+                graph[before_group].append(after_group)
+                in_degree[after_group] += 1
+                if before_group not in in_degree:
+                    in_degree[before_group] = 0
+        
+        # 全ノードの入次数を確保
+        for node in all_nodes:
+            if node not in in_degree:
+                in_degree[node] = 0
+        
+        # Kahn's アルゴリズムを実行
+        queue = deque([node for node in all_nodes if in_degree[node] == 0])
+        result = []
+        
+        while queue:
+            current = queue.popleft()
+            result.append(current)
+            
+            for neighbor in graph[current]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+        
+        # 循環参照の検出
+        if len(result) != len(all_nodes):
+            print(f"⚠️ 循環参照が検出されました。base_orderを使用します。")
+            print(f"📋 処理できなかったノード: {set(all_nodes) - set(result)}")
+            
+            # 循環参照している制約を特定
+            remaining_nodes = set(all_nodes) - set(result)
+            problematic_constraints = []
+            for before_group, after_group in constraints:
+                if before_group in remaining_nodes or after_group in remaining_nodes:
+                    problematic_constraints.append((before_group, after_group))
+            print(f"📋 問題のある制約: {problematic_constraints}")
+            
+            return base_order
+        
+        print(f"✅ トポロジカルソート完了: {result}")
+        return result
+    
+    def _detect_noun_clause_structure(self, sentence, slots):
+        """
+        名詞節構造を検出（what, where, whether, how等で始まる節）
+        """
+        noun_clause_markers = ['what', 'where', 'whether', 'how', 'when', 'why', 'which', 'who', 'that']
+        sentence_lower = sentence.lower()
+        
+        # O1が空文字列で名詞節マーカーがある場合
+        o1_value = slots.get('O1', '')
+        if o1_value == '' or o1_value.strip() == '':
+            for marker in noun_clause_markers:
+                if marker in sentence_lower:
+                    return True
+        return False
+    
+    def _adjust_noun_clause_constraints(self, group_list, sentence):
+        """
+        名詞節における制約を調整（削除済み - 使用されません）
+        """
+        return group_list
     
     def _assign_adverb_numbers(self, sentences_data, common_order, element_groups):
         """
