@@ -827,8 +827,39 @@ class AdverbHandler:
         return boundaries
     
     def _find_main_clause_verb(self, doc) -> int:
-        """主文の動詞位置を特定"""
+        """主文の動詞位置を特定（助動詞文対応）"""
+        # 最初にROOTを探す
+        root_idx = -1
         for i, token in enumerate(doc):
             if token.dep_ == 'ROOT':
-                return i
-        return -1
+                root_idx = i
+                break
+        
+        if root_idx == -1:
+            return -1
+        
+        # 助動詞文の場合、実際の主動詞を探す
+        root_token = doc[root_idx]
+        
+        # "used to", "going to" などの助動詞構造を特定
+        if (root_token.text.lower() in ['used', 'going'] and 
+            root_idx + 1 < len(doc) and 
+            doc[root_idx + 1].text.lower() == 'to'):
+            
+            # 次の動詞（xcomp）を主動詞として扱う
+            for i in range(root_idx + 2, len(doc)):
+                token = doc[i]
+                if token.dep_ == 'xcomp' and token.pos_ == 'VERB':
+                    print(f"🔧 助動詞文主動詞検出: {root_token.text} to {token.text} → 主動詞は {token.text} (idx: {i})")
+                    return i
+        
+        # その他の助動詞の場合も確認
+        if root_token.pos_ in ['AUX', 'VERB']:
+            # xcompまたはvcompが主動詞の可能性
+            for i in range(root_idx + 1, len(doc)):
+                token = doc[i]
+                if token.dep_ in ['xcomp', 'ccomp'] and token.pos_ == 'VERB':
+                    print(f"🔧 助動詞文主動詞検出: {root_token.text} + {token.text} → 主動詞は {token.text} (idx: {i})")
+                    return i
+        
+        return root_idx

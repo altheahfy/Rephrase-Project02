@@ -765,15 +765,15 @@
         "S": "The window",
         "Aux": "was",
         "V": "opened",
-        "M1": "gently",
-        "M2": "by the morning breeze"
+        "M2": "gently",
+        "M3": "by the morning breeze"
       },
       "slots": {
         "S": "The window",
         "Aux": "was",
         "V": "opened",
-        "M1": "gently",
-        "M2": "by the morning breeze"
+        "M2": "gently",
+        "M3": "by the morning breeze"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
@@ -781,10 +781,11 @@
         "3": "The window",
         "4": "was",
         "5": "opened",
-        "8": "by the morning breeze"
+        "8": "gently",
+        "9": "by the morning breeze"
       }
     },
-    "match": false
+    "match": true
   },
   "case_24": {
     "sentence": "The message is being carefully written by the manager.",
@@ -805,15 +806,15 @@
         "S": "The message",
         "Aux": "is being",
         "V": "written",
-        "M1": "carefully",
-        "M2": "by the manager"
+        "M2": "carefully",
+        "M3": "by the manager"
       },
       "slots": {
         "S": "The message",
         "Aux": "is being",
         "V": "written",
-        "M1": "carefully",
-        "M2": "by the manager"
+        "M2": "carefully",
+        "M3": "by the manager"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
@@ -821,10 +822,11 @@
         "3": "The message",
         "4": "is being",
         "5": "written",
-        "8": "by the manager"
+        "8": "carefully",
+        "9": "by the manager"
       }
     },
-    "match": false
+    "match": true
   },
   "case_25": {
     "sentence": "The problem was quickly solved by the expert team.",
@@ -845,15 +847,15 @@
         "S": "The problem",
         "Aux": "was",
         "V": "solved",
-        "M1": "quickly",
-        "M2": "by the expert team"
+        "M2": "quickly",
+        "M3": "by the expert team"
       },
       "slots": {
         "S": "The problem",
         "Aux": "was",
         "V": "solved",
-        "M1": "quickly",
-        "M2": "by the expert team"
+        "M2": "quickly",
+        "M3": "by the expert team"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
@@ -861,10 +863,11 @@
         "3": "The problem",
         "4": "was",
         "5": "solved",
-        "8": "by the expert team"
+        "8": "quickly",
+        "9": "by the expert team"
       }
     },
-    "match": false
+    "match": true
   },
   "case_26": {
     "sentence": "The building is being constructed very carefully by skilled workers.",
@@ -1114,15 +1117,15 @@
         "S": "We",
         "V": "eat",
         "O1": "breakfast",
-        "M1": "always",
-        "M2": "together"
+        "M2": "always",
+        "M3": "together"
       },
       "slots": {
         "S": "We",
         "V": "eat",
         "O1": "breakfast",
-        "M1": "always",
-        "M2": "together"
+        "M2": "always",
+        "M3": "together"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
@@ -1130,10 +1133,11 @@
         "3": "We",
         "5": "eat",
         "6": "breakfast",
-        "8": "together"
+        "8": "always",
+        "9": "together"
       }
     },
-    "match": true
+    "match": false
   },
   "case_33": {
     "sentence": "The cat quietly sat on the mat.",
@@ -1152,24 +1156,25 @@
       "main_slots": {
         "S": "The cat",
         "V": "sat",
-        "M1": "quietly",
-        "M2": "on the mat"
+        "M2": "quietly",
+        "M3": "on the mat"
       },
       "slots": {
         "S": "The cat",
         "V": "sat",
-        "M1": "quietly",
-        "M2": "on the mat"
+        "M2": "quietly",
+        "M3": "on the mat"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
       "ordered_slots": {
         "3": "The cat",
         "5": "sat",
-        "8": "on the mat"
+        "8": "quietly",
+        "9": "on the mat"
       }
     },
-    "match": true
+    "match": false
   },
   "case_34": {
     "sentence": "Students often study here.",
@@ -1188,24 +1193,25 @@
       "main_slots": {
         "S": "Students",
         "V": "study",
-        "M1": "often",
-        "M2": "here"
+        "M2": "often",
+        "M3": "here"
       },
       "slots": {
         "S": "Students",
         "V": "study",
-        "M1": "often",
-        "M2": "here"
+        "M2": "often",
+        "M3": "here"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
       "ordered_slots": {
         "3": "Students",
         "5": "study",
-        "8": "here"
+        "8": "often",
+        "9": "here"
       }
     },
-    "match": true
+    "match": false
   },
   "case_35": {
     "sentence": "She carefully reads books.",
@@ -1371,8 +1377,8 @@
       "slots": {
         "S": "she",
         "V": "works",
-        "M1": "Actually",
-        "M2": "very hard"
+        "M2": "very hard",
+        "M1": "Actually"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
@@ -1403,6 +1409,7 @@
         "S": "He",
         "V": "solved",
         "O1": "the problem",
+        "M1": "quickly",
         "M2": "quickly",
         "M3": "and carefully"
       },
@@ -1411,6 +1418,7 @@
         "V": "solved",
         "O1": "the problem",
         "M2": "quickly",
+        "M1": "quickly",
         "M3": "and carefully"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
@@ -1423,7 +1431,7 @@
         "9": "and carefully"
       }
     },
-    "match": true
+    "match": false
   },
   "case_41": {
     "sentence": "She always speaks English fluently at work.",
@@ -2262,7 +2270,8 @@
         "sub-aux": "was",
         "sub-v": "written",
         "_parent_slot": "S",
-        "sub-m2": "by Shakespeare"
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare"
       },
       "pattern_type": "which_subject",
       "grammar_analysis": {
@@ -2287,8 +2296,12 @@
           "display_order": 3
         },
         "sub-m2": {
-          "value": "by Shakespeare",
+          "value": "carefully",
           "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by Shakespeare",
+          "display_order": 5
         },
         "_parent_slot": "S"
       },
@@ -2298,7 +2311,7 @@
         "7": "famous"
       }
     },
-    "match": false
+    "match": true
   },
   "case_56": {
     "sentence": "The car that was quickly repaired yesterday runs smoothly.",
@@ -2403,7 +2416,8 @@
         "sub-aux": "was",
         "sub-v": "typed",
         "_parent_slot": "S",
-        "sub-m2": "by the secretary"
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary"
       },
       "pattern_type": "which_subject",
       "grammar_analysis": {
@@ -2428,8 +2442,12 @@
           "display_order": 3
         },
         "sub-m2": {
-          "value": "by the secretary",
+          "value": "slowly",
           "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by the secretary",
+          "display_order": 5
         },
         "_parent_slot": "S"
       },
@@ -2439,7 +2457,7 @@
         "8": "today"
       }
     },
-    "match": false
+    "match": true
   },
   "case_58": {
     "sentence": "The student who studies diligently always succeeds academically.",
@@ -2735,7 +2753,8 @@
         "sub-aux": "was",
         "sub-v": "reviewed",
         "_parent_slot": "S",
-        "sub-m2": "by experts"
+        "sub-m2": "thoroughly",
+        "sub-m3": "by experts"
       },
       "pattern_type": "which_subject",
       "grammar_analysis": {
@@ -2760,8 +2779,12 @@
           "display_order": 3
         },
         "sub-m2": {
-          "value": "by experts",
+          "value": "thoroughly",
           "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by experts",
+          "display_order": 5
         },
         "_parent_slot": "S"
       },
@@ -2772,7 +2795,7 @@
         "8": "successfully"
       }
     },
-    "match": false
+    "match": true
   },
   "case_63": {
     "sentence": "The student whose essay was carefully corrected improved dramatically.",
@@ -3451,7 +3474,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "2": "What",
+        "1": "What",
         "3": "did",
         "4": "he",
         "5": "tell",
@@ -3592,7 +3615,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "1": "Where",
+        "2": "Where",
         "3": "did",
         "4": "you",
         "5": "tell",
@@ -4452,7 +4475,8 @@
         "S": "They",
         "Aux": "used to",
         "V": "play",
-        "M2": "here"
+        "M2": "here",
+        "M3": "every day"
       },
       "sub_slots": {},
       "metadata": {
@@ -4476,10 +4500,11 @@
         "4": "used to",
         "3": "They",
         "5": "play",
-        "8": "here"
+        "8": "here",
+        "9": "every day"
       }
     },
-    "match": false
+    "match": true
   },
   "case_106": {
     "sentence": "He is going to study abroad.",
