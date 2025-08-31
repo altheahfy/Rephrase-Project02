@@ -96,7 +96,7 @@
         },
         "sub_slots": {
           "sub-s": "I",
-          "sub-aux": "was",
+          "sub-v": "was",
           "sub-c1": "late",
           "sub-m2": "why"
         }
@@ -129,9 +129,8 @@
           "M2": ""
         },
         "sub_slots": {
-          "sub-s": "if you",
-          "sub-v": "agree",
-          "sub-m1": "on"
+          "sub-s": "on if you",
+          "sub-v": "agree"
         }
       }
     },
