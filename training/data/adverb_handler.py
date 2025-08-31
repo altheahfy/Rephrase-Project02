@@ -82,7 +82,7 @@ class AdverbHandler:
         return pairs
     
     def _collect_verb_modifiers(self, doc, verb_idx: int) -> List[Dict]:
-        """動詞の修飾語を収集（前後両方向から）- 専門分担型ハイブリッド解析"""
+        """動詞の修飾語を収集（前後両方向から）- 専門分担型ハイブリッド解析（受動態対応）"""
         modifiers = []
         
         # 🎯 名詞節境界を先にチェック（that節、wh節、whether節、if節）
@@ -93,6 +93,11 @@ class AdverbHandler:
         if verb_idx != main_clause_verb_idx:
             print(f"🔧 名詞節内動詞検出: verb_idx={verb_idx}, main_verb_idx={main_clause_verb_idx} → 修飾語分離スキップ")
             return modifiers
+        
+        # 🎯 受動態検出: 主動詞を特定
+        main_verb_idx = self._find_main_verb_for_modifiers(doc, verb_idx)
+        effective_verb_idx = main_verb_idx if main_verb_idx != verb_idx else verb_idx
+        print(f"🔧 修飾語基準動詞: verb_idx={verb_idx}, effective_verb_idx={effective_verb_idx}")
         
         # 文頭時間表現の特別処理（「Every morning」などの複合表現）
         if verb_idx > 1:  # 動詞が複合表現の後に位置する場合
@@ -174,30 +179,45 @@ class AdverbHandler:
                 print(f"🔍 文頭副詞検出: {first_token.text} (依存関係: {first_token.dep_})")
         
         
-        # Part 1: 動詞の前にある修飾語を検索（複合修飾語対応）
+        # Part 1: 動詞の前にある修飾語を検索（複合修飾語対応・受動態対応）
         pre_verb_modifiers = []
-        for i in range(verb_idx - 1, -1, -1):
+        for i in range(effective_verb_idx - 1, -1, -1):  # effective_verb_idx を使用
             token = doc[i]
             
             # 既に処理済みの文頭時間表現はスキップ
             if any(mod for mod in modifiers if mod['idx'] <= i <= mod['idx'] + len(mod['text'].split()) - 1):
                 continue
             
-            # 修飾語として識別（この動詞を修飾しているか確認）
-            if self._is_modifier(token) and token.head.i == verb_idx:
-                modifier_info = {
-                    'text': token.text,
-                    'pos': token.pos_,
-                    'tag': token.tag_,
-                    'idx': i,
-                    'type': self._classify_modifier_type(token),
-                    'position': 'pre-verb',  # 動詞前修飾語
-                    'method': 'pos_analysis'  # 使用手法明示
-                }
-                pre_verb_modifiers.append(modifier_info)
+            # 修飾語として識別（この動詞を修飾しているか確認・受動態対応）
+            if self._is_modifier(token):
+                # 受動態の場合: 副詞が主動詞を修飾する場合を特別処理
+                is_passive_adverb = (
+                    effective_verb_idx != verb_idx and  # 受動態
+                    token.pos_ == 'ADV' and 
+                    effective_verb_idx < len(doc) and
+                    (token.head.i == effective_verb_idx or token.head.i == verb_idx)
+                )
+                
+                if token.head.i == verb_idx or is_passive_adverb:
+                    # 受動態の場合、位置を主動詞基準で再計算
+                    position_type = 'pre-verb' if i < effective_verb_idx else 'post-verb'
+                    
+                    modifier_info = {
+                        'text': token.text,
+                        'pos': token.pos_,
+                        'tag': token.tag_,
+                        'idx': i,
+                        'type': self._classify_modifier_type(token),
+                        'position': position_type,  # 主動詞基準の位置
+                        'method': 'pos_analysis_passive_aware',  # 受動態対応手法
+                        'effective_verb_idx': effective_verb_idx  # デバッグ用
+                    }
+                    pre_verb_modifiers.append(modifier_info)
+                    print(f"🔍 受動態副詞検出: {token.text} (位置: {position_type}, 基準動詞idx: {effective_verb_idx})")
             
             # 主語に達したら停止（動詞前修飾語の範囲を制限）
             if token.dep_ in ['nsubj', 'nsubjpass']:
+                break
                 break
         
         # 複合修飾語の結合処理（例: "very carefully"）
@@ -239,6 +259,30 @@ class AdverbHandler:
                     print(f"🔍 時間副詞句検出: {time_phrase}")
                     # 前置詞句の残りの部分をスキップ
                     i = i + 2
+                    continue
+            
+            # 単体時間名詞の処理（"day"が単独で現れる場合も）
+            if (token.text.lower() in ['day', 'week', 'month', 'year', 'morning', 'afternoon', 'evening', 'night'] and 
+                i > 0 and doc[i-1].text.lower() in ['every', 'each', 'last', 'next', 'this', 'that']):
+                # 前のトークンと合わせて時間表現として処理
+                prev_token = doc[i-1]
+                time_phrase = f"{prev_token.text} {token.text}"
+                
+                # 既に処理済みかチェック
+                already_processed = any(mod for mod in modifiers if mod['idx'] == i-1)
+                if not already_processed:
+                    modifier_info = {
+                        'text': time_phrase,
+                        'pos': 'ADV',  # 時間副詞句として扱う
+                        'tag': 'RB',
+                        'idx': i-1,
+                        'type': 'temporal_phrase',
+                        'phrase_end': i,
+                        'position': 'post-verb',
+                        'method': 'retroactive_compound_detection'
+                    }
+                    modifiers.append(modifier_info)
+                    print(f"🔍 遡及時間副詞句検出: {time_phrase}")
                     continue
             
             # 修飾語として識別（保守的判定）
@@ -645,9 +689,52 @@ class AdverbHandler:
             modifier_slots['M2'] = all_modifiers[0]['text']
             
         elif modifier_count == 2:
-            # 2個の場合：REPHRASE_SLOT_STRUCTURE_MANDATORY_REFERENCE.md 仕様に従う
-            pre_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'pre-verb']
-            post_verb_modifiers = [m for m in all_modifiers if m['position_type'] == 'post-verb']
+            # 2個の場合：距離ベースルール適用
+            
+            # 動詞位置を取得（最初の動詞を使用）
+            verb_idx = all_modifiers[0]['verb_idx']
+            
+            # 各修飾語と動詞の距離を計算
+            modifier1 = all_modifiers[0]
+            modifier2 = all_modifiers[1]
+            
+            distance1 = abs(modifier1['modifier_idx'] - verb_idx)
+            distance2 = abs(modifier2['modifier_idx'] - verb_idx)
+            
+            # 🔧 Agent句（by句）の特別処理
+            by_clause_modifiers = []
+            regular_modifiers = []
+            
+            for modifier in all_modifiers:
+                if modifier['text'].lower().startswith('by '):
+                    by_clause_modifiers.append(modifier)
+                else:
+                    regular_modifiers.append(modifier)
+            
+            # Agent句がある場合の特別配置: M2（副詞）, M3（by句）
+            if len(by_clause_modifiers) == 1 and len(regular_modifiers) == 1:
+                modifier_slots['M2'] = regular_modifiers[0]['text']
+                modifier_slots['M3'] = by_clause_modifiers[0]['text']
+                return modifier_slots
+            
+            # 距離ベース配置: 動詞に近い方がM2、遠い方がM1/M3
+            if distance1 <= distance2:
+                # modifier1が動詞に近い
+                closer_modifier = modifier1
+                farther_modifier = modifier2
+            else:
+                # modifier2が動詞に近い
+                closer_modifier = modifier2
+                farther_modifier = modifier1
+            
+            # 動詞に近い修飾語は常にM2
+            modifier_slots['M2'] = closer_modifier['text']
+            
+            # 遠い修飾語は位置によってM1またはM3
+            if farther_modifier['modifier_idx'] < verb_idx:
+                modifier_slots['M1'] = farther_modifier['text']  # 動詞より前
+            else:
+                modifier_slots['M3'] = farther_modifier['text']  # 動詞より後
             
             # 特別ケース: 「副詞 and 副詞」パターンの処理
             if (len(all_modifiers) == 2 and 
@@ -659,20 +746,6 @@ class AdverbHandler:
                     modifier_slots['M2'] = all_modifiers[0]['text']
                     modifier_slots['M3'] = f"and {all_modifiers[1]['text']}"
                     return modifier_slots
-            
-            if len(pre_verb_modifiers) >= 1:
-                # ケース1: 動詞中心(M2)より前に1つある場合 → M1, M2の2つ使用
-                modifier_slots['M1'] = pre_verb_modifiers[0]['text']
-                if len(post_verb_modifiers) >= 1:
-                    modifier_slots['M2'] = post_verb_modifiers[0]['text']
-                else:
-                    # 前に2つある場合
-                    modifier_slots['M2'] = pre_verb_modifiers[1]['text'] if len(pre_verb_modifiers) > 1 else all_modifiers[1]['text']
-                    
-            elif len(post_verb_modifiers) >= 1:
-                # ケース2: 動詞中心(M2)より後に1つある場合 → M2, M3の2つ使用
-                modifier_slots['M2'] = post_verb_modifiers[0]['text']
-                modifier_slots['M3'] = post_verb_modifiers[1]['text'] if len(post_verb_modifiers) > 1 else all_modifiers[1]['text']
                 
         elif modifier_count == 3:
             # 3個 → M1, M2, M3（位置順）
@@ -689,6 +762,38 @@ class AdverbHandler:
             positions.append(pair['verb_idx'])
         return positions
     
+    def _find_main_verb_for_modifiers(self, doc, verb_idx: int) -> int:
+        """
+        修飾語処理用の主動詞を検出（受動態対応）
+        
+        Args:
+            doc: spaCy Doc オブジェクト
+            verb_idx: 現在の動詞インデックス
+            
+        Returns:
+            int: 主動詞のインデックス
+        """
+        # 受動態パターンの検出
+        verb_token = doc[verb_idx]
+        
+        # be動詞の場合、次の過去分詞を探す
+        if verb_token.lemma_ == 'be' or verb_token.text.lower() in ['am', 'is', 'are', 'was', 'were', 'being']:
+            for i in range(verb_idx + 1, len(doc)):
+                next_token = doc[i]
+                # 副詞はスキップ
+                if next_token.pos_ == 'ADV':
+                    continue
+                # 過去分詞を発見
+                if next_token.pos_ == 'VERB' and next_token.tag_ == 'VBN':
+                    print(f"🔧 受動態主動詞検出: be動詞idx={verb_idx} → 主動詞idx={i} ({next_token.text})")
+                    return i
+                # 他の品詞に達したら停止
+                if next_token.pos_ in ['NOUN', 'PRON', 'PROPN', 'ADP']:
+                    break
+        
+        # 通常の動詞の場合はそのまま返す
+        return verb_idx
+
     def _detect_noun_clause_boundaries(self, doc) -> List[Dict]:
         """名詞節の境界を検出"""
         boundaries = []

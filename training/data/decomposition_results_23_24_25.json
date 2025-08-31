@@ -1,0 +1,122 @@
+{
+  "case_23": {
+    "sentence": "The window was gently opened by the morning breeze.",
+    "expected": {
+      "main_slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "gently",
+        "M3": "by the morning breeze"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The window was gently opened by the morning breeze.",
+      "success": true,
+      "main_slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M1": "gently",
+        "M2": "by the morning breeze"
+      },
+      "slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M1": "gently",
+        "M2": "by the morning breeze"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The window",
+        "4": "was",
+        "5": "opened",
+        "8": "by the morning breeze"
+      }
+    },
+    "match": false
+  },
+  "case_24": {
+    "sentence": "The message is being carefully written by the manager.",
+    "expected": {
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The message is being carefully written by the manager.",
+      "success": true,
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M1": "carefully",
+        "M2": "by the manager"
+      },
+      "slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M1": "carefully",
+        "M2": "by the manager"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The message",
+        "4": "is being",
+        "5": "written",
+        "8": "by the manager"
+      }
+    },
+    "match": false
+  },
+  "case_25": {
+    "sentence": "The problem was quickly solved by the expert team.",
+    "expected": {
+      "main_slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M2": "quickly",
+        "M3": "by the expert team"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The problem was quickly solved by the expert team.",
+      "success": true,
+      "main_slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M1": "quickly",
+        "M2": "by the expert team"
+      },
+      "slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M1": "quickly",
+        "M2": "by the expert team"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The problem",
+        "4": "was",
+        "5": "solved",
+        "8": "by the expert team"
+      }
+    },
+    "match": false
+  }
+}
