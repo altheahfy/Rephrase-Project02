@@ -1405,7 +1405,21 @@ class CentralController:
                 if modal_handler:
                     if_modal_result = modal_handler.process(if_clause_without_if)
                     if if_modal_result.get('success', False):
-                        if_basic_result = if_modal_result
+                        # Modal結果とBasic結果をマージ（Basicの主語・目的語・補語を保持）
+                        merged_slots = if_basic_result['main_slots'].copy()
+                        if 'Aux' in if_modal_result['main_slots']:
+                            merged_slots['Aux'] = if_modal_result['main_slots']['Aux']
+                        if 'V' in if_modal_result['main_slots']:
+                            merged_slots['V'] = if_modal_result['main_slots']['V']
+                        
+                        if_basic_result = {
+                            'success': True,
+                            'main_slots': merged_slots,
+                            'sub_slots': {},
+                            'modal_info': if_modal_result.get('modal_info', {}),
+                            'collaboration': ['modal', 'basic_five_pattern'],
+                            'text': if_modal_result.get('text', if_clause_without_if)
+                        }
                         print(f"📝 If節助動詞処理完了: {if_basic_result}")
             
             print(f"📝 If節基本分解: {if_basic_result}")

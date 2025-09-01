@@ -1,0 +1,346 @@
+{
+  "case_131": {
+    "sentence": "If it rains tomorrow, I will stay home.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "I",
+        "Aux": "will",
+        "V": "stay",
+        "M2": "home"
+      },
+      "sub_slots": {
+        "sub-s": "If it",
+        "sub-v": "rains",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "stay",
+        "M2": "home",
+        "M1": "",
+        "Aux": "will"
+      },
+      "sub_slots": {
+        "sub-s": "If it",
+        "sub-v": "rains",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If it rains tomorrow,",
+        "main_clause": "I will stay home.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_132": {
+    "sentence": "If you study hard, you can pass the exam.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "can",
+        "V": "pass",
+        "O1": "the exam"
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "study",
+        "sub-m2": "hard",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "V": "pass",
+        "O1": "the exam",
+        "M2": "",
+        "Aux": "can"
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "study",
+        "sub-m2": "hard",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If you study hard,",
+        "main_clause": "you can pass the exam.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_133": {
+    "sentence": "If I were rich, I would travel the world.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "travel",
+        "O1": "the world"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "travel",
+        "O1": "the world",
+        "M2": "",
+        "Aux": "would"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I were rich,",
+        "main_clause": "I would travel the world.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_134": {
+    "sentence": "If she had time, she could help us.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "she",
+        "Aux": "could",
+        "V": "help",
+        "O1": "us"
+      },
+      "sub_slots": {
+        "sub-s": "If she",
+        "sub-v": "had",
+        "sub-o1": "time",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "V": "help",
+        "O1": "us",
+        "M2": "",
+        "Aux": "could"
+      },
+      "sub_slots": {
+        "sub-s": "If she",
+        "sub-v": "had",
+        "sub-o1": "time",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If she had time,",
+        "main_clause": "she could help us.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_135": {
+    "sentence": "If I had studied harder, I would have passed the test.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would have",
+        "V": "passed",
+        "O1": "the test"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "passed",
+        "O1": "the test",
+        "M2": "",
+        "Aux": "would have"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had studied harder,",
+        "main_clause": "I would have passed the test.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_136": {
+    "sentence": "If they had arrived earlier, they could have seen the show.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "they",
+        "Aux": "could have",
+        "V": "seen",
+        "O1": "the show"
+      },
+      "sub_slots": {
+        "sub-s": "If they",
+        "sub-aux": "had",
+        "sub-v": "arrived",
+        "sub-m2": "earlier",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "they",
+        "V": "seen",
+        "O1": "the show",
+        "M2": "",
+        "Aux": "could have"
+      },
+      "sub_slots": {
+        "sub-s": "If they",
+        "sub-aux": "had",
+        "sub-v": "arrived",
+        "sub-m2": "earlier",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If they had arrived earlier,",
+        "main_clause": "they could have seen the show.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  },
+  "case_137": {
+    "sentence": "If I had been born rich, I would be happy now.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "be",
+        "C1": "happy",
+        "M2": "now"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had been",
+        "sub-v": "born",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "be",
+        "C1": "happy",
+        "M2": "now",
+        "M1": "",
+        "Aux": "would be"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had been",
+        "sub-v": "born",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had been born rich",
+        "main_clause": "I would be happy now.",
+        "confidence": 0.95
+      }
+    },
+    "match": false
+  }
+}
