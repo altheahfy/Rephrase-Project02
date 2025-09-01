@@ -309,7 +309,15 @@ class ConditionalHandler:
                         break
                 
                 if if_marker:
-                    print(f"🎯 advcl+mark(if)検出: '{token.text}' (依存関係使用: 条件節構造のため)")
+                    # 「as if」「as though」パターンを除外
+                    if_pos = if_marker.i
+                    if if_pos > 0:
+                        prev_token = doc[if_pos - 1]
+                        if prev_token.text.lower() == 'as':
+                            print(f"🔍 'as if'パターン検出 → 条件節処理をスキップ")
+                            continue
+                    
+                    print(f"🎯 advcl+mark(if)検出: '{token.text}' → 条件節境界解析")
                     return self._analyze_advcl_conditional(doc, token, if_marker, sentence)
         
         return None

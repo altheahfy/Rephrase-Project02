@@ -1621,6 +1621,14 @@ class CentralController:
                         break
                 
                 if if_marker:
+                    # 「as if」「as though」パターンを除外
+                    if_pos = if_marker.i
+                    if if_pos > 0:
+                        prev_token = doc[if_pos - 1]
+                        if prev_token.text.lower() == 'as':
+                            print(f"🔍 'as if'パターン検出 → 条件節処理をスキップ")
+                            continue
+                    
                     print(f"🎯 advcl+mark(if)検出: '{token.text}' → 条件節境界解析")
                     return self._analyze_conditional_boundary(doc, token, if_marker, text)
         
@@ -1691,6 +1699,10 @@ class CentralController:
         print(f"🔍 品詞分析による補完検出: '{text}'")
         
         # "As if"パターンは条件文ではなく比喩表現として除外
+        if ' as if ' in text.lower() or ' as though ' in text.lower():
+            print(f"⚠️ 'As if/As though'比喩表現検出: 条件文ではない")
+            return "", text  # 条件節なし、全体が主節
+        
         if text.strip().lower().startswith('as if'):
             print(f"⚠️ 'As if'パターン検出: 条件文ではない比喩表現")
             return "", text  # 条件節なし、全体が主節

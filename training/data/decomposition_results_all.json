@@ -3460,7 +3460,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "1": "What",
+        "2": "What",
         "3": "did",
         "4": "he",
         "5": "tell",
@@ -3601,7 +3601,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "2": "Where",
+        "1": "Where",
         "3": "did",
         "4": "you",
         "5": "tell",
@@ -6499,7 +6499,7 @@
         "M2": "home"
       },
       "sub_slots": {
-        "sub-s": "it",
+        "sub-s": "If it",
         "sub-v": "rains",
         "sub-m2": "tomorrow",
         "_parent_slot": "M1"
@@ -6518,7 +6518,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "it",
+          "value": "If it",
           "display_order": 1
         },
         "sub-v": {
@@ -6539,7 +6539,7 @@
         "4": "will"
       }
     },
-    "match": false
+    "match": true
   },
   "case_132": {
     "sentence": "If you study hard, you can pass the exam.",
@@ -6568,7 +6568,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "you",
+        "sub-s": "If you",
         "sub-v": "study",
         "sub-m2": "hard",
         "_parent_slot": "M2"
@@ -6587,7 +6587,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "you",
+          "value": "If you",
           "display_order": 1
         },
         "sub-v": {
@@ -6608,7 +6608,7 @@
         "4": "can"
       }
     },
-    "match": false
+    "match": true
   },
   "case_133": {
     "sentence": "If I were rich, I would travel around the world.",
@@ -6637,7 +6637,7 @@
         "M2": "around the world"
       },
       "sub_slots": {
-        "sub-s": "I",
+        "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
         "_parent_slot": "M1"
@@ -6656,7 +6656,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "I",
+          "value": "If I",
           "display_order": 1
         },
         "sub-v": {
@@ -6677,7 +6677,7 @@
         "4": "would"
       }
     },
-    "match": false
+    "match": true
   },
   "case_134": {
     "sentence": "If she had time, she could help us.",
@@ -6706,7 +6706,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "she",
+        "sub-s": "If she",
         "sub-v": "had",
         "sub-o1": "time",
         "_parent_slot": "M2"
@@ -6725,7 +6725,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "she",
+          "value": "If she",
           "display_order": 1
         },
         "sub-v": {
@@ -6746,7 +6746,7 @@
         "4": "could"
       }
     },
-    "match": false
+    "match": true
   },
   "case_135": {
     "sentence": "If I had studied harder, I would have passed the test.",
@@ -6776,7 +6776,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "I",
+        "sub-s": "If I",
         "sub-v": "studied",
         "sub-aux": "had",
         "sub-m2": "harder",
@@ -6796,7 +6796,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "I",
+          "value": "If I",
           "display_order": 1
         },
         "sub-v": {
@@ -6821,7 +6821,7 @@
         "4": "would have"
       }
     },
-    "match": false
+    "match": true
   },
   "case_136": {
     "sentence": "If they had arrived earlier, they could have seen the show.",
@@ -6851,7 +6851,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "they",
+        "sub-s": "If they",
         "sub-v": "arrived",
         "sub-aux": "had",
         "sub-m2": "earlier",
@@ -6871,7 +6871,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "they",
+          "value": "If they",
           "display_order": 1
         },
         "sub-v": {
@@ -6896,7 +6896,7 @@
         "4": "could have"
       }
     },
-    "match": false
+    "match": true
   },
   "case_137": {
     "sentence": "If I had been born rich, I would be happy now.",
@@ -6928,7 +6928,7 @@
         "M2": "now"
       },
       "sub_slots": {
-        "sub-s": "I",
+        "sub-s": "If I",
         "sub-v": "born",
         "sub-c1": "rich",
         "sub-aux": "had been",
@@ -6948,7 +6948,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "I",
+          "value": "If I",
           "display_order": 1
         },
         "sub-v": {
@@ -6974,7 +6974,7 @@
         "4": "would"
       }
     },
-    "match": false
+    "match": true
   },
   "case_138": {
     "sentence": "If you have finished your work, you may leave early.",
@@ -7004,7 +7004,7 @@
         "M2": "early"
       },
       "sub_slots": {
-        "sub-s": "you",
+        "sub-s": "If you",
         "sub-v": "finished",
         "sub-o1": "your work",
         "sub-aux": "have",
@@ -7024,7 +7024,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "you",
+          "value": "If you",
           "display_order": 1
         },
         "sub-v": {
@@ -7049,7 +7049,7 @@
         "4": "may"
       }
     },
-    "match": false
+    "match": true
   },
   "case_139": {
     "sentence": "Were I you, I would accept the offer.",
@@ -7221,7 +7221,7 @@
         "M2": "please"
       },
       "sub_slots": {
-        "sub-s": "you",
+        "sub-s": "If you",
         "sub-v": "need",
         "sub-o1": "help",
         "sub-aux": "Should",
@@ -7240,7 +7240,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "you",
+          "value": "If you",
           "display_order": 1
         },
         "sub-v": {
@@ -7264,7 +7264,7 @@
         "7": "please"
       }
     },
-    "match": true
+    "match": false
   },
   "case_142": {
     "sentence": "I wish I were taller.",
@@ -7479,40 +7479,16 @@
     "actual": {
       "success": true,
       "main_slots": {
-        "S": "boss",
-        "M2": ""
+        "S": "He",
+        "V": "talks",
+        "O1": "he",
+        "O2": "the boss"
       },
-      "sub_slots": {
-        "sub-s": "he",
-        "sub-v": "were",
-        "_parent_slot": "M2"
-      },
+      "sub_slots": {},
       "collaboration": [
-        "generic_fallback",
-        "conditional"
+        "non_conditional"
       ],
-      "primary_handler": "conditional",
-      "metadata": {
-        "handler": "conditional_human_grammar",
-        "if_clause": "if he were",
-        "main_clause": "the boss.",
-        "confidence": 0.95
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "he",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "were",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "3": "boss",
-        "7": ""
-      }
+      "primary_handler": "non_conditional"
     },
     "match": false
   },
@@ -7535,52 +7511,15 @@
     "actual": {
       "success": true,
       "main_slots": {
-        "S": "she",
-        "Aux": "had",
-        "V": "seen",
-        "O1": "a ghost",
-        "M2": ""
+        "S": "She",
+        "V": "looked",
+        "C1": "she"
       },
-      "sub_slots": {
-        "sub-s": "She",
-        "sub-v": "looked",
-        "sub-m2": "as though",
-        "_parent_slot": "M2"
-      },
+      "sub_slots": {},
       "collaboration": [
-        "adverb",
-        "basic_five_pattern",
-        "conditional"
+        "non_conditional"
       ],
-      "primary_handler": "conditional",
-      "metadata": {
-        "handler": "conditional_human_grammar",
-        "if_clause": "She looked as though",
-        "main_clause": "she had seen a ghost.",
-        "confidence": 0.95
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "She",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "looked",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "as though",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "3": "she",
-        "5": "seen",
-        "6": "a ghost",
-        "7": "",
-        "4": "had"
-      }
+      "primary_handler": "non_conditional"
     },
     "match": false
   },
@@ -7715,7 +7654,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "you",
+        "sub-s": "If you",
         "sub-v": "hurry",
         "_parent_slot": "M2"
       },
@@ -7733,7 +7672,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "you",
+          "value": "If you",
           "display_order": 1
         },
         "sub-v": {
@@ -7835,7 +7774,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "we",
+        "sub-s": "If we",
         "sub-v": "fly",
         "sub-aux": "could",
         "_parent_slot": "M2"
@@ -7854,7 +7793,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "we",
+          "value": "If we",
           "display_order": 1
         },
         "sub-v": {
@@ -7903,7 +7842,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "(you)",
+        "sub-s": "If (you)",
         "sub-v": "Provided",
         "_parent_slot": "M2"
       },
@@ -7921,7 +7860,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "(you)",
+          "value": "If (you)",
           "display_order": 1
         },
         "sub-v": {
@@ -8027,7 +7966,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "I",
+        "sub-s": "If I",
         "sub-v": "known",
         "sub-o1": "you",
         "sub-aux": "had",
@@ -8047,7 +7986,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "I",
+          "value": "If I",
           "display_order": 1
         },
         "sub-v": {
@@ -8101,7 +8040,7 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "it",
+        "sub-s": "If it",
         "sub-v": "costs",
         "sub-o1": "a lot",
         "_parent_slot": "M2"
@@ -8120,7 +8059,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "it",
+          "value": "If it",
           "display_order": 1
         },
         "sub-v": {

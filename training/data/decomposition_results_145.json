@@ -1,0 +1,33 @@
+{
+  "case_145": {
+    "sentence": "He talks as if he were the boss.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "talks",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "as if he",
+        "sub-v": "were",
+        "sub-c1": "the boss",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "talks",
+        "O1": "he",
+        "O2": "the boss"
+      },
+      "sub_slots": {},
+      "collaboration": [
+        "non_conditional"
+      ],
+      "primary_handler": "non_conditional"
+    },
+    "match": false
+  }
+}
