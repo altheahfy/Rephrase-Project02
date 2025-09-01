@@ -948,7 +948,7 @@
         "3": "The teacher",
         "5": "explains",
         "6": "grammar",
-        "1": "clearly",
+        "2": "clearly",
         "7": "to confused students",
         "9": "daily"
       }
@@ -1387,7 +1387,7 @@
         "3": "she",
         "5": "works",
         "7": "very hard",
-        "1": "Actually"
+        "2": "Actually"
       }
     },
     "match": true
@@ -1471,7 +1471,7 @@
         "3": "She",
         "5": "speaks",
         "6": "English",
-        "1": "always",
+        "2": "always",
         "7": "fluently",
         "9": "at work"
       }
@@ -1512,7 +1512,7 @@
       "ordered_slots": {
         "3": "he",
         "5": "jogs",
-        "1": "Every morning",
+        "2": "Every morning",
         "7": "slowly",
         "9": "in the park"
       }
@@ -6535,7 +6535,7 @@
         "3": "I",
         "5": "stay",
         "7": "home",
-        "1": "",
+        "2": "",
         "4": "will"
       }
     },
@@ -6673,7 +6673,7 @@
         "3": "I",
         "5": "travel",
         "7": "around the world",
-        "1": "",
+        "2": "",
         "4": "would"
       }
     },
@@ -6970,7 +6970,7 @@
         "5": "be",
         "8": "happy",
         "7": "now",
-        "1": "",
+        "2": "",
         "4": "would"
       }
     },
@@ -7045,7 +7045,7 @@
         "3": "you",
         "5": "leave",
         "7": "early",
-        "1": "",
+        "2": "",
         "4": "may"
       }
     },
@@ -7189,7 +7189,7 @@
         "3": "she",
         "5": "acted",
         "7": "differently",
-        "1": "",
+        "2": "",
         "4": "would have"
       }
     },
@@ -7260,7 +7260,7 @@
       "ordered_slots": {
         "5": "call",
         "6": "me",
-        "1": "",
+        "2": "",
         "7": "please"
       }
     },
@@ -7484,19 +7484,46 @@
     },
     "actual": {
       "success": true,
+      "text": "He talks as if he were the boss.",
       "main_slots": {
         "S": "He",
         "V": "talks",
-        "O1": "he",
-        "O2": "the boss"
+        "M2": ""
       },
-      "sub_slots": {},
-      "collaboration": [
-        "non_conditional"
-      ],
-      "primary_handler": "non_conditional"
+      "sub_slots": {
+        "sub-s": "as if he",
+        "sub-v": "were",
+        "sub-c1": "the boss",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "metaphorical",
+        "metaphorical_type": null,
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "as if he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "the boss",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "5": "talks",
+        "7": ""
+      }
     },
-    "match": false
+    "match": true
   },
   "case_146": {
     "sentence": "She looked as though she had seen a ghost.",
@@ -7516,18 +7543,51 @@
     },
     "actual": {
       "success": true,
+      "text": "She looked as though she had seen a ghost.",
       "main_slots": {
         "S": "She",
         "V": "looked",
-        "C1": "she"
+        "M2": ""
       },
-      "sub_slots": {},
-      "collaboration": [
-        "non_conditional"
-      ],
-      "primary_handler": "non_conditional"
+      "sub_slots": {
+        "sub-s": "as though she",
+        "sub-v": "seen",
+        "sub-aux": "had",
+        "sub-o1": "a ghost",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "metaphorical",
+        "metaphorical_type": null,
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "as though she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "seen",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "a ghost",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "She",
+        "5": "looked",
+        "7": ""
+      }
     },
-    "match": false
+    "match": true
   },
   "case_147": {
     "sentence": "Without your help, I would have failed.",

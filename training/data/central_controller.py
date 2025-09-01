@@ -578,6 +578,34 @@ class CentralController:
                 else:
                     print(f"  関係副詞が検出されませんでした")
         
+        # 🎯 比喩表現処理（最優先：as if/as though構文）
+        if 'metaphorical' in grammar_patterns:
+            print(f"🎭 比喩表現処理開始: as if/as though構文を検出")
+            metaphorical_handler = self.handlers['metaphorical']
+            metaphorical_result = metaphorical_handler.handle(text)
+            
+            if metaphorical_result['success']:
+                print(f"✅ 比喩表現処理成功: {metaphorical_result}")
+                
+                # 順序情報を追加
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': metaphorical_result['main_slots'],
+                    'sub_slots': metaphorical_result['sub_slots'],
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'metaphorical',
+                        'metaphorical_type': metaphorical_result.get('metaphorical_type'),
+                        'confidence': metaphorical_result.get('confidence', 0.9)
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 比喻表現処理失敗、通常の処理フローに移行")
+                print(f"  MetaphoricalHandler error: {metaphorical_result.get('error')}")
+        
         # 🎯 Phase 6: 助動詞処理（疑問文でない場合に適用）
         if 'modal' in grammar_patterns and 'question' not in grammar_patterns:
             # Step 1: AdverbHandlerで修飾語分離

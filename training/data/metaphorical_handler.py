@@ -193,10 +193,12 @@ class MetaphoricalHandler:
         try:
             # BasicFivePatternHandlerがあれば使用
             if 'basic_five_pattern' in self.collaborators:
-                result = self.collaborators['basic_five_pattern'].handle(main_text)
-                if result.get('success'):
+                result = self.collaborators['basic_five_pattern'].process(main_text)
+                if result.get('success') and 'main_slots' in result:
                     print(f"   ✅ 基本5文型分解成功: {result['main_slots']}")
                     return result
+                else:
+                    print(f"   ⚠️ 基本5文型分解失敗: {result.get('error', 'Unknown error')}")
             
             # フォールバック: シンプルな分解
             doc = self.nlp(main_text)
@@ -216,6 +218,14 @@ class MetaphoricalHandler:
             return {
                 'success': True,
                 'main_slots': main_slots,
+                'sub_slots': {}
+            }
+        except Exception as e:
+            print(f"   ❌ 主節分析エラー: {e}")
+            # 最小限の分解を実行
+            return {
+                'success': True,
+                'main_slots': {'V': main_text},  # 全体を動詞として扱う
                 'sub_slots': {}
             }
             
@@ -246,38 +256,62 @@ class MetaphoricalHandler:
             doc = self.nlp(original_text)
             
             # "as if" / "as though" 以降の部分を分析
-            if ' as if ' in metaphor_text.lower():
+            if 'as if' in metaphor_text.lower():
                 pattern = r'as\s+if\s+(.+)'
                 connector = 'as if'
-            else:
+            elif 'as though' in metaphor_text.lower():
                 pattern = r'as\s+though\s+(.+)'
                 connector = 'as though'
+            else:
+                print(f"   ❌ 比喩パターン不明: '{metaphor_text}'")
+                return {'sub_slots': {}}
             
             match = re.search(pattern, metaphor_text, re.IGNORECASE)
             if not match:
+                print(f"   ❌ パターンマッチ失敗: {pattern}")
                 return {'sub_slots': {}}
             
             clause_content = match.group(1).strip()
             print(f"   節内容: '{clause_content}'")
             
+            # as if/as though の位置を特定
+            as_if_pos = self._find_as_if_position(doc)
+            print(f"   as if/as though 位置: {as_if_pos}")
+            
+            # デバッグ: 依存関係を出力
+            print(f"   === 依存関係分析 ===")
+            for token in doc:
+                print(f"     {token.text}: dep={token.dep_}, pos={token.pos_}, i={token.i}")
+            print(f"   ===================")
+            
             # spaCy解析で比喩節内の要素を特定
             for token in doc:
+                print(f"     トークン分析: '{token.text}' (dep={token.dep_}, pos={token.pos_}, i={token.i}, as_if_pos={as_if_pos})")
+                
                 if token.text.lower() in ['as', 'if', 'though']:
                     continue
                 
-                # 比喩節内の主語検出
-                if token.dep_ == 'nsubj' and token.i > self._find_as_if_position(doc):
+                # 比喻節内の主語検出
+                if token.dep_ == 'nsubj' and token.i > as_if_pos:
                     if 'sub-s' not in sub_slots:
                         sub_slots['sub-s'] = f"{connector} {token.text}"
                         print(f"      比喩節主語検出: '{connector} {token.text}'")
                 
-                # 比喩節内の動詞検出
-                elif token.dep_ in ['advcl', 'ccomp'] and token.i > self._find_as_if_position(doc):
-                    sub_slots['sub-v'] = token.text
-                    print(f"      比喩節動詞検出: '{token.text}'")
+                # 比喩節内の動詞検出（助動詞の場合も考慮）
+                elif token.dep_ in ['advcl', 'ccomp'] and token.i > as_if_pos:
+                    print(f"      動詞候補検出: '{token.text}' (dep={token.dep_}, pos={token.pos_})")
+                    
+                    if token.pos_ == 'AUX':
+                        # 助動詞の場合
+                        sub_slots['sub-v'] = token.text
+                        print(f"      比喩節動詞検出 (助動詞): '{token.text}'")
+                    else:
+                        sub_slots['sub-v'] = token.text
+                        print(f"      比喩節動詞検出: '{token.text}'")
                     
                     # この動詞の助動詞を検出
                     for child in token.children:
+                        print(f"        子要素: '{child.text}' (dep={child.dep_})")
                         if child.dep_ == 'aux':
                             sub_slots['sub-aux'] = child.text
                             print(f"      比喩節助動詞検出: '{child.text}'")
