@@ -458,7 +458,7 @@ class NounClauseHandler:
             'O1': ''  # Wish文の従節は暗黙的
         }
         
-        # 従節構造分析 (I were taller → sub-s: "I", sub-v: "were", sub-c1: "taller")
+        # 従節構造分析 (I had studied abroad → sub-s: "I", sub-aux: "had", sub-v: "studied", sub-m2: "abroad")
         sub_slots = {'_parent_slot': 'O1'}
         
         # 従節内の要素を分析 - ccompの範囲全体をチェック
@@ -477,6 +477,12 @@ class NounClauseHandler:
                         sub_slots['sub-s'] = child.text
                         print(f"      従節主語検出: {child.text} (dep: {child.dep_}, head: {child.head.text})")
                 
+                # この動詞の助動詞を検出
+                for child in token.children:
+                    if child.dep_ == 'aux':
+                        sub_slots['sub-aux'] = child.text
+                        print(f"      従節助動詞検出: {child.text} (dep: {child.dep_})")
+                
                 # この動詞の補語を検出
                 for child in token.children:
                     if child.dep_ in ['acomp', 'attr', 'dobj']:
@@ -488,6 +494,20 @@ class NounClauseHandler:
                             obj_phrase = self._extract_full_phrase(child, doc)
                             sub_slots['sub-o1'] = obj_phrase
                             print(f"      従節目的語検出: {obj_phrase} (dep: {child.dep_})")
+                
+                # この動詞の修飾語（副詞）を検出
+                for child in token.children:
+                    if child.dep_ == 'advmod':
+                        sub_slots['sub-m2'] = child.text
+                        print(f"      従節修飾語検出: {child.text} (dep: {child.dep_})")
+        
+        # 文全体の副詞（abroad等）も検出
+        for token in doc:
+            if token.dep_ == 'advmod' and token.i > ccomp_token.i:
+                # 既に検出されていない場合のみ追加
+                if 'sub-m2' not in sub_slots:
+                    sub_slots['sub-m2'] = token.text
+                    print(f"      従節修飾語検出(広域): {token.text} (dep: {token.dep_})")
         
         print(f"   主節: {main_slots}")
         print(f"   従節: {sub_slots}")

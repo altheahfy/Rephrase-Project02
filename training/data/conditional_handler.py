@@ -139,6 +139,21 @@ class ConditionalHandler:
         
         return detected_patterns
     
+    def _detect_inversion_pattern(self, text: str) -> bool:
+        """
+        倒置仮定法パターンの検出
+        
+        Args:
+            text: 分析対象の英文
+            
+        Returns:
+            bool: 倒置パターンが検出されたかどうか
+        """
+        for pattern_name, pattern in self.inversion_patterns.items():
+            if re.search(pattern, text, re.IGNORECASE):
+                return True
+        return False
+    
     def process(self, sentence: str) -> Dict[str, Any]:
         """
         仮定法文の処理メイン関数
@@ -237,7 +252,10 @@ class ConditionalHandler:
             print(f"📝 主節: '{main_clause}'")
             
             # If節の解析
-            sub_slots = self._analyze_if_clause_for_conditional(if_clause)
+            # 倒置仮定法の場合はIfを付けない（Should you → you）
+            is_inversion = self._detect_inversion_pattern(sentence)
+            include_if_prefix = not is_inversion  # 倒置の場合はFalse
+            sub_slots = self._analyze_if_clause_for_conditional(if_clause, include_if_prefix)
             
             # 主節の解析
             main_slots = self._analyze_main_clause_for_conditional(main_clause)
@@ -309,14 +327,6 @@ class ConditionalHandler:
                         break
                 
                 if if_marker:
-                    # 「as if」「as though」パターンを除外
-                    if_pos = if_marker.i
-                    if if_pos > 0:
-                        prev_token = doc[if_pos - 1]
-                        if prev_token.text.lower() == 'as':
-                            print(f"🔍 'as if'パターン検出 → 条件節処理をスキップ")
-                            continue
-                    
                     print(f"🎯 advcl+mark(if)検出: '{token.text}' → 条件節境界解析")
                     return self._analyze_advcl_conditional(doc, token, if_marker, sentence)
         
@@ -653,7 +663,7 @@ class ConditionalHandler:
         parts = sentence.split(',')
         if len(parts) >= 2:
             inversion_clause = parts[0].strip()
-            main_clause = ','.join(parts[1:]).strip()
+            main_clause = ' '.join(parts[1:]).strip()  # コンマを除去してスペース区切りに
         else:
             # コンマがない場合の処理
             inversion_clause = sentence
@@ -1087,9 +1097,9 @@ class ConditionalHandler:
                 subject = token.text
                 break
         
-        # 条件詞 + 主語
+        # 主語のみ設定（条件詞は含めない）
         if subject:
-            sub_slots['sub-s'] = f"{condition_word} {subject}".strip()
+            sub_slots['sub-s'] = subject
         else:
             sub_slots['sub-s'] = condition_word
         

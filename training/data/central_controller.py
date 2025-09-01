@@ -23,6 +23,7 @@ from noun_clause_handler import NounClauseHandler
 from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
 from conditional_handler import ConditionalHandler
 from imperative_handler import ImperativeHandler
+from metaphorical_handler import MetaphoricalHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -62,6 +63,7 @@ class CentralController:
         omitted_relative_pronoun_handler = OmittedRelativePronounHandler()  # Phase 8: OmittedRelativePronounHandler追加
         conditional_handler = ConditionalHandler(self.nlp)  # Phase 9: ConditionalHandler追加
         imperative_handler = ImperativeHandler()  # Phase 10: ImperativeHandler追加
+        metaphorical_handler = MetaphoricalHandler(self.nlp)  # Phase 11: MetaphoricalHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -73,10 +75,14 @@ class CentralController:
             'passive': passive_voice_handler,
             'modal': modal_handler,
             'noun_clause': noun_clause_handler,
-            'imperative': imperative_handler
+            'imperative': imperative_handler,
+            'basic_five_pattern': basic_five_pattern_handler  # MetaphoricalHandler用
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
         relative_adverb_handler = RelativeAdverbHandler(collaborators)
+        
+        # MetaphoricalHandlerに協力者を注入
+        metaphorical_handler.collaborators = collaborators
         
         # ハンドラー辞書に登録
         self.handlers = {
@@ -90,7 +96,8 @@ class CentralController:
             'noun_clause': noun_clause_handler,  # Phase 7: NounClauseHandler追加
             'omitted_relative_pronoun': omitted_relative_pronoun_handler,  # Phase 8: OmittedRelativePronounHandler追加
             'conditional': conditional_handler,  # Phase 9: ConditionalHandler追加
-            'imperative': imperative_handler  # Phase 10: ImperativeHandler追加
+            'imperative': imperative_handler,  # Phase 10: ImperativeHandler追加
+            'metaphorical': metaphorical_handler  # Phase 11: MetaphoricalHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -312,11 +319,15 @@ class CentralController:
         # Phase 6: 疑問文 + 助動詞 + 関係節 + 5文型の検出
         detected_patterns = []
         
-        # 疑問文検出（最優先）
-        if self.handlers['question'].is_question(text):
+        # 比喩表現検出（最優先）- as if / as though構文
+        if self.handlers['metaphorical'].can_handle(text):
+            detected_patterns.append('metaphorical')
+        
+        # 疑問文検出（高優先度）
+        elif self.handlers['question'].is_question(text):
             detected_patterns.append('question')
         
-        # 仮定法検出（高優先度）- if節、wish文、as if文、without文など
+        # 仮定法検出（高優先度）- if節、wish文、without文など（as if/as though除く）
         conditional_patterns = self.handlers['conditional'].detect_conditional_patterns(text)
         if conditional_patterns:
             detected_patterns.append('conditional')
@@ -778,16 +789,37 @@ class CentralController:
                 
                 # 助動詞処理結果がある場合は統合
                 if modal_success_result:
-                    # 助動詞結果と名詞節結果を統合（関係節と同じパターン）
-                    final_main_slots = modal_success_result['main_slots'].copy()
+                    # 名詞節構造をチェック - wish文等の特別処理
+                    is_wish_clause = (noun_clause_result.get('metadata', {}).get('handler') == 'wish_clause' or
+                                    ' wish ' in processing_text.lower())
                     
-                    # 名詞節のmain_slotsから不足するスロットを追加（特にO1の空スロット）
-                    for slot, value in noun_clause_slots.items():
-                        if slot not in final_main_slots or (slot == 'O1' and value == ''):
-                            final_main_slots[slot] = value
-                            print(f"🔧 名詞節スロット追加: {slot} = '{value}'")
-                    
-                    final_sub_slots = noun_clause_result.get('sub_slots', {})
+                    if is_wish_clause:
+                        # Wish文の場合: 名詞節ハンドラー結果を優先（modalの結果をsub_slotsに移動）
+                        final_main_slots = noun_clause_slots.copy()
+                        
+                        # 助動詞情報をsub_slotsに追加
+                        final_sub_slots = noun_clause_result.get('sub_slots', {}).copy()
+                        modal_aux = modal_success_result['main_slots'].get('Aux')
+                        if modal_aux and 'sub-aux' not in final_sub_slots:
+                            final_sub_slots['sub-aux'] = modal_aux
+                            print(f"🔧 wish文助動詞追加: sub-aux = '{modal_aux}'")
+                        
+                        # M2等の修飾語も適切に処理
+                        modal_m2 = modal_success_result['main_slots'].get('M2')
+                        if modal_m2 and 'sub-m2' not in final_sub_slots:
+                            final_sub_slots['sub-m2'] = modal_m2
+                            print(f"🔧 wish文修飾語追加: sub-m2 = '{modal_m2}'")
+                    else:
+                        # 通常の助動詞+名詞節統合（関係節と同じパターン）
+                        final_main_slots = modal_success_result['main_slots'].copy()
+                        
+                        # 名詞節のmain_slotsから不足するスロットを追加（特にO1の空スロット）
+                        for slot, value in noun_clause_slots.items():
+                            if slot not in final_main_slots or (slot == 'O1' and value == ''):
+                                final_main_slots[slot] = value
+                                print(f"🔧 名詞節スロット追加: {slot} = '{value}'")
+                        
+                        final_sub_slots = noun_clause_result.get('sub_slots', {})
                     
                     collaboration_list = modal_success_result['collaboration'] + ['noun_clause']
                     primary_handler = 'modal'  # 助動詞が主処理
@@ -1590,17 +1622,29 @@ class CentralController:
             auxiliary = modal_match.group(1)
             subject = modal_match.group(2)
             verb_part = modal_match.group(3)
-            return {
+            
+            # 動詞とその他の部分を分離
+            verb_parts = verb_part.split()
+            verb = verb_parts[0] if verb_parts else ''
+            object_part = ' '.join(verb_parts[1:]) if len(verb_parts) > 1 else ''
+            
+            result = {
                 'success': True,
                 'main_slots': {
                     'S': subject,
-                    'V': verb_part.split()[0] if verb_part else '',
+                    'V': verb,
                     'Aux': auxiliary
                 },
                 'sub_slots': {},
                 'collaboration': ['conditional_inversion'],
                 'inversion_type': 'modal'
             }
+            
+            # オブジェクトがある場合は追加
+            if object_part:
+                result['main_slots']['O1'] = object_part
+                
+            return result
         
         return {'success': False, 'error': 'Inversion pattern not recognized'}
         
