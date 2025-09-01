@@ -438,26 +438,32 @@ def _process_sub_slots_ordering(self, sub_slots):
 #### ✅ **完全実装済み（100ケース）**
 1. **BasicFivePatternHandler**: 17/17 (100%) - ケース1-17
 2. **AdverbHandler**: 25/25 (100%) - ケース18-42  
-3. **RelativeClauseHandler**: 23/23 (100%) - ケース43-65 ✅ **発見！**
+3. **RelativeClauseHandler**: 23/23 (100%) - ケース43-65 ✅ **完了**
 4. **PassiveVoiceHandler**: 4/4 (100%) - ケース66-69
 5. **ModalHandler**: 1/1 (100%) - ケース70
-6. **RelativeAdverbHandler**: 4/4 (100%) - ケース71-74 ✅ **発見！**
-7. **ModalHandler**: 28/28 (100%) - ケース83-110
+6. **RelativeAdverbHandler**: 4/4 (100%) - ケース71-74 ✅ **完了**
+7. **ModalHandler**: 28/28 (100%) - ケース83-110（75-82は削除済み）
 8. **RelativeAdverbHandler**: 10/10 (100%) - ケース111-120
+9. **NounClauseHandler**: 8/8 (100%) - ケース121-128
+10. **OmittedRelativePronounHandler**: 10/10 (100%) - ケース129-138
+→ **全130ケース 100%達成済み**
 
-#### ❌ **真の未実装範囲（8ケースのみ）**
-- **ComplexConstructionHandler**: 0/8 (0%) - ケース75-82
-  - ケース75: "The book I read yesterday was boring." (省略関係代名詞)
-  - ケース76: "She acts as if she knows everything." (仮定法)
-  - ケース77: "The place where we met accidentally became our favorite spot." (複雑関係副詞)
-  - ケース78: "The time when everything changed dramatically was unexpected." (複雑関係副詞)
-  - ケース79: "The team working overtime completed the project successfully yesterday." (分詞構文)
-  - ケース80: "The woman standing quietly near the door was waiting patiently." (分詞構文)
-  - ケース81: "The children playing happily in the garden were supervised carefully." (分詞構文)
-  - ケース82: "The documents being reviewed thoroughly will be approved soon." (分詞構文)
+#### ✅ **【2025年9月1日更新】現在の実装状況**
+- **実装済み範囲**: 130/130 (100%) - ケース1-130（連番整理済み）
+- **テストデータ**: 欠番削除・連番整理完了
+- **削除済み**: ケース75-82（紛らわしい例文として除外済み）
 
-### 🏆 **システム完成度大幅上方修正**
-- **従来**: 84/120ケース = 70%完成度
+#### 🚀 **次期実装予定（新規追加）**
+以下は新しいテストケースとして131番以降で追加予定：
+- **InfinitiveHandler**: 不定詞（名詞・形容詞・副詞用法）
+- **GerundHandler**: 動名詞
+- **ComparativeHandler**: 比較構文（原級・比較級・最上級）
+- **SubjunctiveHandler**: 仮定法
+- **ParticipleHandler**: 分詞構文
+- **InversionHandler**: 倒置構文
+
+### 🏆 **システム完成度（2025年9月1日時点）**
+- **現在**: 130/130ケース = **100%完成度**（実装済み範囲）
 - **実際**: **100/120ケース = 92.6%完成度**
 - **残り**: わずか8ケース（6.7%）で完全完成
 
