@@ -1971,10 +1971,11 @@ class CentralController:
                         sub_slots['sub-o1'] = if_slots['O1']
                     print(f"🔧 逆転構造(modal)処理: sub-aux='{if_slots.get('Aux', '')}', sub-s='{if_slots.get('S', '')}', sub-v='{if_slots.get('V', '')}'")
                 else:
-                    # 通常のif節処理
+                    # 通常のif節処理 - "If"を付加
                     print(f"🔧 通常if節処理: inversion_type={inversion_type}")
                     if 'S' in if_slots:
-                        sub_slots['sub-s'] = if_slots['S']  # "If"は付加しない
+                        # 通常のif条件文では"If"を付加
+                        sub_slots['sub-s'] = f"If {if_slots['S']}"
                     if 'V' in if_slots:
                         sub_slots['sub-v'] = if_slots['V']
                     if 'O1' in if_slots:

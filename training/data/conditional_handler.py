@@ -544,11 +544,15 @@ class ConditionalHandler:
         other_tokens.sort(key=lambda t: t.i)
         return " ".join([t.text for t in other_tokens])
     
-    def _analyze_if_clause_for_conditional(self, if_clause: str) -> Dict[str, str]:
+    def _analyze_if_clause_for_conditional(self, if_clause: str, include_if: bool = True) -> Dict[str, str]:
         """
         仮定法if節の解析（構造化アプローチ使用）
+        
+        Args:
+            if_clause: if節の文字列
+            include_if: Ifを含めるかどうか（倒置仮定法ではFalse）
         """
-        print(f"📋 if節解析開始: '{if_clause}'")
+        print(f"📋 if節解析開始: '{if_clause}' (include_if={include_if})")
         
         sub_slots = {}
         
@@ -558,7 +562,12 @@ class ConditionalHandler:
         
         # 主語検出
         subject = self._extract_subject(doc)
-        sub_slots["sub-s"] = f"If {subject}" if subject else "If it"
+        
+        # include_ifフラグに応じてIfを付けるかどうか決定
+        if include_if:
+            sub_slots["sub-s"] = f"If {subject}" if subject else "If it"
+        else:
+            sub_slots["sub-s"] = subject if subject else "it"
         
         # 動詞検出
         verb = self._extract_main_verb(doc)

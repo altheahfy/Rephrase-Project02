@@ -20,10 +20,10 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "will",
         "V": "stay",
-        "M2": "home",
         "M1": "",
-        "Aux": "will"
+        "M2": "home"
       },
       "sub_slots": {
         "sub-s": "If it",
@@ -42,6 +42,28 @@
         "if_clause": "If it rains tomorrow,",
         "main_clause": "I will stay home.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If it",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "rains",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "tomorrow",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "stay",
+        "7": "home",
+        "1": "",
+        "4": "will"
       }
     },
     "match": true
@@ -67,10 +89,10 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "can",
         "V": "pass",
         "O1": "the exam",
-        "M2": "",
-        "Aux": "can"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If you",
@@ -89,41 +111,63 @@
         "if_clause": "If you study hard,",
         "main_clause": "you can pass the exam.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "study",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "hard",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "pass",
+        "6": "the exam",
+        "7": "",
+        "4": "can"
       }
     },
     "match": true
   },
   "case_133": {
-    "sentence": "If I were rich, I would travel the world.",
+    "sentence": "If I were rich, I would travel around the world.",
     "expected": {
       "main_slots": {
-        "M2": "",
         "S": "I",
         "Aux": "would",
         "V": "travel",
-        "O1": "the world"
+        "M1": "",
+        "M2": "around the world"
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       }
     },
     "actual": {
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "travel",
-        "O1": "the world",
-        "M2": "",
-        "Aux": "would"
+        "M1": "",
+        "M2": "around the world"
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       },
       "collaboration": [
         "adverb",
@@ -134,8 +178,30 @@
       "metadata": {
         "handler": "conditional_human_grammar",
         "if_clause": "If I were rich,",
-        "main_clause": "I would travel the world.",
+        "main_clause": "I would travel around the world.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "travel",
+        "7": "around the world",
+        "1": "",
+        "4": "would"
       }
     },
     "match": true
@@ -161,10 +227,10 @@
       "success": true,
       "main_slots": {
         "S": "she",
+        "Aux": "could",
         "V": "help",
         "O1": "us",
-        "M2": "",
-        "Aux": "could"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If she",
@@ -183,6 +249,28 @@
         "if_clause": "If she had time,",
         "main_clause": "she could help us.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "had",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "time",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "help",
+        "6": "us",
+        "7": "",
+        "4": "could"
       }
     },
     "match": true
@@ -209,10 +297,10 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would have",
         "V": "passed",
         "O1": "the test",
-        "M2": "",
-        "Aux": "would have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If I",
@@ -232,6 +320,32 @@
         "if_clause": "If I had studied harder,",
         "main_clause": "I would have passed the test.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "studied",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "harder",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "passed",
+        "6": "the test",
+        "7": "",
+        "4": "would have"
       }
     },
     "match": true
@@ -258,10 +372,10 @@
       "success": true,
       "main_slots": {
         "S": "they",
+        "Aux": "could have",
         "V": "seen",
         "O1": "the show",
-        "M2": "",
-        "Aux": "could have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If they",
@@ -281,6 +395,32 @@
         "if_clause": "If they had arrived earlier,",
         "main_clause": "they could have seen the show.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "arrived",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "earlier",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "they",
+        "5": "seen",
+        "6": "the show",
+        "7": "",
+        "4": "could have"
       }
     },
     "match": true
@@ -308,11 +448,11 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "be",
         "C1": "happy",
-        "M2": "now",
         "M1": "",
-        "Aux": "would"
+        "M2": "now"
       },
       "sub_slots": {
         "sub-s": "If I",
@@ -332,6 +472,33 @@
         "if_clause": "If I had been born rich",
         "main_clause": "I would be happy now.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "born",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "had been",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "be",
+        "8": "happy",
+        "7": "now",
+        "1": "",
+        "4": "would"
       }
     },
     "match": true
@@ -358,10 +525,10 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "may",
         "V": "leave",
-        "M2": "early",
         "M1": "",
-        "Aux": "may"
+        "M2": "early"
       },
       "sub_slots": {
         "sub-s": "If you",
@@ -381,6 +548,32 @@
         "if_clause": "If you have finished your work,",
         "main_clause": "you may leave early.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "finished",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "your work",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "have",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "leave",
+        "7": "early",
+        "1": "",
+        "4": "may"
       }
     },
     "match": true
@@ -406,10 +599,10 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "accept",
         "O1": "the offer",
-        "M2": "",
-        "Aux": "would"
+        "M2": ""
       },
       "sub_slots": {
         "sub-v": "Were",
@@ -428,6 +621,28 @@
         "if_clause": "Were I you",
         "main_clause": "I would accept the offer.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "Were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "you",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "accept",
+        "6": "the offer",
+        "7": "",
+        "4": "would"
       }
     },
     "match": true
@@ -454,10 +669,10 @@
       "success": true,
       "main_slots": {
         "S": "she",
+        "Aux": "would have",
         "V": "acted",
-        "M2": "differently",
         "M1": "",
-        "Aux": "would have"
+        "M2": "differently"
       },
       "sub_slots": {
         "sub-aux": "Had",
@@ -477,6 +692,32 @@
         "if_clause": "Had she known the truth",
         "main_clause": "she would have acted differently.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-aux": {
+          "value": "Had",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "she",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "known",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "the truth",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "acted",
+        "7": "differently",
+        "1": "",
+        "4": "would have"
       }
     },
     "match": true

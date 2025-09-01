@@ -20,10 +20,10 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "will",
         "V": "stay",
-        "M2": "home",
         "M1": "",
-        "Aux": "will"
+        "M2": "home"
       },
       "sub_slots": {
         "sub-s": "If it",
@@ -32,7 +32,6 @@
         "_parent_slot": "M1"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -43,6 +42,28 @@
         "if_clause": "If it rains tomorrow,",
         "main_clause": "I will stay home.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If it",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "rains",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "tomorrow",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "stay",
+        "7": "home",
+        "1": "",
+        "4": "will"
       }
     },
     "match": true
