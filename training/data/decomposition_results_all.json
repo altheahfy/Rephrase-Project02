@@ -3456,7 +3456,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "1": "What",
+        "2": "What",
         "3": "did",
         "4": "he",
         "5": "tell",
@@ -3597,7 +3597,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "2": "Where",
+        "1": "Where",
         "3": "did",
         "4": "you",
         "5": "tell",
@@ -5753,46 +5753,30 @@
       }
     },
     "actual": {
+      "original_text": "It depends on if you agree.",
       "success": true,
-      "text": "It depends on if you agree.",
       "main_slots": {
         "S": "It",
         "V": "depends",
-        "M2": ""
+        "O1": "you",
+        "M2": "on"
       },
-      "sub_slots": {
-        "sub-s": "on if you",
-        "sub-v": "agree",
-        "_parent_slot": "M2"
+      "slots": {
+        "S": "It",
+        "V": "depends",
+        "O1": "you",
+        "M2": "on"
       },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "noun_clause",
-        "collaboration": [
-          "adverb"
-        ],
-        "noun_clause_info": {},
-        "modal_info": {},
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "on if you",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "agree",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
       "ordered_slots": {
         "3": "It",
         "5": "depends",
-        "7": ""
+        "6": "you",
+        "7": "on"
       }
     },
-    "match": true
+    "match": false
   },
   "case_120": {
     "sentence": "I understand how important this is.",
@@ -6612,14 +6596,14 @@
         "S": "I",
         "Aux": "would",
         "V": "travel",
-        "M2": "",
-        "M3": "around the world"
+        "M1": "",
+        "M2": "around the world"
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       }
     },
     "actual": {
@@ -6628,14 +6612,14 @@
         "S": "I",
         "Aux": "would",
         "V": "travel",
-        "O1": "the world",
-        "M2": ""
+        "M1": "",
+        "M2": "around the world"
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       },
       "collaboration": [
         "adverb",
@@ -6662,17 +6646,16 @@
           "value": "rich",
           "display_order": 3
         },
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       },
       "ordered_slots": {
         "3": "I",
         "5": "travel",
-        "6": "the world",
-        "7": "",
+        "7": "around the world",
         "4": "would"
       }
     },
-    "match": false
+    "match": true
   },
   "case_134": {
     "sentence": "If she had time, she could help us.",
@@ -7530,7 +7513,7 @@
       "sub_slots": {
         "sub-s": "If She",
         "sub-v": "looked",
-        "sub-m2": "though",
+        "sub-m2": "as though",
         "_parent_slot": "M2"
       },
       "collaboration": [
@@ -7555,7 +7538,7 @@
           "display_order": 2
         },
         "sub-m2": {
-          "value": "though",
+          "value": "as though",
           "display_order": 3
         },
         "_parent_slot": "M2"

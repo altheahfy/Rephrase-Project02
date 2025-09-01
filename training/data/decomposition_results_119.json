@@ -19,19 +19,22 @@
       "main_slots": {
         "S": "It",
         "V": "depends",
-        "O1": "you"
+        "O1": "you",
+        "M2": "on"
       },
       "slots": {
         "S": "It",
         "V": "depends",
-        "O1": "you"
+        "O1": "you",
+        "M2": "on"
       },
       "grammar_pattern": "basic_five_pattern + passive_voice",
       "phase": 1,
       "ordered_slots": {
         "3": "It",
         "5": "depends",
-        "6": "you"
+        "6": "you",
+        "7": "on"
       }
     },
     "match": false

@@ -1,0 +1,70 @@
+{
+  "case_133": {
+    "sentence": "If I were rich, I would travel around the world.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "travel",
+        "M1": "",
+        "M2": "around the world"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "travel",
+        "M1": "",
+        "M2": "around the world"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I were rich,",
+        "main_clause": "I would travel around the world.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "travel",
+        "7": "around the world",
+        "4": "would"
+      }
+    },
+    "match": true
+  }
+}

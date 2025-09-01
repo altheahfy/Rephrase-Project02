@@ -402,18 +402,32 @@ class AdverbHandler:
         return False
 
     def _is_modifier(self, token) -> bool:
-        """トークンが修飾語かどうか判定（適切なバランス）"""
+        """トークンが修飾語かどうか判定（spaCy依存関係ベース）"""
         # 副詞は基本的に修飾語として扱う（5文型の核心要素ではない）
         if token.pos_ == 'ADV':
             # ただし、文法的に必須の否定副詞のみ除外
             essential_adverbs = ['not', "n't", 'never']
             return token.text.lower() not in essential_adverbs
         
-        # 前置詞句は修飾語として扱う（ただし基本的な前置詞のみ）
+        # 前置詞句の判定：spaCyの依存関係を使用
         if token.pos_ == 'ADP':
-            # 5文型の核心でない前置詞句は修飾語
-            modifier_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'besides', 'except', 'to']
-            return token.text.lower() in modifier_preps
+            # 前置詞が動詞を修飾しているかチェック（依存関係 prep）
+            if token.dep_ == 'prep' and token.head.pos_ == 'VERB':
+                return True
+            # または前置詞が動詞に対して副詞的に機能している場合
+            if token.dep_ in ['prep', 'advmod'] and token.head.pos_ in ['VERB', 'ADJ', 'ADV']:
+                return True
+            # 5文型の必須要素（to不定詞など）は除外
+            essential_prep_patterns = [
+                'to',  # to不定詞（ただし副詞的用法は含める）
+            ]
+            if token.text.lower() in essential_prep_patterns:
+                # to不定詞の場合、副詞的用法なら修飾語として扱う
+                if token.text.lower() == 'to' and token.dep_ == 'aux':
+                    return False  # 不定詞のto
+                # その他の副詞的なtoは修飾語
+                return True
+            return True  # その他の前置詞は基本的に修飾語
         
         # 明確な時間・場所副詞（場所副詞here/thereは修飾語として扱う）
         if token.pos_ in ['NOUN', 'PROPN']:
@@ -443,30 +457,44 @@ class AdverbHandler:
         return token.text.lower() in adverbial_patterns
     
     def _get_prepositional_phrase(self, doc, prep_idx: int) -> Dict:
-        """前置詞句全体を取得し、分離可能かどうか判定"""
+        """前置詞句全体を取得し、分離可能かどうか判定（spaCy依存関係ベース）"""
         prep_token = doc[prep_idx]
         phrase_tokens = [prep_token.text]
         end_idx = prep_idx
         
-        # 前置詞の後続要素を収集
-        for i in range(prep_idx + 1, len(doc)):
-            token = doc[i]
-            
-            # 句読点や次の前置詞、動詞で停止
-            if token.pos_ in ['PUNCT', 'ADP', 'VERB', 'AUX']:
-                break
-            
-            # 単独の修飾語として認識される可能性のある副詞で停止
-            if token.pos_ == 'ADV' and self._is_modifier(token):
-                break
-                
-            phrase_tokens.append(token.text)
-            end_idx = i
+        # spaCyの依存関係を使って前置詞句の範囲を特定
+        # 前置詞の子要素（通常はpobj = prepositional object）を探す
+        phrase_indices = {prep_idx}
         
+        def add_subtree(token):
+            """トークンとその子要素を再帰的に追加"""
+            phrase_indices.add(token.i)
+            for child in token.children:
+                add_subtree(child)
+        
+        # 前置詞の子要素（目的語とその修飾語）を取得
+        for child in prep_token.children:
+            if child.dep_ == 'pobj':  # prepositional object
+                add_subtree(child)
+        
+        # インデックスをソートして連続的な句を作成
+        sorted_indices = sorted(phrase_indices)
+        
+        # 連続している範囲のみを取得（途切れる場合は前置詞句の終了）
+        continuous_indices = [prep_idx]
+        for idx in sorted_indices:
+            if idx > prep_idx and (not continuous_indices or idx == continuous_indices[-1] + 1):
+                continuous_indices.append(idx)
+            elif idx > prep_idx:
+                break  # 連続性が途切れた
+        
+        # フレーズテキストを作成
+        phrase_tokens = [doc[i].text for i in continuous_indices]
+        end_idx = continuous_indices[-1]
         phrase_text = ' '.join(phrase_tokens)
         
         # 前置詞句が修飾語として分離可能かどうか判定
-        is_modifiable = self._is_prepositional_phrase_modifiable(prep_token.text, phrase_tokens)
+        is_modifiable = self._is_prepositional_phrase_modifiable_by_dependency(prep_token)
         
         return {
             'text': phrase_text,
@@ -474,31 +502,28 @@ class AdverbHandler:
             'is_modifiable': is_modifiable
         }
     
-    def _is_prepositional_phrase_modifiable(self, preposition: str, phrase_tokens: List[str]) -> bool:
-        """前置詞句が修飾語として分離可能かどうか判定"""
-        prep_lower = preposition.lower()
-        
-        # 名詞節接続詞を含む場合は分離不可（名詞節として処理）
-        noun_clause_markers = ['that', 'whether', 'if', 'what', 'who', 'which', 'when', 'where', 'why', 'how']
-        phrase_text = ' '.join(phrase_tokens).lower()
-        for marker in noun_clause_markers:
-            if marker in phrase_text:
-                print(f"🔧 名詞節接続詞検出 '{marker}' in '{phrase_text}' - 分離不可")
-                return False
-        
-        # 修飾語として分離可能な前置詞句
-        # 基本5文型の核心構造でない場合は分離対象
-        modifiable_preps = ['for', 'with', 'in', 'on', 'at', 'by', 'during', 'throughout', 'despite', 'without', 'besides', 'except', 'to']
-        
-        # 「to」の場合、特定パターンで修飾語として扱う
-        if prep_lower == 'to':
-            # 「to + 形容詞 + 名詞」のパターンは修飾語として扱う
-            if len(phrase_tokens) >= 3:  # to + adj + noun
-                return True
-            # 動詞の直接目的語でない場合は修飾語として扱う
+    def _is_prepositional_phrase_modifiable_by_dependency(self, prep_token) -> bool:
+        """spaCyの依存関係に基づいて前置詞句が修飾語として分離可能かどうか判定"""
+        # 前置詞が動詞を修飾している場合（dep_=prep）は通常修飾語
+        if prep_token.dep_ == 'prep' and prep_token.head.pos_ == 'VERB':
             return True
-            
-        return prep_lower in modifiable_preps
+        
+        # 副詞的修飾（advmod）の場合も修飾語
+        if prep_token.dep_ == 'advmod':
+            return True
+        
+        # agent句（受動文のby句）は修飾語
+        if prep_token.dep_ == 'agent':
+            return True
+        
+        # 5文型の必須要素かどうかチェック
+        # - dobj, iobj, attr, acomp などの場合は必須要素なので分離不可
+        essential_deps = ['dobj', 'iobj', 'attr', 'acomp', 'xcomp', 'ccomp']
+        if prep_token.dep_ in essential_deps:
+            return False
+        
+        # その他は基本的に修飾語として扱う
+        return True
     
     def _classify_modifier_type(self, token) -> str:
         """修飾語の種類を分類"""
@@ -685,8 +710,9 @@ class AdverbHandler:
         modifier_count = len(all_modifiers)
         
         if modifier_count == 1:
-            # 1個のみ → M2（位置無関係）
-            modifier_slots['M2'] = all_modifiers[0]['text']
+            # 🔥 REPHRASE仕様：1個のみ → 必ずM2に配置（位置無関係）
+            modifier = all_modifiers[0]
+            modifier_slots['M2'] = modifier['text']
             
         elif modifier_count == 2:
             # 特別ケース: 「副詞 and 副詞」パターンを先にチェック
