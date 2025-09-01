@@ -134,6 +134,11 @@ class NounClauseHandler:
         """
         print(f"🔍 名詞節検出開始: '{sentence}'")
         
+        # 🎯 Wish文専用検出（最優先）
+        wish_result = self._detect_wish_clause(doc, sentence)
+        if wish_result:
+            return wish_result
+        
         # spaCy依存関係による名詞節検出
         for token in doc:
             print(f"   {token.text}: dep={token.dep_}, pos={token.pos_}, tag={token.tag_}")
@@ -256,6 +261,76 @@ class NounClauseHandler:
         
         return None
     
+    def _detect_wish_clause(self, doc, sentence: str) -> Optional[Dict[str, Any]]:
+        """
+        Wish文専用検出
+        
+        Args:
+            doc: spaCy解析結果
+            sentence: 処理対象文
+            
+        Returns:
+            Dict: Wish節情報 or None
+        """
+        import re
+        
+        # Wishパターン検出
+        wish_pattern = r'\b(?:wish|wishes|wished)\s+'
+        if not re.search(wish_pattern, sentence, re.IGNORECASE):
+            return None
+        
+        print(f"🎯 Wish文検出: '{sentence}'")
+        
+        # Wish動詞を特定
+        wish_verb = None
+        wish_token = None
+        for token in doc:
+            if token.text.lower() in ['wish', 'wishes', 'wished']:
+                wish_verb = token.text
+                wish_token = token
+                print(f"   Wish動詞: '{wish_verb}' (位置: {token.i})")
+                break
+        
+        if not wish_token:
+            return None
+        
+        # Wish文のccomp節を特定
+        ccomp_token = None
+        for child in wish_token.children:
+            if child.dep_ == 'ccomp':
+                ccomp_token = child
+                print(f"   Wish節検出: '{child.text}' (ccomp)")
+                break
+        
+        if not ccomp_token:
+            return None
+        
+        return {
+            'type': 'wish_clause',
+            'position': 'object',
+            'connector': None,  # 暗黙の[that]
+            'main_verb': wish_verb,
+            'wish_token': wish_token,
+            'ccomp_token': ccomp_token,
+            'clause_range': (ccomp_token.i, len(doc))
+        }
+    
+    def _detect_by_pos_analysis(self, doc, sentence: str) -> Optional[Dict[str, Any]]:
+        """
+        品詞分析による補完検出
+        
+        Args:
+            doc: spaCy解析結果
+            sentence: 処理対象文
+            
+        Returns:
+            Dict: 名詞節情報 or None
+        """
+        print(f"🔍 品詞分析による補完検出: '{sentence}'")
+        
+        # 現在の実装では追加検出なし
+        return None
+    
     def _determine_clause_type(self, connector: str) -> str:
         """
         接続詞から名詞節タイプを判定
@@ -317,7 +392,9 @@ class NounClauseHandler:
         
         print(f"📋 名詞節処理: type={clause_type}, position={position}")
         
-        if clause_type == 'that_clause':
+        if clause_type == 'wish_clause':
+            return self._process_wish_clause(doc, sentence, noun_clause_info)
+        elif clause_type == 'that_clause':
             return self._process_that_clause(doc, sentence, noun_clause_info)
         elif clause_type == 'wh_clause':
             return self._process_wh_clause(doc, sentence, noun_clause_info)
@@ -327,6 +404,83 @@ class NounClauseHandler:
             return self._process_if_clause(doc, sentence, noun_clause_info)
         else:
             return self._create_failure_result(sentence, f"未対応の節タイプ: {clause_type}")
+    
+    def _process_wish_clause(self, doc, sentence: str, noun_clause_info: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Wish文処理
+        
+        Args:
+            doc: spaCy解析結果
+            sentence: 処理対象文
+            noun_clause_info: Wish節情報
+            
+        Returns:
+            Dict: 処理結果
+        """
+        print(f"📋 Wish文処理開始")
+        
+        wish_token = noun_clause_info['wish_token']
+        ccomp_token = noun_clause_info['ccomp_token']
+        
+        # 主節構造（I wish）
+        main_subject = None
+        for token in doc:
+            if token.dep_ == 'nsubj' and token.head == wish_token:
+                main_subject = token.text
+                print(f"   主節主語: '{main_subject}'")
+                break
+        
+        # 従節は空のO1スロットとして表現
+        main_slots = {
+            'S': main_subject or '',
+            'V': wish_token.text,
+            'O1': ''  # Wish文の従節は暗黙的
+        }
+        
+        # 従節構造分析 (I were taller → sub-s: "I", sub-v: "were", sub-c1: "taller")
+        sub_slots = {'_parent_slot': 'O1'}
+        
+        # 従節内の要素を分析 - ccompの範囲全体をチェック
+        clause_start = ccomp_token.i
+        for i in range(clause_start, len(doc)):
+            token = doc[i]
+            
+            # 動詞検出: ccomp自体
+            if token == ccomp_token:
+                sub_slots['sub-v'] = token.text
+                print(f"      従節動詞検出: {token.text} (dep: {token.dep_})")
+                
+                # この動詞の主語を検出
+                for child in token.children:
+                    if child.dep_ == 'nsubj':
+                        sub_slots['sub-s'] = child.text
+                        print(f"      従節主語検出: {child.text} (dep: {child.dep_}, head: {child.head.text})")
+                
+                # この動詞の補語を検出
+                for child in token.children:
+                    if child.dep_ in ['acomp', 'attr', 'dobj']:
+                        if child.pos_ == 'ADJ':
+                            sub_slots['sub-c1'] = child.text
+                            print(f"      従節補語検出: {child.text} (dep: {child.dep_})")
+                        else:
+                            sub_slots['sub-o1'] = child.text
+                            print(f"      従節目的語検出: {child.text} (dep: {child.dep_})")
+        
+        print(f"   主節: {main_slots}")
+        print(f"   従節: {sub_slots}")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['noun_clause', 'basic_five_pattern'],
+            'primary_handler': 'noun_clause',
+            'metadata': {
+                'handler': 'wish_clause',
+                'clause_type': 'wish_clause',
+                'confidence': 0.95
+            }
+        }
     
     def _process_that_clause(self, doc, sentence: str, noun_clause_info: Dict[str, Any]) -> Dict[str, Any]:
         """

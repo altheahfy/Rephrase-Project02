@@ -134,10 +134,8 @@ class ConditionalHandler:
             if re.search(pattern, text, re.IGNORECASE):
                 detected_patterns.append(pattern_name)
         
-        # Wish構文の検出
-        for pattern_name, pattern in self.wish_patterns.items():
-            if re.search(pattern, text, re.IGNORECASE):
-                detected_patterns.append(f"wish_{pattern_name}")
+        # 🚫 Wish構文は除外 - 名詞節として処理される
+        # Wish文は "I wish [that] I were rich" 構造で名詞節ハンドラーが適切
         
         return detected_patterns
     

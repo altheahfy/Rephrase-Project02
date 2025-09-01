@@ -1,0 +1,64 @@
+{
+  "case_142": {
+    "sentence": "I wish I were taller.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "were",
+        "sub-c1": "taller",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I were taller.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "were",
+        "sub-s": "I",
+        "sub-c1": "taller"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "taller",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  }
+}

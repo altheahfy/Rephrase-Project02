@@ -18,62 +18,33 @@
     },
     "actual": {
       "success": true,
-      "text": "If it rains tomorrow, I will stay home.",
       "main_slots": {
-        "S": "it",
-        "Aux": "will",
-        "V": "rains",
+        "S": "I",
+        "V": "stay",
+        "M2": "home",
         "M1": "",
-        "M2": "home"
+        "Aux": "will"
       },
       "sub_slots": {
         "sub-s": "If it",
         "sub-v": "rains",
         "sub-m2": "tomorrow",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "will",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If it",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "rains",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "tomorrow",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "will",
-        "3": "it",
-        "5": "rains",
-        "7": "home"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If it rains tomorrow,",
+        "main_clause": "I will stay home.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_132": {
     "sentence": "If you study hard, you can pass the exam.",
@@ -94,64 +65,33 @@
     },
     "actual": {
       "success": true,
-      "text": "If you study hard, you can pass the exam.",
       "main_slots": {
         "S": "you",
-        "Aux": "can",
-        "V": "study",
+        "V": "pass",
         "O1": "the exam",
-        "M1": "",
-        "M2": "hard"
+        "M2": "",
+        "Aux": "can"
       },
       "sub_slots": {
         "sub-s": "If you",
         "sub-v": "study",
-        "sub-m2": "hard can",
+        "sub-m2": "hard",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "can",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If you",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "study",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "hard can",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "can",
-        "3": "you",
-        "5": "study",
-        "6": "the exam",
-        "7": "hard"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If you study hard,",
+        "main_clause": "you can pass the exam.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_133": {
     "sentence": "If I were rich, I would travel the world.",
@@ -172,62 +112,33 @@
     },
     "actual": {
       "success": true,
-      "text": "If I were rich, I would travel the world.",
       "main_slots": {
         "S": "I",
-        "Aux": "would",
         "V": "travel",
         "O1": "the world",
-        "C1": "rich",
-        "M1": "",
-        "M2": ""
+        "M2": "",
+        "Aux": "would"
       },
       "sub_slots": {
-        "sub-s": "If i",
-        "sub-v": "",
-        "sub-m2": "rich",
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "would",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If i",
-          "display_order": 1
-        },
-        "sub-m2": {
-          "value": "rich",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would",
-        "3": "I",
-        "8": "rich",
-        "5": "travel",
-        "6": "the world",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I were rich,",
+        "main_clause": "I would travel the world.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_134": {
     "sentence": "If she had time, she could help us.",
@@ -248,64 +159,33 @@
     },
     "actual": {
       "success": true,
-      "text": "If she had time, she could help us.",
       "main_slots": {
         "S": "she",
-        "Aux": "could",
-        "V": "had",
-        "O1": "time",
-        "M1": "",
-        "M2": ""
+        "V": "help",
+        "O1": "us",
+        "M2": "",
+        "Aux": "could"
       },
       "sub_slots": {
         "sub-s": "If she",
         "sub-v": "had",
-        "sub-m2": "time",
+        "sub-o1": "time",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "could",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If she",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "had",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "time",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "could",
-        "3": "she",
-        "5": "had",
-        "6": "time",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "If she had time,",
+        "main_clause": "she could help us.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_135": {
     "sentence": "If I had studied harder, I would have passed the test.",
@@ -327,64 +207,34 @@
     },
     "actual": {
       "success": true,
-      "text": "If I had studied harder, I would have passed the test.",
       "main_slots": {
         "S": "I",
-        "Aux": "would have",
-        "V": "studied",
+        "V": "passed",
         "O1": "the test",
-        "M1": "",
-        "M2": "harder"
+        "M2": "",
+        "Aux": "would have"
       },
       "sub_slots": {
-        "sub-s": "If i",
+        "sub-s": "If I",
         "sub-v": "studied",
-        "sub-m2": "harder have",
+        "sub-aux": "had",
+        "sub-m2": "harder",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If i",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "studied",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "harder have",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would have",
-        "3": "I",
-        "5": "studied",
-        "6": "the test",
-        "7": "harder"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had studied harder,",
+        "main_clause": "I would have passed the test.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_136": {
     "sentence": "If they had arrived earlier, they could have seen the show.",
@@ -406,64 +256,34 @@
     },
     "actual": {
       "success": true,
-      "text": "If they had arrived earlier, they could have seen the show.",
       "main_slots": {
         "S": "they",
-        "Aux": "could have",
-        "V": "arrived",
+        "V": "seen",
         "O1": "the show",
-        "M1": "",
-        "M2": "earlier"
+        "M2": "",
+        "Aux": "could have"
       },
       "sub_slots": {
         "sub-s": "If they",
-        "sub-v": "have",
-        "sub-m2": "arrived earlier",
+        "sub-v": "arrived",
+        "sub-aux": "had",
+        "sub-m2": "earlier",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "could have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If they",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "have",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "arrived earlier",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "could have",
-        "3": "they",
-        "5": "arrived",
-        "6": "the show",
-        "7": "earlier"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If they had arrived earlier,",
+        "main_clause": "they could have seen the show.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_137": {
     "sentence": "If I had been born rich, I would be happy now.",
@@ -486,64 +306,35 @@
     },
     "actual": {
       "success": true,
-      "text": "If I had been born rich, I would be happy now.",
       "main_slots": {
         "S": "I",
-        "Aux": "would be",
-        "V": "born",
+        "V": "be",
         "C1": "happy",
+        "M2": "now",
         "M1": "",
-        "M2": "now"
+        "Aux": "would"
       },
       "sub_slots": {
-        "sub-s": "If i",
+        "sub-s": "If I",
         "sub-v": "born",
-        "sub-m2": "been rich",
-        "_parent_slot": "M2"
+        "sub-c1": "rich",
+        "sub-aux": "had been",
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would be",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If i",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "born",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "been rich",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would be",
-        "5": "born",
-        "3": "I",
-        "8": "happy",
-        "7": "now"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had been born rich",
+        "main_clause": "I would be happy now.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_138": {
     "sentence": "If you have finished your work, you may leave early.",
@@ -565,60 +356,34 @@
     },
     "actual": {
       "success": true,
-      "text": "If you have finished your work, you may leave early.",
       "main_slots": {
         "S": "you",
-        "Aux": "have",
-        "V": "finished",
-        "O1": "your work",
+        "V": "leave",
+        "M2": "early",
         "M1": "",
-        "M2": "early"
+        "Aux": "may"
       },
       "sub_slots": {
         "sub-s": "If you",
-        "sub-v": "",
-        "sub-m2": "finished your work",
-        "_parent_slot": "M2"
+        "sub-v": "finished",
+        "sub-o1": "your work",
+        "sub-aux": "have",
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "perfect_auxiliary",
-          "auxiliary": "have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "perfect"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If you",
-          "display_order": 1
-        },
-        "sub-m2": {
-          "value": "finished your work",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "have",
-        "3": "you",
-        "5": "finished",
-        "6": "your work",
-        "7": "early"
+        "handler": "conditional_human_grammar",
+        "if_clause": "If you have finished your work,",
+        "main_clause": "you may leave early.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_139": {
     "sentence": "Were I you, I would accept the offer.",
@@ -639,14 +404,12 @@
     },
     "actual": {
       "success": true,
-      "text": "Were I you, I would accept the offer.",
       "main_slots": {
         "S": "I",
-        "Aux": "would",
         "V": "accept",
         "O1": "the offer",
-        "M1": "",
-        "M2": ""
+        "M2": "",
+        "Aux": "would"
       },
       "sub_slots": {
         "sub-v": "Were",
@@ -654,49 +417,20 @@
         "sub-c1": "you",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "would",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "Were",
-          "display_order": 1
-        },
-        "sub-s": {
-          "value": "I",
-          "display_order": 2
-        },
-        "sub-c1": {
-          "value": "you",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would",
-        "3": "I",
-        "5": "accept",
-        "6": "the offer",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "Were I you",
+        "main_clause": "I would accept the offer.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_140": {
     "sentence": "Had she known the truth, she would have acted differently.",
@@ -718,69 +452,34 @@
     },
     "actual": {
       "success": true,
-      "text": "Had she known the truth, she would have acted differently.",
       "main_slots": {
         "S": "she",
-        "Aux": "would have",
-        "V": "known",
-        "O1": "the truth",
+        "V": "acted",
+        "M2": "differently",
         "M1": "",
-        "M2": "differently"
+        "Aux": "would have"
       },
       "sub_slots": {
         "sub-aux": "Had",
         "sub-s": "she",
         "sub-v": "known",
-        "sub-o1": "truth",
+        "sub-o1": "the truth",
         "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-aux": {
-          "value": "Had",
-          "display_order": 1
-        },
-        "sub-s": {
-          "value": "she",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "known",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "truth",
-          "display_order": 4
-        },
-        "_parent_slot": "M1"
-      },
-      "ordered_slots": {
-        "4": "would have",
-        "3": "she",
-        "5": "known",
-        "6": "the truth",
-        "7": "differently"
+        "handler": "conditional_human_grammar",
+        "if_clause": "Had she known the truth",
+        "main_clause": "she would have acted differently.",
+        "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_141": {
     "sentence": "Should you need help, please call me.",
@@ -800,68 +499,8 @@
       }
     },
     "actual": {
-      "success": true,
-      "text": "Should you need help, please call me.",
-      "main_slots": {
-        "S": "you",
-        "Aux": "Should",
-        "V": "need",
-        "O1": "help",
-        "M1": "",
-        "M2": ""
-      },
-      "sub_slots": {
-        "sub-aux": "Should",
-        "sub-s": "you",
-        "sub-v": "need",
-        "sub-o1": "help me",
-        "_parent_slot": "M2"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "Should",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-aux": {
-          "value": "Should",
-          "display_order": 1
-        },
-        "sub-s": {
-          "value": "you",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "need",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "help me",
-          "display_order": 4
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "Should",
-        "3": "you",
-        "5": "need",
-        "6": "help",
-        "7": ""
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -882,47 +521,28 @@
     },
     "actual": {
       "success": true,
-      "text": "I wish I were taller.",
       "main_slots": {
         "S": "I",
-        "V": "wish",
-        "O1": ""
+        "V": "were",
+        "C1": "taller",
+        "M2": ""
       },
       "sub_slots": {
-        "sub-s": "I",
-        "sub-aux": "were",
-        "sub-c1": "taller",
-        "_parent_slot": "O1"
+        "sub-s": "If I",
+        "sub-v": "wish",
+        "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb"
-        ],
-        "conditional_info": {},
-        "modal_info": {},
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "I",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "were",
-          "display_order": 2
-        },
-        "sub-c1": {
-          "value": "taller",
-          "display_order": 3
-        },
-        "_parent_slot": "O1"
-      },
-      "ordered_slots": {
-        "3": "I",
-        "5": "wish",
-        "6": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "I wish",
+        "main_clause": "I were taller.",
+        "confidence": 0.95
       }
     },
     "match": false
@@ -943,49 +563,8 @@
       }
     },
     "actual": {
-      "success": true,
-      "text": "I wish I had more time.",
-      "main_slots": {
-        "S": "I",
-        "V": "wish",
-        "O1": ""
-      },
-      "sub_slots": {
-        "sub-s": "I",
-        "sub-v": "had",
-        "sub-o1": "time",
-        "_parent_slot": "O1"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb"
-        ],
-        "conditional_info": {},
-        "modal_info": {},
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "I",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "had",
-          "display_order": 2
-        },
-        "sub-o1": {
-          "value": "time",
-          "display_order": 3
-        },
-        "_parent_slot": "O1"
-      },
-      "ordered_slots": {
-        "3": "I",
-        "5": "wish",
-        "6": ""
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1006,67 +585,8 @@
       }
     },
     "actual": {
-      "success": true,
-      "text": "I wish I had studied abroad.",
-      "main_slots": {
-        "S": "I",
-        "Aux": "had",
-        "V": "wish",
-        "O1": "",
-        "M2": "abroad"
-      },
-      "sub_slots": {
-        "sub-s": "I",
-        "sub-aux": "had",
-        "sub-v": "studied",
-        "sub-m2": "abroad",
-        "_parent_slot": "O1"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "perfect_auxiliary",
-          "auxiliary": "had",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "perfect"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "I",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "had",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "studied",
-          "display_order": 3
-        },
-        "sub-m2": {
-          "value": "abroad",
-          "display_order": 4
-        },
-        "_parent_slot": "O1"
-      },
-      "ordered_slots": {
-        "4": "had",
-        "3": "I",
-        "5": "wish",
-        "7": "abroad",
-        "6": ""
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1087,45 +607,28 @@
     },
     "actual": {
       "success": true,
-      "text": "He talks as if he were the boss.",
       "main_slots": {
         "S": "He",
-        "Aux": "",
         "V": "talks",
-        "M1": "",
+        "O1": "the boss",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "as if he",
-        "sub-aux": "were",
+        "sub-s": "If he",
+        "sub-v": "were",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb"
-        ],
-        "conditional_info": {},
-        "modal_info": {},
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "as if he",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "were",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "3": "He",
-        "4": "",
-        "5": "talks",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "if he were",
+        "main_clause": "the boss.",
+        "confidence": 0.95
       }
     },
     "match": false
@@ -1148,66 +651,30 @@
     },
     "actual": {
       "success": true,
-      "text": "She looked as though she had seen a ghost.",
       "main_slots": {
-        "S": "She",
-        "Aux": "had",
-        "V": "looked",
+        "S": "she",
+        "V": "seen",
         "O1": "a ghost",
-        "M1": "",
-        "M2": ""
+        "M2": "",
+        "Aux": "had"
       },
       "sub_slots": {
-        "sub-s": "as though she",
-        "sub-aux": "had",
-        "sub-v": "seen",
-        "sub-o1": "ghost",
+        "sub-s": "If She",
+        "sub-v": "looked",
+        "sub-m2": "though",
         "_parent_slot": "M2"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "perfect_auxiliary",
-          "auxiliary": "had",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "perfect"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "as though she",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "had",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "seen",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "ghost",
-          "display_order": 4
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "had",
-        "3": "She",
-        "5": "looked",
-        "6": "a ghost",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "She looked as though",
+        "main_clause": "she had seen a ghost.",
+        "confidence": 0.95
       }
     },
     "match": false
@@ -1224,41 +691,8 @@
       "sub_slots": {}
     },
     "actual": {
-      "success": true,
-      "text": "Without your help, I would have failed.",
-      "main_slots": {
-        "S": "I",
-        "Aux": "would have",
-        "V": "failed",
-        "M1": "",
-        "M2": "Without your help"
-      },
-      "sub_slots": {},
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_slots": {
-        "4": "would have",
-        "3": "I",
-        "5": "failed",
-        "7": "Without your help"
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1275,43 +709,8 @@
       "sub_slots": {}
     },
     "actual": {
-      "success": true,
-      "text": "But for the rain, we could have had a picnic.",
-      "main_slots": {
-        "S": "we",
-        "Aux": "could have",
-        "V": "had",
-        "O1": "a picnic",
-        "M1": "",
-        "M2": "for the rain"
-      },
-      "sub_slots": {},
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "could have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_slots": {
-        "4": "could have",
-        "3": "we",
-        "5": "had",
-        "6": "a picnic",
-        "7": "for the rain"
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1333,66 +732,29 @@
     },
     "actual": {
       "success": true,
-      "text": "Unless you hurry, you will miss the train.",
       "main_slots": {
         "S": "you",
-        "Aux": "will",
         "V": "hurry",
-        "O1": "the train",
-        "M1": "",
-        "M2": ""
+        "M1": ""
       },
       "sub_slots": {
-        "sub-s": "Unless you",
+        "sub-s": "If you",
+        "sub-v": "miss",
+        "sub-o1": "the train",
         "sub-aux": "will",
-        "sub-v": "hurry",
-        "sub-o1": "train",
-        "_parent_slot": "M2"
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "will",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "Unless you",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "will",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "hurry",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "train",
-          "display_order": 4
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "will",
-        "3": "you",
-        "5": "hurry",
-        "6": "the train",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "you will miss the train.",
+        "main_clause": "Unless you hurry",
+        "confidence": 0.95
       }
     },
     "match": false
@@ -1472,63 +834,8 @@
       }
     },
     "actual": {
-      "success": true,
-      "text": "Imagine if we could fly, how exciting it would be!",
-      "main_slots": {
-        "S": "we",
-        "Aux": "would be",
-        "V": "Imagine",
-        "C1": "how exciting",
-        "M1": "",
-        "M2": ""
-      },
-      "sub_slots": {
-        "sub-s": "If we",
-        "sub-v": "fly",
-        "sub-m2": "how exciting be",
-        "_parent_slot": "M2"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would be",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If we",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "fly",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "how exciting be",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would be",
-        "5": "Imagine",
-        "3": "we",
-        "8": "how exciting",
-        "7": ""
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1550,70 +857,8 @@
       }
     },
     "actual": {
-      "success": true,
-      "text": "Provided that you finish on time, you can take a break.",
-      "main_slots": {
-        "S": "you",
-        "Aux": "can",
-        "V": "Provided",
-        "O1": "a break",
-        "M1": "",
-        "M2": "Provided that you finish on time",
-        "M3": "on time"
-      },
-      "sub_slots": {
-        "sub-s": "Provided that you",
-        "sub-aux": "can",
-        "sub-v": "Provided",
-        "sub-o1": "time break",
-        "_parent_slot": "M2"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "can",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "Provided that you",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "can",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "Provided",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "time break",
-          "display_order": 4
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "can",
-        "5": "Provided",
-        "3": "you",
-        "6": "a break",
-        "7": "Provided that you finish on time",
-        "9": "on time"
-      }
+      "success": false,
+      "error": "Main clause decomposition failed"
     },
     "match": false
   },
@@ -1696,59 +941,31 @@
     },
     "actual": {
       "success": true,
-      "text": "If I had known you were coming, I would have prepared dinner.",
       "main_slots": {
         "S": "I",
-        "Aux": "would have",
-        "V": "known",
+        "V": "prepared",
+        "O1": "dinner",
         "M1": "",
-        "M2": ""
+        "Aux": "would have"
       },
       "sub_slots": {
-        "sub-s": "If i",
+        "sub-s": "If I",
         "sub-v": "known",
-        "sub-m2": "you were",
-        "_parent_slot": "M2"
+        "sub-o1": "you",
+        "sub-aux": "had",
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "complex",
-          "auxiliary": "would have",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "complex_modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If i",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "known",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "you were",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "would have",
-        "3": "I",
-        "5": "known",
-        "7": ""
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had known you were coming",
+        "main_clause": "I would have prepared dinner.",
+        "confidence": 0.95
       }
     },
     "match": false
@@ -1772,61 +989,30 @@
     },
     "actual": {
       "success": true,
-      "text": "Even if it costs a lot, I will buy that house.",
       "main_slots": {
-        "S": "it",
-        "Aux": "will",
-        "V": "costs",
-        "O1": "a lot",
+        "S": "I",
+        "V": "buy",
+        "O1": "that house",
         "M1": "",
-        "M2": "Even"
+        "Aux": "will"
       },
       "sub_slots": {
         "sub-s": "If it",
         "sub-v": "costs",
-        "sub-m2": "a lot buy that house",
-        "_parent_slot": "M2"
+        "sub-o1": "a lot",
+        "_parent_slot": "M1"
       },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "conditional",
-        "collaboration": [
-          "adverb",
-          "conditional"
-        ],
-        "conditional_info": {},
-        "modal_info": {
-          "has_modal": true,
-          "modal_type": "modal_verb",
-          "auxiliary": "will",
-          "main_verb": null,
-          "is_question": false,
-          "is_negative": false,
-          "structure_type": "modal"
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If it",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "costs",
-          "display_order": 2
-        },
-        "sub-m2": {
-          "value": "a lot buy that house",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "will",
-        "3": "it",
-        "5": "costs",
-        "6": "a lot",
-        "7": "Even"
+        "handler": "conditional_human_grammar",
+        "if_clause": "if it costs a lot,",
+        "main_clause": "I will buy that house.",
+        "confidence": 0.95
       }
     },
     "match": false
