@@ -67,6 +67,36 @@ class NounClauseHandler:
             'if_clause': ['if']
         }
     
+    def _extract_full_phrase(self, token, doc):
+        """
+        Extract complete phrase including modifiers for a token
+        
+        Args:
+            token: Main token
+            doc: spaCy parsed document
+            
+        Returns:
+            str: Complete phrase including modifiers
+        """
+        # List to collect phrase tokens
+        phrase_tokens = []
+        
+        # Collect children of main token (modifiers, determiners, etc.)
+        for child in token.children:
+            if child.dep_ in ['amod', 'det', 'compound', 'nummod']:
+                phrase_tokens.append((child.i, child.text))
+        
+        # Add main token
+        phrase_tokens.append((token.i, token.text))
+        
+        # Sort by index to maintain natural word order
+        phrase_tokens.sort(key=lambda x: x[0])
+        
+        # Build phrase
+        phrase = ' '.join([text for _, text in phrase_tokens])
+        
+        return phrase
+    
     def process(self, text: str, original_text: str = None) -> Dict[str, Any]:
         """
         名詞節処理メイン
@@ -463,8 +493,10 @@ class NounClauseHandler:
                             sub_slots['sub-c1'] = child.text
                             print(f"      従節補語検出: {child.text} (dep: {child.dep_})")
                         else:
-                            sub_slots['sub-o1'] = child.text
-                            print(f"      従節目的語検出: {child.text} (dep: {child.dep_})")
+                            # Extract full phrase including modifiers for objects
+                            obj_phrase = self._extract_full_phrase(child, doc)
+                            sub_slots['sub-o1'] = obj_phrase
+                            print(f"      従節目的語検出: {obj_phrase} (dep: {child.dep_})")
         
         print(f"   主節: {main_slots}")
         print(f"   従節: {sub_slots}")
