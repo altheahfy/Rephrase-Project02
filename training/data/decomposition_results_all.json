@@ -3456,7 +3456,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "1": "What",
+        "2": "What",
         "3": "did",
         "4": "he",
         "5": "tell",
@@ -3597,7 +3597,7 @@
         "confidence": 0.75
       },
       "ordered_slots": {
-        "2": "Where",
+        "1": "Where",
         "3": "did",
         "4": "you",
         "5": "tell",
@@ -6489,16 +6489,15 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "will",
         "V": "stay",
-        "M2": "home",
-        "M1": "",
-        "Aux": "will"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If it",
         "sub-v": "rains",
         "sub-m2": "tomorrow",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6511,9 +6510,30 @@
         "if_clause": "If it rains tomorrow,",
         "main_clause": "I will stay home.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If it",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "rains",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "tomorrow",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "stay",
+        "7": "",
+        "4": "will"
       }
     },
-    "match": true
+    "match": false
   },
   "case_132": {
     "sentence": "If you study hard, you can pass the exam.",
@@ -6536,16 +6556,16 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "can",
         "V": "pass",
         "O1": "the exam",
-        "M1": "",
-        "Aux": "can"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If you",
         "sub-v": "study",
         "sub-m2": "hard",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6558,19 +6578,41 @@
         "if_clause": "If you study hard,",
         "main_clause": "you can pass the exam.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "study",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "hard",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "pass",
+        "6": "the exam",
+        "7": "",
+        "4": "can"
       }
     },
-    "match": false
+    "match": true
   },
   "case_133": {
-    "sentence": "If I were rich, I would travel the world.",
+    "sentence": "If I were rich, I would travel around the world.",
     "expected": {
       "main_slots": {
-        "M2": "",
         "S": "I",
         "Aux": "would",
         "V": "travel",
-        "O1": "the world"
+        "M2": "",
+        "M3": "around the world"
       },
       "sub_slots": {
         "sub-s": "If I",
@@ -6583,16 +6625,16 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "travel",
         "O1": "the world",
-        "M1": "",
-        "Aux": "would"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "were",
         "sub-c1": "rich",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6603,8 +6645,30 @@
       "metadata": {
         "handler": "conditional_human_grammar",
         "if_clause": "If I were rich,",
-        "main_clause": "I would travel the world.",
+        "main_clause": "I would travel around the world.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "travel",
+        "6": "the world",
+        "7": "",
+        "4": "would"
       }
     },
     "match": false
@@ -6630,16 +6694,16 @@
       "success": true,
       "main_slots": {
         "S": "she",
+        "Aux": "could",
         "V": "help",
         "O1": "us",
-        "M1": "",
-        "Aux": "could"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If she",
         "sub-v": "had",
         "sub-o1": "time",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6652,9 +6716,31 @@
         "if_clause": "If she had time,",
         "main_clause": "she could help us.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "had",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "time",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "help",
+        "6": "us",
+        "7": "",
+        "4": "could"
       }
     },
-    "match": false
+    "match": true
   },
   "case_135": {
     "sentence": "If I had studied harder, I would have passed the test.",
@@ -6678,17 +6764,17 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would have",
         "V": "passed",
         "O1": "the test",
-        "M1": "",
-        "Aux": "would have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "studied",
         "sub-aux": "had",
         "sub-m2": "harder",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6701,9 +6787,35 @@
         "if_clause": "If I had studied harder,",
         "main_clause": "I would have passed the test.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "studied",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "harder",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "passed",
+        "6": "the test",
+        "7": "",
+        "4": "would have"
       }
     },
-    "match": false
+    "match": true
   },
   "case_136": {
     "sentence": "If they had arrived earlier, they could have seen the show.",
@@ -6727,17 +6839,17 @@
       "success": true,
       "main_slots": {
         "S": "they",
+        "Aux": "could have",
         "V": "seen",
         "O1": "the show",
-        "M1": "",
-        "Aux": "could have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If they",
         "sub-v": "arrived",
         "sub-aux": "had",
         "sub-m2": "earlier",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6750,9 +6862,35 @@
         "if_clause": "If they had arrived earlier,",
         "main_clause": "they could have seen the show.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "arrived",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "earlier",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "they",
+        "5": "seen",
+        "6": "the show",
+        "7": "",
+        "4": "could have"
       }
     },
-    "match": false
+    "match": true
   },
   "case_137": {
     "sentence": "If I had been born rich, I would be happy now.",
@@ -6777,18 +6915,17 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "be",
         "C1": "happy",
-        "M2": "now",
-        "M1": "",
-        "Aux": "would"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "born",
         "sub-c1": "rich",
         "sub-aux": "had been",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6801,9 +6938,35 @@
         "if_clause": "If I had been born rich",
         "main_clause": "I would be happy now.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "born",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "had been",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "be",
+        "8": "happy",
+        "7": "",
+        "4": "would"
       }
     },
-    "match": true
+    "match": false
   },
   "case_138": {
     "sentence": "If you have finished your work, you may leave early.",
@@ -6827,17 +6990,16 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "may",
         "V": "leave",
-        "M2": "early",
-        "M1": "",
-        "Aux": "may"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If you",
         "sub-v": "finished",
         "sub-o1": "your work",
         "sub-aux": "have",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6850,9 +7012,34 @@
         "if_clause": "If you have finished your work,",
         "main_clause": "you may leave early.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "finished",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "your work",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "have",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "leave",
+        "7": "",
+        "4": "may"
       }
     },
-    "match": true
+    "match": false
   },
   "case_139": {
     "sentence": "Were I you, I would accept the offer.",
@@ -6875,16 +7062,16 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would",
         "V": "accept",
         "O1": "the offer",
-        "M1": "",
-        "Aux": "would"
+        "M2": ""
       },
       "sub_slots": {
         "sub-v": "Were",
         "sub-s": "I",
         "sub-c1": "you",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6897,9 +7084,31 @@
         "if_clause": "Were I you",
         "main_clause": "I would accept the offer.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "Were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "you",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "accept",
+        "6": "the offer",
+        "7": "",
+        "4": "would"
       }
     },
-    "match": false
+    "match": true
   },
   "case_140": {
     "sentence": "Had she known the truth, she would have acted differently.",
@@ -6923,17 +7132,16 @@
       "success": true,
       "main_slots": {
         "S": "she",
+        "Aux": "would have",
         "V": "acted",
-        "M2": "differently",
-        "M1": "",
-        "Aux": "would have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-aux": "Had",
         "sub-s": "she",
         "sub-v": "known",
         "sub-o1": "the truth",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -6946,9 +7154,34 @@
         "if_clause": "Had she known the truth",
         "main_clause": "she would have acted differently.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-aux": {
+          "value": "Had",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "she",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "known",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "the truth",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "acted",
+        "7": "",
+        "4": "would have"
       }
     },
-    "match": true
+    "match": false
   },
   "case_141": {
     "sentence": "Should you need help, please call me.",
@@ -6970,10 +7203,10 @@
     "actual": {
       "success": true,
       "main_slots": {
-        "V": "call",
-        "M1": "please",
-        "O1": "me",
         "S": "(you)",
+        "V": "call",
+        "O1": "me",
+        "M1": "please",
         "M2": ""
       },
       "sub_slots": {
@@ -6992,6 +7225,27 @@
         "if_clause": "Should you need help",
         "main_clause": "please call me.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "need",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "Should",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "5": "call",
+        "6": "me",
+        "3": "(you)",
+        "7": ""
       }
     },
     "match": false
@@ -7210,12 +7464,12 @@
       "success": true,
       "main_slots": {
         "S": "boss",
-        "M1": ""
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If he",
         "sub-v": "were",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "generic_fallback",
@@ -7227,6 +7481,21 @@
         "if_clause": "if he were",
         "main_clause": "the boss.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "boss",
+        "7": ""
       }
     },
     "match": false
@@ -7251,16 +7520,16 @@
       "success": true,
       "main_slots": {
         "S": "she",
+        "Aux": "had",
         "V": "seen",
         "O1": "a ghost",
-        "M1": "",
-        "Aux": "had"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If She",
         "sub-v": "looked",
         "sub-m2": "though",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7273,6 +7542,28 @@
         "if_clause": "She looked as though",
         "main_clause": "she had seen a ghost.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If She",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "looked",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "though",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "seen",
+        "6": "a ghost",
+        "7": "",
+        "4": "had"
       }
     },
     "match": false
@@ -7292,13 +7583,13 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would have",
         "V": "failed",
-        "M1": "",
-        "Aux": "would have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-m2": "Without your help",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7311,6 +7602,19 @@
         "if_clause": "Without your help",
         "main_clause": "I would have failed.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "Without your help",
+          "display_order": 1
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "failed",
+        "7": "",
+        "4": "would have"
       }
     },
     "match": false
@@ -7331,14 +7635,14 @@
       "success": true,
       "main_slots": {
         "S": "we",
+        "Aux": "could have",
         "V": "had",
         "O1": "a picnic",
-        "M1": "",
-        "Aux": "could have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-m2": "But for the rain",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7351,6 +7655,20 @@
         "if_clause": "But for the rain",
         "main_clause": "we could have had a picnic.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "But for the rain",
+          "display_order": 1
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "we",
+        "5": "had",
+        "6": "a picnic",
+        "7": "",
+        "4": "could have"
       }
     },
     "match": false
@@ -7375,15 +7693,15 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "will",
         "V": "miss",
         "O1": "the train",
-        "M1": "",
-        "Aux": "will"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If you",
         "sub-v": "hurry",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7396,6 +7714,24 @@
         "if_clause": "Unless you hurry",
         "main_clause": "you will miss the train.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "hurry",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "miss",
+        "6": "the train",
+        "7": "",
+        "4": "will"
       }
     },
     "match": false
@@ -7478,15 +7814,15 @@
       "success": true,
       "main_slots": {
         "S": "exciting it",
+        "Aux": "would",
         "V": "be",
-        "M1": "",
-        "Aux": "would"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If we",
         "sub-v": "fly",
         "sub-aux": "could",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7499,6 +7835,27 @@
         "if_clause": "if we could fly,",
         "main_clause": "how exciting it would be!",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "fly",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "could",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "exciting it",
+        "5": "be",
+        "7": "",
+        "4": "would"
       }
     },
     "match": false
@@ -7524,15 +7881,15 @@
       "success": true,
       "main_slots": {
         "S": "you",
+        "Aux": "can",
         "V": "take",
         "O1": "a break",
-        "M1": "",
-        "Aux": "can"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If (you)",
         "sub-v": "Provided",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7545,6 +7902,24 @@
         "if_clause": "Provided that you finish on time",
         "main_clause": "you can take a break.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If (you)",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "Provided",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "take",
+        "6": "a break",
+        "7": "",
+        "4": "can"
       }
     },
     "match": false
@@ -7630,17 +8005,17 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "would have",
         "V": "prepared",
         "O1": "dinner",
-        "M1": "",
-        "Aux": "would have"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "known",
         "sub-o1": "you",
         "sub-aux": "had",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7653,6 +8028,32 @@
         "if_clause": "If I had known you were coming",
         "main_clause": "I would have prepared dinner.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "known",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "you",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "prepared",
+        "6": "dinner",
+        "7": "",
+        "4": "would have"
       }
     },
     "match": false
@@ -7678,16 +8079,16 @@
       "success": true,
       "main_slots": {
         "S": "I",
+        "Aux": "will",
         "V": "buy",
         "O1": "that house",
-        "M1": "",
-        "Aux": "will"
+        "M2": ""
       },
       "sub_slots": {
         "sub-s": "If it",
         "sub-v": "costs",
         "sub-o1": "a lot",
-        "_parent_slot": "M1"
+        "_parent_slot": "M2"
       },
       "collaboration": [
         "adverb",
@@ -7700,6 +8101,28 @@
         "if_clause": "if it costs a lot,",
         "main_clause": "I will buy that house.",
         "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If it",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "costs",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "a lot",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "buy",
+        "6": "that house",
+        "7": "",
+        "4": "will"
       }
     },
     "match": false
