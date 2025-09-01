@@ -274,10 +274,14 @@ class NounClauseHandler:
             Dict: 名詞節情報 or None
         """
         print(f"🔍 品詞分析補完検出: '{sentence}'")
+        print(f"   DEBUG: doc length = {len(doc)}")
+        print(f"   DEBUG: doc type = {type(doc)}")
         
         # 簡単なパターンマッチング
         for i, token in enumerate(doc):
+            print(f"   DEBUG: Token {i}: '{token.text}' (pos={token.pos_})")
             if token.text.lower() in ['that', 'whether', 'if']:
+                print(f"   DEBUG: Found connector '{token.text.lower()}' at position {i}")
                 # 前置詞句内のif節検出
                 if i > 0 and doc[i-1].pos_ == 'ADP':  # 前置詞
                     print(f"   前置詞+名詞節検出: '{doc[i-1].text} {token.text}' (品詞使用: 単純パターンのため)")
@@ -288,7 +292,10 @@ class NounClauseHandler:
                         'preposition': doc[i-1].text,
                         'clause_range': (i, len(doc))
                     }
+                else:
+                    print(f"   DEBUG: Condition failed - i={i}, prev_pos={doc[i-1].pos_ if i > 0 else 'N/A'}")
         
+        print(f"   DEBUG: No match found, returning None")
         return None
     
     def _detect_wish_clause(self, doc, sentence: str) -> Optional[Dict[str, Any]]:
@@ -344,22 +351,6 @@ class NounClauseHandler:
             'ccomp_token': ccomp_token,
             'clause_range': (ccomp_token.i, len(doc))
         }
-    
-    def _detect_by_pos_analysis(self, doc, sentence: str) -> Optional[Dict[str, Any]]:
-        """
-        品詞分析による補完検出
-        
-        Args:
-            doc: spaCy解析結果
-            sentence: 処理対象文
-            
-        Returns:
-            Dict: 名詞節情報 or None
-        """
-        print(f"🔍 品詞分析による補完検出: '{sentence}'")
-        
-        # 現在の実装では追加検出なし
-        return None
     
     def _determine_clause_type(self, connector: str) -> str:
         """
