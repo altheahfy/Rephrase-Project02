@@ -1380,18 +1380,32 @@ class CentralController:
             
             # ①If sv, sv.パターンを識別し分離
             if_clause, main_clause = self._split_conditional_sentence(text)
-            if not if_clause or not main_clause:
+            
+            # "As if"のような非条件文の場合
+            if not if_clause or if_clause == "":
+                print(f"📝 非条件文として処理: '{text}'")
+                # 全体を主節として基本分解
+                main_basic_result = self._process_basic_decomposition(text)
+                if main_basic_result.get('success', False):
+                    return {
+                        'success': True,
+                        'main_slots': main_basic_result.get('main_slots', {}),
+                        'sub_slots': main_basic_result.get('sub_slots', {}),
+                        'collaboration': ['non_conditional'],
+                        'primary_handler': 'non_conditional'
+                    }
+                else:
+                    return {'success': False, 'error': 'Non-conditional sentence decomposition failed'}
+            
+            if not main_clause:
                 print(f"❌ 仮定法パターンの分離に失敗")
                 return {'success': False, 'error': 'Failed to split conditional pattern'}
             
             print(f"📝 If節: '{if_clause}'")
             print(f"📝 主節: '{main_clause}'")
             
-            # ②主節の基本分解（if節を副詞に置換）
-            simplified_main = self._replace_if_clause_with_adverb(text, if_clause)
-            print(f"📝 簡略化主節: '{simplified_main}'")
-            
-            main_basic_result = self._process_basic_decomposition(simplified_main)
+            # ②主節の基本分解（主節をそのまま処理）
+            main_basic_result = self._process_basic_decomposition(main_clause)
             print(f"📝 主節基本分解: {main_basic_result}")
             
             # 主節の助動詞処理も実行
@@ -1663,13 +1677,26 @@ class CentralController:
         """品詞分析による補完検出（名詞節ハンドラー方式）"""
         print(f"🔍 品詞分析による補完検出: '{text}'")
         
+        # "As if"パターンは条件文ではなく比喩表現として除外
+        if text.strip().lower().startswith('as if'):
+            print(f"⚠️ 'As if'パターン検出: 条件文ではない比喩表現")
+            return "", text  # 条件節なし、全体が主節
+        
         # カンマベース分割（最も確実）
         if ',' in text:
             parts = text.split(',', 1)
-            if parts[0].strip().lower().startswith('if'):
-                return parts[0].strip(), parts[1].strip()
+            first_part = parts[0].strip()
+            second_part = parts[1].strip()
+            
+            # 条件節の特徴を判定
+            conditional_markers = ['if', 'should', 'were', 'had', 'but for', 'without']
+            is_first_conditional = any(first_part.lower().startswith(marker) for marker in conditional_markers)
+            
+            if is_first_conditional:
+                return first_part, second_part
             else:
-                return parts[1].strip(), parts[0].strip()
+                # 前置詞句などが最初に来る場合は逆順
+                return first_part, second_part
         
         # フォールバック: 助動詞位置での分割
         return self._fallback_modal_split(text)
@@ -1722,7 +1749,7 @@ class CentralController:
         return text.replace(if_clause + ',', replacement + ',').replace(if_clause, replacement)
     
     def _process_basic_decomposition(self, text: str) -> Dict[str, Any]:
-        """基本的な5文型+副詞分解"""
+        """基本的な5文型+副詞分解（命令文対応強化版）"""
         try:
             # Step 1: 副詞分離
             adverb_handler = self.handlers['adverb']
@@ -1752,10 +1779,130 @@ class CentralController:
                     'primary_handler': 'basic_five_pattern'
                 }
             else:
-                return {'success': False, 'error': 'Basic decomposition failed'}
+                # 5文型分解失敗時の簡易分解（命令文・前置詞句対応）
+                print(f"⚙️ 5文型分解失敗 → 簡易分解実行")
+                simple_result = self._simple_fallback_decomposition(text)
+                if simple_result['success']:
+                    return simple_result
+                else:
+                    return {'success': False, 'error': 'Basic decomposition failed'}
                 
         except Exception as e:
             return {'success': False, 'error': str(e)}
+    
+    def _simple_fallback_decomposition(self, text: str) -> Dict[str, Any]:
+        """簡易フォールバック分解（命令文・前置詞句用）"""
+        import spacy
+        doc = self.nlp(text)
+        
+        # 命令文パターン検出
+        if self._is_imperative_sentence(doc):
+            return self._decompose_imperative(doc, text)
+        
+        # 前置詞句パターン検出
+        if self._is_prepositional_phrase(doc):
+            return self._decompose_prepositional_phrase(doc, text)
+        
+        # その他の簡易分解
+        return self._decompose_generic_fallback(doc, text)
+    
+    def _is_imperative_sentence(self, doc) -> bool:
+        """命令文判定"""
+        # ROOT動詞が原形で主語がない/省略されている
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+                # 主語がないor代名詞的主語のみ
+                has_explicit_subject = any(child.dep_ == 'nsubj' for child in token.children)
+                return not has_explicit_subject
+        return False
+    
+    def _is_prepositional_phrase(self, doc) -> bool:
+        """前置詞句判定"""
+        # ROOTが前置詞の場合
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'ADP':
+                return True
+        return False
+    
+    def _decompose_imperative(self, doc, text: str) -> Dict[str, Any]:
+        """命令文分解"""
+        slots = {}
+        
+        # 動詞を探す
+        verb_token = None
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+                verb_token = token
+                break
+        
+        if verb_token:
+            slots['V'] = verb_token.text
+            
+            # 目的語を探す
+            for child in verb_token.children:
+                if child.dep_ == 'dobj':
+                    slots['O1'] = child.text
+                elif child.dep_ == 'iobj':
+                    slots['O2'] = child.text
+                elif child.dep_ == 'intj':  # "please"などの間投詞
+                    slots['M1'] = child.text
+        
+        # 主語は省略（命令文の特徴）
+        slots['S'] = '(you)'  # 暗示的主語
+        
+        return {
+            'success': True,
+            'main_slots': slots,
+            'sub_slots': {},
+            'collaboration': ['simple_imperative'],
+            'primary_handler': 'simple_imperative'
+        }
+    
+    def _decompose_prepositional_phrase(self, doc, text: str) -> Dict[str, Any]:
+        """前置詞句分解"""
+        slots = {}
+        
+        # 前置詞を探す
+        prep_token = None
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'ADP':
+                prep_token = token
+                break
+        
+        if prep_token:
+            # 前置詞句全体を修飾語として扱う
+            slots['M1'] = text.strip().rstrip('.,')
+        
+        return {
+            'success': True,
+            'main_slots': slots,
+            'sub_slots': {},
+            'collaboration': ['simple_prepositional'],
+            'primary_handler': 'simple_prepositional'
+        }
+    
+    def _decompose_generic_fallback(self, doc, text: str) -> Dict[str, Any]:
+        """汎用フォールバック分解"""
+        slots = {}
+        
+        # 最低限の動詞・名詞抽出
+        for token in doc:
+            if token.pos_ == 'VERB' and 'V' not in slots:
+                slots['V'] = token.text
+            elif token.pos_ in ['NOUN', 'PRON'] and 'S' not in slots:
+                slots['S'] = token.text
+        
+        # 何も見つからない場合は文全体を修飾語扱い
+        if not slots:
+            slots['M1'] = text.strip().rstrip('.,')
+        
+        return {
+            'success': True,
+            'main_slots': slots,
+            'sub_slots': {},
+            'collaboration': ['generic_fallback'],
+            'primary_handler': 'generic_fallback'
+        }
     
     def _integrate_conditional_results(self, main_basic_result: Dict, if_basic_result: Dict, 
                                      if_clause: str, main_clause: str, 
