@@ -103,7 +103,7 @@ class CentralController:
         sub_slots = result_dict.get('sub_slots', {})
         text = result_dict.get('text', '') or result_dict.get('original_text', '')
         
-        if not main_slots or not text:
+        if not main_slots:
             print(f"⚠️ 順序付与スキップ: main_slots={bool(main_slots)}, text='{text}'")
             return result_dict
         
