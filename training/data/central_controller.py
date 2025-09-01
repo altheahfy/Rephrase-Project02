@@ -1404,9 +1404,14 @@ class CentralController:
                         print(f"📝 主節助動詞処理完了: {main_modal_result}")
                         modal_success_result = main_modal_result
             
-            # ③if節の分解（助動詞処理を含む）
+            # ③if節の分解（逆転構造対応）
             if_clause_without_if = if_clause.replace('If ', '').replace('if ', '')
-            if_basic_result = self._process_basic_decomposition(if_clause_without_if)
+            
+            # 逆転構造の場合は特別処理
+            if_basic_result = self._process_inversion_if_clause(if_clause)
+            if not if_basic_result.get('success', False):
+                # 通常のif節処理にフォールバック
+                if_basic_result = self._process_basic_decomposition(if_clause_without_if)
             
             # If節にも助動詞処理を適用
             if if_basic_result.get('success', False):
@@ -1460,16 +1465,118 @@ class CentralController:
         
         doc = self.nlp(text)
         
-        # Step 1: spaCy依存関係による条件節検出（関係節ハンドラー方式）
+        # Step 1: 逆転構造検出（Were I, Had she等）
+        inversion_info = self._detect_inversion_patterns(doc, text)
+        if inversion_info:
+            print(f"✅ 逆転構造検出成功")
+            return inversion_info['if_clause'], inversion_info['main_clause']
+        
+        # Step 2: spaCy依存関係による条件節検出（関係節ハンドラー方式）
         conditional_info = self._detect_by_dependency_analysis(doc, text)
         if conditional_info:
             print(f"✅ 依存関係解析成功")
             return conditional_info['if_clause'], conditional_info['main_clause']
-        
-        # Step 2: 品詞分析による補完検出（名詞節ハンドラー方式）
+
+        # Step 3: 品詞分析による補完検出（名詞節ハンドラー方式）
         print(f"🔍 品詞分析による補完検出")
         return self._detect_by_pos_analysis_conditional(doc, text)
     
+    def _detect_inversion_patterns(self, doc, text: str) -> Optional[Dict[str, str]]:
+        """逆転構造パターン検出（Were I, Had she等）"""
+        print(f"🔍 逆転構造パターン検出: '{text}'")
+        
+        # 逆転構造パターン: Were/Had/Should + 主語 + ...
+        inversion_patterns = [
+            r'^(Were|Had|Should)\s+(\w+)',
+            r'^(Could|Would|Might)\s+(\w+)'
+        ]
+        
+        for pattern in inversion_patterns:
+            import re
+            match = re.match(pattern, text)
+            if match:
+                auxiliary = match.group(1)
+                subject = match.group(2)
+                print(f"🎯 逆転パターン検出: {auxiliary} + {subject}")
+                
+                # カンマで分割
+                if ',' in text:
+                    parts = text.split(',', 1)
+                    if_clause = parts[0].strip()
+                    main_clause = parts[1].strip()
+                    
+                    return {
+                        'if_clause': if_clause,
+                        'main_clause': main_clause
+                    }
+        
+        return None
+    
+    def _process_inversion_if_clause(self, if_clause: str) -> Dict[str, Any]:
+        """逆転構造の条件節処理"""
+        print(f"🔧 逆転構造条件節処理: '{if_clause}'")
+        
+        import re
+        
+        # Were I you → sub-v: "Were", sub-s: "I", sub-c1: "you"
+        were_pattern = r'^Were\s+(\w+)\s+(\w+)$'
+        were_match = re.match(were_pattern, if_clause)
+        if were_match:
+            subject = were_match.group(1)
+            complement = were_match.group(2)
+            return {
+                'success': True,
+                'main_slots': {
+                    'S': subject,
+                    'V': 'Were',
+                    'C1': complement
+                },
+                'sub_slots': {},
+                'collaboration': ['conditional_inversion'],
+                'inversion_type': 'were'
+            }
+        
+        # Had she known the truth → sub-aux: "Had", sub-s: "she", sub-v: "known", sub-o1: "the truth"
+        had_pattern = r'^Had\s+(\w+)\s+(\w+)\s+(.+)$'
+        had_match = re.match(had_pattern, if_clause)
+        if had_match:
+            subject = had_match.group(1)
+            verb = had_match.group(2)
+            object_part = had_match.group(3)
+            return {
+                'success': True,
+                'main_slots': {
+                    'S': subject,
+                    'V': verb,
+                    'O1': object_part,
+                    'Aux': 'Had'
+                },
+                'sub_slots': {},
+                'collaboration': ['conditional_inversion'],
+                'inversion_type': 'had'
+            }
+        
+        # Should/Could/Would patterns
+        modal_pattern = r'^(Should|Could|Would)\s+(\w+)\s+(.+)$'
+        modal_match = re.match(modal_pattern, if_clause)
+        if modal_match:
+            auxiliary = modal_match.group(1)
+            subject = modal_match.group(2)
+            verb_part = modal_match.group(3)
+            return {
+                'success': True,
+                'main_slots': {
+                    'S': subject,
+                    'V': verb_part.split()[0] if verb_part else '',
+                    'Aux': auxiliary
+                },
+                'sub_slots': {},
+                'collaboration': ['conditional_inversion'],
+                'inversion_type': 'modal'
+            }
+        
+        return {'success': False, 'error': 'Inversion pattern not recognized'}
+        
     def _detect_by_dependency_analysis(self, doc, text: str) -> Optional[Dict[str, str]]:
         """spaCy依存関係による条件節検出（関係節ハンドラー方式）"""
         print(f"🔍 依存関係解析による条件節検出: '{text}'")
@@ -1679,18 +1786,44 @@ class CentralController:
             sub_slots = {}
             if if_basic_result.get('success', False):
                 if_slots = if_basic_result['main_slots']
+                inversion_type = if_basic_result.get('inversion_type')
                 
-                # If節のスロットをsub_スロットに変換
-                if 'S' in if_slots:
-                    sub_slots['sub-s'] = f"If {if_slots['S']}"
-                if 'Aux' in if_slots:
-                    sub_slots['sub-aux'] = if_slots['Aux']
-                if 'V' in if_slots:
-                    sub_slots['sub-v'] = if_slots['V']
-                if 'O1' in if_slots:
-                    sub_slots['sub-o1'] = if_slots['O1']
-                if 'C1' in if_slots:
-                    sub_slots['sub-c1'] = if_slots['C1']
+                # 逆転構造の場合の特別処理
+                if inversion_type == 'were':
+                    # Were I you → sub-v: "Were", sub-s: "I", sub-c1: "you"  
+                    sub_slots['sub-v'] = 'Were'
+                    sub_slots['sub-s'] = if_slots.get('S', '')
+                    sub_slots['sub-c1'] = if_slots.get('C1', '')
+                    print(f"🔧 逆転構造(were)処理: sub-v='Were', sub-s='{if_slots.get('S', '')}', sub-c1='{if_slots.get('C1', '')}'")
+                elif inversion_type == 'had':
+                    # Had she known the truth → sub-aux: "Had", sub-s: "she", sub-v: "known", sub-o1: "the truth"
+                    sub_slots['sub-aux'] = if_slots.get('Aux', '')
+                    sub_slots['sub-s'] = if_slots.get('S', '')
+                    sub_slots['sub-v'] = if_slots.get('V', '')
+                    sub_slots['sub-o1'] = if_slots.get('O1', '')
+                    print(f"🔧 逆転構造(had)処理: sub-aux='{if_slots.get('Aux', '')}', sub-s='{if_slots.get('S', '')}', sub-v='{if_slots.get('V', '')}', sub-o1='{if_slots.get('O1', '')}'")
+                elif inversion_type == 'modal':
+                    # Should/Could/Would patterns
+                    sub_slots['sub-aux'] = if_slots.get('Aux', '')
+                    sub_slots['sub-s'] = if_slots.get('S', '')
+                    sub_slots['sub-v'] = if_slots.get('V', '')
+                    if 'O1' in if_slots:
+                        sub_slots['sub-o1'] = if_slots['O1']
+                    print(f"🔧 逆転構造(modal)処理: sub-aux='{if_slots.get('Aux', '')}', sub-s='{if_slots.get('S', '')}', sub-v='{if_slots.get('V', '')}'")
+                else:
+                    # 通常のif節処理
+                    print(f"🔧 通常if節処理: inversion_type={inversion_type}")
+                    if 'S' in if_slots:
+                        sub_slots['sub-s'] = f"If {if_slots['S']}"
+                    if 'V' in if_slots:
+                        sub_slots['sub-v'] = if_slots['V']
+                    if 'O1' in if_slots:
+                        sub_slots['sub-o1'] = if_slots['O1']
+                    if 'C1' in if_slots:
+                        sub_slots['sub-c1'] = if_slots['C1']
+                    if 'Aux' in if_slots:
+                        sub_slots['sub-aux'] = if_slots['Aux']
+                
                 # その他の要素をsub-m2にまとめる
                 other_elements = []
                 for slot, value in if_slots.items():

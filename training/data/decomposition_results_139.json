@@ -1,0 +1,49 @@
+{
+  "case_139": {
+    "sentence": "Were I you, I would accept the offer.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "accept",
+        "O1": "the offer"
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "accept",
+        "O1": "the offer",
+        "M2": "",
+        "Aux": "would"
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "If I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Were I you",
+        "main_clause": "I would accept the offer.",
+        "confidence": 0.95
+      }
+    },
+    "match": false
+  }
+}

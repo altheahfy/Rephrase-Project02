@@ -33,7 +33,6 @@
       },
       "collaboration": [
         "adverb",
-        "adverb",
         "basic_five_pattern",
         "conditional"
       ],
@@ -80,7 +79,6 @@
         "_parent_slot": "M2"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -129,7 +127,6 @@
       },
       "collaboration": [
         "adverb",
-        "adverb",
         "basic_five_pattern",
         "conditional"
       ],
@@ -177,7 +174,6 @@
       },
       "collaboration": [
         "adverb",
-        "adverb",
         "basic_five_pattern",
         "conditional"
       ],
@@ -220,13 +216,12 @@
       },
       "sub_slots": {
         "sub-s": "If I",
-        "sub-aux": "had",
         "sub-v": "studied",
+        "sub-aux": "had",
         "sub-m2": "harder",
         "_parent_slot": "M2"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -270,13 +265,12 @@
       },
       "sub_slots": {
         "sub-s": "If they",
-        "sub-aux": "had",
         "sub-v": "arrived",
+        "sub-aux": "had",
         "sub-m2": "earlier",
         "_parent_slot": "M2"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -321,12 +315,13 @@
         "Aux": "would be"
       },
       "sub_slots": {
-        "sub-aux": "had been",
+        "sub-s": "If I",
         "sub-v": "born",
+        "sub-c1": "rich",
+        "sub-aux": "had been",
         "_parent_slot": "M1"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -366,17 +361,16 @@
         "V": "leave",
         "M2": "early",
         "M1": "",
-        "Aux": "have"
+        "Aux": "may"
       },
       "sub_slots": {
         "sub-s": "If you",
-        "sub-aux": "have",
         "sub-v": "finished",
         "sub-o1": "your work",
+        "sub-aux": "have",
         "_parent_slot": "M1"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -389,7 +383,7 @@
         "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   },
   "case_139": {
     "sentence": "Were I you, I would accept the offer.",
@@ -409,10 +403,34 @@
       }
     },
     "actual": {
-      "success": false,
-      "error": "Main clause decomposition failed"
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "accept",
+        "O1": "the offer",
+        "M2": "",
+        "Aux": "would"
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Were I you",
+        "main_clause": "I would accept the offer.",
+        "confidence": 0.95
+      }
     },
-    "match": false
+    "match": true
   },
   "case_140": {
     "sentence": "Had she known the truth, she would have acted differently.",
@@ -433,9 +451,34 @@
       }
     },
     "actual": {
-      "success": false,
-      "error": "Main clause decomposition failed"
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "V": "acted",
+        "M2": "differently",
+        "M1": "",
+        "Aux": "would have"
+      },
+      "sub_slots": {
+        "sub-aux": "Had",
+        "sub-s": "she",
+        "sub-v": "known",
+        "sub-o1": "the truth",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Had she known the truth",
+        "main_clause": "she would have acted differently.",
+        "confidence": 0.95
+      }
     },
-    "match": false
+    "match": true
   }
 }
