@@ -21,6 +21,7 @@ from question_handler import QuestionHandler
 from modal_handler import ModalHandler
 from noun_clause_handler import NounClauseHandler
 from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
+from conditional_handler import ConditionalHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -50,7 +51,7 @@ class CentralController:
         # 動的分析用のグループマッピングを初期化
         self._initialize_group_mappings()
         
-        # Phase 6: 基本ハンドラーたちを先に初期化
+        # Phase 9: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
         adverb_handler = AdverbHandler()
         passive_voice_handler = PassiveVoiceHandler()
@@ -58,6 +59,7 @@ class CentralController:
         modal_handler = ModalHandler(self.nlp)  # Phase 6: ModalHandler追加
         noun_clause_handler = NounClauseHandler(self.nlp)  # Phase 7: NounClauseHandler追加
         omitted_relative_pronoun_handler = OmittedRelativePronounHandler()  # Phase 8: OmittedRelativePronounHandler追加
+        conditional_handler = ConditionalHandler(self.nlp)  # Phase 9: ConditionalHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -83,7 +85,8 @@ class CentralController:
             'question': question_handler,
             'modal': modal_handler,  # Phase 6: ModalHandler追加
             'noun_clause': noun_clause_handler,  # Phase 7: NounClauseHandler追加
-            'omitted_relative_pronoun': omitted_relative_pronoun_handler  # Phase 8: OmittedRelativePronounHandler追加
+            'omitted_relative_pronoun': omitted_relative_pronoun_handler,  # Phase 8: OmittedRelativePronounHandler追加
+            'conditional': conditional_handler  # Phase 9: ConditionalHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -318,6 +321,11 @@ class CentralController:
         noun_clauses = self.handlers['noun_clause'].detect_noun_clauses(text)
         if noun_clauses:
             detected_patterns.append('noun_clause')
+        
+        # 仮定法検出（高優先度）- if節、wish文、as if文、without文など
+        conditional_patterns = self.handlers['conditional'].detect_conditional_patterns(text)
+        if conditional_patterns:
+            detected_patterns.append('conditional')
         
         # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
@@ -725,6 +733,74 @@ class CentralController:
             else:
                 print(f"⚠️ 名詞節処理失敗、通常の処理フローに移行")
                 print(f"  NounClauseHandler error: {noun_clause_result.get('error')}")
+        
+        # 🎯 仮定法処理（疑問文でない場合に適用）
+        if 'conditional' in grammar_patterns and 'question' not in grammar_patterns:
+            # Step 1: AdverbHandlerで修飾語分離
+            adverb_handler = self.handlers['adverb']
+            adverb_result = adverb_handler.process(text)
+            
+            modifier_slots = {}
+            processing_text = text
+            
+            if adverb_result['success']:
+                modifier_slots = adverb_result.get('modifier_slots', {})
+                processing_text = adverb_result['separated_text']
+                print(f"🔧 仮定法修飾語分離: '{text}' → '{processing_text}'")
+                for slot, value in modifier_slots.items():
+                    print(f"📍 修飾語検出: {slot} = '{value}'")
+            
+            # Step 2: ConditionalHandlerで仮定法構造処理
+            conditional_handler = self.handlers['conditional']
+            conditional_result = conditional_handler.process(processing_text)
+            
+            if conditional_result['success']:
+                # 仮定法+修飾語統合
+                conditional_main_slots = conditional_result['main_slots']
+                conditional_sub_slots = conditional_result.get('sub_slots', {})
+                
+                # 修飾語を適切なスロットに統合
+                final_main_slots = conditional_main_slots.copy()
+                final_sub_slots = conditional_sub_slots.copy()
+                
+                for slot, value in modifier_slots.items():
+                    if slot.startswith('M'):
+                        # 修飾語は適切な場所に配置
+                        if final_sub_slots:
+                            # sub節がある場合はsub_slotsに配置
+                            sub_slot_key = f"sub-{slot.lower()}"
+                            final_sub_slots[sub_slot_key] = value
+                        else:
+                            # sub節がない場合はmain_slotsに配置
+                            final_main_slots[slot] = value
+                    else:
+                        # その他のスロットはmain_slotsに配置
+                        if slot not in final_main_slots:
+                            final_main_slots[slot] = value
+                
+                # 結果を構築
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': final_main_slots,
+                    'sub_slots': final_sub_slots,
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'conditional',
+                        'collaboration': ['adverb'],
+                        'conditional_info': conditional_result.get('conditional_info', {}),
+                        'confidence': 0.9
+                    }
+                }
+                
+                # 順序情報を追加
+                result = self._apply_order_to_result(result)
+                
+                print(f"✅ 仮定法処理成功: main_slots={final_main_slots}, sub_slots={final_sub_slots}")
+                return result
+            else:
+                print(f"⚠️ 仮定法処理失敗、通常の処理フローに移行")
+                print(f"  ConditionalHandler error: {conditional_result.get('error')}")
         
         # 🎯 省略関係詞処理（関係節処理の前に検出）
         if 'omitted_relative_pronoun' in grammar_patterns:
