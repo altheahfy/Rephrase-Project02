@@ -460,6 +460,16 @@ class CentralController:
                     print(f"📝 Imagine構文ConditionalHandler結果: {conditional_result}")
                     return conditional_result
         
+        # Case 152対策: Provided構文の早期検出
+        if text.lower().startswith('provided that'):
+            print(f"🔧 Provided構文早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 Provided構文ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+        
         # 1. 文法構造分析
         grammar_patterns = self.analyze_grammar_structure(text)
         

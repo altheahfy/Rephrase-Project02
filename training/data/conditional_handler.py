@@ -194,7 +194,7 @@ class ConditionalHandler:
             elif conditional_type in ['without', 'but_for']:
                 return self._process_without_conditional(doc, clean_sentence, conditional_type)
             else:
-                return self._process_other_conditional(doc, clean_sentence, conditional_type)
+                return self._process_other_conditional(doc, sentence, conditional_type)
                 
         except Exception as e:
             print(f"❌ ConditionalHandler処理エラー: {e}")
@@ -204,6 +204,10 @@ class ConditionalHandler:
         """文の前処理"""
         # Case 151対策: Imagine構文の場合はコンマを保持
         if sentence.lower().startswith('imagine if'):
+            # ピリオドのみ除去、コンマは保持
+            clean = re.sub(r'[.]', ' ', sentence).strip()
+        # Case 152対策: Provided構文の場合はコンマを保持
+        elif sentence.lower().startswith('provided that'):
             # ピリオドのみ除去、コンマは保持
             clean = re.sub(r'[.]', ' ', sentence).strip()
         else:
@@ -575,9 +579,6 @@ class ConditionalHandler:
             return main_slots
         
         # 通常の主節解析
-        # 各要素を解析
-        main_slots["M1"] = ""  # 条件節情報は別途設定
-        
         # 主語検出
         subject = self._extract_subject(doc)
         main_slots["S"] = subject if subject else ""
@@ -590,6 +591,10 @@ class ConditionalHandler:
         verb = self._extract_main_verb(doc)
         main_slots["V"] = verb if verb else ""
         
+        # 目的語検出
+        object1 = self._extract_object(doc)
+        main_slots["O1"] = object1 if object1 else ""
+        
         # その他の要素検出
         other_elements = self._extract_other_elements(doc, subject, auxiliary, verb)
         main_slots["M2"] = other_elements if other_elements else ""
@@ -597,6 +602,7 @@ class ConditionalHandler:
         print(f"   主語: '{main_slots['S']}'")
         print(f"   助動詞: '{main_slots['Aux']}'")
         print(f"   動詞: '{main_slots['V']}'")
+        print(f"   目的語: '{main_slots['O1']}'")
         print(f"   その他: '{main_slots['M2']}'")
         
         return main_slots
@@ -626,6 +632,25 @@ class ConditionalHandler:
         for token in doc:
             if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
                 return token.text
+        return ""
+    
+    def _extract_object(self, doc) -> str:
+        """目的語を抽出"""
+        for token in doc:
+            if token.dep_ in ['dobj', 'pobj']:
+                # 目的語とその修飾語を含める
+                obj_tokens = [token]
+                for child in token.children:
+                    if child.dep_ in ['det', 'amod', 'compound']:
+                        obj_tokens.append(child)
+                # 前置詞の場合は前置詞も含める
+                if token.dep_ == 'pobj':
+                    for parent in doc:
+                        if token in list(parent.children) and parent.pos_ == 'ADP':
+                            obj_tokens.append(parent)
+                            break
+                obj_tokens.sort(key=lambda t: t.i)
+                return " ".join([t.text for t in obj_tokens])
         return ""
     
     def _extract_other_elements(self, doc, subject: str, auxiliary: str, verb: str) -> str:
@@ -1134,6 +1159,18 @@ class ConditionalHandler:
     def _split_generic_conditional(self, sentence: str, conditional_type: str) -> Tuple[str, str]:
         """汎用的な条件文分離"""
         
+        # Provided構文の特殊処理（Case 152対策）
+        if conditional_type == 'provided':
+            # "Provided that you finish on time, you can take a break."
+            # -> condition: "Provided that you finish on time"
+            # -> main: "you can take a break."
+            comma_index = sentence.find(',')
+            if comma_index != -1:
+                condition_clause = sentence[:comma_index].strip()
+                main_clause = sentence[comma_index + 1:].strip()
+                print(f"🔧 Provided構文分離: 条件節='{condition_clause}', 主節='{main_clause}'")
+                return condition_clause, main_clause
+        
         # コンマで分割を試す
         parts = sentence.split(',')
         
@@ -1199,12 +1236,57 @@ class ConditionalHandler:
                 for token in doc_after:
                     if token.pos_ == 'VERB' and 'sub-v' not in sub_slots:
                         sub_slots['sub-v'] = token.text
-                    elif token.dep_ in ['dobj', 'pobj'] and 'sub-o1' not in sub_slots:
-                        sub_slots['sub-o1'] = token.text
+                        
+                    # 目的語の抽出は名詞のみ
+                    elif token.dep_ in ['dobj', 'pobj'] and token.pos_ == 'NOUN':
+                        if 'sub-o1' not in sub_slots:
+                            sub_slots['sub-o1'] = token.text
                 
+                sub_slots['_parent_slot'] = 'M1'
                 return sub_slots
         
-        # 条件詞 + 主語の抽出
+        # Provided構文の特殊処理（Case 152対策）
+        elif conditional_type == 'provided':
+            # "Provided that you finish on time" -> "you finish on time"を解析
+            # "that"を除去して実際の条件文を抽出
+            clean_condition = condition_clause.replace('Provided that', '').strip()
+            doc_clean = self.nlp(clean_condition)
+            
+            print(f"🔧 Provided構文解析: '{clean_condition}'")
+            
+            # 主語を特定
+            for token in doc_clean:
+                if token.dep_ == 'nsubj':
+                    sub_slots['sub-s'] = f"Provided that {token.text}"
+                    break
+            
+            # 動詞と助動詞を抽出
+            for token in doc_clean:
+                if token.pos_ == 'VERB' and token.dep_ == 'ROOT':
+                    sub_slots['sub-v'] = token.text
+                elif token.pos_ == 'AUX':
+                    sub_slots['sub-aux'] = token.text
+            
+            # 前置詞句（修飾語）を抽出
+            prep_phrases = []
+            for token in doc_clean:
+                if token.dep_ == 'prep':
+                    # 前置詞とその目的語を取得
+                    phrase_parts = [token.text]
+                    for child in token.children:
+                        if child.dep_ == 'pobj':
+                            phrase_parts.append(child.text)
+                    if len(phrase_parts) > 1:
+                        prep_phrases.append(' '.join(phrase_parts))
+            
+            # "on time"のような修飾語をsub-m2に設定
+            if prep_phrases:
+                sub_slots['sub-m2'] = prep_phrases[0]
+            
+            sub_slots['_parent_slot'] = 'M2'
+            return sub_slots
+        
+        # 通常の条件節解析
         condition_words = {
             'unless': 'Unless',
             'suppose': 'Suppose',

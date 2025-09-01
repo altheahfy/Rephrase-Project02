@@ -7876,50 +7876,19 @@
       },
       "sub_slots": {
         "sub-s": "Provided that you",
-        "sub-aux": "can",
         "sub-v": "finish",
-        "sub-o1": "time break",
+        "sub-m2": "on time",
         "_parent_slot": "M2"
       },
-      "collaboration": [
-        "conditional",
-        "human_grammar"
-      ],
-      "primary_handler": "conditional",
       "metadata": {
-        "handler": "conditional_human_grammar",
-        "if_clause": "Provided that you finish on time",
+        "handler": "conditional",
+        "type": "provided",
+        "condition_clause": "Provided that you finish on time",
         "main_clause": "you can take a break.",
-        "confidence": 0.95
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "Provided that you",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "can",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "finish",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "time break",
-          "display_order": 4
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "4": "can",
-        "3": "you",
-        "5": "take",
-        "6": "a break",
-        "7": ""
+        "confidence": 0.8
       }
     },
-    "match": false
+    "match": true
   },
   "case_153": {
     "sentence": "As long as you promise to be careful, you may borrow my car.",
