@@ -1,4 +1,4 @@
-"""
+﻿"""
 Conditional Handler - 仮定法処理専門ハンドラー
 Phase 9: ConditionalHandler実装
 
@@ -49,30 +49,41 @@ class ConditionalHandler:
     def _initialize_conditional_patterns(self):
         """仮定法パターンの初期化"""
         
-        # If節パターン
+        # If仮定法パターン
         self.if_patterns = {
-            'basic_if': r'\bIf\s+',
-            'even_if': r'\bEven\s+if\s+',
-            'as_if': r'\bas\s+if\s+',
-            'as_though': r'\bas\s+though\s+'
+            'if_present': r'\bif\s+.*\b(will|can|may|shall|must)\b',
+            'if_past': r'\bif\s+.*\b(would|could|might|should)\b',
+            'if_past_perfect': r'\bif\s+.*\bhad\s+.*\b(would|could|might|should)\s+have\b',
+            'if_mixed': r'\bif\s+.*\bhad\s+.*\b(would|could|might|should)\b'
         }
         
         # 倒置仮定法パターン
         self.inversion_patterns = {
-            'were': r'^\s*Were\s+\w+',
-            'had': r'^\s*Had\s+\w+',
-            'should': r'^\s*Should\s+\w+'
+            'were': r'^were\s+\w+',
+            'had': r'^had\s+\w+',
+            'should': r'^should\s+\w+'
         }
         
-        # 仮定法相当語句
-        self.conditional_equivalents = {
-            'unless': r'\bUnless\s+',
-            'suppose': r'\bSuppose\s+',
-            'imagine': r'\bImagine\s+(?:if\s+)?',
-            'provided': r'\bProvided\s+(?:that\s+)?',
-            'as_long_as': r'\bAs\s+long\s+as\s+',
-            'without': r'\bWithout\s+',
-            'but_for': r'\bBut\s+for\s+'
+        # Wish仮定法パターン
+        self.wish_patterns = {
+            'simple': r'\bwish\s+.*',
+            'that': r'\bwish\s+that\s+.*'
+        }
+        
+        # As if/though仮定法パターン
+        self.as_if_patterns = {
+            'as_if': r'\bas\s+if\s+.*',
+            'as_though': r'\bas\s+though\s+.*'
+        }
+        
+        # 仮定法相当語句パターン
+        self.equivalent_patterns = {
+            'without': r'\bwithout\s+.*',
+            'but_for': r'\bbut\s+for\s+.*',
+            'unless': r'\bunless\s+.*',
+            'suppose': r'\bsuppose\s+.*',
+            'provided': r'\bprovided\s+.*',
+            'supposing': r'\bsupposing\s+.*'
         }
         
         # Wish構文パターン
@@ -114,9 +125,14 @@ class ConditionalHandler:
                 detected_patterns.append(f"inversion_{pattern_name}")
         
         # 仮定法相当語句の検出
-        for pattern_name, pattern in self.conditional_equivalents.items():
+        for pattern_name, pattern in self.equivalent_patterns.items():
             if re.search(pattern, text, re.IGNORECASE):
                 detected_patterns.append(f"equivalent_{pattern_name}")
+        
+        # As if/though仮定法の検出
+        for pattern_name, pattern in self.as_if_patterns.items():
+            if re.search(pattern, text, re.IGNORECASE):
+                detected_patterns.append(pattern_name)
         
         # Wish構文の検出
         for pattern_name, pattern in self.wish_patterns.items():
@@ -181,7 +197,7 @@ class ConditionalHandler:
     def _identify_conditional_type(self, sentence: str) -> Optional[str]:
         """仮定法タイプの識別"""
         
-        # If節パターンチェック
+        # If仮定法パターンチェック
         for pattern_name, pattern in self.if_patterns.items():
             if re.search(pattern, sentence, re.IGNORECASE):
                 return pattern_name
@@ -196,8 +212,13 @@ class ConditionalHandler:
             if re.search(pattern, sentence, re.IGNORECASE):
                 return 'wish'
         
+        # As if/though構文チェック
+        for pattern_name, pattern in self.as_if_patterns.items():
+            if re.search(pattern, sentence, re.IGNORECASE):
+                return pattern_name
+        
         # 仮定法相当語句チェック
-        for pattern_name, pattern in self.conditional_equivalents.items():
+        for pattern_name, pattern in self.equivalent_patterns.items():
             if re.search(pattern, sentence, re.IGNORECASE):
                 return pattern_name
         
@@ -255,48 +276,76 @@ class ConditionalHandler:
     def _split_if_conditional(self, sentence: str) -> Tuple[str, str]:
         """If仮定法の条件節と主節を分離"""
         
-        # コンマで分割
-        parts = sentence.split(',')
-        
-        if len(parts) == 2:
-            # "If clause, main clause" パターン
+        # コンマで分割を試行
+        if ',' in sentence:
+            parts = sentence.split(',', 1)  # 最初のコンマで分割
             if_clause = parts[0].strip()
             main_clause = parts[1].strip()
-        elif len(parts) == 1:
-            # コンマなしの場合、spaCy依存関係を利用
-            doc = self.nlp(sentence)
-            if_clause, main_clause = self._split_by_dependency(doc)
-        else:
-            # 複数コンマの場合は最初の分割点を使用
-            if_clause = parts[0].strip()
-            main_clause = ','.join(parts[1:]).strip()
+            
+            # If節が実際にIfで始まるかチェック
+            if if_clause.lower().startswith('if '):
+                return if_clause, main_clause
         
-        return if_clause, main_clause
+        # コンマがない場合やIfが見つからない場合は依存関係解析
+        doc = self.nlp(sentence)
+        return self._split_by_dependency(doc)
     
     def _split_by_dependency(self, doc) -> Tuple[str, str]:
         """依存関係解析による節分離"""
         
         if_start = -1
-        if_end = -1
+        main_start = -1
         
-        # If節の範囲を特定
+        # If節の開始とメイン節の開始を特定
         for i, token in enumerate(doc):
-            if token.text.lower() == 'if':
+            if token.text.lower() == 'if' and if_start == -1:
                 if_start = i
             elif if_start != -1 and token.dep_ == 'ROOT':
-                if_end = i
+                main_start = i
                 break
         
-        if if_start != -1 and if_end != -1:
-            if_clause = ' '.join([token.text for token in doc[if_start:if_end]])
-            main_clause = ' '.join([token.text for token in doc[if_end:]])
+        if if_start != -1 and main_start != -1:
+            # If節: ifからメイン動詞の前まで
+            if_tokens = [doc[j].text for j in range(if_start, main_start)]
+            # 句読点を除外
+            if_tokens = [t for t in if_tokens if t not in [',', '.']]
+            if_clause = ' '.join(if_tokens)
+            
+            # 主節: メイン動詞から最後まで
+            main_tokens = [doc[j].text for j in range(main_start, len(doc))]
+            # 句読点を除外
+            main_tokens = [t for t in main_tokens if t not in [',', '.']]
+            main_clause = ' '.join(main_tokens)
         else:
-            # フォールバック: 単純分割
-            text = doc.text
-            if 'if ' in text.lower():
-                parts = text.lower().split('if ', 1)
-                if_clause = 'If ' + parts[1]
-                main_clause = parts[0].strip() if parts[0].strip() else 'Unknown'
+            # フォールバック処理
+            text = doc.text.replace(',', '').replace('.', '')
+            if ' if ' in text.lower():
+                # 'if'の位置で分割を試行
+                parts = text.split()
+                if_idx = -1
+                for i, word in enumerate(parts):
+                    if word.lower() == 'if':
+                        if_idx = i
+                        break
+                
+                if if_idx != -1:
+                    # 適切な分割点を探す（動詞の位置から判断）
+                    doc_parts = self.nlp(' '.join(parts))
+                    main_verb_idx = -1
+                    for i, token in enumerate(doc_parts):
+                        if token.dep_ == 'ROOT' and i > if_idx:
+                            main_verb_idx = i
+                            break
+                    
+                    if main_verb_idx != -1:
+                        if_clause = ' '.join(parts[if_idx:main_verb_idx])
+                        main_clause = ' '.join(parts[main_verb_idx:])
+                    else:
+                        if_clause = ' '.join(parts[if_idx:])
+                        main_clause = ''
+                else:
+                    if_clause = text
+                    main_clause = ''
             else:
                 if_clause = text
                 main_clause = ''

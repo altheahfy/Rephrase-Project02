@@ -312,6 +312,11 @@ class CentralController:
         if self.handlers['question'].is_question(text):
             detected_patterns.append('question')
         
+        # 仮定法検出（高優先度）- if節、wish文、as if文、without文など
+        conditional_patterns = self.handlers['conditional'].detect_conditional_patterns(text)
+        if conditional_patterns:
+            detected_patterns.append('conditional')
+        
         # 助動詞検出（高優先度）
         modal_info = self.handlers['modal'].detect_modal_structure(text)
         if modal_info.get('has_modal', False):
@@ -321,11 +326,6 @@ class CentralController:
         noun_clauses = self.handlers['noun_clause'].detect_noun_clauses(text)
         if noun_clauses:
             detected_patterns.append('noun_clause')
-        
-        # 仮定法検出（高優先度）- if節、wish文、as if文、without文など
-        conditional_patterns = self.handlers['conditional'].detect_conditional_patterns(text)
-        if conditional_patterns:
-            detected_patterns.append('conditional')
         
         # 関係節検出（優先度高）
         has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
@@ -595,17 +595,20 @@ class CentralController:
                 
                 print(f"✅ 助動詞+修飾語統合成功: {final_slots}")
                 
-                # 🔍 名詞節も検出されている場合は継続処理
-                if 'noun_clause' in grammar_patterns and 'question' not in grammar_patterns:
-                    print(f"🔄 助動詞処理後、名詞節部分も処理します")
-                    # 名詞節処理に進む（Phaseを継続）
+                # 🔍 仮定法・名詞節も検出されている場合は継続処理
+                if ('conditional' in grammar_patterns or 'noun_clause' in grammar_patterns) and 'question' not in grammar_patterns:
+                    if 'conditional' in grammar_patterns:
+                        print(f"🔄 助動詞処理後、仮定法部分も処理します")
+                    if 'noun_clause' in grammar_patterns:
+                        print(f"🔄 助動詞処理後、名詞節部分も処理します")
+                    # 継続処理に進む（Phaseを継続）
                     modal_success_result = {
                         'main_slots': final_slots,
                         'modal_info': modal_result.get('modal_info', {}),
                         'collaboration': ['adverb']
                     }
                 else:
-                    # 名詞節がない場合は助動詞処理のみで終了
+                    # 継続処理する文法項目がない場合は助動詞処理のみで終了
                     result = {
                         'success': True,
                         'text': text,
@@ -624,6 +627,109 @@ class CentralController:
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
+        
+        # 🎯 仮定法処理（疑問文でない場合に適用）
+        if 'conditional' in grammar_patterns and 'question' not in grammar_patterns:
+            # 助動詞処理の結果があるかチェック
+            modal_success_result = locals().get('modal_success_result')
+            
+            # Step 1: AdverbHandlerで修飾語分離（助動詞処理済みでない場合のみ）
+            if not modal_success_result:
+                adverb_handler = self.handlers['adverb']
+                adverb_result = adverb_handler.process(text)
+                
+                modifier_slots = {}
+                processing_text = text
+                
+                if adverb_result['success']:
+                    modifier_slots = adverb_result.get('modifier_slots', {})
+                    processing_text = adverb_result['separated_text']
+                    print(f"🔧 仮定法修飾語分離: '{text}' → '{processing_text}'")
+                    for slot, value in modifier_slots.items():
+                        print(f"📍 修飾語検出: {slot} = '{value}'")
+            else:
+                # 助動詞処理済みの場合、その結果を使用
+                modifier_slots = {}  # 助動詞処理で既に統合済み
+                processing_text = text
+                print(f"🔄 助動詞処理結果を利用して仮定法処理を継続")
+            
+            # Step 2: ConditionalHandlerで仮定法構造処理
+            conditional_handler = self.handlers['conditional']
+            conditional_result = conditional_handler.process(processing_text)
+            
+            if conditional_result['success']:
+                # 仮定法+修飾語統合
+                conditional_main_slots = conditional_result['main_slots']
+                conditional_sub_slots = conditional_result.get('sub_slots', {})
+                
+                # 助動詞処理結果がある場合は統合
+                if modal_success_result:
+                    # 助動詞結果と仮定法結果を統合
+                    final_main_slots = modal_success_result['main_slots'].copy()
+                    
+                    # 仮定法のmain_slotsから不足するスロットを追加
+                    for slot, value in conditional_main_slots.items():
+                        if slot not in final_main_slots or (slot == 'M1' and value == ''):
+                            final_main_slots[slot] = value
+                            print(f"🔧 仮定法スロット追加: {slot} = '{value}'")
+                    
+                    final_sub_slots = conditional_sub_slots.copy()
+                    
+                    collaboration_list = modal_success_result['collaboration'] + ['conditional']
+                    primary_handler = 'conditional'  # 仮定法が主処理
+                    conditional_info = conditional_result.get('conditional_info', {})
+                    modal_info = modal_success_result['modal_info']
+                    print(f"✅ 助動詞+仮定法統合成功: main_slots={final_main_slots}, sub_slots={final_sub_slots}")
+                else:
+                    # 仮定法のみの場合
+                    final_main_slots = conditional_main_slots.copy()
+                    final_sub_slots = conditional_sub_slots.copy()
+                    
+                    # 修飾語をsub_slotsに統合
+                    for slot, value in modifier_slots.items():
+                        if slot.startswith('M'):
+                            # 修飾語は適切な場所に配置
+                            if final_sub_slots:
+                                # sub節がある場合はsub_slotsに配置
+                                sub_slot_key = f"sub-{slot.lower()}"
+                                final_sub_slots[sub_slot_key] = value
+                            else:
+                                # sub節がない場合はmain_slotsに配置
+                                final_main_slots[slot] = value
+                        else:
+                            # その他のスロットはmain_slotsに配置
+                            if slot not in final_main_slots:
+                                final_main_slots[slot] = value
+                    
+                    collaboration_list = ['adverb']
+                    primary_handler = 'conditional'
+                    conditional_info = conditional_result.get('conditional_info', {})
+                    modal_info = {}
+                    print(f"✅ 仮定法処理成功: main_slots={final_main_slots}, sub_slots={final_sub_slots}")
+                
+                # 結果を構築
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': final_main_slots,
+                    'sub_slots': final_sub_slots,
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': primary_handler,
+                        'collaboration': collaboration_list,
+                        'conditional_info': conditional_info,
+                        'modal_info': modal_info,
+                        'confidence': 0.9
+                    }
+                }
+                
+                # 順序情報を追加
+                result = self._apply_order_to_result(result)
+                
+                return result
+            else:
+                print(f"⚠️ 仮定法処理失敗、通常の処理フローに移行")
+                print(f"  ConditionalHandler error: {conditional_result.get('error')}")
         
         # 🎯 Phase 7: 名詞節処理（疑問文でない場合に適用）
         if 'noun_clause' in grammar_patterns and 'question' not in grammar_patterns:
@@ -733,74 +839,6 @@ class CentralController:
             else:
                 print(f"⚠️ 名詞節処理失敗、通常の処理フローに移行")
                 print(f"  NounClauseHandler error: {noun_clause_result.get('error')}")
-        
-        # 🎯 仮定法処理（疑問文でない場合に適用）
-        if 'conditional' in grammar_patterns and 'question' not in grammar_patterns:
-            # Step 1: AdverbHandlerで修飾語分離
-            adverb_handler = self.handlers['adverb']
-            adverb_result = adverb_handler.process(text)
-            
-            modifier_slots = {}
-            processing_text = text
-            
-            if adverb_result['success']:
-                modifier_slots = adverb_result.get('modifier_slots', {})
-                processing_text = adverb_result['separated_text']
-                print(f"🔧 仮定法修飾語分離: '{text}' → '{processing_text}'")
-                for slot, value in modifier_slots.items():
-                    print(f"📍 修飾語検出: {slot} = '{value}'")
-            
-            # Step 2: ConditionalHandlerで仮定法構造処理
-            conditional_handler = self.handlers['conditional']
-            conditional_result = conditional_handler.process(processing_text)
-            
-            if conditional_result['success']:
-                # 仮定法+修飾語統合
-                conditional_main_slots = conditional_result['main_slots']
-                conditional_sub_slots = conditional_result.get('sub_slots', {})
-                
-                # 修飾語を適切なスロットに統合
-                final_main_slots = conditional_main_slots.copy()
-                final_sub_slots = conditional_sub_slots.copy()
-                
-                for slot, value in modifier_slots.items():
-                    if slot.startswith('M'):
-                        # 修飾語は適切な場所に配置
-                        if final_sub_slots:
-                            # sub節がある場合はsub_slotsに配置
-                            sub_slot_key = f"sub-{slot.lower()}"
-                            final_sub_slots[sub_slot_key] = value
-                        else:
-                            # sub節がない場合はmain_slotsに配置
-                            final_main_slots[slot] = value
-                    else:
-                        # その他のスロットはmain_slotsに配置
-                        if slot not in final_main_slots:
-                            final_main_slots[slot] = value
-                
-                # 結果を構築
-                result = {
-                    'success': True,
-                    'text': text,
-                    'main_slots': final_main_slots,
-                    'sub_slots': final_sub_slots,
-                    'metadata': {
-                        'controller': 'central',
-                        'primary_handler': 'conditional',
-                        'collaboration': ['adverb'],
-                        'conditional_info': conditional_result.get('conditional_info', {}),
-                        'confidence': 0.9
-                    }
-                }
-                
-                # 順序情報を追加
-                result = self._apply_order_to_result(result)
-                
-                print(f"✅ 仮定法処理成功: main_slots={final_main_slots}, sub_slots={final_sub_slots}")
-                return result
-            else:
-                print(f"⚠️ 仮定法処理失敗、通常の処理フローに移行")
-                print(f"  ConditionalHandler error: {conditional_result.get('error')}")
         
         # 🎯 省略関係詞処理（関係節処理の前に検出）
         if 'omitted_relative_pronoun' in grammar_patterns:

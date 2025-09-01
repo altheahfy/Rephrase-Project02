@@ -1,0 +1,77 @@
+{
+  "case_131": {
+    "sentence": "If it rains tomorrow, I will stay home.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "I",
+        "Aux": "will",
+        "V": "stay",
+        "M2": "home"
+      },
+      "sub_slots": {
+        "sub-s": "If it",
+        "sub-v": "rains",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "If it rains tomorrow, I will stay home.",
+      "main_slots": {
+        "S": "it",
+        "Aux": "will",
+        "V": "rains",
+        "M2": "home"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "will",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "conditional",
+        "collaboration": [
+          "adverb",
+          "conditional"
+        ],
+        "conditional_info": {},
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "will",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "will",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "tomorrow",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "4": "will",
+        "3": "it",
+        "5": "rains",
+        "7": "home"
+      }
+    },
+    "match": false
+  }
+}
