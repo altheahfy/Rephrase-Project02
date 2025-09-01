@@ -1846,8 +1846,16 @@ class CentralController:
             # 助動詞情報の統合（Main節の助動詞を優先）
             if modal_success_result and 'Aux' in modal_success_result.get('main_slots', {}):
                 modal_main_slots = modal_success_result['main_slots']
-                main_slots['Aux'] = modal_main_slots['Aux']
-                print(f"🔧 Main節助動詞統合: Aux = '{modal_main_slots['Aux']}'")
+                aux_value = modal_main_slots['Aux']
+                
+                # "would be" -> "would" の正規化（動詞 "be" は分離）
+                if aux_value == 'would be':
+                    aux_value = 'would'
+                    main_slots['V'] = 'be'  # 動詞として扱う
+                    print(f"🔧 would be正規化: Aux='would', V='be'")
+                
+                main_slots['Aux'] = aux_value
+                print(f"🔧 Main節助動詞統合: Aux = '{aux_value}'")
             elif 'Aux' in main_basic_result.get('main_slots', {}):
                 # modal_success_resultがない場合、Main節の基本分解から助動詞を探す
                 main_slots['Aux'] = main_basic_result['main_slots']['Aux']

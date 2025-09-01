@@ -26,17 +26,16 @@
         "C1": "happy",
         "M2": "now",
         "M1": "",
-        "Aux": "would be"
+        "Aux": "would"
       },
       "sub_slots": {
         "sub-s": "If I",
-        "sub-aux": "had been",
         "sub-v": "born",
         "sub-c1": "rich",
+        "sub-aux": "had been",
         "_parent_slot": "M1"
       },
       "collaboration": [
-        "adverb",
         "adverb",
         "basic_five_pattern",
         "conditional"
@@ -49,6 +48,6 @@
         "confidence": 0.95
       }
     },
-    "match": false
+    "match": true
   }
 }
