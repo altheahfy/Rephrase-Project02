@@ -239,10 +239,10 @@ class ConditionalHandler:
             print(f"📝 主節: '{main_clause}'")
             
             # If節の解析
-            sub_slots = self._analyze_if_clause(if_clause)
+            sub_slots = self._analyze_if_clause_for_conditional(if_clause)
             
             # 主節の解析
-            main_slots = self._analyze_main_clause(main_clause)
+            main_slots = self._analyze_main_clause_for_conditional(main_clause)
             
             # 親スロット決定
             parent_slot = self._determine_parent_slot(conditional_type, main_clause)
@@ -274,192 +274,310 @@ class ConditionalHandler:
             return {'success': False, 'error': str(e)}
     
     def _split_if_conditional(self, sentence: str) -> Tuple[str, str]:
-        """If仮定法の条件節と主節を分離"""
+        """
+        If仮定法の条件節と主節を分離（構造化解析使用）
+        """
+        print(f"🔍 if文節分離開始: '{sentence}'")
         
-        # コンマで分割を試行
-        if ',' in sentence:
-            parts = sentence.split(',', 1)  # 最初のコンマで分割
-            if_clause = parts[0].strip()
-            main_clause = parts[1].strip()
-            
-            # If節が実際にIfで始まるかチェック
-            if if_clause.lower().startswith('if '):
-                return if_clause, main_clause
-        
-        # コンマがない場合やIfが見つからない場合は依存関係解析
         doc = self.nlp(sentence)
-        return self._split_by_dependency(doc)
+        
+        # spaCy依存関係による条件節検出
+        conditional_info = self._detect_conditional_by_dependency(doc, sentence)
+        if conditional_info:
+            print(f"🎯 依存関係解析成功")
+            return conditional_info["if_clause"], conditional_info["main_clause"]
+        
+        # パターン分析による補完検出
+        print(f"🔍 パターン分析による補完検出")
+        pattern_info = self._detect_conditional_by_pattern(doc, sentence)
+        return pattern_info["if_clause"], pattern_info["main_clause"]
     
-    def _split_by_dependency(self, doc) -> Tuple[str, str]:
-        """依存関係解析による節分離"""
+    def _detect_conditional_by_dependency(self, doc, sentence: str) -> Optional[Dict[str, Any]]:
+        """
+        spaCy依存関係による条件節検出
+        """
+        print(f"🔍 依存関係による条件節検出: '{sentence}'")
         
-        if_start = -1
-        main_start = -1
-        
-        # If節の開始とメイン節の開始を特定
-        for i, token in enumerate(doc):
-            if token.text.lower() == 'if' and if_start == -1:
-                if_start = i
-            elif if_start != -1 and token.dep_ == 'ROOT':
-                main_start = i
-                break
-        
-        if if_start != -1 and main_start != -1:
-            # If節: ifからメイン動詞の前まで
-            if_tokens = [doc[j].text for j in range(if_start, main_start)]
-            # 句読点を除外
-            if_tokens = [t for t in if_tokens if t not in [',', '.']]
-            if_clause = ' '.join(if_tokens)
+        for token in doc:
+            print(f"   {token.text}: dep={token.dep_}, pos={token.pos_}, tag={token.tag_}")
             
-            # 主節: メイン動詞から最後まで
-            main_tokens = [doc[j].text for j in range(main_start, len(doc))]
-            # 句読点を除外
-            main_tokens = [t for t in main_tokens if t not in [',', '.']]
-            main_clause = ' '.join(main_tokens)
-        else:
-            # フォールバック処理
-            text = doc.text.replace(',', '').replace('.', '')
-            if ' if ' in text.lower():
-                # 'if'の位置で分割を試行
-                parts = text.split()
-                if_idx = -1
-                for i, word in enumerate(parts):
-                    if word.lower() == 'if':
-                        if_idx = i
+            # advcl: 副詞節（if節・when節等）
+            if token.dep_ == 'advcl':
+                # if節かどうか確認
+                if_marker = None
+                for child in token.children:
+                    if child.dep_ == 'mark' and child.text.lower() == 'if':
+                        if_marker = child
                         break
                 
-                if if_idx != -1:
-                    # 適切な分割点を探す（動詞の位置から判断）
-                    doc_parts = self.nlp(' '.join(parts))
-                    main_verb_idx = -1
-                    for i, token in enumerate(doc_parts):
-                        if token.dep_ == 'ROOT' and i > if_idx:
-                            main_verb_idx = i
+                if if_marker:
+                    print(f"🎯 advcl+mark(if)検出: '{token.text}' (依存関係使用: 条件節構造のため)")
+                    return self._analyze_advcl_conditional(doc, token, if_marker, sentence)
+        
+        return None
+    
+    def _analyze_advcl_conditional(self, doc, advcl_token, if_marker, sentence: str) -> Dict[str, Any]:
+        """
+        advcl条件節の分析（最もシンプルで確実な分割）
+        """
+        print(f"📋 advcl条件節分析: '{advcl_token.text}'")
+        
+        # カンマで分割（最も一般的で確実）
+        if ',' in sentence:
+            parts = sentence.split(',', 1)
+            # if句が最初に来る場合（標準的）
+            if parts[0].strip().lower().startswith('if'):
+                if_clause = parts[0].strip()
+                main_clause = parts[1].strip()
+            else:
+                # if句が後に来る場合（稀）
+                main_clause = parts[0].strip()
+                if_clause = parts[1].strip()
+        else:
+            # カンマがない場合はif位置で判定
+            if_pos = sentence.lower().find(' if ')
+            if if_pos == -1:
+                if_pos = 0 if sentence.lower().startswith('if ') else -1
+            
+            if if_pos == 0 or if_pos == -1:  # 文頭if
+                # 主動詞（ROOT）の前後で分割
+                root_token = None
+                for token in doc:
+                    if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+                        root_token = token
+                        break
+                
+                if root_token:
+                    # if節の動詞位置とmain動詞位置で判定
+                    if_verb_pos = -1
+                    main_verb_pos = root_token.idx
+                    
+                    # if節内の動詞を探す
+                    for token in doc:
+                        if (token.dep_ == 'advcl' and 
+                            any(child.dep_ == 'mark' and child.text.lower() == 'if' 
+                                for child in token.children)):
+                            if_verb_pos = token.idx
                             break
                     
-                    if main_verb_idx != -1:
-                        if_clause = ' '.join(parts[if_idx:main_verb_idx])
-                        main_clause = ' '.join(parts[main_verb_idx:])
+                    if if_verb_pos != -1 and if_verb_pos < main_verb_pos:
+                        # if節が先、main節が後
+                        split_words = sentence.split()
+                        if_end = -1
+                        for i, word in enumerate(split_words):
+                            if word.lower() in ['will', 'would', 'can', 'could', 'may', 'might', 'should', 'shall']:
+                                if_end = i
+                                break
+                        
+                        if if_end > 0:
+                            if_clause = ' '.join(split_words[:if_end])
+                            main_clause = ' '.join(split_words[if_end:])
+                        else:
+                            # フォールバック: 文の半分で分割
+                            mid = len(split_words) // 2
+                            if_clause = ' '.join(split_words[:mid])
+                            main_clause = ' '.join(split_words[mid:])
                     else:
-                        if_clause = ' '.join(parts[if_idx:])
-                        main_clause = ''
+                        # フォールバック: 文の半分で分割
+                        words = sentence.split()
+                        mid = len(words) // 2
+                        if_clause = ' '.join(words[:mid])
+                        main_clause = ' '.join(words[mid:])
                 else:
-                    if_clause = text
-                    main_clause = ''
+                    # フォールバック: 文の半分で分割
+                    words = sentence.split()
+                    mid = len(words) // 2
+                    if_clause = ' '.join(words[:mid])
+                    main_clause = ' '.join(words[mid:])
             else:
-                if_clause = text
-                main_clause = ''
+                # 文中if
+                if_clause = sentence[if_pos:].strip()
+                main_clause = sentence[:if_pos].strip()
         
-        return if_clause, main_clause
+        print(f"   条件節: '{if_clause}'")
+        print(f"   主節: '{main_clause}'")
+        
+        print("🎯 依存関係解析成功")
+        return {
+            "if_clause": if_clause,
+            "main_clause": main_clause,
+            "structure_type": "dependency"
+        }
     
-    def _analyze_if_clause(self, if_clause: str) -> Dict[str, str]:
-        """If節の解析"""
+    def _detect_conditional_by_pattern(self, doc, sentence: str) -> Dict[str, Any]:
+        """
+        パターン分析による条件節検出（シンプルで確実な方法）
+        """
+        print(f"🔍 パターン分析による条件節検出: '{sentence}'")
+        
+        # カンマで分割を試行（最も確実）
+        if ',' in sentence:
+            parts = sentence.split(',', 1)
+            part1 = parts[0].strip()
+            part2 = parts[1].strip()
+            
+            # ifがどこにあるか確認
+            if part1.lower().startswith('if '):
+                if_clause = part1
+                main_clause = part2
+            elif 'if ' in part2.lower():
+                main_clause = part1
+                if_clause = part2
+            else:
+                # デフォルト: 最初の部分をif節とする
+                if_clause = part1
+                main_clause = part2
+        else:
+            # カンマなしの場合: ifの位置で分割
+            sentence_lower = sentence.lower()
+            if_pos = sentence_lower.find('if ')
+            
+            if if_pos == 0:  # 文頭if
+                # 助動詞を見つけて分割
+                words = sentence.split()
+                split_idx = len(words) // 2  # デフォルトは中間
+                
+                for i, word in enumerate(words):
+                    if word.lower() in ['will', 'would', 'can', 'could', 'may', 'might', 'should', 'shall', 'must']:
+                        # この助動詞が主節の一部か確認
+                        if i > 2:  # "if it rains"より後にある
+                            split_idx = i
+                            break
+                
+                if_clause = ' '.join(words[:split_idx])
+                main_clause = ' '.join(words[split_idx:])
+                
+            elif if_pos > 0:  # 文中if
+                if_clause = sentence[if_pos:].strip()
+                main_clause = sentence[:if_pos].strip()
+            else:
+                # ifが見つからない場合（エラー処理）
+                if_clause = sentence
+                main_clause = ""
+        
+        print(f"📝 If節: '{if_clause}'")
+        print(f"📝 主節: '{main_clause}'")
+        
+        return {
+            "if_clause": if_clause,
+            "main_clause": main_clause,
+            "structure_type": "pattern_based"
+        }
+    
+    def _analyze_main_clause_for_conditional(self, main_clause: str) -> Dict[str, str]:
+        """
+        仮定法主節の解析（構造化アプローチ使用）
+        """
+        print(f"📋 主節解析開始: '{main_clause}'")
+        
+        main_slots = {}
+        doc = self.nlp(main_clause)
+        
+        # 各要素を解析
+        main_slots["M1"] = ""  # 条件節情報は別途設定
+        
+        # 主語検出
+        subject = self._extract_subject(doc)
+        main_slots["S"] = subject if subject else ""
+        
+        # 助動詞検出
+        auxiliary = self._extract_auxiliary(doc)
+        main_slots["Aux"] = auxiliary if auxiliary else ""
+        
+        # 動詞検出
+        verb = self._extract_main_verb(doc)
+        main_slots["V"] = verb if verb else ""
+        
+        # その他の要素検出
+        other_elements = self._extract_other_elements(doc, subject, auxiliary, verb)
+        main_slots["M2"] = other_elements if other_elements else ""
+        
+        print(f"   主語: '{main_slots['S']}'")
+        print(f"   助動詞: '{main_slots['Aux']}'")
+        print(f"   動詞: '{main_slots['V']}'")
+        print(f"   その他: '{main_slots['M2']}'")
+        
+        return main_slots
+    
+    def _extract_subject(self, doc) -> str:
+        """主語を抽出"""
+        for token in doc:
+            if token.dep_ in ['nsubj', 'nsubjpass', 'csubj']:
+                # 主語とその修飾語を含める
+                subject_tokens = [token]
+                for child in token.children:
+                    if child.dep_ in ['det', 'amod', 'compound']:
+                        subject_tokens.append(child)
+                subject_tokens.sort(key=lambda t: t.i)
+                return " ".join([t.text for t in subject_tokens])
+        return ""
+    
+    def _extract_auxiliary(self, doc) -> str:
+        """助動詞を抽出"""
+        for token in doc:
+            if token.dep_ == 'aux' or token.pos_ == 'AUX':
+                return token.text
+        return ""
+    
+    def _extract_main_verb(self, doc) -> str:
+        """主動詞を抽出"""
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+                return token.text
+        return ""
+    
+    def _extract_other_elements(self, doc, subject: str, auxiliary: str, verb: str) -> str:
+        """その他の要素を抽出"""
+        used_words = set()
+        if subject:
+            used_words.update(subject.split())
+        if auxiliary:
+            used_words.add(auxiliary)
+        if verb:
+            used_words.add(verb)
+        
+        other_tokens = []
+        for token in doc:
+            if (token.text not in used_words and 
+                token.pos_ not in ['PUNCT'] and
+                token.dep_ not in ['aux', 'nsubj', 'ROOT']):
+                other_tokens.append(token)
+        
+        other_tokens.sort(key=lambda t: t.i)
+        return " ".join([t.text for t in other_tokens])
+    
+    def _analyze_if_clause_for_conditional(self, if_clause: str) -> Dict[str, str]:
+        """
+        仮定法if節の解析（構造化アプローチ使用）
+        """
+        print(f"📋 if節解析開始: '{if_clause}'")
         
         sub_slots = {}
         
-        # spaCy解析
-        doc = self.nlp(if_clause)
+        # "if"を除去して解析
+        clause_without_if = if_clause.lower().replace("if ", "").strip()
+        doc = self.nlp(clause_without_if)
         
-        # 基本構造抽出
-        if_word = ""
-        subject = ""
-        verb = ""
-        auxiliary = ""
-        obj = ""
-        complement = ""
-        modifier = ""
+        # 主語検出
+        subject = self._extract_subject(doc)
+        sub_slots["sub-s"] = f"If {subject}" if subject else "If it"
         
-        for token in doc:
-            if token.text.lower() in ['if', 'even', 'unless', 'suppose', 'imagine', 'provided', 'as']:
-                if_word += token.text + " "
-            elif token.dep_ == 'nsubj':
-                subject = token.text
-            elif token.pos_ == 'AUX' and token.dep_ != 'ROOT':
-                auxiliary = token.text
-            elif token.dep_ == 'ROOT' or (token.pos_ == 'VERB' and not auxiliary):
-                verb = token.text
-            elif token.dep_ in ['dobj', 'pobj']:
-                obj += token.text + " "
-            elif token.dep_ in ['acomp', 'attr']:
-                complement = token.text
-            elif token.dep_ in ['advmod', 'npadvmod']:
-                modifier += token.text + " "
+        # 動詞検出
+        verb = self._extract_main_verb(doc)
+        sub_slots["sub-v"] = verb if verb else ""
         
-        # If + 主語の結合
-        if_word = if_word.strip()
-        if subject:
-            sub_slots['sub-s'] = f"{if_word} {subject}".strip()
-        else:
-            sub_slots['sub-s'] = if_word
+        # その他の要素検出
+        other_elements = self._extract_other_elements(doc, subject, "", verb)
+        sub_slots["sub-m2"] = other_elements if other_elements else ""
         
-        # 動詞関連
-        if auxiliary:
-            sub_slots['sub-aux'] = auxiliary
-        if verb:
-            sub_slots['sub-v'] = verb
+        # 親スロット情報
+        sub_slots["_parent_slot"] = "M1"
         
-        # 目的語・補語
-        if obj.strip():
-            sub_slots['sub-o1'] = obj.strip()
-        if complement:
-            sub_slots['sub-c1'] = complement
-        
-        # 修飾語
-        if modifier.strip():
-            sub_slots['sub-m2'] = modifier.strip()
+        print(f"   if主語: '{sub_slots['sub-s']}'")
+        print(f"   if動詞: '{sub_slots['sub-v']}'")
+        print(f"   ifその他: '{sub_slots['sub-m2']}'")
         
         return sub_slots
-    
-    def _analyze_main_clause(self, main_clause: str) -> Dict[str, str]:
-        """主節の解析"""
-        
-        main_slots = {}
-        
-        # spaCy解析
-        doc = self.nlp(main_clause)
-        
-        # 基本構造抽出
-        subject = ""
-        verb = ""
-        auxiliary = ""
-        obj = ""
-        complement = ""
-        modifier = ""
-        
-        for token in doc:
-            if token.dep_ == 'nsubj':
-                subject = token.text
-            elif token.pos_ == 'AUX' and token.dep_ != 'ROOT':
-                auxiliary += token.text + " "
-            elif token.dep_ == 'ROOT' or (token.pos_ == 'VERB' and verb == ""):
-                verb = token.text
-            elif token.dep_ in ['dobj']:
-                obj = token.text + " " + obj if obj else token.text
-            elif token.dep_ in ['acomp', 'attr']:
-                complement = token.text
-            elif token.dep_ in ['advmod', 'npadvmod'] and token.text.lower() not in ['please']:
-                modifier += token.text + " "
-            elif token.text.lower() == 'please':
-                # pleaseは特別扱い
-                if 'M2' not in main_slots:
-                    main_slots['M2'] = 'please'
-        
-        # スロット設定
-        if subject:
-            main_slots['S'] = subject
-        if auxiliary.strip():
-            main_slots['Aux'] = auxiliary.strip()
-        if verb:
-            main_slots['V'] = verb
-        if obj:
-            main_slots['O1'] = obj.strip()
-        if complement:
-            main_slots['C1'] = complement
-        if modifier.strip():
-            if 'M2' not in main_slots:
-                main_slots['M2'] = modifier.strip()
-        
-        return main_slots
     
     def _determine_parent_slot(self, conditional_type: str, main_clause: str) -> str:
         """親スロットの決定"""
@@ -486,7 +604,7 @@ class ConditionalHandler:
             sub_slots = self._analyze_inversion_clause(inversion_clause, conditional_type)
             
             # 主節の解析
-            main_slots = self._analyze_main_clause(main_clause)
+            main_slots = self._analyze_main_clause_for_conditional(main_clause)
             
             # 親スロット決定（倒置仮定法は通常M1またはM2）
             parent_slot = 'M1' if 'had' in conditional_type else 'M2'
@@ -718,7 +836,7 @@ class ConditionalHandler:
             print(f"📝 As if節: '{as_if_clause}'")
             
             # 主節の解析
-            main_slots = self._analyze_main_clause(main_part)
+            main_slots = self._analyze_main_clause_for_conditional(main_part)
             
             # As if節の解析
             sub_slots = self._analyze_as_if_clause(as_if_clause, conditional_type)
@@ -818,7 +936,7 @@ class ConditionalHandler:
             print(f"📝 主節: '{main_clause}'")
             
             # 主節の解析
-            main_slots = self._analyze_main_clause(main_clause)
+            main_slots = self._analyze_main_clause_for_conditional(main_clause)
             
             # 前置詞句をM2に設定
             main_slots['M2'] = prep_phrase
@@ -874,7 +992,7 @@ class ConditionalHandler:
             sub_slots = self._analyze_generic_condition(condition_clause, conditional_type)
             
             # 主節の解析
-            main_slots = self._analyze_main_clause(main_clause)
+            main_slots = self._analyze_main_clause_for_conditional(main_clause)
             
             # 親スロット決定
             parent_slot = 'M1' if conditional_type in ['imagine'] else 'M2'

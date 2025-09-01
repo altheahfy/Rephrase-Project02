@@ -23,13 +23,13 @@
         "S": "it",
         "Aux": "will",
         "V": "rains",
+        "M1": "",
         "M2": "home"
       },
       "sub_slots": {
-        "sub-s": "Basic_If it",
-        "sub-aux": "will",
+        "sub-s": "If it",
         "sub-v": "rains",
-        "sub-m2": "tomorrow home",
+        "sub-m2": "tomorrow",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -53,20 +53,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If it",
+          "value": "If it",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "will",
-          "display_order": 2
         },
         "sub-v": {
           "value": "rains",
-          "display_order": 3
+          "display_order": 2
         },
         "sub-m2": {
-          "value": "tomorrow home",
-          "display_order": 4
+          "value": "tomorrow",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -104,14 +100,13 @@
         "Aux": "can",
         "V": "study",
         "O1": "the exam",
+        "M1": "",
         "M2": "hard"
       },
       "sub_slots": {
-        "sub-s": "Basic_If you",
-        "sub-aux": "can",
+        "sub-s": "If you",
         "sub-v": "study",
-        "sub-o1": "exam",
-        "sub-m2": "hard",
+        "sub-m2": "hard can",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -135,24 +130,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If you",
+          "value": "If you",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "can",
-          "display_order": 2
         },
         "sub-v": {
           "value": "study",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "exam",
-          "display_order": 4
+          "display_order": 2
         },
         "sub-m2": {
-          "value": "hard",
-          "display_order": 5
+          "value": "hard can",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -192,13 +179,13 @@
         "V": "travel",
         "O1": "the world",
         "C1": "rich",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "Basic_If I",
-        "sub-aux": "were",
-        "sub-v": "travel",
-        "sub-o1": "world",
+        "sub-s": "If i",
+        "sub-v": "",
+        "sub-m2": "rich",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -222,20 +209,12 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If I",
+          "value": "If i",
           "display_order": 1
         },
-        "sub-aux": {
-          "value": "were",
+        "sub-m2": {
+          "value": "rich",
           "display_order": 2
-        },
-        "sub-v": {
-          "value": "travel",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "world",
-          "display_order": 4
         },
         "_parent_slot": "M2"
       },
@@ -275,13 +254,13 @@
         "Aux": "could",
         "V": "had",
         "O1": "time",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "Basic_If she",
-        "sub-aux": "could",
+        "sub-s": "If she",
         "sub-v": "had",
-        "sub-o1": "time us",
+        "sub-m2": "time",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -305,20 +284,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If she",
+          "value": "If she",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "could",
-          "display_order": 2
         },
         "sub-v": {
           "value": "had",
-          "display_order": 3
+          "display_order": 2
         },
-        "sub-o1": {
-          "value": "time us",
-          "display_order": 4
+        "sub-m2": {
+          "value": "time",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -358,14 +333,13 @@
         "Aux": "would have",
         "V": "studied",
         "O1": "the test",
+        "M1": "",
         "M2": "harder"
       },
       "sub_slots": {
-        "sub-s": "Basic_If I",
-        "sub-aux": "had",
+        "sub-s": "If i",
         "sub-v": "studied",
-        "sub-o1": "test",
-        "sub-m2": "harder",
+        "sub-m2": "harder have",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -389,24 +363,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If I",
+          "value": "If i",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "had",
-          "display_order": 2
         },
         "sub-v": {
           "value": "studied",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "test",
-          "display_order": 4
+          "display_order": 2
         },
         "sub-m2": {
-          "value": "harder",
-          "display_order": 5
+          "value": "harder have",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -446,14 +412,13 @@
         "Aux": "could have",
         "V": "arrived",
         "O1": "the show",
+        "M1": "",
         "M2": "earlier"
       },
       "sub_slots": {
-        "sub-s": "Basic_If they",
-        "sub-aux": "had",
-        "sub-v": "arrived",
-        "sub-o1": "show",
-        "sub-m2": "earlier",
+        "sub-s": "If they",
+        "sub-v": "have",
+        "sub-m2": "arrived earlier",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -477,24 +442,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If they",
+          "value": "If they",
           "display_order": 1
         },
-        "sub-aux": {
-          "value": "had",
+        "sub-v": {
+          "value": "have",
           "display_order": 2
         },
-        "sub-v": {
-          "value": "arrived",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "show",
-          "display_order": 4
-        },
         "sub-m2": {
-          "value": "earlier",
-          "display_order": 5
+          "value": "arrived earlier",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -535,13 +492,13 @@
         "Aux": "would be",
         "V": "born",
         "C1": "happy",
+        "M1": "",
         "M2": "now"
       },
       "sub_slots": {
-        "sub-s": "Basic_If I",
-        "sub-aux": "had",
+        "sub-s": "If i",
         "sub-v": "born",
-        "sub-m2": "now",
+        "sub-m2": "been rich",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -565,20 +522,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If I",
+          "value": "If i",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "had",
-          "display_order": 2
         },
         "sub-v": {
           "value": "born",
-          "display_order": 3
+          "display_order": 2
         },
         "sub-m2": {
-          "value": "now",
-          "display_order": 4
+          "value": "been rich",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -618,14 +571,13 @@
         "Aux": "have",
         "V": "finished",
         "O1": "your work",
+        "M1": "",
         "M2": "early"
       },
       "sub_slots": {
-        "sub-s": "Basic_If you",
-        "sub-aux": "have",
-        "sub-v": "finished",
-        "sub-o1": "work",
-        "sub-m2": "early",
+        "sub-s": "If you",
+        "sub-v": "",
+        "sub-m2": "finished your work",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -649,24 +601,12 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If you",
+          "value": "If you",
           "display_order": 1
         },
-        "sub-aux": {
-          "value": "have",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "finished",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "work",
-          "display_order": 4
-        },
         "sub-m2": {
-          "value": "early",
-          "display_order": 5
+          "value": "finished your work",
+          "display_order": 2
         },
         "_parent_slot": "M2"
       },
@@ -705,6 +645,7 @@
         "Aux": "would",
         "V": "accept",
         "O1": "the offer",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
@@ -755,7 +696,7 @@
         "7": ""
       }
     },
-    "match": true
+    "match": false
   },
   "case_140": {
     "sentence": "Had she known the truth, she would have acted differently.",
@@ -866,6 +807,7 @@
         "Aux": "Should",
         "V": "need",
         "O1": "help",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
@@ -1147,12 +1089,15 @@
       "success": true,
       "text": "He talks as if he were the boss.",
       "main_slots": {
+        "S": "He",
+        "Aux": "",
+        "V": "talks",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "Basic_If He",
+        "sub-s": "as if he",
         "sub-aux": "were",
-        "sub-v": "talks",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -1167,20 +1112,19 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If He",
+          "value": "as if he",
           "display_order": 1
         },
         "sub-aux": {
           "value": "were",
           "display_order": 2
         },
-        "sub-v": {
-          "value": "talks",
-          "display_order": 3
-        },
         "_parent_slot": "M2"
       },
       "ordered_slots": {
+        "3": "He",
+        "4": "",
+        "5": "talks",
         "7": ""
       }
     },
@@ -1210,6 +1154,7 @@
         "Aux": "had",
         "V": "looked",
         "O1": "a ghost",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
@@ -1285,6 +1230,7 @@
         "S": "I",
         "Aux": "would have",
         "V": "failed",
+        "M1": "",
         "M2": "Without your help"
       },
       "sub_slots": {},
@@ -1314,7 +1260,7 @@
         "7": "Without your help"
       }
     },
-    "match": true
+    "match": false
   },
   "case_148": {
     "sentence": "But for the rain, we could have had a picnic.",
@@ -1336,6 +1282,7 @@
         "Aux": "could have",
         "V": "had",
         "O1": "a picnic",
+        "M1": "",
         "M2": "for the rain"
       },
       "sub_slots": {},
@@ -1392,6 +1339,7 @@
         "Aux": "will",
         "V": "hurry",
         "O1": "the train",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
@@ -1531,13 +1479,13 @@
         "Aux": "would be",
         "V": "Imagine",
         "C1": "how exciting",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "Basic_If we",
-        "sub-aux": "could",
-        "sub-v": "Imagine",
-        "sub-m2": "how",
+        "sub-s": "If we",
+        "sub-v": "fly",
+        "sub-m2": "how exciting be",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -1561,20 +1509,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If we",
+          "value": "If we",
           "display_order": 1
         },
-        "sub-aux": {
-          "value": "could",
+        "sub-v": {
+          "value": "fly",
           "display_order": 2
         },
-        "sub-v": {
-          "value": "Imagine",
-          "display_order": 3
-        },
         "sub-m2": {
-          "value": "how",
-          "display_order": 4
+          "value": "how exciting be",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -1613,6 +1557,7 @@
         "Aux": "can",
         "V": "Provided",
         "O1": "a break",
+        "M1": "",
         "M2": "Provided that you finish on time",
         "M3": "on time"
       },
@@ -1701,22 +1646,13 @@
         "M2": "As",
         "M3": "long"
       },
-      "sub_slots": {
-        "sub-s": "As long as you",
-        "sub-aux": "be",
-        "sub-v": "promise",
-        "sub-o1": "car",
-        "sub-m2": "As",
-        "_parent_slot": "M2"
-      },
+      "sub_slots": {},
       "metadata": {
         "controller": "central",
-        "primary_handler": "conditional",
+        "primary_handler": "modal",
         "collaboration": [
-          "adverb",
-          "conditional"
+          "adverb"
         ],
-        "conditional_info": {},
         "modal_info": {
           "has_modal": true,
           "modal_type": "modal_verb",
@@ -1727,29 +1663,6 @@
           "structure_type": "modal"
         },
         "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "As long as you",
-          "display_order": 1
-        },
-        "sub-aux": {
-          "value": "be",
-          "display_order": 2
-        },
-        "sub-v": {
-          "value": "promise",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "car",
-          "display_order": 4
-        },
-        "sub-m2": {
-          "value": "As",
-          "display_order": 5
-        },
-        "_parent_slot": "M2"
       },
       "ordered_slots": {
         "4": "may",
@@ -1788,13 +1701,13 @@
         "S": "I",
         "Aux": "would have",
         "V": "known",
+        "M1": "",
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "Basic_If I",
-        "sub-aux": "had",
+        "sub-s": "If i",
         "sub-v": "known",
-        "sub-o1": "dinner",
+        "sub-m2": "you were",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -1818,20 +1731,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If I",
+          "value": "If i",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "had",
-          "display_order": 2
         },
         "sub-v": {
           "value": "known",
-          "display_order": 3
+          "display_order": 2
         },
-        "sub-o1": {
-          "value": "dinner",
-          "display_order": 4
+        "sub-m2": {
+          "value": "you were",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },
@@ -1869,14 +1778,13 @@
         "Aux": "will",
         "V": "costs",
         "O1": "a lot",
+        "M1": "",
         "M2": "Even"
       },
       "sub_slots": {
-        "sub-s": "Basic_If it",
-        "sub-aux": "will",
+        "sub-s": "If it",
         "sub-v": "costs",
-        "sub-o1": "lot house",
-        "sub-m2": "Even",
+        "sub-m2": "a lot buy that house",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -1900,24 +1808,16 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "Basic_If it",
+          "value": "If it",
           "display_order": 1
-        },
-        "sub-aux": {
-          "value": "will",
-          "display_order": 2
         },
         "sub-v": {
           "value": "costs",
-          "display_order": 3
-        },
-        "sub-o1": {
-          "value": "lot house",
-          "display_order": 4
+          "display_order": 2
         },
         "sub-m2": {
-          "value": "Even",
-          "display_order": 5
+          "value": "a lot buy that house",
+          "display_order": 3
         },
         "_parent_slot": "M2"
       },

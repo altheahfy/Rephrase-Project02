@@ -1,0 +1,52 @@
+{
+  "case_135": {
+    "sentence": "If I had studied harder, I would have passed the test.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would have",
+        "V": "passed",
+        "O1": "the test"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "passed",
+        "O1": "the test",
+        "M2": "",
+        "Aux": "would have"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had studied harder,",
+        "main_clause": "I would have passed the test.",
+        "confidence": 0.95
+      }
+    },
+    "match": true
+  }
+}

@@ -11,7 +11,7 @@ Phase 2: RelativeClauseHandler統合
 
 import spacy
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
 from relative_adverb_handler import RelativeAdverbHandler
@@ -628,10 +628,12 @@ class CentralController:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
         
-        # 🎯 仮定法処理（疑問文でない場合に適用）
+        # 🎯 仮定法処理（人間的文法識別アプローチ）
         if 'conditional' in grammar_patterns and 'question' not in grammar_patterns:
+            print(f"🎯 人間的文法識別による仮定法処理開始")
             # 助動詞処理の結果があるかチェック
             modal_success_result = locals().get('modal_success_result')
+            return self._process_conditional_by_human_grammar(text, modal_success_result)
             
             # Step 1: AdverbHandlerで修飾語分離（助動詞処理済みでない場合のみ）
             if not modal_success_result:
@@ -662,14 +664,20 @@ class CentralController:
                 conditional_main_slots = conditional_result['main_slots']
                 conditional_sub_slots = conditional_result.get('sub_slots', {})
                 
-                # 助動詞処理結果がある場合は統合
+                # 仮定法の場合、仮定法処理結果を優先
                 if modal_success_result:
-                    # 助動詞結果と仮定法結果を統合
-                    final_main_slots = modal_success_result['main_slots'].copy()
+                    # 仮定法処理のmain_slotsを基本とし、助動詞処理結果から必要な情報のみ補完
+                    final_main_slots = conditional_main_slots.copy()
                     
-                    # 仮定法のmain_slotsから不足するスロットを追加
-                    for slot, value in conditional_main_slots.items():
-                        if slot not in final_main_slots or (slot == 'M1' and value == ''):
+                    # 助動詞情報のみ助動詞処理結果から取得
+                    modal_main_slots = modal_success_result['main_slots']
+                    if 'Aux' in modal_main_slots:
+                        final_main_slots['Aux'] = modal_main_slots['Aux']
+                        print(f"🔧 助動詞情報を補完: Aux = '{modal_main_slots['Aux']}'")
+                    
+                    # 仮定法処理で設定されていない追加スロットを補完
+                    for slot, value in modal_main_slots.items():
+                        if slot not in final_main_slots and value:
                             final_main_slots[slot] = value
                             print(f"🔧 仮定法スロット追加: {slot} = '{value}'")
                     
@@ -1355,6 +1363,365 @@ class CentralController:
             return f"{slot_key}_question"
         else:
             return f"{slot_key}_normal"
+    
+    def _process_conditional_by_human_grammar(self, text: str, modal_success_result: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        人間的文法識別による仮定法処理
+        
+        ステップ:
+        ①If sv, sv.パターンを識別
+        ②if節を副詞に置換して主節を基本分解
+        ③if節も基本分解
+        ④仮定法特化処理
+        ⑤統合
+        """
+        try:
+            print(f"📝 元文: '{text}'")
+            
+            # ①If sv, sv.パターンを識別し分離
+            if_clause, main_clause = self._split_conditional_sentence(text)
+            if not if_clause or not main_clause:
+                print(f"❌ 仮定法パターンの分離に失敗")
+                return {'success': False, 'error': 'Failed to split conditional pattern'}
+            
+            print(f"📝 If節: '{if_clause}'")
+            print(f"📝 主節: '{main_clause}'")
+            
+            # ②主節の基本分解（if節を副詞に置換）
+            simplified_main = self._replace_if_clause_with_adverb(text, if_clause)
+            print(f"📝 簡略化主節: '{simplified_main}'")
+            
+            main_basic_result = self._process_basic_decomposition(simplified_main)
+            print(f"📝 主節基本分解: {main_basic_result}")
+            
+            # ③if節の分解（助動詞処理を含む）
+            if_clause_without_if = if_clause.replace('If ', '').replace('if ', '')
+            if_basic_result = self._process_basic_decomposition(if_clause_without_if)
+            
+            # If節にも助動詞処理を適用
+            if if_basic_result.get('success', False):
+                # 助動詞検出を試行
+                modal_handler = self.handlers.get('modal')
+                if modal_handler:
+                    if_modal_result = modal_handler.process(if_clause_without_if)
+                    if if_modal_result.get('success', False):
+                        if_basic_result = if_modal_result
+                        print(f"📝 If節助動詞処理完了: {if_basic_result}")
+            
+            print(f"📝 If節基本分解: {if_basic_result}")
+            
+            # ④⑤仮定法特化処理と統合
+            final_result = self._integrate_conditional_results(
+                main_basic_result, if_basic_result, if_clause, main_clause, modal_success_result
+            )
+            
+            print(f"✅ 人間的文法識別処理完了: {final_result}")
+            return self._apply_order_to_result(final_result)
+            
+        except Exception as e:
+            print(f"❌ 人間的文法識別処理エラー: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def _split_conditional_sentence(self, text: str) -> Tuple[str, str]:
+        """
+        仮定法文を条件節と主節に分離（関係節ハンドラー方式を参考）
+        
+        Args:
+            text: 仮定法文
+            
+        Returns:
+            Tuple[str, str]: (条件節, 主節)
+        """
+        print(f"🔍 節境界識別開始: '{text}'")
+        
+        doc = self.nlp(text)
+        
+        # Step 1: spaCy依存関係による条件節検出（関係節ハンドラー方式）
+        conditional_info = self._detect_by_dependency_analysis(doc, text)
+        if conditional_info:
+            print(f"✅ 依存関係解析成功")
+            return conditional_info['if_clause'], conditional_info['main_clause']
+        
+        # Step 2: 品詞分析による補完検出（名詞節ハンドラー方式）
+        print(f"🔍 品詞分析による補完検出")
+        return self._detect_by_pos_analysis_conditional(doc, text)
+    
+    def _detect_by_dependency_analysis(self, doc, text: str) -> Optional[Dict[str, str]]:
+        """spaCy依存関係による条件節検出（関係節ハンドラー方式）"""
+        print(f"🔍 依存関係解析による条件節検出: '{text}'")
+        
+        for token in doc:
+            print(f"   {token.text}: dep={token.dep_}, pos={token.pos_}, tag={token.tag_}")
+            
+            # advcl: 副詞節（if節・when節等）
+            if token.dep_ == 'advcl':
+                # if節かどうか確認
+                if_marker = None
+                for child in token.children:
+                    if child.dep_ == 'mark' and child.text.lower() == 'if':
+                        if_marker = child
+                        break
+                
+                if if_marker:
+                    print(f"🎯 advcl+mark(if)検出: '{token.text}' → 条件節境界解析")
+                    return self._analyze_conditional_boundary(doc, token, if_marker, text)
+        
+        return None
+    
+    def _analyze_conditional_boundary(self, doc, advcl_token, if_marker, text: str) -> Dict[str, str]:
+        """
+        条件節境界の詳細解析（関係節ハンドラーの境界解析方式）
+        """
+        print(f"📋 条件節境界解析: advcl='{advcl_token.text}', if_pos={if_marker.i}")
+        
+        # if節の範囲を特定
+        if_start = if_marker.i  # if の位置
+        if_end = advcl_token.i   # 条件節動詞の位置
+        
+        # 主節の開始位置を特定（ROOT動詞）
+        main_start = None
+        for token in doc:
+            if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
+                main_start = token.i
+                break
+        
+        if main_start is None:
+            print(f"⚠️ 主節動詞(ROOT)が見つかりません")
+            return self._fallback_comma_split(text)
+        
+        print(f"📍 節境界: if_start={if_start}, if_end={if_end}, main_start={main_start}")
+        
+        # 条件節の範囲を拡張（目的語・修飾語を含める）
+        if_extended_end = self._extend_clause_boundary(doc, advcl_token, main_start)
+        
+        # 文字列分割
+        words = text.split()
+        if_clause = ' '.join(words[if_start:if_extended_end + 1])
+        main_clause = ' '.join(words[if_extended_end + 1:])
+        
+        print(f"📝 条件節: '{if_clause}'")
+        print(f"📝 主節: '{main_clause}'")
+        
+        return {
+            'if_clause': if_clause,
+            'main_clause': main_clause
+        }
+    
+    def _extend_clause_boundary(self, doc, verb_token, main_start: int) -> int:
+        """
+        節境界を拡張（動詞の目的語・修飾語を含める）
+        関係節ハンドラーの境界拡張ロジックを参考
+        """
+        extended_end = verb_token.i
+        
+        # 動詞の子要素（目的語・修飾語）を探索
+        for child in verb_token.children:
+            # 主節より前の要素のみ対象
+            if child.i < main_start:
+                extended_end = max(extended_end, child.i)
+                
+                # 孫要素も確認（形容詞の修飾語など）
+                for grandchild in child.children:
+                    if grandchild.i < main_start:
+                        extended_end = max(extended_end, grandchild.i)
+        
+        print(f"📏 節境界拡張: {verb_token.i} → {extended_end}")
+        return extended_end
+    
+    def _detect_by_pos_analysis_conditional(self, doc, text: str) -> Tuple[str, str]:
+        """品詞分析による補完検出（名詞節ハンドラー方式）"""
+        print(f"🔍 品詞分析による補完検出: '{text}'")
+        
+        # カンマベース分割（最も確実）
+        if ',' in text:
+            parts = text.split(',', 1)
+            if parts[0].strip().lower().startswith('if'):
+                return parts[0].strip(), parts[1].strip()
+            else:
+                return parts[1].strip(), parts[0].strip()
+        
+        # フォールバック: 助動詞位置での分割
+        return self._fallback_modal_split(text)
+    
+    def _fallback_comma_split(self, text: str) -> Dict[str, str]:
+        """フォールバック: カンマ分割"""
+        if ',' in text:
+            parts = text.split(',', 1)
+            return {
+                'if_clause': parts[0].strip(),
+                'main_clause': parts[1].strip()
+            }
+        return self._fallback_modal_split_dict(text)
+    
+    def _fallback_modal_split(self, text: str) -> Tuple[str, str]:
+        """フォールバック: 助動詞位置での分割"""
+        words = text.split()
+        
+        # 助動詞を探す
+        modal_idx = -1
+        for i, word in enumerate(words):
+            if word.lower() in ['will', 'would', 'can', 'could', 'may', 'might', 'should', 'shall']:
+                if i > 2:  # "if it rains"より後
+                    modal_idx = i
+                    break
+        
+        if modal_idx > 0:
+            if_clause = ' '.join(words[:modal_idx])
+            main_clause = ' '.join(words[modal_idx:])
+        else:
+            # 半分で分割
+            mid = len(words) // 2
+            if_clause = ' '.join(words[:mid])
+            main_clause = ' '.join(words[mid:])
+        
+        return if_clause, main_clause
+    
+    def _fallback_modal_split_dict(self, text: str) -> Dict[str, str]:
+        """フォールバック: 助動詞位置での分割（辞書形式）"""
+        if_clause, main_clause = self._fallback_modal_split(text)
+        return {
+            'if_clause': if_clause,
+            'main_clause': main_clause
+        }
+    
+    def _replace_if_clause_with_adverb(self, text: str, if_clause: str) -> str:
+        """If節を副詞に置換"""
+        # 時間的副詞に置換（仮定法の意味を保持）
+        replacement = "conditionally"
+        return text.replace(if_clause + ',', replacement + ',').replace(if_clause, replacement)
+    
+    def _process_basic_decomposition(self, text: str) -> Dict[str, Any]:
+        """基本的な5文型+副詞分解"""
+        try:
+            # Step 1: 副詞分離
+            adverb_handler = self.handlers['adverb']
+            adverb_result = adverb_handler.process(text)
+            
+            processing_text = text
+            modifier_slots = {}
+            
+            if adverb_result['success']:
+                processing_text = adverb_result['separated_text']
+                modifier_slots = adverb_result.get('modifier_slots', {})
+            
+            # Step 2: 5文型分解
+            five_pattern_handler = self.handlers['basic_five_pattern']
+            five_result = five_pattern_handler.process(processing_text)
+            
+            if five_result['success']:
+                # 結果統合
+                final_slots = five_result['slots'].copy()
+                final_slots.update(modifier_slots)
+                
+                return {
+                    'success': True,
+                    'main_slots': final_slots,
+                    'sub_slots': {},
+                    'collaboration': ['adverb', 'basic_five_pattern'],
+                    'primary_handler': 'basic_five_pattern'
+                }
+            else:
+                return {'success': False, 'error': 'Basic decomposition failed'}
+                
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def _integrate_conditional_results(self, main_basic_result: Dict, if_basic_result: Dict, 
+                                     if_clause: str, main_clause: str, 
+                                     modal_success_result: Optional[Dict] = None) -> Dict[str, Any]:
+        """仮定法結果の統合"""
+        try:
+            if not main_basic_result.get('success', False):
+                return {'success': False, 'error': 'Main clause decomposition failed'}
+            
+            # 主節の基本スロット
+            main_slots = main_basic_result['main_slots'].copy()
+            
+            # "conditionally"の位置を特定し、その位置を条件節の配置先として使用
+            conditionally_slot = None
+            for slot, value in main_slots.items():
+                if value == "conditionally":
+                    conditionally_slot = slot
+                    main_slots[slot] = ""  # 削除
+                    print(f"🧹 conditionally削除: {slot} = '{value}' → ''")
+                    break
+            
+            # If節をsub_slotsに変換
+            sub_slots = {}
+            if if_basic_result.get('success', False):
+                if_slots = if_basic_result['main_slots']
+                
+                # If節のスロットをsub_スロットに変換
+                if 'S' in if_slots:
+                    sub_slots['sub-s'] = f"If {if_slots['S']}"
+                if 'Aux' in if_slots:
+                    sub_slots['sub-aux'] = if_slots['Aux']
+                if 'V' in if_slots:
+                    sub_slots['sub-v'] = if_slots['V']
+                if 'O1' in if_slots:
+                    sub_slots['sub-o1'] = if_slots['O1']
+                if 'C1' in if_slots:
+                    sub_slots['sub-c1'] = if_slots['C1']
+                # その他の要素をsub-m2にまとめる
+                other_elements = []
+                for slot, value in if_slots.items():
+                    if slot not in ['S', 'V', 'O1', 'C1', 'Aux'] and value:
+                        other_elements.append(value)
+                if other_elements:
+                    sub_slots['sub-m2'] = ' '.join(other_elements)
+            
+            # "conditionally"があった位置を条件節の親スロットとして使用
+            if conditionally_slot:
+                sub_slots['_parent_slot'] = conditionally_slot
+                print(f"🎯 条件節配置: _parent_slot = '{conditionally_slot}' (conditionallyの元位置)")
+            else:
+                # conditionallyが見つからない場合は空スロットを探す
+                empty_slot = self._determine_empty_slot_for_conditional(main_slots)
+                sub_slots['_parent_slot'] = empty_slot
+                main_slots[empty_slot] = ''  # 条件節のマーカー
+                print(f"🎯 条件節配置: _parent_slot = '{empty_slot}' (空スロット)")
+            
+            # 助動詞情報の統合
+            if modal_success_result:
+                modal_main_slots = modal_success_result['main_slots']
+                if 'Aux' in modal_main_slots:
+                    main_slots['Aux'] = modal_main_slots['Aux']
+                    print(f"🔧 助動詞情報統合: Aux = '{modal_main_slots['Aux']}'")
+            
+            collaboration = main_basic_result.get('collaboration', []) + ['conditional']
+            if modal_success_result:
+                collaboration = modal_success_result.get('collaboration', []) + collaboration
+            
+            return {
+                'success': True,
+                'main_slots': main_slots,
+                'sub_slots': sub_slots,
+                'collaboration': collaboration,
+                'primary_handler': 'conditional',
+                'metadata': {
+                    'handler': 'conditional_human_grammar',
+                    'if_clause': if_clause,
+                    'main_clause': main_clause,
+                    'confidence': 0.95
+                }
+            }
+            
+        except Exception as e:
+            print(f"❌ 仮定法統合エラー: {e}")
+            return {'success': False, 'error': str(e)}
+
+    def _determine_empty_slot_for_conditional(self, main_slots):
+        """条件節を配置する空スロットを決定"""
+        # 文構造に応じて優先的に使用するスロット
+        priority_slots = ['M1', 'M2', 'M3', 'M4', 'M5']
+        
+        # 空のスロットを優先順位に従って検索
+        for slot in priority_slots:
+            if not main_slots.get(slot, '').strip():
+                return slot
+        
+        # すべて埋まっている場合はM1を使用（上書き）
+        return 'M1'
 
 
 if __name__ == "__main__":
