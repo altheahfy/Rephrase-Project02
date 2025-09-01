@@ -2151,14 +2151,14 @@
     "133": {
       "V_group_key": "conditional",
       "grammar_category": "conditional_past",
-      "sentence": "If I were rich, I would travel the world.",
+      "sentence": "If I were rich, I would travel around the world.",
       "expected": {
         "main_slots": {
-          "M2": "",
           "S": "I",
           "Aux": "would",
           "V": "travel",
-          "O1": "the world"
+          "M2": "",
+          "M3": "around the world"
         },
         "sub_slots": {
           "sub-s": "If I",
