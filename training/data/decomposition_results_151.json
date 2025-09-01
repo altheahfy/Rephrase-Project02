@@ -1,0 +1,46 @@
+{
+  "case_151": {
+    "sentence": "Imagine if we could fly, how exciting it would be!",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "it",
+        "Aux": "would",
+        "V": "be",
+        "C1": "exciting",
+        "M2": "how"
+      },
+      "sub_slots": {
+        "sub-s": "Imagine if we",
+        "sub-aux": "could",
+        "sub-v": "fly",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "M2": "how",
+        "C1": "exciting",
+        "S": "it",
+        "Aux": "would",
+        "V": "be",
+        "M1": ""
+      },
+      "sub_slots": {
+        "sub-s": "Imagine if we",
+        "sub-aux": "could",
+        "sub-v": "fly",
+        "_parent_slot": "M1"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "imagine",
+        "condition_clause": "Imagine if we could fly",
+        "main_clause": "how exciting it would be!",
+        "confidence": 0.8
+      }
+    },
+    "match": true
+  }
+}

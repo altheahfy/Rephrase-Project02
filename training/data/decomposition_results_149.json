@@ -1,0 +1,64 @@
+{
+  "case_149": {
+    "sentence": "Unless you hurry, you will miss the train.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "will",
+        "V": "miss",
+        "O1": "the train"
+      },
+      "sub_slots": {
+        "sub-s": "Unless you",
+        "sub-v": "hurry",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "will",
+        "V": "miss",
+        "O1": "the train",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "Unless you",
+        "sub-v": "hurry",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "conditional",
+        "human_grammar"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Unless you hurry",
+        "main_clause": "you will miss the train.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "Unless you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "hurry",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "4": "will",
+        "3": "you",
+        "5": "miss",
+        "6": "the train",
+        "7": ""
+      }
+    },
+    "match": true
+  }
+}

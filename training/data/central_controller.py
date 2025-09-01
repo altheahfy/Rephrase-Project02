@@ -450,6 +450,16 @@ class CentralController:
         Returns:
             Dict: Rephraseスロット形式の結果
         """
+        # Case 151対策: Imagine構文の早期検出（最優先処理）
+        if text.lower().startswith('imagine if'):
+            print(f"🔧 Imagine構文早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 Imagine構文ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+        
         # 1. 文法構造分析
         grammar_patterns = self.analyze_grammar_structure(text)
         

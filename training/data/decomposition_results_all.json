@@ -948,7 +948,7 @@
         "3": "The teacher",
         "5": "explains",
         "6": "grammar",
-        "1": "clearly",
+        "2": "clearly",
         "7": "to confused students",
         "9": "daily"
       }
@@ -1387,7 +1387,7 @@
         "3": "she",
         "5": "works",
         "7": "very hard",
-        "1": "Actually"
+        "2": "Actually"
       }
     },
     "match": true
@@ -1471,7 +1471,7 @@
         "3": "She",
         "5": "speaks",
         "6": "English",
-        "1": "always",
+        "2": "always",
         "7": "fluently",
         "9": "at work"
       }
@@ -1512,7 +1512,7 @@
       "ordered_slots": {
         "3": "he",
         "5": "jogs",
-        "1": "Every morning",
+        "2": "Every morning",
         "7": "slowly",
         "9": "in the park"
       }
@@ -6535,7 +6535,7 @@
         "3": "I",
         "5": "stay",
         "7": "home",
-        "1": "",
+        "2": "",
         "4": "will"
       }
     },
@@ -6673,7 +6673,7 @@
         "3": "I",
         "5": "travel",
         "7": "around the world",
-        "1": "",
+        "2": "",
         "4": "would"
       }
     },
@@ -6970,7 +6970,7 @@
         "5": "be",
         "8": "happy",
         "7": "now",
-        "1": "",
+        "2": "",
         "4": "would"
       }
     },
@@ -7045,7 +7045,7 @@
         "3": "you",
         "5": "leave",
         "7": "early",
-        "1": "",
+        "2": "",
         "4": "may"
       }
     },
@@ -7189,7 +7189,7 @@
         "3": "she",
         "5": "acted",
         "7": "differently",
-        "1": "",
+        "2": "",
         "4": "would have"
       }
     },
@@ -7260,7 +7260,7 @@
       "ordered_slots": {
         "5": "call",
         "6": "me",
-        "1": "",
+        "2": "",
         "7": "please"
       }
     },
@@ -7700,14 +7700,13 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "If you",
+        "sub-s": "Unless you",
         "sub-v": "hurry",
         "_parent_slot": "M2"
       },
       "collaboration": [
-        "adverb",
-        "basic_five_pattern",
-        "conditional"
+        "conditional",
+        "human_grammar"
       ],
       "primary_handler": "conditional",
       "metadata": {
@@ -7718,7 +7717,7 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "If you",
+          "value": "Unless you",
           "display_order": 1
         },
         "sub-v": {
@@ -7728,14 +7727,14 @@
         "_parent_slot": "M2"
       },
       "ordered_slots": {
+        "4": "will",
         "3": "you",
         "5": "miss",
         "6": "the train",
-        "7": "",
-        "4": "will"
+        "7": ""
       }
     },
-    "match": false
+    "match": true
   },
   "case_150": {
     "sentence": "Suppose you had unlimited money, what would you do?",
@@ -7756,42 +7755,54 @@
     },
     "actual": {
       "success": true,
-      "text": "Suppose you had unlimited money, what would you do?",
       "main_slots": {
-        "S": "",
+        "S": "you",
         "Aux": "would",
         "V": "do",
-        "O1": "what"
+        "O1": "what",
+        "M2": ""
       },
       "sub_slots": {
-        "sub-v": "Suppose",
-        "sub-o1": "Suppose [that]",
-        "_parent_slot": "S"
+        "sub-s": "Suppose you",
+        "sub-v": "had",
+        "sub-o1": "unlimited money",
+        "_parent_slot": "M2"
       },
+      "collaboration": [
+        "conditional",
+        "human_grammar"
+      ],
+      "primary_handler": "conditional",
       "metadata": {
-        "controller": "central",
-        "primary_handler": "omitted_relative_pronoun",
-        "confidence": 0.85
+        "handler": "conditional_human_grammar",
+        "if_clause": "Suppose you had unlimited money",
+        "main_clause": "what would you do?",
+        "confidence": 0.95
       },
       "ordered_sub_slots": {
-        "sub-v": {
-          "value": "Suppose",
+        "sub-s": {
+          "value": "Suppose you",
           "display_order": 1
         },
-        "sub-o1": {
-          "value": "Suppose [that]",
+        "sub-v": {
+          "value": "had",
           "display_order": 2
         },
-        "_parent_slot": "S"
+        "sub-o1": {
+          "value": "unlimited money",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
       },
       "ordered_slots": {
-        "5": "do",
-        "3": "",
+        "4": "would",
         "6": "what",
-        "4": "would"
+        "3": "you",
+        "5": "do",
+        "7": ""
       }
     },
-    "match": false
+    "match": true
   },
   "case_151": {
     "sentence": "Imagine if we could fly, how exciting it would be!",
@@ -7814,52 +7825,28 @@
     "actual": {
       "success": true,
       "main_slots": {
-        "S": "exciting it",
+        "M2": "how",
+        "C1": "exciting",
+        "S": "it",
         "Aux": "would",
         "V": "be",
-        "M2": ""
+        "M1": ""
       },
       "sub_slots": {
-        "sub-s": "If we",
-        "sub-v": "fly",
+        "sub-s": "Imagine if we",
         "sub-aux": "could",
-        "_parent_slot": "M2"
+        "sub-v": "fly",
+        "_parent_slot": "M1"
       },
-      "collaboration": [
-        "adverb",
-        "basic_five_pattern",
-        "conditional"
-      ],
-      "primary_handler": "conditional",
       "metadata": {
-        "handler": "conditional_human_grammar",
-        "if_clause": "if we could fly,",
+        "handler": "conditional",
+        "type": "imagine",
+        "condition_clause": "Imagine if we could fly",
         "main_clause": "how exciting it would be!",
-        "confidence": 0.95
-      },
-      "ordered_sub_slots": {
-        "sub-s": {
-          "value": "If we",
-          "display_order": 1
-        },
-        "sub-v": {
-          "value": "fly",
-          "display_order": 2
-        },
-        "sub-aux": {
-          "value": "could",
-          "display_order": 3
-        },
-        "_parent_slot": "M2"
-      },
-      "ordered_slots": {
-        "3": "exciting it",
-        "5": "be",
-        "7": "",
-        "4": "would"
+        "confidence": 0.8
       }
     },
-    "match": false
+    "match": true
   },
   "case_152": {
     "sentence": "Provided that you finish on time, you can take a break.",
@@ -7888,14 +7875,15 @@
         "M2": ""
       },
       "sub_slots": {
-        "sub-s": "If (you)",
-        "sub-v": "Provided",
+        "sub-s": "Provided that you",
+        "sub-aux": "can",
+        "sub-v": "finish",
+        "sub-o1": "time break",
         "_parent_slot": "M2"
       },
       "collaboration": [
-        "adverb",
-        "basic_five_pattern",
-        "conditional"
+        "conditional",
+        "human_grammar"
       ],
       "primary_handler": "conditional",
       "metadata": {
@@ -7906,21 +7894,29 @@
       },
       "ordered_sub_slots": {
         "sub-s": {
-          "value": "If (you)",
+          "value": "Provided that you",
           "display_order": 1
         },
-        "sub-v": {
-          "value": "Provided",
+        "sub-aux": {
+          "value": "can",
           "display_order": 2
+        },
+        "sub-v": {
+          "value": "finish",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "time break",
+          "display_order": 4
         },
         "_parent_slot": "M2"
       },
       "ordered_slots": {
+        "4": "can",
         "3": "you",
         "5": "take",
         "6": "a break",
-        "7": "",
-        "4": "can"
+        "7": ""
       }
     },
     "match": false
