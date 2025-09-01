@@ -1466,35 +1466,39 @@ class CentralController:
             if_clause_without_if = if_clause.replace('If ', '').replace('if ', '')
             
             # 逆転構造の場合は特別処理
-            if_basic_result = self._process_inversion_if_clause(if_clause)
-            if not if_basic_result.get('success', False):
+            inversion_result = self._process_inversion_if_clause(if_clause)
+            if inversion_result.get('success', False):
+                # 倒置構造成功：inversion_typeを保持
+                if_basic_result = inversion_result
+                print(f"🔧 逆転構造条件節処理成功: inversion_type={inversion_result.get('inversion_type')}")
+            else:
                 # 通常のif節処理にフォールバック
                 if_basic_result = self._process_basic_decomposition(if_clause_without_if)
-            
-            # If節にも助動詞処理を適用
-            if if_basic_result.get('success', False):
-                # 助動詞検出を試行
-                modal_handler = self.handlers.get('modal')
-                if modal_handler:
-                    if_modal_result = modal_handler.process(if_clause_without_if)
-                    if if_modal_result.get('success', False):
-                        # Modal結果を優先し、Basic結果で不足分を補完
-                        merged_slots = if_modal_result['main_slots'].copy()
-                        
-                        # Basic結果で補完（Modalで取得できなかった要素のみ）
-                        for slot, value in if_basic_result['main_slots'].items():
-                            if slot not in merged_slots or not merged_slots[slot]:
-                                merged_slots[slot] = value
-                        
-                        if_basic_result = {
-                            'success': True,
-                            'main_slots': merged_slots,
-                            'sub_slots': {},
-                            'modal_info': if_modal_result.get('modal_info', {}),
-                            'collaboration': ['modal', 'basic_five_pattern'],
-                            'text': if_modal_result.get('text', if_clause_without_if)
-                        }
-                        print(f"📝 If節助動詞処理完了: {if_basic_result}")
+                
+                # If節にも助動詞処理を適用
+                if if_basic_result.get('success', False):
+                    # 助動詞検出を試行
+                    modal_handler = self.handlers.get('modal')
+                    if modal_handler:
+                        if_modal_result = modal_handler.process(if_clause_without_if)
+                        if if_modal_result.get('success', False):
+                            # Modal結果を優先し、Basic結果で不足分を補完
+                            merged_slots = if_modal_result['main_slots'].copy()
+                            
+                            # Basic結果で補完（Modalで取得できなかった要素のみ）
+                            for slot, value in if_basic_result['main_slots'].items():
+                                if slot not in merged_slots or not merged_slots[slot]:
+                                    merged_slots[slot] = value
+                            
+                            if_basic_result = {
+                                'success': True,
+                                'main_slots': merged_slots,
+                                'sub_slots': {},
+                                'modal_info': if_modal_result.get('modal_info', {}),
+                                'collaboration': ['modal', 'basic_five_pattern'],
+                                'text': if_modal_result.get('text', if_clause_without_if)
+                            }
+                            print(f"📝 If節助動詞処理完了: {if_basic_result}")
             
             print(f"📝 If節基本分解: {if_basic_result}")
             
