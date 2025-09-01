@@ -2030,9 +2030,12 @@ class CentralController:
                     print(f"🧹 conditionally削除: {slot} = '{value}' → ''")
                     break
             
-            # If節をsub_slotsに変換
+            # Without/But for構文の特別処理
+            is_without_construct = if_clause.strip().lower().startswith(('without', 'but for'))
+            
+            # If節をsub_slotsに変換（Without構文は除く）
             sub_slots = {}
-            if if_basic_result.get('success', False):
+            if if_basic_result.get('success', False) and not is_without_construct:
                 if_slots = if_basic_result['main_slots']
                 inversion_type = if_basic_result.get('inversion_type')
                 
@@ -2081,16 +2084,23 @@ class CentralController:
                 if other_elements:
                     sub_slots['sub-m2'] = ' '.join(other_elements)
             
-            # "conditionally"があった位置を条件節の親スロットとして使用
-            if conditionally_slot:
-                sub_slots['_parent_slot'] = conditionally_slot
-                print(f"🎯 条件節配置: _parent_slot = '{conditionally_slot}' (conditionallyの元位置)")
+            # 条件節の配置処理
+            if is_without_construct:
+                # Without/But for構文は直接main_slotsのM2に配置
+                main_slots['M2'] = if_clause.strip()
+                print(f"🔧 Without構文直接配置: M2 = '{if_clause.strip()}'")
             else:
-                # conditionallyが見つからない場合は空スロットを探す
-                empty_slot = self._determine_empty_slot_for_conditional(main_slots)
-                sub_slots['_parent_slot'] = empty_slot
-                main_slots[empty_slot] = ''  # 条件節のマーカー
-                print(f"🎯 条件節配置: _parent_slot = '{empty_slot}' (空スロット)")
+                # 通常の条件節はsub_slotsに配置
+                # "conditionally"があった位置を条件節の親スロットとして使用
+                if conditionally_slot:
+                    sub_slots['_parent_slot'] = conditionally_slot
+                    print(f"🎯 条件節配置: _parent_slot = '{conditionally_slot}' (conditionallyの元位置)")
+                else:
+                    # conditionallyが見つからない場合は空スロットを探す
+                    empty_slot = self._determine_empty_slot_for_conditional(main_slots)
+                    sub_slots['_parent_slot'] = empty_slot
+                    main_slots[empty_slot] = ''  # 条件節のマーカー
+                    print(f"🎯 条件節配置: _parent_slot = '{empty_slot}' (空スロット)")
             
             # 助動詞情報の統合（Main節の助動詞を優先）
             if modal_success_result and 'Aux' in modal_success_result.get('main_slots', {}):
