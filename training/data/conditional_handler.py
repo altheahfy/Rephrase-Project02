@@ -1097,29 +1097,44 @@ class ConditionalHandler:
                 subject = token.text
                 break
         
-        # 主語のみ設定（条件詞は含めない）
+        # 条件詞 + 主語の設定（Case 150対策）
         if subject:
-            sub_slots['sub-s'] = subject
+            sub_slots['sub-s'] = f"{condition_word} {subject}"
         else:
             sub_slots['sub-s'] = condition_word
         
-        # 動詞・助動詞・目的語等の解析
+        # 動詞・助動詞・目的語等の解析（条件詞以外の動詞を対象）
         verb = ""
         auxiliary = ""
         obj = ""
         modifier = ""
         
         for token in doc:
-            if token.pos_ == 'AUX' and not auxiliary:
+            # 条件詞（Suppose等）は動詞として除外
+            if token.pos_ == 'VERB' and token.text.lower() != conditional_type.lower():
+                if not verb:
+                    verb = token.text
+            elif token.pos_ == 'AUX' and not auxiliary:
                 auxiliary = token.text
-            elif token.pos_ == 'VERB' and not verb:
-                verb = token.text
-            elif token.dep_ in ['dobj', 'pobj']:
-                obj += token.text + " "
+            elif token.dep_ in ['dobj', 'pobj'] and token.pos_ != 'PRON':  # 疑問詞を除外
+                # 形容詞修飾語も含めて目的語を構築
+                obj_parts = []
+                
+                # 目的語の修飾語を収集
+                for child in token.children:
+                    if child.dep_ == 'amod':  # 形容詞修飾語
+                        obj_parts.append(child.text)
+                
+                # 形容詞 + 名詞の順序で構築
+                obj_parts.append(token.text)
+                obj += ' '.join(obj_parts) + " "
+                
             elif token.dep_ in ['advmod', 'npadvmod']:
                 modifier += token.text + " "
         
-        if auxiliary:
+        # Suppose構文の場合は助動詞をサブスロットに含めない
+        # 助動詞は主節に属するため
+        if conditional_type.lower() != 'suppose' and auxiliary:
             sub_slots['sub-aux'] = auxiliary
         if verb:
             sub_slots['sub-v'] = verb

@@ -51,6 +51,12 @@ class OmittedRelativePronounHandler:
         if not self.nlp:
             return False
         
+        # 最初に仮定法キーワードをチェック（Case 150対策）
+        conditional_keywords = ['suppose', 'imagine', 'provided', 'unless', 'wish', 'as if', 'as though']
+        if any(keyword in text.lower() for keyword in conditional_keywords):
+            print(f"🔍 仮定法キーワード検出: 省略関係詞対象外")
+            return False
+        
         # 最初に名詞節をチェック（Case 119対策）
         if self._is_noun_clause(text):
             print(f"🔍 名詞節検出: 省略関係詞対象外")
@@ -114,6 +120,17 @@ class OmittedRelativePronounHandler:
             if has_noun_clause_connector:
                 print(f"  🔍 名詞節検出: 省略関係詞対象外")
                 return False  # 名詞節の場合は省略関係詞ではない
+            
+            # 仮定法キーワードをチェック（Case 150対策）
+            conditional_keywords = ['suppose', 'imagine', 'provided', 'unless', 'wish', 'as if', 'as though']
+            has_conditional_keyword = any(
+                token.text.lower() in conditional_keywords
+                for token in doc
+            )
+            
+            if has_conditional_keyword:
+                print(f"  🔍 仮定法キーワード検出: 省略関係詞対象外")
+                return False  # 仮定法の場合は省略関係詞ではない
             
             # 動詞の数をカウント
             verbs = [token for token in doc if token.pos_ in ['VERB', 'AUX'] and token.dep_ != 'aux']
