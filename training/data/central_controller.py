@@ -2036,16 +2036,9 @@ class CentralController:
 
     def _determine_empty_slot_for_conditional(self, main_slots):
         """条件節を配置する空スロットを決定"""
-        # 文構造に応じて優先的に使用するスロット
-        priority_slots = ['M1', 'M2', 'M3', 'M4', 'M5']
-        
-        # 空のスロットを優先順位に従って検索
-        for slot in priority_slots:
-            if not main_slots.get(slot, '').strip():
-                return slot
-        
-        # すべて埋まっている場合はM1を使用（上書き）
-        return 'M1'
+        # 仕様書に基づく：修飾語1個 → 必ずM2に配置（位置無関係）
+        # 条件節（If節）は常にM2スロットに配置される
+        return 'M2'
 
 
 if __name__ == "__main__":
