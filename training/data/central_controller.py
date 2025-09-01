@@ -22,6 +22,7 @@ from modal_handler import ModalHandler
 from noun_clause_handler import NounClauseHandler
 from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
 from conditional_handler import ConditionalHandler
+from imperative_handler import ImperativeHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -60,6 +61,7 @@ class CentralController:
         noun_clause_handler = NounClauseHandler(self.nlp)  # Phase 7: NounClauseHandler追加
         omitted_relative_pronoun_handler = OmittedRelativePronounHandler()  # Phase 8: OmittedRelativePronounHandler追加
         conditional_handler = ConditionalHandler(self.nlp)  # Phase 9: ConditionalHandler追加
+        imperative_handler = ImperativeHandler()  # Phase 10: ImperativeHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -70,7 +72,8 @@ class CentralController:
             'five_pattern': basic_five_pattern_handler,
             'passive': passive_voice_handler,
             'modal': modal_handler,
-            'noun_clause': noun_clause_handler
+            'noun_clause': noun_clause_handler,
+            'imperative': imperative_handler
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
         relative_adverb_handler = RelativeAdverbHandler(collaborators)
@@ -86,7 +89,8 @@ class CentralController:
             'modal': modal_handler,  # Phase 6: ModalHandler追加
             'noun_clause': noun_clause_handler,  # Phase 7: NounClauseHandler追加
             'omitted_relative_pronoun': omitted_relative_pronoun_handler,  # Phase 8: OmittedRelativePronounHandler追加
-            'conditional': conditional_handler  # Phase 9: ConditionalHandler追加
+            'conditional': conditional_handler,  # Phase 9: ConditionalHandler追加
+            'imperative': imperative_handler  # Phase 10: ImperativeHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -1353,6 +1357,14 @@ class CentralController:
         """
         スロットキーと値を絶対順序分類システム用に分類
         """
+        # M1スロットの特殊処理
+        if slot_key == 'M1':
+            # 空の場合は副詞分析で文頭修飾語として扱われる
+            if not slot_value or slot_value.strip() == '':
+                return 'M1_sentence_initial'
+            # 実際に値がある場合は文頭修飾語
+            return 'M1_sentence_initial'
+        
         # 空スロットの場合は直接normal分類
         if not slot_value or slot_value.strip() == '':
             return f"{slot_key}_normal"
@@ -1404,8 +1416,8 @@ class CentralController:
             print(f"📝 If節: '{if_clause}'")
             print(f"📝 主節: '{main_clause}'")
             
-            # ②主節の基本分解（主節をそのまま処理）
-            main_basic_result = self._process_basic_decomposition(main_clause)
+            # ②主節の基本分解（命令文の場合は専用ハンドラーを使用）
+            main_basic_result = self._process_main_clause_decomposition(main_clause)
             print(f"📝 主節基本分解: {main_basic_result}")
             
             # 主節の助動詞処理も実行
@@ -1434,12 +1446,13 @@ class CentralController:
                 if modal_handler:
                     if_modal_result = modal_handler.process(if_clause_without_if)
                     if if_modal_result.get('success', False):
-                        # Modal結果とBasic結果をマージ（Basicの主語・目的語・補語を保持）
-                        merged_slots = if_basic_result['main_slots'].copy()
-                        if 'Aux' in if_modal_result['main_slots']:
-                            merged_slots['Aux'] = if_modal_result['main_slots']['Aux']
-                        if 'V' in if_modal_result['main_slots']:
-                            merged_slots['V'] = if_modal_result['main_slots']['V']
+                        # Modal結果を優先し、Basic結果で不足分を補完
+                        merged_slots = if_modal_result['main_slots'].copy()
+                        
+                        # Basic結果で補完（Modalで取得できなかった要素のみ）
+                        for slot, value in if_basic_result['main_slots'].items():
+                            if slot not in merged_slots or not merged_slots[slot]:
+                                merged_slots[slot] = value
                         
                         if_basic_result = {
                             'success': True,
@@ -1961,7 +1974,7 @@ class CentralController:
                     # 通常のif節処理
                     print(f"🔧 通常if節処理: inversion_type={inversion_type}")
                     if 'S' in if_slots:
-                        sub_slots['sub-s'] = f"If {if_slots['S']}"
+                        sub_slots['sub-s'] = if_slots['S']  # "If"は付加しない
                     if 'V' in if_slots:
                         sub_slots['sub-v'] = if_slots['V']
                     if 'O1' in if_slots:
@@ -2050,6 +2063,32 @@ class CentralController:
         else:
             # 2個以上既にある場合 → M1を優先（文頭配置）
             return 'M1'
+
+    def _process_main_clause_decomposition(self, main_clause: str) -> Dict[str, Any]:
+        """
+        主節の分解処理（命令文専用ハンドラー対応）
+        
+        Args:
+            main_clause: 主節テキスト
+            
+        Returns:
+            Dict: 分解結果
+        """
+        try:
+            # 命令文かどうかチェック
+            imperative_handler = self.handlers.get('imperative')
+            if imperative_handler:
+                imperative_result = imperative_handler.process(main_clause, context="conditional")
+                if imperative_result.get('success', False):
+                    print(f"🔧 命令文ハンドラー使用: {imperative_result}")
+                    return imperative_result
+            
+            # 命令文でない場合は通常の基本分解
+            return self._process_basic_decomposition(main_clause)
+            
+        except Exception as e:
+            print(f"❌ 主節分解エラー: {e}")
+            return {'success': False, 'error': str(e)}
 
 
 if __name__ == "__main__":

@@ -1,0 +1,191 @@
+{
+  "case_141": {
+    "sentence": "Should you need help, please call me.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "V": "call",
+        "O1": "me",
+        "M2": "please"
+      },
+      "sub_slots": {
+        "sub-aux": "Should",
+        "sub-s": "you",
+        "sub-v": "need",
+        "sub-o1": "help",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "(you)",
+        "V": "call",
+        "O1": "me",
+        "M1": ""
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "need",
+        "sub-aux": "Should",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "simple_imperative",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Should you need help",
+        "main_clause": "please call me.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "need",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "Should",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "5": "call",
+        "6": "me",
+        "3": "(you)"
+      }
+    },
+    "match": false
+  },
+  "case_142": {
+    "sentence": "I wish I were taller.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "were",
+        "sub-c1": "taller",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I were taller.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "were",
+        "sub-s": "I",
+        "sub-c1": "taller"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "taller",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_143": {
+    "sentence": "I wish I had more time.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "had",
+        "sub-o1": "more time",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I had more time.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "had",
+        "sub-s": "I",
+        "sub-o1": "more time"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "had",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "more time",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  }
+}

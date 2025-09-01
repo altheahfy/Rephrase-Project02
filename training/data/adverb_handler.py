@@ -504,6 +504,11 @@ class AdverbHandler:
     
     def _is_prepositional_phrase_modifiable_by_dependency(self, prep_token) -> bool:
         """spaCyの依存関係に基づいて前置詞句が修飾語として分離可能かどうか判定"""
+        # 🚨 前置詞+名詞節パターンの除外チェック
+        # 「on if」「about whether」などの前置詞+名詞節は分離しない
+        if self._is_preposition_plus_noun_clause(prep_token):
+            return False
+        
         # 前置詞が動詞を修飾している場合（dep_=prep）は通常修飾語
         if prep_token.dep_ == 'prep' and prep_token.head.pos_ == 'VERB':
             return True
@@ -524,6 +529,27 @@ class AdverbHandler:
         
         # その他は基本的に修飾語として扱う
         return True
+
+    def _is_preposition_plus_noun_clause(self, prep_token) -> bool:
+        """前置詞+名詞節パターンの検出"""
+        # 前置詞の次のトークンを確認
+        doc = prep_token.doc
+        next_idx = prep_token.i + 1
+        
+        # 文末チェック
+        if next_idx >= len(doc):
+            return False
+        
+        next_token = doc[next_idx]
+        
+        # 名詞節導入語のチェック（if, whether, that, when, where, why, how など）
+        noun_clause_introducers = {'if', 'whether', 'that', 'when', 'where', 'why', 'how', 'what', 'who', 'which'}
+        
+        if next_token.text.lower() in noun_clause_introducers:
+            print(f"🚨 前置詞+名詞節パターン検出: '{prep_token.text} {next_token.text}'")
+            return True
+        
+        return False
     
     def _classify_modifier_type(self, token) -> str:
         """修飾語の種類を分類"""
