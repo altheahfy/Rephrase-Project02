@@ -2036,9 +2036,20 @@ class CentralController:
 
     def _determine_empty_slot_for_conditional(self, main_slots):
         """条件節を配置する空スロットを決定"""
-        # 仕様書に基づく：修飾語1個 → 必ずM2に配置（位置無関係）
-        # 条件節（If節）は常にM2スロットに配置される
-        return 'M2'
+        # 主節に他の修飾語があるかチェック
+        modifier_slots = ['M1', 'M2', 'M3']
+        occupied_modifiers = [slot for slot in modifier_slots if slot in main_slots and main_slots[slot] and main_slots[slot].strip()]
+        
+        if len(occupied_modifiers) == 0:
+            # 修飾語が条件節のみ → M2に配置
+            return 'M2'
+        elif len(occupied_modifiers) == 1:
+            # 既に1個修飾語がある → 前後分散パターン
+            # 条件節は文頭なのでM1、既存修飾語がM2
+            return 'M1'
+        else:
+            # 2個以上既にある場合 → M1を優先（文頭配置）
+            return 'M1'
 
 
 if __name__ == "__main__":
