@@ -2107,6 +2107,494 @@
           "_parent_slot": "S"
         }
       }
+    },
+    "131": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_present",
+      "sentence": "If it rains tomorrow, I will stay home.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "I",
+          "Aux": "will",
+          "V": "stay",
+          "M2": "home"
+        },
+        "sub_slots": {
+          "sub-s": "If it",
+          "sub-v": "rains",
+          "sub-m2": "tomorrow",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "132": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_present",
+      "sentence": "If you study hard, you can pass the exam.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "you",
+          "Aux": "can",
+          "V": "pass",
+          "O1": "the exam"
+        },
+        "sub_slots": {
+          "sub-s": "If you",
+          "sub-v": "study",
+          "sub-m2": "hard",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "133": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_past",
+      "sentence": "If I were rich, I would travel the world.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "I",
+          "Aux": "would",
+          "V": "travel",
+          "O1": "the world"
+        },
+        "sub_slots": {
+          "sub-s": "If I",
+          "sub-v": "were",
+          "sub-c1": "rich",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "134": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_past",
+      "sentence": "If she had time, she could help us.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "she",
+          "Aux": "could",
+          "V": "help",
+          "O1": "us"
+        },
+        "sub_slots": {
+          "sub-s": "If she",
+          "sub-v": "had",
+          "sub-o1": "time",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "135": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_past_perfect",
+      "sentence": "If I had studied harder, I would have passed the test.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "I",
+          "Aux": "would have",
+          "V": "passed",
+          "O1": "the test"
+        },
+        "sub_slots": {
+          "sub-s": "If I",
+          "sub-aux": "had",
+          "sub-v": "studied",
+          "sub-m2": "harder",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "136": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_past_perfect",
+      "sentence": "If they had arrived earlier, they could have seen the show.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "they",
+          "Aux": "could have",
+          "V": "seen",
+          "O1": "the show"
+        },
+        "sub_slots": {
+          "sub-s": "If they",
+          "sub-aux": "had",
+          "sub-v": "arrived",
+          "sub-m2": "earlier",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "137": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_mixed",
+      "sentence": "If I had been born rich, I would be happy now.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "I",
+          "Aux": "would",
+          "V": "be",
+          "C1": "happy",
+          "M2": "now"
+        },
+        "sub_slots": {
+          "sub-s": "If I",
+          "sub-aux": "had been",
+          "sub-v": "born",
+          "sub-c1": "rich",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "138": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_present_perfect",
+      "sentence": "If you have finished your work, you may leave early.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "you",
+          "Aux": "may",
+          "V": "leave",
+          "M2": "early"
+        },
+        "sub_slots": {
+          "sub-s": "If you",
+          "sub-aux": "have",
+          "sub-v": "finished",
+          "sub-o1": "your work",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "139": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_inversion",
+      "sentence": "Were I you, I would accept the offer.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "I",
+          "Aux": "would",
+          "V": "accept",
+          "O1": "the offer"
+        },
+        "sub_slots": {
+          "sub-v": "Were",
+          "sub-s": "I",
+          "sub-c1": "you",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "140": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_inversion",
+      "sentence": "Had she known the truth, she would have acted differently.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "she",
+          "Aux": "would have",
+          "V": "acted",
+          "M2": "differently"
+        },
+        "sub_slots": {
+          "sub-aux": "Had",
+          "sub-s": "she",
+          "sub-v": "known",
+          "sub-o1": "the truth",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "141": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_inversion",
+      "sentence": "Should you need help, please call me.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "V": "call",
+          "O1": "me",
+          "M2": "please"
+        },
+        "sub_slots": {
+          "sub-aux": "Should",
+          "sub-s": "you",
+          "sub-v": "need",
+          "sub-o1": "help",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "142": {
+      "V_group_key": "conditional",
+      "grammar_category": "wish_subjunctive",
+      "sentence": "I wish I were taller.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "wish",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "I",
+          "sub-v": "were",
+          "sub-c1": "taller",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "143": {
+      "V_group_key": "conditional",
+      "grammar_category": "wish_subjunctive",
+      "sentence": "I wish I had more time.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "wish",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "I",
+          "sub-v": "had",
+          "sub-o1": "more time",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "144": {
+      "V_group_key": "conditional",
+      "grammar_category": "wish_subjunctive_past",
+      "sentence": "I wish I had studied abroad.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "wish",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "I",
+          "sub-aux": "had",
+          "sub-v": "studied",
+          "sub-m2": "abroad",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "145": {
+      "V_group_key": "conditional",
+      "grammar_category": "as_if_subjunctive",
+      "sentence": "He talks as if he were the boss.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "talks",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-s": "as if he",
+          "sub-v": "were",
+          "sub-c1": "the boss",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "146": {
+      "V_group_key": "conditional",
+      "grammar_category": "as_if_subjunctive",
+      "sentence": "She looked as though she had seen a ghost.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "looked",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-s": "as though she",
+          "sub-aux": "had",
+          "sub-v": "seen",
+          "sub-o1": "a ghost",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "147": {
+      "V_group_key": "conditional",
+      "grammar_category": "without_conditional",
+      "sentence": "Without your help, I would have failed.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "would have",
+          "V": "failed",
+          "M2": "Without your help"
+        },
+        "sub_slots": {}
+      }
+    },
+    "148": {
+      "V_group_key": "conditional",
+      "grammar_category": "but_for_conditional",
+      "sentence": "But for the rain, we could have had a picnic.",
+      "expected": {
+        "main_slots": {
+          "S": "we",
+          "Aux": "could have",
+          "V": "had",
+          "O1": "a picnic",
+          "M2": "But for the rain"
+        },
+        "sub_slots": {}
+      }
+    },
+    "149": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_unless",
+      "sentence": "Unless you hurry, you will miss the train.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "you",
+          "Aux": "will",
+          "V": "miss",
+          "O1": "the train"
+        },
+        "sub_slots": {
+          "sub-s": "Unless you",
+          "sub-v": "hurry",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "150": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_suppose",
+      "sentence": "Suppose you had unlimited money, what would you do?",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "you",
+          "Aux": "would",
+          "V": "do",
+          "O1": "what"
+        },
+        "sub_slots": {
+          "sub-s": "Suppose you",
+          "sub-v": "had",
+          "sub-o1": "unlimited money",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "151": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_imagine",
+      "sentence": "Imagine if we could fly, how exciting it would be!",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "it",
+          "Aux": "would",
+          "V": "be",
+          "C1": "exciting",
+          "M2": "how"
+        },
+        "sub_slots": {
+          "sub-s": "Imagine if we",
+          "sub-aux": "could",
+          "sub-v": "fly",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "152": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_provided",
+      "sentence": "Provided that you finish on time, you can take a break.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "you",
+          "Aux": "can",
+          "V": "take",
+          "O1": "a break"
+        },
+        "sub_slots": {
+          "sub-s": "Provided that you",
+          "sub-v": "finish",
+          "sub-m2": "on time",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "153": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_as_long_as",
+      "sentence": "As long as you promise to be careful, you may borrow my car.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "you",
+          "Aux": "may",
+          "V": "borrow",
+          "O1": "my car"
+        },
+        "sub_slots": {
+          "sub-s": "As long as you",
+          "sub-v": "promise",
+          "sub-o1": "to be careful",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "154": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_complex",
+      "sentence": "If I had known you were coming, I would have prepared dinner.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "I",
+          "Aux": "would have",
+          "V": "prepared",
+          "O1": "dinner"
+        },
+        "sub_slots": {
+          "sub-s": "If I",
+          "sub-aux": "had",
+          "sub-v": "known",
+          "sub-o1": "you were coming",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "155": {
+      "V_group_key": "conditional",
+      "grammar_category": "conditional_even_if",
+      "sentence": "Even if it costs a lot, I will buy that house.",
+      "expected": {
+        "main_slots": {
+          "M2": "",
+          "S": "I",
+          "Aux": "will",
+          "V": "buy",
+          "O1": "that house"
+        },
+        "sub_slots": {
+          "sub-s": "Even if it",
+          "sub-v": "costs",
+          "sub-o1": "a lot",
+          "_parent_slot": "M2"
+        }
+      }
     }
   }
 }
