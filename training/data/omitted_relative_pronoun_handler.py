@@ -50,6 +50,11 @@ class OmittedRelativePronounHandler:
         """省略関係詞構造の検出"""
         if not self.nlp:
             return False
+        
+        # 最初に名詞節をチェック（Case 119対策）
+        if self._is_noun_clause(text):
+            print(f"🔍 名詞節検出: 省略関係詞対象外")
+            return False
             
         # 基本的な省略関係詞パターンの検出
         for pattern in self.omitted_patterns:
@@ -64,6 +69,24 @@ class OmittedRelativePronounHandler:
             
         return False
     
+    def _is_noun_clause(self, text: str) -> bool:
+        """名詞節かどうかをチェック（省略関係詞の誤判定を防ぐ）"""
+        try:
+            doc = self.nlp(text)
+            
+            # 名詞節を形成する接続詞をチェック
+            noun_clause_connectors = ['if', 'whether', 'how', 'what', 'where', 'when', 'why']
+            has_noun_clause_connector = any(
+                token.text.lower() in noun_clause_connectors and token.dep_ == 'mark'
+                for token in doc
+            )
+            
+            return has_noun_clause_connector
+            
+        except Exception as e:
+            print(f"⚠️ 名詞節チェックエラー: {e}")
+            return False
+    
     def _has_omitted_relative_structure(self, text: str) -> bool:
         """spaCyを使用した省略関係詞構造の検出"""
         try:
@@ -73,12 +96,24 @@ class OmittedRelativePronounHandler:
             # 1. 明示的な関係代名詞がない
             # 2. 複数の動詞がある
             # 3. 先行詞となる名詞がある
+            # 4. 名詞節ではない
             
             relative_pronouns = ['who', 'which', 'that', 'whom', 'whose']
             has_explicit_relative = any(token.text.lower() in relative_pronouns for token in doc)
             
             if has_explicit_relative:
                 return False  # 明示的な関係詞がある場合は対象外
+            
+            # 名詞節を形成する接続詞をチェック（Case 119対策）
+            noun_clause_connectors = ['if', 'whether', 'how', 'what', 'where', 'when', 'why']
+            has_noun_clause_connector = any(
+                token.text.lower() in noun_clause_connectors and token.dep_ == 'mark'
+                for token in doc
+            )
+            
+            if has_noun_clause_connector:
+                print(f"  🔍 名詞節検出: 省略関係詞対象外")
+                return False  # 名詞節の場合は省略関係詞ではない
             
             # 動詞の数をカウント
             verbs = [token for token in doc if token.pos_ in ['VERB', 'AUX'] and token.dep_ != 'aux']

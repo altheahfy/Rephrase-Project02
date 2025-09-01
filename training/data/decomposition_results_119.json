@@ -1,0 +1,39 @@
+{
+  "case_119": {
+    "sentence": "It depends on if you agree.",
+    "expected": {
+      "main_slots": {
+        "S": "It",
+        "V": "depends",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "on if you",
+        "sub-v": "agree",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "original_text": "It depends on if you agree.",
+      "success": true,
+      "main_slots": {
+        "S": "It",
+        "V": "depends",
+        "O1": "you"
+      },
+      "slots": {
+        "S": "It",
+        "V": "depends",
+        "O1": "you"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "It",
+        "5": "depends",
+        "6": "you"
+      }
+    },
+    "match": false
+  }
+}
