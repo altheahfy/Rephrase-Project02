@@ -1394,6 +1394,16 @@ class CentralController:
             main_basic_result = self._process_basic_decomposition(simplified_main)
             print(f"📝 主節基本分解: {main_basic_result}")
             
+            # 主節の助動詞処理も実行
+            modal_success_result = None
+            if main_basic_result.get('success', False):
+                modal_handler = self.handlers.get('modal')
+                if modal_handler:
+                    main_modal_result = modal_handler.process(main_clause)
+                    if main_modal_result.get('success', False):
+                        print(f"📝 主節助動詞処理完了: {main_modal_result}")
+                        modal_success_result = main_modal_result
+            
             # ③if節の分解（助動詞処理を含む）
             if_clause_without_if = if_clause.replace('If ', '').replace('if ', '')
             if_basic_result = self._process_basic_decomposition(if_clause_without_if)
@@ -1651,6 +1661,11 @@ class CentralController:
             # 主節の基本スロット
             main_slots = main_basic_result['main_slots'].copy()
             
+            # 条件節処理前に誤った助動詞をクリア
+            if 'Aux' in main_slots:
+                old_aux = main_slots.pop('Aux')
+                print(f"🧹 条件節処理前助動詞クリア: Aux = '{old_aux}' → 削除")
+            
             # "conditionally"の位置を特定し、その位置を条件節の配置先として使用
             conditionally_slot = None
             for slot, value in main_slots.items():
@@ -1695,12 +1710,19 @@ class CentralController:
                 main_slots[empty_slot] = ''  # 条件節のマーカー
                 print(f"🎯 条件節配置: _parent_slot = '{empty_slot}' (空スロット)")
             
-            # 助動詞情報の統合
-            if modal_success_result:
+            # 助動詞情報の統合（Main節の助動詞を優先）
+            if modal_success_result and 'Aux' in modal_success_result.get('main_slots', {}):
                 modal_main_slots = modal_success_result['main_slots']
-                if 'Aux' in modal_main_slots:
-                    main_slots['Aux'] = modal_main_slots['Aux']
-                    print(f"🔧 助動詞情報統合: Aux = '{modal_main_slots['Aux']}'")
+                main_slots['Aux'] = modal_main_slots['Aux']
+                print(f"🔧 Main節助動詞統合: Aux = '{modal_main_slots['Aux']}'")
+            elif 'Aux' in main_basic_result.get('main_slots', {}):
+                # modal_success_resultがない場合、Main節の基本分解から助動詞を探す
+                main_slots['Aux'] = main_basic_result['main_slots']['Aux']
+                print(f"🔧 基本助動詞統合: Aux = '{main_basic_result['main_slots']['Aux']}'")
+            elif 'Aux' in main_slots and sub_slots.get('sub-aux'):
+                # If節のAuxが誤って混入している場合は削除
+                del main_slots['Aux']
+                print(f"🧹 If節助動詞を削除: Main節に属さない助動詞")
             
             collaboration = main_basic_result.get('collaboration', []) + ['conditional']
             if modal_success_result:

@@ -1,0 +1,49 @@
+{
+  "case_139": {
+    "sentence": "Were I you, I would accept the offer.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "accept",
+        "O1": "the offer"
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": false,
+      "error": "Main clause decomposition failed"
+    },
+    "match": false
+  },
+  "case_140": {
+    "sentence": "Had she known the truth, she would have acted differently.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "she",
+        "Aux": "would have",
+        "V": "acted",
+        "M2": "differently"
+      },
+      "sub_slots": {
+        "sub-aux": "Had",
+        "sub-s": "she",
+        "sub-v": "known",
+        "sub-o1": "the truth",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": false,
+      "error": "Main clause decomposition failed"
+    },
+    "match": false
+  }
+}
