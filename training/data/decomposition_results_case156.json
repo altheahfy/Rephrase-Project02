@@ -1,0 +1,62 @@
+{
+  "case_case156": {
+    "sentence": "To study English is important.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "important"
+      },
+      "sub_slots": {
+        "sub-v": "To study",
+        "sub-o1": "English",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "To study English is important.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "important"
+      },
+      "sub_slots": {
+        "sub-v": "To study",
+        "_parent_slot": "S",
+        "sub-o1": "English"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_nominal_subject",
+          "usage_type": "nominal_subject",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "To study",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "English",
+          "display_order": 2
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "important"
+      }
+    },
+    "match": true
+  }
+}

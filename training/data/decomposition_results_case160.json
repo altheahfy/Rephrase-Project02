@@ -1,0 +1,46 @@
+{
+  "case_case160": {
+    "sentence": "I grew up to become a teacher.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "grew up to",
+        "V": "become",
+        "C1": "a teacher"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I grew up to become a teacher.",
+      "main_slots": {
+        "S": "I",
+        "Aux": "grew up to",
+        "V": "become",
+        "C1": "a teacher"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_adverbial",
+          "usage_type": "adverbial",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "become",
+        "4": "grew up to",
+        "8": "a teacher"
+      }
+    },
+    "match": true
+  }
+}

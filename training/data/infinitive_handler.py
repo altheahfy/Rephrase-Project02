@@ -39,20 +39,34 @@ class InfinitiveHandler:
         try:
             doc = self.nlp(text)
             
-            # spaCy依存関係解析による不定詞検出
+            # spaCy依存関係解析による不定詞検出（複数パターン対応）
             for token in doc:
-                # to + VERB の依存関係パターンを検出
+                # パターン1: to + VERB の直接的な子関係
                 if (token.text.lower() == 'to' and 
                     token.pos_ == 'PART' and  # to は PART (particle) として分類
                     any(child.pos_ == 'VERB' for child in token.children)):
                     return True
                 
-                # xcomp (open clausal complement) での不定詞検出
+                # パターン2: VERB (advcl/xcomp) + to (aux) の関係（case159対応）
+                if (token.pos_ == 'VERB' and 
+                    token.dep_ in ['advcl', 'xcomp'] and
+                    any(child.text.lower() == 'to' and child.dep_ == 'aux' 
+                        for child in token.children)):
+                    return True
+                
+                # パターン3: xcomp (open clausal complement) での不定詞検出
                 if token.dep_ == 'xcomp' and token.pos_ == 'VERB':
                     # xcompの前にtoがあるかチェック
                     for child in token.children:
                         if child.text.lower() == 'to' and child.dep_ == 'aux':
                             return True
+                
+                # パターン4: csubj (clausal subject) での不定詞検出 - 名詞的用法
+                if (token.pos_ == 'VERB' and 
+                    token.dep_ == 'csubj' and
+                    any(child.text.lower() == 'to' and child.dep_ == 'aux' 
+                        for child in token.children)):
+                    return True
             
             return False
             
@@ -134,10 +148,10 @@ class InfinitiveHandler:
                         })
                         print(f"   ✅ xcomp不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
             
-            # パターン2: advcl (adverbial clause) + mark=to  
+            # パターン2: advcl (adverbial clause) + aux/mark=to  
             elif token.dep_ == 'advcl' and token.pos_ == 'VERB':
                 for child in token.children:
-                    if child.text.lower() == 'to' and child.dep_ == 'mark':
+                    if child.text.lower() == 'to' and child.dep_ in ['mark', 'aux']:
                         infinitive_info['found'] = True
                         infinitive_info['infinitive_tokens'].append({
                             'main_verb': token,
@@ -161,6 +175,20 @@ class InfinitiveHandler:
                             'dependency': token.dep_
                         })
                         print(f"   ✅ ccomp不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
+            
+            # パターン4: csubj (clausal subject) + aux=to - 名詞的用法・主語
+            elif token.dep_ == 'csubj' and token.pos_ == 'VERB':
+                for child in token.children:
+                    if child.text.lower() == 'to' and child.dep_ == 'aux':
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': token,
+                            'to_token': child,
+                            'pattern': 'csubj_aux',
+                            'head': token.head,
+                            'dependency': token.dep_
+                        })
+                        print(f"   ✅ csubj不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
         
         # 用法分類（依存関係ベース）
         if infinitive_info['found']:
@@ -201,6 +229,11 @@ class InfinitiveHandler:
             elif pattern == 'ccomp_aux':
                 print(f"   📝 ccomp + 補語節 → 名詞的用法候補")
                 return 'nominal_complement'
+                
+            # csubj: 節主語（名詞的用法・主語）
+            elif pattern == 'csubj_aux':
+                print(f"   📝 csubj + 節主語 → 名詞的用法（主語）")
+                return 'nominal_subject'
         
         return 'unknown'
     
@@ -225,6 +258,8 @@ class InfinitiveHandler:
         
         if syntactic_role == 'nominal_complement':
             return self._process_nominal_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'nominal_subject':
+            return self._process_nominal_subject_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adjectival_complement':
             return self._process_adjectival_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adverbial_clause':
@@ -377,6 +412,57 @@ class InfinitiveHandler:
             }
         }
     
+    def _process_nominal_subject_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """名詞的用法・主語の処理（csubj構造対応）"""
+        print(f"📝 名詞的不定詞・主語処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case156: "To study English is important."
+        # 期待値: main_slots={'S': '', 'V': 'is', 'C1': 'important'}
+        #        sub_slots={'sub-v': 'To study', 'sub-o1': 'English', '_parent_slot': 'S'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # study
+            head = inf_token['head']  # is
+            
+            # メインスロット: 文の主動詞（is）とその補語
+            main_slots['S'] = ''  # 主語は空（不定詞がサブスロットとして処理）
+            main_slots['V'] = head.text  # is
+            
+            # 補語（C1）を検出
+            for child in head.children:
+                if child.dep_ in ['acomp', 'attr'] and child.pos_ == 'ADJ':
+                    main_slots['C1'] = child.text
+                    print(f"   📍 補語検出: C1 = '{child.text}'")
+            
+            # サブスロット: 不定詞部分
+            sub_slots['sub-v'] = f"{to_token.text} {main_verb.text}"  # "To study"
+            sub_slots['_parent_slot'] = 'S'
+            
+            # 不定詞の目的語を検出
+            for child in main_verb.children:
+                if child.dep_ == 'dobj' and child.pos_ in ['NOUN', 'PROPN']:
+                    sub_slots['sub-o1'] = child.text
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{child.text}'")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_nominal_subject',
+                'usage_type': 'nominal_subject',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
     def _process_adjectival_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
         """形容詞的用法の処理（spaCy依存関係ベース）"""
         print(f"📝 形容詞的不定詞処理: {text}")
@@ -430,16 +516,71 @@ class InfinitiveHandler:
                 main_slots['S'] = token.text
             elif token.dep_ == 'ROOT' and token.pos_ == 'VERB':
                 main_slots['V'] = token.text
-            elif token.dep_ == 'dobj':
+            elif token.dep_ == 'dobj' and token.head.dep_ == 'ROOT':
+                # メイン動詞の直接目的語のみ
                 main_slots['O1'] = token.text
         
-        # 不定詞を副詞的修飾語として分類
+        # 副詞的不定詞の詳細分析と出力形式決定
         if infinitive_info['infinitive_tokens']:
             inf_token = infinitive_info['infinitive_tokens'][0]
             to_token = inf_token['to_token']
             main_verb = inf_token['main_verb']
             
-            main_slots['M2'] = f"{to_token.text} {main_verb.text}"
+            # 不定詞の意味的分類（目的 vs 結果 vs その他）
+            infinitive_purpose = self._is_purpose_infinitive(doc, inf_token)
+            infinitive_result = self._is_result_infinitive(doc, inf_token)
+            
+            if infinitive_purpose:
+                # 目的の副詞的不定詞：サブスロット構造で出力
+                print(f"🎯 目的の副詞的不定詞：サブスロット構造で処理")
+                main_slots['M3'] = ""  # 空文字列
+                
+                # 不定詞部分をサブスロットに分解
+                sub_slots['sub-v'] = f"{to_token.text} {main_verb.text}"
+                sub_slots['_parent_slot'] = "M3"
+                
+                # 不定詞の目的語を検出
+                for token in doc:
+                    if (token.head == main_verb and 
+                        token.dep_ == 'dobj'):
+                        # "his friend" のように所有格+名詞を結合
+                        obj_text = self._get_full_noun_phrase(token)
+                        sub_slots['sub-o1'] = obj_text
+                        break
+                        
+            elif infinitive_result:
+                # 結果の副詞的不定詞：Aux+V形式で出力（例：grew up to become）
+                print(f"🎯 結果の副詞的不定詞：Aux+V形式で処理")
+                
+                # メイン動詞に付属する要素を含めてAux構築
+                main_verb_head = inf_token['head']
+                
+                # "grew up" のような句動詞＋to不定詞を一つのAuxとして扱う
+                aux_parts = [main_verb_head.text]
+                
+                # 句動詞の副詞的小詞（prt）を検索
+                for child in main_verb_head.children:
+                    if child.dep_ == 'prt':  # particle（up, down, etc.）
+                        aux_parts.append(child.text)
+                
+                # to不定詞部分を追加
+                aux_parts.extend([to_token.text])
+                
+                main_slots['Aux'] = ' '.join(aux_parts)
+                main_slots['V'] = main_verb.text
+                
+                # 不定詞の補語を検出（become a teacherのa teacher）
+                for token in doc:
+                    if (token.head == main_verb and 
+                        token.dep_ in ['attr', 'dobj']):
+                        # "a teacher" のような名詞句を結合
+                        comp_text = self._get_full_noun_phrase(token)
+                        main_slots['C1'] = comp_text
+                        break
+            else:
+                # 結果・方法等の副詞的不定詞：メインスロット構造
+                print(f"🎯 結果/方法の副詞的不定詞：メインスロット構造で処理")
+                main_slots['M2'] = f"{to_token.text} {main_verb.text}"
         
         return {
             'success': True,
@@ -490,3 +631,77 @@ class InfinitiveHandler:
                 'spacy_analysis': True
             }
         }
+    
+    def _is_purpose_infinitive(self, doc, inf_token: Dict) -> bool:
+        """
+        不定詞が目的の副詞的用法かどうかを判定
+        
+        Args:
+            doc: spaCy解析結果
+            inf_token: 不定詞トークン情報
+            
+        Returns:
+            bool: 目的の副詞的用法の場合True
+        """
+        # 基本的に "came to see" のような移動動詞＋to不定詞は目的用法
+        main_verb_lemma = inf_token['head'].lemma_.lower()
+        
+        # 移動・到着を表す動詞 + to不定詞 = 目的用法
+        purpose_verbs = ['come', 'go', 'run', 'walk', 'drive', 'travel', 'move', 'rush', 'hurry']
+        
+        if main_verb_lemma in purpose_verbs:
+            return True
+            
+        # その他の判定条件（将来拡張可能）
+        return False
+    
+    def _is_result_infinitive(self, doc, inf_token: Dict) -> bool:
+        """
+        不定詞が結果の副詞的用法かどうかを判定
+        
+        Args:
+            doc: spaCy解析結果
+            inf_token: 不定詞トークン情報
+            
+        Returns:
+            bool: 結果の副詞的用法の場合True
+        """
+        # "grew up to become" のような成長・変化動詞 + to不定詞 = 結果用法
+        main_verb_lemma = inf_token['head'].lemma_.lower()
+        
+        # 成長・変化を表す動詞 + to不定詞 = 結果用法
+        result_verbs = ['grow', 'rise', 'wake', 'turn', 'come', 'live', 'get']
+        
+        if main_verb_lemma in result_verbs:
+            # 句動詞（grow up, wake up等）の場合も結果用法
+            for child in inf_token['head'].children:
+                if child.dep_ == 'prt':  # particle
+                    return True
+            return True
+            
+        return False
+    
+    def _get_full_noun_phrase(self, token) -> str:
+        """
+        名詞句全体を取得（所有格等を含む）
+        
+        Args:
+            token: 中心となる名詞トークン
+            
+        Returns:
+            str: 完全な名詞句
+        """
+        # 所有格や形容詞等の修飾語を含む名詞句を構築
+        phrase_tokens = []
+        
+        # 前置修飾語を収集
+        for child in token.children:
+            if child.dep_ in ['poss', 'det', 'amod', 'compound']:
+                phrase_tokens.append((child.i, child.text))
+        
+        # 中心語を追加
+        phrase_tokens.append((token.i, token.text))
+        
+        # 位置順でソートして結合
+        phrase_tokens.sort(key=lambda x: x[0])
+        return ' '.join([t[1] for t in phrase_tokens])

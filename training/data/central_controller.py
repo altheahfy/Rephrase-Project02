@@ -341,6 +341,11 @@ class CentralController:
         if modal_info.get('has_modal', False):
             detected_patterns.append('modal')
         
+        # 不定詞検出（高優先度）- to不定詞構文
+        infinitive_handler = self.handlers['infinitive']
+        if infinitive_handler.can_handle(text):
+            detected_patterns.append('infinitive')
+        
         # 名詞節検出（高優先度）- that節、wh節、whether節、if節
         noun_clauses = self.handlers['noun_clause'].detect_noun_clauses(text)
         if noun_clauses:
@@ -735,6 +740,39 @@ class CentralController:
             else:
                 print(f"⚠️ 助動詞処理失敗、通常の処理フローに移行")
                 print(f"  ModalHandler error: {modal_result.get('error')}")
+        
+        # 🎯 不定詞処理（to-infinitive構文）
+        if 'infinitive' in grammar_patterns:
+            print(f"🔧 InfinitiveHandler処理開始: '{text}'")
+            
+            # 不定詞構文は元の文で解析（修飾語分離前）
+            infinitive_handler = self.handlers['infinitive']
+            infinitive_result = infinitive_handler.process(text)
+            
+            if infinitive_result['success']:
+                print(f"✅ 不定詞処理成功: {infinitive_result}")
+                
+                # 不定詞処理が成功した場合、そのまま結果を返す
+                final_slots = infinitive_result['main_slots'].copy()
+                
+                result = {
+                    'success': True,
+                    'text': text,
+                    'main_slots': final_slots,
+                    'sub_slots': infinitive_result.get('sub_slots', {}),
+                    'metadata': {
+                        'controller': 'central',
+                        'primary_handler': 'infinitive',
+                        'collaboration': infinitive_result.get('collaboration', []),
+                        'infinitive_info': infinitive_result.get('metadata', {}),
+                        'confidence': 0.9
+                    }
+                }
+                
+                return self._apply_order_to_result(result)
+            else:
+                print(f"⚠️ 不定詞処理失敗、通常の処理フローに移行")
+                print(f"  InfinitiveHandler error: {infinitive_result.get('error')}")
         
         # 🎯 仮定法処理（人間的文法識別アプローチ）
         # Case 150対策: Suppose構文は疑問文を含むが仮定法として処理すべき

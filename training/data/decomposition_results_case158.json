@@ -1,0 +1,57 @@
+{
+  "case_case158": {
+    "sentence": "She has something to tell you.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "has",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-v": "something to tell",
+        "sub-o1": "you",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "She has something to tell you.",
+      "main_slots": {
+        "S": "She",
+        "V": "has",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-v": "something to tell",
+        "_parent_slot": "O1",
+        "sub-o1": "you"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "usage_type": "adjectival_modifier",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "something to tell",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "you",
+          "display_order": 2
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "She",
+        "5": "has",
+        "6": ""
+      }
+    },
+    "match": true
+  }
+}

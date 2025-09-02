@@ -62,18 +62,31 @@ def parse_range(case_range: str):
             part = part.strip()
             
             if '-' in part:
-                # 範囲指定 (例: "1-70")
-                start, end = map(int, part.split('-'))
-                target_cases.extend([int(i) for i in range(start, end + 1) if str(i) in test_cases])
+                # 範囲指定 (例: "1-70" または "case156-case170")
+                if part.startswith('case'):
+                    # 文字列キー範囲 (例: "case156-case170")
+                    start_str, end_str = part.split('-')
+                    start_num = int(start_str.replace('case', ''))
+                    end_num = int(end_str.replace('case', ''))
+                    target_cases.extend([f"case{i}" for i in range(start_num, end_num + 1) if f"case{i}" in test_cases])
+                else:
+                    # 数値キー範囲 (例: "1-70")
+                    start, end = map(int, part.split('-'))
+                    target_cases.extend([str(i) for i in range(start, end + 1) if str(i) in test_cases])
             else:
-                # 単一ケース (例: "83")
+                # 単一ケース (例: "83" または "case159")
                 if part in test_cases:
-                    target_cases.append(int(part))
+                    target_cases.append(part)
         
-        # 重複除去とソート
-        target_cases = sorted(list(set(target_cases)))
+        # 重複除去とソート（文字列キーと数値キーを分けて処理）
+        target_cases = list(set(target_cases))
+        # 数値キーと文字列キーを分けてソート
+        numeric_cases = sorted([case for case in target_cases if case.isdigit()], key=int)
+        string_cases = sorted([case for case in target_cases if case.startswith('case')], 
+                             key=lambda x: int(x.replace('case', '')))
+        target_cases = numeric_cases + string_cases
     else:
-        target_cases = list(map(int, test_cases.keys()))
+        target_cases = list(test_cases.keys())
     
     return target_cases
 
@@ -86,7 +99,7 @@ def run_single_case(case_id, show_output=False):
             test_data = json.load(f)
         
         # dataキーの中のケースを取得
-        case_data = test_data['data'].get(str(case_id))
+        case_data = test_data['data'].get(case_id)
         if not case_data:
             print(f"❌ ケース {case_id} が見つかりません")
             return None

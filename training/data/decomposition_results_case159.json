@@ -1,0 +1,62 @@
+{
+  "case_case159": {
+    "sentence": "He came to see his friend.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "came",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "to see",
+        "sub-o1": "his friend",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "He came to see his friend.",
+      "main_slots": {
+        "S": "He",
+        "V": "came",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "to see",
+        "_parent_slot": "M3",
+        "sub-o1": "his friend"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_adverbial",
+          "usage_type": "adverbial",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "to see",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "his friend",
+          "display_order": 2
+        },
+        "_parent_slot": "M3"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "5": "came",
+        "9": ""
+      }
+    },
+    "match": true
+  }
+}

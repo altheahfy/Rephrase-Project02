@@ -573,8 +573,10 @@ class PureDataDrivenOrderManager:
             }
             results.append(result)
             
-            print(f"✅ 例文{i+1}: {sentence}")
-            print(f"  🎯 副詞位置結果: {ordered_slots}")
+            # Debug logging only for first few examples or specific debugging
+            if i < 3:  # Only show first 3 examples 
+                print(f"✅ 例文{i+1}: {sentence}")
+                print(f"  🎯 副詞位置結果: {ordered_slots}")
         
         return results
     
@@ -640,12 +642,13 @@ def main():
             
             print(f"\n💾 結果を {output_file} に保存しました")
             
-            # 結果の確認
-            print(f"\n📊 {v_group_key}グループ副詞位置結果:")
-            for i, result in enumerate(results):
-                print(f"例文{i+1}: {result['sentence']}")
-                print(f"順序: {result['ordered_slots']}")
-                print()
+            # 結果の確認 (簡潔版)
+            print(f"\n📊 {v_group_key}グループ副詞位置結果: {len(results)}例文処理完了")
+            # 詳細は必要に応じてコメントアウト解除
+            # for i, result in enumerate(results):
+            #     print(f"例文{i+1}: {result['sentence']}")
+            #     print(f"順序: {result['ordered_slots']}")
+            #     print()
                 
         except Exception as e:
             print(f"❌ {v_group_key}グループの処理でエラー: {e}")
@@ -671,10 +674,11 @@ def main():
                 all_results[v_group_key] = results
                 
                 print(f"\n🎉 分析完了: {v_group_key}グループ ({len(examples)}例文)")
-                for i, result in enumerate(results):
-                    print(f"例文{i+1}: {result['sentence']}")
-                    print(f"順序: {result['ordered_slots']}")
-                    print()
+                # 詳細ログは必要に応じてコメントアウト解除
+                # for i, result in enumerate(results):
+                #     print(f"例文{i+1}: {result['sentence']}")
+                #     print(f"順序: {result['ordered_slots']}")
+                #     print()
                     
         except Exception as e:
             print(f"❌ {v_group_key}グループの処理でエラー: {e}")
