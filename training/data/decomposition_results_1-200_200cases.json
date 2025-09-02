@@ -2326,26 +2326,40 @@
     "match": false,
     "main_slots": {
       "S": "",
-      "V": "learn"
+      "V": "helps"
     },
     "sub_slots": {
       "sub-v": "Reading",
-      "sub-o1": "books",
-      "sub-o2": "Reading books helps [that]",
-      "_parent_slot": "S"
+      "_parent_slot": "S",
+      "sub-o1": "books"
     }
   },
   "case_173": {
     "sentence": "Learning English takes time.",
-    "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "takes",
+      "O1": "time"
+    },
+    "sub_slots": {
+      "sub-v": "Learning",
+      "_parent_slot": "S",
+      "sub-o1": "English"
+    }
   },
   "case_174": {
     "sentence": "Walking in the park is relaxing.",
     "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "main_slots": {
+      "S": "",
+      "V": "is"
+    },
+    "sub_slots": {
+      "sub-v": "Walking",
+      "_parent_slot": "S",
+      "sub-m2": "in park the"
+    }
   },
   "case_175": {
     "sentence": "Playing tennis regularly keeps you healthy.",
@@ -2365,31 +2379,37 @@
   },
   "case_176": {
     "sentence": "I enjoy reading.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "I",
-      "V": "enjoy"
+      "V": "enjoy",
+      "O1": "reading"
     },
     "sub_slots": {}
   },
   "case_177": {
     "sentence": "She finished studying.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "She",
-      "V": "finished"
+      "V": "finished",
+      "O1": "studying"
     },
     "sub_slots": {}
   },
   "case_178": {
     "sentence": "They avoided talking about it.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "They",
       "V": "avoided",
-      "M2": "about it"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "talking",
+      "_parent_slot": "O1",
+      "sub-m2": "about it"
+    }
   },
   "case_179": {
     "sentence": "We considered buying a new car.",
@@ -2397,10 +2417,13 @@
     "main_slots": {
       "S": "We",
       "V": "considered",
-      "O1": "a",
-      "C2": "car"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "buying",
+      "_parent_slot": "O1",
+      "sub-o1": "car"
+    }
   },
   "case_180": {
     "sentence": "He keeps forgetting his keys.",
@@ -2408,9 +2431,13 @@
     "main_slots": {
       "S": "He",
       "V": "keeps",
-      "O1": "his keys"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "forgetting",
+      "_parent_slot": "O1",
+      "sub-o1": "keys"
+    }
   },
   "case_181": {
     "sentence": "I appreciate your helping me.",
@@ -2418,20 +2445,29 @@
     "main_slots": {
       "S": "I",
       "V": "appreciate",
-      "O1": "your",
-      "O2": "me"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "helping",
+      "_parent_slot": "O1",
+      "sub-o1": "me"
+    }
   },
   "case_182": {
     "sentence": "I'm interested in learning French.",
     "match": false,
     "main_slots": {
       "S": "I",
-      "V": "'",
-      "M2": "in"
+      "V": "'m",
+      "C1": "interested",
+      "C2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m2": "in",
+      "sub-v": "learning",
+      "_parent_slot": "C2",
+      "sub-o1": "French"
+    }
   },
   "case_183": {
     "sentence": "She is good at playing piano.",
@@ -2440,9 +2476,14 @@
       "S": "She",
       "V": "is",
       "C1": "good",
-      "M2": "at"
+      "C2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m2": "at",
+      "sub-v": "playing",
+      "_parent_slot": "C2",
+      "sub-o1": "piano"
+    }
   },
   "case_184": {
     "sentence": "They are afraid of flying.",
@@ -2451,37 +2492,60 @@
       "S": "They",
       "V": "are",
       "C1": "afraid",
-      "M2": "of"
+      "C2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m2": "of",
+      "sub-v": "flying",
+      "_parent_slot": "C2"
+    }
   },
   "case_185": {
     "sentence": "Thank you for helping me.",
     "match": false,
     "main_slots": {
-      "S": "",
-      "V": "helping",
-      "O1": "me"
+      "V": "Thank",
+      "O1": "you",
+      "M2": ""
     },
     "sub_slots": {
-      "sub-v": "Thank",
-      "sub-o1": "you",
       "sub-m2": "for",
-      "sub-o2": "Thank [that]",
-      "_parent_slot": "S"
+      "sub-v": "helping",
+      "_parent_slot": "M2",
+      "sub-o1": "me"
     }
   },
   "case_186": {
     "sentence": "After finishing homework, I watch TV.",
     "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "main_slots": {
+      "S": "I",
+      "V": "watch",
+      "O1": "TV",
+      "M1": ""
+    },
+    "sub_slots": {
+      "sub-m1": "After",
+      "sub-v": "finishing",
+      "_parent_slot": "M1",
+      "sub-o1": "homework"
+    }
   },
   "case_187": {
     "sentence": "Before leaving home, she checked the weather.",
     "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "main_slots": {
+      "S": "she",
+      "V": "checked",
+      "O1": "weather",
+      "M1": ""
+    },
+    "sub_slots": {
+      "sub-m1": "Before",
+      "sub-v": "leaving",
+      "_parent_slot": "M1",
+      "sub-o1": "home"
+    }
   },
   "case_188": {
     "sentence": "Without saying anything, he left.",
@@ -2489,9 +2553,14 @@
     "main_slots": {
       "S": "he",
       "V": "left",
-      "M2": "Without saying anything"
+      "M1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m1": "Without",
+      "sub-v": "saying",
+      "_parent_slot": "M1",
+      "sub-o1": "anything"
+    }
   },
   "case_189": {
     "sentence": "By working hard, you can succeed.",
@@ -2510,9 +2579,9 @@
     "match": false,
     "main_slots": {
       "S": "I",
-      "V": "'",
-      "O1": "interested learning",
-      "M2": "in"
+      "V": "'m",
+      "C1": "interested",
+      "C2": "in learning"
     },
     "sub_slots": {}
   },
@@ -2521,35 +2590,56 @@
     "match": false,
     "main_slots": {
       "S": "I",
-      "V": "'",
-      "M2": "in"
+      "V": "'m",
+      "C1": "interested",
+      "C2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m2": "in",
+      "sub-v": "learning",
+      "_parent_slot": "C2",
+      "sub-o1": "English"
+    }
   },
   "case_192": {
     "sentence": "My hobby is reading.",
     "match": false,
     "main_slots": {
-      "S": "My hobby",
-      "V": "is"
+      "S": "hobby",
+      "V": "is",
+      "C1": "reading"
     },
     "sub_slots": {}
   },
   "case_193": {
     "sentence": "My hobby is reading novels.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "My hobby",
       "V": "is",
-      "C1": "novels"
+      "C1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "reading",
+      "_parent_slot": "C1",
+      "sub-o1": "novels"
+    }
   },
   "case_194": {
     "sentence": "After finishing homework, I watch TV.",
     "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "main_slots": {
+      "S": "I",
+      "V": "watch",
+      "O1": "TV",
+      "M1": ""
+    },
+    "sub_slots": {
+      "sub-m1": "After",
+      "sub-v": "finishing",
+      "_parent_slot": "M1",
+      "sub-o1": "homework"
+    }
   },
   "case_195": {
     "sentence": "She keeps talking about movies.",
@@ -2557,9 +2647,13 @@
     "main_slots": {
       "S": "She",
       "V": "keeps",
-      "M2": "about movies"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "talking",
+      "_parent_slot": "O1",
+      "sub-m2": "about movies"
+    }
   },
   "case_196": {
     "sentence": "I avoid eating junk food.",
@@ -2567,9 +2661,13 @@
     "main_slots": {
       "S": "I",
       "V": "avoid",
-      "O1": "junk food"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "eating",
+      "_parent_slot": "O1",
+      "sub-o1": "food"
+    }
   },
   "case_197": {
     "sentence": "He is good at playing guitar.",
@@ -2578,36 +2676,43 @@
       "S": "He",
       "V": "is",
       "C1": "good",
-      "M2": "at"
+      "C2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-m2": "at",
+      "sub-v": "playing",
+      "_parent_slot": "C2",
+      "sub-o1": "guitar"
+    }
   },
   "case_198": {
     "sentence": "Thank you for helping me.",
     "match": false,
     "main_slots": {
-      "S": "",
-      "V": "helping",
-      "O1": "me"
+      "V": "Thank",
+      "O1": "you",
+      "M2": ""
     },
     "sub_slots": {
-      "sub-v": "Thank",
-      "sub-o1": "you",
       "sub-m2": "for",
-      "sub-o2": "Thank [that]",
-      "_parent_slot": "S"
+      "sub-v": "helping",
+      "_parent_slot": "M2",
+      "sub-o1": "me"
     }
   },
   "case_199": {
     "sentence": "She left without saying goodbye.",
     "match": false,
     "main_slots": {
-      "M1": ""
+      "S": "She",
+      "V": "left",
+      "M2": ""
     },
     "sub_slots": {
-      "sub-s": "If She",
-      "sub-v": "left",
-      "_parent_slot": "M1"
+      "sub-m2": "without",
+      "sub-v": "saying",
+      "_parent_slot": "M2",
+      "sub-o1": "goodbye"
     }
   },
   "case_200": {
@@ -2616,9 +2721,12 @@
     "main_slots": {
       "S": "I",
       "V": "appreciate",
-      "O1": "your",
-      "O2": "us"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "helping",
+      "_parent_slot": "O1",
+      "sub-o1": "us"
+    }
   }
 }

@@ -25,6 +25,7 @@ from conditional_handler import ConditionalHandler
 from imperative_handler import ImperativeHandler
 from metaphorical_handler import MetaphoricalHandler
 from infinitive_handler import InfinitiveHandler
+from gerund_handler import GerundHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -66,6 +67,7 @@ class CentralController:
         imperative_handler = ImperativeHandler()  # Phase 10: ImperativeHandler追加
         metaphorical_handler = MetaphoricalHandler(self.nlp)  # Phase 11: MetaphoricalHandler追加
         infinitive_handler = InfinitiveHandler(self.nlp)  # Phase 12: InfinitiveHandler追加
+        gerund_handler = GerundHandler(self.nlp)  # Phase 13: GerundHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -79,6 +81,7 @@ class CentralController:
             'noun_clause': noun_clause_handler,
             'imperative': imperative_handler,
             'infinitive': infinitive_handler,
+            'gerund': gerund_handler,
             'basic_five_pattern': basic_five_pattern_handler  # MetaphoricalHandler用
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
@@ -86,6 +89,9 @@ class CentralController:
         
         # MetaphoricalHandlerに協力者を注入
         metaphorical_handler.collaborators = collaborators
+        
+        # GerundHandlerに協力者を注入
+        gerund_handler.collaborators = collaborators
         
         # ハンドラー辞書に登録
         self.handlers = {
@@ -101,7 +107,8 @@ class CentralController:
             'conditional': conditional_handler,  # Phase 9: ConditionalHandler追加
             'imperative': imperative_handler,  # Phase 10: ImperativeHandler追加
             'metaphorical': metaphorical_handler,  # Phase 11: MetaphoricalHandler追加
-            'infinitive': infinitive_handler  # Phase 12: InfinitiveHandler追加
+            'infinitive': infinitive_handler,  # Phase 12: InfinitiveHandler追加
+            'gerund': gerund_handler  # Phase 13: GerundHandler追加
         }
         
         # Rephraseスロット定義読み込み
@@ -340,6 +347,11 @@ class CentralController:
         modal_info = self.handlers['modal'].detect_modal_structure(text)
         if modal_info.get('has_modal', False):
             detected_patterns.append('modal')
+        
+        # 動名詞検出（最優先）- VBG動名詞構文
+        gerund_handler = self.handlers['gerund']
+        if gerund_handler.can_handle(text):
+            detected_patterns.append('gerund')
         
         # 不定詞検出（高優先度）- to不定詞構文
         infinitive_handler = self.handlers['infinitive']
@@ -876,6 +888,44 @@ class CentralController:
                     }
                     
                     return self._apply_order_to_result(result)
+        
+        # 🎯 動名詞処理（高優先度）
+        if 'gerund' in grammar_patterns:
+            print(f"🎯 動名詞処理開始")
+            gerund_handler = self.handlers['gerund']
+            
+            # 動名詞用のデフォルトv_group_key
+            v_group_key = "gerund_default"
+            
+            try:
+                gerund_result = gerund_handler.handle(text, v_group_key)
+                
+                if gerund_result['success']:
+                    print(f"✅ 動名詞処理成功: {gerund_result}")
+                    
+                    result = {
+                        'success': True,
+                        'text': text,
+                        'main_slots': gerund_result['main_slots'],
+                        'sub_slots': gerund_result.get('sub_slots', {}),
+                        'metadata': {
+                            'controller': 'central',
+                            'primary_handler': 'gerund',
+                            'collaboration': gerund_result.get('collaboration', []),
+                            'gerund_info': gerund_result.get('metadata', {}),
+                            'confidence': 0.9
+                        }
+                    }
+                    
+                    return self._apply_order_to_result(result)
+                else:
+                    print(f"⚠️ 動名詞処理失敗、通常の処理フローに移行")
+                    print(f"  GerundHandler error: {gerund_result.get('error')}")
+                    
+            except Exception as e:
+                print(f"❌ 動名詞処理エラー: {e}")
+                import traceback
+                traceback.print_exc()
         
         # 🎯 仮定法処理（人間的文法識別アプローチ）
         # Case 150対策: Suppose構文は疑問文を含むが仮定法として処理すべき

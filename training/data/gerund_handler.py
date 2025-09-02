@@ -74,11 +74,16 @@ class GerundHandler:
             
             # 特殊ケース：NOUN として分類される動名詞も考慮
             elif token.pos_ == "NOUN" and token.text.endswith("ing"):
-                # 語幹が動詞かチェック
-                stem = token.text[:-3]  # "ing" を除去
-                if self._is_verb_stem(stem, doc):
-                    print(f"✅ NOUN分類の動名詞検出: '{token.text}'")
+                # 動名詞として使用されているかチェック
+                if self._is_gerund_usage(token, doc):
+                    print(f"✅ NOUN分類の動名詞検出: '{token.text}' ({token.dep_})")
                     return True
+                else:
+                    # 語幹が動詞かチェック
+                    stem = token.text[:-3]  # "ing" を除去
+                    if self._is_verb_stem(stem, doc):
+                        print(f"✅ NOUN分類の動名詞検出（語幹チェック）: '{token.text}'")
+                        return True
                     
         print(f"❌ 動名詞構造なし: '{sentence}'")
         return False
@@ -114,6 +119,10 @@ class GerundHandler:
             for prev_token in doc:
                 if prev_token.i < token.i and prev_token.dep_ == "nsubj":
                     return True
+        
+        # NOUN分類されているが語尾-ingで主語位置にある場合（Swimming is fun.のケース）
+        if token.pos_ == "NOUN" and token.dep_ in ["nsubj", "nsubjpass", "csubj"]:
+            return True
             
         return False
 
@@ -255,7 +264,7 @@ class GerundHandler:
         
         # 修飾語の処理（協力者ハンドラー使用）
         if 'adverb' in self.collaborators:
-            adverb_result = self.collaborators['adverb'].handle(sentence, v_group_key)
+            adverb_result = self.collaborators['adverb'].process(sentence)
             if adverb_result.get('success', False):
                 self._merge_adverb_slots(main_slots, adverb_result.get('main_slots', {}))
         
@@ -309,7 +318,7 @@ class GerundHandler:
         
         # 修飾語の処理
         if 'adverb' in self.collaborators:
-            adverb_result = self.collaborators['adverb'].handle(sentence, v_group_key)
+            adverb_result = self.collaborators['adverb'].process(sentence)
             if adverb_result.get('success', False):
                 self._merge_adverb_slots(main_slots, adverb_result.get('main_slots', {}))
         
