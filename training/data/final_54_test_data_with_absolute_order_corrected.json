@@ -2687,13 +2687,13 @@
           "S": "It",
           "V": "is",
           "C1": "easy",
-          "M2": ""
+          "M2": "for me",
+          "M3": ""
         },
         "sub_slots": {
-          "sub-s": "for me",
           "sub-v": "to understand",
           "sub-o1": "this",
-          "_parent_slot": "M2"
+          "_parent_slot": "M3"
         }
       }
     },
@@ -2705,12 +2705,12 @@
         "main_slots": {
           "S": "This box",
           "V": "is",
-          "C1": ""
+          "C1": "too heavy",
+          "M2": ""
         },
         "sub_slots": {
-          "sub-c1": "too heavy",
           "sub-v": "to carry",
-          "_parent_slot": "C1"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -2722,13 +2722,13 @@
         "main_slots": {
           "S": "She",
           "V": "is",
-          "C1": ""
+          "C1": "old",
+          "M2": ""
         },
         "sub_slots": {
-          "sub-c1": "old enough",
-          "sub-v": "to drive",
+          "sub-v": "enough to drive",
           "sub-o1": "a car",
-          "_parent_slot": "C1"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -2739,15 +2739,11 @@
       "expected": {
         "main_slots": {
           "S": "He",
-          "V": "seems",
-          "O1": ""
+          "Aux": "seems to have",
+          "V": "finished",
+          "O1": "his work"
         },
-        "sub_slots": {
-          "sub-aux": "to have",
-          "sub-v": "finished",
-          "sub-o1": "his work",
-          "_parent_slot": "O1"
-        }
+        "sub_slots": {}
       }
     },
     "case165": {
@@ -2795,12 +2791,12 @@
           "S": "I",
           "V": "want",
           "O1": "you",
-          "O2": ""
+          "C2": ""
         },
         "sub_slots": {
           "sub-v": "to help",
           "sub-o1": "me",
-          "_parent_slot": "O2"
+          "_parent_slot": "C2"
         }
       }
     },
@@ -2811,13 +2807,10 @@
       "expected": {
         "main_slots": {
           "S": "The meeting",
-          "V": ""
+          "Aux": "is about to",
+          "V": "start"
         },
-        "sub_slots": {
-          "sub-aux": "is about",
-          "sub-v": "to start",
-          "_parent_slot": "V"
-        }
+        "sub_slots": {}
       }
     },
     "case169": {
@@ -2828,12 +2821,11 @@
         "main_slots": {
           "S": "She",
           "V": "studies",
-          "O1": "hard",
+          "M2": "hard",
           "M3": ""
         },
         "sub_slots": {
-          "sub-m3": "in order",
-          "sub-v": "to pass",
+          "sub-v": "in order to pass",
           "sub-o1": "the exam",
           "_parent_slot": "M3"
         }
@@ -2847,12 +2839,11 @@
         "main_slots": {
           "S": "He",
           "V": "left",
-          "M1": "early",
+          "M2": "early",
           "M3": ""
         },
         "sub_slots": {
-          "sub-m3": "so as",
-          "sub-v": "to avoid",
+          "sub-v": "so as to avoid",
           "sub-o1": "traffic",
           "_parent_slot": "M3"
         }
