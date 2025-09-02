@@ -764,22 +764,60 @@ class CentralController:
             if infinitive_result['success']:
                 print(f"✅ 不定詞処理成功: {infinitive_result}")
                 
-                # 不定詞処理が成功した場合、そのまま結果を返す
-                final_slots = infinitive_result['main_slots'].copy()
-                
-                result = {
-                    'success': True,
-                    'text': text,
-                    'main_slots': final_slots,
-                    'sub_slots': infinitive_result.get('sub_slots', {}),
-                    'metadata': {
-                        'controller': 'central',
-                        'primary_handler': 'infinitive',
-                        'collaboration': infinitive_result.get('collaboration', []),
-                        'infinitive_info': infinitive_result.get('metadata', {}),
-                        'confidence': 0.9
+                # 🔄 真の協調処理: 助動詞処理結果があるかチェック
+                if modal_success_result:
+                    print(f"🤝 助動詞+不定詞協調処理: 主文構造は助動詞処理、サブスロットは不定詞処理")
+                    
+                    # 助動詞処理の主文構造を使用
+                    final_slots = modal_success_result['main_slots'].copy()
+                    
+                    # 不定詞処理のサブスロットを統合
+                    sub_slots = infinitive_result.get('sub_slots', {})
+                    
+                    # サブスロットが存在する場合、対応するmain_slotを空にする
+                    if sub_slots and '_parent_slot' in sub_slots:
+                        parent_slot = sub_slots['_parent_slot']
+                        if parent_slot in final_slots:
+                            print(f"🔧 協調処理: {parent_slot}をサブスロット用に空に設定")
+                            final_slots[parent_slot] = ''
+                    
+                    result = {
+                        'success': True,
+                        'text': text,
+                        'main_slots': final_slots,
+                        'sub_slots': sub_slots,
+                        'metadata': {
+                            'controller': 'central',
+                            'primary_handler': 'modal',
+                            'collaboration': ['modal', 'infinitive'],
+                            'modal_info': modal_success_result.get('modal_info', {}),
+                            'infinitive_info': infinitive_result.get('metadata', {}),
+                            'confidence': 0.95,
+                            'collaboration_type': 'modal_infinitive_coordination'
+                        }
                     }
-                }
+                    
+                    return self._apply_order_to_result(result)
+                else:
+                    # 助動詞処理結果がない場合は不定詞処理のみ使用
+                    print(f"🔧 不定詞処理のみ使用")
+                    final_slots = infinitive_result['main_slots'].copy()
+                    
+                    result = {
+                        'success': True,
+                        'text': text,
+                        'main_slots': final_slots,
+                        'sub_slots': infinitive_result.get('sub_slots', {}),
+                        'metadata': {
+                            'controller': 'central',
+                            'primary_handler': 'infinitive',
+                            'collaboration': infinitive_result.get('collaboration', []),
+                            'infinitive_info': infinitive_result.get('metadata', {}),
+                            'confidence': 0.9
+                        }
+                    }
+                    
+                    return self._apply_order_to_result(result)
                 
                 return self._apply_order_to_result(result)
             else:

@@ -1,0 +1,231 @@
+{
+  "case_case167": {
+    "sentence": "I want you to help me.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "want",
+        "O1": "you",
+        "C2": ""
+      },
+      "sub_slots": {
+        "sub-v": "to help",
+        "sub-o1": "me",
+        "_parent_slot": "C2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I want you to help me.",
+      "main_slots": {
+        "S": "I",
+        "V": "want",
+        "O1": "you",
+        "C2": ""
+      },
+      "sub_slots": {
+        "sub-v": "to help",
+        "sub-o1": "me",
+        "_parent_slot": "C2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_causative",
+          "usage_type": "causative",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "to help",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "me",
+          "display_order": 2
+        },
+        "_parent_slot": "C2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "want",
+        "6": "you"
+      }
+    },
+    "match": true
+  },
+  "case_case168": {
+    "sentence": "The meeting is about to start.",
+    "expected": {
+      "main_slots": {
+        "S": "The meeting",
+        "Aux": "is about to",
+        "V": "start"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "The meeting is about to start.",
+      "main_slots": {
+        "S": "The meeting",
+        "Aux": "is about to",
+        "V": "start"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_be_about_to",
+          "usage_type": "be_about_to",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "3": "The meeting",
+        "4": "is about to",
+        "5": "start"
+      }
+    },
+    "match": true
+  },
+  "case_case169": {
+    "sentence": "She studies hard in order to pass the exam.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "studies",
+        "M2": "hard",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "in order to pass",
+        "sub-o1": "the exam",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "She studies hard in order to pass the exam.",
+      "main_slots": {
+        "S": "She",
+        "V": "studies",
+        "M2": "hard",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "in order to pass",
+        "_parent_slot": "M3",
+        "sub-o1": "the exam"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_in_order_to",
+          "usage_type": "in_order_to",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "in order to pass",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "the exam",
+          "display_order": 2
+        },
+        "_parent_slot": "M3"
+      },
+      "ordered_slots": {
+        "3": "She",
+        "5": "studies",
+        "9": "",
+        "7": "hard"
+      }
+    },
+    "match": true
+  },
+  "case_case170": {
+    "sentence": "He left early so as to avoid traffic.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "left",
+        "M2": "early",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "so as to avoid",
+        "sub-o1": "traffic",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "He left early so as to avoid traffic.",
+      "main_slots": {
+        "S": "He",
+        "V": "left",
+        "M2": "early",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "so as to avoid",
+        "_parent_slot": "M3",
+        "sub-o1": "traffic"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_so_as_to",
+          "usage_type": "so_as_to",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "so as to avoid",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "traffic",
+          "display_order": 2
+        },
+        "_parent_slot": "M3"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "5": "left",
+        "9": "",
+        "7": "early"
+      }
+    },
+    "match": true
+  }
+}

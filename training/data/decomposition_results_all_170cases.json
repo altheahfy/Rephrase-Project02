@@ -1,0 +1,2280 @@
+{
+  "case_1": {
+    "sentence": "The car is red.",
+    "match": true,
+    "main_slots": {
+      "S": "The car",
+      "V": "is",
+      "C1": "red"
+    },
+    "sub_slots": {}
+  },
+  "case_2": {
+    "sentence": "I love you.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "love",
+      "O1": "you"
+    },
+    "sub_slots": {}
+  },
+  "case_3": {
+    "sentence": "Birds fly.",
+    "match": true,
+    "main_slots": {
+      "S": "Birds",
+      "V": "fly"
+    },
+    "sub_slots": {}
+  },
+  "case_4": {
+    "sentence": "Children play.",
+    "match": true,
+    "main_slots": {
+      "S": "Children",
+      "V": "play"
+    },
+    "sub_slots": {}
+  },
+  "case_5": {
+    "sentence": "Time passes.",
+    "match": true,
+    "main_slots": {
+      "S": "Time",
+      "V": "passes"
+    },
+    "sub_slots": {}
+  },
+  "case_6": {
+    "sentence": "She looks happy.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "looks",
+      "C1": "happy"
+    },
+    "sub_slots": {}
+  },
+  "case_7": {
+    "sentence": "He became a doctor.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "became",
+      "C1": "a doctor"
+    },
+    "sub_slots": {}
+  },
+  "case_8": {
+    "sentence": "The food tastes good.",
+    "match": true,
+    "main_slots": {
+      "S": "The food",
+      "V": "tastes",
+      "C1": "good"
+    },
+    "sub_slots": {}
+  },
+  "case_9": {
+    "sentence": "I read books.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "read",
+      "O1": "books"
+    },
+    "sub_slots": {}
+  },
+  "case_10": {
+    "sentence": "She plays piano.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "plays",
+      "O1": "piano"
+    },
+    "sub_slots": {}
+  },
+  "case_11": {
+    "sentence": "We study English.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "V": "study",
+      "O1": "English"
+    },
+    "sub_slots": {}
+  },
+  "case_12": {
+    "sentence": "I gave him a book.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "gave",
+      "O1": "him",
+      "O2": "a book"
+    },
+    "sub_slots": {}
+  },
+  "case_13": {
+    "sentence": "She told me a story.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "told",
+      "O1": "me",
+      "O2": "a story"
+    },
+    "sub_slots": {}
+  },
+  "case_14": {
+    "sentence": "He bought her flowers.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "bought",
+      "O1": "her",
+      "O2": "flowers"
+    },
+    "sub_slots": {}
+  },
+  "case_15": {
+    "sentence": "We call him Tom.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "V": "call",
+      "O1": "him",
+      "C2": "Tom"
+    },
+    "sub_slots": {}
+  },
+  "case_16": {
+    "sentence": "I found it interesting.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "found",
+      "O1": "it",
+      "C2": "interesting"
+    },
+    "sub_slots": {}
+  },
+  "case_17": {
+    "sentence": "They made her happy.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "V": "made",
+      "O1": "her",
+      "C2": "happy"
+    },
+    "sub_slots": {}
+  },
+  "case_18": {
+    "sentence": "The cake is being baked by my mother.",
+    "match": true,
+    "main_slots": {
+      "S": "The cake",
+      "Aux": "is being",
+      "V": "baked",
+      "M2": "by my mother"
+    },
+    "sub_slots": {}
+  },
+  "case_19": {
+    "sentence": "The cake was eaten by the children.",
+    "match": true,
+    "main_slots": {
+      "S": "The cake",
+      "Aux": "was",
+      "V": "eaten",
+      "M2": "by the children"
+    },
+    "sub_slots": {}
+  },
+  "case_20": {
+    "sentence": "The door was opened by the key.",
+    "match": true,
+    "main_slots": {
+      "S": "The door",
+      "Aux": "was",
+      "V": "opened",
+      "M2": "by the key"
+    },
+    "sub_slots": {}
+  },
+  "case_21": {
+    "sentence": "The students study hard for exams.",
+    "match": true,
+    "main_slots": {
+      "S": "The students",
+      "V": "study",
+      "M2": "hard",
+      "M3": "for exams"
+    },
+    "sub_slots": {}
+  },
+  "case_22": {
+    "sentence": "The car was repaired last week.",
+    "match": true,
+    "main_slots": {
+      "S": "The car",
+      "Aux": "was",
+      "V": "repaired",
+      "M2": "last week"
+    },
+    "sub_slots": {}
+  },
+  "case_23": {
+    "sentence": "The window was gently opened by the morning breeze.",
+    "match": true,
+    "main_slots": {
+      "S": "The window",
+      "Aux": "was",
+      "V": "opened",
+      "M2": "gently",
+      "M3": "by the morning breeze"
+    },
+    "sub_slots": {}
+  },
+  "case_24": {
+    "sentence": "The message is being carefully written by the manager.",
+    "match": true,
+    "main_slots": {
+      "S": "The message",
+      "Aux": "is being",
+      "V": "written",
+      "M2": "carefully",
+      "M3": "by the manager"
+    },
+    "sub_slots": {}
+  },
+  "case_25": {
+    "sentence": "The problem was quickly solved by the expert team.",
+    "match": true,
+    "main_slots": {
+      "S": "The problem",
+      "Aux": "was",
+      "V": "solved",
+      "M2": "quickly",
+      "M3": "by the expert team"
+    },
+    "sub_slots": {}
+  },
+  "case_26": {
+    "sentence": "The building is being constructed very carefully by skilled workers.",
+    "match": true,
+    "main_slots": {
+      "S": "The building",
+      "Aux": "is being",
+      "V": "constructed",
+      "M2": "very carefully",
+      "M3": "by skilled workers"
+    },
+    "sub_slots": {}
+  },
+  "case_27": {
+    "sentence": "The teacher explains grammar clearly to confused students daily.",
+    "match": true,
+    "main_slots": {
+      "S": "The teacher",
+      "V": "explains",
+      "O1": "grammar",
+      "M1": "clearly",
+      "M2": "to confused students",
+      "M3": "daily"
+    },
+    "sub_slots": {}
+  },
+  "case_28": {
+    "sentence": "The student writes essays carefully for better grades.",
+    "match": true,
+    "main_slots": {
+      "S": "The student",
+      "V": "writes",
+      "O1": "essays",
+      "M2": "carefully",
+      "M3": "for better grades"
+    },
+    "sub_slots": {}
+  },
+  "case_29": {
+    "sentence": "She sings beautifully.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "sings",
+      "M2": "beautifully"
+    },
+    "sub_slots": {}
+  },
+  "case_30": {
+    "sentence": "Tomorrow I study.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "study",
+      "M2": "Tomorrow"
+    },
+    "sub_slots": {}
+  },
+  "case_31": {
+    "sentence": "He slowly opened the door.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "opened",
+      "O1": "the door",
+      "M2": "slowly"
+    },
+    "sub_slots": {}
+  },
+  "case_32": {
+    "sentence": "We always eat breakfast together.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "V": "eat",
+      "O1": "breakfast",
+      "M2": "always",
+      "M3": "together"
+    },
+    "sub_slots": {}
+  },
+  "case_33": {
+    "sentence": "The cat quietly sat on the mat.",
+    "match": true,
+    "main_slots": {
+      "S": "The cat",
+      "V": "sat",
+      "M2": "quietly",
+      "M3": "on the mat"
+    },
+    "sub_slots": {}
+  },
+  "case_34": {
+    "sentence": "Students often study here.",
+    "match": true,
+    "main_slots": {
+      "S": "Students",
+      "V": "study",
+      "M2": "often",
+      "M3": "here"
+    },
+    "sub_slots": {}
+  },
+  "case_35": {
+    "sentence": "She carefully reads books.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "reads",
+      "O1": "books",
+      "M2": "carefully"
+    },
+    "sub_slots": {}
+  },
+  "case_36": {
+    "sentence": "Yesterday he became tired.",
+    "match": true,
+    "main_slots": {
+      "S": "he",
+      "V": "became",
+      "C1": "tired",
+      "M2": "Yesterday"
+    },
+    "sub_slots": {}
+  },
+  "case_37": {
+    "sentence": "They run fast.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "V": "run",
+      "M2": "fast"
+    },
+    "sub_slots": {}
+  },
+  "case_38": {
+    "sentence": "I gave him the book yesterday.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "gave",
+      "O1": "him",
+      "O2": "the book",
+      "M2": "yesterday"
+    },
+    "sub_slots": {}
+  },
+  "case_39": {
+    "sentence": "Actually, she works very hard.",
+    "match": true,
+    "main_slots": {
+      "S": "she",
+      "V": "works",
+      "M1": "Actually",
+      "M2": "very hard"
+    },
+    "sub_slots": {}
+  },
+  "case_40": {
+    "sentence": "He quickly and carefully solved the problem.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "solved",
+      "O1": "the problem",
+      "M2": "quickly",
+      "M3": "and carefully"
+    },
+    "sub_slots": {}
+  },
+  "case_41": {
+    "sentence": "She always speaks English fluently at work.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "speaks",
+      "O1": "English",
+      "M1": "always",
+      "M2": "fluently",
+      "M3": "at work"
+    },
+    "sub_slots": {}
+  },
+  "case_42": {
+    "sentence": "Every morning, he jogs slowly in the park.",
+    "match": true,
+    "main_slots": {
+      "S": "he",
+      "V": "jogs",
+      "M1": "Every morning",
+      "M2": "slowly",
+      "M3": "in the park"
+    },
+    "sub_slots": {}
+  },
+  "case_43": {
+    "sentence": "The man who runs fast is strong.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "strong"
+    },
+    "sub_slots": {
+      "sub-s": "The man who",
+      "sub-v": "runs",
+      "sub-m2": "fast",
+      "_parent_slot": "S"
+    }
+  },
+  "case_44": {
+    "sentence": "The book which lies there is mine.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "mine"
+    },
+    "sub_slots": {
+      "sub-s": "The book which",
+      "sub-v": "lies",
+      "_parent_slot": "S",
+      "sub-m2": "there"
+    }
+  },
+  "case_45": {
+    "sentence": "The person that works here is kind.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "kind"
+    },
+    "sub_slots": {
+      "sub-s": "The person that",
+      "sub-v": "works",
+      "_parent_slot": "S",
+      "sub-m2": "here"
+    }
+  },
+  "case_46": {
+    "sentence": "The book which I bought is expensive.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "expensive"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "bought",
+      "sub-o1": "The book which",
+      "_parent_slot": "S"
+    }
+  },
+  "case_47": {
+    "sentence": "The man whom I met is tall.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "tall"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "met",
+      "sub-o1": "The man whom",
+      "_parent_slot": "S"
+    }
+  },
+  "case_48": {
+    "sentence": "The car that he drives is new.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "new"
+    },
+    "sub_slots": {
+      "sub-s": "he",
+      "sub-v": "drives",
+      "sub-o1": "The car that",
+      "_parent_slot": "S"
+    }
+  },
+  "case_49": {
+    "sentence": "The car which was crashed is red.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "red"
+    },
+    "sub_slots": {
+      "sub-s": "The car which",
+      "sub-aux": "was",
+      "sub-v": "crashed",
+      "_parent_slot": "S"
+    }
+  },
+  "case_50": {
+    "sentence": "The book that was written is famous.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "famous"
+    },
+    "sub_slots": {
+      "sub-s": "The book that",
+      "sub-aux": "was",
+      "sub-v": "written",
+      "_parent_slot": "S"
+    }
+  },
+  "case_51": {
+    "sentence": "The letter which was sent arrived.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "arrived"
+    },
+    "sub_slots": {
+      "sub-s": "The letter which",
+      "sub-aux": "was",
+      "sub-v": "sent",
+      "_parent_slot": "S"
+    }
+  },
+  "case_52": {
+    "sentence": "The man whose car is red lives here.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "lives",
+      "M2": "here"
+    },
+    "sub_slots": {
+      "sub-s": "The man whose car",
+      "sub-v": "is",
+      "_parent_slot": "S",
+      "sub-c1": "red"
+    }
+  },
+  "case_53": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "smart"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "borrowed",
+      "sub-o1": "The student whose book",
+      "_parent_slot": "S"
+    }
+  },
+  "case_54": {
+    "sentence": "The woman whose dog barks is my neighbor.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "my neighbor"
+    },
+    "sub_slots": {
+      "sub-s": "The woman whose dog",
+      "sub-v": "barks",
+      "_parent_slot": "S"
+    }
+  },
+  "case_55": {
+    "sentence": "The book which was carefully written by Shakespeare is famous.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "famous"
+    },
+    "sub_slots": {
+      "sub-s": "The book which",
+      "sub-aux": "was",
+      "sub-v": "written",
+      "_parent_slot": "S",
+      "sub-m2": "carefully",
+      "sub-m3": "by Shakespeare"
+    }
+  },
+  "case_56": {
+    "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "runs",
+      "M2": "smoothly"
+    },
+    "sub_slots": {
+      "sub-s": "The car that",
+      "sub-aux": "was",
+      "sub-v": "repaired",
+      "_parent_slot": "S",
+      "sub-m2": "quickly",
+      "sub-m3": "yesterday"
+    }
+  },
+  "case_57": {
+    "sentence": "The letter which was slowly typed by the secretary arrived today.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "arrived",
+      "M2": "today"
+    },
+    "sub_slots": {
+      "sub-s": "The letter which",
+      "sub-aux": "was",
+      "sub-v": "typed",
+      "_parent_slot": "S",
+      "sub-m2": "slowly",
+      "sub-m3": "by the secretary"
+    }
+  },
+  "case_58": {
+    "sentence": "The student who studies diligently always succeeds academically.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "succeeds",
+      "M2": "academically"
+    },
+    "sub_slots": {
+      "sub-s": "The student who",
+      "sub-v": "studies",
+      "sub-m2": "diligently",
+      "sub-m3": "always",
+      "_parent_slot": "S"
+    }
+  },
+  "case_59": {
+    "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "Aux": "is",
+      "V": "respected",
+      "M2": "greatly"
+    },
+    "sub_slots": {
+      "sub-s": "The teacher whose class",
+      "sub-v": "runs",
+      "_parent_slot": "S",
+      "sub-m2": "efficiently"
+    }
+  },
+  "case_60": {
+    "sentence": "The doctor who works carefully saves lives successfully.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "saves",
+      "O1": "lives",
+      "M2": "successfully"
+    },
+    "sub_slots": {
+      "sub-s": "The doctor who",
+      "sub-v": "works",
+      "sub-m2": "carefully",
+      "_parent_slot": "S"
+    }
+  },
+  "case_61": {
+    "sentence": "The house whose roof was damaged badly needs immediate repair.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "needs",
+      "O1": "immediate repair"
+    },
+    "sub_slots": {
+      "sub-s": "The house whose roof",
+      "sub-aux": "was",
+      "sub-v": "damaged",
+      "_parent_slot": "S",
+      "sub-m2": "badly"
+    }
+  },
+  "case_62": {
+    "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "Aux": "was",
+      "V": "published",
+      "M2": "successfully"
+    },
+    "sub_slots": {
+      "sub-s": "The report which",
+      "sub-aux": "was",
+      "sub-v": "reviewed",
+      "_parent_slot": "S",
+      "sub-m2": "thoroughly",
+      "sub-m3": "by experts"
+    }
+  },
+  "case_63": {
+    "sentence": "The student whose essay was carefully corrected improved dramatically.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "improved",
+      "M2": "dramatically"
+    },
+    "sub_slots": {
+      "sub-s": "The student whose essay",
+      "sub-aux": "was",
+      "sub-v": "corrected",
+      "_parent_slot": "S",
+      "sub-m2": "carefully"
+    }
+  },
+  "case_64": {
+    "sentence": "The machine that was properly maintained works efficiently every day.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "works",
+      "M2": "efficiently",
+      "M3": "every day"
+    },
+    "sub_slots": {
+      "sub-s": "The machine that",
+      "sub-aux": "was",
+      "sub-v": "maintained",
+      "_parent_slot": "S",
+      "sub-m2": "properly"
+    }
+  },
+  "case_65": {
+    "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "became",
+      "C1": "famous",
+      "M2": "rapidly"
+    },
+    "sub_slots": {
+      "sub-s": "The artist whose paintings",
+      "sub-aux": "were",
+      "sub-v": "exhibited",
+      "_parent_slot": "S",
+      "sub-m2": "internationally"
+    }
+  },
+  "case_66": {
+    "sentence": "The letter was written by John.",
+    "match": true,
+    "main_slots": {
+      "S": "The letter",
+      "Aux": "was",
+      "V": "written",
+      "M2": "by John"
+    },
+    "sub_slots": {}
+  },
+  "case_67": {
+    "sentence": "The house was built in 1990.",
+    "match": true,
+    "main_slots": {
+      "S": "The house",
+      "Aux": "was",
+      "V": "built",
+      "M2": "in 1990"
+    },
+    "sub_slots": {}
+  },
+  "case_68": {
+    "sentence": "The book was written by a famous author.",
+    "match": true,
+    "main_slots": {
+      "S": "The book",
+      "Aux": "was",
+      "V": "written",
+      "M2": "by a famous author"
+    },
+    "sub_slots": {}
+  },
+  "case_69": {
+    "sentence": "The message was sent yesterday.",
+    "match": true,
+    "main_slots": {
+      "S": "The message",
+      "Aux": "was",
+      "V": "sent",
+      "M2": "yesterday"
+    },
+    "sub_slots": {}
+  },
+  "case_70": {
+    "sentence": "He has finished his homework.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "Aux": "has",
+      "V": "finished",
+      "O1": "his homework"
+    },
+    "sub_slots": {}
+  },
+  "case_71": {
+    "sentence": "The place where we met is beautiful.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "beautiful"
+    },
+    "sub_slots": {
+      "sub-s": "we",
+      "sub-v": "met",
+      "sub-m2": "The place where",
+      "_parent_slot": "S"
+    }
+  },
+  "case_72": {
+    "sentence": "The time when he arrived was late.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "late"
+    },
+    "sub_slots": {
+      "sub-s": "he",
+      "sub-v": "arrived",
+      "sub-m2": "The time when",
+      "_parent_slot": "S"
+    }
+  },
+  "case_73": {
+    "sentence": "The reason why she left is unclear.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "unclear"
+    },
+    "sub_slots": {
+      "sub-s": "she",
+      "sub-v": "left",
+      "sub-m2": "The reason why",
+      "_parent_slot": "S"
+    }
+  },
+  "case_74": {
+    "sentence": "The way how he solved it was clever.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "clever"
+    },
+    "sub_slots": {
+      "sub-s": "he",
+      "sub-v": "solved",
+      "sub-o1": "it",
+      "sub-m2": "The way how",
+      "_parent_slot": "S"
+    }
+  },
+  "case_75": {
+    "sentence": "What did he tell her at the store?",
+    "match": true,
+    "main_slots": {
+      "S": "he",
+      "Aux": "did",
+      "V": "tell",
+      "O1": "her",
+      "O2": "What",
+      "M2": "at the store"
+    },
+    "sub_slots": {}
+  },
+  "case_76": {
+    "sentence": "Did he tell her a secret there?",
+    "match": true,
+    "main_slots": {
+      "S": "he",
+      "Aux": "Did",
+      "V": "tell",
+      "O1": "her",
+      "O2": "a secret",
+      "M2": "there"
+    },
+    "sub_slots": {}
+  },
+  "case_77": {
+    "sentence": "Did I tell him a truth in the kitchen?",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "Did",
+      "V": "tell",
+      "O1": "him",
+      "O2": "a truth",
+      "M2": "in the kitchen"
+    },
+    "sub_slots": {}
+  },
+  "case_78": {
+    "sentence": "Where did you tell me a story?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "did",
+      "V": "tell",
+      "O1": "me",
+      "O2": "a story",
+      "M2": "Where"
+    },
+    "sub_slots": {}
+  },
+  "case_79": {
+    "sentence": "I can swim.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "can",
+      "V": "swim"
+    },
+    "sub_slots": {}
+  },
+  "case_80": {
+    "sentence": "She could speak English fluently.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "Aux": "could",
+      "V": "speak",
+      "O1": "English",
+      "M2": "fluently"
+    },
+    "sub_slots": {}
+  },
+  "case_81": {
+    "sentence": "You will succeed in your career.",
+    "match": true,
+    "main_slots": {
+      "S": "You",
+      "Aux": "will",
+      "V": "succeed",
+      "M2": "in your career"
+    },
+    "sub_slots": {}
+  },
+  "case_82": {
+    "sentence": "We would visit Paris every summer.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "Aux": "would",
+      "V": "visit",
+      "O1": "Paris",
+      "M2": "every summer"
+    },
+    "sub_slots": {}
+  },
+  "case_83": {
+    "sentence": "They should study harder.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "Aux": "should",
+      "V": "study",
+      "M2": "harder"
+    },
+    "sub_slots": {}
+  },
+  "case_84": {
+    "sentence": "You may leave now.",
+    "match": true,
+    "main_slots": {
+      "S": "You",
+      "Aux": "may",
+      "V": "leave",
+      "M2": "now"
+    },
+    "sub_slots": {}
+  },
+  "case_85": {
+    "sentence": "It might rain tomorrow.",
+    "match": true,
+    "main_slots": {
+      "S": "It",
+      "Aux": "might",
+      "V": "rain",
+      "M2": "tomorrow"
+    },
+    "sub_slots": {}
+  },
+  "case_86": {
+    "sentence": "You must finish your homework.",
+    "match": true,
+    "main_slots": {
+      "S": "You",
+      "Aux": "must",
+      "V": "finish",
+      "O1": "your homework"
+    },
+    "sub_slots": {}
+  },
+  "case_87": {
+    "sentence": "I have completed the project.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "have",
+      "V": "completed",
+      "O1": "the project"
+    },
+    "sub_slots": {}
+  },
+  "case_88": {
+    "sentence": "She has lived here for ten years.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "Aux": "has",
+      "V": "lived",
+      "M2": "here",
+      "M3": "for ten years"
+    },
+    "sub_slots": {}
+  },
+  "case_89": {
+    "sentence": "They had already left the building.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "Aux": "had",
+      "V": "left",
+      "O1": "the building",
+      "M2": "already"
+    },
+    "sub_slots": {}
+  },
+  "case_90": {
+    "sentence": "Do you understand the question?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Do",
+      "V": "understand",
+      "O1": "the question"
+    },
+    "sub_slots": {}
+  },
+  "case_91": {
+    "sentence": "Does she work at the hospital?",
+    "match": true,
+    "main_slots": {
+      "S": "she",
+      "Aux": "Does",
+      "V": "work",
+      "M2": "at the hospital"
+    },
+    "sub_slots": {}
+  },
+  "case_92": {
+    "sentence": "Don't touch that button!",
+    "match": true,
+    "main_slots": {
+      "Aux": "Don't",
+      "V": "touch",
+      "O1": "that button"
+    },
+    "sub_slots": {}
+  },
+  "case_93": {
+    "sentence": "Can you help me with this problem?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Can",
+      "V": "help",
+      "O1": "me",
+      "M2": "with this problem"
+    },
+    "sub_slots": {}
+  },
+  "case_94": {
+    "sentence": "Would you like some coffee?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Would",
+      "V": "like",
+      "O1": "some coffee"
+    },
+    "sub_slots": {}
+  },
+  "case_95": {
+    "sentence": "I shall return tomorrow.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "shall",
+      "V": "return",
+      "M2": "tomorrow"
+    },
+    "sub_slots": {}
+  },
+  "case_96": {
+    "sentence": "We ought to start immediately.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "Aux": "ought to",
+      "V": "start",
+      "M2": "immediately"
+    },
+    "sub_slots": {}
+  },
+  "case_97": {
+    "sentence": "They used to play here every day.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "Aux": "used to",
+      "V": "play",
+      "M2": "here",
+      "M3": "every day"
+    },
+    "sub_slots": {}
+  },
+  "case_98": {
+    "sentence": "He is going to study abroad.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "Aux": "is going to",
+      "V": "study",
+      "M2": "abroad"
+    },
+    "sub_slots": {}
+  },
+  "case_99": {
+    "sentence": "I have been waiting for an hour.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "have been",
+      "V": "waiting",
+      "M2": "for an hour"
+    },
+    "sub_slots": {}
+  },
+  "case_100": {
+    "sentence": "You should have called me earlier.",
+    "match": true,
+    "main_slots": {
+      "S": "You",
+      "Aux": "should have",
+      "V": "called",
+      "O1": "me",
+      "M2": "earlier"
+    },
+    "sub_slots": {}
+  },
+  "case_101": {
+    "sentence": "They will be arriving at noon.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "Aux": "will be",
+      "V": "arriving",
+      "M2": "at noon"
+    },
+    "sub_slots": {}
+  },
+  "case_102": {
+    "sentence": "She might have forgotten the appointment.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "Aux": "might have",
+      "V": "forgotten",
+      "O1": "the appointment"
+    },
+    "sub_slots": {}
+  },
+  "case_103": {
+    "sentence": "The house where they lived was demolished.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "Aux": "was",
+      "V": "demolished"
+    },
+    "sub_slots": {
+      "sub-s": "they",
+      "sub-v": "lived",
+      "sub-m2": "The house where",
+      "_parent_slot": "S"
+    }
+  },
+  "case_104": {
+    "sentence": "The day when we graduated was memorable.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "memorable"
+    },
+    "sub_slots": {
+      "sub-s": "we",
+      "sub-v": "graduated",
+      "sub-m2": "The day when",
+      "_parent_slot": "S"
+    }
+  },
+  "case_105": {
+    "sentence": "The reason why he quit is personal.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "personal"
+    },
+    "sub_slots": {
+      "sub-s": "he",
+      "sub-v": "quit",
+      "sub-m2": "The reason why",
+      "_parent_slot": "S"
+    }
+  },
+  "case_106": {
+    "sentence": "The way how she explained it helped everyone.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "helped",
+      "O1": "everyone"
+    },
+    "sub_slots": {
+      "sub-s": "she",
+      "sub-v": "explained",
+      "sub-o1": "it",
+      "sub-m2": "The way how",
+      "_parent_slot": "S"
+    }
+  },
+  "case_107": {
+    "sentence": "The place where we first met holds special memories.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "holds",
+      "O1": "special memories"
+    },
+    "sub_slots": {
+      "sub-m2": "The place where",
+      "sub-s": "we",
+      "sub-v": "met",
+      "_parent_slot": "S",
+      "sub-m3": "first"
+    }
+  },
+  "case_108": {
+    "sentence": "The time when everything will change is approaching.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "Aux": "is",
+      "V": "approaching"
+    },
+    "sub_slots": {
+      "sub-m2": "The time when",
+      "sub-s": "everything",
+      "sub-v": "change",
+      "_parent_slot": "S",
+      "sub-aux": "will"
+    }
+  },
+  "case_109": {
+    "sentence": "The moment when he told her the truth changed everything.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "changed",
+      "O1": "everything"
+    },
+    "sub_slots": {
+      "sub-m2": "The moment when",
+      "sub-s": "he",
+      "sub-v": "told",
+      "_parent_slot": "S",
+      "sub-o1": "her",
+      "sub-o2": "the truth"
+    }
+  },
+  "case_110": {
+    "sentence": "The reason why she was upset became clear.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "became",
+      "C1": "clear"
+    },
+    "sub_slots": {
+      "sub-m2": "The reason why",
+      "sub-s": "she",
+      "sub-aux": "was",
+      "sub-v": "upset",
+      "_parent_slot": "S"
+    }
+  },
+  "case_111": {
+    "sentence": "The city where we spent our honeymoon is in Italy.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "M2": "in Italy"
+    },
+    "sub_slots": {
+      "sub-s": "we",
+      "sub-v": "spent",
+      "sub-o1": "our honeymoon",
+      "sub-m2": "The city where",
+      "_parent_slot": "S"
+    }
+  },
+  "case_112": {
+    "sentence": "The method how they solved the problem was innovative.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "innovative"
+    },
+    "sub_slots": {
+      "sub-s": "they",
+      "sub-v": "solved",
+      "sub-o1": "the problem",
+      "sub-m2": "The method how",
+      "_parent_slot": "S"
+    }
+  },
+  "case_113": {
+    "sentence": "I believe that he is smart.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "believe",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-s": "that he",
+      "sub-v": "is",
+      "sub-c1": "smart",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_114": {
+    "sentence": "I know what you mean.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "know",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-s": "you",
+      "sub-v": "mean",
+      "sub-o1": "what",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_115": {
+    "sentence": "She doesn't know whether he will come.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "Aux": "doesn't",
+      "V": "know",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-s": "whether he",
+      "sub-aux": "will",
+      "sub-v": "come",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_116": {
+    "sentence": "I wonder where she lives.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "wonder",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-s": "she",
+      "sub-v": "lives",
+      "sub-m2": "where",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_117": {
+    "sentence": "That you are here is wonderful.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "wonderful"
+    },
+    "sub_slots": {
+      "sub-s": "That you",
+      "sub-v": "are",
+      "sub-m2": "here",
+      "_parent_slot": "S"
+    }
+  },
+  "case_118": {
+    "sentence": "Tell me who came to the party.",
+    "match": true,
+    "main_slots": {
+      "V": "Tell",
+      "O1": "me",
+      "O2": ""
+    },
+    "sub_slots": {
+      "sub-v": "came",
+      "sub-s": "who",
+      "_parent_slot": "O1",
+      "sub-m2": "to the party"
+    }
+  },
+  "case_119": {
+    "sentence": "It depends on if you agree.",
+    "match": true,
+    "main_slots": {
+      "S": "It",
+      "V": "depends",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "on if you",
+      "sub-v": "agree",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_120": {
+    "sentence": "I understand how important this is.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "understand",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-s": "this",
+      "sub-v": "is",
+      "sub-m2": "how important",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_121": {
+    "sentence": "The book I read was interesting.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "interesting"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "read",
+      "sub-o1": "The book [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_122": {
+    "sentence": "The man I met yesterday was kind.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "kind"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "met",
+      "sub-m2": "yesterday",
+      "sub-o1": "The man [whom]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_123": {
+    "sentence": "The car she drives looks expensive.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "looks",
+      "C1": "expensive"
+    },
+    "sub_slots": {
+      "sub-s": "she",
+      "sub-v": "drives",
+      "sub-o1": "The car [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_124": {
+    "sentence": "The movie we watched last night was amazing.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "amazing"
+    },
+    "sub_slots": {
+      "sub-s": "we",
+      "sub-v": "watched",
+      "sub-m2": "last night",
+      "sub-o1": "The movie [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_125": {
+    "sentence": "The place they visited seems beautiful.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "seems",
+      "C1": "beautiful"
+    },
+    "sub_slots": {
+      "sub-s": "they",
+      "sub-v": "visited",
+      "sub-o1": "The place [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_126": {
+    "sentence": "The gift he bought her was expensive.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "expensive"
+    },
+    "sub_slots": {
+      "sub-s": "he",
+      "sub-v": "bought",
+      "sub-o1": "her",
+      "sub-o2": "The gift [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_127": {
+    "sentence": "The lesson you taught me was valuable.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "valuable"
+    },
+    "sub_slots": {
+      "sub-s": "you",
+      "sub-v": "taught",
+      "sub-o1": "me",
+      "sub-o2": "The lesson [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_128": {
+    "sentence": "The house we built together stands strong.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "stands",
+      "C1": "strong"
+    },
+    "sub_slots": {
+      "sub-s": "we",
+      "sub-v": "built",
+      "sub-m2": "together",
+      "sub-o1": "The house [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_129": {
+    "sentence": "The song I heard this morning was beautiful.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "beautiful"
+    },
+    "sub_slots": {
+      "sub-s": "I",
+      "sub-v": "heard",
+      "sub-m2": "this morning",
+      "sub-o1": "The song [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_130": {
+    "sentence": "The story she told us was incredible.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "was",
+      "C1": "incredible"
+    },
+    "sub_slots": {
+      "sub-s": "she",
+      "sub-v": "told",
+      "sub-o1": "us",
+      "sub-o2": "The story [that]",
+      "_parent_slot": "S"
+    }
+  },
+  "case_131": {
+    "sentence": "If it rains tomorrow, I will stay home.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "will",
+      "V": "stay",
+      "M1": "",
+      "M2": "home"
+    },
+    "sub_slots": {
+      "sub-s": "If it",
+      "sub-v": "rains",
+      "sub-m2": "tomorrow",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_132": {
+    "sentence": "If you study hard, you can pass the exam.",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "can",
+      "V": "pass",
+      "O1": "the exam",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "If you",
+      "sub-v": "study",
+      "sub-m2": "hard",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_133": {
+    "sentence": "If I were rich, I would travel around the world.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would",
+      "V": "travel",
+      "M1": "",
+      "M2": "around the world"
+    },
+    "sub_slots": {
+      "sub-s": "If I",
+      "sub-v": "were",
+      "sub-c1": "rich",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_134": {
+    "sentence": "If she had time, she could help us.",
+    "match": true,
+    "main_slots": {
+      "S": "she",
+      "Aux": "could",
+      "V": "help",
+      "O1": "us",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "If she",
+      "sub-v": "had",
+      "sub-o1": "time",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_135": {
+    "sentence": "If I had studied harder, I would have passed the test.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would have",
+      "V": "passed",
+      "O1": "the test",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "If I",
+      "sub-v": "studied",
+      "sub-aux": "had",
+      "sub-m2": "harder",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_136": {
+    "sentence": "If they had arrived earlier, they could have seen the show.",
+    "match": true,
+    "main_slots": {
+      "S": "they",
+      "Aux": "could have",
+      "V": "seen",
+      "O1": "the show",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "If they",
+      "sub-v": "arrived",
+      "sub-aux": "had",
+      "sub-m2": "earlier",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_137": {
+    "sentence": "If I had been born rich, I would be happy now.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would",
+      "V": "be",
+      "C1": "happy",
+      "M1": "",
+      "M2": "now"
+    },
+    "sub_slots": {
+      "sub-s": "If I",
+      "sub-v": "born",
+      "sub-c1": "rich",
+      "sub-aux": "had been",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_138": {
+    "sentence": "If you have finished your work, you may leave early.",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "may",
+      "V": "leave",
+      "M1": "",
+      "M2": "early"
+    },
+    "sub_slots": {
+      "sub-s": "If you",
+      "sub-v": "finished",
+      "sub-o1": "your work",
+      "sub-aux": "have",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_139": {
+    "sentence": "Were I you, I would accept the offer.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would",
+      "V": "accept",
+      "O1": "the offer",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-v": "Were",
+      "sub-s": "I",
+      "sub-c1": "you",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_140": {
+    "sentence": "Had she known the truth, she would have acted differently.",
+    "match": true,
+    "main_slots": {
+      "S": "she",
+      "Aux": "would have",
+      "V": "acted",
+      "M1": "",
+      "M2": "differently"
+    },
+    "sub_slots": {
+      "sub-aux": "Had",
+      "sub-s": "she",
+      "sub-v": "known",
+      "sub-o1": "the truth",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_141": {
+    "sentence": "Should you need help, please call me.",
+    "match": true,
+    "main_slots": {
+      "V": "call",
+      "O1": "me",
+      "M1": "",
+      "M2": "please"
+    },
+    "sub_slots": {
+      "sub-aux": "Should",
+      "sub-s": "you",
+      "sub-v": "need",
+      "sub-o1": "help",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_142": {
+    "sentence": "I wish I were taller.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "wish",
+      "O1": ""
+    },
+    "sub_slots": {
+      "_parent_slot": "O1",
+      "sub-v": "were",
+      "sub-s": "I",
+      "sub-c1": "taller"
+    }
+  },
+  "case_143": {
+    "sentence": "I wish I had more time.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "wish",
+      "O1": ""
+    },
+    "sub_slots": {
+      "_parent_slot": "O1",
+      "sub-v": "had",
+      "sub-s": "I",
+      "sub-o1": "more time"
+    }
+  },
+  "case_144": {
+    "sentence": "I wish I had studied abroad.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "wish",
+      "O1": ""
+    },
+    "sub_slots": {
+      "_parent_slot": "O1",
+      "sub-v": "studied",
+      "sub-s": "I",
+      "sub-aux": "had",
+      "sub-m2": "abroad"
+    }
+  },
+  "case_145": {
+    "sentence": "He talks as if he were the boss.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "talks",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "as if he",
+      "sub-v": "were",
+      "sub-c1": "the boss",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_146": {
+    "sentence": "She looked as though she had seen a ghost.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "looked",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "as though she",
+      "sub-v": "seen",
+      "sub-aux": "had",
+      "sub-o1": "a ghost",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_147": {
+    "sentence": "Without your help, I would have failed.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would have",
+      "V": "failed",
+      "M2": "Without your help"
+    },
+    "sub_slots": {}
+  },
+  "case_148": {
+    "sentence": "But for the rain, we could have had a picnic.",
+    "match": true,
+    "main_slots": {
+      "S": "we",
+      "Aux": "could have",
+      "V": "had",
+      "O1": "a picnic",
+      "M2": "But for the rain"
+    },
+    "sub_slots": {}
+  },
+  "case_149": {
+    "sentence": "Unless you hurry, you will miss the train.",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "will",
+      "V": "miss",
+      "O1": "the train",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "Unless you",
+      "sub-v": "hurry",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_150": {
+    "sentence": "Suppose you had unlimited money, what would you do?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "would",
+      "V": "do",
+      "O1": "what",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "Suppose you",
+      "sub-v": "had",
+      "sub-o1": "unlimited money",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_151": {
+    "sentence": "Imagine if we could fly, how exciting it would be!",
+    "match": true,
+    "main_slots": {
+      "M2": "how",
+      "C1": "exciting",
+      "S": "it",
+      "Aux": "would",
+      "V": "be",
+      "M1": ""
+    },
+    "sub_slots": {
+      "sub-s": "Imagine if we",
+      "sub-aux": "could",
+      "sub-v": "fly",
+      "_parent_slot": "M1"
+    }
+  },
+  "case_152": {
+    "sentence": "Provided that you finish on time, you can take a break.",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "can",
+      "V": "take",
+      "O1": "a break",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "Provided that you",
+      "sub-v": "finish",
+      "sub-m2": "on time",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_153": {
+    "sentence": "As long as you promise to be careful, you may borrow my car.",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "may",
+      "V": "borrow",
+      "O1": "my car",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "As long as you",
+      "sub-v": "promise",
+      "sub-o1": "to be careful",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_154": {
+    "sentence": "If I had known you were coming, I would have prepared dinner.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "would have",
+      "V": "prepared",
+      "O1": "dinner",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "If I",
+      "sub-v": "known",
+      "sub-aux": "had",
+      "sub-o1": "you were coming",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_155": {
+    "sentence": "Even if it costs a lot, I will buy that house.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "will",
+      "V": "buy",
+      "O1": "that house",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-s": "Even if it",
+      "sub-v": "costs",
+      "sub-o1": "a lot",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_case156": {
+    "sentence": "To study English is important.",
+    "match": false,
+    "main_slots": {},
+    "sub_slots": {}
+  },
+  "case_case157": {
+    "sentence": "I want to learn programming.",
+    "match": false,
+    "main_slots": {
+      "S": "I",
+      "V": "want",
+      "O1": "programming"
+    },
+    "sub_slots": {}
+  },
+  "case_case158": {
+    "sentence": "She has something to tell you.",
+    "match": false,
+    "main_slots": {
+      "S": "She",
+      "V": "has",
+      "O1": "something",
+      "C2": "you"
+    },
+    "sub_slots": {}
+  },
+  "case_case159": {
+    "sentence": "He came to see his friend.",
+    "match": false,
+    "main_slots": {
+      "S": "He",
+      "V": "came",
+      "O1": "his friend"
+    },
+    "sub_slots": {}
+  },
+  "case_case160": {
+    "sentence": "I grew up to become a teacher.",
+    "match": false,
+    "main_slots": {
+      "S": "I",
+      "V": "grew",
+      "C1": "a teacher",
+      "M2": "up"
+    },
+    "sub_slots": {}
+  },
+  "case_case161": {
+    "sentence": "It is easy for me to understand this.",
+    "match": false,
+    "main_slots": {
+      "S": "It",
+      "V": "is",
+      "C1": "easy"
+    },
+    "sub_slots": {}
+  },
+  "case_case162": {
+    "sentence": "This box is too heavy to carry.",
+    "match": false,
+    "main_slots": {
+      "S": "This box",
+      "V": "is",
+      "C1": "heavy"
+    },
+    "sub_slots": {}
+  },
+  "case_case163": {
+    "sentence": "She is old enough to drive a car.",
+    "match": false,
+    "main_slots": {
+      "S": "She",
+      "V": "is",
+      "C1": "old"
+    },
+    "sub_slots": {}
+  },
+  "case_case164": {
+    "sentence": "He seems to have finished his work.",
+    "match": false,
+    "main_slots": {
+      "S": "He",
+      "Aux": "have",
+      "V": "seems",
+      "O1": "his work"
+    },
+    "sub_slots": {}
+  },
+  "case_case165": {
+    "sentence": "This problem needs to be solved quickly.",
+    "match": true,
+    "main_slots": {
+      "S": "This problem",
+      "V": "needs",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-aux": "to be",
+      "sub-v": "solved",
+      "_parent_slot": "O1",
+      "sub-m2": "quickly"
+    }
+  },
+  "case_case166": {
+    "sentence": "I don't know what to do.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "don't",
+      "V": "know",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-o1": "what",
+      "sub-v": "to do",
+      "_parent_slot": "O1"
+    }
+  },
+  "case_case167": {
+    "sentence": "I want you to help me.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "want",
+      "O1": "you",
+      "C2": ""
+    },
+    "sub_slots": {
+      "sub-v": "to help",
+      "sub-o1": "me",
+      "_parent_slot": "C2"
+    }
+  },
+  "case_case168": {
+    "sentence": "The meeting is about to start.",
+    "match": true,
+    "main_slots": {
+      "S": "The meeting",
+      "Aux": "is about to",
+      "V": "start"
+    },
+    "sub_slots": {}
+  },
+  "case_case169": {
+    "sentence": "She studies hard in order to pass the exam.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "studies",
+      "M2": "hard",
+      "M3": ""
+    },
+    "sub_slots": {
+      "sub-v": "in order to pass",
+      "_parent_slot": "M3",
+      "sub-o1": "the exam"
+    }
+  },
+  "case_case170": {
+    "sentence": "He left early so as to avoid traffic.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "V": "left",
+      "M2": "early",
+      "M3": ""
+    },
+    "sub_slots": {
+      "sub-v": "so as to avoid",
+      "_parent_slot": "M3",
+      "sub-o1": "traffic"
+    }
+  }
+}

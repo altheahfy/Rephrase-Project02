@@ -270,27 +270,34 @@ class InfinitiveHandler:
         for token in doc:
             if (token.lemma_.lower() in causative_verbs and 
                 token.pos_ == 'VERB'):
-                # 直接目的語と不定詞を探す
+                # "I want you to help me" パターン
                 object_person = None
                 infinitive_verb = None
+                to_token = None
+                
+                # ccomp構文での不定詞検出
                 for child in token.children:
-                    if child.dep_ == 'nsubj' and child.pos_ == 'PRON':
-                        # ccompパターンでの不定詞主語
-                        for ccomp_child in token.children:
-                            if ccomp_child.dep_ == 'ccomp':
-                                for inf_child in ccomp_child.children:
-                                    if inf_child.text.lower() == 'to':
-                                        object_person = child
-                                        infinitive_verb = ccomp_child
-                                        break
+                    if child.dep_ == 'ccomp' and child.pos_ == 'VERB':
+                        infinitive_verb = child
+                        # toトークンを探す
+                        for inf_child in child.children:
+                            if inf_child.text.lower() == 'to' and inf_child.dep_ == 'aux':
+                                to_token = inf_child
                                 break
+                        
+                        # 不定詞の主語（causativeの目的語）を探す
+                        for inf_child in child.children:
+                            if inf_child.dep_ == 'nsubj':
+                                object_person = inf_child
+                                break
+                        
                         break
                 
-                if object_person and infinitive_verb:
+                if infinitive_verb and object_person:
                     infinitive_info['found'] = True
                     infinitive_info['infinitive_tokens'].append({
                         'main_verb': infinitive_verb,
-                        'to_token': None,  # 後で設定
+                        'to_token': to_token,
                         'pattern': 'causative',
                         'head': token,
                         'dependency': 'ccomp',
@@ -1817,7 +1824,7 @@ class InfinitiveHandler:
             if inf_token['pattern'] == 'causative':
                 main_verb = inf_token['main_verb']
                 causative_verb = inf_token['causative_verb']
-                object_person = inf_token['object']
+                object_person = inf_token.get('object')
                 
                 # 主語を検出
                 subject = None
@@ -1835,7 +1842,10 @@ class InfinitiveHandler:
                 
                 print(f"   📍 主語検出: S = '{subject}'")
                 print(f"   📍 使役動詞検出: V = '{causative_verb.text}'")
-                print(f"   📍 直接目的語検出: O1 = '{object_person.text}'")
+                if object_person:
+                    print(f"   📍 直接目的語検出: O1 = '{object_person.text}'")
+                else:
+                    print(f"   ⚠️ 直接目的語検出失敗")
                 print(f"   📍 目的語補語: C2 = 空（サブスロット使用）")
                 print(f"   📍 不定詞動詞検出: sub-v = 'to {main_verb.text}'")
                 if infinitive_object:
@@ -1846,11 +1856,12 @@ class InfinitiveHandler:
                     'main_slots': {
                         'S': subject or '',
                         'V': causative_verb.text,
-                        'O1': object_person.text,
+                        'O1': object_person.text if object_person else '',
                         'C2': ''
                     },
                     'sub_slots': {
                         'sub-v': f'to {main_verb.text}',
+                        'sub-o1': infinitive_object or '',
                         '_parent_slot': 'C2'
                     },
                     'collaboration': ['infinitive'],

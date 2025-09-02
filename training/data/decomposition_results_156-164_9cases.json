@@ -1,0 +1,343 @@
+{
+  "case_case156": {
+    "sentence": "To study English is important.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "important"
+      },
+      "sub_slots": {
+        "sub-v": "To study",
+        "sub-o1": "English",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "original_text": "To study English is important.",
+      "success": false,
+      "error": "文型を判定できませんでした",
+      "phase": 1
+    },
+    "match": false
+  },
+  "case_case157": {
+    "sentence": "I want to learn programming.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "want",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-v": "to learn",
+        "sub-o1": "programming",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "original_text": "I want to learn programming.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "want",
+        "O1": "programming"
+      },
+      "slots": {
+        "S": "I",
+        "V": "want",
+        "O1": "programming"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "want",
+        "6": "programming"
+      }
+    },
+    "match": false
+  },
+  "case_case158": {
+    "sentence": "She has something to tell you.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "has",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-v": "something to tell",
+        "sub-o1": "you",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "original_text": "She has something to tell you.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "has",
+        "O1": "something",
+        "C2": "you"
+      },
+      "slots": {
+        "S": "She",
+        "V": "has",
+        "O1": "something",
+        "C2": "you"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "has",
+        "6": "something"
+      }
+    },
+    "match": false
+  },
+  "case_case159": {
+    "sentence": "He came to see his friend.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "came",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "to see",
+        "sub-o1": "his friend",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "original_text": "He came to see his friend.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "came",
+        "O1": "his friend"
+      },
+      "slots": {
+        "S": "He",
+        "V": "came",
+        "O1": "his friend"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "He",
+        "5": "came",
+        "6": "his friend"
+      }
+    },
+    "match": false
+  },
+  "case_case160": {
+    "sentence": "I grew up to become a teacher.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "grew up to",
+        "V": "become",
+        "C1": "a teacher"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I grew up to become a teacher.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "grew",
+        "C1": "a teacher",
+        "M2": "up"
+      },
+      "slots": {
+        "S": "I",
+        "V": "grew",
+        "C1": "a teacher",
+        "M2": "up"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "grew",
+        "8": "a teacher",
+        "7": "up"
+      }
+    },
+    "match": false
+  },
+  "case_case161": {
+    "sentence": "It is easy for me to understand this.",
+    "expected": {
+      "main_slots": {
+        "S": "It",
+        "V": "is",
+        "C1": "easy",
+        "M2": "for me",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "to understand",
+        "sub-o1": "this",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "original_text": "It is easy for me to understand this.",
+      "success": true,
+      "main_slots": {
+        "S": "It",
+        "V": "is",
+        "C1": "easy"
+      },
+      "slots": {
+        "S": "It",
+        "V": "is",
+        "C1": "easy"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "It",
+        "5": "is",
+        "8": "easy"
+      }
+    },
+    "match": false
+  },
+  "case_case162": {
+    "sentence": "This box is too heavy to carry.",
+    "expected": {
+      "main_slots": {
+        "S": "This box",
+        "V": "is",
+        "C1": "too heavy",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-v": "to carry",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "original_text": "This box is too heavy to carry.",
+      "success": true,
+      "main_slots": {
+        "S": "This box",
+        "V": "is",
+        "C1": "heavy"
+      },
+      "slots": {
+        "S": "This box",
+        "V": "is",
+        "C1": "heavy"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "This box",
+        "5": "is",
+        "8": "heavy"
+      }
+    },
+    "match": false
+  },
+  "case_case163": {
+    "sentence": "She is old enough to drive a car.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "is",
+        "C1": "old",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-v": "enough to drive",
+        "sub-o1": "a car",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "original_text": "She is old enough to drive a car.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "is",
+        "C1": "old"
+      },
+      "slots": {
+        "S": "She",
+        "V": "is",
+        "C1": "old"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "is",
+        "8": "old"
+      }
+    },
+    "match": false
+  },
+  "case_case164": {
+    "sentence": "He seems to have finished his work.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "Aux": "seems to have",
+        "V": "finished",
+        "O1": "his work"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "He seems to have finished his work.",
+      "main_slots": {
+        "S": "He",
+        "Aux": "have",
+        "V": "seems",
+        "O1": "his work"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "modal",
+          "infinitive"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "infinitive_info": {
+          "handler": "infinitive_perfect",
+          "usage_type": "perfect_infinitive",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.95,
+        "collaboration_type": "modal_infinitive_coordination"
+      },
+      "ordered_slots": {
+        "4": "have",
+        "3": "He",
+        "5": "seems",
+        "6": "his work"
+      }
+    },
+    "match": false
+  }
+}
