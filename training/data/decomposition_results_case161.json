@@ -1,68 +1,18 @@
 {
   "case_case161": {
     "sentence": "It is easy for me to understand this.",
-    "expected": {
-      "main_slots": {
-        "S": "It",
-        "V": "is",
-        "C1": "easy",
-        "M2": "for me",
-        "M3": ""
-      },
-      "sub_slots": {
-        "sub-v": "to understand",
-        "sub-o1": "this",
-        "_parent_slot": "M3"
-      }
+    "match": true,
+    "main_slots": {
+      "S": "It",
+      "V": "is",
+      "C1": "easy",
+      "M2": "for me",
+      "M3": ""
     },
-    "actual": {
-      "success": true,
-      "text": "It is easy for me to understand this.",
-      "main_slots": {
-        "S": "It",
-        "V": "is",
-        "C1": "easy",
-        "M2": "for me",
-        "M3": ""
-      },
-      "sub_slots": {
-        "sub-v": "to understand",
-        "_parent_slot": "M3",
-        "sub-o1": "this"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_formal_subject",
-          "usage_type": "formal_subject",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "to understand",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "this",
-          "display_order": 2
-        },
-        "_parent_slot": "M3"
-      },
-      "ordered_slots": {
-        "3": "It",
-        "5": "is",
-        "8": "easy",
-        "7": "for me",
-        "9": ""
-      }
-    },
-    "match": true
+    "sub_slots": {
+      "sub-v": "to understand",
+      "_parent_slot": "M3",
+      "sub-o1": "this"
+    }
   }
 }

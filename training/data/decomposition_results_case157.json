@@ -1,0 +1,16 @@
+{
+  "case_case157": {
+    "sentence": "I want to learn programming.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "V": "want",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-v": "to learn",
+      "_parent_slot": "O1",
+      "sub-o1": "programming"
+    }
+  }
+}

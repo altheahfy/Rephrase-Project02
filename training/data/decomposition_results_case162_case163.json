@@ -1,0 +1,31 @@
+{
+  "case_case162": {
+    "sentence": "This box is too heavy to carry.",
+    "match": true,
+    "main_slots": {
+      "S": "This box",
+      "V": "is",
+      "C1": "too heavy",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-v": "to carry",
+      "_parent_slot": "M2"
+    }
+  },
+  "case_case163": {
+    "sentence": "She is old enough to drive a car.",
+    "match": true,
+    "main_slots": {
+      "S": "She",
+      "V": "is",
+      "C1": "old",
+      "M2": ""
+    },
+    "sub_slots": {
+      "sub-v": "enough to drive",
+      "_parent_slot": "M2",
+      "sub-o1": "a car"
+    }
+  }
+}

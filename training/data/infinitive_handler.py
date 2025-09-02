@@ -195,8 +195,170 @@ class InfinitiveHandler:
             'dependency_info': []
         }
         
-        # 高度なパターン検出（case164-170対応）
+        # 高度なパターン検出（case156-170対応）
         text_lower = text.lower()
+        
+        # 基本的な不定詞パターン検出を追加（case156-163対応）
+        
+        # 1. 主語不定詞 (case156): "To study English is important."
+        if text.startswith('To '):
+            for token in doc:
+                if token.dep_ == 'csubj' and token.pos_ == 'VERB':
+                    # To+動詞が主語の場合、toトークンを探す
+                    to_token = None
+                    for child in token.children:
+                        if child.text.lower() == 'to' and child.dep_ == 'aux':
+                            to_token = child
+                            break
+                    # toが見つからない場合、前のトークンを探す
+                    if not to_token and token.i > 0 and doc[token.i-1].text.lower() == 'to':
+                        to_token = doc[token.i-1]
+                    
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': token,
+                        'to_token': to_token,
+                        'pattern': 'subject_infinitive',
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ 主語不定詞検出: 'To {token.text}' (to_token={'found' if to_token else 'missing'})")
+                    break
+        
+        # 2. 目的語不定詞 (case157): "I want to learn programming."
+        for token in doc:
+            if (token.dep_ == 'xcomp' and token.pos_ == 'VERB' and 
+                any(child.text.lower() == 'to' and child.dep_ == 'aux' for child in token.children)):
+                # 目的語不定詞を取る動詞パターン
+                parent_verb = token.head
+                # wantは目的語不定詞の典型例なので除外しない
+                infinitive_info['found'] = True
+                infinitive_info['infinitive_tokens'].append({
+                    'main_verb': token,
+                    'to_token': next((child for child in token.children if child.text.lower() == 'to'), None),
+                    'pattern': 'object_infinitive',
+                    'head': parent_verb,
+                    'dependency': token.dep_
+                })
+                print(f"   ✅ 目的語不定詞検出: 'to {token.text}'")
+        
+        # 3. 形容詞的不定詞 (case158): "She has something to tell you."
+        for token in doc:
+            if (token.dep_ == 'relcl' and token.pos_ == 'VERB' and 
+                any(child.text.lower() == 'to' and child.dep_ == 'aux' for child in token.children)):
+                infinitive_info['found'] = True
+                infinitive_info['infinitive_tokens'].append({
+                    'main_verb': token,
+                    'to_token': next((child for child in token.children if child.text.lower() == 'to'), None),
+                    'pattern': 'adjectival_infinitive',
+                    'head': token.head,
+                    'dependency': token.dep_
+                })
+                print(f"   ✅ 形容詞的不定詞検出: 'to {token.text}'")
+        
+        # 4. 副詞的不定詞（目的・結果）(case159, case160): "He came to see", "I grew up to become"
+        for token in doc:
+            if (token.dep_ == 'advcl' and token.pos_ == 'VERB' and 
+                any(child.text.lower() == 'to' and child.dep_ == 'aux' for child in token.children)):
+                infinitive_info['found'] = True
+                infinitive_info['infinitive_tokens'].append({
+                    'main_verb': token,
+                    'to_token': next((child for child in token.children if child.text.lower() == 'to'), None),
+                    'pattern': 'adverbial_infinitive',
+                    'head': token.head,
+                    'dependency': token.dep_
+                })
+                print(f"   ✅ 副詞的不定詞検出: 'to {token.text}'")
+        
+        # 5. for句付き不定詞 (case161): "It is easy for me to understand this."
+        if ' for ' in text_lower and ' to ' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'for' and token.dep_ == 'mark'):
+                    # for句の後にto+動詞を探す
+                    to_token = None
+                    main_verb = None
+                    for next_token in doc[token.i:]:
+                        if next_token.text.lower() == 'to' and next_token.pos_ == 'PART':
+                            to_token = next_token
+                            # toの後の動詞を探す
+                            for verb_token in doc[next_token.i:]:
+                                if verb_token.dep_ == 'advcl' and verb_token.pos_ == 'VERB':
+                                    main_verb = verb_token
+                                    break
+                            break
+                    
+                    if to_token and main_verb:
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': main_verb,
+                            'to_token': to_token,
+                            'pattern': 'for_infinitive',
+                            'head': token.head,
+                            'dependency': 'advcl',
+                            'for_token': token
+                        })
+                        print(f"   ✅ for句付き不定詞検出: 'for ... to {main_verb.text}'")
+                        break
+        
+        # 6. too...to構文 (case162): "This box is too heavy to carry."
+        if ' too ' in text_lower and ' to ' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'too' and token.dep_ == 'advmod'):
+                    # その後にto+動詞があるかチェック
+                    to_token = None
+                    verb_token = None
+                    for next_token in doc[token.i:]:
+                        if next_token.text.lower() == 'to' and next_token.pos_ == 'PART':
+                            to_token = next_token
+                            # toの次のトークンまたは依存関係でVERBを探す
+                            for following in doc[next_token.i:]:
+                                if following.pos_ == 'VERB' and following.dep_ in ['xcomp', 'advcl']:
+                                    verb_token = following
+                                    break
+                            break
+                    
+                    if to_token and verb_token:
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': verb_token,
+                            'to_token': to_token,
+                            'pattern': 'too_to_infinitive',
+                            'head': token.head,
+                            'dependency': verb_token.dep_,
+                            'too_token': token
+                        })
+                        print(f"   ✅ too...to構文検出: 'too ... to {verb_token.text}'")
+                        break
+        
+        # 7. enough...to構文 (case163): "She is old enough to drive a car."
+        if ' enough ' in text_lower and ' to ' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'enough' and token.dep_ == 'advmod'):
+                    # その後にto+動詞があるかチェック
+                    to_token = None
+                    verb_token = None
+                    for next_token in doc[token.i:]:
+                        if next_token.text.lower() == 'to' and next_token.pos_ == 'PART':
+                            to_token = next_token
+                            # toの次のトークンまたは依存関係でVERBを探す
+                            for following in doc[next_token.i:]:
+                                if following.pos_ == 'VERB' and following.dep_ in ['xcomp', 'advcl']:
+                                    verb_token = following
+                                    break
+                            break
+                    
+                    if to_token and verb_token:
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': verb_token,
+                            'to_token': to_token,
+                            'pattern': 'enough_to_infinitive',
+                            'head': token.head,
+                            'dependency': verb_token.dep_,
+                            'enough_token': token
+                        })
+                        print(f"   ✅ enough...to構文検出: 'enough ... to {verb_token.text}'")
+                        break
         
         # 完了不定詞パターン検出: to have + 過去分詞
         if 'to have' in text_lower:
@@ -600,13 +762,42 @@ class InfinitiveHandler:
         """
         print(f"🧠 統語的役割分析: Human Grammar Pattern")
         
+        # 高優先度パターンの処理（for句、too/enough構文優先）
+        for inf_token in infinitive_info['infinitive_tokens']:
+            pattern = inf_token['pattern']
+            
+            # for句付き不定詞を最優先
+            if pattern == 'for_infinitive':
+                print(f"   📝 for句付き不定詞 → 副詞的用法（最優先）")
+                return 'for_infinitive'
+            elif pattern == 'too_to_infinitive':
+                print(f"   📝 too...to構文 → 結果の副詞的用法（最優先）")
+                return 'too_to_infinitive'
+            elif pattern == 'enough_to_infinitive':
+                print(f"   📝 enough...to構文 → 結果の副詞的用法（最優先）")
+                return 'enough_to_infinitive'
+        
+        # 基本パターンの処理（case156-163）
         for inf_token in infinitive_info['infinitive_tokens']:
             pattern = inf_token['pattern']
             head = inf_token['head']
             dependency = inf_token['dependency']
             
+            if pattern == 'subject_infinitive':
+                print(f"   📝 主語不定詞 → 名詞的用法（主語）")
+                return 'subject_infinitive'
+            elif pattern == 'object_infinitive':
+                print(f"   📝 目的語不定詞 → 名詞的用法（目的語）")
+                return 'object_infinitive'
+            elif pattern == 'adjectival_infinitive':
+                print(f"   📝 形容詞的不定詞 → 形容詞的用法")
+                return 'adjectival_infinitive'
+            elif pattern == 'adverbial_infinitive':
+                print(f"   📝 副詞的不定詞 → 副詞的用法")
+                return 'adverbial_infinitive'
+            
             # 特別パターンの処理
-            if pattern == 'too_to_pattern':
+            elif pattern == 'too_to_pattern':
                 print(f"   📝 too...to構文 → 結果の副詞的用法")
                 return 'too_to_adverbial'
             elif pattern == 'enough_to_pattern':
@@ -736,7 +927,24 @@ class InfinitiveHandler:
         
         syntactic_role = infinitive_info.get('syntactic_role', 'unknown')
         
-        if syntactic_role == 'nominal_complement':
+        # 基本パターンの処理（case156-163）
+        if syntactic_role == 'subject_infinitive':
+            return self._process_nominal_subject_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'object_infinitive':
+            return self._process_nominal_object_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'adjectival_infinitive':
+            return self._process_adjectival_modifier_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'adverbial_infinitive':
+            return self._process_adverbial_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'for_infinitive':
+            return self._process_formal_subject_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'too_to_infinitive':
+            return self._process_too_to_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'enough_to_infinitive':
+            return self._process_enough_to_infinitive(doc, text, infinitive_info, slots)
+        
+        # 旧パターン名との互換性
+        elif syntactic_role == 'nominal_complement':
             return self._process_nominal_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'nominal_subject':
             return self._process_nominal_subject_infinitive(doc, text, infinitive_info, slots)
@@ -789,27 +997,43 @@ class InfinitiveHandler:
         
         slots = {}
         
+        if not infinitive_info or 'infinitive_tokens' not in infinitive_info:
+            print(f"   ⚠️ infinitive_info不正: {infinitive_info}")
+            return slots
+        
         for inf_token in infinitive_info['infinitive_tokens']:
-            main_verb = inf_token['main_verb']
-            to_token = inf_token['to_token']
-            head = inf_token['head']
-            pattern = inf_token['pattern']
+            if not inf_token:
+                print(f"   ⚠️ inf_token不正: {inf_token}")
+                continue
+                
+            main_verb = inf_token.get('main_verb')
+            to_token = inf_token.get('to_token')
+            head = inf_token.get('head')
+            pattern = inf_token.get('pattern', 'unknown')
+            
+            if not main_verb or not to_token:
+                print(f"   ⚠️ 必要な要素が不足: main_verb={main_verb}, to_token={to_token}")
+                continue
             
             # 不定詞マーカー分類
-            slots[to_token.text] = 'inf-marker'
-            print(f"   📌 '{to_token.text}' → inf-marker")
+            if hasattr(to_token, 'text'):
+                slots[to_token.text] = 'inf-marker'
+                print(f"   📌 '{to_token.text}' → inf-marker")
             
             # 不定詞動詞分類
-            slots[main_verb.text] = self._classify_infinitive_verb(main_verb, pattern, head)
-            print(f"   🔧 '{main_verb.text}' → {slots[main_verb.text]}")
+            if hasattr(main_verb, 'text'):
+                slots[main_verb.text] = self._classify_infinitive_verb(main_verb, pattern, head)
+                print(f"   🔧 '{main_verb.text}' → {slots[main_verb.text]}")
             
             # 主動詞分類
-            if head.pos_ == 'VERB' and head.text not in slots:
-                slots[head.text] = self._classify_main_verb(head, pattern)
-                print(f"   ⚙️ '{head.text}' → {slots[head.text]}")
+            if head and hasattr(head, 'pos_') and hasattr(head, 'text'):
+                if head.pos_ == 'VERB' and head.text not in slots:
+                    slots[head.text] = self._classify_main_verb(head, pattern)
+                    print(f"   ⚙️ '{head.text}' → {slots[head.text]}")
             
             # 不定詞の引数分析
-            self._analyze_infinitive_arguments(main_verb, slots)
+            if hasattr(main_verb, 'children'):
+                self._analyze_infinitive_arguments(main_verb, slots)
         
         return slots
     

@@ -1,0 +1,16 @@
+{
+  "case_case156": {
+    "sentence": "To study English is important.",
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "important"
+    },
+    "sub_slots": {
+      "sub-v": "To study",
+      "_parent_slot": "S",
+      "sub-o1": "English"
+    }
+  }
+}
