@@ -38,7 +38,7 @@ def parse_range(case_range: str):
     
     # プリセット範囲定義
     presets = {
-        'all': '1-170',         # 対象例文全て（不定詞構文156-170を追加）
+        'all': '1-1000',        # 対象例文全て（将来の拡張にも対応）
         'basic': '1-17',        # 基本5文型
         'adverbs': '18-42',     # 基本副詞
         'relative': '56,58,64', # 関係節
@@ -49,8 +49,8 @@ def parse_range(case_range: str):
         'noun_clauses': '121-130',      # 名詞節
         'conditional': '131-155',       # 仮定法
         'infinitive': '156-170',        # 不定詞構文
-        'core': '1-163',        # コア機能（実装済み全範囲）
-        'advanced': '164-170',  # 高度な不定詞構文
+        'core': '1-170',        # コア機能（実装済み全範囲）
+        'legacy': '1-163',      # 従来範囲（下位互換用）
         'sample100': '1-100',   # サンプル100件
         'sample200': '1-200',   # サンプル200件（将来拡張用）
         'sample500': '1-500',   # サンプル500件（将来拡張用）
@@ -362,8 +362,8 @@ if __name__ == "__main__":
   quick, sample100, sample200, sample500, sample1000, stress
         """)
     
-    parser.add_argument('range', nargs='?', default='core', 
-                       help='対象ケース範囲 (デフォルト: core)')
+    parser.add_argument('range', nargs='?', default='1-1000', 
+                       help='対象ケース範囲 (デフォルト: 1-1000)')
     parser.add_argument('--output', '-o', help='分解結果の出力ファイル名')
     parser.add_argument('--show', '-s', action='store_true', help='コンソールに詳細表示')
     parser.add_argument('--list-presets', action='store_true', help='利用可能なプリセット一覧を表示')

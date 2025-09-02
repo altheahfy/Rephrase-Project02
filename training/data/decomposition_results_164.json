@@ -1,0 +1,57 @@
+{
+  "case_164": {
+    "sentence": "He seems to have finished his work.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "Aux": "seems to have",
+        "V": "finished",
+        "O1": "his work"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "He seems to have finished his work.",
+      "main_slots": {
+        "S": "He",
+        "Aux": "seems to have",
+        "V": "finished",
+        "O1": "his work"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "modal",
+          "infinitive"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "infinitive_info": {
+          "handler": "infinitive_perfect",
+          "usage_type": "perfect_infinitive",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.95,
+        "collaboration_type": "modal_infinitive_coordination"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "4": "seems to have",
+        "5": "finished",
+        "6": "his work"
+      }
+    },
+    "match": true
+  }
+}

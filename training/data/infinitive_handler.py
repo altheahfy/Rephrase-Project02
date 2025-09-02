@@ -48,6 +48,24 @@ class InfinitiveHandler:
         
         print("🔧 InfinitiveHandler初期化: Human Grammar Pattern + spaCy解析")
     
+    def _extract_subject_phrase(self, subject_token):
+        """主語の完全な語句を抽出（限定詞含む）"""
+        if not subject_token:
+            return ""
+        
+        # 主語の左側の修飾語（限定詞など）を収集
+        modifiers = []
+        for child in subject_token.children:
+            if child.dep_ in ['det', 'amod', 'compound', 'nummod'] and child.i < subject_token.i:
+                modifiers.append((child.i, child.text))
+        
+        # 位置順にソート
+        modifiers.sort(key=lambda x: x[0])
+        
+        # 主語の語句を構築
+        phrase_parts = [mod[1] for mod in modifiers] + [subject_token.text]
+        return ' '.join(phrase_parts)
+    
     def can_handle(self, text: str) -> bool:
         """
         不定詞構文を処理可能かチェック（spaCy依存関係解析ベース）
@@ -411,6 +429,8 @@ class InfinitiveHandler:
                 for next_token in doc[token.i + 1:]:
                     if (next_token.text.lower() == 'to' and 
                         next_token.dep_ == 'aux'):
+                        # 子要素をチェック
+                        verb_found = False
                         for verb_token in next_token.children:
                             if verb_token.pos_ == 'VERB':
                                 infinitive_info['found'] = True
@@ -423,8 +443,27 @@ class InfinitiveHandler:
                                     'wh_word': token
                                 })
                                 print(f"   ✅ 疑問詞+不定詞検出: '{token.text} to {verb_token.text}'")
+                                verb_found = True
                                 break
-                        break
+                        
+                        # 子要素にない場合、次のトークンをチェック
+                        if not verb_found and next_token.i + 1 < len(doc):
+                            following_token = doc[next_token.i + 1]
+                            if following_token.pos_ == 'VERB':
+                                infinitive_info['found'] = True
+                                infinitive_info['infinitive_tokens'].append({
+                                    'main_verb': following_token,
+                                    'to_token': next_token,
+                                    'pattern': 'wh_infinitive',
+                                    'head': following_token.head,
+                                    'dependency': 'xcomp',
+                                    'wh_word': token
+                                })
+                                print(f"   ✅ 疑問詞+不定詞検出: '{token.text} to {following_token.text}'")
+                                verb_found = True
+                        
+                        if verb_found:
+                            break
                 break
         
         # 使役構文パターン検出
@@ -455,7 +494,8 @@ class InfinitiveHandler:
                         
                         break
                 
-                if infinitive_verb and object_person:
+                # 真の使役構文は to_token が必須
+                if infinitive_verb and object_person and to_token:
                     infinitive_info['found'] = True
                     infinitive_info['infinitive_tokens'].append({
                         'main_verb': infinitive_verb,
@@ -467,6 +507,8 @@ class InfinitiveHandler:
                         'object': object_person
                     })
                     print(f"   ✅ 使役構文検出: '{token.text} {object_person.text} to {infinitive_verb.text}'")
+                elif infinitive_verb and object_person and not to_token:
+                    print(f"   ❌ 使役構文候補だが to トークンなし: '{token.text} {object_person.text} {infinitive_verb.text}' (名詞節の可能性)")
         
         # be about to構文検出
         if 'about to' in text_lower:
@@ -762,19 +804,46 @@ class InfinitiveHandler:
         """
         print(f"🧠 統語的役割分析: Human Grammar Pattern")
         
-        # 高優先度パターンの処理（for句、too/enough構文優先）
+        # 最高優先度パターンの処理（高度な構文: case164-170）
         for inf_token in infinitive_info['infinitive_tokens']:
             pattern = inf_token['pattern']
             
-            # for句付き不定詞を最優先
+            # 高度なパターンを最優先で処理
+            if pattern == 'perfect_infinitive':
+                print(f"   📝 完了不定詞 → 特別処理（最優先）")
+                return 'perfect_infinitive'
+            elif pattern == 'passive_infinitive':
+                print(f"   📝 受動不定詞 → 特別処理（最優先）")
+                return 'passive_infinitive'
+            elif pattern == 'wh_infinitive':
+                print(f"   📝 疑問詞+不定詞 → 特別処理（最優先）")
+                return 'wh_infinitive'
+            elif pattern == 'causative':
+                print(f"   📝 使役構文 → 目的語補語（最優先）")
+                return 'causative'
+            elif pattern == 'be_about_to':
+                print(f"   📝 be about to構文 → 特別処理（最優先）")
+                return 'be_about_to'
+            elif pattern == 'in_order_to':
+                print(f"   📝 in order to構文 → 目的の副詞的用法（最優先）")
+                return 'in_order_to'
+            elif pattern == 'so_as_to':
+                print(f"   📝 so as to構文 → 目的の副詞的用法（最優先）")
+                return 'so_as_to'
+        
+        # 高優先度パターンの処理（for句、too/enough構文）
+        for inf_token in infinitive_info['infinitive_tokens']:
+            pattern = inf_token['pattern']
+            
+            # for句付き不定詞を高優先
             if pattern == 'for_infinitive':
-                print(f"   📝 for句付き不定詞 → 副詞的用法（最優先）")
+                print(f"   📝 for句付き不定詞 → 副詞的用法（高優先）")
                 return 'for_infinitive'
             elif pattern == 'too_to_infinitive':
-                print(f"   📝 too...to構文 → 結果の副詞的用法（最優先）")
+                print(f"   📝 too...to構文 → 結果の副詞的用法（高優先）")
                 return 'too_to_infinitive'
             elif pattern == 'enough_to_infinitive':
-                print(f"   📝 enough...to構文 → 結果の副詞的用法（最優先）")
+                print(f"   📝 enough...to構文 → 結果の副詞的用法（高優先）")
                 return 'enough_to_infinitive'
         
         # 基本パターンの処理（case156-163）

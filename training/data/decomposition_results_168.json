@@ -1,0 +1,43 @@
+{
+  "case_168": {
+    "sentence": "The meeting is about to start.",
+    "expected": {
+      "main_slots": {
+        "S": "The meeting",
+        "Aux": "is about to",
+        "V": "start"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "The meeting is about to start.",
+      "main_slots": {
+        "S": "The meeting",
+        "Aux": "is about to",
+        "V": "start"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_be_about_to",
+          "usage_type": "be_about_to",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "3": "The meeting",
+        "4": "is about to",
+        "5": "start"
+      }
+    },
+    "match": true
+  }
+}

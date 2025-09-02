@@ -2103,78 +2103,116 @@
       "_parent_slot": "M2"
     }
   },
-  "case_case156": {
+  "case_156": {
     "sentence": "To study English is important.",
-    "match": false,
-    "main_slots": {},
-    "sub_slots": {}
+    "match": true,
+    "main_slots": {
+      "S": "",
+      "V": "is",
+      "C1": "important"
+    },
+    "sub_slots": {
+      "sub-v": "To study",
+      "_parent_slot": "S",
+      "sub-o1": "English"
+    }
   },
-  "case_case157": {
+  "case_157": {
     "sentence": "I want to learn programming.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "I",
       "V": "want",
-      "O1": "programming"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "to learn",
+      "_parent_slot": "O1",
+      "sub-o1": "programming"
+    }
   },
-  "case_case158": {
+  "case_158": {
     "sentence": "She has something to tell you.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "She",
       "V": "has",
-      "O1": "to tell"
+      "O1": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "something to tell",
+      "_parent_slot": "O1",
+      "sub-o1": "you"
+    }
   },
-  "case_case159": {
+  "case_159": {
     "sentence": "He came to see his friend.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "He",
       "V": "came",
-      "O1": "to see"
+      "M3": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "to see",
+      "_parent_slot": "M3",
+      "sub-o1": "his friend"
+    }
   },
-  "case_case160": {
+  "case_160": {
     "sentence": "I grew up to become a teacher.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "I",
-      "V": "grew",
-      "O1": "to become"
+      "Aux": "grew up to",
+      "V": "become",
+      "C1": "a teacher"
     },
     "sub_slots": {}
   },
-  "case_case161": {
+  "case_161": {
     "sentence": "It is easy for me to understand this.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "It",
       "V": "is",
-      "C1": "easy"
+      "C1": "easy",
+      "M2": "for me",
+      "M3": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "to understand",
+      "_parent_slot": "M3",
+      "sub-o1": "this"
+    }
   },
-  "case_case162": {
+  "case_162": {
     "sentence": "This box is too heavy to carry.",
-    "match": false,
+    "match": true,
     "main_slots": {
-      "S": "box",
-      "O1": "to carry"
+      "S": "This box",
+      "V": "is",
+      "C1": "too heavy",
+      "M2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "to carry",
+      "_parent_slot": "M2"
+    }
   },
-  "case_case163": {
+  "case_163": {
     "sentence": "She is old enough to drive a car.",
-    "match": false,
+    "match": true,
     "main_slots": {
       "S": "She",
-      "O1": "to drive"
+      "V": "is",
+      "C1": "old",
+      "M2": ""
     },
-    "sub_slots": {}
+    "sub_slots": {
+      "sub-v": "enough to drive",
+      "_parent_slot": "M2",
+      "sub-o1": "a car"
+    }
   }
 }

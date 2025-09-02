@@ -1,0 +1,65 @@
+{
+  "case_170": {
+    "sentence": "He left early so as to avoid traffic.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "left",
+        "M2": "early",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "so as to avoid",
+        "sub-o1": "traffic",
+        "_parent_slot": "M3"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "He left early so as to avoid traffic.",
+      "main_slots": {
+        "S": "He",
+        "V": "left",
+        "M2": "early",
+        "M3": ""
+      },
+      "sub_slots": {
+        "sub-v": "so as to avoid",
+        "_parent_slot": "M3",
+        "sub-o1": "traffic"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "infinitive",
+        "collaboration": [
+          "infinitive"
+        ],
+        "infinitive_info": {
+          "handler": "infinitive_so_as_to",
+          "usage_type": "so_as_to",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "so as to avoid",
+          "display_order": 1
+        },
+        "sub-o1": {
+          "value": "traffic",
+          "display_order": 2
+        },
+        "_parent_slot": "M3"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "5": "left",
+        "9": "",
+        "7": "early"
+      }
+    },
+    "match": true
+  }
+}

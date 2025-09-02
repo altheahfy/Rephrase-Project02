@@ -757,76 +757,110 @@ class CentralController:
         if 'infinitive' in grammar_patterns:
             print(f"🔧 InfinitiveHandler処理開始: '{text}'")
             
-            # 不定詞構文は元の文で解析（修飾語分離前）
-            infinitive_handler = self.handlers['infinitive']
-            infinitive_result = infinitive_handler.process(text)
+            # 複合助動詞の場合は不定詞処理をスキップ
+            skip_infinitive = False
+            if modal_success_result and modal_success_result.get('modal_info', {}).get('modal_type') == 'complex':
+                modal_auxiliary = modal_success_result.get('modal_info', {}).get('auxiliary', '')
+                complex_modals = ['ought to', 'used to', 'be going to', 'is going to', 'are going to', 'am going to', 'was going to', 'were going to', 'be able to', 'have to', 'has to']
+                if modal_auxiliary in complex_modals:
+                    print(f"🔧 複合助動詞 '{modal_auxiliary}' が検出されたため、不定詞処理をスキップします")
+                    skip_infinitive = True
             
-            if infinitive_result['success']:
-                print(f"✅ 不定詞処理成功: {infinitive_result}")
+            if not skip_infinitive:
+                # 不定詞構文は元の文で解析（修飾語分離前）
+                infinitive_handler = self.handlers['infinitive']
+                infinitive_result = infinitive_handler.process(text)
                 
-                # 🔄 真の協調処理: 助動詞処理結果があるかチェック
-                if modal_success_result:
-                    print(f"🤝 助動詞+不定詞協調処理: 主文構造は助動詞処理、サブスロットは不定詞処理")
+                if infinitive_result['success']:
+                    print(f"✅ 不定詞処理成功: {infinitive_result}")
                     
-                    # 助動詞処理の主文構造を使用
-                    final_slots = modal_success_result['main_slots'].copy()
-                    
-                    # 不定詞処理のサブスロットを統合
-                    sub_slots = infinitive_result.get('sub_slots', {})
-                    
-                    # サブスロットが存在する場合、対応するmain_slotを空にする
-                    if sub_slots and '_parent_slot' in sub_slots:
-                        parent_slot = sub_slots['_parent_slot']
-                        if parent_slot in final_slots:
-                            print(f"🔧 協調処理: {parent_slot}をサブスロット用に空に設定")
-                            final_slots[parent_slot] = ''
-                    
-                    result = {
-                        'success': True,
-                        'text': text,
-                        'main_slots': final_slots,
-                        'sub_slots': sub_slots,
-                        'metadata': {
-                            'controller': 'central',
-                            'primary_handler': 'modal',
-                            'collaboration': ['modal', 'infinitive'],
-                            'modal_info': modal_success_result.get('modal_info', {}),
-                            'infinitive_info': infinitive_result.get('metadata', {}),
-                            'confidence': 0.95,
-                            'collaboration_type': 'modal_infinitive_coordination'
+                    # 🔄 真の協調処理: 助動詞処理結果があるかチェック
+                    if modal_success_result:
+                        print(f"🤝 助動詞+不定詞協調処理: 主文構造は助動詞処理、サブスロットは不定詞処理")
+                        
+                        # 完了不定詞の場合は不定詞処理を優先
+                        infinitive_handler_type = infinitive_result.get('metadata', {}).get('handler', '')
+                        if infinitive_handler_type == 'infinitive_perfect':
+                            print(f"🔧 完了不定詞検出: 不定詞処理結果を優先使用")
+                            final_slots = infinitive_result['main_slots'].copy()
+                            sub_slots = infinitive_result.get('sub_slots', {})
+                        else:
+                            # 通常の協調処理: 助動詞処理の主文構造を使用
+                            final_slots = modal_success_result['main_slots'].copy()
+                            
+                            # 不定詞処理のサブスロットを統合
+                            sub_slots = infinitive_result.get('sub_slots', {})
+                            
+                            # サブスロットが存在する場合、対応するmain_slotを空にする
+                            if sub_slots and '_parent_slot' in sub_slots:
+                                parent_slot = sub_slots['_parent_slot']
+                                if parent_slot in final_slots:
+                                    print(f"🔧 協調処理: {parent_slot}をサブスロット用に空に設定")
+                                    final_slots[parent_slot] = ''
+                        
+                        result = {
+                            'success': True,
+                            'text': text,
+                            'main_slots': final_slots,
+                            'sub_slots': sub_slots,
+                            'metadata': {
+                                'controller': 'central',
+                                'primary_handler': 'modal',
+                                'collaboration': ['modal', 'infinitive'],
+                                'modal_info': modal_success_result.get('modal_info', {}),
+                                'infinitive_info': infinitive_result.get('metadata', {}),
+                                'confidence': 0.95,
+                                'collaboration_type': 'modal_infinitive_coordination'
+                            }
                         }
-                    }
-                    
-                    return self._apply_order_to_result(result)
+                        
+                        return self._apply_order_to_result(result)
+                    else:
+                        # 助動詞処理結果がない場合は不定詞処理のみ使用
+                        print(f"🔧 不定詞処理のみ使用")
+                        final_slots = infinitive_result['main_slots'].copy()
+                        
+                        result = {
+                            'success': True,
+                            'text': text,
+                            'main_slots': final_slots,
+                            'sub_slots': infinitive_result.get('sub_slots', {}),
+                            'metadata': {
+                                'controller': 'central',
+                                'primary_handler': 'infinitive',
+                                'collaboration': infinitive_result.get('collaboration', []),
+                                'infinitive_info': infinitive_result.get('metadata', {}),
+                                'confidence': 0.9
+                            }
+                        }
+                        
+                        return self._apply_order_to_result(result)
                 else:
-                    # 助動詞処理結果がない場合は不定詞処理のみ使用
-                    print(f"🔧 不定詞処理のみ使用")
-                    final_slots = infinitive_result['main_slots'].copy()
+                    print(f"⚠️ 不定詞処理失敗、通常の処理フローに移行")
+                    print(f"  InfinitiveHandler error: {infinitive_result.get('error')}")
                     
-                    result = {
-                        'success': True,
-                        'text': text,
-                        'main_slots': final_slots,
-                        'sub_slots': infinitive_result.get('sub_slots', {}),
-                        'metadata': {
-                            'controller': 'central',
-                            'primary_handler': 'infinitive',
-                            'collaboration': infinitive_result.get('collaboration', []),
-                            'infinitive_info': infinitive_result.get('metadata', {}),
-                            'confidence': 0.9
+                    # 助動詞処理が成功している場合はその結果を使用
+                    if modal_success_result:
+                        print(f"🔄 助動詞処理結果をフォールバックとして使用")
+                        result = {
+                            'success': True,
+                            'text': text,
+                            'main_slots': modal_success_result['main_slots'],
+                            'sub_slots': {},
+                            'metadata': {
+                                'controller': 'central',
+                                'primary_handler': 'modal',
+                                'collaboration': modal_success_result['collaboration'],
+                                'modal_info': modal_success_result.get('modal_info', {}),
+                                'confidence': 0.9,
+                            }
                         }
-                    }
-                    
-                    return self._apply_order_to_result(result)
-                
-                return self._apply_order_to_result(result)
+                        
+                        return self._apply_order_to_result(result)
             else:
-                print(f"⚠️ 不定詞処理失敗、通常の処理フローに移行")
-                print(f"  InfinitiveHandler error: {infinitive_result.get('error')}")
-                
-                # 助動詞処理が成功している場合はその結果を使用
+                # 複合助動詞の場合、助動詞処理結果のみを使用
                 if modal_success_result:
-                    print(f"🔄 助動詞処理結果をフォールバックとして使用")
+                    print(f"🔄 複合助動詞処理: sub_slotsを空にして助動詞処理結果を使用")
                     result = {
                         'success': True,
                         'text': text,
@@ -837,10 +871,10 @@ class CentralController:
                             'primary_handler': 'modal',
                             'collaboration': modal_success_result['collaboration'],
                             'modal_info': modal_success_result.get('modal_info', {}),
-                            'confidence': 0.9,
-                            'fallback_reason': 'infinitive_failed'
+                            'confidence': 0.9
                         }
                     }
+                    
                     return self._apply_order_to_result(result)
         
         # 🎯 仮定法処理（人間的文法識別アプローチ）
