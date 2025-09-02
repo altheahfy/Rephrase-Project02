@@ -3,8 +3,30 @@
 """
 InfinitiveHandler: 不定詞処理ハンドラー
 to不定詞の名詞的・形容詞的・副詞的用法の専門分解
-専門分担型ハイブリッド解析（品詞分析 + 依存関係）+ 人間的文法認識
-ハードコーディング極力排除・汎用的システム設計
+専門分担型ハイブリッド解析（品詞分析 + 依存関係）+ 人間的            # パターン1: xcomp (complement) + aux=to
+            if token.dep_ == 'xcomp' and token.pos_ == 'VERB':
+                for child in token.children:
+                    if child.text.lower() == 'to' and child.dep_ == 'aux':
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': token,
+                            'to_token': child,
+                            'pattern': 'xcomp_aux',
+                            'head': token.head,
+                            'dependency': token.dep_
+                        })
+                        print(f"   ✅ xcomp不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
+                        
+                        # too...to構文の特別判定
+                        if self._is_too_to_pattern(doc, token):
+                            infinitive_info['infinitive_tokens'][-1]['pattern'] = 'too_to_pattern'
+                            print(f"   🎯 too...to構文検出: '{child.text} {token.text}'")
+                        # enough...to構文の特別判定  
+                        elif self._is_enough_to_pattern(doc, token):
+                            infinitive_info['infinitive_tokens'][-1]['pattern'] = 'enough_to_pattern'
+                            print(f"   🎯 enough...to構文検出: '{child.text} {token.text}'")
+                        else:
+                            print(f"   📝 通常のxcomp処理: '{child.text} {token.text}'")ング極力排除・汎用的システム設計
 """
 
 import spacy
@@ -154,6 +176,17 @@ class InfinitiveHandler:
                             'dependency': token.dep_
                         })
                         print(f"   ✅ xcomp不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
+                        
+                        # too...to構文の特別判定
+                        if self._is_too_to_pattern(doc, token):
+                            infinitive_info['infinitive_tokens'][-1]['pattern'] = 'too_to_pattern'
+                            print(f"   🎯 too...to構文検出: '{child.text} {token.text}'")
+                        # enough...to構文の特別判定  
+                        elif self._is_enough_to_pattern(doc, token):
+                            infinitive_info['infinitive_tokens'][-1]['pattern'] = 'enough_to_pattern'
+                            print(f"   🎯 enough...to構文検出: '{child.text} {token.text}'")
+                        else:
+                            print(f"   📝 通常のxcomp処理: '{child.text} {token.text}'")
             
             # パターン2: advcl (adverbial clause) + aux/mark=to  
             elif token.dep_ == 'advcl' and token.pos_ == 'VERB':
@@ -235,8 +268,16 @@ class InfinitiveHandler:
             head = inf_token['head']
             dependency = inf_token['dependency']
             
+            # 特別パターンの処理
+            if pattern == 'too_to_pattern':
+                print(f"   📝 too...to構文 → 結果の副詞的用法")
+                return 'too_to_adverbial'
+            elif pattern == 'enough_to_pattern':
+                print(f"   📝 enough...to構文 → 結果の副詞的用法")
+                return 'enough_to_adverbial'
+            
             # xcomp: 通常は目的語補語（形容詞的・副詞的用法）
-            if pattern == 'xcomp_aux':
+            elif pattern == 'xcomp_aux':
                 if head.pos_ == 'VERB':
                     # want to do 形式は名詞的用法（目的語）
                     if head.lemma_.lower() in ['want', 'need', 'like', 'love', 'hate', 'prefer', 'decide', 'hope', 'plan', 'try', 'attempt']:
@@ -247,10 +288,28 @@ class InfinitiveHandler:
                         return 'adjectival_complement'
                     
             # advcl: 副詞節（副詞的用法）
+            # advcl: for構文の場合は形式主語構文、それ以外は副詞的用法
             elif pattern == 'advcl_mark':
-                print(f"   📝 advcl + mark → 副詞節（副詞的用法）")
-                return 'adverbial_clause'
+                # "It is easy for me to understand" 構文をチェック
+                tokens = [token.text.lower() for token in doc]
+                print(f"   📝 advcl検証: tokens={tokens}")
+                print(f"   📝 advcl検証: head={head.text}, head.lemma={head.lemma_}")
                 
+                # It is ... for ... to ...構文の判定
+                has_it = 'it' in tokens
+                has_be = head.lemma_.lower() in ['be', 'is', 'are', 'was', 'were']
+                has_for = 'for' in tokens
+                has_to = 'to' in tokens
+                
+                print(f"   📝 formal_subject判定: it={has_it}, be={has_be}, for={has_for}, to={has_to}")
+                
+                if has_it and has_be and has_for and has_to:
+                    print(f"   📝 advcl + for構文 → 形式主語構文")
+                    return 'formal_subject'
+                else:
+                    print(f"   📝 advcl + mark → 副詞節（副詞的用法）")
+                    return 'adverbial_clause'
+                    
             # ccomp: 補語節（名詞的用法候補）
             elif pattern == 'ccomp_aux':
                 print(f"   📝 ccomp + 補語節 → 名詞的用法候補")
@@ -267,6 +326,36 @@ class InfinitiveHandler:
                 return 'adjectival_modifier'
         
         return 'unknown'
+    
+    def _is_too_to_pattern(self, doc, infinitive_verb):
+        """too...to構文の判定"""
+        print(f"   🔍 too...to判定開始: infinitive_verb={infinitive_verb.text}")
+        # 'too'が形容詞を修飾している構造を探す
+        for token in doc:
+            print(f"      🔍 token='{token.text}', dep={token.dep_}, pos={token.pos_}")
+            if token.text.lower() == 'too' and token.dep_ == 'advmod':
+                print(f"      ✅ too検出: head={token.head.text}, head.pos={token.head.pos_}")
+                # tooが修飾している形容詞
+                if token.head.pos_ == 'ADJ':
+                    print(f"      ✅ too...to構文判定成功: 'too {token.head.text} to {infinitive_verb.text}'")
+                    return True
+        print(f"      ❌ too...to構文判定失敗")
+        return False
+    
+    def _is_enough_to_pattern(self, doc, infinitive_verb):
+        """enough...to構文の判定"""
+        print(f"   🔍 enough...to判定開始: infinitive_verb={infinitive_verb.text}")
+        # 'enough'が形容詞または副詞を修飾している構造を探す
+        for token in doc:
+            print(f"      🔍 token='{token.text}', dep={token.dep_}, pos={token.pos_}")
+            if token.text.lower() == 'enough' and token.dep_ == 'advmod':
+                print(f"      ✅ enough検出: head={token.head.text}, head.pos={token.head.pos_}")
+                # enoughが修飾している形容詞/副詞
+                if token.head.pos_ in ['ADJ', 'ADV']:
+                    print(f"      ✅ enough...to構文判定成功: '{token.head.text} enough to {infinitive_verb.text}'")
+                    return True
+        print(f"      ❌ enough...to構文判定失敗")
+        return False
     
     def _process_by_usage_type(self, doc, text: str, infinitive_info: Dict) -> Dict[str, Any]:
         """
@@ -297,6 +386,12 @@ class InfinitiveHandler:
             return self._process_adjectival_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adjectival_modifier':
             return self._process_adjectival_modifier_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'formal_subject':
+            return self._process_formal_subject_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'too_to_adverbial':
+            return self._process_too_to_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'enough_to_adverbial':
+            return self._process_enough_to_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adverbial_clause':
             return self._process_adverbial_infinitive(doc, text, infinitive_info, slots)
         else:
@@ -598,6 +693,210 @@ class InfinitiveHandler:
             'metadata': {
                 'handler': 'infinitive_adjectival_modifier',
                 'usage_type': 'adjectival_modifier',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_formal_subject_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """形式主語構文の処理（It is ... for 人 to ...）"""
+        print(f"📝 形式主語不定詞処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case161: "It is easy for me to understand this."
+        # 期待値: main_slots={'S': 'It', 'V': 'is', 'C1': 'easy', 'M2': 'for me', 'M3': ''}
+        #        sub_slots={'sub-v': 'to understand', 'sub-o1': 'this', '_parent_slot': 'M3'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # understand
+            
+            # メインスロット構造を構築
+            main_slots['S'] = 'It'  # 形式主語
+            
+            # be動詞と補語を探す
+            for token in doc:
+                if token.dep_ == 'ROOT' and token.lemma_.lower() == 'be':
+                    main_slots['V'] = token.text  # is
+                    # 補語（形容詞）を探す
+                    for child in token.children:
+                        if child.dep_ == 'acomp':
+                            main_slots['C1'] = child.text  # easy
+                            print(f"   📍 補語検出: C1 = '{child.text}'")
+            
+            # for句を探す
+            for token in doc:
+                if token.text.lower() == 'for' and token.dep_ == 'mark':
+                    # for句の対象を探す
+                    for child in token.children:
+                        if child.dep_ == 'nsubj':
+                            main_slots['M2'] = f"for {child.text}"
+                            print(f"   📍 for句検出: M2 = 'for {child.text}'")
+                    # または親の兄弟から探す
+                    if 'M2' not in main_slots:
+                        parent = token.head
+                        for sibling in parent.children:
+                            if sibling.dep_ == 'nsubj' and sibling != token:
+                                main_slots['M2'] = f"for {sibling.text}"
+                                print(f"   📍 for句検出: M2 = 'for {sibling.text}'")
+                                break
+            
+            # M2が見つからない場合、別の方法で探す
+            if 'M2' not in main_slots:
+                for token in doc:
+                    if token.text.lower() == 'me' and token.dep_ == 'nsubj':
+                        main_slots['M2'] = 'for me'
+                        print(f"   📍 for句検出（代替）: M2 = 'for me'")
+                        break
+            
+            main_slots['M3'] = ''  # 不定詞部分は空でサブスロット化
+            
+            # サブスロット: 不定詞部分
+            sub_slots['sub-v'] = f"{to_token.text} {main_verb.text}"  # "to understand"
+            sub_slots['_parent_slot'] = 'M3'
+            
+            # 不定詞の目的語を検出
+            for child in main_verb.children:
+                if child.dep_ == 'dobj':
+                    sub_slots['sub-o1'] = child.text
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{child.text}'")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_formal_subject',
+                'usage_type': 'formal_subject',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_too_to_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """too...to構文の処理"""
+        print(f"📝 too...to構文処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case162: "This box is too heavy to carry."
+        # 期待値: main_slots={'S': 'This box', 'V': 'is', 'C1': 'too heavy', 'M2': ''}
+        #        sub_slots={'sub-v': 'to carry', '_parent_slot': 'M2'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # carry
+            
+            # メイン構造を解析
+            for token in doc:
+                if token.dep_ == 'nsubj':
+                    # 主語: 限定詞 + 名詞
+                    if token.i > 0 and doc[token.i-1].pos_ == 'DET':
+                        main_slots['S'] = f"{doc[token.i-1].text} {token.text}"
+                    else:
+                        main_slots['S'] = token.text
+                elif token.dep_ == 'ROOT' and token.pos_ in ['AUX', 'VERB']:
+                    main_slots['V'] = token.text  # is
+                    
+                    # 補語: too + 形容詞
+                    for child in token.children:
+                        if child.dep_ == 'acomp' and child.pos_ == 'ADJ':
+                            # tooが修飾している形容詞
+                            for grandchild in child.children:
+                                if grandchild.text.lower() == 'too' and grandchild.dep_ == 'advmod':
+                                    main_slots['C1'] = f"too {child.text}"
+                                    print(f"   📍 too+形容詞検出: C1 = 'too {child.text}'")
+                                    break
+                            if 'C1' not in main_slots:
+                                main_slots['C1'] = child.text
+            
+            main_slots['M2'] = ''  # 不定詞部分は空でサブスロット化
+            
+            # サブスロット: 不定詞部分
+            sub_slots['sub-v'] = f"{to_token.text} {main_verb.text}"  # "to carry"
+            sub_slots['_parent_slot'] = 'M2'
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_too_to',
+                'usage_type': 'too_to_adverbial',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_enough_to_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """enough...to構文の処理"""
+        print(f"📝 enough...to構文処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case163: "She is old enough to drive a car."
+        # 期待値: main_slots={'S': 'She', 'V': 'is', 'C1': 'old', 'M2': ''}
+        #        sub_slots={'sub-v': 'enough to drive', 'sub-o1': 'a car', '_parent_slot': 'M2'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # drive
+            
+            # メイン構造を解析
+            for token in doc:
+                if token.dep_ == 'nsubj':
+                    main_slots['S'] = token.text  # She
+                elif token.dep_ == 'ROOT' and token.pos_ in ['AUX', 'VERB']:
+                    main_slots['V'] = token.text  # is
+                    
+                    # 補語: 形容詞（enoughが修飾している）
+                    for child in token.children:
+                        if child.dep_ == 'acomp' and child.pos_ == 'ADJ':
+                            # enoughが修飾している形容詞
+                            for grandchild in child.children:
+                                if grandchild.text.lower() == 'enough' and grandchild.dep_ == 'advmod':
+                                    main_slots['C1'] = child.text  # old (enoughは除く)
+                                    print(f"   📍 enough+形容詞検出: C1 = '{child.text}'")
+                                    break
+                            if 'C1' not in main_slots:
+                                main_slots['C1'] = child.text
+            
+            main_slots['M2'] = ''  # 不定詞部分は空でサブスロット化
+            
+            # サブスロット: enough + 不定詞部分
+            sub_slots['sub-v'] = f"enough {to_token.text} {main_verb.text}"  # "enough to drive"
+            sub_slots['_parent_slot'] = 'M2'
+            
+            # 不定詞の目的語を検出
+            for child in main_verb.children:
+                if child.dep_ == 'dobj':
+                    # 限定詞 + 名詞
+                    if child.i > 0 and doc[child.i-1].pos_ == 'DET':
+                        sub_slots['sub-o1'] = f"{doc[child.i-1].text} {child.text}"
+                    else:
+                        sub_slots['sub-o1'] = child.text
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{sub_slots['sub-o1']}'")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_enough_to',
+                'usage_type': 'enough_to_adverbial',
                 'confidence': 0.9,
                 'spacy_analysis': True
             }

@@ -1,30 +1,32 @@
 {
-  "case_case158": {
-    "sentence": "She has something to tell you.",
+  "case_case163": {
+    "sentence": "She is old enough to drive a car.",
     "expected": {
       "main_slots": {
         "S": "She",
-        "V": "has",
-        "O1": ""
+        "V": "is",
+        "C1": "old",
+        "M2": ""
       },
       "sub_slots": {
-        "sub-v": "something to tell",
-        "sub-o1": "you",
-        "_parent_slot": "O1"
+        "sub-v": "enough to drive",
+        "sub-o1": "a car",
+        "_parent_slot": "M2"
       }
     },
     "actual": {
       "success": true,
-      "text": "She has something to tell you.",
+      "text": "She is old enough to drive a car.",
       "main_slots": {
         "S": "She",
-        "V": "has",
-        "O1": ""
+        "V": "is",
+        "C1": "old",
+        "M2": ""
       },
       "sub_slots": {
-        "sub-v": "something to tell",
-        "_parent_slot": "O1",
-        "sub-o1": "you"
+        "sub-v": "enough to drive",
+        "_parent_slot": "M2",
+        "sub-o1": "a car"
       },
       "metadata": {
         "controller": "central",
@@ -33,8 +35,8 @@
           "infinitive"
         ],
         "infinitive_info": {
-          "handler": "infinitive_adjectival_modifier",
-          "usage_type": "adjectival_modifier",
+          "handler": "infinitive_enough_to",
+          "usage_type": "enough_to_adverbial",
           "confidence": 0.9,
           "spacy_analysis": true
         },
@@ -42,19 +44,20 @@
       },
       "ordered_sub_slots": {
         "sub-v": {
-          "value": "something to tell",
+          "value": "enough to drive",
           "display_order": 1
         },
         "sub-o1": {
-          "value": "you",
+          "value": "a car",
           "display_order": 2
         },
-        "_parent_slot": "O1"
+        "_parent_slot": "M2"
       },
       "ordered_slots": {
-        "5": "has",
         "3": "She",
-        "6": ""
+        "5": "is",
+        "8": "old",
+        "7": ""
       }
     },
     "match": true

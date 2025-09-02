@@ -1,0 +1,7990 @@
+{
+  "case_1": {
+    "sentence": "The car is red.",
+    "expected": {
+      "main_slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The car is red.",
+      "success": true,
+      "main_slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "slots": {
+        "S": "The car",
+        "V": "is",
+        "C1": "red"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The car",
+        "5": "is",
+        "8": "red"
+      }
+    },
+    "match": true
+  },
+  "case_2": {
+    "sentence": "I love you.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "love",
+        "O1": "you"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I love you.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "love",
+        "O1": "you"
+      },
+      "slots": {
+        "S": "I",
+        "V": "love",
+        "O1": "you"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "love",
+        "6": "you"
+      }
+    },
+    "match": true
+  },
+  "case_3": {
+    "sentence": "Birds fly.",
+    "expected": {
+      "main_slots": {
+        "S": "Birds",
+        "V": "fly"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Birds fly.",
+      "success": true,
+      "main_slots": {
+        "S": "Birds",
+        "V": "fly"
+      },
+      "slots": {
+        "S": "Birds",
+        "V": "fly"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "Birds",
+        "5": "fly"
+      }
+    },
+    "match": true
+  },
+  "case_4": {
+    "sentence": "Children play.",
+    "expected": {
+      "main_slots": {
+        "S": "Children",
+        "V": "play"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Children play.",
+      "success": true,
+      "main_slots": {
+        "S": "Children",
+        "V": "play"
+      },
+      "slots": {
+        "S": "Children",
+        "V": "play"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "Children",
+        "5": "play"
+      }
+    },
+    "match": true
+  },
+  "case_5": {
+    "sentence": "Time passes.",
+    "expected": {
+      "main_slots": {
+        "S": "Time",
+        "V": "passes"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Time passes.",
+      "success": true,
+      "main_slots": {
+        "S": "Time",
+        "V": "passes"
+      },
+      "slots": {
+        "S": "Time",
+        "V": "passes"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "Time",
+        "5": "passes"
+      }
+    },
+    "match": true
+  },
+  "case_6": {
+    "sentence": "She looks happy.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "looks",
+        "C1": "happy"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She looks happy.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "looks",
+        "C1": "happy"
+      },
+      "slots": {
+        "S": "She",
+        "V": "looks",
+        "C1": "happy"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "looks",
+        "8": "happy"
+      }
+    },
+    "match": true
+  },
+  "case_7": {
+    "sentence": "He became a doctor.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "became",
+        "C1": "a doctor"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "He became a doctor.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "became",
+        "C1": "a doctor"
+      },
+      "slots": {
+        "S": "He",
+        "V": "became",
+        "C1": "a doctor"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "He",
+        "5": "became",
+        "8": "a doctor"
+      }
+    },
+    "match": true
+  },
+  "case_8": {
+    "sentence": "The food tastes good.",
+    "expected": {
+      "main_slots": {
+        "S": "The food",
+        "V": "tastes",
+        "C1": "good"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The food tastes good.",
+      "success": true,
+      "main_slots": {
+        "S": "The food",
+        "V": "tastes",
+        "C1": "good"
+      },
+      "slots": {
+        "S": "The food",
+        "V": "tastes",
+        "C1": "good"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The food",
+        "5": "tastes",
+        "8": "good"
+      }
+    },
+    "match": true
+  },
+  "case_9": {
+    "sentence": "I read books.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "read",
+        "O1": "books"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I read books.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "read",
+        "O1": "books"
+      },
+      "slots": {
+        "S": "I",
+        "V": "read",
+        "O1": "books"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "read",
+        "6": "books"
+      }
+    },
+    "match": true
+  },
+  "case_10": {
+    "sentence": "She plays piano.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "plays",
+        "O1": "piano"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She plays piano.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "plays",
+        "O1": "piano"
+      },
+      "slots": {
+        "S": "She",
+        "V": "plays",
+        "O1": "piano"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "plays",
+        "6": "piano"
+      }
+    },
+    "match": true
+  },
+  "case_11": {
+    "sentence": "We study English.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "V": "study",
+        "O1": "English"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "We study English.",
+      "success": true,
+      "main_slots": {
+        "S": "We",
+        "V": "study",
+        "O1": "English"
+      },
+      "slots": {
+        "S": "We",
+        "V": "study",
+        "O1": "English"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "We",
+        "5": "study",
+        "6": "English"
+      }
+    },
+    "match": true
+  },
+  "case_12": {
+    "sentence": "I gave him a book.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "a book"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I gave him a book.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "a book"
+      },
+      "slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "a book"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  },
+  "case_13": {
+    "sentence": "She told me a story.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "told",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She told me a story.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "told",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "slots": {
+        "S": "She",
+        "V": "told",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "told",
+        "6": "me"
+      }
+    },
+    "match": true
+  },
+  "case_14": {
+    "sentence": "He bought her flowers.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "bought",
+        "O1": "her",
+        "O2": "flowers"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "He bought her flowers.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "bought",
+        "O1": "her",
+        "O2": "flowers"
+      },
+      "slots": {
+        "S": "He",
+        "V": "bought",
+        "O1": "her",
+        "O2": "flowers"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "He",
+        "5": "bought",
+        "6": "her"
+      }
+    },
+    "match": true
+  },
+  "case_15": {
+    "sentence": "We call him Tom.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "V": "call",
+        "O1": "him",
+        "C2": "Tom"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "We call him Tom.",
+      "success": true,
+      "main_slots": {
+        "S": "We",
+        "V": "call",
+        "O1": "him",
+        "C2": "Tom"
+      },
+      "slots": {
+        "S": "We",
+        "V": "call",
+        "O1": "him",
+        "C2": "Tom"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "We",
+        "5": "call",
+        "6": "him"
+      }
+    },
+    "match": true
+  },
+  "case_16": {
+    "sentence": "I found it interesting.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "found",
+        "O1": "it",
+        "C2": "interesting"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I found it interesting.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "found",
+        "O1": "it",
+        "C2": "interesting"
+      },
+      "slots": {
+        "S": "I",
+        "V": "found",
+        "O1": "it",
+        "C2": "interesting"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "found",
+        "6": "it"
+      }
+    },
+    "match": true
+  },
+  "case_17": {
+    "sentence": "They made her happy.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "V": "made",
+        "O1": "her",
+        "C2": "happy"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "They made her happy.",
+      "success": true,
+      "main_slots": {
+        "S": "They",
+        "V": "made",
+        "O1": "her",
+        "C2": "happy"
+      },
+      "slots": {
+        "S": "They",
+        "V": "made",
+        "O1": "her",
+        "C2": "happy"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "They",
+        "5": "made",
+        "6": "her"
+      }
+    },
+    "match": true
+  },
+  "case_18": {
+    "sentence": "The cake is being baked by my mother.",
+    "expected": {
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The cake is being baked by my mother.",
+      "success": true,
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "slots": {
+        "S": "The cake",
+        "Aux": "is being",
+        "V": "baked",
+        "M2": "by my mother"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The cake",
+        "4": "is being",
+        "5": "baked",
+        "7": "by my mother"
+      }
+    },
+    "match": true
+  },
+  "case_19": {
+    "sentence": "The cake was eaten by the children.",
+    "expected": {
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "was",
+        "V": "eaten",
+        "M2": "by the children"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The cake was eaten by the children.",
+      "success": true,
+      "main_slots": {
+        "S": "The cake",
+        "Aux": "was",
+        "V": "eaten",
+        "M2": "by the children"
+      },
+      "slots": {
+        "S": "The cake",
+        "Aux": "was",
+        "V": "eaten",
+        "M2": "by the children"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The cake",
+        "4": "was",
+        "5": "eaten",
+        "7": "by the children"
+      }
+    },
+    "match": true
+  },
+  "case_20": {
+    "sentence": "The door was opened by the key.",
+    "expected": {
+      "main_slots": {
+        "S": "The door",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "by the key"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The door was opened by the key.",
+      "success": true,
+      "main_slots": {
+        "S": "The door",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "by the key"
+      },
+      "slots": {
+        "S": "The door",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "by the key"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The door",
+        "4": "was",
+        "5": "opened",
+        "7": "by the key"
+      }
+    },
+    "match": true
+  },
+  "case_21": {
+    "sentence": "The students study hard for exams.",
+    "expected": {
+      "main_slots": {
+        "S": "The students",
+        "V": "study",
+        "M2": "hard",
+        "M3": "for exams"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The students study hard for exams.",
+      "success": true,
+      "main_slots": {
+        "S": "The students",
+        "V": "study",
+        "M2": "hard",
+        "M3": "for exams"
+      },
+      "slots": {
+        "S": "The students",
+        "V": "study",
+        "M2": "hard",
+        "M3": "for exams"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The students",
+        "5": "study",
+        "7": "hard",
+        "9": "for exams"
+      }
+    },
+    "match": true
+  },
+  "case_22": {
+    "sentence": "The car was repaired last week.",
+    "expected": {
+      "main_slots": {
+        "S": "The car",
+        "Aux": "was",
+        "V": "repaired",
+        "M2": "last week"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The car was repaired last week.",
+      "success": true,
+      "main_slots": {
+        "S": "The car",
+        "Aux": "was",
+        "V": "repaired",
+        "M2": "last week"
+      },
+      "slots": {
+        "S": "The car",
+        "Aux": "was",
+        "V": "repaired",
+        "M2": "last week"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The car",
+        "4": "was",
+        "5": "repaired",
+        "7": "last week"
+      }
+    },
+    "match": true
+  },
+  "case_23": {
+    "sentence": "The window was gently opened by the morning breeze.",
+    "expected": {
+      "main_slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "gently",
+        "M3": "by the morning breeze"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The window was gently opened by the morning breeze.",
+      "success": true,
+      "main_slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "gently",
+        "M3": "by the morning breeze"
+      },
+      "slots": {
+        "S": "The window",
+        "Aux": "was",
+        "V": "opened",
+        "M2": "gently",
+        "M3": "by the morning breeze"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The window",
+        "4": "was",
+        "5": "opened",
+        "7": "gently",
+        "9": "by the morning breeze"
+      }
+    },
+    "match": true
+  },
+  "case_24": {
+    "sentence": "The message is being carefully written by the manager.",
+    "expected": {
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The message is being carefully written by the manager.",
+      "success": true,
+      "main_slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "slots": {
+        "S": "The message",
+        "Aux": "is being",
+        "V": "written",
+        "M2": "carefully",
+        "M3": "by the manager"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The message",
+        "4": "is being",
+        "5": "written",
+        "7": "carefully",
+        "9": "by the manager"
+      }
+    },
+    "match": true
+  },
+  "case_25": {
+    "sentence": "The problem was quickly solved by the expert team.",
+    "expected": {
+      "main_slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M2": "quickly",
+        "M3": "by the expert team"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The problem was quickly solved by the expert team.",
+      "success": true,
+      "main_slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M2": "quickly",
+        "M3": "by the expert team"
+      },
+      "slots": {
+        "S": "The problem",
+        "Aux": "was",
+        "V": "solved",
+        "M2": "quickly",
+        "M3": "by the expert team"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The problem",
+        "4": "was",
+        "5": "solved",
+        "7": "quickly",
+        "9": "by the expert team"
+      }
+    },
+    "match": true
+  },
+  "case_26": {
+    "sentence": "The building is being constructed very carefully by skilled workers.",
+    "expected": {
+      "main_slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M2": "very carefully",
+        "M3": "by skilled workers"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The building is being constructed very carefully by skilled workers.",
+      "success": true,
+      "main_slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M2": "very carefully",
+        "M3": "by skilled workers"
+      },
+      "slots": {
+        "S": "The building",
+        "Aux": "is being",
+        "V": "constructed",
+        "M2": "very carefully",
+        "M3": "by skilled workers"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The building",
+        "4": "is being",
+        "5": "constructed",
+        "7": "very carefully",
+        "9": "by skilled workers"
+      }
+    },
+    "match": true
+  },
+  "case_27": {
+    "sentence": "The teacher explains grammar clearly to confused students daily.",
+    "expected": {
+      "main_slots": {
+        "S": "The teacher",
+        "V": "explains",
+        "O1": "grammar",
+        "M1": "clearly",
+        "M2": "to confused students",
+        "M3": "daily"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The teacher explains grammar clearly to confused students daily.",
+      "success": true,
+      "main_slots": {
+        "S": "The teacher",
+        "V": "explains",
+        "O1": "grammar",
+        "M1": "clearly",
+        "M2": "to confused students",
+        "M3": "daily"
+      },
+      "slots": {
+        "S": "The teacher",
+        "V": "explains",
+        "O1": "grammar",
+        "M1": "clearly",
+        "M2": "to confused students",
+        "M3": "daily"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The teacher",
+        "5": "explains",
+        "6": "grammar",
+        "2": "clearly",
+        "7": "to confused students",
+        "9": "daily"
+      }
+    },
+    "match": true
+  },
+  "case_28": {
+    "sentence": "The student writes essays carefully for better grades.",
+    "expected": {
+      "main_slots": {
+        "S": "The student",
+        "V": "writes",
+        "O1": "essays",
+        "M2": "carefully",
+        "M3": "for better grades"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The student writes essays carefully for better grades.",
+      "success": true,
+      "main_slots": {
+        "S": "The student",
+        "V": "writes",
+        "O1": "essays",
+        "M2": "carefully",
+        "M3": "for better grades"
+      },
+      "slots": {
+        "S": "The student",
+        "V": "writes",
+        "O1": "essays",
+        "M2": "carefully",
+        "M3": "for better grades"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The student",
+        "5": "writes",
+        "6": "essays",
+        "7": "carefully",
+        "9": "for better grades"
+      }
+    },
+    "match": true
+  },
+  "case_29": {
+    "sentence": "She sings beautifully.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "sings",
+        "M2": "beautifully"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She sings beautifully.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "sings",
+        "M2": "beautifully"
+      },
+      "slots": {
+        "S": "She",
+        "V": "sings",
+        "M2": "beautifully"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "sings",
+        "7": "beautifully"
+      }
+    },
+    "match": true
+  },
+  "case_30": {
+    "sentence": "Tomorrow I study.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "study",
+        "M2": "Tomorrow"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Tomorrow I study.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "study",
+        "M2": "Tomorrow"
+      },
+      "slots": {
+        "S": "I",
+        "V": "study",
+        "M2": "Tomorrow"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "I",
+        "5": "study",
+        "7": "Tomorrow"
+      }
+    },
+    "match": true
+  },
+  "case_31": {
+    "sentence": "He slowly opened the door.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "opened",
+        "O1": "the door",
+        "M2": "slowly"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "He slowly opened the door.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "opened",
+        "O1": "the door",
+        "M2": "slowly"
+      },
+      "slots": {
+        "S": "He",
+        "V": "opened",
+        "O1": "the door",
+        "M2": "slowly"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "He",
+        "5": "opened",
+        "6": "the door",
+        "7": "slowly"
+      }
+    },
+    "match": true
+  },
+  "case_32": {
+    "sentence": "We always eat breakfast together.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "V": "eat",
+        "O1": "breakfast",
+        "M2": "always",
+        "M3": "together"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "We always eat breakfast together.",
+      "success": true,
+      "main_slots": {
+        "S": "We",
+        "V": "eat",
+        "O1": "breakfast",
+        "M2": "always",
+        "M3": "together"
+      },
+      "slots": {
+        "S": "We",
+        "V": "eat",
+        "O1": "breakfast",
+        "M2": "always",
+        "M3": "together"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "We",
+        "5": "eat",
+        "6": "breakfast",
+        "7": "always",
+        "9": "together"
+      }
+    },
+    "match": true
+  },
+  "case_33": {
+    "sentence": "The cat quietly sat on the mat.",
+    "expected": {
+      "main_slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M2": "quietly",
+        "M3": "on the mat"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The cat quietly sat on the mat.",
+      "success": true,
+      "main_slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M2": "quietly",
+        "M3": "on the mat"
+      },
+      "slots": {
+        "S": "The cat",
+        "V": "sat",
+        "M2": "quietly",
+        "M3": "on the mat"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The cat",
+        "5": "sat",
+        "7": "quietly",
+        "9": "on the mat"
+      }
+    },
+    "match": true
+  },
+  "case_34": {
+    "sentence": "Students often study here.",
+    "expected": {
+      "main_slots": {
+        "S": "Students",
+        "V": "study",
+        "M2": "often",
+        "M3": "here"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Students often study here.",
+      "success": true,
+      "main_slots": {
+        "S": "Students",
+        "V": "study",
+        "M2": "often",
+        "M3": "here"
+      },
+      "slots": {
+        "S": "Students",
+        "V": "study",
+        "M2": "often",
+        "M3": "here"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "Students",
+        "5": "study",
+        "7": "often",
+        "9": "here"
+      }
+    },
+    "match": true
+  },
+  "case_35": {
+    "sentence": "She carefully reads books.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "reads",
+        "O1": "books",
+        "M2": "carefully"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She carefully reads books.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "reads",
+        "O1": "books",
+        "M2": "carefully"
+      },
+      "slots": {
+        "S": "She",
+        "V": "reads",
+        "O1": "books",
+        "M2": "carefully"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "reads",
+        "6": "books",
+        "7": "carefully"
+      }
+    },
+    "match": true
+  },
+  "case_36": {
+    "sentence": "Yesterday he became tired.",
+    "expected": {
+      "main_slots": {
+        "S": "he",
+        "V": "became",
+        "C1": "tired",
+        "M2": "Yesterday"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Yesterday he became tired.",
+      "success": true,
+      "main_slots": {
+        "S": "he",
+        "V": "became",
+        "C1": "tired",
+        "M2": "Yesterday"
+      },
+      "slots": {
+        "S": "he",
+        "V": "became",
+        "C1": "tired",
+        "M2": "Yesterday"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "he",
+        "5": "became",
+        "8": "tired",
+        "7": "Yesterday"
+      }
+    },
+    "match": true
+  },
+  "case_37": {
+    "sentence": "They run fast.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "V": "run",
+        "M2": "fast"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "They run fast.",
+      "success": true,
+      "main_slots": {
+        "S": "They",
+        "V": "run",
+        "M2": "fast"
+      },
+      "slots": {
+        "S": "They",
+        "V": "run",
+        "M2": "fast"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "They",
+        "5": "run",
+        "7": "fast"
+      }
+    },
+    "match": true
+  },
+  "case_38": {
+    "sentence": "I gave him the book yesterday.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "the book",
+        "M2": "yesterday"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "I gave him the book yesterday.",
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "the book",
+        "M2": "yesterday"
+      },
+      "slots": {
+        "S": "I",
+        "V": "gave",
+        "O1": "him",
+        "O2": "the book",
+        "M2": "yesterday"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1
+    },
+    "match": true
+  },
+  "case_39": {
+    "sentence": "Actually, she works very hard.",
+    "expected": {
+      "main_slots": {
+        "S": "she",
+        "V": "works",
+        "M1": "Actually",
+        "M2": "very hard"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Actually, she works very hard.",
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "V": "works",
+        "M1": "Actually",
+        "M2": "very hard"
+      },
+      "slots": {
+        "S": "she",
+        "V": "works",
+        "M2": "very hard",
+        "M1": "Actually"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "she",
+        "5": "works",
+        "7": "very hard",
+        "2": "Actually"
+      }
+    },
+    "match": true
+  },
+  "case_40": {
+    "sentence": "He quickly and carefully solved the problem.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M2": "quickly",
+        "M3": "and carefully"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "He quickly and carefully solved the problem.",
+      "success": true,
+      "main_slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M2": "quickly",
+        "M3": "and carefully"
+      },
+      "slots": {
+        "S": "He",
+        "V": "solved",
+        "O1": "the problem",
+        "M2": "quickly",
+        "M3": "and carefully"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "He",
+        "5": "solved",
+        "6": "the problem",
+        "7": "quickly",
+        "9": "and carefully"
+      }
+    },
+    "match": true
+  },
+  "case_41": {
+    "sentence": "She always speaks English fluently at work.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "speaks",
+        "O1": "English",
+        "M1": "always",
+        "M2": "fluently",
+        "M3": "at work"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "She always speaks English fluently at work.",
+      "success": true,
+      "main_slots": {
+        "S": "She",
+        "V": "speaks",
+        "O1": "English",
+        "M1": "always",
+        "M2": "fluently",
+        "M3": "at work"
+      },
+      "slots": {
+        "S": "She",
+        "V": "speaks",
+        "O1": "English",
+        "M1": "always",
+        "M2": "fluently",
+        "M3": "at work"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "She",
+        "5": "speaks",
+        "6": "English",
+        "2": "always",
+        "7": "fluently",
+        "9": "at work"
+      }
+    },
+    "match": true
+  },
+  "case_42": {
+    "sentence": "Every morning, he jogs slowly in the park.",
+    "expected": {
+      "main_slots": {
+        "S": "he",
+        "V": "jogs",
+        "M1": "Every morning",
+        "M2": "slowly",
+        "M3": "in the park"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "Every morning, he jogs slowly in the park.",
+      "success": true,
+      "main_slots": {
+        "S": "he",
+        "V": "jogs",
+        "M1": "Every morning",
+        "M2": "slowly",
+        "M3": "in the park"
+      },
+      "slots": {
+        "S": "he",
+        "V": "jogs",
+        "M1": "Every morning",
+        "M2": "slowly",
+        "M3": "in the park"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "he",
+        "5": "jogs",
+        "2": "Every morning",
+        "7": "slowly",
+        "9": "in the park"
+      }
+    },
+    "match": true
+  },
+  "case_43": {
+    "sentence": "The man who runs fast is strong.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man who runs fast is strong.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "The man who",
+        "sub-v": "runs",
+        "sub-m2": "fast",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The man who",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "runs",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "fast",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "strong"
+      }
+    },
+    "match": true
+  },
+  "case_44": {
+    "sentence": "The book which lies there is mine.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "sub-m2": "there",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which lies there is mine.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "mine"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "lies",
+        "_parent_slot": "S",
+        "sub-m2": "there"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The book which",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lies",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "there",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "mine"
+      }
+    },
+    "match": true
+  },
+  "case_45": {
+    "sentence": "The person that works here is kind.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "sub-m2": "here",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The person that works here is kind.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "The person that",
+        "sub-v": "works",
+        "_parent_slot": "S",
+        "sub-m2": "here"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The person that",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "works",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "here",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "kind"
+      }
+    },
+    "match": true
+  },
+  "case_46": {
+    "sentence": "The book which I bought is expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The book which",
+        "sub-s": "I",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which I bought is expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "bought",
+        "sub-o1": "The book which",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "bought",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The book which",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "expensive"
+      }
+    },
+    "match": true
+  },
+  "case_47": {
+    "sentence": "The man whom I met is tall.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "tall"
+      },
+      "sub_slots": {
+        "sub-o1": "The man whom",
+        "sub-s": "I",
+        "sub-v": "met",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man whom I met is tall.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "tall"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "met",
+        "sub-o1": "The man whom",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "met",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The man whom",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "tall"
+      }
+    },
+    "match": true
+  },
+  "case_48": {
+    "sentence": "The car that he drives is new.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "new"
+      },
+      "sub_slots": {
+        "sub-o1": "The car that",
+        "sub-s": "he",
+        "sub-v": "drives",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car that he drives is new.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "new"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "drives",
+        "sub-o1": "The car that",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "drives",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The car that",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "new"
+      }
+    },
+    "match": true
+  },
+  "case_49": {
+    "sentence": "The car which was crashed is red.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "red"
+      },
+      "sub_slots": {
+        "sub-s": "The car which",
+        "sub-aux": "was",
+        "sub-v": "crashed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car which was crashed is red.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "red"
+      },
+      "sub_slots": {
+        "sub-s": "The car which",
+        "sub-aux": "was",
+        "sub-v": "crashed",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The car which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "crashed",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "red"
+      }
+    },
+    "match": true
+  },
+  "case_50": {
+    "sentence": "The book that was written is famous.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book that",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book that was written is famous.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book that",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The book that",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "written",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "famous"
+      }
+    },
+    "match": true
+  },
+  "case_51": {
+    "sentence": "The letter which was sent arrived.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The letter which was sent arrived.",
+      "main_slots": {
+        "S": "",
+        "V": "arrived"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "sent",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The letter which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "sent",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "arrived"
+      }
+    },
+    "match": true
+  },
+  "case_52": {
+    "sentence": "The man whose car is red lives here.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "sub-c1": "red",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man whose car is red lives here.",
+      "main_slots": {
+        "S": "",
+        "V": "lives",
+        "M2": "here"
+      },
+      "sub_slots": {
+        "sub-s": "The man whose car",
+        "sub-v": "is",
+        "_parent_slot": "S",
+        "sub-c1": "red"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The man whose car",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "red",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "lives",
+        "7": "here"
+      }
+    },
+    "match": true
+  },
+  "case_53": {
+    "sentence": "The student whose book I borrowed is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-o1": "The student whose book",
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student whose book I borrowed is smart.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "smart"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "borrowed",
+        "sub-o1": "The student whose book",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "borrowed",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The student whose book",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "is",
+        "3": "",
+        "8": "smart"
+      }
+    },
+    "match": true
+  },
+  "case_54": {
+    "sentence": "The woman whose dog barks is my neighbor.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The woman whose dog barks is my neighbor.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "my neighbor"
+      },
+      "sub_slots": {
+        "sub-s": "The woman whose dog",
+        "sub-v": "barks",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The woman whose dog",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "barks",
+          "display_order": 2
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "my neighbor"
+      }
+    },
+    "match": true
+  },
+  "case_55": {
+    "sentence": "The book which was carefully written by Shakespeare is famous.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-v": "written",
+        "sub-aux": "was",
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book which was carefully written by Shakespeare is famous.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "famous"
+      },
+      "sub_slots": {
+        "sub-s": "The book which",
+        "sub-aux": "was",
+        "sub-v": "written",
+        "_parent_slot": "S",
+        "sub-m2": "carefully",
+        "sub-m3": "by Shakespeare"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The book which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "written",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "carefully",
+          "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by Shakespeare",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "famous"
+      }
+    },
+    "match": true
+  },
+  "case_56": {
+    "sentence": "The car that was quickly repaired yesterday runs smoothly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-v": "repaired",
+        "sub-aux": "was",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car that was quickly repaired yesterday runs smoothly.",
+      "main_slots": {
+        "S": "",
+        "V": "runs",
+        "M2": "smoothly"
+      },
+      "sub_slots": {
+        "sub-s": "The car that",
+        "sub-aux": "was",
+        "sub-v": "repaired",
+        "_parent_slot": "S",
+        "sub-m2": "quickly",
+        "sub-m3": "yesterday"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The car that",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "repaired",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "quickly",
+          "display_order": 4
+        },
+        "sub-m3": {
+          "value": "yesterday",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "runs",
+        "7": "smoothly"
+      }
+    },
+    "match": true
+  },
+  "case_57": {
+    "sentence": "The letter which was slowly typed by the secretary arrived today.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "arrived",
+        "M2": "today"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-v": "typed",
+        "sub-aux": "was",
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The letter which was slowly typed by the secretary arrived today.",
+      "main_slots": {
+        "S": "",
+        "V": "arrived",
+        "M2": "today"
+      },
+      "sub_slots": {
+        "sub-s": "The letter which",
+        "sub-aux": "was",
+        "sub-v": "typed",
+        "_parent_slot": "S",
+        "sub-m2": "slowly",
+        "sub-m3": "by the secretary"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The letter which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "typed",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "slowly",
+          "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by the secretary",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "arrived",
+        "7": "today"
+      }
+    },
+    "match": true
+  },
+  "case_58": {
+    "sentence": "The student who studies diligently always succeeds academically.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "sub-m2": "diligently",
+        "sub-m3": "always",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student who studies diligently always succeeds academically.",
+      "main_slots": {
+        "S": "",
+        "V": "succeeds",
+        "M2": "academically"
+      },
+      "sub_slots": {
+        "sub-s": "The student who",
+        "sub-v": "studies",
+        "sub-m2": "diligently",
+        "sub-m3": "always",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The student who",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "studies",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "diligently",
+          "display_order": 3
+        },
+        "sub-m3": {
+          "value": "always",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "succeeds",
+        "7": "academically"
+      }
+    },
+    "match": true
+  },
+  "case_59": {
+    "sentence": "The teacher whose class runs efficiently is respected greatly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "sub-m2": "efficiently",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The teacher whose class runs efficiently is respected greatly.",
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "respected",
+        "M2": "greatly"
+      },
+      "sub_slots": {
+        "sub-s": "The teacher whose class",
+        "sub-v": "runs",
+        "_parent_slot": "S",
+        "sub-m2": "efficiently"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": true,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The teacher whose class",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "runs",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "efficiently",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "respected",
+        "4": "is",
+        "7": "greatly"
+      }
+    },
+    "match": true
+  },
+  "case_60": {
+    "sentence": "The doctor who works carefully saves lives successfully.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "saves",
+        "O1": "lives",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The doctor who",
+        "sub-v": "works",
+        "sub-m2": "carefully",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The doctor who works carefully saves lives successfully.",
+      "main_slots": {
+        "S": "",
+        "V": "saves",
+        "O1": "lives",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The doctor who",
+        "sub-v": "works",
+        "sub-m2": "carefully",
+        "_parent_slot": "S"
+      },
+      "pattern_type": "who_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The doctor who",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "works",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "carefully",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "saves",
+        "6": "lives",
+        "7": "successfully"
+      }
+    },
+    "match": true
+  },
+  "case_61": {
+    "sentence": "The house whose roof was damaged badly needs immediate repair.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "needs",
+        "O1": "immediate repair"
+      },
+      "sub_slots": {
+        "sub-s": "The house whose roof",
+        "sub-aux": "was",
+        "sub-v": "damaged",
+        "sub-m2": "badly",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The house whose roof was damaged badly needs immediate repair.",
+      "main_slots": {
+        "S": "",
+        "V": "needs",
+        "O1": "immediate repair"
+      },
+      "sub_slots": {
+        "sub-s": "The house whose roof",
+        "sub-aux": "was",
+        "sub-v": "damaged",
+        "_parent_slot": "S",
+        "sub-m2": "badly"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The house whose roof",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "damaged",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "badly",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "needs",
+        "6": "immediate repair"
+      }
+    },
+    "match": true
+  },
+  "case_62": {
+    "sentence": "The report which was thoroughly reviewed by experts was published successfully.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "published",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The report which",
+        "sub-aux": "was",
+        "sub-v": "reviewed",
+        "sub-m2": "thoroughly",
+        "sub-m3": "by experts",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The report which was thoroughly reviewed by experts was published successfully.",
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "published",
+        "M2": "successfully"
+      },
+      "sub_slots": {
+        "sub-s": "The report which",
+        "sub-aux": "was",
+        "sub-v": "reviewed",
+        "_parent_slot": "S",
+        "sub-m2": "thoroughly",
+        "sub-m3": "by experts"
+      },
+      "pattern_type": "which_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": true,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The report which",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "reviewed",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "thoroughly",
+          "display_order": 4
+        },
+        "sub-m3": {
+          "value": "by experts",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "published",
+        "4": "was",
+        "7": "successfully"
+      }
+    },
+    "match": true
+  },
+  "case_63": {
+    "sentence": "The student whose essay was carefully corrected improved dramatically.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "improved",
+        "M2": "dramatically"
+      },
+      "sub_slots": {
+        "sub-s": "The student whose essay",
+        "sub-aux": "was",
+        "sub-v": "corrected",
+        "sub-m2": "carefully",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The student whose essay was carefully corrected improved dramatically.",
+      "main_slots": {
+        "S": "",
+        "V": "improved",
+        "M2": "dramatically"
+      },
+      "sub_slots": {
+        "sub-s": "The student whose essay",
+        "sub-aux": "was",
+        "sub-v": "corrected",
+        "_parent_slot": "S",
+        "sub-m2": "carefully"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The student whose essay",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "corrected",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "carefully",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "improved",
+        "7": "dramatically"
+      }
+    },
+    "match": true
+  },
+  "case_64": {
+    "sentence": "The machine that was properly maintained works efficiently every day.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "sub-m2": "properly",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The machine that was properly maintained works efficiently every day.",
+      "main_slots": {
+        "S": "",
+        "V": "works",
+        "M2": "efficiently",
+        "M3": "every day"
+      },
+      "sub_slots": {
+        "sub-s": "The machine that",
+        "sub-aux": "was",
+        "sub-v": "maintained",
+        "_parent_slot": "S",
+        "sub-m2": "properly"
+      },
+      "pattern_type": "that_subject",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The machine that",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "maintained",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "properly",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "works",
+        "7": "efficiently",
+        "9": "every day"
+      }
+    },
+    "match": true
+  },
+  "case_65": {
+    "sentence": "The artist whose paintings were exhibited internationally became famous rapidly.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "famous",
+        "M2": "rapidly"
+      },
+      "sub_slots": {
+        "sub-s": "The artist whose paintings",
+        "sub-aux": "were",
+        "sub-v": "exhibited",
+        "sub-m2": "internationally",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The artist whose paintings were exhibited internationally became famous rapidly.",
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "famous",
+        "M2": "rapidly"
+      },
+      "sub_slots": {
+        "sub-s": "The artist whose paintings",
+        "sub-aux": "were",
+        "sub-v": "exhibited",
+        "_parent_slot": "S",
+        "sub-m2": "internationally"
+      },
+      "pattern_type": "whose_possessive",
+      "grammar_analysis": {
+        "relative_clause": true,
+        "passive_voice": false,
+        "detected_patterns": [
+          "relative_clause",
+          "basic_five_pattern"
+        ]
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "The artist whose paintings",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "exhibited",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "internationally",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "became",
+        "8": "famous",
+        "7": "rapidly"
+      }
+    },
+    "match": true
+  },
+  "case_66": {
+    "sentence": "The letter was written by John.",
+    "expected": {
+      "main_slots": {
+        "S": "The letter",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by John"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The letter was written by John.",
+      "success": true,
+      "main_slots": {
+        "S": "The letter",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by John"
+      },
+      "slots": {
+        "S": "The letter",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by John"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The letter",
+        "4": "was",
+        "5": "written",
+        "7": "by John"
+      }
+    },
+    "match": true
+  },
+  "case_67": {
+    "sentence": "The house was built in 1990.",
+    "expected": {
+      "main_slots": {
+        "S": "The house",
+        "Aux": "was",
+        "V": "built",
+        "M2": "in 1990"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The house was built in 1990.",
+      "success": true,
+      "main_slots": {
+        "S": "The house",
+        "Aux": "was",
+        "V": "built",
+        "M2": "in 1990"
+      },
+      "slots": {
+        "S": "The house",
+        "Aux": "was",
+        "V": "built",
+        "M2": "in 1990"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The house",
+        "4": "was",
+        "5": "built",
+        "7": "in 1990"
+      }
+    },
+    "match": true
+  },
+  "case_68": {
+    "sentence": "The book was written by a famous author.",
+    "expected": {
+      "main_slots": {
+        "S": "The book",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by a famous author"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The book was written by a famous author.",
+      "success": true,
+      "main_slots": {
+        "S": "The book",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by a famous author"
+      },
+      "slots": {
+        "S": "The book",
+        "Aux": "was",
+        "V": "written",
+        "M2": "by a famous author"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The book",
+        "4": "was",
+        "5": "written",
+        "7": "by a famous author"
+      }
+    },
+    "match": true
+  },
+  "case_69": {
+    "sentence": "The message was sent yesterday.",
+    "expected": {
+      "main_slots": {
+        "S": "The message",
+        "Aux": "was",
+        "V": "sent",
+        "M2": "yesterday"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "original_text": "The message was sent yesterday.",
+      "success": true,
+      "main_slots": {
+        "S": "The message",
+        "Aux": "was",
+        "V": "sent",
+        "M2": "yesterday"
+      },
+      "slots": {
+        "S": "The message",
+        "Aux": "was",
+        "V": "sent",
+        "M2": "yesterday"
+      },
+      "grammar_pattern": "basic_five_pattern + passive_voice",
+      "phase": 1,
+      "ordered_slots": {
+        "3": "The message",
+        "4": "was",
+        "5": "sent",
+        "7": "yesterday"
+      }
+    },
+    "match": true
+  },
+  "case_70": {
+    "sentence": "He has finished his homework.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "Aux": "has",
+        "V": "finished",
+        "O1": "his homework"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "He has finished his homework.",
+      "main_slots": {
+        "S": "He",
+        "Aux": "has",
+        "V": "finished",
+        "O1": "his homework"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "has",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "has",
+        "3": "He",
+        "5": "finished",
+        "6": "his homework"
+      }
+    },
+    "match": true
+  },
+  "case_71": {
+    "sentence": "The place where we met is beautiful.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The place where we met is beautiful.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "met",
+        "sub-m2": "The place where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "met",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The place where",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "beautiful"
+      }
+    },
+    "match": true
+  },
+  "case_72": {
+    "sentence": "The time when he arrived was late.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "late"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "he",
+        "sub-v": "arrived",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The time when he arrived was late.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "late"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "arrived",
+        "sub-m2": "The time when",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "arrived",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The time when",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "was",
+        "8": "late"
+      }
+    },
+    "match": true
+  },
+  "case_73": {
+    "sentence": "The reason why she left is unclear.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "unclear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-v": "left",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The reason why she left is unclear.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "unclear"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "left",
+        "sub-m2": "The reason why",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "why",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "left",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The reason why",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "unclear"
+      }
+    },
+    "match": true
+  },
+  "case_74": {
+    "sentence": "The way how he solved it was clever.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "clever"
+      },
+      "sub_slots": {
+        "sub-m2": "The way how",
+        "sub-s": "he",
+        "sub-v": "solved",
+        "sub-o1": "it",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The way how he solved it was clever.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "clever"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "solved",
+        "sub-o1": "it",
+        "sub-m2": "The way how",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "solved",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "it",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The way how",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "was",
+        "8": "clever"
+      }
+    },
+    "match": true
+  },
+  "case_75": {
+    "sentence": "What did he tell her at the store?",
+    "expected": {
+      "main_slots": {
+        "O2": "What",
+        "Aux": "did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "M2": "at the store"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "What did he tell her at the store?",
+      "main_slots": {
+        "S": "he",
+        "Aux": "did",
+        "V": "tell",
+        "O1": "her",
+        "O2": "What",
+        "M2": "at the store"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "1": "What",
+        "3": "did",
+        "4": "he",
+        "5": "tell",
+        "6": "her",
+        "8": "at the store"
+      }
+    },
+    "match": true
+  },
+  "case_76": {
+    "sentence": "Did he tell her a secret there?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Did",
+        "S": "he",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Did he tell her a secret there?",
+      "main_slots": {
+        "S": "he",
+        "Aux": "Did",
+        "V": "tell",
+        "O1": "her",
+        "O2": "a secret",
+        "M2": "there"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "3": "Did",
+        "4": "he",
+        "5": "tell",
+        "6": "her",
+        "7": "a secret",
+        "8": "there"
+      }
+    },
+    "match": true
+  },
+  "case_77": {
+    "sentence": "Did I tell him a truth in the kitchen?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Did",
+        "S": "I",
+        "V": "tell",
+        "O1": "him",
+        "O2": "a truth",
+        "M2": "in the kitchen"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Did I tell him a truth in the kitchen?",
+      "main_slots": {
+        "S": "I",
+        "Aux": "Did",
+        "V": "tell",
+        "O1": "him",
+        "O2": "a truth",
+        "M2": "in the kitchen"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "3": "Did",
+        "4": "I",
+        "5": "tell",
+        "6": "him",
+        "7": "a truth",
+        "8": "in the kitchen"
+      }
+    },
+    "match": true
+  },
+  "case_78": {
+    "sentence": "Where did you tell me a story?",
+    "expected": {
+      "main_slots": {
+        "M2": "Where",
+        "Aux": "did",
+        "S": "you",
+        "V": "tell",
+        "O1": "me",
+        "O2": "a story"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Where did you tell me a story?",
+      "main_slots": {
+        "S": "you",
+        "Aux": "did",
+        "V": "tell",
+        "O1": "me",
+        "O2": "a story",
+        "M2": "Where"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "wh_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "2": "Where",
+        "3": "did",
+        "4": "you",
+        "5": "tell",
+        "6": "me",
+        "7": "a story"
+      }
+    },
+    "match": true
+  },
+  "case_79": {
+    "sentence": "I can swim.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "can",
+        "V": "swim"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I can swim.",
+      "main_slots": {
+        "S": "I",
+        "Aux": "can",
+        "V": "swim"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "can",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "can",
+        "3": "I",
+        "5": "swim"
+      }
+    },
+    "match": true
+  },
+  "case_80": {
+    "sentence": "She could speak English fluently.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "could",
+        "V": "speak",
+        "O1": "English",
+        "M2": "fluently"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She could speak English fluently.",
+      "main_slots": {
+        "S": "She",
+        "Aux": "could",
+        "V": "speak",
+        "O1": "English",
+        "M2": "fluently"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "could",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "could",
+        "3": "She",
+        "5": "speak",
+        "6": "English",
+        "7": "fluently"
+      }
+    },
+    "match": true
+  },
+  "case_81": {
+    "sentence": "You will succeed in your career.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "will",
+        "V": "succeed",
+        "M2": "in your career"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You will succeed in your career.",
+      "main_slots": {
+        "S": "You",
+        "Aux": "will",
+        "V": "succeed",
+        "M2": "in your career"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "will",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "will",
+        "3": "You",
+        "5": "succeed",
+        "7": "in your career"
+      }
+    },
+    "match": true
+  },
+  "case_82": {
+    "sentence": "We would visit Paris every summer.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "Aux": "would",
+        "V": "visit",
+        "O1": "Paris",
+        "M2": "every summer"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "We would visit Paris every summer.",
+      "main_slots": {
+        "S": "We",
+        "Aux": "would",
+        "V": "visit",
+        "O1": "Paris",
+        "M2": "every summer"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "would",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "would",
+        "3": "We",
+        "5": "visit",
+        "6": "Paris",
+        "7": "every summer"
+      }
+    },
+    "match": true
+  },
+  "case_83": {
+    "sentence": "They should study harder.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "should",
+        "V": "study",
+        "M2": "harder"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They should study harder.",
+      "main_slots": {
+        "S": "They",
+        "Aux": "should",
+        "V": "study",
+        "M2": "harder"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "should",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "should",
+        "3": "They",
+        "5": "study",
+        "7": "harder"
+      }
+    },
+    "match": true
+  },
+  "case_84": {
+    "sentence": "You may leave now.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "may",
+        "V": "leave",
+        "M2": "now"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You may leave now.",
+      "main_slots": {
+        "S": "You",
+        "Aux": "may",
+        "V": "leave",
+        "M2": "now"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "may",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "may",
+        "3": "You",
+        "5": "leave",
+        "7": "now"
+      }
+    },
+    "match": true
+  },
+  "case_85": {
+    "sentence": "It might rain tomorrow.",
+    "expected": {
+      "main_slots": {
+        "S": "It",
+        "Aux": "might",
+        "V": "rain",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "It might rain tomorrow.",
+      "main_slots": {
+        "S": "It",
+        "Aux": "might",
+        "V": "rain",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "might",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "might",
+        "3": "It",
+        "5": "rain",
+        "7": "tomorrow"
+      }
+    },
+    "match": true
+  },
+  "case_86": {
+    "sentence": "You must finish your homework.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "must",
+        "V": "finish",
+        "O1": "your homework"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You must finish your homework.",
+      "main_slots": {
+        "S": "You",
+        "Aux": "must",
+        "V": "finish",
+        "O1": "your homework"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "must",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "must",
+        "3": "You",
+        "5": "finish",
+        "6": "your homework"
+      }
+    },
+    "match": true
+  },
+  "case_87": {
+    "sentence": "I have completed the project.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "have",
+        "V": "completed",
+        "O1": "the project"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I have completed the project.",
+      "main_slots": {
+        "S": "I",
+        "Aux": "have",
+        "V": "completed",
+        "O1": "the project"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "have",
+        "3": "I",
+        "5": "completed",
+        "6": "the project"
+      }
+    },
+    "match": true
+  },
+  "case_88": {
+    "sentence": "She has lived here for ten years.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "has",
+        "V": "lived",
+        "M2": "here",
+        "M3": "for ten years"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She has lived here for ten years.",
+      "main_slots": {
+        "S": "She",
+        "Aux": "has",
+        "V": "lived",
+        "M2": "here",
+        "M3": "for ten years"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "has",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "has",
+        "3": "She",
+        "5": "lived",
+        "7": "here",
+        "9": "for ten years"
+      }
+    },
+    "match": true
+  },
+  "case_89": {
+    "sentence": "They had already left the building.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "had",
+        "M2": "already",
+        "V": "left",
+        "O1": "the building"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They had already left the building.",
+      "main_slots": {
+        "S": "They",
+        "Aux": "had",
+        "V": "left",
+        "O1": "the building",
+        "M2": "already"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "had",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "had",
+        "3": "They",
+        "5": "left",
+        "6": "the building",
+        "7": "already"
+      }
+    },
+    "match": true
+  },
+  "case_90": {
+    "sentence": "Do you understand the question?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Do",
+        "S": "you",
+        "V": "understand",
+        "O1": "the question"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Do you understand the question?",
+      "main_slots": {
+        "S": "you",
+        "Aux": "Do",
+        "V": "understand",
+        "O1": "the question"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "4": "Do",
+        "3": "you",
+        "5": "understand",
+        "6": "the question"
+      }
+    },
+    "match": true
+  },
+  "case_91": {
+    "sentence": "Does she work at the hospital?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Does",
+        "S": "she",
+        "V": "work",
+        "M2": "at the hospital"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Does she work at the hospital?",
+      "main_slots": {
+        "S": "she",
+        "Aux": "Does",
+        "V": "work",
+        "M2": "at the hospital"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "4": "Does",
+        "3": "she",
+        "5": "work",
+        "7": "at the hospital"
+      }
+    },
+    "match": true
+  },
+  "case_92": {
+    "sentence": "Don't touch that button!",
+    "expected": {
+      "main_slots": {
+        "Aux": "Don't",
+        "V": "touch",
+        "O1": "that button"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Don't touch that button!",
+      "main_slots": {
+        "Aux": "Don't",
+        "V": "touch",
+        "O1": "that button"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "do_auxiliary",
+          "auxiliary": "Don't",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": true,
+          "structure_type": "auxiliary"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "Don't",
+        "5": "touch",
+        "6": "that button"
+      }
+    },
+    "match": true
+  },
+  "case_93": {
+    "sentence": "Can you help me with this problem?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Can",
+        "S": "you",
+        "V": "help",
+        "O1": "me",
+        "M2": "with this problem"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Can you help me with this problem?",
+      "main_slots": {
+        "S": "you",
+        "Aux": "Can",
+        "V": "help",
+        "O1": "me",
+        "M2": "with this problem"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "4": "Can",
+        "3": "you",
+        "5": "help",
+        "6": "me",
+        "7": "with this problem"
+      }
+    },
+    "match": true
+  },
+  "case_94": {
+    "sentence": "Would you like some coffee?",
+    "expected": {
+      "main_slots": {
+        "Aux": "Would",
+        "S": "you",
+        "V": "like",
+        "O1": "some coffee"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "Would you like some coffee?",
+      "main_slots": {
+        "S": "you",
+        "Aux": "Would",
+        "V": "like",
+        "O1": "some coffee"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "question",
+        "collaboration": [
+          "adverb",
+          "basic_five_pattern"
+        ],
+        "question_type": "yes_no_question",
+        "sentence_pattern": null,
+        "confidence": 0.75
+      },
+      "ordered_slots": {
+        "4": "Would",
+        "3": "you",
+        "5": "like",
+        "6": "some coffee"
+      }
+    },
+    "match": true
+  },
+  "case_95": {
+    "sentence": "I shall return tomorrow.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "shall",
+        "V": "return",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I shall return tomorrow.",
+      "main_slots": {
+        "S": "I",
+        "Aux": "shall",
+        "V": "return",
+        "M2": "tomorrow"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "modal_verb",
+          "auxiliary": "shall",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "shall",
+        "3": "I",
+        "5": "return",
+        "7": "tomorrow"
+      }
+    },
+    "match": true
+  },
+  "case_96": {
+    "sentence": "We ought to start immediately.",
+    "expected": {
+      "main_slots": {
+        "S": "We",
+        "Aux": "ought to",
+        "V": "start",
+        "M2": "immediately"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "We ought to start immediately.",
+      "main_slots": {
+        "S": "We",
+        "Aux": "ought to",
+        "V": "start",
+        "M2": "immediately"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "ought to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "ought to",
+        "3": "We",
+        "5": "start",
+        "7": "immediately"
+      }
+    },
+    "match": true
+  },
+  "case_97": {
+    "sentence": "They used to play here every day.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "used to",
+        "V": "play",
+        "M2": "here",
+        "M3": "every day"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They used to play here every day.",
+      "main_slots": {
+        "S": "They",
+        "Aux": "used to",
+        "V": "play",
+        "M2": "here",
+        "M3": "every day"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "used to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "used to",
+        "3": "They",
+        "5": "play",
+        "7": "here",
+        "9": "every day"
+      }
+    },
+    "match": true
+  },
+  "case_98": {
+    "sentence": "He is going to study abroad.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "Aux": "is going to",
+        "V": "study",
+        "M2": "abroad"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "He is going to study abroad.",
+      "main_slots": {
+        "S": "He",
+        "Aux": "is going to",
+        "V": "study",
+        "M2": "abroad"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "is going to",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "is going to",
+        "3": "He",
+        "5": "study",
+        "7": "abroad"
+      }
+    },
+    "match": true
+  },
+  "case_99": {
+    "sentence": "I have been waiting for an hour.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "have been",
+        "V": "waiting",
+        "M2": "for an hour"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "I have been waiting for an hour.",
+      "main_slots": {
+        "S": "I",
+        "Aux": "have been",
+        "V": "waiting",
+        "M2": "for an hour"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "have been",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "have been",
+        "3": "I",
+        "5": "waiting",
+        "7": "for an hour"
+      }
+    },
+    "match": true
+  },
+  "case_100": {
+    "sentence": "You should have called me earlier.",
+    "expected": {
+      "main_slots": {
+        "S": "You",
+        "Aux": "should have",
+        "V": "called",
+        "O1": "me",
+        "M2": "earlier"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "You should have called me earlier.",
+      "main_slots": {
+        "S": "You",
+        "Aux": "should have",
+        "V": "called",
+        "O1": "me",
+        "M2": "earlier"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "should have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "should have",
+        "3": "You",
+        "5": "called",
+        "6": "me",
+        "7": "earlier"
+      }
+    },
+    "match": true
+  },
+  "case_101": {
+    "sentence": "They will be arriving at noon.",
+    "expected": {
+      "main_slots": {
+        "S": "They",
+        "Aux": "will be",
+        "V": "arriving",
+        "M2": "at noon"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "They will be arriving at noon.",
+      "main_slots": {
+        "S": "They",
+        "Aux": "will be",
+        "V": "arriving",
+        "M2": "at noon"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "will be",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "will be",
+        "3": "They",
+        "5": "arriving",
+        "7": "at noon"
+      }
+    },
+    "match": true
+  },
+  "case_102": {
+    "sentence": "She might have forgotten the appointment.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "might have",
+        "V": "forgotten",
+        "O1": "the appointment"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "text": "She might have forgotten the appointment.",
+      "main_slots": {
+        "S": "She",
+        "Aux": "might have",
+        "V": "forgotten",
+        "O1": "the appointment"
+      },
+      "sub_slots": {},
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb"
+        ],
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "complex",
+          "auxiliary": "might have",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "complex_modal"
+        },
+        "confidence": 0.9
+      },
+      "ordered_slots": {
+        "4": "might have",
+        "3": "She",
+        "5": "forgotten",
+        "6": "the appointment"
+      }
+    },
+    "match": true
+  },
+  "case_103": {
+    "sentence": "The house where they lived was demolished.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "demolished"
+      },
+      "sub_slots": {
+        "sub-m2": "The house where",
+        "sub-s": "they",
+        "sub-v": "lived",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The house where they lived was demolished.",
+      "main_slots": {
+        "S": "",
+        "Aux": "was",
+        "V": "demolished"
+      },
+      "sub_slots": {
+        "sub-s": "they",
+        "sub-v": "lived",
+        "sub-m2": "The house where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lived",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The house where",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "4": "was",
+        "5": "demolished"
+      }
+    },
+    "match": true
+  },
+  "case_104": {
+    "sentence": "The day when we graduated was memorable.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "memorable"
+      },
+      "sub_slots": {
+        "sub-m2": "The day when",
+        "sub-s": "we",
+        "sub-v": "graduated",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The day when we graduated was memorable.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "memorable"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "graduated",
+        "sub-m2": "The day when",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "graduated",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The day when",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "was",
+        "8": "memorable"
+      }
+    },
+    "match": true
+  },
+  "case_105": {
+    "sentence": "The reason why he quit is personal.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "personal"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "he",
+        "sub-v": "quit",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The reason why he quit is personal.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "personal"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "quit",
+        "sub-m2": "The reason why",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "why",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "quit",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "The reason why",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "personal"
+      }
+    },
+    "match": true
+  },
+  "case_106": {
+    "sentence": "The way how she explained it helped everyone.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "helped",
+        "O1": "everyone"
+      },
+      "sub_slots": {
+        "sub-m2": "The way how",
+        "sub-s": "she",
+        "sub-v": "explained",
+        "sub-o1": "it",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The way how she explained it helped everyone.",
+      "main_slots": {
+        "S": "",
+        "V": "helped",
+        "O1": "everyone"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "explained",
+        "sub-o1": "it",
+        "sub-m2": "The way how",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "explained",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "it",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The way how",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "helped",
+        "6": "everyone"
+      }
+    },
+    "match": true
+  },
+  "case_107": {
+    "sentence": "The place where we first met holds special memories.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "holds",
+        "O1": "special memories"
+      },
+      "sub_slots": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met",
+        "sub-m3": "first",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The place where we first met holds special memories.",
+      "main_slots": {
+        "S": "",
+        "V": "holds",
+        "O1": "special memories"
+      },
+      "sub_slots": {
+        "sub-m2": "The place where",
+        "sub-s": "we",
+        "sub-v": "met",
+        "_parent_slot": "S",
+        "sub-m3": "first"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The place where",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "we",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "met",
+          "display_order": 3
+        },
+        "sub-m3": {
+          "value": "first",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "holds",
+        "6": "special memories"
+      }
+    },
+    "match": true
+  },
+  "case_108": {
+    "sentence": "The time when everything will change is approaching.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "approaching"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-aux": "will",
+        "sub-v": "change",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The time when everything will change is approaching.",
+      "main_slots": {
+        "S": "",
+        "Aux": "is",
+        "V": "approaching"
+      },
+      "sub_slots": {
+        "sub-m2": "The time when",
+        "sub-s": "everything",
+        "sub-v": "change",
+        "_parent_slot": "S",
+        "sub-aux": "will"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The time when",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "everything",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "change",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "will",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "approaching",
+        "4": "is"
+      }
+    },
+    "match": true
+  },
+  "case_109": {
+    "sentence": "The moment when he told her the truth changed everything.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "changed",
+        "O1": "everything"
+      },
+      "sub_slots": {
+        "sub-m2": "The moment when",
+        "sub-s": "he",
+        "sub-v": "told",
+        "sub-o1": "her",
+        "sub-o2": "the truth",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The moment when he told her the truth changed everything.",
+      "main_slots": {
+        "S": "",
+        "V": "changed",
+        "O1": "everything"
+      },
+      "sub_slots": {
+        "sub-m2": "The moment when",
+        "sub-s": "he",
+        "sub-v": "told",
+        "_parent_slot": "S",
+        "sub-o1": "her",
+        "sub-o2": "the truth"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "when",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The moment when",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "he",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "told",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "her",
+          "display_order": 4
+        },
+        "sub-o2": {
+          "value": "the truth",
+          "display_order": 5
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "changed",
+        "6": "everything"
+      }
+    },
+    "match": true
+  },
+  "case_110": {
+    "sentence": "The reason why she was upset became clear.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "clear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-aux": "was",
+        "sub-v": "upset",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The reason why she was upset became clear.",
+      "main_slots": {
+        "S": "",
+        "V": "became",
+        "C1": "clear"
+      },
+      "sub_slots": {
+        "sub-m2": "The reason why",
+        "sub-s": "she",
+        "sub-aux": "was",
+        "sub-v": "upset",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "why",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-m2": {
+          "value": "The reason why",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "she",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "was",
+          "display_order": 3
+        },
+        "sub-v": {
+          "value": "upset",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "became",
+        "8": "clear"
+      }
+    },
+    "match": true
+  },
+  "case_111": {
+    "sentence": "The city where we spent our honeymoon is in Italy.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "M2": "in Italy"
+      },
+      "sub_slots": {
+        "sub-m2": "The city where",
+        "sub-s": "we",
+        "sub-v": "spent",
+        "sub-o1": "our honeymoon",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The city where we spent our honeymoon is in Italy.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "M2": "in Italy"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "spent",
+        "sub-o1": "our honeymoon",
+        "sub-m2": "The city where",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "where",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "spent",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "our honeymoon",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The city where",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "7": "in Italy"
+      }
+    },
+    "match": true
+  },
+  "case_112": {
+    "sentence": "The method how they solved the problem was innovative.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "innovative"
+      },
+      "sub_slots": {
+        "sub-m2": "The method how",
+        "sub-s": "they",
+        "sub-v": "solved",
+        "sub-o1": "the problem",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The method how they solved the problem was innovative.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "innovative"
+      },
+      "sub_slots": {
+        "sub-s": "they",
+        "sub-v": "solved",
+        "sub-o1": "the problem",
+        "sub-m2": "The method how",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "relative_adverb",
+        "relative_adverb": "how",
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "solved",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "the problem",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "The method how",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "was",
+        "8": "innovative"
+      }
+    },
+    "match": true
+  },
+  "case_113": {
+    "sentence": "I believe that he is smart.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "believe",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "that he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I believe that he is smart.",
+      "main_slots": {
+        "S": "I",
+        "V": "believe",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "that he",
+        "sub-v": "is",
+        "sub-c1": "smart",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "that he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "smart",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "believe",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_114": {
+    "sentence": "I know what you mean.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "know",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-o1": "what",
+        "sub-s": "you",
+        "sub-v": "mean",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I know what you mean.",
+      "main_slots": {
+        "S": "I",
+        "V": "know",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "you",
+        "sub-v": "mean",
+        "sub-o1": "what",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "mean",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "what",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "know",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_115": {
+    "sentence": "She doesn't know whether he will come.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "Aux": "doesn't",
+        "V": "know",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "whether he",
+        "sub-aux": "will",
+        "sub-v": "come",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "She doesn't know whether he will come.",
+      "main_slots": {
+        "S": "She",
+        "Aux": "doesn't",
+        "V": "know",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "whether he",
+        "sub-aux": "will",
+        "sub-v": "come",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb",
+          "noun_clause"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "do_auxiliary",
+          "auxiliary": "doesn't",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": true,
+          "structure_type": "auxiliary"
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "whether he",
+          "display_order": 1
+        },
+        "sub-aux": {
+          "value": "will",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "come",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "She",
+        "4": "doesn't",
+        "5": "know",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_116": {
+    "sentence": "I wonder where she lives.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wonder",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-m2": "where",
+        "sub-s": "she",
+        "sub-v": "lives",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wonder where she lives.",
+      "main_slots": {
+        "S": "I",
+        "V": "wonder",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "lives",
+        "sub-m2": "where",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "lives",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "where",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wonder",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_117": {
+    "sentence": "That you are here is wonderful.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "wonderful"
+      },
+      "sub_slots": {
+        "sub-s": "That you",
+        "sub-v": "are",
+        "sub-m2": "here",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "That you are here is wonderful.",
+      "main_slots": {
+        "S": "",
+        "V": "is",
+        "C1": "wonderful"
+      },
+      "sub_slots": {
+        "sub-s": "That you",
+        "sub-v": "are",
+        "sub-m2": "here",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "That you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "are",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "here",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "3": "",
+        "5": "is",
+        "8": "wonderful"
+      }
+    },
+    "match": true
+  },
+  "case_118": {
+    "sentence": "Tell me who came to the party.",
+    "expected": {
+      "main_slots": {
+        "V": "Tell",
+        "O1": "me",
+        "O2": ""
+      },
+      "sub_slots": {
+        "sub-s": "who",
+        "sub-v": "came",
+        "sub-m2": "to the party",
+        "_parent_slot": "O2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "Tell me who came to the party.",
+      "main_slots": {
+        "V": "Tell",
+        "O1": "me",
+        "O2": ""
+      },
+      "sub_slots": {
+        "sub-v": "came",
+        "sub-s": "who",
+        "_parent_slot": "O1",
+        "sub-m2": "to the party"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "came",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "who",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "to the party",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "5": "Tell",
+        "6": "me",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_119": {
+    "sentence": "It depends on if you agree.",
+    "expected": {
+      "main_slots": {
+        "S": "It",
+        "V": "depends",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "on if you",
+        "sub-v": "agree",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "It depends on if you agree.",
+      "main_slots": {
+        "S": "It",
+        "V": "depends",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "on if you",
+        "sub-v": "agree",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "on if you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "agree",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "It",
+        "5": "depends",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_120": {
+    "sentence": "I understand how important this is.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "understand",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-m2": "how important",
+        "sub-s": "this",
+        "sub-v": "is",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I understand how important this is.",
+      "main_slots": {
+        "S": "I",
+        "V": "understand",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "this",
+        "sub-v": "is",
+        "sub-m2": "how important",
+        "_parent_slot": "O1"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "this",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "is",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "how important",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "understand",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_121": {
+    "sentence": "The book I read was interesting.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "interesting"
+      },
+      "sub_slots": {
+        "sub-o1": "The book [that]",
+        "sub-s": "I",
+        "sub-v": "read",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The book I read was interesting.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "interesting"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "read",
+        "sub-o1": "The book [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "read",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The book [that]",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "interesting"
+      }
+    },
+    "match": true
+  },
+  "case_122": {
+    "sentence": "The man I met yesterday was kind.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-o1": "The man [whom]",
+        "sub-s": "I",
+        "sub-v": "met",
+        "sub-m2": "yesterday",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The man I met yesterday was kind.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "kind"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "met",
+        "sub-m2": "yesterday",
+        "sub-o1": "The man [whom]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "met",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "yesterday",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "The man [whom]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "kind"
+      }
+    },
+    "match": true
+  },
+  "case_123": {
+    "sentence": "The car she drives looks expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "looks",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "The car [that]",
+        "sub-s": "she",
+        "sub-v": "drives",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The car she drives looks expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "looks",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "drives",
+        "sub-o1": "The car [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "drives",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The car [that]",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "looks",
+        "3": "",
+        "8": "expensive"
+      }
+    },
+    "match": true
+  },
+  "case_124": {
+    "sentence": "The movie we watched last night was amazing.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "amazing"
+      },
+      "sub_slots": {
+        "sub-o1": "The movie [that]",
+        "sub-s": "we",
+        "sub-v": "watched",
+        "sub-m2": "last night",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The movie we watched last night was amazing.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "amazing"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "watched",
+        "sub-m2": "last night",
+        "sub-o1": "The movie [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "watched",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "last night",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "The movie [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "amazing"
+      }
+    },
+    "match": true
+  },
+  "case_125": {
+    "sentence": "The place they visited seems beautiful.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "seems",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-o1": "The place [that]",
+        "sub-s": "they",
+        "sub-v": "visited",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The place they visited seems beautiful.",
+      "main_slots": {
+        "S": "",
+        "V": "seems",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-s": "they",
+        "sub-v": "visited",
+        "sub-o1": "The place [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "visited",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "The place [that]",
+          "display_order": 3
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "seems",
+        "3": "",
+        "8": "beautiful"
+      }
+    },
+    "match": true
+  },
+  "case_126": {
+    "sentence": "The gift he bought her was expensive.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-o1": "her",
+        "sub-o2": "The gift [that]",
+        "sub-s": "he",
+        "sub-v": "bought",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The gift he bought her was expensive.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "expensive"
+      },
+      "sub_slots": {
+        "sub-s": "he",
+        "sub-v": "bought",
+        "sub-o1": "her",
+        "sub-o2": "The gift [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "bought",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "her",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The gift [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "expensive"
+      }
+    },
+    "match": true
+  },
+  "case_127": {
+    "sentence": "The lesson you taught me was valuable.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "valuable"
+      },
+      "sub_slots": {
+        "sub-o1": "me",
+        "sub-o2": "The lesson [that]",
+        "sub-s": "you",
+        "sub-v": "taught",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The lesson you taught me was valuable.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "valuable"
+      },
+      "sub_slots": {
+        "sub-s": "you",
+        "sub-v": "taught",
+        "sub-o1": "me",
+        "sub-o2": "The lesson [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "taught",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "me",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The lesson [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "valuable"
+      }
+    },
+    "match": true
+  },
+  "case_128": {
+    "sentence": "The house we built together stands strong.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "stands",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-o1": "The house [that]",
+        "sub-s": "we",
+        "sub-v": "built",
+        "sub-m2": "together",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The house we built together stands strong.",
+      "main_slots": {
+        "S": "",
+        "V": "stands",
+        "C1": "strong"
+      },
+      "sub_slots": {
+        "sub-s": "we",
+        "sub-v": "built",
+        "sub-m2": "together",
+        "sub-o1": "The house [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "we",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "built",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "together",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "The house [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "stands",
+        "3": "",
+        "8": "strong"
+      }
+    },
+    "match": true
+  },
+  "case_129": {
+    "sentence": "The song I heard this morning was beautiful.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-o1": "The song [that]",
+        "sub-s": "I",
+        "sub-v": "heard",
+        "sub-m2": "this morning",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The song I heard this morning was beautiful.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "beautiful"
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "heard",
+        "sub-m2": "this morning",
+        "sub-o1": "The song [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "heard",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "this morning",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "The song [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "beautiful"
+      }
+    },
+    "match": true
+  },
+  "case_130": {
+    "sentence": "The story she told us was incredible.",
+    "expected": {
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "incredible"
+      },
+      "sub_slots": {
+        "sub-o1": "us",
+        "sub-o2": "The story [that]",
+        "sub-s": "she",
+        "sub-v": "told",
+        "_parent_slot": "S"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "The story she told us was incredible.",
+      "main_slots": {
+        "S": "",
+        "V": "was",
+        "C1": "incredible"
+      },
+      "sub_slots": {
+        "sub-s": "she",
+        "sub-v": "told",
+        "sub-o1": "us",
+        "sub-o2": "The story [that]",
+        "_parent_slot": "S"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "omitted_relative_pronoun",
+        "confidence": 0.85
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "told",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "us",
+          "display_order": 3
+        },
+        "sub-o2": {
+          "value": "The story [that]",
+          "display_order": 4
+        },
+        "_parent_slot": "S"
+      },
+      "ordered_slots": {
+        "5": "was",
+        "3": "",
+        "8": "incredible"
+      }
+    },
+    "match": true
+  },
+  "case_131": {
+    "sentence": "If it rains tomorrow, I will stay home.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "I",
+        "Aux": "will",
+        "V": "stay",
+        "M2": "home"
+      },
+      "sub_slots": {
+        "sub-s": "If it",
+        "sub-v": "rains",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "will",
+        "V": "stay",
+        "M1": "",
+        "M2": "home"
+      },
+      "sub_slots": {
+        "sub-s": "If it",
+        "sub-v": "rains",
+        "sub-m2": "tomorrow",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If it rains tomorrow,",
+        "main_clause": "I will stay home.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If it",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "rains",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "tomorrow",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "stay",
+        "7": "home",
+        "2": "",
+        "4": "will"
+      }
+    },
+    "match": true
+  },
+  "case_132": {
+    "sentence": "If you study hard, you can pass the exam.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "can",
+        "V": "pass",
+        "O1": "the exam"
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "study",
+        "sub-m2": "hard",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "can",
+        "V": "pass",
+        "O1": "the exam",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "study",
+        "sub-m2": "hard",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If you study hard,",
+        "main_clause": "you can pass the exam.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "study",
+          "display_order": 2
+        },
+        "sub-m2": {
+          "value": "hard",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "pass",
+        "6": "the exam",
+        "7": "",
+        "4": "can"
+      }
+    },
+    "match": true
+  },
+  "case_133": {
+    "sentence": "If I were rich, I would travel around the world.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "travel",
+        "M1": "",
+        "M2": "around the world"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "travel",
+        "M1": "",
+        "M2": "around the world"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "were",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I were rich,",
+        "main_clause": "I would travel around the world.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "travel",
+        "7": "around the world",
+        "2": "",
+        "4": "would"
+      }
+    },
+    "match": true
+  },
+  "case_134": {
+    "sentence": "If she had time, she could help us.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "she",
+        "Aux": "could",
+        "V": "help",
+        "O1": "us"
+      },
+      "sub_slots": {
+        "sub-s": "If she",
+        "sub-v": "had",
+        "sub-o1": "time",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "Aux": "could",
+        "V": "help",
+        "O1": "us",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If she",
+        "sub-v": "had",
+        "sub-o1": "time",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If she had time,",
+        "main_clause": "she could help us.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "had",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "time",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "help",
+        "6": "us",
+        "7": "",
+        "4": "could"
+      }
+    },
+    "match": true
+  },
+  "case_135": {
+    "sentence": "If I had studied harder, I would have passed the test.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would have",
+        "V": "passed",
+        "O1": "the test"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would have",
+        "V": "passed",
+        "O1": "the test",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "studied",
+        "sub-aux": "had",
+        "sub-m2": "harder",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "if_past",
+        "if_clause": "If I had studied harder",
+        "main_clause": "I would have passed the test",
+        "confidence": 0.9
+      }
+    },
+    "match": true
+  },
+  "case_136": {
+    "sentence": "If they had arrived earlier, they could have seen the show.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "they",
+        "Aux": "could have",
+        "V": "seen",
+        "O1": "the show"
+      },
+      "sub_slots": {
+        "sub-s": "If they",
+        "sub-aux": "had",
+        "sub-v": "arrived",
+        "sub-m2": "earlier",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "they",
+        "Aux": "could have",
+        "V": "seen",
+        "O1": "the show",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If they",
+        "sub-v": "arrived",
+        "sub-aux": "had",
+        "sub-m2": "earlier",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If they had arrived earlier,",
+        "main_clause": "they could have seen the show.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If they",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "arrived",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "earlier",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "they",
+        "5": "seen",
+        "6": "the show",
+        "7": "",
+        "4": "could have"
+      }
+    },
+    "match": true
+  },
+  "case_137": {
+    "sentence": "If I had been born rich, I would be happy now.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "be",
+        "C1": "happy",
+        "M2": "now"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had been",
+        "sub-v": "born",
+        "sub-c1": "rich",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "be",
+        "C1": "happy",
+        "M1": "",
+        "M2": "now"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "born",
+        "sub-c1": "rich",
+        "sub-aux": "had been",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If I had been born rich",
+        "main_clause": "I would be happy now.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If I",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "born",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "rich",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "had been",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "be",
+        "8": "happy",
+        "7": "now",
+        "2": "",
+        "4": "would"
+      }
+    },
+    "match": true
+  },
+  "case_138": {
+    "sentence": "If you have finished your work, you may leave early.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "you",
+        "Aux": "may",
+        "V": "leave",
+        "M2": "early"
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-aux": "have",
+        "sub-v": "finished",
+        "sub-o1": "your work",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "may",
+        "V": "leave",
+        "M1": "",
+        "M2": "early"
+      },
+      "sub_slots": {
+        "sub-s": "If you",
+        "sub-v": "finished",
+        "sub-o1": "your work",
+        "sub-aux": "have",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "If you have finished your work,",
+        "main_clause": "you may leave early.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "If you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "finished",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "your work",
+          "display_order": 3
+        },
+        "sub-aux": {
+          "value": "have",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "you",
+        "5": "leave",
+        "7": "early",
+        "2": "",
+        "4": "may"
+      }
+    },
+    "match": true
+  },
+  "case_139": {
+    "sentence": "Were I you, I would accept the offer.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would",
+        "V": "accept",
+        "O1": "the offer"
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would",
+        "V": "accept",
+        "O1": "the offer",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-v": "Were",
+        "sub-s": "I",
+        "sub-c1": "you",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Were I you",
+        "main_clause": "I would accept the offer.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "Were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "you",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "accept",
+        "6": "the offer",
+        "7": "",
+        "4": "would"
+      }
+    },
+    "match": true
+  },
+  "case_140": {
+    "sentence": "Had she known the truth, she would have acted differently.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "she",
+        "Aux": "would have",
+        "V": "acted",
+        "M2": "differently"
+      },
+      "sub_slots": {
+        "sub-aux": "Had",
+        "sub-s": "she",
+        "sub-v": "known",
+        "sub-o1": "the truth",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "she",
+        "Aux": "would have",
+        "V": "acted",
+        "M1": "",
+        "M2": "differently"
+      },
+      "sub_slots": {
+        "sub-aux": "Had",
+        "sub-s": "she",
+        "sub-v": "known",
+        "sub-o1": "the truth",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Had she known the truth",
+        "main_clause": "she would have acted differently.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-aux": {
+          "value": "Had",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "she",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "known",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "the truth",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "3": "she",
+        "5": "acted",
+        "7": "differently",
+        "2": "",
+        "4": "would have"
+      }
+    },
+    "match": true
+  },
+  "case_141": {
+    "sentence": "Should you need help, please call me.",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "V": "call",
+        "O1": "me",
+        "M2": "please"
+      },
+      "sub_slots": {
+        "sub-aux": "Should",
+        "sub-s": "you",
+        "sub-v": "need",
+        "sub-o1": "help",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "V": "call",
+        "O1": "me",
+        "M1": "",
+        "M2": "please"
+      },
+      "sub_slots": {
+        "sub-aux": "Should",
+        "sub-s": "you",
+        "sub-v": "need",
+        "sub-o1": "help",
+        "_parent_slot": "M1"
+      },
+      "collaboration": [
+        "imperative",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Should you need help",
+        "main_clause": "please call me.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-aux": {
+          "value": "Should",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "you",
+          "display_order": 2
+        },
+        "sub-v": {
+          "value": "need",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "help",
+          "display_order": 4
+        },
+        "_parent_slot": "M1"
+      },
+      "ordered_slots": {
+        "5": "call",
+        "6": "me",
+        "2": "",
+        "7": "please"
+      }
+    },
+    "match": true
+  },
+  "case_142": {
+    "sentence": "I wish I were taller.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "were",
+        "sub-c1": "taller",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I were taller.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "were",
+        "sub-s": "I",
+        "sub-c1": "taller"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "were",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "taller",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_143": {
+    "sentence": "I wish I had more time.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-v": "had",
+        "sub-o1": "more time",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I had more time.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "had",
+        "sub-s": "I",
+        "sub-o1": "more time"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "noun_clause",
+        "collaboration": [
+          "adverb"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {},
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "had",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "more time",
+          "display_order": 3
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_144": {
+    "sentence": "I wish I had studied abroad.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "sub-s": "I",
+        "sub-aux": "had",
+        "sub-v": "studied",
+        "sub-m2": "abroad",
+        "_parent_slot": "O1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "I wish I had studied abroad.",
+      "main_slots": {
+        "S": "I",
+        "V": "wish",
+        "O1": ""
+      },
+      "sub_slots": {
+        "_parent_slot": "O1",
+        "sub-v": "studied",
+        "sub-s": "I",
+        "sub-aux": "had",
+        "sub-m2": "abroad"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "modal",
+        "collaboration": [
+          "adverb",
+          "noun_clause"
+        ],
+        "noun_clause_info": {},
+        "modal_info": {
+          "has_modal": true,
+          "modal_type": "perfect_auxiliary",
+          "auxiliary": "had",
+          "main_verb": null,
+          "is_question": false,
+          "is_negative": false,
+          "structure_type": "perfect"
+        },
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-v": {
+          "value": "studied",
+          "display_order": 1
+        },
+        "sub-s": {
+          "value": "I",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-m2": {
+          "value": "abroad",
+          "display_order": 4
+        },
+        "_parent_slot": "O1"
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "wish",
+        "6": ""
+      }
+    },
+    "match": true
+  },
+  "case_145": {
+    "sentence": "He talks as if he were the boss.",
+    "expected": {
+      "main_slots": {
+        "S": "He",
+        "V": "talks",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "as if he",
+        "sub-v": "were",
+        "sub-c1": "the boss",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "He talks as if he were the boss.",
+      "main_slots": {
+        "S": "He",
+        "V": "talks",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "as if he",
+        "sub-v": "were",
+        "sub-c1": "the boss",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "metaphorical",
+        "metaphorical_type": null,
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "as if he",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "were",
+          "display_order": 2
+        },
+        "sub-c1": {
+          "value": "the boss",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "He",
+        "5": "talks",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_146": {
+    "sentence": "She looked as though she had seen a ghost.",
+    "expected": {
+      "main_slots": {
+        "S": "She",
+        "V": "looked",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "as though she",
+        "sub-aux": "had",
+        "sub-v": "seen",
+        "sub-o1": "a ghost",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "text": "She looked as though she had seen a ghost.",
+      "main_slots": {
+        "S": "She",
+        "V": "looked",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "as though she",
+        "sub-v": "seen",
+        "sub-aux": "had",
+        "sub-o1": "a ghost",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "controller": "central",
+        "primary_handler": "metaphorical",
+        "metaphorical_type": null,
+        "confidence": 0.9
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "as though she",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "seen",
+          "display_order": 2
+        },
+        "sub-aux": {
+          "value": "had",
+          "display_order": 3
+        },
+        "sub-o1": {
+          "value": "a ghost",
+          "display_order": 4
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "3": "She",
+        "5": "looked",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_147": {
+    "sentence": "Without your help, I would have failed.",
+    "expected": {
+      "main_slots": {
+        "S": "I",
+        "Aux": "would have",
+        "V": "failed",
+        "M2": "Without your help"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would have",
+        "V": "failed",
+        "M2": "Without your help"
+      },
+      "sub_slots": {},
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Without your help",
+        "main_clause": "I would have failed.",
+        "confidence": 0.95
+      },
+      "ordered_slots": {
+        "3": "I",
+        "5": "failed",
+        "7": "Without your help",
+        "4": "would have"
+      }
+    },
+    "match": true
+  },
+  "case_148": {
+    "sentence": "But for the rain, we could have had a picnic.",
+    "expected": {
+      "main_slots": {
+        "S": "we",
+        "Aux": "could have",
+        "V": "had",
+        "O1": "a picnic",
+        "M2": "But for the rain"
+      },
+      "sub_slots": {}
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "we",
+        "Aux": "could have",
+        "V": "had",
+        "O1": "a picnic",
+        "M2": "But for the rain"
+      },
+      "sub_slots": {},
+      "collaboration": [
+        "adverb",
+        "basic_five_pattern",
+        "conditional"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "But for the rain",
+        "main_clause": "we could have had a picnic.",
+        "confidence": 0.95
+      },
+      "ordered_slots": {
+        "3": "we",
+        "5": "had",
+        "6": "a picnic",
+        "7": "But for the rain",
+        "4": "could have"
+      }
+    },
+    "match": true
+  },
+  "case_149": {
+    "sentence": "Unless you hurry, you will miss the train.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "will",
+        "V": "miss",
+        "O1": "the train"
+      },
+      "sub_slots": {
+        "sub-s": "Unless you",
+        "sub-v": "hurry",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "will",
+        "V": "miss",
+        "O1": "the train",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "Unless you",
+        "sub-v": "hurry",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "conditional",
+        "human_grammar"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Unless you hurry",
+        "main_clause": "you will miss the train.",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "Unless you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "hurry",
+          "display_order": 2
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "4": "will",
+        "3": "you",
+        "5": "miss",
+        "6": "the train",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_150": {
+    "sentence": "Suppose you had unlimited money, what would you do?",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "would",
+        "V": "do",
+        "O1": "what"
+      },
+      "sub_slots": {
+        "sub-s": "Suppose you",
+        "sub-v": "had",
+        "sub-o1": "unlimited money",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "would",
+        "V": "do",
+        "O1": "what",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "Suppose you",
+        "sub-v": "had",
+        "sub-o1": "unlimited money",
+        "_parent_slot": "M2"
+      },
+      "collaboration": [
+        "conditional",
+        "human_grammar"
+      ],
+      "primary_handler": "conditional",
+      "metadata": {
+        "handler": "conditional_human_grammar",
+        "if_clause": "Suppose you had unlimited money",
+        "main_clause": "what would you do?",
+        "confidence": 0.95
+      },
+      "ordered_sub_slots": {
+        "sub-s": {
+          "value": "Suppose you",
+          "display_order": 1
+        },
+        "sub-v": {
+          "value": "had",
+          "display_order": 2
+        },
+        "sub-o1": {
+          "value": "unlimited money",
+          "display_order": 3
+        },
+        "_parent_slot": "M2"
+      },
+      "ordered_slots": {
+        "4": "would",
+        "6": "what",
+        "3": "you",
+        "5": "do",
+        "7": ""
+      }
+    },
+    "match": true
+  },
+  "case_151": {
+    "sentence": "Imagine if we could fly, how exciting it would be!",
+    "expected": {
+      "main_slots": {
+        "M1": "",
+        "S": "it",
+        "Aux": "would",
+        "V": "be",
+        "C1": "exciting",
+        "M2": "how"
+      },
+      "sub_slots": {
+        "sub-s": "Imagine if we",
+        "sub-aux": "could",
+        "sub-v": "fly",
+        "_parent_slot": "M1"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "M2": "how",
+        "C1": "exciting",
+        "S": "it",
+        "Aux": "would",
+        "V": "be",
+        "M1": ""
+      },
+      "sub_slots": {
+        "sub-s": "Imagine if we",
+        "sub-aux": "could",
+        "sub-v": "fly",
+        "_parent_slot": "M1"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "imagine",
+        "condition_clause": "Imagine if we could fly",
+        "main_clause": "how exciting it would be!",
+        "confidence": 0.8
+      }
+    },
+    "match": true
+  },
+  "case_152": {
+    "sentence": "Provided that you finish on time, you can take a break.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "can",
+        "V": "take",
+        "O1": "a break"
+      },
+      "sub_slots": {
+        "sub-s": "Provided that you",
+        "sub-v": "finish",
+        "sub-m2": "on time",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "can",
+        "V": "take",
+        "O1": "a break",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "Provided that you",
+        "sub-v": "finish",
+        "sub-m2": "on time",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "provided",
+        "condition_clause": "Provided that you finish on time",
+        "main_clause": "you can take a break.",
+        "confidence": 0.8
+      }
+    },
+    "match": true
+  },
+  "case_153": {
+    "sentence": "As long as you promise to be careful, you may borrow my car.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "you",
+        "Aux": "may",
+        "V": "borrow",
+        "O1": "my car"
+      },
+      "sub_slots": {
+        "sub-s": "As long as you",
+        "sub-v": "promise",
+        "sub-o1": "to be careful",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "you",
+        "Aux": "may",
+        "V": "borrow",
+        "O1": "my car",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "As long as you",
+        "sub-v": "promise",
+        "sub-o1": "to be careful",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "as_long_as",
+        "condition_clause": "As long as you promise to be careful",
+        "main_clause": "you may borrow my car.",
+        "confidence": 0.8
+      }
+    },
+    "match": true
+  },
+  "case_154": {
+    "sentence": "If I had known you were coming, I would have prepared dinner.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would have",
+        "V": "prepared",
+        "O1": "dinner"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "known",
+        "sub-o1": "you were coming",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would have",
+        "V": "prepared",
+        "O1": "dinner",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "known",
+        "sub-aux": "had",
+        "sub-o1": "you were coming",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "if_past",
+        "if_clause": "If I had known you were coming",
+        "main_clause": "I would have prepared dinner",
+        "confidence": 0.9
+      }
+    },
+    "match": true
+  },
+  "case_155": {
+    "sentence": "Even if it costs a lot, I will buy that house.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "will",
+        "V": "buy",
+        "O1": "that house"
+      },
+      "sub_slots": {
+        "sub-s": "Even if it",
+        "sub-v": "costs",
+        "sub-o1": "a lot",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "will",
+        "V": "buy",
+        "O1": "that house",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "Even if it",
+        "sub-v": "costs",
+        "sub-o1": "a lot",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "if_present",
+        "if_clause": "Even if it costs a lot",
+        "main_clause": "I will buy that house",
+        "confidence": 0.9
+      }
+    },
+    "match": true
+  }
+}

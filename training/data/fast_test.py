@@ -38,7 +38,7 @@ def parse_range(case_range: str):
     
     # プリセット範囲定義
     presets = {
-        'all': '1-155',         # 対象例文全て（仮定法131-155を追加）
+        'all': '1-170',         # 対象例文全て（不定詞構文156-170を追加）
         'basic': '1-17',        # 基本5文型
         'adverbs': '18-42',     # 基本副詞
         'relative': '56,58,64', # 関係節
@@ -47,7 +47,8 @@ def parse_range(case_range: str):
         'modal': '87-110',      # モーダルハンドラ（助動詞・疑問文）
         'relative_adverbs': '111-120',  # 関係副詞
         'noun_clauses': '121-130',      # 名詞節
-        'conditional': '131-155'        # 仮定法
+        'conditional': '131-155',       # 仮定法
+        'infinitive': '156-170'         # 不定詞構文
     }
     
     # プリセット確認

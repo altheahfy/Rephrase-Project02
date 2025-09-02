@@ -1,288 +1,4 @@
 {
-  "case_case156": {
-    "sentence": "To study English is important.",
-    "expected": {
-      "main_slots": {
-        "S": "",
-        "V": "is",
-        "C1": "important"
-      },
-      "sub_slots": {
-        "sub-v": "To study",
-        "sub-o1": "English",
-        "_parent_slot": "S"
-      }
-    },
-    "actual": {
-      "success": true,
-      "text": "To study English is important.",
-      "main_slots": {
-        "S": "",
-        "V": "is",
-        "C1": "important"
-      },
-      "sub_slots": {
-        "sub-v": "To study",
-        "_parent_slot": "S",
-        "sub-o1": "English"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_nominal_subject",
-          "usage_type": "nominal_subject",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "To study",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "English",
-          "display_order": 2
-        },
-        "_parent_slot": "S"
-      },
-      "ordered_slots": {
-        "3": "",
-        "5": "is",
-        "8": "important"
-      }
-    },
-    "match": true
-  },
-  "case_case157": {
-    "sentence": "I want to learn programming.",
-    "expected": {
-      "main_slots": {
-        "S": "I",
-        "V": "want",
-        "O1": ""
-      },
-      "sub_slots": {
-        "sub-v": "to learn",
-        "sub-o1": "programming",
-        "_parent_slot": "O1"
-      }
-    },
-    "actual": {
-      "success": true,
-      "text": "I want to learn programming.",
-      "main_slots": {
-        "S": "I",
-        "V": "want",
-        "O1": ""
-      },
-      "sub_slots": {
-        "sub-v": "to learn",
-        "_parent_slot": "O1",
-        "sub-o1": "programming"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_nominal_object",
-          "usage_type": "nominal_object",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "to learn",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "programming",
-          "display_order": 2
-        },
-        "_parent_slot": "O1"
-      },
-      "ordered_slots": {
-        "3": "I",
-        "5": "want",
-        "6": ""
-      }
-    },
-    "match": true
-  },
-  "case_case158": {
-    "sentence": "She has something to tell you.",
-    "expected": {
-      "main_slots": {
-        "S": "She",
-        "V": "has",
-        "O1": ""
-      },
-      "sub_slots": {
-        "sub-v": "something to tell",
-        "sub-o1": "you",
-        "_parent_slot": "O1"
-      }
-    },
-    "actual": {
-      "success": true,
-      "text": "She has something to tell you.",
-      "main_slots": {
-        "S": "She",
-        "V": "has",
-        "O1": ""
-      },
-      "sub_slots": {
-        "sub-v": "something to tell",
-        "_parent_slot": "O1",
-        "sub-o1": "you"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_adjectival_modifier",
-          "usage_type": "adjectival_modifier",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "something to tell",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "you",
-          "display_order": 2
-        },
-        "_parent_slot": "O1"
-      },
-      "ordered_slots": {
-        "5": "has",
-        "3": "She",
-        "6": ""
-      }
-    },
-    "match": true
-  },
-  "case_case159": {
-    "sentence": "He came to see his friend.",
-    "expected": {
-      "main_slots": {
-        "S": "He",
-        "V": "came",
-        "M3": ""
-      },
-      "sub_slots": {
-        "sub-v": "to see",
-        "sub-o1": "his friend",
-        "_parent_slot": "M3"
-      }
-    },
-    "actual": {
-      "success": true,
-      "text": "He came to see his friend.",
-      "main_slots": {
-        "S": "He",
-        "V": "came",
-        "M3": ""
-      },
-      "sub_slots": {
-        "sub-v": "to see",
-        "_parent_slot": "M3",
-        "sub-o1": "his friend"
-      },
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_adverbial",
-          "usage_type": "adverbial",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "to see",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "his friend",
-          "display_order": 2
-        },
-        "_parent_slot": "M3"
-      },
-      "ordered_slots": {
-        "3": "He",
-        "5": "came",
-        "9": ""
-      }
-    },
-    "match": true
-  },
-  "case_case160": {
-    "sentence": "I grew up to become a teacher.",
-    "expected": {
-      "main_slots": {
-        "S": "I",
-        "Aux": "grew up to",
-        "V": "become",
-        "C1": "a teacher"
-      },
-      "sub_slots": {}
-    },
-    "actual": {
-      "success": true,
-      "text": "I grew up to become a teacher.",
-      "main_slots": {
-        "S": "I",
-        "Aux": "grew up to",
-        "V": "become",
-        "C1": "a teacher"
-      },
-      "sub_slots": {},
-      "metadata": {
-        "controller": "central",
-        "primary_handler": "infinitive",
-        "collaboration": [
-          "infinitive"
-        ],
-        "infinitive_info": {
-          "handler": "infinitive_adverbial",
-          "usage_type": "adverbial",
-          "confidence": 0.9,
-          "spacy_analysis": true
-        },
-        "confidence": 0.9
-      },
-      "ordered_slots": {
-        "3": "I",
-        "5": "become",
-        "4": "grew up to",
-        "8": "a teacher"
-      }
-    },
-    "match": true
-  },
   "case_case161": {
     "sentence": "It is easy for me to understand this.",
     "expected": {
@@ -303,17 +19,10 @@
       "success": true,
       "text": "It is easy for me to understand this.",
       "main_slots": {
-        "S": "It",
-        "V": "is",
-        "C1": "easy",
-        "M2": "for me",
-        "M3": ""
+        "S": "me",
+        "M2": "to understand"
       },
-      "sub_slots": {
-        "sub-v": "to understand",
-        "_parent_slot": "M3",
-        "sub-o1": "this"
-      },
+      "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "infinitive",
@@ -321,33 +30,19 @@
           "infinitive"
         ],
         "infinitive_info": {
-          "handler": "infinitive_formal_subject",
-          "usage_type": "formal_subject",
+          "handler": "infinitive_adverbial",
+          "usage_type": "adverbial",
           "confidence": 0.9,
           "spacy_analysis": true
         },
         "confidence": 0.9
       },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "to understand",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "this",
-          "display_order": 2
-        },
-        "_parent_slot": "M3"
-      },
       "ordered_slots": {
-        "3": "It",
-        "5": "is",
-        "8": "easy",
-        "7": "for me",
-        "9": ""
+        "3": "me",
+        "7": "to understand"
       }
     },
-    "match": true
+    "match": false
   },
   "case_case162": {
     "sentence": "This box is too heavy to carry.",
@@ -367,15 +62,10 @@
       "success": true,
       "text": "This box is too heavy to carry.",
       "main_slots": {
-        "S": "This box",
-        "V": "is",
-        "C1": "too heavy",
-        "M2": ""
+        "S": "box",
+        "O1": "to carry"
       },
-      "sub_slots": {
-        "sub-v": "to carry",
-        "_parent_slot": "M2"
-      },
+      "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "infinitive",
@@ -383,28 +73,19 @@
           "infinitive"
         ],
         "infinitive_info": {
-          "handler": "infinitive_too_to",
-          "usage_type": "too_to_adverbial",
-          "confidence": 0.9,
+          "handler": "infinitive_basic",
+          "usage_type": "basic",
+          "confidence": 0.8,
           "spacy_analysis": true
         },
         "confidence": 0.9
       },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "to carry",
-          "display_order": 1
-        },
-        "_parent_slot": "M2"
-      },
       "ordered_slots": {
-        "3": "This box",
-        "5": "is",
-        "8": "too heavy",
-        "7": ""
+        "3": "box",
+        "6": "to carry"
       }
     },
-    "match": true
+    "match": false
   },
   "case_case163": {
     "sentence": "She is old enough to drive a car.",
@@ -426,15 +107,9 @@
       "text": "She is old enough to drive a car.",
       "main_slots": {
         "S": "She",
-        "V": "is",
-        "C1": "old",
-        "M2": ""
+        "O1": "to drive"
       },
-      "sub_slots": {
-        "sub-v": "enough to drive",
-        "_parent_slot": "M2",
-        "sub-o1": "a car"
-      },
+      "sub_slots": {},
       "metadata": {
         "controller": "central",
         "primary_handler": "infinitive",
@@ -442,32 +117,19 @@
           "infinitive"
         ],
         "infinitive_info": {
-          "handler": "infinitive_enough_to",
-          "usage_type": "enough_to_adverbial",
-          "confidence": 0.9,
+          "handler": "infinitive_basic",
+          "usage_type": "basic",
+          "confidence": 0.8,
           "spacy_analysis": true
         },
         "confidence": 0.9
       },
-      "ordered_sub_slots": {
-        "sub-v": {
-          "value": "enough to drive",
-          "display_order": 1
-        },
-        "sub-o1": {
-          "value": "a car",
-          "display_order": 2
-        },
-        "_parent_slot": "M2"
-      },
       "ordered_slots": {
         "3": "She",
-        "5": "is",
-        "8": "old",
-        "7": ""
+        "6": "to drive"
       }
     },
-    "match": true
+    "match": false
   },
   "case_case164": {
     "sentence": "He seems to have finished his work.",
