@@ -2671,14 +2671,11 @@
       "expected": {
         "main_slots": {
           "S": "I",
-          "V": "grew up",
-          "M3": ""
+          "Aux": "grew up to",
+          "V": "become",
+          "C1": "a teacher"
         },
-        "sub_slots": {
-          "sub-v": "to become",
-          "sub-c1": "a teacher",
-          "_parent_slot": "M3"
-        }
+        "sub_slots": {}
       }
     },
     "case161": {
