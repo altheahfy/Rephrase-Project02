@@ -67,6 +67,13 @@ class InfinitiveHandler:
                     any(child.text.lower() == 'to' and child.dep_ == 'aux' 
                         for child in token.children)):
                     return True
+                
+                # パターン5: relcl (relative clause) での不定詞検出 - 形容詞的用法
+                if (token.pos_ == 'VERB' and 
+                    token.dep_ == 'relcl' and
+                    any(child.text.lower() == 'to' and child.dep_ == 'aux' 
+                        for child in token.children)):
+                    return True
             
             return False
             
@@ -189,6 +196,20 @@ class InfinitiveHandler:
                             'dependency': token.dep_
                         })
                         print(f"   ✅ csubj不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
+            
+            # パターン5: relcl (relative clause) + aux=to - 形容詞的用法
+            elif token.dep_ == 'relcl' and token.pos_ == 'VERB':
+                for child in token.children:
+                    if child.text.lower() == 'to' and child.dep_ == 'aux':
+                        infinitive_info['found'] = True
+                        infinitive_info['infinitive_tokens'].append({
+                            'main_verb': token,
+                            'to_token': child,
+                            'pattern': 'relcl_aux',
+                            'head': token.head,
+                            'dependency': token.dep_
+                        })
+                        print(f"   ✅ relcl不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
         
         # 用法分類（依存関係ベース）
         if infinitive_info['found']:
@@ -217,8 +238,13 @@ class InfinitiveHandler:
             # xcomp: 通常は目的語補語（形容詞的・副詞的用法）
             if pattern == 'xcomp_aux':
                 if head.pos_ == 'VERB':
-                    print(f"   📝 xcomp + 動詞head → 目的語補語（形容詞的用法候補）")
-                    return 'adjectival_complement'
+                    # want to do 形式は名詞的用法（目的語）
+                    if head.lemma_.lower() in ['want', 'need', 'like', 'love', 'hate', 'prefer', 'decide', 'hope', 'plan', 'try', 'attempt']:
+                        print(f"   📝 xcomp + 欲求・意思動詞 → 名詞的用法（目的語）")
+                        return 'nominal_object'
+                    else:
+                        print(f"   📝 xcomp + 動詞head → 目的語補語（形容詞的用法候補）")
+                        return 'adjectival_complement'
                     
             # advcl: 副詞節（副詞的用法）
             elif pattern == 'advcl_mark':
@@ -234,6 +260,11 @@ class InfinitiveHandler:
             elif pattern == 'csubj_aux':
                 print(f"   📝 csubj + 節主語 → 名詞的用法（主語）")
                 return 'nominal_subject'
+                
+            # relcl: 関係節・形容詞的用法
+            elif pattern == 'relcl_aux':
+                print(f"   📝 relcl + 関係節 → 形容詞的用法")
+                return 'adjectival_modifier'
         
         return 'unknown'
     
@@ -260,8 +291,12 @@ class InfinitiveHandler:
             return self._process_nominal_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'nominal_subject':
             return self._process_nominal_subject_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'nominal_object':
+            return self._process_nominal_object_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adjectival_complement':
             return self._process_adjectival_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'adjectival_modifier':
+            return self._process_adjectival_modifier_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adverbial_clause':
             return self._process_adverbial_infinitive(doc, text, infinitive_info, slots)
         else:
@@ -458,6 +493,111 @@ class InfinitiveHandler:
             'metadata': {
                 'handler': 'infinitive_nominal_subject',
                 'usage_type': 'nominal_subject',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_nominal_object_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """名詞的用法・目的語の処理（xcomp構造対応）"""
+        print(f"📝 名詞的不定詞・目的語処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case157: "I want to learn programming."
+        # 期待値: main_slots={'S': 'I', 'V': 'want', 'O1': ''}
+        #        sub_slots={'sub-v': 'to learn', 'sub-o1': 'programming', '_parent_slot': 'O1'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # learn
+            head = inf_token['head']  # want
+            
+            # メインスロット: 主動詞（want）とその主語
+            for token in doc:
+                if token.dep_ == 'nsubj' and token.head == head:
+                    main_slots['S'] = token.text
+                    print(f"   📍 主語検出: S = '{token.text}'")
+            
+            main_slots['V'] = head.text  # want
+            main_slots['O1'] = ''  # 目的語は空（不定詞がサブスロットとして処理）
+            
+            # サブスロット: 不定詞部分
+            sub_slots['sub-v'] = f"{to_token.text} {main_verb.text}"  # "to learn"
+            sub_slots['_parent_slot'] = 'O1'
+            
+            # 不定詞の目的語を検出
+            for child in main_verb.children:
+                if child.dep_ == 'dobj' and child.pos_ in ['NOUN', 'PROPN']:
+                    sub_slots['sub-o1'] = child.text
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{child.text}'")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_nominal_object',
+                'usage_type': 'nominal_object',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_adjectival_modifier_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """形容詞的用法・修飾語の処理（relcl構造対応）"""
+        print(f"📝 形容詞的不定詞・修飾語処理: {text}")
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # case158: "She has something to tell you."
+        # 期待値: main_slots={'S': 'She', 'V': 'has', 'O1': ''}
+        #        sub_slots={'sub-v': 'something to tell', 'sub-o1': 'you', '_parent_slot': 'O1'}
+        
+        if infinitive_info['infinitive_tokens']:
+            inf_token = infinitive_info['infinitive_tokens'][0]
+            to_token = inf_token['to_token']
+            main_verb = inf_token['main_verb']  # tell
+            head = inf_token['head']  # something
+            
+            # メインスロット: 主動詞とその主語・目的語
+            for token in doc:
+                if token.dep_ == 'ROOT':
+                    main_slots['V'] = token.text  # has
+                    # 主語を探す
+                    for child in token.children:
+                        if child.dep_ == 'nsubj':
+                            main_slots['S'] = child.text
+                            print(f"   📍 主語検出: S = '{child.text}'")
+                        # 目的語を探す（head=somethingの親）
+                        elif child.dep_ == 'dobj' and child == head:
+                            main_slots['O1'] = ''  # 目的語は不定詞でサブスロット化
+                            print(f"   📍 目的語検出（不定詞修飾対象）: '{child.text}' → O1空欄")
+            
+            # サブスロット: 不定詞部分
+            sub_slots['sub-v'] = f"{head.text} {to_token.text} {main_verb.text}"  # "something to tell"
+            sub_slots['_parent_slot'] = 'O1'
+            
+            # 不定詞の目的語を検出
+            for child in main_verb.children:
+                if child.dep_ == 'dobj':
+                    sub_slots['sub-o1'] = child.text
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{child.text}'")
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': sub_slots,
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_adjectival_modifier',
+                'usage_type': 'adjectival_modifier',
                 'confidence': 0.9,
                 'spacy_analysis': True
             }

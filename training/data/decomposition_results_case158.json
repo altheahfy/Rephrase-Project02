@@ -32,7 +32,12 @@
         "collaboration": [
           "infinitive"
         ],
-        "usage_type": "adjectival_modifier",
+        "infinitive_info": {
+          "handler": "infinitive_adjectival_modifier",
+          "usage_type": "adjectival_modifier",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
         "confidence": 0.9
       },
       "ordered_sub_slots": {
@@ -47,8 +52,8 @@
         "_parent_slot": "O1"
       },
       "ordered_slots": {
-        "3": "She",
         "5": "has",
+        "3": "She",
         "6": ""
       }
     },

@@ -32,7 +32,12 @@
         "collaboration": [
           "infinitive"
         ],
-        "usage_type": "nominal",
+        "infinitive_info": {
+          "handler": "infinitive_nominal_object",
+          "usage_type": "nominal_object",
+          "confidence": 0.9,
+          "spacy_analysis": true
+        },
         "confidence": 0.9
       },
       "ordered_sub_slots": {
