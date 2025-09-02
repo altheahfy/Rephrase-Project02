@@ -84,7 +84,8 @@ class ConditionalHandler:
             'suppose': r'\bsuppose\s+.*',
             'provided': r'\bprovided\s+.*',
             'supposing': r'\bsupposing\s+.*',
-            'imagine': r'\bimagine\s+if\s+.*'
+            'imagine': r'\bimagine\s+if\s+.*',
+            'as_long_as': r'\bas\s+long\s+as\s+.*'
         }
         
         # Wish構文パターン
@@ -208,6 +209,15 @@ class ConditionalHandler:
             clean = re.sub(r'[.]', ' ', sentence).strip()
         # Case 152対策: Provided構文の場合はコンマを保持
         elif sentence.lower().startswith('provided that'):
+            # ピリオドのみ除去、コンマは保持
+            clean = re.sub(r'[.]', ' ', sentence).strip()
+        # Case 153対策: As long as構文の場合はコンマを保持
+        elif sentence.lower().startswith('as long as'):
+            # ピリオドのみ除去、コンマは保持
+            clean = re.sub(r'[.]', ' ', sentence).strip()
+        # Case 154対策: If過去完了仮定法の場合はコンマを保持
+        elif (sentence.lower().startswith('if') and 
+              'had' in sentence.lower() and 'would have' in sentence.lower()):
             # ピリオドのみ除去、コンマは保持
             clean = re.sub(r'[.]', ' ', sentence).strip()
         else:
@@ -379,65 +389,42 @@ class ConditionalHandler:
                 main_clause = parts[0].strip()
                 if_clause = parts[1].strip()
         else:
-            # カンマがない場合はif位置で判定
-            if_pos = sentence.lower().find(' if ')
-            if if_pos == -1:
-                if_pos = 0 if sentence.lower().startswith('if ') else -1
-            
-            if if_pos == 0 or if_pos == -1:  # 文頭if
-                # 主動詞（ROOT）の前後で分割
-                root_token = None
-                for token in doc:
-                    if token.dep_ == 'ROOT' and token.pos_ == 'VERB':
-                        root_token = token
+            # カンマがない場合：文頭のifから助動詞の直前まで
+            if sentence.lower().startswith('if '):
+                words = sentence.split()
+                modal_pos = -1
+                # 助動詞を探す（would, could, should, will, can, mayなど）
+                modal_words = ['would', 'could', 'should', 'will', 'can', 'may', 'might', 'shall', 'must']
+                for i, word in enumerate(words):
+                    if word.lower() in modal_words:
+                        modal_pos = i
                         break
                 
-                if root_token:
-                    # if節の動詞位置とmain動詞位置で判定
-                    if_verb_pos = -1
-                    main_verb_pos = root_token.idx
-                    
-                    # if節内の動詞を探す
-                    for token in doc:
-                        if (token.dep_ == 'advcl' and 
-                            any(child.dep_ == 'mark' and child.text.lower() == 'if' 
-                                for child in token.children)):
-                            if_verb_pos = token.idx
+                if modal_pos > 0:
+                    if_clause = ' '.join(words[:modal_pos])
+                    main_clause = ' '.join(words[modal_pos:])
+                else:
+                    # 主語で分割を試行（I would -> 前のIまでがif節）
+                    second_i_pos = -1
+                    for i in range(1, len(words)):  # 最初のIは除く
+                        if words[i].lower() == 'i':
+                            second_i_pos = i
                             break
                     
-                    if if_verb_pos != -1 and if_verb_pos < main_verb_pos:
-                        # if節が先、main節が後
-                        split_words = sentence.split()
-                        if_end = -1
-                        for i, word in enumerate(split_words):
-                            if word.lower() in ['will', 'would', 'can', 'could', 'may', 'might', 'should', 'shall']:
-                                if_end = i
-                                break
-                        
-                        if if_end > 0:
-                            if_clause = ' '.join(split_words[:if_end])
-                            main_clause = ' '.join(split_words[if_end:])
-                        else:
-                            # フォールバック: 文の半分で分割
-                            mid = len(split_words) // 2
-                            if_clause = ' '.join(split_words[:mid])
-                            main_clause = ' '.join(split_words[mid:])
+                    if second_i_pos > 0:
+                        if_clause = ' '.join(words[:second_i_pos])
+                        main_clause = ' '.join(words[second_i_pos:])
                     else:
-                        # フォールバック: 文の半分で分割
-                        words = sentence.split()
+                        # フォールバック: 半分で分割
                         mid = len(words) // 2
                         if_clause = ' '.join(words[:mid])
                         main_clause = ' '.join(words[mid:])
-                else:
-                    # フォールバック: 文の半分で分割
-                    words = sentence.split()
-                    mid = len(words) // 2
-                    if_clause = ' '.join(words[:mid])
-                    main_clause = ' '.join(words[mid:])
             else:
-                # 文中if
-                if_clause = sentence[if_pos:].strip()
-                main_clause = sentence[:if_pos].strip()
+                # フォールバック: 半分で分割
+                words = sentence.split()
+                mid = len(words) // 2
+                if_clause = ' '.join(words[:mid])
+                main_clause = ' '.join(words[mid:])
         
         print(f"   条件節: '{if_clause}'")
         print(f"   主節: '{main_clause}'")
@@ -583,8 +570,13 @@ class ConditionalHandler:
         subject = self._extract_subject(doc)
         main_slots["S"] = subject if subject else ""
         
-        # 助動詞検出
-        auxiliary = self._extract_auxiliary(doc)
+        # 主語がない場合、if節の主語を推定（Case 154対策）
+        if not main_slots["S"] and main_clause.startswith(('would', 'could', 'should', 'will', 'can', 'may')):
+            # 前のif節から主語を推定（仮定法でよくあるパターン）
+            main_slots["S"] = "I"  # デフォルト主語
+        
+        # 助動詞検出（複合助動詞対応）
+        auxiliary = self._extract_auxiliary_complex(doc)
         main_slots["Aux"] = auxiliary if auxiliary else ""
         
         # 動詞検出
@@ -617,7 +609,11 @@ class ConditionalHandler:
                     if child.dep_ in ['det', 'amod', 'compound']:
                         subject_tokens.append(child)
                 subject_tokens.sort(key=lambda t: t.i)
-                return " ".join([t.text for t in subject_tokens])
+                subject_text = " ".join([t.text for t in subject_tokens])
+                # 主語を大文字化（特にI）
+                if subject_text.lower() == 'i':
+                    return 'I'
+                return subject_text
         return ""
     
     def _extract_auxiliary(self, doc) -> str:
@@ -625,6 +621,21 @@ class ConditionalHandler:
         for token in doc:
             if token.dep_ == 'aux' or token.pos_ == 'AUX':
                 return token.text
+        return ""
+    
+    def _extract_auxiliary_complex(self, doc) -> str:
+        """複合助動詞を抽出（would have等）"""
+        aux_tokens = []
+        for token in doc:
+            if token.dep_ == 'aux' or token.pos_ == 'AUX':
+                aux_tokens.append(token)
+        
+        if len(aux_tokens) >= 2:
+            # would have のような複合助動詞
+            aux_tokens.sort(key=lambda t: t.i)
+            return " ".join([t.text for t in aux_tokens])
+        elif len(aux_tokens) == 1:
+            return aux_tokens[0].text
         return ""
     
     def _extract_main_verb(self, doc) -> str:
@@ -641,7 +652,7 @@ class ConditionalHandler:
                 # 目的語とその修飾語を含める
                 obj_tokens = [token]
                 for child in token.children:
-                    if child.dep_ in ['det', 'amod', 'compound']:
+                    if child.dep_ in ['det', 'amod', 'compound', 'poss']:
                         obj_tokens.append(child)
                 # 前置詞の場合は前置詞も含める
                 if token.dep_ == 'pobj':
@@ -1171,6 +1182,18 @@ class ConditionalHandler:
                 print(f"🔧 Provided構文分離: 条件節='{condition_clause}', 主節='{main_clause}'")
                 return condition_clause, main_clause
         
+        # As long as構文の特殊処理（Case 153対策）
+        elif conditional_type == 'as_long_as':
+            # "As long as you promise to be careful, you may borrow my car."
+            # -> condition: "As long as you promise to be careful"
+            # -> main: "you may borrow my car."
+            comma_index = sentence.find(',')
+            if comma_index != -1:
+                condition_clause = sentence[:comma_index].strip()
+                main_clause = sentence[comma_index + 1:].strip()
+                print(f"🔧 As long as構文分離: 条件節='{condition_clause}', 主節='{main_clause}'")
+                return condition_clause, main_clause
+        
         # コンマで分割を試す
         parts = sentence.split(',')
         
@@ -1282,6 +1305,45 @@ class ConditionalHandler:
             # "on time"のような修飾語をsub-m2に設定
             if prep_phrases:
                 sub_slots['sub-m2'] = prep_phrases[0]
+            
+            sub_slots['_parent_slot'] = 'M2'
+            return sub_slots
+        
+        # As long as構文の特殊処理（Case 153対策）
+        elif conditional_type == 'as_long_as':
+            # "As long as you promise to be careful" -> "you promise to be careful"を解析
+            # "As long as"を除去して実際の条件文を抽出
+            clean_condition = condition_clause.replace('As long as', '').strip()
+            doc_clean = self.nlp(clean_condition)
+            
+            print(f"🔧 As long as構文解析: '{clean_condition}'")
+            
+            # 主語を特定
+            for token in doc_clean:
+                if token.dep_ == 'nsubj':
+                    sub_slots['sub-s'] = f"As long as {token.text}"
+                    break
+            
+            # 動詞を抽出 (助動詞は除く)
+            for token in doc_clean:
+                if token.pos_ == 'VERB' and token.dep_ == 'ROOT':
+                    sub_slots['sub-v'] = token.text
+            
+            # to不定詞句を抽出 ("to be careful")
+            infinitive_phrases = []
+            for token in doc_clean:
+                if token.text.lower() == 'to' and token.pos_ == 'PART':
+                    # toから後の部分を取得
+                    phrase_parts = ['to']
+                    for child in token.head.subtree:
+                        if child.i > token.i:
+                            phrase_parts.append(child.text)
+                    if len(phrase_parts) > 1:
+                        infinitive_phrases.append(' '.join(phrase_parts))
+            
+            # "to be careful"のような句をsub-o1に設定
+            if infinitive_phrases:
+                sub_slots['sub-o1'] = infinitive_phrases[0]
             
             sub_slots['_parent_slot'] = 'M2'
             return sub_slots

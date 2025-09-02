@@ -1,0 +1,45 @@
+{
+  "case_154": {
+    "sentence": "If I had known you were coming, I would have prepared dinner.",
+    "expected": {
+      "main_slots": {
+        "M2": "",
+        "S": "I",
+        "Aux": "would have",
+        "V": "prepared",
+        "O1": "dinner"
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-aux": "had",
+        "sub-v": "known",
+        "sub-o1": "you were coming",
+        "_parent_slot": "M2"
+      }
+    },
+    "actual": {
+      "success": true,
+      "main_slots": {
+        "S": "I",
+        "Aux": "would have",
+        "V": "prepared",
+        "O1": "dinner",
+        "M2": ""
+      },
+      "sub_slots": {
+        "sub-s": "If I",
+        "sub-v": "known",
+        "sub-m2": "coming",
+        "_parent_slot": "M2"
+      },
+      "metadata": {
+        "handler": "conditional",
+        "type": "if_past",
+        "if_clause": "If I had known you were coming",
+        "main_clause": "I would have prepared dinner",
+        "confidence": 0.9
+      }
+    },
+    "match": false
+  }
+}

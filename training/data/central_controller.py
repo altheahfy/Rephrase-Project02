@@ -470,6 +470,37 @@ class CentralController:
                     print(f"📝 Provided構文ConditionalHandler結果: {conditional_result}")
                     return conditional_result
         
+        # Case 153対策: As long as構文の早期検出
+        if text.lower().startswith('as long as'):
+            print(f"🔧 As long as構文早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 As long as構文ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+                    
+        # Case 154対策: If過去完了仮定法の早期検出
+        if text.lower().startswith('if') and ('had' in text.lower() and 'would have' in text.lower()):
+            print(f"🔧 If過去完了仮定法早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 If過去完了仮定法ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+        
+        # Case 154対策: If過去完了仮定法の早期検出
+        if (text.lower().startswith('if') and 
+            'had' in text.lower() and 'would have' in text.lower()):
+            print(f"🔧 If過去完了仮定法早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 If過去完了仮定法ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+        
         # 1. 文法構造分析
         grammar_patterns = self.analyze_grammar_structure(text)
         
