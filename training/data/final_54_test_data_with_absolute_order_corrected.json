@@ -3167,9 +3167,9 @@
       "expected": {
         "main_slots": {
           "S": "I",
-          "V": "am",
-          "C1": "interested",
-          "C2": "in learning"
+          "Aux": "am",
+          "V": "interested",
+          "M2": "in learning"
         },
         "sub_slots": {}
       }
@@ -3181,15 +3181,14 @@
       "expected": {
         "main_slots": {
           "S": "I",
-          "V": "am",
-          "C1": "interested",
-          "C2": ""
+          "Aux": "am",
+          "V": "interested",
+          "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "in",
-          "sub-v": "learning",
+          "sub-v": "in learning",
           "sub-o1": "English",
-          "_parent_slot": "C2"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -3229,16 +3228,15 @@
       "sentence": "After finishing homework, I watch TV.",
       "expected": {
         "main_slots": {
-          "M1": "",
+          "M2": "",
           "S": "I",
           "V": "watch",
           "O1": "TV"
         },
         "sub_slots": {
-          "sub-m1": "After",
-          "sub-v": "finishing",
+          "sub-v": "After finishing",
           "sub-o1": "homework",
-          "_parent_slot": "M1"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -3253,8 +3251,8 @@
           "O1": ""
         },
         "sub_slots": {
-          "sub-v": "talking",
-          "sub-m2": "about movies",
+          "sub-v": "talking about",
+          "sub-o1": "movies",
           "_parent_slot": "O1"
         }
       }
@@ -3285,13 +3283,12 @@
           "S": "He",
           "V": "is",
           "C1": "good",
-          "C2": ""
+          "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "at",
-          "sub-v": "playing",
+          "sub-v": "at playing",
           "sub-o1": "guitar",
-          "_parent_slot": "C2"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -3303,13 +3300,12 @@
         "main_slots": {
           "V": "Thank",
           "O1": "you",
-          "C2": ""
+          "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "for",
-          "sub-v": "helping",
+          "sub-v": "for helping",
           "sub-o1": "me",
-          "_parent_slot": "C2"
+          "_parent_slot": "M2"
         }
       }
     },
@@ -3324,8 +3320,7 @@
           "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "without",
-          "sub-v": "saying",
+          "sub-v": "without saying",
           "sub-o1": "goodbye",
           "_parent_slot": "M2"
         }
@@ -3342,8 +3337,7 @@
           "O1": ""
         },
         "sub_slots": {
-          "sub-s": "your",
-          "sub-v": "helping",
+          "sub-v": "your helping",
           "sub-o1": "us",
           "_parent_slot": "O1"
         }
