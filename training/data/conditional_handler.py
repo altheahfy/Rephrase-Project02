@@ -665,10 +665,12 @@ class ConditionalHandler:
         exclude_words.add("if")   # if
         
         # 主語と動詞、特定の助動詞以外の要素を収集
+        # Case 135対策: 副詞（ADV）と副詞修飾語（advmod）は修飾語として扱うため除外
         for token in doc:
             token_lower = token.text.lower()
             if (token_lower not in exclude_words and 
-                token.pos_ not in ['PUNCT', 'SPACE'] and
+                token.pos_ not in ['PUNCT', 'SPACE', 'ADV'] and  # ADV（副詞）を除外
+                token.dep_ not in ['advmod'] and  # advmod（副詞修飾語）を除外
                 not (token.dep_ == 'aux' and token_lower == 'had')):  # hadのみ除外
                 tokens.append(token.text)
         
