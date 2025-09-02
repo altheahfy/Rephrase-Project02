@@ -24,6 +24,7 @@ from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
 from conditional_handler import ConditionalHandler
 from imperative_handler import ImperativeHandler
 from metaphorical_handler import MetaphoricalHandler
+from infinitive_handler import InfinitiveHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
 
@@ -64,6 +65,7 @@ class CentralController:
         conditional_handler = ConditionalHandler(self.nlp)  # Phase 9: ConditionalHandler追加
         imperative_handler = ImperativeHandler()  # Phase 10: ImperativeHandler追加
         metaphorical_handler = MetaphoricalHandler(self.nlp)  # Phase 11: MetaphoricalHandler追加
+        infinitive_handler = InfinitiveHandler(self.nlp)  # Phase 12: InfinitiveHandler追加
         
         # Pure Data-Driven Order Manager を初期化
         self.order_manager = PureDataDrivenOrderManager()
@@ -76,6 +78,7 @@ class CentralController:
             'modal': modal_handler,
             'noun_clause': noun_clause_handler,
             'imperative': imperative_handler,
+            'infinitive': infinitive_handler,
             'basic_five_pattern': basic_five_pattern_handler  # MetaphoricalHandler用
         }
         relative_clause_handler = RelativeClauseHandler(collaborators)
@@ -97,7 +100,8 @@ class CentralController:
             'omitted_relative_pronoun': omitted_relative_pronoun_handler,  # Phase 8: OmittedRelativePronounHandler追加
             'conditional': conditional_handler,  # Phase 9: ConditionalHandler追加
             'imperative': imperative_handler,  # Phase 10: ImperativeHandler追加
-            'metaphorical': metaphorical_handler  # Phase 11: MetaphoricalHandler追加
+            'metaphorical': metaphorical_handler,  # Phase 11: MetaphoricalHandler追加
+            'infinitive': infinitive_handler  # Phase 12: InfinitiveHandler追加
         }
         
         # Rephraseスロット定義読み込み

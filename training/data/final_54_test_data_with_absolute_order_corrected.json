@@ -2595,6 +2595,205 @@
           "_parent_slot": "M2"
         }
       }
+    },
+    "case156": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_nominal_subject",
+      "sentence": "To study English is important.",
+      "expected": {
+        "main_slots": {
+          "S": "To study English",
+          "V": "is",
+          "C": "important"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case157": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_nominal_object",
+      "sentence": "I want to learn programming.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "want",
+          "O1": "to learn programming"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case158": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_adjectival",
+      "sentence": "She has something to tell you.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "has",
+          "O1": "something to tell you"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case159": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_adverbial_purpose",
+      "sentence": "He came to see his friend.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "came",
+          "M3": "to see his friend"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case160": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_adverbial_result",
+      "sentence": "I grew up to become a teacher.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "grew up",
+          "M3": "to become a teacher"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case161": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_with_for",
+      "sentence": "It is easy for me to understand this.",
+      "expected": {
+        "main_slots": {
+          "S": "It",
+          "V": "is",
+          "C": "easy",
+          "M2": "for me to understand this"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case162": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_too_to",
+      "sentence": "This box is too heavy to carry.",
+      "expected": {
+        "main_slots": {
+          "S": "This box",
+          "V": "is",
+          "C": "too heavy to carry"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case163": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_enough_to",
+      "sentence": "She is old enough to drive a car.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "is",
+          "C": "old enough to drive a car"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case164": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_perfect",
+      "sentence": "He seems to have finished his work.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "seems",
+          "O1": "to have finished his work"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case165": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_passive",
+      "sentence": "This problem needs to be solved quickly.",
+      "expected": {
+        "main_slots": {
+          "S": "This problem",
+          "V": "needs",
+          "O1": "to be solved quickly"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case166": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_wh_question",
+      "sentence": "I don't know what to do.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "don't",
+          "V": "know",
+          "O1": "what to do"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case167": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_causative",
+      "sentence": "I want you to help me.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "want",
+          "O1": "you",
+          "O2": "to help me"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case168": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_be_about_to",
+      "sentence": "The meeting is about to start.",
+      "expected": {
+        "main_slots": {
+          "S": "The meeting",
+          "V": "is about to start"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case169": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_in_order_to",
+      "sentence": "She studies hard in order to pass the exam.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "studies",
+          "O1": "hard",
+          "M3": "in order to pass the exam"
+        },
+        "sub_slots": {}
+      }
+    },
+    "case170": {
+      "V_group_key": "infinitive",
+      "grammar_category": "infinitive_so_as_to",
+      "sentence": "He left early so as to avoid traffic.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "left",
+          "M1": "early",
+          "M3": "so as to avoid traffic"
+        },
+        "sub_slots": {}
+      }
     }
   }
 }
