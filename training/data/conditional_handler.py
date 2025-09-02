@@ -220,6 +220,10 @@ class ConditionalHandler:
               'had' in sentence.lower() and 'would have' in sentence.lower()):
             # ピリオドのみ除去、コンマは保持
             clean = re.sub(r'[.]', ' ', sentence).strip()
+        # Case 155対策: Even if構文の場合はコンマを保持
+        elif sentence.lower().startswith('even if'):
+            # ピリオドのみ除去、コンマは保持
+            clean = re.sub(r'[.]', ' ', sentence).strip()
         else:
             # 通常処理: 句読点処理
             clean = re.sub(r'[,.]', ' ', sentence).strip()
@@ -380,8 +384,9 @@ class ConditionalHandler:
         # カンマで分割（最も一般的で確実）
         if ',' in sentence:
             parts = sentence.split(',', 1)
-            # if句が最初に来る場合（標準的）
-            if parts[0].strip().lower().startswith('if'):
+            # if句またはeven if句が最初に来る場合（標準的）
+            if (parts[0].strip().lower().startswith('if') or 
+                parts[0].strip().lower().startswith('even if')):
                 if_clause = parts[0].strip()
                 main_clause = parts[1].strip()
             else:
@@ -389,8 +394,9 @@ class ConditionalHandler:
                 main_clause = parts[0].strip()
                 if_clause = parts[1].strip()
         else:
-            # カンマがない場合：文頭のifから助動詞の直前まで
-            if sentence.lower().startswith('if '):
+            # カンマがない場合：文頭のifまたはeven ifから助動詞の直前まで
+            if (sentence.lower().startswith('if ') or 
+                sentence.lower().startswith('even if ')):
                 words = sentence.split()
                 modal_pos = -1
                 # 助動詞を探す（would, could, should, will, can, mayなど）
@@ -645,6 +651,31 @@ class ConditionalHandler:
                 return token.text
         return ""
     
+    def _extract_object_complement_for_if(self, doc, subject: str, verb: str) -> str:
+        """if節専用の目的語・補語抽出（"you were coming"など）"""
+        tokens = []
+        subject_tokens = subject.lower().split() if subject else []
+        verb_token = verb.lower() if verb else ""
+        
+        # 除外する単語（主語、動詞、特定の助動詞、句読点）
+        exclude_words = set()
+        exclude_words.update(subject_tokens)
+        exclude_words.add(verb_token)
+        exclude_words.add("had")  # 過去完了の助動詞had
+        exclude_words.add("if")   # if
+        
+        # 主語と動詞、特定の助動詞以外の要素を収集
+        for token in doc:
+            token_lower = token.text.lower()
+            if (token_lower not in exclude_words and 
+                token.pos_ not in ['PUNCT', 'SPACE'] and
+                not (token.dep_ == 'aux' and token_lower == 'had')):  # hadのみ除外
+                tokens.append(token.text)
+        
+        if tokens:
+            return " ".join(tokens)
+        return ""
+    
     def _extract_object(self, doc) -> str:
         """目的語を抽出"""
         for token in doc:
@@ -696,33 +727,63 @@ class ConditionalHandler:
         
         sub_slots = {}
         
-        # "if"を除去して解析
-        clause_without_if = if_clause.lower().replace("if ", "").strip()
-        doc = self.nlp(clause_without_if)
+        # Case 155対策: "Even if"の特別処理
+        is_even_if = if_clause.lower().startswith("even if")
         
-        # 主語検出
-        subject = self._extract_subject(doc)
-        
-        # include_ifフラグに応じてIfを付けるかどうか決定
-        if include_if:
-            sub_slots["sub-s"] = f"If {subject}" if subject else "If it"
+        if is_even_if:
+            # "Even if"を除去して解析
+            clause_without_if = if_clause.lower().replace("even if ", "").strip()
+            doc = self.nlp(clause_without_if)
+            
+            # 主語検出
+            subject = self._extract_subject(doc)
+            
+            # "Even if"の場合、必ず"Even if + 主語"として設定
+            sub_slots["sub-s"] = f"Even if {subject}" if subject else "Even if it"
         else:
-            sub_slots["sub-s"] = subject if subject else "it"
+            # 通常の"if"処理
+            clause_without_if = if_clause.lower().replace("if ", "").strip()
+            doc = self.nlp(clause_without_if)
+            
+            # 主語検出
+            subject = self._extract_subject(doc)
+            
+            # include_ifフラグに応じてIfを付けるかどうか決定
+            if include_if:
+                sub_slots["sub-s"] = f"If {subject}" if subject else "If it"
+            else:
+                sub_slots["sub-s"] = subject if subject else "it"
         
         # 動詞検出
         verb = self._extract_main_verb(doc)
         sub_slots["sub-v"] = verb if verb else ""
         
-        # その他の要素検出
-        other_elements = self._extract_other_elements(doc, subject, "", verb)
-        sub_slots["sub-m2"] = other_elements if other_elements else ""
+        # 助動詞検出（過去完了の"had"など）
+        auxiliary = self._extract_auxiliary(doc)
+        if auxiliary:
+            sub_slots["sub-aux"] = auxiliary
+        
+        # 目的語・補語検出（you were coming）
+        object_complement = self._extract_object_complement_for_if(doc, subject, verb)
+        if object_complement:
+            sub_slots["sub-o1"] = object_complement
+        else:
+            # その他の要素検出（従来の方法）
+            other_elements = self._extract_other_elements(doc, subject, "", verb)
+            if other_elements:
+                sub_slots["sub-m2"] = other_elements
         
         # 親スロット情報
         sub_slots["_parent_slot"] = "M1"
         
         print(f"   if主語: '{sub_slots['sub-s']}'")
         print(f"   if動詞: '{sub_slots['sub-v']}'")
-        print(f"   ifその他: '{sub_slots['sub-m2']}'")
+        if 'sub-aux' in sub_slots:
+            print(f"   if助動詞: '{sub_slots['sub-aux']}'")
+        if 'sub-o1' in sub_slots:
+            print(f"   if目的語: '{sub_slots['sub-o1']}'")
+        if 'sub-m2' in sub_slots:
+            print(f"   ifその他: '{sub_slots['sub-m2']}'")
         
         return sub_slots
     

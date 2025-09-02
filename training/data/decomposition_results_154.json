@@ -29,7 +29,8 @@
       "sub_slots": {
         "sub-s": "If I",
         "sub-v": "known",
-        "sub-m2": "coming",
+        "sub-aux": "had",
+        "sub-o1": "you were coming",
         "_parent_slot": "M2"
       },
       "metadata": {
@@ -40,6 +41,6 @@
         "confidence": 0.9
       }
     },
-    "match": false
+    "match": true
   }
 }

@@ -501,6 +501,16 @@ class CentralController:
                     print(f"📝 If過去完了仮定法ConditionalHandler結果: {conditional_result}")
                     return conditional_result
         
+        # Case 155対策: Even if構文の早期検出
+        if text.lower().startswith('even if'):
+            print(f"🔧 Even if構文早期検出: ConditionalHandlerに直接処理")
+            conditional_handler = self.handlers.get('conditional')
+            if conditional_handler:
+                conditional_result = conditional_handler.process(text)
+                if conditional_result.get('success', False):
+                    print(f"📝 Even if構文ConditionalHandler結果: {conditional_result}")
+                    return conditional_result
+        
         # 1. 文法構造分析
         grammar_patterns = self.analyze_grammar_structure(text)
         
