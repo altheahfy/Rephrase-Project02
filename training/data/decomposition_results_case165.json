@@ -1,0 +1,17 @@
+{
+  "case_case165": {
+    "sentence": "This problem needs to be solved quickly.",
+    "match": true,
+    "main_slots": {
+      "S": "This problem",
+      "V": "needs",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-aux": "to be",
+      "sub-v": "solved",
+      "_parent_slot": "O1",
+      "sub-m2": "quickly"
+    }
+  }
+}

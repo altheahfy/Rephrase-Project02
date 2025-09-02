@@ -673,8 +673,11 @@ class CentralController:
                 
                 return self._apply_order_to_result(result)
             else:
-                print(f"⚠️ 比喻表現処理失敗、通常の処理フローに移行")
+                print(f"⚠️ 比喩表現処理失敗、通常の処理フローに移行")
                 print(f"  MetaphoricalHandler error: {metaphorical_result.get('error')}")
+        
+        # 助動詞処理の成功結果を保持する変数（関数レベルスコープ）
+        modal_success_result = None
         
         # 🎯 Phase 6: 助動詞処理（疑問文でない場合に適用）
         if 'modal' in grammar_patterns and 'question' not in grammar_patterns:
@@ -708,12 +711,14 @@ class CentralController:
                 
                 print(f"✅ 助動詞+修飾語統合成功: {final_slots}")
                 
-                # 🔍 仮定法・名詞節も検出されている場合は継続処理
-                if ('conditional' in grammar_patterns or 'noun_clause' in grammar_patterns) and 'question' not in grammar_patterns:
+                # 🔍 仮定法・名詞節・不定詞も検出されている場合は継続処理
+                if ('conditional' in grammar_patterns or 'noun_clause' in grammar_patterns or 'infinitive' in grammar_patterns) and 'question' not in grammar_patterns:
                     if 'conditional' in grammar_patterns:
                         print(f"🔄 助動詞処理後、仮定法部分も処理します")
                     if 'noun_clause' in grammar_patterns:
                         print(f"🔄 助動詞処理後、名詞節部分も処理します")
+                    if 'infinitive' in grammar_patterns:
+                        print(f"🔄 助動詞処理後、不定詞部分も処理します")
                     # 継続処理に進む（Phaseを継続）
                     modal_success_result = {
                         'main_slots': final_slots,
@@ -722,6 +727,13 @@ class CentralController:
                     }
                 else:
                     # 継続処理する文法項目がない場合は助動詞処理のみで終了
+                    # 助動詞結果を保存してからreturn
+                    modal_success_result = {
+                        'main_slots': final_slots,
+                        'modal_info': modal_result.get('modal_info', {}),
+                        'collaboration': ['adverb']
+                    }
+                    
                     result = {
                         'success': True,
                         'text': text,
@@ -773,6 +785,25 @@ class CentralController:
             else:
                 print(f"⚠️ 不定詞処理失敗、通常の処理フローに移行")
                 print(f"  InfinitiveHandler error: {infinitive_result.get('error')}")
+                
+                # 助動詞処理が成功している場合はその結果を使用
+                if modal_success_result:
+                    print(f"🔄 助動詞処理結果をフォールバックとして使用")
+                    result = {
+                        'success': True,
+                        'text': text,
+                        'main_slots': modal_success_result['main_slots'],
+                        'sub_slots': {},
+                        'metadata': {
+                            'controller': 'central',
+                            'primary_handler': 'modal',
+                            'collaboration': modal_success_result['collaboration'],
+                            'modal_info': modal_success_result.get('modal_info', {}),
+                            'confidence': 0.9,
+                            'fallback_reason': 'infinitive_failed'
+                        }
+                    }
+                    return self._apply_order_to_result(result)
         
         # 🎯 仮定法処理（人間的文法識別アプローチ）
         # Case 150対策: Suppose構文は疑問文を含むが仮定法として処理すべき
@@ -784,7 +815,6 @@ class CentralController:
             if 'question' not in grammar_patterns or is_equivalent_conditional:
                 print(f"🎯 人間的文法識別による仮定法処理開始")
                 # 助動詞処理の結果があるかチェック
-                modal_success_result = locals().get('modal_success_result')
                 return self._process_conditional_by_human_grammar(text, modal_success_result)
             
             # Step 1: AdverbHandlerで修飾語分離（助動詞処理済みでない場合のみ）

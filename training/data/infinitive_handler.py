@@ -97,6 +97,40 @@ class InfinitiveHandler:
                         for child in token.children)):
                     return True
             
+            # 高度なパターン検出（case164-170対応）
+            text_lower = text.lower()
+            
+            # 完了不定詞: to have + 過去分詞
+            if 'to have' in text_lower and any(token.tag_ in ['VBN'] for token in doc):
+                return True
+            
+            # 受動不定詞: to be + 過去分詞
+            if 'to be' in text_lower and any(token.tag_ in ['VBN'] for token in doc):
+                return True
+            
+            # 疑問詞+不定詞: what/how/when/where to do
+            if any(token.text.lower() in ['what', 'how', 'when', 'where', 'which', 'who'] and 
+                   token.pos_ in ['PRON', 'ADV'] for token in doc) and 'to ' in text_lower:
+                return True
+            
+            # 使役構文: want + 人 + to do
+            for token in doc:
+                if (token.lemma_.lower() in ['want', 'ask', 'tell', 'expect', 'allow', 'cause'] and
+                    'to ' in text_lower):
+                    return True
+            
+            # be about to構文
+            if 'about to' in text_lower:
+                return True
+            
+            # in order to構文
+            if 'in order to' in text_lower:
+                return True
+            
+            # so as to構文
+            if 'so as to' in text_lower:
+                return True
+            
             return False
             
         except Exception as e:
@@ -161,8 +195,174 @@ class InfinitiveHandler:
             'dependency_info': []
         }
         
-        # spaCy依存関係による不定詞検出
+        # 高度なパターン検出（case164-170対応）
+        text_lower = text.lower()
+        
+        # 完了不定詞パターン検出: to have + 過去分詞
+        if 'to have' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'to' and i + 1 < len(doc) and 
+                    doc[i + 1].text.lower() == 'have'):
+                    # 過去分詞を探す
+                    for j in range(i + 2, len(doc)):
+                        if doc[j].tag_ == 'VBN':  # 過去分詞
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[i + 1],  # have
+                                'to_token': token,
+                                'pattern': 'perfect_infinitive',
+                                'head': doc[i + 1].head,
+                                'dependency': 'xcomp',
+                                'participle': doc[j]
+                            })
+                            print(f"   ✅ 完了不定詞検出: 'to have {doc[j].text}'")
+                            break
+                    break
+        
+        # 受動不定詞パターン検出: to be + 過去分詞
+        if 'to be' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'to' and i + 1 < len(doc) and 
+                    doc[i + 1].text.lower() == 'be'):
+                    # 過去分詞を探す
+                    for j in range(i + 2, len(doc)):
+                        if doc[j].tag_ == 'VBN':  # 過去分詞
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[i + 1],  # be
+                                'to_token': token,
+                                'pattern': 'passive_infinitive',
+                                'head': doc[i + 1].head,
+                                'dependency': 'xcomp',
+                                'participle': doc[j]
+                            })
+                            print(f"   ✅ 受動不定詞検出: 'to be {doc[j].text}'")
+                            break
+                    break
+        
+        # 疑問詞+不定詞パターン検出
+        wh_words = ['what', 'how', 'when', 'where', 'which', 'who']
         for token in doc:
+            if (token.text.lower() in wh_words and 
+                token.pos_ in ['PRON', 'ADV']):
+                # その後にto+動詞があるかチェック
+                for next_token in doc[token.i + 1:]:
+                    if (next_token.text.lower() == 'to' and 
+                        next_token.dep_ == 'aux'):
+                        for verb_token in next_token.children:
+                            if verb_token.pos_ == 'VERB':
+                                infinitive_info['found'] = True
+                                infinitive_info['infinitive_tokens'].append({
+                                    'main_verb': verb_token,
+                                    'to_token': next_token,
+                                    'pattern': 'wh_infinitive',
+                                    'head': verb_token.head,
+                                    'dependency': 'xcomp',
+                                    'wh_word': token
+                                })
+                                print(f"   ✅ 疑問詞+不定詞検出: '{token.text} to {verb_token.text}'")
+                                break
+                        break
+                break
+        
+        # 使役構文パターン検出
+        causative_verbs = ['want', 'ask', 'tell', 'expect', 'allow', 'cause']
+        for token in doc:
+            if (token.lemma_.lower() in causative_verbs and 
+                token.pos_ == 'VERB'):
+                # 直接目的語と不定詞を探す
+                object_person = None
+                infinitive_verb = None
+                for child in token.children:
+                    if child.dep_ == 'nsubj' and child.pos_ == 'PRON':
+                        # ccompパターンでの不定詞主語
+                        for ccomp_child in token.children:
+                            if ccomp_child.dep_ == 'ccomp':
+                                for inf_child in ccomp_child.children:
+                                    if inf_child.text.lower() == 'to':
+                                        object_person = child
+                                        infinitive_verb = ccomp_child
+                                        break
+                                break
+                        break
+                
+                if object_person and infinitive_verb:
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': infinitive_verb,
+                        'to_token': None,  # 後で設定
+                        'pattern': 'causative',
+                        'head': token,
+                        'dependency': 'ccomp',
+                        'causative_verb': token,
+                        'object': object_person
+                    })
+                    print(f"   ✅ 使役構文検出: '{token.text} {object_person.text} to {infinitive_verb.text}'")
+        
+        # be about to構文検出
+        if 'about to' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'about' and 
+                    i + 1 < len(doc) and doc[i + 1].text.lower() == 'to'):
+                    # その後の動詞を探す
+                    for j in range(i + 2, len(doc)):
+                        if doc[j].pos_ == 'VERB':
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[j],
+                                'to_token': doc[i + 1],
+                                'pattern': 'be_about_to',
+                                'head': token.head,
+                                'dependency': 'xcomp',
+                                'about_token': token
+                            })
+                            print(f"   ✅ be about to構文検出: 'about to {doc[j].text}'")
+                            break
+                    break
+        
+        # in order to構文検出
+        if 'in order to' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'in' and 
+                    i + 2 < len(doc) and 
+                    doc[i + 1].text.lower() == 'order' and 
+                    doc[i + 2].text.lower() == 'to'):
+                    # その後の動詞を探す
+                    for j in range(i + 3, len(doc)):
+                        if doc[j].pos_ == 'VERB':
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[j],
+                                'to_token': doc[i + 2],
+                                'pattern': 'in_order_to',
+                                'head': doc[j].head,
+                                'dependency': 'acl'
+                            })
+                            print(f"   ✅ in order to構文検出: 'in order to {doc[j].text}'")
+                            break
+                    break
+        
+        # so as to構文検出
+        if 'so as to' in text_lower:
+            for i, token in enumerate(doc):
+                if (token.text.lower() == 'so' and 
+                    i + 2 < len(doc) and 
+                    doc[i + 1].text.lower() == 'as' and 
+                    doc[i + 2].text.lower() == 'to'):
+                    # その後の動詞を探す
+                    for j in range(i + 3, len(doc)):
+                        if doc[j].pos_ == 'VERB':
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[j],
+                                'to_token': doc[i + 2],
+                                'pattern': 'so_as_to',
+                                'head': doc[j].head,
+                                'dependency': 'advcl'
+                            })
+                            print(f"   ✅ so as to構文検出: 'so as to {doc[j].text}'")
+                            break
+                    break
             # パターン1: xcomp (open clausal complement) + aux=to
             if token.dep_ == 'xcomp' and token.pos_ == 'VERB':
                 for child in token.children:
@@ -244,6 +444,136 @@ class InfinitiveHandler:
                         })
                         print(f"   ✅ relcl不定詞検出: '{child.text} {token.text}' (head: {token.head.text})")
         
+        # 高度なパターン検出（case164-170）
+        text_lower = text.lower()
+        
+        # 完了不定詞検出: to have + 過去分詞
+        if not infinitive_info['found'] and 'to have' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'have' and 
+                    any(child.text.lower() == 'to' and child.dep_ == 'aux' for child in token.children) and
+                    any(child.tag_ == 'VBN' for child in token.children)):
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': token,
+                        'to_token': next((child for child in token.children if child.text.lower() == 'to'), None),
+                        'pattern': 'perfect_infinitive',
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ 完了不定詞検出: 'to have + 過去分詞' (head: {token.head.text})")
+        
+        # 受動不定詞検出: to be + 過去分詞
+        if not infinitive_info['found'] and 'to be' in text_lower:
+            for token in doc:
+                if (token.lemma_ == 'be' and 
+                    any(child.text.lower() == 'to' and child.dep_ == 'aux' for child in token.children) and
+                    any(child.tag_ == 'VBN' for child in token.children)):
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': token,
+                        'to_token': next((child for child in token.children if child.text.lower() == 'to'), None),
+                        'pattern': 'passive_infinitive',
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ 受動不定詞検出: 'to be + 過去分詞' (head: {token.head.text})")
+        
+        # 疑問詞+不定詞検出: what/how/when/where to do
+        if not infinitive_info['found']:
+            for token in doc:
+                if (token.text.lower() in ['what', 'how', 'when', 'where', 'which', 'who'] and
+                    token.pos_ in ['PRON', 'ADV']):
+                    # 次のtoを探す
+                    for next_token in doc[token.i+1:]:
+                        if (next_token.text.lower() == 'to' and next_token.pos_ == 'PART' and
+                            next_token.i < len(doc) - 1 and doc[next_token.i + 1].pos_ == 'VERB'):
+                            infinitive_info['found'] = True
+                            infinitive_info['infinitive_tokens'].append({
+                                'main_verb': doc[next_token.i + 1],
+                                'to_token': next_token,
+                                'pattern': 'wh_infinitive',
+                                'wh_word': token,
+                                'head': token.head,
+                                'dependency': token.dep_
+                            })
+                            print(f"   ✅ 疑問詞+不定詞検出: '{token.text} to {doc[next_token.i + 1].text}'")
+                            break
+        
+        # be about to構文検出
+        if not infinitive_info['found'] and 'about to' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'about' and token.i < len(doc) - 2 and
+                    doc[token.i + 1].text.lower() == 'to' and doc[token.i + 2].pos_ == 'VERB'):
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': doc[token.i + 2],
+                        'to_token': doc[token.i + 1],
+                        'pattern': 'be_about_to',
+                        'about_token': token,
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ be about to構文検出: 'about to {doc[token.i + 2].text}'")
+        
+        # in order to構文検出
+        if not infinitive_info['found'] and 'in order to' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'order' and token.i < len(doc) - 2 and
+                    doc[token.i + 1].text.lower() == 'to' and doc[token.i + 2].pos_ == 'VERB'):
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': doc[token.i + 2],
+                        'to_token': doc[token.i + 1],
+                        'pattern': 'in_order_to',
+                        'order_token': token,
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ in order to構文検出: 'in order to {doc[token.i + 2].text}'")
+        
+        # so as to構文検出
+        if not infinitive_info['found'] and 'so as to' in text_lower:
+            for token in doc:
+                if (token.text.lower() == 'as' and token.i < len(doc) - 2 and
+                    doc[token.i + 1].text.lower() == 'to' and doc[token.i + 2].pos_ == 'VERB' and
+                    token.i > 0 and doc[token.i - 1].text.lower() == 'so'):
+                    infinitive_info['found'] = True
+                    infinitive_info['infinitive_tokens'].append({
+                        'main_verb': doc[token.i + 2],
+                        'to_token': doc[token.i + 1],
+                        'pattern': 'so_as_to',
+                        'as_token': token,
+                        'head': token.head,
+                        'dependency': token.dep_
+                    })
+                    print(f"   ✅ so as to構文検出: 'so as to {doc[token.i + 2].text}'")
+        
+        # 使役構文検出: want + 人 + to do
+        if not infinitive_info['found']:
+            for token in doc:
+                if (token.lemma_.lower() in ['want', 'ask', 'tell', 'expect', 'allow', 'cause'] and
+                    token.pos_ == 'VERB'):
+                    # 目的語 + to + 動詞の構造を探す
+                    for child in token.children:
+                        if child.dep_ == 'dobj':  # 直接目的語
+                            # 次のtoを探す
+                            for next_token in doc[child.i+1:]:
+                                if (next_token.text.lower() == 'to' and next_token.pos_ == 'PART' and
+                                    next_token.i < len(doc) - 1 and doc[next_token.i + 1].pos_ == 'VERB'):
+                                    infinitive_info['found'] = True
+                                    infinitive_info['infinitive_tokens'].append({
+                                        'main_verb': doc[next_token.i + 1],
+                                        'to_token': next_token,
+                                        'pattern': 'causative',
+                                        'causative_verb': token,
+                                        'object': child,
+                                        'head': token,
+                                        'dependency': 'causative'
+                                    })
+                                    print(f"   ✅ 使役構文検出: '{token.text} {child.text} to {doc[next_token.i + 1].text}'")
+                                    break
+        
         # 用法分類（依存関係ベース）
         if infinitive_info['found']:
             infinitive_info['syntactic_role'] = self._analyze_syntactic_role(doc, infinitive_info)
@@ -275,6 +605,29 @@ class InfinitiveHandler:
             elif pattern == 'enough_to_pattern':
                 print(f"   📝 enough...to構文 → 結果の副詞的用法")
                 return 'enough_to_adverbial'
+            
+            # 高度なパターンの処理（case164-170）
+            elif pattern == 'perfect_infinitive':
+                print(f"   📝 完了不定詞 → 助動詞形式")
+                return 'perfect_infinitive'
+            elif pattern == 'passive_infinitive':
+                print(f"   📝 受動不定詞 → 名詞的用法（目的語）")
+                return 'passive_infinitive'
+            elif pattern == 'wh_infinitive':
+                print(f"   📝 疑問詞+不定詞 → 名詞的用法（目的語）")
+                return 'wh_infinitive'
+            elif pattern == 'causative':
+                print(f"   📝 使役構文 → 目的語補語")
+                return 'causative'
+            elif pattern == 'be_about_to':
+                print(f"   📝 be about to構文 → 助動詞形式")
+                return 'be_about_to'
+            elif pattern == 'in_order_to':
+                print(f"   📝 in order to構文 → 目的の副詞的用法")
+                return 'in_order_to'
+            elif pattern == 'so_as_to':
+                print(f"   📝 so as to構文 → 目的の副詞的用法")
+                return 'so_as_to'
             
             # xcomp: 通常は目的語補語（形容詞的・副詞的用法）
             elif pattern == 'xcomp_aux':
@@ -394,6 +747,23 @@ class InfinitiveHandler:
             return self._process_enough_to_infinitive(doc, text, infinitive_info, slots)
         elif syntactic_role == 'adverbial_clause':
             return self._process_adverbial_infinitive(doc, text, infinitive_info, slots)
+        
+        # 高度なパターンの処理（case164-170）
+        elif syntactic_role == 'perfect_infinitive':
+            return self._process_perfect_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'passive_infinitive':
+            return self._process_passive_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'wh_infinitive':
+            return self._process_wh_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'causative':
+            return self._process_causative_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'be_about_to':
+            return self._process_be_about_to_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'in_order_to':
+            return self._process_in_order_to_infinitive(doc, text, infinitive_info, slots)
+        elif syntactic_role == 'so_as_to':
+            return self._process_so_as_to_infinitive(doc, text, infinitive_info, slots)
+        
         else:
             return self._process_basic_infinitive(doc, text, infinitive_info, slots)
     
@@ -1144,3 +1514,568 @@ class InfinitiveHandler:
         # 位置順でソートして結合
         phrase_tokens.sort(key=lambda x: x[0])
         return ' '.join([t[1] for t in phrase_tokens])
+
+    # ========== 高度な不定詞構文処理メソッド（case164-170） ==========
+    
+    def _process_perfect_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        完了不定詞の処理（case164: He seems to have finished his work）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 完了不定詞処理: {text}")
+        
+        # 文構造を特定: He seems to have finished his work
+        main_subject = None      # He
+        governing_verb = None    # seems  
+        perfect_verb = None      # finished
+        object_part = None       # his work
+        
+        # spaCy解析で各要素を検出
+        for token in doc:
+            if token.dep_ == 'nsubj' and token.head.pos_ == 'VERB':
+                main_subject = token.text
+            elif token.lemma_ in ['seem', 'appear', 'happen'] and token.pos_ == 'VERB':
+                governing_verb = token.text
+            elif token.dep_ == 'xcomp' and token.pos_ == 'VERB':
+                perfect_verb = token.text
+                # 完了不定詞の目的語を検出
+                for child in token.children:
+                    if child.dep_ == 'dobj':
+                        # 所有格も含めて目的語を構築
+                        obj_parts = []
+                        for obj_child in child.children:
+                            if obj_child.dep_ == 'poss':
+                                obj_parts.append(obj_child.text)
+                        obj_parts.append(child.text)
+                        object_part = ' '.join(obj_parts)
+        
+        print(f"   📍 主語検出: S = '{main_subject}'")
+        print(f"   📍 完了助動詞統合: Aux = '{governing_verb} to have'")
+        print(f"   📍 過去分詞検出: V = '{perfect_verb}'")
+        if object_part:
+            print(f"   📍 目的語検出: O1 = '{object_part}'")
+        
+        # 期待される形式で結果を構築
+        main_slots = {
+            'S': main_subject or '',
+            'Aux': f"{governing_verb} to have" if governing_verb else "to have",
+            'V': perfect_verb or '',
+            'O1': object_part or ''
+        }
+        
+        return {
+            'success': True,
+            'main_slots': main_slots,
+            'sub_slots': {},
+            'collaboration': ['infinitive'],
+            'primary_handler': 'infinitive',
+            'metadata': {
+                'handler': 'infinitive_perfect',
+                'usage_type': 'perfect_infinitive',
+                'confidence': 0.9,
+                'spacy_analysis': True
+            }
+        }
+    
+    def _process_passive_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        受動不定詞の処理（case165: This problem needs to be solved quickly）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 受動不定詞処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'passive_infinitive':
+                be_verb = inf_token['main_verb']  # be
+                
+                # 真の主動詞を探す: beの支配語の支配語をチェック
+                governing_verb = be_verb.head
+                if governing_verb.dep_ == 'xcomp':
+                    # xcompの場合は、その支配語が真の主動詞
+                    main_verb = governing_verb.head
+                else:
+                    main_verb = governing_verb
+                
+                print(f"   🔍 be動詞: {be_verb.text}")
+                print(f"   🔍 be動詞の支配語: {governing_verb.text} (dep: {governing_verb.dep_})")
+                print(f"   🔍 DEBUG: governing_verb tag = {governing_verb.tag_}")
+                print(f"   🔍 真の主動詞候補: {main_verb.text}")
+                
+                # 過去分詞と修飾語を探す
+                past_participle = None
+                
+                # governing_verb自身が過去分詞かチェック
+                if governing_verb.tag_ == 'VBN':
+                    past_participle = governing_verb
+                    print(f"   🔍 governing_verb自身が過去分詞: {governing_verb.text}")
+                adverb = None
+                
+                # be動詞の子要素から過去分詞を探す
+                print(f"   🔍 DEBUG: be動詞'{be_verb.text}'の子要素をチェック")
+                for child in be_verb.children:
+                    print(f"   🔍 DEBUG: be動詞の子: {child.text} (tag: {child.tag_}, dep: {child.dep_})")
+                    if child.tag_ == 'VBN':  # 過去分詞
+                        past_participle = child
+                        print(f"   🔍 be動詞の子から過去分詞発見: {child.text}")
+                    elif child.dep_ == 'advmod':  # 副詞修飾語
+                        adverb = child.text
+                        print(f"   🔍 be動詞の子から副詞発見: {child.text}")
+                
+                # be動詞の兄弟（governingの子要素）から過去分詞を探す
+                if not past_participle:
+                    print(f"   🔍 DEBUG: governing verb '{governing_verb.text}'の子要素をチェック")
+                    for child in governing_verb.children:
+                        print(f"   🔍 DEBUG: governing verbの子: {child.text} (tag: {child.tag_}, dep: {child.dep_})")
+                        if child.tag_ == 'VBN':
+                            past_participle = child
+                            print(f"   🔍 governing verbの子から過去分詞発見: {child.text}")
+                
+                # 過去分詞の子要素から副詞を探す
+                if past_participle and not adverb:
+                    for child in past_participle.children:
+                        if child.dep_ == 'advmod':
+                            adverb = child.text
+                            print(f"   🔍 過去分詞の子から副詞発見: {child.text}")
+                            break
+                
+                # 文全体から 'quickly' のような副詞を探す（フォールバック）
+                if not adverb:
+                    for token in doc:
+                        if token.pos_ == 'ADV' and token.dep_ == 'advmod':
+                            # 過去分詞に依存する副詞を優先
+                            if past_participle and token.head == past_participle:
+                                adverb = token.text
+                                print(f"   🔍 フォールバック: 過去分詞に依存する副詞発見: {token.text}")
+                                break
+                            # または動詞に依存する副詞
+                            elif token.head == governing_verb:
+                                adverb = token.text
+                                print(f"   🔍 フォールバック: governing verbに依存する副詞発見: {token.text}")
+                                break
+                
+                # 主語を検出: 真の主動詞の主語を探す
+                subject = None
+                for token in doc:
+                    if token.dep_ == 'nsubj' and token.head == main_verb:
+                        subject = self._get_full_noun_phrase(token)
+                        break
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                print(f"   📍 主動詞検出: V = '{main_verb.text}'")
+                print(f"   📍 受動不定詞目的語: O1 = 空（サブスロット使用）")
+                print(f"   📍 受動助動詞検出: sub-aux = 'to be'")
+                print(f"   📍 受動動詞検出: sub-v = '{past_participle.text if past_participle else 'unknown'}'")
+                if adverb:
+                    print(f"   📍 副詞修飾語検出: sub-m2 = '{adverb}'")
+                
+                result = {
+                    'success': True,
+                    'main_slots': {
+                        'S': subject or '',
+                        'V': main_verb.text,
+                        'O1': ''
+                    },
+                    'sub_slots': {
+                        'sub-aux': 'to be',
+                        'sub-v': past_participle.text if past_participle else '',
+                        '_parent_slot': 'O1'
+                    },
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_passive',
+                        'usage_type': 'passive_infinitive',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+                
+                if adverb:
+                    result['sub_slots']['sub-m2'] = adverb
+                
+                return result
+        
+        return {'success': False, 'error': '受動不定詞の解析に失敗しました'}
+    
+    def _process_wh_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        疑問詞+不定詞の処理（case166: I don't know what to do）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 疑問詞+不定詞処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'wh_infinitive':
+                main_verb = inf_token['main_verb']
+                wh_word = inf_token['wh_word']
+                head = inf_token['head']
+                
+                # 主語と助動詞を検出
+                subject = None
+                auxiliary = None
+                
+                # より正確な主語・助動詞検出
+                for token in doc:
+                    if token.dep_ == 'nsubj' and token.head == head:
+                        subject = token.text
+                    elif token.dep_ == 'aux' and token.head == head:
+                        # 助動詞と否定の組み合わせをチェック
+                        neg_token = None
+                        for child in token.head.children:
+                            if child.dep_ == 'neg':
+                                neg_token = child
+                                break
+                        
+                        if neg_token:
+                            auxiliary = f"{token.text}{neg_token.text}"
+                        else:
+                            auxiliary = token.text
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                if auxiliary:
+                    print(f"   📍 助動詞検出: Aux = '{auxiliary}'")
+                print(f"   📍 主動詞検出: V = '{head.text}'")
+                print(f"   📍 疑問詞+不定詞目的語: O1 = 空（サブスロット使用）")
+                print(f"   📍 疑問詞検出: sub-o1 = '{wh_word.text}'")
+                print(f"   📍 不定詞動詞検出: sub-v = 'to {main_verb.text}'")
+                
+                # main_slotsに助動詞も含める
+                main_slots = {
+                    'S': subject or '',
+                    'V': head.text,
+                    'O1': ''
+                }
+                
+                if auxiliary:
+                    main_slots['Aux'] = auxiliary
+                
+                result = {
+                    'success': True,
+                    'main_slots': main_slots,
+                    'sub_slots': {
+                        'sub-o1': wh_word.text,
+                        'sub-v': f'to {main_verb.text}',
+                        '_parent_slot': 'O1'
+                    },
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_wh_question',
+                        'usage_type': 'wh_infinitive',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+                
+                if auxiliary:
+                    result['main_slots']['Aux'] = auxiliary
+                
+                return result
+        
+        return {'success': False, 'error': '疑問詞+不定詞の解析に失敗しました'}
+    
+    def _process_causative_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        使役構文の処理（case167: I want you to help me）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 使役構文処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'causative':
+                main_verb = inf_token['main_verb']
+                causative_verb = inf_token['causative_verb']
+                object_person = inf_token['object']
+                
+                # 主語を検出
+                subject = None
+                for token in doc:
+                    if token.dep_ == 'nsubj' and token.head == causative_verb:
+                        subject = token.text
+                        break
+                
+                # 不定詞の目的語を検出
+                infinitive_object = None
+                for child in main_verb.children:
+                    if child.dep_ == 'dobj':
+                        infinitive_object = child.text
+                        break
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                print(f"   📍 使役動詞検出: V = '{causative_verb.text}'")
+                print(f"   📍 直接目的語検出: O1 = '{object_person.text}'")
+                print(f"   📍 目的語補語: C2 = 空（サブスロット使用）")
+                print(f"   📍 不定詞動詞検出: sub-v = 'to {main_verb.text}'")
+                if infinitive_object:
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{infinitive_object}'")
+                
+                result = {
+                    'success': True,
+                    'main_slots': {
+                        'S': subject or '',
+                        'V': causative_verb.text,
+                        'O1': object_person.text,
+                        'C2': ''
+                    },
+                    'sub_slots': {
+                        'sub-v': f'to {main_verb.text}',
+                        '_parent_slot': 'C2'
+                    },
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_causative',
+                        'usage_type': 'causative',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+                
+                if infinitive_object:
+                    result['sub_slots']['sub-o1'] = infinitive_object
+                
+                return result
+        
+        return {'success': False, 'error': '使役構文の解析に失敗しました'}
+    
+    def _process_be_about_to_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        be about to構文の処理（case168: The meeting is about to start）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 be about to構文処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'be_about_to':
+                main_verb = inf_token['main_verb']
+                about_token = inf_token['about_token']
+                
+                # 主語とbe動詞を検出
+                subject = None
+                be_verb = None
+                
+                for token in doc:
+                    if token.dep_ == 'nsubj':
+                        subject = self._get_full_noun_phrase(token)
+                    elif token.lemma_ == 'be' and token.pos_ == 'AUX':
+                        be_verb = token.text
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                print(f"   📍 be about to助動詞統合: Aux = '{be_verb} about to'")
+                print(f"   📍 不定詞動詞検出: V = '{main_verb.text}'")
+                
+                return {
+                    'success': True,
+                    'main_slots': {
+                        'S': subject or '',
+                        'Aux': f'{be_verb} about to' if be_verb else 'about to',
+                        'V': main_verb.text
+                    },
+                    'sub_slots': {},
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_be_about_to',
+                        'usage_type': 'be_about_to',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+        
+        return {'success': False, 'error': 'be about to構文の解析に失敗しました'}
+    
+    def _process_in_order_to_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        in order to構文の処理（case169: She studies hard in order to pass the exam）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 in order to構文処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'in_order_to':
+                main_verb = inf_token['main_verb']
+                
+                # 主語と主動詞を検出
+                subject = None
+                main_verb_word = None
+                adverb = None
+                
+                for token in doc:
+                    if token.dep_ == 'nsubj':
+                        subject = token.text
+                    elif token.dep_ == 'ROOT':
+                        main_verb_word = token.text
+                    elif token.dep_ == 'advmod' and token.head.dep_ == 'ROOT':
+                        adverb = token.text
+                
+                # 不定詞の目的語を検出
+                infinitive_object = None
+                for child in main_verb.children:
+                    if child.dep_ == 'dobj':
+                        infinitive_object = self._get_full_noun_phrase(child)
+                        break
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                print(f"   📍 主動詞検出: V = '{main_verb_word}'")
+                if adverb:
+                    print(f"   📍 副詞修飾語検出: M2 = '{adverb}'")
+                print(f"   📍 目的の副詞句: M3 = 空（サブスロット使用）")
+                print(f"   📍 in order to動詞検出: sub-v = 'in order to {main_verb.text}'")
+                if infinitive_object:
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{infinitive_object}'")
+                
+                result = {
+                    'success': True,
+                    'main_slots': {
+                        'S': subject or '',
+                        'V': main_verb_word or '',
+                        'M3': ''
+                    },
+                    'sub_slots': {
+                        'sub-v': f'in order to {main_verb.text}',
+                        '_parent_slot': 'M3'
+                    },
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_in_order_to',
+                        'usage_type': 'in_order_to',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+                
+                if adverb:
+                    result['main_slots']['M2'] = adverb
+                if infinitive_object:
+                    result['sub_slots']['sub-o1'] = infinitive_object
+                
+                return result
+        
+        return {'success': False, 'error': 'in order to構文の解析に失敗しました'}
+    
+    def _process_so_as_to_infinitive(self, doc, text: str, infinitive_info: Dict, slots: Dict) -> Dict[str, Any]:
+        """
+        so as to構文の処理（case170: He left early so as to avoid traffic）
+        
+        Args:
+            doc: spaCy解析結果
+            text: 元の英文
+            infinitive_info: 不定詞情報
+            slots: スロット分類
+            
+        Returns:
+            Dict[str, Any]: 処理結果
+        """
+        print(f"📝 so as to構文処理: {text}")
+        
+        for inf_token in infinitive_info['infinitive_tokens']:
+            if inf_token['pattern'] == 'so_as_to':
+                main_verb = inf_token['main_verb']
+                
+                # 主語と主動詞を検出
+                subject = None
+                main_verb_word = None
+                adverb = None
+                
+                for token in doc:
+                    if token.dep_ == 'nsubj':
+                        subject = token.text
+                    elif token.dep_ == 'ROOT':
+                        main_verb_word = token.text
+                    elif token.dep_ == 'advmod' and token.head.dep_ == 'ROOT':
+                        adverb = token.text
+                
+                # 不定詞の目的語を検出
+                infinitive_object = None
+                for child in main_verb.children:
+                    if child.dep_ == 'dobj':
+                        infinitive_object = child.text
+                        break
+                
+                print(f"   📍 主語検出: S = '{subject}'")
+                print(f"   📍 主動詞検出: V = '{main_verb_word}'")
+                if adverb:
+                    print(f"   📍 副詞修飾語検出: M2 = '{adverb}'")
+                print(f"   📍 目的の副詞句: M3 = 空（サブスロット使用）")
+                print(f"   📍 so as to動詞検出: sub-v = 'so as to {main_verb.text}'")
+                if infinitive_object:
+                    print(f"   📍 不定詞目的語検出: sub-o1 = '{infinitive_object}'")
+                
+                result = {
+                    'success': True,
+                    'main_slots': {
+                        'S': subject or '',
+                        'V': main_verb_word or '',
+                        'M3': ''
+                    },
+                    'sub_slots': {
+                        'sub-v': f'so as to {main_verb.text}',
+                        '_parent_slot': 'M3'
+                    },
+                    'collaboration': ['infinitive'],
+                    'primary_handler': 'infinitive',
+                    'metadata': {
+                        'handler': 'infinitive_so_as_to',
+                        'usage_type': 'so_as_to',
+                        'confidence': 0.9,
+                        'spacy_analysis': True
+                    }
+                }
+                
+                if adverb:
+                    result['main_slots']['M2'] = adverb
+                if infinitive_object:
+                    result['sub_slots']['sub-o1'] = infinitive_object
+                
+                return result
+        
+        return {'success': False, 'error': 'so as to構文の解析に失敗しました'}

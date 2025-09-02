@@ -1,0 +1,17 @@
+{
+  "case_case166": {
+    "sentence": "I don't know what to do.",
+    "match": false,
+    "main_slots": {
+      "S": "",
+      "Aux": "to",
+      "V": "do",
+      "O1": ""
+    },
+    "sub_slots": {
+      "sub-o1": "what",
+      "sub-v": "to do",
+      "_parent_slot": "O1"
+    }
+  }
+}

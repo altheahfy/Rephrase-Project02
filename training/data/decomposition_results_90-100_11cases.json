@@ -1,0 +1,125 @@
+{
+  "case_90": {
+    "sentence": "Do you understand the question?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Do",
+      "V": "understand",
+      "O1": "the question"
+    },
+    "sub_slots": {}
+  },
+  "case_91": {
+    "sentence": "Does she work at the hospital?",
+    "match": true,
+    "main_slots": {
+      "S": "she",
+      "Aux": "Does",
+      "V": "work",
+      "M2": "at the hospital"
+    },
+    "sub_slots": {}
+  },
+  "case_92": {
+    "sentence": "Don't touch that button!",
+    "match": true,
+    "main_slots": {
+      "Aux": "Don't",
+      "V": "touch",
+      "O1": "that button"
+    },
+    "sub_slots": {}
+  },
+  "case_93": {
+    "sentence": "Can you help me with this problem?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Can",
+      "V": "help",
+      "O1": "me",
+      "M2": "with this problem"
+    },
+    "sub_slots": {}
+  },
+  "case_94": {
+    "sentence": "Would you like some coffee?",
+    "match": true,
+    "main_slots": {
+      "S": "you",
+      "Aux": "Would",
+      "V": "like",
+      "O1": "some coffee"
+    },
+    "sub_slots": {}
+  },
+  "case_95": {
+    "sentence": "I shall return tomorrow.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "shall",
+      "V": "return",
+      "M2": "tomorrow"
+    },
+    "sub_slots": {}
+  },
+  "case_96": {
+    "sentence": "We ought to start immediately.",
+    "match": true,
+    "main_slots": {
+      "S": "We",
+      "Aux": "ought to",
+      "V": "start",
+      "M2": "immediately"
+    },
+    "sub_slots": {}
+  },
+  "case_97": {
+    "sentence": "They used to play here every day.",
+    "match": true,
+    "main_slots": {
+      "S": "They",
+      "Aux": "used to",
+      "V": "play",
+      "M2": "here",
+      "M3": "every day"
+    },
+    "sub_slots": {}
+  },
+  "case_98": {
+    "sentence": "He is going to study abroad.",
+    "match": true,
+    "main_slots": {
+      "S": "He",
+      "Aux": "is going to",
+      "V": "study",
+      "M2": "abroad"
+    },
+    "sub_slots": {}
+  },
+  "case_99": {
+    "sentence": "I have been waiting for an hour.",
+    "match": true,
+    "main_slots": {
+      "S": "I",
+      "Aux": "have been",
+      "V": "waiting",
+      "M2": "for an hour"
+    },
+    "sub_slots": {}
+  },
+  "case_100": {
+    "sentence": "You should have called me earlier.",
+    "match": true,
+    "main_slots": {
+      "S": "You",
+      "Aux": "should have",
+      "V": "called",
+      "O1": "me",
+      "M2": "earlier"
+    },
+    "sub_slots": {}
+  }
+}
