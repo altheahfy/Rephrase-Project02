@@ -1,8 +1,8 @@
 {
   "meta": {
-    "total_count": 130,
-    "valid_count": 130,
-    "new_count": 112,
+    "total_count": 195,
+    "valid_count": 195,
+    "new_count": 137,
     "basic_pattern_count": 33,
     "adverb_test_count": 14,
     "reorganized": true,
@@ -17,13 +17,17 @@
       "relative_adverbs": 10,
       "noun_clauses": 8,
       "omitted_relative_pronouns": 10,
+      "infinitive_constructions": 15,
+      "gerund_constructions": 25,
       "absolute_order_test": 0
     },
-    "total_reorganized": 130,
+    "total_reorganized": 195,
     "tell_group_normalized": true,
     "modal_handler_test_added": true,
     "omitted_relative_pronoun_added": true,
-    "note": "連番整理済み（1-130）- 新文法ハンドラー開発準備完了",
+    "infinitive_handler_added": true,
+    "gerund_handler_added": true,
+    "note": "連番整理済み（1-195）- 動名詞ハンドラー包括テスト対応",
     "renumbered": true
   },
   "data": {
@@ -2846,6 +2850,489 @@
           "sub-v": "so as to avoid",
           "sub-o1": "traffic",
           "_parent_slot": "M3"
+        }
+      }
+    },
+    "171": {
+      "V_group_key": "gerund_subject",
+      "grammar_category": "gerund_subject",
+      "sentence": "Swimming is fun.",
+      "expected": {
+        "main_slots": {
+          "S": "Swimming",
+          "V": "is",
+          "C1": "fun"
+        },
+        "sub_slots": {}
+      }
+    },
+    "172": {
+      "V_group_key": "gerund_subject",
+      "grammar_category": "gerund_subject",
+      "sentence": "Reading books helps you learn.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "helps",
+          "O1": "you",
+          "C2": "learn"
+        },
+        "sub_slots": {
+          "sub-v": "Reading",
+          "sub-o1": "books",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "173": {
+      "V_group_key": "gerund_subject",
+      "grammar_category": "gerund_subject",
+      "sentence": "Learning English takes time.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "takes",
+          "O1": "time"
+        },
+        "sub_slots": {
+          "sub-v": "Learning",
+          "sub-o1": "English",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "174": {
+      "V_group_key": "gerund_subject",
+      "grammar_category": "gerund_subject",
+      "sentence": "Walking in the park is relaxing.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "relaxing"
+        },
+        "sub_slots": {
+          "sub-v": "Walking",
+          "sub-m2": "in the park",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "175": {
+      "V_group_key": "gerund_subject",
+      "grammar_category": "gerund_subject",
+      "sentence": "Playing tennis regularly keeps you healthy.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "keeps",
+          "O1": "you",
+          "C1": "healthy"
+        },
+        "sub_slots": {
+          "sub-v": "Playing",
+          "sub-o1": "tennis",
+          "sub-m2": "regularly",
+          "_parent_slot": "S"
+        }
+      }
+    },
+    "176": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "I enjoy reading.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "enjoy",
+          "O1": "reading"
+        },
+        "sub_slots": {}
+      }
+    },
+    "177": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "She finished studying.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "finished",
+          "O1": "studying"
+        },
+        "sub_slots": {}
+      }
+    },
+    "178": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "They avoided talking about it.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "avoided",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-v": "talking",
+          "sub-m2": "about it",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "179": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "We considered buying a new car.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "considered",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-v": "buying",
+          "sub-o1": "a new car",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "180": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "He keeps forgetting his keys.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "keeps",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-v": "forgetting",
+          "sub-o1": "his keys",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "181": {
+      "V_group_key": "gerund_object",
+      "grammar_category": "gerund_object",
+      "sentence": "I appreciate your helping me.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "appreciate",
+          "O1": "your helping me"
+        },
+        "sub_slots": {}
+      }
+    },
+    "182": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "I'm interested in learning French.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "am",
+          "V": "interested",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "in",
+          "sub-v": "learning",
+          "sub-o1": "French",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "183": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "She is good at playing piano.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "is",
+          "C1": "good",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "at",
+          "sub-v": "playing",
+          "sub-o1": "piano",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "184": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "They are afraid of flying.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "are",
+          "C1": "afraid",
+          "C2": "of flying"
+        },
+        "sub_slots": {}
+      }
+    },
+    "185": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "Thank you for helping me.",
+      "expected": {
+        "main_slots": {
+          "V": "Thank",
+          "O1": "you",
+          "M2": "for helping me"
+        },
+        "sub_slots": {}
+      }
+    },
+    "186": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "After finishing homework, I watch TV.",
+      "expected": {
+        "main_slots": {
+          "M1": "After finishing homework",
+          "S": "I",
+          "V": "watch",
+          "O1": "TV"
+        },
+        "sub_slots": {}
+      }
+    },
+    "187": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "Before leaving home, she checked the weather.",
+      "expected": {
+        "main_slots": {
+          "M1": "Before leaving home",
+          "S": "she",
+          "V": "checked",
+          "O1": "the weather"
+        },
+        "sub_slots": {}
+      }
+    },
+    "188": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "Without saying anything, he left.",
+      "expected": {
+        "main_slots": {
+          "M1": "Without saying anything",
+          "S": "he",
+          "V": "left"
+        },
+        "sub_slots": {}
+      }
+    },
+    "189": {
+      "V_group_key": "gerund_prepositional",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "By working hard, you can succeed.",
+      "expected": {
+        "main_slots": {
+          "M1": "By working hard",
+          "S": "you",
+          "Aux": "can",
+          "V": "succeed"
+        },
+        "sub_slots": {}
+      }
+    },
+    "190": {
+      "V_group_key": "gerund_prep_simple",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "I'm interested in learning.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "am",
+          "C1": "interested",
+          "C2": "in learning"
+        },
+        "sub_slots": {}
+      }
+    },
+    "191": {
+      "V_group_key": "gerund_prep_complex",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "I'm interested in learning English.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "am",
+          "C1": "interested",
+          "C2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "in",
+          "sub-v": "learning",
+          "sub-o1": "English",
+          "_parent_slot": "C2"
+        }
+      }
+    },
+    "192": {
+      "V_group_key": "gerund_complement_simple",
+      "grammar_category": "gerund_complement",
+      "sentence": "My hobby is reading.",
+      "expected": {
+        "main_slots": {
+          "S": "My hobby",
+          "V": "is",
+          "C1": "reading"
+        },
+        "sub_slots": {}
+      }
+    },
+    "193": {
+      "V_group_key": "gerund_complement_complex",
+      "grammar_category": "gerund_complement",
+      "sentence": "My hobby is reading novels.",
+      "expected": {
+        "main_slots": {
+          "S": "My hobby",
+          "V": "is",
+          "C1": ""
+        },
+        "sub_slots": {
+          "sub-v": "reading",
+          "sub-o1": "novels",
+          "_parent_slot": "C1"
+        }
+      }
+    },
+    "194": {
+      "V_group_key": "gerund_after_preposition",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "After finishing homework, I watch TV.",
+      "expected": {
+        "main_slots": {
+          "M1": "",
+          "S": "I",
+          "V": "watch",
+          "O1": "TV"
+        },
+        "sub_slots": {
+          "sub-m1": "After",
+          "sub-v": "finishing",
+          "sub-o1": "homework",
+          "_parent_slot": "M1"
+        }
+      }
+    },
+    "195": {
+      "V_group_key": "gerund_keep_doing",
+      "grammar_category": "gerund_object",
+      "sentence": "She keeps talking about movies.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "keeps",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-v": "talking",
+          "sub-m2": "about movies",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "196": {
+      "V_group_key": "gerund_avoid_doing",
+      "grammar_category": "gerund_object",
+      "sentence": "I avoid eating junk food.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "avoid",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-v": "eating",
+          "sub-o1": "junk food",
+          "_parent_slot": "O1"
+        }
+      }
+    },
+    "197": {
+      "V_group_key": "gerund_good_at",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "He is good at playing guitar.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "is",
+          "C1": "good",
+          "C2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "at",
+          "sub-v": "playing",
+          "sub-o1": "guitar",
+          "_parent_slot": "C2"
+        }
+      }
+    },
+    "198": {
+      "V_group_key": "gerund_thank_for",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "Thank you for helping me.",
+      "expected": {
+        "main_slots": {
+          "V": "Thank",
+          "O1": "you",
+          "C2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "for",
+          "sub-v": "helping",
+          "sub-o1": "me",
+          "_parent_slot": "C2"
+        }
+      }
+    },
+    "199": {
+      "V_group_key": "gerund_without_doing",
+      "grammar_category": "gerund_prepositional",
+      "sentence": "She left without saying goodbye.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "left",
+          "M2": ""
+        },
+        "sub_slots": {
+          "sub-m2": "without",
+          "sub-v": "saying",
+          "sub-o1": "goodbye",
+          "_parent_slot": "M2"
+        }
+      }
+    },
+    "200": {
+      "V_group_key": "gerund_possessive",
+      "grammar_category": "gerund_possessive",
+      "sentence": "I appreciate your helping us.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "appreciate",
+          "O1": ""
+        },
+        "sub_slots": {
+          "sub-s": "your",
+          "sub-v": "helping",
+          "sub-o1": "us",
+          "_parent_slot": "O1"
         }
       }
     }

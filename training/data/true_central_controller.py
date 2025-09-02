@@ -27,6 +27,7 @@ from conditional_handler import ConditionalHandler
 from imperative_handler import ImperativeHandler
 from metaphorical_handler import MetaphoricalHandler
 from infinitive_handler import InfinitiveHandler
+from gerund_handler import GerundHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 
 
@@ -92,6 +93,7 @@ class TrueCentralController:
         imperative_handler = ImperativeHandler()
         metaphorical_handler = MetaphoricalHandler(self.nlp)
         infinitive_handler = InfinitiveHandler(self.nlp)
+        gerund_handler = GerundHandler(self.nlp)
         
         # 協力者注入（Dependency Injection）
         collaborators = {
@@ -102,12 +104,14 @@ class TrueCentralController:
             'noun_clause': noun_clause_handler,
             'imperative': imperative_handler,
             'infinitive': infinitive_handler,
+            'gerund': gerund_handler,
             'basic_five_pattern': basic_five_pattern_handler
         }
         
         relative_clause_handler = RelativeClauseHandler(collaborators)
         relative_adverb_handler = RelativeAdverbHandler(collaborators)
         metaphorical_handler.collaborators = collaborators
+        gerund_handler.collaborators = collaborators
         
         # ステージ別ハンドラー配置
         self.stage_handlers = {
@@ -123,7 +127,8 @@ class TrueCentralController:
                 modal_handler,
                 question_handler,
                 imperative_handler,
-                infinitive_handler
+                infinitive_handler,
+                gerund_handler
             ],
             'basic_pattern': [
                 basic_five_pattern_handler,
@@ -148,7 +153,8 @@ class TrueCentralController:
             'conditional': conditional_handler,
             'imperative': imperative_handler,
             'metaphorical': metaphorical_handler,
-            'infinitive': infinitive_handler
+            'infinitive': infinitive_handler,
+            'gerund': gerund_handler
         }
         
     def process_sentence(self, sentence: str) -> Dict[str, Any]:
