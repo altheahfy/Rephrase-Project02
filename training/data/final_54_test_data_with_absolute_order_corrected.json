@@ -3039,8 +3039,7 @@
           "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "in",
-          "sub-v": "learning",
+          "sub-v": "in learning",
           "sub-o1": "French",
           "_parent_slot": "M2"
         }
@@ -3058,8 +3057,7 @@
           "M2": ""
         },
         "sub_slots": {
-          "sub-m2": "at",
-          "sub-v": "playing",
+          "sub-v": "at playing",
           "sub-o1": "piano",
           "_parent_slot": "M2"
         }
@@ -3074,9 +3072,12 @@
           "S": "They",
           "V": "are",
           "C1": "afraid",
-          "C2": "of flying"
+          "O1": ""
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-v": "of flying",
+          "_parent_slot": "O1"
+        }
       }
     },
     "185": {
@@ -3098,12 +3099,16 @@
       "sentence": "After finishing homework, I watch TV.",
       "expected": {
         "main_slots": {
-          "M1": "After finishing homework",
+          "M2": "",
           "S": "I",
           "V": "watch",
           "O1": "TV"
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-v": "After finishing",
+          "sub-o1": "homework",
+          "_parent_slot": "M2"
+        }
       }
     },
     "187": {
@@ -3112,12 +3117,16 @@
       "sentence": "Before leaving home, she checked the weather.",
       "expected": {
         "main_slots": {
-          "M1": "Before leaving home",
+          "M2": "",
           "S": "she",
           "V": "checked",
           "O1": "the weather"
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-v": "Before leaving",
+          "sub-o1": "home",
+          "_parent_slot": "M2"
+        }
       }
     },
     "188": {
@@ -3126,11 +3135,15 @@
       "sentence": "Without saying anything, he left.",
       "expected": {
         "main_slots": {
-          "M1": "Without saying anything",
+          "M2": "",
           "S": "he",
           "V": "left"
         },
-        "sub_slots": {}
+        "sub_slots": {
+          "sub-v": "Without saying",
+          "sub-o1": "anything",
+          "_parent_slot": "M2"
+        }
       }
     },
     "189": {

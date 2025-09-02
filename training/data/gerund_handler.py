@@ -364,7 +364,13 @@ class GerundHandler:
         
         # 前置詞句の文法的役割を判定
         prep_role = self._determine_prep_phrase_role(preposition, doc)
-        target_slot = "C2" if prep_role == "complement" else "M2"
+        
+        # 文頭の前置詞句（コンマで区切られている）はM1に配置
+        is_sentence_initial = self._is_sentence_initial_prep_phrase(preposition, doc)
+        if is_sentence_initial:
+            target_slot = "M1"
+        else:
+            target_slot = "C2" if prep_role == "complement" else "M2"
         
         if has_objects_or_modifiers:
             # V要素（動詞的要素）があるのでサブスロット化
@@ -372,7 +378,8 @@ class GerundHandler:
             main_slots[target_slot] = ""  # 上位スロットは空
             
             # サブスロットに分解
-            sub_slots["sub-m2"] = preposition.text  # 前置詞部分
+            sub_slot_key = "sub-m1" if target_slot == "M1" else "sub-m2"
+            sub_slots[sub_slot_key] = preposition.text  # 前置詞部分
             sub_slots["sub-v"] = gerund_token.text   # 動名詞部分
             sub_slots[f"_parent_slot"] = target_slot
             
@@ -456,10 +463,19 @@ class GerundHandler:
         """
         動名詞が目的語や修飾語を持つかどうかを判定
         V要素があるかどうかの判定（Rephraseルール）
+        
+        特例: 単体動名詞でも動詞的性質が強い場合はV要素として扱う
         """
+        # 直接的な子要素を持つ場合
         for child in gerund_token.children:
             if child.dep_ in ["dobj", "pobj", "advmod", "amod", "compound", "prep"]:
                 return True
+        
+        # 特例: 特定の動詞的性質が強い単語はV要素として扱う
+        verb_like_gerunds = {"flying", "swimming", "running", "driving", "cooking", "dancing"}
+        if gerund_token.text.lower() in verb_like_gerunds:
+            return True
+            
         return False
 
     def _extract_gerund_elements_to_subslots(self, gerund_token, sub_slots):
@@ -579,6 +595,21 @@ class GerundHandler:
             return "complement"
         
         return "modifier"
+
+    def _is_sentence_initial_prep_phrase(self, prep_token, doc) -> bool:
+        """
+        文頭の前置詞句かどうかを判定
+        コンマで区切られた文頭の副詞句を検出
+        """
+        # 前置詞が文の最初の方にあり、後にコンマがある場合
+        if prep_token.i == 0:  # 文頭の前置詞
+            # 前置詞句の後にコンマがあるかチェック
+            for i in range(prep_token.i + 1, len(doc)):
+                if doc[i].text == ",":
+                    return True
+                elif doc[i].pos_ in ["VERB", "PRON"] and doc[i].dep_ in ["nsubj", "ROOT"]:
+                    break
+        return False
 
     def _merge_adverb_slots(self, main_slots, adverb_slots):
         """
