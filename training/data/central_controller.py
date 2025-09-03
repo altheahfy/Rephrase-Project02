@@ -12,6 +12,7 @@ Phase 2: RelativeClauseHandler統合
 import spacy
 import json
 from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass
 from basic_five_pattern_handler import BasicFivePatternHandler
 from relative_clause_handler import RelativeClauseHandler
 from relative_adverb_handler import RelativeAdverbHandler
@@ -28,6 +29,29 @@ from infinitive_handler import InfinitiveHandler
 from gerund_handler import GerundHandler
 from pure_data_driven_order_manager import PureDataDrivenOrderManager
 # from dynamic_absolute_order_manager import DynamicAbsoluteOrderManager  # 破棄済み
+
+
+@dataclass
+class ProcessingContext:
+    """🔧 リファクタリング: 処理コンテキスト - 全ハンドラー間で共有される情報"""
+    sentence: str
+    tokens: Any  # spaCy Doc object
+    main_slots: Dict[str, str] = None
+    sub_slots: Dict[str, Any] = None
+    metadata: Dict[str, Any] = None
+    current_stage: str = 'initialization'
+    completed_handlers: List[str] = None
+    early_detection_result: Optional[Dict[str, Any]] = None
+    
+    def __post_init__(self):
+        if self.main_slots is None:
+            self.main_slots = {}
+        if self.sub_slots is None:
+            self.sub_slots = {}
+        if self.metadata is None:
+            self.metadata = {}
+        if self.completed_handlers is None:
+            self.completed_handlers = []
 
 
 class CentralController:
@@ -54,6 +78,12 @@ class CentralController:
         
         # 動的分析用のグループマッピングを初期化
         self._initialize_group_mappings()
+        
+        # 🔧 リファクタリング Phase 4: 設定初期化を先に実行
+        self._initialize_configurations()
+        
+        # 🔧 リファクタリング: 早期検出パターンの一般化
+        self._initialize_early_detection_patterns()
         
         # Phase 9: 基本ハンドラーたちを先に初期化
         basic_five_pattern_handler = BasicFivePatternHandler()
@@ -297,23 +327,335 @@ class CentralController:
             raise FileNotFoundError("slot_order_data.json が見つかりません")
     
     def _determine_group_key(self, slots: Dict[str, str], text: str) -> str:
-        """スロットと文章から動詞グループキーを決定"""
+        """🔧 リファクタリング: 設定ベースの動詞グループキー決定"""
+        verb_config = self.verb_group_config
+        text_lower = text.lower()
+        
+        # スロット内の動詞をチェック
         if 'V' in slots:
             verb = slots['V'].lower()
-            if 'tell' in verb:
-                return 'tell'
-            elif 'gave' in verb or 'give' in verb:
-                return 'gave'
+            for pattern_config in verb_config['verb_patterns']:
+                pattern = pattern_config['pattern']
+                alt_forms = pattern_config['alt_forms']
+                
+                if pattern in verb or any(alt in verb for alt in alt_forms):
+                    return pattern_config['group_key']
         
-        # 文章からも動詞を検出
-        text_lower = text.lower()
-        if 'tell' in text_lower or 'told' in text_lower:
-            return 'tell'
-        elif 'gave' in text_lower or 'give' in text_lower:
-            return 'gave'
+        # 文章全体から動詞を検出
+        for pattern_config in verb_config['verb_patterns']:
+            pattern = pattern_config['pattern']
+            alt_forms = pattern_config['alt_forms']
+            
+            if pattern in text_lower or any(alt in text_lower for alt in alt_forms):
+                return pattern_config['group_key']
         
         # デフォルト
-        return 'basic'
+        return verb_config['default_group_key']
+    
+    def _initialize_configurations(self):
+        """🔧 リファクタリング Phase 4: 全設定の初期化"""
+        # 動詞グループ決定設定
+        self.verb_group_config = {
+            'verb_patterns': [
+                {'pattern': 'tell', 'group_key': 'tell', 'alt_forms': ['told']},
+                {'pattern': 'give', 'group_key': 'gave', 'alt_forms': ['gave', 'given']},
+            ],
+            'default_group_key': 'basic'
+        }
+        
+        # 条件節処理設定
+        self.conditional_processing_config = {
+            'equivalent_keywords': ['suppose', 'imagine', 'provided', 'unless', 'as long as'],
+            'prefix_mapping': {
+                'unless': 'Unless',
+                'provided that': 'Provided that',
+                'as long as': 'As long as',
+                'even if': 'Even if',
+                'suppose': 'Suppose',
+                'imagine': 'Imagine'
+            },
+            'slot_placement_rules': {
+                'default_slot': 'M2',
+                'fallback_strategy': 'use_m1_for_sentence_initial',
+                'max_modifiers_before_fallback': 1
+            }
+        }
+    
+    def _initialize_early_detection_patterns(self):
+        """🔧 リファクタリング: 早期検出パターンをデータ駆動型で初期化"""
+        # 🔧 リファクタリング Phase 4: 設定化された早期検出パターン
+        conditional_config = self.conditional_processing_config
+        
+        self.early_detection_patterns = {
+            # ConditionalHandler処理パターン (Case 151-155対応)
+            'conditional_patterns': [
+                {
+                    'pattern': self._create_startswith_pattern('imagine if'),
+                    'handler': 'conditional',
+                    'description': 'Imagine構文 (Case 151)',
+                    'priority': 1
+                },
+                {
+                    'pattern': self._create_startswith_pattern('provided that'),
+                    'handler': 'conditional', 
+                    'description': 'Provided構文 (Case 152)',
+                    'priority': 1
+                },
+                {
+                    'pattern': self._create_startswith_pattern('as long as'),
+                    'handler': 'conditional',
+                    'description': 'As long as構文 (Case 153)', 
+                    'priority': 1
+                },
+                {
+                    'pattern': self._create_complex_conditional_pattern(),
+                    'handler': 'conditional',
+                    'description': 'If過去完了仮定法 (Case 154)',
+                    'priority': 1
+                },
+                {
+                    'pattern': self._create_startswith_pattern('even if'),
+                    'handler': 'conditional',
+                    'description': 'Even if構文 (Case 155)',
+                    'priority': 1
+                }
+            ]
+        }
+        
+        # 🔧 リファクタリング Phase 2: 特別処理パターンの一般化
+        self.special_processing_patterns = {
+            'question_patterns': [
+                {
+                    'pattern_type': 'wh_subject_conflict',
+                    'condition': lambda slot, wh_slots: slot == 'S' and any(wh_slot == 'S' for wh_slot in wh_slots),
+                    'action': 'skip_five_pattern_slot',
+                    'description': 'WH語が主語位置の場合の競合回避'
+                }
+            ],
+            'noun_clause_patterns': [
+                {
+                    'pattern_type': 'wish_clause_detection',
+                    'condition': lambda text, metadata: (
+                        metadata.get('handler') == 'wish_clause' or 
+                        ' wish ' in text.lower()
+                    ),
+                    'action': 'prioritize_noun_clause_result',
+                    'description': 'Wish文での名詞節優先処理'
+                }
+            ]
+        }
+    
+    def _process_early_detection(self, text: str) -> Optional[Dict[str, Any]]:
+        """🔧 リファクタリング: 汎用的早期検出処理"""
+        for pattern_group in self.early_detection_patterns.values():
+            for pattern_config in sorted(pattern_group, key=lambda x: x['priority']):
+                if pattern_config['pattern'](text):
+                    handler_name = pattern_config['handler']
+                    description = pattern_config['description']
+                    
+                    print(f"🔧 早期検出: {description} → {handler_name}Handler処理")
+                    
+                    handler = self.handlers.get(handler_name)
+                    if handler:
+                        result = handler.process(text)
+                        if result.get('success', False):
+                            print(f"📝 {description}処理結果: {result}")
+                            return result
+                    
+                    print(f"⚠️ {handler_name}Handler処理失敗または未発見")
+        
+        return None
+    
+    def process_sentence_v2(self, text: str) -> Dict[str, Any]:
+        """🔧 リファクタリング: ProcessingContextを活用した新しい処理方式"""
+        
+        # 1. ProcessingContext初期化
+        context = ProcessingContext(
+            sentence=text,
+            tokens=self.nlp(text),
+            current_stage='early_detection'
+        )
+        
+        # 2. 早期検出処理
+        early_result = self._process_early_detection(text)
+        if early_result:
+            context.early_detection_result = early_result
+            return early_result
+        
+        # 3. 段階的処理開始
+        context.current_stage = 'structure_analysis'
+        return self._process_with_context(context)
+    
+    def _process_with_context(self, context: ProcessingContext) -> Dict[str, Any]:
+        """ProcessingContextを使用した段階的処理"""
+        
+        # Stage 1: 構造分析
+        if context.current_stage == 'structure_analysis':
+            grammar_patterns = self.analyze_grammar_structure(context.sentence)
+            context.metadata['grammar_patterns'] = grammar_patterns
+            context.current_stage = 'handler_selection'
+        
+        # Stage 2: ハンドラー選択と実行
+        if context.current_stage == 'handler_selection':
+            result = self._execute_handlers_with_context(context)
+            if result:
+                return result
+        
+        # フォールバック: 従来処理
+        return self.process_sentence(context.sentence)
+    
+    def _execute_handlers_with_context(self, context: ProcessingContext) -> Optional[Dict[str, Any]]:
+        """ProcessingContextを活用したハンドラー実行"""
+        
+        grammar_patterns = context.metadata.get('grammar_patterns', [])
+        
+        # 疑問文優先処理
+        if 'question' in grammar_patterns:
+            return self._process_question_with_context(context)
+        
+        # 関係節処理 
+        if 'relative_clause' in grammar_patterns:
+            return self._process_relative_clause_with_context(context)
+        
+        # 条件節処理
+        if 'conditional' in grammar_patterns:
+            return self._process_conditional_with_context(context)
+        
+        # その他のハンドラー処理...
+        return None
+    
+    def _process_question_with_context(self, context: ProcessingContext) -> Optional[Dict[str, Any]]:
+        """ProcessingContextを活用した疑問文処理"""
+        context.completed_handlers.append('question_processing')
+        
+        # 既存の疑問文処理ロジックを活用
+        # （詳細実装は省略、必要に応じて拡張）
+        return None
+    
+    def _process_relative_clause_with_context(self, context: ProcessingContext) -> Optional[Dict[str, Any]]:
+        """ProcessingContextを活用した関係節処理"""
+        context.completed_handlers.append('relative_clause_processing')
+        
+        # 既存の関係節処理ロジックを活用
+        # （詳細実装は省略、必要に応じて拡張）
+        return None
+    
+    def _process_conditional_with_context(self, context: ProcessingContext) -> Optional[Dict[str, Any]]:
+        """ProcessingContextを活用した条件節処理"""
+        context.completed_handlers.append('conditional_processing')
+        
+        # ConditionalHandlerを直接呼び出し
+        conditional_handler = self.handlers.get('conditional')
+        if conditional_handler:
+            result = conditional_handler.process(context.sentence)
+            if result.get('success', False):
+                context.metadata['processed_by'] = 'conditional_handler'
+                return result
+        
+        return None
+    
+    def _apply_special_processing(self, pattern_category: str, context_data: Dict[str, Any]) -> Dict[str, Any]:
+        """🔧 リファクタリング: 特別処理パターンの汎用的適用"""
+        
+        if pattern_category not in self.special_processing_patterns:
+            return context_data
+        
+        patterns = self.special_processing_patterns[pattern_category]
+        
+        for pattern_config in patterns:
+            pattern_type = pattern_config['pattern_type']
+            condition = pattern_config['condition']
+            action = pattern_config['action']
+            description = pattern_config['description']
+            
+            # パターン別の条件チェックと処理
+            if pattern_category == 'question_patterns' and pattern_type == 'wh_subject_conflict':
+                if self._check_wh_subject_conflict_condition(condition, context_data):
+                    print(f"🔧 特別処理適用: {description}")
+                    return self._apply_wh_subject_conflict_action(context_data)
+            
+            elif pattern_category == 'noun_clause_patterns' and pattern_type == 'wish_clause_detection':
+                if self._check_wish_clause_condition(condition, context_data):
+                    print(f"🔧 特別処理適用: {description}")
+                    return self._apply_wish_clause_action(context_data)
+        
+        return context_data
+    
+    def _check_wh_subject_conflict_condition(self, condition_func, context_data: Dict[str, Any]) -> bool:
+        """WH語主語競合の条件チェック"""
+        wh_slots = context_data.get('wh_slots', {})
+        target_slot = context_data.get('target_slot', '')
+        return condition_func(target_slot, wh_slots)
+    
+    def _check_wish_clause_condition(self, condition_func, context_data: Dict[str, Any]) -> bool:
+        """Wish文の条件チェック"""
+        text = context_data.get('text', '')
+        metadata = context_data.get('metadata', {})
+        return condition_func(text, metadata)
+    
+    def _apply_wh_subject_conflict_action(self, context_data: Dict[str, Any]) -> Dict[str, Any]:
+        """WH語主語競合時のアクション実行"""
+        context_data['skip_five_pattern_slot'] = True
+        return context_data
+    
+    def _apply_wish_clause_action(self, context_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Wish文処理のアクション実行"""
+        context_data['prioritize_noun_clause'] = True
+        return context_data
+    
+    # 🔧 リファクタリング Phase 4: 条件節処理ヘルパーメソッド
+    def _check_equivalent_conditional(self, if_clause: str) -> bool:
+        """設定ベースの仮定法相当語句チェック"""
+        if_clause_lower = if_clause.lower()
+        equivalent_keywords = self.conditional_processing_config['equivalent_keywords']
+        return any(keyword in if_clause_lower for keyword in equivalent_keywords)
+    
+    def _get_conditional_prefix_v2(self, if_clause: str) -> str:
+        """設定ベースの条件節プレフィックス決定"""
+        if_clause_lower = if_clause.lower().strip()
+        prefix_mapping = self.conditional_processing_config['prefix_mapping']
+        
+        for keyword, prefix in prefix_mapping.items():
+            if if_clause_lower.startswith(keyword):
+                return prefix
+        
+        # デフォルトは "If"
+        return 'If'
+    
+    def _determine_conditional_slot_v2(self, main_slots: Dict[str, Any]) -> str:
+        """設定ベースの条件節スロット配置決定"""
+        config = self.conditional_processing_config['slot_placement_rules']
+        
+        # 主節に他の修飾語があるかチェック
+        modifier_slots = ['M1', 'M2', 'M3']
+        occupied_modifiers = [slot for slot in modifier_slots 
+                             if slot in main_slots and main_slots[slot] and main_slots[slot].strip()]
+        
+        max_modifiers = config['max_modifiers_before_fallback']
+        
+        if len(occupied_modifiers) == 0:
+            # 修飾語が条件節のみ → デフォルトスロットに配置
+            return config['default_slot']
+        elif len(occupied_modifiers) <= max_modifiers:
+            # 設定に基づいたフォールバック戦略
+            if config['fallback_strategy'] == 'use_m1_for_sentence_initial':
+                return 'M1'  # 文頭配置優先
+            else:
+                return config['default_slot']
+        else:
+            # 上限を超えた場合 → M1を優先（文頭配置）
+            return 'M1'
+    
+    # 🔧 リファクタリング Phase 4: パターン生成ヘルパーメソッド
+    def _create_startswith_pattern(self, keyword: str):
+        """設定可能なstartswithパターン生成"""
+        return lambda text: text.lower().startswith(keyword)
+    
+    def _create_complex_conditional_pattern(self):
+        """複合条件パターン生成（If過去完了仮定法用）"""
+        return lambda text: (text.lower().startswith('if') and 
+                           'had' in text.lower() and 
+                           'would have' in text.lower())
     
     def analyze_grammar_structure(self, text: str) -> List[str]:
         """
@@ -471,66 +813,10 @@ class CentralController:
         Returns:
             Dict: Rephraseスロット形式の結果
         """
-        # Case 151対策: Imagine構文の早期検出（最優先処理）
-        if text.lower().startswith('imagine if'):
-            print(f"🔧 Imagine構文早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 Imagine構文ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
-        
-        # Case 152対策: Provided構文の早期検出
-        if text.lower().startswith('provided that'):
-            print(f"🔧 Provided構文早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 Provided構文ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
-        
-        # Case 153対策: As long as構文の早期検出
-        if text.lower().startswith('as long as'):
-            print(f"🔧 As long as構文早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 As long as構文ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
-                    
-        # Case 154対策: If過去完了仮定法の早期検出
-        if text.lower().startswith('if') and ('had' in text.lower() and 'would have' in text.lower()):
-            print(f"🔧 If過去完了仮定法早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 If過去完了仮定法ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
-        
-        # Case 154対策: If過去完了仮定法の早期検出
-        if (text.lower().startswith('if') and 
-            'had' in text.lower() and 'would have' in text.lower()):
-            print(f"🔧 If過去完了仮定法早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 If過去完了仮定法ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
-        
-        # Case 155対策: Even if構文の早期検出
-        if text.lower().startswith('even if'):
-            print(f"🔧 Even if構文早期検出: ConditionalHandlerに直接処理")
-            conditional_handler = self.handlers.get('conditional')
-            if conditional_handler:
-                conditional_result = conditional_handler.process(text)
-                if conditional_result.get('success', False):
-                    print(f"📝 Even if構文ConditionalHandler結果: {conditional_result}")
-                    return conditional_result
+        # 🔧 リファクタリング: 汎用的早期検出処理
+        early_result = self._process_early_detection(text)
+        if early_result:
+            return early_result
         
         # 1. 文法構造分析
         grammar_patterns = self.analyze_grammar_structure(text)
@@ -928,7 +1214,7 @@ class CentralController:
                 traceback.print_exc()
         
         # 🎯 仮定法処理（人間的文法識別アプローチ）
-        # Case 150対策: Suppose構文は疑問文を含むが仮定法として処理すべき
+        # 🔧 リファクタリング: 設定ベースの仮定法処理開始チェック
         if 'conditional' in grammar_patterns:
             # 仮定法等価表現（suppose/imagine等）の場合は疑問文があっても優先処理
             conditional_patterns = self.handlers['conditional'].detect_conditional_patterns(text)
@@ -1752,9 +2038,8 @@ class CentralController:
                         modal_success_result = main_modal_result
             
             # ③if節の分解（逆転構造対応）
-            # Case 150対策: Suppose等の仮定法相当語句の場合は直接ConditionalHandlerに渡す
-            conditional_keywords = ['suppose', 'imagine', 'provided', 'unless', 'as long as']
-            is_equivalent_conditional = any(keyword in if_clause.lower() for keyword in conditional_keywords)
+            # 🔧 リファクタリング: 設定ベースの仮定法相当語句検出
+            is_equivalent_conditional = self._check_equivalent_conditional(if_clause)
             
             if is_equivalent_conditional:
                 print(f"🔧 仮定法相当語句検出: ConditionalHandlerで処理")
@@ -1776,10 +2061,11 @@ class CentralController:
                         # 主節は既に処理済みなので、統合処理に進む
                         final_main_slots = modal_success_result.get('main_slots', {}) if modal_success_result else main_basic_result.get('main_slots', {})
                         
-                        # Case 150対策: M2スロットに空文字列を設定
-                        parent_slot = conditional_result.get('sub_slots', {}).get('_parent_slot', 'M2')
+                        # 🔧 リファクタリング: 設定ベースのスロット配置
+                        parent_slot = conditional_result.get('sub_slots', {}).get('_parent_slot', 
+                                                                                  self.conditional_processing_config['slot_placement_rules']['default_slot'])
                         final_main_slots[parent_slot] = ''  # 期待値通りに空文字列
-                        print(f"🎯 M2スロット設定: {parent_slot} = '' (条件節マーカー)")
+                        print(f"🎯 {parent_slot}スロット設定: {parent_slot} = '' (条件節マーカー)")
                         
                         final_result = {
                             'success': True,
@@ -2455,41 +2741,12 @@ class CentralController:
             return {'success': False, 'error': str(e)}
 
     def _determine_empty_slot_for_conditional(self, main_slots):
-        """条件節を配置する空スロットを決定"""
-        # 主節に他の修飾語があるかチェック
-        modifier_slots = ['M1', 'M2', 'M3']
-        occupied_modifiers = [slot for slot in modifier_slots if slot in main_slots and main_slots[slot] and main_slots[slot].strip()]
-        
-        if len(occupied_modifiers) == 0:
-            # 修飾語が条件節のみ → M2に配置
-            return 'M2'
-        elif len(occupied_modifiers) == 1:
-            # 既に1個修飾語がある → 前後分散パターン
-            # 条件節は文頭なのでM1、既存修飾語がM2
-            return 'M1'
-        else:
-            # 2個以上既にある場合 → M1を優先（文頭配置）
-            return 'M1'
+        """🔧 リファクタリング: 設定ベースの条件節スロット配置（互換性維持）"""
+        return self._determine_conditional_slot_v2(main_slots)
 
     def _get_conditional_prefix(self, if_clause: str) -> str:
-        """条件節の接続詞を判定して適切なプレフィックスを返す"""
-        if_clause_lower = if_clause.lower().strip()
-        
-        if if_clause_lower.startswith('unless'):
-            return 'Unless'
-        elif if_clause_lower.startswith('provided that'):
-            return 'Provided that'
-        elif if_clause_lower.startswith('as long as'):
-            return 'As long as'
-        elif if_clause_lower.startswith('even if'):
-            return 'Even if'
-        elif if_clause_lower.startswith('suppose'):
-            return 'Suppose'
-        elif if_clause_lower.startswith('imagine'):
-            return 'Imagine'
-        else:
-            # デフォルトは "If"
-            return 'If'
+        """🔧 リファクタリング: 設定ベースの条件節プレフィックス（互換性維持）"""
+        return self._get_conditional_prefix_v2(if_clause)
 
     def _process_main_clause_decomposition(self, main_clause: str) -> Dict[str, Any]:
         """
