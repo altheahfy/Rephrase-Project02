@@ -574,6 +574,14 @@ class GerundHandler:
             elif child.dep_ == "attr" and not exclude_attr and not main_slots.get("C1"):
                 main_slots["C1"] = child.text
                 
+            # xcomp補語（動詞補語）
+            elif child.dep_ == "xcomp" and not main_slots.get("C2"):
+                main_slots["C2"] = child.text
+                
+            # ccomp補語（名詞節補語）
+            elif child.dep_ == "ccomp" and not main_slots.get("C2"):
+                main_slots["C2"] = child.text
+                
             # 前置詞句（exclude_prepで指定されたもの以外）
             elif child.dep_ == "prep" and child != exclude_prep:
                 prep_phrase = self._build_prep_phrase(child)
