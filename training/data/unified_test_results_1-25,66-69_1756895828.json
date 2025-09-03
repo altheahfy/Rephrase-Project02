@@ -1,0 +1,3613 @@
+{
+  "test_summary": {
+    "total_cases": 29,
+    "case_range": "1-25,66-69",
+    "timestamp": 1756895824.895851
+  },
+  "system_results": {
+    "legacy": {
+      "success": 29,
+      "failure": 0,
+      "total_time": 2.025843381881714,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 29,
+      "failure": 0,
+      "total_time": 1.1467211246490479,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 29,
+      "total_accuracy": 29.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 29,
+      "total_accuracy": 29.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "1",
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The car is red.",
+        "success": true,
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The car",
+          "5": "is",
+          "8": "red"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.02743220329284668
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.09088945388793945,
+        "v2_time": 0.02759408950805664
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "2",
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "I love you.",
+        "success": true,
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "I",
+          "5": "love",
+          "6": "you"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.02004551887512207
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05474543571472168,
+        "v2_time": 0.02016282081604004
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "3",
+      "sentence": "Birds fly.",
+      "expected": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "Birds fly.",
+        "success": true,
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "Birds",
+          "5": "fly"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.6,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.021331310272216797
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05533456802368164,
+        "v2_time": 0.021529674530029297
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "4",
+      "sentence": "Children play.",
+      "expected": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "Children play.",
+        "success": true,
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "Children",
+          "5": "play"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "Children",
+          "V": "play"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.6,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.020871639251708984
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05866193771362305,
+        "v2_time": 0.020972728729248047
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "5",
+      "sentence": "Time passes.",
+      "expected": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "Time passes.",
+        "success": true,
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "Time",
+          "5": "passes"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "Time",
+          "V": "passes"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.6,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.0233306884765625
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.058901309967041016,
+        "v2_time": 0.023465633392333984
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "6",
+      "sentence": "She looks happy.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "She looks happy.",
+        "success": true,
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "She",
+          "5": "looks",
+          "8": "happy"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "looks",
+          "C1": "happy"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.025358200073242188
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05754828453063965,
+        "v2_time": 0.02553415298461914
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "7",
+      "sentence": "He became a doctor.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "He became a doctor.",
+        "success": true,
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "He",
+          "5": "became",
+          "8": "a doctor"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "became",
+          "C1": "a doctor"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.021501779556274414
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06377506256103516,
+        "v2_time": 0.021708965301513672
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "8",
+      "sentence": "The food tastes good.",
+      "expected": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The food tastes good.",
+        "success": true,
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The food",
+          "5": "tastes",
+          "8": "good"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The food",
+          "V": "tastes",
+          "C1": "good"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.023574113845825195
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06473493576049805,
+        "v2_time": 0.023820161819458008
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "9",
+      "sentence": "I read books.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "I read books.",
+        "success": true,
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "I",
+          "5": "read",
+          "6": "books"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "read",
+          "O1": "books"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.023653745651245117
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.058995962142944336,
+        "v2_time": 0.023860692977905273
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "10",
+      "sentence": "She plays piano.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "She plays piano.",
+        "success": true,
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "She",
+          "5": "plays",
+          "6": "piano"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "plays",
+          "O1": "piano"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.026035785675048828
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06160163879394531,
+        "v2_time": 0.026201725006103516
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "11",
+      "sentence": "We study English.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "We study English.",
+        "success": true,
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "We",
+          "5": "study",
+          "6": "English"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "study",
+          "O1": "English"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.12848544120788574
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05617642402648926,
+        "v2_time": 0.12867951393127441
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "12",
+      "sentence": "I gave him a book.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "I gave him a book.",
+        "success": true,
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "gave",
+          "O1": "him",
+          "O2": "a book"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.02373194694519043
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06076312065124512,
+        "v2_time": 0.023850440979003906
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "13",
+      "sentence": "She told me a story.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "She told me a story.",
+        "success": true,
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "She",
+          "5": "told",
+          "6": "me"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "told",
+          "O1": "me",
+          "O2": "a story"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.023051977157592773
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.057898521423339844,
+        "v2_time": 0.02320718765258789
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "14",
+      "sentence": "He bought her flowers.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "He bought her flowers.",
+        "success": true,
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "He",
+          "5": "bought",
+          "6": "her"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "bought",
+          "O1": "her",
+          "O2": "flowers"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.022083282470703125
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06236672401428223,
+        "v2_time": 0.022236347198486328
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "15",
+      "sentence": "We call him Tom.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "We call him Tom.",
+        "success": true,
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "We",
+          "5": "call",
+          "6": "him"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "call",
+          "O1": "him",
+          "C2": "Tom"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.023154735565185547
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06190967559814453,
+        "v2_time": 0.023308992385864258
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "16",
+      "sentence": "I found it interesting.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "I found it interesting.",
+        "success": true,
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "I",
+          "5": "found",
+          "6": "it"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "found",
+          "O1": "it",
+          "C2": "interesting"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.021191120147705078
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07665848731994629,
+        "v2_time": 0.02130722999572754
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "17",
+      "sentence": "They made her happy.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "They made her happy.",
+        "success": true,
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "They",
+          "5": "made",
+          "6": "her"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "They",
+          "V": "made",
+          "O1": "her",
+          "C2": "happy"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 1.2,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.02780318260192871
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.08305501937866211,
+        "v2_time": 0.027957677841186523
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "18",
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The cake is being baked by my mother.",
+        "success": true,
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The cake",
+          "4": "is being",
+          "5": "baked",
+          "7": "by my mother"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The cake",
+          "V": "baked",
+          "M2": "by my mother",
+          "Aux": "is being"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.06470608711242676
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.09366202354431152,
+        "v2_time": 0.06483650207519531
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "19",
+      "sentence": "The cake was eaten by the children.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The cake was eaten by the children.",
+        "success": true,
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The cake",
+          "4": "was",
+          "5": "eaten",
+          "7": "by the children"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The cake",
+          "V": "eaten",
+          "M2": "by the children",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.05406832695007324
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.09244060516357422,
+        "v2_time": 0.054181814193725586
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "20",
+      "sentence": "The door was opened by the key.",
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The door was opened by the key.",
+        "success": true,
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The door",
+          "4": "was",
+          "5": "opened",
+          "7": "by the key"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The door",
+          "V": "opened",
+          "M2": "by the key",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.05452704429626465
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.08217239379882812,
+        "v2_time": 0.0546422004699707
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "21",
+      "sentence": "The students study hard for exams.",
+      "expected": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The students study hard for exams.",
+        "success": true,
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The students",
+          "5": "study",
+          "7": "hard",
+          "9": "for exams"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The students",
+          "V": "study",
+          "M2": "hard",
+          "M3": "for exams"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.041463613510131836
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07573318481445312,
+        "v2_time": 0.04157829284667969
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "22",
+      "sentence": "The car was repaired last week.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The car was repaired last week.",
+        "success": true,
+        "main_slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "slots": {
+          "S": "The car",
+          "Aux": "was",
+          "V": "repaired",
+          "M2": "last week"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The car",
+          "4": "was",
+          "5": "repaired",
+          "7": "last week"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The car",
+          "V": "repaired",
+          "M2": "last week",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.04883742332458496
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07793951034545898,
+        "v2_time": 0.0489504337310791
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "23",
+      "sentence": "The window was gently opened by the morning breeze.",
+      "expected": {
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The window was gently opened by the morning breeze.",
+        "success": true,
+        "main_slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "slots": {
+          "S": "The window",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The window",
+          "4": "was",
+          "5": "opened",
+          "7": "gently",
+          "9": "by the morning breeze"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The window",
+          "V": "opened",
+          "M2": "gently",
+          "M3": "by the morning breeze",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.05104494094848633
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.0746304988861084,
+        "v2_time": 0.051818132400512695
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "24",
+      "sentence": "The message is being carefully written by the manager.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The message is being carefully written by the manager.",
+        "success": true,
+        "main_slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "slots": {
+          "S": "The message",
+          "Aux": "is being",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The message",
+          "4": "is being",
+          "5": "written",
+          "7": "carefully",
+          "9": "by the manager"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The message",
+          "V": "written",
+          "M2": "carefully",
+          "M3": "by the manager",
+          "Aux": "is being"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.07234716415405273
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07234907150268555,
+        "v2_time": 0.07246160507202148
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "25",
+      "sentence": "The problem was quickly solved by the expert team.",
+      "expected": {
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The problem was quickly solved by the expert team.",
+        "success": true,
+        "main_slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "slots": {
+          "S": "The problem",
+          "Aux": "was",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The problem",
+          "4": "was",
+          "5": "solved",
+          "7": "quickly",
+          "9": "by the expert team"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The problem",
+          "V": "solved",
+          "M2": "quickly",
+          "M3": "by the expert team",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.053109169006347656
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.08338546752929688,
+        "v2_time": 0.05322432518005371
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "66",
+      "sentence": "The letter was written by John.",
+      "expected": {
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The letter was written by John.",
+        "success": true,
+        "main_slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "slots": {
+          "S": "The letter",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by John"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The letter",
+          "4": "was",
+          "5": "written",
+          "7": "by John"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The letter",
+          "V": "written",
+          "M2": "by John",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.04708719253540039
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07229971885681152,
+        "v2_time": 0.0475618839263916
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "67",
+      "sentence": "The house was built in 1990.",
+      "expected": {
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The house was built in 1990.",
+        "success": true,
+        "main_slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "slots": {
+          "S": "The house",
+          "Aux": "was",
+          "V": "built",
+          "M2": "in 1990"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The house",
+          "4": "was",
+          "5": "built",
+          "7": "in 1990"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The house",
+          "V": "built",
+          "M2": "in 1990",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.05269575119018555
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07325410842895508,
+        "v2_time": 0.052808523178100586
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "68",
+      "sentence": "The book was written by a famous author.",
+      "expected": {
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The book was written by a famous author.",
+        "success": true,
+        "main_slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "slots": {
+          "S": "The book",
+          "Aux": "was",
+          "V": "written",
+          "M2": "by a famous author"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The book",
+          "4": "was",
+          "5": "written",
+          "7": "by a famous author"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The book",
+          "V": "written",
+          "M2": "by a famous author",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.051058053970336914
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07628440856933594,
+        "v2_time": 0.05121207237243652
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "69",
+      "sentence": "The message was sent yesterday.",
+      "expected": {
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The message was sent yesterday.",
+        "success": true,
+        "main_slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "slots": {
+          "S": "The message",
+          "Aux": "was",
+          "V": "sent",
+          "M2": "yesterday"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The message",
+          "4": "was",
+          "5": "sent",
+          "7": "yesterday"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The message",
+          "V": "sent",
+          "M2": "yesterday",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.04787850379943848
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06767582893371582,
+        "v2_time": 0.04804730415344238
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}
