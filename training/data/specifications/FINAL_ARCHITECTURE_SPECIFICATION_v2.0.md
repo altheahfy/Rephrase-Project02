@@ -44,6 +44,66 @@
 
 ---
 
+## 🚨 **ハードコーディング絶対禁止原則**
+
+### **🔴 禁止事項 - 以下は絶対に実装してはならない**
+
+```python
+# ❌ 個別ハンドラー名の決め打ち処理
+if handler_name == 'basic_five_pattern':
+    confidence = 0.6
+elif handler_name == 'adverb':
+    confidence = 0.8
+
+# ❌ 固定信頼度値の直接代入
+confidence = 0.9  # 絶対禁止
+
+# ❌ 特定パターン名のハードコード
+patterns = ['basic_five_pattern']  # 絶対禁止
+
+# ❌ 個別ハンドラーへの特別処理
+if 'relative_clause' in handler_reports:
+    # 特別な処理  # 絶対禁止
+```
+
+### **✅ 必須実装方針 - 完全汎用化**
+
+```python
+# ✅ 統一インターフェースによる動的処理
+for handler_name, handler in self.active_handlers.items():
+    result = handler.process(sentence)
+    confidence = handler.calculate_confidence(result)
+    patterns = handler.get_detected_patterns()
+
+# ✅ ハンドラー自身による信頼度計算
+class HandlerInterface:
+    def calculate_confidence(self, result: Dict) -> float:
+        """各ハンドラーが自身の信頼度を動的に計算"""
+        pass
+    
+    def get_detected_patterns(self) -> List[str]:
+        """検出されたパターンを動的に返す"""
+        pass
+
+# ✅ 設定駆動型の協調システム
+cooperation_rules = self.load_cooperation_config()
+for rule in cooperation_rules:
+    if rule.matches(handler_reports):
+        rule.execute_coordination(handlers, text)
+```
+
+### **🎯 汎用性確保のための設計原則**
+
+1. **動的信頼度算出**: ハンドラー自身が文脈に応じて信頼度を計算
+2. **統一インターフェース**: 全ハンドラーが共通のメソッドを実装
+3. **設定駆動型処理**: 外部設定ファイルで協調ルールを定義
+4. **完全汎用的統合**: ハンドラー名に依存しない統合メカニズム
+5. **拡張可能アーキテクチャ**: 新ハンドラー追加時もコード変更不要
+
+**⚠️ 違反検出**: 実装時に上記禁止事項が発見された場合は即座に実装中断し、汎用化を優先する
+
+---
+
 ## 🎯 **現状認識と移行戦略**
 
 ### **現在の状況**
@@ -614,6 +674,7 @@ elif conditional_patterns:  # ← 優先順位による排他処理
 3. **統合判断**: 中央での最終判断による処理決定
 4. **協力調整**: 必要時のハンドラー間協力の調整
 5. **品質保証**: バッティング・欠落の最終チェック
+6. **🚨 完全汎用化**: ハンドラー名決め打ち・固定値を一切使用しない
 
 #### **Phase 6: 真の中央管理システム化**
 
@@ -626,10 +687,10 @@ class CentralController:
         # 1. 全ハンドラーから情報収集（判断はさせない）
         handler_reports = self._collect_all_handler_reports(text)
         
-        # 2. 中央での統合判断
+        # 2. 中央での統合判断（⚠️ ハンドラー名決め打ち禁止）
         integrated_analysis = self._integrate_handler_reports(handler_reports)
         
-        # 3. 協力が必要な場合の調整
+        # 3. 協力が必要な場合の調整（⚠️ 汎用的協調システム）
         if self._requires_collaboration(integrated_analysis):
             collaborative_result = self._coordinate_handlers(integrated_analysis, text)
             return collaborative_result
@@ -642,12 +703,14 @@ class CentralController:
     def _collect_all_handler_reports(self, text: str) -> Dict[str, Any]:
         """全ハンドラーから並行情報収集"""
         reports = {}
+        # ✅ 汎用的処理：ハンドラー名に依存しない
         for handler_name, handler in self.handlers.items():
             # ハンドラーには「情報提供」のみを求める
             reports[handler_name] = handler.provide_analysis_report(text)
         return reports
     
     def _integrate_handler_reports(self, reports: Dict[str, Any]) -> Dict[str, Any]:
+        """🚨 完全汎用的統合処理 - ハンドラー名決め打ち絶対禁止"""
         """中央での統合判断"""
         # 信頼度、競合、補完関係を総合的に判断
         # 設定ファイルベースの統合ルール適用
