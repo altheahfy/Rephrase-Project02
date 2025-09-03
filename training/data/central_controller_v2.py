@@ -22,6 +22,8 @@ from enum import Enum
 from basic_five_pattern_handler import BasicFivePatternHandler
 from modal_handler import ModalHandler
 from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
+from adverb_handler import AdverbHandler
+from passive_voice_handler import PassiveVoiceHandler
 
 
 class AnalysisConfidence(Enum):
@@ -121,6 +123,20 @@ class CentralControllerV2:
         except Exception as e:
             print(f"⚠️ RelativeClauseHandler 初期化エラー: {e}")
             
+        try:
+            # AdverbHandlerは引数なしで初期化
+            handlers['adverb'] = AdverbHandler()
+            print("✅ AdverbHandler 初期化完了")
+        except Exception as e:
+            print(f"⚠️ AdverbHandler 初期化エラー: {e}")
+            
+        try:
+            # PassiveVoiceHandlerを追加
+            handlers['passive_voice'] = PassiveVoiceHandler()
+            print("✅ PassiveVoiceHandler 初期化完了")
+        except Exception as e:
+            print(f"⚠️ PassiveVoiceHandler 初期化エラー: {e}")
+            
         print(f"✅ POC ハンドラー初期化完了: {len(handlers)}個")
         return handlers
 
@@ -146,8 +162,8 @@ class CentralControllerV2:
             return {
                 'main_slots': slots_result.get('main_slots', {}),
                 'sub_slots': slots_result.get('sub_slots', {}),
-                'detected_grammar': [primary_handler] if primary_handler else [],
-                'confidence': handler_reports.get(primary_handler, {}).get('confidence', 0.0),
+                'detected_grammar': cooperation_plan.get('active_handlers', []),
+                'confidence': max([handler_reports[h]['confidence'] for h in cooperation_plan.get('active_handlers', [])], default=0.0),
                 'v2_metadata': {
                     'handler_reports': len(handler_reports),
                     'cooperation_plan': cooperation_plan,
@@ -174,14 +190,29 @@ class CentralControllerV2:
         
         for handler_name, handler in self.active_handlers.items():
             try:
+                print(f"🔍 {handler_name} ハンドラー処理開始")
                 report = self._get_handler_report(handler_name, handler, sentence)
-                reports[handler_name] = {
-                    'confidence': report.confidence,
-                    'patterns': report.detected_patterns,
-                    'metadata': report.metadata
-                }
+                print(f"🔍 {handler_name} レポート取得成功: {report}")
+                
+                # HandlerReportオブジェクトか辞書かチェック
+                if hasattr(report, 'confidence'):
+                    # HandlerReportオブジェクトの場合
+                    reports[handler_name] = {
+                        'confidence': report.confidence,
+                        'patterns': report.detected_patterns,
+                        'metadata': report.metadata
+                    }
+                else:
+                    # 辞書の場合
+                    reports[handler_name] = {
+                        'confidence': report['confidence'],
+                        'patterns': report['patterns'],
+                        'metadata': report['metadata']
+                    }
             except Exception as e:
                 print(f"⚠️ {handler_name} レポート取得エラー: {e}")
+                import traceback
+                traceback.print_exc()
                 reports[handler_name] = {
                     'confidence': 0.0,
                     'patterns': [],
@@ -190,40 +221,200 @@ class CentralControllerV2:
         
         return reports
     
+    def _get_handler_report(self, handler_name, handler, sentence):
+        """各ハンドラーからの分析レポートを取得"""
+        if handler_name == 'basic_five_pattern':
+            try:
+                result = handler.process(sentence)
+                if result and result.get('success', False):
+                    confidence = len(result.get('slots', {})) * 0.3  # スロット数に基づく信頼度
+                    patterns = ['basic_five_pattern']
+                else:
+                    confidence = 0.0
+                    patterns = []
+                
+                return {
+                    'confidence': confidence,
+                    'patterns': patterns,
+                    'metadata': {'result': result}
+                }
+            except Exception as e:
+                return {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
+        elif handler_name == 'adverb':
+            try:
+                result = handler.process(sentence)
+                if result and result.get('success', False):
+                    # 副詞が検出された場合の信頼度
+                    modifiers = result.get('modifiers', {})
+                    modifier_count = len(modifiers)
+                    if modifier_count > 0:
+                        # 副詞が検出された場合は高い信頼度を設定
+                        confidence = 0.8  # 副詞検出時は最高優先度
+                        patterns = ['adverb_modifier']
+                    else:
+                        confidence = 0.0
+                        patterns = []
+                else:
+                    confidence = 0.0
+                    patterns = []
+                
+                return {
+                    'confidence': confidence,
+                    'patterns': patterns,
+                    'metadata': {'result': result}
+                }
+            except Exception as e:
+                return {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
+        elif handler_name == 'modal':
+            try:
+                # ModalHandlerの場合は簡易評価
+                # 現在はPOCなので基本的な評価
+                return {
+                    'confidence': 0.1,  # 低い基準信頼度
+                    'patterns': [],
+                    'metadata': {}
+                }
+            except Exception as e:
+                return {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
+        elif handler_name == 'passive_voice':
+            try:
+                result = handler.process(sentence)
+                if result and result.get('is_passive', False):
+                    # 受動態が検出された場合の信頼度
+                    confidence = 0.9  # 受動態検出時は高い信頼度
+                    patterns = ['passive_voice']
+                    
+                    # 成功フラグを追加してAdapterパターンを適用
+                    result['success'] = True
+                else:
+                    confidence = 0.0
+                    patterns = []
+                
+                return {
+                    'confidence': confidence,
+                    'patterns': patterns,
+                    'metadata': {'result': result}
+                }
+            except Exception as e:
+                return {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
+        # その他のハンドラーも低い基準信頼度
+        return {
+            'confidence': 0.1,
+            'patterns': [],
+            'metadata': {}
+        }
+    
     def _make_integration_decision(self, handler_reports):
-        """統合判断（新メソッド）"""
+        """統合判断（新メソッド） - 全ハンドラー結果の統合処理"""
         if not handler_reports:
             return None, {}
         
-        # 最も信頼度の高いハンドラーを選択
-        best_handler = max(handler_reports.keys(), 
-                          key=lambda h: handler_reports[h]['confidence'])
+        # 中央管理システム: 優先度ではなく、全ハンドラーの結果を統合
+        active_handlers = [h for h, report in handler_reports.items() 
+                          if report['confidence'] > 0.0]
         
         cooperation_plan = {
-            'primary': best_handler,
-            'strategy': 'single_handler'
+            'strategy': 'comprehensive_integration',
+            'active_handlers': active_handlers,
+            'integration_mode': 'merge_all_results'
         }
         
-        return best_handler, cooperation_plan
+        # 統合処理のため、特定の「primary」ハンドラーは選択しない
+        return 'integrated', cooperation_plan
     
     def _execute_slot_decomposition(self, sentence, primary_handler, handler_reports):
-        """スロット分解実行（Rephraseルール準拠）"""
-        if not primary_handler or primary_handler not in self.active_handlers:
+        """スロット分解実行（Rephraseルール準拠） - 全ハンドラー結果統合"""
+        if primary_handler != 'integrated' or not handler_reports:
             return {'main_slots': {}, 'sub_slots': {}}
         
-        handler = self.active_handlers[primary_handler]
+        # 中央管理システム: 全ハンドラーの結果を統合
+        integrated_main_slots = {}
+        integrated_sub_slots = {}
         
+        # 特殊ルール: 受動態が検出された場合の優先統合
+        passive_detected = False
+        for handler_name in handler_reports:
+            if handler_name == 'passive_voice' and handler_reports[handler_name]['confidence'] > 0.0:
+                passive_detected = True
+                break
+        
+        for handler_name, handler in self.active_handlers.items():
+            if handler_name not in handler_reports:
+                continue
+                
+            report = handler_reports[handler_name]
+            if report['confidence'] <= 0.0:
+                continue
+            
+            # 受動態検出時は、BasicFivePatternHandlerのSVC誤認識をスキップ
+            if passive_detected and handler_name == 'basic_five_pattern':
+                handler_result = self._get_handler_slot_result(handler_name, handler, sentence)
+                if handler_result:
+                    handler_main = handler_result.get('main_slots', {})
+                    # SVC誤認識の場合、C1をスキップしてSとVのみ統合
+                    if 'C1' in handler_main and 'V' in handler_main:
+                        # 受動態の場合、C1は誤認識なのでスキップ
+                        filtered_main = {k: v for k, v in handler_main.items() if k != 'C1'}
+                        integrated_main_slots.update(filtered_main)
+                        print(f"🔍 {handler_name}結果統合（受動態優先）: main={filtered_main}, sub={{}}")
+                    else:
+                        integrated_main_slots.update(handler_main)
+                        print(f"🔍 {handler_name}結果統合: main={handler_main}, sub={{}}")
+                continue
+            
+            try:
+                # 各ハンドラーの結果を取得して統合
+                handler_result = self._get_handler_slot_result(handler_name, handler, sentence)
+                
+                if handler_result:
+                    # main_slotsとsub_slotsを統合
+                    handler_main = handler_result.get('main_slots', {})
+                    handler_sub = handler_result.get('sub_slots', {})
+                    
+                    # スロットの統合（重複チェック付き）
+                    integrated_main_slots.update(handler_main)
+                    integrated_sub_slots.update(handler_sub)
+                    
+                    print(f"🔍 {handler_name}結果統合: main={handler_main}, sub={handler_sub}")
+                
+            except Exception as e:
+                print(f"⚠️ {handler_name} 統合エラー: {e}")
+                continue
+        
+        print(f"🎯 統合結果: main_slots={integrated_main_slots}, sub_slots={integrated_sub_slots}")
+        
+        return {
+            'main_slots': integrated_main_slots,
+            'sub_slots': integrated_sub_slots
+        }
+    
+    def _get_handler_slot_result(self, handler_name, handler, sentence):
+        """各ハンドラーからスロット結果を取得"""
         try:
-            if primary_handler == 'basic_five_pattern':
-                # BasicFivePatternHandlerを使用してRephraseスロット分解実行
-                # 正しいメソッド名は'process'
+            if handler_name == 'basic_five_pattern':
                 result = handler.process(sentence)
                 if result and result.get('success', False):
-                    # 既存ハンドラーの結果をV2形式に変換
-                    # BasicFivePatternHandlerは'slots'キーに結果を格納
                     all_slots = result.get('slots', {})
-                    
-                    # main_slotsとsub_slotsを分離
                     main_slots = {}
                     sub_slots = {}
                     
@@ -233,33 +424,64 @@ class CentralControllerV2:
                         else:
                             main_slots[key] = value
                     
-                    print(f"🔍 BasicFivePattern結果変換: main_slots={main_slots}, sub_slots={sub_slots}")
+                    return {'main_slots': main_slots, 'sub_slots': sub_slots}
                     
-                    return {
-                        'main_slots': main_slots,
-                        'sub_slots': sub_slots
-                    }
-                else:
-                    print(f"⚠️ BasicFivePatternHandler結果: {result}")
-                    # 失敗時はフォールバック処理
-                    return self._basic_slot_decomposition(sentence)
+            elif handler_name == 'adverb':
+                result = handler.process(sentence)
+                if result and result.get('success', False):
+                    all_slots = result.get('modifier_slots', {})
+                    main_slots = {}
+                    sub_slots = {}
+                    
+                    for key, value in all_slots.items():
+                        if key.startswith('sub-'):
+                            sub_slots[key] = value
+                        else:
+                            main_slots[key] = value
+                    
+                    return {'main_slots': main_slots, 'sub_slots': sub_slots}
             
-            # 他のハンドラーの場合（後で実装）
-            elif primary_handler == 'modal':
-                # ModalHandlerも基本的にはBasicFivePatternと同様の処理
-                # 現在はPOCなので簡易実装
-                return self._basic_slot_decomposition(sentence)
+            elif handler_name == 'modal':
+                # 現在はPOCなので基本実装
+                return {'main_slots': {}, 'sub_slots': {}}
             
-            elif primary_handler == 'relative_clause':
-                # 関係節の場合はサブスロット処理が重要
-                # 現在はPOCなので簡易実装
-                return self._basic_slot_decomposition(sentence)
+            elif handler_name == 'passive_voice':
+                result = handler.process(sentence)
+                if result and result.get('is_passive', False):
+                    # 受動態構造からスロット情報を構築
+                    main_slots = {}
+                    sub_slots = {}
+                    
+                    # 主語を抽出（spaCy依存関係解析）
+                    doc = handler.nlp(sentence)
+                    for token in doc:
+                        if token.dep_ == 'nsubjpass':  # 受動態の主語
+                            # 記事詞も含む主語を抽出
+                            if token.children:
+                                # 冠詞を含む主語構築
+                                subject_tokens = []
+                                for child in token.children:
+                                    if child.dep_ == 'det':
+                                        subject_tokens.append(child.text)
+                                subject_tokens.append(token.text)
+                                main_slots['S'] = ' '.join(subject_tokens)
+                            else:
+                                main_slots['S'] = token.text
+                            break
+                    
+                    # 助動詞と動詞を設定
+                    main_slots['Aux'] = result.get('aux', '')
+                    main_slots['V'] = result.get('verb', '')
+                    
+                    return {'main_slots': main_slots, 'sub_slots': sub_slots}
+                    
+                return {'main_slots': {}, 'sub_slots': {}}
             
-            # フォールバック: 基本的なスロット分解
-            return self._basic_slot_decomposition(sentence)
+            # その他のハンドラー
+            return {'main_slots': {}, 'sub_slots': {}}
             
         except Exception as e:
-            print(f"⚠️ スロット分解エラー ({primary_handler}): {e}")
+            print(f"⚠️ {handler_name} スロット取得エラー: {e}")
             return {'main_slots': {}, 'sub_slots': {}}
     
     def _extract_sub_slots_from_legacy_result(self, legacy_result):
@@ -333,11 +555,17 @@ class CentralControllerV2:
     
     def _quality_assurance(self, handler_reports, primary_handler):
         """品質保証チェック"""
+        active_handlers = [h for h, report in handler_reports.items() 
+                          if report['confidence'] > 0.0]
+        
+        max_confidence = max([report['confidence'] for report in handler_reports.values()], default=0.0)
+        
         return {
-            'has_primary_grammar': bool(primary_handler),
-            'confidence_acceptable': handler_reports.get(primary_handler, {}).get('confidence', 0) > 0.3,
+            'has_active_handlers': len(active_handlers) > 0,
+            'confidence_acceptable': max_confidence > 0.3,
             'no_critical_conflicts': True,
-            'text_coverage_adequate': True
+            'text_coverage_adequate': True,
+            'integrated_processing': primary_handler == 'integrated'
         }
 
     def analyze_grammar_structure_v2(self, text: str) -> Dict[str, Any]:
@@ -375,41 +603,6 @@ class CentralControllerV2:
                 )
         
         return reports
-    
-    def _get_handler_report(self, handler_name: str, handler: Any, text: str) -> HandlerReport:
-        """個別ハンドラーから情報レポート取得"""
-        
-        # 既存ハンドラーの情報を新形式に変換
-        if handler_name == 'basic_five_pattern':
-            # BasicFivePatternHandlerの場合
-            confidence = 0.8 if self._has_basic_structure(text) else 0.3
-            patterns = ['five_pattern'] if confidence > 0.5 else []
-            
-        elif handler_name == 'modal':
-            # ModalHandlerの場合
-            modal_info = handler.detect_modal_structure(text)
-            confidence = 0.9 if modal_info.get('has_modal', False) else 0.1
-            patterns = ['modal'] if modal_info.get('has_modal', False) else []
-            
-        elif handler_name == 'relative_clause':
-            # RelativeClauseHandlerの場合
-            doc = self.nlp(text)
-            has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
-                             for token in doc)
-            confidence = 0.7 if has_relative else 0.2
-            patterns = ['relative_clause'] if has_relative else []
-            
-        else:
-            # 未知のハンドラー
-            confidence = 0.0
-            patterns = []
-        
-        return HandlerReport(
-            handler_name=handler_name,
-            confidence=confidence,
-            detected_patterns=patterns,
-            metadata={'text_length': len(text)}
-        )
     
     def _has_basic_structure(self, text: str) -> bool:
         """基本構造の存在確認（簡易版）"""

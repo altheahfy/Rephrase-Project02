@@ -1,0 +1,293 @@
+{
+  "test_summary": {
+    "total_cases": 2,
+    "case_range": "19-20",
+    "timestamp": 1756894182.984557
+  },
+  "system_results": {
+    "legacy": {
+      "success": 2,
+      "failure": 0,
+      "total_time": 0.16664433479309082,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 2,
+      "failure": 0,
+      "total_time": 0.0863046646118164,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 2,
+      "total_accuracy": 2.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 2,
+      "total_accuracy": 2.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "19",
+      "sentence": "The cake was eaten by the children.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The cake was eaten by the children.",
+        "success": true,
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "was",
+          "V": "eaten",
+          "M2": "by the children"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The cake",
+          "4": "was",
+          "5": "eaten",
+          "7": "by the children"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The cake",
+          "V": "eaten",
+          "M2": "by the children",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.04297327995300293
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.09416770935058594,
+        "v2_time": 0.043314218521118164
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "20",
+      "sentence": "The door was opened by the key.",
+      "expected": {
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The door was opened by the key.",
+        "success": true,
+        "main_slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "slots": {
+          "S": "The door",
+          "Aux": "was",
+          "V": "opened",
+          "M2": "by the key"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The door",
+          "4": "was",
+          "5": "opened",
+          "7": "by the key"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The door",
+          "V": "opened",
+          "M2": "by the key",
+          "Aux": "was"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.04285907745361328
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07247662544250488,
+        "v2_time": 0.04299044609069824
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}

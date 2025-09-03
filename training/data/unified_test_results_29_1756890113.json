@@ -1,0 +1,158 @@
+{
+  "test_summary": {
+    "total_cases": 1,
+    "case_range": "29",
+    "timestamp": 1756890113.7651792
+  },
+  "system_results": {
+    "legacy": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.08726167678833008,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.020672082901000977,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "29",
+      "sentence": "She sings beautifully.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M2": "beautifully"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "She sings beautifully.",
+        "success": true,
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M2": "beautifully"
+        },
+        "slots": {
+          "S": "She",
+          "V": "sings",
+          "M2": "beautifully"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "She",
+          "5": "sings",
+          "7": "beautifully"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "sings",
+          "M2": "beautifully"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 3,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.020537376403808594
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.08726167678833008,
+        "v2_time": 0.020672082901000977
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}

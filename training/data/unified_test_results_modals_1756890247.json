@@ -1,0 +1,36 @@
+{
+  "test_summary": {
+    "total_cases": 1,
+    "case_range": "modals",
+    "timestamp": 1756890247.559942
+  },
+  "system_results": {
+    "legacy": {
+      "success": 0,
+      "failure": 0,
+      "total_time": 0,
+      "success_rate": 0.0
+    },
+    "v2": {
+      "success": 0,
+      "failure": 0,
+      "total_time": 0,
+      "success_rate": 0.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 0,
+      "total_accuracy": 0,
+      "average_accuracy": 0.0,
+      "perfect_match_rate": 0.0
+    },
+    "v2": {
+      "perfect_matches": 0,
+      "total_accuracy": 0,
+      "average_accuracy": 0.0,
+      "perfect_match_rate": 0.0
+    }
+  },
+  "individual_results": []
+}

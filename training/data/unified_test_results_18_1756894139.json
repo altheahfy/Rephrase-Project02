@@ -1,0 +1,165 @@
+{
+  "test_summary": {
+    "total_cases": 1,
+    "case_range": "18",
+    "timestamp": 1756894139.8373084
+  },
+  "system_results": {
+    "legacy": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.09792757034301758,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.040485382080078125,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "18",
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The cake is being baked by my mother.",
+        "success": true,
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The cake",
+          "4": "is being",
+          "5": "baked",
+          "7": "by my mother"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The cake",
+          "V": "baked",
+          "M2": "by my mother",
+          "Aux": "is being"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb",
+          "passive_voice"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb",
+              "passive_voice"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.040366172790527344
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.09792757034301758,
+        "v2_time": 0.040485382080078125
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}

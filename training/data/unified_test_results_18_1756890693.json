@@ -1,0 +1,179 @@
+{
+  "test_summary": {
+    "total_cases": 1,
+    "case_range": "18",
+    "timestamp": 1756890693.728742
+  },
+  "system_results": {
+    "legacy": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.11037135124206543,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.03326821327209473,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 0,
+      "total_accuracy": 0.75,
+      "average_accuracy": 0.75,
+      "perfect_match_rate": 0.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "18",
+      "sentence": "The cake is being baked by my mother.",
+      "expected": {
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The cake is being baked by my mother.",
+        "success": true,
+        "main_slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "slots": {
+          "S": "The cake",
+          "Aux": "is being",
+          "V": "baked",
+          "M2": "by my mother"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The cake",
+          "4": "is being",
+          "5": "baked",
+          "7": "by my mother"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The cake",
+          "V": "is",
+          "C1": "my mother",
+          "M2": "by my mother"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal",
+          "adverb"
+        ],
+        "confidence": 0.8999999999999999,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal",
+              "adverb"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.03314971923828125
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "is being"
+                }
+              ],
+              "extra": [
+                {
+                  "slot": "C1",
+                  "actual": "my mother"
+                }
+              ],
+              "incorrect": [
+                {
+                  "slot": "V",
+                  "expected": "baked",
+                  "actual": "is"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.11037135124206543,
+        "v2_time": 0.03326821327209473
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}
