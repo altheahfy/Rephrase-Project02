@@ -1,0 +1,216 @@
+{
+  "test_summary": {
+    "total_cases": 1,
+    "case_range": "43",
+    "timestamp": 1756897212.9930434
+  },
+  "system_results": {
+    "legacy": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.126054048538208,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 1,
+      "failure": 0,
+      "total_time": 0.02583765983581543,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 1,
+      "total_accuracy": 1.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 0,
+      "total_accuracy": 0.0,
+      "average_accuracy": 0.0,
+      "perfect_match_rate": 0.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "43",
+      "sentence": "The man who runs fast is strong.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The man who runs fast is strong.",
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "strong"
+        },
+        "sub_slots": {
+          "sub-s": "The man who",
+          "sub-v": "runs",
+          "sub-m2": "fast",
+          "_parent_slot": "S"
+        },
+        "pattern_type": "who_subject",
+        "grammar_analysis": {
+          "relative_clause": true,
+          "passive_voice": false,
+          "detected_patterns": [
+            "relative_clause",
+            "basic_five_pattern"
+          ]
+        },
+        "ordered_sub_slots": {
+          "sub-s": {
+            "value": "The man who",
+            "display_order": 1
+          },
+          "sub-v": {
+            "value": "runs",
+            "display_order": 2
+          },
+          "sub-m2": {
+            "value": "fast",
+            "display_order": 3
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "is",
+          "8": "strong"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The man who",
+          "V": "runs"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern",
+          "modal"
+        ],
+        "confidence": 0.6,
+        "v2_metadata": {
+          "handler_reports": 4,
+          "cooperation_plan": {
+            "strategy": "comprehensive_integration",
+            "active_handlers": [
+              "basic_five_pattern",
+              "modal"
+            ],
+            "integration_mode": "merge_all_results"
+          },
+          "quality_checks": {
+            "has_active_handlers": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true,
+            "integrated_processing": true
+          },
+          "processing_time": 0.02573871612548828
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "C1",
+                  "expected": "strong"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The man who"
+                },
+                {
+                  "slot": "V",
+                  "expected": "is",
+                  "actual": "runs"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-s",
+                  "expected": "The man who"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "runs"
+                },
+                {
+                  "slot": "sub-m2",
+                  "expected": "fast"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.126054048538208,
+        "v2_time": 0.02583765983581543
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}

@@ -504,19 +504,50 @@ class UnifiedTestSystem:
                     print(f"     エラー: {mismatch['errors']}")
                     continue
                 
-                print(f"     期待値: {mismatch['expected']}")
-                print(f"     実際値: {mismatch['actual']}")
+                print(f"     期待値(main): {mismatch['expected']}")
+                print(f"     実際値(main): {mismatch['actual']}")
+                
+                # サブスロット情報の追加表示
+                case_result = None
+                for result in results.get('individual_results', []):
+                    if result.get('case_number') == mismatch['case_id']:
+                        case_result = result
+                        break
+                
+                if case_result:
+                    expected_all = case_result.get('expected', {})
+                    v2_result = case_result.get('v2_result', {})
+                    expected_sub = expected_all.get('sub_slots', {})
+                    actual_sub = v2_result.get('sub_slots', {})
+                    v2_validation = case_result.get('validations', {}).get('v2', {})
+                    
+                    if expected_sub or actual_sub:
+                        print(f"     期待値(sub): {expected_sub}")
+                        print(f"     実際値(sub): {actual_sub}")
+                        print(f"     サブスロット一致: {'✅' if v2_validation.get('sub_slots_match', False) else '❌'}")
                 
                 # 差分詳細（differences構造を使用）
                 main_diff = mismatch.get('differences', {}).get('main_slots', {})
                 if main_diff.get('missing'):
-                    print(f"     不足スロット: {[item['slot'] for item in main_diff['missing']]}")
+                    print(f"     不足スロット(main): {[item['slot'] for item in main_diff['missing']]}")
                 if main_diff.get('extra'):
-                    print(f"     余分スロット: {[item['slot'] for item in main_diff['extra']]}")
+                    print(f"     余分スロット(main): {[item['slot'] for item in main_diff['extra']]}")
                 if main_diff.get('incorrect'):
-                    print(f"     値違いスロット:")
+                    print(f"     値違いスロット(main):")
                     for item in main_diff['incorrect']:
                         print(f"       {item['slot']}: 期待=\"{item['expected']}\" → 実際=\"{item['actual']}\"")
+                
+                # サブスロット差分詳細
+                sub_diff = mismatch.get('differences', {}).get('sub_slots', {})
+                if sub_diff:
+                    if sub_diff.get('missing'):
+                        print(f"     不足スロット(sub): {[item['slot'] for item in sub_diff['missing']]}")
+                    if sub_diff.get('extra'):
+                        print(f"     余分スロット(sub): {[item['slot'] for item in sub_diff['extra']]}")
+                    if sub_diff.get('incorrect'):
+                        print(f"     値違いスロット(sub):")
+                        for item in sub_diff['incorrect']:
+                            print(f"       {item['slot']}: 期待=\"{item['expected']}\" → 実際=\"{item['actual']}\"")
         else:
             print(f"✅ 新システム: 全件完全一致")
         

@@ -21,7 +21,7 @@ from enum import Enum
 # 既存ハンドラーをインポート（段階的移行のため）
 from basic_five_pattern_handler import BasicFivePatternHandler
 from modal_handler import ModalHandler
-from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
+from relative_clause_handler import RelativeClauseHandler  # 正しい関係節ハンドラー
 from adverb_handler import AdverbHandler
 from passive_voice_handler import PassiveVoiceHandler
 
@@ -117,8 +117,8 @@ class CentralControllerV2:
             print(f"⚠️ ModalHandler 初期化エラー: {e}")
             
         try:
-            # RelativeClauseHandlerは空辞書を引数に取る
-            handlers['relative_clause'] = OmittedRelativePronounHandler({})
+            # RelativeClauseHandlerは協力者辞書を引数に取る
+            handlers['relative_clause'] = RelativeClauseHandler({})
             print("✅ RelativeClauseHandler 初期化完了")
         except Exception as e:
             print(f"⚠️ RelativeClauseHandler 初期化エラー: {e}")
@@ -317,6 +317,45 @@ class CentralControllerV2:
                     'metadata': {'error': str(e)}
                 }
         
+        elif handler_name == 'relative_clause':
+            try:
+                print(f"🔍 relative_clause ハンドラー処理開始")
+                # ①複文の入れ子構造（関係節）検知
+                result = handler.process(sentence)  # RelativeClauseHandlerはprocess使用
+                print(f"🔍 relative_clause レポート取得: result={result}")
+                
+                if result and result.get('success', False):
+                    # 関係節が検出された場合の信頼度
+                    confidence = 0.95  # 関係節検出時は最高優先度
+                    patterns = ['relative_clause']
+                    
+                    # ②③境界特定情報をメタデータに保存
+                    metadata = {
+                        'result': result,
+                        'boundary_info': result.get('boundary_info', {}),
+                        'nested_structure': True,
+                        'cooperation_required': ['basic_five_pattern', 'adverb', 'passive_voice']
+                    }
+                    print(f"🔍 relative_clause レポート取得成功: confidence={confidence}")
+                else:
+                    confidence = 0.0
+                    patterns = []
+                    metadata = {'result': result}
+                    print(f"🔍 relative_clause レポート取得失敗: confidence={confidence}")
+                
+                return {
+                    'confidence': confidence,
+                    'patterns': patterns,
+                    'metadata': metadata
+                }
+            except Exception as e:
+                print(f"⚠️ relative_clause ハンドラーエラー: {e}")
+                return {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
         # その他のハンドラーも低い基準信頼度
         return {
             'confidence': 0.1,
@@ -358,6 +397,41 @@ class CentralControllerV2:
                 passive_detected = True
                 break
         
+        # 🎯 関係節が検出された場合は、V2の7段階処理を最優先で実行
+        for handler_name in handler_reports:
+            if handler_name == 'relative_clause':
+                report = handler_reports[handler_name]
+                if report['confidence'] > 0.8:  # 関係節検出時の高信頼度
+                    print(f"🔄 関係節検出: V2の7段階階層処理を実行")
+                    
+                    # 既存RelativeClauseHandlerの完全な結果を取得
+                    relative_handler_result = report['metadata'].get('result', {})
+                    print(f"🔍 既存RelativeClause詳細結果: {relative_handler_result}")
+                    
+                    # V2の7段階処理で境界決定と構造統合を実行
+                    handler = self.active_handlers['relative_clause']
+                    v2_analysis = self._hierarchical_relative_clause_processing(handler, sentence)
+                    
+                    # 🎯 既存ハンドラーの結果を優先統合（重複処理回避）
+                    final_sub_slots = {}
+                    
+                    # 既存RelativeClauseHandlerのサブスロットを使用
+                    if relative_handler_result and relative_handler_result.get('sub_slots'):
+                        existing_sub_slots = relative_handler_result['sub_slots']
+                        print(f"🔍 既存サブスロット統合: {existing_sub_slots}")
+                        final_sub_slots.update(existing_sub_slots)
+                    
+                    # V2で生成されたサブスロットがあれば追加統合
+                    if v2_analysis.get('sub_slots'):
+                        final_sub_slots.update(v2_analysis['sub_slots'])
+                    
+                    print(f"🎯 最終統合サブスロット: {final_sub_slots}")
+                    
+                    return {
+                        'main_slots': v2_analysis['main_slots'],
+                        'sub_slots': final_sub_slots
+                    }
+
         # 修飾語競合解決: AdverbHandlerが検出した修飾語パターンを収集
         adverb_modifiers = {}
         if 'adverb' in handler_reports and handler_reports['adverb']['confidence'] > 0.0:
@@ -464,6 +538,10 @@ class CentralControllerV2:
                             main_slots[key] = value
                     
                     return {'main_slots': main_slots, 'sub_slots': sub_slots}
+            
+            elif handler_name == 'relative_clause':
+                # ユーザー様の7段階処理フロー実装
+                return self._hierarchical_relative_clause_processing(handler, sentence)
             
             elif handler_name == 'modal':
                 # 現在はPOCなので基本実装
@@ -782,6 +860,171 @@ class CentralControllerV2:
         print(f"   一致: {comparison['differences']['result_match']}")
         
         return comparison
+
+    def _hierarchical_relative_clause_processing(self, handler, sentence):
+        """ユーザー様の7段階処理フロー実装"""
+        print(f"🔄 関係節階層処理開始: {sentence}")
+        
+        try:
+            # ①V2が例文に複文の入れ子構造（関係節）があることを検知
+            result = handler.process(sentence)  # RelativeClauseHandlerはprocess使用
+            if not result or not result.get('success', False):
+                return {'main_slots': {}, 'sub_slots': {}}
+            
+            print(f"✅ ①構造検知完了: {result.get('boundary_info', {})}")
+            
+            # ②さらに例文全体で他に何の文法が登場するか検知・整理
+            grammar_inventory = self._detect_grammar_patterns(sentence)
+            print(f"✅ ②文法整理完了: {grammar_inventory}")
+            
+            # ③必要なハンドラーを招集し、協調して境界を特定
+            boundary_decision = self._coordinate_boundary_detection(sentence, result, grammar_inventory)
+            print(f"✅ ③境界決定完了: {boundary_decision}")
+            
+            # ④⑤V2が境界を決定し、節に対して代表的な語句を残してマスク
+            masked_sentence = self._create_masked_sentence(sentence, boundary_decision)
+            print(f"✅ ④⑤マスク処理完了: '{masked_sentence}'")
+            
+            # ⑥上位スロットを合体したものに対して必要なハンドラーを読んで処理
+            main_clause_slots = self._process_main_clause(masked_sentence, grammar_inventory)
+            print(f"✅ ⑥主節処理完了: {main_clause_slots}")
+            
+            # ⑦節を各ハンドラーに処理させ、結果を統合
+            relative_clause_slots = self._process_relative_clause(boundary_decision['relative_clause'], grammar_inventory)
+            print(f"✅ ⑦関係節処理完了: {relative_clause_slots}")
+            
+            return {'main_slots': main_clause_slots, 'sub_slots': relative_clause_slots}
+            
+        except Exception as e:
+            print(f"⚠️ 階層処理エラー: {e}")
+            return {'main_slots': {}, 'sub_slots': {}}
+    
+    def _detect_grammar_patterns(self, sentence):
+        """②文法パターン検知・整理"""
+        patterns = {
+            'has_passive': False,
+            'has_modal': False,
+            'has_adverb': False,
+            'verb_forms': [],
+            'complexity_level': 'simple'
+        }
+        
+        doc = self.nlp(sentence)
+        for token in doc:
+            if token.tag_ == 'VBN' and any(aux.lemma_ in ['be', 'have'] for aux in token.ancestors):
+                patterns['has_passive'] = True
+            if token.tag_ == 'MD':
+                patterns['has_modal'] = True
+            if token.pos_ == 'ADV':
+                patterns['has_adverb'] = True
+            if token.pos_ == 'VERB':
+                patterns['verb_forms'].append(token.lemma_)
+        
+        patterns['complexity_level'] = 'complex' if len(patterns['verb_forms']) > 1 else 'simple'
+        return patterns
+    
+    def _coordinate_boundary_detection(self, sentence, relative_result, grammar_patterns):
+        """③ハンドラー協調による境界特定 - 既存システムの境界検出ロジックを活用"""
+        
+        # 既存RelativeClauseHandlerの結果から正確な境界情報を取得
+        if relative_result and relative_result.get('success', False):
+            main_continuation = relative_result.get('main_continuation', '')
+            relative_pronoun = relative_result.get('relative_pronoun', '')
+            antecedent = relative_result.get('antecedent', '')
+            
+            # 既存システムの簡略文作成ロジックを使用
+            boundary_info = {
+                'main_clause': main_continuation,
+                'relative_clause': '',  # 関係節内容は既存ハンドラーから取得
+                'boundary_position': 0,
+                'relative_pronoun': relative_pronoun,
+                'antecedent': antecedent
+            }
+            
+            # main_continuationから主節動詞を特定
+            doc_main = self.nlp(main_continuation)
+            for token in doc_main:
+                if token.dep_ == 'ROOT' or (token.pos_ in ['VERB', 'AUX'] and token.dep_ in ['aux', 'auxpass', 'cop']):
+                    boundary_info['main_verb'] = token.text
+                    boundary_info['main_verb_pos'] = token.i
+                    break
+            
+            return boundary_info
+        
+        # フォールバック: 基本的なspaCy検出
+        doc = self.nlp(sentence)
+        boundary_info = {
+            'main_clause': sentence,
+            'relative_clause': '',
+            'boundary_position': 0,
+            'relative_pronoun': ''
+        }
+        
+        return boundary_info
+    
+    def _create_masked_sentence(self, sentence, boundary_decision):
+        """④⑤代表語句によるマスク処理 - 関係節を先行詞に置換"""
+        
+        # 既存RelativeClauseHandlerが作成した簡略文（main_continuation）を使用
+        if 'main_clause' in boundary_decision and boundary_decision['main_clause']:
+            main_clause = boundary_decision['main_clause'].strip()
+            antecedent = boundary_decision.get('antecedent', '')
+            
+            # 先行詞を復元してマスク文作成
+            if antecedent and main_clause:
+                # main_continuationが動詞から始まる場合、先行詞を前に付ける
+                if main_clause and not main_clause.split()[0].lower() in ['the', 'a', 'an', 'this', 'that', 'these', 'those']:
+                    masked_sentence = f"{antecedent} {main_clause}"
+                else:
+                    masked_sentence = main_clause
+                
+                print(f"🔍 マスク処理: '{sentence}' → '{masked_sentence}'")
+                return masked_sentence
+            
+            return main_clause
+        
+        # フォールバック: 元の文をそのまま返す
+        return sentence
+    
+    def _process_main_clause(self, masked_sentence, grammar_patterns):
+        """⑥マスク文での主節処理"""
+        main_slots = {}
+        
+        print(f"🔍 主節処理入力: '{masked_sentence}'")
+        
+        # BasicFivePatternHandlerで主節を処理
+        if 'basic_five_pattern' in self.active_handlers:
+            basic_handler = self.active_handlers['basic_five_pattern']
+            result = basic_handler.process(masked_sentence)
+            print(f"🔍 BasicFivePattern結果: {result}")
+            
+            if result and result.get('success', False):
+                main_slots = result.get('slots', {})
+                print(f"🔍 抽出されたスロット: {main_slots}")
+        
+        # 🎯 Rephrase空化ルール適用: 関係節存在時にSスロットを空にする
+        if main_slots and 'S' in main_slots:
+            main_slots['S'] = ''
+            print(f"🎯 Rephrase空化ルール適用: S → '' (関係節による主語抽象化)")
+        
+        print(f"🔍 最終主節スロット: {main_slots}")
+        return main_slots
+    
+    def _process_relative_clause(self, relative_clause, grammar_patterns):
+        """⑦関係節の個別処理 - 既存ハンドラー結果の統合"""
+        sub_slots = {}
+        
+        if not relative_clause:
+            return sub_slots
+        
+        print(f"🔍 関係節処理入力: '{relative_clause}'")
+        print(f"🔍 ⑦段階は既存ハンドラー結果を統合するのみ - 重複処理回避")
+        
+        # ⑦段階では新たにハンドラーを呼び出さず、
+        # 既存のRelativeClauseHandlerとAdverbHandlerの結果を統合
+        # （重複処理を避け、V2の中央管理理念に従う）
+        
+        return sub_slots
 
 
 def test_new_system():
