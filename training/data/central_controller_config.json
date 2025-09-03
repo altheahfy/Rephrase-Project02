@@ -159,5 +159,27 @@
     "verb_pos_tags": ["VERB", "AUX"],
     "noun_pos_tags": ["NOUN", "PRON", "PROPN"],
     "relative_pronouns": ["who", "which", "that", "whose", "whom"]
+  },
+  
+  "central_management": {
+    "integration_rules": {
+      "conflict_resolution": "confidence_based",
+      "cooperation_triggers": ["boundary_ambiguity", "complex_grammar"],
+      "quality_thresholds": {
+        "minimum_confidence": 0.3,
+        "high_confidence": 0.7,
+        "cross_validation_required": true
+      }
+    },
+    "handler_coordination": {
+      "parallel_processing": true,
+      "timeout_seconds": 5,
+      "fallback_strategy": "best_effort"
+    },
+    "phase_6a_settings": {
+      "poc_handlers": ["basic_five_pattern", "modal", "relative_clause"],
+      "comparison_mode": true,
+      "verbose_logging": true
+    }
   }
 }
