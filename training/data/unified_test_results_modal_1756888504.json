@@ -1,0 +1,3641 @@
+{
+  "test_summary": {
+    "total_cases": 24,
+    "case_range": "modal",
+    "timestamp": 1756888502.5378938
+  },
+  "system_results": {
+    "legacy": {
+      "success": 24,
+      "failure": 0,
+      "total_time": 1.6130671501159668,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 24,
+      "failure": 0,
+      "total_time": 0.5859572887420654,
+      "success_rate": 1.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 24,
+      "total_accuracy": 24.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 0,
+      "total_accuracy": 12.499999999999998,
+      "average_accuracy": 0.5208333333333333,
+      "perfect_match_rate": 0.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "87",
+      "sentence": "I have completed the project.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "have",
+          "V": "completed",
+          "O1": "the project"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "I have completed the project.",
+        "main_slots": {
+          "S": "I",
+          "Aux": "have",
+          "V": "completed",
+          "O1": "the project"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "perfect_auxiliary",
+            "auxiliary": "have",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "perfect"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "have",
+          "3": "I",
+          "5": "completed",
+          "6": "the project"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "completed",
+          "O1": "project"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.015449285507202148
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "have"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "the project",
+                  "actual": "project"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.10866427421569824,
+        "v2_time": 0.015574216842651367
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "88",
+      "sentence": "She has lived here for ten years.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "has",
+          "V": "lived",
+          "M2": "here",
+          "M3": "for ten years"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "She has lived here for ten years.",
+        "main_slots": {
+          "S": "She",
+          "Aux": "has",
+          "V": "lived",
+          "M2": "here",
+          "M3": "for ten years"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "perfect_auxiliary",
+            "auxiliary": "has",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "perfect"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "has",
+          "3": "She",
+          "5": "lived",
+          "7": "here",
+          "9": "for ten years"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "lived",
+          "M2": "here"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.017208099365234375
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "has"
+                },
+                {
+                  "slot": "M3",
+                  "expected": "for ten years"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.6,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.8
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.0899498462677002,
+        "v2_time": 0.017322540283203125
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "89",
+      "sentence": "They had already left the building.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "had",
+          "M2": "already",
+          "V": "left",
+          "O1": "the building"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "They had already left the building.",
+        "main_slots": {
+          "S": "They",
+          "Aux": "had",
+          "V": "left",
+          "O1": "the building",
+          "M2": "already"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "perfect_auxiliary",
+            "auxiliary": "had",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "perfect"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "had",
+          "3": "They",
+          "5": "left",
+          "6": "the building",
+          "7": "already"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "They",
+          "V": "left",
+          "O1": "building",
+          "M2": "already"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.023131370544433594
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "had"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "the building",
+                  "actual": "building"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.6,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.8
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06096506118774414,
+        "v2_time": 0.02331995964050293
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "90",
+      "sentence": "Do you understand the question?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Do",
+          "S": "you",
+          "V": "understand",
+          "O1": "the question"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "Do you understand the question?",
+        "main_slots": {
+          "S": "you",
+          "Aux": "Do",
+          "V": "understand",
+          "O1": "the question"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "question",
+          "collaboration": [
+            "adverb",
+            "basic_five_pattern"
+          ],
+          "question_type": "yes_no_question",
+          "sentence_pattern": null,
+          "confidence": 0.75
+        },
+        "ordered_slots": {
+          "4": "Do",
+          "3": "you",
+          "5": "understand",
+          "6": "the question"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "you",
+          "V": "understand",
+          "O1": "question"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.1031348705291748
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "Do"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "the question",
+                  "actual": "question"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05464816093444824,
+        "v2_time": 0.10324239730834961
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "91",
+      "sentence": "Does she work at the hospital?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Does",
+          "S": "she",
+          "V": "work",
+          "M2": "at the hospital"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "Does she work at the hospital?",
+        "main_slots": {
+          "S": "she",
+          "Aux": "Does",
+          "V": "work",
+          "M2": "at the hospital"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "question",
+          "collaboration": [
+            "adverb",
+            "basic_five_pattern"
+          ],
+          "question_type": "yes_no_question",
+          "sentence_pattern": null,
+          "confidence": 0.75
+        },
+        "ordered_slots": {
+          "4": "Does",
+          "3": "she",
+          "5": "work",
+          "7": "at the hospital"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "she",
+          "V": "work"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.022416353225708008
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "Does"
+                },
+                {
+                  "slot": "M2",
+                  "expected": "at the hospital"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.04926872253417969,
+        "v2_time": 0.022670269012451172
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "92",
+      "sentence": "Don't touch that button!",
+      "expected": {
+        "main_slots": {
+          "Aux": "Don't",
+          "V": "touch",
+          "O1": "that button"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "Don't touch that button!",
+        "main_slots": {
+          "Aux": "Don't",
+          "V": "touch",
+          "O1": "that button"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "do_auxiliary",
+            "auxiliary": "Don't",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": true,
+            "structure_type": "auxiliary"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "Don't",
+          "5": "touch",
+          "6": "that button"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "V": "touch",
+          "O1": "button"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.015810489654541016
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "Don't"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "that button",
+                  "actual": "button"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.3333333333333333,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.6666666666666666
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07657551765441895,
+        "v2_time": 0.01592087745666504
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "93",
+      "sentence": "Can you help me with this problem?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Can",
+          "S": "you",
+          "V": "help",
+          "O1": "me",
+          "M2": "with this problem"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "Can you help me with this problem?",
+        "main_slots": {
+          "S": "you",
+          "Aux": "Can",
+          "V": "help",
+          "O1": "me",
+          "M2": "with this problem"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "question",
+          "collaboration": [
+            "adverb",
+            "basic_five_pattern"
+          ],
+          "question_type": "yes_no_question",
+          "sentence_pattern": null,
+          "confidence": 0.75
+        },
+        "ordered_slots": {
+          "4": "Can",
+          "3": "you",
+          "5": "help",
+          "6": "me",
+          "7": "with this problem"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "you",
+          "V": "help",
+          "O1": "me"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.016071796417236328
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "Can"
+                },
+                {
+                  "slot": "M2",
+                  "expected": "with this problem"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.6,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.8
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05417656898498535,
+        "v2_time": 0.016180038452148438
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "94",
+      "sentence": "Would you like some coffee?",
+      "expected": {
+        "main_slots": {
+          "Aux": "Would",
+          "S": "you",
+          "V": "like",
+          "O1": "some coffee"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "Would you like some coffee?",
+        "main_slots": {
+          "S": "you",
+          "Aux": "Would",
+          "V": "like",
+          "O1": "some coffee"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "question",
+          "collaboration": [
+            "adverb",
+            "basic_five_pattern"
+          ],
+          "question_type": "yes_no_question",
+          "sentence_pattern": null,
+          "confidence": 0.75
+        },
+        "ordered_slots": {
+          "4": "Would",
+          "3": "you",
+          "5": "like",
+          "6": "some coffee"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "you",
+          "V": "like",
+          "O1": "coffee"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.015877485275268555
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "Would"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "some coffee",
+                  "actual": "coffee"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.048876285552978516,
+        "v2_time": 0.01609206199645996
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "95",
+      "sentence": "I shall return tomorrow.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "shall",
+          "V": "return",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "I shall return tomorrow.",
+        "main_slots": {
+          "S": "I",
+          "Aux": "shall",
+          "V": "return",
+          "M2": "tomorrow"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "modal_verb",
+            "auxiliary": "shall",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "shall",
+          "3": "I",
+          "5": "return",
+          "7": "tomorrow"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "return"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.019196033477783203
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "shall"
+                },
+                {
+                  "slot": "M2",
+                  "expected": "tomorrow"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.0720524787902832,
+        "v2_time": 0.0193021297454834
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "96",
+      "sentence": "We ought to start immediately.",
+      "expected": {
+        "main_slots": {
+          "S": "We",
+          "Aux": "ought to",
+          "V": "start",
+          "M2": "immediately"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "We ought to start immediately.",
+        "main_slots": {
+          "S": "We",
+          "Aux": "ought to",
+          "V": "start",
+          "M2": "immediately"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "ought to",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "ought to",
+          "3": "We",
+          "5": "start",
+          "7": "immediately"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "We",
+          "V": "ought",
+          "M2": "immediately"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.017313718795776367
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "ought to"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "V",
+                  "expected": "start",
+                  "actual": "ought"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07333922386169434,
+        "v2_time": 0.017536163330078125
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "97",
+      "sentence": "They used to play here every day.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "used to",
+          "V": "play",
+          "M2": "here",
+          "M3": "every day"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "They used to play here every day.",
+        "main_slots": {
+          "S": "They",
+          "Aux": "used to",
+          "V": "play",
+          "M2": "here",
+          "M3": "every day"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "used to",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "used to",
+          "3": "They",
+          "5": "play",
+          "7": "here",
+          "9": "every day"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "They",
+          "V": "used",
+          "M2": "here"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.016711711883544922
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "used to"
+                },
+                {
+                  "slot": "M3",
+                  "expected": "every day"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "V",
+                  "expected": "play",
+                  "actual": "used"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.4,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.7
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07035160064697266,
+        "v2_time": 0.016936063766479492
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "98",
+      "sentence": "He is going to study abroad.",
+      "expected": {
+        "main_slots": {
+          "S": "He",
+          "Aux": "is going to",
+          "V": "study",
+          "M2": "abroad"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "He is going to study abroad.",
+        "main_slots": {
+          "S": "He",
+          "Aux": "is going to",
+          "V": "study",
+          "M2": "abroad"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "is going to",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "is going to",
+          "3": "He",
+          "5": "study",
+          "7": "abroad"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "He",
+          "V": "going",
+          "M2": "abroad"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.016451120376586914
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "is going to"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "V",
+                  "expected": "study",
+                  "actual": "going"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.08534765243530273,
+        "v2_time": 0.01655864715576172
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "99",
+      "sentence": "I have been waiting for an hour.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "Aux": "have been",
+          "V": "waiting",
+          "M2": "for an hour"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "I have been waiting for an hour.",
+        "main_slots": {
+          "S": "I",
+          "Aux": "have been",
+          "V": "waiting",
+          "M2": "for an hour"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "have been",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "have been",
+          "3": "I",
+          "5": "waiting",
+          "7": "for an hour"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "I",
+          "V": "waiting"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.02240586280822754
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "have been"
+                },
+                {
+                  "slot": "M2",
+                  "expected": "for an hour"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07326364517211914,
+        "v2_time": 0.022752046585083008
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "100",
+      "sentence": "You should have called me earlier.",
+      "expected": {
+        "main_slots": {
+          "S": "You",
+          "Aux": "should have",
+          "V": "called",
+          "O1": "me",
+          "M2": "earlier"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "You should have called me earlier.",
+        "main_slots": {
+          "S": "You",
+          "Aux": "should have",
+          "V": "called",
+          "O1": "me",
+          "M2": "earlier"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "should have",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "should have",
+          "3": "You",
+          "5": "called",
+          "6": "me",
+          "7": "earlier"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "You",
+          "V": "called",
+          "O1": "me",
+          "M2": "earlier"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.015689373016357422
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "should have"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.8,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.9
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07115983963012695,
+        "v2_time": 0.015796899795532227
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "101",
+      "sentence": "They will be arriving at noon.",
+      "expected": {
+        "main_slots": {
+          "S": "They",
+          "Aux": "will be",
+          "V": "arriving",
+          "M2": "at noon"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "They will be arriving at noon.",
+        "main_slots": {
+          "S": "They",
+          "Aux": "will be",
+          "V": "arriving",
+          "M2": "at noon"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "will be",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "will be",
+          "3": "They",
+          "5": "arriving",
+          "7": "at noon"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "They",
+          "V": "arriving"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.018580913543701172
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "will be"
+                },
+                {
+                  "slot": "M2",
+                  "expected": "at noon"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06479883193969727,
+        "v2_time": 0.018678903579711914
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "102",
+      "sentence": "She might have forgotten the appointment.",
+      "expected": {
+        "main_slots": {
+          "S": "She",
+          "Aux": "might have",
+          "V": "forgotten",
+          "O1": "the appointment"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "She might have forgotten the appointment.",
+        "main_slots": {
+          "S": "She",
+          "Aux": "might have",
+          "V": "forgotten",
+          "O1": "the appointment"
+        },
+        "sub_slots": {},
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "modal",
+          "collaboration": [
+            "adverb"
+          ],
+          "modal_info": {
+            "has_modal": true,
+            "modal_type": "complex",
+            "auxiliary": "might have",
+            "main_verb": null,
+            "is_question": false,
+            "is_negative": false,
+            "structure_type": "complex_modal"
+          },
+          "confidence": 0.9
+        },
+        "ordered_slots": {
+          "4": "might have",
+          "3": "She",
+          "5": "forgotten",
+          "6": "the appointment"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "She",
+          "V": "forgotten",
+          "O1": "appointment"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.015735387802124023
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "might have"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "O1",
+                  "expected": "the appointment",
+                  "actual": "appointment"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.5,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 0.75
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07261013984680176,
+        "v2_time": 0.015848398208618164
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "103",
+      "sentence": "The house where they lived was demolished.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "demolished"
+        },
+        "sub_slots": {
+          "sub-m2": "The house where",
+          "sub-s": "they",
+          "sub-v": "lived",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The house where they lived was demolished.",
+        "main_slots": {
+          "S": "",
+          "Aux": "was",
+          "V": "demolished"
+        },
+        "sub_slots": {
+          "sub-s": "they",
+          "sub-v": "lived",
+          "sub-m2": "The house where",
+          "_parent_slot": "S"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "where",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-s": {
+            "value": "they",
+            "display_order": 1
+          },
+          "sub-v": {
+            "value": "lived",
+            "display_order": 2
+          },
+          "sub-m2": {
+            "value": "The house where",
+            "display_order": 3
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "4": "was",
+          "5": "demolished"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The house",
+          "V": "lived"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.0163726806640625
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "was"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The house"
+                },
+                {
+                  "slot": "V",
+                  "expected": "demolished",
+                  "actual": "lived"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The house where"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "they"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "lived"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05576324462890625,
+        "v2_time": 0.016521215438842773
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "104",
+      "sentence": "The day when we graduated was memorable.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "memorable"
+        },
+        "sub_slots": {
+          "sub-m2": "The day when",
+          "sub-s": "we",
+          "sub-v": "graduated",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The day when we graduated was memorable.",
+        "main_slots": {
+          "S": "",
+          "V": "was",
+          "C1": "memorable"
+        },
+        "sub_slots": {
+          "sub-s": "we",
+          "sub-v": "graduated",
+          "sub-m2": "The day when",
+          "_parent_slot": "S"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "when",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-s": {
+            "value": "we",
+            "display_order": 1
+          },
+          "sub-v": {
+            "value": "graduated",
+            "display_order": 2
+          },
+          "sub-m2": {
+            "value": "The day when",
+            "display_order": 3
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "was",
+          "8": "memorable"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The day",
+          "V": "graduated"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.08020329475402832
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "C1",
+                  "expected": "memorable"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The day"
+                },
+                {
+                  "slot": "V",
+                  "expected": "was",
+                  "actual": "graduated"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The day when"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "we"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "graduated"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.060112714767456055,
+        "v2_time": 0.08046483993530273
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "105",
+      "sentence": "The reason why he quit is personal.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "personal"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "he",
+          "sub-v": "quit",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The reason why he quit is personal.",
+        "main_slots": {
+          "S": "",
+          "V": "is",
+          "C1": "personal"
+        },
+        "sub_slots": {
+          "sub-s": "he",
+          "sub-v": "quit",
+          "sub-m2": "The reason why",
+          "_parent_slot": "S"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "why",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-s": {
+            "value": "he",
+            "display_order": 1
+          },
+          "sub-v": {
+            "value": "quit",
+            "display_order": 2
+          },
+          "sub-m2": {
+            "value": "The reason why",
+            "display_order": 3
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "is",
+          "8": "personal"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The reason",
+          "V": "quit"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.016370058059692383
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "C1",
+                  "expected": "personal"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The reason"
+                },
+                {
+                  "slot": "V",
+                  "expected": "is",
+                  "actual": "quit"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The reason why"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "he"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "quit"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.07705879211425781,
+        "v2_time": 0.016477346420288086
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "106",
+      "sentence": "The way how she explained it helped everyone.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "helped",
+          "O1": "everyone"
+        },
+        "sub_slots": {
+          "sub-m2": "The way how",
+          "sub-s": "she",
+          "sub-v": "explained",
+          "sub-o1": "it",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The way how she explained it helped everyone.",
+        "main_slots": {
+          "S": "",
+          "V": "helped",
+          "O1": "everyone"
+        },
+        "sub_slots": {
+          "sub-s": "she",
+          "sub-v": "explained",
+          "sub-o1": "it",
+          "sub-m2": "The way how",
+          "_parent_slot": "S"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "how",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-s": {
+            "value": "she",
+            "display_order": 1
+          },
+          "sub-v": {
+            "value": "explained",
+            "display_order": 2
+          },
+          "sub-o1": {
+            "value": "it",
+            "display_order": 3
+          },
+          "sub-m2": {
+            "value": "The way how",
+            "display_order": 4
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "helped",
+          "6": "everyone"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The way",
+          "V": "explained",
+          "O1": "it",
+          "O2": "everyone"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.018081188201904297
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [
+                {
+                  "slot": "O2",
+                  "actual": "everyone"
+                }
+              ],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The way"
+                },
+                {
+                  "slot": "V",
+                  "expected": "helped",
+                  "actual": "explained"
+                },
+                {
+                  "slot": "O1",
+                  "expected": "everyone",
+                  "actual": "it"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The way how"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "she"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "explained"
+                },
+                {
+                  "slot": "sub-o1",
+                  "expected": "it"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06939578056335449,
+        "v2_time": 0.018193721771240234
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "107",
+      "sentence": "The place where we first met holds special memories.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "holds",
+          "O1": "special memories"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met",
+          "sub-m3": "first",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The place where we first met holds special memories.",
+        "main_slots": {
+          "S": "",
+          "V": "holds",
+          "O1": "special memories"
+        },
+        "sub_slots": {
+          "sub-m2": "The place where",
+          "sub-s": "we",
+          "sub-v": "met",
+          "_parent_slot": "S",
+          "sub-m3": "first"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "where",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-m2": {
+            "value": "The place where",
+            "display_order": 1
+          },
+          "sub-s": {
+            "value": "we",
+            "display_order": 2
+          },
+          "sub-v": {
+            "value": "met",
+            "display_order": 3
+          },
+          "sub-m3": {
+            "value": "first",
+            "display_order": 4
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "holds",
+          "6": "special memories"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The place",
+          "V": "met",
+          "O1": "special memories"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.021416187286376953
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The place"
+                },
+                {
+                  "slot": "V",
+                  "expected": "holds",
+                  "actual": "met"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The place where"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "we"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "met"
+                },
+                {
+                  "slot": "sub-m3",
+                  "expected": "first"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.3333333333333333,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.16666666666666666
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.04884529113769531,
+        "v2_time": 0.021526336669921875
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "108",
+      "sentence": "The time when everything will change is approaching.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "approaching"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "everything",
+          "sub-aux": "will",
+          "sub-v": "change",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The time when everything will change is approaching.",
+        "main_slots": {
+          "S": "",
+          "Aux": "is",
+          "V": "approaching"
+        },
+        "sub_slots": {
+          "sub-m2": "The time when",
+          "sub-s": "everything",
+          "sub-v": "change",
+          "_parent_slot": "S",
+          "sub-aux": "will"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "when",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-m2": {
+            "value": "The time when",
+            "display_order": 1
+          },
+          "sub-s": {
+            "value": "everything",
+            "display_order": 2
+          },
+          "sub-v": {
+            "value": "change",
+            "display_order": 3
+          },
+          "sub-aux": {
+            "value": "will",
+            "display_order": 4
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "approaching",
+          "4": "is"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "everything",
+          "V": "approaching",
+          "M2": "when"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "modal"
+        ],
+        "confidence": 0.9,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "modal",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.020477294921875
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "Aux",
+                  "expected": "is"
+                }
+              ],
+              "extra": [
+                {
+                  "slot": "M2",
+                  "actual": "when"
+                }
+              ],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "everything"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The time when"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "everything"
+                },
+                {
+                  "slot": "sub-aux",
+                  "expected": "will"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "change"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.3333333333333333,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.16666666666666666
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.05899167060852051,
+        "v2_time": 0.02059030532836914
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "109",
+      "sentence": "The moment when he told her the truth changed everything.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "changed",
+          "O1": "everything"
+        },
+        "sub_slots": {
+          "sub-m2": "The moment when",
+          "sub-s": "he",
+          "sub-v": "told",
+          "sub-o1": "her",
+          "sub-o2": "the truth",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The moment when he told her the truth changed everything.",
+        "main_slots": {
+          "S": "",
+          "V": "changed",
+          "O1": "everything"
+        },
+        "sub_slots": {
+          "sub-m2": "The moment when",
+          "sub-s": "he",
+          "sub-v": "told",
+          "_parent_slot": "S",
+          "sub-o1": "her",
+          "sub-o2": "the truth"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "when",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-m2": {
+            "value": "The moment when",
+            "display_order": 1
+          },
+          "sub-s": {
+            "value": "he",
+            "display_order": 2
+          },
+          "sub-v": {
+            "value": "told",
+            "display_order": 3
+          },
+          "sub-o1": {
+            "value": "her",
+            "display_order": 4
+          },
+          "sub-o2": {
+            "value": "the truth",
+            "display_order": 5
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "changed",
+          "6": "everything"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The moment",
+          "V": "told"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.01918506622314453
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [
+                {
+                  "slot": "O1",
+                  "expected": "everything"
+                }
+              ],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The moment"
+                },
+                {
+                  "slot": "V",
+                  "expected": "changed",
+                  "actual": "told"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The moment when"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "he"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "told"
+                },
+                {
+                  "slot": "sub-o1",
+                  "expected": "her"
+                },
+                {
+                  "slot": "sub-o2",
+                  "expected": "the truth"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.06934380531311035,
+        "v2_time": 0.01931929588317871
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    },
+    {
+      "case_number": "110",
+      "sentence": "The reason why she was upset became clear.",
+      "expected": {
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "clear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-aux": "was",
+          "sub-v": "upset",
+          "_parent_slot": "S"
+        }
+      },
+      "legacy_result": {
+        "success": true,
+        "text": "The reason why she was upset became clear.",
+        "main_slots": {
+          "S": "",
+          "V": "became",
+          "C1": "clear"
+        },
+        "sub_slots": {
+          "sub-m2": "The reason why",
+          "sub-s": "she",
+          "sub-aux": "was",
+          "sub-v": "upset",
+          "_parent_slot": "S"
+        },
+        "metadata": {
+          "controller": "central",
+          "primary_handler": "relative_adverb",
+          "relative_adverb": "why",
+          "confidence": 0.9
+        },
+        "ordered_sub_slots": {
+          "sub-m2": {
+            "value": "The reason why",
+            "display_order": 1
+          },
+          "sub-s": {
+            "value": "she",
+            "display_order": 2
+          },
+          "sub-aux": {
+            "value": "was",
+            "display_order": 3
+          },
+          "sub-v": {
+            "value": "upset",
+            "display_order": 4
+          },
+          "_parent_slot": "S"
+        },
+        "ordered_slots": {
+          "3": "",
+          "5": "became",
+          "8": "clear"
+        }
+      },
+      "v2_result": {
+        "main_slots": {
+          "S": "The reason",
+          "V": "was",
+          "C1": "upset"
+        },
+        "sub_slots": {},
+        "detected_grammar": [
+          "basic_five_pattern"
+        ],
+        "confidence": 0.8,
+        "v2_metadata": {
+          "handler_reports": 2,
+          "cooperation_plan": {
+            "primary": "basic_five_pattern",
+            "strategy": "single_handler"
+          },
+          "quality_checks": {
+            "has_primary_grammar": true,
+            "confidence_acceptable": true,
+            "no_critical_conflicts": true,
+            "text_coverage_adequate": true
+          },
+          "processing_time": 0.01904749870300293
+        }
+      },
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": {
+          "overall_match": false,
+          "main_slots_match": false,
+          "sub_slots_match": false,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": [
+                {
+                  "slot": "S",
+                  "expected": "",
+                  "actual": "The reason"
+                },
+                {
+                  "slot": "V",
+                  "expected": "became",
+                  "actual": "was"
+                },
+                {
+                  "slot": "C1",
+                  "expected": "clear",
+                  "actual": "upset"
+                }
+              ]
+            },
+            "sub_slots": {
+              "missing": [
+                {
+                  "slot": "sub-m2",
+                  "expected": "The reason why"
+                },
+                {
+                  "slot": "sub-s",
+                  "expected": "she"
+                },
+                {
+                  "slot": "sub-aux",
+                  "expected": "was"
+                },
+                {
+                  "slot": "sub-v",
+                  "expected": "upset"
+                },
+                {
+                  "slot": "_parent_slot",
+                  "expected": "S"
+                }
+              ],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 0.0,
+            "sub_slots_accuracy": 0.0,
+            "overall_accuracy": 0.0
+          }
+        }
+      },
+      "performance": {
+        "legacy_time": 0.04750800132751465,
+        "v2_time": 0.019132614135742188
+      },
+      "errors": {
+        "legacy": null,
+        "v2": null
+      }
+    }
+  ]
+}
