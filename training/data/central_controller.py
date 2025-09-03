@@ -11,6 +11,7 @@ Phase 2: RelativeClauseHandler統合
 
 import spacy
 import json
+import os
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from basic_five_pattern_handler import BasicFivePatternHandler
@@ -143,6 +144,23 @@ class CentralController:
         
         # Rephraseスロット定義読み込み
         self.slot_structure = self._load_slot_structure()
+
+    def _get_default_relative_adverb_patterns(self) -> List[str]:
+        """関係副詞パターンのデフォルト設定を返す"""
+        return [
+            r'\bthe\s+\w+\s+where\b',
+            r'\bthe\s+\w+\s+when\b', 
+            r'\bthe\s+\w+\s+why\b',
+            r'\bthe\s+\w+\s+how\b'
+        ]
+    
+    def _get_default_pos_validation(self) -> Dict[str, List[str]]:
+        """POS品詞検証のデフォルト設定を返す"""
+        return {
+            'verb_pos_tags': ['VERB', 'AUX'],
+            'noun_pos_tags': ['NOUN', 'PRON', 'PROPN'],
+            'relative_pronouns': ['who', 'which', 'that', 'whose', 'whom']
+        }
     
     def _apply_order_to_result(self, result_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -334,7 +352,7 @@ class CentralController:
         # スロット内の動詞をチェック
         if 'V' in slots:
             verb = slots['V'].lower()
-            for pattern_config in verb_config['verb_patterns']:
+            for pattern_config in verb_config['patterns']:
                 pattern = pattern_config['pattern']
                 alt_forms = pattern_config['alt_forms']
                 
@@ -342,7 +360,7 @@ class CentralController:
                     return pattern_config['group_key']
         
         # 文章全体から動詞を検出
-        for pattern_config in verb_config['verb_patterns']:
+        for pattern_config in verb_config['patterns']:
             pattern = pattern_config['pattern']
             alt_forms = pattern_config['alt_forms']
             
@@ -353,18 +371,52 @@ class CentralController:
         return verb_config['default_group_key']
     
     def _initialize_configurations(self):
-        """🔧 リファクタリング Phase 4: 全設定の初期化"""
-        # 動詞グループ決定設定
-        self.verb_group_config = {
-            'verb_patterns': [
+        """🔧 リファクタリング Phase 5: 外部設定ファイルからの設定読み込み"""
+        config_file = 'central_controller_config.json'
+        
+        if os.path.exists(config_file):
+            print(f"🔧 外部設定ファイル読み込み: {config_file}")
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    external_config = json.load(f)
+                
+                # 外部設定を適用
+                self.config = external_config  # 全体設定を保存
+                self.verb_group_config = external_config.get('verb_groups', self._get_default_verb_config())
+                self.conditional_processing_config = external_config.get('conditional_processing', self._get_default_conditional_config())
+                self.grammar_detection_config = external_config.get('grammar_detection_priority', self._get_default_grammar_detection())
+                self.auxiliary_normalization_config = external_config.get('auxiliary_normalization', self._get_default_auxiliary_config())
+                self.question_markers_config = external_config.get('question_markers', self._get_default_question_markers())
+                
+                print(f"✅ 外部設定ファイル読み込み完了")
+                return
+                
+            except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                print(f"⚠️ 外部設定ファイル読み込み失敗: {e}")
+                print(f"🔄 デフォルト設定を使用します")
+        
+        # フォールバック: デフォルト設定
+        print(f"🔧 デフォルト設定を使用")
+        self.config = {}  # 空の設定
+        self.verb_group_config = self._get_default_verb_config()
+        self.conditional_processing_config = self._get_default_conditional_config()
+        self.grammar_detection_config = self._get_default_grammar_detection()
+        self.auxiliary_normalization_config = self._get_default_auxiliary_config()
+        self.question_markers_config = self._get_default_question_markers()
+    
+    def _get_default_verb_config(self):
+        """デフォルト動詞グループ設定"""
+        return {
+            'patterns': [
                 {'pattern': 'tell', 'group_key': 'tell', 'alt_forms': ['told']},
                 {'pattern': 'give', 'group_key': 'gave', 'alt_forms': ['gave', 'given']},
             ],
             'default_group_key': 'basic'
         }
-        
-        # 条件節処理設定
-        self.conditional_processing_config = {
+    
+    def _get_default_conditional_config(self):
+        """デフォルト条件節処理設定"""
+        return {
             'equivalent_keywords': ['suppose', 'imagine', 'provided', 'unless', 'as long as'],
             'prefix_mapping': {
                 'unless': 'Unless',
@@ -379,6 +431,33 @@ class CentralController:
                 'fallback_strategy': 'use_m1_for_sentence_initial',
                 'max_modifiers_before_fallback': 1
             }
+        }
+    
+    def _get_default_grammar_detection(self):
+        """デフォルト文法検出順序設定"""
+        return [
+            {'name': 'metaphorical', 'handler': 'metaphorical', 'method': 'can_handle', 'priority': 1},
+            {'name': 'question', 'handler': 'question', 'method': 'is_question', 'priority': 2},
+            {'name': 'gerund', 'handler': 'gerund', 'method': 'can_handle', 'priority': 3},
+            {'name': 'infinitive', 'handler': 'infinitive', 'method': 'can_handle', 'priority': 4}
+        ]
+    
+    def _get_default_auxiliary_config(self):
+        """デフォルト助動詞正規化設定"""
+        return {
+            'question_auxiliaries': ['did', 'do', 'does', 'can', 'will', 'would', 'should', 'could', 'might', 'may'],
+            'removal_patterns': [
+                {'type': 'do_family', 'auxiliaries': ['did', 'do', 'does'], 'action': 'remove_and_reorder'},
+                {'type': 'modal', 'auxiliaries': ['can', 'will', 'would', 'should', 'could', 'might', 'may'], 'action': 'remove_and_reorder'}
+            ]
+        }
+    
+    def _get_default_question_markers(self):
+        """デフォルト疑問文マーカー設定"""
+        return {
+            'end_markers': ['?', '？'],
+            'wh_words': ['what', 'who', 'when', 'where', 'why', 'how', 'which', 'whose'],
+            'yes_no_starters': ['do', 'does', 'did', 'can', 'will', 'would', 'should', 'could', 'might', 'may', 'is', 'are', 'was', 'were']
         }
     
     def _initialize_early_detection_patterns(self):
@@ -706,8 +785,9 @@ class CentralController:
             detected_patterns.append('noun_clause')
         
         # 関係節検出（優先度高）
-        has_relative = any(token.text.lower() in ['who', 'which', 'that', 'whose', 'whom'] 
-                          for token in doc)
+        relative_pronouns = self.config.get('pos_validation', {}).get('relative_pronouns', 
+                                           self._get_default_pos_validation()['relative_pronouns'])
+        has_relative = any(token.text.lower() in relative_pronouns for token in doc)
         
         # 省略関係詞検出（関係節検出の前にチェック）
         omitted_rel_handler = self.handlers['omitted_relative_pronoun']
@@ -715,12 +795,8 @@ class CentralController:
         
         # 関係副詞検出（関係節より優先）
         import re
-        relative_adverb_patterns = [
-            r'\bthe\s+\w+\s+where\b',
-            r'\bthe\s+\w+\s+when\b', 
-            r'\bthe\s+\w+\s+why\b',
-            r'\bthe\s+\w+\s+how\b'
-        ]
+        relative_adverb_patterns = self.config.get('relative_adverb_patterns', 
+                                                  self._get_default_relative_adverb_patterns())
         has_relative_adverb = any(re.search(pattern, text.lower()) for pattern in relative_adverb_patterns)
         
         if has_relative_adverb:
@@ -731,8 +807,12 @@ class CentralController:
             detected_patterns.append('relative_clause')
         
         # 基本5文型の存在確認（POS解析ベース）
-        has_verb = any(token.pos_ in ['VERB', 'AUX'] for token in doc)
-        has_noun = any(token.pos_ in ['NOUN', 'PRON', 'PROPN'] for token in doc)
+        pos_validation = self.config.get('pos_validation', self._get_default_pos_validation())
+        verb_pos_tags = pos_validation.get('verb_pos_tags', ['VERB', 'AUX'])
+        noun_pos_tags = pos_validation.get('noun_pos_tags', ['NOUN', 'PRON', 'PROPN'])
+        
+        has_verb = any(token.pos_ in verb_pos_tags for token in doc)
+        has_noun = any(token.pos_ in noun_pos_tags for token in doc)
         
         if has_verb and has_noun:
             detected_patterns.append('basic_five_pattern')

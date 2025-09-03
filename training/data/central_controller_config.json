@@ -1,0 +1,163 @@
+{
+  "grammar_detection_priority": [
+    {
+      "name": "metaphorical",
+      "handler": "metaphorical",
+      "method": "can_handle",
+      "priority": 1,
+      "description": "比喩表現検出（as if / as though構文）"
+    },
+    {
+      "name": "question", 
+      "handler": "question",
+      "method": "is_question",
+      "priority": 2,
+      "description": "疑問文検出"
+    },
+    {
+      "name": "gerund",
+      "handler": "gerund", 
+      "method": "can_handle",
+      "priority": 3,
+      "description": "動名詞構造検出"
+    },
+    {
+      "name": "infinitive",
+      "handler": "infinitive",
+      "method": "can_handle", 
+      "priority": 4,
+      "description": "不定詞構造検出"
+    }
+  ],
+  
+  "auxiliary_normalization": {
+    "question_auxiliaries": ["did", "do", "does", "can", "will", "would", "should", "could", "might", "may"],
+    "removal_patterns": [
+      {
+        "type": "do_family",
+        "auxiliaries": ["did", "do", "does"],
+        "action": "remove_and_reorder"
+      },
+      {
+        "type": "modal",
+        "auxiliaries": ["can", "will", "would", "should", "could", "might", "may"],
+        "action": "remove_and_reorder"
+      }
+    ]
+  },
+  
+  "question_markers": {
+    "end_markers": ["?", "？"],
+    "wh_words": ["what", "who", "when", "where", "why", "how", "which", "whose"],
+    "yes_no_starters": ["do", "does", "did", "can", "will", "would", "should", "could", "might", "may", "is", "are", "was", "were"]
+  },
+  
+  "conditional_processing": {
+    "equivalent_keywords": ["suppose", "imagine", "provided", "unless", "as long as"],
+    "prefix_mapping": {
+      "unless": "Unless",
+      "provided that": "Provided that", 
+      "as long as": "As long as",
+      "even if": "Even if",
+      "suppose": "Suppose",
+      "imagine": "Imagine"
+    },
+    "slot_placement_rules": {
+      "default_slot": "M2",
+      "fallback_strategy": "use_m1_for_sentence_initial",
+      "max_modifiers_before_fallback": 1
+    }
+  },
+  
+  "verb_groups": {
+    "patterns": [
+      {
+        "pattern": "tell",
+        "group_key": "tell", 
+        "alt_forms": ["told"],
+        "description": "Tell動詞グループ"
+      },
+      {
+        "pattern": "give",
+        "group_key": "gave",
+        "alt_forms": ["gave", "given"],
+        "description": "Give動詞グループ"
+      }
+    ],
+    "default_group_key": "basic"
+  },
+  
+  "early_detection_patterns": {
+    "conditional_patterns": [
+      {
+        "pattern_type": "startswith",
+        "keyword": "imagine if",
+        "handler": "conditional",
+        "description": "Imagine構文 (Case 151)",
+        "priority": 1
+      },
+      {
+        "pattern_type": "startswith", 
+        "keyword": "provided that",
+        "handler": "conditional",
+        "description": "Provided構文 (Case 152)",
+        "priority": 1
+      },
+      {
+        "pattern_type": "startswith",
+        "keyword": "as long as", 
+        "handler": "conditional",
+        "description": "As long as構文 (Case 153)",
+        "priority": 1
+      },
+      {
+        "pattern_type": "complex_conditional",
+        "conditions": ["startswith:if", "contains:had", "contains:would have"],
+        "handler": "conditional",
+        "description": "If過去完了仮定法 (Case 154)",
+        "priority": 1
+      },
+      {
+        "pattern_type": "startswith",
+        "keyword": "even if",
+        "handler": "conditional", 
+        "description": "Even if構文 (Case 155)",
+        "priority": 1
+      }
+    ]
+  },
+  
+  "special_processing": {
+    "question_patterns": [
+      {
+        "pattern_type": "wh_subject_conflict",
+        "condition_type": "slot_conflict",
+        "target_slots": ["S"],
+        "action": "skip_five_pattern_slot",
+        "description": "WH語が主語位置の場合の競合回避"
+      }
+    ],
+    "noun_clause_patterns": [
+      {
+        "pattern_type": "wish_clause_detection",
+        "condition_type": "text_contains",
+        "keywords": [" wish "],
+        "action": "prioritize_noun_clause_result", 
+        "description": "Wish文での名詞節優先処理"
+      }
+    ]
+  },
+  
+  "relative_adverb_patterns": [
+    "\\bthe\\s+\\w+\\s+where\\b",
+    "\\bthe\\s+\\w+\\s+when\\b",
+    "\\bthe\\s+\\w+\\s+why\\b",
+    "\\bthe\\s+\\w+\\s+how\\b"
+  ],
+  
+  "pos_validation": {
+    "verb_pos_tags": ["VERB", "AUX"],
+    "noun_pos_tags": ["NOUN", "PRON", "PROPN"],
+    "relative_pronouns": ["who", "which", "that", "whose", "whom"]
+  }
+}
