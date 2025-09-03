@@ -207,7 +207,7 @@ class CentralControllerV2:
         return best_handler, cooperation_plan
     
     def _execute_slot_decomposition(self, sentence, primary_handler, handler_reports):
-        """スロット分解実行"""
+        """スロット分解実行（Rephraseルール準拠）"""
         if not primary_handler or primary_handler not in self.active_handlers:
             return {'main_slots': {}, 'sub_slots': {}}
         
@@ -215,20 +215,121 @@ class CentralControllerV2:
         
         try:
             if primary_handler == 'basic_five_pattern':
-                # BasicFivePatternHandlerを使用
-                result = handler.process_sentence(sentence)
+                # BasicFivePatternHandlerを使用してRephraseスロット分解実行
+                # 正しいメソッド名は'process'
+                result = handler.process(sentence)
                 if result and result.get('success', False):
+                    # 既存ハンドラーの結果をV2形式に変換
+                    # BasicFivePatternHandlerは'slots'キーに結果を格納
+                    all_slots = result.get('slots', {})
+                    
+                    # main_slotsとsub_slotsを分離
+                    main_slots = {}
+                    sub_slots = {}
+                    
+                    for key, value in all_slots.items():
+                        if key.startswith('sub-'):
+                            sub_slots[key] = value
+                        else:
+                            main_slots[key] = value
+                    
+                    print(f"🔍 BasicFivePattern結果変換: main_slots={main_slots}, sub_slots={sub_slots}")
+                    
                     return {
-                        'main_slots': result.get('main_slots', {}),
-                        'sub_slots': result.get('slots', {})
+                        'main_slots': main_slots,
+                        'sub_slots': sub_slots
                     }
+                else:
+                    print(f"⚠️ BasicFivePatternHandler結果: {result}")
+                    # 失敗時はフォールバック処理
+                    return self._basic_slot_decomposition(sentence)
             
             # 他のハンドラーの場合（後で実装）
-            return {'main_slots': {}, 'sub_slots': {}}
+            elif primary_handler == 'modal':
+                # ModalHandlerも基本的にはBasicFivePatternと同様の処理
+                # 現在はPOCなので簡易実装
+                return self._basic_slot_decomposition(sentence)
+            
+            elif primary_handler == 'relative_clause':
+                # 関係節の場合はサブスロット処理が重要
+                # 現在はPOCなので簡易実装
+                return self._basic_slot_decomposition(sentence)
+            
+            # フォールバック: 基本的なスロット分解
+            return self._basic_slot_decomposition(sentence)
             
         except Exception as e:
             print(f"⚠️ スロット分解エラー ({primary_handler}): {e}")
             return {'main_slots': {}, 'sub_slots': {}}
+    
+    def _extract_sub_slots_from_legacy_result(self, legacy_result):
+        """既存システムの結果からサブスロットを抽出"""
+        sub_slots = {}
+        
+        # 既存システムのslotsからサブスロット（sub-で始まる）を抽出
+        all_slots = legacy_result.get('slots', {})
+        for key, value in all_slots.items():
+            if key.startswith('sub-') and value:  # sub-で始まる非空スロット
+                sub_slots[key] = value
+        
+        return sub_slots
+    
+    def _basic_slot_decomposition(self, sentence):
+        """基本的なスロット分解（Rephraseルール簡易版）"""
+        # spaCyで基本的な解析
+        doc = self.nlp(sentence)
+        
+        main_slots = {}
+        sub_slots = {}
+        
+        # 主語検出
+        subject = None
+        verb = None
+        objects = []
+        modifiers = []
+        
+        for token in doc:
+            if token.dep_ == 'nsubj':  # 主語
+                subject = token.text
+            elif token.dep_ == 'ROOT' and token.pos_ in ['VERB', 'AUX']:  # 動詞
+                verb = token.text
+            elif token.dep_ in ['dobj', 'iobj']:  # 目的語
+                objects.append(token.text)
+            elif token.dep_ in ['acomp', 'attr']:  # 補語
+                if 'C1' not in main_slots:
+                    main_slots['C1'] = token.text
+            elif token.dep_ == 'advmod':  # 副詞
+                modifiers.append(token.text)
+        
+        # Rephraseルールに従って配置
+        if subject:
+            main_slots['S'] = subject
+        if verb:
+            main_slots['V'] = verb
+        
+        # 目的語配置
+        if objects:
+            if len(objects) >= 1:
+                main_slots['O1'] = objects[0]
+            if len(objects) >= 2:
+                main_slots['O2'] = objects[1]
+        
+        # 修飾語配置（個数ベースルール）
+        if modifiers:
+            if len(modifiers) == 1:
+                main_slots['M2'] = modifiers[0]
+            elif len(modifiers) == 2:
+                main_slots['M1'] = modifiers[0]
+                main_slots['M3'] = modifiers[1]
+            elif len(modifiers) >= 3:
+                main_slots['M1'] = modifiers[0]
+                main_slots['M2'] = modifiers[1]
+                main_slots['M3'] = modifiers[2]
+        
+        return {
+            'main_slots': main_slots,
+            'sub_slots': sub_slots
+        }
     
     def _quality_assurance(self, handler_reports, primary_handler):
         """品質保証チェック"""
@@ -241,40 +342,15 @@ class CentralControllerV2:
 
     def analyze_grammar_structure_v2(self, text: str) -> Dict[str, Any]:
         """
-        新中央管理システムによる文法解析
+        新中央管理システムによる文法解析（unified_test.py互換）
         
         Returns:
-            分析結果 + 比較用メタデータ
+            process_sentenceと同じ形式の結果
         """
         print(f"\n🔬 新システム分析開始: '{text}'")
         
-        # Step 1: 全ハンドラーから情報収集
-        handler_reports = self._collect_all_handler_reports(text)
-        
-        # Step 2: 中央での統合判断
-        integrated_analysis = self._integrate_handler_reports(handler_reports, text)
-        
-        # Step 3: 協力調整（必要時）
-        if self._requires_collaboration(integrated_analysis):
-            collaborative_result = self._coordinate_handlers(integrated_analysis, text)
-            integrated_analysis = collaborative_result
-        
-        # Step 4: 品質保証チェック
-        validated_result = self._validate_final_result(integrated_analysis, text)
-        
-        # Step 5: 既存システム互換形式に変換
-        legacy_format_result = self._convert_to_legacy_format(validated_result)
-        
-        return {
-            'v2_result': validated_result,
-            'legacy_format': legacy_format_result,
-            'analysis_metadata': {
-                'system_version': 'v2',
-                'handler_count': len(handler_reports),
-                'confidence_score': validated_result.confidence_score,
-                'processing_time': None  # 後で実装
-            }
-        }
+        # process_sentenceメソッドをそのまま呼び出し
+        return self.process_sentence(text)
     
     def _collect_all_handler_reports(self, text: str) -> Dict[str, HandlerReport]:
         """全ハンドラーから並行情報収集"""

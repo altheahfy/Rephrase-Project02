@@ -350,26 +350,14 @@ class UnifiedTestSystem:
     def _convert_v2_to_legacy_format(self, v2_analysis: Dict[str, Any]) -> Dict[str, Any]:
         """V2結果を既存システム形式に変換（期待値照合用）"""
         
-        # Phase 6a: 基本的な変換実装
-        # 将来的には実際のスロット分解結果を返す予定
-        
-        # 現状は文法項目検出のみ実装されているため、
-        # スロット分解は今後の実装対象
+        # V2システムは既にmain_slots、sub_slotsを返している
+        # 直接それらを使用して既存形式に変換
         converted_result = {
-            'main_slots': {
-                # TODO: V2システムでスロット分解実装後に追加
-                # 現状は空のスロットを返す
-            },
-            'sub_slots': {
-                # TODO: V2システムでサブスロット分解実装後に追加
-            },
-            'detected_grammar': v2_analysis['legacy_format'],
-            'confidence': v2_analysis['v2_result'].confidence_score,
-            'v2_metadata': {
-                'handler_reports': len(v2_analysis['v2_result'].handler_reports),
-                'cooperation_plan': v2_analysis['v2_result'].cooperation_plan,
-                'quality_checks': v2_analysis['v2_result'].quality_checks
-            }
+            'main_slots': v2_analysis.get('main_slots', {}),
+            'sub_slots': v2_analysis.get('sub_slots', {}),
+            'detected_grammar': v2_analysis.get('detected_grammar', []),
+            'confidence': v2_analysis.get('confidence', 0.0),
+            'v2_metadata': v2_analysis.get('v2_metadata', {})
         }
         
         return converted_result

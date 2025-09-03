@@ -1,0 +1,234 @@
+{
+  "test_summary": {
+    "total_cases": 3,
+    "case_range": "1-3",
+    "timestamp": 1756888208.848461
+  },
+  "system_results": {
+    "legacy": {
+      "success": 3,
+      "failure": 0,
+      "total_time": 0.20129942893981934,
+      "success_rate": 1.0
+    },
+    "v2": {
+      "success": 0,
+      "failure": 3,
+      "total_time": 0.04281306266784668,
+      "success_rate": 0.0
+    }
+  },
+  "accuracy_results": {
+    "legacy": {
+      "perfect_matches": 3,
+      "total_accuracy": 3.0,
+      "average_accuracy": 1.0,
+      "perfect_match_rate": 1.0
+    },
+    "v2": {
+      "perfect_matches": 0,
+      "total_accuracy": 0,
+      "average_accuracy": 0.0,
+      "perfect_match_rate": 0.0
+    }
+  },
+  "individual_results": [
+    {
+      "case_number": "1",
+      "sentence": "The car is red.",
+      "expected": {
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "The car is red.",
+        "success": true,
+        "main_slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "slots": {
+          "S": "The car",
+          "V": "is",
+          "C1": "red"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "The car",
+          "5": "is",
+          "8": "red"
+        }
+      },
+      "v2_result": null,
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": null
+      },
+      "performance": {
+        "legacy_time": 0.08811163902282715,
+        "v2_time": 0.015046834945678711
+      },
+      "errors": {
+        "legacy": null,
+        "v2": "'legacy_format'"
+      }
+    },
+    {
+      "case_number": "2",
+      "sentence": "I love you.",
+      "expected": {
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "I love you.",
+        "success": true,
+        "main_slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "slots": {
+          "S": "I",
+          "V": "love",
+          "O1": "you"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "I",
+          "5": "love",
+          "6": "you"
+        }
+      },
+      "v2_result": null,
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": null
+      },
+      "performance": {
+        "legacy_time": 0.057971954345703125,
+        "v2_time": 0.013546228408813477
+      },
+      "errors": {
+        "legacy": null,
+        "v2": "'legacy_format'"
+      }
+    },
+    {
+      "case_number": "3",
+      "sentence": "Birds fly.",
+      "expected": {
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "sub_slots": {}
+      },
+      "legacy_result": {
+        "original_text": "Birds fly.",
+        "success": true,
+        "main_slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "slots": {
+          "S": "Birds",
+          "V": "fly"
+        },
+        "grammar_pattern": "basic_five_pattern + passive_voice",
+        "phase": 1,
+        "ordered_slots": {
+          "3": "Birds",
+          "5": "fly"
+        }
+      },
+      "v2_result": null,
+      "validations": {
+        "legacy": {
+          "overall_match": true,
+          "main_slots_match": true,
+          "sub_slots_match": true,
+          "differences": {
+            "main_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            },
+            "sub_slots": {
+              "missing": [],
+              "extra": [],
+              "incorrect": []
+            }
+          },
+          "scores": {
+            "main_slots_accuracy": 1.0,
+            "sub_slots_accuracy": 1.0,
+            "overall_accuracy": 1.0
+          }
+        },
+        "v2": null
+      },
+      "performance": {
+        "legacy_time": 0.05521583557128906,
+        "v2_time": 0.014219999313354492
+      },
+      "errors": {
+        "legacy": null,
+        "v2": "'legacy_format'"
+      }
+    }
+  ]
+}
