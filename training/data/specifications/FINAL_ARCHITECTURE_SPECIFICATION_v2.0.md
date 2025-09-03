@@ -573,3 +573,188 @@ class ImprovementTracker:
 **実行指針**: この仕様書に基づいて実装を進行
 
 **他の設計書**: 参考資料として保持、本仕様書が最終判断基準
+
+---
+
+## 🏛️ **中央管理システム アーキテクチャ設計**
+**追加日**: 2025年9月3日  
+**背景**: Phase 5完了後の次世代アーキテクチャ設計
+
+### **現状の問題認識**
+
+#### **現在の「疑似中央管理」システム**
+```python
+# 現状: 優先順位による排他的処理
+if self.handlers['metaphorical'].can_handle(text):
+    detected_patterns.append('metaphorical')
+elif self.handlers['question'].is_question(text):  # ← 勝手に判断
+    detected_patterns.append('question')
+elif conditional_patterns:  # ← 優先順位による排他処理
+    detected_patterns.append('conditional')
+```
+
+**問題点**:
+- ❌ **各ハンドラーが勝手に処理可否を判断**
+- ❌ **優先順位による排他的処理で見落とし発生**
+- ❌ **CentralControllerが単なる順次実行者**
+- ❌ **複合文法（仮定法+関係節等）への対応不可**
+
+### **真の中央管理システム設計**
+
+#### **設計原則**
+1. **監督的立場**: CentralControllerが全てを把握・統制
+2. **情報収集**: 全ハンドラーから並行して情報収集
+3. **統合判断**: 中央での最終判断による処理決定
+4. **協力調整**: 必要時のハンドラー間協力の調整
+5. **品質保証**: バッティング・欠落の最終チェック
+
+#### **Phase 6: 真の中央管理システム化**
+
+##### **Phase 6a: 新システム実装（並行運用）**
+```python
+class CentralController:
+    def analyze_grammar_structure_v2(self, text: str) -> Dict[str, Any]:
+        """真の中央管理システム（新実装）"""
+        
+        # 1. 全ハンドラーから情報収集（判断はさせない）
+        handler_reports = self._collect_all_handler_reports(text)
+        
+        # 2. 中央での統合判断
+        integrated_analysis = self._integrate_handler_reports(handler_reports)
+        
+        # 3. 協力が必要な場合の調整
+        if self._requires_collaboration(integrated_analysis):
+            collaborative_result = self._coordinate_handlers(integrated_analysis, text)
+            return collaborative_result
+        
+        # 4. 品質保証チェック
+        validated_result = self._validate_final_result(integrated_analysis)
+        
+        return validated_result
+    
+    def _collect_all_handler_reports(self, text: str) -> Dict[str, Any]:
+        """全ハンドラーから並行情報収集"""
+        reports = {}
+        for handler_name, handler in self.handlers.items():
+            # ハンドラーには「情報提供」のみを求める
+            reports[handler_name] = handler.provide_analysis_report(text)
+        return reports
+    
+    def _integrate_handler_reports(self, reports: Dict[str, Any]) -> Dict[str, Any]:
+        """中央での統合判断"""
+        # 信頼度、競合、補完関係を総合的に判断
+        # 設定ファイルベースの統合ルール適用
+        pass
+    
+    def _coordinate_handlers(self, analysis: Dict[str, Any], text: str) -> Dict[str, Any]:
+        """ハンドラー間協力の調整"""
+        # 関係節境界特定時の5文型+副詞ハンドラー協力等
+        pass
+    
+    def _validate_final_result(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        """最終品質保証"""
+        # バッティング検出、欠落確認、論理的整合性チェック
+        pass
+```
+
+##### **Phase 6b: 段階的移行戦略**
+
+**Step 1: 概念実証（2-3ハンドラー）**
+```python
+# 最小実装での動作確認
+handlers_for_poc = ['basic_five_pattern', 'relative_clause', 'modal']
+```
+
+**Step 2: 並行運用・比較検証**
+```python
+def dual_system_comparison(self, text: str):
+    """新旧システム並行実行・結果比較"""
+    old_result = self.analyze_grammar_structure(text)
+    new_result = self.analyze_grammar_structure_v2(text)
+    
+    return {
+        'old_system': old_result,
+        'new_system': new_result,
+        'differences': self._analyze_differences(old_result, new_result),
+        'accuracy_comparison': self._validate_against_expected(text, old_result, new_result)
+    }
+```
+
+**Step 3: 部分切り替え**
+- 検証済みハンドラーを段階的に新システムに移行
+- リスクの低い文法項目から順次切り替え
+
+**Step 4: 完全移行**
+- 全ハンドラー移行完了後に旧システム廃止
+
+#### **新ハンドラーインターフェース設計**
+
+```python
+class BaseHandler:
+    """統一ハンドラーインターフェース"""
+    
+    def provide_analysis_report(self, text: str) -> Dict[str, Any]:
+        """情報提供専用メソッド（判断はしない）"""
+        return {
+            'confidence': self._calculate_confidence(text),
+            'detected_patterns': self._detect_patterns(text),
+            'boundary_info': self._identify_boundaries(text),
+            'cooperation_needs': self._identify_cooperation_needs(text),
+            'metadata': self._collect_metadata(text)
+        }
+    
+    def execute_processing(self, text: str, coordination_info: Dict[str, Any]) -> Dict[str, Any]:
+        """中央からの指示による実際の処理実行"""
+        # CentralControllerからの指示に基づいて処理
+        pass
+```
+
+#### **期待される効果**
+
+**1. 複合文法への対応**
+```python
+# 例: "I wish I knew the book that she was reading when we met."
+# 新システムでの処理
+analysis_reports = {
+    'conditional': {'confidence': 0.9, 'patterns': ['wish_clause']},
+    'relative_clause': {'confidence': 0.85, 'boundary': [4, 8]}, 
+    'noun_clause': {'confidence': 0.8, 'type': 'embedded'},
+    'basic_five_pattern': {'confidence': 0.95, 'multiple_layers': True}
+}
+# → 全ての文法項目を適切に処理・統合
+```
+
+**2. スケーラビリティ向上**
+- 新しい文法項目追加時の既存システムへの影響なし
+- 複雑度増加への中央調整による対応
+- 各ハンドラー改善の全体への波及
+
+**3. 保守性向上**
+- 中央での統合ログによるデバッグ容易性
+- バッティング・欠落の自動検出
+- 協力ルールの外部設定化
+
+#### **実装優先度**
+
+**Phase 6a: 高優先度**
+- 現状の優先順位システムでは複合文法への対応限界
+- 今後の100%精度達成には必須のアーキテクチャ変更
+- 段階的移行によるリスク最小化
+
+**設定ファイル拡張**
+```json
+{
+  "central_management": {
+    "integration_rules": {
+      "conflict_resolution": "confidence_based",
+      "cooperation_triggers": ["boundary_ambiguity", "complex_grammar"],
+      "quality_thresholds": {
+        "minimum_confidence": 0.7,
+        "cross_validation_required": true
+      }
+    }
+  }
+}
+```
+
+この中央管理システムにより、「どんな複雑な文でもほぼ100%誤りなく分解」という最終目標達成への道筋が確立される。
