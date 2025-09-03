@@ -180,6 +180,14 @@ class HandlerAdapter:
         self.config = adapter_config
         self.processing_history: List[Dict[str, Any]] = []
     
+    def get_handler_id(self) -> str:
+        """ハンドラーIDを返す"""
+        return self.config.handler_id
+    
+    def get_supported_patterns(self) -> List[str]:
+        """サポートパターンを返す"""
+        return self.config.supported_patterns
+    
     def get_configuration(self) -> HandlerConfiguration:
         return self.config
     
@@ -223,7 +231,7 @@ class HandlerAdapter:
         
         return result
     
-    def get_processing_confidence(self, input_text: str) -> float:
+    def get_confidence_for_input(self, input_text: str) -> float:
         """レガシーハンドラーから信頼度を推定"""
         try:
             if hasattr(self.legacy_handler, 'get_confidence'):
@@ -236,6 +244,11 @@ class HandlerAdapter:
                 return 0.5  # デフォルト信頼度
         except:
             return 0.0
+    
+    def process(self, input_text: str) -> Dict[str, Any]:
+        """レガシーインターフェース互換性"""
+        result = self.analyze_input(input_text)
+        return result.to_dict() if hasattr(result, 'to_dict') else result
     
     def can_cooperate_with(self, other_handler_id: str) -> bool:
         return other_handler_id in self.config.cooperation_preferences
