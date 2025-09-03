@@ -1,0 +1,113 @@
+{
+  "success": true,
+  "adapter_creation": true,
+  "interface_compatibility": true,
+  "controller_integration": true,
+  "legacy_integration": true,
+  "test_results": {
+    "BasicFivePattern_interface": [
+      {
+        "input": "She reads books quickly.",
+        "success": true,
+        "confidence": 1.0,
+        "has_metadata": true
+      },
+      {
+        "input": "The book that I read was interesting.",
+        "success": true,
+        "confidence": 1.0,
+        "has_metadata": true
+      },
+      {
+        "input": "The letter was sent by John.",
+        "success": true,
+        "confidence": 1.0,
+        "has_metadata": true
+      },
+      {
+        "input": "They gave him a gift.",
+        "success": true,
+        "confidence": 1.0,
+        "has_metadata": true
+      }
+    ],
+    "Adverb_interface": [
+      {
+        "input": "She reads books quickly.",
+        "success": true,
+        "confidence": 1.0,
+        "has_metadata": true
+      },
+      {
+        "input": "The book that I read was interesting.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      },
+      {
+        "input": "The letter was sent by John.",
+        "success": true,
+        "confidence": 0.9,
+        "has_metadata": true
+      },
+      {
+        "input": "They gave him a gift.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      }
+    ],
+    "RelativeClause_interface": [
+      {
+        "input": "She reads books quickly.",
+        "success": true,
+        "confidence": 0.4,
+        "has_metadata": true
+      },
+      {
+        "input": "The book that I read was interesting.",
+        "success": true,
+        "confidence": 0.4,
+        "has_metadata": true
+      },
+      {
+        "input": "The letter was sent by John.",
+        "success": true,
+        "confidence": 0.4,
+        "has_metadata": true
+      },
+      {
+        "input": "They gave him a gift.",
+        "success": true,
+        "confidence": 0.4,
+        "has_metadata": true
+      }
+    ],
+    "PassiveVoice_interface": [
+      {
+        "input": "She reads books quickly.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      },
+      {
+        "input": "The book that I read was interesting.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      },
+      {
+        "input": "The letter was sent by John.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      },
+      {
+        "input": "They gave him a gift.",
+        "success": true,
+        "confidence": 0.3,
+        "has_metadata": true
+      }
+    ]
+  }
+}
