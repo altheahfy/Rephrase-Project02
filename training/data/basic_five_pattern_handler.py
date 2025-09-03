@@ -89,6 +89,8 @@ class BasicFivePatternHandler:
         """
         基本要素抽出: S, V, O, C の候補を抽出
         
+        重要: 前置詞句の名詞は基本スロット（S, O1, O2, C1, C2）から完全除外
+        
         Args:
             doc: spaCy Doc オブジェクト
             
@@ -125,10 +127,35 @@ class BasicFivePatternHandler:
         if verb_idx is None:
             return elements
         
-        # 動詞後の要素を詳細分析
-        post_verb_tokens = [token for token in doc[verb_idx + 1:] if token.pos_ != 'PUNCT']
+        # 🔥 重要: 前置詞句検出と除外
+        # 動詞後の要素から前置詞句を完全に除外
+        core_elements = []  # 基本スロット候補（前置詞句除外後）
         
-        if not post_verb_tokens:
+        i = verb_idx + 1
+        while i < len(doc):
+            token = doc[i]
+            
+            if token.pos_ == 'PUNCT':
+                i += 1
+                continue
+                
+            elif token.pos_ == 'ADP':  # 前置詞発見
+                # 前置詞句全体をスキップ（前置詞＋名詞句）
+                print(f"🚫 前置詞句検出・除外: '{token.text}' から文末まで")
+                while i < len(doc) and doc[i].pos_ != 'PUNCT':
+                    i += 1
+                break  # 前置詞句以降は全てスキップ
+                
+            elif token.pos_ in ['NOUN', 'PRON', 'PROPN', 'ADJ', 'DET']:
+                core_elements.append(token)
+                i += 1
+                
+            else:
+                i += 1
+        
+        print(f"🔍 前置詞句除外後の核要素: {[token.text for token in core_elements]}")
+        
+        if not core_elements:
             return elements
         
         # 動詞の種類判定（連結動詞かどうか）
@@ -144,52 +171,43 @@ class BasicFivePatternHandler:
             # 使役動詞・授与動詞の場合：特別な処理
             current_phrase = []
             
-            for token in post_verb_tokens:
+            for token in core_elements:
                 if token.pos_ in ['DET', 'ADJ', 'NOUN', 'PRON', 'PROPN']:
                     if token.pos_ == 'PRON' and current_phrase:
                         # 代名詞が来た場合、前の句を終了して新しい句を開始
                         if current_phrase:
-                            phrase_text = ' '.join(current_phrase)
+                            phrase_text = ' '.join([t.text for t in current_phrase])
                             elements_found.append(('NOUN', phrase_text))
-                        current_phrase = [token.text]
+                        current_phrase = [token]
                     elif token.pos_ == 'PRON':
                         # 単独の代名詞
                         elements_found.append(('NOUN', token.text))
                     elif token.pos_ == 'ADJ':
                         # 単独の形容詞
                         if current_phrase:
-                            phrase_text = ' '.join(current_phrase)
+                            phrase_text = ' '.join([t.text for t in current_phrase])
                             elements_found.append(('NOUN', phrase_text))
                             current_phrase = []
                         elements_found.append(('ADJ', token.text))
                     else:
-                        current_phrase.append(token.text)
-                elif current_phrase:
-                    # 句の終了
-                    phrase_text = ' '.join(current_phrase)
-                    elements_found.append(('NOUN', phrase_text))
-                    current_phrase = []
+                        current_phrase.append(token)
             
             # 最後の句を処理
             if current_phrase:
-                phrase_text = ' '.join(current_phrase)
+                phrase_text = ' '.join([t.text for t in current_phrase])
                 elements_found.append(('NOUN', phrase_text))
         else:
             # 通常の場合：句ベースで処理
             current_phrase = []
             
-            for token in post_verb_tokens:
+            for token in core_elements:
                 if token.pos_ in ['DET', 'ADJ', 'NOUN', 'PRON', 'PROPN']:
-                    current_phrase.append(token.text)
+                    current_phrase.append(token)
                 elif current_phrase:  # 句の終了
-                    phrase_text = ' '.join(current_phrase)
+                    phrase_text = ' '.join([t.text for t in current_phrase])
                     
                     # 最後のトークンのPOSで判定
-                    last_token_pos = None
-                    for t in post_verb_tokens:
-                        if t.text == current_phrase[-1]:
-                            last_token_pos = t.pos_
-                            break
+                    last_token_pos = current_phrase[-1].pos_
                     
                     if last_token_pos == 'ADJ':
                         elements_found.append(('ADJ', phrase_text))
@@ -199,14 +217,10 @@ class BasicFivePatternHandler:
             
             # 最後の句を処理
             if current_phrase:
-                phrase_text = ' '.join(current_phrase)
+                phrase_text = ' '.join([t.text for t in current_phrase])
                 
                 # 最後のトークンのPOSで判定
-                last_token_pos = None
-                for t in post_verb_tokens:
-                    if t.text == current_phrase[-1]:
-                        last_token_pos = t.pos_
-                        break
+                last_token_pos = current_phrase[-1].pos_
                 
                 if last_token_pos == 'ADJ':
                     elements_found.append(('ADJ', phrase_text))

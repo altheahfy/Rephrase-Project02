@@ -448,6 +448,94 @@ class UnifiedTestSystem:
         if legacy_avg > 0:
             print(f"   性能比: 新システムが{legacy_avg/v2_avg:.1f}倍高速" if v2_avg < legacy_avg else f"   性能比: 既存システムが{v2_avg/legacy_avg:.1f}倍高速")
 
+        # 不一致案件の詳細表示
+        self.print_mismatch_details(results)
+    
+    def print_mismatch_details(self, results: Dict[str, Any]):
+        """不一致案件の詳細表示"""
+        print(f"\n📋 不一致案件詳細分析:")
+        print("=" * 60)
+        
+        # 新システムの不一致案件を抽出
+        v2_mismatches = []
+        legacy_mismatches = []
+        
+        for case_result in results.get('individual_results', []):
+            case_id = case_result.get('case_number')
+            text = case_result.get('sentence', '')
+            expected = case_result.get('expected', {})
+            
+            # 新システムの不一致チェック
+            v2_validation = case_result.get('validations', {}).get('v2', {})
+            if v2_validation and not v2_validation.get('overall_match', False):
+                v2_result = case_result.get('v2_result', {})
+                v2_mismatches.append({
+                    'case_id': case_id,
+                    'text': text,
+                    'expected': expected.get('main_slots', {}),
+                    'actual': v2_result.get('main_slots', {}),
+                    'accuracy': v2_validation.get('scores', {}).get('overall_accuracy', 0),
+                    'differences': v2_validation.get('differences', {}),
+                    'errors': case_result.get('errors', {}).get('v2')
+                })
+            
+            # 既存システムの不一致チェック  
+            legacy_validation = case_result.get('validations', {}).get('legacy', {})
+            if legacy_validation and not legacy_validation.get('overall_match', False):
+                legacy_result = case_result.get('legacy_result', {})
+                legacy_mismatches.append({
+                    'case_id': case_id,
+                    'text': text,
+                    'expected': expected.get('main_slots', {}),
+                    'actual': legacy_result.get('main_slots', {}),
+                    'accuracy': legacy_validation.get('scores', {}).get('overall_accuracy', 0),
+                    'differences': legacy_validation.get('differences', {}),
+                    'errors': case_result.get('errors', {}).get('legacy')
+                })
+        
+        # 新システムの不一致表示
+        if v2_mismatches:
+            print(f"🔴 新システム不一致案件: {len(v2_mismatches)}件")
+            for i, mismatch in enumerate(v2_mismatches, 1):
+                print(f"\n  {i}. ケース{mismatch['case_id']}: \"{mismatch['text']}\"")
+                print(f"     精度: {mismatch['accuracy']:.1%}")
+                
+                if mismatch.get('errors'):
+                    print(f"     エラー: {mismatch['errors']}")
+                    continue
+                
+                print(f"     期待値: {mismatch['expected']}")
+                print(f"     実際値: {mismatch['actual']}")
+                
+                # 差分詳細（differences構造を使用）
+                main_diff = mismatch.get('differences', {}).get('main_slots', {})
+                if main_diff.get('missing'):
+                    print(f"     不足スロット: {[item['slot'] for item in main_diff['missing']]}")
+                if main_diff.get('extra'):
+                    print(f"     余分スロット: {[item['slot'] for item in main_diff['extra']]}")
+                if main_diff.get('incorrect'):
+                    print(f"     値違いスロット:")
+                    for item in main_diff['incorrect']:
+                        print(f"       {item['slot']}: 期待=\"{item['expected']}\" → 実際=\"{item['actual']}\"")
+        else:
+            print(f"✅ 新システム: 全件完全一致")
+        
+        # 既存システムの不一致表示
+        if legacy_mismatches:
+            print(f"\n🔴 既存システム不一致案件: {len(legacy_mismatches)}件")
+            for i, mismatch in enumerate(legacy_mismatches, 1):
+                print(f"\n  {i}. ケース{mismatch['case_id']}: \"{mismatch['text']}\"")
+                print(f"     精度: {mismatch['accuracy']:.1%}")
+                
+                if mismatch.get('errors'):
+                    print(f"     エラー: {mismatch['errors']}")
+                    continue
+                
+                print(f"     期待値: {mismatch['expected']}")
+                print(f"     実際値: {mismatch['actual']}")
+        else:
+            print(f"✅ 既存システム: 全件完全一致")
+
 
 def main():
     """メイン実行関数"""

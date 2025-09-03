@@ -358,6 +358,14 @@ class CentralControllerV2:
                 passive_detected = True
                 break
         
+        # 修飾語競合解決: AdverbHandlerが検出した修飾語パターンを収集
+        adverb_modifiers = {}
+        if 'adverb' in handler_reports and handler_reports['adverb']['confidence'] > 0.0:
+            adverb_handler = self.active_handlers['adverb']
+            adverb_result = self._get_handler_slot_result('adverb', adverb_handler, sentence)
+            if adverb_result:
+                adverb_modifiers = adverb_result.get('main_slots', {})
+        
         for handler_name, handler in self.active_handlers.items():
             if handler_name not in handler_reports:
                 continue
@@ -380,6 +388,22 @@ class CentralControllerV2:
                     else:
                         integrated_main_slots.update(handler_main)
                         print(f"🔍 {handler_name}結果統合: main={handler_main}, sub={{}}")
+                continue
+            
+            # 修飾語競合解決: BasicFivePatternとAdverbの競合チェック
+            if handler_name == 'basic_five_pattern' and adverb_modifiers:
+                handler_result = self._get_handler_slot_result(handler_name, handler, sentence)
+                if handler_result:
+                    handler_main = handler_result.get('main_slots', {})
+                    handler_sub = handler_result.get('sub_slots', {})
+                    
+                    # 修飾語との競合をチェックして解決
+                    filtered_main = self._resolve_modifier_conflicts(handler_main, adverb_modifiers, sentence)
+                    
+                    integrated_main_slots.update(filtered_main)
+                    integrated_sub_slots.update(handler_sub)
+                    
+                    print(f"🔍 {handler_name}結果統合（修飾語競合解決後）: main={filtered_main}, sub={handler_sub}")
                 continue
             
             try:
@@ -495,6 +519,28 @@ class CentralControllerV2:
                 sub_slots[key] = value
         
         return sub_slots
+    
+    def _resolve_modifier_conflicts(self, basic_slots, adverb_modifiers, sentence):
+        """BasicFivePatternとAdverbの修飾語競合を解決"""
+        filtered_slots = basic_slots.copy()
+        
+        # 前置詞句修飾語（M2, M3など）をチェック
+        for modifier_key, modifier_value in adverb_modifiers.items():
+            if modifier_key.startswith('M') and modifier_value:
+                # 前置詞句から名詞部分を抽出 (例: "for exams" → "exams")
+                modifier_words = modifier_value.split()
+                if len(modifier_words) >= 2:  # 前置詞 + 名詞の形
+                    noun_part = modifier_words[-1]  # 最後の単語（通常名詞）
+                    
+                    # BasicFivePatternの目的語スロットと競合チェック
+                    for basic_key, basic_value in list(filtered_slots.items()):
+                        if basic_key in ['O1', 'O2', 'C1', 'C2'] and basic_value:
+                            # 目的語/補語が修飾語内の名詞と一致する場合
+                            if basic_value.lower() == noun_part.lower():
+                                print(f"🔧 修飾語競合解決: {basic_key}='{basic_value}' を削除（{modifier_key}='{modifier_value}' と重複）")
+                                del filtered_slots[basic_key]
+                                
+        return filtered_slots
     
     def _basic_slot_decomposition(self, sentence):
         """基本的なスロット分解（Rephraseルール簡易版）"""
