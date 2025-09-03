@@ -139,6 +139,13 @@ class GerundHandler:
         
         return stem.lower() in common_verb_stems
 
+    def process(self, sentence: str) -> Dict[str, Any]:
+        """
+        True Central Management System用の処理メソッド
+        理想的なアーキテクチャ対応
+        """
+        return self.handle(sentence, "V")  # デフォルトのV要素として処理
+
     def handle(self, sentence: str, v_group_key: str) -> Dict[str, Any]:
         """
         動名詞構造の解析とスロット分解
