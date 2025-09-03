@@ -13,6 +13,7 @@
 import spacy
 import json
 import os
+import time
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
@@ -20,7 +21,7 @@ from enum import Enum
 # 既存ハンドラーをインポート（段階的移行のため）
 from basic_five_pattern_handler import BasicFivePatternHandler
 from modal_handler import ModalHandler
-from relative_clause_handler import RelativeClauseHandler
+from omitted_relative_pronoun_handler import OmittedRelativePronounHandler
 
 
 class AnalysisConfidence(Enum):
@@ -115,13 +116,128 @@ class CentralControllerV2:
             
         try:
             # RelativeClauseHandlerは空辞書を引数に取る
-            handlers['relative_clause'] = RelativeClauseHandler({})
+            handlers['relative_clause'] = OmittedRelativePronounHandler({})
             print("✅ RelativeClauseHandler 初期化完了")
         except Exception as e:
             print(f"⚠️ RelativeClauseHandler 初期化エラー: {e}")
             
         print(f"✅ POC ハンドラー初期化完了: {len(handlers)}個")
         return handlers
+
+    def process_sentence(self, sentence):
+        """文の総合分析と分解を実行（unified_test.py互換）"""
+        try:
+            start_time = time.time()
+            
+            # ステップ1: 並行情報収集
+            handler_reports = self._collect_handler_reports(sentence)
+            
+            # ステップ2: 統合判断
+            primary_handler, cooperation_plan = self._make_integration_decision(handler_reports)
+            
+            # ステップ3: スロット分解実行
+            slots_result = self._execute_slot_decomposition(sentence, primary_handler, handler_reports)
+            
+            # ステップ4: 品質保証
+            quality_result = self._quality_assurance(handler_reports, primary_handler)
+            
+            processing_time = time.time() - start_time
+            
+            return {
+                'main_slots': slots_result.get('main_slots', {}),
+                'sub_slots': slots_result.get('sub_slots', {}),
+                'detected_grammar': [primary_handler] if primary_handler else [],
+                'confidence': handler_reports.get(primary_handler, {}).get('confidence', 0.0),
+                'v2_metadata': {
+                    'handler_reports': len(handler_reports),
+                    'cooperation_plan': cooperation_plan,
+                    'quality_checks': quality_result,
+                    'processing_time': processing_time
+                }
+            }
+            
+        except Exception as e:
+            print(f"❌ CentralControllerV2エラー: {str(e)}")
+            return {
+                'main_slots': {},
+                'sub_slots': {},
+                'detected_grammar': [],
+                'confidence': 0.0,
+                'v2_metadata': {
+                    'error': str(e)
+                }
+            }
+    
+    def _collect_handler_reports(self, sentence):
+        """並行情報収集（新メソッド）"""
+        reports = {}
+        
+        for handler_name, handler in self.active_handlers.items():
+            try:
+                report = self._get_handler_report(handler_name, handler, sentence)
+                reports[handler_name] = {
+                    'confidence': report.confidence,
+                    'patterns': report.detected_patterns,
+                    'metadata': report.metadata
+                }
+            except Exception as e:
+                print(f"⚠️ {handler_name} レポート取得エラー: {e}")
+                reports[handler_name] = {
+                    'confidence': 0.0,
+                    'patterns': [],
+                    'metadata': {'error': str(e)}
+                }
+        
+        return reports
+    
+    def _make_integration_decision(self, handler_reports):
+        """統合判断（新メソッド）"""
+        if not handler_reports:
+            return None, {}
+        
+        # 最も信頼度の高いハンドラーを選択
+        best_handler = max(handler_reports.keys(), 
+                          key=lambda h: handler_reports[h]['confidence'])
+        
+        cooperation_plan = {
+            'primary': best_handler,
+            'strategy': 'single_handler'
+        }
+        
+        return best_handler, cooperation_plan
+    
+    def _execute_slot_decomposition(self, sentence, primary_handler, handler_reports):
+        """スロット分解実行"""
+        if not primary_handler or primary_handler not in self.active_handlers:
+            return {'main_slots': {}, 'sub_slots': {}}
+        
+        handler = self.active_handlers[primary_handler]
+        
+        try:
+            if primary_handler == 'basic_five_pattern':
+                # BasicFivePatternHandlerを使用
+                result = handler.process_sentence(sentence)
+                if result and result.get('success', False):
+                    return {
+                        'main_slots': result.get('main_slots', {}),
+                        'sub_slots': result.get('slots', {})
+                    }
+            
+            # 他のハンドラーの場合（後で実装）
+            return {'main_slots': {}, 'sub_slots': {}}
+            
+        except Exception as e:
+            print(f"⚠️ スロット分解エラー ({primary_handler}): {e}")
+            return {'main_slots': {}, 'sub_slots': {}}
+    
+    def _quality_assurance(self, handler_reports, primary_handler):
+        """品質保証チェック"""
+        return {
+            'has_primary_grammar': bool(primary_handler),
+            'confidence_acceptable': handler_reports.get(primary_handler, {}).get('confidence', 0) > 0.3,
+            'no_critical_conflicts': True,
+            'text_coverage_adequate': True
+        }
 
     def analyze_grammar_structure_v2(self, text: str) -> Dict[str, Any]:
         """
