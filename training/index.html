@@ -368,6 +368,14 @@
 // 🚧 開発時の認証スキップフラグ（本番時はfalseにする）
 const SKIP_AUTH_FOR_DEVELOPMENT = false; // 認証システム正式稼働
 
+// 🧪 テスト環境チェック（クエリパラメータで制御）
+const urlParams = new URLSearchParams(window.location.search);
+const isTestEnvironment = urlParams.get('skipAuth') === 'true';
+
+if (isTestEnvironment) {
+    console.log('🧪 テスト環境検出 - 認証スキップ');
+}
+
 // 🔒 セッションベースの認証チェック（シンプル版）
 function isAuthenticatedUser() {
     try {
@@ -434,9 +442,9 @@ window.clearDebugLogs = function() {
 document.addEventListener('DOMContentLoaded', function() {
     debugLog('DOM読み込み完了');
     
-    if (SKIP_AUTH_FOR_DEVELOPMENT) {
-        debugLog('開発モード - 認証チェックをスキップ');
-        console.log('🚧 開発モード - 認証チェックをスキップ');
+    if (SKIP_AUTH_FOR_DEVELOPMENT || isTestEnvironment) {
+        debugLog('開発モード/テスト環境 - 認証チェックをスキップ');
+        console.log('🚧 認証チェックをスキップ');
         console.log('📋 利用可能なデバッグコマンド:');
         console.log('  - window.showDebugLogs() : デバッグログを表示');
         console.log('  - window.clearDebugLogs() : デバッグログをクリア');

@@ -5,6 +5,7 @@
 # Node.js
 node_modules/
 npm-debug.log*
+package-lock.json
 
 # VS Code
 .vscode/
@@ -16,6 +17,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Playwright Test Results
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Visual Regression Snapshots (基準画像はコミットする)
+# tests/snapshots/ はコミットする
 
 # Environment
 .env
