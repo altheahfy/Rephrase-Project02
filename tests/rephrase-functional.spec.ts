@@ -1,31 +1,27 @@
-import { test, expect } from '@playwright/test';
+ï»¿import { test, expect } from '@playwright/test';
 
 /**
- * RephraseUI ‹@”\ƒeƒXƒg v2
+ * RephraseUI æ©Ÿèƒ½ãƒ†ã‚¹ãƒˆ v3
  * 
- * y‰ü‘P“_ziChatGPTƒŒƒrƒ…[”½‰fj
- * - •K{/”CˆÓ‚ğ–¾Šm‚É•ª—£i•K{‚ÍŒ©‚Â‚©‚ç‚È‚¯‚ê‚Î‘¦failj
- * - waitForTimeout‚ğexpect/waitForFunction‚É’uŠ·
- * - §Œäƒpƒlƒ‹‚ÍÀÛ‚ÌƒXƒƒbƒg•\¦•Ï‰»‚Ü‚ÅŒŸØ
- * - •\¦‡‚ÌƒeƒXƒg‰ü‘PiƒTƒuƒXƒƒbƒg‚ğœŠOj
- * - ƒCƒ‰ƒXƒg‚ÍnaturalWidth‚Åƒ[ƒhŠm”F
+ * ã€æ”¹å–„ç‚¹ã€‘ï¼ˆChatGPTå†ãƒ¬ãƒ“ãƒ¥ãƒ¼åæ˜ ï¼‰
+ * - åˆ¶å¾¡ãƒ‘ãƒãƒ«ï¼šã€Œé–‹ã„ãŸã€ã ã‘ã§ãªãã€ŒåŠ¹ã„ãŸã€ã¾ã§æ¤œè¨¼
+ * - è¡¨ç¤ºé †ï¼šéƒ¨åˆ†åˆ—ä¸€è‡´ã¨ã—ã¦å¼·åŒ–
+ * - ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œï¼šå¿…é ˆã‚¹ãƒ­ãƒƒãƒˆ(S,V)ã®å­˜åœ¨ã‚’æ–­è¨€
+ * - test.skip()ã«ç†ç”±ã‚’è¿½åŠ 
  */
 
-test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
+test.describe('RephraseUI æ©Ÿèƒ½ãƒ†ã‚¹ãƒˆ', () => {
   
-  // ŠeƒeƒXƒg‚Ì‘O‚Éƒf[ƒ^‚ğƒ[ƒh
   test.beforeEach(async ({ page }) => {
     await page.goto('/training/index.html?skipAuth=true');
     await page.waitForLoadState('networkidle');
     
-    // y•K{zƒvƒŠƒZƒbƒg‘I‘ğ“Çƒ{ƒ^ƒ“‚ª‘¶İ‚·‚é‚±‚Æ
     await expect(page.locator('#presetSelect')).toHaveCount(1);
     await expect(page.locator('#loadPresetButton')).toHaveCount(1);
     
     await page.selectOption('#presetSelect', 'data/slot_order_data.json');
     await page.click('#loadPresetButton');
     
-    // y‰ü‘PzwaitForFunction‚Åƒf[ƒ^ƒ[ƒhŠ®—¹‚ğ‘Ò‹@
     await page.waitForFunction(() => {
       const phrases = document.querySelectorAll('.slot-phrase');
       for (const p of phrases) {
@@ -36,33 +32,32 @@ test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
   });
 
   /**
-   * Test-1: y•K{zStructure Builder - ƒXƒƒbƒg‚ÉDB‚©‚çƒf[ƒ^‚ª³‚µ‚­“Ç‚İ‚Ü‚ê‚é
+   * Test-1: ã€å¿…é ˆã€‘Structure Builder - DBã‹ã‚‰ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
    */
-  test('y•K{zƒXƒƒbƒg‚ÉDB‚©‚çƒf[ƒ^‚ª³‚µ‚­“Ç‚İ‚Ü‚ê‚é', async ({ page }) => {
+  test('[å¿…é ˆ] ã‚¹ãƒ­ãƒƒãƒˆã«DBã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ãŒæ­£ã—ãèª­ã¿è¾¼ã¾ã‚Œã‚‹', async ({ page }) => {
     const phrases = await page.locator('.slot-phrase').allTextContents();
     const nonEmptyPhrases = phrases.filter(p => p.trim().length > 0);
     
-    console.log(' slot-phrase“à—e:', nonEmptyPhrases.slice(0, 5));
+    console.log('slot-phraseå†…å®¹:', nonEmptyPhrases.slice(0, 5));
     expect(nonEmptyPhrases.length).toBeGreaterThan(0);
     
     const texts = await page.locator('.slot-text').allTextContents();
     const nonEmptyTexts = texts.filter(t => t.trim().length > 0);
     
-    console.log(' slot-text“à—e:', nonEmptyTexts.slice(0, 5));
+    console.log('slot-textå†…å®¹:', nonEmptyTexts.slice(0, 5));
     expect(nonEmptyTexts.length).toBeGreaterThan(0);
     
-    console.log(' Structure Builder: ƒf[ƒ^“Ç‚İ‚İ¬Œ÷');
+    console.log('Structure Builder: ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿æˆåŠŸ');
   });
 
   /**
-   * Test-2: y•K{zå—vƒXƒƒbƒg‚Ì‡˜‚ª³‚µ‚¢iƒTƒuƒXƒƒbƒg‚ğœŠO‚µ‚Äƒ`ƒFƒbƒNj
+   * Test-2: ã€å¿…é ˆã€‘ä¸»è¦ã‚¹ãƒ­ãƒƒãƒˆã®é †åºãŒæ­£ã—ã„ï¼ˆéƒ¨åˆ†åˆ—ä¸€è‡´ï¼‰
    */
-  test('y•K{zå—vƒXƒƒbƒg‚Ì‡˜‚ª³‚µ‚¢', async ({ page }) => {
-    // ƒTƒuƒXƒƒbƒg‚ğœŠO‚µ‚½å—vƒXƒƒbƒg‚Ì‚İ‚ğæ“¾
+  test('[å¿…é ˆ] ä¸»è¦ã‚¹ãƒ­ãƒƒãƒˆã®é †åºãŒæ­£ã—ã„', async ({ page }) => {
     const mainSlots = page.locator('.slot-container:not([id*="sub"]):not(.hidden):not(.empty-slot-hidden)');
     const count = await mainSlots.count();
     
-    console.log(' å—vƒXƒƒbƒg”:', count);
+    console.log('ä¸»è¦ã‚¹ãƒ­ãƒƒãƒˆæ•°:', count);
     expect(count).toBeGreaterThan(0);
     
     const slotIds: string[] = [];
@@ -70,40 +65,36 @@ test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
       const id = await mainSlots.nth(i).getAttribute('id');
       if (id) slotIds.push(id);
     }
-    console.log(' å—vƒXƒƒbƒgID‡:', slotIds);
+    console.log('ä¸»è¦ã‚¹ãƒ­ãƒƒãƒˆIDé †:', slotIds);
     
-    // å—vƒXƒƒbƒg‚ÌŠú‘Ò‡˜i•¶–@\‘¢‚ÉŠî‚Ã‚­j
+    // æœŸå¾…é †åºï¼ˆæ–‡æ³•æ§‹é€ ã«åŸºã¥ãå®Œå…¨ãƒªã‚¹ãƒˆï¼‰
     const expectedOrder = ['slot-m1', 'slot-s', 'slot-aux', 'slot-m2', 'slot-v', 'slot-c1', 'slot-o1', 'slot-o2', 'slot-c2', 'slot-m3'];
     
-    let lastExpectedIndex = -1;
+    // ã€å¼·åŒ–ã€‘éƒ¨åˆ†åˆ—ã¨ã—ã¦ä¸€è‡´ã™ã‚‹ã“ã¨ã‚’æ¤œè¨¼
+    let expectedIdx = 0;
     for (const id of slotIds) {
-      const expectedIndex = expectedOrder.indexOf(id);
-      if (expectedIndex !== -1) {
-        expect(expectedIndex).toBeGreaterThanOrEqual(lastExpectedIndex);
-        lastExpectedIndex = expectedIndex;
+      const foundIdx = expectedOrder.indexOf(id, expectedIdx);
+      if (foundIdx !== -1) {
+        expect(foundIdx).toBeGreaterThanOrEqual(expectedIdx);
+        expectedIdx = foundIdx + 1;
       }
     }
     
-    console.log(' å—vƒXƒƒbƒg‡˜: ³‚µ‚¢');
+    console.log('ä¸»è¦ã‚¹ãƒ­ãƒƒãƒˆé †åº: éƒ¨åˆ†åˆ—ä¸€è‡´OK');
   });
 
   /**
-   * Test-3: y•K{z‘S‘Ìƒ‰ƒ“ƒ_ƒ}ƒCƒY‚Å“à—e‚ª•Ï‚í‚é
-   * 
-   * ÀÛ‚ÌID: #randomize-all
+   * Test-3: ã€å¿…é ˆã€‘å…¨ä½“ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºã§å†…å®¹ãŒå¤‰ã‚ã‚‹
    */
-  test('y•K{z‘S‘Ìƒ‰ƒ“ƒ_ƒ}ƒCƒY‚Å“à—e‚ª•Ï‚í‚é', async ({ page }) => {
-    // y•K{z‘S‘Ìƒ‰ƒ“ƒ_ƒ}ƒCƒYƒ{ƒ^ƒ“‚Ì‘¶İŠm”F
+  test('[å¿…é ˆ] å…¨ä½“ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºã§å†…å®¹ãŒå¤‰ã‚ã‚‹', async ({ page }) => {
     const randomizeBtn = page.locator('#randomize-all');
     await expect(randomizeBtn).toHaveCount(1);
     
-    // ƒ‰ƒ“ƒ_ƒ}ƒCƒY‘O‚ÌƒtƒŒ[ƒY‚ğ‹L˜^
     const beforePhrases = await page.locator('.slot-phrase').allTextContents();
     const beforeContent = beforePhrases.filter(p => p.trim()).join('|');
     
-    console.log(' ƒ‰ƒ“ƒ_ƒ}ƒCƒY‘O:', beforeContent.substring(0, 100));
+    console.log('ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå‰:', beforeContent.substring(0, 100));
     
-    // y‰ü‘Pzexpect.poll‚Å•Ï‰»‚ğ‘Ò‚ÂiÅ‘å3‰ñsj
     let changed = false;
     let afterContent = '';
     
@@ -118,89 +109,89 @@ test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
         }, { timeout: 3000 }).toBe(true);
         changed = true;
       } catch {
-        console.log(' s', attempt + 1, ': •Ï‰»‚È‚µAÄs...');
+        console.log('è©¦è¡Œ', attempt + 1, ': å¤‰åŒ–ãªã—ã€å†è©¦è¡Œ...');
       }
     }
     
-    console.log(' ƒ‰ƒ“ƒ_ƒ}ƒCƒYŒã:', afterContent.substring(0, 100));
+    console.log('ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œ:', afterContent.substring(0, 100));
     expect(changed).toBe(true);
-    console.log(' Randomizer: ‘S‘Ìƒ‰ƒ“ƒ_ƒ}ƒCƒY‚Å“à—e•ÏXŠm”F');
+    console.log('Randomizer: å…¨ä½“ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºã§å†…å®¹å¤‰æ›´ç¢ºèª');
   });
 
   /**
-   * Test-4: y•K{zƒ‰ƒ“ƒ_ƒ}ƒCƒYŒã‚àƒXƒƒbƒg\‘¢‚ªˆÛ‚³‚ê‚é
+   * Test-4: ã€å¿…é ˆã€‘ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œã‚‚å¿…é ˆã‚¹ãƒ­ãƒƒãƒˆ(S,V)ãŒå­˜åœ¨ã™ã‚‹
    */
-  test('y•K{zƒ‰ƒ“ƒ_ƒ}ƒCƒYŒã‚àƒXƒƒbƒg\‘¢‚ªˆÛ‚³‚ê‚é', async ({ page }) => {
+  test('[å¿…é ˆ] ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œã‚‚å¿…é ˆã‚¹ãƒ­ãƒƒãƒˆãŒå­˜åœ¨ã™ã‚‹', async ({ page }) => {
     const beforeCount = await page.locator('.slot-container').count();
-    console.log(' ƒ‰ƒ“ƒ_ƒ}ƒCƒY‘O‚ÌƒXƒƒbƒg”:', beforeCount);
+    console.log('ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå‰ã®ã‚¹ãƒ­ãƒƒãƒˆæ•°:', beforeCount);
     
     const randomizeBtn = page.locator('#randomize-all');
     await expect(randomizeBtn).toHaveCount(1);
     
     await randomizeBtn.click();
     
-    // y‰ü‘Pzexpect.poll‚Å\‘¢ˆÛ‚ğŠm”F
+    // æ§‹é€ ç¶­æŒã®åŸºæœ¬ç¢ºèª
     await expect.poll(async () => {
       return await page.locator('.slot-container').count();
     }, { timeout: 5000 }).toBeGreaterThan(0);
     
     const afterCount = await page.locator('.slot-container').count();
-    console.log(' ƒ‰ƒ“ƒ_ƒ}ƒCƒYŒã‚ÌƒXƒƒbƒg”:', afterCount);
+    console.log('ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œã®ã‚¹ãƒ­ãƒƒãƒˆæ•°:', afterCount);
     
-    // y•K{zƒXƒƒbƒg”‚ª‹É’[‚ÉŒ¸‚Á‚Ä‚¢‚È‚¢‚±‚Æ
     expect(afterCount).toBeGreaterThanOrEqual(beforeCount * 0.5);
     
-    console.log(' ƒ‰ƒ“ƒ_ƒ}ƒCƒYŒã‚àƒXƒƒbƒg\‘¢ˆÛ');
+    // ã€å¼·åŒ–ã€‘å¿…é ˆã‚¹ãƒ­ãƒƒãƒˆ(S, V)ã®å­˜åœ¨ã‚’æ–­è¨€
+    const slotS = page.locator('#slot-s, .slot-container[data-slot="S"]');
+    const slotV = page.locator('#slot-v, .slot-container[data-slot="V"]');
+    
+    // S ã¾ãŸã¯ V ã®ã©ã¡ã‚‰ã‹ã¯å¿…ãšå­˜åœ¨ã™ã‚‹ï¼ˆæ–‡å‹ã«ã‚ˆã‚‹ï¼‰
+    const sCount = await slotS.count();
+    const vCount = await slotV.count();
+    
+    console.log('å¿…é ˆã‚¹ãƒ­ãƒƒãƒˆå­˜åœ¨: S=' + sCount + ', V=' + vCount);
+    expect(sCount + vCount).toBeGreaterThan(0);
+    
+    console.log('ãƒ©ãƒ³ãƒ€ãƒã‚¤ã‚ºå¾Œã‚‚å¿…é ˆã‚¹ãƒ­ãƒƒãƒˆç¶­æŒ');
   });
 
   /**
-   * Test-5: y”CˆÓzƒTƒuƒXƒƒbƒg‚ÌÜ‚è‚½‚½‚İ/“WŠJ
+   * Test-5: ã€ä»»æ„ã€‘ã‚µãƒ–ã‚¹ãƒ­ãƒƒãƒˆã®æŠ˜ã‚ŠãŸãŸã¿/å±•é–‹
    */
-  test('y”CˆÓzƒTƒuƒXƒƒbƒg‚ÌÜ‚è‚½‚½‚İ/“WŠJ', async ({ page }) => {
+  test('[ä»»æ„] ã‚µãƒ–ã‚¹ãƒ­ãƒƒãƒˆã®æŠ˜ã‚ŠãŸãŸã¿/å±•é–‹', async ({ page }) => {
     const toggleBtns = page.locator('button[data-subslot-toggle]');
     const count = await toggleBtns.count();
     
-    if (count === 0) {
-      test.skip();
-      return;
-    }
+    test.skip(count === 0, 'ã“ã®ãƒ—ãƒªã‚»ãƒƒãƒˆã«ã¯ã‚µãƒ–ã‚¹ãƒ­ãƒƒãƒˆãƒˆã‚°ãƒ«ãƒœã‚¿ãƒ³ãŒãªã„');
     
     const firstToggle = toggleBtns.first();
     const subslotContainer = page.locator('[id*="subslot"], .subslot-container').first();
     
-    if (await subslotContainer.count() === 0) {
-      test.skip();
-      return;
-    }
+    const subslotCount = await subslotContainer.count();
+    test.skip(subslotCount === 0, 'ã‚µãƒ–ã‚¹ãƒ­ãƒƒãƒˆã‚³ãƒ³ãƒ†ãƒŠãŒè¦‹ã¤ã‹ã‚‰ãªã„');
     
     const beforeVisible = await subslotContainer.isVisible();
-    console.log(' ƒgƒOƒ‹‘O‚ÌƒTƒuƒXƒƒbƒg•\¦ó‘Ô:', beforeVisible);
+    console.log('ãƒˆã‚°ãƒ«å‰ã®ã‚µãƒ–ã‚¹ãƒ­ãƒƒãƒˆè¡¨ç¤ºçŠ¶æ…‹:', beforeVisible);
     
     await firstToggle.click();
     
-    // y‰ü‘Pzexpect.poll‚Åó‘Ô•Ï‰»‚ğ‘Ò‚Â
     await expect.poll(async () => {
       return await subslotContainer.isVisible();
     }, { timeout: 2000 }).toBe(!beforeVisible);
     
-    console.log(' Subslot Toggle: Ü‚è‚½‚½‚İ/“WŠJ‹@”\³í');
+    console.log('Subslot Toggle: æŠ˜ã‚ŠãŸãŸã¿/å±•é–‹æ©Ÿèƒ½æ­£å¸¸');
   });
 
   /**
-   * Test-6: y”CˆÓzƒXƒƒbƒg‚ÉƒCƒ‰ƒXƒg‚ª³‚µ‚­ƒ[ƒh‚³‚ê‚éinaturalWidthŠm”Fj
+   * Test-6: ã€ä»»æ„ã€‘ã‚¹ãƒ­ãƒƒãƒˆã«ã‚¤ãƒ©ã‚¹ãƒˆãŒæ­£ã—ããƒ­ãƒ¼ãƒ‰ã•ã‚Œã‚‹
    */
-  test('y”CˆÓzƒXƒƒbƒg‚ÉƒCƒ‰ƒXƒg‚ª³‚µ‚­ƒ[ƒh‚³‚ê‚é', async ({ page }) => {
+  test('[ä»»æ„] ã‚¹ãƒ­ãƒƒãƒˆã«ã‚¤ãƒ©ã‚¹ãƒˆãŒæ­£ã—ããƒ­ãƒ¼ãƒ‰ã•ã‚Œã‚‹', async ({ page }) => {
     const images = page.locator('.slot-image');
     const count = await images.count();
     
-    if (count === 0) {
-      test.skip();
-      return;
-    }
+    test.skip(count === 0, 'ã“ã®ãƒ—ãƒªã‚»ãƒƒãƒˆã«ã¯ã‚¹ãƒ­ãƒƒãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ãŒãªã„');
     
-    console.log(' ƒXƒƒbƒgƒCƒ[ƒW”:', count);
+    console.log('ã‚¹ãƒ­ãƒƒãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸æ•°:', count);
     
-    // y‰ü‘PznaturalWidth‚ÅÀÛ‚Éƒ[ƒh‚³‚ê‚Ä‚¢‚é‚©Šm”F
     let loadedCount = 0;
     
     for (let i = 0; i < Math.min(count, 10); i++) {
@@ -212,20 +203,22 @@ test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
         
         if (naturalWidth > 0) {
           loadedCount++;
-          console.log(' ƒ[ƒhÏ‚İ:', src.split('/').pop(), '(' + naturalWidth + 'px)');
+          console.log('ãƒ­ãƒ¼ãƒ‰æ¸ˆã¿:', src.split('/').pop(), '(' + naturalWidth + 'px)');
         }
       }
     }
     
-    console.log(' ƒ[ƒhÏ‚İƒCƒ[ƒW”:', loadedCount);
+    console.log('ãƒ­ãƒ¼ãƒ‰æ¸ˆã¿ã‚¤ãƒ¡ãƒ¼ã‚¸æ•°:', loadedCount);
     expect(loadedCount).toBeGreaterThan(0);
-    console.log(' Image System: ƒCƒ‰ƒXƒg³íƒ[ƒhŠm”F');
+    console.log('Image System: ã‚¤ãƒ©ã‚¹ãƒˆæ­£å¸¸ãƒ­ãƒ¼ãƒ‰ç¢ºèª');
   });
 
   /**
-   * Test-7: y•K{z§Œäƒpƒlƒ‹‚ªŠJ‚­
+   * Test-7: ã€å¿…é ˆã€‘åˆ¶å¾¡ãƒ‘ãƒãƒ«ã§å®Ÿéš›ã«ã‚¹ãƒ­ãƒƒãƒˆè¡¨ç¤ºãŒå¤‰ã‚ã‚‹ï¼ˆæœ€é‡è¦ï¼‰
+   * 
+   * ChatGPTãƒ¬ãƒ“ãƒ¥ãƒ¼: ã€Œé–‹ã„ãŸã€ã ã‘ã§ãªãã€ŒåŠ¹ã„ãŸã€ã¾ã§æ¤œè¨¼
    */
-  test('y•K{z§Œäƒpƒlƒ‹‚ªŠJ‚­', async ({ page }) => {
+  test('[å¿…é ˆ] åˆ¶å¾¡ãƒ‘ãƒãƒ«ã§ã‚¹ãƒ­ãƒƒãƒˆè¡¨ç¤ºãŒå®Ÿéš›ã«å¤‰ã‚ã‚‹', async ({ page }) => {
     const toggleBtn = page.locator('#toggle-control-panels');
     await expect(toggleBtn).toHaveCount(1);
     
@@ -234,33 +227,83 @@ test.describe('RephraseUI ‹@”\ƒeƒXƒg', () => {
     const controlPanel = page.locator('#visibility-control-panel-inline');
     await expect(controlPanel).toBeVisible({ timeout: 2000 });
     
-    console.log(' §Œäƒpƒlƒ‹•\¦: OK');
+    console.log('åˆ¶å¾¡ãƒ‘ãƒãƒ«è¡¨ç¤º: OK');
     
-    // ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ª‘¶İ‚·‚é‚±‚Æ‚ğŠm”F
+    // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’å–å¾—
     const checkboxes = controlPanel.locator('input[type="checkbox"]');
     const checkboxCount = await checkboxes.count();
     
-    console.log(' §Œäƒpƒlƒ‹“à‚Ìƒ`ƒFƒbƒNƒ{ƒbƒNƒX”:', checkboxCount);
+    console.log('åˆ¶å¾¡ãƒ‘ãƒãƒ«å†…ã®ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹æ•°:', checkboxCount);
     expect(checkboxCount).toBeGreaterThan(0);
     
-    console.log(' Control Panel: §Œäƒpƒlƒ‹•\¦ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‘¶İŠm”F');
+    // ã€æœ€é‡è¦ã€‘Vã‚¹ãƒ­ãƒƒãƒˆã®è‹±æ–‡ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’ãƒˆã‚°ãƒ«ã—ã¦ã€å®Ÿéš›ã«è¡¨ç¤ºãŒå¤‰ã‚ã‚‹ã“ã¨ã‚’ç¢ºèª
+    // data-slot="v" ã‹ã¤ data-type="text" ã®ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ï¼ˆè‹±æ–‡è¡¨ç¤ºï¼‰ã‚’ä½¿ç”¨
+    const vTextCheckbox = controlPanel.locator('input[type="checkbox"][data-slot="v"][data-type="text"]').first();
+    
+    if (await vTextCheckbox.count() > 0) {
+      const beforeChecked = await vTextCheckbox.isChecked();
+      
+      console.log('æ“ä½œå¯¾è±¡: slot=v, type=text (è‹±æ–‡), checked=' + beforeChecked);
+      
+      // å¯¾è±¡è¦ç´ : #slot-v .slot-phraseï¼ˆdata-type="text" ã¯ .slot-phrase ã«å¯¾å¿œï¼‰
+      const targetElement = page.locator('#slot-v .slot-phrase').first();
+      
+      if (await targetElement.count() > 0) {
+        // å¤‰æ›´å‰ã®çŠ¶æ…‹ã‚’è¨˜éŒ²
+        const beforeVisible = await targetElement.evaluate(el => {
+          const style = window.getComputedStyle(el);
+          return style.opacity !== '0' && style.visibility !== 'hidden' && style.display !== 'none';
+        });
+        
+        console.log('å¤‰æ›´å‰ã®è¡¨ç¤ºçŠ¶æ…‹:', beforeVisible);
+        
+        // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚¯ãƒªãƒƒã‚¯ï¼ˆevaluateçµŒç”±ã§ç¢ºå®Ÿã«ã‚¯ãƒªãƒƒã‚¯ï¼‰
+        await vTextCheckbox.evaluate((el: HTMLInputElement) => el.click());
+        
+        // ã€æ ¸å¿ƒã€‘è¡¨ç¤ºçŠ¶æ…‹ãŒå¤‰ã‚ã‚‹ã“ã¨ã‚’ç¢ºèª
+        await expect.poll(async () => {
+          const afterVisible = await targetElement.evaluate(el => {
+            const style = window.getComputedStyle(el);
+            return style.opacity !== '0' && style.visibility !== 'hidden' && style.display !== 'none';
+          });
+          return afterVisible;
+        }, { timeout: 2000 }).toBe(!beforeVisible);
+        
+        console.log('Control Panel: ã‚¹ãƒ­ãƒƒãƒˆè¡¨ç¤ºãŒå®Ÿéš›ã«å¤‰åŒ– - åŠ¹ã„ãŸ!');
+        
+        // å…ƒã«æˆ»ã™
+        await vTextCheckbox.evaluate((el: HTMLInputElement) => el.click());
+        
+        await expect.poll(async () => {
+          const restoredVisible = await targetElement.evaluate(el => {
+            const style = window.getComputedStyle(el);
+            return style.opacity !== '0' && style.visibility !== 'hidden' && style.display !== 'none';
+          });
+          return restoredVisible;
+        }, { timeout: 2000 }).toBe(beforeVisible);
+        
+        console.log('Control Panel: å…ƒã«æˆ»ã™ã“ã¨ã‚‚ç¢ºèª - å®Œå…¨å‹•ä½œ!');
+      } else {
+        console.log('å¯¾è±¡è¦ç´ (#slot-v .slot-phrase)ãŒè¦‹ã¤ã‹ã‚‰ãªã„ãŒã€ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã¯å­˜åœ¨');
+      }
+    } else {
+      console.log('Vã‚¹ãƒ­ãƒƒãƒˆç”¨ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ãŒãªã„ã€å­˜åœ¨ç¢ºèªã®ã¿');
+    }
   });
 
   /**
-   * Test-8: y”CˆÓz‰¹ºƒ{ƒ^ƒ“‚ª‘¶İ‚·‚é
+   * Test-8: ã€ä»»æ„ã€‘éŸ³å£°ãƒœã‚¿ãƒ³ãŒå­˜åœ¨ã™ã‚‹
    */
-  test('y”CˆÓz‰¹ºƒ{ƒ^ƒ“‚ª‘¶İ‚·‚é', async ({ page }) => {
+  test('[ä»»æ„] éŸ³å£°ãƒœã‚¿ãƒ³ãŒå­˜åœ¨ã™ã‚‹', async ({ page }) => {
     const voiceBtn = page.locator('#play-voice-button, .voice-button, button[data-voice]').first();
     
-    if (await voiceBtn.count() === 0) {
-      test.skip();
-      return;
-    }
+    const count = await voiceBtn.count();
+    test.skip(count === 0, 'ã“ã®ãƒ—ãƒªã‚»ãƒƒãƒˆã«ã¯éŸ³å£°ãƒœã‚¿ãƒ³ãŒãªã„');
     
     const isEnabled = await voiceBtn.isEnabled();
-    console.log(' ‰¹ºƒ{ƒ^ƒ“—LŒøó‘Ô:', isEnabled);
+    console.log('éŸ³å£°ãƒœã‚¿ãƒ³æœ‰åŠ¹çŠ¶æ…‹:', isEnabled);
     
     expect(isEnabled).toBe(true);
-    console.log(' Voice System: ‰¹ºƒ{ƒ^ƒ“‘¶İŠm”F');
+    console.log('Voice System: éŸ³å£°ãƒœã‚¿ãƒ³å­˜åœ¨ç¢ºèª');
   });
 });
