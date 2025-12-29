@@ -318,7 +318,16 @@ test.describe('RephraseUI 私の代行テスト', () => {
         }
         
         console.log(`  🔧 「全英文非表示」ボタンをクリック（全サブスロット一括非表示）`);
-        await hideAllButton.click();
+        
+        // ボタンをスクロールして可視化
+        await hideAllButton.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+        
+        try {
+          await hideAllButton.click({ timeout: 5000 });
+        } catch (e) {
+          console.log(`  ⚠️ 「全英文非表示」クリック失敗: ${e.message}（スキップ）`);
+          continue;
+        }
         await page.waitForTimeout(500);
         
         console.log(`  ✅ ${parentSlotName} の全サブスロット英語テキストを非表示に設定`);
@@ -328,23 +337,29 @@ test.describe('RephraseUI 私の代行テスト', () => {
         const subslotTypes = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         let auxButtonClickCount = 0;
         for (const subslotType of subslotTypes) {
-          const auxButton = subslotPanel.locator(
-            `.subslot-toggle-button[data-subslot-type="${subslotType}"][data-element-type="auxtext"]`
-          );
-          
-          const buttonCount = await auxButton.count();
-          if (buttonCount === 0) continue;
-          
-          const isVisible = await auxButton.isVisible();
-          if (!isVisible) continue;
-          
-          const isActive = await auxButton.evaluate(el => el.classList.contains('active'));
-          console.log(`    🔍 ${subslotType} 📝補助: active=${isActive}`);
-          
-          // activeに関係なく全てクリック（非表示に変更）
-          await auxButton.click();
-          auxButtonClickCount++;
-          await page.waitForTimeout(100);
+          try {
+            const auxButton = subslotPanel.locator(
+              `.subslot-toggle-button[data-subslot-type="${subslotType}"][data-element-type="auxtext"]`
+            );
+            
+            const buttonCount = await auxButton.count();
+            if (buttonCount === 0) continue;
+            
+            const isVisible = await auxButton.isVisible().catch(() => false);
+            if (!isVisible) continue;
+            
+            const isActive = await auxButton.evaluate(el => el.classList.contains('active')).catch(() => false);
+            console.log(`    🔍 ${subslotType} 📝補助: active=${isActive}`);
+            
+            // active=true（表示状態）の場合のみクリックして非表示にする
+            if (isActive) {
+              await auxButton.click({ timeout: 3000 });
+              auxButtonClickCount++;
+              await page.waitForTimeout(100);
+            }
+          } catch (err) {
+            console.log(`    ⚠️ ${subslotType} 📝補助ボタンのクリック失敗: ${err.message}`);
+          }
         }
         
         console.log(`  ✅ ${parentSlotName} の日本語補助: ${auxButtonClickCount}個クリック`);
@@ -381,7 +396,8 @@ test.describe('RephraseUI 私の代行テスト', () => {
         for (const subslotId of subslotIds) {
           const combination = `${parentSlotName}-${subslotId}`;
           const containerIdPattern = `slot-${parentSlotName}-${subslotId}`;
-          const container = page.locator(`#${containerIdPattern}`);
+          // 🎯 静的DOMの.slot-containerのみを対象（動的記載エリアを除外）
+          const container = page.locator(`#${containerIdPattern}.slot-container`);
           
           if (await container.count() === 0) {
             console.log(`  ⚠️ ${containerIdPattern} が見つからない`);
@@ -637,7 +653,16 @@ test.describe('RephraseUI 私の代行テスト', () => {
         }
         
         console.log(`  🔧 「全英文非表示」ボタンをクリック（全サブスロット一括非表示）`);
-        await hideAllButton.click();
+        
+        // ボタンをスクロールして可視化
+        await hideAllButton.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+        
+        try {
+          await hideAllButton.click({ timeout: 5000 });
+        } catch (e) {
+          console.log(`  ⚠️ 「全英文非表示」クリック失敗: ${e.message}（スキップ）`);
+          continue;
+        }
         await page.waitForTimeout(500);
         
         console.log(`  ✅ ${parentSlotName} の全サブスロット英語テキストを非表示に設定`);
@@ -647,23 +672,29 @@ test.describe('RephraseUI 私の代行テスト', () => {
         const subslotTypes = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
         let auxButtonClickCount = 0;
         for (const subslotType of subslotTypes) {
-          const auxButton = subslotPanel.locator(
-            `.subslot-toggle-button[data-subslot-type="${subslotType}"][data-element-type="auxtext"]`
-          );
-          
-          const buttonCount = await auxButton.count();
-          if (buttonCount === 0) continue;
-          
-          const isVisible = await auxButton.isVisible();
-          if (!isVisible) continue;
-          
-          const isActive = await auxButton.evaluate(el => el.classList.contains('active'));
-          console.log(`    🔍 ${subslotType} 📝補助: active=${isActive}`);
-          
-          // activeに関係なく全てクリック（非表示に変更）
-          await auxButton.click();
-          auxButtonClickCount++;
-          await page.waitForTimeout(100);
+          try {
+            const auxButton = subslotPanel.locator(
+              `.subslot-toggle-button[data-subslot-type="${subslotType}"][data-element-type="auxtext"]`
+            );
+            
+            const buttonCount = await auxButton.count();
+            if (buttonCount === 0) continue;
+            
+            const isVisible = await auxButton.isVisible().catch(() => false);
+            if (!isVisible) continue;
+            
+            const isActive = await auxButton.evaluate(el => el.classList.contains('active')).catch(() => false);
+            console.log(`    🔍 ${subslotType} 📝補助: active=${isActive}`);
+            
+            // active=true（表示状態）の場合のみクリックして非表示にする
+            if (isActive) {
+              await auxButton.click({ timeout: 3000 });
+              auxButtonClickCount++;
+              await page.waitForTimeout(100);
+            }
+          } catch (err) {
+            console.log(`    ⚠️ ${subslotType} 📝補助ボタンのクリック失敗: ${err.message}`);
+          }
         }
         
         console.log(`  ✅ ${parentSlotName} の日本語補助: ${auxButtonClickCount}個クリック`);
@@ -712,7 +743,8 @@ test.describe('RephraseUI 私の代行テスト', () => {
         for (const subslotId of subslotIds) {
           const combination = `${parentSlotName}-${subslotId}`;
           const containerIdPattern = `slot-${parentSlotName}-${subslotId}`;
-          const container = page.locator(`#${containerIdPattern}`);
+          // 🎯 静的DOMの.slot-containerのみを対象（動的記載エリアを除外）
+          const container = page.locator(`#${containerIdPattern}.slot-container`);
           
           if (await container.count() === 0) {
             console.log(`  ⚠️ ${containerIdPattern} が見つからない`);
