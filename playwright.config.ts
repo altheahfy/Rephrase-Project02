@@ -55,11 +55,14 @@ export default defineConfig({
     // },
   ],
 
-  // Live Server が起動していない場合の警告
+  // Live Server が既に起動していることを前提
+  // webServer設定をコメントアウトして既存サーバーを使用
+  /*
   webServer: {
     command: 'echo "Please start Live Server manually on port 5500"',
     port: 5500,
     timeout: 3 * 1000,
     reuseExistingServer: true,
   },
+  */
 });

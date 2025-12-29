@@ -5,6 +5,46 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2025-12-29] サブスロット表示要素の正確なクラス名（重要）
+
+### 調査結果
+**サブスロットの表示要素は以下のクラスで識別される**:
+
+| 要素タイプ | data-element-type | 実際のHTML要素クラス | 用途 |
+|-----------|-------------------|-------------------|------|
+| 英語テキスト | `text` | `.slot-phrase` | 英文（例: "making"） |
+| 日本語補助テキスト | `auxtext` | `.slot-text` | 補助説明（例: "何を？"） |
+
+**ソース**: `training/js/subslot_visibility_control.js` Line 418-419:
+```javascript
+const targetElements = {
+  'text': subslotElement.querySelectorAll('.slot-phrase'),
+  'auxtext': subslotElement.querySelectorAll('.slot-text')
+};
+```
+
+### 設計判断の理由
+1. **非表示状態の検証には両方のクラスを確認する必要がある**
+   - 英語テキスト（`.slot-phrase`）だけでなく
+   - 日本語補助テキスト（`.slot-text`）も非表示を維持すべき
+   
+2. **命名が直感的でない理由**
+   - `.slot-text`は「英語テキスト」ではなく「日本語補助テキスト」
+   - これはK-MAD以前の開発で決定された歴史的経緯
+
+3. **テストでの使用**
+   ```typescript
+   // 英語テキスト
+   const slotPhrase = container.locator('.slot-phrase');
+   const phraseIsVisible = await slotPhrase.isVisible();
+   
+   // 日本語補助テキスト
+   const slotText = container.locator('.slot-text');
+   const textIsVisible = await slotText.isVisible();
+   ```
+
+---
+
 ## [2025-12-29] Test-1成功：親スロット＋サブスロット組み合わせによる正確な識別
 
 ### 発生した問題
